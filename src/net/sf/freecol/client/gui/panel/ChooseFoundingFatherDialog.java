@@ -72,7 +72,6 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog<FoundingFath
         tb = new JTabbedPane(JTabbedPane.TOP);
 
         FatherDetailPanel details = new FatherDetailPanel(getFreeColClient(), gui, new ColopediaPanel(getFreeColClient(), gui));
-        boolean hasSelectedTab = false;
         for (int index = 0; index < possibleFoundingFathers.size(); index++) {
             FoundingFather father = possibleFoundingFathers.get(index);
             JPanel panel = new JPanel();

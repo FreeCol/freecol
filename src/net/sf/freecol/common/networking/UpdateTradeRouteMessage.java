@@ -70,7 +70,6 @@ public class UpdateTradeRouteMessage extends DOMMessage {
      *         or an error <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Connection connection) {
-        Game game = server.getGame();
         ServerPlayer serverPlayer = server.getPlayer(connection);
 
         if (tradeRoute == null || tradeRoute.getId() == null

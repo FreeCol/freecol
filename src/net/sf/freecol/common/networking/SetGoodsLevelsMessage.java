@@ -80,8 +80,7 @@ public class SetGoodsLevelsMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
-        Game game = player.getGame();
-        ServerPlayer serverPlayer = server.getPlayer(connection);
+       ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Colony colony;
         try {

@@ -83,7 +83,6 @@ public class SpySettlementMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
-        Game game = server.getGame();
 
         Unit unit;
         try {
