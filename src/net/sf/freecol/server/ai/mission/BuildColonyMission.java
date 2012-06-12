@@ -370,10 +370,9 @@ public class BuildColonyMission extends Mission {
         final Player player = unit.getOwner();
         final AIUnit aiUnit = getAIUnit();
         Location newTarget;
-        int value;
         if (reason != null
             || (target instanceof Tile
-                && (value = player.getColonyValue((Tile)target)) < colonyValue)) {
+                && (player.getColonyValue((Tile)target)) < colonyValue)) {
             if ((newTarget = findTarget(aiUnit, true)) == null) {
                 setTarget(null);
                 logger.finest(tag + " unable to retarget: " + this);

@@ -49,8 +49,6 @@ public class BuildingToolTip extends JToolTip {
     }
 
 
-    private GUI gui;
-
 
     /**
      * Creates this BuildingToolTip.
@@ -61,7 +59,6 @@ public class BuildingToolTip extends JToolTip {
      */
     public BuildingToolTip(FreeColClient freeColClient, Building building,
                            GUI gui) {
-        this.gui = gui;
 
         int workplaces = building.getUnitCapacity();
 
