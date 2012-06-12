@@ -250,7 +250,7 @@ public class Map extends FreeColGameObject implements Location {
             Direction[] ret = new Direction[NUMBER_OF_DIRECTIONS];
             ret[0] = this;
 
-            int step = 1, mask = 1, ord = this.ordinal();
+            int step = 1, mask = 1;
             for (int i = 1; i < NUMBER_OF_DIRECTIONS - 1; i += 2) {
                 Direction dr = this.rotate(step);
                 Direction dl = this.rotate(NUMBER_OF_DIRECTIONS - step);
@@ -1018,7 +1018,6 @@ public class Map extends FreeColGameObject implements Location {
             //}
 
             // Collect the parameters for the current node.
-            final int currentCost = currentNode.getCost();
             final int currentMovesLeft = currentNode.getMovesLeft();
             final int currentTurns = currentNode.getTurns();
             final boolean currentOnCarrier = currentNode.isOnCarrier();
