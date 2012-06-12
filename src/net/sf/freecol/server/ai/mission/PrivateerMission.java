@@ -53,7 +53,6 @@ public class PrivateerMission extends Mission {
     private PrivateerMissionState state = PrivateerMissionState.HUNTING;
     private Location nearestPort = null;
     private Tile target = null;
-    private boolean valid = true;
 
 
     /**
@@ -252,7 +251,6 @@ public class PrivateerMission extends Mission {
         if (path == null) {
             if ((path = unit.findOurNearestPort()) == null) {
                 logger.finest("Failed to find port for goods");
-                valid = false;
                 return;
             }
             Tile last = path.getLastNode().getTile();
