@@ -752,11 +752,14 @@ public class Messages {
     public static List<String> getSettlementNames(Player player) {
         List<String> names = new ArrayList<String>();
 
-        // Fallback prefix first
-        names.add(message((player.isEuropean()) ? "Colony" : "Settlement"));
-
-        // Collect the rest
         collectNames(player.getNationID() + ".settlementName.", names);
+
+        // Try the spec-qualified version.
+        if (names.isEmpty()) {
+            collectNames(player.getNationID() + ".settlementName."
+                + player.getSpecification().getId() + ".", names);
+        }
+
         return names;
     }
 

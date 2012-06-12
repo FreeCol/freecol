@@ -375,7 +375,6 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     protected List<String> settlementNames = null;
     protected String capitalName = null;
-    protected String settlementFallback = null;
 
     /**
      * A cache of ship names, including a fallback ship name prefix.
@@ -851,7 +850,6 @@ public class Player extends FreeColGameObject implements Nameable {
         if (settlementNames == null) {
             settlementNames = new ArrayList<String>();
             settlementNames.addAll(Messages.getSettlementNames(this));
-            settlementFallback = settlementNames.remove(0);
             if (isIndian()) {
                 capitalName = settlementNames.remove(0);
                 if (random != null) {
@@ -894,7 +892,8 @@ public class Player extends FreeColGameObject implements Nameable {
         }
 
         // Fallback method
-        final String base = settlementFallback + "-";
+        final String base = Messages.message((isEuropean()) ? "Colony"
+            : "Settlement") + "-";
         String name;
         int i = settlements.size() + 1;
         while (game.getSettlement(name = base + Integer.toString(i)) != null) {
