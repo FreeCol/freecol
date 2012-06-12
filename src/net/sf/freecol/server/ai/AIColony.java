@@ -374,7 +374,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         // a special c-s message to execute the rearrangement--- code to
         // untangle the movement dependencies is non-trivial.
         for (Unit u : scratch.getUnitList()) {
-            AIUnit aiU = getAIUnit(u);
             WorkLocation wl = (WorkLocation)u.getLocation();
             wl = colony.getCorrespondingWorkLocation(wl);
             u.setLocation(wl);
@@ -511,7 +510,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     private void resetExports() {
         final Specification spec = getSpecification();
-        final List<GoodsType> produce = colonyPlan.getPreferredProduction();
         if (fullExport.isEmpty()) {
             // Initialize the exportable sets.
             // Luxury goods, non-raw materials (silver), and raw
