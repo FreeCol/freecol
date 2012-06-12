@@ -118,9 +118,6 @@ public final class InGameController implements NetworkConstants {
 
     private int turnsPlayed = 0;
 
-    /** The most recently saved game file, or <b>null</b>. */
-    private File lastSaveGameFile;
-
     private static FileFilter FSG_FILTER = new FileFilter() {
             public boolean accept(File file) {
                 return file.isFile() && file.getName().endsWith(".fsg");
@@ -1098,7 +1095,6 @@ public final class InGameController implements NetworkConstants {
             server.setActiveUnit(gui.getActiveUnit());
             server.saveGame(file, freeColClient.getMyPlayer().getName(),
                 freeColClient.getClientOptions());
-            lastSaveGameFile = file;
             gui.closeStatusPanel();
             result = true;
         } catch (IOException e) {
