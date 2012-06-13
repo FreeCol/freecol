@@ -24,7 +24,7 @@
     <property name="freecol.metaserver.jar.file" value="${basedir}/FreeCol-metaserver.jar"/>
     <property name="freecol.overview.file" value="${freecol.src.dir}/overview.html"/>
     <property name="test" value="AllTests"/>
-    <property name="miglayout.jar" value="jars/miglayout-3.7.3.1-swing.jar"/>
+    <property name="miglayout.jar" value="jars/miglayout-4.0-swing.jar"/>
     <property name="cli.jar" value="jars/commons-cli-1.1.jar"/>
     <property name="cortado.jar" value="jars/cortado-0.6.0.jar"/>
 <!--
