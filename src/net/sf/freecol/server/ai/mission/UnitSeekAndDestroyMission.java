@@ -137,6 +137,9 @@ public class UnitSeekAndDestroyMission extends Mission {
      */
     private static int scoreSettlementPath(AIUnit aiUnit, PathNode path,
         Settlement settlement) {
+        if (invalidSettlementReason(aiUnit, settlement) != null) {
+            return Integer.MIN_VALUE;
+        }
         final Unit unit = aiUnit.getUnit();
         final CombatModel combatModel = unit.getGame().getCombatModel();
 
@@ -172,6 +175,9 @@ public class UnitSeekAndDestroyMission extends Mission {
      */
     private static int scoreUnitPath(AIUnit aiUnit, PathNode path,
         Unit defender) {
+        if (invalidUnitReason(aiUnit, defender) != null) {
+            return Integer.MIN_VALUE;
+        }
         final Unit unit = aiUnit.getUnit();
         final Tile tile = path.getLastNode().getTile();
         final int turns = path.getTotalTurns();
@@ -296,7 +302,7 @@ public class UnitSeekAndDestroyMission extends Mission {
         final Player owner = aiUnit.getUnit().getOwner();
         return (owner == other) ? Mission.TARGETOWNERSHIP
             : (owner.getStance(other) == Stance.WAR) ? null
-            : (owner.isIndian() || owner.getTension(other).getLevel()
+            : (owner.isIndian() && owner.getTension(other).getLevel()
                 .compareTo(Tension.Level.CONTENT) > 0) ? null
             : "target-at-peace";
     }

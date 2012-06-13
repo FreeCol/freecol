@@ -309,12 +309,12 @@ public class NativeAIPlayer extends AIPlayer {
                     }
                 }
             } else if ((tension = is.getAlarm(enemy)) == null
-                || tension.getLevel().compareTo(Tension.Level.HAPPY) <= 0) {
+                || tension.getLevel().compareTo(Tension.Level.CONTENT) <= 0) {
                 ; // Not regarded as a threat
             } else {
                 // Evaluate the threat
                 float threshold, bonus, value = 0.0f;
-                if (tension.getLevel().compareTo(Tension.Level.CONTENT) <= 0) {
+                if (tension.getLevel().compareTo(Tension.Level.DISPLEASED) <= 0) {
                     threshold = 1.0f;
                     bonus = 0.0f;
                 } else {
@@ -371,18 +371,22 @@ public class NativeAIPlayer extends AIPlayer {
                 }
             });
 
-        // Assign units to attack the threats, chosing closest unit.
+        // Assign units to attack the threats, greedily chosing closest unit.
         while (!threatTiles.isEmpty() && !units.isEmpty()) {
             Tile tile = threatTiles.remove(0);
             int bestDistance = Integer.MAX_VALUE;
             Unit unit = null;
             for (Unit u : units) {
+                AIUnit aiu = aiMain.getAIUnit(u);
+                if (UnitSeekAndDestroyMission.invalidReason(aiu,
+                        tile.getDefendingUnit(u)) != null) continue;
                 int distance = u.getTile().getDistanceTo(tile);
                 if (bestDistance > distance) {
                     bestDistance = distance;
                     unit = u;
                 }
             }
+            if (unit == null) continue; // Declined to attack.
             units.remove(unit);
             AIUnit aiUnit = aiMain.getAIUnit(unit);
             Unit target = tile.getDefendingUnit(unit);

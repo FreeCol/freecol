@@ -641,7 +641,7 @@ public abstract class Mission extends AIObject {
             .getAIPlayer(aiUnit.getUnit().getOwner());
 
         return new GoalDecider() {
-            private int bestValue = Integer.MIN_VALUE;
+            private int bestValue = -1;
             private PathNode best = null;
 
             public PathNode getGoal() { return best; }
