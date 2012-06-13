@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTradeItem;
@@ -1028,6 +1029,9 @@ public class EuropeanAIPlayer extends AIPlayer {
      * conditions.
      */
     private void initializeMissions() {
+        // Debug setup is very different.
+        if (FreeColDebugger.isInDebugMode()) return;
+
         AIMain aiMain = getAIMain();
 
         // Give the ship a transport mission.
