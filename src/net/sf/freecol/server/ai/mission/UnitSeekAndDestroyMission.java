@@ -348,8 +348,7 @@ public class UnitSeekAndDestroyMission extends Mission {
                 != null) ? reason
             : (tile == null) ? "target-not-on-map"
             : (tile.getSettlement() != null) ? "target-in-settlement"
-            : ((target.isNaval() && !tile.isLand())
-                != unit.isNaval()) ? "target-incompatible"
+            : (!unit.isTileAccessible(tile)) ? "target-incompatible"
             : null;
     }
 

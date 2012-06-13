@@ -1038,10 +1038,7 @@ public class Map extends FreeColGameObject implements Location {
                 // Check for disembarkation on new tile, setting
                 // moveUnit to the unit that would actually move.
                 boolean moveOnCarrier = currentOnCarrier
-                    && (!moveTile.isLand()
-                        || (moveTile.getSettlement() != null
-                            && (moveTile.getSettlement().getOwner()
-                                == currentUnit.getOwner())));
+                    && carrier.isTileAccessible(moveTile);
                 Unit moveUnit = (moveOnCarrier) ? carrier : unit;
                 int moveMovesLeft = (currentOnCarrier && !moveOnCarrier)
                     ? moveUnit.getInitialMovesLeft()

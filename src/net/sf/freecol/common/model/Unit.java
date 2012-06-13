@@ -1581,6 +1581,20 @@ public class Unit extends FreeColGameObject
     }
 
     /**
+     * Does a basic check whether a unit can ever expect to move to a tile.
+     *
+     * @param tile The code <code>Tile</code> to check.
+     * @return True if some sort of legal move to the tile exists, including
+     *     special cases where there is an interaction but the unit does not
+     *     actually move, such as trade.
+     */
+    public boolean isTileAccessible(Tile tile) {
+        return (isNaval()) ? !tile.isLand() || (tile.getSettlement() != null
+            && getOwner() == tile.getSettlement().getOwner())
+            : tile.isLand();
+    }
+
+    /**
      * Gets the cost of moving this <code>Unit</code> onto the given
      * <code>Tile</code>. A call to {@link #getMoveType(Tile)} will return
      * <code>MOVE_NO_MOVES</code>, if {@link #getMoveCost} returns a move cost
@@ -1622,8 +1636,7 @@ public class Unit extends FreeColGameObject
             }
         }
 
-        if (isNaval() && from.isLand()
-            && from.getSettlement() == null) {
+        if (isBeached(from)) {
             // Ship on land due to it was in a colony which was abandoned
             cost = ml;
         } else if (cost > ml) {
@@ -3263,8 +3276,18 @@ public class Unit extends FreeColGameObject
      * @return True if the unit is a beached ship.
      */
     public boolean isBeached() {
-        return isNaval() && getTile() != null && getTile().isLand()
-            && getSettlement() == null;
+        return isBeached(getTile());
+    }
+
+    /**
+     * Would this unit be beached if it was on a particular tile?
+     *
+     * @param tile The <code>Tile</code> to check.
+     * @return True if the unit is a beached ship.
+     */
+    public boolean isBeached(Tile tile) {
+        return isNaval() && tile != null && tile.isLand()
+            && tile.getSettlement() == null;
     }
 
     /**

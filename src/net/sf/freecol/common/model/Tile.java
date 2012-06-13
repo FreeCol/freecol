@@ -1158,12 +1158,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public boolean canAdd(Locatable locatable) {
         if (locatable instanceof Unit) {
-            Unit unit = (Unit) locatable;
-            if (unit.isNaval()) {
-                return isLand() ? getSettlement() != null : true;
-            } else {
-                return isLand();
-            }
+            return ((Unit)locatable).isTileAccessible(this);
         } else if (locatable instanceof TileImprovement) {
             return ((TileImprovement) locatable).getType().isTileTypeAllowed(getType());
         } else {
