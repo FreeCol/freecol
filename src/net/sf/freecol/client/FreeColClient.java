@@ -523,7 +523,11 @@ public final class FreeColClient {
     public void quit() {
         getConnectController().quitGame(isSinglePlayer());
         exitActions();
-        gui.quit();
+        try {
+            gui.quit();
+        } catch (Exception e) {
+            System.exit(1);
+        }
         System.exit(0);
     }
 

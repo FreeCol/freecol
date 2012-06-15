@@ -441,15 +441,9 @@ public class GUI {
     }
 
 
-    public void quit() {
+    public void quit() throws Exception {
         if (!isWindowed()) {
-            try {
                 gd.setFullScreenWindow(null);
-            } catch(Exception e) {
-                // this can fail, but who cares?
-                // we are quitting anyway
-                System.exit(1);
-            }
         }
     }
 

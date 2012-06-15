@@ -444,16 +444,23 @@ public class ClientOptions extends OptionGroup {
             }
         }
     };
+    
+    
+    private class MessageSourceComparator implements Comparator<ModelMessage> {
+        private Game game;
 
-    private Comparator<ModelMessage> messageSourceComparator = new Comparator<ModelMessage>() {
         // sort according to message source
+        
+        private MessageSourceComparator(Game game) {
+            this.game = game;
+        }
+        
         public int compare(ModelMessage message1, ModelMessage message2) {
             String sourceId1 = message1.getSourceId();
             String sourceId2 = message2.getSourceId();
             if (sourceId1 == sourceId2) {
                 return messageTypeComparator.compare(message1, message2);
             }
-            Game game = FreeCol.getFreeColClient().getGame();
             FreeColGameObject source1 = game.getMessageSource(message1);
             FreeColGameObject source2 = game.getMessageSource(message2);
             int base = getClassIndex(source1) - getClassIndex(source2);
@@ -481,7 +488,9 @@ public class ClientOptions extends OptionGroup {
             }
         }
 
-    };
+
+    }
+    
 
     private Comparator<ModelMessage> messageTypeComparator = new Comparator<ModelMessage>() {
         // sort according to message type
@@ -666,10 +675,10 @@ public class ClientOptions extends OptionGroup {
      *
      * @return a <code>Comparator</code> value
      */
-    public Comparator<ModelMessage> getModelMessageComparator() {
+    public Comparator<ModelMessage> getModelMessageComparator(Game game) {
         switch (getInteger(MESSAGES_GROUP_BY)) {
         case MESSAGES_GROUP_BY_SOURCE:
-            return messageSourceComparator;
+            return new MessageSourceComparator(game);
         case MESSAGES_GROUP_BY_TYPE:
             return messageTypeComparator;
         default:

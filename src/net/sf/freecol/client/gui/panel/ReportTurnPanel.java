@@ -82,7 +82,7 @@ public final class ReportTurnPanel extends ReportPanel {
         this._messages = messages;
 
         Comparator<ModelMessage> comparator
-            = options.getModelMessageComparator();
+            = options.getModelMessageComparator(freeColClient.getGame());
         if (comparator != null) {
             Arrays.sort(messages, comparator);
         }

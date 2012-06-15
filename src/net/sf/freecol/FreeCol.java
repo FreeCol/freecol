@@ -94,8 +94,6 @@ public final class FreeCol {
                             introVideo = true;
     private static String logFile = null;
 
-    private static FreeColClient freeColClient;
-
     private static boolean standAloneServer = false;
     private static boolean publicServer = true;
 
@@ -166,7 +164,7 @@ public final class FreeCol {
         if (standAloneServer) {
             startServer();
         } else {
-            freeColClient = new FreeColClient(FreeColDirectories.getSavegameFile(), windowSize, sound, splashFilename, introVideo, fontName);
+            FreeColClient freeColClient = new FreeColClient(FreeColDirectories.getSavegameFile(), windowSize, sound, splashFilename, introVideo, fontName);
         }
     }
 
@@ -250,15 +248,6 @@ public final class FreeCol {
      */
     public static int getDefaultPort() {
         return DEFAULT_PORT;
-    }
-
-    /**
-     * Gets the <code>FreeColClient</code>.
-     * @return The <code>FreeColClient</code>, or <code>null</code>
-     *      if the game is run as a standalone server.
-     */
-    public static FreeColClient getFreeColClient() {
-        return freeColClient;
     }
 
     /**
