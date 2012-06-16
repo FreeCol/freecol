@@ -23,6 +23,7 @@ package net.sf.freecol.client.gui.sound;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -222,35 +223,26 @@ public class SoundPlayer {
             DataLine.Info info = new DataLine.Info(SourceDataLine.class,
                                                    audioFormat);
             try {
-                line = (SourceDataLine) mixer.getLine(info);
+                line = (SourceDataLine)mixer.getLine(info);
                 line.open(audioFormat);
-                line.start();
-                setVolume(line, volume);
             } catch (Exception e) {
                 logger.log(Level.WARNING, "Can not open SourceDataLine", e);
+                return null;
             }
+            line.start();
+            setVolume(line, volume);
             return line;
         }
 
         private boolean playSound(File file) {
             boolean ret = false;
 
-            FileInputStream fis = null;
-            try {
-                fis = new FileInputStream(file);
-            } catch (FileNotFoundException e) {
-                logger.warning("Could not find audio file: " + file.getName());
-                return false;
-            } 
-
             AudioInputStream in = null;
-            if (fis != null) {
-                try {
-                    in = AudioSystem.getAudioInputStream(fis);
-                } catch (Exception e) {
-                    logger.warning("Could not get audio input stream for: "
-                        + file.getName());
-                }
+            try {
+                in = AudioSystem.getAudioInputStream(file);
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "No audio input stream for: "
+                    + file.getName(), e);
             }
 
             AudioInputStream din = null;
@@ -272,44 +264,40 @@ public class SoundPlayer {
             }
 
             SourceDataLine line = null;
-            if (decodedFormat != null) {
-                line = openLine(decodedFormat);
+            if (din != null) {
+                line = openLine(din.getFormat());
             }
 
             if (line != null) {
                 try { 
                     startPlaying();
-                    rawplay(din, line);
+                    rawPlay(din, line);
                     ret = true;
                 } catch (IOException e) {
                     logger.log(Level.WARNING, "Error playing: "
                         + file.getName(), e);
                 } finally {
                     stopPlaying();
-                }
-            }
-
-            try {
-                if (line != null) {
                     line.drain();
                     line.stop();
                     line.close();
+                    try {
+                        din.close();
+                        in.close();
+                    } catch (IOException e) {}
                 }
-                if (din != null) din.close();
-                if (in != null) in.close();
-                if (fis != null) fis.close();
-            } catch (IOException e) {} // Ignore errors on close
+            } 
 
             return ret;
         }
 
-        private void rawplay(AudioInputStream din, SourceDataLine lin)
+        private void rawPlay(AudioInputStream in, SourceDataLine lin)
             throws IOException {
             for (;;) {
                 if (!keepPlaying()) {
                     break;
                 }
-                int read = din.read(data, 0, data.length);
+                int read = in.read(data, 0, data.length);
                 if (read < 0) {
                     break;
                 } else if (read > 0) {
