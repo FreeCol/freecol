@@ -155,14 +155,12 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
             }
         }
 
-        specificationBox.setRenderer(new FreeColModFileRenderer());
+        setRenderers();
 
         JButton cancel = new JButton( Messages.message("cancel") );
         JLabel nameLabel = localizedLabel("name");
 
         setCancelComponent(cancel);
-
-        nationalAdvantages.setRenderer(new AdvantageRenderer());
 
         group.add(single);
         group.add(join);
@@ -216,6 +214,16 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         enableComponents();
 
         setSize(getPreferredSize());
+    }
+
+    /**
+     * Moved these here out of the constructor to allow
+     * warning suppression to work.
+     */
+    @SuppressWarnings("unchecked") // FIXME in Java7
+    private void setRenderers() {
+        specificationBox.setRenderer(new FreeColModFileRenderer());
+        nationalAdvantages.setRenderer(new AdvantageRenderer());
     }
 
 
