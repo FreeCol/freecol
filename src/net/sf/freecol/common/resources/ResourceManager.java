@@ -182,12 +182,11 @@ public class ResourceManager {
         }
         preloadThread = new Thread(FreeCol.CLIENT_THREAD+"Resource loader") {
             public void run() {
-                List<Resource> resources =
-                    new LinkedList<Resource>(mergedContainer.getResources().values());
+                // Make a local copy of the resources to load.
+                List<Resource> resources
+                    = new LinkedList<Resource>(mergedContainer.getResources().values());
                 for (Resource r : resources) {
-                    if (preloadThread != this) {
-                        return;
-                    }
+                    if (preloadThread != this) return; // Cancelled!
                     r.preload();
                 }
             }
@@ -204,41 +203,39 @@ public class ResourceManager {
             dirty = false;
             preloadThread = null;
             createMergedContainer();
-            startBackgroundPreloading(lastWindowSize);
+            if (!"true".equals(System.getProperty("java.awt.headless", "false"))) {
+                startBackgroundPreloading(lastWindowSize);
+            }
         }
     }
 
     /**
-     * Creates a merged container for easy access to resources.
+     * Creates a merged container containing all the resources.
      */
     private static void createMergedContainer() {
-        ResourceMapping _mergedContainer = new ResourceMapping();
-        _mergedContainer.addAll(baseMapping);
-        _mergedContainer.addAll(tcMapping);
-        _mergedContainer.addAll(campaignMapping);
-        _mergedContainer.addAll(scenarioMapping);
-        ListIterator<ResourceMapping> it = modMappings.listIterator(modMappings.size());
-        while (it.hasPrevious()) {
-            _mergedContainer.addAll(it.previous());
-        }
-        _mergedContainer.addAll(gameMapping);
-        mergedContainer = _mergedContainer;
+        ResourceMapping mc = new ResourceMapping();
+        mc.addAll(baseMapping);
+        mc.addAll(tcMapping);
+        mc.addAll(campaignMapping);
+        mc.addAll(scenarioMapping);
+        for (ResourceMapping rm : modMappings) mc.addAll(rm);
+        mc.addAll(gameMapping);
+        mergedContainer = mc;
     }
 
     /**
-     * Returns the resource of the given type.
+     * Gets the resource of the given type.
+     *
      * @param <T> The type of the resource to get.
      * @param resourceId The resource to get.
      * @param type The type of the resource to get.
      * @return The resource if there is one with the given
-     *      resourceId and type, or else <code>null</code>.
+     *     resourceId and type, or else <code>null</code>.
      */
-    public static <T> T getResource(final String resourceId, final Class<T> type) {
+    public static <T> T getResource(final String resourceId,
+                                    final Class<T> type) {
+        updateIfDirty();
         final Resource r = mergedContainer.get(resourceId);
-        if (type.isInstance(r)) {
-            return type.cast(r);
-        }
-
         if (r == null) { // Log only unexpected failures
             if (!resourceId.startsWith("dynamic.")) {
                 logger.finest("getResource(" + resourceId
@@ -249,7 +246,7 @@ public class ResourceManager {
                           + ", " + type.getName() + ") -> "
                           + r.getClass().getName());
         }
-        return null;
+        return (type.isInstance(r)) ? type.cast(r) : null;
     }
 
     public static boolean hasResource(final String resourceId) {
@@ -426,6 +423,7 @@ public class ResourceManager {
      *      by that name.
      */
     public static Color getProductionColor(int bonus) {
+        updateIfDirty();
         return ResourceManager.getColor("productionBonus." + bonus + ".color");
     }
 
@@ -477,6 +475,7 @@ public class ResourceManager {
      *     to load.
      */
     public static Font getFont(final String resource, int style) {
+        updateIfDirty();
         Font font = ResourceManager.getFont(resource);
         return font.deriveFont(style);
     }
@@ -490,6 +489,7 @@ public class ResourceManager {
      *     to load.
      */
     public static Font getFont(final String resource, float size) {
+        updateIfDirty();
         Font font = ResourceManager.getFont(resource);
         return font.deriveFont(size);
     }
@@ -503,6 +503,7 @@ public class ResourceManager {
      *     to load.
      */
     public static Font getFont(final String resource, int style, float size) {
+        updateIfDirty();
         Font font = ResourceManager.getFont(resource);
         return font.deriveFont(style, size);
     }
@@ -514,6 +515,7 @@ public class ResourceManager {
      * @return The <code>FAFile</code> found in a FAFileResource.
      */
     public static FAFile getFAFile(final String resource) {
+        updateIfDirty();
         final FAFileResource r = getResource(resource, FAFileResource.class);
         return (r == null) ? null : r.getFAFile();
     }
@@ -525,6 +527,7 @@ public class ResourceManager {
      * @return A <code>File</code> containing the audio data.
      */
     public static File getAudio(final String resource) {
+        updateIfDirty();
         final AudioResource r = getResource(resource, AudioResource.class);
         return (r == null) ? null : r.getAudio();
     }

@@ -21,11 +21,13 @@ package net.sf.freecol.client.gui.sound;
 
 import java.awt.Dimension;
 import java.io.File;
+import java.io.IOException;
 import javax.sound.sampled.AudioSystem;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.common.io.FreeColDataFile;
 import net.sf.freecol.common.io.FreeColDirectories;
+import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.PercentageOption;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -47,6 +49,9 @@ public class SoundTest extends FreeColTestCase {
         } catch (Exception e) {
             fail("Could not construct sound player: " + e.getMessage());
         }
+        File baseDirectory = FreeColDirectories.getBaseDirectory();
+        FreeColDataFile baseData = new FreeColDataFile(baseDirectory);
+        ResourceManager.setBaseMapping(baseData.getResourceMapping());
     }
 
     @Override
@@ -79,11 +84,6 @@ public class SoundTest extends FreeColTestCase {
     }
 
     public void testSound() {
-        File baseDirectory = FreeColDirectories.getBaseDirectory();
-        FreeColDataFile baseData = new FreeColDataFile(baseDirectory);
-        ResourceManager.setBaseMapping(baseData.getResourceMapping());
-        ResourceManager.preload(new Dimension(1,1));
-
         // these sounds are base resources, and should be enough for a test
         playSound("sound.intro.general");
         playSound("sound.event.illegalMove");
@@ -91,10 +91,12 @@ public class SoundTest extends FreeColTestCase {
     }
 
     public void testClassic() {
-        File baseDirectory = FreeColDirectories.getRulesClassicDirectory();
-        FreeColDataFile baseData = new FreeColDataFile(baseDirectory);
-        ResourceManager.setBaseMapping(baseData.getResourceMapping());
-        ResourceManager.preload(new Dimension(1,1));
+        try {
+            FreeColTcFile tcData = new FreeColTcFile("classic");
+            ResourceManager.setTcMapping(tcData.getResourceMapping());
+        } catch (IOException e) {
+            fail("Could not load classic ruleset.");
+        }
 
         playSound("sound.intro.model.nation.english");
         playSound("sound.intro.model.nation.dutch");

@@ -128,9 +128,8 @@ public final class FreeColClient {
      */
     private boolean loggedIn = false;
 
-
     /**
-     * Describe headless here.
+     * Run in headless mode.
      */
     private boolean headless;
 
@@ -150,7 +149,8 @@ public final class FreeColClient {
                          final Dimension size,
                          final boolean sound,
                          final String splashFilename,
-                         final boolean showOpeningVideo, String fontName) {
+                         final boolean showOpeningVideo,
+                         final String fontName) {
         gui = new GUI(this);
 
         // Look for base data directory.  Failure is fatal.
@@ -165,13 +165,13 @@ public final class FreeColClient {
             System.exit(1);
         }
 
+        // headless mode is enable for the test suite, where it now
+        // works again.
+        // TODO: It would be nice to have it useful for running full
+        // automated debug games without GUI, but that is untested and
+        // probably still borked.  Fix.
         headless = "true".equals(System.getProperty("java.awt.headless",
                 "false"));
-        // TODO: make headless operation work
-        if (headless) {
-            System.err.println("Headless operation disabled.\n");
-            System.exit(1);
-        }
 
         mapEditor = false;
 
@@ -219,7 +219,7 @@ public final class FreeColClient {
         loadClientOptions(savedGame);
 
         // Once resources are in place, get preloading started.
-        ResourceManager.preload(windowSize);
+        if (!headless) ResourceManager.preload(windowSize);
 
         // Work out the main font now that resources are loaded.
         Font font = null;

@@ -17,11 +17,13 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
 package net.sf.freecol.client;
 
 import static junit.framework.Assert.assertTrue;
 import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.server.FreeColServer;
+
 
 public class ClientTestHelper {
 
@@ -29,25 +31,23 @@ public class ClientTestHelper {
     public static final String username = "test";
 
     public static FreeColClient startClient(FreeColServer freeColServer) {
+        // This is not ideal, but headless mode allows cutting off
+        // some excessive resource loading, especially in the sound
+        // tests where the resource manager is exercised.
+        System.setProperty("java.awt.headless", "true"); 
 
-        //ImageLibrary imageLibrary = new ImageLibrary();
         FreeColClient client = new FreeColClient(null, null, false, null, false, null);
         ConnectController connectController = client.getConnectController();
         client.setFreeColServer(freeColServer);
         client.setSinglePlayer(true);
-        client.setHeadless(true);
         boolean connected = connectController.login(username, "127.0.0.1",
                                                     freeColServer.getPort());
         assertTrue(connected);
         client.getPreGameController().setReady(true);
-        //client.getClientOptions().putOption(new RangeOption(ClientOptions.ANIMATION_SPEED, 0));
-        //assertEquals(0, client.getClientOptions().getInt(ClientOptions.ANIMATION_SPEED));
         return client;
     }
     
     public static void stopClient(FreeColClient client) {
-        
         client.getConnectController().quitGame(false);
     }
-
 }
