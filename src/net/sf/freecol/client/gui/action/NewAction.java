@@ -49,10 +49,10 @@ public class NewAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        if (!freeColClient.isMapEditor()) {
-            freeColClient.newGame();
-        } else {
+        if (freeColClient.isMapEditor()) {
             freeColClient.getMapEditorController().newMap();
+        } else {
+            freeColClient.newGame();
         }
     }
 }
