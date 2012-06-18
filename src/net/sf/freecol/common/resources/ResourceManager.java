@@ -26,7 +26,6 @@ import java.awt.Image;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.logging.Logger;
 

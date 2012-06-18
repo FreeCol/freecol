@@ -627,15 +627,6 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
     }
 
     /**
-     * Set the <code>Editable</code> value.
-     *
-     * @param newEditable boolean, the new Editable value
-     */
-    protected void setEditable(boolean newEditable) {
-        this.editable = newEditable;
-    }
-
-    /**
      * Sort the given modifiers according to type.
      *
      * @param result Set of <code>Modifier</code>

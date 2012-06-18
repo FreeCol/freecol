@@ -19,9 +19,9 @@
 
 package net.sf.freecol.client.gui.sound;
 
-import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
+
 import javax.sound.sampled.AudioSystem;
 
 import net.sf.freecol.client.ClientOptions;

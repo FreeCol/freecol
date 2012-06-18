@@ -24,7 +24,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.Thread.UncaughtExceptionHandler;
-import java.security.SecureRandom;
 import java.util.Locale;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
@@ -40,6 +39,7 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.FreeColSeed;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColSavegameFile;
@@ -110,8 +110,6 @@ public final class FreeCol {
 
     private static String splashFilename = DEFAULT_SPLASH_FILE;
     private static Dimension windowSize;
-
-    private static long freeColSeed = 0L;
 
     private static int freeColTimeout = -1;
 
@@ -580,7 +578,7 @@ public final class FreeCol {
             if (line.hasOption("seed")) {
                 String seedStr = line.getOptionValue("seed");
                 try {
-                    freeColSeed = Long.parseLong(seedStr);
+                    FreeColSeed.initialize(Long.parseLong(seedStr));
                 } catch (NumberFormatException e) {
                     System.err.println("Ignoring bad seed: " + seedStr);
                 }
@@ -650,27 +648,6 @@ public final class FreeCol {
      */
     public static String getLogFile() {
         return logFile;
-    }
-
-    /**
-     * Gets the seed for the PRNG.
-     *
-     * @return The seed.
-     */
-    public static long getFreeColSeed() {
-        if (freeColSeed == 0L) {
-            freeColSeed = new SecureRandom().nextLong();
-            logger.info("Using seed: " + freeColSeed);
-        }
-        return freeColSeed;
-    }
-
-    /**
-     * Increments the seed for the PRNG.
-     */
-    public static void incrementFreeColSeed() {
-        freeColSeed = getFreeColSeed() + 1;
-        logger.info("Reseeded with: " + freeColSeed);
     }
 
     /**

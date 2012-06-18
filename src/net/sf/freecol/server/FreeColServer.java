@@ -50,6 +50,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.FreeColSeed;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
@@ -283,7 +284,7 @@ public final class FreeColServer {
         this.singlePlayer = singlePlayer;
         this.port = port;
         this.name = name;
-        this.random = new Random(FreeCol.getFreeColSeed());
+        this.random = new Random(FreeColSeed.getFreeColSeed());
 
         userConnectionHandler = new UserConnectionHandler(this);
         preGameController = new PreGameController(this);
@@ -373,7 +374,7 @@ public final class FreeColServer {
             throw fe;
         }
         if (random == null) {
-            this.random = new Random(FreeCol.getFreeColSeed());
+            this.random = new Random(FreeColSeed.getFreeColSeed());
         }
         inGameController = new InGameController(this, random);
         mapGenerator = new SimpleMapGenerator(random, getSpecification());

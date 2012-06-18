@@ -31,7 +31,6 @@ import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.control.InGameInputHandler;
@@ -43,6 +42,7 @@ import net.sf.freecol.client.gui.action.ActionManager;
 import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
 import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.FreeColSeed;
 import net.sf.freecol.common.io.FreeColDataFile;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColModFile;
@@ -507,7 +507,7 @@ public final class FreeColClient {
                                          "stopCurrentGame.yes",
                                          "stopCurrentGame.no")) {
                 getConnectController().quitGame(true);
-                FreeCol.incrementFreeColSeed();
+                FreeColSeed.incrementFreeColSeed();
             } else {
                 return;
             }
