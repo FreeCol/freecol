@@ -143,7 +143,7 @@ abstract public class FreeColGameObject extends FreeColObject {
      */
     protected void setDefaultId(Game game) {
         setId(getRealXMLElementTagName() + ":"
-              + ((ServerGame)game).getNextID());
+              + game.getNextID());
     }
 
     /**

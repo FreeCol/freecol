@@ -44,6 +44,8 @@ import net.sf.freecol.common.option.OptionGroup;
 
 import org.w3c.dom.Element;
 
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
 
 /**
  * The main component of the game model.
@@ -1241,5 +1243,9 @@ public class Game extends FreeColGameObject {
      */
     public static String getXMLElementTagName() {
         return "game";
+    }
+
+    public String getNextID() {
+        throw new NotImplementedException();
     }
 }
