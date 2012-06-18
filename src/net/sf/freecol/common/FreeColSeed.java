@@ -13,7 +13,7 @@ public class FreeColSeed {
 
     public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
 
-    public static final String REVISION = "$Revision: 2763 $";
+    public static final String REVISION = "$Revision$";
 
     private static long freeColSeed;
     
