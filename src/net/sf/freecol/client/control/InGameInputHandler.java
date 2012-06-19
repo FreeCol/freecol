@@ -432,7 +432,7 @@ public final class InGameInputHandler extends InputHandler {
             fcc.getInGameController().nextActiveUnit(defTile);
         }
 
-        fcc.getActionManager().update();
+        fcc.updateActions();
     }
 
     /**

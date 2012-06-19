@@ -168,7 +168,7 @@ public final class MapEditorController {
             }
             mapGenerator.createMap(game);
             gui.setFocus(game.getMap().getTile(1,1));
-            freeColClient.getActionManager().update();
+            freeColClient.updateActions();
             gui.refresh();
         } catch (FreeColException e) {
             gui.closeMenus();
@@ -270,7 +270,7 @@ public final class MapEditorController {
                         public void run() {
                             gui.closeStatusPanel();
                             gui.setFocus(freeColClient.getGame().getMap().getTile(1,1));
-                            freeColClient.getActionManager().update();
+                            freeColClient.updateActions();
                             gui.refresh();
                         }
                     } );

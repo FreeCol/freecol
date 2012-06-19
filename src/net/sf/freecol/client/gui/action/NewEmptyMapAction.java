@@ -73,7 +73,7 @@ public class NewEmptyMapAction extends MapboardAction {
         mapGenerator.createEmptyMap(game, new boolean[size.width][size.height]);
 
         gui.setFocus(game.getMap().getTile(1,1));
-        freeColClient.getActionManager().update();
+        freeColClient.updateActions();
         gui.refresh();
     }
 

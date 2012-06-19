@@ -36,7 +36,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
-import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.FreeColClient; 
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
@@ -177,7 +177,7 @@ public final class ConnectController {
             }
         }
         if (loadedMod) { // Update actions in case new ones loaded.
-            freeColClient.getActionManager().update();
+            freeColClient.updateActions();
         }
     }
 
@@ -332,8 +332,7 @@ public final class ConnectController {
             return false;
         }
         freeColClient.setMyPlayer(player);
-        freeColClient.getActionManager()
-            .addSpecificationActions(game.getSpecification());
+        freeColClient.addSpecificationActions(game.getSpecification());
         logger.info("FreeColClient logged in as " + userName
                     + "/" + player.getId());
 

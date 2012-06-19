@@ -318,14 +318,10 @@ public final class FreeColClient {
     }
 
 
-    /**
-     * Gets the object responsible for keeping and updating the actions.
-     *
-     * @return The <code>ActionManager</code>.
-     */
-    public ActionManager getActionManager() {
-        return actionManager;
+    public void updateActions() {
+        actionManager.update();
     }
+    
 
     /**
      * Gets the <code>Client</code> that can be used to send messages to the
@@ -730,5 +726,17 @@ public final class FreeColClient {
         if (actionManager != null)
             actionManager.update();
     }
+
+
+
+    public ActionManager getActionManager() {
+        return actionManager;
+    }
+    
+    public void addSpecificationActions(Specification specification) {
+        actionManager.addSpecificationActions(specification);
+    }
+    
+    
     
 }

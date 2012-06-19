@@ -78,7 +78,7 @@ public final class ClientOptionsDialog extends OptionsDialog  {
             File file = FreeColDirectories.getClientOptionsFile();
             try {
                 getGroup().save(file);
-                getFreeColClient().getActionManager().update();
+                getFreeColClient().updateActions();
                 getGUI().resetMenuBar();
                 // Immediately redraw the minimap if that was updated.
                 getGUI().updateMapControls();

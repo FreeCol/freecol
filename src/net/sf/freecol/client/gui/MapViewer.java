@@ -1342,7 +1342,7 @@ public final class MapViewer {
                 ret = true;
             }
         } else {
-            freeColClient.getActionManager().update();
+            freeColClient.updateActions();
             gui.updateMenuBar();
             gui.updateMapControls();
         }
@@ -1478,7 +1478,7 @@ public final class MapViewer {
             }
         }
 
-        freeColClient.getActionManager().update();
+        freeColClient.updateActions();
         gui.updateMenuBar();
 
         gui.updateMapControls();

@@ -1263,7 +1263,7 @@ public final class InGameController implements NetworkConstants {
                         }
                     };
             }
-            freeColClient.getActionManager().update();
+            freeColClient.updateActions();
             if (SwingUtilities.isEventDispatchThread()) {
                 uiTask.run();
             } else {
@@ -1928,7 +1928,7 @@ public final class InGameController implements NetworkConstants {
         if (askServer().declareIndependence(nationName, countryName)
             && player.getPlayerType() == PlayerType.REBEL) {
             gui.showDeclarationDialog();
-            freeColClient.getActionManager().update();
+            freeColClient.updateActions();
             nextModelMessage();
         }
     }
@@ -2245,7 +2245,7 @@ public final class InGameController implements NetworkConstants {
         // TODO: check if this is necessary for all actions?
         SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    freeColClient.getActionManager().update();
+                    freeColClient.updateActions();
                     gui.updateMenuBar();
                 }
             });

@@ -387,7 +387,7 @@ public final class Canvas extends JDesktopPane {
     public void add(Component comp, Integer i) {
         addToCanvas(comp, i);
         gui.updateMenuBar();
-        freeColClient.getActionManager().update();
+        freeColClient.updateActions();
     }
 
     /**
@@ -596,7 +596,7 @@ public final class Canvas extends JDesktopPane {
         removeFromCanvas(comp);
         final boolean takeFocus = (comp != statusPanel);
         gui.updateMenuBar();
-        freeColClient.getActionManager().update();
+        freeColClient.updateActions();
         if (takeFocus && !isShowingSubPanel()) {
             requestFocus();
         }
@@ -885,7 +885,7 @@ public final class Canvas extends JDesktopPane {
         clientOptionsDialogShowing = true;
         OptionGroup group = showFreeColDialog(clientOptionsDialog, null);
         clientOptionsDialogShowing = false;
-        freeColClient.getActionManager().update();
+        freeColClient.updateActions();
         return group;
     }
 
