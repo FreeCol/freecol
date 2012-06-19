@@ -18,14 +18,12 @@
  */
 
 
-package net.sf.freecol.client.networking;
+package net.sf.freecol.common.networking;
 
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.MessageHandler;
 
 import org.w3c.dom.Element;
 

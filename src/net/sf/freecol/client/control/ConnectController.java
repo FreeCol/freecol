@@ -40,7 +40,6 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
-import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.common.io.FreeColDirectories;
@@ -52,6 +51,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.networking.Client;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.LoginMessage;
@@ -303,7 +303,7 @@ public final class ConnectController {
      */
     public boolean login(String userName, String host, int port) {
         freeColClient.setMapEditor(false);
-
+ 
         Client client = freeColClient.getClient();
         if (client != null) client.disconnect();
 
