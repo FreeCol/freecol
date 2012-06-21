@@ -20,12 +20,10 @@
 
 package net.sf.freecol.common.networking;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -146,16 +144,7 @@ public class ServerAPI {
      */
     private Element askExpecting(DOMMessage message, String tag,
                                  HashMap<String, String> results) {
-        Element request = message.toXMLElement();
-        Element reply;
-        try {
-            reply = freeColClient.getClient().getConnection()
-                .askDumping(request);
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "Could not send \""
-                + request.getTagName() + "\"-message.", e);
-            reply = null;
-        }
+        Element reply = freeColClient.getClient().ask(message.toXMLElement());
 
         if (reply == null) return null;
         if ("error".equals(reply.getTagName())) {
