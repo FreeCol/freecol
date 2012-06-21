@@ -32,7 +32,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.util.Introspector;
 import net.sf.freecol.common.util.Utils;
-import net.sf.freecol.server.model.ServerGame;
 
 import org.w3c.dom.Element;
 
