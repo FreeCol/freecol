@@ -44,8 +44,6 @@ import net.sf.freecol.common.option.OptionGroup;
 
 import org.w3c.dom.Element;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 
 /**
  * The main component of the game model.
@@ -194,8 +192,17 @@ public class Game extends FreeColGameObject {
         this.setFreeColGameObject(getId(), this);
     }
 
-    /** Returns the unique identifier for this game. 
-     *  (A game UUID persists in save game files.)
+    /**
+     * Stub for routine only meaningful in the server.
+     */
+    public String getNextID() {
+        throw new IllegalStateException("game.getNextID not implemented");
+    }
+
+    /**
+     * Gets the unique identifier for this game. 
+     * A game UUID persists in save game files.
+     *
      * @return java.util.UUID
      */
     public UUID getUUID () {
@@ -978,8 +985,7 @@ public class Game extends FreeColGameObject {
     }
 
 
-    // comment of Janet: latter is a sick implementation as long as hashCode
-    // cannot be rooted back to class Object's functionality
+    // Serialization
 
     /**
      * This method writes an XML-representation of this object to the given
@@ -1243,9 +1249,5 @@ public class Game extends FreeColGameObject {
      */
     public static String getXMLElementTagName() {
         return "game";
-    }
-
-    public String getNextID() {
-        throw new NotImplementedException();
     }
 }
