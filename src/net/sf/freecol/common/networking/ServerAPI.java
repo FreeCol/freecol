@@ -164,7 +164,7 @@ public class ServerAPI {
                                + ((messageId != null) ? messageId : "")
                                + "/" + ((messageText != null)
                                    ? messageText : ""));
-                handleReply(reply);
+                freeColClient.getClient().handleReply(reply);
             }
             return null;
         }
@@ -207,17 +207,6 @@ public class ServerAPI {
         return null;
     }
 
-    /**
-     * Handle a reply element using the client input handler.
-     *
-     * @param reply The reply <code>Element</code> to handle.
-     */
-    private void handleReply(Element reply) {
-        if (reply != null) {
-            freeColClient.getInGameInputHandler()
-                .handle(freeColClient.getClient().getConnection(), reply);
-        }
-    }
 
     /**
      * Extends askExpecting to also handle returns from the server.
@@ -232,7 +221,7 @@ public class ServerAPI {
         Element reply = askExpecting(message, tag, results);
         if (reply == null) return false;
 
-        handleReply(reply);
+        freeColClient.getClient().handleReply(reply);
         return true;
     }
 
@@ -553,7 +542,7 @@ public class ServerAPI {
             Game game = freeColClient.getGame();
             return new DiplomacyMessage(game, reply).getAgreement();
         }
-        handleReply(reply);
+        freeColClient.getClient().handleReply(reply);
         return null;
     }
 

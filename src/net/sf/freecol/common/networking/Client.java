@@ -25,6 +25,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
+import net.sf.freecol.common.FreeColException;
+
 import org.w3c.dom.Element;
 
 
@@ -160,5 +162,22 @@ public final class Client {
             logger.log(Level.WARNING, "Could not ask: " + element, e);
         }
         return null;
+    }
+    
+
+    /**
+     * Handle a reply element using the client input handler.
+     *
+     * @param reply The reply <code>Element</code> to handle.
+     */
+    public void handleReply(Element reply) {
+        if (reply != null) {
+            try {
+                c.getMessageHandler()
+                    .handle(c, reply);
+            } catch (FreeColException e) {
+                logger.log(Level.WARNING, "Could not handle reply: " + reply, e);
+            }
+        }
     }
 }
