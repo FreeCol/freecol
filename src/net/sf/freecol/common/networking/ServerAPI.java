@@ -70,15 +70,19 @@ public class ServerAPI {
 
     private FreeColClient freeColClient; // cached client reference
 
+    private Client client;
+
 
     /**
      * Creates a new <code>ServerAPI</code>.
      *
      * @param freeColClient The <code>FreeColClient</code> that is
      *     communicating with a server.
+     * @param client 
      */
-    public ServerAPI(FreeColClient freeColClient) {
+    public ServerAPI(FreeColClient freeColClient, Client client) {
         this.freeColClient = freeColClient;
+        this.client = client;
     }
 
 
@@ -118,7 +122,7 @@ public class ServerAPI {
      * @return True if the send succeeded.
      */
     private boolean send(DOMMessage message) {
-        freeColClient.getClient().send(message.toXMLElement());
+        client.send(message.toXMLElement());
         return true;
     }
 
@@ -144,7 +148,7 @@ public class ServerAPI {
      */
     private Element askExpecting(DOMMessage message, String tag,
                                  HashMap<String, String> results) {
-        Element reply = freeColClient.getClient().ask(message.toXMLElement());
+        Element reply = client.ask(message.toXMLElement());
 
         if (reply == null) return null;
         if ("error".equals(reply.getTagName())) {
@@ -164,7 +168,7 @@ public class ServerAPI {
                                + ((messageId != null) ? messageId : "")
                                + "/" + ((messageText != null)
                                    ? messageText : ""));
-                freeColClient.getClient().handleReply(reply);
+                client.handleReply(reply);
             }
             return null;
         }
@@ -221,7 +225,7 @@ public class ServerAPI {
         Element reply = askExpecting(message, tag, results);
         if (reply == null) return false;
 
-        freeColClient.getClient().handleReply(reply);
+        client.handleReply(reply);
         return true;
     }
 
@@ -467,8 +471,8 @@ public class ServerAPI {
      * @param chat The text of the message.
      * @return True if the send succeeded.
      */
-    public boolean chat(String chat) {
-        return send(new ChatMessage(freeColClient.getMyPlayer(), chat, false));
+    public boolean chat(Player player, String chat) {
+        return send(new ChatMessage(player, chat, false));
     }
 
     /**
@@ -532,17 +536,17 @@ public class ServerAPI {
      * @param agreement The <code>DiplomaticTrade</code> agreement to propose.
      * @return The resulting agreement or null if none present.
      */
-    public DiplomaticTrade diplomacy(Unit unit, Settlement settlement,
+    public DiplomaticTrade diplomacy(Game game, Unit unit, Settlement settlement,
                                      DiplomaticTrade agreement) {
         Element reply = askExpecting(new DiplomacyMessage(unit, settlement,
                                                           agreement),
             null, null);
-        if (reply == null) return null;
+        if (reply == null) 
+            return null;
         if (DiplomacyMessage.getXMLElementTagName().equals(reply.getTagName())) {
-            Game game = freeColClient.getGame();
             return new DiplomacyMessage(game, reply).getAgreement();
         }
-        freeColClient.getClient().handleReply(reply);
+        client.handleReply(reply);
         return null;
     }
 
@@ -689,7 +693,7 @@ public class ServerAPI {
      * @return The goods for sale in the settlement,
      *     or null if the server interaction failed.
      */
-    public List<Goods> getGoodsForSaleInSettlement(Unit unit,
+    public List<Goods> getGoodsForSaleInSettlement(Game game, Unit unit,
                                                    Settlement settlement) {
         GoodsForSaleMessage message
             = new GoodsForSaleMessage(unit, settlement, null);
@@ -697,7 +701,6 @@ public class ServerAPI {
             GoodsForSaleMessage.getXMLElementTagName(), null);
         if (reply == null) return null;
 
-        Game game = freeColClient.getGame();
         List<Goods> goodsOffered = new ArrayList<Goods>();
         NodeList childNodes = reply.getChildNodes();
         for (int i = 0; i < childNodes.getLength(); i++) {
@@ -1153,5 +1156,9 @@ public class ServerAPI {
     public boolean work(Unit unit, WorkLocation workLocation) {
         return askHandling(new WorkMessage(unit, workLocation),
             null, null);
+    }
+
+    public void continuePlaying() {
+        client.send(DOMMessage.createMessage("continuePlaying"));        
     }
 }

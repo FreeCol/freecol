@@ -51,7 +51,6 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.networking.Client;
-import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.ServerAPI;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.resources.ResourceMapping;
@@ -241,7 +240,8 @@ public final class FreeColClient {
         }
 
         // Once resources are in place, get preloading started.
-        if (!headless) ResourceManager.preload(windowSize);
+        if (!headless) 
+            ResourceManager.preload(windowSize);
 
         // Start the GUI.
         gui.hideSplashScreen();
@@ -269,7 +269,8 @@ public final class FreeColClient {
      * @return A ServerAPI.
      */
     public ServerAPI askServer() {
-        if (serverAPI == null) serverAPI = new ServerAPI(this);
+        if (serverAPI == null) 
+            serverAPI = new ServerAPI(this, client);
         return serverAPI;
     }
 
@@ -309,7 +310,7 @@ public final class FreeColClient {
      * Continue playing after winning the game.
      */
     public void continuePlaying() {
-        client.send(DOMMessage.createMessage("continuePlaying"));
+        askServer().continuePlaying();
     }
 
     public boolean currentPlayerIsMyPlayer() {

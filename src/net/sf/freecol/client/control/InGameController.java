@@ -2957,12 +2957,12 @@ public final class InGameController implements NetworkConstants {
                 agreement = ourAgreement;
             }
             if (agreement.getStatus() != TradeStatus.PROPOSE_TRADE) {
-                askServer().diplomacy(unit, settlement, agreement);
+                askServer().diplomacy(freeColClient.getGame(), unit, settlement, agreement);
                 gui.updateMenuBar();
                 break;
             }
 
-            agreement = askServer().diplomacy(unit, settlement, agreement);
+            agreement = askServer().diplomacy(freeColClient.getGame(), unit, settlement, agreement);
             status = (agreement == null) ? TradeStatus.REJECT_TRADE
                 : agreement.getStatus();
             switch (status) {
@@ -3086,7 +3086,7 @@ public final class InGameController implements NetworkConstants {
 
         // Get list of goods for sale
         List<Goods> forSale
-            = askServer().getGoodsForSaleInSettlement(unit, settlement);
+            = askServer().getGoodsForSaleInSettlement(freeColClient.getGame(), unit, settlement);
         for (;;) {
             if (forSale.isEmpty()) {
                 // There is nothing to sell to the player
@@ -3593,7 +3593,7 @@ public final class InGameController implements NetworkConstants {
      * @param chat The text of the message.
      */
     public void sendChat(String chat) {
-        askServer().chat(chat);
+        askServer().chat(freeColClient.getMyPlayer(), chat);
     }
 
     /**
