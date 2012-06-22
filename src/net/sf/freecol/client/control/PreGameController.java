@@ -184,27 +184,28 @@ public final class PreGameController {
      * Add player-specific resources to the resource manager.
      *
      * @param nationId The player nation identifier.
+     * @param mapping The mapping to add to.
      */
-    private void addPlayerResources(String nationId) {
+    private void addPlayerResources(String nationId, ResourceMapping mapping) {
         Color color = ResourceManager.getColor(nationId + ".color");
-        ResourceMapping gameMapping = new ResourceMapping();
-        gameMapping.add(nationId + ".chip", ChipResource.colorChip(color));
-        gameMapping.add(nationId + ".mission.chip",
-                        ChipResource.missionChip(color, false));
-        gameMapping.add(nationId + ".mission.expert.chip",
-                        ChipResource.missionChip(color, true));
-        ResourceManager.addGameMapping(gameMapping);
+        mapping.add(nationId + ".chip", ChipResource.colorChip(color));
+        mapping.add(nationId + ".mission.chip",
+                    ChipResource.missionChip(color, false));
+        mapping.add(nationId + ".mission.expert.chip",
+                    ChipResource.missionChip(color, true));
     }
 
     /**
      * Starts the game.
      */
     public void startGame() {
+        ResourceMapping gameMapping = new ResourceMapping();
         for (Player player : freeColClient.getGame().getPlayers()) {
-            addPlayerResources(player.getNationID());
+            addPlayerResources(player.getNationID(), gameMapping);
         }
         // Unknown nation is not in getPlayers() list.
-        addPlayerResources(Nation.UNKNOWN_NATION_ID);
+        addPlayerResources(Nation.UNKNOWN_NATION_ID, gameMapping);
+        ResourceManager.addGameMapping(gameMapping);
 
         Player myPlayer = freeColClient.getMyPlayer();
         if (!freeColClient.isHeadless()) {

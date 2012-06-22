@@ -53,7 +53,7 @@ public final class WindowedFrame extends FreeColFrame  {
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
-                ResourceManager.startBackgroundPreloading(freeColClient.getGUI().getCanvas().getSize());
+                ResourceManager.preload(freeColClient.getGUI().getCanvas().getSize());
             }
         });
 
@@ -69,6 +69,4 @@ public final class WindowedFrame extends FreeColFrame  {
             pack();
         }   
     }
-
-   
 }

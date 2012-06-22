@@ -218,9 +218,6 @@ public final class FreeColClient {
         // resources specified in the active mods.
         loadClientOptions(savedGame);
 
-        // Once resources are in place, get preloading started.
-        if (!headless) ResourceManager.preload(windowSize);
-
         // Work out the main font now that resources are loaded.
         Font font = null;
         if (fontName != null) {
@@ -243,6 +240,9 @@ public final class FreeColClient {
             System.exit(1);
         }
 
+        // Once resources are in place, get preloading started.
+        if (!headless) ResourceManager.preload(windowSize);
+
         // Start the GUI.
         gui.hideSplashScreen();
         SwingUtilities.invokeLater(new Runnable() {
@@ -261,7 +261,6 @@ public final class FreeColClient {
                 });
         }
     }
-
 
 
     /**

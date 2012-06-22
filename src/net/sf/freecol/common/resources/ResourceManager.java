@@ -68,7 +68,7 @@ public class ResourceManager {
 
     private static volatile boolean dirty = false;
 
-    private static Dimension lastWindowSize;
+    private static Dimension lastWindowSize = null;
 
 
     /**
@@ -150,46 +150,44 @@ public class ResourceManager {
     }
 
     /**
-     * Preload resources. This method is intended to
-     * be called when starting the application, as
-     * it blocks until resources needed for the first
-     * panels have been loaded.
-     *
-     * It also ensures that the {@link #startBackgroundPreloading(Dimension)
-     * background preloading thread} is started.
+     * Preload resources.
      *
      * @param windowSize
      */
     public static void preload(final Dimension windowSize) {
-        if (lastWindowSize != windowSize) {
+        if (!windowSize.equals(lastWindowSize)) {
             dirty = true;
+            logger.info("Window size changes from " + lastWindowSize
+                + " to " + windowSize);
+            lastWindowSize = windowSize;
         }
-        lastWindowSize = windowSize;
-        updateIfDirty(); // starts: startBackgroundPreloading
+        updateIfDirty();
     }
 
     /**
-     * Starts background preloading of resources.
-     * @param windowSize The window size to use when scaling
-     *      full screen size images.
+     * Create and start a new background preload thread.
      */
-    public static void startBackgroundPreloading(final Dimension windowSize) {
-        lastWindowSize = windowSize;
-        if (dirty) {
-            updateIfDirty();
-            return; // startBackgroundPreloading will be called from update
+    private static void startBackgroundPreloading() {
+        if ("true".equals(System.getProperty("java.awt.headless", "false"))) {
+            return; // Do not preload in headless mode
         }
+        if (lastWindowSize == null) return; // Wait for initial preload.
+        
         preloadThread = new Thread(FreeCol.CLIENT_THREAD+"Resource loader") {
-            public void run() {
-                // Make a local copy of the resources to load.
-                List<Resource> resources
-                    = new LinkedList<Resource>(mergedContainer.getResources().values());
-                for (Resource r : resources) {
-                    if (preloadThread != this) return; // Cancelled!
-                    r.preload();
+                public void run() {
+                    // Make a local copy of the resources to load.
+                    List<Resource> resources
+                        = new LinkedList<Resource>(mergedContainer.getResources().values());
+                    int n = 0;
+                    for (Resource r : resources) {
+                        if (preloadThread != this) return; // Cancelled!
+                        r.preload();
+                        n++;
+                    }
+                    logger.info("Background thread preloaded " + n
+                        + " resources.");
                 }
-            }
-        };
+            };
         preloadThread.setPriority(2);
         preloadThread.start();
     }
@@ -202,9 +200,7 @@ public class ResourceManager {
             dirty = false;
             preloadThread = null;
             createMergedContainer();
-            if (!"true".equals(System.getProperty("java.awt.headless", "false"))) {
-                startBackgroundPreloading(lastWindowSize);
-            }
+            startBackgroundPreloading();
         }
     }
 
@@ -240,12 +236,15 @@ public class ResourceManager {
                 logger.finest("getResource(" + resourceId
                               + ", " + type.getName() + ") failed");
             }
-        } else { // Log type errors
-            logger.finest("getResource(" + resourceId
-                          + ", " + type.getName() + ") -> "
-                          + r.getClass().getName());
+            return null;
         }
-        return (type.isInstance(r)) ? type.cast(r) : null;
+        if (!type.isInstance(r)) { // Log type errors
+            logger.warning("getResource(" + resourceId
+                           + ", " + type.getName() + ") -> "
+                           + r.getClass().getName());
+            return null;
+        }
+        return type.cast(r);
     }
 
     public static boolean hasResource(final String resourceId) {
@@ -266,7 +265,6 @@ public class ResourceManager {
      *      identified by that name.
      */
     public static SimpleZippedAnimation getSimpleZippedAnimation(final String resource) {
-        updateIfDirty();
         final SZAResource r = getResource(resource, SZAResource.class);
         return (r != null) ? r.getSimpleZippedAnimation() : null;
     }
@@ -276,7 +274,6 @@ public class ResourceManager {
      * @return The <code>Video</code> in it's original size.
      */
     public static Video getVideo(final String resource) {
-        updateIfDirty();
         final VideoResource r = getResource(resource, VideoResource.class);
         return (r != null) ? r.getVideo() : null;
     }
@@ -293,7 +290,6 @@ public class ResourceManager {
      *      identified by that name.
      */
     public static SimpleZippedAnimation getSimpleZippedAnimation(final String resource, final double scale) {
-        updateIfDirty();
         final SZAResource r = getResource(resource, SZAResource.class);
         return (r != null) ? r.getSimpleZippedAnimation(scale) : null;
     }
@@ -307,7 +303,6 @@ public class ResourceManager {
      *      identified by that name.
      */
     public static Image getImage(final String resource) {
-        updateIfDirty();
         final ImageResource r = getResource(resource, ImageResource.class);
         return (r != null) ? r.getImage() : null;
     }
@@ -324,7 +319,6 @@ public class ResourceManager {
      *      identified by that name.
      */
     public static Image getImage(final String resource, final double scale) {
-        updateIfDirty();
         final ImageResource r = getResource(resource, ImageResource.class);
         return (r != null) ? r.getImage(scale) : null;
     }
@@ -340,7 +334,6 @@ public class ResourceManager {
      *      identified by that name.
      */
     public static Image getImage(final String resource, final Dimension size) {
-        updateIfDirty();
         final ImageResource r = getResource(resource, ImageResource.class);
         return (r != null) ? r.getImage(size) : null;
     }
@@ -357,7 +350,6 @@ public class ResourceManager {
      *      identified by that name.
      */
     public static Image getGrayscaleImage(final String resource, final Dimension size) {
-        updateIfDirty();
         final ImageResource r = getResource(resource, ImageResource.class);
         return (r != null) ? r.getGrayscaleImage(size) : null;
     }
@@ -374,7 +366,6 @@ public class ResourceManager {
      *      identified by that name.
      */
     public static Image getGrayscaleImage(final String resource, final double scale) {
-        updateIfDirty();
         final ImageResource r = getResource(resource, ImageResource.class);
         return (r != null) ? r.getGrayscaleImage(scale) : null;
     }
@@ -391,7 +382,6 @@ public class ResourceManager {
      * @see #getImage(String)
      */
     public static ImageIcon getImageIcon(final String resource) {
-        updateIfDirty();
         final Image im = getImage(resource);
         return (im != null) ? new ImageIcon(im) : null;
     }
@@ -407,7 +397,6 @@ public class ResourceManager {
      * @see #getImage(String)
      */
     public static Color getColor(final String resource) {
-        updateIfDirty();
         final ColorResource r = getResource(resource, ColorResource.class);
         return (r != null) ? r.getColor() : null;
     }
@@ -422,7 +411,6 @@ public class ResourceManager {
      *      by that name.
      */
     public static Color getProductionColor(int bonus) {
-        updateIfDirty();
         return ResourceManager.getColor("productionBonus." + bonus + ".color");
     }
 
@@ -437,14 +425,12 @@ public class ResourceManager {
      * @see #getImage(String)
      */
     public static Image getChip(final String resource) {
-        updateIfDirty();
         final ChipResource r = getResource(resource, ChipResource.class);
         return (r != null) ? r.getImage() : null;
     }
 
 
     public static Image getChip(final String resource, double scale) {
-        updateIfDirty();
         final ChipResource r = getResource(resource, ChipResource.class);
         return (r != null) ? r.getImage(scale) : null;
     }
@@ -459,7 +445,6 @@ public class ResourceManager {
      *     to load.
      */
     public static Font getFont(final String resource) {
-        updateIfDirty();
         final FontResource r = getResource(resource, FontResource.class);
         if (r == null) return FontResource.getEmergencyFont();
         return r.getFont();
@@ -474,7 +459,6 @@ public class ResourceManager {
      *     to load.
      */
     public static Font getFont(final String resource, int style) {
-        updateIfDirty();
         Font font = ResourceManager.getFont(resource);
         return font.deriveFont(style);
     }
@@ -488,7 +472,6 @@ public class ResourceManager {
      *     to load.
      */
     public static Font getFont(final String resource, float size) {
-        updateIfDirty();
         Font font = ResourceManager.getFont(resource);
         return font.deriveFont(size);
     }
@@ -502,7 +485,6 @@ public class ResourceManager {
      *     to load.
      */
     public static Font getFont(final String resource, int style, float size) {
-        updateIfDirty();
         Font font = ResourceManager.getFont(resource);
         return font.deriveFont(style, size);
     }
@@ -514,7 +496,6 @@ public class ResourceManager {
      * @return The <code>FAFile</code> found in a FAFileResource.
      */
     public static FAFile getFAFile(final String resource) {
-        updateIfDirty();
         final FAFileResource r = getResource(resource, FAFileResource.class);
         return (r == null) ? null : r.getFAFile();
     }
@@ -526,7 +507,6 @@ public class ResourceManager {
      * @return A <code>File</code> containing the audio data.
      */
     public static File getAudio(final String resource) {
-        updateIfDirty();
         final AudioResource r = getResource(resource, AudioResource.class);
         return (r == null) ? null : r.getAudio();
     }
