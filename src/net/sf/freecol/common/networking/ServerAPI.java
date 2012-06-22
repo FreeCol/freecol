@@ -28,7 +28,6 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
-import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.BuildableType;
@@ -64,11 +63,10 @@ import org.w3c.dom.NodeList;
 /**
  * The API for client->server messaging.
  */
-public class ServerAPI {
+public abstract class ServerAPI {
 
     private static final Logger logger = Logger.getLogger(ServerAPI.class.getName());
 
-    private FreeColClient freeColClient; // cached client reference
 
     private Client client;
 
@@ -80,8 +78,7 @@ public class ServerAPI {
      *     communicating with a server.
      * @param client 
      */
-    public ServerAPI(FreeColClient freeColClient, Client client) {
-        this.freeColClient = freeColClient;
+    public ServerAPI(Client client) {
         this.client = client;
     }
 
@@ -176,10 +173,7 @@ public class ServerAPI {
         // Success!
         if (tag == null || tag.equals(reply.getTagName())) {
             // Do the standard processing.
-            String sound = reply.getAttribute("sound");
-            if (sound != null && !sound.isEmpty()) {
-                freeColClient.getGUI().playSound(sound);
-            }
+            doClientProcessingFor(reply);
             // Look for special attributes
             if (results != null) {
                 if (results.containsKey("*")) {
@@ -205,11 +199,13 @@ public class ServerAPI {
             + " which should have been " + tag
             + " to message " + message;
         logger.warning(complaint);
-        if (FreeColDebugger.isInDebugMode()) {
-            freeColClient.getGUI().errorMessage(null, complaint);
-        }
+        doRaiseErrorMessage(complaint);
         return null;
     }
+
+    protected abstract void doRaiseErrorMessage(String complaint);
+
+    protected abstract void doClientProcessingFor(Element reply);
 
 
     /**

@@ -40,6 +40,7 @@ import net.sf.freecol.client.control.PreGameInputHandler;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.ActionManager;
 import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
+import net.sf.freecol.client.networking.UserServerAPI;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.FreeColSeed;
 import net.sf.freecol.common.io.FreeColDataFile;
@@ -270,7 +271,7 @@ public final class FreeColClient {
      */
     public ServerAPI askServer() {
         if (serverAPI == null) 
-            serverAPI = new ServerAPI(this, client);
+            serverAPI = new UserServerAPI(gui, client);
         return serverAPI;
     }
 
