@@ -222,7 +222,7 @@ public class GUI {
         }
         setWindowed(windowed);
         
-        this.frame = FreeColFrame.createFreeColFrame(freeColClient, gd, windowed);
+        this.frame = FreeColFrame.createFreeColFrame(freeColClient, canvas, gd, windowed);
         
         frame.setJMenuBar(menuBar);
         frame.setCanvas(canvas);

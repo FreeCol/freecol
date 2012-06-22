@@ -18,9 +18,10 @@ public abstract class FreeColFrame extends JFrame {
     private FreeColClient freeColClient;
     
     
-    public static FreeColFrame createFreeColFrame(FreeColClient freeColClient, GraphicsDevice gd, boolean windowed) {
+    public static FreeColFrame createFreeColFrame(FreeColClient freeColClient, Canvas canvas, 
+            GraphicsDevice gd, boolean windowed) {
         if (windowed) 
-            return new WindowedFrame(freeColClient);
+            return new WindowedFrame(freeColClient, canvas);
         return new FullScreenFrame(freeColClient, gd);
     }
     

@@ -40,6 +40,7 @@ public final class FullScreenFrame extends FreeColFrame {
 
     /**
      * The constructor to use.
+     * @param canvas 
      * 
      * @param gd
      *            The context of this <code>FullScreenFrame</code>.

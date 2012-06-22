@@ -42,8 +42,9 @@ public final class WindowedFrame extends FreeColFrame  {
 
     /**
     * The constructor to use.
+     * @param canvas 
     */
-    public WindowedFrame(final FreeColClient freeColClient) {
+    public WindowedFrame(final FreeColClient freeColClient, final Canvas canvas) {
         super(freeColClient, "FreeCol " + FreeCol.getVersion());
         logger.info("WindowedFrame's JFrame created.");
 
@@ -53,7 +54,7 @@ public final class WindowedFrame extends FreeColFrame  {
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
-                ResourceManager.preload(freeColClient.getGUI().getCanvas().getSize());
+                ResourceManager.preload(canvas.getSize());
             }
         });
 
