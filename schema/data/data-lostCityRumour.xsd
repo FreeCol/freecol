@@ -50,6 +50,7 @@
       <xs:enumeration value="COLONIST" />
       <xs:enumeration value="TREASURE" />
       <xs:enumeration value="FOUNTAIN_OF_YOUTH" />
+      <xs:enumeration value="MOUNDS" />
     </xs:restriction>
   </xs:simpleType>
 
