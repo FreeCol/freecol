@@ -31,104 +31,109 @@
     </xs:annotation>
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
-	<xs:element name="children">
-	  <xs:complexType>
-	    <xs:attribute name="xLength" type="xs:int" use="required"/>
-	    <xs:anyAttribute namespace="##local" processContents="skip">
-	      <xs:annotation>
-		<xs:documentation>
-		  Value enumeration x0, x1, x2, x3 etc.
-		</xs:documentation>
-	      </xs:annotation>
-	    </xs:anyAttribute>
-	  </xs:complexType>
-	</xs:element>
+	      <xs:element name="children">
+	        <xs:complexType>
+	          <xs:attribute name="xLength" type="xs:int" use="required"/>
+	          <xs:anyAttribute namespace="##local" processContents="skip">
+	            <xs:annotation>
+		            <xs:documentation>
+		              Value enumeration x0, x1, x2, x3 etc.
+		            </xs:documentation>
+	            </xs:annotation>
+	          </xs:anyAttribute>
+	        </xs:complexType>
+	      </xs:element>
+        <xs:element name="child">
+          <xs:complexType>
+            <xs:attribute name="id" type="RegionId"/>
+          </xs:complexType>
+        </xs:element>
       </xs:choice>
       <xs:attribute name="id" type="RegionId"/>
       <xs:attribute name="ID" type="RegionId">
 	<xs:annotation>
 	  <xs:documentation>
 	    Object ID
-          </xs:documentation>
+    </xs:documentation>
 	</xs:annotation>
       </xs:attribute>
       <xs:attribute name="nameKey" type="xs:string" use="required">
-	<xs:annotation>
-	  <xs:documentation>
-	    Key used to retrieve description from Messages
-	  </xs:documentation>
-	</xs:annotation>
+	      <xs:annotation>
+	        <xs:documentation>
+	          Key used to retrieve description from Messages
+	        </xs:documentation>
+	      </xs:annotation>
       </xs:attribute>
       <xs:attribute name="claimable" type="xs:boolean" use="optional"
-		    default="false">
-	<xs:annotation>
-	  <xs:documentation>
-	    Whether this Region is claimable. Ocean Regions
-	    and non-leaf Regions
-	    should not be claimable.
+		                default="false">
+	      <xs:annotation>
+	        <xs:documentation>
+	          Whether this Region is claimable. Ocean Regions
+	          and non-leaf Regions
+	          should not be claimable.
           </xs:documentation>
-	</xs:annotation>
+	      </xs:annotation>
       </xs:attribute>
       <xs:attribute name="discoverable" type="xs:boolean" use="optional"
-		    default="false">
-	<xs:annotation>
-	  <xs:documentation>
-	    Whether this Region is discoverable. The Eastern
-	    Ocean regions should not
-	    be discoverable. In general, non-leaf
-	    regions should not be
-	    discoverable. The Pacific Ocean is an
-	    exception, however.
+		                default="false">
+	      <xs:annotation>
+	        <xs:documentation>
+	          Whether this Region is discoverable. The Eastern
+	          Ocean regions should not
+	          be discoverable. In general, non-leaf
+	          regions should not be
+	          discoverable. The Pacific Ocean is an
+	          exception, however.
           </xs:documentation>
-	</xs:annotation>
+	      </xs:annotation>
       </xs:attribute>
       <xs:attribute name="prediscovered" type="xs:boolean"
-		    use="optional" default="false">
-	<xs:annotation>
-	  <xs:documentation>
-	    Whether the Region is already discovered when the
-	    game starts.
+		                use="optional" default="false">
+	      <xs:annotation>
+	        <xs:documentation>
+	          Whether the Region is already discovered when the
+	          game starts.
           </xs:documentation>
-	</xs:annotation>
+	      </xs:annotation>
       </xs:attribute>
       <xs:attribute name="scoreValue" type="xs:int" use="optional"
-		    default="0">
-	<xs:annotation>
-	  <xs:documentation>
-	    How much discovering this Region contributes to
-	    your score. This
-	    should be zero unless the Region is discoverable.
-	  </xs:documentation>
-	</xs:annotation>
+		                default="0">
+	      <xs:annotation>
+	        <xs:documentation>
+	          How much discovering this Region contributes to
+	          your score. This
+	          should be zero unless the Region is discoverable.
+	        </xs:documentation>
+	      </xs:annotation>
       </xs:attribute>
       <xs:attribute name="type" type="RegionType" use="required">
-	<xs:annotation>
-	  <xs:documentation>
-	    Object ID
+	      <xs:annotation>
+	        <xs:documentation>
+	          Object ID
           </xs:documentation>
-	</xs:annotation>
+	      </xs:annotation>
       </xs:attribute>
       <xs:attribute name="discoveredIn" type="xs:int" use="optional"
-		    default="-1">
-	<xs:annotation>
-	  <xs:documentation>
-	    Which Turn the Region was discovered in.
-	  </xs:documentation>
-	</xs:annotation>
+		                default="-1">
+	      <xs:annotation>
+	        <xs:documentation>
+	          Which Turn the Region was discovered in.
+	        </xs:documentation>
+	      </xs:annotation>
       </xs:attribute>
       <xs:attribute name="discoveredBy" type="xs:string" use="optional">
-	<xs:annotation>
-	  <xs:documentation>
-	    Which Player the Region was discovered by.
-	  </xs:documentation>
-	</xs:annotation>
+	      <xs:annotation>
+	        <xs:documentation>
+	          Which Player the Region was discovered by.
+	        </xs:documentation>
+	      </xs:annotation>
       </xs:attribute>
       <xs:attribute name="parent" type="xs:string" use="optional">
-	<xs:annotation>
-	  <xs:documentation>
-	    The parent Region of this Region.
-	  </xs:documentation>
-	</xs:annotation>
+	      <xs:annotation>
+	        <xs:documentation>
+	          The parent Region of this Region.
+	        </xs:documentation>
+	      </xs:annotation>
       </xs:attribute>
       <xs:attribute name="name" type="xs:string" use="optional" />
     </xs:complexType>
