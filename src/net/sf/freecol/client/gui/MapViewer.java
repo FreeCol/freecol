@@ -64,6 +64,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
@@ -87,13 +88,16 @@ import net.sf.freecol.common.model.TileItem;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.resources.ImageResource;
 import net.sf.freecol.common.resources.ResourceManager;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
-* This class is responsible for drawing the map/background on the <code>Canvas</code>.
-* In addition, the graphical state of the map (focus, active unit..) is also a responsibility
-* of this class.
-*/
+ * This class is responsible for drawing the map/background on the
+ * <code>Canvas</code>.
+ *
+ * In addition, the graphical state of the map (focus, active unit..)
+ * is also a responsibility of this class.
+ */
 public final class MapViewer {
 
     public static enum BorderType { COUNTRY, REGION }
@@ -2328,7 +2332,12 @@ public final class MapViewer {
             break;
         case ClientOptions.DISPLAY_TILE_TEXT_REGIONS:
             if (tile.getRegion() != null) {
-                text = Messages.message(tile.getRegion().getLabel());
+                if (FreeColDebugger.isInDebugMode()
+                    && tile.getRegion().getName() == null) {
+                    text = Utils.lastPart(tile.getRegion().getNameKey(), ".");
+                } else {
+                    text = Messages.message(tile.getRegion().getLabel());
+                }
             }
             paintBorders(g, tile, BorderType.REGION, true);
             break;
@@ -2580,26 +2589,19 @@ public final class MapViewer {
             e.printStackTrace();
         }
 
-        // FOR DEBUGGING:
-        if (freeColClient.getFreeColServer() != null
-            && (unit.getOwner().isAI()
-                || unit.hasAbility(Ability.PIRACY))) {
-            net.sf.freecol.server.ai.AIUnit au = freeColClient
-                .getFreeColServer().getAIMain().getAIUnit(unit);
-            if (au != null) {
-                g.setColor(Color.WHITE);
-                String text = (unit.getOwner().isAI()) ? "" : "(";
-                if (au.getMission() != null) {
-                    String missionName = au.getMission().getClass().toString();
-                    missionName = missionName.substring(missionName.lastIndexOf('.') + 1);
-
-                    text += missionName;
-                } else {
-                    text += "No mission";
-                }
-                text += (unit.getOwner().isAI()) ? "" : ")";
-                g.drawString(text, 0 , 0);
-            }
+        // FOR DEBUGGING
+        net.sf.freecol.server.ai.AIUnit au;
+        if (FreeColDebugger.isInDebugMode()
+            && !freeColClient.getMyPlayer().owns(unit)
+            && freeColClient.getFreeColServer() != null
+            && (au = freeColClient.getFreeColServer().getAIMain()
+                .getAIUnit(unit)) != null) {
+            g.setColor(Color.WHITE);
+            String wrap = (unit.getOwner().isAI()) ? "" : "(";
+            String text = wrap + ((au.getMission() == null) ? "No mission"
+                : Utils.lastPart(au.getMission().getClass().toString(), "."))
+                + wrap;
+            g.drawString(text, 0, 0);
         }
     }
 
