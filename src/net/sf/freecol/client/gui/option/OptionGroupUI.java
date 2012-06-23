@@ -65,6 +65,8 @@ public final class OptionGroupUI extends JPanel
 
     private OptionGroup group;
 
+    private boolean editable;
+
 
     /**
      * The constructor that will add the items to this panel.
@@ -72,9 +74,10 @@ public final class OptionGroupUI extends JPanel
      * @param parent The parent of this panel.
      * @param id a <code>String</code> value
      */
-    public OptionGroupUI(GUI gui, OptionGroup group) {
+    public OptionGroupUI(GUI gui, OptionGroup group, boolean editable) {
         this.gui = gui;
         this.group = group;
+        this.editable = editable;
 
         setLayout(new MigLayout("fill", "[200:]unrelated[550:, grow, fill]", "[top]"));
 
@@ -141,7 +144,7 @@ public final class OptionGroupUI extends JPanel
             if (node.isLeaf()) {
                 OptionGroup group = (OptionGroup) node.getUserObject();
                 for (Option option : group.getOptions()) {
-                    addOptionUI(option, group.isEditable());
+                    addOptionUI(option, editable && group.isEditable());
                 }
             } else {
                 tree.expandPath(event.getPath());

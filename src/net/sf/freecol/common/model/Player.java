@@ -2677,7 +2677,7 @@ public class Player extends FreeColGameObject implements Nameable {
                             for (AbstractGoods production : tile.getType().getProduction()) {
                                 GoodsType type = production.getType();
                                 int potential = tile.potential(type, null);
-                                value += potential * type.getInitialSellPrice();
+                                value += potential * spec.getInitialPrice(type);
                                 // a few tiles with high production are better
                                 // than many tiles with low production
                                 int highProductionValue = 0;

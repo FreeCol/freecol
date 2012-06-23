@@ -56,7 +56,7 @@ public final class ResourceType extends FreeColGameObjectType {
         float bestValue = 0f;
         for (Modifier modifier : getModifiers()) {
             GoodsType goodsType = getSpecification().getGoodsType(modifier.getId());
-            float value = goodsType.getInitialSellPrice() * modifier.applyTo(100);
+            float value = getSpecification().getInitialPrice(goodsType) * modifier.applyTo(100);
             if (bestType == null || value > bestValue) {
                 bestType = goodsType;
                 bestValue = value;

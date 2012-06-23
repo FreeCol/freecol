@@ -127,7 +127,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
         }
 
         // Options:
-        ui = new OptionGroupUI(getGUI(), group);
+        ui = new OptionGroupUI(getGUI(), group, editable);
         optionPanel = new JPanel() {
             @Override
             public String getUIClassID() {
@@ -176,7 +176,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
     protected void updateUI(OptionGroup group) {
         this.group = group;
         optionPanel.removeAll();
-        ui = new OptionGroupUI(getGUI(), group);
+        ui = new OptionGroupUI(getGUI(), group, editable);
         optionPanel.add(ui);
         revalidate();
         repaint();

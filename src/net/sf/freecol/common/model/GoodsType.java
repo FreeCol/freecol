@@ -61,6 +61,10 @@ public final class GoodsType extends FreeColGameObjectType {
     private GoodsType storedAs;
 
     private int initialAmount;
+
+    /**
+     * The initial <em>minimum</em> sales price for this type of goods.
+     */
     private int initialPrice;
     private int priceDiff;
 
@@ -163,15 +167,24 @@ public final class GoodsType extends FreeColGameObjectType {
         return initialAmount;
     }
 
-    public int getInitialSellPrice() {
+    /**
+     * Returns the initial <em>minimum</em> sales price for this type
+     * of goods. The actual initial sales price in a particular Market
+     * may be higher. This method is only used for initializing
+     * Markets.
+     *
+     * @return an <code>int</code> value
+     * @see Market
+     */
+    int getInitialSellPrice() {
         return initialPrice;
     }
 
-    public int getInitialBuyPrice() {
+    int getInitialBuyPrice() {
         return initialPrice + priceDiff;
     }
 
-    public int getPriceDifference() {
+    int getPriceDifference() {
         return priceDiff;
     }
 

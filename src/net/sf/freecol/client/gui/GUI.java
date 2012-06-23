@@ -635,8 +635,8 @@ public class GUI {
         canvas.showDeclarationDialog();
     }
 
-    public void showDifficultyDialog() {
-        canvas.showDifficultyDialog();
+    public void showDifficultyDialog(boolean editable) {
+        canvas.showDifficultyDialog(editable);
     }
 
     public OptionGroup showDifficultyDialog(Specification specification) {

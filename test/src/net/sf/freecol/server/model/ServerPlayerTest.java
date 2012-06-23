@@ -85,7 +85,7 @@ public class ServerPlayerTest extends FreeColTestCase {
         Market frenchMarket = french.getMarket();
         Market englishMarket = english.getMarket();
         int frenchGold = french.getGold();
-        int silverPrice = silverType.getInitialSellPrice();
+        int silverPrice = spec().getInitialPrice(silverType);
 
         // Sell lightly in the English market to check that the good
         // is now considered "traded".
@@ -404,7 +404,7 @@ public class ServerPlayerTest extends FreeColTestCase {
         ServerPlayer p = (ServerPlayer) g.getPlayer("model.nation.dutch");
         Market dm = p.getMarket();
         int previousGold = p.getGold();
-        int price = silverType.getInitialSellPrice();
+        int price = spec().getInitialPrice(silverType);
 
         p.sell(null, silverType, 1000, new Random());
 
@@ -418,7 +418,7 @@ public class ServerPlayerTest extends FreeColTestCase {
         ServerPlayer player = (ServerPlayer) game.getPlayer("model.nation.dutch");
         Market dm = player.getMarket();
         player.modifyGold(1000000);
-        int price = foodType.getInitialBuyPrice();
+        int price = dm.getCostToBuy(foodType);
         player.buy(new GoodsContainer(game, player.getEurope()), foodType,
                    10000, new Random());
 

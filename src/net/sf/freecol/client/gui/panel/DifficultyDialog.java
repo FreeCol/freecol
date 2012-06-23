@@ -75,10 +75,11 @@ public final class DifficultyDialog extends OptionsDialog implements TreeSelecti
      * @param gui The <code>GUI</code> to display on.
      * @param level An <code>OptionGroup</code> encapsulating the difficulty
      *     level to display.
+     * @param editable a <code>boolean</code> value
      */
     public DifficultyDialog(FreeColClient freeColClient, GUI gui,
-                            OptionGroup level) {
-        super(freeColClient, gui, true);
+                            OptionGroup level, boolean editable) {
+        super(freeColClient, gui, editable);
         specification = getSpecification();
         selected = level;
         initialize(level, Messages.message("difficulty"), null);

@@ -323,6 +323,42 @@ public final class Specification {
             logger.warning("Failed to set year options: " + e.toString());
         }
 
+        // generate dynamic game options
+        OptionGroup prices = new OptionGroup("gameOptions.prices", this);
+        for (GoodsType goodsType : goodsTypeList) {
+            String name = goodsType.getSuffix("model.goods.");
+            if (goodsType.getInitialSellPrice() > 0) {
+                int diff = (goodsType.isNewWorldGoodsType() || goodsType.isNewWorldLuxuryType()) ? 3 : 0;
+                IntegerOption minimum = new IntegerOption("model.option." + name + ".minimumPrice", this);
+                minimum.setValue(goodsType.getInitialSellPrice());
+                minimum.setMinimumValue(1);
+                minimum.setMaximumValue(100);
+                prices.add(minimum);
+                addAbstractOption(minimum);
+                IntegerOption maximum = new IntegerOption("model.option." + name + ".maximumPrice", this);
+                maximum.setValue(goodsType.getInitialSellPrice() + diff);
+                maximum.setMinimumValue(1);
+                maximum.setMaximumValue(100);
+                prices.add(maximum);
+                addAbstractOption(maximum);
+                IntegerOption spread = new IntegerOption("model.option." + name + ".spread", this);
+                spread.setValue(goodsType.getPriceDifference());
+                spread.setMinimumValue(1);
+                spread.setMaximumValue(100);
+                prices.add(spread);
+                addAbstractOption(spread);
+            } else if (goodsType.getPrice() < FreeColGameObjectType.INFINITY) {
+                IntegerOption price = new IntegerOption("model.option." + name + ".price", this);
+                price.setValue(goodsType.getPrice());
+                price.setMinimumValue(1);
+                price.setMaximumValue(100);
+                prices.add(price);
+                addAbstractOption(price);
+            }
+        }
+        getOptionGroup("gameOptions").add(prices);
+        allOptionGroups.put(id, prices);
+
         logger.info("Specification initialization complete. "
                     + allTypes.size() + " FreeColGameObjectTypes,\n"
                     + allOptions.size() + " Options, "
@@ -848,6 +884,24 @@ public final class Specification {
      */
     public GoodsType getPrimaryFoodType() {
         return getGoodsType("model.goods.food");
+    }
+
+    /**
+     * Returns the initial <em>minimum</em> price of the given goods
+     * type. The initial price in a particular Market may be higher.
+     *
+     * @param goodsType a <code>GoodsType</code> value
+     * @return an <code>int</code> value
+     */
+    public int getInitialPrice(GoodsType goodsType) {
+        String suffix = goodsType.getSuffix("model.goods.");
+        if (hasOption("model.option." + suffix + ".minimumPrice")
+            && hasOption("model.option." + suffix + ".maximumPrice")) {
+            return Math.min(getInteger("model.option." + suffix + ".maximumPrice"),
+                            getInteger("model.option." + suffix + ".minimumPrice"));
+        } else {
+            return goodsType.getInitialSellPrice();
+        }
     }
 
     // -- Resources --

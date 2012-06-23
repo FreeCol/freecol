@@ -101,12 +101,40 @@ public class FreeColGameObjectType extends FreeColObject {
         return index;
     }
 
+    /**
+     * Returns a string suitable for looking up the name of this
+     * object in {@link net.sf.freecol.client.gui.i18n.Messages}.
+     *
+     * @return a <code>String</code> value
+     */
     public final String getNameKey() {
         return getId() + ".name";
     }
 
+    /**
+     * Returns a string suitable for looking up the description of
+     * this object in {@link net.sf.freecol.client.gui.i18n.Messages}.
+     *
+     * @return a <code>String</code> value
+     */
     public final String getDescriptionKey() {
         return getId() + ".description";
+    }
+
+    /**
+     * Returns the ID of this object with the given prefix removed if
+     * the ID of the object starts with the prefix, and the entire ID
+     * otherwise.
+     *
+     * @param prefix a <code>String</code> value
+     * @return a <code>String</code> value
+     */
+    public final String getSuffix(String prefix) {
+        if (getId().startsWith(prefix)) {
+            return getId().substring(prefix.length());
+        } else {
+            return getId();
+        }
     }
 
     /**

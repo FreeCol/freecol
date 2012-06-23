@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Element;
@@ -146,12 +147,22 @@ public final class Market extends FreeColGameObject implements Ownable {
      * @param random A pseudo-random number source.
      */
     public void randomizeInitialPrice(Random random) {
-        for (GoodsType type : getGame().getSpecification().getGoodsTypeList()) {
-            if (type.isNewWorldGoodsType() || type.isNewWorldLuxuryType()) {
-                int add = Utils.randomInt(null, null, random, 3);
-                if (add > 0) {
-                    setInitialPrice(type, add + getInitialPrice(type));
+        Specification spec = getGame().getSpecification();
+        for (GoodsType type : spec.getGoodsTypeList()) {
+            String prefix = "model.option." + type.getSuffix("model.goods.");
+            // these options are not available for all goods types
+            if (spec.hasOption(prefix + ".minimumPrice")
+                && spec.hasOption(prefix + ".maximumPrice")) {
+                int min = spec.getInteger(prefix + ".minimumPrice");
+                int max = spec.getInteger(prefix + ".maximumPrice");
+                int value = min;
+                if (max > min) {
+                    value += Utils.randomInt(null, null, random, max - min);
+                } else if (max < min) {
+                    // user error
+                    value = max + Utils.randomInt(null, null, random, min - max);
                 }
+                setInitialPrice(type, value);
             }
         }
     }
