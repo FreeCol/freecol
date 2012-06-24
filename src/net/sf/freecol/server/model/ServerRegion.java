@@ -41,11 +41,33 @@ public class ServerRegion extends Region {
     private Rectangle bounds = new Rectangle();
 
 
-    public ServerRegion(Game game, String nameKey, RegionType type) {
-        this(game, nameKey, type, null);
+    /**
+     * Constructor for copying in a new region from an imported game.
+     */
+    public ServerRegion(Game game, Region region) {
+        super(game);
+        this.name = region.getName();
+        this.nameKey = region.getNameKey();
+        this.parent = null;
+        this.claimable = region.isClaimable();
+        this.discoverable = region.isDiscoverable();
+        this.discoveredIn = region.getDiscoveredIn();
+        this.discoveredBy = region.getDiscoveredBy();
+        this.prediscovered = region.isPrediscovered();
+        this.scoreValue = region.getScoreValue();
+        this.type = region.getType();
     }
 
-    public ServerRegion(Game game, String nameKey, RegionType type, Region parent) {
+    /**
+     * Creates a new server region.
+     *
+     * @param game The <code>Game</code> to create in.
+     * @param nameKey The i18n-name of the region.
+     * @param type The <code>RegionType</code> to use.
+     * @param parent The <code>Region</code> to be the parent of this one.
+     */
+    public ServerRegion(Game game, String nameKey, RegionType type,
+                        Region parent) {
         super(game);
         setNameKey(nameKey);
         setType(type);
@@ -101,7 +123,7 @@ public class ServerRegion extends Region {
             bounds.setBounds(tile.getX(), tile.getY(), 0, 0);
         } else {
             bounds.add(tile.getX(), tile.getY());
-        } 
+        }
     }
 
     /**

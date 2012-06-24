@@ -267,7 +267,16 @@ public class MapGeneratorTest extends FreeColTestCase {
         assertEquals(pacific, southPacific.getParent());
         assertNull(southPacific.getDiscoverableRegion());
 
+        Region atlantic = map.getRegion("model.region.atlantic");
+        assertNotNull(atlantic);
+        assertFalse(atlantic.isPacific());
+        assertFalse(atlantic.isDiscoverable());
+        assertNull(atlantic.getDiscoverableRegion());
+
+        Region northAtlantic = map.getRegion("model.region.northAtlantic");
+        assertNotNull(northAtlantic);
+        assertFalse(northAtlantic.isPacific());
+        assertFalse(northAtlantic.isDiscoverable());
+        assertNull(northAtlantic.getDiscoverableRegion());
     }        
-
 }
-

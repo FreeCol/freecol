@@ -108,11 +108,11 @@ public class SimpleMapGenerator implements MapGenerator {
     }
 
     /**
-     * Returns the approximate number of land tiles.
+     * Gets the approximate number of land tiles.
      *
-     * @return the approximate number of land tiles
+     * @return The approximate number of land tiles
      */
-    private int getLand() {
+    private int getApproximateLandCount() {
         return mapGeneratorOptions.getInteger("model.option.mapWidth")
             * mapGeneratorOptions.getInteger("model.option.mapHeight")
             * mapGeneratorOptions.getInteger("model.option.landMass")
@@ -134,9 +134,8 @@ public class SimpleMapGenerator implements MapGenerator {
             Game g = null;
             try {
                 logger.info("Importing file " + importFile.getPath());
-                g = FreeColServer
-                    .readGame(new FreeColSavegameFile(importFile),
-                        game.getSpecification(), null);
+                g = FreeColServer.readGame(new FreeColSavegameFile(importFile),
+                    game.getSpecification(), null);
             } catch (IOException ioe) {
                 g = null;
             }
@@ -145,7 +144,7 @@ public class SimpleMapGenerator implements MapGenerator {
             importGame = null;
         }
 
-        // Create land map:
+        // Create land map.
         boolean[][] landMap;
         if (importGame != null) {
             landMap = LandGenerator.importLandMap(importGame);
@@ -157,14 +156,9 @@ public class SimpleMapGenerator implements MapGenerator {
         terrainGenerator.createMap(game, importGame, landMap);
 
         Map map = game.getMap();
-        if (map.getRegions() == null || map.getRegions().isEmpty()) {
-            terrainGenerator.createOceanRegions(map);
-            terrainGenerator.createLandRegions(map);
-        }
         createIndianSettlements(map, game.getPlayers());
         createEuropeanUnits(map, game.getPlayers());
         createLostCityRumours(map, importGame);
-
     }
 
     /**
@@ -224,7 +218,7 @@ public class SimpleMapGenerator implements MapGenerator {
                 }
             }
         } else {
-            int number = getLand() / getMapGeneratorOptions().getInteger("model.option.rumourNumber");
+            int number = getApproximateLandCount() / getMapGeneratorOptions().getInteger("model.option.rumourNumber");
             int counter = 0;
 
             // TODO: Remove temporary fix:

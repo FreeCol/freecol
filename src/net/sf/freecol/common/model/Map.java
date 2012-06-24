@@ -23,11 +23,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.Random;
 import java.util.logging.Logger;
 
@@ -43,7 +45,7 @@ import net.sf.freecol.common.util.Utils;
 
 
 /**
- * A rectangular isometric map. The map is represented as a
+ * A rectangular isometric map.  The map is represented as a
  * two-dimensional array of tiles.  Off-map destinations, such as
  * {@link Europe}, can be reached via the {@link HighSeas}.
  *
@@ -458,10 +460,10 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Returns the <code>Region</code> with the given ID.
+     * Returns the <code>Region</code> with the given key (the nameKey).
      *
-     * @param id a <code>String</code> value
-     * @return a <code>Region</code> value
+     * @param key The key to lookup the region with.
+     * @return The region with the given name key.
      */
     public Region getRegion(final String id) {
         return regions.get(id);
@@ -1874,6 +1876,125 @@ public class Map extends FreeColGameObject implements Location {
         return null;
     }
 
+
+    /**
+     * Flood fills from a given <code>Position</code> p, based on
+     * connectivity information encoded in boolmap
+     *
+     * @param boolmap The connectivity information for this floodfill.
+     * @param p The starting <code>Position</code>.
+     * @return A boolean[][] of the same size as boolmap, where "true"
+     *      means the fill succeeded at that location.
+     */
+    public static boolean[][] floodFill(boolean[][] boolmap, Position p) {
+        return floodFill(boolmap, p, Integer.MAX_VALUE);
+    }
+
+    /**
+     * Flood fills from a given <code>Position</code> p, based on
+     * connectivity information encoded in boolmap
+     *
+     * @param boolmap The connectivity information for this floodfill.
+     * @param p The starting <code>Position</code>.
+     * @param limit Limit to stop flood fill at.
+     * @return A boolean[][] of the same size as boolmap, where "true"
+     *      means the fill succeeded at that location.
+     */
+    public static boolean[][] floodFill(boolean[][] boolmap, Position p,
+                                        int limit) {
+        Queue<Position>q = new LinkedList<Position>();
+        boolean[][] visited = new boolean[boolmap.length][boolmap[0].length];
+        visited[p.getX()][p.getY()] = true;
+        limit--;
+        do {
+            for (Direction direction : Direction.values()) {
+                Position n = p.getAdjacent(direction);
+                if (Map.isValid(n, boolmap.length, boolmap[0].length)
+                    && boolmap[n.getX()][n.getY()]
+                    && !visited[n.getX()][n.getY()] && limit > 0) {
+                    visited[n.getX()][n.getY()] = true;
+                    limit--;
+                    q.add(n);
+                }
+            }
+
+            p = q.poll();
+        } while (p != null && limit > 0);
+        return visited;
+    }
+
+    /**
+     * Sets the contiguity identifier for all tiles.
+     */
+    public void resetContiguity() {
+        // Create the water map.  It is an error for any tile not to
+        // have a region at this point.
+        boolean[][] waterMap = new boolean[getWidth()][getHeight()];
+        for (int y = 0; y < getHeight(); y++) {
+            for (int x = 0; x < getWidth(); x++) {
+                if (isValid(x, y)) {
+                    waterMap[x][y] = !getTile(x,y).isLand();
+                }
+            }
+        }
+
+        // Flood fill each contiguous water region, setting the
+        // contiguity number.
+        int contig = 0;
+        for (int y = 0; y < getHeight(); y++) {
+            for (int x = 0; x < getWidth(); x++) {
+                Tile tile = getTile(x, y);
+                if (waterMap[x][y]) {
+                    if (tile.getContiguity() >= 0) continue;
+                    
+                    boolean[][] found = floodFill(waterMap,
+                                                  new Position(x, y));
+                    for (int yy = 0; yy < getHeight(); yy++) {
+                        for (int xx = 0; xx < getWidth(); xx++) {
+                            if (found[xx][yy]) {
+                                Tile t = getTile(xx, yy);
+                                if (t.getContiguity() < 0) {
+                                    t.setContiguity(contig);
+                                }
+                            }
+                        }
+                    }
+                    contig++;
+                }
+            }
+        }
+
+        // Complement the waterMap, it is now the land map.
+        for (int y = 0; y < getHeight(); y++) {
+            for (int x = 0; x < getWidth(); x++) {
+                if (isValid(x, y)) waterMap[x][y] = !waterMap[x][y];
+            }
+        }
+
+        // Flood fill again for each contiguous land region.
+        for (int y = 0; y < getHeight(); y++) {
+            for (int x = 0; x < getWidth(); x++) {
+                if (waterMap[x][y]) {
+                    Tile tile = getTile(x, y);
+                    if (tile.getContiguity() >= 0) continue;
+                    
+                    boolean[][] found = floodFill(waterMap,
+                                                  new Position(x, y));
+                    for (int yy = 0; yy < getHeight(); yy++) {
+                        for (int xx = 0; xx < getWidth(); xx++) {
+                            if (found[xx][yy]) {
+                                Tile t = getTile(xx, yy);
+                                if (t.getContiguity() < 0) {
+                                    t.setContiguity(contig);
+                                }
+                            }
+                        }
+                    }
+                    contig++;
+                }
+            }
+        }
+    }        
 
     // Serialization
 

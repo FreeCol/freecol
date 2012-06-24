@@ -1085,6 +1085,10 @@ public final class FreeColServer {
         }
         // end compatibility code
 
+        // @compat 0.10.x
+        game.getMap().resetContiguity();
+        // end compatibility code
+
         // ensure that option groups can not be edited
         game.getMapGeneratorOptions().setEditable(false);
         try {

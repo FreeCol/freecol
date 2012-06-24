@@ -117,6 +117,22 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     private int style;
 
     /**
+     * An artificial contiguous-region number to identify connected
+     * parts of the map.  That is, all land tiles with the same
+     * contiguity number can be reached by a land unit on any of
+     * those tiles in the absence of extra-geographic blockages like
+     * settlements and other units.  Similarly for water tiles/naval
+     * units.
+     *
+     * This is used to quickly scope out the sort of paths available
+     * to a unit attempting to reach some destination.  It only needs
+     * serialization from server to client, as it is set by the
+     * TerrainGenerator on map import or creation.
+     */
+    private int contiguity = -1;
+
+
+    /**
      * A constructor to use.
      *
      * @param game The <code>Game</code> this <code>Tile</code> belongs to.
@@ -1049,6 +1065,24 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
+     * Get the contiguity identifier for this tile.
+     *
+     * @return A contiguity number.
+     */
+    public int getContiguity() {
+        return contiguity;
+    }
+
+    /**
+     * Sets the contiguity identifier for this tile.
+     *
+     * @param contiguity A contiguity number.
+     */
+    public void setContiguity(int contiguity) {
+        this.contiguity = contiguity;
+    }
+
+    /**
      * Gets a <code>Unit</code> that can become active. This is preferably a
      * <code>Unit</code> not currently performing any work.
      *
@@ -1731,6 +1765,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
 
+    // Serialization
+
     /**
      * Write a minimal version of the tile.  Useful if the player
      * has not explored the tile.
@@ -1802,6 +1838,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
         if (connected && !type.isConnected()) {
             out.writeAttribute("connected", Boolean.toString(true));
+        }
+
+        if (contiguity >= 0) {
+            out.writeAttribute("contiguity", Integer.toString(contiguity));
         }
 
         if (showAll || toSavedGame || player.canSee(this)) {
@@ -1889,6 +1929,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         moveToEurope = (in.getAttributeValue(null, "moveToEurope") == null)
             ? null
             : getAttribute(in, "moveToEurope", false);
+
+        contiguity = getAttribute(in, "contiguity", -1);
 
         final String owningSettlementStr
             = in.getAttributeValue(null, "owningSettlement");

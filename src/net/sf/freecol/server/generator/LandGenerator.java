@@ -22,6 +22,7 @@ package net.sf.freecol.server.generator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
@@ -29,6 +30,7 @@ import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
+
 
 /**
  * Class for creating a land map.
@@ -44,6 +46,8 @@ import net.sf.freecol.common.option.OptionGroup;
  * </ul>
  */
 public class LandGenerator {
+
+    private static final Logger logger = Logger.getLogger(LandGenerator.class.getName());
 
     private final OptionGroup mapGeneratorOptions;
     private final Random random;
@@ -82,13 +86,23 @@ public class LandGenerator {
      * and <i>false</i> means ocean.
      */
     public static boolean[][] importLandMap(Game game) {
-        boolean[][] map = new boolean[game.getMap().getWidth()][game.getMap().getHeight()];
-        for (int i=0; i<map.length; i++) {
-            for (int j=0; j<map[0].length; j++) {
-                map[i][j] = game.getMap().getTile(i, j).isLand();
+        Map map = game.getMap();
+        boolean[][] bmap = new boolean[map.getWidth()][map.getHeight()];
+        for (int y = 0; y < bmap[0].length; y++) {
+            for (int x = 0; x < bmap.length; x++) {
+                if (map.isValid(x, y)) {
+                    try {
+                        bmap[x][y] = map.getTile(x, y).isLand();
+                    } catch (Exception e) {
+                        logger.severe("Import failure at tile (" + x
+                            + ", " + y + ").");
+                    }
+                } else {
+                    bmap[x][y] = false;
+                }
             }
         }
-        return map;
+        return bmap;
     }
 
 

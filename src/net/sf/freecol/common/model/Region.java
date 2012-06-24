@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -46,7 +47,6 @@ public class Region extends FreeColGameObject implements Nameable {
         MOUNTAIN,
         DESERT;
 
-
         /**
          * Gets a name index key for this region type.
          *
@@ -60,61 +60,61 @@ public class Region extends FreeColGameObject implements Nameable {
     /**
      * The name of this Region.
      */
-    private String name;
+    protected String name;
 
     /**
      * Key used to retrieve description from Messages.
      */
-    private String nameKey;
+    protected String nameKey;
 
     /**
      * The parent Region of this Region.
      */
-    private Region parent;
+    protected Region parent;
 
     /**
      * Whether this Region is claimable. Ocean Regions and non-leaf
      * Regions should not be claimable.
      */
-    private boolean claimable = false;
+    protected boolean claimable = false;
 
     /**
      * Whether this Region is discoverable. The Eastern Ocean regions
      * should not be discoverable. In general, non-leaf regions should
      * not be discoverable. The Pacific Ocean is an exception, however.
      */
-    private boolean discoverable = false;
+    protected boolean discoverable = false;
 
     /**
      * Which Turn the Region was discovered in.
      */
-    private Turn discoveredIn;
+    protected Turn discoveredIn;
 
     /**
      * Which Player the Region was discovered by.
      */
-    private Player discoveredBy;
+    protected Player discoveredBy;
 
     /**
      * Whether the Region is already discovered when the game starts.
      */
-    private boolean prediscovered = false;
+    protected boolean prediscovered = false;
 
     /**
      * How much discovering this Region contributes to your score.
      * This should be zero unless the Region is discoverable.
      */
-    private int scoreValue = 0;
+    protected int scoreValue = 0;
 
     /**
      * Describe type here.
      */
-    private RegionType type;
+    protected RegionType type;
 
     /**
      * The children Regions of this Region.
      */
-    private List<Region> children = new ArrayList<Region>();
+    protected List<Region> children = new ArrayList<Region>();
 
 
     /**
@@ -149,18 +149,36 @@ public class Region extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Get the <code>NameKey</code> value.
+     * Get the explicit region name.
      *
-     * @return a <code>String</code> value
+     * @return The name, or null if it does not have one.
+     */
+    public final String getName() {
+        return name;
+    }
+
+    /**
+     * Sets the region name.
+     *
+     * @param newName The new name value.
+     */
+    public final void setName(final String newName) {
+        this.name = newName;
+    }
+
+    /**
+     * Gets the name key.
+     *
+     * @return The name key.
      */
     public final String getNameKey() {
         return nameKey;
     }
 
     /**
-     * Set the <code>NameKey</code> value.
+     * Set the name key.
      *
-     * @param newNameKey The new NameKey value.
+     * @param newNameKey The new name key.
      */
     public final void setNameKey(final String newNameKey) {
         this.nameKey = newNameKey;
@@ -171,7 +189,7 @@ public class Region extends FreeColGameObject implements Nameable {
      * Ocean. The Pacific Ocean is special in so far as it is the only
      * Region that could be discovered in the original game.
      *
-     * @return a <code>boolean</code> value
+     * @return True if this region is the Pacific.
      */
     public boolean isPacific() {
         if (PACIFIC_NAME_KEY.equals(nameKey)) {
@@ -184,73 +202,58 @@ public class Region extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Get the <code>Name</code> value.
-     *
-     * @return a <code>String</code> value
-     */
-    public final String getName() {
-        return name;
-    }
-
-    /**
-     * Set the <code>Name</code> value.
-     *
-     * @param newName The new Name value.
-     */
-    public final void setName(final String newName) {
-        this.name = newName;
-    }
-
-    /**
      * Returns the name or default name of this Region.
      *
-     * @return a <code>String</code> value
+     * @return The i18n-ready name for the region.
      */
     public StringTemplate getLabel() {
         if (prediscovered || isPacific()) {
             return StringTemplate.key(nameKey);
         } else if (name == null) {
-            return StringTemplate.key("model.region." + type.toString().toLowerCase(Locale.US) + ".unknown");
+            return StringTemplate.key("model.region."
+                + type.toString().toLowerCase(Locale.US) + ".unknown");
         } else {
             return StringTemplate.name(name);
         }
     }
 
     public String getTypeNameKey() {
-        return "model.region." + type.toString().toLowerCase(Locale.US) + ".name";
+        return "model.region." + type.toString().toLowerCase(Locale.US)
+            + ".name";
     }
 
     /**
-     * Get the <code>Parent</code> value.
+     * Gets the enclosing parent region.
      *
-     * @return a <code>Region</code> value
+     * @return The parent region
      */
     public final Region getParent() {
         return parent;
     }
 
     /**
-     * Set the <code>Parent</code> value.
+     * Sets the parent region.
      *
-     * @param newParent The new Parent value.
+     * @param newParent The new parent region.
      */
     public final void setParent(final Region newParent) {
         this.parent = newParent;
     }
 
     /**
-     * Get the <code>Children</code> value.
+     * Get a list of the child regions.
      *
-     * @return a <code>List<Region></code> value
+     * @return The child regions.
      */
     public final List<Region> getChildren() {
+        if (children == null) return Collections.emptyList();
         return children;
     }
 
     /**
-     * Set the <code>Children</code> value.
+     * Sets the child regions.
      *
-     * @param newChildren The new Children value.
+     * @param newChildren The new child regions.
      */
     public final void setChildren(final List<Region> newChildren) {
         this.children = newChildren;
@@ -266,36 +269,36 @@ public class Region extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Get the <code>Claimable</code> value.
+     * Can this region be claimed?
      *
-     * @return a <code>boolean</code> value
+     * @return True if the region can be claimed.
      */
     public final boolean isClaimable() {
         return claimable;
     }
 
     /**
-     * Set the <code>Claimable</code> value.
+     * Set the claimable value.
      *
-     * @param newClaimable The new Claimable value.
+     * @param newClaimable The new claimable value.
      */
     public final void setClaimable(final boolean newClaimable) {
         this.claimable = newClaimable;
     }
 
     /**
-     * Get the <code>Discoverable</code> value.
+     * Can this region be discovered?
      *
-     * @return a <code>boolean</code> value
+     * @return True if the region can be discovered.
      */
     public final boolean isDiscoverable() {
         return discoverable;
     }
 
     /**
-     * Set the <code>Discoverable</code> value.
+     * Set the discoverable value.
      *
-     * @param newDiscoverable The new Discoverable value.
+     * @param newDiscoverable The new discoverable value.
      */
     public final void setDiscoverable(final boolean newDiscoverable) {
         this.discoverable = newDiscoverable;
@@ -305,85 +308,13 @@ public class Region extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Get the <code>Prediscovered</code> value.
-     *
-     * @return a <code>boolean</code> value
-     */
-    public final boolean isPrediscovered() {
-        return prediscovered;
-    }
-
-    /**
-     * Set the <code>Prediscovered</code> value.
-     *
-     * @param newPrediscovered The new Prediscovered value.
-     */
-    public final void setPrediscovered(final boolean newPrediscovered) {
-        this.prediscovered = newPrediscovered;
-    }
-
-    /**
-     * Get the <code>ScoreValue</code> value.
-     *
-     * @return an <code>int</code> value
-     */
-    public final int getScoreValue() {
-        return scoreValue;
-    }
-
-    /**
-     * Set the <code>ScoreValue</code> value.
-     *
-     * @param newScoreValue The new ScoreValue value.
-     */
-    public final void setScoreValue(final int newScoreValue) {
-        this.scoreValue = newScoreValue;
-    }
-
-    /**
-     * Get the <code>Type</code> value.
-     *
-     * @return a <code>RegionType</code> value
-     */
-    public final RegionType getType() {
-        return type;
-    }
-
-    /**
-     * Set the <code>Type</code> value.
-     *
-     * @param newType The new Type value.
-     */
-    public final void setType(final RegionType newType) {
-        this.type = newType;
-    }
-
-    /**
-     * Returns true if this is the whole map Region.
-     *
-     * @return a <code>boolean</code> value
-     */
-    public boolean isRoot() {
-        return parent == null;
-    }
-
-    /**
-     * Returns true if this is a leaf node.
-     *
-     * @return a <code>boolean</code> value
-     */
-    public boolean isLeaf() {
-        return children == null;
-    }
-
-    /**
      * Returns a discoverable Region or null. If this region is
      * discoverable, it is returned. If not, a discoverable parent is
      * returned, unless there is none. This is intended for
      * discovering the Pacific Ocean when discovering one of its
      * sub-Regions.
      *
-     * @return a <code>Region</code> value
+     * @return A discoverable a region, or null if none found.
      */
     public Region getDiscoverableRegion() {
         if (isDiscoverable()) {
@@ -396,62 +327,128 @@ public class Region extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Get the <code>DiscoveredIn</code> value.
+     * Gets the turn the region was discovered in.
      *
-     * @return a <code>Turn</code> value
+     * @return The discovery turn.
      */
     public final Turn getDiscoveredIn() {
         return discoveredIn;
     }
 
     /**
-     * Set the <code>DiscoveredIn</code> value.
+     * Sets the discovery turn.
      *
-     * @param newDiscoveredIn The new DiscoveredIn value.
+     * @param newDiscoveredIn The new discoveredy turn.
      */
     public final void setDiscoveredIn(final Turn newDiscoveredIn) {
         this.discoveredIn = newDiscoveredIn;
     }
 
     /**
-     * Get the <code>DiscoveredBy</code> value.
+     * Gets the player that discovered the region.
      *
-     * @return a <code>Player</code> value
+     * @return The discovering <code>Player</code>.
      */
     public final Player getDiscoveredBy() {
         return discoveredBy;
     }
 
     /**
-     * Set the <code>DiscoveredBy</code> value.
+     * Sets the discovering player.
      *
-     * @param newDiscoveredBy The new DiscoveredBy value.
+     * @param newDiscoveredBy The new discovering player.
      */
     public final void setDiscoveredBy(final Player newDiscoveredBy) {
         this.discoveredBy = newDiscoveredBy;
     }
 
     /**
+     * Is the region pre-discovered (e.g. the Atlantic).
+     *
+     * @return True if the region is prediscovered.
+     */
+    public final boolean isPrediscovered() {
+        return prediscovered;
+    }
+
+    /**
+     * Sets the prediscovered value.
+     *
+     * @param newPrediscovered The new prediscovered value.
+     */
+    public final void setPrediscovered(final boolean newPrediscovered) {
+        this.prediscovered = newPrediscovered;
+    }
+
+    /**
      * Mark the Region as discovered.
      *
-     * @param player a <code>Player</code> value
-     * @param turn a <code>Turn</code> value
-     * @param newName a <code>String</code> value
+     * @param player The discovering <code>Player</code>.
+     * @param turn The discovery <code>Turn</code>.
+     * @param newName The name of the region.
      */
     public HistoryEvent discover(Player player, Turn turn, String newName) {
         discoveredBy = player;
         discoveredIn = turn;
         name = newName;
         discoverable = false;
-        if (getSpecification().getBoolean(GameOptions.EXPLORATION_POINTS) ||
-            isPacific()) {
+        if (getSpecification().getBoolean(GameOptions.EXPLORATION_POINTS)
+            || isPacific()) {
             player.modifyScore(getScoreValue());
         }
+        for (Region r : getChildren()) r.setDiscoverable(false);
         return new HistoryEvent(turn, HistoryEvent.EventType.DISCOVER_REGION)
             .addStringTemplate("%nation%", player.getNationName())
             .addName("%region%", newName);
     }
 
+    /**
+     * Gets the score for discovering this region.
+     *
+     * @return The score.
+     */
+    public final int getScoreValue() {
+        return scoreValue;
+    }
+
+    /**
+     * Sets the score for discovering this region.
+     *
+     * @param newScoreValue The new score.
+     */
+    public final void setScoreValue(final int newScoreValue) {
+        this.scoreValue = newScoreValue;
+    }
+
+    /**
+     * Gets the type of the region.
+     *
+     * @return The region type.
+     */
+    public final RegionType getType() {
+        return type;
+    }
+
+    /**
+     * Sets the region type.
+     *
+     * @param newType The new type value.
+     */
+    public final void setType(final RegionType newType) {
+        this.type = newType;
+    }
+
+    /**
+     * Returns true if this is a leaf node.
+     *
+     * @return True if the region has no children.
+     */
+    public boolean isLeaf() {
+        return children == null;
+    }
+
+
+    // Serialization
 
     /**
      * This method writes an XML-representation of this object to the given
@@ -523,7 +520,8 @@ public class Region extends FreeColGameObject implements Nameable {
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+    protected void readFromXMLImpl(XMLStreamReader in)
+        throws XMLStreamException {
         setId(in.getAttributeValue(null, ID_ATTRIBUTE));
         nameKey = in.getAttributeValue(null, "nameKey");
         name = in.getAttributeValue(null, "name");
@@ -557,12 +555,16 @@ public class Region extends FreeColGameObject implements Nameable {
         if (children.isEmpty()) {
             children = null;
         }
-
     }            
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
-        return nameKey;
+        return "[Region " + getId()
+            + " " + ((name == null) ? "(null)" : name)
+            + " " + nameKey + " " + type + "]";
     }
 
     /**
