@@ -118,6 +118,11 @@ public class ListOption<T> extends AbstractOption<List<AbstractOption<T>>> {
      * @param value The value to be set.
      */
     public void setValue(List<AbstractOption<T>> value) {
+        // fail fast: the list value may be empty, but it must not be
+        // null
+        if (value == null) {
+            throw new IllegalArgumentException("ListOption value must not be 'null'!");
+        }
         final List<AbstractOption<T>> oldValue = this.value;
         this.value = value;
 
