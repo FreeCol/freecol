@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -138,5 +139,25 @@ public class NationTypeTest extends FreeColTestCase {
 
 
     }
+
+    public void testBuildingAdvantage() {
+        Game game = getGame();
+        game.setMap(getTestMap(true));
+
+        Colony colony = getStandardColony();
+        colony.getOwner().setNationType(spec().getNationType("model.nationType.building"));
+
+        List<Modifier> modifiers = new ArrayList<Modifier>(colony.getOwner().getModifierSet("model.goods.hammers"));
+        assertEquals(1, modifiers.size());
+
+        BuildingType carpenterHouse = spec().getBuildingType("model.building.carpenterHouse");
+        assertFalse("Hammer production bonus should not apply to buildings",
+                    modifiers.get(0).appliesTo(carpenterHouse));
+        for (Unit unit : colony.getUnitList()) {
+            assertTrue("Hammer production bonus should apply to all persons",
+                       modifiers.get(0).appliesTo(unit.getType()));
+        }
+    }
+
 
 }
