@@ -78,8 +78,7 @@ public abstract class ServerAPI {
      *     communicating with a server.
      * @param client 
      */
-    public ServerAPI(Client client) {
-        this.client = client;
+    public ServerAPI() {
     }
 
 
@@ -1156,5 +1155,14 @@ public abstract class ServerAPI {
 
     public void continuePlaying() {
         client.send(DOMMessage.createMessage("continuePlaying"));        
+    }
+
+    public Client getClient() {
+        return client;
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
+        
     }
 }

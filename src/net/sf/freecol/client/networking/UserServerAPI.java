@@ -2,7 +2,6 @@ package net.sf.freecol.client.networking;
 
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.debug.FreeColDebugger;
-import net.sf.freecol.common.networking.Client;
 import net.sf.freecol.common.networking.ServerAPI;
 
 import org.w3c.dom.Element;
@@ -18,8 +17,8 @@ public class UserServerAPI extends ServerAPI {
 
     private GUI gui;
 
-    public UserServerAPI(GUI gui, Client client) {
-        super(client);
+    public UserServerAPI(GUI gui) {
+        super();
         this.gui = gui;
     }
 

@@ -155,7 +155,7 @@ public class ResourceManager {
      * @param windowSize
      */
     public static void preload(final Dimension windowSize) {
-        if (!windowSize.equals(lastWindowSize)) {
+        if (windowSize != null && !windowSize.equals(lastWindowSize)) {
             dirty = true;
             logger.info("Window size changes from " + lastWindowSize
                 + " to " + windowSize);

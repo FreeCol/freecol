@@ -91,7 +91,6 @@ public final class FreeColClient {
      * The network <code>Client</code> that can be used to send messages to
      * the server.
      */
-    private Client client;
 
     // Model:
     private Game game;
@@ -152,6 +151,7 @@ public final class FreeColClient {
                          final boolean showOpeningVideo,
                          final String fontName) {
         gui = new GUI(this);
+        serverAPI = new UserServerAPI(gui);
 
         // Look for base data directory.  Failure is fatal.
         File baseDirectory = FreeColDirectories.getBaseDirectory();
@@ -270,8 +270,6 @@ public final class FreeColClient {
      * @return A ServerAPI.
      */
     public ServerAPI askServer() {
-        if (serverAPI == null) 
-            serverAPI = new UserServerAPI(gui, client);
         return serverAPI;
     }
 
@@ -332,7 +330,7 @@ public final class FreeColClient {
      * @see #setClient
      */
     public Client getClient() {
-        return client;
+        return serverAPI.getClient();
     }
 
     /**
@@ -552,7 +550,7 @@ public final class FreeColClient {
      * @see #getClient
      */
     public void setClient(Client client) {
-        this.client = client;
+        serverAPI.setClient(client);
     }
 
     /**
