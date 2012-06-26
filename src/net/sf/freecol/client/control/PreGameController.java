@@ -35,7 +35,6 @@ import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
@@ -148,9 +147,7 @@ public final class PreGameController {
      * @param message The text of the message.
      */
     public void chat(String message) {
-        freeColClient.getClient()
-            .send(new ChatMessage(freeColClient.getMyPlayer(),
-                    message, Boolean.FALSE).toXMLElement());
+        freeColClient.askServer().chat(freeColClient.getMyPlayer(), message);
     }
 
     /**
