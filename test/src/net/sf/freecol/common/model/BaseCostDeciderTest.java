@@ -85,7 +85,7 @@ public class BaseCostDeciderTest extends FreeColTestCase {
                                    game.getMap().getTile(2, 2), 4);
         assertEquals(plainsType.getBasicMoveCost(), cost);
         assertEquals(4 - plainsType.getBasicMoveCost(), decider.getMovesLeft());
-        assertFalse(decider.isNewTurn());
+        assertEquals(0, decider.getNewTurns());
     }
     
     /**
@@ -206,7 +206,7 @@ public class BaseCostDeciderTest extends FreeColTestCase {
         assertTrue("Move should be valid, has contact and goods to trade",
                    cost != CostDecider.ILLEGAL_MOVE);
         assertTrue("Move should consume whole turn",
-                   base.getMovesLeft() == 0 && !base.isNewTurn());
+                   base.getMovesLeft() == 0 && base.getNewTurns() == 0);
 
         // Try with colonist on galleon
         Unit colonist = new ServerUnit(game, galleon, game.getCurrentPlayer(),

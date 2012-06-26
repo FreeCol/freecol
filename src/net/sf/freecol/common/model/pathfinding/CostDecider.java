@@ -20,6 +20,7 @@
 
 package net.sf.freecol.common.model.pathfinding;
 
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 
@@ -39,32 +40,28 @@ public interface CostDecider {
      * @param unit The <code>Unit</code> that will be used when
      *      determining the cost. This should be the same type
      *      of unit as the one following the path.
-     * @param oldTile The <code>Tile</code> we are moving from.
-     * @param newTile The <code>Tile</code> we are moving to.
-     * @param movesLeftBefore The remaining moves left. The
-     *      <code>CostDecider</code> can use this information
-     *      if needed.
+     * @param oldLocation The <code>Location</code> we are moving from.
+     * @param newLocation The <code>Location</code> we are moving to.
+     * @param movesLeftBefore The moves left to the unit prior to moving.
      * @return The cost of moving the given unit from the
-     *      <code>oldTile</code> to the <code>newTile</code>.
+     *     <code>oldLocation</code> to the <code>newLocation</code>.
      */
-    public int getCost(Unit unit, Tile oldTile, Tile newTile,
+    public int getCost(Unit unit, Location oldLocation, Location newLocation,
                        int movesLeftBefore);
     
     /**
-     * Gets the number of moves left. This method should be
-     * called after invoking {@link #getCost}.
+     * Gets the number of moves left. 
+     * This method should be called after invoking {@link #getCost}.
      * 
      * @return The number of moves left.
      */
     public int getMovesLeft();
 
     /**
-     * Checks if a new turn is needed in order to make the
-     * move. This method should be called after invoking 
-     * {@link #getCost}.
+     * Gets the number of turns consumed.
+     * This method should be called after invoking {@link #getCost}.
      * 
-     * @return <code>true</code> if the move requires a
-     *      new turn and <code>false</code> otherwise.
+     * @return The number of turns consumed.
      */    
-    public boolean isNewTurn();    
+    public int getNewTurns();    
 }

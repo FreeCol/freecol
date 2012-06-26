@@ -83,12 +83,15 @@ public class Map extends FreeColGameObject implements Location {
      * A cost decider to help find a path to Europe without knowing the unit.
      */
     private static final CostDecider europeCostDecider = new CostDecider() {
-            public int getCost(Unit unit, Tile oldTile, Tile newTile, 
-                              int movesLeft) {
-                return (newTile.isLand()) ? ILLEGAL_MOVE : 1;
+            public int getCost(Unit unit, Location oldLocation,
+                               Location newLocation, int movesLeft) {
+                return (newLocation == null
+                    || newLocation.getTile() == null
+                    || newLocation.getTile().isLand()) ? ILLEGAL_MOVE
+                    : 1;
             }
             public int getMovesLeft() { return 0; }
-            public boolean isNewTurn() { return false; }
+            public int getNewTurns() { return 0; }
         };
 
     /**
@@ -1069,7 +1072,7 @@ public class Map extends FreeColGameObject implements Location {
                     moveTurns++;
                 } else {
                     moveMovesLeft = moveDecider.getMovesLeft();
-                    if (moveDecider.isNewTurn()) moveTurns++;
+                    moveTurns += moveDecider.getNewTurns();
                 }
                 int moveCost = PathNode.getCost(moveTurns, moveMovesLeft);
 

@@ -20,13 +20,14 @@
 
 package net.sf.freecol.common.model.pathfinding;
 
+import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 
+
 /**
  * Class for determining the cost of a single move.
- * 
- * <br /><br />
  * 
  * This {@link CostDecider} is used as a default by
  * {@link net.sf.freecol.common.model.Map#findPath} and 
@@ -35,76 +36,104 @@ import net.sf.freecol.common.model.Unit;
  */
 class BaseCostDecider implements CostDecider {
 
+    /**
+     * The number of moves left following a proposed move.
+     */
     private int movesLeft;
-    private boolean newTurn;
-    
+
+    /**
+     * The number of turns consumed by the proposed move.
+     */
+    private int newTurns;
+
+
     /**
      * Determines the cost of a single move.
      * 
      * @param unit The <code>Unit</code> making the move.
-     * @param oldTile The <code>Tile</code> we are moving from.
-     * @param newTile The <code>Tile</code> we are moving to.
+     * @param oldLocation The <code>Location</code> we are moving from.
+     * @param newLocation The <code>Location</code> we are moving to.
      * @param movesLeftBefore The moves left before making the move.
      * @return The cost of moving the given unit from the
-     *      <code>oldTile</code> to the <code>newTile</code>.
+     *      <code>oldLocation</code> to the <code>newLocation</code>.
      */    
-    public int getCost(final Unit unit, final Tile oldTile, final Tile newTile,
-                       int movesLeftBefore) {
-        newTurn = false;
+    public int getCost(final Unit unit, final Location oldLocation,
+                       final Location newLocation, int movesLeftBefore) {
+        int cost = 0;
+        newTurns = 0;
               
-        // Not allowed to use an unexplored tile.
-        if (!newTile.isExplored()) {
-            return ILLEGAL_MOVE;
-        }
-        
-        // Disallow illegal moves.
-        // Special moves and moving off a carrier consume a whole turn.
-        boolean consumeMove = false;
-        switch (unit.getSimpleMoveType(oldTile, newTile)) {
-        case MOVE_HIGH_SEAS:
-            break;
-        case ATTACK_UNIT:
-            // Ignore hostile units in the base case, treating attacks
-            // as moves.
-        case MOVE:
-            if (!unit.isOnCarrier()) break; // Fall through if disembarking.
-        case ATTACK_SETTLEMENT:
-        case EXPLORE_LOST_CITY_RUMOUR:
-        case EMBARK:
-        case ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST:
-        case ENTER_INDIAN_SETTLEMENT_WITH_SCOUT:
-        case ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY:
-        case ENTER_FOREIGN_COLONY_WITH_SCOUT:
-        case ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS:
-            consumeMove = true;
-            break;
-        default:
-            return ILLEGAL_MOVE;
-        }
+        Tile oldTile = oldLocation.getTile();
+        Tile newTile = newLocation.getTile();
+        if (oldLocation instanceof Europe) { // Coming from Europe
+            if (newLocation instanceof Europe
+                || newTile == null
+                || !newTile.canMoveToEurope()
+                || !unit.isNaval()) return ILLEGAL_MOVE;
+            newTurns = unit.getSailTurns();
+            movesLeft = unit.getInitialMovesLeft();
+            cost = newTurns * unit.getInitialMovesLeft();
 
-        int moveCost = unit.getMoveCost(oldTile, newTile, movesLeftBefore);
-        if (moveCost <= movesLeftBefore) {
-            movesLeft = movesLeftBefore - moveCost;
-        } else { // This move takes an extra turn to complete:
-            final int thisTurnMovesLeft = movesLeftBefore;
-            int initialMoves = unit.getInitialMovesLeft();
-            final int moveCostNextTurn = unit.getMoveCost(oldTile, newTile,
-                                                          initialMoves);
-            moveCost = thisTurnMovesLeft + moveCostNextTurn;
-            movesLeft = initialMoves - moveCostNextTurn;
-            newTurn = true;
-        }
-        if (consumeMove) {
-            moveCost += movesLeft;
-            movesLeft = 0;
-        }
+        } else if (oldTile == null) {
+            return ILLEGAL_MOVE;
 
-        return moveCost;
+        } else if (newLocation instanceof Europe) { // Going to Europe
+            if (!unit.canMoveToEurope()) return ILLEGAL_MOVE;
+            newTurns = unit.getSailTurns();
+            movesLeft = unit.getInitialMovesLeft();
+            cost = newTurns * unit.getInitialMovesLeft();
+
+        } else if (newTile == null || !newTile.isExplored()) {
+            return ILLEGAL_MOVE;
+
+        } else { // Moving between tiles
+            // Disallow illegal moves.
+            // Special moves and moving off a carrier consume a whole turn.
+            boolean consumeMove = false;
+            switch (unit.getSimpleMoveType(oldTile, newTile)) {
+            case MOVE_HIGH_SEAS:
+                break;
+            case ATTACK_UNIT:
+                // Ignore hostile units in the base case, treating attacks
+                // as moves.
+            case MOVE:
+                if (!unit.isOnCarrier()) break; // Fall through if disembarking.
+            case ATTACK_SETTLEMENT:
+            case EXPLORE_LOST_CITY_RUMOUR:
+            case EMBARK:
+            case ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST:
+            case ENTER_INDIAN_SETTLEMENT_WITH_SCOUT:
+            case ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY:
+            case ENTER_FOREIGN_COLONY_WITH_SCOUT:
+            case ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS:
+                consumeMove = true;
+                break;
+            default:
+                return ILLEGAL_MOVE;
+            }
+
+            cost = unit.getMoveCost(oldTile, newTile, movesLeftBefore);
+            if (cost <= movesLeftBefore) {
+                movesLeft = movesLeftBefore - cost;
+            } else { // This move takes an extra turn to complete:
+                final int thisTurnMovesLeft = movesLeftBefore;
+                int initialMoves = unit.getInitialMovesLeft();
+                final int moveCostNextTurn = unit.getMoveCost(oldTile, newTile,
+                                                              initialMoves);
+                cost = thisTurnMovesLeft + moveCostNextTurn;
+                movesLeft = initialMoves - moveCostNextTurn;
+                newTurns++;
+            }
+            if (consumeMove) {
+                cost += movesLeft;
+                movesLeft = 0;
+            }
+        }
+        return cost;
     }
     
     /**
-     * Gets the number of moves left. This method should be
-     * called after invoking {@link #getCost}.
+     * Gets the number of moves left after the proposed move.
+     * This method should be called after invoking {@link #getCost}.
      * 
      * @return The number of moves left.
      */
@@ -113,14 +142,12 @@ class BaseCostDecider implements CostDecider {
     }
     
     /**
-     * Checks if a new turn is needed in order to make the
-     * move. This method should be called after invoking 
-     * {@link #getCost}.
+     * Gets the number of turns consumed by the proposed move.
+     * This method should be called after invoking {@link #getCost}.
      * 
-     * @return <code>true</code> if the move requires a
-     *      new turn and <code>false</code> otherwise.
+     * @return The number of turns consumed.
      */      
-    public boolean isNewTurn() {
-        return newTurn;
+    public int getNewTurns() {
+        return newTurns;
     }
 }
