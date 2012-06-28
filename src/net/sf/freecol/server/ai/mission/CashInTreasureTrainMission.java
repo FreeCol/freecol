@@ -99,9 +99,9 @@ public class CashInTreasureTrainMission extends Mission {
      */
     public static Location extractTarget(AIUnit aiUnit, PathNode path) {
         final Unit unit = aiUnit.getUnit();
-        final Tile tile = (path == null) ? unit.getTile()
-            : path.getLastNode().getTile();
-        return (invalidReason(aiUnit, tile) == null) ? tile : null;
+        final Location loc = (path == null) ? unit.getLocation()
+            : path.getLastNode().getLocation();
+        return (invalidReason(aiUnit, loc) == null) ? loc : null;
     }
 
     /**

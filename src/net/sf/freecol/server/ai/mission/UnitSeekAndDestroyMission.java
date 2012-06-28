@@ -110,14 +110,18 @@ public class UnitSeekAndDestroyMission extends Mission {
      * @return A target for this mission, or null if none found.
      */
     public static Location extractTarget(AIUnit aiUnit, PathNode path) {
-        final Tile tile = (path == null) ? null : path.getLastNode().getTile();
-        return (tile == null || aiUnit == null || aiUnit.getUnit() == null) 
+        final Location loc = (path == null) ? null
+            : path.getLastNode().getLocation();
+        Tile t;
+        Unit u;
+        return (loc == null || aiUnit == null || aiUnit.getUnit() == null) 
             ? null
-            : (invalidReason(aiUnit, tile.getSettlement()) == null)
-            ? tile.getSettlement()
-            : (invalidReason(aiUnit,
-                    tile.getDefendingUnit(aiUnit.getUnit())) == null)
-            ? tile.getDefendingUnit(aiUnit.getUnit())
+            : (invalidReason(aiUnit, loc.getSettlement()) == null)
+            ? loc.getSettlement()
+            : ((t = loc.getTile()) != null
+                && invalidReason(aiUnit,
+                    u = t.getDefendingUnit(aiUnit.getUnit())) == null)
+            ? u
             : null;
     }
 
@@ -174,7 +178,7 @@ public class UnitSeekAndDestroyMission extends Mission {
      * @return A score of the desirability of the mission.
      */
     private static int scoreUnitPath(AIUnit aiUnit, PathNode path,
-        Unit defender) {
+                                     Unit defender) {
         if (invalidUnitReason(aiUnit, defender) != null) {
             return Integer.MIN_VALUE;
         }
@@ -184,7 +188,7 @@ public class UnitSeekAndDestroyMission extends Mission {
         final CombatModel combatModel = unit.getGame().getCombatModel();
         final float off = combatModel.getOffencePower(unit, defender);
         final float def = combatModel.getDefencePower(unit, defender);
-        if (off <= 0) return Integer.MIN_VALUE;
+        if (tile == null || off <= 0) return Integer.MIN_VALUE;
 
         int value = 1020 - turns * 100;
         value += 100 * (off - def);

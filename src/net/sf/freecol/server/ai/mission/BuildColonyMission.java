@@ -132,11 +132,11 @@ public class BuildColonyMission extends Mission {
      * @return A target for this mission, or null if none found.
      */
     public static Location extractTarget(AIUnit aiUnit, PathNode path) {
-        final Tile tile = (path == null) ? aiUnit.getUnit().getTile()
-            : path.getLastNode().getTile();
-        Colony colony = tile.getColony();
+        final Location loc = (path == null) ? aiUnit.getUnit().getLocation()
+            : path.getLastNode().getLocation();
+        Colony colony = loc.getColony();
         return (invalidReason(aiUnit, colony) == null) ? colony
-            : (invalidReason(aiUnit, tile) == null) ? tile
+            : (invalidReason(aiUnit, loc) == null) ? loc
             : null;
     }
 
@@ -199,7 +199,7 @@ public class BuildColonyMission extends Mission {
             public boolean hasSubGoals() { return true; }
             public boolean check(Unit u, PathNode path) {
                 int value = scorePath(aiUnit, path);
-                Colony colony = path.getTile().getColony();
+                Colony colony = path.getLocation().getColony();
                 if (colony != null && invalidReason(aiUnit, colony) == null) {
                     if (deferOK && value > backupValue) {
                         backupValue = value;

@@ -109,14 +109,14 @@ public class ScoutingMission extends Mission {
      * @return A target for this mission, or null if none found.
      */
     public static Location extractTarget(AIUnit aiUnit, PathNode path) {
-        final Tile tile = (path == null) ? aiUnit.getUnit().getTile()
-            : path.getLastNode().getTile();
-        return (tile == null) ? null
-            : (tile.getIndianSettlement() != null
+        final Location loc = (path == null) ? aiUnit.getUnit().getLocation()
+            : path.getLastNode().getLocation();
+        return (loc == null) ? null
+            : (loc.getSettlement() instanceof IndianSettlement
                 && invalidSettlementReason(aiUnit,
-                    tile.getIndianSettlement()) == null)
-            ? tile.getIndianSettlement()
-            : (invalidTileReason(aiUnit, tile) == null) ? tile
+                    (IndianSettlement)loc.getSettlement()) == null)
+            ? loc.getSettlement()
+            : (invalidTileReason(aiUnit, loc.getTile()) == null) ? loc.getTile()
             : null;
     }
 

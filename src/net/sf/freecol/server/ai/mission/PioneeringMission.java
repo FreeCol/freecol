@@ -242,15 +242,15 @@ public class PioneeringMission extends Mission {
      * @return A target for this mission, or null if none found.
      */
     public static Location extractTarget(AIUnit aiUnit, PathNode path) {
-        final Tile tile = (path == null) ? aiUnit.getUnit().getTile()
-            : path.getLastNode().getTile();
-        return (tile == null) ? null
+        final Location loc = (path == null) ? aiUnit.getUnit().getLocation()
+            : path.getLastNode().getLocation();
+        return (loc == null) ? null
             : (Mission.invalidAIUnitReason(aiUnit) != null) ? null
             : (hasTools(aiUnit))
-            ? ((invalidPioneeringTileReason(aiUnit, tile) == null)
-                ? tile : null)
-            : ((invalidPioneeringColonyReason(aiUnit, tile.getColony()) == null)
-                ? tile.getColony() : null);
+            ? ((invalidPioneeringTileReason(aiUnit, loc.getTile()) == null)
+                ? loc.getTile() : null)
+            : ((invalidPioneeringColonyReason(aiUnit, loc.getColony()) == null)
+                ? loc.getColony() : null);
     }
 
     /**
@@ -293,7 +293,7 @@ public class PioneeringMission extends Mission {
                 public PathNode getGoal() { return best; }
                 public boolean hasSubGoals() { return true; }
                 public boolean check(Unit u, PathNode path) {
-                    Colony colony = path.getTile().getColony();
+                    Colony colony = path.getLocation().getColony();
                     if (invalidPioneeringColonyReason(aiUnit, colony) == null
                         && path.getTotalTurns() < bestValue) {
                         bestValue = path.getTotalTurns();

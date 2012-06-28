@@ -102,11 +102,11 @@ public class DefendSettlementMission extends Mission {
      *     if none found.
      */
     public static Location extractTarget(AIUnit aiUnit, PathNode path) {
-        final Tile tile = (path == null) ? aiUnit.getUnit().getTile()
-            : path.getLastNode().getTile();
-        return (tile == null) ? null
-            : (invalidReason(aiUnit, tile.getSettlement()) == null)
-            ? tile.getSettlement()
+        final Location loc = (path == null) ? aiUnit.getUnit().getLocation()
+            : path.getLastNode().getLocation();
+        return (loc.getTile() == null) ? null
+            : (invalidReason(aiUnit, loc.getSettlement()) == null)
+            ? loc.getSettlement()
             : null;
     }
 
