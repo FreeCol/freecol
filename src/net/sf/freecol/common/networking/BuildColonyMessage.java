@@ -80,6 +80,7 @@ public class BuildColonyMessage extends DOMMessage {
      */
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
+        Game game = server.getGame();
         ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Unit unit;
@@ -97,7 +98,7 @@ public class BuildColonyMessage extends DOMMessage {
             return DOMMessage.clientError("Null colony name");
         } else if (Player.ASSIGN_SETTLEMENT_NAME.equals(colonyName)) {
             ; // ok
-        } else if (player.getColony(colonyName) != null) {
+        } else if (game.getSettlement(colonyName) != null) {
             return DOMMessage.clientError("Non-unique colony name "
                 + colonyName);
         }
