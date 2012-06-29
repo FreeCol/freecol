@@ -38,23 +38,21 @@ public final class SelectOptionUI extends OptionUI<SelectOption>  {
     private JComboBox box = new JComboBox();
 
     /**
-    * Creates a new <code>SelectOptionUI</code> for the given <code>SelectOption</code>.
-    *
-    * @param option The <code>SelectOption</code> to make a user interface for
-    * @param editable boolean whether user can modify the setting
-    */
+     * Creates a new <code>SelectOptionUI</code> for the given <code>SelectOption</code>.
+     *
+     * @param option The <code>SelectOption</code> to make a user interface for
+     * @param editable boolean whether user can modify the setting
+     */
     @SuppressWarnings("unchecked") // FIXME in Java7
     public SelectOptionUI(GUI gui, final SelectOption option, boolean editable) {
         super(gui, option, editable);
+        DefaultComboBoxModel model = new DefaultComboBoxModel();
 
-        String[] strings = option.getItemValues().values().toArray(new String[0]);
-        if (option.localizeLabels()) {
-            for (int index = 0; index < strings.length; index++) {
-                strings[index] = Messages.message(strings[index]);
-            }
+        for (String string : option.getItemValues().values()) {
+            model.addElement(option.localizeLabels() ? Messages.message(string) : string);
         }
 
-        box.setModel(new DefaultComboBoxModel(strings));
+        box.setModel(model);
         box.setSelectedIndex(option.getValue());
 
         initialize();
