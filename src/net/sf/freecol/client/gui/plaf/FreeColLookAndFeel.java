@@ -109,6 +109,7 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
                     FreeColListUI.class,
                     FreeColMenuBarUI.class,
                     FreeColMenuItemUI.class,
+                    FreeColOptionPaneUI.class,
                     FreeColPanelUI.class,
                     FreeColPopupMenuUI.class,
                     FreeColRadioButtonUI.class,
