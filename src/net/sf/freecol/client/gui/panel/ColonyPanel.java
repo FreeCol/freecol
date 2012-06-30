@@ -103,7 +103,7 @@ import net.sf.freecol.common.model.UnitType;
  * spec that corresponds to the good types in this colony.
  */
 public final class ColonyPanel extends FreeColPanel
-    implements ActionListener, PropertyChangeListener {
+    implements ActionListener, PortPanel, PropertyChangeListener {
 
     private static Logger logger = Logger.getLogger(ColonyPanel.class.getName());
 
@@ -1334,10 +1334,10 @@ public final class ColonyPanel extends FreeColPanel
      * A panel that holds UnitsLabels that represent naval Units that are
      * waiting in the port of the colony.
      */
-    public final class InPortPanel extends JPanel {
+    public final class InPortPanel extends net.sf.freecol.client.gui.panel.InPortPanel {
 
         public InPortPanel() {
-            super(new MigLayout("wrap 3, fill, insets 0"));
+            setLayout(new MigLayout("wrap 3, fill, insets 0"));
             setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(),
                                                        Messages.message("inPort")));
         }
@@ -1373,11 +1373,6 @@ public final class ColonyPanel extends FreeColPanel
                                  : (lastCarrier != null) ? lastCarrier
                                  : null);
             // No revalidate+repaint as this is done in setSelectedUnitLabel
-        }
-
-        @Override
-        public String getUIClassID() {
-            return "InPortPanelUI";
         }
 
     }

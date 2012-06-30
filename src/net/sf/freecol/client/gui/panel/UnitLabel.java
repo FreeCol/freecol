@@ -55,7 +55,8 @@ import net.sf.freecol.common.resources.ResourceManager;
  * This label holds Unit data in addition to the JLabel data, which makes it
  * ideal to use for drag and drop purposes.
  */
-public final class UnitLabel extends JLabel implements ActionListener {
+public final class UnitLabel extends JLabel
+    implements ActionListener, Draggable {
 
     @SuppressWarnings("unused")
         private static Logger logger = Logger.getLogger(UnitLabel.class.getName());
@@ -427,4 +428,10 @@ public final class UnitLabel extends JLabel implements ActionListener {
 
         return false;
     }
+
+    public boolean isOnCarrier() {
+        return unit != null && unit.isOnCarrier();
+    }
+
+
 }

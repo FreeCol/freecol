@@ -190,25 +190,14 @@ public final class DefaultTransferHandler extends TransferHandler {
                  * unit/cargo on the panel below.
                  */
                 if (unitLabel.getUnit().isCarrier()
-                    && unitLabel.getParent() instanceof EuropePanel.InPortPanel) {
-                    if (data instanceof UnitLabel
-                        && ((UnitLabel) data).getUnit().isOnCarrier()
-                        || data instanceof GoodsLabel
-                        && ((GoodsLabel) data).getGoods().getLocation() instanceof Unit) {
-                        oldSelectedUnit = ((EuropePanel) parentPanel).getSelectedUnitLabel();
+                    && unitLabel.getParent() instanceof InPortPanel
+                    && parentPanel instanceof PortPanel) {
+                    PortPanel portPanel = (PortPanel) parentPanel;
+                    if (data instanceof Draggable && ((Draggable) data).isOnCarrier()) {
+                        oldSelectedUnit = portPanel.getSelectedUnitLabel();
                     }
-                    ((EuropePanel) parentPanel).setSelectedUnitLabel(unitLabel);
-                    comp = ((EuropePanel) parentPanel).getCargoPanel();
-                } else if (unitLabel.getUnit().isCarrier()
-                    && unitLabel.getParent() instanceof ColonyPanel.InPortPanel) {
-                    if (data instanceof UnitLabel
-                        && ((UnitLabel) data).getUnit().isOnCarrier()
-                        || data instanceof GoodsLabel
-                        && ((GoodsLabel) data).getGoods().getLocation() instanceof Unit) {
-                        oldSelectedUnit = ((ColonyPanel) parentPanel).getSelectedUnitLabel();
-                    }
-                    ((ColonyPanel) parentPanel).setSelectedUnitLabel(unitLabel);
-                    comp = ((ColonyPanel) parentPanel).getCargoPanel();
+                    portPanel.setSelectedUnitLabel(unitLabel);
+                    comp = portPanel.getCargoPanel();
                 } else if (unitLabel.canUnitBeEquipedWith(data)) {
                     // don't do anything before partial amount has been checked
                 } else {

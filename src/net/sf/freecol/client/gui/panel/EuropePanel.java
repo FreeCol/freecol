@@ -73,7 +73,8 @@ import net.sf.freecol.common.model.Unit;
  * This is a panel for the Europe display. It shows the ships in Europe and
  * allows the user to send them back.
  */
-public final class EuropePanel extends FreeColPanel {
+public final class EuropePanel extends FreeColPanel
+    implements PortPanel {
 
     private static Logger logger = Logger.getLogger(EuropePanel.class.getName());
 
@@ -588,7 +589,8 @@ public final class EuropePanel extends FreeColPanel {
      * A panel that holds UnitLabels that represent naval units that are
      * waiting in Europe.
      */
-    public final class InPortPanel extends JPanel implements PropertyChangeListener {
+    public final class InPortPanel extends net.sf.freecol.client.gui.panel.InPortPanel
+        implements PropertyChangeListener {
 
         /**
          * Initialize this InPortPanel.

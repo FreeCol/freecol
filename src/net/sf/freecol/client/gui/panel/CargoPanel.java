@@ -44,7 +44,7 @@ import net.sf.freecol.common.model.Unit;
  * that are on board the currently selected ship.
  */
 public class CargoPanel extends FreeColPanel
-    implements PropertyChangeListener {
+    implements DropTarget, PropertyChangeListener {
 
     private static Logger logger = Logger.getLogger(CargoPanel.class.getName());
 
@@ -294,4 +294,13 @@ public class CargoPanel extends FreeColPanel
     public String getUIClassID() {
         return "CargoPanelUI";
     }
+
+    public boolean accepts(Unit unit) {
+        return true;
+    }
+
+    public boolean accepts(Goods goods) {
+        return true;
+    }
+
 }
