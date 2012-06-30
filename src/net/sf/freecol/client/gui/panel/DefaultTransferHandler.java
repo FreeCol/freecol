@@ -250,8 +250,6 @@ public final class DefaultTransferHandler extends TransferHandler {
                     if (!target.accepts(unit)) {
                         return false;
                     }
-                    // Do this in the 'add'-methods instead:
-                    //data.getParent().remove(data);
 
                     if ((comp instanceof ColonyPanel.OutsideColonyPanel
                          || comp instanceof ColonyPanel.ColonyCargoPanel)
@@ -262,17 +260,9 @@ public final class DefaultTransferHandler extends TransferHandler {
 
                     // Update unit selection
 
-                    // new unit selection has already been taken cared of
-                    //if this unit was moved to ToAmericaPanel
-
-                    if (oldSelectedUnit != null) {
-                        if ((oldSelectedUnit).getParent() instanceof EuropePanel.InPortPanel) {
-                            ((EuropePanel) parentPanel).setSelectedUnit(oldSelectedUnit.getUnit());
-                        } else {
-                            ((ColonyPanel) parentPanel).setSelectedUnit(oldSelectedUnit.getUnit());
-                        }
-                    }
-
+                    // new unit selection has already been taken care
+                    // of if this unit was moved to ToAmericaPanel
+                    restoreSelection(oldSelectedUnit);
                     comp.revalidate();
 
                     return true;
@@ -282,10 +272,10 @@ public final class DefaultTransferHandler extends TransferHandler {
             } else if (data instanceof GoodsLabel) {
                 // Check if the goods can be dragged to comp.
                 GoodsLabel label = (GoodsLabel)data;
+                Goods goods = label.getGoods();
 
                 // Import the data.
                 if (label.isPartialChosen()) {
-                    Goods goods = label.getGoods();
                     int defaultAmount = -1;
                     if (goods.getLocation() instanceof GoodsLocation) {
                         GoodsLocation loc = (GoodsLocation)goods.getLocation();
@@ -297,72 +287,30 @@ public final class DefaultTransferHandler extends TransferHandler {
                                 GoodsContainer.CARGO_SIZE);
                         }
                     }
-                    int amount = getAmount(label.getGoods().getType(),
-                        label.getGoods().getAmount(), defaultAmount, false);
+                    int amount = getAmount(goods.getType(),
+                                           goods.getAmount(), defaultAmount, false);
                     if (amount <= 0) return false;
-                    label.getGoods().setAmount(amount);
-                } else if (label.getGoods().getAmount() > GoodsContainer.CARGO_SIZE) {
-                    label.getGoods().setAmount(GoodsContainer.CARGO_SIZE);
+                    goods.setAmount(amount);
+                } else if (goods.getAmount() > GoodsContainer.CARGO_SIZE) {
+                    goods.setAmount(GoodsContainer.CARGO_SIZE);
                 }
 
-                /*
-                  if (!(comp instanceof ColonyPanel.WarehousePanel ||
-                  comp instanceof CargoPanel ||
-                  comp instanceof EuropePanel.MarketPanel) ||
-                  (comp instanceof CargoPanel && !((CargoPanel) comp).isActive())) {
-
-                  return false;
-                  }
-                */
-
                 if (comp instanceof UnitLabel) {
-                    UnitLabel unitLabel = ((UnitLabel) comp);
-                    Unit unit = unitLabel.getUnit();
-                    if (unit.hasAbility(Ability.CAN_BE_EQUIPPED)) {
-                        Goods goods = label.getGoods();
-                        for (EquipmentType equipment : freeColClient.getGame().getSpecification()
-                                 .getEquipmentTypeList()) {
-                            if (unit.canBeEquippedWith(equipment) && equipment.getGoodsRequired().size() == 1) {
-                                AbstractGoods requiredGoods = equipment.getGoodsRequired().get(0);
-                                if (requiredGoods.getType().equals(goods.getType())
-                                    && requiredGoods.getAmount() <= goods.getAmount()) {
-                                    int amount = Math.min(goods.getAmount() / requiredGoods.getAmount(),
-                                        equipment.getMaximumCount());
-                                    freeColClient.getInGameController()
-                                        .equipUnit(unit, equipment, amount);
-                                    unitLabel.updateIcon();
-                                    return true;
-                                }
-                            }
-                        }
-                    }
-                    return false;
+                    return equipUnitIfPossible((UnitLabel) comp, goods);
                 } else if (comp instanceof JLabel) {
                     logger.warning("Oops, I thought we didn't have to write this part.");
                     return true;
-                } else if (comp instanceof JPanel) {
-                    //data.getParent().remove(data);
-
-                    if (comp instanceof ColonyPanel.WarehousePanel) {
-                        ((ColonyPanel.WarehousePanel)comp).add(data, true);
-                    } else if (comp instanceof CargoPanel) {
-                        ((CargoPanel)comp).add(data, true);
-                    } else if (comp instanceof EuropePanel.MarketPanel) {
-                        ((EuropePanel.MarketPanel)comp).add(data, true);
+                } else if (comp instanceof DropTarget) {
+                    DropTarget target = (DropTarget) comp;
+                    if (target.accepts(goods)) {
+                        target.add(data, true);
                     } else {
-                        logger.warning("The receiving component is of an invalid type.");
                         return false;
                     }
 
-                    comp.revalidate();
+                    restoreSelection(oldSelectedUnit);
 
-                    if (oldSelectedUnit != null) {
-                        if (oldSelectedUnit.getParent() instanceof EuropePanel.InPortPanel) {
-                            ((EuropePanel) parentPanel).setSelectedUnit(oldSelectedUnit.getUnit());
-                        } else {
-                            ((ColonyPanel) parentPanel).setSelectedUnit(oldSelectedUnit.getUnit());
-                        }
-                    }
+                    comp.revalidate();
 
                     return true;
                 }
@@ -383,33 +331,11 @@ public final class DefaultTransferHandler extends TransferHandler {
                 }
 
                 if (comp instanceof UnitLabel) {
-                    UnitLabel unitLabel = (UnitLabel) comp;
-                    Unit unit = unitLabel.getUnit();
-                    if (unit.hasAbility(Ability.CAN_BE_EQUIPPED)) {
-                        for (EquipmentType equipment : freeColClient.getGame().getSpecification()
-                                 .getEquipmentTypeList()) {
-                            if (unit.canBeEquippedWith(equipment) && equipment.getGoodsRequired().size() == 1) {
-                                AbstractGoods requiredGoods = equipment.getGoodsRequired().get(0);
-                                if (requiredGoods.getType().equals(label.getType())
-                                    && requiredGoods.getAmount() <= label.getAmount()) {
-                                    int amount = Math.min(label.getAmount() / requiredGoods.getAmount(),
-                                        equipment.getMaximumCount());
-                                    freeColClient.getInGameController()
-                                        .equipUnit(unit, equipment, amount);
-                                    unitLabel.updateIcon();
-                                    return true;
-                                }
-                            }
-                        }
-                    }
-                    return false;
+                    return equipUnitIfPossible((UnitLabel) comp, label.getGoods());
                 } else if (comp instanceof JLabel) {
                     logger.warning("Oops, I thought we didn't have to write this part.");
                     return true;
                 } else if (comp instanceof JPanel) {
-                    // Be not removing MarketLabels from their home. -sjm
-                    //data.getParent().remove(data);
-
                     if (comp instanceof CargoPanel) {
                         ((CargoPanel)comp).add(data, true);
                     } else {
@@ -430,6 +356,38 @@ public final class DefaultTransferHandler extends TransferHandler {
         return false;
     }
 
+    private void restoreSelection(UnitLabel oldSelectedUnit) {
+        if (oldSelectedUnit != null) {
+            if ((oldSelectedUnit).getParent() instanceof EuropePanel.InPortPanel) {
+                ((EuropePanel) parentPanel).setSelectedUnit(oldSelectedUnit.getUnit());
+            } else {
+                ((ColonyPanel) parentPanel).setSelectedUnit(oldSelectedUnit.getUnit());
+            }
+        }
+    }
+
+
+    private boolean equipUnitIfPossible(UnitLabel unitLabel, AbstractGoods goods) {
+        Unit unit = unitLabel.getUnit();
+        if (unit.hasAbility(Ability.CAN_BE_EQUIPPED)) {
+            for (EquipmentType equipment : freeColClient.getGame().getSpecification()
+                     .getEquipmentTypeList()) {
+                if (unit.canBeEquippedWith(equipment) && equipment.getGoodsRequired().size() == 1) {
+                    AbstractGoods requiredGoods = equipment.getGoodsRequired().get(0);
+                    if (requiredGoods.getType().equals(goods.getType())
+                        && requiredGoods.getAmount() <= goods.getAmount()) {
+                        int amount = Math.min(goods.getAmount() / requiredGoods.getAmount(),
+                                              equipment.getMaximumCount());
+                        freeColClient.getInGameController()
+                            .equipUnit(unit, equipment, amount);
+                        unitLabel.updateIcon();
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
 
     /**
      * Displays an input dialog box where the user should specify a goods transfer amount.

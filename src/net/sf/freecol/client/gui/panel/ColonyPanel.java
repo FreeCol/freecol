@@ -1122,6 +1122,11 @@ public final class ColonyPanel extends FreeColPanel
                 return unit.isPerson();
             }
 
+            public boolean accepts(Goods goods) {
+                return false;
+            }
+
+
         }
 
     }
@@ -1318,6 +1323,11 @@ public final class ColonyPanel extends FreeColPanel
         public boolean accepts(Unit unit) {
             return !unit.isCarrier();
         }
+
+        public boolean accepts(Goods goods) {
+            return false;
+        }
+
     }
 
     /**
@@ -1490,6 +1500,10 @@ public final class ColonyPanel extends FreeColPanel
 
         public boolean accepts(Unit unit) {
             return false;
+        }
+
+        public boolean accepts(Goods goods) {
+            return true;
         }
 
     }
@@ -1828,6 +1842,10 @@ public final class ColonyPanel extends FreeColPanel
 
             public boolean accepts(Unit unit) {
                 return unit.isPerson();
+            }
+
+            public boolean accepts(Goods goods) {
+                return false;
             }
 
         }

@@ -521,10 +521,6 @@ public final class EuropePanel extends FreeColPanel {
             revalidate();
         }
 
-        public boolean accepts(Unit unit) {
-            return unit.isNaval() && !unit.isUnderRepair();
-        }
-
         /**
          * Adds a component to this DestinationPanel and makes sure that
          * the unit that the component represents gets modified so
@@ -576,6 +572,15 @@ public final class EuropePanel extends FreeColPanel {
             EuropePanel.this.refresh();
             return c;
         }
+
+        public boolean accepts(Unit unit) {
+            return unit.isNaval() && !unit.isUnderRepair();
+        }
+
+        public boolean accepts(Goods goods) {
+            return false;
+        }
+
     }
 
 
@@ -718,6 +723,11 @@ public final class EuropePanel extends FreeColPanel {
         public boolean accepts(Unit unit) {
             return !unit.isNaval();
         }
+
+        public boolean accepts(Goods goods) {
+            return false;
+        }
+
     }
 
     /**
@@ -807,6 +817,10 @@ public final class EuropePanel extends FreeColPanel {
 
         public boolean accepts(Unit unit) {
             return false;
+        }
+
+        public boolean accepts(Goods goods) {
+            return true;
         }
     }
 

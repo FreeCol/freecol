@@ -21,12 +21,15 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Component;
+import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Unit;
 
 
 public interface DropTarget {
 
     public boolean accepts(Unit unit);
+
+    public boolean accepts(Goods goods);
 
     public Component add(Component comp, boolean editState);
 
