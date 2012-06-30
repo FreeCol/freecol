@@ -245,63 +245,20 @@ public final class DefaultTransferHandler extends TransferHandler {
                 // Check if the unit can be dragged to comp.
 
                 Unit unit = ((UnitLabel)data).getUnit();
-
-                if (unit.isUnderRepair()) {
-                    return false;
-                }
-
-                if (unit.getLocation() instanceof HighSeas
-                    && !(comp instanceof EuropePanel.DestinationPanel)) {
-                    return false;
-                }
-
-                if (!unit.isNaval()
-                    && (comp instanceof EuropePanel.InPortPanel
-                        || comp instanceof ColonyPanel.InPortPanel
-                        || comp instanceof EuropePanel.DestinationPanel)) {
-                    return false;
-                }
-
-                if (comp instanceof EuropePanel.MarketPanel || comp instanceof ColonyPanel.WarehousePanel) {
-                    return false;
-                }
-
-                if (unit.isNaval() && (comp instanceof EuropePanel.DocksPanel
-                        || comp instanceof ColonyPanel.OutsideColonyPanel
-                        || comp instanceof ColonyPanel.BuildingsPanel.ASingleBuildingPanel
-                        || comp instanceof ColonyPanel.TilePanel.ASingleTilePanel
-                        || comp instanceof CargoPanel)) {
-                    return false;
-                }
-
-                if (comp instanceof JLabel) {
-                    logger.warning("Oops, I thought we didn't have to write this part.");
-                    return true;
-                } else if (comp instanceof JPanel) {
+                if (comp instanceof DropTarget) {
+                    DropTarget target = (DropTarget) comp;
+                    if (!target.accepts(unit)) {
+                        return false;
+                    }
                     // Do this in the 'add'-methods instead:
                     //data.getParent().remove(data);
 
-                    if (comp instanceof EuropePanel.DestinationPanel) {
-                        ((EuropePanel.DestinationPanel)comp).add(data, true);
-                    } else if (comp instanceof EuropePanel.DocksPanel) {
-                        ((EuropePanel.DocksPanel)comp).add(data, true);
-                    } else if (comp instanceof ColonyPanel.BuildingsPanel.ASingleBuildingPanel) {
-                        ((ColonyPanel.BuildingsPanel.ASingleBuildingPanel) comp).add(data, true);
-                    } else if (comp instanceof ColonyPanel.OutsideColonyPanel) {
-                        ColonyPanel.OutsideColonyPanel outside = ((ColonyPanel.OutsideColonyPanel) comp);
-                        if (!gui.tryLeaveColony(unit)) return false;
-                        outside.add(data, true);
-                    } else if (comp instanceof ColonyPanel.ColonyCargoPanel) {
-                        if (!gui.tryLeaveColony(unit)) return false;
-                        ((CargoPanel)comp).add(data, true);
-                    } else if (comp instanceof CargoPanel) {
-                        ((CargoPanel)comp).add(data, true);
-                    } else if (comp instanceof ColonyPanel.TilePanel.ASingleTilePanel) {
-                        ((ColonyPanel.TilePanel.ASingleTilePanel)comp).add(data, true);
-                    } else {
-                        logger.warning("The receiving component is of an invalid type.");
+                    if ((comp instanceof ColonyPanel.OutsideColonyPanel
+                         || comp instanceof ColonyPanel.ColonyCargoPanel)
+                        && !gui.tryLeaveColony(unit)) {
                         return false;
                     }
+                    target.add(data, true);
 
                     // Update unit selection
 
@@ -319,6 +276,8 @@ public final class DefaultTransferHandler extends TransferHandler {
                     comp.revalidate();
 
                     return true;
+                } else {
+                    return false;
                 }
             } else if (data instanceof GoodsLabel) {
                 // Check if the goods can be dragged to comp.

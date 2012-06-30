@@ -463,7 +463,7 @@ public final class EuropePanel extends FreeColPanel {
      * A panel that holds UnitsLabels that represent Units that are going to
      * America or Europe.
      */
-    public final class DestinationPanel extends JPanel {
+    public final class DestinationPanel extends JPanel implements DropTarget {
 
         private Location destination;
 
@@ -519,6 +519,10 @@ public final class EuropePanel extends FreeColPanel {
                     destination.getLocationNameFor(getMyPlayer()));
             ((TitledBorder) getBorder()).setTitle(Messages.message(t));
             revalidate();
+        }
+
+        public boolean accepts(Unit unit) {
+            return unit.isNaval() && !unit.isUnderRepair();
         }
 
         /**
@@ -579,8 +583,7 @@ public final class EuropePanel extends FreeColPanel {
      * A panel that holds UnitLabels that represent naval units that are
      * waiting in Europe.
      */
-    public final class InPortPanel extends JPanel
-        implements PropertyChangeListener {
+    public final class InPortPanel extends JPanel implements PropertyChangeListener {
 
         /**
          * Initialize this InPortPanel.
@@ -648,7 +651,7 @@ public final class EuropePanel extends FreeColPanel {
      * waiting on the docks in Europe.
      */
     public final class DocksPanel extends JPanel
-        implements PropertyChangeListener {
+        implements DropTarget, PropertyChangeListener {
 
         /**
          * Initializes this DocksPanel.
@@ -711,12 +714,16 @@ public final class EuropePanel extends FreeColPanel {
                           + " -> " + event.getNewValue());
             update();
         }
+
+        public boolean accepts(Unit unit) {
+            return !unit.isNaval();
+        }
     }
 
     /**
      * A panel that shows goods available for purchase in Europe.
      */
-    public final class MarketPanel extends JPanel {
+    public final class MarketPanel extends JPanel implements DropTarget {
 
         private final EuropePanel europePanel;
 
@@ -796,6 +803,10 @@ public final class EuropePanel extends FreeColPanel {
 
         public void remove(Component comp) {
             // Don't remove market labels.
+        }
+
+        public boolean accepts(Unit unit) {
+            return false;
         }
     }
 

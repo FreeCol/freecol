@@ -1032,7 +1032,8 @@ public final class ColonyPanel extends FreeColPanel
          * This panel is a single line (one building) in the
          * <code>BuildingsPanel</code>.
          */
-        public final class ASingleBuildingPanel extends BuildingPanel implements Autoscroll {
+        public final class ASingleBuildingPanel extends BuildingPanel
+            implements Autoscroll, DropTarget  {
 
             /**
              * Creates this ASingleBuildingPanel.
@@ -1116,7 +1117,13 @@ public final class ColonyPanel extends FreeColPanel
                 getController().work(unit, building);
                 return true;
             }
+
+            public boolean accepts(Unit unit) {
+                return unit.isPerson();
+            }
+
         }
+
     }
 
     public final class PopulationPanel extends JPanel {
@@ -1187,7 +1194,7 @@ public final class ColonyPanel extends FreeColPanel
      * front of a colony.
      */
     public final class OutsideColonyPanel extends JPanel
-        implements PropertyChangeListener {
+        implements DropTarget, PropertyChangeListener {
 
         private Colony colony;
 
@@ -1307,6 +1314,10 @@ public final class ColonyPanel extends FreeColPanel
         public String getUIClassID() {
             return "OutsideColonyPanelUI";
         }
+
+        public boolean accepts(Unit unit) {
+            return !unit.isCarrier();
+        }
     }
 
     /**
@@ -1358,6 +1369,7 @@ public final class ColonyPanel extends FreeColPanel
         public String getUIClassID() {
             return "InPortPanelUI";
         }
+
     }
 
     /**
@@ -1365,7 +1377,7 @@ public final class ColonyPanel extends FreeColPanel
      * the Colony.
      */
     public final class WarehousePanel extends JPanel
-        implements PropertyChangeListener {
+        implements DropTarget, PropertyChangeListener {
 
         private final ColonyPanel colonyPanel;
 
@@ -1475,6 +1487,11 @@ public final class ColonyPanel extends FreeColPanel
         public String getUIClassID() {
             return "WarehousePanelUI";
         }
+
+        public boolean accepts(Unit unit) {
+            return false;
+        }
+
     }
 
 
@@ -1570,7 +1587,8 @@ public final class ColonyPanel extends FreeColPanel
          * itself is not visible, however the content of the component is (i.e.
          * the people working and the production)
          */
-        public final class ASingleTilePanel extends JPanel implements PropertyChangeListener {
+        public final class ASingleTilePanel extends JPanel
+            implements DropTarget, PropertyChangeListener {
 
             private ColonyTile colonyTile;
 
@@ -1806,6 +1824,12 @@ public final class ColonyPanel extends FreeColPanel
                               + " -> " + event.getNewValue());
                 initialize();
             }
+
+
+            public boolean accepts(Unit unit) {
+                return unit.isPerson();
+            }
+
         }
     }
 }
