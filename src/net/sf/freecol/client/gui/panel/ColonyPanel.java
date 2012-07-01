@@ -102,8 +102,8 @@ import net.sf.freecol.common.model.UnitType;
  * which is why we need to call getColony().getSpecification() to get the
  * spec that corresponds to the good types in this colony.
  */
-public final class ColonyPanel extends FreeColPanel
-    implements ActionListener, PortPanel, PropertyChangeListener {
+public final class ColonyPanel extends PortPanel
+    implements ActionListener, PropertyChangeListener {
 
     private static Logger logger = Logger.getLogger(ColonyPanel.class.getName());
 
@@ -132,9 +132,7 @@ public final class ColonyPanel extends FreeColPanel
 
     private final OutsideColonyPanel outsideColonyPanel;
 
-    private final InPortPanel inPortPanel;
-
-    private final ColonyCargoPanel cargoPanel;
+    private final ColonyInPortPanel inPortPanel;
 
     private final WarehousePanel warehousePanel;
 
@@ -151,8 +149,6 @@ public final class ColonyPanel extends FreeColPanel
     private final MouseListener releaseListener;
 
     private Colony colony;
-
-    private UnitLabel selectedUnitLabel;
 
     private JButton unloadButton = new JButton(Messages.message("unload"));
 
@@ -219,7 +215,7 @@ public final class ColonyPanel extends FreeColPanel
 
         outsideColonyPanel = new OutsideColonyPanel();
 
-        inPortPanel = new InPortPanel();
+        inPortPanel = new ColonyInPortPanel();
 
         warehousePanel = new WarehousePanel(this);
 
@@ -345,15 +341,6 @@ public final class ColonyPanel extends FreeColPanel
 
         initialize(colony);
         restoreSavedSize(850, 600);
-    }
-
-    /**
-     * Returns a pointer to the <code>CargoPanel</code>-object in use.
-     *
-     * @return The <code>CargoPanel</code>.
-     */
-    public final CargoPanel getCargoPanel() {
-        return cargoPanel;
     }
 
     /**
@@ -609,15 +596,6 @@ public final class ColonyPanel extends FreeColPanel
         }
 
         setSelectedUnitLabel(unitLabel);
-    }
-
-    /**
-     * Returns the currently select unit label.
-     *
-     * @return The currently select unit label.
-     */
-    public UnitLabel getSelectedUnitLabel() {
-        return selectedUnitLabel;
     }
 
     /**
@@ -953,10 +931,6 @@ public final class ColonyPanel extends FreeColPanel
             updateCarrierButtons();
         }
 
-        @Override
-        public String getUIClassID() {
-            return "CargoPanelUI";
-        }
     }
 
     /**
@@ -1334,47 +1308,24 @@ public final class ColonyPanel extends FreeColPanel
      * A panel that holds UnitsLabels that represent naval Units that are
      * waiting in the port of the colony.
      */
-    public final class InPortPanel extends net.sf.freecol.client.gui.panel.InPortPanel {
+    public final class ColonyInPortPanel extends InPortPanel {
 
-        public InPortPanel() {
+        public ColonyInPortPanel() {
+            super(ColonyPanel.this, isEditable());
             setLayout(new MigLayout("wrap 3, fill, insets 0"));
             setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(),
                                                        Messages.message("inPort")));
         }
 
         public void initialize() {
-            removeAll();
-            if (getColony() == null) return;
-
-            UnitLabel lastCarrier = null;
-            UnitLabel prevCarrier = null;
-            for (Unit unit : getColony().getTile().getUnitList()) {
-                if (!unit.isCarrier()) continue;
-
-                UnitLabel unitLabel = new UnitLabel(getFreeColClient(), unit, getGUI());
-                TradeRoute tradeRoute = unit.getTradeRoute();
-                if (tradeRoute != null) {
-                    unitLabel.setDescriptionLabel(Messages.message(Messages.getLabel(unit))
-                                                  + " (" + tradeRoute.getName() + ")");
-                }
-                if (isEditable()) {
-                    unitLabel.setTransferHandler(defaultTransferHandler);
-                    unitLabel.addMouseListener(pressListener);
-                }
-                add(unitLabel);
-
-                lastCarrier = unitLabel;
-                if (getSelectedUnit() == unit) prevCarrier = unitLabel;
+            if (getColony() != null) {
+                super.initialize(getColony().getTile().getUnitList());
             }
-
-            // Keep the previous selected unit if possible, otherwise default
-            // on the last carrier.
-            setSelectedUnitLabel((prevCarrier != null) ? prevCarrier
-                                 : (lastCarrier != null) ? lastCarrier
-                                 : null);
-            // No revalidate+repaint as this is done in setSelectedUnitLabel
         }
 
+        public boolean accepts(Unit unit) {
+            return unit.isCarrier();
+        }
     }
 
     /**

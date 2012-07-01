@@ -268,8 +268,7 @@ public final class UnitLabel extends JLabel
             pl.paintComponent(g);
             g.translate(0, -10);
         } else if (getParent() instanceof ColonyPanel.OutsideColonyPanel ||
-                   getParent() instanceof ColonyPanel.InPortPanel ||
-                   getParent() instanceof EuropePanel.InPortPanel ||
+                   getParent() instanceof InPortPanel ||
                    getParent() instanceof EuropePanel.DocksPanel ||
                    getParent().getParent() instanceof ReportPanel) {
             g.drawImage(gui.getMapViewer().getOccupationIndicatorImage(g, unit), 0, 0, null);

@@ -73,8 +73,7 @@ import net.sf.freecol.common.model.Unit;
  * This is a panel for the Europe display. It shows the ships in Europe and
  * allows the user to send them back.
  */
-public final class EuropePanel extends FreeColPanel
-    implements PortPanel {
+public final class EuropePanel extends PortPanel {
 
     private static Logger logger = Logger.getLogger(EuropePanel.class.getName());
 
@@ -91,23 +90,15 @@ public final class EuropePanel extends FreeColPanel
 
     private final DestinationPanel toEuropePanel;
 
-    private final InPortPanel inPortPanel;
+    private final EuropeInPortPanel inPortPanel;
 
     private final DocksPanel docksPanel;
-
-    private final EuropeCargoPanel cargoPanel;
 
     private final MarketPanel marketPanel;
 
     private final TransactionLog log;
 
-    private final DefaultTransferHandler defaultTransferHandler;
-
-    private final MouseListener pressListener;
-
     private Europe europe;
-
-    private UnitLabel selectedUnitLabel;
 
     private JButton exitButton;
 
@@ -142,8 +133,8 @@ public final class EuropePanel extends FreeColPanel
 
         toAmericaPanel = new DestinationPanel();
         toEuropePanel = new DestinationPanel();
-        inPortPanel = new InPortPanel();
-        cargoPanel = new EuropeCargoPanel(freeColClient, getGUI());
+        inPortPanel = new EuropeInPortPanel();
+        cargoPanel = new CargoPanel(freeColClient, getGUI(), true);
         docksPanel = new DocksPanel();
         marketPanel = new MarketPanel(this);
 
@@ -264,25 +255,6 @@ public final class EuropePanel extends FreeColPanel
     }
 
     /**
-     * Gets the cargo panel.
-     *
-     * @return The cargo panel.
-     */
-    public final CargoPanel getCargoPanel() {
-        return cargoPanel;
-    }
-
-    /**
-     * Returns the currently select unit.
-     *
-     * @return The currently select unit.
-     */
-    public Unit getSelectedUnit() {
-        return (selectedUnitLabel == null) ? null
-            : selectedUnitLabel.getUnit();
-    }
-
-    /**
      * Selects a unit that is potentially located somewhere in port.
      *
      * @param unit The <code>Unit</code> to select.
@@ -302,15 +274,6 @@ public final class EuropePanel extends FreeColPanel
         }
 
         setSelectedUnitLabel(unitLabel);
-    }
-
-    /**
-     * Returns the currently select unit label.
-     *
-     * @return The currently select unit label.
-     */
-    public UnitLabel getSelectedUnitLabel() {
-        return selectedUnitLabel;
     }
 
     /**
@@ -449,18 +412,6 @@ public final class EuropePanel extends FreeColPanel
 
 
     /**
-     * Trivial wrapper for CargoPanel.
-     * TODO: check if still needed?
-     */
-    public final class EuropeCargoPanel extends CargoPanel {
-
-        public EuropeCargoPanel(FreeColClient freeColClient, GUI gui) {
-            super(freeColClient, gui, true);
-        }
-
-    }
-
-    /**
      * A panel that holds UnitsLabels that represent Units that are going to
      * America or Europe.
      */
@@ -589,8 +540,12 @@ public final class EuropePanel extends FreeColPanel
      * A panel that holds UnitLabels that represent naval units that are
      * waiting in Europe.
      */
-    public final class InPortPanel extends net.sf.freecol.client.gui.panel.InPortPanel
+    public final class EuropeInPortPanel extends InPortPanel
         implements PropertyChangeListener {
+
+        public EuropeInPortPanel() {
+            super(EuropePanel.this, true);
+        }
 
         /**
          * Initialize this InPortPanel.
@@ -601,40 +556,17 @@ public final class EuropePanel extends FreeColPanel
         }
 
         /**
+         * Update this InPortPanel.
+         */
+        public void update() {
+            initialize(europe.getUnitList());
+        }
+
+        /**
          * Cleans up this InPortPanel.
          */
         public void cleanup() {
             removePropertyChangeListeners();
-        }
-
-        /**
-         * Update this InPortPanel.
-         */
-        public void update() {
-            removeAll();
-
-            UnitLabel lastCarrier = null;
-            UnitLabel prevCarrier = null;
-            for (Unit unit : europe.getUnitList()) {
-                if (unit.isNaval()
-                    && (unit.getState() == Unit.UnitState.ACTIVE
-                        || unit.getState() == Unit.UnitState.SENTRY)) {
-                    UnitLabel unitLabel = new UnitLabel(getFreeColClient(), unit, getGUI());
-                    unitLabel.setTransferHandler(defaultTransferHandler);
-                    unitLabel.addMouseListener(pressListener);
-                    add(unitLabel);
-
-                    lastCarrier = unitLabel;
-                    if (getSelectedUnit() == unit) prevCarrier = unitLabel;
-                }
-            }
-
-            // Keep the previous selected unit if possible, otherwise default
-            // on the last carrier.
-            setSelectedUnitLabel((prevCarrier != null) ? prevCarrier
-                                 : (lastCarrier != null) ? lastCarrier
-                                 : null);
-            // No revalidate+repaint as this is done in setSelectedUnitLabel
         }
 
         public void addPropertyChangeListeners() {
@@ -650,6 +582,12 @@ public final class EuropePanel extends FreeColPanel
                           + ": " + event.getOldValue()
                           + " -> " + event.getNewValue());
             update();
+        }
+
+        public boolean accepts(Unit unit) {
+            return unit.isNaval()
+                && (unit.getState() == Unit.UnitState.ACTIVE
+                    || unit.getState() == Unit.UnitState.SENTRY);
         }
     }
 

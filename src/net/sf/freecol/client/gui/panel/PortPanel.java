@@ -20,14 +20,63 @@
 
 package net.sf.freecol.client.gui.panel;
 
-public interface PortPanel {
+import java.awt.event.MouseListener;
+import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.model.Unit;
 
-    public CargoPanel getCargoPanel();
+public abstract class PortPanel extends FreeColPanel {
 
-    public UnitLabel getSelectedUnitLabel();
+    protected CargoPanel cargoPanel;
+    protected UnitLabel selectedUnitLabel;
+    protected DefaultTransferHandler defaultTransferHandler;
+    protected MouseListener pressListener;
 
-    public void setSelectedUnitLabel(UnitLabel label);
 
+
+    public PortPanel(FreeColClient client, GUI gui) {
+        super(client, gui);
+    }
+
+    /**
+     * Gets the cargo panel.
+     *
+     * @return The cargo panel.
+     */
+    public final CargoPanel getCargoPanel() {
+        return cargoPanel;
+    }
+
+    /**
+     * Returns the currently select unit.
+     *
+     * @return The currently select unit.
+     */
+    public Unit getSelectedUnit() {
+        return (selectedUnitLabel == null) ? null
+            : selectedUnitLabel.getUnit();
+    }
+
+    /**
+     * Returns the currently select unit label.
+     *
+     * @return The currently select unit label.
+     */
+    public UnitLabel getSelectedUnitLabel() {
+        return selectedUnitLabel;
+    }
+
+    public void setSelectedUnitLabel(UnitLabel label) {
+        selectedUnitLabel = label;
+    }
+
+    public DefaultTransferHandler getTransferHandler() {
+        return defaultTransferHandler;
+    }
+
+    public MouseListener getPressListener() {
+        return pressListener;
+    }
 
 
 }
