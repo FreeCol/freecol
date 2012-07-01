@@ -132,8 +132,6 @@ public final class ColonyPanel extends PortPanel
 
     private final OutsideColonyPanel outsideColonyPanel;
 
-    private final ColonyInPortPanel inPortPanel;
-
     private final WarehousePanel warehousePanel;
 
     private final TilePanel tilePanel;
@@ -141,10 +139,6 @@ public final class ColonyPanel extends PortPanel
     private final BuildingsPanel buildingsPanel;
 
     private final ConstructionPanel constructionPanel;
-
-    private final DefaultTransferHandler defaultTransferHandler;
-
-    private final MouseListener pressListener;
 
     private final MouseListener releaseListener;
 
@@ -387,7 +381,7 @@ public final class ColonyPanel extends PortPanel
     }
 
     public void updateInPortPanel() {
-        inPortPanel.initialize();
+        inPortPanel.update();
     }
 
     public void updateWarehousePanel() {
@@ -624,6 +618,10 @@ public final class ColonyPanel extends PortPanel
         inPortPanel.repaint();
     }
 
+    public List<Unit> getUnitList() {
+        return colony.getTile().getUnitList();
+    }
+
     /**
      * Initialize the data on the window. This is the same as calling:
      * <code>initialize(colony, game, null)</code>.
@@ -675,6 +673,7 @@ public final class ColonyPanel extends PortPanel
 
         constructionPanel.setColony(colony);
         outsideColonyPanel.setColony(colony);
+        inPortPanel.setName(colony.getName() + " - port");
     }
 
     /**
@@ -1172,52 +1171,27 @@ public final class ColonyPanel extends PortPanel
      * A panel that holds UnitLabels that represent Units that are standing in
      * front of a colony.
      */
-    public final class OutsideColonyPanel extends JPanel
-        implements DropTarget, PropertyChangeListener {
-
-        private Colony colony;
+    public final class OutsideColonyPanel extends UnitPanel implements DropTarget {
 
         public OutsideColonyPanel() {
-            super(new MigLayout("wrap 4, fill, insets 0"));
+            super(ColonyPanel.this, null, ColonyPanel.this.isEditable());
+            setLayout(new MigLayout("wrap 4, fill, insets 0"));
             setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(),
                                                        Messages.message("outsideColony")));
         }
 
-        public Colony getColony() {
-            return colony;
-        }
-
         public void setColony(Colony newColony) {
             removePropertyChangeListeners();
-            this.colony = newColony;
             addPropertyChangeListeners();
-            initialize();
+            setName(newColony.getName() + " - outside");
+            update();
         }
 
         public void initialize() {
-            removeAll();
-            if (getColony() == null) return;
-
-            Tile colonyTile = getColony().getTile();
-            for (Unit unit : colonyTile.getUnitList()) {
-                // we only deal with land, non-carrier units here
-                if (unit.isNaval() || unit.isCarrier()) {
-                    continue;
-                }
-
-                UnitLabel unitLabel = new UnitLabel(getFreeColClient(), unit, getGUI());
-                if (isEditable()) {
-                    unitLabel.setTransferHandler(defaultTransferHandler);
-                    unitLabel.addMouseListener(pressListener);
-                }
-                add(unitLabel, false);
+            if (colony != null) {
+                setName(getColony().getName() + " - port");
+                super.initialize();
             }
-            revalidate();
-            repaint();
-        }
-
-        public void cleanup() {
-            removePropertyChangeListeners();
         }
 
         /**
@@ -1264,29 +1238,20 @@ public final class ColonyPanel extends PortPanel
             }
         }
 
-        private void addPropertyChangeListeners() {
-            Colony colony = getColony();
+        @Override
+        protected void addPropertyChangeListeners() {
             if (colony != null) {
                 colony.getTile().addPropertyChangeListener(Tile.UNIT_CHANGE,
                                                            this);
             }
         }
 
-        private void removePropertyChangeListeners() {
-            Colony colony = getColony();
+        @Override
+        protected void removePropertyChangeListeners() {
             if (colony != null) {
                 colony.getTile().removePropertyChangeListener(Tile.UNIT_CHANGE,
                                                               this);
             }
-        }
-
-        public void propertyChange(PropertyChangeEvent event) {
-            String property = event.getPropertyName();
-            logger.finest("Outside " + getColony().getId()
-                          + " change " + property
-                          + ": " + event.getOldValue()
-                          + " -> " + event.getNewValue());
-            initialize();
         }
 
         @Override
@@ -1311,7 +1276,7 @@ public final class ColonyPanel extends PortPanel
     public final class ColonyInPortPanel extends InPortPanel {
 
         public ColonyInPortPanel() {
-            super(ColonyPanel.this, isEditable());
+            super(ColonyPanel.this, null, ColonyPanel.this.isEditable());
             setLayout(new MigLayout("wrap 3, fill, insets 0"));
             setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(),
                                                        Messages.message("inPort")));
@@ -1319,7 +1284,8 @@ public final class ColonyPanel extends PortPanel
 
         public void initialize() {
             if (getColony() != null) {
-                super.initialize(getColony().getTile().getUnitList());
+                setName(getColony().getName() + " - port");
+                super.initialize();
             }
         }
 

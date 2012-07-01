@@ -90,8 +90,6 @@ public final class EuropePanel extends PortPanel {
 
     private final DestinationPanel toEuropePanel;
 
-    private final EuropeInPortPanel inPortPanel;
-
     private final DocksPanel docksPanel;
 
     private final MarketPanel marketPanel;
@@ -297,6 +295,10 @@ public final class EuropePanel extends PortPanel {
         }
         inPortPanel.revalidate();
         inPortPanel.repaint();
+    }
+
+    public List<Unit> getUnitList() {
+        return europe.getUnitList();
     }
 
     /**
@@ -540,48 +542,21 @@ public final class EuropePanel extends PortPanel {
      * A panel that holds UnitLabels that represent naval units that are
      * waiting in Europe.
      */
-    public final class EuropeInPortPanel extends InPortPanel
-        implements PropertyChangeListener {
+    public final class EuropeInPortPanel extends InPortPanel {
 
         public EuropeInPortPanel() {
-            super(EuropePanel.this, true);
+            super(EuropePanel.this, "Europe - port", true);
         }
 
-        /**
-         * Initialize this InPortPanel.
-         */
-        public void initialize() {
-            addPropertyChangeListeners();
-            update();
-        }
-
-        /**
-         * Update this InPortPanel.
-         */
-        public void update() {
-            initialize(europe.getUnitList());
-        }
-
-        /**
-         * Cleans up this InPortPanel.
-         */
-        public void cleanup() {
-            removePropertyChangeListeners();
-        }
-
-        public void addPropertyChangeListeners() {
+        @Override
+        protected void addPropertyChangeListeners() {
             europe.addPropertyChangeListener(this);
+            System.out.println("added property listener " + europe);
         }
 
-        public void removePropertyChangeListeners() {
+        @Override
+        protected void removePropertyChangeListeners() {
             europe.removePropertyChangeListener(this);
-        }
-
-        public void propertyChange(PropertyChangeEvent event) {
-            logger.finest("Europe-port change " + event.getPropertyName()
-                          + ": " + event.getOldValue()
-                          + " -> " + event.getNewValue());
-            update();
         }
 
         public boolean accepts(Unit unit) {
@@ -595,43 +570,11 @@ public final class EuropePanel extends PortPanel {
      * A panel that holds UnitsLabels that represent Units that are
      * waiting on the docks in Europe.
      */
-    public final class DocksPanel extends JPanel
-        implements DropTarget, PropertyChangeListener {
+    public final class DocksPanel extends UnitPanel implements DropTarget {
 
-        /**
-         * Initializes this DocksPanel.
-         */
-        public void initialize() {
+        public DocksPanel() {
+            super(EuropePanel.this, "Europe - docks", true);
             setLayout(new MigLayout("wrap 6"));
-            addPropertyChangeListeners();
-            update();
-        }
-
-        /**
-         * Cleans up this DocksPanel.
-         */
-        public void cleanup() {
-            removePropertyChangeListeners();
-        }
-
-        /**
-         * Update this DocksPanel.
-         */
-        public void update() {
-            removeAll();
-
-            List<Unit> units = europe.getUnitList();
-            for (Unit unit : units) {
-                if (!unit.isNaval()) {
-                    UnitLabel unitLabel = new UnitLabel(getFreeColClient(), unit, getGUI());
-                    unitLabel.setTransferHandler(defaultTransferHandler);
-                    unitLabel.addMouseListener(pressListener);
-                    add(unitLabel);
-                }
-            }
-
-            revalidate();
-            repaint();
         }
 
         public Component add(Component comp, boolean editState) {
@@ -651,13 +594,6 @@ public final class EuropePanel extends PortPanel {
 
         public void removePropertyChangeListeners() {
             europe.removePropertyChangeListener(this);
-        }
-
-        public void propertyChange(PropertyChangeEvent event) {
-            logger.finest("Europe-docks change " + event.getPropertyName()
-                          + ": " + event.getOldValue()
-                          + " -> " + event.getNewValue());
-            update();
         }
 
         public boolean accepts(Unit unit) {

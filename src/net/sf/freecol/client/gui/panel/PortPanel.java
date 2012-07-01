@@ -21,6 +21,7 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.MouseListener;
+import java.util.List;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.model.Unit;
@@ -31,8 +32,7 @@ public abstract class PortPanel extends FreeColPanel {
     protected UnitLabel selectedUnitLabel;
     protected DefaultTransferHandler defaultTransferHandler;
     protected MouseListener pressListener;
-
-
+    protected InPortPanel inPortPanel;
 
     public PortPanel(FreeColClient client, GUI gui) {
         super(client, gui);
@@ -78,5 +78,6 @@ public abstract class PortPanel extends FreeColPanel {
         return pressListener;
     }
 
+    public abstract List<Unit> getUnitList();
 
 }
