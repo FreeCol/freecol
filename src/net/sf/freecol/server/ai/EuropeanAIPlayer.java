@@ -1029,8 +1029,9 @@ public class EuropeanAIPlayer extends AIPlayer {
      * conditions.
      */
     private void initializeMissions() {
-        // Debug setup is very different.
-        if (FreeColDebugger.isInDebugMode()) return;
+        // Full debug setup is very different.
+        if (FreeColDebugger.getDebugLevel() >= FreeColDebugger.DEBUG_FULL)
+            return;
 
         AIMain aiMain = getAIMain();
 
@@ -1038,7 +1039,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         TransportMission tm = null;
         for (AIUnit aiu : getAIUnits()) {
             Unit u = aiu.getUnit();
-            if (u.isNaval()) {
+            if (u.isNaval() && !aiu.hasMission()) {
                 aiu.setMission(tm = new TransportMission(aiMain, aiu));
             }
         }
@@ -1048,7 +1049,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         Location target = null;
         for (AIUnit aiu : getAIUnits()) {
             Unit u = aiu.getUnit();
-            if (!u.isNaval()) {
+            if (!u.isNaval() && !aiu.hasMission()) {
                 if (target == null) {
                     target = BuildColonyMission.findTarget(aiu, false);
                 }
