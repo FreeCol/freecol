@@ -2785,7 +2785,7 @@ public final class InGameController extends Controller {
         if (serverPlayer.isEuropean()) {
             settlement = new ServerColony(game, serverPlayer, name, tile);
             serverPlayer.addSettlement(settlement);
-            settlement.placeSettlement(serverPlayer.isAI());
+            settlement.placeSettlement(false);
         } else {
             IndianNationType nationType
                 = (IndianNationType) serverPlayer.getNationType();
