@@ -51,9 +51,17 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
     private static final Logger logger = Logger.getLogger(Tile.class.getName());
 
-    // This must be distinct from ColonyTile/Building.UNIT_CHANGE or
-    // the colony panel can get confused.
+    /**
+     * This must be distinct from ColonyTile/Building.UNIT_CHANGE or
+     * the colony panel can get confused.
+     */
     public static final String UNIT_CHANGE = "TILE_UNIT_CHANGE";
+
+    /**
+     * Flag to assign to the high seas count to flag that the high seas
+     * connectivity needs recalculation after reading in the map.
+     */
+    public static final int FLAG_RECALCULATE = Integer.MAX_VALUE;
 
     /**
      * The maximum distance that will still be considered "near" when
@@ -63,8 +71,16 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public static final int NEAR_RADIUS = 8;
 
+    /**
+     * The type of the tile.
+     * Beware: this may appear to be null in the client when the tile is
+     * unexplored.
+     */
     private TileType type;
 
+    /**
+     * The tile coordinates in the enclosing map.
+     */
     private int x, y;
 
     /** The player that consider this tile to be their land. */
@@ -100,9 +116,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     private Region region;
 
     /**
-     * Whether this tile is connected to Europe.
+     * The number of tiles to traverse to get to the high seas.
      */
-    private boolean connected = false;
+    private int highSeasCount = -1;
 
     /**
      * Does this tile have an explicit moveToEurope state.  If null,
@@ -218,7 +234,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         scratch.tileItemContainer = tileItemContainer;
         scratch.playerExploredTiles = playerExploredTiles;
         scratch.region = region;
-        scratch.connected = connected;
+        scratch.highSeasCount = highSeasCount;
         scratch.moveToEurope = moveToEurope;
         scratch.style = style;
         return scratch;
@@ -599,21 +615,30 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
-     * Whether this tile is connected to Europe.
+     * Gets whether this tile is connected to the high seas.
      *
-     * @return a <code>boolean</code> value
+     * @return True if this tile is connected to the high seas.
      */
-    public boolean isConnected() {
-        return (connected || (type != null && type.isConnected()));
+    public boolean isHighSeasConnected() {
+        return highSeasCount >= 0;
     }
 
     /**
-     * Set the <code>Connected</code> value.
+     * Gets the high seas count.
      *
-     * @param newConnected The new Connected value.
+     * @return The high seas count value.
      */
-    public void setConnected(final boolean newConnected) {
-        this.connected = newConnected;
+    public int getHighSeasCount() {
+        return this.highSeasCount;
+    }
+
+    /**
+     * Set the high seas count.
+     *
+     * @param count The new high seas count value.
+     */
+    public void setHighSeasCount(final int count) {
+        this.highSeasCount = count;
     }
 
     /**
@@ -639,13 +664,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *
      * @return True if a unit can move to Europe from this tile.
      */
-    public boolean canMoveToEurope() {
+    public boolean canMoveToHighSeas() {
         return (getMoveToEurope() != null) ? getMoveToEurope()
             : (type == null) ? false
-            : (type.hasAbility("model.ability.moveToEurope")) ? true
-            // TODO: remove this when we are confident all the maps have
-            // appropriate moveToEurope overrides.
-            : isAdjacentToMapEdge() && type.isWater();
+            : type.isDirectlyHighSeasConnected();
     }
 
     /**
@@ -977,25 +999,21 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public boolean hasUnexploredAdjacent() {
         for (Tile t: getSurroundingTiles(1)) {
-            if (!t.isExplored()) {
-                return true;
-            }
+            if (!t.isExplored()) return true;
         }
         return false;
     }
 
     /**
-     * Returns true if this tile has at least one adjacent land tile (if water),
-     * or at least one adjacent water tile (if land).
+     * Is this a shoreline tile?  The tile can be water or land, and the
+     * water can be ocean, river or an inland lake.  If this is true for
+     * a land tile with a colony, the colony can build docks.
      *
-     * @return a <code>boolean</code> value
+     * @return True if this tile is shore.
      */
-    public boolean isCoast() {
-        for (Direction direction : Direction.values()) {
-            Tile otherTile = getNeighbourOrNull(direction);
-            if (otherTile != null && otherTile.isLand()!=this.isLand()) {
-                return true;
-            }
+    public boolean isShore() {
+        for (Tile t : getSurroundingTiles(1)) {
+            if (t.isLand() != this.isLand()) return true;
         }
         return false;
     }
@@ -1612,107 +1630,76 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @param direction The direction (N, NE, E, etc.)
      * @return Adjacent tile
      */
-     public Tile getAdjacentTile(Direction direction) {
-         int x = getX() + ((getY() & 1) != 0 ?
-                               direction.getOddDX() : direction.getEvenDX());
-         int y = getY() + ((getY() & 1) != 0 ?
-                               direction.getOddDY() : direction.getEvenDY());
-         return getMap().getTile(x, y);
-     }
-
-     /**
-      * Returns all the tiles surrounding this tile within the
-      * given range. This tile is not included.
-      *
-      * @param range
-      *            How far away do we need to go starting from this.
-      * @return The tiles surrounding this tile.
-      */
-     public Iterable<Tile> getSurroundingTiles(final int range) {
-         return new Iterable<Tile>() {
-             public Iterator<Tile> iterator() {
-                 final Iterator<Position> m = (range == 1)
-                     ? getMap().getAdjacentIterator(getPosition())
-                     : getMap().getCircleIterator(getPosition(), true, range);
-
-                 return new Iterator<Tile>() {
-                     public boolean hasNext() {
-                         return m.hasNext();
-                     }
-
-                     public Tile next() {
-                         return getMap().getTile(m.next());
-                     }
-
-                     public void remove() {
-                         m.remove();
-                     }
-                 };
-             }
-         };
-     }
-
-
-     /**
-      * Returns all the tiles surrounding this tile within the
-      * given inclusive upper and lower bounds.
-      * getSurroundingTiles(r) is equivalent to getSurroundingTiles(1, r),
-      * thus this tile is included if rangeMin is zero.
-      *
-      * @param rangeMin The inclusive minimum distance from this tile.
-      * @param rangeMax The inclusive maximum distance from this tile.
-      * @return A list of the tiles surrounding this tile.
-      */
-     public List<Tile> getSurroundingTiles(int rangeMin, int rangeMax) {
-         List<Tile> result = new ArrayList<Tile>();
-         if (rangeMin > rangeMax || rangeMin < 0) return result;
-
-         if (rangeMin == 0) result.add(this);
-
-         if (rangeMax > 0) {
-             for (Tile t : getSurroundingTiles(rangeMax)) {
-                 // add all tiles up to rangeMax
-                 result.add(t);
-             }
-         }
-         if (rangeMin > 1) {
-             for (Tile t : getSurroundingTiles(rangeMin - 1)) {
-                 // remove the tiles closer than rangeMin
-                 result.remove(t);
-             }
-         }
-         return result;
-     }
-
+    public Tile getAdjacentTile(Direction direction) {
+        int x = getX() + ((getY() & 1) != 0 ?
+            direction.getOddDX() : direction.getEvenDX());
+        int y = getY() + ((getY() & 1) != 0 ?
+            direction.getOddDY() : direction.getEvenDY());
+        return getMap().getTile(x, y);
+    }
+    
     /**
-     * Checks if the given <code>Tile</code> is adjacent to the
-     * east or west edge of the map.
+     * Returns all the tiles surrounding this tile within the
+     * given range. This tile is not included.
      *
-     * @return <code>true</code> if the given tile is at the edge of the map.
+     * @param range
+     *            How far away do we need to go starting from this.
+     * @return The tiles surrounding this tile.
      */
-    public boolean isAdjacentToVerticalMapEdge() {
-        if ((getNeighbourOrNull(Direction.E) == null)
-            || (getNeighbourOrNull(Direction.W) == null)) {
-            return true;
-        }
-        return false;
+    public Iterable<Tile> getSurroundingTiles(final int range) {
+        return new Iterable<Tile>() {
+            public Iterator<Tile> iterator() {
+                final Iterator<Position> m = (range == 1)
+                    ? getMap().getAdjacentIterator(getPosition())
+                    : getMap().getCircleIterator(getPosition(), true, range);
+
+                return new Iterator<Tile>() {
+                    public boolean hasNext() {
+                        return m.hasNext();
+                    }
+
+                    public Tile next() {
+                        return getMap().getTile(m.next());
+                    }
+
+                    public void remove() {
+                        m.remove();
+                    }
+                };
+            }
+        };
     }
 
     /**
-     * Checks if the given <code>Tile</code> is adjacent to the edge of the
-     * map.
+     * Returns all the tiles surrounding this tile within the
+     * given inclusive upper and lower bounds.
+     * getSurroundingTiles(r) is equivalent to getSurroundingTiles(1, r),
+     * thus this tile is included if rangeMin is zero.
      *
-     * @return <code>true</code> if the given tile is at the edge of the map.
+     * @param rangeMin The inclusive minimum distance from this tile.
+     * @param rangeMax The inclusive maximum distance from this tile.
+     * @return A list of the tiles surrounding this tile.
      */
-    public boolean isAdjacentToMapEdge() {
-        for (Direction direction : Direction.values()) {
-            if (getNeighbourOrNull(direction) == null) {
-                return true;
+    public List<Tile> getSurroundingTiles(int rangeMin, int rangeMax) {
+        List<Tile> result = new ArrayList<Tile>();
+        if (rangeMin > rangeMax || rangeMin < 0) return result;
+
+        if (rangeMin == 0) result.add(this);
+
+        if (rangeMax > 0) {
+            for (Tile t : getSurroundingTiles(rangeMax)) {
+                // add all tiles up to rangeMax
+                result.add(t);
             }
         }
-        return false;
+        if (rangeMin > 1) {
+            for (Tile t : getSurroundingTiles(rangeMin - 1)) {
+                // remove the tiles closer than rangeMin
+                result.remove(t);
+            }
+        }
+        return result;
     }
-
 
     /**
      * Finds the nearest settlement to this tile.
@@ -1836,8 +1823,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             out.writeAttribute("moveToEurope", Boolean.toString(moveToEurope));
         }
 
-        if (connected && !type.isConnected()) {
-            out.writeAttribute("connected", Boolean.toString(true));
+        // Compatibility note: this used to be a boolean
+        if (highSeasCount >= 0) {
+            out.writeAttribute("connected", Integer.toString(highSeasCount));
         }
 
         if (contiguity >= 0) {
@@ -1920,7 +1908,25 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             type = getSpecification().getTileType(typeString);
         }
 
-        connected = getAttribute(in, "connected", false);
+        String str = in.getAttributeValue(null, "connected");
+        if (str == null || "".equals(str)) {
+            highSeasCount = -1;
+        } else {
+            try {
+                highSeasCount = Integer.parseInt(str);
+            } catch (NumberFormatException nfe) {
+                // @compat 0.10.5
+                // < 0.10.6 used to have a simple boolean connected
+                // attribute, but it is now highSeasCount, the number of
+                // tiles to get to a tile where a unit can move
+                // directly to the high seas.
+                if (getAttribute(in, "connected", false)) {
+                    highSeasCount = Tile.FLAG_RECALCULATE;
+                } else
+                // @end compatibility code
+                    highSeasCount = -1;
+            }
+        }
 
         owner = getFreeColGameObject(in, "owner", Player.class, null);
 

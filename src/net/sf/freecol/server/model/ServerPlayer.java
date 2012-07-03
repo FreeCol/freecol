@@ -284,7 +284,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             // Post-declaration European player needs a coastal colony
             // and can not hope for resupply from Europe.
             for (Colony colony : getColonies()) {
-                if (colony.isConnected()) return false;
+                if (colony.isConnectedPort()) return false;
             }
             return true;
 

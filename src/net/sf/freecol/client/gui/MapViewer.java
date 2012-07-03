@@ -2368,8 +2368,8 @@ public final class MapViewer {
 
         if (displayCoordinates) {
             String posString = tile.getX() + ", " + tile.getY();
-            if (tile.isConnected()) {
-                posString += "C";
+            if (tile.getHighSeasCount() >= 0) {
+                posString += "/" + Integer.toString(tile.getHighSeasCount());
             }
             centerString(g, posString);
         }

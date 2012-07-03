@@ -71,7 +71,7 @@ public class Map extends FreeColGameObject implements Location {
             public PathNode getGoal() { return goal; }
             public boolean hasSubGoals() { return false; }
             public boolean check(Unit u, PathNode pathNode) {
-                if (pathNode.getTile().canMoveToEurope()) {
+                if (pathNode.getTile().canMoveToHighSeas()) {
                     goal = pathNode;
                     return true;
                 }
@@ -1999,6 +1999,64 @@ public class Map extends FreeColGameObject implements Location {
         }
     }        
 
+    /**
+     * Sets the high seas count for all tiles connected to the high seas.
+     * Any ocean tiles on the map vertical edges that do not have an
+     * explicit false moveToEurope attribute are given a true one.
+     *
+     * Set all high seas counts negative, then start with a count of
+     * zero for tiles with the moveToEurope attribute or of a type
+     * with that ability.  Iterate outward by neighbouring tile,
+     * incrementing the count on each pass, stopping at land.  Thus,
+     * only the coastal land tiles will have a non-negative high seas
+     * count.  This significantly speeds up the colony site evaluator,
+     * as it does not have to try to find a path to Europe for each
+     * tile.
+     */
+    public void resetHighSeasCount() {
+        List<Tile> curr = new ArrayList<Tile>();
+        List<Tile> next = new ArrayList<Tile>();
+        int hsc = 0;
+        for (Tile t : getAllTiles()) {
+            t.setHighSeasCount(-1);
+            if (!t.isLand()) {
+                if ((t.getX() == 0 || t.getX() == getWidth()-1)
+                    && t.getType().isHighSeasConnected()
+                    && !t.getType().isDirectlyHighSeasConnected()
+                    && t.getMoveToEurope() == null) {
+                    t.setMoveToEurope(true);
+                }
+                if (t.canMoveToHighSeas()) {
+                    t.setHighSeasCount(hsc);
+                    next.add(t);
+                }
+            }
+        }
+        while (!next.isEmpty()) {
+            hsc++;
+            curr.addAll(next);
+            next.clear();
+            while (!curr.isEmpty()) {
+                Tile tile = curr.remove(0);
+                // Deliberately using low level access to neighbours
+                // rather than Tile.getSurroundingTiles() because that
+                // relies on the map being attached to the game, which
+                // is not necessarily true in the test suite.
+                Position position = new Position(tile.getX(), tile.getY());
+                for (Direction d : Direction.values()) {
+                    Position p = position.getAdjacent(d);
+                    if (isValid(p)) {
+                        Tile t = getTile(p);
+                        if (t.getHighSeasCount() < 0) {
+                            t.setHighSeasCount(hsc);
+                            if (!t.isLand()) next.add(t);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     // Serialization
 
     /**
@@ -2038,7 +2096,9 @@ public class Map extends FreeColGameObject implements Location {
         out.writeEndElement();
     }
 
-
+    /**
+     * {@inheritDoc}
+     */
     protected void writeAttributes(XMLStreamWriter out, Player player,
                                    boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
@@ -2050,6 +2110,9 @@ public class Map extends FreeColGameObject implements Location {
         out.writeAttribute("maximumLatitude", Integer.toString(maximumLatitude));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected void writeChildren(XMLStreamWriter out, Player player,
                                  boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
@@ -2070,12 +2133,12 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * Initialize this object from an XML-representation of this object.
      *
-     * @param in
-     *            The input stream with the XML.
+     * @param in The input stream with the XML.
      */
     @Override
     protected void readFromXMLImpl(XMLStreamReader in)
             throws XMLStreamException {
+        boolean fixupHighSeas = false; // @compat 0.10.5
         setId(in.getAttributeValue(null, ID_ATTRIBUTE));
         setLayer(Layer.valueOf(getAttribute(in, "layer", "ALL")));
 
@@ -2094,6 +2157,11 @@ public class Map extends FreeColGameObject implements Location {
             if (in.getLocalName().equals(Tile.getXMLElementTagName())) {
                 Tile t = updateFreeColGameObject(in, Tile.class);
                 setTile(t, t.getX(), t.getY());
+                // @compat 0.10.5
+                if (t.getHighSeasCount() == Tile.FLAG_RECALCULATE) {
+                    fixupHighSeas = true;
+                }
+                // @end compatibility code
             } else if (in.getLocalName().equals(Region.getXMLElementTagName())) {
                 setRegion(updateFreeColGameObject(in, Region.class));
             } else {
@@ -2101,6 +2169,8 @@ public class Map extends FreeColGameObject implements Location {
                 in.nextTag();
             }
         }
+
+        if (fixupHighSeas) resetHighSeasCount(); // @compat 0.10.5
     }
 
     /**

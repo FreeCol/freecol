@@ -335,7 +335,7 @@ public class InGameControllerTest extends FreeColTestCase {
         assertFalse("Standard colony is not landlocked",
                     port.isLandLocked());
         assertTrue("Standard colony is connected to Europe",
-                   port.isConnected());
+                   port.isConnectedPort());
         treasure.setLocation(port.getTile());
         assertTrue("Can cash in treasure from a port",
                    treasure.canCashInTreasureTrain());
@@ -345,7 +345,7 @@ public class InGameControllerTest extends FreeColTestCase {
         assertTrue("Inland colony is landlocked",
                    inland.isLandLocked());
         assertFalse("Inland colony is not connected to Europe",
-                    inland.isConnected());
+                    inland.isConnectedPort());
         treasure.setLocation(inland.getTile());
         assertFalse("Can not cash in treasure from inland colony",
                     treasure.canCashInTreasureTrain());
@@ -356,7 +356,7 @@ public class InGameControllerTest extends FreeColTestCase {
         assertFalse("Lake colony is not landlocked",
                     lake.isLandLocked());
         assertFalse("Lake colony is not connected to Europe",
-                    lake.isConnected());
+                    lake.isConnectedPort());
         treasure.setLocation(lake.getTile());
         assertFalse("Can not cash in treasure from lake colony",
                     treasure.canCashInTreasureTrain());
@@ -469,7 +469,7 @@ public class InGameControllerTest extends FreeColTestCase {
         galleon.setDestination(tile3);
         assertEquals("Wrong destination for Galleon",
                      tile3, galleon.getDestination());
-        galleon.getTile().setConnected(true);
+        galleon.getTile().setHighSeasCount(5);
         assertEquals("Galleon repair location is Europe",
             dutch.getEurope(), galleon.getRepairLocation());
 
@@ -817,7 +817,7 @@ public class InGameControllerTest extends FreeColTestCase {
                     colony.canBePillaged(attacker));
         Unit privateer = new ServerUnit(game, colony.getTile(), dutch,
                                         privateerType);
-        colony.getTile().setConnected(false); // no repair possible
+        colony.getTile().setHighSeasCount(-1); // no repair possible
         assertTrue("Colony has ship, should be pillageable",
                    colony.canBePillaged(attacker));
         crs = fakeAttackResult(CombatResult.WIN, attacker, defender);

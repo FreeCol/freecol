@@ -421,15 +421,15 @@ abstract public class Settlement extends GoodsLocation
     }
 
     /**
-     * Returns whether this settlement is connected by water to Europe.
+     * Gets whether this settlement is connected to the high seas.
+     * This is more than merely non-landlocked, because the settlement
+     * could be on an inland lake.
      *
-     * @return <code>true</code> if this <code>Settlement</code> is connected
-     *         to Europe.
+     * @return True if the settlement is connected to the high seas.
      */
-    public boolean isConnected() {
+    public boolean isConnectedPort() {
         for (Tile t : getTile().getSurroundingTiles(1)) {
-            if (t.isExplored() && t.getType().isWater()
-                && t.isConnected()) return true;
+            if (!t.isLand() && t.isHighSeasConnected()) return true;
         }
         return false;
     }

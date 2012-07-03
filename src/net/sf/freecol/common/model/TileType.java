@@ -120,12 +120,22 @@ public final class TileType extends FreeColGameObjectType {
     }
 
     /**
-     * Get the <code>Connected</code> value.
+     * Is this tile type connected to the high seas, by definition.
      *
-     * @return a <code>boolean</code> value
+     * @return True if the tile type is inherently connected to the high seas.
      */
-    public boolean isConnected() {
+    public boolean isHighSeasConnected() {
         return connected;
+    }
+
+    /**
+     * Is this tile type directly connected to the high seas, that is, a
+     * unit on a tile of this type can move immediately to the high seas.
+     *
+     * @return True if the tile type is directly connected.
+     */
+    public boolean isDirectlyHighSeasConnected() {
+        return hasAbility("model.ability.moveToEurope");
     }
     
     /**

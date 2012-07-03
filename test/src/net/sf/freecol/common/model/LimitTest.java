@@ -77,7 +77,6 @@ public class LimitTest extends FreeColTestCase {
     }
 
     public void testIndependenceLimits() {
-
         Game game = getStandardGame();
         Player dutch = game.getPlayer("model.nation.dutch");
         Map map = getTestMap();
@@ -91,7 +90,7 @@ public class LimitTest extends FreeColTestCase {
         assertNotNull(spec().getOption(GameOptions.LAST_COLONIAL_YEAR));
 
         Limit rebelLimit = event.getLimit("model.limit.independence.rebels");
-        Limit colonyLimit = event.getLimit("model.limit.independence.colonies");
+        Limit colonyLimit = event.getLimit("model.limit.independence.coastalColonies");
         Limit yearLimit = event.getLimit("model.limit.independence.year");
 
         assertNotNull(rebelLimit);
@@ -125,8 +124,12 @@ public class LimitTest extends FreeColTestCase {
 
         Tile tile = colony.getTile().getNeighbourOrNull(Map.Direction.N);
         tile.setType(spec().getTileType("model.tile.ocean"));
-        tile.setConnected(true);
-        assertTrue(colony.isConnected());
+        tile.setHighSeasCount(5);
+        tile.setExploredBy(dutch, true);
+        assertTrue(tile.isExploredBy(dutch));
+        assertTrue(tile.isHighSeasConnected());
+        assertTrue(!tile.isLand());
+        assertTrue(colony.isConnectedPort());
         assertTrue(colonyLimit.getLeftHandSide().appliesTo(colony));
         assertTrue(colonyLimit.evaluate(dutch));
 

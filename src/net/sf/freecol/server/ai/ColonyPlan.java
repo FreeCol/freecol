@@ -774,7 +774,7 @@ public class ColonyPlan {
             if (type.hasAbility(Ability.PRODUCE_IN_WATER)) {
                 double factor = 0.0;
                 if (!colony.hasAbility(Ability.PRODUCE_IN_WATER)
-                    && colony.getTile().isCoast()) {
+                    && colony.getTile().isShore()) {
                     int landFood = 0, seaFood = 0;
                     for (Tile t : colony.getTile().getSurroundingTiles(1)) {
                         if (t.getOwningSettlement() == colony
@@ -855,7 +855,7 @@ public class ColonyPlan {
         }
         
         double wagonNeed = 0.0;
-        if (!colony.isConnected()) { // Inland colonies need transportation
+        if (!colony.isConnectedPort()) { // Inland colonies need transportation
             int wagons = 0;
             for (Unit u : player.getUnits()) {
                 if (u.hasAbility(Ability.CARRY_GOODS)
@@ -863,7 +863,7 @@ public class ColonyPlan {
             }
             int inland = 0;
             for (Colony c : player.getColonies()) {
-                if (!c.isConnected()) inland++;
+                if (!c.isConnectedPort()) inland++;
             }
             if (inland > wagons) {
                 wagonNeed = (double)(inland - wagons) / inland;

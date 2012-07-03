@@ -716,7 +716,7 @@ public class TransportMission extends Mission {
 
         // Try Europe
         if (carrier.isNaval() && carrier.getOwner().canMoveToEurope()) {
-            if (carrier.canMoveToEurope()) {
+            if (carrier.canMoveToHighSeas()) {
                 return new Destination(true, null);
             }
             if ((path = carrier.findPathToEurope()) != null) {
@@ -1469,7 +1469,7 @@ public class TransportMission extends Mission {
             Destination destination = getNextDestination();
             boolean canMoveToEurope = destination != null
                 && destination.moveToEurope()
-                && carrier.canMoveToEurope();
+                && carrier.canMoveToHighSeas();
 
             if (destination == null
                 || (destination.getPath() == null && !canMoveToEurope)) {

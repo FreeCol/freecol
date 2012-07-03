@@ -164,7 +164,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                 public boolean check(Unit u, PathNode pathNode) {
                     if (!pathNode.getTile().isEmpty()) return false;
                     for (Tile t : pathNode.getTile().getSurroundingTiles(1)) {
-                        if (t.isConnected() && t.isEmpty()) {
+                        if (t.isHighSeasConnected() && t.isEmpty()) {
                             goal = pathNode;
                             return true;
                         }
@@ -182,7 +182,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
 
         // If teleporting in, the connected tile is an acceptable target.
         for (Tile t : tile.getSurroundingTiles(1)) {
-            if (t.isConnected() && t.isEmpty()) {
+            if (t.isHighSeasConnected() && t.isEmpty()) {
                 tile = t;
                 break;
             }
@@ -243,7 +243,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                 if (target instanceof Settlement) {
                     // Value connected settlements highly.
                     // Initially, accept no others.
-                    if (((Settlement)target).isConnected()) {
+                    if (((Settlement)target).isConnectedPort()) {
                         value += 500;
                     } else {
                         if (getPlayer().getNumberOfSettlements() <= 0) {

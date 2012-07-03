@@ -150,7 +150,7 @@ public final class TilePopup extends JPopupMenu {
             }
 
             // Add move to Europe entry if the unit can do so
-            if (unitTile == tile && activeUnit.canMoveToEurope()) {
+            if (unitTile == tile && activeUnit.canMoveToHighSeas()) {
                 JMenuItem europeMenuItem
                     = new JMenuItem(Messages.message(StringTemplate.template("gotoEurope")));
                 europeMenuItem.addActionListener(new ActionListener() {

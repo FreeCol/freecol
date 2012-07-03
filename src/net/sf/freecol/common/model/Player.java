@@ -2510,7 +2510,7 @@ public class Player extends FreeColGameObject implements Nameable {
                         advantages *= 0.5f;
                     }
                 } else {
-                    if (tile.isConnected()) {
+                    if (tile.isHighSeasConnected()) {
                         nearbyTileIsOcean = true;
                     }
                     if (tile.getType()!=null) {
@@ -2581,7 +2581,7 @@ public class Player extends FreeColGameObject implements Nameable {
         final float[] MOD_NEUTRAL_COLONY = {0.0f, 0.0f, 0.9f, 0.95f, 1.0f};
         final float[] MOD_ENEMY_UNIT     = {0.0f, 0.5f, 0.6f, 0.7f,  0.8f};
 
-        final int LONG_PATH_TURNS = 3;
+        final int LONG_PATH_TILES = 16;
         final int PRIMARY_GOODS_VALUE = 30;
 
         //goods production in excess of this on a tile counts as good/high
@@ -2628,15 +2628,16 @@ public class Player extends FreeColGameObject implements Nameable {
             advantage *= MOD_HAS_RESOURCE;
         }
 
-        //penalty if path to europe doesn't exist, or is too long
-        //TODO: instead check tile.isConnected() for neighbouring tiles,
-        // should be more efficient?
-        final PathNode n = getGame().getMap().findPathToEurope(t);
-        if (n == null) {
-            // no path to Europe, therefore it is a poor location
-            // TODO: at the moment, this means we are land-locked
+        // Penalty if there is no direct connection to the high seas, or
+        // if it is too long.
+        int tilesToHighSeas = Integer.MAX_VALUE;
+        for (Tile n : t.getSurroundingTiles(1)) {
+            int v = t.getHighSeasCount();
+            if (v >= 0 && v < tilesToHighSeas) tilesToHighSeas = v;
+        }
+        if (tilesToHighSeas == Integer.MAX_VALUE) {
             advantage *= MOD_NO_PATH;
-        } else if (n.getTotalTurns() > LONG_PATH_TURNS) {
+        } else if (tilesToHighSeas > LONG_PATH_TILES) {
             advantage *= MOD_LONG_PATH;
         }
 

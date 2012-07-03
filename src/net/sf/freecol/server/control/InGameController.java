@@ -2150,7 +2150,7 @@ public final class InGameController extends Controller {
             // Update settlement tile with new information, and any
             // newly visible tiles, possibly with enhanced radius.
             for (Tile t : tile.getSurroundingTiles(radius)) {
-                if (!serverPlayer.canSee(t) && (t.isLand() || t.isCoast())) {
+                if (!serverPlayer.canSee(t) && (t.isLand() || t.isShore())) {
                     serverPlayer.setExplored(t);
                     cs.add(See.only(serverPlayer), t);
                 }

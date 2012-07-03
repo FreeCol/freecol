@@ -125,7 +125,7 @@ public class River {
     private java.util.Map<Position, River> riverMap;
 
     /**
-     * Whether the river is connected to Europe.
+     * Whether the river is connected to the high seas.
      */
     private boolean connected = false;
 
@@ -356,7 +356,7 @@ public class River {
                             nextRiver = riverMap.get(px);
                             nextRiver.grow(lastSection, px);
                             // if the other river is connected, so is this one
-                            connected = nextRiver.connected;
+                            connected |= nextRiver.connected;
                             // add this region to other river if too small
                             if (getLength() < 10) {
                                 region = nextRiver.region;
@@ -376,7 +376,7 @@ public class River {
                                 waterSection.setBranch(lastDir.getReverseDirection(),
                                                        TileImprovement.SMALL_RIVER);
                             }
-                            connected = tile.isConnected();
+                            connected |= tile.isHighSeasConnected();
                             drawToMap(sections);
                         }
                         return true;
@@ -444,11 +444,9 @@ public class River {
             if (tile.isLand()) {
                 if (section.getSize() >= TileImprovement.FJORD_RIVER) {
                     TileType greatRiver = map.getSpecification().getTileType("model.tile.greatRiver");
-                    tile.setType(greatRiver);   // changing the type resets the improvements
+                    tile.setType(greatRiver);
+                    // changing the type resets the improvements
                     //container.addRiver(section.getSize(), section.encodeStyle());
-                    if (connected) {
-                        tile.setConnected(true);
-                    }
                     logger.fine("Added fjord (magnitude: " + section.getSize() +
                                 ") to tile at " + section.getPosition());
                 } else if (section.getSize() > TileImprovement.NO_RIVER) {

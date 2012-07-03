@@ -547,20 +547,6 @@ public class Colony extends Settlement implements Nameable {
     }
 
     /**
-     * Return whether this colony is connected to the HighSeas, or
-     * not. A colony next to a lake would not be landlocked, for
-     * example, but it might well be disconnected from Europe.
-     *
-     * @return a <code>boolean</code> value
-     */
-    public boolean isConnected() {
-        for (Tile t : getTile().getSurroundingTiles(1)) {
-            if (t.isConnected()) return true;
-        }
-        return false;
-    }
-
-    /**
      * Returns whether this colony has undead units.
      *
      * @return whether this colony has undead units.

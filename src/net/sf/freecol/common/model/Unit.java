@@ -609,7 +609,7 @@ public class Unit extends FreeColGameObject
         }
         if (loc.getColony() != null) {
             // Cash in if at a colony which has connectivity to Europe
-            return loc.getColony().isConnected();
+            return loc.getColony().isConnectedPort();
         }
         // Otherwise, cash in if in Europe.
         return loc instanceof Europe
@@ -1408,7 +1408,7 @@ public class Unit extends FreeColGameObject
                     int value;
                     if (settlement != null
                         && settlement.getOwner() == player
-                        && (!coastal || settlement.isConnected())
+                        && (!coastal || settlement.isConnectedPort())
                         && (value = path.getTotalTurns()) < bestValue) {
                         bestValue = value;
                         best = path;
@@ -1790,7 +1790,7 @@ public class Unit extends FreeColGameObject
                 return (isOffensiveUnit())
                     ? MoveType.ATTACK_UNIT
                     : MoveType.MOVE_NO_ATTACK_CIVILIAN;
-            } else if (target.canMoveToEurope()) {
+            } else if (target.canMoveToHighSeas()) {
                 return MoveType.MOVE_HIGH_SEAS;
             } else {
                 return MoveType.MOVE;
@@ -2128,8 +2128,8 @@ public class Unit extends FreeColGameObject
                 }
             }
         }
-        boolean connected = tile.isConnected()
-            || (tile.getColony() != null && tile.getColony().isConnected());
+        boolean connected = tile.isHighSeasConnected()
+            || (tile.getColony() != null && tile.getColony().isConnectedPort());
         return (closestLocation != null) ? closestLocation.getTile()
             : (connected) ? player.getEurope()
             : null;
@@ -3105,14 +3105,14 @@ public class Unit extends FreeColGameObject
      *
      * @return <code>true</code> if this unit can move to Europe.
      */
-    public boolean canMoveToEurope() {
+    public boolean canMoveToHighSeas() {
         if (getLocation() instanceof Europe) return true;
         if (!getOwner().canMoveToEurope() || !isNaval()) return false;
 
         Tile tile = getTile();
-        if (tile.canMoveToEurope()) return true;
+        if (tile.canMoveToHighSeas()) return true;
         for (Tile t : tile.getSurroundingTiles(1)) {
-            if (t.canMoveToEurope() && getMoveType(t).isLegal()) return true;
+            if (t.canMoveToHighSeas() && getMoveType(t).isLegal()) return true;
         }
         return false;
     }

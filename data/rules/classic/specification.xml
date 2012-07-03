@@ -68,9 +68,9 @@
         <leftHandSide scopeLevel="PLAYER" method-name="getSoL" />
         <rightHandSide value="50" />
       </limit>
-      <limit id="model.limit.independence.colonies" operator="GT">
+      <limit id="model.limit.independence.coastalColonies" operator="GT">
         <leftHandSide operandType="SETTLEMENTS" scopeLevel="PLAYER"
-                      method-name="isConnected" method-value="true" />
+                      method-name="isConnectedPort" method-value="true" />
         <rightHandSide value="0" />
       </limit>
       <limit id="model.limit.independence.year" operator="LE">

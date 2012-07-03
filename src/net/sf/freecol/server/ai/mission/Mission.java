@@ -461,7 +461,7 @@ public abstract class Mission extends AIObject {
                 + settlement.getTile().getUnitCount();
             if (settlement instanceof Colony) {
                 Colony colony = (Colony)settlement;
-                value += ((colony.isConnected()) ? 10 : 0) // Favour coastal
+                value += ((colony.isConnectedPort()) ? 10 : 0) // Favour coastal
                     + colony.getAvailableWorkLocations().size();
             }
             if (value > bestValue) {
@@ -796,7 +796,7 @@ public abstract class Mission extends AIObject {
                     logger.finest(logMe + " at sea: " + this);
                     return MoveType.MOVE_ILLEGAL;
                 }
-                if (unit.getTile().canMoveToEurope()) {
+                if (unit.getTile().canMoveToHighSeas()) {
                     if (aiUnit.moveToEurope()) {
                         logger.finest(logMe + " sailed for Europe: " + this);
                         return MoveType.MOVE_HIGH_SEAS;
@@ -919,7 +919,7 @@ public abstract class Mission extends AIObject {
                 return MoveType.MOVE_NO_REPAIR;
             }
         }
-        if (europe && unit.getTile().canMoveToEurope()) {
+        if (europe && unit.getTile().canMoveToHighSeas()) {
             if (!AIMessage.askMoveTo(getAIUnit(),
                     unit.getOwner().getEurope())) {
                 logger.finest(logMe + " at " + unit.getTile()

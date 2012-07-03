@@ -192,8 +192,8 @@ public class TerrainGenerator {
             oceanTileTypes = new ArrayList<TileType>();
             for (TileType type : game.getSpecification().getTileTypeList()) {
                 if (type.isWater()
-                    && type.isConnected()
-                    && !type.hasAbility("model.ability.moveToEurope")) {
+                    && type.isHighSeasConnected()
+                    && !type.isDirectlyHighSeasConnected()) {
                     oceanTileTypes.add(type);
                 }
             }
@@ -515,6 +515,7 @@ public class TerrainGenerator {
         }
 
         map.resetContiguity();
+        map.resetHighSeasCount();
     }
 
     /**
@@ -1369,7 +1370,7 @@ public class TerrainGenerator {
                 t.add(new TileImprovement(t.getGame(), t, fishBonusRiverType));
             }
 
-            if (t.getType().isConnected()) {
+            if (t.getType().isHighSeasConnected()) {
                 if (generateBonus && adjacentLand > 1
                     && random.nextInt(10 - adjacentLand) == 0) {
                     t.addResource(createResource(t));

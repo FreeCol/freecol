@@ -210,7 +210,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         int sailTurns = unit.getSailTurns();
         for (Player p : game.getPlayers()) {
             for (Settlement s : p.getSettlements()) {
-                if (!s.isConnected()
+                if (!s.isConnectedPort()
                     || (s instanceof IndianSettlement
                         && !((IndianSettlement)s).hasContactedSettlement(player)))
                     continue;
@@ -266,7 +266,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
             int turns = (path != null) ? unit.getSailTurns()
                 + path.getTotalTurns()
                 : (unit.getTile() != null
-                    && unit.getTile().canMoveToEurope()) ? unit.getSailTurns()
+                    && unit.getTile().canMoveToHighSeas()) ? unit.getSailTurns()
                 : -1;
             if (turns >= 0) {
                 Europe europe = getMyPlayer().getEurope();

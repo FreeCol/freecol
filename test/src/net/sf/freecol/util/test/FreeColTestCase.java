@@ -429,6 +429,8 @@ public class FreeColTestCase extends TestCase {
                     }
                 }
             }
+            m.resetContiguity();
+            m.resetHighSeasCount();
             return m;
         }
 
