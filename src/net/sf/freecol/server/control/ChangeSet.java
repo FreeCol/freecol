@@ -505,7 +505,7 @@ public class ChangeSet {
         private boolean seeOld(ServerPlayer serverPlayer) {
             Tile oldTile = oldLocation.getTile();
             return unit.getOwner() == serverPlayer
-                || (oldLocation instanceof Tile && serverPlayer.canSee(oldTile)
+                || (oldTile != null && serverPlayer.canSee(oldTile)
                     && oldTile.getSettlement() == null);
         }
 
