@@ -154,7 +154,6 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                 specificationBox.setSelectedItem(tc);
             }
         }
-
         setRenderers();
 
         JButton cancel = new JButton( Messages.message("cancel") );
@@ -214,6 +213,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         enableComponents();
 
         setSize(getPreferredSize());
+        
     }
 
     /**

@@ -61,6 +61,8 @@ public final class MainPanel extends FreeColPanel {
         boolean canContinue = getFreeColClient().getInGameController()
             .getLastSaveGameFile() != null;
 
+
+        
         ActionManager am = getFreeColClient().getActionManager();
         JButton newButton = new JButton(am.getFreeColAction(NewAction.id));
         JButton openButton = new JButton(am.getFreeColAction(OpenAction.id));
@@ -94,6 +96,7 @@ public final class MainPanel extends FreeColPanel {
         add(mapEditorButton, "width 70%");
         add(optionsButton, "width 70%");
         add(quitButton, "width 70%");
+
 
         setSize(getPreferredSize());
     }
