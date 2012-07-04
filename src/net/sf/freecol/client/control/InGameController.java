@@ -3350,9 +3350,7 @@ public final class InGameController implements NetworkConstants {
         // just select nothing and wait.
         gui.setActiveUnit(null);
         ClientOptions options = freeColClient.getClientOptions();
-        if (moveMode >= MODE_END_TURN) {
-            endTurn();
-        } else if (tile != null) {
+        if (tile != null) {
             gui.setSelectedTile(tile, false);
         } else if (options.getBoolean(ClientOptions.AUTO_END_TURN)) {
             endTurn();
