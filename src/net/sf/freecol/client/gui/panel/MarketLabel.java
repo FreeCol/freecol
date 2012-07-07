@@ -37,7 +37,7 @@ import net.sf.freecol.common.model.Player;
 /**
  * This label represents a cargo type on the European market.
  */
-public final class MarketLabel extends AbstractGoodsLabel {
+public final class MarketLabel extends AbstractGoodsLabel implements Draggable {
 
     private static Logger logger = Logger.getLogger(MarketLabel.class.getName());
 
@@ -76,6 +76,16 @@ public final class MarketLabel extends AbstractGoodsLabel {
      */
     public void setAmount(int amount) {
         getGoods().setAmount(amount);
+    }
+
+    /**
+     * Returns <code>false</code>, since a MarketLabel is only ever
+     * part of a Market.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean isOnCarrier() {
+        return false;
     }
 
     /**

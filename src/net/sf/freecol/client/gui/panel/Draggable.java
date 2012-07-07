@@ -21,6 +21,10 @@
 package net.sf.freecol.client.gui.panel;
 
 
+/**
+ * Some kind of label that can be dragged from one panel to another.
+ *
+ */
 public interface Draggable {
 
     public boolean isOnCarrier();

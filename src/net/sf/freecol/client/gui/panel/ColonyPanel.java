@@ -807,11 +807,11 @@ public final class ColonyPanel extends PortPanel
                 String menuTitle = new String(Messages.message(unit.getLabel()) + " Outside of Colony");
                 subMenu = new JMenuItem(menuTitle, unitIcon);
                 subMenu.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                        unitMenu.createUnitMenu(new UnitLabel(getFreeColClient(), unit, getGUI()));
-                        unitMenu.show(getGUI().getCanvas(), 0, 0);
+                        public void actionPerformed(ActionEvent e) {
+                            unitMenu.createUnitMenu(new UnitLabel(getFreeColClient(), unit, getGUI()));
+                            unitMenu.show(getGUI().getCanvas(), 0, 0);
                         }
-                });
+                    });
                 unitNumber++;
                 colonyUnitsMenu.add(subMenu);
             }
