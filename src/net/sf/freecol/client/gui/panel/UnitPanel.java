@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import javax.swing.JPanel;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 
@@ -35,10 +36,21 @@ public abstract class UnitPanel extends JPanel implements PropertyChangeListener
     private boolean editable;
     private PortPanel portPanel;
 
-    public UnitPanel(PortPanel portPanel, String name, boolean editable) {
+    /**
+     * The location this UnitPanel visualizes.
+     */
+    private Location unitLocation;
+
+    /**
+     * Describe suffix here.
+     */
+    private String suffix;
+
+    public UnitPanel(PortPanel portPanel, Location location, String suffix, boolean editable) {
         this.portPanel = portPanel;
         this.editable = editable;
-        setName(name);
+        unitLocation = location;
+        setName(suffix);
     }
 
     public boolean isEditable() {
@@ -49,16 +61,49 @@ public abstract class UnitPanel extends JPanel implements PropertyChangeListener
         return portPanel;
     }
 
-    public void initialize() {
+    /**
+     * Set the <code>Location</code> value.
+     *
+     * @param newLocation The new Location value.
+     */
+    public final void setUnitLocation(final Location newLocation) {
+        removePropertyChangeListeners();
+        unitLocation = newLocation;
         addPropertyChangeListeners();
+        setName(suffix);
         update();
+    }
+
+    /**
+     * Get the <code>Suffix</code> value.
+     *
+     * @return a <code>String</code> value
+     */
+    public final String getSuffix() {
+        return suffix;
+    }
+
+    /**
+     * Set the <code>Suffix</code> value.
+     *
+     * @param newSuffix The new Suffix value.
+     */
+    public final void setSuffix(final String newSuffix) {
+        this.suffix = newSuffix;
+    }
+
+    public void initialize() {
+        if (unitLocation != null) {
+            addPropertyChangeListeners();
+            update();
+        }
     }
 
     public void update() {
         removeAll();
 
-        for (Unit unit : portPanel.getUnitList()) {
-            if (accepts(unit)) {
+        for (Unit unit : unitLocation.getUnitList()) {
+            if (displays(unit)) {
 
                 UnitLabel unitLabel = new UnitLabel(portPanel.getFreeColClient(), unit, portPanel.getGUI());
                 TradeRoute tradeRoute = unit.getTradeRoute();
@@ -100,19 +145,22 @@ public abstract class UnitPanel extends JPanel implements PropertyChangeListener
     }
 
     public void propertyChange(PropertyChangeEvent event) {
-        logger.finest(getName() + " change " + event.getPropertyName()
+        logger.finest(unitLocation.getLocationName()
+                      + " - " + suffix
+                      + " change " + event.getPropertyName()
                       + ": " + event.getOldValue()
                       + " -> " + event.getNewValue());
         update();
     }
 
     /**
-     * Returns <code>true</code> if this panel accepts the given Unit.
+     * Returns <code>true</code> if this panel could display the given
+     * Unit.
      *
      * @param unit an <code>Unit</code> value
      * @return a <code>boolean</code> value
      */
-    public abstract boolean accepts(Unit unit);
+    public abstract boolean displays(Unit unit);
 
 
 }

@@ -23,13 +23,14 @@ import java.awt.Component;
 import java.util.List;
 import javax.swing.JPanel;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 
 public abstract class InPortPanel extends UnitPanel {
 
-    public InPortPanel(PortPanel portPanel, String name, boolean editable) {
-        super(portPanel, name, editable);
+    public InPortPanel(PortPanel portPanel, Location location, String suffix, boolean editable) {
+        super(portPanel, location, suffix, editable);
     }
 
     private void selectLabel() {
