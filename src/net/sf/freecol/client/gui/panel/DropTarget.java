@@ -27,10 +27,31 @@ import net.sf.freecol.common.model.Unit;
 
 public interface DropTarget {
 
+    /**
+     * Returns <code>true</code> if the given Unit could be dropped on
+     * this target.
+     *
+     * @param unit an <code>Unit</code> value
+     * @return a <code>boolean</code> value
+     */
     public boolean accepts(Unit unit);
 
+    /**
+     * Returns <code>true</code> if the given Goods could be dropped on
+     * this target.
+     *
+     * @param goods a <code>Goods</code> value
+     * @return a <code>boolean</code> value
+     */
     public boolean accepts(Goods goods);
 
+    /**
+     * Adds the given component to this target.
+     *
+     * @param comp a <code>Component</code> value
+     * @param editState a <code>boolean</code> value
+     * @return a <code>Component</code> value
+     */
     public Component add(Component comp, boolean editState);
 
 }
