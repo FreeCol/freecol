@@ -78,4 +78,6 @@ public abstract class PortPanel extends FreeColPanel {
         return pressListener;
     }
 
+    public abstract List<Unit> getUnitList();
+
 }

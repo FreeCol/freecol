@@ -618,6 +618,10 @@ public final class ColonyPanel extends PortPanel
         inPortPanel.repaint();
     }
 
+    public List<Unit> getUnitList() {
+        return colony.getTile().getUnitList();
+    }
+
     /**
      * Initialize the data on the window. This is the same as calling:
      * <code>initialize(colony, game, null)</code>.
@@ -668,8 +672,8 @@ public final class ColonyPanel extends PortPanel
         populationPanel.update();
 
         constructionPanel.setColony(colony);
-        outsideColonyPanel.setUnitLocation(colony.getTile());
-        inPortPanel.setUnitLocation(colony.getTile());
+        outsideColonyPanel.setColony(colony);
+        inPortPanel.setName(colony.getName() + " - port");
     }
 
     /**
@@ -807,11 +811,11 @@ public final class ColonyPanel extends PortPanel
                 String menuTitle = new String(Messages.message(unit.getLabel()) + " Outside of Colony");
                 subMenu = new JMenuItem(menuTitle, unitIcon);
                 subMenu.addActionListener(new ActionListener() {
-                        public void actionPerformed(ActionEvent e) {
-                            unitMenu.createUnitMenu(new UnitLabel(getFreeColClient(), unit, getGUI()));
-                            unitMenu.show(getGUI().getCanvas(), 0, 0);
+                public void actionPerformed(ActionEvent e) {
+                        unitMenu.createUnitMenu(new UnitLabel(getFreeColClient(), unit, getGUI()));
+                        unitMenu.show(getGUI().getCanvas(), 0, 0);
                         }
-                    });
+                });
                 unitNumber++;
                 colonyUnitsMenu.add(subMenu);
             }
@@ -869,7 +873,6 @@ public final class ColonyPanel extends PortPanel
         if (property == null) {
             logger.warning("Null property change");
         } else if (Unit.CARGO_CHANGE.equals(property)) {
-            System.out.println("Cargo change fired");
             updateInPortPanel();
         } else if (ColonyChangeEvent.POPULATION_CHANGE.toString().equals(property)) {
             populationPanel.update();
@@ -1171,10 +1174,24 @@ public final class ColonyPanel extends PortPanel
     public final class OutsideColonyPanel extends UnitPanel implements DropTarget {
 
         public OutsideColonyPanel() {
-            super(ColonyPanel.this, colony, "outside", ColonyPanel.this.isEditable());
+            super(ColonyPanel.this, null, ColonyPanel.this.isEditable());
             setLayout(new MigLayout("wrap 4, fill, insets 0"));
             setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(),
                                                        Messages.message("outsideColony")));
+        }
+
+        public void setColony(Colony newColony) {
+            removePropertyChangeListeners();
+            addPropertyChangeListeners();
+            setName(newColony.getName() + " - outside");
+            update();
+        }
+
+        public void initialize() {
+            if (colony != null) {
+                setName(getColony().getName() + " - port");
+                super.initialize();
+            }
         }
 
         /**
@@ -1242,10 +1259,6 @@ public final class ColonyPanel extends PortPanel
             return "OutsideColonyPanelUI";
         }
 
-        public boolean displays(Unit unit) {
-            return accepts(unit);
-        }
-
         public boolean accepts(Unit unit) {
             return !unit.isCarrier();
         }
@@ -1263,13 +1276,20 @@ public final class ColonyPanel extends PortPanel
     public final class ColonyInPortPanel extends InPortPanel {
 
         public ColonyInPortPanel() {
-            super(ColonyPanel.this, colony, "port", ColonyPanel.this.isEditable());
+            super(ColonyPanel.this, null, ColonyPanel.this.isEditable());
             setLayout(new MigLayout("wrap 3, fill, insets 0"));
             setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(),
                                                        Messages.message("inPort")));
         }
 
-        public boolean displays(Unit unit) {
+        public void initialize() {
+            if (getColony() != null) {
+                setName(getColony().getName() + " - port");
+                super.initialize();
+            }
+        }
+
+        public boolean accepts(Unit unit) {
             return unit.isCarrier();
         }
     }

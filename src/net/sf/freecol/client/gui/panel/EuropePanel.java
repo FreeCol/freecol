@@ -297,6 +297,10 @@ public final class EuropePanel extends PortPanel {
         inPortPanel.repaint();
     }
 
+    public List<Unit> getUnitList() {
+        return europe.getUnitList();
+    }
+
     /**
      * Initialize this EuropePanel.
      *
@@ -308,8 +312,8 @@ public final class EuropePanel extends PortPanel {
         header.setText(Messages.message(europe.getNameKey()));
 
         // Initialize the subpanels.
-        toAmericaPanel.initialize(game.getMap());
-        toEuropePanel.initialize(europe);
+        toAmericaPanel.initialize(getGame().getMap());
+        toEuropePanel.initialize(getMyPlayer().getEurope());
         // Initialize cargoPanel before inPortPanel calls setSelectedUnit().
         cargoPanel.initialize();
         inPortPanel.initialize();
@@ -413,42 +417,62 @@ public final class EuropePanel extends PortPanel {
      * A panel that holds UnitsLabels that represent Units that are going to
      * America or Europe.
      */
-    public final class DestinationPanel extends UnitPanel implements DropTarget {
+    public final class DestinationPanel extends JPanel implements DropTarget {
 
         private Location destination;
 
-        public DestinationPanel() {
-            super(EuropePanel.this, null, "high seas", true);
-        }
-
         /**
-         * This is necessary because the EuropePanel is constructed
-         * much too early.
+         * Initialize this DestinationPanel.
          */
         public void initialize(Location destination) {
             this.destination = destination;
-            setUnitLocation(getMyPlayer().getHighSeas());
+            update();
+        }
+
+        /**
+         * Cleans up this DestinationPanel.
+         */
+        public void cleanup() {}
+
+        /**
+         * Update this DestinationPanel.
+         */
+        public void update() {
+            removeAll();
+
+            HighSeas highSeas = getMyPlayer().getHighSeas();
+            if (highSeas != null) {
+                for (Unit unit : highSeas.getUnitList()) {
+                    boolean belongs;
+                    if (destination instanceof Europe) {
+                        belongs = unit.getDestination() == destination;
+                    } else if (destination instanceof Map) {
+                        belongs = unit.getDestination() == destination
+                            || (unit.getDestination() != null
+                                && unit.getDestination().getTile() != null
+                                && unit.getDestination().getTile().getMap()
+                                == destination);
+                    } else {
+                        logger.warning("Bogus DestinationPanel location: "
+                            + ((FreeColGameObject) destination)
+                            + " for unit: " + unit);
+                        belongs = false;
+                    }
+                    if (belongs) {
+                        UnitLabel unitLabel = new UnitLabel(getFreeColClient(), unit, getGUI());
+                        unitLabel.setTransferHandler(defaultTransferHandler);
+                        unitLabel.addMouseListener(pressListener);
+                        add(unitLabel);
+                    }
+                }
+            }
+
             StringTemplate t = StringTemplate.template("goingTo")
                 .addName("%type%", "ship")
                 .addStringTemplate("%location%",
                     destination.getLocationNameFor(getMyPlayer()));
             ((TitledBorder) getBorder()).setTitle(Messages.message(t));
-            super.initialize();
-        }
-
-        public boolean displays(Unit unit) {
-            if (unit.getDestination() == destination) {
-                return true;
-            } else if (destination instanceof Europe) {
-                return (unit.getDestination() != null
-                        && unit.getDestination().getTile() != null
-                        && unit.getDestination().getTile().getMap() == destination);
-            } else {
-                logger.warning("Bogus DestinationPanel location: "
-                               + ((FreeColGameObject) destination)
-                               + " for unit: " + unit);
-                return false;
-            }
+            revalidate();
         }
 
         /**
@@ -521,7 +545,7 @@ public final class EuropePanel extends PortPanel {
     public final class EuropeInPortPanel extends InPortPanel {
 
         public EuropeInPortPanel() {
-            super(EuropePanel.this, europe, "port", true);
+            super(EuropePanel.this, "Europe - port", true);
         }
 
         @Override
@@ -535,12 +559,11 @@ public final class EuropePanel extends PortPanel {
             europe.removePropertyChangeListener(this);
         }
 
-        public boolean displays(Unit unit) {
+        public boolean accepts(Unit unit) {
             return unit.isNaval()
                 && (unit.getState() == Unit.UnitState.ACTIVE
                     || unit.getState() == Unit.UnitState.SENTRY);
         }
-
     }
 
     /**
@@ -550,7 +573,7 @@ public final class EuropePanel extends PortPanel {
     public final class DocksPanel extends UnitPanel implements DropTarget {
 
         public DocksPanel() {
-            super(EuropePanel.this, europe, "docks", true);
+            super(EuropePanel.this, "Europe - docks", true);
             setLayout(new MigLayout("wrap 6"));
         }
 
@@ -573,12 +596,8 @@ public final class EuropePanel extends PortPanel {
             europe.removePropertyChangeListener(this);
         }
 
-        public boolean displays(Unit unit) {
-            return accepts(unit);
-        }
-
         public boolean accepts(Unit unit) {
-            return !(unit.isNaval() || unit.isCarrier());
+            return !unit.isNaval();
         }
 
         public boolean accepts(Goods goods) {
