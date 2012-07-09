@@ -571,28 +571,6 @@ public final class ColonyPanel extends PortPanel
     }
 
     /**
-     * Selects a unit that is potentially located somewhere in port.
-     *
-     * @param unit The <code>Unit</code> to select.
-     */
-    public void setSelectedUnit(Unit unit) {
-        UnitLabel unitLabel = null;
-
-        if (unit != null) {
-            Component[] components = inPortPanel.getComponents();
-            for (int i = 0; i < components.length; i++) {
-                if (components[i] instanceof UnitLabel
-                    && ((UnitLabel) components[i]).getUnit() == unit) {
-                    unitLabel = (UnitLabel) components[i];
-                    break;
-                }
-            }
-        }
-
-        setSelectedUnitLabel(unitLabel);
-    }
-
-    /**
      * Selects a unit that is located somewhere on this panel.
      *
      * @param unitLabel The <code>UnitLabel</code> for the unit that

@@ -346,12 +346,9 @@ public final class DefaultTransferHandler extends TransferHandler {
     }
 
     private void restoreSelection(UnitLabel oldSelectedUnit) {
-        if (oldSelectedUnit != null) {
-            if ((oldSelectedUnit).getParent() instanceof EuropePanel.EuropeInPortPanel) {
-                ((EuropePanel) parentPanel).setSelectedUnit(oldSelectedUnit.getUnit());
-            } else {
-                ((ColonyPanel) parentPanel).setSelectedUnit(oldSelectedUnit.getUnit());
-            }
+        if (oldSelectedUnit != null
+            && oldSelectedUnit.getParent() instanceof InPortPanel) {
+            ((PortPanel) parentPanel).setSelectedUnitLabel(oldSelectedUnit);
         }
     }
 
