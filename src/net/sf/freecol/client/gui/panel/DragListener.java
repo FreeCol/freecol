@@ -30,7 +30,6 @@ import javax.swing.TransferHandler;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Unit;
 
@@ -122,44 +121,26 @@ public final class DragListener extends MouseAdapter {
                 }
             }
         } else {
-            TransferHandler handler = comp.getTransferHandler();
-
-            if (e.isShiftDown()) {
-                if (comp instanceof GoodsLabel) {
-                    ((GoodsLabel) comp).setPartialChosen(true);
-                } else if (comp instanceof MarketLabel) {
-                    ((MarketLabel) comp).setPartialChosen(true);
+            if (comp instanceof AbstractGoodsLabel) {
+                AbstractGoodsLabel label = (AbstractGoodsLabel) comp;
+                if (e.isShiftDown()) {
+                    label.setPartialChosen(true);
+                } else if(e.isAltDown()){
+                    label.toEquip(true);
+                } else {
+                    label.setPartialChosen(false);
+                    label.setDefaultAmount();
                 }
-            } else if(e.isAltDown()){
-                if (comp instanceof GoodsLabel) {
-                    ((GoodsLabel) comp).toEquip(true);
-                } else if (comp instanceof MarketLabel) {
-                    ((MarketLabel) comp).toEquip(true);
-                }
-            } else {
-                if (comp instanceof GoodsLabel) {
-                    ((GoodsLabel) comp).setPartialChosen(false);
-                } else if (comp instanceof MarketLabel) {
-                    ((MarketLabel) comp).setPartialChosen(false);
-                    ((MarketLabel) comp).setAmount(GoodsContainer.CARGO_SIZE);
-                }
-            }
-
-            if ((comp instanceof UnitLabel) && (((UnitLabel) comp).getUnit().isCarrier())) {
+            } else if (comp instanceof UnitLabel) {
                 Unit u = ((UnitLabel) comp).getUnit();
-                if (parentPanel instanceof EuropePanel) {
-                    if (!u.isAtSea()) {
-                        ((EuropePanel) parentPanel).setSelectedUnitLabel((UnitLabel) comp);
-                    }
-                } else if (parentPanel instanceof ColonyPanel) {
-                    ColonyPanel colonyPanel = (ColonyPanel) parentPanel;
-                    if(colonyPanel.getSelectedUnit() != u){
-                        colonyPanel.setSelectedUnit(u);
-                        colonyPanel.updateInPortPanel();
-                    }
+                if (u.isCarrier()
+                    && !u.isAtSea()
+                    && parentPanel instanceof PortPanel) {
+                    ((PortPanel) parentPanel).setSelectedUnitLabel((UnitLabel) comp);
                 }
             }
 
+            TransferHandler handler = comp.getTransferHandler();
             if (handler != null) {
                 handler.exportAsDrag(comp, e, TransferHandler.COPY);
             }

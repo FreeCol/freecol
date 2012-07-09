@@ -116,7 +116,16 @@ public class AbstractGoodsLabel extends JLabel {
     public int getAmount() {
         return goods.getAmount();
     }
-    
+
+    /**
+     * Sets the amount of the goods wrapped by this Label to a default
+     * value. By default, do nothing. Override this method if
+     * necessary.
+     */
+    public void setDefaultAmount() {
+        // do nothing
+    }
+
     protected GUI getGUI() {
         return gui;
     }
