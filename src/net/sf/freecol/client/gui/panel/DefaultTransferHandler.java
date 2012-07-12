@@ -193,27 +193,10 @@ public final class DefaultTransferHandler extends TransferHandler {
                 } else if (unitLabel.canUnitBeEquipedWith(data)) {
                     // don't do anything before partial amount has been checked
                 } else {
-                    try {
-                        comp = (JComponent)comp.getParent();
-                    } catch (ClassCastException e) {
-                        return false;
-                    }
-
-                    // This is because we use an extra panel for
-                    // layout in this particular case; may find a
-                    // better solution later.
-                    try {
-                        if ((JComponent)comp.getParent() instanceof ColonyPanel.BuildingsPanel.ASingleBuildingPanel) {
-                            comp = (JComponent)comp.getParent();
-                        }
-                    } catch (ClassCastException e) {}
+                    comp = getDropTarget(comp);
                 }
             } else if (comp instanceof AbstractGoodsLabel) {
-                try {
-                    comp = (JComponent)comp.getParent();
-                } catch (ClassCastException e) {
-                    return false;
-                }
+                comp = getDropTarget(comp);
             }
 
             // t is already in comp:
@@ -335,6 +318,16 @@ public final class DefaultTransferHandler extends TransferHandler {
             logger.log(Level.WARNING, "Import data fail", e);
         }
         return false;
+    }
+
+    public JComponent getDropTarget(JComponent component) {
+        if (component instanceof DropTarget) {
+            return component;
+        } else if (component.getParent() instanceof JComponent) {
+            return getDropTarget((JComponent) component.getParent());
+        } else {
+            return null;
+        }
     }
 
     private void restoreSelection(UnitLabel oldSelectedUnit) {
