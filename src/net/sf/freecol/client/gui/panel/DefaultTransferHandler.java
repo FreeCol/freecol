@@ -113,16 +113,11 @@ public final class DefaultTransferHandler extends TransferHandler {
      * flavor that is indicated by the second parameter, 'false' otherwise.
      */
     public boolean canImport(JComponent comp, DataFlavor[] flavor) {
-        if (!(comp instanceof UnitLabel) &&
-            !(comp instanceof GoodsLabel) &&
-            !(comp instanceof MarketLabel) &&
-            !(comp instanceof JPanel) &&
-            !(comp instanceof JLabel)) {
-            return false;
-        }
-        for (int i = 0; i < flavor.length; i++) {
-            if (flavor[i].equals(DefaultTransferHandler.flavor)) {
-                return true;
+        if (comp instanceof JPanel || comp instanceof JLabel) {
+            for (int i = 0; i < flavor.length; i++) {
+                if (flavor[i].equals(DefaultTransferHandler.flavor)) {
+                    return true;
+                }
             }
         }
         return false;
@@ -136,14 +131,11 @@ public final class DefaultTransferHandler extends TransferHandler {
      * @return The resulting Transferable (an ImageSelection object).
      */
     public Transferable createTransferable(JComponent comp) {
-        if (comp instanceof UnitLabel) {
-            return new ImageSelection((UnitLabel)comp);
-        } else if (comp instanceof GoodsLabel) {
-            return new ImageSelection((GoodsLabel)comp);
-        } else if (comp instanceof MarketLabel) {
-            return new ImageSelection((MarketLabel)comp);
+        if (comp instanceof JLabel && comp instanceof Draggable) {
+            return new ImageSelection((JLabel) comp);
+        } else {
+            return null;
         }
-        return null;
     }
 
     /**
@@ -216,7 +208,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                         }
                     } catch (ClassCastException e) {}
                 }
-            } else if ((comp instanceof GoodsLabel) || (comp instanceof MarketLabel)) {
+            } else if (comp instanceof AbstractGoodsLabel) {
                 try {
                     comp = (JComponent)comp.getParent();
                 } catch (ClassCastException e) {
