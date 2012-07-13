@@ -28,6 +28,11 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 
+
+/**
+ * This class provides common functionality for sub-panels of a
+ * PortPanel that display UnitLabels.
+ */
 public abstract class UnitPanel extends JPanel implements PropertyChangeListener {
 
     private static Logger logger = Logger.getLogger(UnitPanel.class.getName());
@@ -83,7 +88,7 @@ public abstract class UnitPanel extends JPanel implements PropertyChangeListener
      * Select a UnitLabel based on some criterion. By default, do nothing.
      *
      */
-    private void selectLabel() {
+    public void selectLabel() {
         // do nothing
     }
 

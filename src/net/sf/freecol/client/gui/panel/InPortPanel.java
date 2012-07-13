@@ -26,13 +26,18 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 
+/**
+ * This class displays the carriers present in a port.
+ *
+ * @see PortPanel
+ */
 public abstract class InPortPanel extends UnitPanel {
 
     public InPortPanel(PortPanel portPanel, String name, boolean editable) {
         super(portPanel, name, editable);
     }
 
-    private void selectLabel() {
+    public void selectLabel() {
         // Keep the previous selected unit if possible, otherwise default
         // on the last carrier.
         Unit selectedUnit = getPortPanel().getSelectedUnit();

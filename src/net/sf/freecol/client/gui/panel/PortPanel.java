@@ -26,6 +26,12 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.model.Unit;
 
+/**
+ * This class provides common functionality for panels that display
+ * ports, such as the ColonyPanel and the EuropePanel. This includes
+ * an InPortPanel for displaying the carriers in port, and a
+ * CargoPanel for displaying the cargo aboard that carrier.
+ */
 public abstract class PortPanel extends FreeColPanel {
 
     protected CargoPanel cargoPanel;
