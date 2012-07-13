@@ -77,7 +77,7 @@ public class FreeColGameObjectType extends FreeColObject {
     public final FeatureContainer getFeatureContainer() {
         return featureContainer;
     }
-    
+
     /**
      * Describe <code>setIndex</code> method here.
      *
@@ -138,7 +138,7 @@ public class FreeColGameObjectType extends FreeColObject {
     }
 
     /**
-     * Applies the difficulty level with the given ID to this
+     * Applies the given difficulty level to this
      * FreeColGameObjectType. This method does nothing. If the
      * behaviour of a FreeColGameObjectType depends on difficulty, it
      * must override this method.
@@ -150,7 +150,8 @@ public class FreeColGameObjectType extends FreeColObject {
     }
 
     /**
-     * Get the <code>ModifierIndex</code> value.
+     * Get the <code>ModifierIndex</code> value. This is the priority
+     * with which Modifiers provided by this type will be applied.
      *
      * @return an <code>int</code> value
      */
@@ -159,8 +160,11 @@ public class FreeColGameObjectType extends FreeColObject {
     }
 
     /**
-     * Get the index for the given Modifier.
+     * Get the index for the given Modifier. By default, this returns
+     * the type's modifier index. Override this method if the type
+     * should distinguish different modifier priorities.
      *
+     * @see BuildingType#getModifierIndex(Modifier)
      * @param modifier a <code>Modifier</code> value
      * @return an <code>int</code> value
      */
@@ -178,7 +182,9 @@ public class FreeColGameObjectType extends FreeColObject {
     }
 
     /**
-     * Get the <code>Abstract</code> value.
+     * Get the <code>Abstract</code> value. Abstract types can be used
+     * to derive other types, but can not be instantiated. They will
+     * be removed from the Specification after it has loaded completely.
      *
      * @return a <code>boolean</code> value
      */
