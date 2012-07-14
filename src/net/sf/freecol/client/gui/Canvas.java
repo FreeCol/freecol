@@ -672,7 +672,7 @@ public final class Canvas extends JDesktopPane {
     }
 
     public void showAboutPanel() {
-        showSubPanel(new AboutPanel(freeColClient, gui), true);
+        showSubPanel(new AboutPanel(freeColClient, gui), false);
     }
 
 
@@ -921,14 +921,14 @@ public final class Canvas extends JDesktopPane {
     public void showCompactLabourReport() {
         CompactLabourReport details = new CompactLabourReport(freeColClient, gui);
         details.initialize();
-        showSubPanel(details, true);
+        showSubPanel(details, false);
 
     }
 
     public void showCompactLabourReport(UnitData unitData) {
         CompactLabourReport details = new CompactLabourReport(freeColClient, gui, unitData);
         details.initialize();
-        showSubPanel(details, true);
+        showSubPanel(details, false);
     }
 
     /**
@@ -1138,7 +1138,7 @@ public final class Canvas extends JDesktopPane {
     }
 
     public void showGameOptionsDialog(boolean editable, boolean loadCustomOptions) {
-        showSubPanel(new GameOptionsDialog(freeColClient, gui, editable, loadCustomOptions), true);
+        showSubPanel(new GameOptionsDialog(freeColClient, gui, editable, loadCustomOptions), false);
     }
 
     /**
@@ -1147,7 +1147,7 @@ public final class Canvas extends JDesktopPane {
      * @param messageId An optional message to add to the high scores panel.
      */
     public void showHighScoresPanel(String messageId) {
-        showSubPanel(new ReportHighScoresPanel(freeColClient, gui, messageId), PopupPosition.ORIGIN, true);
+        showSubPanel(new ReportHighScoresPanel(freeColClient, gui, messageId), PopupPosition.ORIGIN, false);
     }
 
     /**
@@ -1377,7 +1377,7 @@ public final class Canvas extends JDesktopPane {
     }
 
     public OptionGroup showMapGeneratorOptionsDialog(OptionGroup mgo, boolean editable, boolean loadCustomOptions) {
-        return showFreeColDialog(new MapGeneratorOptionsDialog(freeColClient, gui, mgo, editable, loadCustomOptions), null, true);
+        return showFreeColDialog(new MapGeneratorOptionsDialog(freeColClient, gui, mgo, editable, loadCustomOptions), null, false);
     }
 
     public Dimension showMapSizeDialog() {
@@ -1533,34 +1533,34 @@ public final class Canvas extends JDesktopPane {
     }
 
     public void showReportCargoPanel() {
-        showSubPanel(new ReportCargoPanel(freeColClient, gui), true);
+        showSubPanel(new ReportCargoPanel(freeColClient, gui), false);
 
     }
 
     public void showReportColonyPanel() {
-        showSubPanel(new ReportColonyPanel(freeColClient, gui), true);
+        showSubPanel(new ReportColonyPanel(freeColClient, gui), false);
 
     }
 
     public void showReportContinentalCongressPanel() {
-        showSubPanel(new ReportContinentalCongressPanel(freeColClient, gui), true);
+        showSubPanel(new ReportContinentalCongressPanel(freeColClient, gui), false);
     }
 
     public void showReportEducationPanel() {
-        showSubPanel(new ReportEducationPanel(freeColClient, gui), true);
+        showSubPanel(new ReportEducationPanel(freeColClient, gui), false);
 
     }
 
     public void showReportExplorationPanel() {
-        showSubPanel(new ReportExplorationPanel(freeColClient, gui), true);
+        showSubPanel(new ReportExplorationPanel(freeColClient, gui), false);
     }
 
     public void showReportForeignAffairPanel() {
-        showSubPanel(new ReportForeignAffairPanel(freeColClient, gui), true);
+        showSubPanel(new ReportForeignAffairPanel(freeColClient, gui), false);
     }
 
     public void showReportHistoryPanel() {
-        showSubPanel(new ReportHistoryPanel(freeColClient, gui), true);
+        showSubPanel(new ReportHistoryPanel(freeColClient, gui), false);
     }
 
     public void showReportIndianPanel() {
@@ -1572,40 +1572,40 @@ public final class Canvas extends JDesktopPane {
         
         ReportLabourDetailPanel details = new ReportLabourDetailPanel(freeColClient, gui, unitType, data, unitCount, colonies);
         details.initialize();
-        showSubPanel(details, true);
+        showSubPanel(details, false);
     }
 
     public void showReportLabourPanel() {
-        showSubPanel(new ReportLabourPanel(freeColClient, gui), true);
+        showSubPanel(new ReportLabourPanel(freeColClient, gui), false);
 
     }
 
     public void showReportMilitaryPanel() {
-        showSubPanel(new ReportMilitaryPanel(freeColClient, gui), true);
+        showSubPanel(new ReportMilitaryPanel(freeColClient, gui), false);
     }
 
     public void showReportNavalPanel() {
-        showSubPanel(new ReportNavalPanel(freeColClient, gui), true);
+        showSubPanel(new ReportNavalPanel(freeColClient, gui), false);
 
     }
 
     public void showReportProductionPanel() {
-        showSubPanel(new ReportProductionPanel(freeColClient, gui), true);
+        showSubPanel(new ReportProductionPanel(freeColClient, gui), false);
 
     }
 
 
     public void showReportReligiousPanel() {
-        showSubPanel(new ReportReligiousPanel(freeColClient, gui), true);
+        showSubPanel(new ReportReligiousPanel(freeColClient, gui), false);
 
     }
 
     public void showReportRequirementsPanel() {
-        showSubPanel(new ReportRequirementsPanel(freeColClient, gui), true);
+        showSubPanel(new ReportRequirementsPanel(freeColClient, gui), false);
     }
 
     public void showReportTradePanel() {
-        showSubPanel(new ReportTradePanel(freeColClient, gui), true);
+        showSubPanel(new ReportTradePanel(freeColClient, gui), false);
 
     }
 
@@ -1616,7 +1616,7 @@ public final class Canvas extends JDesktopPane {
      * @param messages The <code>ModelMessage</code>s to show.
      */
     public void showReportTurnPanel(ModelMessage... messages) {
-        showSubPanel(new ReportTurnPanel(freeColClient, gui, messages), true);
+        showSubPanel(new ReportTurnPanel(freeColClient, gui, messages), false);
     }
 
     public int showRiverStyleDialog() {
@@ -2329,11 +2329,11 @@ public final class Canvas extends JDesktopPane {
  
 
     public Parameters showParametersDialog() {
-        return showFreeColDialog(new ParametersDialog(freeColClient, gui), null, true);
+        return showFreeColDialog(new ParametersDialog(freeColClient, gui), null, false);
     }
 
     public MapSize showScaleMapSizeDialog() {
-        return showFreeColDialog(new ScaleMapSizeDialog(freeColClient, gui), null, true);
+        return showFreeColDialog(new ScaleMapSizeDialog(freeColClient, gui), null, false);
     }
 
 
