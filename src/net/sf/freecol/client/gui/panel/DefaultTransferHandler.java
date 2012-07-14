@@ -58,7 +58,6 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsLocation;
 import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.HighSeas;
 import net.sf.freecol.common.model.Unit;
 
 

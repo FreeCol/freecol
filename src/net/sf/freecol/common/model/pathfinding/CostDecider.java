@@ -21,7 +21,6 @@
 package net.sf.freecol.common.model.pathfinding;
 
 import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 
 

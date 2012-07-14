@@ -20,9 +20,7 @@
 package net.sf.freecol.server.generator;
 
 import java.awt.Rectangle;
-
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -48,8 +46,8 @@ import net.sf.freecol.common.model.TileItemContainer;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
-import net.sf.freecol.server.model.ServerRegion;
 import net.sf.freecol.common.util.RandomChoice;
+import net.sf.freecol.server.model.ServerRegion;
 
 
 /**

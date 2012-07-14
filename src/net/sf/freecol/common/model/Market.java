@@ -29,7 +29,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Element;

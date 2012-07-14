@@ -21,9 +21,10 @@ package net.sf.freecol.client.gui.panel;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.List;
 import java.util.logging.Logger;
+
 import javax.swing.JPanel;
+
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;

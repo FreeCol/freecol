@@ -20,10 +20,7 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Component;
-import java.util.List;
-import javax.swing.JPanel;
-import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.model.TradeRoute;
+
 import net.sf.freecol.common.model.Unit;
 
 /**
