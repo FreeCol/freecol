@@ -610,6 +610,7 @@ public class TransportMission extends Mission {
 
                 public boolean check(final Unit unit, final PathNode pathNode) {
                     final Tile newTile = pathNode.getTile();
+                    if (newTile == null) return false;
                     final Unit defender = newTile.getDefendingUnit(unit);
                     if (newTile.isLand()
                         || defender == null
@@ -1155,22 +1156,23 @@ public class TransportMission extends Mission {
                 } else if ((destTile = au.getTransportDestination().getTile())
                            != null) {
                     PathNode p;
-                    if (carrier.getTile() == null) {
+                    Tile carrierTile = carrier.getTile();
+                    if (carrierTile == null) {
                         ;// Get back on the map
-                    } else if (destTile == carrier.getTile()) {
+                    } else if (destTile == carrierTile) {
                         // Unload at destination tile
                         unload = true;
                         reason = "Arrived at " + destTile;
-                    } else if ((p = u.findPath(carrier.getTile(), destTile,
+                    } else if ((p = u.findPath(carrierTile, destTile,
                                                carrier)) != null) {
                         final PathNode dropNode = p.getTransportDropNode();
-                        int d;
-                        if (dropNode != null && dropNode.getTile() != null
-                            && (d = dropNode.getTile().getDistanceTo(carrier.getTile())) != Map.COST_INFINITY
-                            && d <= 1) {
+                        Tile dropTile = (dropNode == null) ? null
+                            : dropNode.getTile();
+                        if (dropTile != null
+                            && carrierTile.getDirection(dropTile) != null) {
                             // Next to the drop node, proceed with mission
                             mission.doMission();
-                            reason = "Next to drop node " + dropNode.getTile();
+                            reason = "Next to drop node " + dropTile;
                         }
                     } else {
                         // Destination has become unreachable
