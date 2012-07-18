@@ -68,7 +68,7 @@ class BaseCostDecider implements CostDecider {
             if (newLocation instanceof Europe
                 || newTile == null
                 || !newTile.isDirectlyHighSeasConnected()
-                || !unit.getType().canMoveToEurope()) return ILLEGAL_MOVE;
+                || !unit.getType().canMoveToHighSeas()) return ILLEGAL_MOVE;
             newTurns = unit.getSailTurns();
             movesLeft = unit.getInitialMovesLeft();
             cost = newTurns * unit.getInitialMovesLeft();

@@ -34,6 +34,7 @@ import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.PathNode;
@@ -763,12 +764,15 @@ public abstract class Mission extends AIObject {
      *   have moved, or have exhausted its moves.
      * - MOVE_HIGH_SEAS if the unit has successfully set sail.
      * - MOVE_ILLEGAL if the unit is unable to proceed for now
-     * - MOVE_NO_MOVES if out of moves short of the target
+     * - MOVE_NO_MOVES is underway but short of the target
      * - MOVE_NO_REPAIR if the unit died for whatever reason
      * - other legal results (e.g. ENTER_INDIAN_SETTLEMENT*) if that would
      *   occur if the unit proceeded.  Such moves require special handling
      *   and are not performed here, the calling mission code must
      *   handle them.
+     *
+     * Logging is fine on failures, finest on valid return values other
+     * than normal path completion.
      *
      * @param logMe A prefix string for the log messages.
      * @param target The destination <code>Location</code>.
@@ -786,34 +790,53 @@ public abstract class Mission extends AIObject {
         PathNode path = null;
         boolean inTransit = false;
         boolean needTransport = false;
-        if (target instanceof Europe) {
-            if (!unit.getOwner().canMoveToEurope()) {
+
+        // Sanitize the unit location and drop out the trivial cases.
+        if (unit.isAtSea()) {
+            logger.finest(logMe + " at sea: " + this);
+            return MoveType.MOVE_NO_MOVES;
+        } else if (unit.isInEurope()) {
+            if (target instanceof Europe) {
+                return MoveType.MOVE;
+            } else if (!unit.getOwner().canMoveToEurope()) {
+                logger.fine(logMe + " impossible move from Europe"
+                    + ": " + this);
                 return MoveType.MOVE_ILLEGAL;
             }
-            if (unit.isInEurope()) return MoveType.MOVE;
-
-            if (unit.isNaval()) {
-                if (unit.isAtSea()) {
-                    logger.finest(logMe + " at sea: " + this);
+        } else if (unit.getTile() == null) {
+            logger.fine(logMe + " null unit tile: " + this);
+            return MoveType.MOVE_ILLEGAL;
+        } else {
+            if (unit.getTile() == targetTile) {
+                return MoveType.MOVE;
+            } else if (target instanceof Europe) {
+                if (!unit.getOwner().canMoveToEurope()) {
+                    logger.fine(logMe + " impossible move to Europe"
+                        + ": " + this);
                     return MoveType.MOVE_ILLEGAL;
                 }
+            }
+        }
+
+        final Map map = unit.getGame().getMap();
+        if (target instanceof Europe) { // Going to Europe
+            if (unit.getType().canMoveToHighSeas()) {
                 if (unit.getTile().isDirectlyHighSeasConnected()) {
-                    if (aiUnit.moveToEurope()) {
-                        logger.finest(logMe + " sailed for Europe: " + this);
+                    if (AIMessage.askMoveTo(aiUnit, target)) {
+                        logger.finest(logMe + " sailed for " + target
+                            + ": " + this);
                         return MoveType.MOVE_HIGH_SEAS;
                     } else {
-                        logger.finest(logMe + " failed to sail for Europe: "
-                            + this);
+                        logger.fine(logMe + " failed to sail for " + target
+                            + ": " + this);
                         return MoveType.MOVE_ILLEGAL;
                     }
                 }
-                path = unit.getGame().getMap().findFullPath(unit,
-                    unit.getLocation(), unit.getOwner().getEurope(),
-                    null, null);
+                path = map.findFullPath(unit, unit.getLocation(), target, null,
+                    CostDeciders.avoidSettlementsAndBlockingUnits());
                 if (path == null) {
-                    logger.finest(logMe
-                        + " can not get from " + unit.getTile()
-                        + " to Europe: " + this);
+                    logger.fine(logMe + " no path from " + unit.getLocation()
+                        + " to " + target + ": " + this);
                     return MoveType.MOVE_ILLEGAL;
                 }
             } else if (unit.isOnCarrier()) {
@@ -821,77 +844,71 @@ public abstract class Mission extends AIObject {
             } else {
                 needTransport = true;
             }
-        } else {
-            if (unit.getTile() == targetTile) return MoveType.MOVE;
-
-            if (unit.isNaval()) {
-                if (unit.isAtSea()) {
-                    logger.finest(logMe + " at sea: " + this);
-                    return MoveType.MOVE_ILLEGAL;
-                } else if (unit.isInEurope()) {
-                    if (aiUnit.moveToAmerica()) {
-                        logger.finest(logMe + " sailed for the New World: "
-                            + this);
-                        return MoveType.MOVE_HIGH_SEAS;
-                    } else {
-                        logger.finest(logMe + " in Europe failed to sail: "
-                            + this);
-                        return MoveType.MOVE_ILLEGAL;
-                    }
+        } else if (unit.isInEurope()) { // Going to the map
+            if (unit.getType().canMoveToHighSeas()) {
+                if (AIMessage.askMoveTo(aiUnit, targetTile)) {
+                    logger.finest(logMe + " sailed for " + target
+                        + ": " + this);
+                    return MoveType.MOVE_HIGH_SEAS;
                 } else {
-                    path = unit.findPath(unit.getTile(), targetTile, null,
-                        CostDeciders.avoidSettlementsAndBlockingUnits());
-                    if (path == null) {
-                        logger.finest(logMe
-                            + " can not sail from " + unit.getTile()
-                            + " to " + targetTile + ": " + this);
-                        return MoveType.MOVE_ILLEGAL;
-                    }
+                    logger.fine(logMe + " failed to sail for " + target
+                        + ": "+ this);
+                    return MoveType.MOVE_ILLEGAL;
                 }
             } else if (unit.isOnCarrier()) {
-                if (unit.getTile() == null) {
-                    inTransit = true;
-                } else {
-                    path = unit.findPath(unit.getTile(), targetTile, carrier,
-                        CostDeciders.avoidSettlementsAndBlockingUnits());
-                    if (path == null) {
-                        logger.finest(logMe 
-                            + " can not get from " + unit.getTile()
-                            + " to " + targetTile + ": " + this);
-                        return MoveType.MOVE_ILLEGAL;
-                    } else {
-                        inTransit = path.isOnCarrier();
-                    }
-                }
+                inTransit = true;
             } else {
-                if (unit.isInEurope()) {
-                    needTransport = true;
-                } else if (unit.getTile() == null) { // Can not happen
-                    throw new IllegalStateException("No tile or carrier: "
-                        + unit);
-                } else {
-                    path = unit.findPath(unit.getTile(), targetTile, null,
-                        CostDeciders.avoidSettlementsAndBlockingUnits());
-                    if (path == null) needTransport = true;
+                needTransport = true;
+            }
+        } else { // Moving on the map
+            if (unit.getType().canMoveToHighSeas()) {
+                // If there is no path for a high seas capable unit, give up.
+                path = map.findFullPath(unit, unit.getTile(), targetTile, null,
+                    CostDeciders.avoidSettlementsAndBlockingUnits());
+                if (path == null) {
+                    logger.fine(logMe + " no path from " + unit.getLocation()
+                        + " to " + target + ": " + this);
+                    return MoveType.MOVE_ILLEGAL;
                 }
+            } else if (unit.isOnCarrier()) {
+                // Check if the carrier still has a useful path...
+                path = map.findFullPath(unit, unit.getTile(), targetTile, 
+                    unit.getCarrier(),
+                    CostDeciders.avoidSettlementsAndBlockingUnits());
+                if (path == null) {
+                    logger.fine(logMe + " no transit from " + unit.getLocation()
+                        + " to " + target + ": " + this);
+                    return MoveType.MOVE_ILLEGAL;
+                }
+                // ...and whether the unit needs to stay on board.
+                inTransit = path.isOnCarrier() && path.next.isOnCarrier();
+            } else {
+                // Not high seas capable.  If no path, it needs transport.
+                path = map.findFullPath(unit, unit.getTile(), targetTile, null,
+                    CostDeciders.avoidSettlementsAndBlockingUnits());
+                needTransport = path == null;
             }
         }
         if (inTransit) {
-            logger.finest(logMe + " in transit to " + target + ": " + this);
-            return MoveType.MOVE_ILLEGAL;
+            logger.finest(logMe + " at " + unit.getLocation()
+                + " in transit to " + target + ": " + this);
+            return MoveType.MOVE_NO_MOVES;
         } else if (needTransport) {
             logger.finest(logMe + " at " + unit.getLocation()
                 + " needs transport to " + target + ": " + this);
             return MoveType.MOVE_ILLEGAL;
+        } else if (path == null) {
+            throw new IllegalStateException("Path == null"); // Can not happen
+        } else {
+            return followPath(logMe, path);
         }
-
-        // This can not happen.
-        if (path == null) throw new IllegalStateException("Path == null");
-        return followPath(logMe, path);
     }
 
     /**
      * Follow a path to a target.
+     *
+     * Logging is fine on failures, finest on valid return values other
+     * than normal path completion.
      *
      * @param logMe A prefix string for the log messages.
      * @param path The <code>PathNode</code> to follow.
@@ -899,48 +916,76 @@ public abstract class Mission extends AIObject {
      */
     protected MoveType followPath(String logMe, PathNode path) {
         final Unit unit = getUnit();
+        final AIUnit aiUnit = getAIUnit();
+        final int NO_EUROPE = 0;
+        final int USES_EUROPE = 1;
+        final int BOTH_EUROPE = 2;
+
         for (; path != null; path = path.next) {
-            if (unit.getMovesLeft() <= 0 || unit.isAtSea()) {
+            int useEurope = 0;
+            // Sanitize the unit state.
+            if (unit.isDisposed()) {
+                logger.fine(logMe + " died going to " + path.getLocation()
+                    + ": " + this);
+                return MoveType.MOVE_NO_REPAIR;
+            } else if (unit.getMovesLeft() <= 0 || unit.isAtSea()) {
                 logger.finest(logMe + " at " + unit.getLocation()
                     + " en route to " + path.getLastNode().getLocation()
                     + ": " + this);
                 return MoveType.MOVE_NO_MOVES;
-            }
-
-            if (path.getLocation() instanceof Europe) {
-                if (unit.isInEurope()) continue;
-                if (unit.getTile() != null
-                    && unit.getTile().isDirectlyHighSeasConnected()) {
-                    if (!AIMessage.askMoveTo(getAIUnit(),
-                            unit.getOwner().getEurope())) {
-                        logger.finest(logMe + " at " + unit.getTile()
-                            + " failed to sail for Europe: " + this);
-                        return MoveType.MOVE_ILLEGAL;
-                    }
-                    logger.finest(logMe + " sailed for Europe: " + this);
-                    return MoveType.MOVE_HIGH_SEAS;
-                } else {
-                    logger.finest(logMe + " can not move to Europe from "
-                        + unit.getLocation() + ": " + this);
-                    return MoveType.MOVE_ILLEGAL;
-                }
-            }
-
-            MoveType mt = unit.getMoveType(path.getDirection());
-if (path.next != null && (mt == MoveType.ATTACK_UNIT || mt == MoveType.ATTACK_SETTLEMENT)) logger.warning("FOUND " + mt + " on " + path.fullPathToString());
-            if (!mt.isProgress()) return mt; // Special handling required
-
-            if (!AIMessage.askMove(getAIUnit(), path.getDirection())) {
-                logger.finest(logMe + " at " + unit.getTile()
-                    + " failed to move: " + this);
+            } else if (unit.isInEurope()) {
+                useEurope++;
+            } else if (unit.getTile() == null) {
+                logger.fine(logMe + " null location tile: " + this);
                 return MoveType.MOVE_ILLEGAL;
-            } else if (unit.isDisposed()) {
-                logger.finest(logMe + " died en route to " + path.getTile()
-                    + ": " + this);
-                return MoveType.MOVE_NO_REPAIR;
             }
+            // Sanitize the path node.
+            if (path.getLocation() instanceof Europe) {
+                useEurope++;
+            } else if (path.getTile() == null) {
+                logger.fine(logMe + " null path tile " + path.toString()
+                    + ": " + this);
+                return MoveType.MOVE_ILLEGAL;
+            }
+
+            // Post-sanitization there are only two valid cases,
+            // not using Europe at all, and sailing to/from Europe.
+            // Ignore the trivial path within Europe.
+            // On success, continue or return.
+            // On failure, fall through to the error report.
+            switch (useEurope) {
+            case NO_EUROPE:
+                if (unit.getTile() == path.getTile()) continue;
+                MoveType mt = unit.getMoveType(path.getDirection());
+                if (!mt.isProgress()) { // Special handling required.
+                    logger.finest(logMe + " at " + unit.getTile()
+                        + " has special move " + mt + " to " + path.getTile()
+                        + ": " + this);
+                    return mt;
+                }
+
+                if (AIMessage.askMove(aiUnit, path.getDirection())) continue;
+                break;
+
+            case USES_EUROPE:
+                if (AIMessage.askMoveTo(aiUnit, path.getLocation())) {
+                    logger.finest(logMe + " now on high seas: " + this);
+                    return MoveType.MOVE_HIGH_SEAS;
+                }
+                break;
+
+            case BOTH_EUROPE:
+                continue; // Do nothing, on to next node.
+
+            default:
+                throw new IllegalStateException("Can not happen");
+            }
+            logger.finest(logMe + " at " + unit.getLocation()
+                + " failed to move to " + path.getLocation()
+                + ": " + this);
+            return MoveType.MOVE_ILLEGAL;
         }
-        return MoveType.MOVE; // Must have completed path
+        return MoveType.MOVE; // Must have completed path normally, no log.
     }
 
     // Fake implementation of Transportable interface.

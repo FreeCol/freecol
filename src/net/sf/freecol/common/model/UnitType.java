@@ -637,14 +637,14 @@ public final class UnitType extends BuildableType
     }
 
     /**
-     * Can this unit type move to Europe.
+     * Can this unit type move to the High Seas.
      *
      * ATM this is synonymous with being a naval unit, but we should use
      * this routine instead of isNaval() in case this changes.
      *
-     * @return True if units of this type can move to Europe.
+     * @return True if units of this type can move to the High Seas.
      */
-    public boolean canMoveToEurope() {
+    public boolean canMoveToHighSeas() {
         return isNaval();
     }
 

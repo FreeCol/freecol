@@ -664,7 +664,7 @@ public class Map extends FreeColGameObject implements Location {
             throw new IllegalArgumentException("Null start.");
         } else if ((europe = unit.getOwner().getEurope()) == null) {
             throw new IllegalArgumentException("Null Europe.");
-        } else if (!unit.getType().canMoveToEurope()) {
+        } else if (!unit.getType().canMoveToHighSeas()) {
             throw new IllegalArgumentException("Unit can not move to Europe: "
                 + unit);
         }
@@ -846,9 +846,8 @@ public class Map extends FreeColGameObject implements Location {
 
             } else { // Start in Europe, end on a Tile
                 // Fail fast without water unit.
-                if (!waterUnit.getType().canMoveToEurope()) return null;
+                if (!waterUnit.getType().canMoveToHighSeas()) return null;
 
-System.err.println("FOO!");
                 // Search backwards from target to get best entry location.
                 path = search(unit, end.getTile(), getHighSeasGoalDecider(),
                               costDecider, INFINITY, carrier, null);
@@ -875,7 +874,7 @@ System.err.println("FOO!");
         } else { // start has Tile
             if (end instanceof Europe) {
                 // Fail fast if Europe is unattainable.
-                if (!waterUnit.getType().canMoveToEurope()) return null;
+                if (!waterUnit.getType().canMoveToHighSeas()) return null;
                 
                 // Search forwards to the high seas.
                 path = search(unit, start.getTile(), getHighSeasGoalDecider(),
@@ -894,14 +893,14 @@ System.err.println("FOO!");
                 final Tile endTile = end.getTile();
                 final GoalDecider gd = getLocationGoalDecider(endTile);
                 final SearchHeuristic sh = getManhattenHeuristic(endTile);
-                if (startTile.isConnectedTo(endTile)) {
-                    // If the unit could get to the destination
-                    // without the carrier, compare both with and
-                    // without-carrier paths.  The latter will usually
-                    // be faster, but not always, e.g. mounted units
-                    // on a good road system.
+                if (startTile.getContiguity() == endTile.getContiguity()) {
+                    // If the unit potentially could get to the
+                    // destination without a carrier, compare both
+                    // with-carrier and without-carrier paths.  The
+                    // latter will usually be faster, but not always,
+                    // e.g. mounted units on a good road system.
                     PathNode walkPath = search(unit, startTile, gd,
-                                               costDecider, INFINITY, null, sh);
+                        costDecider, INFINITY, null, sh);
                     if (carrier == null) return walkPath;
                     PathNode carrierPath = search(unit, startTile, gd,
                                                   costDecider, INFINITY,
@@ -910,8 +909,7 @@ System.err.println("FOO!");
                         : (walkPath == null) ? carrierPath
                         : (walkPath.getLastNode().getCost()
                             <= carrierPath.getLastNode().getCost())
-                        ? walkPath
-                        : carrierPath;
+                        ? walkPath : carrierPath;
                 } else if (waterUnit != null) {
                     // If there is a water unit then complex paths which
                     // use settlements and inland lakes are possible, but
@@ -966,7 +964,7 @@ System.err.println("FOO!");
         } else if (start instanceof Europe) {
             Unit waterUnit = (carrier != null) ? carrier : unit;
             // Fail fast if Europe is unattainable.
-            if (!waterUnit.getType().canMoveToEurope()) return null;
+            if (!waterUnit.getType().canMoveToHighSeas()) return null;
 
             PathNode path = search(unit, (Tile)waterUnit.getEntryLocation(),
                                    goalDecider, costDecider,
@@ -1371,7 +1369,7 @@ System.err.println("FOO!");
                     && currentNode.previous.getLocation() != europe)
                 && !closedList.containsKey(europe.getId())
                 && currentUnit != null
-                && currentUnit.getType().canMoveToEurope()
+                && currentUnit.getType().canMoveToHighSeas()
                 && currentTile.isDirectlyHighSeasConnected()) {
 
                 MoveCandidate move = new MoveCandidate(currentUnit,

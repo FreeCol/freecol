@@ -3096,7 +3096,7 @@ public class Unit extends FreeColGameObject
     public boolean canMoveToHighSeas() {
         if (isInEurope() || isAtSea()) return true;
         if (!getOwner().canMoveToEurope()
-            || !getType().canMoveToEurope()) return false;
+            || !getType().canMoveToHighSeas()) return false;
         return getTile().isDirectlyHighSeasConnected();
     }
 
