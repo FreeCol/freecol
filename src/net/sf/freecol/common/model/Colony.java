@@ -1785,18 +1785,19 @@ public class Colony extends Settlement implements Nameable {
     }
 
     /**
-     * Return the Building best suited for the given Unit.
+     * Gets the Building best suited for the given Unit.
      *
-     * @param unit an <code>Unit</code> value
-     * @return a <code>Building</code> value
+     * @param unit The <code>Unit</code> to get the building for.
+     * @return The best <code>Building</code>.
      */
     public Building getBuildingFor(Unit unit) {
-        List<Building> buildings = new ArrayList<Building>();
         GoodsType expertProduction = unit.getType().getExpertProduction();
-        if (expertProduction != null && !expertProduction.isFarmed()) {
-            buildings.addAll(getBuildingsForProducing(expertProduction));
+        Building best;
+        if (expertProduction != null && !expertProduction.isFarmed()
+            && (best = getBuildingFor(unit, expertProduction)) != null) {
+            return best;
         }
-        buildings.addAll(getBuildings());
+        List<Building> buildings = new ArrayList<Building>(getBuildings());
         for (Building building : buildings) {
             switch (building.getNoAddReason(unit)) {
             case NONE: case ALREADY_PRESENT:
@@ -1810,6 +1811,35 @@ public class Colony extends Settlement implements Nameable {
             }
         }
         return null;
+    }
+
+    /**
+     * Gets the Building best suited for the given Unit to produce an
+     * optional type of goods.
+     *
+     * @param unit The <code>Unit</code> to get the building for.
+     * @param goodsType The optional <code>GoodsType</code> to produce.
+     * @return The best <code>Building</code>.
+     */
+    public Building getBuildingFor(Unit unit, GoodsType goodsType) {
+        List<Building> buildings
+            = new ArrayList<Building>(getBuildingsForProducing(goodsType));
+        Building best = null;
+        int bestProd = 0;
+        for (Building building : buildings) {
+            switch (building.getNoAddReason(unit)) {
+            case NONE: case ALREADY_PRESENT:
+                int prod = building.getProductionOf(unit, goodsType);
+                if (prod > bestProd) {
+                    bestProd = prod;
+                    best = building;
+                }
+                break;
+            default:
+                break;
+            }
+        }
+        return best;
     }
 
     /**
@@ -1828,21 +1858,22 @@ public class Colony extends Settlement implements Nameable {
      */
     public ColonyTile getVacantColonyTileFor(Unit unit, boolean allowClaim,
                                              GoodsType... goodsTypes) {
-        ColonyTile bestPick = null;
-        int highestProduction = 0;
+        ColonyTile best = null;
+        int bestProd = 0;
         for (ColonyTile colonyTile : colonyTiles) {
+            Tile workTile = colonyTile.getWorkTile();
             switch (colonyTile.getNoAddReason(unit)) {
+            case CLAIM_REQUIRED:
+                if (owner.getLandPrice(workTile) < 0) allowClaim = false;
+                // Fall through.
             case NONE: case ALREADY_PRESENT:
-                Tile workTile = colonyTile.getWorkTile();
-                if (workTile.getOwningSettlement() == this
-                    || (allowClaim && owner.getLandPrice(workTile) == 0)) {
-                    for (GoodsType goodsType : goodsTypes) {
-                        int potential = colonyTile.getProductionOf(unit,
-                                                                   goodsType);
-                        if (potential > highestProduction) {
-                            highestProduction = potential;
-                            bestPick = colonyTile;
-                        }
+                if (workTile.getOwningSettlement() != this
+                    && !allowClaim) break;
+                for (GoodsType goodsType : goodsTypes) {
+                    int prod = colonyTile.getProductionOf(unit, goodsType);
+                    if (prod > bestProd) {
+                        bestProd = prod;
+                        best = colonyTile;
                     }
                 }
                 break;
@@ -1850,7 +1881,7 @@ public class Colony extends Settlement implements Nameable {
                 break;
             }
         }
-        return bestPick;
+        return best;
     }
 
     /**

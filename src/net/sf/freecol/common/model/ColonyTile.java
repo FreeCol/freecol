@@ -136,6 +136,19 @@ public class ColonyTile extends WorkLocation implements Ownable {
         return workTile.getLabel();
     }
 
+    /**
+     * Gets a template describing whether this work location can/needs-to
+     * be claimed.
+     *
+     * @return A suitable template.
+     */
+    @Override
+    public StringTemplate getClaimTemplate() {
+        return (isColonyCenterTile()) ? super.getClaimTemplate()
+            : StringTemplate.template("workClaimColonyTile")
+                .add("%direction%", "direction."
+                    + getTile().getDirection(workTile).toString());
+    }
 
     /**
      * Checks if this is the tile where the <code>Colony</code> is located.
@@ -154,6 +167,16 @@ public class ColonyTile extends WorkLocation implements Ownable {
      */
     public Tile getWorkTile() {
         return workTile;
+    }
+
+    /**
+     * Gets the owning settlement for this colony tile.
+     *
+     * @return The owning settlement for this colony tile.
+     */
+    @Override
+    public Settlement getOwningSettlement() {
+        return workTile.getOwningSettlement();
     }
 
     /**

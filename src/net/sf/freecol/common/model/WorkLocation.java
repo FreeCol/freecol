@@ -37,7 +37,7 @@ import javax.xml.stream.XMLStreamWriter;
 public abstract class WorkLocation extends UnitLocation implements Ownable {
 
     /**
-     * Describe colony here.
+     * The colony that contains this work location.
      */
     private Colony colony;
 
@@ -118,7 +118,6 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
      */
     public abstract boolean canAutoProduce();
 
-
     /**
      * Checks if this work location is available to the colony to be worked.
      *
@@ -167,6 +166,18 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
      */
     public final void setColony(final Colony newColony) {
         this.colony = newColony;
+    }
+
+    /**
+     * Gets the owning settlement for this work location.
+     *
+     * Usually the same as getColony() but overridden by ColonyTile
+     * to handle unclaimed tiles.
+     *
+     * @return The owning settlement for this work location.
+     */
+    public Settlement getOwningSettlement() {
+        return colony;
     }
 
     /**
@@ -220,6 +231,16 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
      */
     public boolean canTeach() {
         return hasAbility(Ability.CAN_TEACH);
+    }
+
+    /**
+     * Gets a template describing whether this work location can/needs-to
+     * be claimed.  To be overridden by classes where this is meaningful.
+     *
+     * @return A suitable template.
+     */
+    public StringTemplate getClaimTemplate() {
+        return StringTemplate.name("");
     }
 
     /**
@@ -282,6 +303,9 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
         }
         return false;
     }
+
+
+    // Serialization
 
     /**
      * {@inheritDoc}

@@ -28,6 +28,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -43,12 +44,15 @@ import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.ColonyTile;
+import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.resources.ResourceManager;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -69,8 +73,8 @@ public final class UnitLabel extends JLabel
         SENTRY,
         COLOPEDIA,
         LEAVE_TOWN,
-        WORK_TILE,
-        WORK_BUILDING,
+        WORK_COLONYTILE, // Must match the WorkLocation actual type
+        WORK_BUILDING,   // Must match the WorkLocation actual type
         CLEAR_ORDERS,
         ASSIGN_TRADE_ROUTE,
     }
@@ -305,48 +309,47 @@ public final class UnitLabel extends JLabel
      * @param event The incoming action event
      */
     public void actionPerformed(ActionEvent event) {
-        String commandString = event.getActionCommand();
-        String arg = null;
-        int index = commandString.indexOf(':');
-        if (index > 0) {
-            arg = commandString.substring(index + 1);
-            commandString = commandString.substring(0, index);
-        }
-        UnitAction command = Enum.valueOf(UnitAction.class, commandString.toUpperCase());
-        switch(command) {
+        final Game game = freeColClient.getGame();
+        final Specification spec = game.getSpecification();
+        String[] args = event.getActionCommand().split("/");
+        switch (Enum.valueOf(UnitAction.class,
+                             args[0].toUpperCase(Locale.US))) {
         case ASSIGN:
-            Unit teacher = unit.getGame().getFreeColGameObject(arg, Unit.class);
-            inGameController.assignTeacher(unit, teacher);
+            inGameController.assignTeacher(unit,
+                game.getFreeColGameObject(args[1], Unit.class));
+            /*
             Component uc = getParent();
             while (uc != null) {
-                /*
-                  if (uc instanceof ColonyPanel) {
-                  ((ColonyPanel) uc).reinitialize();
-                  break;
-                  }
-                */
+                if (uc instanceof ColonyPanel) {
+                    ((ColonyPanel) uc).reinitialize();
+                    break;
+                }
                 uc = uc.getParent();
             }
+            */
             break;
-        case WORK_TILE:
-            GoodsType goodsType = freeColClient.getGame().getSpecification().getGoodsType(arg);
-            // Change workType first for the benefit of change listeners
-            inGameController.changeWorkType(unit, goodsType);
-            // Move unit to best producing ColonyTile
-            ColonyTile bestTile = unit.getColony().getVacantColonyTileFor(unit, false, goodsType);
-            if (bestTile == null
-                || (unit.getLocation() instanceof WorkLocation
-                    && (((WorkLocation)unit.getLocation())
-                        .getProductionOf(unit, goodsType)
-                        > bestTile.getProductionOf(unit, goodsType)))) break;
-            inGameController.work(unit, bestTile);
+        case WORK_COLONYTILE:
+            if (args.length < 3) break;
+            ColonyTile colonyTile
+                = game.getFreeColGameObject(args[1], ColonyTile.class);
+            if (colonyTile == unit.getLocation()) break;
+            // Claim tile if needed, then change workType first for
+            // the benefit of change listeners, before finally
+            // committing to work.
+            if (args.length >= 4 && "!".equals(args[3])) {
+                if (!inGameController.claimLand(colonyTile.getWorkTile(), 
+                                                unit.getColony(), 0)) break;
+            }
+            inGameController.changeWorkType(unit, spec.getGoodsType(args[2]));
+            inGameController.work(unit, colonyTile);
             break;
         case WORK_BUILDING:
-            BuildingType buildingType = freeColClient.getGame().getSpecification().getBuildingType(arg);
-            Building building = unit.getColony().getBuilding(buildingType);
-            if (building != unit.getLocation()) {
-                inGameController.work(unit, building);
-            }
+            if (args.length < 3) break;
+            Building building
+                = game.getFreeColGameObject(args[1], Building.class);
+            if (building == unit.getLocation()) break;
+            inGameController.changeWorkType(unit, spec.getGoodsType(args[2]));
+            inGameController.work(unit, building);
             break;
         case ACTIVATE_UNIT:
             inGameController.changeState(unit, Unit.UnitState.ACTIVE);
@@ -432,5 +435,15 @@ public final class UnitLabel extends JLabel
         return unit != null && unit.isOnCarrier();
     }
 
-
+    /**
+     * Gets a string corresponding to the UnitAction to work at a work
+     * location.
+     *
+     * @param wl The <code>WorkLocation</code> to use.
+     * @return The unit action as a string.
+     */
+    public static String getWorkLabel(WorkLocation wl) {
+        return "WORK_" + Utils.lastPart(wl.getClass().toString(), ".")
+            .toUpperCase(Locale.US);
+    }
 }
