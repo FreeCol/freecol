@@ -636,6 +636,17 @@ public final class UnitType extends BuildableType
         return hasAbility(Ability.NAVAL_UNIT);
     }
 
+    /**
+     * Can this unit type move to Europe.
+     *
+     * ATM this is synonymous with being a naval unit, but we should use
+     * this routine instead of isNaval() in case this changes.
+     *
+     * @return True if units of this type can move to Europe.
+     */
+    public boolean canMoveToEurope() {
+        return isNaval();
+    }
 
     /**
      * Returns true if this UnitType has a skill.
@@ -643,7 +654,6 @@ public final class UnitType extends BuildableType
      * @return a <code>boolean</code> value
      */
     public boolean hasSkill() {
-
         return skill != UNDEFINED;
     }
 

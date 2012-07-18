@@ -392,6 +392,7 @@ public abstract class Mission extends AIObject {
             public boolean check(Unit unit, PathNode pathNode) {
                 CombatModel combatModel = getGame().getCombatModel();
                 Tile newTile = pathNode.getTile();
+                if (newTile == null) return false;
                 Unit defender = newTile.getDefendingUnit(unit);
 
                 if( defender == null){
@@ -541,7 +542,7 @@ public abstract class Mission extends AIObject {
         } else {
             result = AIMessage.askUnloadCargo(aiUnit, goods);
             if (result) {
-                final Colony colony = carrier.getTile().getColony();
+                final Colony colony = carrier.getLocation().getColony();
                 final AIColony aiColony = getAIMain().getAIColony(colony);
                 if (aiColony != null) aiColony.completeWish(goods);
                 colony.firePropertyChange(Colony.REARRANGE_WORKERS, true, false);
@@ -796,7 +797,7 @@ public abstract class Mission extends AIObject {
                     logger.finest(logMe + " at sea: " + this);
                     return MoveType.MOVE_ILLEGAL;
                 }
-                if (unit.getTile().canMoveToHighSeas()) {
+                if (unit.getTile().isDirectlyHighSeasConnected()) {
                     if (aiUnit.moveToEurope()) {
                         logger.finest(logMe + " sailed for Europe: " + this);
                         return MoveType.MOVE_HIGH_SEAS;
@@ -806,7 +807,9 @@ public abstract class Mission extends AIObject {
                         return MoveType.MOVE_ILLEGAL;
                     }
                 }
-                path = unit.findPathToEurope();
+                path = unit.getGame().getMap().findFullPath(unit,
+                    unit.getLocation(), unit.getOwner().getEurope(),
+                    null, null);
                 if (path == null) {
                     logger.finest(logMe
                         + " can not get from " + unit.getTile()
@@ -884,7 +887,7 @@ public abstract class Mission extends AIObject {
 
         // This can not happen.
         if (path == null) throw new IllegalStateException("Path == null");
-        return followPath(logMe, path, target instanceof Europe);
+        return followPath(logMe, path);
     }
 
     /**
@@ -892,21 +895,39 @@ public abstract class Mission extends AIObject {
      *
      * @param logMe A prefix string for the log messages.
      * @param path The <code>PathNode</code> to follow.
-     * @param europe The ultimate target is Europe, move there if possible.
      * @return The type of move the unit stopped at.
      */
-    protected MoveType followPath(String logMe, PathNode path,
-                                  boolean europe) {
+    protected MoveType followPath(String logMe, PathNode path) {
         final Unit unit = getUnit();
         for (; path != null; path = path.next) {
-            if (unit.getMovesLeft() <= 0) {
-                logger.finest(logMe + " at " + unit.getTile()
-                    + " en route to " + path.getLastNode().getTile()
+            if (unit.getMovesLeft() <= 0 || unit.isAtSea()) {
+                logger.finest(logMe + " at " + unit.getLocation()
+                    + " en route to " + path.getLastNode().getLocation()
                     + ": " + this);
                 return MoveType.MOVE_NO_MOVES;
             }
 
+            if (path.getLocation() instanceof Europe) {
+                if (unit.isInEurope()) continue;
+                if (unit.getTile() != null
+                    && unit.getTile().isDirectlyHighSeasConnected()) {
+                    if (!AIMessage.askMoveTo(getAIUnit(),
+                            unit.getOwner().getEurope())) {
+                        logger.finest(logMe + " at " + unit.getTile()
+                            + " failed to sail for Europe: " + this);
+                        return MoveType.MOVE_ILLEGAL;
+                    }
+                    logger.finest(logMe + " sailed for Europe: " + this);
+                    return MoveType.MOVE_HIGH_SEAS;
+                } else {
+                    logger.finest(logMe + " can not move to Europe from "
+                        + unit.getLocation() + ": " + this);
+                    return MoveType.MOVE_ILLEGAL;
+                }
+            }
+
             MoveType mt = unit.getMoveType(path.getDirection());
+if (path.next != null && (mt == MoveType.ATTACK_UNIT || mt == MoveType.ATTACK_SETTLEMENT)) logger.warning("FOUND " + mt + " on " + path.fullPathToString());
             if (!mt.isProgress()) return mt; // Special handling required
 
             if (!AIMessage.askMove(getAIUnit(), path.getDirection())) {
@@ -919,16 +940,6 @@ public abstract class Mission extends AIObject {
                 return MoveType.MOVE_NO_REPAIR;
             }
         }
-        if (europe && unit.getTile().canMoveToHighSeas()) {
-            if (!AIMessage.askMoveTo(getAIUnit(),
-                    unit.getOwner().getEurope())) {
-                logger.finest(logMe + " at " + unit.getTile()
-                    + " failed to sail for Europe: " + this);
-                return MoveType.MOVE_ILLEGAL;
-            }
-            logger.finest(logMe + " sailed for Europe: " + this);
-            return MoveType.MOVE_HIGH_SEAS;
-        }             
         return MoveType.MOVE; // Must have completed path
     }
 

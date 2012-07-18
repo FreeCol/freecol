@@ -266,7 +266,8 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
             int turns = (path != null) ? unit.getSailTurns()
                 + path.getTotalTurns()
                 : (unit.getTile() != null
-                    && unit.getTile().canMoveToHighSeas()) ? unit.getSailTurns()
+                    && unit.getTile().isDirectlyHighSeasConnected())
+                ? unit.getSailTurns()
                 : -1;
             if (turns >= 0) {
                 Europe europe = getMyPlayer().getEurope();

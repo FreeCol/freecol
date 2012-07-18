@@ -323,6 +323,8 @@ public class Europe extends UnitLocation implements Ownable, Named {
     }
 
 
+    // Serialization
+
     /**
      * This method writes an XML-representation of this object to the given
      * stream.
@@ -457,7 +459,7 @@ public class Europe extends UnitLocation implements Ownable, Named {
     }
 
     /**
-     * Returns a suitable name.
+     * {@inheritDoc}
      */
     public String toString() {
         return "Europe";

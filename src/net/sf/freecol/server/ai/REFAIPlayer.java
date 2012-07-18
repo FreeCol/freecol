@@ -162,7 +162,8 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                 public PathNode getGoal() { return goal; }
                 public boolean hasSubGoals() { return true; }
                 public boolean check(Unit u, PathNode pathNode) {
-                    if (!pathNode.getTile().isEmpty()) return false;
+                    Tile tile = pathNode.getTile();
+                    if (tile == null || !tile.isEmpty()) return false;
                     for (Tile t : pathNode.getTile().getSurroundingTiles(1)) {
                         if (t.isHighSeasConnected() && t.isEmpty()) {
                             goal = pathNode;

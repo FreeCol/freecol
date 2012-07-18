@@ -104,10 +104,10 @@ public class PathNode {
      * Gets the <code>Tile</code> of this <code>PathNode</code>.
      *
      * @return The <code>Tile</code> this <code>PathNode</code>
-     *     represents in the path.
+     *     represents in the path, if any.
      */
     public Tile getTile() {
-        return (location instanceof Tile) ? (Tile)location : null;
+        return (location == null) ? null : location.getTile();
     }
 
     /**
@@ -205,16 +205,25 @@ public class PathNode {
     }
 
     /**
+     * Gets the first node of this path.
+     *
+     * @return The first <code>PathNode</code>.
+     */
+    public PathNode getFirstNode() {
+        PathNode path;
+        for (path = this; path.previous != null; path = path.previous);
+        return path;
+    }
+
+    /**
      * Gets the last node of this path.
      *
      * @return The last <code>PathNode</code>.
      */
     public PathNode getLastNode() {
-        PathNode temp = this;
-        while (temp.next != null) {
-            temp = temp.next;
-        }
-        return temp;
+        PathNode path;
+        for (path = this; path.next != null; path = path.next);
+        return path;
     }
 
     /**
@@ -260,14 +269,37 @@ public class PathNode {
     }
 
     /**
+     * Gets the next carrier move on this path.
+     *
+     * @return The first node along the path which is a carrier move, or null
+     *     if the path does not use a carrier.
+     */
+    public PathNode getCarrierMove() {
+        for (PathNode path = this; path != null; path = path.next) {
+            if (path.isOnCarrier()) return path;
+        }
+        return null;
+    }
+
+    /**
+     * Does this path us a carrier at any point?
+     *
+     * @return True if there is an onCarrier move in this path.
+     */
+    public boolean usesCarrier() {
+        return getFirstNode().getCarrierMove() != null;
+    }
+
+    /**
      * {@inheritDoc}
      */
     public String toString() {
-        return "PathNode loc=" + ((FreeColGameObject)location).getId()
+        return "PathNode loc=" + ((FreeColGameObject)location).toString()
             + " movesLeft=" + Integer.toString(movesLeft)
             + " turns=" + Integer.toString(turns)
             + " onCarrier=" + Boolean.toString(onCarrier)
-            + " direction=" + getDirection();
+            + " direction=" + getDirection()
+            + " cost=" + getCost();
     }
 
     /**

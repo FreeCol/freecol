@@ -40,6 +40,8 @@ import net.sf.freecol.util.test.FreeColTestUtils;
 
 public class MapTest extends FreeColTestCase {
 
+    private final TileType highSeasType
+        = spec().getTileType("model.tile.highSeas");
     private final TileType oceanType
         = spec().getTileType("model.tile.ocean");
     private final TileType plainsType
@@ -127,7 +129,6 @@ public class MapTest extends FreeColTestCase {
         for (Tile t: map.getTile(4,8).getSurroundingTiles(1))
             surroundingTiles.add(t);
 
-
         assertEquals(8, surroundingTiles.size());
         assertTrue(surroundingTiles.contains(map.getTile(4, 6)));
         assertTrue(surroundingTiles.contains(map.getTile(4, 10)));
@@ -175,7 +176,6 @@ public class MapTest extends FreeColTestCase {
     }
 
     public void testGetWholeMapIterator() {
-
         Game game = getStandardGame();
 
         Tile[][] tiles = new Tile[5][6];
@@ -259,9 +259,7 @@ public class MapTest extends FreeColTestCase {
             assertFalse(i.hasNext());
         }
         { // Odd case
-
             Iterator<Position> i = map.getAdjacentIterator(map.getTile(4, 7).getPosition());
-
             List<Position> shouldBe = new ArrayList<Position>();
             shouldBe.add(new Position(4, 5));
             shouldBe.add(new Position(4, 9));
@@ -286,7 +284,8 @@ public class MapTest extends FreeColTestCase {
         Game game = getStandardGame();
         MapBuilder builder = new MapBuilder(game);
         builder.setDimensions(10, 15).build();
-        Direction[] dirs = Direction.getRandomDirections("testRandomDirection", new Random(1));
+        Direction[] dirs = Direction.getRandomDirections("testRandomDirection",
+            new Random(1));
         assertNotNull(dirs);
     }
 
@@ -301,7 +300,8 @@ public class MapTest extends FreeColTestCase {
 
         // set obstructing indian camp
         Tile settlementTile = map.getTile(2,10);
-        FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
+        FreeColTestCase.IndianSettlementBuilder builder
+            = new FreeColTestCase.IndianSettlementBuilder(game);
         builder.settlementTile(settlementTile).build();
 
         // set unit
@@ -329,9 +329,9 @@ public class MapTest extends FreeColTestCase {
         Player frenchPlayer = game.getPlayer("model.nation.french");
         Tile settlementTile = map.getTile(2,10);
         FreeColTestUtils.getColonyBuilder().player(frenchPlayer)
-                                                                 .colonyTile(settlementTile)
-                                                                 .build();
-        assertTrue("French colony was not set properly on the map",settlementTile.getSettlement() != null);
+            .colonyTile(settlementTile).build();
+        assertTrue("French colony was not set properly on the map",
+            settlementTile.getSettlement() != null);
         // set unit
         Player dutchPlayer = game.getPlayer("model.nation.dutch");
         Tile unitTile = map.getTile(1, 11);
@@ -394,8 +394,10 @@ public class MapTest extends FreeColTestCase {
                                        colonistType);
         colonist.setDestination(destinationTile);
 
-        PathNode path = map.findPath(colonist, colonist.getTile(), destinationTile, null, CostDeciders.avoidSettlementsAndBlockingUnits());
-        assertNull("No path should be available",path);
+        PathNode path = map.findPath(colonist, colonist.getTile(),
+            destinationTile, null,
+            CostDeciders.avoidSettlementsAndBlockingUnits());
+        assertNull("No path should be available", path);
     }
 
     public void testShortestPathObstructed() {
@@ -405,7 +407,8 @@ public class MapTest extends FreeColTestCase {
 
         // set obstructing indian camp
         Tile settlementTile = map.getTile(2, 10);
-        FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
+        FreeColTestCase.IndianSettlementBuilder builder
+            = new FreeColTestCase.IndianSettlementBuilder(game);
         builder.settlementTile(settlementTile).build();
 
         // set unit
@@ -422,7 +425,8 @@ public class MapTest extends FreeColTestCase {
 
     public void testSearchForColony() {
         Game game = getStandardGame();
-        Map map = getCoastTestMap(spec().getTileType("model.tile.plains"), true);
+        Map map = getCoastTestMap(spec().getTileType("model.tile.plains"),
+            true);
         game.setMap(map);
 
         Player dutchPlayer = game.getPlayer("model.nation.dutch");
@@ -431,10 +435,8 @@ public class MapTest extends FreeColTestCase {
         Tile colonyTile = map.getTile(9, 9); // should be on coast
         Unit galleon = new ServerUnit(game, unitTile, dutchPlayer, galleonType);
         Unit artillery = new ServerUnit(game, galleon, dutchPlayer, artilleryType);
-        FreeColTestUtils.getColonyBuilder()
-            .player(frenchPlayer)
-            .colonyTile(colonyTile)
-            .build();
+        FreeColTestUtils.getColonyBuilder().player(frenchPlayer)
+            .colonyTile(colonyTile).build();
         assertTrue("French colony not on the map",
                    colonyTile.getSettlement() != null);
         dutchPlayer.setStance(frenchPlayer, Stance.WAR);
@@ -459,15 +461,16 @@ public class MapTest extends FreeColTestCase {
                 }
 
                 public boolean check(Unit u, PathNode pathNode) {
-                    Tile newTile = pathNode.getTile();
-                    boolean result = newTile.getSettlement() != null;
-                    if (result) {
-                        if (scoreTile(newTile) > score) {
-                            score = scoreTile(newTile);
+                    Settlement settlement = pathNode.getLocation().getSettlement();
+                    if (settlement != null) {
+                        int value = scoreTile(pathNode.getTile());
+                        if (value > score) {
+                            score = value;
                             found = pathNode;
+                            return true;
                         }
                     }
-                    return result;
+                    return false;
                 }
             };
 
@@ -480,10 +483,8 @@ public class MapTest extends FreeColTestCase {
 
         // Add another colony
         Tile colonyTile2 = map.getTile(5, 5); // should score less
-        FreeColTestUtils.getColonyBuilder()
-            .player(frenchPlayer)
-            .colonyTile(colonyTile2)
-            .build();
+        FreeColTestUtils.getColonyBuilder().player(frenchPlayer)
+            .colonyTile(colonyTile2).build();
         assertTrue("French colony not on the map",
                    colonyTile2.getSettlement() != null);
         path = map.search(artillery, unitTile,
@@ -533,7 +534,100 @@ public class MapTest extends FreeColTestCase {
         assertEquals(45, map.getRow(45));
         assertEquals(90, map.getLatitude(90));
         assertEquals(90, map.getRow(90));
-
     }
 
+    public void testFullPath() {
+        Game game = getStandardGame();
+        Map map = getCoastTestMap(spec().getTileType("model.tile.plains"),
+                                  true);
+        game.setMap(map);
+
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Tile settlementTile = map.getTile(9, 2);
+        FreeColTestUtils.getColonyBuilder().player(dutch)
+            .colonyTile(settlementTile).build();
+        assertTrue("Dutch colony should be on the map.",
+            settlementTile.getSettlement() != null);
+        assertTrue("Dutch colony should be on the shore.",
+            settlementTile.isShore());
+
+        // Check colonist can find the trivial path
+        Unit colonist = new ServerUnit(game, settlementTile, dutch,
+                                       colonistType);
+        PathNode path = map.findFullPath(colonist, settlementTile,
+                                         settlementTile, null, null);
+        assertNotNull("Trivial path should exist.", path);
+        assertNull("Trivial path should be trivial.", path.next);
+        assertEquals("Trivial path should start at settlement.",
+            settlementTile, path.getTile());
+
+        // Check colonist can not find a path into the sea
+        Tile seaTile = map.getTile(13, 2);
+        path = map.findFullPath(colonist, settlementTile, seaTile, null, null);
+        assertNull("Sea path should be illegal.", path);
+
+        // Check that a naval unit can find that path.
+        Unit galleon = new ServerUnit(game, settlementTile, dutch,
+                                      galleonType);
+        path = map.findFullPath(galleon, settlementTile, seaTile, null, null);
+        assertNotNull("Sea path should be legal for naval unit.", path);
+        assertEquals("Sea path should start at settlement.", settlementTile,
+            path.getTile());
+        assertEquals("Sea path should end at sea tile.", seaTile,
+            path.getLastNode().getTile());
+
+        // Check giving the colonist access to a carrier makes the sea
+        // path work.
+        path = map.findFullPath(colonist, settlementTile, seaTile,
+                                galleon, null);
+        assertNotNull("Sea path should now be legal.", path);
+        assertEquals("Sea path should start at settlement.", settlementTile,
+            path.getTile());
+        assertEquals("Sea path should end at sea tile.", seaTile,
+            path.getLastNode().getTile());
+
+        // Check the path still works if the colonist has to walk to
+        // the carrier.
+        Tile landTile = map.getTile(2, 2);
+        path = map.findFullPath(colonist, landTile, seaTile, galleon, null);
+        assertNotNull("Sea path should still be legal.", path);
+        assertEquals("Sea path should start at land tile.", landTile,
+            path.getTile());
+        assertEquals("Sea path should end at sea tile.", seaTile,
+            path.getLastNode().getTile());
+        while (!path.isOnCarrier()) path = path.next;
+        assertEquals("Sea path should include pickup at settlement.",
+            settlementTile, path.getTile());
+
+        // Check the colonist uses the carrier if it is quicker than walking.
+        Tile shoreTile = map.getTile(9, 13);
+        assertTrue("Shore tile should be on the shore.", shoreTile.isShore());
+        path = map.findFullPath(colonist, settlementTile, shoreTile, galleon, null);
+        assertNotNull("Shore path should be legal.", path);
+        assertTrue("Shore path should have carrier moves.", path.usesCarrier());
+        assertNotNull("Shore path should have drop node.",
+            path.getCarrierMove().getTransportDropNode());
+
+        // Check the colonist does not use the carrier if it does not help.
+        Tile midTile = map.getTile(9, 4);
+        path = map.findFullPath(colonist, map.getTile(2, 6), midTile, galleon,
+                                null);
+        assertNotNull("Middle path should be legal.", path);
+        assertFalse("Middle path should not not use carrier.",
+            path.usesCarrier());
+
+        // Check path to Europe.
+        Europe europe = dutch.getEurope();
+        path = map.findFullPath(colonist, settlementTile, europe, galleon,
+            null);
+        assertNotNull("To-Europe path should be valid.", path);
+        assertEquals("To-Europe path should end in Europe.", europe,
+            path.getLastNode().getLocation());
+
+        // Check path from Europe.
+        path = map.findFullPath(colonist, europe, landTile, galleon, null);
+        assertNotNull("From-Europe path should be valid.", path);
+        assertEquals("From-Europe path should start in Europe.", europe,
+            path.getLocation());
+    }
 }

@@ -1403,7 +1403,8 @@ public class Unit extends FreeColGameObject
                 public boolean hasSubGoals() { return true; }
                 public boolean check(Unit u, PathNode path) {
                     Tile t = path.getTile();
-                    if (t == startTile && excludeStart) return false;
+                    if (t == null
+                        || (t == startTile && excludeStart)) return false;
                     Settlement settlement = t.getSettlement();
                     int value;
                     if (settlement != null
@@ -1531,6 +1532,7 @@ public class Unit extends FreeColGameObject
                 public boolean hasSubGoals() { return false; }
                 public boolean check(Unit unit, PathNode path) {
                     Tile tile = path.getTile();
+                    if (tile == null) return false;
                     Unit first = tile.getFirstUnit();
                     if (first == null
                         || !getOwner().atWarWith(first.getOwner())) {
@@ -1790,10 +1792,10 @@ public class Unit extends FreeColGameObject
                 return (isOffensiveUnit())
                     ? MoveType.ATTACK_UNIT
                     : MoveType.MOVE_NO_ATTACK_CIVILIAN;
-            } else if (target.canMoveToHighSeas()) {
-                return MoveType.MOVE_HIGH_SEAS;
             } else {
-                return MoveType.MOVE;
+                return (target.isDirectlyHighSeasConnected())
+                    ? MoveType.MOVE_HIGH_SEAS
+                    : MoveType.MOVE;
             }
         }
     }
@@ -3086,33 +3088,32 @@ public class Unit extends FreeColGameObject
     }
 
     /**
-     * Checks if this <code>Unit</code> can be moved to Europe.
+     * Checks if this <code>Unit</code> can be moved to the high seas
+     * from its current location.
      *
-     * TODO: the new Carribean map has no south pole, and this allows
-     * moving to Europe via the bottom edge of the map, which is
-     * approximately the equator line.  Should we enforce moving to
-     * Europe requires high seas, and no movement via north/south
-     * poles?
-     *
-     * mpope 201103: Just leave it up to the map itself, tiles can
-     * include a "moveToEurope" attribute to override the default
-     * behaviour, which is to allow movement to Europe from tiles with
-     * the moveToEurope ability or on the map borders.
-     *
-     * Now, IMHO on the Carribean map, settling on the land next to
-     * the south border gives an unfair advantage and we *should* set
-     * moveToEurope==false on the nearby sea tiles.
-     *
-     * @return <code>true</code> if this unit can move to Europe.
+     * @return True if this unit can move immediately to the high seas.
      */
     public boolean canMoveToHighSeas() {
-        if (getLocation() instanceof Europe) return true;
-        if (!getOwner().canMoveToEurope() || !isNaval()) return false;
+        if (isInEurope() || isAtSea()) return true;
+        if (!getOwner().canMoveToEurope()
+            || !getType().canMoveToEurope()) return false;
+        return getTile().isDirectlyHighSeasConnected();
+    }
 
+    /**
+     * Does this unit have a valid move to the high seas this turn.
+     *
+     * @return True if the unit can either move immediately to the high
+     *      seas or can make a move to a neighbouring high seas tile.
+     */
+    public boolean hasHighSeasMove() {
+        if (canMoveToHighSeas()) return true;
         Tile tile = getTile();
-        if (tile.canMoveToHighSeas()) return true;
-        for (Tile t : tile.getSurroundingTiles(1)) {
-            if (t.canMoveToHighSeas() && getMoveType(t).isLegal()) return true;
+        if (tile != null && getMovesLeft() > 0) {
+            for (Tile t : tile.getSurroundingTiles(1)) {
+                if (t.isDirectlyHighSeasConnected()
+                    && getMoveType(t).isLegal()) return true;
+            }
         }
         return false;
     }

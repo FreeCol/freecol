@@ -1041,9 +1041,7 @@ public class SimpleMapGenerator implements MapGenerator {
                 offset = -offset;
                 for (int x = start; 0 <= x && x < map.getWidth(); x += offset) {
                     tile = map.getTile(x, row);
-                    if (tile.canMoveToHighSeas()) {
-                        return tile;
-                    }
+                    if (tile.isDirectlyHighSeasConnected()) return tile;
                 }
             }
         }

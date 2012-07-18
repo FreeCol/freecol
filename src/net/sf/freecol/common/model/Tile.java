@@ -660,12 +660,12 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
-     * Can a unit move to Europe from this tile?
+     * Can a unit move to the high seas from this tile?
      *
-     * @return True if a unit can move to Europe from this tile.
+     * @return True if a unit can move to high seas from this tile.
      */
-    public boolean canMoveToHighSeas() {
-        return (getMoveToEurope() != null) ? getMoveToEurope()
+    public boolean isDirectlyHighSeasConnected() {
+        return (getMoveToEurope() != null) ? getMoveToEurope().booleanValue()
             : (type == null) ? false
             : type.isDirectlyHighSeasConnected();
     }
@@ -1098,6 +1098,17 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public void setContiguity(int contiguity) {
         this.contiguity = contiguity;
+    }
+
+    /**
+     * Is this tile connected to another across the same contiguous piece
+     * of land or water?
+     *
+     * @param other The other <code>Tile</code> to check.
+     * @return True if the tiles are connected.
+     */
+    public boolean isConnectedTo(Tile other) {
+        return getContiguity() == other.getContiguity();
     }
 
     /**

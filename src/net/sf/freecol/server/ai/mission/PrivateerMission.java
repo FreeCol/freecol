@@ -66,7 +66,7 @@ public class PrivateerMission extends Mission {
         super(aiMain, aiUnit);
         Unit unit = aiUnit.getUnit();
         logger.finest("Assigning PrivateerMission to unit=" + unit
-            + " at " + unit.getTile());
+            + " at " + unit.getLocation());
         uninitialized = false;
     }
 
@@ -187,7 +187,7 @@ public class PrivateerMission extends Mission {
             unit.setMovesLeft(0);
             return;
         }
-        logger.finest("Privateer (" + unit.getId() + ") at " + unit.getTile() + " hunting");
+        logger.finest("Privateer (" + unit.getId() + ") at " + unit.getLocation() + " hunting");
 
         // has captured goods, must get them to port
         if(unit.getGoodsCount() > 0){
@@ -258,8 +258,7 @@ public class PrivateerMission extends Mission {
                 : unit.getOwner().getEurope();
         }
 
-        if (followPath(tag, path, nearestPort instanceof Europe)
-            != MoveType.MOVE) return;
+        if (followPath(tag, path) != MoveType.MOVE) return;
 
         if (isUnitInPort()) {
             dumpCargoInPort();

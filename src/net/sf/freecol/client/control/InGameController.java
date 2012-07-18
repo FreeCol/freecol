@@ -848,7 +848,7 @@ public final class InGameController implements NetworkConstants {
             // surrounded by high seas.
             if (unit.getDestination() instanceof Europe
                 && unit.getTile() != null
-                && unit.getTile().canMoveToHighSeas()) {
+                && unit.getTile().isDirectlyHighSeasConnected()) {
                 moveTo(unit, unit.getDestination());
                 return false;
             }
@@ -2668,7 +2668,7 @@ public final class InGameController implements NetworkConstants {
         Tile oldTile = unit.getTile();
         Tile newTile = oldTile.getNeighbourOrNull(direction);
         if ((newTile == null
-             || (!oldTile.canMoveToHighSeas() && newTile.canMoveToHighSeas()))
+             || (!oldTile.isDirectlyHighSeasConnected() && newTile.isDirectlyHighSeasConnected()))
             && gui.showConfirmDialog(oldTile,
                 StringTemplate.template("highseas.text")
                 .addAmount("%number%", unit.getSailTurns()),
@@ -3518,7 +3518,7 @@ public final class InGameController implements NetworkConstants {
             && freeColClient.currentPlayerIsMyPlayer()) {
             if (destination instanceof Europe) {
                 if (unit.getTile() != null
-                    && unit.getTile().canMoveToHighSeas()) {
+                    && unit.getTile().isDirectlyHighSeasConnected()) {
                     moveTo(unit, destination);
                 } else {
                     moveToDestination(unit);
