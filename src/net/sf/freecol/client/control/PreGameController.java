@@ -35,14 +35,11 @@ import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.ChipResource;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.resources.ResourceMapping;
-
-import org.w3c.dom.Element;
 
 
 
@@ -80,9 +77,10 @@ public final class PreGameController {
      */
     public void setReady(boolean ready) {
         freeColClient.getMyPlayer().setReady(ready);
+        
+        freeColClient.askServer().setReady(ready);
 
-        freeColClient.getClient().send(DOMMessage.createMessage("ready",
-                "value", Boolean.toString(ready)));
+       
     }
 
     /**
@@ -92,10 +90,9 @@ public final class PreGameController {
      */
     public void setNation(Nation nation) {
         freeColClient.getMyPlayer().setNation(nation);
+        
+        freeColClient.askServer().setNation(nation);
 
-        freeColClient.getClient()
-            .sendAndWait(DOMMessage.createMessage("setNation",
-                    "value", nation.getId()));
     }
 
     /**
@@ -106,9 +103,8 @@ public final class PreGameController {
     public void setNationType(NationType nationType) {
         freeColClient.getMyPlayer().setNationType(nationType);
 
-        freeColClient.getClient()
-            .sendAndWait(DOMMessage.createMessage("setNationType",
-                    "value", nationType.getId()));
+        freeColClient.askServer().setNationType(nationType);
+
     }
 
     /**
@@ -121,10 +117,8 @@ public final class PreGameController {
         freeColClient.getGame().getNationOptions()
             .getNations().put(nation, state);
 
-        freeColClient.getClient()
-            .sendAndWait(DOMMessage.createMessage("setAvailable",
-                    "nation", nation.getId(),
-                    "state", state.toString()));
+        freeColClient.askServer().setAvailable(nation, state);
+
     }
 
     /**
@@ -134,8 +128,8 @@ public final class PreGameController {
     public void requestLaunch() {
         if (freeColClient.getGame().isAllPlayersReadyToLaunch()) {
             gui.showStatusPanel(Messages.message("status.startingGame"));
-            freeColClient.getClient()
-                .send(DOMMessage.createMessage("requestLaunch"));
+            freeColClient.askServer().requestLaunch();
+
         } else {
             gui.errorMessage("server.notAllReady");
         }
@@ -158,9 +152,8 @@ public final class PreGameController {
         OptionGroup gameOptions = freeColClient.getGame().getSpecification()
             .getOptionGroup("gameOptions");
 
-        Element up = DOMMessage.createMessage("updateGameOptions");
-        up.appendChild(gameOptions.toXMLElement(up.getOwnerDocument()));
-        freeColClient.getClient().send(up);
+        freeColClient.askServer().updateGameOptions(gameOptions);
+
     }
 
     /**
@@ -171,10 +164,8 @@ public final class PreGameController {
         OptionGroup mapOptions = freeColClient.getGame()
             .getMapGeneratorOptions();
 
-        Element up = DOMMessage.createMessage("updateMapGeneratorOptions");
-        up.appendChild(mapOptions.toXMLElement(up.getOwnerDocument()));
-        //freeColClient.getGame().setMapGeneratorOptions(mapGeneratorOptions);
-        freeColClient.getClient().send(up);
+        freeColClient.askServer().updateMapGeneratorOption(mapOptions);
+
     }
 
     /**

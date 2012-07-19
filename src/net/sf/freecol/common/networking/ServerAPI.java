@@ -43,7 +43,10 @@ import net.sf.freecol.common.model.HighScore;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
+import net.sf.freecol.common.model.Nation;
+import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.NationSummary;
+import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Settlement;
@@ -54,6 +57,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
+import net.sf.freecol.common.option.OptionGroup;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -64,23 +68,6 @@ import org.w3c.dom.NodeList;
  * The API for client->server messaging.
  */
 public abstract class ServerAPI {
-
-    private static final Logger logger = Logger.getLogger(ServerAPI.class.getName());
-
-
-    private Client client;
-
-
-    /**
-     * Creates a new <code>ServerAPI</code>.
-     *
-     * @param freeColClient The <code>FreeColClient</code> that is
-     *     communicating with a server.
-     * @param client 
-     */
-    public ServerAPI() {
-    }
-
 
     /** Temporary trivial message wrapper. */
     private class TrivialMessage extends DOMMessage {
@@ -96,136 +83,25 @@ public abstract class ServerAPI {
         public Element toXMLElement() {
             return DOMMessage.createMessage(tag, attributes);
         }
+    }
+
+
+    private static final Logger logger = Logger.getLogger(ServerAPI.class.getName());
+
+
+    private Client client;
+
+
+    /**
+     * Creates a new <code>ServerAPI</code>.
+     *
+     * @param freeColClient The <code>FreeColClient</code> that is
+     *     communicating with a server.
+     * @param client 
+     */
+    public ServerAPI() {
     };
 
-
-    /**
-     * Helper to load a map.
-     *
-     * @param queries Query strings.
-     * @return A map with null mappings for the query strings.
-     */
-    private HashMap<String, String> loadMap(String... queries) {
-        HashMap<String, String> result = new HashMap<String, String>();
-        for (String q : queries) result.put(q, null);
-        return result;
-    }
-
-    /**
-     * Sends a DOMMessage to the server.
-     *
-     * @param message The <code>DOMMessage</code> to send.
-     * @return True if the send succeeded.
-     */
-    private boolean send(DOMMessage message) {
-        client.send(message.toXMLElement());
-        return true;
-    }
-
-    /**
-     * Sends the specified message to the server and returns the reply,
-     * if it has the specified tag.
-     * Handle "error" replies if they have a messageID or when in debug mode.
-     * This routine allows code simplification in much of the following
-     * client-server communication.
-     *
-     * In following routines we follow the convention that server I/O
-     * is confined to the ask<foo>() routine, which typically returns
-     * true if the server interaction succeeded, which does *not*
-     * necessarily imply that the actual substance of the request was
-     * allowed (e.g. a move may result in the death of a unit rather
-     * than actually moving).
-     *
-     * @param message A <code>DOMMessage</code> to send.
-     * @param tag The expected tag
-     * @param results A <code>Map</code> to store special attribute results in.
-     * @return The answer from the server if it has the specified tag,
-     *         otherwise <code>null</code>.
-     */
-    private Element askExpecting(DOMMessage message, String tag,
-                                 HashMap<String, String> results) {
-        Element reply = client.ask(message.toXMLElement());
-
-        if (reply == null) return null;
-        if ("error".equals(reply.getTagName())) {
-            String messageId = reply.getAttribute("messageID");
-            String messageText = reply.getAttribute("message");
-            if (messageId != null && messageText != null
-                && FreeColDebugger.isInDebugMode()) {
-                // If debugging suppress the bland but i18n compliant
-                // failure message in favour of the higher detail
-                // non-i18n text.
-                reply.removeAttribute("messageID");
-            }
-            if (messageId == null && messageText == null) {
-                logger.warning("Received null error response");
-            } else {
-                logger.warning("Received error response: "
-                               + ((messageId != null) ? messageId : "")
-                               + "/" + ((messageText != null)
-                                   ? messageText : ""));
-                client.handleReply(reply);
-            }
-            return null;
-        }
-
-        // Success!
-        if (tag == null || tag.equals(reply.getTagName())) {
-            // Do the standard processing.
-            doClientProcessingFor(reply);
-            // Look for special attributes
-            if (results != null) {
-                if (results.containsKey("*")) {
-                    results.remove("*");
-                    int len = reply.getAttributes().getLength();
-                    for (int i = 0; i < len; i++) {
-                        Node n = reply.getAttributes().item(i);
-                        results.put(n.getNodeName(), n.getNodeValue());
-                    }
-                } else {
-                    for (String k : results.keySet()) {
-                        if (reply.hasAttribute(k)) {
-                            results.put(k, reply.getAttribute(k));
-                        }
-                    }
-                }
-            }
-            return reply;
-        }
-
-        // Unexpected reply.  Whine and fail.
-        String complaint = "Received reply with tag " + reply.getTagName()
-            + " which should have been " + tag
-            + " to message " + message;
-        logger.warning(complaint);
-        doRaiseErrorMessage(complaint);
-        return null;
-    }
-
-    protected abstract void doRaiseErrorMessage(String complaint);
-
-    protected abstract void doClientProcessingFor(Element reply);
-
-
-    /**
-     * Extends askExpecting to also handle returns from the server.
-     *
-     * @param message A <code>DOMMessage</code> to send.
-     * @param tag The expected tag
-     * @param results A <code>Map</code> to store special attribute results in.
-     * @return True if the server interaction succeeded, else false.
-     */
-    private boolean askHandling(DOMMessage message, String tag,
-                                HashMap<String, String> results) {
-        Element reply = askExpecting(message, tag, results);
-        if (reply == null) return false;
-
-        client.handleReply(reply);
-        return true;
-    }
-
-
-    // Public interface
 
     /**
      * Server query-response to abandon a colony.
@@ -288,6 +164,7 @@ public abstract class ServerAPI {
             null, null);
     }
 
+
     /**
      * Server query-response for attacking.
      *
@@ -299,6 +176,9 @@ public abstract class ServerAPI {
         return askHandling(new AttackMessage(unit, direction),
             null, null);
     }
+
+
+    // Public interface
 
     /**
      * Server query-response for building a colony.
@@ -410,6 +290,16 @@ public abstract class ServerAPI {
     }
 
     /**
+     * Send a chat message.
+     *
+     * @param chat The text of the message.
+     * @return True if the send succeeded.
+     */
+    public boolean chat(Player player, String chat) {
+        return send(new ChatMessage(player, chat, false));
+    }
+
+    /**
      * Server query-response for checking the high score.
      *
      * @return True if the player has achieved a new high score.
@@ -460,14 +350,8 @@ public abstract class ServerAPI {
             null, null);
     }
 
-    /**
-     * Send a chat message.
-     *
-     * @param chat The text of the message.
-     * @return True if the send succeeded.
-     */
-    public boolean chat(Player player, String chat) {
-        return send(new ChatMessage(player, chat, false));
+    public void continuePlaying() {
+        client.send(DOMMessage.createMessage("continuePlaying"));        
     }
 
     /**
@@ -626,6 +510,34 @@ public abstract class ServerAPI {
             null, null);
     }
 
+    public Client getClient() {
+        return client;
+    }
+
+    /**
+     * Server query-response to get a list of goods for sale from a settlement.
+     *
+     * @param unit The <code>Unit</code> that is trading.
+     * @param settlement The <code>Settlement</code> that is trading.
+     * @return The goods for sale in the settlement,
+     *     or null if the server interaction failed.
+     */
+    public List<Goods> getGoodsForSaleInSettlement(Game game, Unit unit,
+                                                   Settlement settlement) {
+        GoodsForSaleMessage message
+            = new GoodsForSaleMessage(unit, settlement, null);
+        Element reply = askExpecting(message,
+            GoodsForSaleMessage.getXMLElementTagName(), null);
+        if (reply == null) return null;
+
+        List<Goods> goodsOffered = new ArrayList<Goods>();
+        NodeList childNodes = reply.getChildNodes();
+        for (int i = 0; i < childNodes.getLength(); i++) {
+            goodsOffered.add(new Goods(game, (Element) childNodes.item(i)));
+        }
+        return goodsOffered;
+    }
+
     /**
      * Server query-response for asking for the high scores list.
      *
@@ -648,6 +560,21 @@ public abstract class ServerAPI {
             }
         }
         return result;
+    }
+
+    /**
+     * Server query-response for asking for the nation summary of a player.
+     *
+     * @param player The <code>Player</code> to summarize.
+     * @return A summary of that nation, or null on error.
+     */
+    public NationSummary getNationSummary(Player player) {
+        GetNationSummaryMessage message = new GetNationSummaryMessage(player);
+        Element reply = askExpecting(message,
+            GetNationSummaryMessage.getXMLElementTagName(), null);
+        if (reply == null) return null;
+
+        return new GetNationSummaryMessage(reply).getNationSummary();
     }
 
     /**
@@ -678,30 +605,6 @@ public abstract class ServerAPI {
             result.add(unit);
         }
         return result;
-    }
-
-    /**
-     * Server query-response to get a list of goods for sale from a settlement.
-     *
-     * @param unit The <code>Unit</code> that is trading.
-     * @param settlement The <code>Settlement</code> that is trading.
-     * @return The goods for sale in the settlement,
-     *     or null if the server interaction failed.
-     */
-    public List<Goods> getGoodsForSaleInSettlement(Game game, Unit unit,
-                                                   Settlement settlement) {
-        GoodsForSaleMessage message
-            = new GoodsForSaleMessage(unit, settlement, null);
-        Element reply = askExpecting(message,
-            GoodsForSaleMessage.getXMLElementTagName(), null);
-        if (reply == null) return null;
-
-        List<Goods> goodsOffered = new ArrayList<Goods>();
-        NodeList childNodes = reply.getChildNodes();
-        for (int i = 0; i < childNodes.getLength(); i++) {
-            goodsOffered.add(new Goods(game, (Element) childNodes.item(i)));
-        }
-        return goodsOffered;
     }
 
     /**
@@ -843,21 +746,6 @@ public abstract class ServerAPI {
     }
 
     /**
-     * Server query-response for asking for the nation summary of a player.
-     *
-     * @param player The <code>Player</code> to summarize.
-     * @return A summary of that nation, or null on error.
-     */
-    public NationSummary getNationSummary(Player player) {
-        GetNationSummaryMessage message = new GetNationSummaryMessage(player);
-        Element reply = askExpecting(message,
-            GetNationSummaryMessage.getXMLElementTagName(), null);
-        if (reply == null) return null;
-
-        return new GetNationSummaryMessage(reply).getNationSummary();
-    }
-
-    /**
      * Server query-response for naming a new land.
      *
      * @param unit The <code>Unit</code> that has come ashore.
@@ -932,6 +820,17 @@ public abstract class ServerAPI {
     }
 
     /**
+     * Server query-response for putting a unit outside a colony.
+     *
+     * @param unit The <code>Unit</code> to put out.
+     * @return True if the server interaction succeeded.
+     */
+    public boolean putOutsideColony(Unit unit) {
+        return askHandling(new PutOutsideColonyMessage(unit),
+            null, null);
+    }
+
+    /**
      * Server query-response for renaming an object.
      *
      * @param object A <code>FreeColGameObject</code> to rename.
@@ -943,6 +842,10 @@ public abstract class ServerAPI {
             null, null);
     }
 
+    public void requestLaunch() {
+        client.send(DOMMessage.createMessage("requestLaunch"));    
+    }
+
     /**
      * Retires the player from the game.
      *
@@ -950,17 +853,6 @@ public abstract class ServerAPI {
      */
     public boolean retire() {
         return askHandling(new TrivialMessage("retire"),
-            null, null);
-    }
-
-    /**
-     * Server query-response for putting a unit outside a colony.
-     *
-     * @param unit The <code>Unit</code> to put out.
-     * @return True if the server interaction succeeded.
-     */
-    public boolean putOutsideColony(Unit unit) {
-        return askHandling(new PutOutsideColonyMessage(unit),
             null, null);
     }
 
@@ -1027,6 +919,12 @@ public abstract class ServerAPI {
             null, null);
     }
 
+    public void setAvailable(Nation nation, NationState state) {
+        client.sendAndWait(DOMMessage.createMessage("setAvailable",
+                    "nation", nation.getId(),
+                    "state", state.toString()));    
+    }
+
     /**
      * Server query-response for changing a build queue.
      *
@@ -1038,6 +936,11 @@ public abstract class ServerAPI {
                                      List<BuildableType> buildQueue) {
         return askHandling(new SetBuildQueueMessage(colony, buildQueue),
             null, null);
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
+        
     }
 
     /**
@@ -1063,6 +966,21 @@ public abstract class ServerAPI {
     public boolean setGoodsLevels(Colony colony, ExportData data) {
         return askHandling(new SetGoodsLevelsMessage(colony, data),
             null, null);
+    }
+
+    public void setNation(Nation nation) {
+       client.sendAndWait(DOMMessage.createMessage("setNation",
+                    "value", nation.getId()));        
+    }
+
+    public void setNationType(NationType nationType) {
+        client.sendAndWait(DOMMessage.createMessage("setNationType",
+                    "value", nationType.getId()));    
+    }
+
+    public void setReady(boolean ready) {
+        client.send(DOMMessage.createMessage("ready",
+                "value", Boolean.toString(ready)));        
     }
 
     /**
@@ -1130,6 +1048,18 @@ public abstract class ServerAPI {
             null, null);
     }
 
+    public void updateGameOptions(OptionGroup gameOptions) {
+        Element up = DOMMessage.createMessage("updateGameOptions");
+        up.appendChild(gameOptions.toXMLElement(up.getOwnerDocument()));
+        client.send(up);        
+    }
+
+    public void updateMapGeneratorOption(OptionGroup mapOptions) {
+        Element up = DOMMessage.createMessage("updateMapGeneratorOptions");
+        up.appendChild(mapOptions.toXMLElement(up.getOwnerDocument()));
+        client.send(up);    
+    }
+
     /**
      * Server query-response for asking for updating the trade route.
      *
@@ -1153,16 +1083,127 @@ public abstract class ServerAPI {
             null, null);
     }
 
-    public void continuePlaying() {
-        client.send(DOMMessage.createMessage("continuePlaying"));        
+    protected abstract void doClientProcessingFor(Element reply);
+
+    protected abstract void doRaiseErrorMessage(String complaint);
+
+    /**
+     * Sends the specified message to the server and returns the reply,
+     * if it has the specified tag.
+     * Handle "error" replies if they have a messageID or when in debug mode.
+     * This routine allows code simplification in much of the following
+     * client-server communication.
+     *
+     * In following routines we follow the convention that server I/O
+     * is confined to the ask<foo>() routine, which typically returns
+     * true if the server interaction succeeded, which does *not*
+     * necessarily imply that the actual substance of the request was
+     * allowed (e.g. a move may result in the death of a unit rather
+     * than actually moving).
+     *
+     * @param message A <code>DOMMessage</code> to send.
+     * @param tag The expected tag
+     * @param results A <code>Map</code> to store special attribute results in.
+     * @return The answer from the server if it has the specified tag,
+     *         otherwise <code>null</code>.
+     */
+    private Element askExpecting(DOMMessage message, String tag,
+                                 HashMap<String, String> results) {
+        Element reply = client.ask(message.toXMLElement());
+
+        if (reply == null) return null;
+        if ("error".equals(reply.getTagName())) {
+            String messageId = reply.getAttribute("messageID");
+            String messageText = reply.getAttribute("message");
+            if (messageId != null && messageText != null
+                && FreeColDebugger.isInDebugMode()) {
+                // If debugging suppress the bland but i18n compliant
+                // failure message in favour of the higher detail
+                // non-i18n text.
+                reply.removeAttribute("messageID");
+            }
+            if (messageId == null && messageText == null) {
+                logger.warning("Received null error response");
+            } else {
+                logger.warning("Received error response: "
+                               + ((messageId != null) ? messageId : "")
+                               + "/" + ((messageText != null)
+                                   ? messageText : ""));
+                client.handleReply(reply);
+            }
+            return null;
+        }
+
+        // Success!
+        if (tag == null || tag.equals(reply.getTagName())) {
+            // Do the standard processing.
+            doClientProcessingFor(reply);
+            // Look for special attributes
+            if (results != null) {
+                if (results.containsKey("*")) {
+                    results.remove("*");
+                    int len = reply.getAttributes().getLength();
+                    for (int i = 0; i < len; i++) {
+                        Node n = reply.getAttributes().item(i);
+                        results.put(n.getNodeName(), n.getNodeValue());
+                    }
+                } else {
+                    for (String k : results.keySet()) {
+                        if (reply.hasAttribute(k)) {
+                            results.put(k, reply.getAttribute(k));
+                        }
+                    }
+                }
+            }
+            return reply;
+        }
+
+        // Unexpected reply.  Whine and fail.
+        String complaint = "Received reply with tag " + reply.getTagName()
+            + " which should have been " + tag
+            + " to message " + message;
+        logger.warning(complaint);
+        doRaiseErrorMessage(complaint);
+        return null;
     }
 
-    public Client getClient() {
-        return client;
+    /**
+     * Extends askExpecting to also handle returns from the server.
+     *
+     * @param message A <code>DOMMessage</code> to send.
+     * @param tag The expected tag
+     * @param results A <code>Map</code> to store special attribute results in.
+     * @return True if the server interaction succeeded, else false.
+     */
+    private boolean askHandling(DOMMessage message, String tag,
+                                HashMap<String, String> results) {
+        Element reply = askExpecting(message, tag, results);
+        if (reply == null) return false;
+
+        client.handleReply(reply);
+        return true;
     }
 
-    public void setClient(Client client) {
-        this.client = client;
-        
+    /**
+     * Helper to load a map.
+     *
+     * @param queries Query strings.
+     * @return A map with null mappings for the query strings.
+     */
+    private HashMap<String, String> loadMap(String... queries) {
+        HashMap<String, String> result = new HashMap<String, String>();
+        for (String q : queries) result.put(q, null);
+        return result;
+    }
+
+    /**
+     * Sends a DOMMessage to the server.
+     *
+     * @param message The <code>DOMMessage</code> to send.
+     * @return True if the send succeeded.
+     */
+    private boolean send(DOMMessage message) {
+        client.send(message.toXMLElement());
+        return true;
     }
 }
