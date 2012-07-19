@@ -841,11 +841,11 @@ public class Map extends FreeColGameObject implements Location {
         PathNode path;
         if (start instanceof Europe) {
             if (end instanceof Europe) { // The trivial(Europe) path.
-                return new PathNode(start, unit.getMovesLeft(), 0,
+                path = new PathNode(start, unit.getMovesLeft(), 0,
                                     false, null, null);
 
             } else { // Start in Europe, end on a Tile
-                // Fail fast without water unit.
+                // Fail fast without capable water unit.
                 if (!waterUnit.getType().canMoveToHighSeas()) return null;
 
                 // Search backwards from target to get best entry location.
@@ -867,9 +867,9 @@ public class Map extends FreeColGameObject implements Location {
                 for (PathNode p = path; p != null; p = p.next) {
                     p.setTurns(p.getTurns() + waterUnit.getSailTurns());
                 }
-                return path.previous = new PathNode(start, unit.getMovesLeft(),
-                                                    0, carrier != null,
-                                                    null, path);
+                path.previous = new PathNode(start, unit.getMovesLeft(), 0,
+                                             carrier != null, null, path);
+                path = path.previous;
             }
         } else { // start has Tile
             if (end instanceof Europe) {
@@ -886,7 +886,6 @@ public class Map extends FreeColGameObject implements Location {
                 seas.next = new PathNode(end, unit.getInitialMovesLeft(),
                     seas.getTurns() + waterUnit.getSailTurns(),
                     seas.isOnCarrier(), seas, null);
-                return path;
 
             } else { // start and end are Tiles
                 final Tile startTile = start.getTile();
@@ -899,29 +898,32 @@ public class Map extends FreeColGameObject implements Location {
                     // with-carrier and without-carrier paths.  The
                     // latter will usually be faster, but not always,
                     // e.g. mounted units on a good road system.
-                    PathNode walkPath = search(unit, startTile, gd,
-                        costDecider, INFINITY, null, sh);
-                    if (carrier == null) return walkPath;
-                    PathNode carrierPath = search(unit, startTile, gd,
-                                                  costDecider, INFINITY,
-                                                  carrier, sh);
-                    return (carrierPath == null) ? walkPath
-                        : (walkPath == null) ? carrierPath
-                        : (walkPath.getLastNode().getCost()
-                            <= carrierPath.getLastNode().getCost())
-                        ? walkPath : carrierPath;
+                    PathNode carrierPath;
+                    path = search(unit, startTile, gd, costDecider, INFINITY,
+                                  null, sh);
+                    if (carrier != null
+                        && (carrierPath = search(unit, startTile, gd,
+                                                 costDecider, INFINITY,
+                                                 carrier, sh)) != null
+                        && (path == null
+                            || (path.getLastNode().getCost()
+                                > carrierPath.getLastNode().getCost()))) {
+                        path = carrierPath;
+if (path != null) logger.warning(path.fullPathToString());
+                    }
                 } else if (waterUnit != null) {
                     // If there is a water unit then complex paths which
                     // use settlements and inland lakes are possible, but
                     // hard to capture with the contiguity test, so just
                     // allow the search to proceed.
-                    return search(unit, startTile, gd, costDecider, INFINITY,
+                    path = search(unit, startTile, gd, costDecider, INFINITY,
                                   carrier, sh);
                 } else { // Otherwise, there is a connectivity failure.
-                    return null;
+                    path = null;
                 }
             }
         }
+        return path;
     }
 
     /**
@@ -1022,7 +1024,6 @@ public class Map extends FreeColGameObject implements Location {
         private boolean onCarrier;
         private CostDecider decider;
         private int cost;
-        private boolean costed;
         
 
         /**
@@ -1047,51 +1048,31 @@ public class Map extends FreeColGameObject implements Location {
             this.turns = turns;
             this.onCarrier = onCarrier;
             this.decider = decider;
-            this.cost = 0;
-            this.costed = false;
+            if ((this.cost = decider.getCost(unit, current.getLocation(),
+                        dst, movesLeft)) != CostDecider.ILLEGAL_MOVE) {
+                this.turns += decider.getNewTurns();
+                this.movesLeft = decider.getMovesLeft();
+                this.cost = PathNode.getCost(turns, movesLeft);
+            }
         }
 
         /**
-         * Creates a new move candidate where the moves and turns left
-         * are specified.
-         *
-         * @param unit The <code>Unit</code> to move.
-         * @param current The current position on the path.
-         * @param dst The <code>Location</code> to move to.
-         * @param movesLeft The new number of moves left.
-         * @param turns The new number of turns.
-         * @param onCarrier Will the new move be on a carrier.
+         * Handles the change of unit as a result of an embark.
          */
-        public MoveCandidate(Unit unit, PathNode current, Location dst,
-                             int movesLeft, int turns, boolean onCarrier) {
+        public void embarkUnit(Unit unit) {
             this.unit = unit;
-            this.current = current;
-            this.dst = dst;
-            this.movesLeft = movesLeft;
-            this.turns = turns;
-            this.onCarrier = onCarrier;
+            this.movesLeft = unit.getInitialMovesLeft();
             this.cost = PathNode.getCost(turns, movesLeft);
-            this.costed = true;
         }
 
         /**
          * Gets the cost of this candidate move.
          *
          * @return The move cost.
-         */
         public int getCost() {
-            if (!costed) {
-                Location src = current.getLocation();
-                cost = decider.getCost(unit, src, dst, movesLeft);
-                if (cost != CostDecider.ILLEGAL_MOVE) {
-                    turns += decider.getNewTurns();
-                    movesLeft = decider.getMovesLeft();
-                    cost = PathNode.getCost(turns, movesLeft);
-                }
-                costed = true;
-            }
             return cost;
         }
+         */
 
         /**
          * Do not let the CostDecider (which may be conservative)
@@ -1101,7 +1082,7 @@ public class Map extends FreeColGameObject implements Location {
          *     goal with.
          */
         public void recoverGoal(GoalDecider goalDecider) {
-            if (getCost() == CostDecider.ILLEGAL_MOVE
+            if (cost == CostDecider.ILLEGAL_MOVE
                 && unit != null
                 && current.getTile() != null
                 && dst.getTile() != null
@@ -1124,8 +1105,8 @@ public class Map extends FreeColGameObject implements Location {
          * @param best The <code>PathNode</code> to compare against.
          */
         public boolean canImprove(PathNode best) {
-            return getCost() != CostDecider.ILLEGAL_MOVE
-                && (best == null || getCost() < best.getCost());
+            return cost != CostDecider.ILLEGAL_MOVE
+                && (best == null || cost < best.getCost());
         }
 
         /**
@@ -1147,11 +1128,11 @@ public class Map extends FreeColGameObject implements Location {
             }
             path = new PathNode(dst, movesLeft, turns, onCarrier,
                                 current, null);
-            int cost = getCost();
+            int fcost = cost;
             if (sh != null && dst.getTile() != null) {
-                cost += sh.getValue(dst.getTile());
+                fcost += sh.getValue(dst.getTile());
             }
-            f.put(dst.getId(), new Integer(cost));
+            f.put(dst.getId(), new Integer(fcost));
             openList.put(dst.getId(), path);
             openListQueue.offer(path);
         }
@@ -1312,7 +1293,8 @@ public class Map extends FreeColGameObject implements Location {
                         : MoveStep.FAIL)
                     : ((carrierMove
                             && !usedCarrier(currentNode)) ? MoveStep.EMBARK
-                        : (unitMove) ? ((unit.isNaval()) ? MoveStep.BYWATER
+                        : (unitMove) ? ((unit.isNaval())
+                            ? MoveStep.BYWATER
                             : MoveStep.BYLAND)
                         : MoveStep.FAIL);
                 MoveCandidate move;
@@ -1330,21 +1312,28 @@ public class Map extends FreeColGameObject implements Location {
                             : CostDeciders.defaultCostDeciderFor(waterUnit)));
                     break;
                 case EMBARK:
-                    move = new MoveCandidate(carrier, currentNode, moveTile,
-                        carrier.getInitialMovesLeft(), currentTurns, true);
+                    move = new MoveCandidate(unit, currentNode, moveTile,
+                        currentMovesLeft, currentTurns, true,
+                        ((costDecider != null) ? costDecider
+                            : CostDeciders.defaultCostDeciderFor(unit)));
+                    move.embarkUnit(carrier);
                     break;
                 case DISEMBARK:
-                    // Check if embarked this turn.
-                    // Consume an extra move if so.
-                    int moveTurns = currentTurns + 1;
+                    // Check if already embarked this turn.  If so, the
+                    // disembarking unit should have zero moves left,
+                    // if not, its full amount is available.
+                    int movesLeft = unit.getInitialMovesLeft();
                     for (PathNode p = currentNode; p != null; p = p.previous) {
+                        if (p.getTurns() < currentTurns) break;
                         if (!p.isOnCarrier()) {
-                            if (p.getTurns() == currentTurns) moveTurns++;
+                            movesLeft = 0;
                             break;
                         }
-                    }                                
+                    }
                     move = new MoveCandidate(unit, currentNode, moveTile,
-                        unit.getInitialMovesLeft(), moveTurns, false);
+                        movesLeft, currentTurns, false,
+                        ((costDecider != null) ? costDecider
+                            : CostDeciders.defaultCostDeciderFor(unit)));
                     break;
                 case FAIL: default: // Loop on failure.
                     move = null;
@@ -1363,7 +1352,7 @@ public class Map extends FreeColGameObject implements Location {
                 }
             }
 
-            // Also try moving to Europe, if it exists and the move is ok.
+            // Also try moving to Europe if it exists and the move is ok.
             if (europe != null
                 && (currentNode.previous != null
                     && currentNode.previous.getLocation() != europe)
