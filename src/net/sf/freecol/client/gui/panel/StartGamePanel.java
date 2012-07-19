@@ -163,8 +163,6 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         gameOptions.addActionListener(this);
         mapGeneratorOptions.addActionListener(this);
 
-        setSize(getPreferredSize());
-
         setEnabled(true);
 
     }

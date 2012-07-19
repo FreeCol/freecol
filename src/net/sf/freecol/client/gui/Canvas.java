@@ -914,7 +914,7 @@ public final class Canvas extends JDesktopPane {
 
 
     public void showColopediaPanel(String nodeId) {
-        showSubPanel(new ColopediaPanel(freeColClient, gui, nodeId), true);
+        showSubPanel(new ColopediaPanel(freeColClient, gui, nodeId), false);
     }
 
 
@@ -1101,7 +1101,7 @@ public final class Canvas extends JDesktopPane {
         localDialog.initialize();
         europeOpenDialog = localDialog; // Set the open dialog to the class variable
 
-        int response = showFreeColDialog(localDialog, null, true);
+        int response = showFreeColDialog(localDialog, null, false);
 
         if (europeOpenDialog == localDialog) {
             europeOpenDialog = null;    // Clear class variable when it's closed
@@ -1130,7 +1130,7 @@ public final class Canvas extends JDesktopPane {
      * @param type The <code>EventType</code>.
      */
     public void showEventPanel(EventType type) {
-        showSubPanel(new EventPanel(freeColClient, gui, type), PopupPosition.CENTERED, true);
+        showSubPanel(new EventPanel(freeColClient, gui, type), PopupPosition.CENTERED, false);
     }
 
     public void showFindSettlementDialog() {
@@ -1898,7 +1898,7 @@ public final class Canvas extends JDesktopPane {
     }
 
     public void showTilePanel(Tile tile) {
-        showSubPanel(new TilePanel(freeColClient, gui, tile), true);
+        showSubPanel(new TilePanel(freeColClient, gui, tile), false);
     }
 
     /**
