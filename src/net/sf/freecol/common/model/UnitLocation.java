@@ -186,6 +186,12 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      * Gets the reason why a given <code>Locatable</code> can not be
      * added to this Location.
      *
+     * Be careful to test for unit presence last before success
+     * (NoAddReason.NONE) except perhaps for the capacity test, so
+     * that we can treat ALREADY_PRESENT as success in some cases
+     * (e.g. if the unit changes type --- does it still have a
+     * required skill?)
+     *
      * @param locatable The <code>Locatable</code> to test.
      * @return The reason why adding would fail.
      */
@@ -193,17 +199,14 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
         Unit unit = (locatable instanceof Unit) ? (Unit) locatable : null;
         return (unit == null)
             ? NoAddReason.WRONG_TYPE
-            : (units == null
-                || unit.getSpaceTaken() + getSpaceTaken() > getUnitCapacity())
+            : (units == null)
             ? NoAddReason.CAPACITY_EXCEEDED
             : (!isEmpty() && units.get(0).getOwner() != unit.getOwner())
             ? NoAddReason.OCCUPIED_BY_ENEMY
-            // Always test this last before success (NoAddReason.NONE),
-            // so that we can treat ALREADY_PRESENT as success in some
-            // cases (e.g. if the unit changes type --- does it still
-            // have a required skill?)
-            : contains(unit)
+            : (contains(unit))
             ? NoAddReason.ALREADY_PRESENT
+            : (unit.getSpaceTaken() + getSpaceTaken() > getUnitCapacity())
+            ? NoAddReason.CAPACITY_EXCEEDED
             : NoAddReason.NONE;
     }
 
