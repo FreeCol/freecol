@@ -218,10 +218,13 @@ public final class QuickActionMenu extends JPopupMenu {
     private boolean addWorkItems(final UnitLabel unitLabel) {
         final int currentItems = this.getComponentCount();
         final Unit unit = unitLabel.getUnit();
+        final UnitType unitType = unit.getType();
         final Colony colony = unit.getLocation().getColony();
         final Specification spec = freeColClient.getGame().getSpecification();
         WorkLocation current = (unit.getLocation() instanceof WorkLocation)
             ? (WorkLocation)unit.getLocation() : null;
+        final int bonusChange = (current != null) ? 0
+            : colony.governmentChange(colony.getWorkLocationUnitCount() + 1);
 
         Map<JMenuItem, Integer> items = new HashMap<JMenuItem, Integer>();
         Map<JMenuItem, Integer> extras = new HashMap<JMenuItem, Integer>();
@@ -230,25 +233,25 @@ public final class QuickActionMenu extends JPopupMenu {
             int bestUnownedProd = 0;
             WorkLocation bestOwned = null;
             WorkLocation bestUnowned = null;
-            int prod;
             for (WorkLocation wl : colony.getAllWorkLocations()) {
+                int prod = bonusChange;
                 switch (wl.getNoAddReason(unit)) {
                 case NONE:
-                    prod = wl.getProductionOf(unit, type);
+                    prod += wl.getPotentialProduction(unitType, type);
                     if (prod > bestOwnedProd) {
                         bestOwnedProd = prod;
                         bestOwned = wl;
                     }
                     break;
                 case ALREADY_PRESENT:
-                    prod = wl.getProductionOf(unit, type);
+                    prod += wl.getPotentialProduction(unitType, type);
                     if (prod > bestOwnedProd) {
                         bestOwnedProd = prod;
                         bestOwned = (unit.getWorkType() == type) ? null : wl;
                     }
                     break;
                 case CLAIM_REQUIRED:
-                    prod = wl.getProductionOf(unit, type);
+                    prod += wl.getPotentialProduction(unitType, type);
                     if (prod > bestUnownedProd) {
                         bestUnownedProd = prod;
                         bestUnowned = wl;
