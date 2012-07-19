@@ -219,6 +219,7 @@ public final class QuickActionMenu extends JPopupMenu {
         final int currentItems = this.getComponentCount();
         final Unit unit = unitLabel.getUnit();
         final UnitType unitType = unit.getType();
+        final GoodsType expertGoods = unitType.getExpertProduction();
         final Colony colony = unit.getLocation().getColony();
         final Specification spec = freeColClient.getGame().getSpecification();
         WorkLocation current = (unit.getLocation() instanceof WorkLocation)
@@ -228,6 +229,8 @@ public final class QuickActionMenu extends JPopupMenu {
 
         Map<JMenuItem, Integer> items = new HashMap<JMenuItem, Integer>();
         Map<JMenuItem, Integer> extras = new HashMap<JMenuItem, Integer>();
+        JMenuItem expertOwned = null;
+        JMenuItem expertUnowned = null;
         for (GoodsType type : spec.getGoodsTypeList()) {
             int bestOwnedProd = 0;
             int bestUnownedProd = 0;
@@ -262,20 +265,32 @@ public final class QuickActionMenu extends JPopupMenu {
                 }
             }
             if (bestOwned != null) {
-                items.put(makeProductionItem(type, bestOwned,
-                        bestOwnedProd, unitLabel, false),
-                    new Integer(bestOwnedProd));
+                JMenuItem ji = makeProductionItem(type, bestOwned,
+                    bestOwnedProd, unitLabel, false);
+                if (type == expertGoods) {
+                    expertOwned = ji;
+                } else {
+                    items.put(ji, new Integer(bestOwnedProd));
+                }
             }
             if (bestUnowned != null && bestUnownedProd > bestOwnedProd) {
-                extras.put(makeProductionItem(type, bestUnowned,
-                        bestUnownedProd, unitLabel, true),
-                    new Integer(bestUnownedProd));
+                JMenuItem ji = makeProductionItem(type, bestUnowned,
+                    bestUnownedProd, unitLabel, true);
+                if (type == expertGoods) {
+                    expertUnowned = ji;
+                } else {
+                    extras.put(ji, new Integer(bestUnownedProd));
+                }
             }
         }
-        for (JMenuItem j : descendingList(items)) this.add(j);
-        if (!extras.isEmpty()) {
-            if (!items.isEmpty()) this.addSeparator();
-            for (JMenuItem j : descendingList(extras)) this.add(j);
+        List<JMenuItem> owned = descendingList(items);
+        if (expertOwned != null) owned.add(0, expertOwned);
+        for (JMenuItem j : owned) this.add(j);
+        List<JMenuItem> unowned = descendingList(extras);
+        if (expertUnowned != null) unowned.add(0, expertUnowned);
+        if (!unowned.isEmpty()) {
+            if (!owned.isEmpty()) this.addSeparator();
+            for (JMenuItem j : unowned) this.add(j);
         }
         if (current != null) {
             JMenuItem ji = new JMenuItem(Messages.message("showProductivity"));
