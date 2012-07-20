@@ -24,7 +24,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -51,7 +50,6 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.networking.Client;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.LoginMessage;
@@ -255,41 +253,7 @@ public final class ConnectController {
         }
     }
 
-    /**
-     * Connects a client to host:port (or more).
-     *
-     * @param threadName The name for the thread.
-     * @param host The name of the machine running the
-     *            <code>FreeColServer</code>.
-     * @param port The port to use when connecting to the host.
-     * @return The client.
-     * @throws ConnectException
-     * @throws IOException
-     */
-    private Client connectClient(String threadName, String host, int port)
-        throws ConnectException, IOException {
-        Client client = null;
-        int tries;
-        if (port < 0) {
-            port = FreeCol.getDefaultPort();
-            tries = 10;
-        } else {
-            tries = 1;
-        }
-        for (int i = tries; i > 0; i--) {
-            try {
-                client = new Client(host, port,
-                                    freeColClient.getPreGameInputHandler(),
-                                    threadName);
-                if (client != null) break;
-            } catch (ConnectException e) {
-                if (i == 1) throw e;
-            } catch (IOException e) {
-                if (i == 1) throw e;
-            }
-        }
-        return client;
-    }
+ 
 
     /**
      * Starts the client and connects to <i>host:port</i>.
@@ -304,17 +268,17 @@ public final class ConnectController {
     public boolean login(String userName, String host, int port) {
         freeColClient.setMapEditor(false);
  
-        Client client = freeColClient.getClient();
-        if (client != null) client.disconnect();
+        freeColClient.askServer().disconnect();
 
         try {
-            client = connectClient(FreeCol.CLIENT_THREAD + userName,
-                                   host, port);
+
+            freeColClient.askServer().connect(FreeCol.CLIENT_THREAD + userName,
+                    host, port, freeColClient.getPreGameInputHandler());
+            
         } catch (Exception e) {
             gui.errorMessage("server.couldNotConnect", e.getMessage());
             return false;
         }
-        freeColClient.setClient(client);
 
         LoginMessage msg = freeColClient.askServer()
             .login(userName, FreeCol.getVersion());
@@ -556,11 +520,10 @@ public final class ConnectController {
      */
     public void logout(boolean notifyServer) {
         if (notifyServer) {
-            freeColClient.getClient()
-                .sendAndWait(DOMMessage.createMessage("logout",
-                        "reason", "User has quit the client."));
+            freeColClient.askServer().logout();
+
         }
-        freeColClient.getClient().getConnection().close();
+        freeColClient.askServer().disconnect();
 
         ResourceManager.setScenarioMapping(null);
         ResourceManager.setCampaignMapping(null);
@@ -570,7 +533,7 @@ public final class ConnectController {
         }
         freeColClient.setGame(null);
         freeColClient.setMyPlayer(null);
-        freeColClient.setClient(null);
+        freeColClient.askServer().reset();
         freeColClient.setLoggedIn(false);
     }
 

@@ -20,6 +20,8 @@
 
 package net.sf.freecol.common.networking;
 
+import java.io.IOException;
+import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -28,6 +30,7 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.BuildableType;
@@ -1205,5 +1208,62 @@ public abstract class ServerAPI {
     private boolean send(DOMMessage message) {
         client.send(message.toXMLElement());
         return true;
+    }
+
+
+    public void logout() {
+        
+        client
+            .sendAndWait(DOMMessage.createMessage("logout",
+                    "reason", "User has quit the client."));        
+    }
+
+
+    public void disconnect() {
+        if (client != null) 
+            client.disconnect();        
+    }
+
+
+    /**
+     * Connects a client to host:port (or more).
+     *
+     * @param threadName The name for the thread.
+     * @param host The name of the machine running the
+     *            <code>FreeColServer</code>.
+     * @param port The port to use when connecting to the host.
+     * @return The client.
+     * @throws ConnectException
+     * @throws IOException
+     */
+    public void connect(String threadName, String host, int port, MessageHandler messageHandler) 
+        throws ConnectException, IOException {
+        int tries;
+            if (port < 0) {
+                port = FreeCol.getDefaultPort();
+                tries = 10;
+            } else {
+                tries = 1;
+            }
+            for (int i = tries; i > 0; i--) {
+                try {
+                    client = new Client(host, port,
+                                        messageHandler,
+                                        threadName);
+                    if (client != null) 
+                        break;
+                } catch (ConnectException e) {
+                    if (i == 1) 
+                        throw e;
+                } catch (IOException e) {
+                    if (i == 1) 
+                        throw e;
+                }
+            }
+    }
+
+
+    public void reset() {
+        client = null;
     }
 }

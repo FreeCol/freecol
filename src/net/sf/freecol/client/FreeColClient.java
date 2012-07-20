@@ -542,16 +542,6 @@ public final class FreeColClient {
         }
     }
 
-    /**
-     * Sets the <code>Client</code> that shall be used to send messages to the
-     * server.
-     *
-     * @param client The <code>Client</code>.
-     * @see #getClient
-     */
-    public void setClient(Client client) {
-        serverAPI.setClient(client);
-    }
 
     /**
      * Sets the <code>FreeColServer</code> which has been started by the
