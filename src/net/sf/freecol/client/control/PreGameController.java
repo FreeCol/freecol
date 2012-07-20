@@ -203,8 +203,7 @@ public final class PreGameController {
             gui.playSound(null); // Stop the long introduction sound
             gui.playSound("sound.intro." + myPlayer.getNationID());
         }
-        freeColClient.getClient()
-            .setMessageHandler(freeColClient.getInGameInputHandler());
+        freeColClient.askServer().registerMessageHandler(freeColClient.getInGameInputHandler());
 
         if (!freeColClient.isHeadless()) {
             freeColClient.setInGame(true);

@@ -1266,4 +1266,10 @@ public abstract class ServerAPI {
     public void reset() {
         client = null;
     }
+
+
+    public void registerMessageHandler(MessageHandler messageHandler) {
+        client.setMessageHandler(messageHandler);
+        
+    }
 }
