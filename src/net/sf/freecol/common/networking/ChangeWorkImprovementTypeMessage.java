@@ -115,7 +115,7 @@ public class ChangeWorkImprovementTypeMessage extends DOMMessage {
             // TODO: This does not check if the tile (not TileType
             // accepts the improvement).
             if (!type.isWorkerAllowed(unit)) {
-                return DOMMessage.clientError("Unit can not to create improvement: "
+                return DOMMessage.clientError("Unit can not create improvement: "
                     + improvementId);
             }
         } else { // Has improvement, check if worker can contribute to it

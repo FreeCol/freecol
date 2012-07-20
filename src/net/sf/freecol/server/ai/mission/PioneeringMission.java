@@ -651,13 +651,15 @@ public class PioneeringMission extends Mission {
                     + tileImprovementPlan.getType()
                     + " at target " + tile + ": " + this);
             } else {
-                setTarget(null);
                 aiPlayer.removeTileImprovementPlan(tileImprovementPlan);
                 tileImprovementPlan.dispose();
-                logger.finest(tag + " failed to improve " + tile + ": " + this);
+                setTarget(null);
+                logger.warning(tag + " failed to improve " + tile
+                    + ": " + this);
             }
         } else { // Probably just out of moves.
-            logger.finest(tag + " waiting to improve at " + tile + ": " + this);
+            logger.finest(tag + " waiting to improve at " + tile
+                + ": " + this);
         }
     }
 
