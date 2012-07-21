@@ -31,7 +31,6 @@ import java.util.NoSuchElementException;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Random;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -909,7 +908,7 @@ public class Map extends FreeColGameObject implements Location {
                             || (path.getLastNode().getCost()
                                 > carrierPath.getLastNode().getCost()))) {
                         path = carrierPath;
-if (path != null) logger.warning(path.fullPathToString());
+                        if (path != null) logger.warning(path.fullPathToString());
                     }
                 } else if (waterUnit != null) {
                     // If there is a water unit then complex paths which

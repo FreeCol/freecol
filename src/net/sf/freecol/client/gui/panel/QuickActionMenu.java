@@ -44,7 +44,6 @@ import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.GameOptions;
@@ -58,7 +57,6 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
-import net.sf.freecol.common.util.Utils;
 
 
 /**

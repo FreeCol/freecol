@@ -42,7 +42,6 @@ import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Building;
-import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
