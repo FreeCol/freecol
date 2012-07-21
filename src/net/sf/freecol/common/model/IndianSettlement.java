@@ -1050,6 +1050,15 @@ public class IndianSettlement extends Settlement {
         return 0;
     }
 
+    /**
+     * Native settlements do not require upkeep.
+     *
+     * @return 0
+     */
+    public int getUpkeep() {
+        return 0;
+    }
+
     public boolean checkForNewMissionaryConvert() {
 
         /* Increase convert progress and generate convert if needed. */

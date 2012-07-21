@@ -30,6 +30,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.util.RandomChoice;
 
 public final class TileImprovementType extends FreeColGameObjectType {
 
@@ -50,6 +51,12 @@ public final class TileImprovementType extends FreeColGameObjectType {
 
     private Map<TileType, TileTypeChange> tileTypeChanges
         = new HashMap<TileType, TileTypeChange>();
+
+    /**
+     * The disasters that may strike this type of tile improvement.
+     */
+    private List<RandomChoice<Disaster>> disasters
+        = new ArrayList<RandomChoice<Disaster>>();
 
     private int movementCost;
     private float movementCostFactor;
@@ -402,6 +409,14 @@ public final class TileImprovementType extends FreeColGameObjectType {
                 change.toXML(out);
             }
         }
+
+        for (RandomChoice<Disaster> choice : disasters) {
+            out.writeStartElement("disaster");
+            out.writeAttribute("id", choice.getObject().getId());
+            out.writeAttribute("probability",
+                Integer.toString(choice.getProbability()));
+            out.writeEndElement();
+        }
     }
 
     /**
@@ -466,6 +481,11 @@ public final class TileImprovementType extends FreeColGameObjectType {
                 in.nextTag(); // close this element
             }
             tileTypeChanges.put(change.getFrom(), change);
+        } else if ("disaster".equals(childName)) {
+            Disaster disaster = getSpecification().getDisaster(in.getAttributeValue(null, "id"));
+            int probability = getAttribute(in, "probability", 100);
+            disasters.add(new RandomChoice<Disaster>(disaster, probability));
+            in.nextTag(); // close this element
         } else {
             super.readChild(in);
         }

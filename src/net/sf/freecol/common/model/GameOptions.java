@@ -129,4 +129,8 @@ public class GameOptions {
      * Does the REF "teleport" to its first target.
      */
     public static final String TELEPORT_REF = "model.option.teleportREF";
+
+    public static final String ENABLE_UPKEEP = "model.option.enableUpkeep";
+
+
 }

@@ -440,6 +440,14 @@ abstract public class Settlement extends GoodsLocation
     public abstract int getSoL();
 
     /**
+     * Returns the amount of money necessary to maintain all of the
+     * settlement's buildings.
+     *
+     * @return an <code>int</code> value
+     */
+    public abstract int getUpkeep();
+
+    /**
      * Propagates a global change in tension down to a settlement.
      * Only apply the change if the settlement is aware of the player
      * causing alarm.

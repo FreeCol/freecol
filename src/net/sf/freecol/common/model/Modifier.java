@@ -25,8 +25,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.common.model.Turn;
-
 
 /**
  * The <code>Modifier</code> class encapsulates a bonus or penalty
@@ -34,7 +32,7 @@ import net.sf.freecol.common.model.Turn;
  * combat. The Modifier may be applicable only to certain Objects
  * specified by means of <code>Scope</code> objects.
  */
-public final class Modifier extends Feature implements Comparable<Modifier> {
+public class Modifier extends Feature implements Comparable<Modifier> {
 
     public static final String OFFENCE = "model.modifier.offence";
     public static final String DEFENCE = "model.modifier.defence";
@@ -84,7 +82,7 @@ public final class Modifier extends Feature implements Comparable<Modifier> {
     // -- Constructors --
 
     @SuppressWarnings("unused")
-    private Modifier() {
+    protected Modifier() {
         // empty constructor
     }
 
@@ -159,9 +157,13 @@ public final class Modifier extends Feature implements Comparable<Modifier> {
                                          template.getValue(),
                                          template.getType());
         float inc = template.getIncrement();
+        int duration = template.getDuration();
+        // TODO: remove this, it only works for additive modifiers anyway
+        if (duration == 0) {
+            duration = (int)(template.getValue()/-inc);
+        }
         modifier.setIncrement(inc, template.getIncrementType(), start,
-                              new Turn(start.getNumber()
-                                       + (int)(template.getValue()/-inc)));
+                              new Turn(start.getNumber() + duration));
         return modifier;
     }
 

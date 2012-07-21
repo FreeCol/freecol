@@ -429,7 +429,7 @@ public class Colony extends Settlement implements Nameable {
             }
         }
     }
-            
+
     /**
      * Returns true if the colony can reduce its population
      * voluntarily. This is generally the case, but can be prevented
@@ -967,6 +967,20 @@ public class Colony extends Settlement implements Nameable {
     }
 
     /**
+     * Returns the amount of money necessary to maintain all of the
+     * colony's buildings.
+     *
+     * @return an <code>int</code> value
+     */
+    public int getUpkeep() {
+        int upkeep = 0;
+        for (Building building : buildingMap.values()) {
+            upkeep += building.getType().getUpkeep();
+        }
+        return upkeep;
+    }
+
+    /**
      * Gets the number of units inside this colony.
      *
      * @return The number of <code>Unit</code>s in this colony.
@@ -979,7 +993,7 @@ public class Colony extends Settlement implements Nameable {
      * Gets the total number of units in the work locations.
      *
      * @return The number of <code>Unit</code>s in the work locations.
-     */     
+     */
     public int getWorkLocationUnitCount() {
         int count = 0;
         for (WorkLocation w : getCurrentWorkLocations()) {
@@ -2914,7 +2928,7 @@ public class Colony extends Settlement implements Nameable {
             }
         }
         // end compatibility code
-        
+
         // Hack to kick AI colonies when the population changes.
         if (owner.isAI() && getUnitCount() != oldUnitCount) {
             firePropertyChange(REARRANGE_WORKERS, true, false);

@@ -51,6 +51,12 @@ public abstract class Feature extends FreeColObject {
     private Turn lastTurn;
 
     /**
+     * The duration of this Feature. By default, the duration is
+     * unlimited.
+     */
+    private int duration = 0;
+
+    /**
      * A list of Scopes limiting the applicability of this Feature.
      */
     private List<Scope> scopes;
@@ -152,6 +158,24 @@ public abstract class Feature extends FreeColObject {
      */
     public final void setSource(final FreeColObject newSource) {
         this.source = newSource;
+    }
+
+    /**
+     * Get the <code>Duration</code> value.
+     *
+     * @return an <code>int</code> value
+     */
+    public final int getDuration() {
+        return duration;
+    }
+
+    /**
+     * Set the <code>Duration</code> value.
+     *
+     * @param newDuration The new Duration value.
+     */
+    public final void setDuration(final int newDuration) {
+        this.duration = newDuration;
     }
 
     /**
@@ -379,6 +403,8 @@ public abstract class Feature extends FreeColObject {
         if (lastTurn != null) {
             setLastTurn(new Turn(Integer.parseInt(lastTurn)));
         }
+
+        duration = getAttribute(in, "duration", 0);
     }
 
     /**

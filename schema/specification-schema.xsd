@@ -45,6 +45,7 @@
      0.67: expand tile type change
      0.68: add role as a game object type
      0.69: add attribute editable to option group
+     0.70: add disasters, and duration to features
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 
@@ -66,6 +67,7 @@
         <xs:element ref="options"/>
         <xs:element ref="modifiers"/>
         <xs:element ref="events"/>
+        <xs:element ref="disasters"/>
       </xs:choice>
       <xs:attribute name="id" type="xs:ID"/>
       <xs:attribute name="extends" type="xs:string"/>
@@ -152,6 +154,12 @@
         <xs:element ref="primary-production"/>
         <xs:element ref="secondary-production"/>
         <xs:element ref="ability"/>
+        <xs:element name="disaster">
+          <xs:complexType>
+            <xs:attribute name="id" type="xs:string"/>
+            <xs:attribute name="probability" type="xs:int"/>
+          </xs:complexType>
+        </xs:element>
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:ID"/>
       <xs:attribute name="basic-move-cost" use="required" type="xs:nonNegativeInteger"/>
@@ -306,6 +314,12 @@
         <xs:choice>
           <xs:element ref="modifier"/>
           <xs:element ref="change"/>
+          <xs:element name="disaster">
+            <xs:complexType>
+              <xs:attribute name="id" type="xs:string"/>
+              <xs:attribute name="probability" type="xs:int"/>
+            </xs:complexType>
+          </xs:element>
         </xs:choice>
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:ID"/>
@@ -492,6 +506,46 @@
       <xs:attribute name="id" use="required" type="xs:ID"/>
       <xs:attribute name="value" type="xs:string"/>
       <xs:attribute name="scoreValue" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="disasters">
+    <xs:complexType>
+      <xs:sequence minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="disaster" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="disaster">
+    <xs:complexType>
+      <xs:sequence minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="effect" />
+      </xs:sequence>
+      <xs:attribute name="id" use="required" type="xs:string"/>
+      <xs:attribute name="extends" type="xs:string"/>
+      <xs:attribute name="abstract" type="xs:boolean" />
+      <xs:attribute name="natural" type="xs:boolean" />
+      <xs:attribute name="effects">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="ONE"/>
+            <xs:enumeration value="SEVERAL"/>
+            <xs:enumeration value="ALL"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="effect">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="modifier" />
+        <xs:element ref="scope" />
+      </xs:choice>
+      <xs:attribute name="id" use="required" type="xs:string" />
+      <xs:attribute name="probability" type="xs:int" />
     </xs:complexType>
   </xs:element>
 
@@ -888,49 +942,55 @@
     </xs:complexType>
   </xs:element>
 
+  <xs:complexType name="feature">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="scope"/>
+    </xs:sequence>
+    <xs:attribute name="id" use="required" type="xs:string"/>
+    <xs:attribute name="delete" type="xs:boolean"/>
+    <xs:attribute name="source" type="xs:string"/>
+    <xs:attribute name="duration" type="xs:int"/>
+  </xs:complexType>
+
   <xs:element name="ability">
     <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="scope"/>
-      </xs:sequence>
-      <xs:attribute name="id" use="required" type="xs:string"/>
-      <xs:attribute name="value" type="xs:boolean"/>
-      <xs:attribute name="delete" type="xs:boolean"/>
-      <xs:attribute name="source" type="xs:string"/>
+      <xs:complexContent>
+        <xs:extension base="feature">
+          <xs:attribute name="value" type="xs:boolean"/>
+        </xs:extension>
+      </xs:complexContent>
     </xs:complexType>
   </xs:element>
 
-  <xs:element name="modifier">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="scope"/>
-      </xs:sequence>
-      <xs:attribute name="id" use="required" type="xs:string"/>
-      <xs:attribute name="type">
-        <xs:simpleType>
-          <xs:restriction base="xs:token">
-            <xs:enumeration value="additive"/>
-            <xs:enumeration value="multiplicative"/>
-            <xs:enumeration value="percentage"/>
-          </xs:restriction>
-        </xs:simpleType>
-      </xs:attribute>
-      <xs:attribute name="value" type="xs:float"/>
-      <xs:attribute name="increment" use="optional" type="xs:float"/>
-      <xs:attribute name="incrementType" use="optional">
-        <xs:simpleType>
-          <xs:restriction base="xs:token">
-            <xs:enumeration value="additive"/>
-            <xs:enumeration value="multiplicative"/>
-            <xs:enumeration value="percentage"/>
-          </xs:restriction>
-        </xs:simpleType>
-      </xs:attribute>
-      <xs:attribute name="delete" type="xs:boolean"/>
-      <xs:attribute name="source" type="xs:string"/>
-      <xs:attribute name="index" type="xs:nonNegativeInteger"/>
-    </xs:complexType>
-  </xs:element>
+  <xs:element name="modifier" type="modifier" />
+
+  <xs:complexType name="modifier">
+    <xs:complexContent>
+      <xs:extension base="feature">
+        <xs:attribute name="type">
+          <xs:simpleType>
+            <xs:restriction base="xs:token">
+              <xs:enumeration value="additive"/>
+              <xs:enumeration value="multiplicative"/>
+              <xs:enumeration value="percentage"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="value" type="xs:float"/>
+        <xs:attribute name="increment" use="optional" type="xs:float"/>
+        <xs:attribute name="incrementType" use="optional">
+          <xs:simpleType>
+            <xs:restriction base="xs:token">
+              <xs:enumeration value="additive"/>
+              <xs:enumeration value="multiplicative"/>
+              <xs:enumeration value="percentage"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="index" type="xs:nonNegativeInteger"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
 
   <xs:element name="scope" type="ScopeType" />
 

@@ -19,6 +19,7 @@
         <xs:element ref="options"/>
         <xs:element ref="modifiers"/>
         <xs:element ref="events"/>
+        <xs:element ref="disasters"/>
       </xs:choice>
       <xs:attribute name="id" type="xs:ID"/>
       <xs:attribute name="extends" type="xs:string"/>
@@ -108,6 +109,12 @@
         <xs:element ref="primary-production"/>
         <xs:element ref="secondary-production"/>
         <xs:element ref="ability"/>
+        <xs:element name="disaster">
+          <xs:complexType>
+            <xs:attribute name="id" type="xs:string"/>
+            <xs:attribute name="probability" type="xs:int"/>
+          </xs:complexType>
+        </xs:element>
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:ID"/>
       <xs:attribute name="basic-move-cost" use="required" type="xs:nonNegativeInteger"/>
@@ -255,6 +262,12 @@
         <xs:choice>
           <xs:element ref="modifier"/>
           <xs:element ref="change"/>
+          <xs:element name="disaster">
+            <xs:complexType>
+              <xs:attribute name="id" type="xs:string"/>
+              <xs:attribute name="probability" type="xs:int"/>
+            </xs:complexType>
+          </xs:element>
         </xs:choice>
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:ID"/>
@@ -441,6 +454,46 @@
       <xs:attribute name="id" use="required" type="xs:ID"/>
       <xs:attribute name="value" type="xs:string"/>
       <xs:attribute name="scoreValue" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="disasters">
+    <xs:complexType>
+      <xs:sequence minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="disaster" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="disaster">
+    <xs:complexType>
+      <xs:sequence minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="effect" />
+      </xs:sequence>
+      <xs:attribute name="id" use="required" type="xs:string"/>
+      <xs:attribute name="extends" type="xs:string"/>
+      <xs:attribute name="abstract" type="xs:boolean" />
+      <xs:attribute name="natural" type="xs:boolean" />
+      <xs:attribute name="effects">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="ONE"/>
+            <xs:enumeration value="SEVERAL"/>
+            <xs:enumeration value="ALL"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="effect">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="modifier" />
+        <xs:element ref="scope" />
+      </xs:choice>
+      <xs:attribute name="id" use="required" type="xs:string" />
+      <xs:attribute name="probability" type="xs:int" />
     </xs:complexType>
   </xs:element>
 

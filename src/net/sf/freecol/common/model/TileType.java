@@ -73,6 +73,12 @@ public final class TileType extends FreeColGameObjectType {
     private AbstractGoods secondaryGoods = null;
 
     /**
+     * The disasters that may strike this type of tile.
+     */
+    private List<RandomChoice<Disaster>> disasters
+        = new ArrayList<RandomChoice<Disaster>>();
+
+    /**
      * A list of AbstractGoods produced by this TileType when it is
      * not the colony center tile.
      */
@@ -137,10 +143,10 @@ public final class TileType extends FreeColGameObjectType {
     public boolean isDirectlyHighSeasConnected() {
         return hasAbility("model.ability.moveToEurope");
     }
-    
+
     /**
      * Is this tile an elevation.
-     * 
+     *
      * @return <tt>true</tt> if and only if the tile is an elevation, <tt>false</tt> otherwise.
      */
     public boolean isElevation() {
@@ -334,6 +340,24 @@ public final class TileType extends FreeColGameObjectType {
     }
 
     /**
+     * Get the <code>Disasters</code> value.
+     *
+     * @return a <code>List<RandomChoice<Disaster>></code> value
+     */
+    public List<RandomChoice<Disaster>> getDisasters() {
+        return disasters;
+    }
+
+    /**
+     * Set the <code>Disasters</code> value.
+     *
+     * @param newDisasters The new Disasters value.
+     */
+    public void setDisasters(final List<RandomChoice<Disaster>> newDisasters) {
+        this.disasters = newDisasters;
+    }
+
+    /**
      * Can this <code>TileType</code> contain a specified <code>ResourceType</code>?
      *
      * @param resourceType a <code>ResourceType</code> to test
@@ -481,6 +505,14 @@ public final class TileType extends FreeColGameObjectType {
                 Integer.toString(choice.getProbability()));
             out.writeEndElement();
         }
+
+        for (RandomChoice<Disaster> choice : disasters) {
+            out.writeStartElement("disaster");
+            out.writeAttribute("id", choice.getObject().getId());
+            out.writeAttribute("probability",
+                Integer.toString(choice.getProbability()));
+            out.writeEndElement();
+        }
     }
 
     /**
@@ -547,6 +579,11 @@ public final class TileType extends FreeColGameObjectType {
             ResourceType type = getSpecification().getResourceType(in.getAttributeValue(null, "type"));
             int probability = getAttribute(in, "probability", 100);
             resourceType.add(new RandomChoice<ResourceType>(type, probability));
+            in.nextTag(); // close this element
+        } else if ("disaster".equals(childName)) {
+            Disaster disaster = getSpecification().getDisaster(in.getAttributeValue(null, "id"));
+            int probability = getAttribute(in, "probability", 100);
+            disasters.add(new RandomChoice<Disaster>(disaster, probability));
             in.nextTag(); // close this element
         } else {
             super.readChild(in);

@@ -134,6 +134,7 @@ public final class Specification {
     private final List<Role> roles = new ArrayList<Role>();
 
     private final List<Event> events = new ArrayList<Event>();
+    private final List<Disaster> disasters = new ArrayList<Disaster>();
     private final List<Modifier> specialModifiers = new ArrayList<Modifier>();
 
     private final Map<String, ChildReader> readerMap = new HashMap<String, ChildReader>();
@@ -193,6 +194,7 @@ public final class Specification {
         readerMap.put("equipment-types",
                       new TypeReader<EquipmentType>(EquipmentType.class, equipmentTypes));
         readerMap.put("events", new TypeReader<Event>(Event.class, events));
+        readerMap.put("disasters", new TypeReader<Disaster>(Disaster.class, disasters));
         readerMap.put("founding-fathers",
                       new TypeReader<FoundingFather>(FoundingFather.class, foundingFathers));
         readerMap.put("goods-types",
@@ -1208,6 +1210,15 @@ public final class Specification {
 
     public Event getEvent(String id) {
         return getType(id, Event.class);
+    }
+
+    // -- Disasters --
+    public List<Disaster> getDisasters() {
+        return disasters;
+    }
+
+    public Disaster getDisaster(String id) {
+        return getType(id, Disaster.class);
     }
 
     /**
