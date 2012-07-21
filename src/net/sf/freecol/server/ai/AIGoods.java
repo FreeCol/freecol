@@ -131,7 +131,8 @@ public class AIGoods extends AIObject implements Transportable {
         setTransport(null);
         if (destination != null) {
             if (destination instanceof Colony) {
-                (getAIMain().getAIColony((Colony) destination)).removeAIGoods(this);
+                AIColony aic = getAIMain().getAIColony((Colony)destination);
+                if (aic != null) aic.removeAIGoods(this);
             } else if (destination instanceof Europe) {
                 // Nothing to remove.
             } else {
