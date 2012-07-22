@@ -401,9 +401,12 @@ abstract public class Settlement extends GoodsLocation
 
             // The owner forgets about the settlement.
             Player oldOwner = owner;
-            setOwner(null);
             oldOwner.removeSettlement(this);
             oldOwner.invalidateCanSeeTiles();
+            // It is not safe to setOwner(null).  When a settlement is
+            // destroyed there is a race between this code and some
+            // display routines that still need to know who owned the
+            // dead settlement.
         }
 
         objects.addAll(super.disposeList());
