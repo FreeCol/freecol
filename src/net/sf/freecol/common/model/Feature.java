@@ -244,6 +244,7 @@ public abstract class Feature extends FreeColObject {
         hash += 31 * hash + (source == null ? 0 : source.hashCode());
         hash += 31 * hash + (firstTurn == null ? 0 : firstTurn.getNumber());
         hash += 31 * hash + (lastTurn == null ? 0 : lastTurn.getNumber());
+        hash += 31 * hash + duration;
         if (scopes != null) {
             for (Scope scope : scopes) {
                 // TODO: is this safe? It is an easy way to ignore the order
@@ -281,6 +282,9 @@ public abstract class Feature extends FreeColObject {
             } else if (feature.firstTurn == null) {
                 return false;
             } else if (firstTurn.getNumber() != feature.firstTurn.getNumber()) {
+                return false;
+            }
+            if (duration != feature.duration) {
                 return false;
             }
             if (scopes == null) {
