@@ -2111,30 +2111,28 @@ public class Unit extends FreeColGameObject
      * @return The closest <code>Location</code> where a ship can be repaired.
      */
     public Location getRepairLocation() {
-        Location closestLocation = null;
-        int shortestDistance = INFINITY;
-        Player player = getOwner();
-        Tile tile = getTile();
+        final Player player = getOwner();
+        final Tile tile = getTile();
+        PathNode path = findPathToEurope();
+        Location bestLocation = null;
+        int bestTurns = INFINITY;
+        if (path != null) {
+            bestLocation = player.getEurope();
+            bestTurns = path.getTotalTurns();
+        }
         for (Colony colony : player.getColonies()) {
-            if (colony == null || colony == tile.getColony()) continue;
-            int distance;
-            if (colony.hasAbility("model.ability.repairUnits")) {
+            if (colony != null && colony != tile.getColony()
+                && colony.hasAbility("model.ability.repairUnits")
+                && (path = this.findPath(colony.getTile())) != null
+                && path.getTotalTurns() < bestTurns) {
                 // Tile.getDistanceTo(Tile) doesn't care about
                 // connectivity, so we need to check for an available
                 // path to target colony instead
-                PathNode pn = this.findPath(colony.getTile());
-                if (pn != null
-                    && (distance = pn.getTotalTurns()) < shortestDistance) {
-                    closestLocation = colony;
-                    shortestDistance = distance;
-                }
+                bestTurns = path.getTotalTurns();
+                bestLocation = colony;
             }
         }
-        boolean connected = tile.isHighSeasConnected()
-            || (tile.getColony() != null && tile.getColony().isConnectedPort());
-        return (closestLocation != null) ? closestLocation.getTile()
-            : (connected) ? player.getEurope()
-            : null;
+        return bestLocation;
     }
 
     /**
