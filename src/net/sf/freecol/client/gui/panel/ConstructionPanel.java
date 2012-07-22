@@ -61,7 +61,6 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
     /**
      * Creates a ConstructionPanel.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param gui The <code>GUI</code> to display on.
      * @param colony The <code>Colony</code> whose construction is to be
      *     modified.

@@ -13,7 +13,6 @@ public class Animations {
     /**
      * Animates a unit move.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param gui The <code>GUI</code> to display on.
      * @param unit The <code>Unit</code> to be animated.
      * @param source The source <code>Tile</code> for the unit.
@@ -28,7 +27,6 @@ public class Animations {
     /**
      * Animates a unit attack.
      * 
-     * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param gui The <code>GUI</code> to display on.
      * @param attacker The <code>Unit</code> that is attacking.
      * @param defender The <code>Unit</code> that is defending.

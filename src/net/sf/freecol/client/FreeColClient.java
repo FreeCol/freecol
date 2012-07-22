@@ -327,7 +327,6 @@ public final class FreeColClient {
      * server.
      *
      * @return the <code>Client</code>
-     * @see #setClient
      */
     public Client getClient() {
         return serverAPI.getClient();

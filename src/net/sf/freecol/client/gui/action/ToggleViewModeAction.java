@@ -29,7 +29,7 @@ import net.sf.freecol.client.gui.GUI;
  * An action for changing view mode between move units mode and view terrain
  * mode
  *
- * @see net.sf.freecol.client.gui.ViewMode
+ * @see net.sf.freecol.client.gui.GUI
  */
 public class ToggleViewModeAction extends MapboardAction {
 

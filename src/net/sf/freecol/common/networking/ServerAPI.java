@@ -98,9 +98,6 @@ public abstract class ServerAPI {
     /**
      * Creates a new <code>ServerAPI</code>.
      *
-     * @param freeColClient The <code>FreeColClient</code> that is
-     *     communicating with a server.
-     * @param client 
      */
     public ServerAPI() {
     };
@@ -1232,7 +1229,6 @@ public abstract class ServerAPI {
      * @param host The name of the machine running the
      *            <code>FreeColServer</code>.
      * @param port The port to use when connecting to the host.
-     * @return The client.
      * @throws ConnectException
      * @throws IOException
      */

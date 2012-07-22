@@ -41,7 +41,6 @@ final class UnitAttackAnimation {
     /**
      * Build a new attack animation.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param gui The <code>GUI</code> to display on.
      * @param attacker The <code>Unit</code> that is attacking.
      * @param defender The <code>Unit</code> that is defending.

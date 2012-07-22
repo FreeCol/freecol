@@ -1214,7 +1214,6 @@ public class GUI {
     /**
      * Common utility routine to retrieve animation speed.
      *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param unit The <code>Unit</code> to be animated.
      * @return The animation speed.
      */

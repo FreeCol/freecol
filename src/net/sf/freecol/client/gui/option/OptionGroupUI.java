@@ -71,8 +71,9 @@ public final class OptionGroupUI extends JPanel
     /**
      * The constructor that will add the items to this panel.
      *
-     * @param parent The parent of this panel.
-     * @param id a <code>String</code> value
+     * @param gui
+     * @param group 
+     * @param editable 
      */
     public OptionGroupUI(GUI gui, OptionGroup group, boolean editable) {
         this.gui = gui;
@@ -118,7 +119,6 @@ public final class OptionGroupUI extends JPanel
     /**
      * Builds the JTree which represents the navigation menu and then returns it
      *
-     * @return The navigation tree.
      */
     private void buildTree(OptionGroup group, DefaultMutableTreeNode parent) {
 
