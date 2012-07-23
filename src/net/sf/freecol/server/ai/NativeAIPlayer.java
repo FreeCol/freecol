@@ -505,7 +505,7 @@ public class NativeAIPlayer extends AIPlayer {
                 availableUnits.remove(u);
                 aiUnit = getAIUnit(u);
                 if (IndianBringGiftMission.invalidReason(aiUnit) == null
-                    && map.findFullPath(u, u.getTile(), is.getTile(),
+                    && u.findFullPath(u.getTile(), is.getTile(),
                         null, CostDeciders.numberOfLegalTiles()) != null) {
                     unit = u;
                 }
@@ -524,7 +524,7 @@ public class NativeAIPlayer extends AIPlayer {
                 if (c != null
                     && is.getAlarm(c.getOwner()) != null
                     && IndianBringGiftMission.invalidReason(aiUnit, c) == null
-                    && map.findFullPath(unit, is.getTile(), c.getTile(),
+                    && unit.findFullPath(is.getTile(), c.getTile(),
                         null, CostDeciders.numberOfLegalTiles()) != null) {
                     nearbyColonies.add(c);
                 }
@@ -590,7 +590,7 @@ public class NativeAIPlayer extends AIPlayer {
                 availableUnits.remove(u);
                 aiUnit = getAIUnit(u);
                 if (IndianDemandMission.invalidReason(aiUnit) == null
-                    && map.findFullPath(u, u.getTile(), is.getTile(),
+                    && u.findFullPath(u.getTile(), is.getTile(),
                         null, CostDeciders.numberOfLegalTiles()) != null) {
                     unit = u;
                 }
@@ -609,7 +609,7 @@ public class NativeAIPlayer extends AIPlayer {
                 if (c != null
                     && is.getAlarm(c.getOwner()) != null
                     && IndianDemandMission.invalidReason(aiUnit, c) == null
-                    && map.findFullPath(unit, is.getTile(), c.getTile(),
+                    && unit.findFullPath(is.getTile(), c.getTile(),
                         null, CostDeciders.numberOfLegalTiles()) != null) {
                     nearbyColonies.add(c);
                 }

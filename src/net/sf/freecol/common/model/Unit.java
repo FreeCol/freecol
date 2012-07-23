@@ -1191,6 +1191,37 @@ public class Unit extends FreeColGameObject
     }
 
     /**
+     * Finds the fastest path from the current location to the
+     * specified one.  No carrier is provided, and the default cost
+     * decider for this unit is used.
+     *
+     * @param end The <code>Location</code> in which the path ends.
+     * @return A <code>PathNode</code> from the current location to the
+     *     end location, or null if none found.
+     */
+    public PathNode findFullPath(Location end) {
+        return findFullPath(getLocation(), end, null, null);
+    }
+
+    /**
+     * Finds a quickest path between specified locations, optionally
+     * using a carrier and special purpose cost decider.
+     *
+     * @param start The <code>Location</code> to start at.
+     * @param end The <code>Location</code> to end at.
+     * @param carrier An optional <code>Unit</code> to carry the unit.
+     * @param costDecider An optional <code>CostDecider</code> for
+     *     determining the movement costs (uses default cost deciders
+     *     for the unit/s if not provided).
+     * @return A <code>PathNode</code>, or null if no path is found.
+     */
+    public PathNode findFullPath(Location start, Location end, Unit carrier,
+                                 CostDecider costDecider) {
+        return getGame().getMap().findFullPath(this, start, end,
+                                               carrier, costDecider);
+    }
+
+    /**
      * Finds a shortest path from the current <code>Tile</code> to the one
      * specified.  Only paths on water are allowed if <code>isNaval()</code>
      * and only paths on land if not.
@@ -1291,18 +1322,10 @@ public class Unit extends FreeColGameObject
      *         or <code>INFINITY</code> if no path can be found.
      */
     public int getTurnsToReach(Tile start, Tile end) {
-        if (start == end) return 0;
-
-        PathNode p;
-        if (isOnCarrier()) {
-            Location dest = getDestination();
-            setDestination(end);
-            p = this.findPath(start, end, getCarrier());
-            setDestination(dest);
-        } else {
-            p = this.findPath(start, end);
-        }
-        return (p != null) ? p.getTotalTurns() : INFINITY;
+        PathNode path = findFullPath(start, end, 
+            (isOnCarrier()) ? getCarrier() : null,
+            CostDeciders.avoidSettlementsAndBlockingUnits());
+        return (path == null) ? INFINITY : path.getTotalTurns();
     }
 
     /**
