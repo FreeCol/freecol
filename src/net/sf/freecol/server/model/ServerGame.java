@@ -22,7 +22,9 @@ package net.sf.freecol.server.model;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -252,16 +254,20 @@ public class ServerGame extends Game implements ServerModelObject {
      * @param spanishSuccession an <code>Event</code> value
      */
     private void csSpanishSuccession(ChangeSet cs, Event spanishSuccession) {
-        Player weakestAIPlayer = null;
-        Player strongestAIPlayer = null;
+        Map<Player, Integer> scores = new HashMap<Player, Integer>();
         for (Player player : getLiveEuropeanPlayers()) {
             if (player.isREF() || !player.isAI()) continue;
+            scores.put(player, new Integer(player.getSpanishSuccessionScore()));
+        }
+        Player weakestAIPlayer = null;
+        Player strongestAIPlayer = null;
+        for (Player player : scores.keySet()) {
             if (weakestAIPlayer == null
-                || weakestAIPlayer.getScore() > player.getScore()) {
+                || scores.get(weakestAIPlayer) > scores.get(player)) {
                 weakestAIPlayer = player;
             }
             if (strongestAIPlayer == null
-                || strongestAIPlayer.getScore() < player.getScore()) {
+                || scores.get(strongestAIPlayer) < scores.get(player)) {
                 strongestAIPlayer = player;
             }
         }
@@ -276,12 +282,17 @@ public class ServerGame extends Game implements ServerModelObject {
             && (strongLimit == null || strongLimit.evaluate(strongestAIPlayer))) {
             String logMe = "Spanish succession"
                 + " in " + getTurn()
-                + " " + weakestAIPlayer.getName()
+                + " scores[";
+            for (Player player : scores.keySet()) {
+                logMe += " " + player.getName() + "=" + scores.get(player);
+            }
+            logMe += " ]\n=> " + weakestAIPlayer.getName()
                 + " cedes to " + strongestAIPlayer.getName()
                 + ":";
             for (Player player : getPlayers()) {
                 for (IndianSettlement settlement
                          : player.getIndianSettlementsWithMission(weakestAIPlayer)) {
+                    logMe += " " + settlement.getName() + "(mission)";
                     Unit missionary = settlement.getMissionary();
                     missionary.setOwner(strongestAIPlayer);
                     settlement.getTile().updatePlayerExploredTiles();
