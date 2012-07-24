@@ -218,7 +218,8 @@ public final class PreGameController {
 
         gui.setUpMouseListenersForCanvas();
 
-        if (FreeColDebugger.isInDebugMode() && FreeColDebugger.getDebugRunTurns() > 0) {
+        if (FreeColDebugger.isInDebugMode()
+            && FreeColDebugger.getDebugRunTurns() > 0) {
             freeColClient.skipTurns(FreeColDebugger.getDebugRunTurns());
         } else if (freeColClient.getGame().getTurn().getNumber() == 1) {
             ModelMessage message =

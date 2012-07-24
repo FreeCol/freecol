@@ -38,7 +38,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.option.AbstractOption;
 import net.sf.freecol.common.option.AbstractUnitOption;
@@ -1193,11 +1192,6 @@ public final class Specification {
 
         for (FreeColGameObjectType type : allTypes.values()) {
             type.applyDifficultyLevel(level);
-        }
-
-        // TODO: find a better place for this!
-        if (FreeColDebugger.getDebugLevel() >= FreeColDebugger.DEBUG_FULL) {
-            getIntegerOption(GameOptions.STARTING_MONEY).setValue(10000);
         }
 
         this.difficultyLevel = level.getId();

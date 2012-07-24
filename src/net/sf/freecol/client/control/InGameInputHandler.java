@@ -450,11 +450,7 @@ public final class InGameInputHandler extends InputHandler {
         final boolean newTurn = player.equals(newPlayer);
         if (FreeColDebugger.isInDebugMode()
             && fcc.currentPlayerIsMyPlayer()) closeMenus();
-
-        if (tryCompleteDebugRun(fcc)) {
-            fcc.quit();
-            return null;
-        }
+        FreeColDebugger.finishDebugRun(fcc, false);
 
         if (SwingUtilities.isEventDispatchThread()) {
             takeTurn(newPlayer, newTurn);
@@ -518,7 +514,7 @@ public final class InGameInputHandler extends InputHandler {
                                                        Player.class);
         Player myPlayer = freeColClient.getMyPlayer();
         if (player == myPlayer) {
-            if (tryCompleteDebugRun(freeColClient)) freeColClient.quit();
+            FreeColDebugger.finishDebugRun(freeColClient, true);
             if (freeColClient.isSinglePlayer()) {
                 if (myPlayer.getPlayerType() != Player.PlayerType.UNDEAD
                     && new ShowConfirmDialogSwingTask(null,
@@ -550,8 +546,7 @@ public final class InGameInputHandler extends InputHandler {
      */
     private Element gameEnded(Element element) {
         FreeColClient freeColClient = getFreeColClient();
-        if (tryCompleteDebugRun(freeColClient)) freeColClient.quit();
-
+        FreeColDebugger.finishDebugRun(freeColClient, true);
         Player winner = getGame().getFreeColGameObject(element.getAttribute("winner"),
                                                        Player.class);
         if (winner == freeColClient.getMyPlayer()) {
@@ -1140,27 +1135,6 @@ public final class InGameInputHandler extends InputHandler {
      * Handler methods end here.
      *
      */
-
-    /**
-     * Try to complete a debug run, if any.
-     *
-     * @param fcc The <code>FreeColClient</code> of the game.
-     * @return True if a debug run was completed.
-     */
-    public static boolean tryCompleteDebugRun(FreeColClient fcc) {
-        if (FreeColDebugger.getDebugRunTurns() != 0) return false;
-        if (FreeColDebugger.getDebugRunSave() != null) {
-            FreeColServer fcs = fcc.getFreeColServer();
-            if (fcs != null) {
-                try {
-                    fcs.saveGame(new File(".", FreeColDebugger.getDebugRunSave()),
-                        fcc.getMyPlayer().getName(),
-                        fcc.getClientOptions());
-                } catch (IOException e) {}
-            }
-        }
-        return true;
-    }
 
     /**
      * This utility class is the base class for tasks that need to run in the

@@ -714,10 +714,9 @@ public final class InGameController extends Controller {
                 if (debugOnlyAITurns > 0) {
                     if (--debugOnlyAITurns <= 0) {
                         // If this was a debug run, complete it.  This will
-                        // possibly signal the client to save and quit.
-                        if (FreeColDebugger.getDebugRunTurns() > 0) {
-                            FreeColDebugger.completeDebugRun();
-                        }
+                        // signal the client to save and quit at the next
+                        // suitable opportunity.
+                        FreeColDebugger.signalEndDebugRun();
                     }
                 }
             }

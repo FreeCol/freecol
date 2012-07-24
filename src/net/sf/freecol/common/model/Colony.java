@@ -37,7 +37,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.Settlement;
 
@@ -1496,16 +1495,15 @@ public class Colony extends Settlement implements Nameable {
      * @param amount The number of liberty to add.
      */
     public void addLiberty(int amount) {
-        if (FreeColDebugger.isInDebugMode()) {
-            getOwner().incrementLiberty(amount);
-            List<GoodsType> libertyTypeList = getSpecification().getLibertyGoodsTypeList();
-            if (getMembers() <= getUnitCount() + 1
-                && amount > 0
-                && !libertyTypeList.isEmpty()) {
-                addGoods(libertyTypeList.get(0), amount);
-            }
-            updateSoL();
+        getOwner().incrementLiberty(amount);
+        List<GoodsType> libertyTypeList = getSpecification()
+            .getLibertyGoodsTypeList();
+        if (getMembers() <= getUnitCount() + 1
+            && amount > 0
+            && !libertyTypeList.isEmpty()) {
+            addGoods(libertyTypeList.get(0), amount);
         }
+        updateSoL();
     }
 
     /**

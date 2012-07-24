@@ -64,6 +64,7 @@ import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.option.FileOption;
+import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.util.RandomChoice;
@@ -663,14 +664,11 @@ public class SimpleMapGenerator implements MapGenerator {
         }
         settlement.placeSettlement(true);
 
-        // START DEBUG:
-        if (FreeColDebugger.isInDebugMode()) {
-            for (GoodsType goodsType : map.getSpecification().getGoodsTypeList()) {
-                if (goodsType.isNewWorldGoodsType())
-                    settlement.addGoods(goodsType, 150);
+        if (FreeColDebugger.getDebugLevel() >= FreeColDebugger.DEBUG_FULL) {
+            for (GoodsType type : map.getSpecification().getGoodsTypeList()) {
+                if (type.isNewWorldGoodsType()) settlement.addGoods(type, 150);
             }
         }
-        // END DEBUG
 
         return settlement;
     }
@@ -825,6 +823,8 @@ public class SimpleMapGenerator implements MapGenerator {
 
             if (FreeColDebugger.getDebugLevel() >= FreeColDebugger.DEBUG_FULL) {
                 createDebugUnits(map, player, startTile);
+                IntegerOption op = spec.getIntegerOption(GameOptions.STARTING_MONEY);
+                if (op != null) op.setValue(10000);
             }
         }
     }

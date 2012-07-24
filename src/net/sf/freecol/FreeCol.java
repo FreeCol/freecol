@@ -526,23 +526,13 @@ public final class FreeCol {
             }
             if (line.hasOption("debug")) {
                 // If the optional argument is supplied use limited mode.
-                String optionValue = line.getOptionValue("debug");
-                FreeColDebugger.configureDebugLevel(optionValue);
+                FreeColDebugger.configureDebugLevel(line.getOptionValue("debug"));
                 // user set log level has precedence
                 if (!line.hasOption("log-level")) {
                     logLevel = Level.FINEST;
                 }
                 if (line.hasOption("debug-run")) {
-                    String opt = line.getOptionValue("debug-run");
-                    int comma = opt.indexOf(",");
-                    String turns = opt.substring(0, (comma < 0) ? opt.length()
-                                                 : comma);
-                    try {
-                        FreeColDebugger.setDebugRunTurns(Integer.parseInt(turns));
-                    } catch (NumberFormatException e) {
-                        FreeColDebugger.setDebugRunTurns(-1);
-                    }
-                    if (comma > 0) FreeColDebugger.setDebugRunSave(opt.substring(comma + 1));
+                    FreeColDebugger.configureDebugRun(line.getOptionValue("debug-run"));
                 }
             }
             if (line.hasOption("server")) {
