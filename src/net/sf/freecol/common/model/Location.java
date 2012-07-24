@@ -22,6 +22,7 @@ package net.sf.freecol.common.model;
 import java.util.Iterator;
 import java.util.List;
 
+
 /**
  * A place where a <code>Locatable</code> can be put.
  *
@@ -29,25 +30,30 @@ import java.util.List;
  */
 public interface Location {
 
+    /**
+     * Gets the id of this <code>Location</code>.
+     *
+     * @return The id.
+     * @see FreeColGameObject#getId
+     */
+    public String getId();
 
     /**
-     * Returns the Tile where this Location is located. Or null if no Tile
-     * applies.
+     * Gets the Tile associated with this Location.
      *
-     * @return The Tile where this Location is located. Or null if no Tile
-     *         applies.
+     * @return The Tile associated with this Location, or null if none found.
      */
     public Tile getTile();
 
     /**
-     * Returns the name of this location.
+     * Gets the name of this location.
      *
      * @return The name of this location.
      */
     public StringTemplate getLocationName();
 
     /**
-     * Returns the name of this location for a particular player.
+     * Gets the name of this location for a particular player.
      *
      * @param player The <code>Player</code> to return the name for.
      * @return The name of this location.
@@ -57,16 +63,16 @@ public interface Location {
     /**
      * Adds a <code>Locatable</code> to this Location.
      *
-     * @param locatable
-     *            The <code>Locatable</code> to add to this Location.
+     * @param locatable The <code>Locatable</code> to add to this Location.
+     * @return True if the locatable was added.
      */
     public boolean add(Locatable locatable);
 
     /**
      * Removes a <code>Locatable</code> from this Location.
      *
-     * @param locatable
-     *            The <code>Locatable</code> to remove from this Location.
+     * @param locatable The <code>Locatable</code> to remove from this Location.
+     * @return True if the locatable was removed.
      */
     public boolean remove(Locatable locatable);
 
@@ -74,14 +80,8 @@ public interface Location {
      * Checks if this <code>Location</code> contains the specified
      * <code>Locatable</code>.
      *
-     * @param locatable
-     *            The <code>Locatable</code> to test the presence of.
-     * @return
-     *            <ul>
-     *            <li><i>true</i> if the specified <code>Locatable</code> is
-     *            on this <code>Location</code> and
-     *            <li><i>false</i> otherwise.
-     *            </ul>
+     * @param locatable The <code>Locatable</code> to test the presence of.
+     * @return True if the locatable is present at this location.
      */
     public boolean contains(Locatable locatable);
 
@@ -89,23 +89,22 @@ public interface Location {
      * Checks whether or not the specified locatable may be added to this
      * <code>Location</code>.
      *
-     * @param locatable
-     *            The <code>Locatable</code> to add.
-     * @return The result.
+     * @param locatable The <code>Locatable</code> to add.
+     * @return True if the locatable can be added to this location.
      */
     public boolean canAdd(Locatable locatable);
 
     /**
-     * Returns the amount of Units at this Location.
+     * Gets the number of units at this Location.
      *
-     * @return The amount of Units at this Location.
+     * @return The number of units at this Location.
      */
     public int getUnitCount();
 
     /**
-     * Returns a list containing all the Units present at this Location.
+     * Gets a list of all the units present at this location.
      *
-     * @return a list containing the Units present at this location.
+     * @return A list of all the units at this location.
      */
     public List<Unit> getUnitList();
 
@@ -113,40 +112,32 @@ public interface Location {
      * Gets a <code>Iterator</code> of every <code>Unit</code> directly
      * located on this <code>Location</code>.
      *
-     * @return The <code>Iterator</code>.
+     * @return A unit <code>Iterator</code>.
      */
     public Iterator<Unit> getUnitIterator();
-
-    /**
-     * Gets the ID of this <code>Location</code>.
-     *
-     * @return The ID.
-     * @see FreeColGameObject#getId
-     */
-    public String getId();
 
     /**
      * Gets the <code>GoodsContainer</code> this <code>Location</code> use
      * for storing it's goods.
      *
      * @return The <code>GoodsContainer</code> or <code>null</code> if the
-     *         <code>Location</code> cannot store any goods.
+     *     <code>Location</code> cannot store any goods.
      */
     public GoodsContainer getGoodsContainer();
 
     /**
-     * Returns the <code>Settlement</code> this <code>Location</code> is
+     * Gets the <code>Settlement</code> this <code>Location</code> is
      * located in.
      *
-     * @return The current <code>Settlement</code> or null if none.
+     * @return The associated <code>Settlement</code>, or null if none.
      */
     public Settlement getSettlement();
 
     /**
-     * Returns the <code>Colony</code> this <code>Location</code> is
+     * Gets the <code>Colony</code> this <code>Location</code> is
      * located in.
      *
-     * @return The current <code>Colony</code> or null if none.
+     * @return The associated <code>Colony</code>, or null if none.
      */
     public Colony getColony();
 }
