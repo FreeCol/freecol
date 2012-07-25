@@ -1209,7 +1209,7 @@ public class Unit extends FreeColGameObject
      *
      * @param start The <code>Location</code> to start at.
      * @param end The <code>Location</code> to end at.
-     * @param carrier An optional <code>Unit</code> to carry the unit.
+     * @param carrier An optional carrier <code>Unit</code> to carry the unit.
      * @param costDecider An optional <code>CostDecider</code> for
      *     determining the movement costs (uses default cost deciders
      *     for the unit/s if not provided).
@@ -1312,19 +1312,49 @@ public class Unit extends FreeColGameObject
     }
 
     /**
-     * Returns the number of turns this <code>Unit</code> will have to use in
-     * order to reach the given <code>Tile</code>.
+     * Gets the number of turns required for this unit to reach a
+     * destination location from its current position.  If the unit is
+     * currently on a carrier, it will be used.
      *
-     * @param start The <code>Tile</code> to start the search from.
-     * @param end The <code>Tile</code> to be reached by this
-     *            <code>Unit</code>.
+     * @param end The destination <code>Location</code>.
+     * @return The number of turns it will take to reach the destination,
+     *         or <code>INFINITY</code> if no path can be found.
+     */
+    public int getTurnsToReach(Location end) {
+        return getTurnsToReach(getLocation(), end);
+    }
+
+    /**
+     * Gets the number of turns required for this unit to reach a
+     * destination location from a starting location.  If the unit is
+     * currently on a carrier, it will be used.
+     *
+     * @param start The <code>Location</code> to start the search from.
+     * @param end The destination <code>Location</code>.
      * @return The number of turns it will take to reach the <code>end</code>,
      *         or <code>INFINITY</code> if no path can be found.
      */
-    public int getTurnsToReach(Tile start, Tile end) {
-        PathNode path = findFullPath(start, end, 
-            (isOnCarrier()) ? getCarrier() : null,
+    public int getTurnsToReach(Location start, Location end) {
+        return getTurnsToReach(start, end, getCarrier(),
             CostDeciders.avoidSettlementsAndBlockingUnits());
+    }
+
+    /**
+     * Gets the number of turns required for this unit to reach a
+     * destination location from a starting location, using an optional
+     * carrier and cost decider.
+     *
+     * @param start The <code>Location</code> to start the search from.
+     * @param end The destination <code>Location</code>.
+     * @param carrier An optional carrier <code>Unit</code> to use.
+     * @param costDecider An optional <code>CostDecider</code> to
+     *     score the path with.
+     * @return The number of turns it will take to reach the <code>end</code>,
+     *         or <code>INFINITY</code> if no path can be found.
+     */
+    public int getTurnsToReach(Location start, Location end, Unit carrier,
+                               CostDecider costDecider) {
+        PathNode path = findFullPath(start, end, carrier, costDecider);
         return (path == null) ? INFINITY : path.getTotalTurns();
     }
 
@@ -1335,7 +1365,6 @@ public class Unit extends FreeColGameObject
      * @param destination The destination for this unit.
      * @return The number of turns it will take to reach the destination,
      *         or <code>INFINITY</code> if no path can be found.
-     */
     public int getTurnsToReach(Location destination) {
         if (destination == null) {
             logger.log(Level.WARNING, "destination == null", new Throwable());
@@ -1400,6 +1429,7 @@ public class Unit extends FreeColGameObject
         Tile start = (carrier == null) ? getTile() : carrier.getTile();
         return getTurnsToReach(start, destination.getTile());
     }
+     */
 
     /**
      * Find a path for this unit to the nearest settlement with the

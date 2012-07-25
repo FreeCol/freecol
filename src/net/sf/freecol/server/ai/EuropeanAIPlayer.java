@@ -589,17 +589,19 @@ public class EuropeanAIPlayer extends AIPlayer {
                 && (m = getMilitaryMission(aiUnit)) != null) {
                 ; // ok
 
+            } else if (unit.isAtSea()) {
+                m = null;
+
             } else if (unit.isColonist()
                 && (m = getColonistMission(aiUnit, fewColonies,
                                            workerWishes)) != null) {
                 ; // ok
 
+            } else if (m instanceof IdleAtSettlementMission) {
+                m = null;
+
             } else {
-                if (m instanceof IdleAtSettlementMission) {
-                    m = null;
-                } else {
-                    m = new IdleAtSettlementMission(aiMain, aiUnit);
-                }
+                m = new IdleAtSettlementMission(aiMain, aiUnit);
             }
             if (m != null) {
                 if (!m.isOneTime()) logger.fine("Mission-New " + m);
@@ -636,6 +638,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         /*
          * Motivated by (speed) performance: This map stores the
          * distance between the unit and the destination of a Wish:
+         * TODO: develop a generalized path cache and drop this.
          */
         HashMap<Location, Integer> distances = new HashMap<Location, Integer>(121);
         for (List<Wish> al : workerWishes.values()) {
