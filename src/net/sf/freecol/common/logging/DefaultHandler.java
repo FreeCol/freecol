@@ -28,6 +28,7 @@ import java.util.logging.LogRecord;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.networking.DOMMessage;
 
 
@@ -49,13 +50,15 @@ public final class DefaultHandler extends Handler {
      * @throws FreeColException In case the log file could not be
      *             created/written to.
      */
-    public DefaultHandler(boolean consoleLogging, String fileName) throws FreeColException {
+    public DefaultHandler(boolean consoleLogging, String fileName)
+        throws FreeColException {
         this.consoleLogging = consoleLogging;
         File file = new File(fileName);
 
         if (file.exists()) {
             if (file.isDirectory()) {
-                throw new FreeColException("Log file \"" + fileName + "\" could not be created.");
+                throw new FreeColException("Log file \"" + fileName
+                    + "\" could not be created.");
             } else if (file.isFile()) {
                 file.delete();
             }
@@ -64,17 +67,20 @@ public final class DefaultHandler extends Handler {
         try {
             file.createNewFile();
         } catch (IOException e) {
-            throw new FreeColException("Log file \"" + fileName + "\" could not be created: " + e.getMessage());
+            throw new FreeColException("Log file \"" + fileName
+                + "\" could not be created: " + e.getMessage());
         }
 
         if (!file.canWrite()) {
-            throw new FreeColException("Can not write in log file \"" + fileName + "\".");
+            throw new FreeColException("Can not write in log file \""
+                + fileName + "\".");
         }
 
         try {
             fileWriter = new FileWriter(file);
         } catch (IOException e) {
-            throw new FreeColException("Can not write in log file \"" + fileName + "\".");
+            throw new FreeColException("Can not write in log file \""
+                + fileName + "\".");
         }
 
         // We should use XMLFormatter here in the future
@@ -82,14 +88,18 @@ public final class DefaultHandler extends Handler {
         setFormatter(new TextFormatter());
 
         try {
-            String str = "FreeCol game version: " + FreeCol.getRevision() + "\n" + "FreeCol protocol version: "
-                    + DOMMessage.getFreeColProtocolVersion() + "\n\n" + "Java vendor: "
-                    + System.getProperty("java.vendor") + "\n" + "Java version: " + System.getProperty("java.version")
-                    + "\n" + "Java WM name: " + System.getProperty("java.vm.name") + "\n" + "Java WM vendor: "
-                    + System.getProperty("java.vm.vendor") + "\n" + "Java WM version: "
-                    + System.getProperty("java.vm.version") + "\n\n" + "OS name: " + System.getProperty("os.name")
-                    + "\n" + "OS architecture: " + System.getProperty("os.arch") + "\n" + "OS version: "
-                    + System.getProperty("os.version") + "\n\n";
+            String str = "FreeCol game version: " + FreeCol.getRevision()
+                + "\nFreeCol protocol version: "
+                + DOMMessage.getFreeColProtocolVersion()
+                + "\n\nJava vendor: " + System.getProperty("java.vendor")
+                + "\nJava version: " + System.getProperty("java.version")
+                + "\nJava WM name: " + System.getProperty("java.vm.name")
+                + "\nJava WM vendor: " + System.getProperty("java.vm.vendor")
+                + "\nJava WM version: " + System.getProperty("java.vm.version")
+                + "\n\nOS name: " + System.getProperty("os.name")
+                + "\nOS architecture: " + System.getProperty("os.arch")
+                + "\nOS version: " + System.getProperty("os.version")
+                + "\n\n";
             fileWriter.write(str, 0, str.length());
         } catch (IOException e) {
             e.printStackTrace();
@@ -124,16 +134,20 @@ public final class DefaultHandler extends Handler {
      * Publishes the given LogRecord by writing its data to a file using a
      * TextFormatter.
      * 
-     * @param record The log record to publish.
+     * @param record The <code>LogRecord</code> to publish.
      */
     @Override
     public void publish(LogRecord record) {
+        if (record.getThrown() != null) {
+            FreeColDebugger.handleCrash(record);
+        }
         if (record.getLevel().intValue() < getLevel().intValue()) {
             return;
         }
 
         String str = getFormatter().format(record);
-        if (consoleLogging && record.getLevel().intValue() >= Level.WARNING.intValue()) {
+        if (consoleLogging
+            && record.getLevel().intValue() >= Level.WARNING.intValue()) {
             System.err.println(str);
         }
 
