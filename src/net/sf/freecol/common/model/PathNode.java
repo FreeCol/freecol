@@ -152,6 +152,17 @@ public class PathNode {
     }
 
     /**
+     * Adds turns to the turns on this path.
+     *
+     * @param turns The number of turns to add.
+     */
+    public void addTurns(int turns) {
+        for (PathNode p = this; p != null; p = p.next) {
+            p.setTurns(p.getTurns() + turns);
+        }
+    }
+
+    /**
      * Checks if the unit using this path is still onboard its transport.
      *
      * @return <code>true</code> if the unit is still onboard a

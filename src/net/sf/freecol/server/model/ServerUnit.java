@@ -276,50 +276,34 @@ public class ServerUnit extends Unit implements ServerModelObject {
         setWorkLeft(-1);
 
         if (getLocation() instanceof HighSeas) {
+            ServerPlayer owner = (ServerPlayer)getOwner();
             Europe europe = owner.getEurope();
             Map map = getGame().getMap();
-            if (getDestination() == europe) {
-                setLocation(europe);
-                logger.info(toString() + " arrives in Europe");
+            Location dst = getDestination();
+            Location result = resolveDestination();
+            if (result == europe) {
+                logger.info(this + " arrives in Europe");
                 if (getTradeRoute() != null) {
                     setMovesLeft(0);
-                    setState(UnitState.ACTIVE);
-                    return false;
-                }
-                ServerPlayer owner = (ServerPlayer) getOwner();
-                setDestination(null);
-                cs.addMessage(See.only(owner),
-                              new ModelMessage(ModelMessage.MessageType.DEFAULT,
-                                               "model.unit.arriveInEurope",
-                                               europe, this)
-                              .add("%europe%", europe.getNameKey()));
-                setState(UnitState.ACTIVE);
-                cs.add(See.only(owner), europe, owner.getHighSeas());
-            } else if (getDestination() == map) {
-                logger.info(toString() + " arrives in America");
-                setDestination(null);
-                csMove(getFullEntryLocation().getSafeTile(getOwner(), null),
-                       random, cs);
-            } else if (getDestination() instanceof Settlement) {
-                Settlement settlement = (Settlement) getDestination();
-                // Used to setDestination(null) due to bugs with uncleared
-                // destinations.  In this case though the unit is not yet
-                // at the destination, and perhaps the bugs are now sorted.
-                PathNode path = map.findPathToEurope(this,
-                    settlement.getTile(), CostDeciders.serverAvoidIllegal());
-                Tile entry;
-                if (path == null) {
-                    entry = getFullEntryLocation();
                 } else {
-                    entry = path.getLastNode().getTile();
-                    setEntryLocation(entry);
+                    setDestination(null);
+                    cs.addMessage(See.only(owner),
+                        new ModelMessage(ModelMessage.MessageType.DEFAULT,
+                                         "model.unit.arriveInEurope",
+                                         europe, this)
+                        .add("%europe%", europe.getNameKey()));
                 }
-                csMove(entry, random, cs);
-                logger.info(toString() + " arrives in America"
-                    + ", sailing for" + settlement.getName()
-                    + " from " + entry);
+                setState(UnitState.ACTIVE);
+                setLocation(europe);
+                cs.add(See.only(owner), europe, owner.getHighSeas());
+            } else if (result instanceof Tile) {
+                Tile tile = ((Tile)result).getSafeTile(owner, random);
+                logger.info(this + " arrives in America at " + tile
+                    + ((dst == null) ? "" : ", sailing for " + dst));
+                if (dst instanceof Map) setDestination(null);
+                csMove(tile, random, cs);
             } else {
-                logger.warning(toString() + " has unsupported destination "
+                logger.warning(this + " has unsupported destination "
                                + getDestination());
             }
         } else {

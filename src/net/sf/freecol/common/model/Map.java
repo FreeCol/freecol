@@ -797,6 +797,61 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
+     * Unified argument tests for full path searches, which then finds
+     * the actual starting location for the path.  Deals with special
+     * cases like starting on a carrier and/or high seas.
+     *
+     * @param unit The <code>Unit</code> to find the path for.
+     * @param start The <code>Location</code> in which the path starts from.
+     * @param carrier An optional naval carrier <code>Unit</code> to use.
+     * @return The actual starting location.
+     * @throws IllegalArgumentException If there are any argument problems.
+     */
+    private Location findRealStart(final Unit unit, final Location start,
+                                   final Unit carrier) {
+        if (unit == null) {
+            throw new IllegalArgumentException("Null unit.");
+        } else if (carrier != null && !carrier.canCarryUnits()) {
+            throw new IllegalArgumentException("Non-carrier carrier: "
+                + carrier);
+        } else if (carrier != null && !carrier.canCarryUnit(unit)) {
+            throw new IllegalArgumentException("Carrier can not carry unit: "
+                + carrier + "/" + unit);
+        }
+        Location entry;
+        if (start == null) {
+            throw new IllegalArgumentException("Null start.");
+        } else if (start instanceof Unit) {
+            Location unitLoc = ((Unit)start).getLocation();
+            if (unitLoc == null) {
+                throw new IllegalArgumentException("Null on-carrier start.");
+            } else if (unitLoc instanceof HighSeas) {
+                if (carrier == null) {
+                    throw new IllegalArgumentException("Null carrier when starting on high seas: " + unit);
+                } else if (carrier != (Unit)start) {
+                    throw new IllegalArgumentException("Wrong carrier when starting on high seas: " + unit + "/" + carrier);
+                }
+                entry = carrier.resolveDestination();
+            } else {
+                entry = unitLoc;
+            }
+        } else if (start instanceof HighSeas) {
+            if (unit.isOnCarrier()) {
+                entry = unit.getCarrier().resolveDestination();
+            } else if (unit.isNaval()) {
+                entry = unit.resolveDestination();
+            } else {
+                throw new IllegalArgumentException("No carrier when starting on high seas: " + unit);
+            }
+        } else if (start instanceof Europe || start.getTile() != null) {
+            entry = start; // OK
+        } else {
+            throw new IllegalArgumentException("Invalid start: " + start);
+        }
+        return entry;
+    }
+
+    /**
      * Version of findPath that includes the start tile and generalized
      * start and end locations.
      *
@@ -809,38 +864,28 @@ public class Map extends FreeColGameObject implements Location {
      *     for the unit/s if not provided).
      * @return A <code>PathNode</code> starting at the start location and
      *     ending at the end location, or null if no path is found.
-     * @throws IllegalArgumentException If the unit is null, or
-     *     the start and end locations are not Europe or yield Tiles,
-     *     or the carrier/unit combination is bogus.
+     * @throws IllegalArgumentException If the unit is null, or the
+     *     start and end locations do not make sense, or the
+     *     carrier/unit combination is bogus.
      */
     public PathNode findFullPath(final Unit unit,
                                  final Location start, final Location end,
                                  final Unit carrier, CostDecider costDecider) {
-        if (unit == null) {
-            throw new IllegalArgumentException("Null unit.");
-        } else if (start == null) {
-            throw new IllegalArgumentException("Null start.");
-        } else if (!(start instanceof Europe || start.getTile() != null)) {
-            throw new IllegalArgumentException("Invalid start: " + start);
-        } else if (end == null) {
+        if (end == null) {
             throw new IllegalArgumentException("Null end.");
         } else if (!(end instanceof Europe || end.getTile() != null)) {
             throw new IllegalArgumentException("Invalid end: " + end);
-        } else if (carrier != null) {
-            if (!carrier.isNaval()) {
-                throw new IllegalArgumentException("Non-naval carrier: "
-                    + carrier);
-            } else if (unit.isNaval()) {
-                throw new IllegalArgumentException("Carrier for naval unit: "
-                    + unit);
-            }
         }
+        Location entry = findRealStart(unit, start, carrier);
+        int initialTurns = (!unit.isAtSea()) ? 0
+            : (unit.isOnCarrier()) ? unit.getCarrier().getWorkLeft()
+            : unit.getWorkLeft();
 
-        Unit waterUnit = (carrier != null) ? carrier : unit;
         PathNode path;
-        if (start instanceof Europe) {
+        Unit waterUnit = (carrier != null) ? carrier : unit;
+        if (entry instanceof Europe) {
             if (end instanceof Europe) { // The trivial(Europe) path.
-                path = new PathNode(start, unit.getMovesLeft(), 0,
+                path = new PathNode(entry, unit.getMovesLeft(), 0,
                                     false, null, null);
 
             } else { // Start in Europe, end on a Tile
@@ -854,29 +899,27 @@ public class Map extends FreeColGameObject implements Location {
 
                 // Now search forward from there to get a path in the right
                 // order (the existing one might not be optimal if reversed!)
-                Tile entry = path.getLastNode().getTile();
-                path = search(unit, entry,
+                Tile tile = path.getLastNode().getTile();
+                path = search(unit, tile,
                               getLocationGoalDecider(end.getTile()),
                               costDecider, INFINITY, carrier,
-                              getManhattenHeuristic(entry));
+                              getManhattenHeuristic(tile));
 
                 // At the front of the path insert a node for the
                 // starting location in Europe, correcting for the turns
                 // to sail to the entry location.
-                for (PathNode p = path; p != null; p = p.next) {
-                    p.setTurns(p.getTurns() + waterUnit.getSailTurns());
-                }
-                path.previous = new PathNode(start, unit.getMovesLeft(), 0,
-                                             carrier != null, null, path);
+                path.addTurns(waterUnit.getSailTurns());
+                path.previous = new PathNode(entry, unit.getMovesLeft(),
+                                             0, carrier != null, null, path);
                 path = path.previous;
             }
-        } else { // start has Tile
+        } else { // entry has Tile
             if (end instanceof Europe) {
                 // Fail fast if Europe is unattainable.
                 if (!waterUnit.getType().canMoveToHighSeas()) return null;
                 
                 // Search forwards to the high seas.
-                path = search(unit, start.getTile(), getHighSeasGoalDecider(),
+                path = search(unit, entry.getTile(), getHighSeasGoalDecider(),
                               costDecider, INFINITY, carrier, null);
                 if (path == null) return null;
 
@@ -886,8 +929,8 @@ public class Map extends FreeColGameObject implements Location {
                     seas.getTurns() + waterUnit.getSailTurns(),
                     seas.isOnCarrier(), seas, null);
 
-            } else { // start and end are Tiles
-                final Tile startTile = start.getTile();
+            } else { // entry and end are Tiles
+                final Tile startTile = entry.getTile();
                 final Tile endTile = end.getTile();
                 final GoalDecider gd = getLocationGoalDecider(endTile);
                 final SearchHeuristic sh = getManhattenHeuristic(endTile);
@@ -908,7 +951,6 @@ public class Map extends FreeColGameObject implements Location {
                             || (path.getLastNode().getCost()
                                 > carrierPath.getLastNode().getCost()))) {
                         path = carrierPath;
-                        if (path != null) logger.warning(path.fullPathToString());
                     }
                 } else if (waterUnit != null) {
                     // If there is a water unit then complex paths which
@@ -922,6 +964,7 @@ public class Map extends FreeColGameObject implements Location {
                 }
             }
         }
+        if (path != null && initialTurns != 0) path.addTurns(initialTurns);
         return path;
     }
 
@@ -941,46 +984,39 @@ public class Map extends FreeColGameObject implements Location {
      *     <code>Unit</code> is allowed to move.  This is the
      *     maximum search range for a goal.
      * @param carrier An optional naval carrier <code>Unit</code> to use.
-     * @return The path to a goal or null if none can be found.
-     * @throws IllegalArgumentException if <code>unit</code> or
-     *      <code>start</code> is null or neither Europe or yields a tile,
-     *      or the carrier/unit combination is bogus.
+     * @return The path to a goal, or null if none can be found.
+     * @throws IllegalArgumentException If the unit is null, or the
+     *     start location does not make sense, or the carrier/unit
+     *     combination is bogus.
      */
-    public PathNode searchFullPath(final Unit unit, final Location start,
+    public PathNode searchFullPath(final Unit unit, Location start,
                                    final GoalDecider goalDecider,
                                    final CostDecider costDecider,
                                    final int maxTurns, final Unit carrier) {
-        if (unit == null) {
-            throw new IllegalArgumentException("Null unit.");
-        } else if (start == null) {
-            throw new IllegalArgumentException("Null start.");
-        } else if (carrier != null) {
-            if (!carrier.isNaval()) {
-                throw new IllegalArgumentException("Non-naval carrier: "
-                    + carrier);
-            } else if (unit.isNaval()) {
-                throw new IllegalArgumentException("Carrier for naval unit: "
-                    + unit);
-            }
-        } else if (start instanceof Europe) {
+        Location entry = findRealStart(unit, start, carrier);
+        int initialTurns = (!unit.isAtSea()) ? 0
+            : (unit.isOnCarrier()) ? unit.getCarrier().getWorkLeft()
+            : unit.getWorkLeft();
+
+        PathNode path;
+        if (entry instanceof Europe) {
             Unit waterUnit = (carrier != null) ? carrier : unit;
             // Fail fast if Europe is unattainable.
             if (!waterUnit.getType().canMoveToHighSeas()) return null;
 
-            PathNode path = search(unit, (Tile)waterUnit.getEntryLocation(),
-                                   goalDecider, costDecider,
-                                   maxTurns, carrier, null);
+            path = search(unit, (Tile)waterUnit.getEntryLocation(),
+                          goalDecider, costDecider, maxTurns, carrier, null);
             if (path == null) return null;
-            for (PathNode p = path; p != null; p = p.next) {
-                p.setTurns(p.getTurns() + waterUnit.getSailTurns());
-            }
-            return path.previous = new PathNode(start, waterUnit.getMovesLeft(),
-                                                0, carrier != null, null, path);
-        } else if (start.getTile() == null) {
-            throw new IllegalArgumentException("Invalid start: " + start);
+            path.addTurns(waterUnit.getSailTurns());
+            path.previous = new PathNode(entry, waterUnit.getMovesLeft(),
+                                         0, carrier != null, null, path);
+            path = path.previous;
+        } else {
+            path = search(unit, entry.getTile(), goalDecider, costDecider,
+                          maxTurns, carrier, null);
         }
-        return search(unit, start.getTile(), goalDecider, costDecider,
-                      maxTurns, carrier, null);
+        if (path != null && initialTurns != 0) path.addTurns(initialTurns);
+        return path;
     }
 
     /**

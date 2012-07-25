@@ -3293,6 +3293,26 @@ public class Unit extends FreeColGameObject
     }
 
     /**
+     * Resolves a destination for a unit on the high seas.
+     * That is, the location where the unit will appear when it leaves
+     * the high seas, which will either be Europe or a tile.
+     *
+     * @return The location the unit should appear next after leaving
+     *      the high seas.
+     */
+    public Location resolveDestination() {
+        if (!isAtSea()) throw new IllegalArgumentException("Not at sea.");
+        PathNode path;
+        Location dst = getDestination();
+        return (dst == null) ? getFullEntryLocation()
+            : (dst instanceof Europe) ? dst
+            : (dst.getTile() == null
+               || (path = findPathToEurope(dst.getTile()))
+                == null) ? getFullEntryLocation()
+            : path.getLastNode().getTile();
+    }
+
+    /**
      * Is the unit a beached ship?
      *
      * @return True if the unit is a beached ship.

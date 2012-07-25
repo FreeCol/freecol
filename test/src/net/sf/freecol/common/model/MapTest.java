@@ -646,5 +646,18 @@ public class MapTest extends FreeColTestCase {
         assertNotNull("From-lake-settlement path should be valid.", path);
         assertEquals("From-lake-settlement path should end in Europe.", europe,
             path.getLastNode().getLocation());
+
+        // Put the unit on the carrier, put the carrier out to sea, and
+        // find a path inland.
+        colonist.setLocation(galleon);
+        galleon.setLocation(seaTile);
+        path = map.findFullPath(colonist, galleon, landTile, galleon, null);
+        assertNotNull("From-galleon path should be valid.", path);
+        assertEquals("From-galleon path should start at sea.", seaTile,
+            path.getLocation());
+        assertTrue("From-galleon path should start on carrier.",
+            path.isOnCarrier());
+        assertNotNull("From-galleon path should have a drop node.",
+            path.getTransportDropNode());
     }
 }
