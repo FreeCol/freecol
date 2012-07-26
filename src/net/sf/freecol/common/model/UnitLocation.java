@@ -121,7 +121,8 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      * @param in a <code>XMLStreamReader</code> value
      * @exception XMLStreamException if an error occurs
      */
-    public UnitLocation(Game game, XMLStreamReader in) throws XMLStreamException {
+    public UnitLocation(Game game, XMLStreamReader in)
+        throws XMLStreamException {
         super(game, in);
     }
 
@@ -136,13 +137,24 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     }
 
     /**
-     * Gets the maximum number of <code>Units</code> this Location
-     * can hold.  To be overridden by subclasses.
+     * Removes all references to this object.
      *
-     * @return Integer.MAX_VALUE, denoting no effective limit.
+     * @return A list of disposed objects.
      */
-    public int getUnitCapacity() {
-        return Integer.MAX_VALUE;
+    public List<FreeColGameObject> disposeList() {
+        List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
+        while (!units.isEmpty()) {
+            objects.addAll(units.remove(0).disposeList());
+        }
+        objects.addAll(super.disposeList());
+        return objects;
+    }
+
+    /**
+     * Dispose of this UnitLocation.
+     */
+    public void dispose() {
+        disposeList();
     }
 
     /**
@@ -157,19 +169,44 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     }
 
     /**
-     * Returns the name of this location.
+     * Returns true if there are no Units present in this Location.
      *
-     * @return The name of this location.
+     * @return a <code>boolean</code> value
+     */
+    public boolean isEmpty() {
+        return units.isEmpty();
+    }
+
+    /**
+     * Is this unit location full?
+     *
+     * @return True if this location is full.
+     */
+    public boolean isFull() {
+        return units.size() >= getUnitCapacity();
+    }
+
+
+    // Interface Location
+
+    // getId() inherited from FreeColGameObject
+
+    /**
+     * {@inheritDoc}
+     */
+    public Tile getTile() {
+        return null; // Override this where it becomes meaningful.
+    }
+
+    /**
+     * {@inheritDoc}
      */
     public StringTemplate getLocationName() {
         return StringTemplate.key(getId());
     }
 
     /**
-     * Returns the name of this location for a particular player.
-     *
-     * @param player The <code>Player</code> to return the name for.
-     * @return The name of this location.
+     * {@inheritDoc}
      */
     public StringTemplate getLocationNameFor(Player player) {
         return getLocationName();
@@ -177,44 +214,6 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
 
     /**
      * {@inheritDoc}
-     */
-    public boolean canAdd(Locatable locatable) {
-        return getNoAddReason(locatable) == NoAddReason.NONE;
-    }
-
-    /**
-     * Gets the reason why a given <code>Locatable</code> can not be
-     * added to this Location.
-     *
-     * Be careful to test for unit presence last before success
-     * (NoAddReason.NONE) except perhaps for the capacity test, so
-     * that we can treat ALREADY_PRESENT as success in some cases
-     * (e.g. if the unit changes type --- does it still have a
-     * required skill?)
-     *
-     * @param locatable The <code>Locatable</code> to test.
-     * @return The reason why adding would fail.
-     */
-    public NoAddReason getNoAddReason(Locatable locatable) {
-        Unit unit = (locatable instanceof Unit) ? (Unit) locatable : null;
-        return (unit == null)
-            ? NoAddReason.WRONG_TYPE
-            : (units == null)
-            ? NoAddReason.CAPACITY_EXCEEDED
-            : (!isEmpty() && units.get(0).getOwner() != unit.getOwner())
-            ? NoAddReason.OCCUPIED_BY_ENEMY
-            : (contains(unit))
-            ? NoAddReason.ALREADY_PRESENT
-            : (unit.getSpaceTaken() + getSpaceTaken() > getUnitCapacity())
-            ? NoAddReason.CAPACITY_EXCEEDED
-            : NoAddReason.NONE;
-    }
-
-    /**
-     * Adds a <code>Locatable</code> to this Location.
-     *
-     * @param locatable
-     *            The <code>Locatable</code> to add to this Location.
      */
     public boolean add(Locatable locatable) {
         if (locatable instanceof Unit) {
@@ -238,186 +237,133 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     }
 
     /**
-     * Removes a <code>Locatable</code> from this Location.
-     *
-     * @param locatable
-     *            The <code>Locatable</code> to remove from this Location.
+     * {@inheritDoc}
      */
     public boolean remove(Locatable locatable) {
         if (locatable instanceof Unit) {
-            return units.remove((Unit) locatable);
+            return units.remove((Unit)locatable);
         } else {
-            logger.warning("Tried to remove Locatable " + locatable
-                           + " from UnitLocation with ID " + getId() + ".");
+            logger.warning("Tried to remove non-Unit " + locatable
+                           + " from UnitLocation: " + getId());
             return false;
         }
     }
 
     /**
-     * Checks if this <code>Location</code> contains the specified
-     * <code>Locatable</code>.
-     *
-     * @param locatable
-     *            The <code>Locatable</code> to test the presence of.
-     * @return
-     *            <ul>
-     *            <li><i>true</i> if the specified <code>Locatable</code> is
-     *            on this <code>Location</code> and
-     *            <li><i>false</i> otherwise.
-     *            </ul>
+     * {@inheritDoc}
      */
     public boolean contains(Locatable locatable) {
-        return units != null && units.contains(locatable);
+        return units.contains(locatable);
     }
 
     /**
-     * Returns <code>true</code> if this Location admits the given
-     * <code>Ownable</code>. By default, this is the case if the
-     * Location and the Ownable have the same owner, or if at least
-     * one of the owners is <code>null</code>.
-     *
-     * @param ownable an <code>Ownable</code> value
-     * @return a <code>boolean</code> value
+     * {@inheritDoc}
      */
-    /*
-    public boolean admitsOwnable(Ownable ownable) {
-        return (owner == null
-                || ownable.getOwner() == null
-                || owner == ownable.getOwner());
+    public boolean canAdd(Locatable locatable) {
+        return getNoAddReason(locatable) == NoAddReason.NONE;
     }
-    */
 
     /**
-     * Returns the number of Units at this Location.
-     *
-     * @return The number of Units at this Location.
+     * {@inheritDoc}
      */
     public int getUnitCount() {
         return units.size();
     }
 
     /**
-     * Returns true if there are no Units present in this Location.
-     *
-     * @return a <code>boolean</code> value
-     */
-    public boolean isEmpty() {
-        return units.isEmpty();
-    }
-
-    /**
-     * Is this unit location full?
-     *
-     * @return True if this location is full.
-     */
-    public boolean isFull() {
-        return getUnitCount() >= getUnitCapacity();
-    }
-
-    /**
-     * Gets the Units present at this Location.
-     *
-     * @return A copy of the list containing the Units present at this location.
+     * {@inheritDoc}
      */
     public List<Unit> getUnitList() {
         return new ArrayList<Unit>(units);
     }
 
     /**
-     * Gets a <code>Iterator</code> of every <code>Unit</code> directly
-     * located on this <code>Location</code>.
-     *
-     * @return The <code>Iterator</code>.
+     * {@inheritDoc}
      */
     public Iterator<Unit> getUnitIterator() {
         return getUnitList().iterator();
     }
 
     /**
-     * Returns the <code>Tile</code> where this <code>Location</code>
-     * is located, or <code>null</code> if it is not located on a Tile.
-     *
-     * @return a <code>Tile</code> value
+     * {@inheritDoc}
      */
-    public Tile getTile() {
+    public GoodsContainer getGoodsContainer() {
         return null;
     }
 
     /**
-     * Returns the <code>Colony</code> this <code>Location</code> is
-     * located in, or <code>null</code> if it is not located in a colony.
-     *
-     * @return A <code>Colony</code>
-     */
-    public Colony getColony() {
-        return null;
-    }
-
-    /**
-     * Returns the <code>Settlement</code> this <code>Location</code>
-     * is located in, or <code>null</code> if it is not located in any
-     * settlement.
-     *
-     * @return a <code>Settlement</code> value
+     * {@inheritDoc}
      */
     public Settlement getSettlement() {
         return null;
     }
 
     /**
-     * Gets the <code>GoodsContainer</code> this <code>Location</code>
-     * use for storing it's goods, or <code>null</code> if the
-     * <code>Location</code> cannot store any goods.
-     *
-     * @return A <code>GoodsContainer</code> value
+     * {@inheritDoc}
      */
-    public GoodsContainer getGoodsContainer() {
+    public Colony getColony() {
         return null;
     }
 
 
+    // Overrideable routines to be implemented by UnitLocation subclasses.
+
     /**
-     * Removes all references to this object.
+     * Gets the reason why a given <code>Locatable</code> can not be
+     * added to this Location.
      *
-     * @return A list of disposed objects.
+     * Be careful to test for unit presence last before success
+     * (NoAddReason.NONE) except perhaps for the capacity test, so
+     * that we can treat ALREADY_PRESENT as success in some cases
+     * (e.g. if the unit changes type --- does it still have a
+     * required skill?)
+     *
+     * TODO: consider moving this up to Location.
+     *
+     * @param locatable The <code>Locatable</code> to test.
+     * @return The reason why adding would fail.
      */
-    public List<FreeColGameObject> disposeList() {
-        List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
-        while (!units.isEmpty()) {
-            objects.addAll(units.remove(0).disposeList());
-        }
-        objects.addAll(super.disposeList());
-        return objects;
+    public NoAddReason getNoAddReason(Locatable locatable) {
+        Unit unit = (locatable instanceof Unit) ? (Unit) locatable : null;
+        return (unit == null)
+            ? NoAddReason.WRONG_TYPE
+            : (units == null)
+            ? NoAddReason.CAPACITY_EXCEEDED
+            : (!isEmpty() && units.get(0).getOwner() != unit.getOwner())
+            ? NoAddReason.OCCUPIED_BY_ENEMY
+            : (contains(unit))
+            ? NoAddReason.ALREADY_PRESENT
+            : (unit.getSpaceTaken() + getSpaceTaken() > getUnitCapacity())
+            ? NoAddReason.CAPACITY_EXCEEDED
+            : NoAddReason.NONE;
     }
 
     /**
-     * Dispose of this UnitLocation.
+     * Gets the maximum number of <code>Units</code> this Location
+     * can hold.  To be overridden by subclasses.
+     *
+     * @return Integer.MAX_VALUE, denoting no effective limit.
      */
-    public void dispose() {
-        disposeList();
+    public int getUnitCapacity() {
+        return Integer.MAX_VALUE;
     }
 
+
+    // Serialization
 
     /**
      * {@inheritDoc}
      */
-    @Override
     protected void writeAttributes(XMLStreamWriter out)
         throws XMLStreamException {
         out.writeAttribute(ID_ATTRIBUTE, getId());
     }
 
     /**
-     * Serialize the children of this UnitLocation, i.e. the Units
-     * themselves.
-     *
-     * @param out a <code>XMLStreamWriter</code> value
-     * @param player a <code>Player</code> value
-     * @param showAll a <code>boolean</code> value
-     * @param toSavedGame a <code>boolean</code> value
-     * @exception XMLStreamException if an error occurs
+     * {@inheritDoc}
      */
-    protected void writeChildren(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
+    protected void writeChildren(XMLStreamWriter out, Player player,
+                                 boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
         for (Unit unit : units) {
             unit.toXML(out, player, showAll, toSavedGame);
@@ -434,17 +380,17 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
         }
     }
 
-
+    /**
+     * {@inheritDoc}
+     */
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
         if (Unit.getXMLElementTagName().equals(in.getLocalName())) {
             Unit unit = updateFreeColGameObject(in, Unit.class);
-            if (!units.contains(unit)) {
-                units.add(unit);
-            }
+            if (!units.contains(unit)) units.add(unit);
         } else {
-            logger.warning("Found unknown child element '" + in.getLocalName() + "' of UnitLocation " + getId() + ".");
+            logger.warning("Found unknown child element '" + in.getLocalName()
+                + "' of UnitLocation " + getId() + ".");
             in.nextTag();
         }
     }
-
 }
