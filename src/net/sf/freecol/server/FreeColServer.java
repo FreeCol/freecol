@@ -1326,20 +1326,21 @@ public final class FreeColServer {
     }
 
     /**
-     * Makes the entire map visible for all players. Used only when debugging
-     * (will be removed).
+     * Reveals or hides the entire map for all players.
+     * Debug menu helper.
+     *
+     * @param reveal If true, reveal, if false, hide.
      */
-    public void revealMapForAllPlayers() {
-        Iterator<Player> playerIterator = getGame().getPlayerIterator();
-        while (playerIterator.hasNext()) {
-            ServerPlayer player = (ServerPlayer) playerIterator.next();
-            player.revealMap();
+    public void exploreMapForAllPlayers(boolean reveal) {
+        for (Player player : getGame().getLiveEuropeanPlayers()) {
+            ((ServerPlayer)player).exploreMap(reveal);
         }
-        playerIterator = getGame().getPlayerIterator();
-        while (playerIterator.hasNext()) {
-            ServerPlayer player = (ServerPlayer) playerIterator.next();
+        getSpecification().getBooleanOption(GameOptions.FOG_OF_WAR)
+            .setValue(reveal);
+
+        for (Player player : getGame().getLiveEuropeanPlayers()) {
             try {
-                player.getConnection()
+                ((ServerPlayer)player).getConnection()
                     .sendDumping(DOMMessage.createMessage("reconnect"));
             } catch (IOException e) {
                 logger.log(Level.WARNING, "Error sending reconnect.", e);

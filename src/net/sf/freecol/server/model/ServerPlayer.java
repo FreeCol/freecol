@@ -773,7 +773,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
         return tile.isExploredBy(this);
     }
 
-
     /**
      * Sets the given tile to be explored by this player and updates
      * the player's information about the tile.
@@ -782,6 +781,19 @@ public class ServerPlayer extends Player implements ServerModelObject {
         tile.setExploredBy(this, true);
     }
 
+    /**
+     * Makes the entire map visible.
+     * Debug mode helper.
+     *
+     * @param reveal If true, reveal the map, if false, hide it.
+     */
+    public void exploreMap(boolean reveal) {
+        for (Tile tile : getGame().getMap().getAllTiles()) {
+            tile.setExploredBy(this, reveal);
+        }
+        resetExploredTiles(getGame().getMap());
+        invalidateCanSeeTiles();
+    }
 
     /**
      * Sets the tiles within the given <code>Unit</code>'s line of
@@ -871,19 +883,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
         if (!checkGold(mercPrice)) mercPrice = getGold();
         return mercPrice;
-    }
-
-    /**
-     * Makes the entire map visible.
-     * Debug mode helper.
-     */
-    public void revealMap() {
-        for (Tile tile: getGame().getMap().getAllTiles()) {
-            setExplored(tile);
-        }
-        getSpecification().getBooleanOption(GameOptions.FOG_OF_WAR)
-            .setValue(false);
-        invalidateCanSeeTiles();
     }
 
     /**

@@ -157,7 +157,7 @@ public class DebugMenu extends JMenu {
         this.add(reveal);
         reveal.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    server.revealMapForAllPlayers();
+                    server.exploreMapForAllPlayers(true);
                     reveal.setEnabled(false);
                     game.getSpecification()
                         .getBooleanOption(GameOptions.FOG_OF_WAR)
@@ -165,6 +165,22 @@ public class DebugMenu extends JMenu {
                 }
             });
         reveal.setEnabled(server != null);
+
+        final JMenuItem hide
+            = new JCheckBoxMenuItem(Messages.message("menuBar.debug.hideEntireMap"));
+        hide.setOpaque(false);
+        //hide.setMnemonic(KeyEvent.VK_R);
+        this.add(hide);
+        hide.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    server.exploreMapForAllPlayers(false);
+                    hide.setEnabled(false);
+                    game.getSpecification()
+                        .getBooleanOption(GameOptions.FOG_OF_WAR)
+                        .setValue(false);
+                }
+            });
+        hide.setEnabled(server != null);
 
         final JMenu cvpMenu
             = new JMenu(Messages.message("menuBar.debug.showColonyValue"));
