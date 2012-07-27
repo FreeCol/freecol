@@ -1359,79 +1359,6 @@ public class Unit extends FreeColGameObject
     }
 
     /**
-     * Returns the number of turns this <code>Unit</code> will have to
-     * use in order to reach the given <code>Location</code>.
-     *
-     * @param destination The destination for this unit.
-     * @return The number of turns it will take to reach the destination,
-     *         or <code>INFINITY</code> if no path can be found.
-    public int getTurnsToReach(Location destination) {
-        if (destination == null) {
-            logger.log(Level.WARNING, "destination == null", new Throwable());
-        }
-
-        boolean toEurope = destination instanceof Europe;
-        Unit carrier = getCarrier();
-        PathNode p;
-
-        // Handle the special cases of travelling to and from Europe
-        if (toEurope) {
-            if (isInEurope()) {
-                return 0;
-            } else if (isNaval()) {
-                p = this.findPathToEurope();
-            } else if (carrier != null) {
-                p = carrier.findPathToEurope();
-            } else {
-                return INFINITY;
-            }
-            return (p == null) ? INFINITY : p.getTotalTurns();
-        }
-        if (isInEurope()) {
-            if (isNaval()) {
-                p = this.findPath(getFullEntryLocation(),
-                                  destination.getTile());
-            } else {
-                if (carrier == null) {
-                    // Pick a carrier.  If none found the unit is stuck!
-                    for (Unit u : getOwner().getUnits()) {
-                        if (u.isNaval()) {
-                            carrier = u;
-                            break;
-                        }
-                    }
-                    if (carrier == null) return INFINITY;
-                }
-                if (carrier.getFullEntryLocation().getTile()
-                    == destination.getTile()) return carrier.getSailTurns();
-                p = this.findPath(carrier.getFullEntryLocation(),
-                                  destination.getTile(), carrier);
-            }
-            return (p == null) ? INFINITY
-                : p.getTotalTurns() + carrier.getSailTurns();
-        }
-        if (isAtSea()) {
-            if (isNaval()) {
-                p = this.findPath(getFullEntryLocation(),
-                                  destination.getTile());
-                carrier = this;
-            } else {
-                if (carrier == null) return INFINITY;
-                p = this.findPath(carrier.getFullEntryLocation(),
-                                  destination.getTile(), carrier);
-            }
-            return (p == null) ? INFINITY : p.getTotalTurns()
-                + carrier.getWorkLeft();
-        }
-
-        // Not in Europe, at sea, or going to Europe, so there must be
-        // a well defined start and end tile.
-        Tile start = (carrier == null) ? getTile() : carrier.getTile();
-        return getTurnsToReach(start, destination.getTile());
-    }
-     */
-
-    /**
      * Find a path for this unit to the nearest settlement with the
      * same owner that is reachable without a carrier.
      *
@@ -1595,7 +1522,7 @@ public class Unit extends FreeColGameObject
                         PathNode reverse;
                         if (u.canAttack(unit)
                             && cm.calculateCombatOdds(u, unit).win >= threat
-                            && (reverse = u.findPath(start)) != null
+                            && (reverse = u.findFullPath(start)) != null
                             && reverse.getTotalTurns() < range) {
                             found = path;
                             return true;
@@ -2176,7 +2103,7 @@ public class Unit extends FreeColGameObject
         for (Colony colony : player.getColonies()) {
             if (colony != null && colony != tile.getColony()
                 && colony.hasAbility("model.ability.repairUnits")
-                && (path = this.findPath(colony.getTile())) != null
+                && (path = this.findFullPath(colony.getTile())) != null
                 && path.getTotalTurns() < bestTurns) {
                 // Tile.getDistanceTo(Tile) doesn't care about
                 // connectivity, so we need to check for an available
