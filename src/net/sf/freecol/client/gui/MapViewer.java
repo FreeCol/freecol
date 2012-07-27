@@ -2149,6 +2149,11 @@ public final class MapViewer {
             Player clientPlayer = freeColClient.getMyPlayer();
             for (int index = 0; index < settlements.size(); index++) {
                 final Settlement settlement = settlements.get(index);
+                if (settlement.isDisposed()) {
+                    logger.warning("Settlement display race detected: "
+                                   + settlement.getName());
+                    continue;
+                }
                 String name = Messages.message(settlement.getNameFor(clientPlayer));
                 if (name != null) {
                     Color backgroundColor = lib.getColor(settlement.getOwner());

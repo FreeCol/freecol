@@ -307,13 +307,7 @@ public class ProductionCache {
             goodsType = g;
             workLocation = w;
             unit = u;
-            if (workLocation instanceof ColonyTile) {
-                production = ((ColonyTile) workLocation).getWorkTile().potential(goodsType, unit.getType());
-            } else if (workLocation instanceof Building) {
-                production = ((Building) workLocation).getUnitProductivity(unit);
-            } else {
-                production = 0;
-            }
+            production = w.getProductionOf(u, g);
             GoodsType expertProduction = unit.getType().getExpertProduction();
             if (expertProduction != null) {
                 if (expertProduction == goodsType) {

@@ -65,8 +65,18 @@ public class ProductionCache {
 
 
     /**
-     * Updates all data structures. The method has no side effects.
+     * Updates all data structures.  The method has no side effects.
      *
+     * For now, there is a hard assumption that ColonyTiles do not
+     * consume but Buildings do.  One day we may want to generalize
+     * this, which will require processing the goods types in an order
+     * sorted by the requirement dependencies.  But not yet.  This
+     * assumption is made explicit by getting the ProductionInfo from
+     * ColonyTiles with the simple getBasicProductionInfo() routine,
+     * but from Buildings with getAdjustedProductionInfo() which takes
+     * account of the input and output goods levels.  Ideally these
+     * should be unified into a WorkLocation.getProductionInfo with the
+     * Building-form arguments.
      */
     private synchronized void update() {
         if (upToDate) return; // nothing to do
@@ -74,17 +84,15 @@ public class ProductionCache {
         netProduction.clear();
         goodsUsed.clear();
         ProductionMap production = new ProductionMap();
+
         for (ColonyTile colonyTile : colony.getColonyTiles()) {
-            List<AbstractGoods> p = colonyTile.getProduction();
-            if (!p.isEmpty()) {
-                production.add(p);
-                ProductionInfo info = new ProductionInfo();
-                info.addProduction(p);
-                productionAndConsumption.put(colonyTile, info);
-                for (AbstractGoods goods : p) {
-                    goodsUsed.add(goods.getType());
-                    netProduction.incrementCount(goods.getType().getStoredAs(), goods.getAmount());
-                }
+            ProductionInfo info = colonyTile.getBasicProductionInfo();
+            production.add(info.getProduction());
+            productionAndConsumption.put(colonyTile, info);
+            for (AbstractGoods goods : info.getProduction()) {
+                goodsUsed.add(goods.getType());
+                netProduction.incrementCount(goods.getType().getStoredAs(),
+                                             goods.getAmount());
             }
         }
 
@@ -120,7 +128,7 @@ public class ProductionCache {
                     output = new AbstractGoods(production.get(outputType));
                     output.setAmount(output.getAmount() + getGoodsCount(outputType));
                 }
-                info = building.getProductionInfo(output, goods);
+                info = building.getAdjustedProductionInfo(output, goods);
             } else if (consumer instanceof Unit) {
                 info = ((Unit) consumer).getProductionInfo(goods);
             } else if (consumer instanceof BuildQueue) {

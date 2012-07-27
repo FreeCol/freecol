@@ -153,18 +153,18 @@ public class IndividualFatherTest extends FreeColTestCase {
 
         statesman1.setType(statesmanType);
         statesman1.setLocation(townHall);
-        assertEquals(6 + 1, townHall.getProductionOf(bellsType));
+        assertEquals(6 + 1, townHall.getTotalProductionOf(bellsType));
 
         statesman2.setType(statesmanType);
         statesman2.setLocation(townHall);
-        assertEquals(2 * 6 + 1, townHall.getProductionOf(bellsType));
+        assertEquals(2 * 6 + 1, townHall.getTotalProductionOf(bellsType));
 
         statesman3.setType(statesmanType);
         statesman3.setLocation(townHall);
-        assertEquals(3 * 6 + 1, townHall.getProductionOf(bellsType));
+        assertEquals(3 * 6 + 1, townHall.getTotalProductionOf(bellsType));
 
         player.setTax(20);
-        assertEquals(3 * 6 + 1, townHall.getProductionOf(bellsType));
+        assertEquals(3 * 6 + 1, townHall.getTotalProductionOf(bellsType));
 
         FoundingFather paine
             = spec().getFoundingFather("model.foundingFather.thomasPaine");
@@ -181,13 +181,13 @@ public class IndividualFatherTest extends FreeColTestCase {
         assertEquals(player.getTax(), (int) paineModifier.getValue());
 
         int expected = (int) (3 * 6 * 1.2f + 1);
-        assertEquals(expected, townHall.getProductionOf(bellsType));
+        assertEquals(expected, townHall.getTotalProductionOf(bellsType));
 
         player.setTax(30);
         player.recalculateBellsBonus();
 
         expected = (int) (3 * 6 * 1.3f + 1);
-        assertEquals(expected, townHall.getProductionOf(bellsType));
+        assertEquals(expected, townHall.getTotalProductionOf(bellsType));
     }
 
     public void testRevere() {
@@ -318,13 +318,13 @@ public class IndividualFatherTest extends FreeColTestCase {
 
         assertEquals(0, player.getModifierSet("model.goods.bells").size());
         assertEquals(1, colony.getModifierSet("model.goods.bells").size());
-        assertEquals(4, townHall.getProduction());
+        assertEquals(4, townHall.getTotalProductionOf(bellsType));
 
         player.addFather(jefferson);
         assertEquals(1, player.getModifierSet("model.goods.bells").size());
         assertEquals(2, colony.getModifierSet("model.goods.bells").size());
-        assertEquals(2, townHall.getProductionModifiers().size());
-        assertEquals(5, townHall.getProduction());
+        assertEquals(2, townHall.getProductionModifiers(bellsType, null).size());
+        assertEquals(5, townHall.getTotalProductionOf(bellsType));
     }
 
     public void lasCasas() {

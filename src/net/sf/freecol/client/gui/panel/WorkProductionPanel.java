@@ -73,8 +73,8 @@ public class WorkProductionPanel extends FreeColPanel {
         if (unit.getLocation() instanceof ColonyTile) {
             ColonyTile colonyTile = (ColonyTile) unit.getLocation();
             GoodsType goodsType = unit.getWorkType();
-            Set<Modifier> tileModifiers = colonyTile.getProductionModifiers(goodsType, unitType);
-            if (FeatureContainer.applyModifierSet(0f, turn, tileModifiers) > 0) {
+            List<Modifier> tileModifiers = colonyTile.getProductionModifiers(goodsType, unitType);
+            if (FeatureContainer.applyModifiers(0f, turn, tileModifiers) > 0) {
                 tileModifiers.addAll(unit.getModifierSet(goodsType.getId()));
                 unitModifiers.addAll(tileModifiers);
                 if (colony.getProductionBonus() != 0) {

@@ -618,7 +618,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                 for (GoodsType goodsType : spec.getGoodsTypeList()) {
                     if (goodsType.isBuildingMaterial()
                         && !goodsType.isStorable()
-                        && getProductionOf(goodsType) > 0) {
+                        && getTotalProductionOf(goodsType) > 0) {
                         // Production is idle
                         cs.addMessage(See.only(owner),
                             new ModelMessage(ModelMessage.MessageType.WARNING,

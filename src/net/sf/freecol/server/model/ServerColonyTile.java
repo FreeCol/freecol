@@ -72,25 +72,7 @@ public class ServerColonyTile extends ColonyTile implements ServerModelObject {
         ServerPlayer owner = (ServerPlayer) colony.getOwner();
 
         Tile workTile = getWorkTile();
-        if (isColonyCenterTile()) {
-            /*
-            GoodsType goodsType;
-            if (workType.getPrimaryGoods() != null) {
-                colony.addGoods(getPrimaryProduction());
-            }
-            if (workType.getSecondaryGoods() != null) {
-                colony.addGoods(getSecondaryProduction());
-            }
-            */
-        } else if (!isEmpty() && canBeWorked()) {
-            /*
-            int amount = getProductionOf(unit.getWorkType());
-            if (amount > 0) {
-                colony.addGoods(unit.getWorkType(), amount);
-                unit.setExperience(amount + unit.getExperience());
-                cs.addPartial(See.only(owner), unit, "experience");
-            }
-            */
+        if (!isColonyCenterTile() && !isEmpty() && canBeWorked()) {
             for (Unit unit : getUnitList()) {
                 Resource resource
                     = workTile.expendResource(unit.getWorkType(),

@@ -226,7 +226,6 @@ public class TileTest extends FreeColTestCase {
     }
 
     public void testPrimarySecondaryGoods() {
-
         Game game = getStandardGame();
         game.setMap(getTestMap(true));
         Colony colony = getStandardColony();
@@ -242,9 +241,11 @@ public class TileTest extends FreeColTestCase {
         assertEquals(cotton, secondaryProduction.getType());
         assertEquals(2, secondaryProduction.getAmount());
 
-        TileImprovement ti = new TileImprovement(game, tile, spec().getTileImprovementType("model.improvement.plow"));
+        TileImprovement ti = new TileImprovement(game, tile,
+            spec().getTileImprovementType("model.improvement.plow"));
         ti.setTurnsToComplete(0);
         tile.add(ti);
+        colony.invalidateCache();
 
         production = center.getProduction();
         assertEquals(2, production.size());
@@ -256,6 +257,8 @@ public class TileTest extends FreeColTestCase {
         assertEquals(2, secondaryProduction.getAmount());
 
         tile.setType(plainsForest);
+        colony.invalidateCache();
+
         production = center.getProduction();
         assertEquals(2, production.size());
         primaryProduction = production.get(0);
@@ -265,9 +268,11 @@ public class TileTest extends FreeColTestCase {
         assertEquals(furs, secondaryProduction.getType());
         assertEquals(3, secondaryProduction.getAmount());
 
-        ti = new TileImprovement(game, tile, spec().getTileImprovementType("model.improvement.road"));
+        ti = new TileImprovement(game, tile, 
+            spec().getTileImprovementType("model.improvement.road"));
         ti.setTurnsToComplete(0);
         tile.add(ti);
+        colony.invalidateCache();
 
         production = center.getProduction();
         assertEquals(2, production.size());
@@ -277,7 +282,6 @@ public class TileTest extends FreeColTestCase {
         assertEquals(3, primaryProduction.getAmount());
         assertEquals(furs, secondaryProduction.getType());
         assertEquals(3, secondaryProduction.getAmount());
-
     }
 
     public void testPotential() {
@@ -434,20 +438,27 @@ public class TileTest extends FreeColTestCase {
         assertTrue(tile2.hasRoad());
         assertFalse(tile2.hasRiver());
 
-        assertTrue(hasBonusFromSource(tile1.getProductionBonus(sugar, null), river1.getType()));
-        assertFalse(hasBonusFromSource(tile1.getProductionBonus(lumber, null), river1.getType()));
-        assertFalse(hasBonusFromSource(tile2.getProductionBonus(sugar, null), road2.getType()));
-        assertTrue(hasBonusFromSource(tile2.getProductionBonus(ore, null), road2.getType()));
+        assertTrue(hasBonusFrom(tile1.getProductionModifiers(sugar, null),
+                                river1.getType()));
+        assertTrue(hasBonusFrom(tile1.getProductionModifiers(lumber, null),
+                                river1.getType()));
+        assertFalse(hasBonusFrom(tile2.getProductionModifiers(sugar, null),
+                                 road2.getType()));
+        assertTrue(hasBonusFrom(tile2.getProductionModifiers(ore, null),
+                                road2.getType()));
 
         tile1.addResource(new Resource(game, tile1, sugarResource));
 
-        assertTrue(hasBonusFromSource(tile1.getProductionBonus(sugar, null), savannah));
-        assertTrue(hasBonusFromSource(tile1.getProductionBonus(sugar, null), river1.getType()));
-        assertTrue(hasBonusFromSource(tile1.getProductionBonus(sugar, null), sugarResource));
-
+        assertTrue(hasBonusFrom(tile1.getProductionModifiers(sugar, null),
+                                savannah));
+        assertTrue(hasBonusFrom(tile1.getProductionModifiers(sugar, null),
+                                river1.getType()));
+        assertTrue(hasBonusFrom(tile1.getProductionModifiers(sugar, null),
+                                sugarResource));
     }
 
-    private boolean hasBonusFromSource(Set<Modifier> modifierSet, FreeColGameObjectType source) {
+    private boolean hasBonusFrom(List<Modifier> modifierSet,
+                                 FreeColGameObjectType source) {
         for (Modifier modifier : modifierSet) {
             if (source.equals(modifier.getSource())) {
                 return true;
@@ -562,21 +573,21 @@ public class TileTest extends FreeColTestCase {
         Tile tile = colony.getTile().getNeighbourOrNull(Map.Direction.N);
         ColonyTile colonyTile = colony.getColonyTile(tile);
         tile.addResource(new Resource(game, tile, mineralsResource));
-        if (colonyTile.getUnit() != null) {
-            colonyTile.getUnit().setLocation(colony.getBuilding(townHallType));
+        if (!colonyTile.isEmpty()) {
+            colonyTile.getUnitList().get(0).setLocation(colony.getBuilding(townHallType));
         }
-        assertNull(colonyTile.getUnit());
+        assertTrue(colonyTile.isEmpty());
 
         Unit unit = colony.getUnitList().get(0);
         assertEquals(colonistType, unit.getType());
         assertTrue(silver.isFarmed());
         assertEquals(0, tundra.getProductionOf(silver, colonistType));
         assertEquals(1, tile.potential(silver, colonistType));
+        
+        assertFalse(tile.getProductionModifiers(silver, unit.getType())
+            .isEmpty());
 
-        Set<Modifier> modifiers = tile.getProductionBonus(silver, unit.getType());
-        assertFalse(modifiers.isEmpty());
-
-        assertEquals(1, colonyTile.getProductionOf(unit, silver));
+        assertEquals(1, colonyTile.getPotentialProduction(silver, unit.getType()));
         assertEquals(colonyTile.getWorkTile().getOwningSettlement(), colony);
         assertTrue(colonyTile.canBeWorked());
         assertTrue(colonyTile.canAdd(unit));

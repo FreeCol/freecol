@@ -618,7 +618,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         // What goods are really needed?
         List<GoodsType> needed = new ArrayList<GoodsType>();
         for (GoodsType g : spec.getRawBuildingGoodsTypeList()) {
-            if (colony.getProductionOf(g) <= 0) needed.add(g);
+            if (colony.getTotalProductionOf(g) <= 0) needed.add(g);
         }
 
         // If a tile can be stolen, do so if already at war with the
@@ -687,7 +687,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             for (WorkLocation wl : colony.getAvailableWorkLocations()) {
                 if (!wl.canAdd(u)) continue;
                 for (GoodsType type : libertyGoods) {
-                    if (wl.getPotentialProduction(u.getType(), type) > 0
+                    if (wl.getPotentialProduction(type, u.getType()) > 0
                         && AIMessage.askWork(getAIUnit(u), wl)
                         && u.getLocation() == wl) {
                         AIMessage.askChangeWorkType(getAIUnit(u), type);

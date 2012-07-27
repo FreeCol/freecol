@@ -1082,8 +1082,7 @@ public class Colony extends Settlement implements Nameable {
         }
 
         for (Building building : buildingMap.values()) {
-            if (building.canTeach() &&
-                building.canAdd(unitType)) {
+            if (building.canTeach() && building.canAddType(unitType)) {
                 return true;
             }
         }
@@ -1652,23 +1651,22 @@ public class Colony extends Settlement implements Nameable {
     public int getFoodProduction() {
         int result = 0;
         for (GoodsType foodType : getSpecification().getFoodGoodsTypeList()) {
-            result += getProductionOf(foodType);
+            result += getTotalProductionOf(foodType);
         }
         return result;
     }
 
     /**
-     * Returns the production of the given type of goods.
+     * Gets the total production of the given type of goods.
      *
      * @param goodsType The type of goods to get the production for.
      * @return The production of the given type of goods the current turn by all
-     *         of the <code>Colony</code>'s {@link Building buildings} and
-     *         {@link ColonyTile tiles}.
+     *     of the <code>WorkLocation</code>s in the colony.
      */
-    public int getProductionOf(GoodsType goodsType) {
+    public int getTotalProductionOf(GoodsType goodsType) {
         int amount = 0;
         for (WorkLocation workLocation : getCurrentWorkLocations()) {
-            amount += workLocation.getProductionOf(goodsType);
+            amount += workLocation.getTotalProductionOf(goodsType);
         }
         return amount;
     }
@@ -1720,7 +1718,8 @@ public class Colony extends Settlement implements Nameable {
                     switch (tile.getNoAddReason(unit)) {
                     case NONE: case ALREADY_PRESENT:
                         for (GoodsType type : rawTypes) {
-                            int amount = tile.getProductionOf(unit, type);
+                            int amount = tile.getPotentialProduction(type,
+                                unit.getType());
                             if (amount > bestAmount) {
                                 bestAmount = amount;
                                 bestWork = type;
@@ -1778,7 +1777,8 @@ public class Colony extends Settlement implements Nameable {
         for (GoodsType foodType : getSpecification().getFoodGoodsTypeList()) {
             ColonyTile colonyTile = getVacantColonyTileFor(unit, false, foodType);
             if (colonyTile != null) {
-                int production = colonyTile.getProductionOf(unit, foodType);
+                int production = colonyTile.getPotentialProduction(foodType,
+                    unit.getType());
                 if (production > bestProduction) {
                     bestProduction = production;
                     bestTile = colonyTile;
@@ -1841,7 +1841,8 @@ public class Colony extends Settlement implements Nameable {
         for (Building building : buildings) {
             switch (building.getNoAddReason(unit)) {
             case NONE: case ALREADY_PRESENT:
-                int prod = building.getProductionOf(unit, goodsType);
+                int prod = building.getPotentialProduction(goodsType,
+                                                           unit.getType());
                 if (prod > bestProd) {
                     bestProd = prod;
                     best = building;
@@ -1882,7 +1883,8 @@ public class Colony extends Settlement implements Nameable {
                 if (workTile.getOwningSettlement() != this
                     && !allowClaim) break;
                 for (GoodsType goodsType : goodsTypes) {
-                    int prod = colonyTile.getProductionOf(unit, goodsType);
+                    int prod = colonyTile.getPotentialProduction(goodsType,
+                        unit.getType());
                     if (prod > bestProd) {
                         bestProd = prod;
                         best = colonyTile;
@@ -2717,16 +2719,22 @@ public class Colony extends Settlement implements Nameable {
             // work location of the expert.
             WorkLocation ewl = expert.getWorkLocation();
             if (ewl != null) {
-                expertProductionNow = ewl.getProductionOf(expert, expertise);
-                nonExpertProductionPotential = ewl.getProductionOf(nonExpert, expertise);
+                expertProductionNow = ewl.getPotentialProduction(expertise,
+                    expert.getType());
+                nonExpertProductionPotential
+                    = ewl.getPotentialProduction(expertise,
+                        nonExpert.getType());
             }
 
             // Get the current and potential productions for the
             // work location of the non-expert.
             WorkLocation nwl = nonExpert.getWorkTile();
             if (nwl != null) {
-                nonExpertProductionNow = nwl.getProductionOf(nonExpert, expertise);
-                expertProductionPotential = nwl.getProductionOf(expert, expertise);
+                nonExpertProductionNow = nwl.getPotentialProduction(expertise,
+                    nonExpert.getType());
+                expertProductionPotential
+                    = nwl.getPotentialProduction(expertise,
+                        expert.getType());
             }
 
             // Find the unit that achieves the best improvement.

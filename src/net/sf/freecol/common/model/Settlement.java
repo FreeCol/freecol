@@ -400,9 +400,8 @@ abstract public class Settlement extends GoodsLocation
             settlementTile.setSettlement(null);
 
             // The owner forgets about the settlement.
-            Player oldOwner = owner;
-            oldOwner.removeSettlement(this);
-            oldOwner.invalidateCanSeeTiles();
+            owner.removeSettlement(this);
+            owner.invalidateCanSeeTiles();
             // It is not safe to setOwner(null).  When a settlement is
             // destroyed there is a race between this code and some
             // display routines that still need to know who owned the
@@ -463,13 +462,12 @@ abstract public class Settlement extends GoodsLocation
     public abstract boolean propagateAlarm(Player player, int addToAlarm);
 
     /**
-     * Returns the production of the given type of goods.
+     * Gets the total production of the given type of goods in this settlement.
      *
      * @param goodsType The type of goods to get the production for.
-     * @return The production of the given type of goods the current turn by the
-     * <code>Settlement</code>
+     * @return The total production of the given type of goods.
      */
-    public abstract int getProductionOf(GoodsType goodsType);
+    public abstract int getTotalProductionOf(GoodsType goodsType);
 
     /**
      * Returns the number of goods of a given type used by the settlement

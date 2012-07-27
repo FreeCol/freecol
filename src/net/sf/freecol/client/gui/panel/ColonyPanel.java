@@ -716,15 +716,15 @@ public final class ColonyPanel extends PortPanel
         int unitNumber = 0;
         JMenuItem subMenu = null;
 
-        for(final Unit unit : colony.getUnitList())
-        {
+        for (final Unit unit : colony.getUnitList()) {
             ColonyTile workingOnLand = unit.getWorkTile();
-            if(workingOnLand != null){
+            if (workingOnLand != null) {
                 GoodsType goodsType = unit.getWorkType();
                 int producing = workingOnLand.getProductionOf(unit, goodsType);
                 unitIcon = imageLibrary.getUnitImageIcon(unit, 0.5);
-                String menuTitle = new String(Messages.message(unit.getLabel()) + " Producing: " + producing + " " +
-                                              Messages.message(goodsType.getId() + ".name"));
+                String menuTitle = new String(Messages.message(unit.getLabel())
+                    + " Producing: " + producing + " "
+                    + Messages.message(goodsType.getId() + ".name"));
                 subMenu = new JMenuItem(menuTitle, unitIcon);
   	            subMenu.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
@@ -1680,7 +1680,7 @@ public final class ColonyPanel extends PortPanel
                     // Try to use expertise, then tile-specific
                     workType = unit.getType().getExpertProduction();
                     if (workType == null) {
-                        workType = colonyTile.getWorkType(unit);
+                        workType = colonyTile.getBestWorkType(unit);
                     }
                 }
                 // Set the unit to work.  Note this might upgrade the
@@ -1699,8 +1699,8 @@ public final class ColonyPanel extends PortPanel
                     ColonyTile best = colony.getVacantColonyTileFor(unit, false,
                                                                     workType);
                     if (best != null && colonyTile != best
-                        && (colonyTile.getProductionOf(unit, workType)
-                            < best.getProductionOf(unit, workType))) {
+                        && (colonyTile.getPotentialProduction(workType, unit.getType())
+                            < best.getPotentialProduction(workType, unit.getType()))) {
                         StringTemplate template
                             = StringTemplate.template("colonyPanel.notBestTile")
                             .addStringTemplate("%unit%", Messages.getLabel(unit))

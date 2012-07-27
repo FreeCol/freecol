@@ -104,7 +104,7 @@ public class ServerIndianSettlement extends IndianSettlement
         // Produce goods.
         List<GoodsType> goodsList = spec.getGoodsTypeList();
         for (GoodsType g : goodsList) {
-            addGoods(g.getStoredAs(), getProductionOf(g));
+            addGoods(g.getStoredAs(), getTotalProductionOf(g));
         }
 
         // Consume goods.
@@ -156,7 +156,7 @@ public class ServerIndianSettlement extends IndianSettlement
         GoodsType horsesType = spec.getGoodsType("model.goods.horses");
         // TODO: remove this
         GoodsType grainType = spec.getGoodsType("model.goods.grain");
-        int foodProdAvail = getProductionOf(grainType) - getFoodConsumption();
+        int foodProdAvail = getTotalProductionOf(grainType) - getFoodConsumption();
         if (getGoodsCount(horsesType) >= horsesType.getBreedingNumber()
             && foodProdAvail > 0) {
             int nHorses = Math.min(MAX_HORSES_PER_TURN, foodProdAvail);

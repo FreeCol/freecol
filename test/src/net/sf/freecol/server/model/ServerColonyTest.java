@@ -267,7 +267,7 @@ public class ServerColonyTest extends FreeColTestCase {
         assertEquals("Wrong initial lumber quantity, ",
                      initialLumber, colony.getGoodsCount(lumberGoodsType));
         assertTrue("Colony shoud be able to produce work (hammers)",
-                   colony.getProductionOf(hammerGoodsType) > 0);
+            colony.getTotalProductionOf(hammerGoodsType) > 0);
         assertEquals("Colony shold not have any work production(hammers) initially, ",
                      initialHammers, colony.getGoodsCount(hammerGoodsType));
 
@@ -321,7 +321,8 @@ public class ServerColonyTest extends FreeColTestCase {
         assertEquals(bells, colony.getGoodsCount(bellsType));
         assertEquals(bells, colony.getLiberty());
 
-        int crosses = colony.getProductionOf(crossType) - colony.getConsumptionOf(crossType);
+        int crosses = colony.getTotalProductionOf(crossType)
+            - colony.getConsumptionOf(crossType);
         assertEquals(crosses, colony.getNetProductionOf(crossType));
         assertEquals(crosses, colony.getGoodsCount(crossType));
         assertEquals(crosses, colony.getImmigration());

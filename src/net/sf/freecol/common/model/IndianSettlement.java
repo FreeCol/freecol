@@ -1004,12 +1004,12 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
-     * Gets the production of a specified goods type for this settlement.
+     * Gets the total production of a specified goods type for this settlement.
      *
      * @param type The <code>GoodsType</code> to produce.
      * @return The production potention for the goods type.
      */
-    public int getProductionOf(GoodsType type) {
+    public int getTotalProductionOf(GoodsType type) {
         if (type.isRefined()) {
             if (type != goodsToMake()) return 0;
             // Pretend 1/3 of the units present make the item with

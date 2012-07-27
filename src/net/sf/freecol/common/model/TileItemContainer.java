@@ -318,16 +318,17 @@ public class TileItemContainer extends FreeColGameObject {
      * @param unitType a <code>UnitType</code> value
      * @return a <code>Modifier</code> value
      */
-    public Set<Modifier> getProductionBonus(GoodsType goodsType, UnitType unitType) {
-        Set<Modifier> result = new HashSet<Modifier>();
+    public List<Modifier> getProductionModifiers(GoodsType goodsType,
+                                                 UnitType unitType) {
+        List<Modifier> result = new ArrayList<Modifier>();
         for (TileItem item : tileItems) {
             if (item instanceof Resource) {
-                result.addAll(((Resource) item).getType().getProductionModifier(goodsType, unitType));
+                result.addAll(((Resource) item).getType()
+                    .getProductionModifier(goodsType, unitType));
             } else if (item instanceof TileImprovement) {
-                Modifier modifier = ((TileImprovement) item).getProductionModifier(goodsType);
-                if (modifier != null) {
-                    result.add(modifier);
-                }
+                Modifier modifier = ((TileImprovement) item)
+                    .getProductionModifier(goodsType);
+                if (modifier != null) result.add(modifier);
             }
         }
         return result;

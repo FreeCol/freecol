@@ -524,7 +524,7 @@ public class LabourData {
             });
             return;
         }
-
+        WorkLocation wl = (WorkLocation)location;
         LocationData colonyData = unitData.getLocationData(colony);
         Unit teacher = unit.getTeacher();
         if (teacher != null) {
@@ -533,21 +533,11 @@ public class LabourData {
             UnitData learning = getUnitData(Unit.getUnitTypeTeaching(teacher.getType(), unit.getType()));
             learning.getLocationData(colony).addOtherStudent(unitData.getUnitName());
         }
+        if (wl.canTeach()) colonyData.teachers++;
 
         GoodsType currentlyWorking = unit.getWorkType();
-        int production;
-        if (location instanceof Building) {
-            Building building = (Building) location;
-
-            if (building.canTeach()) {
-                colonyData.teachers++;
-                return;
-            }
-
-            production = building.getUnitProductivity(unit);
-        } else {
-            production = ((ColonyTile) location).getProductionOf(unit, currentlyWorking);
-        }
+        int production = (currentlyWorking == null) ? 0
+            : wl.getProductionOf(unit, currentlyWorking);
 
         UnitData workingAs = experts.get(currentlyWorking);
 

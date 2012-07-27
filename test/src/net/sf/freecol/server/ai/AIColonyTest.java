@@ -176,7 +176,7 @@ public class AIColonyTest extends FreeColTestCase {
             carpenterHouse.getUnitCount());
         assertEquals("Colony should not be producing sugar, except center",
             colony.getTile().getType().getProductionOf(sugarType,colonistType),
-            colony.getProductionOf(sugarType));
+            colony.getTotalProductionOf(sugarType));
         assertTrue("Colony should be producing rum",
             colony.getNetProductionOf(rumType) > 0);
 
@@ -192,9 +192,9 @@ public class AIColonyTest extends FreeColTestCase {
         assertEquals("Colony does not need a carpenter", 0,
             carpenterHouse.getUnitCount());
         assertTrue("Colony should be producing ore",
-            colony.getProductionOf(oreType) > 0);
+            colony.getTotalProductionOf(oreType) > 0);
         assertTrue("Colony should be producing tools",
-            colony.getProductionOf(toolsType) > 0);
+            colony.getTotalProductionOf(toolsType) > 0);
     }
 
     /**

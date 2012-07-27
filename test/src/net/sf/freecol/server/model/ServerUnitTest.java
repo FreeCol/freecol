@@ -215,6 +215,7 @@ public class ServerUnitTest extends FreeColTestCase {
             ServerTestHelper.newTurn();
             n++;
         }
+        colony.invalidateCache();
 
         assertTrue(plain58.hasImprovement(plow));
         // Production for next turn is updated
@@ -353,17 +354,17 @@ public class ServerUnitTest extends FreeColTestCase {
         Tile tile = colony.getTile().getNeighbourOrNull(Direction.N);
         assertTrue(colony.getOwner().canOwnTile(tile));
         ColonyTile colonyTile = colony.getColonyTile(tile);
-        if (colonyTile.getUnit() != null) {
-            colonyTile.getUnit().setLocation(colony.getBuilding(townHallType));
+        if (!colonyTile.isEmpty()) {
+            colonyTile.getUnitList().get(0).setLocation(colony.getBuilding(townHallType));
         }
         assertTrue(colonyTile.canBeWorked());
         colonist.setLocation(colonyTile);
         colonist.setWorkType(grainType);
         assertEquals("Wrong work allocation",
                      grainType, colonist.getWorkType());
-        assertEquals(colonyTile.getUnit(), colonist);
+        assertEquals(colonyTile.getUnitList().get(0), colonist);
         // Will colonist gain experience?
-        assertTrue(colonyTile.getProductionOf(colonist.getWorkType()) > 0);
+        assertTrue(colonyTile.getTotalProductionOf(colonist.getWorkType()) > 0);
         // Can colonist be upgraded
         UnitType learn = spec().getExpertForProducing(colonist.getWorkType());
         assertNotNull(learn);

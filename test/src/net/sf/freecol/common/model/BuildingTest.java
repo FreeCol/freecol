@@ -35,6 +35,10 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 public class BuildingTest extends FreeColTestCase {
 
+    private static final BuildingType armoryType
+        = spec().getBuildingType("model.building.armory");
+    private static final BuildingType blacksmithType
+        = spec().getBuildingType("model.building.blacksmithHouse");
     private static final BuildingType chapelType
         = spec().getBuildingType("model.building.chapel");
     private static final BuildingType countryType
@@ -61,6 +65,26 @@ public class BuildingTest extends FreeColTestCase {
         = spec().getBuildingType("model.building.warehouse");
     private static final BuildingType weaverHouseType
         = spec().getBuildingType("model.building.weaverHouse");
+
+    private static final GoodsType bellsType
+        = spec().getGoodsType("model.goods.bells");
+    private static final GoodsType clothType
+        = spec().getGoodsType("model.goods.cloth");
+    private static final GoodsType cottonType
+        = spec().getGoodsType("model.goods.cotton");
+    private static final GoodsType foodType
+        = spec().getPrimaryFoodType();
+    private static final GoodsType grainType
+        = spec().getGoodsType("model.goods.grain");
+    private static final GoodsType horsesType
+        = spec().getGoodsType("model.goods.horses");
+    private static final GoodsType musketsType
+        = spec().getGoodsType("model.goods.muskets");
+    private static final GoodsType toolsType
+        = spec().getGoodsType("model.goods.tools");
+
+    private static final TileType plainsType
+        = spec().getTileType("model.tile.plains");
 
     private static final UnitType elderStatesmanType
         = spec().getUnitType("model.unit.elderStatesman");
@@ -375,45 +399,41 @@ public class BuildingTest extends FreeColTestCase {
         Unit colonist = units.get(0);
         Unit worker = units.get(1);
 
-        TileType plainsType = spec().getTileType("model.tile.plains");
-        GoodsType cottonType = spec().getGoodsType("model.goods.cotton");
-        GoodsType clothType = spec().getGoodsType("model.goods.cloth");
-
         Building weaver = colony.getBuilding(weaverHouseType);
         assertEquals(cottonType, weaver.getGoodsInputType());
         assertEquals(clothType, weaver.getGoodsOutputType());
 
-        assertEquals(plainsType, ((WorkLocation) colonist.getLocation()).getTile().getType());
-        assertEquals(plainsType, ((WorkLocation) worker.getLocation()).getTile().getType());
+        assertTrue(colonist.getLocation() instanceof ColonyTile);
+        assertEquals(plainsType, ((ColonyTile)colonist.getLocation()).getWorkTile().getType());
+        assertTrue(worker.getLocation() instanceof ColonyTile);
+        assertEquals(plainsType, ((ColonyTile)worker.getLocation()).getWorkTile().getType());
 
         weaver.add(worker);
         assertEquals(worker, weaver.getUnitList().get(0));
 
         colony.addGoods(cottonType, 2);
-        assertEquals(2, colony.getProductionOf(cottonType));
-        assertEquals(3, weaver.getProductionOf(clothType));
-        assertEquals(3, colony.getProductionOf(clothType));
+        assertEquals(2, colony.getTotalProductionOf(cottonType));
+        assertEquals(3, weaver.getTotalProductionOf(clothType));
+        assertEquals(3, colony.getTotalProductionOf(clothType));
         assertEquals(-1, colony.getNetProductionOf(cottonType));
         assertEquals(3, colony.getNetProductionOf(clothType));
 
         colonist.setWorkType(cottonType);
+        colony.invalidateCache();
 
-        assertEquals(4, colony.getProductionOf(cottonType));
+        assertEquals(4, colony.getTotalProductionOf(cottonType));
         colony.addGoods(cottonType, 4);
-        assertEquals(3, colony.getProductionOf(clothType));
+        assertEquals(3, colony.getTotalProductionOf(clothType));
         assertEquals(1, colony.getNetProductionOf(cottonType));
         assertEquals(3, colony.getNetProductionOf(clothType));
 
     }
 
     public void testAutoProduction() {
-    	Game game = getGame();
-    	game.setMap(getTestMap(true));
+        Game game = getGame();
+        game.setMap(getTestMap(true));
 
         Colony colony = getStandardColony(1);
-        GoodsType foodType = spec().getPrimaryFoodType();
-        GoodsType grainType = spec().getGoodsType("model.goods.grain");
-        GoodsType horsesType = spec().getGoodsType("model.goods.horses");
 
         Building pasture = colony.getBuilding(countryType);
         assertEquals(grainType, pasture.getGoodsInputType());
@@ -421,18 +441,18 @@ public class BuildingTest extends FreeColTestCase {
 
         // no horses yet
         assertEquals(8, colony.getNetProductionOf(foodType));
-        assertEquals(0, pasture.getProductionOf(horsesType));
+        assertEquals(0, pasture.getTotalProductionOf(horsesType));
         assertEquals(0, colony.getNetProductionOf(horsesType));
-        assertEquals(0, pasture.getMaximumProduction());
+        assertEquals(0, pasture.getMaximumProductionOf(horsesType));
 
         colony.addGoods(horsesType, 50);
-        assertEquals(2, pasture.getProductionOf(horsesType));
-        assertEquals(2, pasture.getMaximumProduction());
+        assertEquals(2, pasture.getTotalProductionOf(horsesType));
+        assertEquals(2, pasture.getMaximumProductionOf(horsesType));
         assertEquals(2, colony.getNetProductionOf(horsesType));
 
         colony.addGoods(horsesType, 1);
-        assertEquals(4, pasture.getProductionOf(horsesType));
-        assertEquals(4, pasture.getMaximumProduction());
+        assertEquals(4, pasture.getTotalProductionOf(horsesType));
+        assertEquals(4, pasture.getMaximumProductionOf(horsesType));
         assertEquals(4, colony.getNetProductionOf(horsesType));
 
         pasture.upgrade();
@@ -440,27 +460,27 @@ public class BuildingTest extends FreeColTestCase {
 
         colony.addGoods(horsesType, 25);
         assertEquals(25, colony.getGoodsCount(horsesType));
-        assertEquals(2, pasture.getProductionOf(horsesType));
-        assertEquals(2, pasture.getMaximumProduction());
+        assertEquals(2, pasture.getTotalProductionOf(horsesType));
+        assertEquals(2, pasture.getMaximumProductionOf(horsesType));
         assertEquals(2, colony.getNetProductionOf(horsesType));
 
         colony.addGoods(horsesType, 1);
         assertEquals(26, colony.getGoodsCount(horsesType));
-        assertEquals(4, pasture.getProductionOf(horsesType));
-        assertEquals(4, pasture.getMaximumProduction());
+        assertEquals(4, pasture.getTotalProductionOf(horsesType));
+        assertEquals(4, pasture.getMaximumProductionOf(horsesType));
         assertEquals(4, colony.getNetProductionOf(horsesType));
 
         colony.addGoods(horsesType, 24);
         assertEquals(50, colony.getGoodsCount(horsesType));
-        assertEquals(4, pasture.getProductionOf(horsesType));
-        assertEquals(4, pasture.getMaximumProduction());
+        assertEquals(4, pasture.getTotalProductionOf(horsesType));
+        assertEquals(4, pasture.getMaximumProductionOf(horsesType));
         assertEquals(4, colony.getNetProductionOf(horsesType));
 
         colony.addGoods(horsesType, 1);
         assertEquals(51, colony.getGoodsCount(horsesType));
         // no more than half the surplus production!
-        assertEquals(4, pasture.getProductionOf(horsesType));
-        assertEquals(6, pasture.getMaximumProduction());
+        assertEquals(4, pasture.getTotalProductionOf(horsesType));
+        assertEquals(6, pasture.getMaximumProductionOf(horsesType));
         assertEquals("Horse production should equal food surplus.",
                      colony.getNetProductionOf(foodType),
                      colony.getNetProductionOf(horsesType));
@@ -486,13 +506,15 @@ public class BuildingTest extends FreeColTestCase {
         assertEquals(1.0f, bellsModifier.getValue());
 
         assertEquals("Wrong initial bell production",
-                     (int) bellsModifier.getValue(), building.getProduction());
+            (int) bellsModifier.getValue(),
+            building.getTotalProductionOf(bellsType));
 
         building.add(colonist);
         // 3 from the colonist
-        assertEquals(3, building.getUnitProductivity(colonist));
+        assertEquals(3, building.getUnitConsumption(colonist));
         // 3 from the colonist + 1
-        assertEquals("Wrong bell production", 4, building.getProduction());
+        assertEquals("Wrong bell production", 4,
+            building.getTotalProductionOf(bellsType));
 
         FoundingFather jefferson = spec().getFoundingFather("model.foundingFather.thomasJefferson");
         modifiers = jefferson.getModifierSet("model.goods.bells");
@@ -503,32 +525,32 @@ public class BuildingTest extends FreeColTestCase {
                    .contains(bellsModifier));
         assertTrue(colony.getModifierSet("model.goods.bells").contains(bellsModifier));
 
-        assertEquals(3, building.getUnitProductivity(colonist));
+        assertEquals(3, building.getUnitConsumption(colonist));
         // 3 from the colonist + 50% + 1 = 5.5
-        assertEquals("Wrong bell production with Jefferson", 5, building.getProduction());
+        assertEquals("Wrong bell production with Jefferson", 5,
+            building.getTotalProductionOf(bellsType));
 
         building.add(statesman);
-        assertEquals(3, building.getUnitProductivity(colonist));
-        assertEquals(6, building.getUnitProductivity(statesman));
+        assertEquals(3, building.getUnitConsumption(colonist));
+        assertEquals(6, building.getUnitConsumption(statesman));
         // 3 + 6 + 50% + 1 = 14
-        assertEquals("Wrong bell production with Jefferson", 14, building.getProduction());
+        assertEquals("Wrong bell production with Jefferson", 14,
+            building.getTotalProductionOf(bellsType));
 
         setProductionBonus(colony, 2);
-        assertEquals(5, building.getUnitProductivity(colonist));
-        assertEquals(10, building.getUnitProductivity(statesman));
+        assertEquals(5, building.getUnitConsumption(colonist));
+        assertEquals(10, building.getUnitConsumption(statesman));
         // 5 + 10 + 50% + 1 = 23
         assertEquals("Wrong bell production with Jefferson and +2 production bonus",
-                     23, building.getProduction());
+            23, building.getTotalProductionOf(bellsType));
 
         Building newspaper = new ServerBuilding(getGame(), colony, newspaperType);
         colony.addBuilding(newspaper);
-        assertEquals(5, building.getUnitProductivity(colonist));
-        assertEquals(10, building.getUnitProductivity(statesman));
+        assertEquals(5, building.getUnitConsumption(colonist));
+        assertEquals(10, building.getUnitConsumption(statesman));
         // 5 + 10 + 50% + 1 + 100% = 47
         assertEquals("Wrong bell production with Jefferson, newspaper and +2 production bonus",
-                     47, building.getProduction());
-
-
+            47, building.getTotalProductionOf(bellsType));
     }
 
     public void testPrintingPressBonus() {
@@ -539,19 +561,19 @@ public class BuildingTest extends FreeColTestCase {
         Unit unit = colony.getUnitList().get(0);
         Building building = colony.getBuilding(townHallType);
 
-        int bellProduction = building.getProduction();
+        int bellProduction = building.getTotalProductionOf(bellsType);
         int expectBellProd = 1;
         assertEquals("Wrong initial bell production",expectBellProd,bellProduction);
 
         Building printingPress = new ServerBuilding(getGame(), colony, printingPressType);
         colony.addBuilding(printingPress);
 
-        bellProduction = building.getProduction();
+        bellProduction = building.getTotalProductionOf(bellsType);
         expectBellProd = 1;
         assertEquals("Wrong bell production with printing press",expectBellProd,bellProduction);
 
         building.add(unit);
-        bellProduction = building.getProduction();
+        bellProduction = building.getTotalProductionOf(bellsType);
         expectBellProd = 6; // 1 initial plus 3 from the colonist + 2 from printing press
         assertEquals("Wrong final bell production",expectBellProd,bellProduction);
     }
@@ -564,25 +586,24 @@ public class BuildingTest extends FreeColTestCase {
         Unit unit = colony.getUnitList().get(0);
         Building building = colony.getBuilding(townHallType);
 
-        int bellProduction = building.getProduction();
+        int bellProduction = building.getTotalProductionOf(bellsType);
         int expectBellProd = 1;
         assertEquals("Wrong initial bell production",expectBellProd,bellProduction);
 
         Building newspaper = new ServerBuilding(getGame(), colony, newspaperType);
         colony.addBuilding(newspaper);
 
-        bellProduction = building.getProduction();
+        bellProduction = building.getTotalProductionOf(bellsType);
         expectBellProd = 2;
         assertEquals("Wrong bell production with newspaper",expectBellProd,bellProduction);
 
         building.add(unit);
-        bellProduction = building.getProduction();
+        bellProduction = building.getTotalProductionOf(bellsType);
         expectBellProd = 8; // 1 initial plus 3 from the colonist + 4 from newspaper
         assertEquals("Wrong final bell production",expectBellProd,bellProduction);
     }
 
-
-    public void testUnitProductivity() {
+    public void testUnitConsumption() {
         Game game = getGame();
         game.setMap(getTestMap(true));
 
@@ -591,31 +612,28 @@ public class BuildingTest extends FreeColTestCase {
 
         for (Building building : colony.getBuildings()) {
             GoodsType outputType = building.getGoodsOutputType();
-            if (outputType != null) {
-                for (UnitType type : spec().getUnitTypeList()) {
-                    if (building.getType().canAdd(type)
-                        && type.isAvailableTo(colony.getOwner())) {
-                        unit.setType(type);
-                        int productivity = building.getUnitProductivity(unit);
-                        int expected = building.getType().getBasicProduction();
-                        if (type == building.getExpertUnitType()) {
-                            expected = 6;
-                        } else if (type == indenturedServantType) {
-                            expected = 2;
-                        } else if (type == indianConvertType) {
-                            expected = 1;
-                        } else if (type == pettyCriminalType) {
-                            expected = 1;
-                        }
-                        if (expected != building.getType().getBasicProduction()) {
-                            Set<Modifier> modifierSet = type.getModifierSet(outputType.getId());
-                            assertFalse("ModifierSet should not be empty!",
-                                        modifierSet.isEmpty());
-                        }
-                        assertEquals("Wrong productivity for " + type,
-                                     expected, productivity);
-                    }
+            if (outputType == null) continue;
+            for (UnitType type : spec().getUnitTypeList()) {
+                if (!building.getType().canAdd(type)
+                    || !type.isAvailableTo(colony.getOwner())) continue;
+                unit.setType(type);
+                int productivity = building.getUnitConsumption(unit);
+                int expected = building.getType().getBasicProduction();
+                if (type == building.getExpertUnitType()) {
+                    expected = 6;
+                } else if (type == indenturedServantType) {
+                    expected = 2;
+                } else if (type == indianConvertType) {
+                    expected = 1;
+                } else if (type == pettyCriminalType) {
+                    expected = 1;
                 }
+                if (expected != building.getType().getBasicProduction()) {
+                    assertFalse("ModifierSet should not be empty!",
+                        type.getModifierSet(outputType.getId()).isEmpty());
+                }
+                assertEquals("Wrong productivity for " + type, expected,
+                    productivity);
             }
         }
     }
@@ -623,11 +641,6 @@ public class BuildingTest extends FreeColTestCase {
     public void testToolsMusketProduction() {
         Game game = getGame();
         game.setMap(getTestMap(true));
-
-        BuildingType armoryType
-            = spec().getBuildingType("model.building.armory");
-        BuildingType blacksmithType
-            = spec().getBuildingType("model.building.blacksmithHouse");
 
         Colony colony = getStandardColony(8);
         List<Unit> units = colony.getUnitList();
@@ -648,17 +661,17 @@ public class BuildingTest extends FreeColTestCase {
         armory.add(units.get(3));
 
         assertEquals(3, smithy.getType().getBasicProduction());
-        assertEquals(6, smithy.getProduction());
+        assertEquals(6, smithy.getTotalProductionOf(toolsType));
         assertEquals(3, armory.getType().getBasicProduction());
-        assertEquals(6, armory.getProduction());
+        assertEquals(6, armory.getTotalProductionOf(musketsType));
 
         smithy.upgrade();
         armory.upgrade();
 
         assertEquals(6, smithy.getType().getBasicProduction());
-        assertEquals(12, smithy.getProduction());
+        assertEquals(12, smithy.getTotalProductionOf(toolsType));
         assertEquals(6, armory.getType().getBasicProduction());
-        assertEquals(12, armory.getProduction());
+        assertEquals(12, armory.getTotalProductionOf(musketsType));
 
         // make sure we can build factory level buildings
         colony.getOwner().addFather(spec().getFoundingFather("model.foundingFather.adamSmith"));
@@ -667,11 +680,10 @@ public class BuildingTest extends FreeColTestCase {
         armory.upgrade();
 
         assertEquals(6, smithy.getType().getBasicProduction());
-        assertEquals(18, smithy.getProduction());
+        assertEquals(18, smithy.getTotalProductionOf(toolsType));
         assertEquals(6, armory.getType().getBasicProduction());
         assertEquals("According to bug report #3430371, the arsenal does not enjoy "
                      + "the usual factory level production bonus of 50%",
-                     12, armory.getProduction());
-
+            12, armory.getTotalProductionOf(musketsType));
     }
 }

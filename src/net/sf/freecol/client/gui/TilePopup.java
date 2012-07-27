@@ -720,7 +720,7 @@ public final class TilePopup extends JPopupMenu {
 
         sb.append("\nGoods Production\n");
         for (GoodsType type : spec.getGoodsTypeList()) {
-            int prod = sis.getProductionOf(type);
+            int prod = sis.getTotalProductionOf(type);
             if (prod > 0) {
                 sb.append(Messages.message(type.getNameKey())
                           + " " + prod + "\n");

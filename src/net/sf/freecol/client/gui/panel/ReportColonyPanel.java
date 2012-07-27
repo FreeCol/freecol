@@ -212,7 +212,7 @@ public final class ReportColonyPanel extends ReportPanel
                 if (newValue != 0 || stockValue > 0) {
                     int maxProduction = 0;
                     for (Building building : colony.getBuildingsForProducing(goodsType)) {
-                        maxProduction += building.getMaximumProduction();
+                        maxProduction += building.getMaximumProductionOf(goodsType);
                     }
                     ProductionLabel productionLabel = new ProductionLabel(getFreeColClient(), getGUI(), goodsType, newValue);
                     if (maxProduction > 0) {
@@ -485,7 +485,7 @@ public final class ReportColonyPanel extends ReportPanel
                         .addAmount("%amount%", p);
                 }
             } else if (p == 0) {
-                if (colony.getProductionOf(g) == 0) {
+                if (colony.getTotalProductionOf(g) == 0) {
                     c = null;
                     tip = null;
                 } else {
@@ -578,8 +578,8 @@ public final class ReportColonyPanel extends ReportPanel
                     needsWorker = true;
                 } else if ((expert = spec.getExpertForProducing(work)) != null
                     && expert != u.getType()
-                    && (delta = wl.getPotentialProduction(expert, work)
-                        - wl.getPotentialProduction(u.getType(), work)) > 0
+                    && (delta = wl.getPotentialProduction(work, expert)
+                        - wl.getPotentialProduction(work, u.getType())) > 0
                     && wantGoods(wl, work, u, expert)) {
                     addSuggestion(improve, u.getType(), expert,
                         work, delta);
@@ -592,7 +592,7 @@ public final class ReportColonyPanel extends ReportPanel
             if (needsWorker
                 && (work = bestProduction(wl, colonistType)) != null
                 && (expert = spec.getExpertForProducing(work)) != null
-                && (delta = wl.getPotentialProduction(expert, work)) > 0
+                && (delta = wl.getPotentialProduction(work, expert)) > 0
                 && wantGoods(wl, work, null, expert)) {
                 addSuggestion(want, null, expert, work, delta);
             }
@@ -854,10 +854,10 @@ public final class ReportColonyPanel extends ReportPanel
         } else if (wl instanceof Building) {
             Building bu = (Building) wl;
             Colony colony = wl.getColony();
-            ret = bu.canAdd(expert)
+            ret = bu.canAddType(expert)
                 && (bu.getLevel() > 1
                     || ("model.goods.hammers".equals(goodsType.getId())
-                        && (colony.getProductionOf(goodsType) == 0
+                        && (colony.getTotalProductionOf(goodsType) == 0
                             || (unit != null && unit.getType() != expert)))
                     || (goodsType.isLibertyType()
                         && colony.getSoL() < 100));
@@ -920,7 +920,7 @@ public final class ReportColonyPanel extends ReportPanel
             final Specification spec = getSpecification();
             List<AbstractGoods> prod = new ArrayList<AbstractGoods>();
             for (GoodsType g : spec.getGoodsTypeList()) {
-                int amount = wl.getPotentialProduction(type, g);
+                int amount = wl.getPotentialProduction(g, type);
                 if (amount > 0) prod.add(new AbstractGoods(g, amount));
             }
             if (prod.isEmpty()) return null;

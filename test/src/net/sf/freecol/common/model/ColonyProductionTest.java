@@ -171,7 +171,7 @@ public class ColonyProductionTest extends FreeColTestCase {
 
     	int initialBellCount = colony.getGoodsCount(bellsType);
     	int expectedBellCount = 0;
-    	int bellsProdPerTurn = colony.getProductionOf(bellsType);
+    	int bellsProdPerTurn = colony.getTotalProductionOf(bellsType);
     	int expectedBellProd = 1;
     	int bellsUpkeep = colony.getConsumptionOf(bellsType);
     	int expectedBellUpkeep =  colony.getUnitCount() - 2;
@@ -183,9 +183,11 @@ public class ColonyProductionTest extends FreeColTestCase {
     	assertEquals("Wrong bell upkeep",expectedBellUpkeep,bellsUpkeep);
     	assertEquals("Wrong bell net production",expectedBellNetProd,bellsNetProdPerTurn);
     }
+
     /**
-     * Tests that there is no over production of horses, to avoid being thrown out
-     * A test of the proper production of horses is in <code>BuildingTest</code>
+     * Tests that there is no over production of horses, to avoid them
+     * being thrown out.  A test of the proper production of horses is
+     * in <code>BuildingTest</code>
      */
     public void testNoHorsesOverProduction() {
         Game game = getGame();
@@ -195,22 +197,30 @@ public class ColonyProductionTest extends FreeColTestCase {
 
         Building pasture = colony.getBuilding(countryType);
         assertEquals(horsesType, pasture.getGoodsOutputType());
-        assertEquals("Wrong warehouse capacity in colony",100,colony.getWarehouseCapacity());
+        assertEquals("Wrong warehouse capacity in colony",
+            GoodsContainer.CARGO_SIZE, colony.getWarehouseCapacity());
 
         // Still room for more
         colony.addGoods(horsesType, 99);
         assertTrue(colony.getNetProductionOf(foodType) > 0);
 
-        assertEquals("Wrong horse production",1, pasture.getProductionOf(horsesType));
-        assertEquals("Wrong maximum horse production", 1, pasture.getMaximumProduction());
-        assertEquals("Wrong net horse production",1, colony.getNetProductionOf(horsesType));
+        assertEquals("Wrong horse production", 1,
+            pasture.getTotalProductionOf(horsesType));
+        assertEquals("Wrong maximum horse production", 1,
+            pasture.getMaximumProductionOf(horsesType));
+        assertEquals("Wrong net horse production", 1,
+            colony.getNetProductionOf(horsesType));
 
         // No more room available
         colony.addGoods(horsesType, 1);
-        assertEquals("Wrong number of horses in colony",colony.getWarehouseCapacity(), colony.getGoodsCount(horsesType));
-        assertEquals("Wrong horse production",0, pasture.getProductionOf(horsesType));
-        assertEquals("Wrong maximum horse production", 0, pasture.getMaximumProduction());
-        assertEquals("Wrong net horse production",0, colony.getNetProductionOf(horsesType));
+        assertEquals("Wrong number of horses in colony",
+            colony.getWarehouseCapacity(), colony.getGoodsCount(horsesType));
+        assertEquals("Wrong horse production", 0,
+            pasture.getTotalProductionOf(horsesType));
+        assertEquals("Wrong maximum horse production", 0,
+            pasture.getMaximumProductionOf(horsesType));
+        assertEquals("Wrong net horse production", 0,
+            colony.getNetProductionOf(horsesType));
     }
 
 
@@ -433,16 +443,20 @@ public class ColonyProductionTest extends FreeColTestCase {
         assertNotNull(colonistType);
 
         assertEquals("Zero potential production of cotton in town hall", 0,
-            townHall.getPotentialProduction(colonistType, cottonType));
+            townHall.getPotentialProduction(cottonType, colonistType));
         assertEquals("Basic potential production of bells in town hall", 
             (int)FeatureContainer.applyModifiers(townHallType.getBasicProduction(),
-                game.getTurn(), townHall.getProductionModifiers()),
-            townHall.getPotentialProduction(colonistType, bellsType));
+                game.getTurn(), townHall.getProductionModifiers(bellsType, null)),
+            townHall.getPotentialProduction(bellsType, colonistType));
 
-        assertEquals("Basic potential production of cotton in town hall",
+        assertEquals("Basic potential production of cotton on center tile"
+            + " if not using a unit",
             plainsType.getProductionOf(cottonType, null),
-            colonyTile.getPotentialProduction(colonistType, cottonType));
+            colonyTile.getPotentialProduction(cottonType, null));
+        assertEquals("Zero potential production of cotton on center tile"
+            + " if using a unit",
+            0, colonyTile.getPotentialProduction(cottonType, colonistType));
         assertEquals("Zero potential production of cotton in town hall", 0,
-            townHall.getPotentialProduction(colonistType, cottonType));
+            townHall.getPotentialProduction(cottonType, colonistType));
     }
 }

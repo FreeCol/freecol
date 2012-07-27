@@ -1297,17 +1297,13 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @param goodsType a <code>GoodsType</code> value
      * @return a <code>Modifier</code> value
      */
-    public Set<Modifier> getProductionBonus(GoodsType goodsType, UnitType unitType) {
-        Set<Modifier> result = new HashSet<Modifier>();
+    public List<Modifier> getProductionModifiers(GoodsType goodsType,
+                                                 UnitType unitType) {
+        List<Modifier> result = new ArrayList<Modifier>();
         result.addAll(type.getProductionBonus(goodsType));
         if (tileItemContainer != null) {
-            Resource resource = tileItemContainer.getResource();
-            if (resource != null) {
-                result.addAll(resource.getType().getProductionModifier(goodsType, unitType));
-            }
-            if (!result.isEmpty()) {
-                result.addAll(tileItemContainer.getProductionBonus(goodsType, unitType));
-            }
+            result.addAll(tileItemContainer.getProductionModifiers(goodsType,
+                                                                   unitType));
         }
         return result;
     }
@@ -1989,7 +1985,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             : settlement.getOwner();
         if (settlement == null && oldSettlement != null) {
             // Settlement disappeared
-            oldSettlement.setOwner(null);
+            logger.info("Settlement " + oldSettlement.getName() + " removed.");
             oldSettlementOwner.removeSettlement(oldSettlement);
         } else if (settlement != null && oldSettlement == null) {
             // Settlement appeared
@@ -1997,9 +1993,11 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             owner = settlementOwner;
         } else if (settlementOwner != oldSettlementOwner) {
             // Settlement changed owner
-            oldSettlement.setOwner(null);
-            oldSettlementOwner.removeSettlement(oldSettlement);
+            logger.info("Settlement " + oldSettlement.getName() + " captured"
+                + " from " + oldSettlement.getOwner()
+                + " to " + settlementOwner);
             settlement.setOwner(settlementOwner);
+            oldSettlementOwner.removeSettlement(oldSettlement);
             settlementOwner.addSettlement(settlement);
             owner = settlementOwner;
         }

@@ -2946,7 +2946,7 @@ public class Player extends FreeColGameObject implements Nameable {
         for (Colony colony : getColonies()) {
             for (GoodsType libertyGoods : getSpecification()
                      .getLibertyGoodsTypeList()) {
-                libertyNextTurn += colony.getProductionOf(libertyGoods);
+                libertyNextTurn += colony.getTotalProductionOf(libertyGoods);
             }
         }
         return libertyNextTurn;

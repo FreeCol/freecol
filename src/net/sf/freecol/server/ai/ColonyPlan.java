@@ -245,8 +245,8 @@ public class ColonyPlan {
      */
     private int getWorkLocationProduction(WorkLocation wl,
                                           GoodsType goodsType) {
-        return wl.getPotentialProduction(spec().getDefaultUnitType(),
-                                         goodsType);
+        return wl.getPotentialProduction(goodsType,
+                                         spec().getDefaultUnitType());
     }
 
     // Public functionality.
@@ -721,7 +721,7 @@ public class ColonyPlan {
                 1.0/*FIXME: Brewster?*/);
         } else if (produce.contains(goodsType)) {
             if ("trade".equals(advantage)) factor = 1.2;
-            double f = 0.1 * colony.getProductionOf(goodsType.getRawMaterial());
+            double f = 0.1 * colony.getTotalProductionOf(goodsType.getRawMaterial());
             ret = prioritize(type, PRODUCTION_WEIGHT,
                 f/*FIXME: improvement?*/);
         }
@@ -1509,8 +1509,8 @@ locations:      for (WorkLocation wl : scratch.getAvailableWorkLocations()) {
                     for (Unit u : new ArrayList<Unit>(workers)) {
                         for (GoodsType type : libertyGoodsTypes) {
                             if (wl.canAdd(u)
-                                && wl.getPotentialProduction(u.getType(),
-                                                             type) > 0) {
+                                && wl.getPotentialProduction(type, 
+                                    u.getType()) > 0) {
                                 u.setLocation(wl);
                                 u.setWorkType(type);
                                 break locations;

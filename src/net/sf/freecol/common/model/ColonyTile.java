@@ -53,11 +53,13 @@ public class ColonyTile extends WorkLocation implements Ownable {
      */
     public static final int UNIT_CAPACITY = 1;
 
-    /** The tile to work. */
+    /**
+     * The tile to work.  This is accessed through getWorkTile().
+     * Beware!  Do not confuse this with getTile(), which returns
+     * the colony center tile (because every work location belongs to
+     * the enclosing colony).
+     */
     protected Tile workTile;
-
-    /** Is this colony tile at the center of the colony. */
-    protected boolean colonyCenterTile;
 
 
     /**
@@ -80,7 +82,6 @@ public class ColonyTile extends WorkLocation implements Ownable {
 
         setColony(colony);
         this.workTile = workTile;
-        colonyCenterTile = (getTile() == workTile);
     }
 
     /**
@@ -111,22 +112,6 @@ public class ColonyTile extends WorkLocation implements Ownable {
     }
 
     /**
-     * Returns the (non-unique) name of this <code>ColonyTile</code>.
-     * @return The name of this ColonyTile.
-     */
-    public StringTemplate getLocationName() {
-        String name = getColony().getName();
-        if (isColonyCenterTile()) {
-            return StringTemplate.name(name);
-        } else {
-            return StringTemplate.template("nearLocation")
-                .add("%direction%", "direction."
-                    + getTile().getDirection(workTile).toString())
-                .addName("%location%", name);
-        }
-    }
-
-    /**
      * Returns a description of the tile, with the name of the tile
      * and any improvements made to it (road/plow).
      *
@@ -137,26 +122,12 @@ public class ColonyTile extends WorkLocation implements Ownable {
     }
 
     /**
-     * Gets a template describing whether this work location can/needs-to
-     * be claimed.
-     *
-     * @return A suitable template.
-     */
-    @Override
-    public StringTemplate getClaimTemplate() {
-        return (isColonyCenterTile()) ? super.getClaimTemplate()
-            : StringTemplate.template("workClaimColonyTile")
-                .add("%direction%", "direction."
-                    + getTile().getDirection(workTile).toString());
-    }
-
-    /**
      * Checks if this is the tile where the <code>Colony</code> is located.
      *
      * @return True if this is the colony center tile.
      */
     public boolean isColonyCenterTile() {
-        return colonyCenterTile;
+        return getWorkTile() == getTile();
     }
 
     /**
@@ -170,25 +141,203 @@ public class ColonyTile extends WorkLocation implements Ownable {
     }
 
     /**
-     * Gets the owning settlement for this colony tile.
-     *
-     * @return The owning settlement for this colony tile.
+     * Relocates any worker on this <code>ColonyTile</code>.
+     * The workers are added to another {@link WorkLocation}
+     * within the {@link Colony}.
      */
-    @Override
-    public Settlement getOwningSettlement() {
-        return workTile.getOwningSettlement();
+    public void relocateWorkers() {
+        for (Unit unit : getUnitList()) {
+            for (WorkLocation wl : getColony().getCurrentWorkLocations()) {
+                if (wl != this && wl.canAdd(unit)) {
+                    unit.setLocation(wl);
+                    break;
+                }
+            }
+        }
     }
 
     /**
-     * Gets the <code>Unit</code> currently working on this
-     * <code>ColonyTile</code>.
-     *
-     * @return The <code>Unit</code> or <i>null</i> if no unit is present.
-     * TODO: deprecate this in favour of using the unit list, as we are
-     * unnecessarily encoding the assumption that there can only be one unit.
+     * Returns the unit who is occupying the tile
+     * @return the unit who is occupying the tile
+     * @see #isOccupied()
      */
-    public Unit getUnit() {
-        return (isEmpty()) ? null : getUnitList().get(0);
+    public Unit getOccupyingUnit() {
+        return workTile.getOccupyingUnit();
+    }
+
+    /**
+     * Checks whether there is a fortified enemy unit in the tile.
+     * Units can't produce in occupied tiles
+     * @return <code>true</code> if an fortified enemy unit is in the tile
+     */
+    public boolean isOccupied() {
+        return workTile.isOccupied();
+    }
+
+    /**
+     * Returns the primary production of a colony center tile. In the
+     * standard rule sets, this is always some kind of food and all
+     * tile improvements contribute to the production.
+     *
+     * @return an <code>AbstractGoods</code> value
+     */
+    private AbstractGoods getPrimaryProduction() {
+        if (workTile.getType().getPrimaryGoods() == null) {
+            return null;
+        } else {
+            AbstractGoods primaryProduction
+                = new AbstractGoods(workTile.getType().getPrimaryGoods());
+            int potential = primaryProduction.getAmount();
+            if (workTile.getTileItemContainer() != null) {
+                potential = workTile.getTileItemContainer()
+                    .getTotalBonusPotential(primaryProduction.getType(), null,
+                                            potential, false);
+            }
+            primaryProduction.setAmount(potential
+                + Math.max(0, getColony().getProductionBonus()));
+            return primaryProduction;
+        }
+    }
+
+    /**
+     * Returns the secondary production of a colony center tile. Only
+     * natural tile improvements, such as rivers, contribute to the
+     * production. Artificial tile improvements, such as plowing, are
+     * ignored.
+     *
+     * @return an <code>int</code> value
+     */
+    private AbstractGoods getSecondaryProduction() {
+        if (workTile.getType().getSecondaryGoods() == null) {
+            return null;
+        } else {
+            AbstractGoods secondaryProduction
+                = new AbstractGoods(workTile.getType().getSecondaryGoods());
+            int potential = secondaryProduction.getAmount();
+            if (workTile.getTileItemContainer() != null) {
+                potential = workTile.getTileItemContainer()
+                    .getTotalBonusPotential(secondaryProduction.getType(), null,
+                                            potential, true);
+            }
+            secondaryProduction.setAmount(potential
+                + Math.max(0, getColony().getProductionBonus()));
+            return secondaryProduction;
+        }
+    }
+
+    /**
+     * Gets the basic production information for the colony tile,
+     * ignoring any colony limited (which for now, should be irrelevant).
+     *
+     * @return The raw production of this colony tile.
+     * @see ProductionCache#update
+     */
+    public ProductionInfo getBasicProductionInfo() {
+        ProductionInfo pi = new ProductionInfo();
+        if (isColonyCenterTile()) {
+            AbstractGoods primaryProduction = getPrimaryProduction();
+            if (primaryProduction != null) {
+                pi.addProduction(primaryProduction);
+            }
+            AbstractGoods secondaryProduction = getSecondaryProduction();
+            if (secondaryProduction != null) {
+                pi.addProduction(secondaryProduction);
+            }
+        } else {
+            for (Unit unit : getUnitList()) {
+                GoodsType goodsType = unit.getWorkType();
+                pi.addProduction(new AbstractGoods(goodsType,
+                        getProductionOf(unit, goodsType)));
+            }
+        }
+        return pi;
+    }
+
+
+    // Interface Location
+
+    /**
+     * {@inheritDoc}
+     */
+    public StringTemplate getLocationName() {
+        String name = getColony().getName();
+        if (isColonyCenterTile()) {
+            return StringTemplate.name(name);
+        } else {
+            return StringTemplate.template("nearLocation")
+                .add("%direction%", "direction."
+                    + getTile().getDirection(workTile).toString())
+                .addName("%location%", name);
+        }
+    }
+
+    // Omit getLocationNameFor
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean add(final Locatable locatable) {
+        NoAddReason reason = getNoAddReason(locatable);
+        if (reason != NoAddReason.NONE) {
+            throw new IllegalStateException("Can not add " + locatable
+                + " to " + toString() + " because " + reason);
+        }
+        Unit unit = (Unit) locatable;
+        if (contains(unit)) return true;
+
+        if (super.add(unit)) {
+            unit.setState(Unit.UnitState.IN_COLONY);
+
+            // Choose a sensible work type only if none already specified.
+            if (unit.getWorkType() == null) {
+                AbstractGoods goods = workTile.getType().getPrimaryGoods();
+                if (goods == null) {
+                    goods = workTile.getType().getSecondaryGoods();
+                    if (goods == null
+                        && !workTile.getType().getProduction().isEmpty()) {
+                        goods = workTile.getType().getProduction().get(0);
+                    }
+                }
+                if (goods != null) unit.setWorkType(goods.getType());
+            }
+
+            getColony().invalidateCache();
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean remove(final Locatable locatable) {
+        if (!(locatable instanceof Unit)) {
+            throw new IllegalStateException("Not a unit: " + locatable);
+        }
+        Unit unit = (Unit) locatable;
+        if (!contains(unit)) return true;
+
+        if (super.remove(unit)) {
+            unit.setState(Unit.UnitState.ACTIVE);
+            unit.setMovesLeft(0);
+
+            getColony().invalidateCache();
+            return true;
+        }
+        return false;
+    }
+
+
+    // Interface UnitLocation
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public NoAddReason getNoAddReason(Locatable locatable) {
+        NoAddReason reason = getNoWorkReason();
+        return (reason != NoAddReason.NONE) ? reason
+            : super.getNoAddReason(locatable);
     }
 
     /**
@@ -198,6 +347,9 @@ public class ColonyTile extends WorkLocation implements Ownable {
     public int getUnitCapacity() {
         return (isColonyCenterTile()) ? 0 : UNIT_CAPACITY;
     }
+
+
+    // Interface WorkLocation
 
     /**
      * {@inheritDoc}
@@ -238,328 +390,104 @@ public class ColonyTile extends WorkLocation implements Ownable {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public NoAddReason getNoAddReason(Locatable locatable) {
-        NoAddReason reason = getNoWorkReason();
-        return (reason != NoAddReason.NONE) ? reason
-            : super.getNoAddReason(locatable);
+    public boolean canAutoProduce() {
+        return isColonyCenterTile();
     }
 
     /**
-     * Add the specified locatable to this colony tile.
-     *
-     * @param locatable The <code>Locatable</code> to add.
+     * {@inheritDoc}
      */
-    public boolean add(final Locatable locatable) {
-        NoAddReason reason = getNoAddReason(locatable);
-        if (reason != NoAddReason.NONE) {
-            throw new IllegalStateException("Can not add " + locatable
-                + " to " + toString() + " because " + reason);
+    public int getProductionOf(Unit unit, GoodsType goodsType) {
+        if (unit == null) {
+            throw new IllegalArgumentException("Null unit.");
         }
-        Unit unit = (Unit) locatable;
-        if (contains(unit)) return true;
+        return getPotentialProduction(goodsType, unit.getType());
+    }
 
-        if (super.add(unit)) {
-            unit.setState(Unit.UnitState.IN_COLONY);
-
-            // Choose a sensible work type only if none already specified.
-            if (unit.getWorkType() == null) {
-                AbstractGoods goods = workTile.getType().getPrimaryGoods();
-                if (goods == null) {
-                    goods = workTile.getType().getSecondaryGoods();
-                    if (goods == null
-                        && !workTile.getType().getProduction().isEmpty()) {
-                        goods = workTile.getType().getProduction().get(0);
-                    }
-                }
-                if (goods != null) unit.setWorkType(goods.getType());
+    /**
+     * {@inheritDoc}
+     */
+    public int getPotentialProduction(GoodsType goodsType, UnitType unitType) {
+        int production = 0;
+        TileType tileType = workTile.getType();
+        if (isColonyCenterTile()) {
+            production = (unitType != null) ? 0
+                : (tileType.getPrimaryGoods() != null
+                    && tileType.getPrimaryGoods().getType() == goodsType)
+                ? getPrimaryProduction().getAmount()
+                : (tileType.getSecondaryGoods() != null
+                    && tileType.getSecondaryGoods().getType() == goodsType)
+                ? getSecondaryProduction().getAmount()
+                : 0;
+        } else if (workTile.isLand()
+            || getColony().hasAbility(Ability.PRODUCE_IN_WATER)) {
+            List<Modifier> mods = getProductionModifiers(goodsType, unitType);
+            if (!mods.isEmpty()) {
+                production = (int)FeatureContainer.applyModifiers(0f,
+                    getGame().getTurn(), mods);
             }
-
-            getColony().invalidateCache();
-            return true;
         }
-        return false;
+        return Math.max(0, production);
     }
 
     /**
-     * Remove the specified locatable from this colony tile.
-     *
-     * @param locatable The <code>Locatable</code> to be removed.
+     * {@inheritDoc}
      */
-    public boolean remove(final Locatable locatable) {
-        if (!(locatable instanceof Unit)) {
-            throw new IllegalStateException("Not a unit: " + locatable);
+    public List<Modifier> getProductionModifiers(GoodsType goodsType, 
+                                                 UnitType unitType) {
+        if (goodsType == null) {
+            throw new IllegalArgumentException("Null GoodsType.");
         }
-        Unit unit = (Unit) locatable;
-        if (!contains(unit)) return true;
-
-        if (super.remove(unit)) {
-            unit.setState(Unit.UnitState.ACTIVE);
-            unit.setMovesLeft(0);
-
-            getColony().invalidateCache();
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Relocates any worker on this <code>ColonyTile</code>.
-     * The workers are added to another {@link WorkLocation}
-     * within the {@link Colony}.
-     */
-    public void relocateWorkers() {
-        for (Unit unit : getUnitList()) {
-            for (WorkLocation wl : getColony().getCurrentWorkLocations()) {
-                if (wl != this && wl.canAdd(unit)) {
-                    unit.setLocation(wl);
-                    break;
+        List<Modifier> result = new ArrayList<Modifier>();
+        final TileType tileType = getWorkTile().getType();
+        final String id = goodsType.getId();
+        final Turn turn = getGame().getTurn();
+        if (isColonyCenterTile()) {
+            if (tileType.isPrimaryGoodsType(goodsType)
+                || tileType.isSecondaryGoodsType(goodsType)) {
+                result.addAll(workTile.getProductionModifiers(goodsType, null));
+                result.addAll(getColony().getModifierSet(id));
+            }
+        } else {
+            result.addAll(workTile.getProductionModifiers(goodsType, unitType));
+            if (FeatureContainer.applyModifiers(0f, turn, result) > 0) {
+                result.addAll(getColony().getModifierSet(id));
+                if (unitType != null) {
+                    result.addAll(unitType.getModifierSet(id, tileType, turn));
                 }
             }
         }
+        return result;
     }
 
     /**
-     * Returns the unit who is occupying the tile
-     * @return the unit who is occupying the tile
-     * @see #isOccupied()
+     * {@inheritDoc}
      */
-    public Unit getOccupyingUnit() {
-        return workTile.getOccupyingUnit();
-    }
-
-    /**
-     * Checks whether there is a fortified enemy unit in the tile.
-     * Units can't produce in occupied tiles
-     * @return <code>true</code> if an fortified enemy unit is in the tile
-     */
-    public boolean isOccupied() {
-        return workTile.isOccupied();
-    }
-
-    /**
-     * Returns a worktype for a unit.
-     *
-     * @param unit a <code>Unit</code> value
-     * @return a workType
-     */
-    public GoodsType getWorkType(Unit unit) {
+    public GoodsType getBestWorkType(Unit unit) {
         GoodsType workType = unit.getWorkType();
-        int amount = (workType == null) ? 0 : getProductionOf(unit, workType);
-        if (amount == 0) {
-            List<GoodsType> farmedGoodsTypes = getSpecification().getFarmedGoodsTypeList();
-            for(GoodsType farmedGoods : farmedGoodsTypes) {
-                int newAmount = getProductionOf(unit, farmedGoods);
-                if (newAmount > amount) {
-                    amount = newAmount;
-                    workType = farmedGoods;
-                }
+        int amount = 0;
+        for (GoodsType g : getSpecification().getFarmedGoodsTypeList()) {
+            int newAmount = getPotentialProduction(g, unit.getType());
+            if (newAmount > amount) {
+                amount = newAmount;
+                workType = g;
             }
         }
         return workType;
     }
 
     /**
-     * Returns the primary production of a colony center tile. In the
-     * standard rule sets, this is always some kind of food and all
-     * tile improvements contribute to the production.
-     *
-     * @return an <code>AbstractGoods</code> value
+     * {@inheritDoc}
      */
-    private AbstractGoods getPrimaryProduction() {
-        if (workTile.getType().getPrimaryGoods() == null) {
-            return null;
-        } else {
-            AbstractGoods primaryProduction = new AbstractGoods(workTile.getType().getPrimaryGoods());
-            int potential = primaryProduction.getAmount();
-            if (workTile.getTileItemContainer() != null) {
-                potential = workTile.getTileItemContainer()
-                    .getTotalBonusPotential(primaryProduction.getType(), null,
-                                            potential, false);
-            }
-            primaryProduction.setAmount(potential + Math.max(0, getColony().getProductionBonus()));
-            return primaryProduction;
-        }
+    public StringTemplate getClaimTemplate() {
+        return (isColonyCenterTile()) ? super.getClaimTemplate()
+            : StringTemplate.template("workClaimColonyTile")
+                .add("%direction%", "direction."
+                    + getTile().getDirection(workTile).toString());
     }
 
-    /**
-     * Returns the secondary production of a colony center tile. Only
-     * natural tile improvements, such as rivers, contribute to the
-     * production. Artificial tile improvements, such as plowing, are
-     * ignored.
-     *
-     * @return an <code>int</code> value
-     */
-    private AbstractGoods getSecondaryProduction() {
-        if (workTile.getType().getSecondaryGoods() == null) {
-            return null;
-        } else {
-            AbstractGoods secondaryProduction = new AbstractGoods(workTile.getType().getSecondaryGoods());
-            int potential = secondaryProduction.getAmount();
-            if (workTile.getTileItemContainer() != null) {
-                potential = workTile.getTileItemContainer()
-                    .getTotalBonusPotential(secondaryProduction.getType(), null,
-                                            potential, true);
-            }
-            secondaryProduction.setAmount(potential + Math.max(0, getColony().getProductionBonus()));
-            return secondaryProduction;
-        }
-    }
 
-    public List<AbstractGoods> getProduction() {
-        List<AbstractGoods> result = new ArrayList<AbstractGoods>(2);
-        if (isColonyCenterTile()) {
-            AbstractGoods primaryProduction = getPrimaryProduction();
-            if (primaryProduction != null) {
-                result.add(primaryProduction);
-            }
-            AbstractGoods secondaryProduction = getSecondaryProduction();
-            if (secondaryProduction != null) {
-                result.add(secondaryProduction);
-            }
-        } else {
-            for (Unit unit : getUnitList()) {
-                GoodsType goodsType = unit.getWorkType();
-                result.add(new AbstractGoods(goodsType, getProductionOf(unit,
-                            goodsType)));
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Gets the production modifiers for the given type of goods and unit.
-     *
-     * @param goodsType The <code>GoodsType</code> to produce.
-     * @param unitType The <code>unitType</code> to produce them.
-     * @return A set of the applicable modifiers.
-     */
-    public Set<Modifier> getProductionModifiers(GoodsType goodsType, UnitType unitType) {
-        if (goodsType == null) {
-            throw new IllegalArgumentException("GoodsType must not be 'null'.");
-        }
-        Set<Modifier> result = new HashSet<Modifier>();
-        for (Unit unit : getUnitList()) {
-            if (isColonyCenterTile()
-                && (workTile.getType().isPrimaryGoodsType(goodsType)
-                    || workTile.getType().isSecondaryGoodsType(goodsType))) {
-                result.addAll(workTile.getProductionBonus(goodsType, null));
-                result.addAll(getColony().getModifierSet(goodsType.getId()));
-            } else if (goodsType.equals(unit.getWorkType())) {
-                result.addAll(workTile.getProductionBonus(goodsType, unitType));
-                result.addAll(unit.getModifierSet(goodsType.getId()));
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Returns the production of the given type of goods.
-     *
-     * @param goodsType a <code>GoodsType</code> value
-     * @return an <code>int</code> value
-     */
-    public int getProductionOf(GoodsType goodsType) {
-        if (goodsType == null) {
-            throw new IllegalArgumentException("GoodsType must not be 'null'.");
-        }
-        if (isColonyCenterTile()) {
-            TileType type = workTile.getType();
-            return (type.getPrimaryGoods() != null
-                && type.getPrimaryGoods().getType() == goodsType)
-                ? getPrimaryProduction().getAmount()
-                : (type.getSecondaryGoods() != null
-                    && type.getSecondaryGoods().getType() == goodsType)
-                ? getSecondaryProduction().getAmount()
-                : 0;
-        }
-        int production = 0;
-        for (Unit unit : getUnitList()) {
-            if (goodsType.equals(unit.getWorkType())) {
-                production += getProductionOf(unit, goodsType);
-            }
-        }
-        return Math.max(0, production);
-    }
-
-    /**
-     * Returns the production of the given type of goods which would
-     * be produced by the given unit
-     *
-     * @param unit The <code>Unit</code> that is to produce.
-     * @param goodsType The <code>GoodsType</code> to produce.
-     * @return The consequent production.
-     */
-    public int getProductionOf(Unit unit, GoodsType goodsType) {
-        if (unit == null) {
-            throw new IllegalArgumentException("Unit must not be 'null'.");
-        }
-
-        int result = 0;
-        if (workTile.isLand()
-            || getColony().hasAbility(Ability.PRODUCE_IN_WATER)) {
-            Turn turn = getGame().getTurn();
-            Set<Modifier> modifiers = workTile.getProductionBonus(goodsType,
-                unit.getType());
-            if (FeatureContainer.applyModifierSet(0f, turn, modifiers) > 0) {
-                modifiers.addAll(unit.getModifierSet(goodsType.getId()));
-                modifiers.add(getColony().getProductionModifier(goodsType));
-                modifiers.addAll(getColony().getModifierSet(goodsType.getId()));
-                result = Math.max(1,
-                    (int)FeatureContainer.applyModifiers(0f, turn,
-                        new ArrayList<Modifier>(modifiers)));
-            }
-        }
-        return Math.max(0, result);
-    }
-
-    /**
-     * Gets the potential production of a given goods type from using
-     * a unit of a given type in this building.
-     *
-     * @param unitType The optional <code>UnitType</code> to check.
-     * @param goodsType The <code>GoodsType</code> to check.
-     * @return The amount of goods potentially produced.
-     */
-    public int getPotentialProduction(UnitType unitType, GoodsType goodsType) {
-        int production = 0;
-        if (isColonyCenterTile()) {
-            TileType type = workTile.getType();
-            return (type.getPrimaryGoods() != null
-                && type.getPrimaryGoods().getType() == goodsType)
-                ? getPrimaryProduction().getAmount()
-                : (type.getSecondaryGoods() != null
-                    && type.getSecondaryGoods().getType() == goodsType)
-                ? getSecondaryProduction().getAmount()
-                : 0;
-        }
-        if (workTile.isLand()
-            || getColony().hasAbility(Ability.PRODUCE_IN_WATER)) {
-            Turn turn = getGame().getTurn();
-            Set<Modifier> modifiers = workTile.getProductionBonus(goodsType,
-                                                                   unitType);
-            if (FeatureContainer.applyModifierSet(0f, turn, modifiers) > 0) {
-                if (unitType != null) {
-                    modifiers.addAll(unitType.getModifierSet(goodsType.getId()));
-                }
-                modifiers.add(getColony().getProductionModifier(goodsType));
-                modifiers.addAll(getColony().getModifierSet(goodsType.getId()));
-                production = Math.max(1,
-                    (int)FeatureContainer.applyModifiers(0f, turn,
-                        new ArrayList<Modifier>(modifiers)));
-            }
-        }
-        return Math.max(0, production);
-    }
-
-    /**
-     * Colony tiles can not auto-produce except for the center tile.
-     *
-     * @return True if this work location can produce goods without workers.
-     */
-    public boolean canAutoProduce() {
-        return isColonyCenterTile();
-    }
+    // Serialization
 
     /**
      * This method writes an XML-representation of this object to
@@ -612,8 +540,6 @@ public class ColonyTile extends WorkLocation implements Ownable {
         super.readAttributes(in);
 
         workTile = getFreeColGameObject(in, "workTile", Tile.class);
-
-        colonyCenterTile = getTile() == workTile;
 
         super.readChildren(in);
     }

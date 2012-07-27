@@ -245,7 +245,7 @@ public class UnitWas implements Comparable<UnitWas> {
                     || info.getProduction().size() == 0) ? 0
                     : info.getProduction().get(0).getAmount();
             } else if (location instanceof ColonyTile) {
-                return ((ColonyTile)location).getProductionOf(goodsType);
+                return ((ColonyTile)location).getTotalProductionOf(goodsType);
             }
         }
         return 0;

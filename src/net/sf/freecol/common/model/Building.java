@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+
 /**
  * Represents a building in a colony.
  */
@@ -89,112 +90,12 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public String getNameKey() {
-        return buildingType.getNameKey();
-    }
-
-    /**
-     * Returns the level of this building.
-     *
-     * @return an <code>int</code> value
-     */
-    public int getLevel() {
-        return buildingType.getLevel();
-    }
-
-    /**
-     * Returns the name of this location.
-     *
-     * @return The name of this location.
-     */
-    public StringTemplate getLocationName() {
-        return StringTemplate.template("inLocation")
-            .add("%location%", getNameKey());
-    }
-
-    /**
-     * Gets the name of the improved building of the same type. An improved
-     * building is a building of a higher level.
-     *
-     * @return The name of the improved building or <code>null</code> if the
-     *         improvement does not exist.
-     */
-    public String getNextNameKey() {
-        final BuildingType next = buildingType.getUpgradesTo();
-        return next == null ? null : next.getNameKey();
-    }
-
-    /**
-     * Checks if this building can have a higher level.
-     *
-     * @return If this <code>Building</code> can have a higher level, that
-     *         {@link FoundingFather Adam Smith} is present for manufactoring
-     *         factory level buildings and that the <code>Colony</code>
-     *         containing this <code>Building</code> has a sufficiently high
-     *         population.
-     */
-    public boolean canBuildNext() {
-        return getColony().canBuild(buildingType.getUpgradesTo());
-    }
-
-
-    /**
      * Gets the type of this building.
      *
-     * @return The type.
+     * @return The building type.
      */
     public BuildingType getType() {
         return buildingType;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean hasAbility(String id) {
-        return getType().hasAbility(id);
-    }
-
-    /**
-     * Returns whether this building can be damaged
-     *
-     * @return <code>true</code> if can be damaged
-     * @see #damage
-     */
-    public boolean canBeDamaged() {
-        return !buildingType.isAutomaticBuild()
-            && !getColony().isAutomaticBuild(buildingType);
-    }
-
-    /**
-     * Reduces this building to previous level (is set to UpgradesFrom
-     * attribute in BuildingType) or is destroyed if it's the first level
-     *
-     * @return True if the building was damaged.
-     */
-    public boolean damage() {
-        if (canBeDamaged()) {
-            setType(buildingType.getUpgradesFrom());
-            getColony().invalidateCache();
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Upgrades this building to next level (is set to UpgradesTo
-     * attribute in BuildingType)
-     *
-     * @return True if the upgrade succeeds.
-     */
-    public boolean upgrade() {
-        if (canBuildNext()) {
-            setType(buildingType.getUpgradesTo());
-            getColony().invalidateCache();
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -218,7 +119,7 @@ public class Building extends WorkLocation implements Named, Comparable<Building
 
             // Colonists which can't work here must be put outside
             for (Unit unit : getUnitList()) {
-                if (!canAdd(unit.getType())) {
+                if (!canAddType(unit.getType())) {
                     unit.setLocation(colony.getTile());
                 }
             }
@@ -237,8 +138,90 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      * {@inheritDoc}
      */
     @Override
-    public int getUnitCapacity() {
-        return buildingType.getWorkPlaces();
+    public boolean hasAbility(String id) {
+        return getType().hasAbility(id);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getNameKey() {
+        return getType().getNameKey();
+    }
+
+    /**
+     * Returns the level of this building.
+     *
+     * @return an <code>int</code> value
+     */
+    public int getLevel() {
+        return getType().getLevel();
+    }
+
+    /**
+     * Gets the name of the improved building of the same type. An improved
+     * building is a building of a higher level.
+     *
+     * @return The name of the improved building or <code>null</code> if the
+     *         improvement does not exist.
+     */
+    public String getNextNameKey() {
+        final BuildingType next = getType().getUpgradesTo();
+        return next == null ? null : next.getNameKey();
+    }
+
+    /**
+     * Checks if this building can have a higher level.
+     *
+     * @return If this <code>Building</code> can have a higher level, that
+     *         {@link FoundingFather Adam Smith} is present for manufactoring
+     *         factory level buildings and that the <code>Colony</code>
+     *         containing this <code>Building</code> has a sufficiently high
+     *         population.
+     */
+    public boolean canBuildNext() {
+        return getColony().canBuild(getType().getUpgradesTo());
+    }
+
+    /**
+     * Returns whether this building can be damaged
+     *
+     * @return <code>true</code> if can be damaged
+     * @see #damage
+     */
+    public boolean canBeDamaged() {
+        return !getType().isAutomaticBuild()
+            && !getColony().isAutomaticBuild(getType());
+    }
+
+    /**
+     * Reduces this building to previous level (is set to UpgradesFrom
+     * attribute in BuildingType) or is destroyed if it's the first level
+     *
+     * @return True if the building was damaged.
+     */
+    public boolean damage() {
+        if (canBeDamaged()) {
+            setType(getType().getUpgradesFrom());
+            getColony().invalidateCache();
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Upgrades this building to next level (is set to UpgradesTo
+     * attribute in BuildingType)
+     *
+     * @return True if the upgrade succeeds.
+     */
+    public boolean upgrade() {
+        if (canBuildNext()) {
+            setType(getType().getUpgradesTo());
+            getColony().invalidateCache();
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -251,83 +234,13 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public NoAddReason getNoWorkReason() {
-        return NoAddReason.NONE;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public NoAddReason getNoAddReason(Locatable locatable) {
-        if (!(locatable instanceof Unit)) return NoAddReason.WRONG_TYPE;
-        NoAddReason reason = getNoWorkReason();
-        Unit unit = (Unit) locatable;
-        BuildingType type = getType();
-
-        return (reason != NoAddReason.NONE) ? reason
-            : !type.canAdd(unit.getType()) ? NoAddReason.MISSING_SKILL
-            : super.getNoAddReason(locatable);
-    }
-
-    /**
-     * Checks if the specified <code>UnitType</code> may be added to this
-     * <code>WorkLocation</code>.
+     * Can a particular type of unit be added to this building?
      *
-     * @param unitType the <code>UnitType</code>.
-     * @return <i>true</i> if the <i>UnitType</i> may be added and <i>false</i>
-     *         otherwise.
+     * @param unitType The <code>UnitType</code> to check.
+     * @return True if unit type can be added to this building.
      */
-    public boolean canAdd(final UnitType unitType) {
-        return canBeWorked() && buildingType.canAdd(unitType);
-    }
-
-    /**
-     * Adds the specified locatable to this building.
-     *
-     * @param locatable The <code>Locatable</code> to add.
-     */
-    public boolean add(final Locatable locatable) {
-        NoAddReason reason = getNoAddReason(locatable);
-        if (reason != NoAddReason.NONE) {
-            throw new IllegalStateException("Can not add " + locatable
-                + " to " + toString() + " because " + reason);
-        }
-        Unit unit = (Unit) locatable;
-        if (contains(unit)) return true;
-
-        if (super.add(unit)) {
-            unit.setState(Unit.UnitState.IN_COLONY);
-            unit.setWorkType(getGoodsOutputType());
-
-            getColony().invalidateCache();
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Removes the specified locatable from this building.
-     *
-     * @param locatable The <code>Locatable</code> to remove.
-     */
-    public boolean remove(final Locatable locatable) {
-        if (!(locatable instanceof Unit)) {
-            throw new IllegalStateException("Not a unit: " + locatable);
-        }
-        Unit unit = (Unit) locatable;
-        if (!contains(unit)) return true;
-
-        if (super.remove(unit)) {
-            unit.setState(Unit.UnitState.ACTIVE);
-            unit.setMovesLeft(0);
-
-            getColony().invalidateCache();
-            return true;
-        }
-        return false;
+    public boolean canAddType(UnitType unitType) {
+        return canBeWorked() && getType().canAdd(unitType);
     }
 
     /**
@@ -353,24 +266,40 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     }
 
     /**
-     * Returns the ProductionInfo for this Building from the Colony's
-     * cache.
+     * Gets the maximum productivity of a unit working in this work location,
+     * considering *only* the contribution of the unit, exclusive of
+     * that of the work location.
      *
-     * @return a <code>ProductionInfo</code> object
+     * Used below, only public for the test suite.
+     * 
+     * @param unit The <code>Unit</code> to check.
+     * @return The maximum return from this unit.
      */
-    public ProductionInfo getProductionInfo() {
-        return getColony().getProductionInfo(this);
+    public int getUnitConsumption(Unit unit) {
+        if (getGoodsOutputType() == null || unit == null) return 0;
+
+        int productivity = getType().getBasicProduction();
+        if (productivity > 0) {
+            productivity += getColony().getProductionBonus();
+            productivity = (int)unit.getType()
+                .applyModifier(Math.max(1, productivity),
+                    getGoodsOutputType().getId());
+        }
+        return Math.max(0, productivity);
     }
 
     /**
-     * Returns the ProductionInfo for this Building.
+     * Gets the production information for this building taking account
+     * of the available input and output goods.
      *
-     * @param output the output goods already available in the colony,
-     *        necessary in order to avoid excess production
-     * @param input the input goods available
-     * @return a <code>ProductionInfo</code> object
+     * @param output The output goods already available in the colony,
+     *     necessary in order to avoid excess production.
+     * @param input The input goods available.
+     * @return The production information.
+     * @see ProductionCache#update
      */
-    public ProductionInfo getProductionInfo(AbstractGoods output, List<AbstractGoods> input) {
+    public ProductionInfo getAdjustedProductionInfo(AbstractGoods output,
+                                                    List<AbstractGoods> input) {
         ProductionInfo result = new ProductionInfo();
         GoodsType outputType = getGoodsOutputType();
         GoodsType inputType = getGoodsInputType();
@@ -379,7 +308,7 @@ public class Building extends WorkLocation implements Named, Comparable<Building
                                                + " should have been: " + outputType);
         }
         int capacity = getColony().getWarehouseCapacity();
-        if (buildingType.hasAbility(Ability.AVOID_EXCESS_PRODUCTION)
+        if (getType().hasAbility(Ability.AVOID_EXCESS_PRODUCTION)
             && output.getAmount() >= capacity) {
             // warehouse is already full: produce nothing
             return result;
@@ -407,15 +336,20 @@ public class Building extends WorkLocation implements Named, Comparable<Building
                 int available = getColony().getGoodsCount(outputType);
                 if (available >= outputType.getBreedingNumber()) {
                     // we need at least these many horses/animals to breed
-                    int divisor = (int) getType().applyModifier(0, "model.modifier.breedingDivisor");
-                    int factor = (int) getType().applyModifier(0, "model.modifier.breedingFactor");
+                    int divisor = (int)getType().applyModifier(0f,
+                        "model.modifier.breedingDivisor");
+                    int factor = (int)getType().applyModifier(0f,
+                        "model.modifier.breedingFactor");
                     maximumInput = ((available - 1) / divisor + 1) * factor;
                 }
             } else {
-                maximumInput = getProductivity();
+                for (Unit u : getUnitList()) {
+                    maximumInput += getUnitConsumption(u);
+                }
+                maximumInput = Math.max(0, maximumInput);
             }
             Turn turn = getGame().getTurn();
-            List<Modifier> productionModifiers = getProductionModifiers();
+            List<Modifier> productionModifiers = getProductionModifiers(getGoodsOutputType(), null);
             int maxProd = (int)FeatureContainer.applyModifiers(maximumInput,
                 turn, productionModifiers);
             int actualInput = (inputType == null)
@@ -424,7 +358,7 @@ public class Building extends WorkLocation implements Named, Comparable<Building
             // experts in factory level buildings may produce a
             // certain amount of goods even when no input is available
             if (availableInput < maximumInput
-                && buildingType.hasAbility(Ability.EXPERTS_USE_CONNECTIONS)
+                && getType().hasAbility(Ability.EXPERTS_USE_CONNECTIONS)
                 && getSpecification().getBoolean(GameOptions.EXPERTS_HAVE_CONNECTIONS)) {
                 int minimumGoodsInput = 0;
                 for (Unit unit: getUnitList()) {
@@ -441,7 +375,7 @@ public class Building extends WorkLocation implements Named, Comparable<Building
             int prod = (int)FeatureContainer.applyModifiers(actualInput, turn,
                                                             productionModifiers);
             if (prod > 0) {
-                if (buildingType.hasAbility(Ability.AVOID_EXCESS_PRODUCTION)) {
+                if (getType().hasAbility(Ability.AVOID_EXCESS_PRODUCTION)) {
                     int total = output.getAmount() + prod;
                     while (total > capacity) {
                         if (actualInput <= 0) {
@@ -476,204 +410,172 @@ public class Building extends WorkLocation implements Named, Comparable<Building
         return result;
     }
 
-    /**
-     * Returns the actual production of this building.
-     *
-     * @return The amount of goods being produced by this <code>Building</code>
-     *         the current turn. The type of goods being produced is given by
-     *         {@link #getGoodsOutputType}.
-     * @see #getMaximumProduction
-     */
-    public int getProduction() {
-        ProductionInfo info = getProductionInfo();
-        if (info == null) return 0;
-        List<AbstractGoods> production = info.getProduction();
-        if (production == null || production.isEmpty()) {
-            return 0;
-        } else {
-            return production.get(0).getAmount();
-        }
-    }
 
-    /**
-     * Returns the maximum production of this building.
-     *
-     * @return The production of this building, with the current amount of
-     *         workers, when there is enough "input goods".
-     */
-    public int getMaximumProduction() {
-        ProductionInfo info = getProductionInfo();
-        if (info == null) return 0;
-        List<AbstractGoods> production = info.getMaximumProduction();
-        if (production == null || production.isEmpty()) {
-            return getProduction();
-        } else {
-            return production.get(0).getAmount();
-        }
-    }
-
-    /**
-     * Returns the additional production of new <code>Unit</code> at
-     * this building for next turn.
-     *
-     * TODO: Make this work properly. In the past, the method never
-     * worked correctly anyway, since it did not take the possible
-     * decrease in the production of input goods into account that
-     * might be caused by moving a unit to this Building from another
-     * WorkLocation. To do this right, it would be necessary to
-     * re-calculate the production for the whole getColony().
-     *
-     * @return The production of this building the next turn.
-     */
-    public int getAdditionalProductionNextTurn(Unit addUnit) {
-        return getUnitProductivity(addUnit);
-    }
-
-    /**
-     * Returns true if this building can produce goods without workers.
-     *
-     * @return a <code>boolean</code> value
-     */
-    public boolean canAutoProduce() {
-        return buildingType.hasAbility(Ability.AUTO_PRODUCTION);
-    }
-
-    /**
-     * Returns the maximum productivity of worker/s currently working
-     * in this building.
-     *
-     * @param additionalUnits units to add before calculating result
-     * @return The maximum returns from workers in this building,
-     *         assuming enough "input goods".
-     */
-    private int getProductivity(Unit... additionalUnits) {
-        if (getGoodsOutputType() == null) {
-            return 0;
-        }
-
-        int productivity = 0;
-        for (Unit unit : getUnitList()) {
-            productivity += getUnitProductivity(unit);
-        }
-        for (Unit unit : additionalUnits) {
-            if (canAdd(unit)) {
-                productivity += getUnitProductivity(unit);
-            }
-        }
-        return Math.max(0, productivity);
-    }
-
-    /**
-     * Returns the maximum productivity of a unit working in this building.
-     *
-     * @return The maximum returns from this unit if in this <code>Building</code>,
-     *         assuming enough "input goods".
-     */
-    public int getUnitProductivity(Unit prodUnit) {
-        if (getGoodsOutputType() == null || prodUnit == null) {
-            return 0;
-        }
-
-        int productivity = buildingType.getBasicProduction();
-        if (productivity > 0) {
-            productivity += getColony().getProductionBonus();
-            productivity = (int)prodUnit.getType()
-                .applyModifier(Math.max(1, productivity),
-                               getGoodsOutputType().getId());
-        }
-        return Math.max(0, productivity);
-    }
-
-    /**
-     * Returns the production of the given type of goods.
-     *
-     * @param goodsType The type of goods to get the production for.
-     * @return the production og the given goods this turn. This method will
-     *         return the same as {@link #getProduction} if the given type of
-     *         goods is the same as {@link #getGoodsOutputType} and
-     *         <code>0</code> otherwise.
-     */
-    public int getProductionOf(GoodsType goodsType) {
-        if (goodsType == getGoodsOutputType()) {
-            return getProduction();
-        }
-
-        return 0;
-    }
-
-    /**
-     * Gets the production of the given type of goods produced by a unit.
-     *
-     * @param unit The unit to do the work.
-     * @param goodsType The type of goods to get the production of.
-     * @return The production of the given type of goods.
-     */
-    public int getProductionOf(Unit unit, GoodsType goodsType) {
-        int result = (unit == null
-            || getGoodsOutputType() == null
-            || getGoodsOutputType() != goodsType) ? 0
-            : getUnitProductivity(unit);
-        return Math.max(0, result);
-    }
-
-    /**
-     * Gets the potential productivity of a given goods type from using
-     * a unit of a given type in this building.
-     *
-     * @param unitType The optional <code>UnitType</code> to check.
-     * @param goodsType The <code>GoodsType</code> to check.
-     * @return The amount of goods potentially produced.
-     */
-    public int getPotentialProduction(UnitType unitType, GoodsType goodsType) {
-        int production = 0;
-        if (getGoodsOutputType() == goodsType) {
-            production += buildingType.getBasicProduction();
-            if (production > 0) {
-                production += getColony().getProductionBonus();
-                if (unitType != null) {
-                    unitType.applyModifier(Math.max(1, production),
-                                           getGoodsOutputType().getId());
-                }
-                production = (int)FeatureContainer.applyModifiers(production,
-                    getGame().getTurn(), getProductionModifiers());
-            }
-        }
-        return Math.max(0, production);
-    }
-
-
-    /**
-     * Returns a List of all Modifiers that influence the total
-     * production of the Building. In particular, the method does not
-     * return any Modifiers that influence of the productivity of
-     * individual units present in the Building, such as the colony
-     * production bonus.
-     *
-     * @return A list of all Modifiers that influence the total
-     *     production of the Building
-     */
-    public List<Modifier> getProductionModifiers() {
-        List<Modifier> modifiers = new ArrayList<Modifier>();
-        GoodsType goodsOutputType = getGoodsOutputType();
-        Turn turn = getGame().getTurn();
-        if (goodsOutputType != null) {
-            modifiers.addAll(getColony()
-                .getModifierSet(goodsOutputType.getId(), buildingType, turn));
-            if (getOwner() != null) {
-                modifiers.addAll(getOwner()
-                    .getModifierSet(goodsOutputType.getId(), buildingType, turn));
-            }
-        }
-        Collections.sort(modifiers);
-        return modifiers;
-    }
-
+    // Interface Comparable
     /**
      * {@inheritDoc}
      */
     public int compareTo(Building other) {
         return getType().compareTo(other.getType());
     }
+
+
+    // Interface Location
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public StringTemplate getLocationName() {
+        return StringTemplate.template("inLocation")
+            .add("%location%", getNameKey());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean add(final Locatable locatable) {
+        NoAddReason reason = getNoAddReason(locatable);
+        if (reason != NoAddReason.NONE) {
+            throw new IllegalStateException("Can not add " + locatable
+                + " to " + toString() + " because " + reason);
+        }
+        Unit unit = (Unit) locatable;
+        if (contains(unit)) return true;
+
+        if (super.add(unit)) {
+            unit.setState(Unit.UnitState.IN_COLONY);
+            unit.setWorkType(getGoodsOutputType());
+
+            getColony().invalidateCache();
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean remove(final Locatable locatable) {
+        if (!(locatable instanceof Unit)) {
+            throw new IllegalStateException("Not a unit: " + locatable);
+        }
+        Unit unit = (Unit) locatable;
+        if (!contains(unit)) return true;
+
+        if (super.remove(unit)) {
+            unit.setState(Unit.UnitState.ACTIVE);
+            unit.setMovesLeft(0);
+
+            getColony().invalidateCache();
+            return true;
+        }
+        return false;
+    }
+
+
+    // Interface UnitLocation
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public NoAddReason getNoAddReason(Locatable locatable) {
+        if (!(locatable instanceof Unit)) return NoAddReason.WRONG_TYPE;
+        NoAddReason reason = getNoWorkReason();
+        Unit unit = (Unit) locatable;
+        BuildingType type = getType();
+
+        return (reason != NoAddReason.NONE) ? reason
+            : !type.canAdd(unit.getType()) ? NoAddReason.MISSING_SKILL
+            : super.getNoAddReason(locatable);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getUnitCapacity() {
+        return getType().getWorkPlaces();
+    }
+
+
+    // Interface WorkLocation
+
+    /**
+     * {@inheritDoc}
+     */
+    public NoAddReason getNoWorkReason() {
+        return NoAddReason.NONE;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean canAutoProduce() {
+        return getType().hasAbility(Ability.AUTO_PRODUCTION);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int getProductionOf(Unit unit, GoodsType goodsType) {
+        if (unit == null) {
+            throw new IllegalArgumentException("Null unit.");
+        }
+        int result = (getGoodsOutputType() == null
+            || getGoodsOutputType() != goodsType) ? 0
+            : getPotentialProduction(goodsType, unit.getType());
+        return Math.max(0, result);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int getPotentialProduction(GoodsType goodsType, UnitType unitType) {
+        int production = 0;
+        if (getGoodsOutputType() == goodsType) {
+            production += getType().getBasicProduction();
+            if (production > 0) {
+                production = (int)FeatureContainer.applyModifiers(production,
+                    getGame().getTurn(), 
+                    getProductionModifiers(goodsType, unitType));
+            }
+        }
+        return Math.max(0, production);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public List<Modifier> getProductionModifiers(GoodsType goodsType,
+                                                 UnitType unitType) {
+        List<Modifier> mods = new ArrayList<Modifier>();
+        if (goodsType != null && goodsType == getGoodsOutputType()) {
+            final String id = goodsType.getId();
+            final Turn turn = getGame().getTurn();
+            mods.addAll(getColony().getModifierSet(id, getType(), turn));
+            if (unitType != null) {
+                mods.addAll(unitType.getModifierSet(id, getType(), turn));
+            }
+            Player owner = getOwner();
+            if (owner != null) {
+                mods.addAll(owner.getModifierSet(id, getType(), turn));
+            }
+        }
+        return mods;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public GoodsType getBestWorkType(Unit unit) {
+        return getGoodsOutputType();
+    }
+
+    // Omitted getClaimTemplate, buildings do not need to be claimed.
 
 
     // Interface Consumer
@@ -710,16 +612,18 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      * @return an <code>int</code> value
      */
     public int getPriority() {
-        return buildingType.getPriority();
+        return getType().getPriority();
     }
 
     /**
      * {@inheritDoc}
      */
     public Set<Modifier> getModifierSet(String id) {
-        return buildingType.getModifierSet(id);
+        return getType().getModifierSet(id);
     }
 
+
+    // Serialization
 
     /**
      * This method writes an XML-representation of this object to the given

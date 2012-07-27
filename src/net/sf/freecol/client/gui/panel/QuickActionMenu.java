@@ -238,21 +238,21 @@ public final class QuickActionMenu extends JPopupMenu {
                 int prod = bonusChange;
                 switch (wl.getNoAddReason(unit)) {
                 case NONE:
-                    prod += wl.getPotentialProduction(unitType, type);
+                    prod += wl.getPotentialProduction(type, unitType);
                     if (prod > bestOwnedProd) {
                         bestOwnedProd = prod;
                         bestOwned = wl;
                     }
                     break;
                 case ALREADY_PRESENT:
-                    prod += wl.getPotentialProduction(unitType, type);
+                    prod += wl.getPotentialProduction(type, unitType);
                     if (prod > bestOwnedProd) {
                         bestOwnedProd = prod;
                         bestOwned = (unit.getWorkType() == type) ? null : wl;
                     }
                     break;
                 case CLAIM_REQUIRED:
-                    prod += wl.getPotentialProduction(unitType, type);
+                    prod += wl.getPotentialProduction(type, unitType);
                     if (prod > bestUnownedProd) {
                         bestUnownedProd = prod;
                         bestUnowned = wl;
@@ -581,7 +581,7 @@ public final class QuickActionMenu extends JPopupMenu {
             menuItem.addActionListener(unitLabel);
             this.add(menuItem);
             if(tempUnit.getLocation() instanceof Building &&
-               !((Building)tempUnit.getLocation()).canAdd(newUnitType)){
+               !((Building)tempUnit.getLocation()).canAddType(newUnitType)){
                     menuItem.setEnabled(false);
             }
             separatorNeeded = true;

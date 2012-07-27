@@ -19,19 +19,23 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.Collections;
+import java.util.List;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+
 /**
  * The <code>WorkLocation</code> is a place in a {@link Colony} where
- * <code>Units</code> can work. The unit capacity of a WorkLocation is
- * likely to be limited. ColonyTiles can only hold a single worker,
- * and Buildings can hold no more than three workers, for example.
- * WorkLocations do not store any Goods. They take any Goods they
- * consume from the Colony, and put all Goods they produce there,
- * too. Although the WorkLocation implements {@link Ownable}, its
- * owner can not be changed directly, as it is always owned by the
+ * <code>Units</code> can work.  The unit capacity of a WorkLocation
+ * is likely to be limited.  ColonyTiles can only hold a single
+ * worker, and Buildings can hold no more than three workers, for
+ * example.  WorkLocations do not store any Goods.  They take any
+ * Goods they consume from the Colony, and put all Goods they produce
+ * there, too.  Although the WorkLocation implements {@link Ownable},
+ * its owner can not be changed directly, as it is always owned by the
  * owner of the Colony.
  */
 public abstract class WorkLocation extends UnitLocation implements Ownable {
@@ -65,7 +69,8 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
-    public WorkLocation(Game game, XMLStreamReader in) throws XMLStreamException {
+    public WorkLocation(Game game, XMLStreamReader in)
+        throws XMLStreamException {
         super(game, in);
     }
 
@@ -80,83 +85,6 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
      */
     public WorkLocation(Game game, String id) {
         super(game, id);
-    }
-
-
-    /**
-     * Gets the production of the given type of goods.
-     *
-     * @param goodsType The type of goods to get the production of.
-     * @return The production of the given type of goods.
-     */
-    public abstract int getProductionOf(GoodsType goodsType);
-
-    /**
-     * Gets the production of the given type of goods produced by a unit.
-     *
-     * @param unit The unit to do the work.
-     * @param goodsType The type of goods to get the production of.
-     * @return The production of the given type of goods.
-     */
-    public abstract int getProductionOf(Unit unit, GoodsType goodsType);
-
-    /**
-     * Gets the potential production of a given goods type from using
-     * a unit of a given type in this work location.
-     *
-     * @param unitType The <code>UnitType</code> to produce the goods.
-     * @param goodsType The <code>GoodsType</code> to produce.
-     * @return The amount of goods potentially produced.
-     */
-    public abstract int getPotentialProduction(UnitType unitType,
-                                               GoodsType goodsType);
-
-    /**
-     * Can this work location can produce goods without workers?
-     *
-     * @return True if this work location can produce goods without workers.
-     */
-    public abstract boolean canAutoProduce();
-
-    /**
-     * Checks if this work location is available to the colony to be worked.
-     *
-     * @return The reason why/not the work location can be worked.
-     */
-    public abstract NoAddReason getNoWorkReason();
-
-    /**
-     * Checks if this colony tile can be worked.
-     *
-     * @return True if the colony tile can be worked.
-     */
-    public boolean canBeWorked() {
-        return getNoWorkReason() == NoAddReason.NONE;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public NoAddReason getNoAddReason(Locatable locatable) {
-        return (locatable instanceof Unit && ((Unit) locatable).isPerson())
-            ? super.getNoAddReason(locatable)
-            : NoAddReason.WRONG_TYPE;
-    }
-
-    /**
-     * Returns the <code>Colony</code> this <code>WorkLocation</code> is
-     * located in.
-     *
-     * This method always returns a colony != null (in contrast to
-     * Location.getColony(), which might return null).
-     *
-     * @return The <code>Colony</code> this <code>WorkLocation</code> is
-     *         located in.
-     *
-     * @see Location#getColony
-     */
-    public final Colony getColony() {
-        return colony;
     }
 
     /**
@@ -177,25 +105,6 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
      * @return The owning settlement for this work location.
      */
     public Settlement getOwningSettlement() {
-        return colony;
-    }
-
-    /**
-     * Gets the <code>Tile</code> where this work location is
-     * located.
-     *
-     * @return The <code>Tile</code>.
-     */
-    public Tile getTile() {
-        return colony.getTile();
-    }
-
-    /**
-     * Returns the settlement containing this building.
-     *
-     * @return This colony.
-     */
-    public Settlement getSettlement() {
         return colony;
     }
 
@@ -224,9 +133,18 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
     }
 
     /**
-     * Returns <code>true</code> if this work location has the Ability to
-     * teach skills.
+     * Checks if this work location can actually be worked.
      *
+     * @return True if the work location can be worked.
+     */
+    public boolean canBeWorked() {
+        return getNoWorkReason() == NoAddReason.NONE;
+    }
+
+    /**
+     * Does this work location have teaching capability?
+     *
+     * @return True if this is a teaching location.
      * @see Ability#CAN_TEACH
      */
     public boolean canTeach() {
@@ -234,19 +152,75 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
     }
 
     /**
-     * Gets a template describing whether this work location can/needs-to
-     * be claimed.  To be overridden by classes where this is meaningful.
+     * Gets the ProductionInfo for this WorkLocation from the Colony's
+     * cache.
      *
-     * @return A suitable template.
+     * @return The work location <code>ProductionInfo</code>.
      */
-    public StringTemplate getClaimTemplate() {
-        return StringTemplate.name("");
+    public ProductionInfo getProductionInfo() {
+        return getColony().getProductionInfo(this);
     }
 
     /**
-     * Adds the specified locatable to this building.
+     * Gets the production at this work location.
      *
-     * @param locatable The <code>Locatable</code> to add.
+     * @return The work location production.
+     */
+    public List<AbstractGoods> getProduction() {
+        ProductionInfo info = getProductionInfo();
+        if (info == null) return Collections.emptyList();
+        return info.getProduction();
+    }
+
+    /**
+     * Gets the total production of a specified goods type at this
+     * work location.
+     *
+     * @param goodsType The <code>GoodsType</code> to check.
+     * @return The amount of production.
+     */
+    public int getTotalProductionOf(GoodsType goodsType) {
+        if (goodsType == null) {
+            throw new IllegalArgumentException("Null GoodsType.");
+        }
+        for (AbstractGoods ag : getProduction()) {
+            if (ag.getType() == goodsType) return ag.getAmount();
+        }
+        return 0;
+    }
+
+    /**
+     * Gets the maximum production of this work location for a given
+     * goods type, assuming the current workers and input goods.
+     *
+     * @param goodsType The <code>GoodsType</code> to check.
+     * @return The maximum production of the goods at this work location.
+     */
+    public int getMaximumProductionOf(GoodsType goodsType) {
+        ProductionInfo info = getProductionInfo();
+        if (info == null) return 0;
+        List<AbstractGoods> production = info.getMaximumProduction();
+        if (production != null) {
+            for (AbstractGoods ag : production) {
+                if (ag.getType() == goodsType) return ag.getAmount();
+            }
+        }
+        return getTotalProductionOf(goodsType);
+    }
+
+    // Interface Location
+
+    /**
+     * {@inheritDoc}
+     */
+    public final Tile getTile() {
+        return colony.getTile();
+    }
+
+    // Omit getLocationName, getLocationNameFor
+
+    /**
+     * {@inheritDoc}
      */
     public boolean add(final Locatable locatable) {
         if (!(locatable instanceof Unit)) {
@@ -277,9 +251,7 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
     }
 
     /**
-     * Removes the specified locatable from this building.
-     *
-     * @param locatable The <code>Locatable</code> to remove.
+     * {@inheritDoc}
      */
     public boolean remove(final Locatable locatable) {
         if (!(locatable instanceof Unit)) {
@@ -302,6 +274,103 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
             return true;
         }
         return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public final Settlement getSettlement() {
+        return colony;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public final Colony getColony() {
+        return colony;
+    }
+
+
+    // Interface UnitLocation
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public NoAddReason getNoAddReason(Locatable locatable) {
+        return (locatable instanceof Unit && ((Unit) locatable).isPerson())
+            ? super.getNoAddReason(locatable)
+            : NoAddReason.WRONG_TYPE;
+    }
+
+    // Omitted getUnitCapacity, the superclass implementation is still ok.
+
+
+    // Abstract and overrideable routines to be implemented by
+    // WorkLocation subclasses.
+
+    /**
+     * Checks if this work location is available to the colony to be worked.
+     *
+     * @return The reason why/not the work location can be worked.
+     */
+    public abstract NoAddReason getNoWorkReason();
+
+    /**
+     * Can this work location can produce goods without workers?
+     *
+     * @return True if this work location can produce goods without workers.
+     */
+    public abstract boolean canAutoProduce();
+
+    /**
+     * Gets the production of a unit of the given type of goods.
+     *
+     * @param unit The unit to do the work.
+     * @param goodsType The type of goods to get the production of.
+     * @return The production of the given type of goods.
+     */
+    public abstract int getProductionOf(Unit unit, GoodsType goodsType);
+
+    /**
+     * Gets the potential production of a given goods type from
+     * optionally using a unit of a given type in this work location.
+     *
+     * @param goodsType The <code>GoodsType</code> to produce.
+     * @param unitType An optional <code>UnitType</code> to produce the goods.
+     * @return The amount of goods potentially produced.
+     */
+    public abstract int getPotentialProduction(GoodsType goodsType,
+                                               UnitType unitType);
+
+    /**
+     * Gets the production modifiers for the given type of goods and unit.
+     *
+     * @param goodsType The <code>GoodsType</code> to produce.
+     * @param unitType The optional <code>unitType</code> to produce them.
+     * @return A list of the applicable modifiers.
+     */
+    public abstract List<Modifier> getProductionModifiers(GoodsType goodsType, 
+                                                          UnitType unitType);
+
+    /**
+     * Gets the best work type a unit to perform at this work location.
+     *
+     * @param unit The <code>Unit</code> to check.
+     * @return The best work type.
+     */
+    public abstract GoodsType getBestWorkType(Unit unit);
+
+    /**
+     * Gets a template describing whether this work location can/needs-to
+     * be claimed.  To be overridden by classes where this is meaningful.
+     *
+     * This is a default null implementation.
+     *
+     * @return A suitable template.
+     */
+    public StringTemplate getClaimTemplate() {
+        return StringTemplate.name("");
     }
 
 

@@ -67,7 +67,7 @@ public class ServerIndianSettlementTest extends FreeColTestCase {
         assertEquals(1, camp.getUnitCount());
         assertEquals(0, camp.getGoodsCount(foodType));
 
-        int foodProduced = camp.getProductionOf(grainType);
+        int foodProduced = camp.getTotalProductionOf(grainType);
         int foodConsumed = camp.getFoodConsumption();
         assertTrue("Food Produced should be more the food consumed",foodProduced > foodConsumed);
 
@@ -94,7 +94,7 @@ public class ServerIndianSettlementTest extends FreeColTestCase {
 
         // verify that there is food production for the horses
         assertEquals("Horses need food", foodType, horsesType.getRawMaterial());
-        int foodProduced = camp.getProductionOf(grainType);
+        int foodProduced = camp.getTotalProductionOf(grainType);
         int foodConsumed = camp.getFoodConsumption();
         int foodAvail = foodProduced - foodConsumed;
         assertTrue("Food Produced should be more the food consumed",
@@ -134,7 +134,7 @@ public class ServerIndianSettlementTest extends FreeColTestCase {
         assertEquals(initialBravesInCamp, camp1.getUnitCount());
         assertEquals(0, camp1.getGoodsCount(foodType));
 
-        int foodProduced = camp1.getProductionOf(grainType);
+        int foodProduced = camp1.getTotalProductionOf(grainType);
         int foodConsumed = camp1.getFoodConsumption();
         assertEquals(2, brave.getConsumptionOf(foodType));
         assertEquals(2 * camp1.getUnitCount(), foodConsumed);

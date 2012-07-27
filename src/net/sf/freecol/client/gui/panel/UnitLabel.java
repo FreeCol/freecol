@@ -264,7 +264,7 @@ public final class UnitLabel extends JLabel
 
         if (unit.getLocation() instanceof ColonyTile) {
             GoodsType workType = unit.getWorkType();
-            int production = ((ColonyTile) unit.getLocation()).getProductionOf(workType);
+            int production = ((ColonyTile) unit.getLocation()).getTotalProductionOf(workType);
 
             ProductionLabel pl = new ProductionLabel(freeColClient, gui, workType, production);
             g.translate(0, 10);
