@@ -61,7 +61,8 @@ public class Europe extends UnitLocation implements Ownable, Named {
     public static enum MigrationType {
         NORMAL,     // Unit decided to migrate
         RECRUIT,    // Player is paying
-        FOUNTAIN    // As a result of a Fountain of Youth discovery
+        FOUNTAIN,   // As a result of a Fountain of Youth discovery
+        SURVIVAL    // Emergency autorecruit in server
     }
 
 

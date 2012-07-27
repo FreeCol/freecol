@@ -98,6 +98,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
     public static final int ALARM_TILE_IN_USE = 2;
     public static final int ALARM_MISSIONARY_PRESENT = -10;
 
+    // checkForDeath results
+    public static final int IS_DEAD = -1;
+    public static final int IS_ALIVE = 0;
+    public static final int AUTORECRUIT = 1;
+    
     // How far to search for a colony to add an Indian convert to.
     public static final int MAX_CONVERT_DISTANCE = 10;
 
@@ -262,9 +267,12 @@ public class ServerPlayer extends Player implements ServerModelObject {
     /**
      * Checks if this player has died.
      *
-     * @return True if this player should die.
+     * @return Negative if the player is dead, zero if they are ok,
+     *      positive non-zero if the server should auto-recruit
+     *      colonist units to keep this player alive.
      */
-    public boolean checkForDeath() {
+    public int checkForDeath() {
+        final Specification spec = getGame().getSpecification();
         /*
          * Die if: (isNative && (no colonies or units))
          *      || ((rebel or independent) && !(has coastal colony))
@@ -274,200 +282,128 @@ public class ServerPlayer extends Player implements ServerModelObject {
          */
         switch (getPlayerType()) {
         case NATIVE: // All natives units are viable
-            return getUnits().isEmpty();
+            return (getUnits().isEmpty()) ? IS_DEAD : IS_ALIVE;
 
         case COLONIAL: // Handle the hard case below
-            if (isUnknownEnemy()) return false;
+            if (isUnknownEnemy()) return IS_ALIVE;
             break;
 
         case REBEL: case INDEPENDENT:
             // Post-declaration European player needs a coastal colony
             // and can not hope for resupply from Europe.
             for (Colony colony : getColonies()) {
-                if (colony.isConnectedPort()) return false;
+                if (colony.isConnectedPort()) return IS_ALIVE;
             }
-            return true;
+            return IS_DEAD;
 
         case ROYAL:
-            return getRebels().isEmpty();
+            return (getRebels().isEmpty()) ? IS_DEAD : IS_ALIVE;
 
         case UNDEAD:
-            return getUnits().isEmpty();
+            return (getUnits().isEmpty()) ? IS_DEAD : IS_ALIVE;
 
         default:
             throw new IllegalStateException("Bogus player type");
         }
 
-        // Quick check for a colony
-        if (!getColonies().isEmpty()) {
-            return false;
-        }
+        // Quick check for a colony.  Do not log, this is the common case.
+        if (!getColonies().isEmpty()) return IS_ALIVE;
 
-        // Verify player units
-        boolean hasCarrier = false;
-        List<Unit> unitList = getUnits();
-        for(Unit unit : unitList){
-            boolean isValidUnit = false;
-
-            if(unit.isCarrier()){
+        // Traverse player units, look for valid carriers, colonists,
+        // carriers with units, carriers with goods.
+        boolean hasCarrier = false, hasColonist = false, hasEmbarked = false,
+            hasGoods = false;
+        for (Unit unit : getUnits()) {
+            if (unit.isCarrier()) {
+                if (unit.getGoodsCount() > 0) hasGoods = true;
                 hasCarrier = true;
                 continue;
             }
 
-            // Can found new colony
-            if(unit.isColonist()){
-                isValidUnit = true;
-            }
+            // Must be able to found new colony or capture units
+            if (!unit.isColonist() && !unit.isOffensiveUnit()) continue;
+            hasColonist = true;
 
-            // Can capture units
-            if(unit.isOffensiveUnit()){
-                isValidUnit = true;
+            // Verify if unit is in new world, or on a carrier in new world
+            Unit carrier;
+            if ((carrier = unit.getCarrier()) != null) {
+                if (carrier.getTile() != null) {
+                    logger.info(getName() + " alive, unit (embarked) on map.");
+                    return IS_ALIVE;
+                }
+                hasEmbarked = true;
             }
-
-            if(!isValidUnit){
-                continue;
-            }
-
-            // Verify if unit is in new world
-            Location unitLocation = unit.getLocation();
-            // unit in new world
-            if(unitLocation instanceof Tile){
-                logger.info(getName() + " found colonist in new world");
-                return false;
-            }
-            // onboard a carrier
-            Unit carrier = unit.getCarrier();
-            if (carrier != null && carrier.getTile() != null) {
-                logger.info(getName() + " found colonist aboard carrier in new world");
-                return false;
+            if (unit.getTile() != null) {
+                logger.info(getName() + " alive, unit on map.");
+                return IS_ALIVE;
             }
         }
-        /*
-         * At this point we know the player does not have any valid units or
-         * settlements on the map.
-         */
-
-        // After the season cutover year, no presence in New World
-        // means death
-        int mandatory = getGame().getSpecification().getInteger("model.option.mandatoryColonyYear");
+        // The player does not have any valid units or settlements on the map.
+        
+        int mandatory = spec.getInteger("model.option.mandatoryColonyYear");
         if (getGame().getTurn().getYear() >= mandatory) {
-            logger.info(getName() + " no presence in new world after "
-                        + mandatory);
-            return true;
+            // After the season cutover year there must be a presence
+            // in the New World.
+            logger.info(getName() + " dead, no presence >= " + mandatory);
+            return IS_DEAD;
         }
 
+        // No problems, unit available on carrier but off map, or goods
+        // available to be sold.
+        if (hasEmbarked) {
+            logger.info(getName() + " alive, has embarked unit.");
+            return IS_ALIVE;
+        } else if (hasGoods) {
+            logger.info(getName() + " alive, has cargo.");
+            return IS_ALIVE;
+        }
+
+        // It is necessary to still have a carrier.
+        final Europe europe = getEurope();
         int goldNeeded = 0;
-        /*
-         * No carrier, check if has gold to buy one
-         */
-        if(!hasCarrier){
-            /*
-             * Find the cheapest naval unit
-             */
-
-            Iterator<UnitType> navalUnits = getSpecification()
-                .getUnitTypesWithAbility(Ability.NAVAL_UNIT).iterator();
-
-            int lowerPrice = Integer.MAX_VALUE;
-
-            while(navalUnits.hasNext()){
-                UnitType unit = navalUnits.next();
-
-                int unitPrice = getEurope().getUnitPrice(unit);
-
-                // cannot be bought
-                if(unitPrice == UnitType.UNDEFINED){
-                    continue;
-                }
-
-                if(unitPrice < lowerPrice){
-                    lowerPrice = unitPrice;
+        if (!hasCarrier) {
+            int price = Integer.MAX_VALUE;
+            if (europe != null) {
+                for (UnitType type
+                         : spec.getUnitTypesWithAbility(Ability.NAVAL_UNIT)) {
+                    int p = europe.getUnitPrice(type);
+                    if (p != UNDEFINED && p < price) price = p;
                 }
             }
-
-            //Sanitation
-            if(lowerPrice == Integer.MAX_VALUE){
-                logger.warning(getName() + " could not find naval unit to buy");
-                return true;
+            if (price == Integer.MAX_VALUE || !checkGold(price)) {
+                logger.info(getName() + " dead, can not buy carrier.");
+                return IS_DEAD;
             }
-
-            goldNeeded += lowerPrice;
-
-            // cannot buy carrier
-            if (!checkGold(goldNeeded)) {
-                logger.info(getName() + " does not have enough money to buy carrier");
-                return true;
-            }
-            logger.info(getName() + " has enough money to buy carrier, has="
-                        + getGold() + ", needs=" + lowerPrice);
+            goldNeeded += price;
         }
 
-        /*
-         * Check if player has colonists.
-         * We already checked that it has (or can buy) a carrier to
-         * transport them to New World
-         */
-        List<Unit> units = new ArrayList<Unit>();
-        units.addAll(getEurope().getUnitList());
-        units.addAll(getHighSeas().getUnitList());
-        for (Unit eu : units) {
-            if (eu.isCarrier()) {
-                /*
-                 * The carrier has colonist units on board
-                 */
-                for (Unit u : eu.getUnitList()) {
-                    if (u.isColonist()) return false;
-                }
-
-                // The carrier has units or goods that can be sold.
-                if (eu.getGoodsCount() > 0) {
-                    logger.info(getName() + " has goods to sell");
-                    return false;
-                }
-                continue;
+        // A colonist is required.
+        if (hasColonist) {
+            logger.info(getName() + " alive, has waiting colonist.");
+            return IS_ALIVE;
+        } else {
+            if (europe == null) {
+                logger.info(getName() + " dead, can not recruit.");
+                return IS_DEAD;
             }
-            if (eu.isColonist()) {
-                logger.info(getName() + " has colonist unit waiting in port");
-                return false;
+            UnitType unitType = null;
+            int price = europe.getRecruitPrice();
+            for (UnitType type : spec
+                     .getUnitTypesWithAbility("model.ability.foundColony")) {
+                int p = europe.getUnitPrice(type);
+                if (p != UNDEFINED && p < price) price = p;
+            }
+            goldNeeded += price;
+            if (checkGold(goldNeeded)) {
+                logger.info(getName() + " alive, can buy colonist.");
+                return IS_ALIVE;
             }
         }
 
-        // No colonists, check if has gold to train or recruit one.
-        int goldToRecruit = getEurope().getRecruitPrice();
-
-        /*
-         * Find the cheapest colonist, either by recruiting or training
-         */
-
-        Iterator<UnitType> trainedUnits = getSpecification().getUnitTypesTrainedInEurope().iterator();
-
-        int goldToTrain = Integer.MAX_VALUE;
-
-        while(trainedUnits.hasNext()){
-            UnitType unit = trainedUnits.next();
-
-            if(!unit.hasAbility("model.ability.foundColony")){
-                continue;
-            }
-
-            int unitPrice = getEurope().getUnitPrice(unit);
-
-            // cannot be bought
-            if(unitPrice == UnitType.UNDEFINED){
-                continue;
-            }
-
-            if(unitPrice < goldToTrain){
-                goldToTrain = unitPrice;
-            }
-        }
-
-        goldNeeded += Math.min(goldToTrain, goldToRecruit);
-
-        if (checkGold(goldNeeded)) return false;
-        // Does not have enough money for recruiting or training
-        logger.info(getName() + " does not have enough money for recruiting or training");
-        return true;
+        // Col1 auto-recruits a unit in Europe if you run out before
+        // the cutover year.
+        logger.info(getName() + " survives by autorecruit.");
+        return AUTORECRUIT;
     }
 
     /**
@@ -1630,6 +1566,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
             cs.addPartial(See.only(this), this,
                           "immigration", "immigrationRequired");
             break;
+        case SURVIVAL:
+            break;
         default:
             throw new IllegalArgumentException("Bogus migration type");
         }
@@ -2703,7 +2641,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 .addName("%name%", settlementName)
                 .addStringTemplate("%nation%", nativeNation));
         }
-        if (nativePlayer.checkForDeath()) {
+        if (nativePlayer.checkForDeath() == IS_DEAD) {
             cs.addGlobalHistory(game,
                 new HistoryEvent(game.getTurn(),
                     HistoryEvent.EventType.DESTROY_NATION)
@@ -3233,7 +3171,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             .addStringTemplate("%enemyNation%", winnerNation)
             .addStringTemplate("%enemyUnit%", winner.getLabel())
             .addStringTemplate("%location%", loserLocation));
-        if (loserPlayer.isIndian() && loserPlayer.checkForDeath()) {
+        if (loserPlayer.isIndian() && loserPlayer.checkForDeath() == IS_DEAD) {
             StringTemplate nativeNation = loserPlayer.getNationName();
             cs.addGlobalHistory(getGame(),
                 new HistoryEvent(getGame().getTurn(),

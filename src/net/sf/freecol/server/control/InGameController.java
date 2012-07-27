@@ -725,19 +725,27 @@ public final class InGameController extends Controller {
                 // "can not happen"
                 return DOMMessage.clientError("Can not get next player");
             }
-            if (player.checkForDeath()) { // Remove dead players and retry
+            // Remove dead players and retry
+            switch (player.checkForDeath()) {
+            case ServerPlayer.IS_DEAD:
                 player.csWithdraw(cs);
                 sendToAll(cs);
                 logger.info(player.getNation() + " is dead.");
                 continue;
-            } else if (player.isREF() && player.checkForREFDefeat()) {
-                for (Player p : player.getRebels()) {
-                    csGiveIndependence(player, (ServerPlayer) p, cs);
+            case ServerPlayer.IS_ALIVE:
+                if (player.isREF() && player.checkForREFDefeat()) {
+                    for (Player p : player.getRebels()) {
+                        csGiveIndependence(player, (ServerPlayer) p, cs);
+                    }
+                    player.csWithdraw(cs);
+                    sendToAll(cs);
+                    logger.info(player.getNation() + " is defeated.");
+                    continue;
                 }
-                player.csWithdraw(cs);
-                sendToAll(cs);
-                logger.info(player.getNation() + " is defeated.");
-                continue;
+                break;
+            default: // Need to autorecruit a unit to keep alive.
+                serverPlayer.csEmigrate(0, MigrationType.SURVIVAL, random, cs);
+                break;
             }
 
             // Do "new turn"-like actions that need to wait until right

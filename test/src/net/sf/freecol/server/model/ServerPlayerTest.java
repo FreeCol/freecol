@@ -309,59 +309,64 @@ public class ServerPlayerTest extends FreeColTestCase {
 
     public void testCheckGameOverNoUnits() {
         Game game = ServerTestHelper.startServerGame(getTestMap());
+        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
 
-        ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
-
-        assertTrue("Should be game over due to no units",
-                   dutch.checkForDeath());
+        dutch.setGold(0);
+        assertEquals("Should not have units", 0, dutch.getUnits().size());
+        assertEquals("Should be game over due to no carrier", -1,
+                     dutch.checkForDeath());
     }
 
     public void testCheckNoGameOverEnoughMoney() {
         Game game = ServerTestHelper.startServerGame(getTestMap());
+        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
 
-        ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
-
-        dutch.modifyGold(10000);
-        assertFalse("Should not be game, enough money",
-                    dutch.checkForDeath());
+        dutch.setGold(10000);
+        assertEquals("Should not be game, enough money", 0,
+                     dutch.checkForDeath());
     }
 
     public void testCheckNoGameOverHasColonistInNewWorld() {
         Map map = getTestMap();
         Game game = ServerTestHelper.startServerGame(map);
-
-        ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        dutch.setGold(0);
 
         new ServerUnit(game, map.getTile(4, 7), dutch, colonistType);
-
-        assertFalse("Should not be game over, has units",
-                    dutch.checkForDeath());
+        assertEquals("Should not be game over, has units", 0,
+                     dutch.checkForDeath());
     }
 
     public void testCheckGameOver1600Threshold() {
         Map map = getTestMap();
         Game game = ServerTestHelper.startServerGame(map);
+        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        dutch.setGold(0);
 
-        ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
+        new ServerUnit(game, dutch.getEurope(), dutch, galleonType);
+        assertEquals("Should have 1 unit", 1, dutch.getUnits().size());
+        assertEquals("Should not be game over, not 1600 yet, autorecruit", 1,
+                     dutch.checkForDeath());
 
         new ServerUnit(game, dutch.getEurope(), dutch, colonistType);
-        new ServerUnit(game, dutch.getEurope(), dutch, galleonType);
-        assertFalse("Should not be game over, not 1600 yet",
-                    dutch.checkForDeath());
+        assertEquals("Should have 2 units", 2, dutch.getUnits().size());
+        assertEquals("Should not be game over, not 1600 yet", 0,
+                     dutch.checkForDeath());
 
         game.setTurn(new Turn(1600));
-        assertTrue("Should be game over, no new world presence after 1600",
-                   dutch.checkForDeath());
+        assertEquals("Should be game over, no new world presence >= 1600", -1,
+                     dutch.checkForDeath());
     }
 
     public void testCheckGameOverUnitsGoingToEurope() {
         Map map = getTestMap(spec().getTileType("model.tile.highSeas"));
         Game game = ServerTestHelper.startServerGame(map);
         InGameController igc = ServerTestHelper.getInGameController();
+        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        dutch.setGold(0);
 
-        ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
-
-        Unit galleon = new ServerUnit(game, map.getTile(6, 8), dutch, galleonType);
+        Unit galleon = new ServerUnit(game, map.getTile(6, 8), dutch,
+                                      galleonType);
         Unit colonist = new ServerUnit(game, galleon, dutch, colonistType);
         assertTrue("Colonist should be aboard the galleon",
                    colonist.getLocation() == galleon);
@@ -369,43 +374,45 @@ public class ServerPlayerTest extends FreeColTestCase {
                      1, galleon.getUnitCount());
         igc.moveTo(dutch, galleon, dutch.getEurope());
 
-        assertFalse("Should not be game over, units between new world and europe",
-                    dutch.checkForDeath());
+        assertEquals("Should not be game over, units between new world and europe", 0,
+                     dutch.checkForDeath());
 
         game.setTurn(new Turn(1600));
-        assertTrue("Should be game over, no new world presence after 1600",
-                   dutch.checkForDeath());
+        assertEquals("Should be game over, no new world presence >= 1600", -1,
+                     dutch.checkForDeath());
     }
 
     public void testCheckGameOverUnitsGoingToNewWorld() {
         Map map = getTestMap();
         Game game = ServerTestHelper.startServerGame(map);
         InGameController igc = ServerTestHelper.getInGameController();
+        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        dutch.setGold(0);
 
-        ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
-
-        Unit galleon = new ServerUnit(game,dutch.getEurope(), dutch, galleonType);
+        Unit galleon = new ServerUnit(game, dutch.getEurope(), dutch,
+                                      galleonType);
         Unit colonist = new ServerUnit(game, galleon, dutch, colonistType);
-        assertTrue("Colonist should be aboard the galleon",colonist.getLocation() == galleon);
-        assertEquals("Galleon should have a colonist onboard",1,galleon.getUnitCount());
+        assertEquals("Colonist should be aboard the galleon", galleon,
+                     colonist.getLocation());
+        assertEquals("Galleon should have a colonist onboard", 1,
+                     galleon.getUnitCount());
         igc.moveTo(dutch, galleon, map);
 
-        assertFalse("Should not be game over, units between new world and europe",
-                    dutch.checkForDeath());
+        assertEquals("Should not be game over, units between new world and europe", 0,
+                     dutch.checkForDeath());
 
         game.setTurn(new Turn(1600));
-        assertTrue("Should be game over, no new world presence after 1600",
-                   dutch.checkForDeath());
+        assertEquals("Should be game over, no new world presence >= 1600", -1,
+                     dutch.checkForDeath());
     }
 
     public void testSellingMakesPricesFall() {
         Game g = ServerTestHelper.startServerGame(getTestMap());
+        ServerPlayer p = (ServerPlayer)g.getPlayer("model.nation.dutch");
 
-        ServerPlayer p = (ServerPlayer) g.getPlayer("model.nation.dutch");
         Market dm = p.getMarket();
         int previousGold = p.getGold();
         int price = spec().getInitialPrice(silverType);
-
         p.sell(null, silverType, 1000, new Random());
 
         assertEquals(previousGold + price * 1000, p.getGold());
@@ -414,8 +421,8 @@ public class ServerPlayerTest extends FreeColTestCase {
 
     public void testBuyingMakesPricesRaise() {
         Game game = ServerTestHelper.startServerGame(getTestMap());
+        ServerPlayer player = (ServerPlayer)game.getPlayer("model.nation.dutch");
 
-        ServerPlayer player = (ServerPlayer) game.getPlayer("model.nation.dutch");
         Market dm = player.getMarket();
         player.modifyGold(1000000);
         int price = dm.getCostToBuy(foodType);
@@ -427,7 +434,8 @@ public class ServerPlayerTest extends FreeColTestCase {
     }
 
     /**
-     * Helper Method for finding out how much of a good to sell until the price drops.
+     * Helper Method for finding out how much of a good to sell until
+     * the price drops.
      */
     public int sellUntilPriceDrop(Game game, ServerPlayer player,
                                   GoodsType type) {
@@ -482,8 +490,8 @@ public class ServerPlayerTest extends FreeColTestCase {
     public void testDutchMarket() {
 
         Game game = getStandardGame();
-        ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
-        ServerPlayer french = (ServerPlayer) game.getPlayer("model.nation.french");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        ServerPlayer french = (ServerPlayer)game.getPlayer("model.nation.french");
         assertEquals("model.nationType.trade", dutch.getNationType().getId());
         assertFalse(dutch.getNationType().getModifierSet("model.modifier.tradeBonus").isEmpty());
         assertFalse(dutch.getModifierSet("model.modifier.tradeBonus").isEmpty());
@@ -492,7 +500,7 @@ public class ServerPlayerTest extends FreeColTestCase {
             int dutchSellAmount = sellUntilPriceDrop(game, dutch, silverType);
 
             Game g2 = getStandardGame();
-            ServerPlayer french2 = (ServerPlayer) g2.getPlayer("model.nation.french");
+            ServerPlayer french2 = (ServerPlayer)g2.getPlayer("model.nation.french");
             int frenchSellAmount = sellUntilPriceDrop(g2, french2, silverType);
 
             assertTrue(dutchSellAmount > frenchSellAmount);
