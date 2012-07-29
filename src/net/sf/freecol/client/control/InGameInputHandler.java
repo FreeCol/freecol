@@ -47,6 +47,7 @@ import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.LastSale;
 import net.sf.freecol.common.model.ModelMessage;
+import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.Stance;
@@ -153,6 +154,8 @@ public final class InGameInputHandler extends InputHandler {
             reply = addPlayer(element);
         } else if (type.equals("addObject")) {
             reply = addObject(element);
+        } else if (type.equals("removeObject")) {
+            reply = removeObject(element);
         } else if (type.equals("newLandName")) {
             reply = newLandName(element);
         } else if (type.equals("newRegionName")) {
@@ -172,7 +175,7 @@ public final class InGameInputHandler extends InputHandler {
         logger.log(Level.FINEST, "Handled message: " + type
             + " replying with: "
             + ((reply == null) ? "null" : reply.getTagName()));
-        
+
         final FreeColClient fcc = getFreeColClient();
         if (Boolean.TRUE.toString().equals(element.getAttribute("flush"))
             && fcc.currentPlayerIsMyPlayer()) {
@@ -268,7 +271,7 @@ public final class InGameInputHandler extends InputHandler {
                 if (fcgo instanceof Unit) {
                     Unit u = (Unit) fcgo;
                     player.invalidateCanSeeTiles();
-                    if (u == gui.getActiveUnit()) 
+                    if (u == gui.getActiveUnit())
                         gui.setActiveUnit(null);
                     // Temporary hack until we have real containers.
                     player.removeUnit(u);
@@ -998,12 +1001,51 @@ public final class InGameInputHandler extends InputHandler {
             } else if (tag == TradeRoute.getXMLElementTagName()) {
                 TradeRoute t = new TradeRoute(game, e);
                 player.getTradeRoutes().add(t);
+            } else if (tag == Modifier.getXMLElementTagName()) {
+                Modifier m = new Modifier(spec);
+                m.readFromXMLElement(e);
+                player.addModifier(m);
             } else {
                 logger.warning("addObject unrecognized: " + tag);
             }
         }
         return null;
     }
+
+    /**
+     * Remove the objects which are the children of this Element.
+     *
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *            holds all the information.
+     */
+    public Element removeObject(Element element) {
+        Game game = getGame();
+        Specification spec = game.getSpecification();
+        NodeList nodes = element.getChildNodes();
+        for (int i = 0; i < nodes.getLength(); i++) {
+            Element e = (Element) nodes.item(i);
+            String owner = e.getAttribute("owner");
+            Player player = game.getFreeColGameObject(owner, Player.class);
+            if (player == null) {
+                logger.warning("addObject with broken owner: "
+                               + ((owner == null) ? "(null)" : owner));
+                continue;
+            }
+            String tag = e.getTagName();
+            if (tag == null) {
+                logger.warning("addObject null tag");
+            } else if (tag == Modifier.getXMLElementTagName()) {
+                Modifier m = new Modifier(spec);
+                m.readFromXMLElement(e, spec);
+                player.removeModifier(m);
+            } else {
+                logger.warning("removeObject unrecognized: " + tag);
+            }
+        }
+        return null;
+    }
+
+
 
     /**
      * Ask the player to name the new land.
@@ -1291,7 +1333,7 @@ public final class InGameInputHandler extends InputHandler {
             doNoResultWork();
             return null;
         }
-        
+
         abstract void doNoResultWork();
 
     }
@@ -1509,7 +1551,7 @@ public final class InGameInputHandler extends InputHandler {
             if (focus || !gui.onScreen(sourceTile)) {
                 gui.setFocusImmediately(sourceTile);
             }
-            
+
             gui.animateUnitMove(unit, sourceTile, destinationTile);
             gui.refresh();
         }
@@ -1563,7 +1605,7 @@ public final class InGameInputHandler extends InputHandler {
             if (focus || !gui.onScreen(unit.getTile())) {
                 gui.setFocusImmediately(unit.getTile());
             }
-            
+
             gui.animateUnitAttack(unit, defender, success);
             gui.refresh();
         }

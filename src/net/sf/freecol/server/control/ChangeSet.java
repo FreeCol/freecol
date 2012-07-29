@@ -33,6 +33,7 @@ import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.LastSale;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.ModelMessage;
+import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.Stance;
@@ -369,7 +370,7 @@ public class ChangeSet {
                 + " #" + getPriority()
                 + " " + attacker.getId() + " " + success
                 + " " + defender.getId() + "]";
-        } 
+        }
     }
 
     /**
@@ -440,7 +441,7 @@ public class ChangeSet {
             return "[" + getClass().getName() + " " + see.toString()
                 + " #" + getPriority()
                 + " " + key + "=" + value + "]";
-        } 
+        }
     }
 
     /**
@@ -491,7 +492,7 @@ public class ChangeSet {
             return "[" + getClass().getName() + " " + see.toString()
                 + " #" + getPriority()
                 + " " + message + "]";
-        } 
+        }
     }
 
     /**
@@ -605,7 +606,7 @@ public class ChangeSet {
                 + " " + unit.getId()
                 + " " + ((FreeColGameObject)oldLocation).getId()
                 + " " + newTile.getId() + "]";
-        } 
+        }
     }
 
     /**
@@ -688,7 +689,7 @@ public class ChangeSet {
             return "[" + getClass().getName() + " " + see.toString()
                 + " #" + getPriority()
                 + " " + fcgo.getId() + "]";
-        } 
+        }
     }
 
     /**
@@ -754,7 +755,7 @@ public class ChangeSet {
                 + " " + fcgo.getId();
             for (String f : fields) ret += " " + f;
             return ret + "]";
-        } 
+        }
     }
 
     private static class RemoveChange extends Change {
@@ -797,7 +798,7 @@ public class ChangeSet {
         @Override
         public boolean isPerhapsNotifiable(ServerPlayer serverPlayer) {
             Settlement settlement;
-            return tile != null 
+            return tile != null
                 && serverPlayer.canSee(tile)
                 && ((settlement = tile.getSettlement()) == null
                     || settlement.isDisposed()
@@ -836,7 +837,7 @@ public class ChangeSet {
                 + " " + ((tile == null) ? "<null>" : tile.getId());
             for (FreeColGameObject f : contents) ret += " " + f.getId();
             return ret + " " + fcgo.getId() + "]";
-        } 
+        }
     }
 
     /**
@@ -844,6 +845,7 @@ public class ChangeSet {
      */
     private static class OwnedChange extends Change {
         private FreeColObject fco;
+        private boolean add = true;
 
         /**
          * Build a new OwnedChange.
@@ -854,6 +856,19 @@ public class ChangeSet {
         OwnedChange(See see, FreeColObject fco) {
             super(see);
             this.fco = fco;
+        }
+
+        /**
+         * Build a new OwnedChange.
+         *
+         * @param see The visibility of this change.
+         * @param fco The <code>FreeColObject</code> to update.
+         * @param add Whether to add or remove the object.
+         */
+        OwnedChange(See see, FreeColObject fco, boolean add) {
+            super(see);
+            this.fco = fco;
+            this.add = add;
         }
 
         /**
@@ -874,7 +889,7 @@ public class ChangeSet {
          * @return An "addObject" element.
          */
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
-            Element element = doc.createElement("addObject");
+            Element element = doc.createElement((add ? "add" : "remove") + "Object");
             Element child = fco.toXMLElement(serverPlayer, doc, false, false);
             child.setAttribute("owner", serverPlayer.getId());
             element.appendChild(child);
@@ -885,10 +900,12 @@ public class ChangeSet {
          * Debug helper.
          */
         public String toString() {
-            return "[" + getClass().getName() + " " + see.toString()
+            return "[" + getClass().getName()
+                + " " + see.toString()
                 + " #" + getPriority()
+                + " " + (add ? "add" : "remove")
                 + " " + fco.getId() + "]";
-        } 
+        }
     }
 
     private static class SpyChange extends Change {
@@ -940,7 +957,7 @@ public class ChangeSet {
             return "[" + getClass().getName() + " " + see.toString()
                 + " #" + getPriority()
                 + " " + tile.getId() + "]";
-        } 
+        }
     }
 
     /**
@@ -999,7 +1016,7 @@ public class ChangeSet {
                 + " #" + getPriority()
                 + " " + first.getId()
                 + " " + stance + " " + second.getId() + "]";
-        } 
+        }
     }
 
     /**
@@ -1061,7 +1078,7 @@ public class ChangeSet {
                 + " " + name;
             for (String a : attributes) ret += " " + a;
             return ret + "]";
-        } 
+        }
     }
 
     /**
@@ -1209,6 +1226,36 @@ public class ChangeSet {
                                FoundingFather father) {
         changes.add(new OwnedChange(See.only(serverPlayer), father));
         serverPlayer.addFather(father);
+        return this;
+    }
+
+    /**
+     * Helper function to add a modifier event to a ChangeSet. Also
+     * adds the modifier to the owner.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> adding the father.
+     * @param modifier a <code>Modifier</code> value
+     * @return The updated <code>ChangeSet</code>.
+     */
+    public ChangeSet addModifier(ServerPlayer serverPlayer,
+                                 Modifier modifier) {
+        changes.add(new OwnedChange(See.only(serverPlayer), modifier));
+        serverPlayer.addModifier(modifier);
+        return this;
+    }
+
+    /**
+     * Helper function to add a modifier removal event to a ChangeSet.
+     * Also removes the modifier from the owner.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> adding the father.
+     * @param modifier a <code>Modifier</code> value
+     * @return The updated <code>ChangeSet</code>.
+     */
+    public ChangeSet removeModifier(ServerPlayer serverPlayer,
+                                    Modifier modifier) {
+        changes.add(new OwnedChange(See.only(serverPlayer), modifier, false));
+        serverPlayer.removeModifier(modifier);
         return this;
     }
 

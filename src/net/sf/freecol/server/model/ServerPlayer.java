@@ -41,6 +41,8 @@ import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
+import net.sf.freecol.common.model.Disaster;
+import net.sf.freecol.common.model.Effect;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Europe.MigrationType;
@@ -1054,6 +1056,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 cs.addPartial(See.only(this), this, "immigration");
             }
             cs.addPartial(See.only(this), this, "liberty");
+
+            if (getSpecification().getBoolean(GameOptions.ENABLE_UPKEEP)) {
+                csPayUpkeep(random, cs);
+            }
+
             if (getPlayerType() == PlayerType.REBEL
                 && interventionBells >= getSpecification().getInteger("model.option.interventionBells")) {
                 interventionBells = Integer.MIN_VALUE;
@@ -1102,6 +1109,67 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 }
             }
         }
+    }
+
+    public void csPayUpkeep(Random random, ChangeSet cs) {
+        Disaster bankruptcy = getSpecification().getDisaster(Disaster.BANKRUPTCY);
+        int upkeep = 0;
+        for (Settlement settlement : settlements) {
+            upkeep += settlement.getUpkeep();
+        }
+        if (getGold() >= upkeep) {
+            modifyGold(-upkeep);
+            if (isBankrupt()) {
+                setBankrupt(false);
+                for (RandomChoice<Effect> effect: bankruptcy.getEffects()) {
+                    for (Modifier modifier : effect.getObject().getModifiers()) {
+                        cs.removeModifier(this, modifier);
+                    }
+                }
+                cs.addMessage(See.only(this),
+                              new ModelMessage(ModelMessage.MessageType.GOVERNMENT_EFFICIENCY,
+                                               "model.disaster.bankruptcy.stop", this));
+            }
+        } else {
+            modifyGold(-getGold());
+            if (!isBankrupt()) {
+                setBankrupt(true);
+                for (Effect effect : getEffects(bankruptcy, random)) {
+                    for (Modifier modifier : effect.getModifiers()) {
+                        cs.addModifier(this, modifier);
+                    }
+                }
+                cs.addMessage(See.only(this),
+                              new ModelMessage(ModelMessage.MessageType.GOVERNMENT_EFFICIENCY,
+                                               "model.disaster.bankruptcy.start", this));
+            }
+        }
+        cs.addPartial(See.only(this), this, "bankrupt");
+        cs.addPartial(See.only(this), this, "gold");
+    }
+
+
+    private List<Effect> getEffects(Disaster disaster, Random random) {
+        List<Effect> result = new ArrayList<Effect>();
+        switch(disaster.getNumberOfEffects()) {
+        case ONE:
+            result.add(RandomChoice.getWeightedRandom(logger, "Get effects of disaster",
+                                                      random, disaster.getEffects()));
+            break;
+        case SEVERAL:
+            for (RandomChoice<Effect> effect : disaster.getEffects()) {
+                if (Utils.randomInt(logger, "Get effects of disaster", random, 100)
+                    < effect.getProbability()) {
+                    result.add(effect.getObject());
+                }
+            }
+            break;
+        case ALL:
+            for (RandomChoice<Effect> effect : disaster.getEffects()) {
+                result.add(effect.getObject());
+            }
+        }
+        return result;
     }
 
     /**

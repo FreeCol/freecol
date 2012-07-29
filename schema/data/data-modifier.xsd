@@ -48,6 +48,8 @@
       <xs:attribute name="incrementType" type="ModifierType"
 		    use="optional" />
       <xs:attribute name="increment" type="xs:float" use="optional" />
+      <xs:attribute name="duration" type="xs:int" use="optional" />
+      <xs:attribute name="temporary" type="xs:boolean" use="optional" />
 
     </xs:complexType>
   </xs:element>

@@ -19,7 +19,7 @@
     *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
     *
   -->
-<!-- specification version 0.69 -->
+<!-- specification version 0.70 -->
 <!-- in case of incompatible changes, please update version number and
      XSD schema for validation. -->
 <freecol-specification id="classic">
@@ -480,25 +480,25 @@
       <effect id="model.disaster.effect.lossOfMoney" probability="10"/>
       <effect id="model.disaster.effect.lossOfGoods" probability="10"/>
       <effect id="model.disaster.effect.lossOfTileProduction" probability="10">
-        <modifier id="model.goods.grain" type="percentage" value="50" duration="3"/>
-        <modifier id="model.goods.sugar" type="percentage" value="50" duration="3"/>
-        <modifier id="model.goods.tobacco" type="percentage" value="50" duration="3"/>
-        <modifier id="model.goods.cotton" type="percentage" value="50" duration="3"/>
-        <modifier id="model.goods.furs" type="percentage" value="50" duration="3"/>
-        <modifier id="model.goods.lumber" type="percentage" value="50" duration="3"/>
-        <modifier id="model.goods.ore" type="percentage" value="50" duration="3"/>
-        <modifier id="model.goods.silver" type="percentage" value="50" duration="3"/>
+        <modifier id="model.goods.grain" type="percentage" value="-50" duration="3" temporary="true"/>
+        <modifier id="model.goods.sugar" type="percentage" value="-50" duration="3" temporary="true"/>
+        <modifier id="model.goods.tobacco" type="percentage" value="-50" duration="3" temporary="true"/>
+        <modifier id="model.goods.cotton" type="percentage" value="-50" duration="3" temporary="true"/>
+        <modifier id="model.goods.furs" type="percentage" value="-50" duration="3" temporary="true"/>
+        <modifier id="model.goods.lumber" type="percentage" value="-50" duration="3" temporary="true"/>
+        <modifier id="model.goods.ore" type="percentage" value="-50" duration="3" temporary="true"/>
+        <modifier id="model.goods.silver" type="percentage" value="-50" duration="3" temporary="true"/>
       </effect>
       <effect id="model.disaster.effect.lossOfBuildingProduction" probability="10">
-        <modifier id="model.goods.rum" type="percentage" value="50" duration="3"/>
-        <modifier id="model.goods.cigars" type="percentage" value="50" duration="3"/>
-        <modifier id="model.goods.cloth" type="percentage" value="50" duration="3"/>
-        <modifier id="model.goods.coats" type="percentage" value="50" duration="3"/>
-        <modifier id="model.goods.tools" type="percentage" value="50" duration="3"/>
-        <modifier id="model.goods.muskets" type="percentage" value="50" duration="3"/>
-        <modifier id="model.goods.bells" type="percentage" value="50" duration="3"/>
-        <modifier id="model.goods.hammers" type="percentage" value="50" duration="3"/>
-        <modifier id="model.goods.crosses" type="percentage" value="50" duration="3"/>
+        <modifier id="model.goods.rum" type="percentage" value="-50" duration="3" temporary="true"/>
+        <modifier id="model.goods.cigars" type="percentage" value="-50" duration="3" temporary="true"/>
+        <modifier id="model.goods.cloth" type="percentage" value="-50" duration="3" temporary="true"/>
+        <modifier id="model.goods.coats" type="percentage" value="-50" duration="3" temporary="true"/>
+        <modifier id="model.goods.tools" type="percentage" value="-50" duration="3" temporary="true"/>
+        <modifier id="model.goods.muskets" type="percentage" value="-50" duration="3" temporary="true"/>
+        <modifier id="model.goods.bells" type="percentage" value="-50" duration="3" temporary="true"/>
+        <modifier id="model.goods.hammers" type="percentage" value="-50" duration="3" temporary="true"/>
+        <modifier id="model.goods.crosses" type="percentage" value="-50" duration="3" temporary="true"/>
       </effect>
       <effect id="model.disaster.effect.lossOfBuilding" probability="10"/>
       <effect id="model.disaster.effect.damagedUnit" probability="5">
@@ -537,15 +537,15 @@
     </disaster>
     <disaster id="model.disaster.bankruptcy" natural="false" effects="ALL">
       <effect id="model.disaster.effect.lossOfBuildingProduction">
-        <modifier id="model.goods.rum" type="percentage" value="50"/>
-        <modifier id="model.goods.cigars" type="percentage" value="50"/>
-        <modifier id="model.goods.cloth" type="percentage" value="50"/>
-        <modifier id="model.goods.coats" type="percentage" value="50"/>
-        <modifier id="model.goods.tools" type="percentage" value="50"/>
-        <modifier id="model.goods.muskets" type="percentage" value="50"/>
-        <modifier id="model.goods.bells" type="percentage" value="50"/>
-        <modifier id="model.goods.hammers" type="percentage" value="50"/>
-        <modifier id="model.goods.crosses" type="percentage" value="50"/>
+        <modifier id="model.goods.rum" type="percentage" value="-50" temporary="true"/>
+        <modifier id="model.goods.cigars" type="percentage" value="-50" temporary="true"/>
+        <modifier id="model.goods.cloth" type="percentage" value="-50" temporary="true"/>
+        <modifier id="model.goods.coats" type="percentage" value="-50" temporary="true"/>
+        <modifier id="model.goods.tools" type="percentage" value="-50" temporary="true"/>
+        <modifier id="model.goods.muskets" type="percentage" value="-50" temporary="true"/>
+        <modifier id="model.goods.bells" type="percentage" value="-50" temporary="true"/>
+        <modifier id="model.goods.hammers" type="percentage" value="-50" temporary="true"/>
+        <modifier id="model.goods.crosses" type="percentage" value="-50" temporary="true"/>
       </effect>
     </disaster>
   </disasters>
@@ -2549,8 +2549,8 @@
         <booleanOption id="model.option.saveProductionOverflow" defaultValue="true"/>
         <!-- Whether to educate the least skilled unit first -->
         <booleanOption id="model.option.allowStudentSelection" defaultValue="false"/>
+        <booleanOption id="model.option.enableUpkeep" defaultValue="false"/>
         <!--
-        <booleanOption id="model.option.enableUpkeep" defaultvalue="false"/>
         <integerOption id="model.option.naturalDisasters" defaultValue="0"
                        minimumValue="0" maximumValue="100" />
         -->

@@ -112,6 +112,8 @@
 		    default="false"/>
       <xs:attribute name="dead" type="xs:boolean" use="optional"
 		    default="false"/>
+      <xs:attribute name="bankrupt" type="xs:boolean" use="optional"
+		    default="false"/>
 
       <xs:attribute name="tax" type="xs:int" use="required"/>
       <!-- TODO: remove this some time -->

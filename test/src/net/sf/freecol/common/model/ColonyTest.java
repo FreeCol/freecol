@@ -427,4 +427,22 @@ public class ColonyTest extends FreeColTestCase {
                     colony.isUnderSiege());
     }
 
+
+    public void testUpkeep() {
+        Game game = getGame();
+        game.setMap(getTestMap(true));
+        Colony colony = getStandardColony(5);
+
+        assertEquals("New colonies should not require upkeep.",
+                     0, colony.getUpkeep());
+
+        int churchUpkeep = churchType.getUpkeep();
+        colony.getBuilding(churchType).upgrade();
+        assertEquals(churchUpkeep, colony.getUpkeep());
+
+        int lumberMillUpkeep = lumberMillType.getUpkeep();
+        colony.getBuilding(carpenterHouseType).upgrade();
+        assertEquals(churchUpkeep + lumberMillUpkeep, colony.getUpkeep());
+    }
+
 }

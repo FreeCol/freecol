@@ -87,6 +87,13 @@ public class Modifier extends Feature implements Comparable<Modifier> {
     }
 
     /**
+     * Use this only for reading from DOM Elements.
+     */
+    public Modifier(Specification specification) {
+        setSpecification(specification);
+    }
+
+    /**
      * Creates a new <code>Modifier</code> instance.
      *
      * @param id a <code>String</code> value
@@ -158,6 +165,7 @@ public class Modifier extends Feature implements Comparable<Modifier> {
                                          template.getType());
         float inc = template.getIncrement();
         int duration = template.getDuration();
+        modifier.setTemporary(template.isTemporary());
         // TODO: remove this, it only works for additive modifiers anyway
         if (duration == 0) {
             duration = (int)(template.getValue()/-inc);

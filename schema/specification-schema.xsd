@@ -950,6 +950,7 @@
     <xs:attribute name="delete" type="xs:boolean"/>
     <xs:attribute name="source" type="xs:string"/>
     <xs:attribute name="duration" type="xs:int"/>
+    <xs:attribute name="temporary" type="xs:boolean"/>
   </xs:complexType>
 
   <xs:element name="ability">

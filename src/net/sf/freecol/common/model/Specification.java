@@ -1259,6 +1259,7 @@ public final class Specification {
         // copy the order of section in specification.xml
         writeSection(out, "modifiers", specialModifiers);
         writeSection(out, "events", events);
+        writeSection(out, "disasters", disasters);
         writeSection(out, "goods-types", goodsTypeList);
         writeSection(out, "resource-types", resourceTypeList);
         writeSection(out, "tile-types", tileTypeList);

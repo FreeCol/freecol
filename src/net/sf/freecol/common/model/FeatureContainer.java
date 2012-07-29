@@ -455,7 +455,7 @@ public class FeatureContainer {
     public void replaceSource(FreeColGameObjectType oldSource,
                               FreeColGameObjectType newSource) {
         for (Ability ability : getAbilities(this)) {
-            if (ability.getSource() == oldSource) {
+            if (oldSource == null || ability.getSource() == oldSource) {
                 removeAbility(this, ability);
                 Ability newAbility = new Ability(ability);
                 newAbility.setSource(newSource);
@@ -463,7 +463,7 @@ public class FeatureContainer {
             }
         }
         for (Modifier modifier : getModifiers(this)) {
-            if (modifier.getSource() == oldSource) {
+            if (oldSource == null || modifier.getSource() == oldSource) {
                 removeModifier(this, modifier);
                 Modifier newModifier = new Modifier(modifier);
                 newModifier.setSource(newSource);

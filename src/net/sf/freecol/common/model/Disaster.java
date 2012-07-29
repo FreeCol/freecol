@@ -144,12 +144,25 @@ public class Disaster extends FreeColGameObjectType {
         String nodeName = in.getLocalName();
         if ("effect".equals(nodeName)) {
             Effect effect = new Effect(in, getSpecification());
+            effect.getFeatureContainer().replaceSource(null, this);
             effects.add(new RandomChoice<Effect>(effect, effect.getProbability()));
         } else {
             super.readChild(in);
         }
     }
 
+
+    /**
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        super.toXML(out, getXMLElementTagName());
+    }
 
     @Override
     protected void writeAttributes(XMLStreamWriter out)
@@ -174,6 +187,15 @@ public class Disaster extends FreeColGameObjectType {
         for (RandomChoice<Effect> choice : effects) {
             choice.getObject().toXMLImpl(out);
         }
+    }
+
+    /**
+     * Returns the tag name of the root element representing this object.
+     *
+     * @return "disaster".
+     */
+    public static String getXMLElementTagName() {
+        return "disaster";
     }
 
 }

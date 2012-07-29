@@ -57,6 +57,13 @@ public abstract class Feature extends FreeColObject {
     private int duration = 0;
 
     /**
+     * Transient features are provided by events such as disasters and
+     * goods parties, and need to be serialized by the
+     * FreeColGameObject they apply to.
+     */
+    private boolean temporary;
+
+    /**
      * A list of Scopes limiting the applicability of this Feature.
      */
     private List<Scope> scopes;
@@ -179,6 +186,24 @@ public abstract class Feature extends FreeColObject {
     }
 
     /**
+     * Get the <code>Temporary</code> value.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public final boolean isTemporary() {
+        return temporary;
+    }
+
+    /**
+     * Set the <code>Temporary</code> value.
+     *
+     * @param newTemporary The new Temporary value.
+     */
+    public final void setTemporary(final boolean newTemporary) {
+        this.temporary = newTemporary;
+    }
+
+    /**
      * Returns true if the <code>appliesTo</code> method of at least
      * one <code>Scope</code> object returns true.
      *
@@ -245,6 +270,7 @@ public abstract class Feature extends FreeColObject {
         hash += 31 * hash + (firstTurn == null ? 0 : firstTurn.getNumber());
         hash += 31 * hash + (lastTurn == null ? 0 : lastTurn.getNumber());
         hash += 31 * hash + duration;
+        hash += 31 * (temporary ? 1 : 0);
         if (scopes != null) {
             for (Scope scope : scopes) {
                 // TODO: is this safe? It is an easy way to ignore the order
@@ -287,6 +313,9 @@ public abstract class Feature extends FreeColObject {
             if (duration != feature.duration) {
                 return false;
             }
+            if (temporary != feature.temporary) {
+                return false;
+            }
             if (scopes == null) {
                 if (feature.scopes != null) {
                     return false;
@@ -319,6 +348,8 @@ public abstract class Feature extends FreeColObject {
         this.source = other.source;
         this.firstTurn = other.firstTurn;
         this.lastTurn = other.lastTurn;
+        this.duration = other.duration;
+        this.temporary = other.temporary;
         setScopes(other.getScopes());
     }
 
@@ -345,6 +376,12 @@ public abstract class Feature extends FreeColObject {
         if (getLastTurn() != null) {
             out.writeAttribute("lastTurn",
                 String.valueOf(getLastTurn().getNumber()));
+        }
+        if (duration != 0) {
+            out.writeAttribute("duration", Integer.toString(duration));
+        }
+        if (temporary) {
+            out.writeAttribute("temporary", "true");
         }
     }
 
@@ -409,6 +446,7 @@ public abstract class Feature extends FreeColObject {
         }
 
         duration = getAttribute(in, "duration", 0);
+        temporary = getAttribute(in, "temporary", false);
     }
 
     /**

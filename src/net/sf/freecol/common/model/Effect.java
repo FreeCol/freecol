@@ -132,6 +132,18 @@ public class Effect extends FreeColGameObjectType {
     }
 
     /**
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        super.toXML(out, getXMLElementTagName());
+    }
+
+    /**
      * Write the children of this object to a stream.
      *
      * @param out The target stream.

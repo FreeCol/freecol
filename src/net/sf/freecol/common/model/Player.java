@@ -350,6 +350,12 @@ public class Player extends FreeColGameObject implements Nameable {
     private boolean[][] canSeeTiles = null;
     private final Object canSeeLock = new Object();
 
+    /**
+     * Whether the player is bankrupt, i.e. unable to pay for the
+     * maintenance of all buildings.
+     */
+    private boolean bankrupt;
+
     // Contains the abilities and modifiers of this type.
     protected final FeatureContainer featureContainer = new FeatureContainer();
 
@@ -382,7 +388,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     protected List<String> shipNames = null;
     protected String shipFallback = null;
-    
+
 
     public static final Comparator<Player> playerComparator = new Comparator<Player>() {
         public int compare(Player player1, Player player2) {
@@ -688,14 +694,14 @@ public class Player extends FreeColGameObject implements Nameable {
     public boolean removeSettlement(Settlement settlement) {
         return settlements.remove(settlement);
     }
-    
+
     public boolean owns(Ownable ownable) {
         if (ownable == null)
             return false;
         return this.equals(ownable.getOwner());
     }
-    
-    
+
+
 
     /**
      * Returns a list of all Settlements this player owns.
@@ -977,7 +983,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
         return null;
     }
-            
+
     /**
      * Returns the type of this player.
      *
@@ -1097,6 +1103,24 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public void setDead(boolean dead) {
         this.dead = dead;
+    }
+
+    /**
+     * Get the <code>Bankrupt</code> value.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public final boolean isBankrupt() {
+        return bankrupt;
+    }
+
+    /**
+     * Set the <code>Bankrupt</code> value.
+     *
+     * @param newBankrupt The new Bankrupt value.
+     */
+    public final void setBankrupt(final boolean newBankrupt) {
+        this.bankrupt = newBankrupt;
     }
 
     /**
@@ -1338,7 +1362,7 @@ public class Player extends FreeColGameObject implements Nameable {
     		logger.warning("Unit to add is null");
     		return;
     	}
-    	
+
     	// make sure the owner of the unit is set first, before adding it to the list
     	if(newUnit.getOwner() != null && !this.owns(newUnit)){
     		throw new IllegalStateException(this + " adding another players unit=" + newUnit);
@@ -2497,7 +2521,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * its whole production to europe. The value of such colony is the maximum
      * amount of money it can make in one turn, assuming sale of its secondary
      * goods plus farmed goods from one of the surrounding tiles.
-     *     
+     *
      * @return The value of a future colony located on this tile. This value is
      *         used by the AI when deciding where to build a new colony.
      */
@@ -2611,7 +2635,7 @@ public class Player extends FreeColGameObject implements Nameable {
             if (tile.getSettlement() != null) return -INFINITY;
         }
 
-        //initialize tile value        
+        //initialize tile value
         int value = 0;
         if (t.getType().getPrimaryGoods() != null) {
             value += t.potential(t.getType().getPrimaryGoods().getType(), null) * PRIMARY_GOODS_VALUE;
@@ -2745,7 +2769,7 @@ public class Player extends FreeColGameObject implements Nameable {
             }
         }
 
-        //check availability of key goods        
+        //check availability of key goods
         for (GoodsType type : rawBuildingMaterialMap.keySet()) {
             Integer amount = rawBuildingMaterialMap.getCount(type);
             if (amount == 0) {
@@ -3516,6 +3540,7 @@ public class Player extends FreeColGameObject implements Nameable {
         out.writeAttribute("admin", Boolean.toString(admin));
         out.writeAttribute("ready", Boolean.toString(ready));
         out.writeAttribute("dead", Boolean.toString(dead));
+        out.writeAttribute("bankrupt", Boolean.toString(bankrupt));
         out.writeAttribute("playerType", playerType.toString());
         out.writeAttribute("ai", Boolean.toString(ai));
         out.writeAttribute("tax", Integer.toString(tax));
@@ -3572,22 +3597,22 @@ public class Player extends FreeColGameObject implements Nameable {
                 out.writeAttribute(VALUE_TAG, String.valueOf(entry.getValue().getValue()));
                 out.writeEndElement();
             }
-            
+
             for (Entry<String, Stance> entry : stance.entrySet()) {
                 out.writeStartElement(STANCE_TAG);
                 out.writeAttribute("player", entry.getKey());
                 out.writeAttribute(VALUE_TAG, entry.getValue().toString());
                 out.writeEndElement();
             }
-            
+
             for (HistoryEvent event : history) {
                 event.toXML(out);
             }
-            
+
             for (TradeRoute route : tradeRoutes) {
                 route.toXML(out, this, false, false);
             }
-            
+
             if (highSeas != null) {
                 highSeas.toXMLImpl(out, player, showAll, toSavedGame);
             }
@@ -3626,6 +3651,13 @@ public class Player extends FreeColGameObject implements Nameable {
                     sale.toXMLImpl(out);
                 }
             }
+            Turn turn = getGame().getTurn();
+            for (Modifier modifier : getModifiers()) {
+                if (modifier.isTemporary() && !modifier.isOutOfDate(turn)) {
+                    modifier.toXML(out);
+                }
+            }
+
         } else {
             Tension t = getTension(player);
             if (t != null) {
@@ -3667,6 +3699,7 @@ public class Player extends FreeColGameObject implements Nameable {
         ready = getAttribute(in, "ready", false);
         ai = getAttribute(in, "ai", false);
         dead = getAttribute(in, "dead", false);
+        bankrupt = getAttribute(in, "bankrupt", false);
         tax = Integer.parseInt(in.getAttributeValue(null, "tax"));
         playerType = Enum.valueOf(PlayerType.class, in.getAttributeValue(null, "playerType"));
         currentFather = getSpecification().getType(in, "currentFather", FoundingFather.class, null);
@@ -3759,6 +3792,8 @@ public class Player extends FreeColGameObject implements Nameable {
                 LastSale lastSale = new LastSale();
                 lastSale.readFromXMLImpl(in);
                 saveSale(lastSale);
+            } else if (Modifier.getXMLElementTagName().equals(in.getLocalName())) {
+                addModifier(new Modifier(in, getSpecification()));
             } else {
                 logger.warning("Unknown tag: " + in.getLocalName() + " loading player");
                 in.nextTag();
@@ -3783,6 +3818,7 @@ public class Player extends FreeColGameObject implements Nameable {
         recalculateBellsBonus();
 
         invalidateCanSeeTiles();
+
     }
 
     /**

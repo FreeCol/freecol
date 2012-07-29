@@ -476,6 +476,35 @@ public abstract class FreeColObject {
     }
 
     /**
+     * Initialize this object from an XML-representation of this object.
+     * @param element An XML-element that will be used to initialize
+     *      this object.
+     * @param specification a <code>Specification</code> value
+     */
+    public void readFromXMLElement(Element element, Specification specification) {
+        XMLInputFactory xif = XMLInputFactory.newInstance();
+        try {
+            try {
+                TransformerFactory factory = TransformerFactory.newInstance();
+                Transformer xmlTransformer = factory.newTransformer();
+                StringWriter stringWriter = new StringWriter();
+                xmlTransformer.transform(new DOMSource(element), new StreamResult(stringWriter));
+                String xml = stringWriter.toString();
+                XMLStreamReader xsr = xif.createXMLStreamReader(new StringReader(xml));
+                xsr.nextTag();
+                readFromXMLImpl(xsr, specification);
+            } catch (TransformerException e) {
+                logger.log(Level.WARNING, "TransformerException", e);
+                throw new IllegalStateException("TransformerException");
+            }
+        } catch (XMLStreamException e) {
+            logger.log(Level.WARNING, "XMLStreamException", e);
+            throw new IllegalStateException("XMLStreamException");
+        }
+    }
+
+
+    /**
      * Initializes this object from an XML-representation of this object,
      * unless the PARTIAL_ATTRIBUTE tag is present which indicates
      * a partial update of an existing object.
