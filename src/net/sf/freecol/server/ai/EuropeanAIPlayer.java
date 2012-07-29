@@ -809,8 +809,8 @@ public class EuropeanAIPlayer extends AIPlayer {
             }
         }
         if (targetLoc != null
-            && ((path = unit.findPath(startTile, targetLoc.getTile(),
-                                      unit.getCarrier())) != null)
+            && ((path = unit.findFullPath(startTile, targetLoc.getTile(),
+                                          unit.getCarrier(), null)) != null)
             && (value = UnitSeekAndDestroyMission.scorePath(aiUnit,
                     path)) > bestValue) {
             bestValue = value;
