@@ -280,7 +280,7 @@ public abstract class Mission extends AIObject {
      *     move can not be made.
      */
     protected Direction moveTowards(Tile tile) {
-        PathNode pathNode = getUnit().findPath(tile);
+        PathNode pathNode = getUnit().findFullPath(tile);
         return (pathNode == null) ? null : moveTowards(pathNode);
     }
 
@@ -294,18 +294,20 @@ public abstract class Mission extends AIObject {
      *     move can not be made.
      */
     protected Direction moveTowards(PathNode pathNode) {
-        if (getUnit().getMovesLeft() <= 0) return null;
+        final Unit unit = getUnit();
+        if (unit.getMovesLeft() <= 0) return null;
 
-        while (pathNode.next != null && pathNode.getTurns() == 0) {
+        for (; pathNode.next != null && pathNode.getTurns() == 0;
+             pathNode = pathNode.next) {
+            if (pathNode.getLocation() == unit.getLocation()) continue;
             if (!isValid()) return null;
-            if (!getUnit().getMoveType(pathNode.getDirection()).isProgress()) {
+            if (!unit.getMoveType(pathNode.getDirection()).isProgress()) {
                 break;
             }
             if (!AIMessage.askMove(aiUnit, pathNode.getDirection())
-                || getUnit() == null || getUnit().isDisposed()) {
+                || unit == null || unit.isDisposed()) {
                 return null;
             }
-            pathNode = pathNode.next;
         }
         return (pathNode.getTurns() == 0
                 && getUnit().getMoveType(pathNode.getDirection()).isLegal())
