@@ -719,32 +719,23 @@ public abstract class Mission extends AIObject {
      * Should the unit use transport to get to a specified tile?
      *
      * True if:
+     * - The unit and tile are not null
      * - The unit is not there already
      * AND
-     *   - the unit already has transport, this will always be faster
-     *     (TODO: actually, mounted units on good roads might be faster,
-     *     check for this)
-     *   - if not on the map
-     *   - if on the map but can not find a path to the tile, unless
-     *     adjacent to the destination which usually means the path
-     *     finding failed due to a temporary blockage such as an enemy unit
-     *   - if the path to the tile will take more than MAX_TURNS
+     *   - there is no path OR the path uses an existing carrier
      *
      * @param tile The <code>Tile</code> to go to.
      * @return True if the unit should use transport.
      */
     protected boolean shouldTakeTransportToTile(Tile tile) {
-        final int MAX_TURNS = 5;
         final Unit unit = getUnit();
         PathNode path;
         return tile != null
             && unit != null
             && unit.getTile() != tile
-            && (unit.isOnCarrier()
-                || unit.getTile() == null
-                || ((path = unit.findPath(tile)) == null
-                    && !unit.getTile().isAdjacent(tile))
-                || (path != null && path.getTotalTurns() >= MAX_TURNS));
+            && ((path = unit.findFullPath(unit.getLocation(), tile,
+                                          unit.getCarrier(), null)) == null
+                || path.usesCarrier());
     }
 
     /**

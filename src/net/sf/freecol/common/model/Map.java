@@ -904,6 +904,9 @@ public class Map extends FreeColGameObject implements Location {
                               getLocationGoalDecider(end.getTile()),
                               costDecider, INFINITY, carrier,
                               getManhattenHeuristic(tile));
+                if (path == null) {
+                    throw new IllegalStateException("SEARCH-FAIL: " + tile + " to " + end);
+                }
 
                 // At the front of the path insert a node for the
                 // starting location in Europe, correcting for the turns
