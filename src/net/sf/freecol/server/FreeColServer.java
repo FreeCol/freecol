@@ -1214,6 +1214,9 @@ public final class FreeColServer {
                     Specification.SHIP_TRADE_PENALTY_SOURCE,
                     -30.0f, Modifier.Type.PERCENTAGE));
         }
+        // Introduced: SAVEGAME_VERSION == 12
+        addBooleanOption(GameOptions.ENABLE_UPKEEP,
+            "gameOptions.colony", false);
     }
 
     private void addBooleanOption(String id, String gr, boolean defaultValue) {
