@@ -107,6 +107,11 @@ public class Messages {
         new HashMap<String, Selector>();
 
 
+    static {
+        tagMap.put("turn", new TurnSelector());
+    }
+
+
 
     /**
      * Returns the Selector with the given tag.

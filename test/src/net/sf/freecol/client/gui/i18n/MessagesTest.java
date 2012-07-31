@@ -27,6 +27,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.server.model.ServerUnit;
@@ -277,6 +278,44 @@ public class MessagesTest extends FreeColTestCase {
 
         assertEquals("Ruoka", Messages.message(StringTemplate.key("key3")));
         assertEquals("Ruoka", Messages.message("key3"));
+
+    }
+
+    public void testTurnChoices() {
+        String mapping = "monarch={{turn:%turn%|1492=bob|SPRING 1493=anson"
+            + "|AUTUMN 1493-1588=paul|1589-SPRING 1612=james"
+            + "|AUTUMN 1612-AUTUMN 1667=nathan|default=fred}}";
+
+        ByteArrayInputStream stream = new ByteArrayInputStream(mapping.getBytes());
+        Messages.loadResources(stream);
+
+        StringTemplate t = StringTemplate.template("monarch")
+            .addName("%turn%", Turn.toString(1));
+        assertEquals("bob", Messages.message(t));
+
+        t = StringTemplate.template("monarch")
+            .addName("%turn%", Turn.toString(2));
+        assertEquals("anson", Messages.message(t));
+
+        t = StringTemplate.template("monarch")
+            .addName("%turn%", "AUTUMN 1493");
+        assertEquals("paul", Messages.message(t));
+
+        t = StringTemplate.template("monarch")
+            .addName("%turn%", Turn.toString(100));
+        assertEquals("james", Messages.message(t));
+
+        t = StringTemplate.template("monarch")
+            .addName("%turn%", Turn.toString(150));
+        assertEquals("nathan", Messages.message(t));
+
+        t = StringTemplate.template("monarch")
+            .addName("%turn%", "YEAR 1624");
+        assertEquals("nathan", Messages.message(t));
+
+        t = StringTemplate.template("monarch")
+            .addName("%turn%", Turn.toString(1000));
+        assertEquals("fred", Messages.message(t));
 
     }
 
