@@ -903,7 +903,7 @@ public class Map extends FreeColGameObject implements Location {
                 path = search(unit, tile,
                               getLocationGoalDecider(end.getTile()),
                               costDecider, INFINITY, carrier,
-                              getManhattenHeuristic(tile));
+                              getManhattenHeuristic(end.getTile()));
                 if (path == null) {
                     throw new IllegalStateException("SEARCH-FAIL: " + tile + " to " + end);
                 }
