@@ -77,6 +77,7 @@ public abstract class Mission extends AIObject {
 
     // Common mission invalidity reasons.
     protected static final String AIUNITNULL = "aiUnit-null";
+    protected static final String TARGETNULL = "target-null";
     protected static final String TARGETINVALID = "target-invalid";
     protected static final String TARGETOWNERSHIP = "target-ownership";
     protected static final String TARGETNOTFOUND = "target-not-found";
@@ -259,7 +260,7 @@ public abstract class Mission extends AIObject {
      * @return A reason for the target to be invalid, or null if none found.
      */
     public static String invalidTargetReason(Location target, Player owner) {
-        return (target == null) ? "target-null"
+        return (target == null) ? Mission.TARGETNULL
             : (((FreeColGameObject)target).isDisposed()) ? "target-disposed"
             : (owner == null) ? null
             : (target instanceof Ownable
@@ -687,6 +688,8 @@ public abstract class Mission extends AIObject {
             ? CashInTreasureTrainMission.scorePath(aiUnit, path)
             : (type == DefendSettlementMission.class)
             ? DefendSettlementMission.scorePath(aiUnit, path)
+            : (type == MissionaryMission.class)
+            ? MissionaryMission.scorePath(aiUnit, path)
             : (type == PioneeringMission.class)
             ? PioneeringMission.scorePath(aiUnit, path)
             : (type == ScoutingMission.class)
