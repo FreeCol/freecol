@@ -20,6 +20,7 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -41,6 +42,7 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Building;
+import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -93,7 +95,7 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
         ProductionInfo info = building.getProductionInfo();
 
         if (info == null || info.getProduction().isEmpty()) {
-            add(new JLabel(), "span");
+            productionOutput = null;
         } else {
             AbstractGoods output = info.getProduction().get(0);
             if (output.getAmount() > 0) {
@@ -107,8 +109,22 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
                 AbstractGoods maximum = info.getMaximumProduction().isEmpty()
                     ? output : info.getMaximumProduction().get(0);
                 productionOutput = new ProductionLabel(freeColClient, gui, output, maximum);
-                add(productionOutput, "span, align center");
             }
+        }
+        JLabel upkeep = null;
+        if (building.getSpecification().getBoolean(GameOptions.ENABLE_UPKEEP)
+            && building.getType().getUpkeep() > 0) {
+            upkeep = new UpkeepLabel(building.getType().getUpkeep());
+        }
+        if (productionOutput == null) {
+            if (upkeep != null) {
+                add(upkeep, "span, align center");
+            }
+        } else if (upkeep == null) {
+            add(productionOutput, "span, align center");
+        } else {
+            add(productionOutput, "span, split 2, align center");
+            add(upkeep);
         }
 
         for (Unit unit : building.getUnitList()) {
@@ -181,6 +197,27 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
                       + ": " + event.getOldValue()
                       + " -> " + event.getNewValue());
         initialize();
+    }
+
+
+    public class UpkeepLabel extends JLabel {
+
+        private final Image image;
+
+        public UpkeepLabel(int number) {
+            super(gui.getImageLibrary().getMiscImageIcon("coin"));
+            image = gui.getMapViewer()
+                .createStringImage(gui.getCanvas().getGraphics(),
+                                   Integer.toString(number), getForeground(),
+                                   ResourceManager.getFont("SimpleFont", Font.BOLD, 12f));
+        }
+
+        @Override
+        public void paintComponent(Graphics g) {
+            getIcon().paintIcon(null, g, 0, 0);
+            g.drawImage(image, (getIcon().getIconWidth() - image.getWidth(null))/2,
+                        (getIcon().getIconHeight() - image.getHeight(null))/2, null);
+        }
     }
 
 }
