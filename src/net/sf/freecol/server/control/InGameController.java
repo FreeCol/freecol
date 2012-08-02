@@ -744,7 +744,8 @@ public final class InGameController extends Controller {
                 }
                 break;
             default: // Need to autorecruit a unit to keep alive.
-                serverPlayer.csEmigrate(0, MigrationType.SURVIVAL, random, cs);
+                ((ServerPlayer)player).csEmigrate(0, MigrationType.SURVIVAL,
+                                                  random, cs);
                 break;
             }
 

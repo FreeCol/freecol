@@ -383,23 +383,21 @@ public class ServerPlayer extends Player implements ServerModelObject {
         if (hasColonist) {
             logger.info(getName() + " alive, has waiting colonist.");
             return IS_ALIVE;
-        } else {
-            if (europe == null) {
-                logger.info(getName() + " dead, can not recruit.");
-                return IS_DEAD;
-            }
-            UnitType unitType = null;
-            int price = europe.getRecruitPrice();
-            for (UnitType type : spec
-                     .getUnitTypesWithAbility("model.ability.foundColony")) {
-                int p = europe.getUnitPrice(type);
-                if (p != UNDEFINED && p < price) price = p;
-            }
-            goldNeeded += price;
-            if (checkGold(goldNeeded)) {
-                logger.info(getName() + " alive, can buy colonist.");
-                return IS_ALIVE;
-            }
+        } else if (europe == null) {
+            logger.info(getName() + " dead, can not recruit.");
+            return IS_DEAD;
+        }
+        UnitType unitType = null;
+        int price = europe.getRecruitPrice();
+        for (UnitType type : spec
+                 .getUnitTypesWithAbility("model.ability.foundColony")) {
+            int p = europe.getUnitPrice(type);
+            if (p != UNDEFINED && p < price) price = p;
+        }
+        goldNeeded += price;
+        if (checkGold(goldNeeded)) {
+            logger.info(getName() + " alive, can buy colonist.");
+            return IS_ALIVE;
         }
 
         // Col1 auto-recruits a unit in Europe if you run out before
@@ -1651,10 +1649,17 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 "Replace recruit", random, recruits));
         cs.add(See.only(this), europe);
 
-        // Add an informative message only if this was an ordinary
-        // migration where we did not select the unit type.
+        // Add an informative message if this was a survival recruitment,
+        // or an ordinary migration where we did not select the unit type.
         // Other cases were selected.
-        if (!selected) {
+        if (type == MigrationType.SURVIVAL) {
+            cs.addMessage(See.only(this),
+                new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
+                                 "model.europe.autoRecruit",
+                                 this, unit)
+                .add("%europe%", europe.getNameKey())
+                .addStringTemplate("%unit%", unit.getLabel()));
+        } else if (!selected) {
             cs.addMessage(See.only(this),
                 new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
                                  "model.europe.emigrate",
