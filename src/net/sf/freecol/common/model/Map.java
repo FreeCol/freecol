@@ -673,27 +673,6 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Finds the best path to <code>Europe</code> independently of any unit.
-     * This method is intended to be executed by the server code,
-     * with complete knowledge of the map
-     *
-     * @param start The starting <code>Tile</code>.
-     * @return The path to the target or null if no target can be found.
-     * @throws IllegalArgumentException If <code>start</code> is null.
-     * @see Europe
-    public PathNode findPathToEurope(Tile start) {
-        if (start == null) {
-            throw new IllegalArgumentException("Null start.");
-        }
-
-        PathNode path = search(null, start,
-            getLocationGoalDecider(unit.getOwner().getEurope()),
-            INFINITY, null, null);
-        return (path == null) ? null : path.next;
-    }
-     */
-
-    /**
      * Searches for a goal determined by the given <code>GoalDecider</code>.
      *
      * @param unit The <code>Unit</code> to find a path for.
@@ -905,7 +884,8 @@ public class Map extends FreeColGameObject implements Location {
                               costDecider, INFINITY, carrier,
                               getManhattenHeuristic(end.getTile()));
                 if (path == null) {
-                    throw new IllegalStateException("SEARCH-FAIL: " + tile + " to " + end);
+                    throw new IllegalStateException("SEARCH-FAIL: " + unit
+                        + "/" + carrier + " from " + tile + " to " + end);
                 }
 
                 // At the front of the path insert a node for the
@@ -1062,7 +1042,8 @@ public class Map extends FreeColGameObject implements Location {
         private boolean onCarrier;
         private CostDecider decider;
         private int cost;
-        
+        private PathNode path;
+
 
         /**
          * Creates a new move candidate where a cost decider will be used
@@ -1086,12 +1067,14 @@ public class Map extends FreeColGameObject implements Location {
             this.turns = turns;
             this.onCarrier = onCarrier;
             this.decider = decider;
-            if ((this.cost = decider.getCost(unit, current.getLocation(),
-                        dst, movesLeft)) != CostDecider.ILLEGAL_MOVE) {
+            this.cost = decider.getCost(unit, current.getLocation(),
+                                        dst, movesLeft);
+            if (this.cost != CostDecider.ILLEGAL_MOVE) {
                 this.turns += decider.getNewTurns();
                 this.movesLeft = decider.getMovesLeft();
                 this.cost = PathNode.getCost(turns, movesLeft);
             }
+            this.path = null;
         }
 
         /**
@@ -1104,13 +1087,12 @@ public class Map extends FreeColGameObject implements Location {
         }
 
         /**
-         * Gets the cost of this candidate move.
-         *
-         * @return The move cost.
-        public int getCost() {
-            return cost;
-        }
+         * Resets the path.  Required after the parameters change.
          */
+        public void resetPath() {
+            this.path = new PathNode(dst, movesLeft, turns, onCarrier,
+                                     current, null);
+        }
 
         /**
          * Do not let the CostDecider (which may be conservative)
@@ -1127,13 +1109,12 @@ public class Map extends FreeColGameObject implements Location {
                 && (unit.getSimpleMoveType(current.getTile(), dst.getTile())
                     .isLegal())
                 && goalDecider != null
-                && goalDecider.check(unit,
-                    new PathNode(dst, movesLeft, turns, onCarrier, 
-                        current, null))) {
+                && goalDecider.check(unit, path)) {
                 // Pretend it finishes the move.
                 movesLeft = unit.getInitialMovesLeft();
                 turns++;
                 cost = PathNode.getCost(turns, movesLeft);
+                resetPath();
             }
         }
 
@@ -1148,7 +1129,7 @@ public class Map extends FreeColGameObject implements Location {
         }
 
         /**
-         * Replace a given path with this candidate move.
+         * Replace a given path with that of this candidate move.
          *
          * @param openList The list of available nodes.
          * @param openListQueue The queue of available nodes.
@@ -1159,13 +1140,11 @@ public class Map extends FreeColGameObject implements Location {
                             PriorityQueue<PathNode> openListQueue,
                             HashMap<String, Integer> f,
                             SearchHeuristic sh) {
-            PathNode path = openList.get(dst.getId());
-            if (path != null) {
+            PathNode best = openList.get(dst.getId());
+            if (best != null) {
                 openList.remove(dst.getId());
-                openListQueue.remove(path);
+                openListQueue.remove(best);
             }
-            path = new PathNode(dst, movesLeft, turns, onCarrier,
-                                current, null);
             int fcost = cost;
             if (sh != null && dst.getTile() != null) {
                 fcost += sh.getValue(dst.getTile());
@@ -1379,6 +1358,8 @@ public class Map extends FreeColGameObject implements Location {
                 }
 
                 if (move != null) {
+                    move.resetPath();
+
                     // Special case when on the map.
                     move.recoverGoal(goalDecider);
 
@@ -1405,6 +1386,7 @@ public class Map extends FreeColGameObject implements Location {
                     ((costDecider != null) ? costDecider
                         : CostDeciders.defaultCostDeciderFor(currentUnit)));
 
+                move.resetPath();
                 if (move.canImprove(openList.get(europe.getId()))) {
                     move.improve(openList, openListQueue, f, null);
                 }
