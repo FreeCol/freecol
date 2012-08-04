@@ -1133,7 +1133,7 @@ public class ColonyPlan {
         }
         return null;
     }
-
+    
     /**
      * Gets the best worker to execute a work location plan.
      * - The most productive one wins (which will automatically pick a
@@ -1156,17 +1156,31 @@ public class ColonyPlan {
     static public Unit getBestWorker(WorkLocation wl, GoodsType goodsType,
                                      List<Unit> workers) {
         if (workers == null || workers.isEmpty()) return null;
-        Colony colony = wl.getColony();
+        final Colony colony = wl.getColony();
+        final GoodsType outputType = (goodsType.isStoredAs()) 
+            ? goodsType.getStoredAs() : goodsType;
+
+        // Avoid some nasty autodestructions by accepting singleton
+        // workers that do *something*.
+        if (workers.size() == 1) {
+            Unit u = workers.get(0);
+            if (!wl.canAdd(u)) return null;
+            Location oldLoc = u.getLocation();
+            GoodsType oldWork = u.getWorkType();
+            u.setLocation(wl);
+            u.setWorkType(goodsType);
+            int production = wl.getProductionOf(u, goodsType);
+            u.setLocation(oldLoc);
+            u.setWorkType(oldWork);
+            return (production > 0) ? u : null;
+        }
+
         // Do not mutate the workers list!
         List<Unit> todo = new ArrayList<Unit>(workers);
         List<Unit> best = new ArrayList<Unit>();
+        int bestValue = colony.getAdjustedNetProductionOf(outputType);
         Unit special = null;
-        GoodsType outputType = (goodsType.isStoredAs()) 
-            ? goodsType.getStoredAs() : goodsType;
-        int bestValue;
-
         best.clear();
-        bestValue = colony.getAdjustedNetProductionOf(outputType);
         for (Unit u : todo) {
             if (!wl.canAdd(u)) continue;
             Location oldLoc = u.getLocation();
@@ -1182,13 +1196,17 @@ public class ColonyPlan {
                 if (u.getType().getExpertProduction() == goodsType) {
                     special = u;
                 }
-            } else if (value == bestValue) {
+            } else if (value == bestValue && !best.isEmpty()) {
                 best.add(u);
+                if (u.getType().getExpertProduction() == goodsType) {
+                    special = u;
+                }
             }
-
+            
             u.setLocation(oldLoc);
             u.setWorkType(oldWork);
         }
+
         switch (best.size()) {
         case 0: return null; // Not good.  No unit improves production.
         case 1: return best.get(0);
