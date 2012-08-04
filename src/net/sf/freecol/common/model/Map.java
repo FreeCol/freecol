@@ -1096,20 +1096,24 @@ public class Map extends FreeColGameObject implements Location {
 
         /**
          * Do not let the CostDecider (which may be conservative)
-         * block a final destination if it is still a legal move.
+         * block a final destination if it is still a legal move
+         * or only illegal because it is occupied by an enemy unit, which
+         * may be a temporary condition.
          *
          * @param goalDecider A <code>GoalDecider</code> to check the
          *     goal with.
          */
         public void recoverGoal(GoalDecider goalDecider) {
+            Unit.MoveType mt;
             if (cost == CostDecider.ILLEGAL_MOVE
                 && unit != null
                 && current.getTile() != null
                 && dst.getTile() != null
-                && (unit.getSimpleMoveType(current.getTile(), dst.getTile())
-                    .isLegal())
                 && goalDecider != null
-                && goalDecider.check(unit, path)) {
+                && goalDecider.check(unit, path)
+                && ((mt = unit.getSimpleMoveType(current.getTile(),
+                                                 dst.getTile())).isLegal()
+                    || mt == Unit.MoveType.MOVE_NO_ATTACK_CIVILIAN)) {
                 // Pretend it finishes the move.
                 movesLeft = unit.getInitialMovesLeft();
                 turns++;
