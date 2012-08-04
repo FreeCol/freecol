@@ -331,10 +331,10 @@ public class ColonyPlanTest extends FreeColTestCase {
         assertEquals(colonist1, ColonyPlan.getBestWorker(townHall, bellsType, units));
 
         // colonist1 still has *less* experience to waste.  Experience
-        // should not cause a preference when production is zero.
+        // now causes a preference when production is zero.
         colonist1.setWorkType(lumberType);
         colonist1.modifyExperience(80);
-        assertNull(ColonyPlan.getBestWorker(colonyTile, lumberType, units));
+        assertEquals(colonist1, ColonyPlan.getBestWorker(colonyTile, lumberType, units));
         assertEquals(colonist2, ColonyPlan.getBestWorker(colonyTile, sugarType, units));
         assertEquals(colonist1, ColonyPlan.getBestWorker(colonyTile, grainType, units));
         assertEquals(colonist1, ColonyPlan.getBestWorker(townHall, bellsType, units));

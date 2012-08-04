@@ -1179,8 +1179,10 @@ public class ColonyPlan {
                 bestValue = value;
                 best.clear();
                 best.add(u);
-                if (u.getType().getExpertProduction() == goodsType) special = u;
-            } else if (value == bestValue && !best.isEmpty()) {
+                if (u.getType().getExpertProduction() == goodsType) {
+                    special = u;
+                }
+            } else if (value == bestValue) {
                 best.add(u);
             }
 
