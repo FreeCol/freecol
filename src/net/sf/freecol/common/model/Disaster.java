@@ -134,7 +134,11 @@ public class Disaster extends FreeColGameObjectType {
 
         effects = new ArrayList<RandomChoice<Effect>>();
         if (parent != this) {
-            effects.addAll(parent.effects);
+            for (RandomChoice<Effect> choice : parent.effects) {
+                Effect effect = new Effect(choice.getObject());
+                effect.getFeatureContainer().replaceSource(parent, this);
+                effects.add(new RandomChoice<Effect>(effect, effect.getProbability()));
+            }
         }
 
     }
@@ -196,6 +200,14 @@ public class Disaster extends FreeColGameObjectType {
      */
     public static String getXMLElementTagName() {
         return "disaster";
+    }
+
+    public String toString() {
+        String result = getId();
+        for (RandomChoice<Effect> choice : effects) {
+            result += " " + choice.getObject();
+        }
+        return result;
     }
 
 }

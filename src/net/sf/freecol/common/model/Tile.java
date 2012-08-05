@@ -39,6 +39,7 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.common.util.Utils;
 
 
@@ -474,6 +475,25 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             return result;
         }
     }
+
+    /**
+     * Returns a weighted list of natural disasters than can strike
+     * this tile. This list comprises all natural disasters that can
+     * strike a tile of this type or a completed tile improvement
+     * present.
+     *
+     * @return a <code>List<RandomChoice<Disaster>></code> value
+     */
+    public List<RandomChoice<Disaster>> getDisasters() {
+        List<RandomChoice<Disaster>> disasters
+            = new ArrayList<RandomChoice<Disaster>>();
+        disasters.addAll(type.getDisasters());
+        for (TileImprovement ti : getCompletedTileImprovements()) {
+            disasters.addAll(ti.getType().getDisasters());
+        }
+        return disasters;
+    }
+
 
     /**
      * Gets the <code>Unit</code> that is currently defending this

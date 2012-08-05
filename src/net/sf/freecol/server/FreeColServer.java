@@ -1217,6 +1217,8 @@ public final class FreeColServer {
         // Introduced: SAVEGAME_VERSION == 12
         addBooleanOption(GameOptions.ENABLE_UPKEEP,
             "gameOptions.colony", false);
+        addIntegerOption(GameOptions.NATURAL_DISASTERS,
+            "gameOptions.colony", 0);
     }
 
     private void addBooleanOption(String id, String gr, boolean defaultValue) {

@@ -38,7 +38,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.ProductionInfo;
-import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.util.RandomChoice;
 
 
 /**
@@ -699,6 +699,22 @@ public class Colony extends Settlement implements Nameable {
      */
     public List<ColonyTile> getColonyTiles() {
         return colonyTiles;
+    }
+
+    /**
+     * Returns a weighted list of natural disasters than can strike
+     * this colony. This list comprises all natural disasters that can
+     * strike the colony's tiles.
+     *
+     * @return a <code>List<RandomChoice<Disaster>></code> value
+     */
+    public List<RandomChoice<Disaster>> getDisasters() {
+        List<RandomChoice<Disaster>> disasters
+            = new ArrayList<RandomChoice<Disaster>>();
+        for (ColonyTile tile : colonyTiles) {
+            disasters.addAll(tile.getWorkTile().getDisasters());
+        }
+        return disasters;
     }
 
     /**

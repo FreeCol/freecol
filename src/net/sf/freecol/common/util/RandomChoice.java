@@ -65,7 +65,7 @@ public class RandomChoice<T> {
             total += choice.getProbability();
         }
         return total;
-    }        
+    }
 
     public static <T> T select(Collection<RandomChoice<T>> input, int probability) {
         if (input.isEmpty()) {

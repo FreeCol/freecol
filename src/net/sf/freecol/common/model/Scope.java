@@ -325,7 +325,6 @@ public class Scope extends FreeColObject implements Cloneable {
         }
     }
 
-
     /**
      * This method writes an XML-representation of this object to
      * the given stream.

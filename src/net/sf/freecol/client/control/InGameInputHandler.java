@@ -35,6 +35,7 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.FreeColActionUI;
 import net.sf.freecol.common.debug.FreeColDebugger;
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
@@ -154,8 +155,8 @@ public final class InGameInputHandler extends InputHandler {
             reply = addPlayer(element);
         } else if (type.equals("addObject")) {
             reply = addObject(element);
-        } else if (type.equals("removeObject")) {
-            reply = removeObject(element);
+        } else if (type.equals("featureChange")) {
+            reply = featureChange(element);
         } else if (type.equals("newLandName")) {
             reply = newLandName(element);
         } else if (type.equals("newRegionName")) {
@@ -1001,10 +1002,6 @@ public final class InGameInputHandler extends InputHandler {
             } else if (tag == TradeRoute.getXMLElementTagName()) {
                 TradeRoute t = new TradeRoute(game, e);
                 player.getTradeRoutes().add(t);
-            } else if (tag == Modifier.getXMLElementTagName()) {
-                Modifier m = new Modifier(spec);
-                m.readFromXMLElement(e);
-                player.addModifier(m);
             } else {
                 logger.warning("addObject unrecognized: " + tag);
             }
@@ -1013,33 +1010,40 @@ public final class InGameInputHandler extends InputHandler {
     }
 
     /**
-     * Remove the objects which are the children of this Element.
+     * Adds a feature to or removes a feature from a FreeColGameObject.
      *
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information.
      */
-    public Element removeObject(Element element) {
+    public Element featureChange(Element element) {
         Game game = getGame();
         Specification spec = game.getSpecification();
+        boolean add = "add".equalsIgnoreCase(element.getAttribute("add"));
+        FreeColGameObject object = game.getFreeColGameObject(element.getAttribute("id"));
         NodeList nodes = element.getChildNodes();
         for (int i = 0; i < nodes.getLength(); i++) {
             Element e = (Element) nodes.item(i);
-            String owner = e.getAttribute("owner");
-            Player player = game.getFreeColGameObject(owner, Player.class);
-            if (player == null) {
-                logger.warning("addObject with broken owner: "
-                               + ((owner == null) ? "(null)" : owner));
-                continue;
-            }
             String tag = e.getTagName();
             if (tag == null) {
-                logger.warning("addObject null tag");
+                logger.warning("featureChange null tag");
             } else if (tag == Modifier.getXMLElementTagName()) {
                 Modifier m = new Modifier(spec);
                 m.readFromXMLElement(e, spec);
-                player.removeModifier(m);
+                if (add) {
+                    object.addModifier(m);
+                } else {
+                    object.removeModifier(m);
+                }
+            } else if (tag == Ability.getXMLElementTagName()) {
+                Ability a = new Ability("");
+                a.readFromXMLElement(e, spec);
+                if (add) {
+                    object.addAbility(a);
+                } else {
+                    object.removeAbility(a);
+                }
             } else {
-                logger.warning("removeObject unrecognized: " + tag);
+                logger.warning("featureChange unrecognized: " + tag);
             }
         }
         return null;

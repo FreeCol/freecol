@@ -339,6 +339,16 @@ public final class TileImprovementType extends FreeColGameObjectType {
     }
 
     /**
+     * Return a weighted list of natural disasters than can strike
+     * this tile improvement type.
+     *
+     * @return a <code>List<RandomChoice<Disaster>></code> value
+     */
+    public List<RandomChoice<Disaster>> getDisasters() {
+        return disasters;
+    }
+
+    /**
      * Makes an XML-representation of this object.
      *
      * @param out The output stream.

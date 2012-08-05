@@ -340,7 +340,8 @@ public final class TileType extends FreeColGameObjectType {
     }
 
     /**
-     * Get the <code>Disasters</code> value.
+     * Return a weighted list of natural disasters than can strike
+     * this tile type.
      *
      * @return a <code>List<RandomChoice<Disaster>></code> value
      */

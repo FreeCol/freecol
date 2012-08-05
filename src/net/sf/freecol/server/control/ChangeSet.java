@@ -24,6 +24,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import net.sf.freecol.common.model.Ability;
+import net.sf.freecol.common.model.Feature;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
@@ -845,7 +847,6 @@ public class ChangeSet {
      */
     private static class OwnedChange extends Change {
         private FreeColObject fco;
-        private boolean add = true;
 
         /**
          * Build a new OwnedChange.
@@ -856,19 +857,6 @@ public class ChangeSet {
         OwnedChange(See see, FreeColObject fco) {
             super(see);
             this.fco = fco;
-        }
-
-        /**
-         * Build a new OwnedChange.
-         *
-         * @param see The visibility of this change.
-         * @param fco The <code>FreeColObject</code> to update.
-         * @param add Whether to add or remove the object.
-         */
-        OwnedChange(See see, FreeColObject fco, boolean add) {
-            super(see);
-            this.fco = fco;
-            this.add = add;
         }
 
         /**
@@ -889,7 +877,7 @@ public class ChangeSet {
          * @return An "addObject" element.
          */
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
-            Element element = doc.createElement((add ? "add" : "remove") + "Object");
+            Element element = doc.createElement("addObject");
             Element child = fco.toXMLElement(serverPlayer, doc, false, false);
             child.setAttribute("owner", serverPlayer.getId());
             element.appendChild(child);
@@ -903,8 +891,70 @@ public class ChangeSet {
             return "[" + getClass().getName()
                 + " " + see.toString()
                 + " #" + getPriority()
-                + " " + (add ? "add" : "remove")
                 + " " + fco.getId() + "]";
+        }
+    }
+
+    /**
+     * Encapsulate a feature change.
+     */
+    private static class FeatureChange extends Change {
+        private FreeColGameObject object;
+        private Feature feature;
+        private boolean add;
+
+        /**
+         * Build a new OwnedChange.
+         *
+         * @param see The visibility of this change.
+         * @param object The <code>FreeColGameObject</code> to update.
+         * @param feature a <code>Feature</code> value to add or remove.
+         * @param add a <code>boolean</code> value
+         */
+        FeatureChange(See see, FreeColGameObject object, Feature feature, boolean add) {
+            super(see);
+            this.object = object;
+            this.feature = feature;
+            this.add = add;
+        }
+
+        /**
+         * Gets the sort priority.
+         *
+         * @return "CHANGE_OWNER"
+         */
+        public int getPriority() {
+            return ChangePriority.CHANGE_OWNED.getPriority();
+        }
+
+        /**
+         * Specialize a feature change into an element for a
+         * particular player.
+         *
+         * @param serverPlayer The <code>ServerPlayer</code> to update.
+         * @param doc The owner <code>Document</code>.
+         * @return An "addObject" element.
+         */
+        public Element toElement(ServerPlayer serverPlayer, Document doc) {
+            Element element = doc.createElement("featureChange");
+            element.setAttribute("add", Boolean.toString(add));
+            element.setAttribute("id", object.getId());
+            Element child = feature.toXMLElement(doc);
+            element.appendChild(child);
+            return element;
+        }
+
+        /**
+         * Debug helper.
+         */
+        public String toString() {
+            return "[" + getClass().getName()
+                + " " + see.toString()
+                + " #" + getPriority()
+                + " " + (add ? "add" : "remove")
+                + " " + feature
+                + " " + (add ? "to" : "from")
+                + " " + object.getId() + "]";
         }
     }
 
@@ -1230,32 +1280,42 @@ public class ChangeSet {
     }
 
     /**
-     * Helper function to add a modifier event to a ChangeSet. Also
-     * adds the modifier to the owner.
+     * Helper function to add an Ability to a FreeColGameObject, or remove it.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> adding the father.
-     * @param modifier a <code>Modifier</code> value
-     * @return The updated <code>ChangeSet</code>.
+     * @param serverPlayer a <code>ServerPlayer</code> value
+     * @param object a <code>FreeColGameObject</code> value
+     * @param ability an <code>Ability</code> value
+     * @param add a <code>boolean</code> value
+     * @return a <code>ChangeSet</code> value
      */
-    public ChangeSet addModifier(ServerPlayer serverPlayer,
-                                 Modifier modifier) {
-        changes.add(new OwnedChange(See.only(serverPlayer), modifier));
-        serverPlayer.addModifier(modifier);
+    public ChangeSet addFeatureChange(ServerPlayer serverPlayer, FreeColGameObject object,
+                                      Ability ability, boolean add) {
+        changes.add(new FeatureChange(See.only(serverPlayer), object, ability, add));
+        if (add) {
+            object.addAbility(ability);
+        } else {
+            object.removeAbility(ability);
+        }
         return this;
     }
 
     /**
-     * Helper function to add a modifier removal event to a ChangeSet.
-     * Also removes the modifier from the owner.
+     * Helper function to add a Modifier to a FreeColGameObject, or remove it.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> adding the father.
+     * @param serverPlayer a <code>ServerPlayer</code> value
+     * @param object a <code>FreeColGameObject</code> value
      * @param modifier a <code>Modifier</code> value
-     * @return The updated <code>ChangeSet</code>.
+     * @param add a <code>boolean</code> value
+     * @return a <code>ChangeSet</code> value
      */
-    public ChangeSet removeModifier(ServerPlayer serverPlayer,
-                                    Modifier modifier) {
-        changes.add(new OwnedChange(See.only(serverPlayer), modifier, false));
-        serverPlayer.removeModifier(modifier);
+    public ChangeSet addFeatureChange(ServerPlayer serverPlayer, FreeColGameObject object,
+                                      Modifier modifier, boolean add) {
+        changes.add(new FeatureChange(See.only(serverPlayer), object, modifier, add));
+        if (add) {
+            object.addModifier(modifier);
+        } else {
+            object.removeModifier(modifier);
+        }
         return this;
     }
 

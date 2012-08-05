@@ -343,6 +343,21 @@ public class ModelMessage extends StringTemplate {
     }
 
     /**
+     * Add a new key and replacement to the StringTemplate. The
+     * replacement must be a proper name. This is only possible if the
+     * StringTemplate is of type TEMPLATE.
+     *
+     * @param key a <code>String</code> value
+     * @param object a <code>FreeColObject</code> value
+     * @return a <code>ModelMessage</code> value
+     */
+    public ModelMessage addName(String key, FreeColObject object) {
+        super.addName(key, object);
+        return this;
+    }
+
+
+    /**
      * Add a key and an integer value to replace it to this
      * StringTemplate.
      *

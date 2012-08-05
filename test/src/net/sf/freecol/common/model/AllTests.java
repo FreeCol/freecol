@@ -34,6 +34,7 @@ public class AllTests {
 	suite.addTestSuite(ColonyTest.class);
 	suite.addTestSuite(ColonyProductionTest.class);
 	suite.addTestSuite(CombatTest.class);
+	suite.addTestSuite(DisasterTest.class);
 	suite.addTestSuite(EuropeTest.class);
 	suite.addTestSuite(FoundingFatherTest.class);
 	suite.addTestSuite(GameTest.class);

@@ -132,5 +132,5 @@ public class GameOptions {
 
     public static final String ENABLE_UPKEEP = "model.option.enableUpkeep";
 
-
+    public static final String NATURAL_DISASTERS = "model.option.naturalDisasters";
 }

@@ -39,6 +39,13 @@ import javax.xml.stream.XMLStreamWriter;
  */
 public class Effect extends FreeColGameObjectType {
 
+    public static final String DAMAGED_UNIT = "model.disaster.effect.damageUnit";
+    public static final String LOSS_OF_UNIT = "model.disaster.effect.lossOfUnit";
+    public static final String LOSS_OF_MONEY = "model.disaster.effect.lossOfMoney";
+    public static final String LOSS_OF_GOODS = "model.disaster.effect.lossOfGoods";
+    public static final String LOSS_OF_TILE_PRODUCTION = "model.disaster.effect.lossOfTileProduction";
+    public static final String LOSS_OF_BUILDING_PRODUCTION = "model.disaster.effect.lossOfBuildingProduction";
+
     /**
      * The probability of this effect.
      */
@@ -64,6 +71,14 @@ public class Effect extends FreeColGameObjectType {
     public Effect(XMLStreamReader in, Specification specification) throws XMLStreamException {
         setSpecification(specification);
         readFromXMLImpl(in, specification);
+    }
+
+    public Effect(Effect template) {
+        setSpecification(template.getSpecification());
+        setId(template.getId());
+        this.probability = template.probability;
+        this.scopes = template.scopes;
+        addFeatures(template);
     }
 
     /**
@@ -102,18 +117,32 @@ public class Effect extends FreeColGameObjectType {
         this.scopes = newScopes;
     }
 
-    @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
-        super.writeAttributes(out);
-        out.writeAttribute("probability", Integer.toString(probability));
+    /**
+     * Returns true if the <code>appliesTo</code> method of at least
+     * one <code>Scope</code> object returns true.
+     *
+     * @param objectType a <code>FreeColGameObjectType</code> value
+     * @return a <code>boolean</code> value
+     */
+    public boolean appliesTo(final FreeColGameObjectType objectType) {
+        if (scopes.isEmpty()) {
+            return true;
+        } else {
+            for (Scope scope : scopes) {
+                if (scope.appliesTo(objectType)) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
+
 
     @Override
     protected void readAttributes(XMLStreamReader in, Specification specification)
         throws XMLStreamException {
         super.readAttributes(in, specification);
-        getAttribute(in, "probability", 0);
+        probability = getAttribute(in, "probability", 0);
     }
 
     @Override
@@ -143,6 +172,13 @@ public class Effect extends FreeColGameObjectType {
         super.toXML(out, getXMLElementTagName());
     }
 
+    @Override
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeAttributes(out);
+        out.writeAttribute("probability", Integer.toString(probability));
+    }
+
     /**
      * Write the children of this object to a stream.
      *
@@ -170,6 +206,16 @@ public class Effect extends FreeColGameObjectType {
      */
     public static String getXMLElementTagName() {
         return "effect";
+    }
+
+    public String toString() {
+        String result = getId() + " [probability: " + probability + "%]";
+        if (getScopes() != null) {
+            for (Scope scope : getScopes()) {
+                result += " " + scope;
+            }
+        }
+        return result;
     }
 
 }
