@@ -34,6 +34,7 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -109,15 +110,16 @@ public class ScoutingMission extends Mission {
      * @return A target for this mission, or null if none found.
      */
     public static Location extractTarget(AIUnit aiUnit, PathNode path) {
-        final Location loc = (path == null) ? aiUnit.getUnit().getLocation()
-            : path.getLastNode().getLocation();
+        if (path == null) return null;
+        final Unit unit = aiUnit.getUnit();
+        final Location loc = path.getLastNode().getLocation();
+        Settlement settlement;
         return (loc == null) ? null
-            : (loc.getSettlement() instanceof IndianSettlement
-                && invalidSettlementReason(aiUnit,
-                    (IndianSettlement)loc.getSettlement()) == null)
-            ? loc.getSettlement()
-            : (invalidTileReason(aiUnit, loc.getTile()) == null) ? loc.getTile()
-            : null;
+            : ((settlement = loc.getSettlement()) != null)
+            ? ((invalidSettlementReason(aiUnit, settlement) == null)
+                ? settlement : null)
+            : ((invalidTileReason(aiUnit, loc.getTile()) == null)
+                ? loc.getTile() : null);
     }
 
     /**
@@ -145,9 +147,9 @@ public class ScoutingMission extends Mission {
     public static PathNode findTargetPath(final AIUnit aiUnit) {
         Unit unit;
         Tile startTile;
-        if (aiUnit == null
-            || (unit = aiUnit.getUnit()) == null || unit.isDisposed()
-            || (startTile = unit.getPathStartTile()) == null) return null;
+        if (Mission.invalidAIUnitReason(aiUnit) != null
+            || (startTile = (unit = aiUnit.getUnit()).getTile()) == null) 
+            return null;
 
         final Unit carrier = unit.getCarrier();
         final GoalDecider scoutingDecider
@@ -174,7 +176,9 @@ public class ScoutingMission extends Mission {
 
     /**
      * Finds a suitable scouting target for the supplied unit.
-     * Falls back to the best settlement if the unit is not on the map.
+     * Falls back to the best settlement if a path is not found.
+     *
+     * TODO: improve the fallback to an actual scouting target.
      *
      * @param aiUnit The <code>AIUnit</code> to test.
      * @return A <code>PathNode</code> to the target, or null if none found.
@@ -195,9 +199,9 @@ public class ScoutingMission extends Mission {
      */
     @Override
     public Location getTransportDestination() {
-        return (target == null
-            || !shouldTakeTransportToTile(target.getTile())) ? null
-            : target;
+        return (target != null && shouldTakeTransportToTile(target.getTile()))
+            ? target
+            : null;
     }
 
 
@@ -227,21 +231,31 @@ public class ScoutingMission extends Mission {
 
     /**
      * Is this a valid scouting target because it is a suitable native
-     * settlement.
+     * settlement or an intermediate colony.
      *
      * @param aiUnit The <code>AIUnit</code> to test.
-     * @param is The <code>IndianSettlement</code> to test.
+     * @param settlement The <code>Settlement</code> to test.
      * @return A reason why the mission would be invalid, or null if none found.
      */
     private static String invalidSettlementReason(AIUnit aiUnit,
-                                                  IndianSettlement is) {
+                                                  Settlement settlement) {
         final Unit unit = aiUnit.getUnit();
         final Player owner = unit.getOwner();
-        Tension tension = is.getAlarm(owner);
-        return (is.hasSpokenToChief(owner)) ? "settlement-contacted"
-            : (tension != null && tension.getValue()
-                >= Tension.Level.HATEFUL.getLimit()) ? "settlement-hateful"
-            : null;
+        IndianSettlement is;
+        Tension tension;
+        return (settlement == null || settlement.isDisposed())
+            ? Mission.TARGETINVALID
+            : (settlement instanceof Colony)
+            ? ((settlement.getOwner() == owner) ? null
+                : Mission.TARGETOWNERSHIP)
+            : (settlement instanceof IndianSettlement)
+            ? (((is = (IndianSettlement)settlement).hasSpokenToChief(owner))
+                ? "settlement-contacted"
+                : ((tension = is.getAlarm(owner)) != null
+                    && tension.getValue() >= Tension.Level.HATEFUL.getLimit())
+                ? "settlement-hateful"
+                : null)
+            : Mission.TARGETINVALID;
     }
 
     /**
@@ -253,7 +267,7 @@ public class ScoutingMission extends Mission {
      */
     private static String invalidTileReason(AIUnit aiUnit, Tile tile) {
         return (tile == null) ? "tile-null"
-            : (!tile.hasLostCityRumour()) ? "tile-empty"
+            : (!tile.hasLostCityRumour()) ? "tile-lacks-rumour"
             : null;
     }
 
@@ -288,12 +302,13 @@ public class ScoutingMission extends Mission {
      */
     public static String invalidReason(AIUnit aiUnit, Location loc) {
         String reason;
-        return ((reason = invalidAIUnitReason(aiUnit)) != null) ? reason
-            : ((reason = invalidScoutingReason(aiUnit)) != null) ? reason
+        return ((reason = invalidAIUnitReason(aiUnit)) != null
+            || (reason = invalidScoutingReason(aiUnit)) != null)
+            ? reason
+            : (loc instanceof Settlement)
+            ? invalidSettlementReason(aiUnit, (Settlement)loc)
             : (loc instanceof Tile)
             ? invalidTileReason(aiUnit, (Tile)loc)
-            : (loc instanceof IndianSettlement)
-            ? invalidSettlementReason(aiUnit, (IndianSettlement)loc)
             : Mission.TARGETINVALID;
     }
 
@@ -303,10 +318,11 @@ public class ScoutingMission extends Mission {
      * Performs this mission.
      */
     public void doMission() {
+        final AIUnit aiUnit = getAIUnit();
         final Unit unit = getUnit();
         String reason = invalidReason();
         if (isTargetReason(reason)) {
-            if ((target = findTarget(getAIUnit())) == null) {
+            if ((target = findTarget(aiUnit)) == null) {
                 logger.finest(tag + " could not retarget: " + this);
                 return;
             }
@@ -316,21 +332,28 @@ public class ScoutingMission extends Mission {
         }
 
         // Go to the target.
-        final AIUnit aiUnit = getAIUnit();
+        Direction d;
         Unit.MoveType mt = travelToTarget(tag, target);
         switch (mt) {
-        case ATTACK_UNIT: case MOVE_NO_MOVES: case MOVE_NO_REPAIR:
-        case MOVE_ILLEGAL:
+        case MOVE_ILLEGAL: case MOVE_NO_MOVES: case MOVE_NO_REPAIR:
+            return;
+        case ATTACK_UNIT:
+            // Could be adjacent to the destination but it is
+            // temporarily blocked by another unit.  Make a random
+            // (directed if possible) move and try again.
+            moveRandomly(tag, unit.getTile().getDirection(target.getTile()));
             return;
         case MOVE:
             break;
         case ENTER_INDIAN_SETTLEMENT_WITH_SCOUT:
-            Direction d = unit.getTile().getDirection(target.getTile());
-            if (d == null) {
+            if ((d = unit.getTile().getDirection(target.getTile())) == null) {
                 throw new IllegalStateException("Unit not next to target "
                     + target + ": " + unit + "/" + unit.getLocation());
             }
-            AIMessage.askScoutIndianSettlement(aiUnit, d);
+            if (!AIMessage.askScoutIndianSettlement(aiUnit, d)) {
+                logger.warning(tag + " unexpected failure at " + target
+                    + ": " + this);
+            }
             if (unit.isDisposed()) {
                 logger.finest(tag + " died at target " + target
                     + ": " + this);
@@ -342,19 +365,16 @@ public class ScoutingMission extends Mission {
             return;
         }
 
-        // Retarget when complete, but do not retarget from one colony
-        // to another (just drop equipment and invalidate the mission).
-        final Player player = unit.getOwner();
+        // Retarget on failure or complete, but do not retarget from
+        // one colony to another, just drop equipment and invalidate
+        // the mission.
         Location completed = target;
         target = findTarget(aiUnit);
-        if (invalidTargetReason(completed, player) == null
-            && invalidTargetReason(target, player) == null) {
+        if (completed instanceof Colony && target instanceof Colony) {
             Colony colony = (Colony)completed;
             for (EquipmentType e : new ArrayList<EquipmentType>(unit
                     .getEquipment().keySet())) {
-                int n = unit.getEquipmentCount(e);
-                unit.changeEquipment(e, -n);
-                colony.addEquipmentGoods(e, n); // TODO: check for overflow
+                AIMessage.askEquipUnit(aiUnit, e, -unit.getEquipmentCount(e));
             }
             target = null;
         }
@@ -374,7 +394,9 @@ public class ScoutingMission extends Mission {
      *             stream.
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        toXML(out, getXMLElementTagName());
+        if (isValid()) {
+            toXML(out, getXMLElementTagName());
+        }
     }
 
     /**
@@ -396,7 +418,7 @@ public class ScoutingMission extends Mission {
         super.readAttributes(in);
 
         String str = in.getAttributeValue(null, "target");
-        target = getGame().getFreeColLocation(str);
+        target = (str == null) ? null : getGame().getFreeColLocation(str);
     }
 
     /**
