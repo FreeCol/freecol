@@ -188,6 +188,12 @@ public class Event extends FreeColGameObjectType {
             }
             Limit limit = new Limit(getSpecification());
             limit.readFromXML(in);
+            // @compat 0.10.5
+            if (limit.getId().equals("model.limit.independence.colonies")) {
+                limit.setId("model.limit.independence.coastalColonies");
+                limit.getLeftHandSide().setMethodName("isConnectedPort");
+            }
+            // @end compatibility code
             limits.put(limit.getId(), limit);
         } else {
             super.readChild(in);
