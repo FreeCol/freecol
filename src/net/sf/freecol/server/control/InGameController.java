@@ -917,6 +917,11 @@ public final class InGameController extends Controller {
                 .addStringTemplate("%nation%", independent.getNationName())
                 .addStringTemplate("%ref%", serverPlayer.getNationName()));
         cs.add(See.only(independent), independent);
+
+        // Col1 reveals the map on independence
+        List<FreeColGameObject> objs = new ArrayList<FreeColGameObject>();
+        objs.addAll(independent.exploreMap(true));
+        cs.add(See.only(independent), objs);
     }
 
     private StringTemplate unitTemplate(String base, List<Unit> units) {

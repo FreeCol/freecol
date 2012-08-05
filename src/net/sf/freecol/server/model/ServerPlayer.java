@@ -722,13 +722,19 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * Debug mode helper.
      *
      * @param reveal If true, reveal the map, if false, hide it.
+     * @return A list of tiles whose visibility changed.
      */
-    public void exploreMap(boolean reveal) {
+    public List<Tile> exploreMap(boolean reveal) {
+        List<Tile> result = new ArrayList<Tile>();
         for (Tile tile : getGame().getMap().getAllTiles()) {
-            tile.setExploredBy(this, reveal);
+            if (tile.isExploredBy(this) != reveal) {
+                tile.setExploredBy(this, reveal);
+                result.add(tile);
+            }
         }
         resetExploredTiles(getGame().getMap());
         invalidateCanSeeTiles();
+        return result;
     }
 
     /**
