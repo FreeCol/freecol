@@ -328,6 +328,8 @@ public class ChangeSet {
 
         /**
          * Should a player perhaps be notified of this attack?
+         * Do not use Unit.isVisibleTo because that gives a false
+         * negative for units in settlements, which should be animated.
          *
          * @param serverPlayer The <code>ServerPlayer</code> to notify.
          * @return True if the player should be notified.
@@ -336,8 +338,10 @@ public class ChangeSet {
         public boolean isPerhapsNotifiable(ServerPlayer serverPlayer) {
             return serverPlayer == attacker.getOwner()
                 || serverPlayer == defender.getOwner()
-                || (attacker.isVisibleTo(serverPlayer)
-                    && defender.isVisibleTo(serverPlayer));
+                || (attacker.getTile() != null
+                    && serverPlayer.canSee(attacker.getTile())
+                    && defender.getTile() != null
+                    && serverPlayer.canSee(defender.getTile()));
         }
 
         /**
