@@ -122,17 +122,13 @@ public class WorkerWish extends Wish {
 
 
     /**
-     * Updates this <code>WorkerWish</code> with the
-     * given attributes.
+     * Updates this <code>WorkerWish</code> with the given attributes.
      *
-     * @param value The value identifying the importance of
-     *       this <code>Wish</code>.
-     * @param unitType The type of unit needed for releasing this wish
-     *       completly.
-     * @param expertNeeded Determines wether the <code>unitType</code> is
-     *       required or not.
+     * @param value The urgency of the wish.
+     * @param unitType The <code>UnitType</code> to wish for.
+     * @param expertNeeded Is an expert unit required?
      */
-    public void update(int value, UnitType unitType, boolean expertNeeded) {
+    public void update(UnitType unitType, boolean expertNeeded, int value) {
         setValue(value);
         this.unitType = unitType;
         this.expertNeeded = expertNeeded;

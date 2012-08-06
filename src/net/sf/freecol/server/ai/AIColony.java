@@ -1000,32 +1000,47 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     }
 
     /**
-     * Updates the wishes for the <code>Colony</code>.
+     * Requires a worker wish for a unit type to be provided to this AIColony.
+     * If a suitable wish is already present, the expert and value parameters
+     * take precedence as they are more likely to be up to date.
      *
-     * Remove the WorkerWishes as we do not yet reliably track unit arrivals
-     * and departures, or other events like learning from experience.
-     * Update the goods wishes as we do check if unloading goods satisfies
-     * a goods wish.
+     * @param type The <code>UnitType</code> to wish for.
+     * @param expertNeeded Is an expert unit required?
+     * @param value The urgency of the wish.
      */
-    private void updateWishes() {
-        int i = 0;
-        while (i < wishes.size()) {
-            if (wishes.get(i) instanceof WorkerWish) {
-                Wish w = wishes.remove(i);
-                w.dispose();
-            } else {
-                i++;
+    public void requireWorkerWish(UnitType type, boolean expertNeeded,
+                                  int value) {
+        WorkerWish ww = null;
+        for (Wish w : wishes) {
+            if (w instanceof WorkerWish
+                && ((WorkerWish)w).getUnitType() == type) {
+                ww = (WorkerWish)w;
+                break;
             }
         }
-        createWorkerWishes();
+        if (ww != null) {
+            ww.update(type, expertNeeded, value);
+        } else {
+            ww = new WorkerWish(getAIMain(), colony, value, type, expertNeeded);
+            wishes.add(ww);
+            logger.finest(colony.getName() + " makes new worker wish: "
+                + ww);
+        }
+    }
+
+    /**
+     * Updates the wishes for the <code>Colony</code>.
+     */
+    private void updateWishes() {
+        updateWorkerWishes();
         updateGoodsWishes();
         Collections.sort(wishes);
     }
 
     /**
-     * Creates the worker wishes.
+     * Updates the worker wishes.
      */
-    private void createWorkerWishes() {
+    private void updateWorkerWishes() {
         final Specification spec = getSpecification();
         final int baseValue = 25;
         final int priorityMax = 50;
@@ -1073,10 +1088,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                     - priorityDecay * producing.indexOf(goods))
                 + (Math.min(multipleMax, experts.getCount(expert) - 1)
                     * multipleBonus);
-            WorkerWish ww = new WorkerWish(getAIMain(), colony, value, expert,
-                true);
-            wishes.add(ww);
-            logger.finest(colony.getName() + " makes new worker wish: " + ww);
+            requireWorkerWish(expert, true, value);
         }
 
         // Request population increase if no worker wishes and the bonus
@@ -1095,10 +1107,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 expert = spec.getExpertForProducing(plan.getGoodsType());
                 break;
             }
-            WorkerWish ww = new WorkerWish(getAIMain(), colony, 50, expert,
-                false);
-            wishes.add(ww);
-            logger.finest(colony.getName() + " makes new worker wish: " + ww);
+            requireWorkerWish(expert, false, 50);
         }
 
         // TODO: check for students
@@ -1108,11 +1117,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         if (isBadlyDefended(colony)) {
             UnitType bestDefender = colony.getBestDefenderType();
             if (bestDefender != null) {
-                WorkerWish ww = new WorkerWish(getAIMain(), colony, 100,
-                                               bestDefender, true);
-                wishes.add(ww);
-                logger.finest(colony.getName() + " makes new worker wish: "
-                    + ww);
+                requireWorkerWish(bestDefender, true, 100);
             }
         }
     }
