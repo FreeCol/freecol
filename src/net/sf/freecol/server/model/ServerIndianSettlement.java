@@ -121,9 +121,12 @@ public class ServerIndianSettlement extends IndianSettlement
             logger.finest("Famine in " + getName());
         }
         if (getUnitCount() <= 0) {
-            cs.addDispose(See.perhaps().always(owner), getTile(), this);
-            logger.info(getName() + " collapsed.");
-            return;
+            if (tile.isEmpty()) {
+                logger.info(getName() + " collapsed.");
+                owner.csDisposeSettlement(this, cs);
+                return;
+            }
+            tile.getFirstUnit().setLocation(this);
         }
 
         // Check for new resident.

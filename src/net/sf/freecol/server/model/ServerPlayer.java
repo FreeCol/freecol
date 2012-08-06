@@ -2878,7 +2878,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param settlement The <code>Settlement</code> under attack.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    private void csDisposeSettlement(Settlement settlement, ChangeSet cs) {
+    public void csDisposeSettlement(Settlement settlement, ChangeSet cs) {
         logger.finest("Disposing of " + settlement.getName());
         ServerPlayer owner = (ServerPlayer) settlement.getOwner();
         HashMap<Settlement, Integer> votes = new HashMap<Settlement, Integer>();
