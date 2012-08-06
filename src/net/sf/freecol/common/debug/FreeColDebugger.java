@@ -74,11 +74,11 @@ public class FreeColDebugger {
      */
     public static void configureDebugLevel(String optionValue) {
         try {
-            debugLevel = Integer.parseInt(optionValue);
-            debugLevel = Math.min(Math.max(getDebugLevel(), DEBUG_OFF),
-                                  DEBUG_FULL_COMMS);
+            setDebugLevel(Math.min(Math.max(Integer.parseInt(optionValue),
+                                            DEBUG_OFF),
+                                   DEBUG_FULL_COMMS));
         } catch (NumberFormatException e) {
-            FreeColDebugger.debugLevel = DEBUG_FULL;
+            setDebugLevel(DEBUG_FULL);
         }
     }
 
@@ -104,7 +104,16 @@ public class FreeColDebugger {
      * @return The debug level.
      */
     public static int getDebugLevel() {
-        return debugLevel;
+        return FreeColDebugger.debugLevel;
+    }
+
+    /**
+     * Sets the debug level.
+     *
+     * @param level The new debug level.
+     */
+    private static void setDebugLevel(int level) {
+        FreeColDebugger.debugLevel = level;
     }
 
     /**
@@ -113,7 +122,7 @@ public class FreeColDebugger {
      * @return True if the program is in debug mode.
      */
     public static boolean isInDebugMode() {
-        return debugLevel > DEBUG_OFF;
+        return getDebugLevel() > DEBUG_OFF;
     }
 
     /**
@@ -123,7 +132,7 @@ public class FreeColDebugger {
      *      debug mode and <code>false</code> otherwise.
      */
     public static void setInDebugMode(boolean debug) {
-        FreeColDebugger.debugLevel = (debug) ? DEBUG_FULL : DEBUG_OFF;
+        setDebugLevel((debug) ? DEBUG_FULL : DEBUG_OFF);
     }
 
     /**
@@ -132,7 +141,7 @@ public class FreeColDebugger {
      * @return The turns to run in debug mode.
      */
     public static int getDebugRunTurns() {
-        return debugRunTurns;
+        return FreeColDebugger.debugRunTurns;
     }
 
     /**
@@ -150,7 +159,7 @@ public class FreeColDebugger {
      * @return The debug save file name.
      */
     public static String getDebugRunSave() {
-        return debugRunSave;
+        return FreeColDebugger.debugRunSave;
     }
 
     /**
@@ -171,16 +180,16 @@ public class FreeColDebugger {
      */
     public static boolean finishDebugRun(FreeColClient freeColClient,
                                          boolean force) {
-        if (debugRunTurns < 0) return false; // Not a debug run
-        if (debugRunTurns > 0 && !force) return false; // Still going
+        if (getDebugRunTurns() < 0) return false; // Not a debug run
+        if (getDebugRunTurns() > 0 && !force) return false; // Still going
         // Zero => signalEndDebugRun was called
-        debugRunTurns = -1;
+        setDebugRunTurns(-1);
 
-        if (debugRunSave != null) {
+        if (getDebugRunSave() != null) {
             FreeColServer fcs = freeColClient.getFreeColServer();
             if (fcs != null) {
                 try {
-                    fcs.saveGame(new File(".", debugRunSave),
+                    fcs.saveGame(new File(".", getDebugRunSave()),
                                  freeColClient.getMyPlayer().getName(),
                                  freeColClient.getClientOptions());
                 } catch (IOException e) {}
@@ -195,7 +204,7 @@ public class FreeColDebugger {
      * opportunity.  Currently called from the server.
      */
     public static void signalEndDebugRun() {
-        if (debugRunTurns > 0) debugRunTurns = 0;
+        if (debugRunTurns > 0) setDebugRunTurns(0);
     }
 
     /**
