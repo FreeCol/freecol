@@ -3250,6 +3250,18 @@ public class Unit extends FreeColGameObject
     }
 
     /**
+     * Gets the best (closest) entry location for this unit to reach a
+     * given tile.
+     *
+     * @param tile The target <code>Tile</code>.
+     * @return The best entry location tile to arrive on the map at, or null
+     *     if none found.
+     */
+    public Tile getBestEntryTile(Tile tile) {
+        return getGame().getMap().getBestEntryTile(this, tile, null);
+    }
+
+    /**
      * Resolves a destination for a unit on the high seas.
      * That is, the location where the unit will appear when it leaves
      * the high seas, which will either be Europe or a tile.
@@ -3259,14 +3271,13 @@ public class Unit extends FreeColGameObject
      */
     public Location resolveDestination() {
         if (!isAtSea()) throw new IllegalArgumentException("Not at sea.");
-        PathNode path;
         Location dst = getDestination();
+        Tile best;
         return (dst == null) ? getFullEntryLocation()
             : (dst instanceof Europe) ? dst
-            : (dst.getTile() == null
-               || (path = findPathToEurope(dst.getTile()))
-                == null) ? getFullEntryLocation()
-            : path.getLastNode().getTile();
+            : (dst.getTile() != null
+                && (best = getBestEntryTile(dst.getTile())) != null) ? best
+            : getFullEntryLocation();
     }
 
     /**

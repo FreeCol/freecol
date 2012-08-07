@@ -646,7 +646,7 @@ public class Map extends FreeColGameObject implements Location {
      *
      * @param unit The <code>Unit</code> that should be used to determine
      *     whether or not a path is legal.
-     * @param start The starting <code>Tile</code>.
+     * @param start The starting <code>Location</code>.
      * @param costDecider An optional <code>CostDecider</code>
      *     responsible for determining the path cost.
      * @return The path to Europe, or null if not found.
@@ -654,7 +654,7 @@ public class Map extends FreeColGameObject implements Location {
      *     <code>unit</code> are null, or the unit is not able to move
      *     to Europe.
      */
-    public PathNode findPathToEurope(Unit unit, Tile start,
+    public PathNode findPathToEurope(Unit unit, Location start,
                                      CostDecider costDecider) {
         Europe europe = null;
         if (unit == null) {
@@ -831,6 +831,23 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
+     * Gets the best (closest) entry location for this unit to reach a
+     * given tile.
+     *
+     * @param unit The <code>Unit</code> to check.
+     * @param tile The target <code>Tile</code>.
+     * @param carrier An optional carrier <code>Unit</code>to use.
+     * @return The best entry location tile to arrive on the map at, or null
+     *     if none found.
+     */
+    public Tile getBestEntryTile(Unit unit, Tile tile, Unit carrier) {
+        PathNode path = search(unit, tile, getHighSeasGoalDecider(),
+                               CostDeciders.avoidIllegal(), INFINITY,
+                               carrier, null);
+        return (path == null) ? null : path.getLastNode().getTile();
+    }
+
+    /**
      * Version of findPath that includes the start tile and generalized
      * start and end locations.
      *
@@ -871,14 +888,12 @@ public class Map extends FreeColGameObject implements Location {
                 // Fail fast without capable water unit.
                 if (!waterUnit.getType().canMoveToHighSeas()) return null;
 
-                // Search backwards from target to get best entry location.
-                path = search(unit, end.getTile(), getHighSeasGoalDecider(),
-                              costDecider, INFINITY, carrier, null);
-                if (path == null) return null;
+                // Find the best place to enter the map from Europe.
+                Tile tile = getBestEntryTile(unit, end.getTile(), carrier);
+                if (tile == null) return null;
 
                 // Now search forward from there to get a path in the right
                 // order (the existing one might not be optimal if reversed!)
-                Tile tile = path.getLastNode().getTile();
                 path = search(unit, tile,
                               getLocationGoalDecider(end.getTile()),
                               costDecider, INFINITY, carrier,
