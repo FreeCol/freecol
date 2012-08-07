@@ -311,8 +311,8 @@ public class MapTest extends FreeColTestCase {
                                        colonistType);
         colonist.setDestination(destinationTile);
 
-        PathNode path = colonist.findPath(destinationTile);
-        assertNull("No path should be available",path);
+        PathNode path = colonist.findFullPath(destinationTile);
+        assertNull("No path should be available", path);
     }
 
     /**
@@ -339,8 +339,8 @@ public class MapTest extends FreeColTestCase {
                                        colonistType);
         colonist.setDestination(destinationTile);
 
-        PathNode path = colonist.findPath(destinationTile);
-        assertNull("No path should be available",path);
+        PathNode path = colonist.findFullPath(destinationTile);
+        assertNull("No path should be available", path);
     }
 
     public void testMoveThroughTileWithEnemyUnit() {
@@ -393,7 +393,7 @@ public class MapTest extends FreeColTestCase {
                                        colonistType);
         colonist.setDestination(destinationTile);
 
-        PathNode path = map.findPath(colonist, colonist.getTile(),
+        PathNode path = map.findFullPath(colonist, colonist.getTile(),
             destinationTile, null,
             CostDeciders.avoidSettlementsAndBlockingUnits());
         assertNull("No path should be available", path);
@@ -418,8 +418,8 @@ public class MapTest extends FreeColTestCase {
         Tile destinationTile = map.getTile(3,7);
         colonist.setDestination(destinationTile);
 
-        PathNode path = colonist.findPath(destinationTile);
-        assertNotNull("A path should be available",path);
+        PathNode path = colonist.findFullPath(destinationTile);
+        assertNotNull("A path should be available", path);
     }
 
     public void testSearchForColony() {
