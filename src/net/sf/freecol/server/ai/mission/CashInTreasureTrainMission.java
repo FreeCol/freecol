@@ -123,7 +123,9 @@ public class CashInTreasureTrainMission extends Mission {
      * Find a suitable cashin location for this unit.
      *
      * @param aiUnit The <code>AIUnit</code> to execute a cash in mission.
-     * @return A <code>PathNode</code> to the target, or null if not found.
+     * @return A <code>PathNode</code> to the target, or null if not found
+     *     which includes the case when Europe should be preferred (because
+     *     the unit can not get there by itself).
      */
     private static PathNode findTargetPath(AIUnit aiUnit) {
         Unit unit;
@@ -145,9 +147,8 @@ public class CashInTreasureTrainMission extends Mission {
         PathNode path;
 
         // Find out how quickly the unit can get to Europe.
-        final int europeTurns = (europe == null || carrier == null
-            || (path = carrier.findPathToEurope(startTile)) == null) ? -1
-            : path.getTotalTurns();
+        final int europeTurns = (carrier == null || europe == null) ? -1
+            : carrier.getTurnsToReach(europe);
 
         // Find out how quickly the unit can get to a local cash-in site.
         path = unit.search(startTile, cashInDecider,

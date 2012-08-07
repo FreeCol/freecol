@@ -1037,7 +1037,7 @@ public class TransportMission extends Mission {
         if (destination == null) return null;
         if (destination.getTile() == null) {
             return (destination instanceof Europe) 
-                ? findPathToEurope(start.getTile())
+                ? carrier.findPathToEurope(start.getTile())
                 : null;
         }
 
@@ -1323,18 +1323,6 @@ public class TransportMission extends Mission {
         }
 
         return transportablesChanged;
-    }
-
-    /**
-     * Finds the best path to <code>Europe</code>.
-     *
-     * @param start The starting <code>Tile</code>.
-     * @return The path to the target or <code>null</code> if no target can be
-     *         found.
-     * @see Europe
-     */
-    protected PathNode findPathToEurope(Tile start) {
-        return getUnit().findPathToEurope(start);
     }
 
 
