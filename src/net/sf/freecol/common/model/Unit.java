@@ -38,6 +38,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
@@ -1293,21 +1294,22 @@ public class Unit extends FreeColGameObject
 
     /**
      * Convenience wrapper to find a path to Europe for this unit.
+     * Does *not* use a carrier, a naval unit is expected.
      *
      * @return A path to Europe, or null if none found.
      */
     public PathNode findPathToEurope() {
-        Location loc = getLocation();
-        return (loc instanceof Tile) ? this.findPathToEurope((Tile)loc) : null;
+        return findPathToEurope(getLocation());
     }
 
     /**
      * Convenience wrapper to find a path to Europe for this unit.
+     * Does *not* use a carrier, a naval unit is expected.
      *
-     * @param start The <code>Tile</code> to start from.
+     * @param start The <code>Location</code> to start from.
      * @return A path to Europe, or null if none found.
      */
-    public PathNode findPathToEurope(Tile start) {
+    public PathNode findPathToEurope(Location start) {
         return getGame().getMap().findPathToEurope(this, start, null);
     }
 
@@ -1422,11 +1424,11 @@ public class Unit extends FreeColGameObject
     public PathNode findOurNearestPort() {
         PathNode ePath = null;
         int eTurns = -1;
+        Europe europe = getOwner().getEurope();
         if (isNaval()) {
             if (isInEurope() || isAtSea()) return null;
-            ePath = findPathToEurope();
-            eTurns = (ePath == null) ? -1
-                : ePath.getTotalTurns() + getSailTurns();
+            ePath = (europe == null) ? null : findFullPath(europe);
+            eTurns = (ePath == null) ? -1 : ePath.getTotalTurns();
         }
         PathNode sPath = findOurNearestSettlement(false, Integer.MAX_VALUE,
                                                   true);
@@ -2093,22 +2095,19 @@ public class Unit extends FreeColGameObject
     public Location getRepairLocation() {
         final Player player = getOwner();
         final Tile tile = getTile();
-        PathNode path = findPathToEurope();
-        Location bestLocation = null;
-        int bestTurns = INFINITY;
-        if (path != null) {
-            bestLocation = player.getEurope();
-            bestTurns = path.getTotalTurns();
-        }
+        Location bestLocation = player.getEurope();
+        int bestTurns = (bestLocation == null) ? INFINITY
+            : getTurnsToReach(bestLocation);
         for (Colony colony : player.getColonies()) {
+            int turns;
             if (colony != null && colony != tile.getColony()
                 && colony.hasAbility("model.ability.repairUnits")
-                && (path = this.findFullPath(colony.getTile())) != null
-                && path.getTotalTurns() < bestTurns) {
+                && (turns = getTurnsToReach(colony)) >= 0
+                && turns < bestTurns) {
                 // Tile.getDistanceTo(Tile) doesn't care about
                 // connectivity, so we need to check for an available
                 // path to target colony instead
-                bestTurns = path.getTotalTurns();
+                bestTurns = turns;
                 bestLocation = colony;
             }
         }

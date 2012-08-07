@@ -834,8 +834,10 @@ public class InGameControllerTest extends FreeColTestCase {
                      braveType, attacker.getType());
         assertTrue("Colony should not be disposed",
                    !colony.isDisposed());
-        assertTrue("Ship should be disposed",
-                   privateer.isDisposed());
+        assertTrue("Privateer should be under repair",
+                   privateer.isUnderRepair());
+        assertEquals("Privateer should be in Europe", dutch.getEurope(),
+                     privateer.getLocation());
 
         // Attacker pillages, stealing goods
         assertFalse("Colony should not be pillageable",
