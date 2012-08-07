@@ -1581,7 +1581,7 @@ public final class MapViewer {
             ? activeUnit.findPathToEurope()
             : (activeUnit.getDestination().getTile() == activeUnit.getTile())
             ? null // Do nothing, unit has arrived
-            : activeUnit.findPath(activeUnit.getDestination().getTile());
+            : activeUnit.findFullPath(activeUnit.getDestination().getTile());
     }
 
     /**

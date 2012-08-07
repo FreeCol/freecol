@@ -130,7 +130,7 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
                 if (tile != null) {
                     Unit unit = mapViewer.getActiveUnit();
                     if (unit != null && unit.getTile() != tile) {
-                        PathNode dragPath = unit.findPath(tile);
+                        PathNode dragPath = unit.findFullPath(tile);
                         mapViewer.startGoto();
                         mapViewer.setGotoPath(dragPath);
                     }

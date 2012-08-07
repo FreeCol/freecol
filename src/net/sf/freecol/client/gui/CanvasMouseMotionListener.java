@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
 
 
 /**
@@ -71,10 +72,10 @@ public final class CanvasMouseMotionListener extends AbstractCanvasListener impl
 
             if (tile != null) {
                 if (lastTile != tile) {
+                    Unit active = mapViewer.getActiveUnit();
                     lastTile = tile;
-                    if (mapViewer.getActiveUnit() != null
-                        && mapViewer.getActiveUnit().getTile() != tile) {
-                        PathNode dragPath = mapViewer.getActiveUnit().findPath(tile);
+                    if (active != null && active.getTile() != tile) {
+                        PathNode dragPath = active.findFullPath(tile);
                         mapViewer.setGotoPath(dragPath);
                     } else {
                         mapViewer.setGotoPath(null);
@@ -98,13 +99,14 @@ public final class CanvasMouseMotionListener extends AbstractCanvasListener impl
             (e.getModifiers() & MouseEvent.BUTTON1_MASK) == MouseEvent.BUTTON1_MASK) {
             // only perform the goto for the left mouse button
             if (mapViewer.isGotoStarted()) {
-                if (mapViewer.getActiveUnit() == null) {
+                Unit active = mapViewer.getActiveUnit();
+                if (active == null) {
                     mapViewer.stopGoto();
                 } else {
                     if (lastTile != tile) {
                         lastTile = tile;
-                        if (mapViewer.getActiveUnit().getTile() != tile) {
-                            PathNode dragPath = mapViewer.getActiveUnit().findPath(tile);
+                        if (active.getTile() != tile) {
+                            PathNode dragPath = active.findFullPath(tile);
                             mapViewer.setGotoPath(dragPath);
                         } else {
                             mapViewer.setGotoPath(null);
