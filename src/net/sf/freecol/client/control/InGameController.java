@@ -511,9 +511,7 @@ public final class InGameController implements NetworkConstants {
 
             // Find a path to the stop.  Skip if none.
             Location destination = stop.getLocation();
-            PathNode path = (destination instanceof Europe)
-                ? unit.findPathToEurope()
-                : unit.findPath(destination.getTile());
+            PathNode path = unit.findFullPath(destination);
             if (path == null) {
                 StringTemplate dest = destination.getLocationNameFor(player);
                 messages.add(new ModelMessage(ModelMessage.MessageType.GOODS_MOVEMENT,
@@ -843,17 +841,29 @@ public final class InGameController implements NetworkConstants {
     private boolean followPath(Unit unit, PathNode path) {
         // Traverse the path to the destination.
         for (; path != null; path = path.next) {
+            if (path.getLocation() == unit.getLocation()) continue;
 
-            // Special case for the map edges on maps not
-            // surrounded by high seas.
-            if (unit.getDestination() instanceof Europe
-                && unit.getTile() != null
-                && unit.getTile().isDirectlyHighSeasConnected()) {
-                moveTo(unit, unit.getDestination());
-                return false;
+            if (path.getLocation() instanceof Europe) {
+                if (unit.getTile() != null
+                    && unit.getTile().isDirectlyHighSeasConnected()) {
+                    moveTo(unit, path.getLocation());
+                    return false;
+                } else {
+                    logger.warning("Can not move to Europe from "
+                        + unit.getLocation()
+                        + " on path: " + path.fullPathToString());
+                }
+            } else {
+                if (path.getDirection() != null) {
+                    if (!moveDirection(unit, path.getDirection(), false)) {
+                        return false;
+                    }
+                } else {
+                    logger.warning("Can not move to tile from "
+                        + unit.getLocation()
+                        + " on path: " + path.fullPathToString());
+                }
             }
-
-            if (!moveDirection(unit, path.getDirection(), false)) return false;
         }
         return true;
     }
@@ -2280,11 +2290,7 @@ public final class InGameController implements NetworkConstants {
             }
 
             // Find a path to the destination.
-            PathNode path = (destination instanceof Europe)
-                ? unit.findPathToEurope()
-                : unit.findPath(destination.getTile());
-
-            // No path, give up.
+            PathNode path = unit.findFullPath(destination);
             if (path == null) {
                 StringTemplate src = unit.getLocation()
                     .getLocationNameFor(player);
