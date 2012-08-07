@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
@@ -595,7 +596,23 @@ public class PioneeringMission extends Mission {
         }
 
         // Go there.
-        if (travelToTarget(tag, target) != Unit.MoveType.MOVE) return;
+        Unit.MoveType mt = travelToTarget(tag, target);
+        switch (mt) {
+        case MOVE_NO_MOVES:
+            return;
+        case MOVE_ILLEGAL:
+            // Might be a temporary blockage due to an occupying unit
+            // at the target.  Move randomly and retry if adjacent.
+            Direction d = unit.getTile().getDirection(target.getTile());
+            if (d != null) moveRandomly(tag, d);
+            return;
+        case MOVE:
+            break;
+        default:
+            logger.warning(tag + " unexpected move type (" + mt
+                + ") at " + unit.getLocation() + ": " + this);
+            return;
+        }
 
         // Take control of the land before proceeding to improve.
         tile = target.getTile();
