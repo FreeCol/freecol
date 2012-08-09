@@ -1453,6 +1453,28 @@ public class Unit extends FreeColGameObject
     }
 
     /**
+     * Convenience wrapper for the
+     * {@link net.sf.freecol.common.model.Map#search} function.
+     *
+     * @param start The <code>Location</code> to start the search from.
+     * @param goalDecider The object responsible for determining whether a
+     *     given <code>PathNode</code> is a goal or not.
+     * @param costDecider An optional <code>CostDecider</code>
+     *     responsible for determining the path cost.
+     * @param maxTurns The maximum number of turns the given
+     *     <code>Unit</code> is allowed to move. This is the
+     *     maximum search range for a goal.
+     * @param carrier An optional naval carrier <code>Unit</code> to use.
+     * @return The path to a goal, or null if none can be found.
+     */
+    public PathNode searchFullPath(Location start, GoalDecider gd,
+                                   CostDecider cd, int maxTurns,
+                                   Unit carrier) {
+        return getGame().getMap().searchFullPath(this, start, gd, cd, maxTurns,
+                                                 carrier);
+    }
+
+    /**
      * Can this unit attack a specified defender?
      *
      * A naval unit can never attack a land unit or settlement,
