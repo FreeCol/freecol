@@ -1293,27 +1293,6 @@ public class Unit extends FreeColGameObject
     }
 
     /**
-     * Convenience wrapper to find a path to Europe for this unit.
-     * Does *not* use a carrier, a naval unit is expected.
-     *
-     * @return A path to Europe, or null if none found.
-     */
-    public PathNode findPathToEurope() {
-        return findPathToEurope(getLocation());
-    }
-
-    /**
-     * Convenience wrapper to find a path to Europe for this unit.
-     * Does *not* use a carrier, a naval unit is expected.
-     *
-     * @param start The <code>Location</code> to start from.
-     * @return A path to Europe, or null if none found.
-     */
-    public PathNode findPathToEurope(Location start) {
-        return getGame().getMap().findPathToEurope(this, start, null);
-    }
-
-    /**
      * Gets the number of turns required for this unit to reach a
      * destination location from its current position.  If the unit is
      * currently on a carrier, it will be used.

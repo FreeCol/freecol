@@ -193,12 +193,10 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         // Unit should be aboard a man-o-war which we can use to find a
         // path to Europe.  Use the end of that path.
         if (unit.isOnCarrier()) {
-            path = unit.getCarrier().findPathToEurope(tile);
-            if (path == null) {
-                logger.warning("Can not find path to Europe from: " + tile);
-                return null;
-            }
-            return path.getLastNode().getTile();
+            Tile entry = unit.getCarrier().getBestEntryTile(tile);
+            if (entry != null) return entry;
+            logger.warning("Can not find path to Europe from: " + tile);
+            return null;
         }
         logger.warning("REF land unit not aboard a ship: " + unit);
         return null;

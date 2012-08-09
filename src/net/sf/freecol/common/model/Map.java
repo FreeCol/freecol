@@ -642,37 +642,6 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Finds the best path to <code>Europe</code>.
-     *
-     * @param unit The <code>Unit</code> that should be used to determine
-     *     whether or not a path is legal.
-     * @param start The starting <code>Location</code>.
-     * @param costDecider An optional <code>CostDecider</code>
-     *     responsible for determining the path cost.
-     * @return The path to Europe, or null if not found.
-     * @throws IllegalArgumentException If <code>start</code> or
-     *     <code>unit</code> are null, or the unit is not able to move
-     *     to Europe.
-     */
-    public PathNode findPathToEurope(Unit unit, Location start,
-                                     CostDecider costDecider) {
-        Europe europe = null;
-        if (unit == null) {
-            throw new IllegalArgumentException("Null unit.");
-        } else if (start == null) {
-            throw new IllegalArgumentException("Null start.");
-        } else if ((europe = unit.getOwner().getEurope()) == null) {
-            throw new IllegalArgumentException("Null Europe.");
-        } else if (!unit.getType().canMoveToHighSeas()) {
-            throw new IllegalArgumentException("Unit can not move to Europe: "
-                + unit);
-        }
-
-        PathNode path = findFullPath(unit, start, europe, null, costDecider);
-        return (path == null) ? null : path.next;
-    }
-
-    /**
      * Searches for a goal determined by the given <code>GoalDecider</code>.
      *
      * @param unit The <code>Unit</code> to find a path for.

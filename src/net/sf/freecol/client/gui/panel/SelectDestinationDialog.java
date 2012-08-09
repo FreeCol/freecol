@@ -55,6 +55,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
@@ -204,32 +205,30 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
 
     private void collectDestinationsFromEurope(Unit unit,
                                                List<GoodsType> goodsTypes) {
-        Player player = unit.getOwner();
-        Game game = getGame();
-        Map map = game.getMap();
-        int sailTurns = unit.getSailTurns();
+        final Player player = unit.getOwner();
+        final Europe europe = player.getEurope();
+        final Game game = getGame();
+        final Map map = game.getMap();
         for (Player p : game.getPlayers()) {
             for (Settlement s : p.getSettlements()) {
-                if (!s.isConnectedPort()
+                if (s.isConnectedPort()
                     || (s instanceof IndianSettlement
-                        && !((IndianSettlement)s).hasContactedSettlement(player)))
-                    continue;
-                PathNode path = unit.findPathToEurope(s.getTile());
-                if (path != null) {
-                    String extras = (s.getOwner() != unit.getOwner())
-                        ? getExtras(unit, s, goodsTypes) : "";
-                    destinations.add(new Destination(s,
-                            sailTurns + path.getTurns(), extras));
+                        && ((IndianSettlement)s).hasContactedSettlement(player))) {
+                    int turns = unit.getTurnsToReach(europe, s.getTile());
+                    if (turns != FreeColObject.INFINITY) {
+                        String extras = (s.getOwner() != unit.getOwner())
+                            ? getExtras(unit, s, goodsTypes) : "";
+                        destinations.add(new Destination(s, turns, extras));
+                    }
                 }
             }
         }
 
         if (destinationComparator == null) {
-            destinationComparator = new DestinationComparator(getMyPlayer());
+            destinationComparator = new DestinationComparator(player);
         }
         Collections.sort(destinations, destinationComparator);
-
-        destinations.add(0, new Destination(map, sailTurns, ""));
+        destinations.add(0, new Destination(map, unit.getSailTurns(), ""));
     }
 
     private void collectDestinationsFromAmerica(Unit unit,
@@ -261,19 +260,15 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         }
         Collections.sort(destinations, destinationComparator);
 
-        if (unit.isNaval() && unit.getOwner().canMoveToEurope()) {
-            PathNode path = unit.findPathToEurope();
-            int turns = (path != null) ? unit.getSailTurns()
-                + path.getTotalTurns()
-                : (unit.getTile() != null
-                    && unit.getTile().isDirectlyHighSeasConnected())
-                ? unit.getSailTurns()
-                : -1;
-            if (turns >= 0) {
-                Europe europe = getMyPlayer().getEurope();
+        final Europe europe = unit.getOwner().getEurope();
+        if (unit.isNaval()
+            && unit.getOwner().canMoveToEurope()
+            && europe != null) {
+            int turns = unit.getTurnsToReach(europe);
+            if (turns != FreeColObject.INFINITY) {
                 destinations.add(0,
                     new Destination(europe, turns,
-                        getExtras(unit, europe, goodsTypes)));
+                                    getExtras(unit, europe, goodsTypes)));
             }
         }
     }

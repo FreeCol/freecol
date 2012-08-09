@@ -1568,20 +1568,16 @@ public final class MapViewer {
         gotoStarted = false;
     }
 
-
-
     /**
-    * Sets the path of the active unit to display it.
-    */
+     * Sets the path of the active unit to display it.
+     */
     public void updateGotoPathForActiveUnit() {
         currentPath = (activeUnit == null
-                       || activeUnit.getDestination() == null)
+                       || activeUnit.getDestination() == null
+                       || Map.isSameLocation(activeUnit.getLocation(),
+                                             activeUnit.getDestination()))
             ? null
-            : (activeUnit.getDestination() instanceof Europe)
-            ? activeUnit.findPathToEurope()
-            : (activeUnit.getDestination().getTile() == activeUnit.getTile())
-            ? null // Do nothing, unit has arrived
-            : activeUnit.findFullPath(activeUnit.getDestination().getTile());
+            : activeUnit.findFullPath(activeUnit.getDestination());
     }
 
     /**

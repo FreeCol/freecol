@@ -660,7 +660,7 @@ public class TransportMission extends Mission {
             PathNode path;
             if (dst.getTile() == null) {
                 if (dst instanceof Europe
-                    && (path = carrier.findPathToEurope()) != null) {
+                    && (path = findPathToEurope(carrier)) != null) {
                     logger.finest(tag + " next destination = " + dst
                         + " (" + ((isCarrying(t)) ? "transport" : "collect") 
                         + " " + t + "): " + carrier);
@@ -720,7 +720,7 @@ public class TransportMission extends Mission {
             if (carrier.canMoveToHighSeas()) {
                 return new Destination(true, null);
             }
-            if ((path = carrier.findPathToEurope()) != null) {
+            if ((path = findPathToEurope(carrier)) != null) {
                 return new Destination(true, path);
             }
         }
@@ -1037,7 +1037,7 @@ public class TransportMission extends Mission {
         if (destination == null) return null;
         if (destination.getTile() == null) {
             return (destination instanceof Europe) 
-                ? carrier.findPathToEurope(start.getTile())
+                ? findPathToEurope(carrier, start.getTile())
                 : null;
         }
 
@@ -1323,6 +1323,31 @@ public class TransportMission extends Mission {
         }
 
         return transportablesChanged;
+    }
+
+    /**
+     * Convenience wrapper to find a path to Europe for this unit.
+     * Does *not* use a carrier, a naval unit is expected.
+     *
+     * @param unit The <code>Unit</code> to use.
+     * @return A path to Europe, or null if none found.
+     */
+    private PathNode findPathToEurope(Unit unit) {
+        return unit.findFullPath(unit.getLocation(),unit.getOwner().getEurope(),
+                                 null, null);
+    }
+
+    /**
+     * Convenience wrapper to find a path to Europe for this unit.
+     * Does *not* use a carrier, a naval unit is expected.
+     *
+     * @param unit The <code>Unit</code> to use.
+     * @param start The <code>Location</code> to start from.
+     * @return A path to Europe, or null if none found.
+     */
+    private PathNode findPathToEurope(Unit unit, Location start) {
+        return unit.findFullPath(start, unit.getOwner().getEurope(),
+                                 null, null);
     }
 
 

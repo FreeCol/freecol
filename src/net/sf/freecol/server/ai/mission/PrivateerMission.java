@@ -244,18 +244,13 @@ public class PrivateerMission extends Mission {
             return;
         }
 
-        PathNode path
-            = (nearestPort instanceof Europe) ? unit.findPathToEurope()
-            : (nearestPort instanceof Tile) ? unit.findPath((Tile)nearestPort)
-            : null;
+        PathNode path = unit.findFullPath(nearestPort);
         if (path == null) {
             if ((path = unit.findOurNearestPort()) == null) {
                 logger.finest("Failed to find port for goods");
                 return;
             }
-            Tile last = path.getLastNode().getTile();
-            nearestPort = (last.getSettlement() != null) ? last
-                : unit.getOwner().getEurope();
+            nearestPort = path.getLastNode().getLocation();
         }
 
         if (followPath(tag, path) != MoveType.MOVE) return;
