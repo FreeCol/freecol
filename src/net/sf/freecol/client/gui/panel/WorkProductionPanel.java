@@ -68,65 +68,48 @@ public class WorkProductionPanel extends FreeColPanel {
         Colony colony = unit.getColony();
         UnitType unitType = unit.getType();
 
-        List<Modifier> unitModifiers = new ArrayList<Modifier>();
         List<Modifier> modifiers = new ArrayList<Modifier>();
         if (unit.getLocation() instanceof ColonyTile) {
             ColonyTile colonyTile = (ColonyTile) unit.getLocation();
             GoodsType goodsType = unit.getWorkType();
-            List<Modifier> tileModifiers = colonyTile.getProductionModifiers(goodsType, unitType);
+            List<Modifier> tileModifiers
+                = colonyTile.getProductionModifiers(goodsType, unitType);
             if (FeatureContainer.applyModifiers(0f, turn, tileModifiers) > 0) {
-                tileModifiers.addAll(unit.getModifierSet(goodsType.getId()));
-                unitModifiers.addAll(tileModifiers);
-                if (colony.getProductionBonus() != 0) {
-                    modifiers.add(colony.getProductionModifier(goodsType));
-                }
-                modifiers.addAll(colony.getModifierSet(goodsType.getId()));
+                modifiers.addAll(tileModifiers);
             }
-            Collections.sort(unitModifiers);
-            add(localizedLabel(colonyTile.getLabel()), "span, align center, wrap 30");
 
+            add(localizedLabel(colonyTile.getLabel()),
+                               "span, align center, wrap 30");
             TileType tileType = colonyTile.getWorkTile().getType();
             int width = getGUI().getImageLibrary()
                 .getTerrainImageWidth(tileType);
             int height = getGUI().getImageLibrary()
                 .getTerrainImageHeight(tileType);
-            BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-            getGUI().getMapViewer().displayColonyTile((Graphics2D) image.getGraphics(),
-                                              colonyTile.getWorkTile(), colony);
+            BufferedImage image = new BufferedImage(width, height,
+                BufferedImage.TYPE_INT_ARGB);
+            getGUI().getMapViewer()
+                .displayColonyTile((Graphics2D) image.getGraphics(),
+                                   colonyTile.getWorkTile(), colony);
             add(new JLabel(new ImageIcon(image)));
 
         } else if (unit.getLocation() instanceof Building) {
             Building building = (Building) unit.getLocation();
             GoodsType goodsType = building.getGoodsOutputType();
-            if (building.getType().getProductionModifier() != null) {
-                unitModifiers.add(building.getType().getProductionModifier());
-            }
-            if (colony.getProductionBonus() != 0) {
-                unitModifiers.add(colony.getProductionModifier(goodsType));
-            }
+            modifiers.addAll(building.getProductionModifiers(goodsType,
+                                                             unitType));
 
-            if (goodsType != null) {
-                unitModifiers.addAll(unit.getType().getModifierSet(goodsType.getId()));
-            }
-            modifiers.addAll(colony.getModifierSet(goodsType.getId()));
-            add(localizedLabel(building.getNameKey()), "span, align center, wrap 30");
-
-            add(new JLabel(ResourceManager.getImageIcon(building.getType().getId() + ".image")));
+            add(localizedLabel(building.getNameKey()),
+                               "span, align center, wrap 30");
+            add(new JLabel(ResourceManager.getImageIcon(building.getType()
+                        .getId() + ".image")));
         }
+        add(new UnitLabel(getFreeColClient(), unit, getGUI(), false, false),
+            "wrap");
+
         Collections.sort(modifiers);
-
-        add(new UnitLabel(getFreeColClient(), unit, getGUI(), false, false), "wrap");
-
         float result = 0.0f;
-        for (Modifier modifier : unitModifiers) {
+        for (Modifier modifier : modifiers) {
             result = addModifier(modifier, unitType, result);
-        }
-        if (!modifiers.isEmpty()) {
-            add(new JSeparator(JSeparator.HORIZONTAL), "newline, span, growx");
-
-            for (Modifier modifier : modifiers) {
-                result = addModifier(modifier, unitType, result);
-            }
         }
 
         if (result < 0.0f) {
@@ -148,7 +131,6 @@ public class WorkProductionPanel extends FreeColPanel {
         add(okButton, "span, tag ok");
 
         setSize(getPreferredSize());
-
     }
 
 
