@@ -255,14 +255,26 @@ public abstract class Mission extends AIObject {
      * Is a target a valid mission target?
      *
      * @param target The target <code>Location</code> to check.
-     * @param player An optional <code>Player</code> that should own
+     * @return A reason for the target to be invalid, or null if none found.
+     */
+    public static String invalidTargetReason(Location target) {
+        return (target == null) ? Mission.TARGETNULL
+            : (((FreeColGameObject)target).isDisposed()) ? "target-disposed"
+            : null;
+    }
+
+    /**
+     * Is a target a valid mission target?
+     *
+     * @param target The target <code>Location</code> to check.
+     * @param player A <code>Player</code> that should own
      *     the target.
      * @return A reason for the target to be invalid, or null if none found.
      */
     public static String invalidTargetReason(Location target, Player owner) {
-        return (target == null) ? Mission.TARGETNULL
-            : (((FreeColGameObject)target).isDisposed()) ? "target-disposed"
-            : (owner == null) ? null
+        String reason = invalidTargetReason(target);
+        return (reason != null)
+            ? reason
             : (target instanceof Ownable
                 && owner != ((Ownable)target).getOwner())
             ? Mission.TARGETOWNERSHIP
@@ -1083,9 +1095,8 @@ public abstract class Mission extends AIObject {
      * @return A reason for mission invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit, Location loc) {
-        String reason;
-        return ((reason = invalidAIUnitReason(aiUnit)) != null) ? reason
-            : invalidTargetReason(loc, null);
+        String reason = invalidAIUnitReason(aiUnit);
+        return (reason != null) ? reason : invalidTargetReason(loc);
     }
 
     /**

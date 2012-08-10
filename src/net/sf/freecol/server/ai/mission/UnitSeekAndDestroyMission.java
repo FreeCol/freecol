@@ -326,8 +326,7 @@ public class UnitSeekAndDestroyMission extends Mission {
         final Player player = unit.getOwner();
         String reason;
         return (unit.isNaval()) ? "unit-is-naval"
-            : ((reason = invalidTargetReason(settlement, null))
-                != null) ? reason
+            : ((reason = invalidTargetReason(settlement)) != null) ? reason
             : (settlement.getOwner() == player) ? Mission.TARGETOWNERSHIP
             : ((reason = invalidStanceReason(aiUnit, settlement.getOwner()))
                 != null) ? reason
@@ -347,7 +346,7 @@ public class UnitSeekAndDestroyMission extends Mission {
         final Unit unit = aiUnit.getUnit();
         Tile tile = target.getTile();
         String reason;
-        return ((reason = invalidTargetReason(target, null)) != null) ? reason
+        return ((reason = invalidTargetReason(target)) != null) ? reason
             : ((reason = invalidStanceReason(aiUnit, target.getOwner()))
                 != null) ? reason
             : (tile == null) ? "target-not-on-map"

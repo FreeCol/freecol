@@ -184,7 +184,7 @@ public class IndianDemandMission extends Mission {
             : ((reason = invalidDemandReason(aiUnit)) != null) ? reason
             : (aiUnit.getUnit().getSpaceLeft() == 0) ? null
             : (loc instanceof Colony)
-            ? (((reason = invalidTargetReason(loc, null)) != null) ? reason
+            ? (((reason = invalidTargetReason(loc)) != null) ? reason
                 : ((reason = invalidDemandColonyReason(aiUnit, (Colony)loc))
                     != null) ? reason : null)
             : Mission.TARGETINVALID;

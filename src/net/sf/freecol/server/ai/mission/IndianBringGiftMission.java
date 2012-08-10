@@ -189,7 +189,7 @@ public class IndianBringGiftMission extends Mission {
         return ((reason = invalidAIUnitReason(aiUnit)) != null) ? reason
             : ((reason = invalidGiftReason(aiUnit)) != null) ? reason
             : (loc instanceof Colony)
-            ? (((reason = invalidTargetReason(loc, null)) != null) ? reason
+            ? (((reason = invalidTargetReason(loc)) != null) ? reason
                 : ((reason = invalidGiftColonyReason(aiUnit, (Colony)loc))
                     != null) ? reason : null)
             : Mission.TARGETINVALID;
