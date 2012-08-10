@@ -1379,7 +1379,8 @@ public class Unit extends FreeColGameObject
                     return false;
                 }
             };
-        return search(startTile, gd, CostDeciders.avoidIllegal(), range, null);
+        return searchFullPath(startTile, gd, CostDeciders.avoidIllegal(),
+                              range, null);
     }
 
     /**
@@ -1409,8 +1410,7 @@ public class Unit extends FreeColGameObject
             ePath = (europe == null) ? null : findFullPath(europe);
             eTurns = (ePath == null) ? -1 : ePath.getTotalTurns();
         }
-        PathNode sPath = findOurNearestSettlement(false, Integer.MAX_VALUE,
-                                                  true);
+        PathNode sPath = findOurNearestSettlement(false, INFINITY, true);
         int sTurns = (sPath == null) ? -1 : sPath.getTotalTurns();
         return (sPath == null && ePath == null) ? null
             : (ePath == null || sTurns <= eTurns) ? sPath
@@ -1548,8 +1548,8 @@ public class Unit extends FreeColGameObject
             .getMovement()) / this.getInitialMovesLeft();
 
         return (start == null) ? null
-            : search(start, threatDecider, CostDeciders.avoidIllegal(),
-                     reverseRange, getCarrier());
+            : searchFullPath(start, threatDecider, CostDeciders.avoidIllegal(),
+                             reverseRange, getCarrier());
     }
     
     /**
