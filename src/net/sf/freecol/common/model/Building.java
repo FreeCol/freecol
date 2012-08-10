@@ -536,13 +536,11 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      */
     public int getPotentialProduction(GoodsType goodsType, UnitType unitType) {
         int production = 0;
-        if (getGoodsOutputType() == goodsType) {
-            production += getType().getBasicProduction();
-            if (production > 0) {
-                production = (int)FeatureContainer.applyModifiers(production,
-                    getGame().getTurn(), 
-                    getProductionModifiers(goodsType, unitType));
-            }
+        if (getGoodsOutputType() == goodsType
+            && getType().getBasicProduction() > 0) {
+            production = (int)FeatureContainer.applyModifiers(0f,
+                getGame().getTurn(), 
+                getProductionModifiers(goodsType, unitType));
         }
         return Math.max(0, production);
     }
@@ -554,15 +552,28 @@ public class Building extends WorkLocation implements Named, Comparable<Building
                                                  UnitType unitType) {
         List<Modifier> mods = new ArrayList<Modifier>();
         if (goodsType != null && goodsType == getGoodsOutputType()) {
+            final BuildingType type = getType();
             final String id = goodsType.getId();
             final Turn turn = getGame().getTurn();
-            mods.addAll(getColony().getModifierSet(id, getType(), turn));
+            final Player owner = getOwner();
+            // This is fragile.  The colony contains all the buildings,
+            // including this one, so as long as buildings produce
+            // distinct goods, this works.
+            mods.addAll(getColony().getModifierSet(id, type, turn));
             if (unitType != null) {
-                mods.addAll(unitType.getModifierSet(id, getType(), turn));
-            }
-            Player owner = getOwner();
-            if (owner != null) {
-                mods.addAll(owner.getModifierSet(id, getType(), turn));
+                mods.add(type.getProductionModifier());
+                mods.addAll(unitType.getModifierSet(id, type, turn));
+                // If a unit is present add unspecific owner bonuses
+                // (which includes things like the Building advantage).
+                if (owner != null) {
+                    mods.addAll(owner.getModifierSet(id, null, turn));
+                }
+            } else {
+                // If a unit is not present add only the owner bonuses
+                // specific to the building (such as the Paine bells bonus).
+                if (owner != null) {
+                    mods.addAll(owner.getModifierSet(id, type, turn));
+                }
             }
         }
         return mods;
