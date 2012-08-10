@@ -25,12 +25,14 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.server.ai.AIMain;
@@ -52,7 +54,10 @@ public class CashInTreasureTrainMission extends Mission {
     /** Maximum number of turns to travel to a cash in location. */
     private static final int MAX_TURNS = 20;
 
-    /** A target to aim for, used for a TransportMission. */
+    /**
+     * The location to cash this treasure train in at, either a Colony
+     * or Europe.
+     */
     private Location target = null;
 
 
@@ -65,7 +70,7 @@ public class CashInTreasureTrainMission extends Mission {
      */
     public CashInTreasureTrainMission(AIMain aiMain, AIUnit aiUnit) {
         super(aiMain, aiUnit);
-        target = findTarget(aiUnit);
+        target = findTarget(aiUnit, true);
         logger.finest(tag + " starts at " + aiUnit.getUnit().getLocation()
             + " with target " + target + ": " + this);
         uninitialized = false;
@@ -98,10 +103,12 @@ public class CashInTreasureTrainMission extends Mission {
      * @return A target for this mission, or null if none found.
      */
     public static Location extractTarget(AIUnit aiUnit, PathNode path) {
-        final Unit unit = aiUnit.getUnit();
-        final Location loc = (path == null) ? unit.getLocation()
-            : path.getLastNode().getLocation();
-        return (invalidReason(aiUnit, loc) == null) ? loc : null;
+        if (path == null) return null;
+        final Location loc = path.getLastNode().getLocation();
+        Colony colony = loc.getColony();
+        return (invalidColonyReason(aiUnit, colony) == null) ? colony
+            : (loc instanceof Europe) ? loc
+            : null;
     }
 
     /**
@@ -113,77 +120,124 @@ public class CashInTreasureTrainMission extends Mission {
      * @return A score for the proposed mission.
      */
     public static int scorePath(AIUnit aiUnit, PathNode path) {
-        int turns = (path == null) ? 1 : path.getTotalTurns() + 1;
-        Location loc = extractTarget(aiUnit, path);
-        return (invalidReason(aiUnit, loc) == null) ? 1000 / turns
+        final Location loc = extractTarget(aiUnit, path);
+        return (loc instanceof Colony || loc instanceof Europe)
+            ? (aiUnit.getUnit().getTreasureAmount()
+                / (path.getTotalTurns() + 1))
             : Integer.MIN_VALUE;
     }
 
     /**
-     * Find a suitable cashin location for this unit.
+     * Makes a goal decider that checks cash in sites.
+     *
+     * @param aiUnit The <code>AIUnit</code> to search with.
+     * @param deferOK Keep track of the nearest colonies to use as a
+     *     fallback destination.
+     * @return A suitable <code>GoalDecider</code>.
+     */
+    private static GoalDecider getGoalDecider(final AIUnit aiUnit,
+                                              final boolean deferOK) {
+        final Player owner = aiUnit.getUnit().getOwner();
+
+        return new GoalDecider() {
+            private PathNode best = null;
+            private int bestValue = 0;
+            private PathNode backup = null;
+            private int backupValue = 0;
+
+            public PathNode getGoal() {
+                return (best != null) ? best : backup;
+            }
+            public boolean hasSubGoals() { return true; }
+            public boolean check(Unit u, PathNode path) {
+                int value;
+                Colony colony;
+                if (deferOK
+                    && (colony = path.getLocation().getColony()) != null
+                    && invalidTargetReason(colony, owner) == null) {
+                    value = 100 - path.getTotalTurns()
+                        + ((colony.isConnectedPort()) ? 50 : 0);
+                    if (value > backupValue) {
+                        backupValue = value;
+                        backup = path;
+                    }
+                }
+                value = scorePath(aiUnit, path);
+                if (value > bestValue) {
+                    bestValue = value;
+                    best = path;
+                    return true;
+                }
+                return false;
+            }
+        };
+    }
+
+    /**
+     * Find a suitable cash in location for this unit.
      *
      * @param aiUnit The <code>AIUnit</code> to execute a cash in mission.
+     * @param deferOK Enables deferring to a fallback colony.
      * @return A <code>PathNode</code> to the target, or null if not found
      *     which includes the case when Europe should be preferred (because
      *     the unit can not get there by itself).
      */
-    private static PathNode findTargetPath(AIUnit aiUnit) {
-        Unit unit;
-        if (aiUnit == null
-            || (unit = aiUnit.getUnit()) == null || unit.isDisposed()) {
-            return null;
-        }
+    private static PathNode findTargetPath(AIUnit aiUnit, boolean deferOK) {
+        if (invalidAIUnitReason(aiUnit) != null) return null;
+        final Unit unit = aiUnit.getUnit();
+        final Tile startTile = unit.getPathStartTile();
+        if (startTile == null) return null;
+        
         // Not on the map?  Europe *must* be viable, so go there
         // (return null for now, path still impossible).
+        PathNode path;
         final Player player = unit.getOwner();
         final Europe europe = player.getEurope();
-        Tile startTile;
-        if ((startTile = unit.getPathStartTile()) == null
-            || player.getNumberOfSettlements() <= 0) return null;
-
         final Unit carrier = unit.getCarrier();
-        final GoalDecider cashInDecider
-            = getMissionGoalDecider(aiUnit, CashInTreasureTrainMission.class);
-        PathNode path;
+        final CostDecider standardCd
+            = CostDeciders.avoidSettlementsAndBlockingUnits();
+        final CostDecider relaxedCd = CostDeciders.numberOfTiles();
 
-        // Find out how quickly the unit can get to Europe.
-        final int europeTurns = (carrier == null || europe == null) ? -1
-            : carrier.getTurnsToReach(europe);
+        if (player.getNumberOfSettlements() <= 0) {
+            // No settlements, so go straight to Europe.  If Europe does
+            // not exist then this mission is doomed.  If a carrier is
+            // present use it, otherwise relax the cost decider and at least
+            // start working on a path.
+            return (europe == null)
+                ? null // Nowhere suitable at all!
+                : (carrier != null)
+                ? unit.findFullPath(startTile, europe, carrier, standardCd)
+                : unit.findFullPath(startTile, europe, null, relaxedCd);
+        }
 
-        // Find out how quickly the unit can get to a local cash-in site.
-        path = unit.search(startTile, cashInDecider,
-                           CostDeciders.avoidIllegal(), MAX_TURNS, carrier);
-        final int localTurns = (path == null) ? -1 : path.getTotalTurns();
-
-        // If there is a viable local target, go there first unless it is
-        // quicker to just go straight to Europe.
-        // Otherwise go to Europe if possible.
-        if (localTurns >= 0
-            && (europeTurns < 0 || localTurns < europeTurns)) return path;
-        if (europeTurns >= 0) return null;
-
-        // Finally search again for the nearest colony, this time with
-        // relaxed cost decider that ignores blockages and no range
-        // restriction.
-        path = unit.search(startTile, cashInDecider,
-                           CostDeciders.numberOfTiles(), INFINITY, carrier);
+        // Can the unit get to a cash in site?
+        final GoalDecider gd = getGoalDecider(aiUnit, deferOK);
+        path = unit.searchFullPath(startTile, gd, standardCd,
+                                   MAX_TURNS, carrier);
         if (path != null) return path;
 
-        // Failed.  TODO: some sort of hack to build a colony nearby.
-        return null;
+        // One more try with a relaxed cost decider and no range limit.
+        path = unit.searchFullPath(startTile, gd, relaxedCd,
+                                   INFINITY, carrier);
+        if (path == null) {
+            throw new IllegalStateException("Should have found a path!");
+        }
+        return path;
     }
 
     /**
      * Finds a suitable cashin target for the supplied unit.
-     * Falls back to Europe if the unit is not on the map.
      *
      * @param aiUnit The <code>AIUnit</code> to test.
+     * @param deferOK Enables deferring to a fallback colony.
      * @return A <code>PathNode</code> to the target, or null if none found.
      */
-    public static Location findTarget(AIUnit aiUnit) {
-        Location loc = extractTarget(aiUnit, findTargetPath(aiUnit));
-        if (loc == null) loc = aiUnit.getUnit().getOwner().getEurope();
-        return (invalidReason(aiUnit, loc) == null) ? loc : null;
+    public static Location findTarget(AIUnit aiUnit, boolean deferOK) {
+        final Player player = aiUnit.getUnit().getOwner();
+        final Europe europe = player.getEurope();
+        PathNode path = findTargetPath(aiUnit, deferOK);
+        return (path != null) ? extractTarget(aiUnit, path)
+            : null;
     }
 
 
@@ -194,10 +248,11 @@ public class CashInTreasureTrainMission extends Mission {
      *
      * @return The destination for this <code>Transportable</code>.
      */
+    @Override
     public Location getTransportDestination() {
         return (target instanceof Europe
-            || (target instanceof Tile
-                && shouldTakeTransportToTile((Tile)target))) ? target
+            || (target instanceof Colony
+                && shouldTakeTransportToTile(target.getTile()))) ? target
             : null;
     }
 
@@ -225,16 +280,46 @@ public class CashInTreasureTrainMission extends Mission {
     }
 
     /**
-     * Why would a CashInTreasureTrainMission be invalid with the given unit?
+     * Why would this mission be invalid with the given unit?
      *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @return A reason to not perform the mission, or null if none.
+     * @param aiUnit The <code>AIUnit</code> to test.
+     * @return A reason why the mission would be invalid with the unit,
+     *     or null if none found.
      */
-    private static String invalidCashinReason(AIUnit aiUnit) {
+    private static String invalidMissionReason(AIUnit aiUnit) {
+        String reason = invalidAIUnitReason(aiUnit);
+        if (reason != null) return reason;
         final Unit unit = aiUnit.getUnit();
         return (!unit.canCarryTreasure()) ? "unit-cannot-carry-treasure"
             : (unit.getTreasureAmount() <= 0) ? "unit-treasure-nonpositive"
             : null;
+    }
+
+    /**
+     * Why is this mission invalid with a given colony target?
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param colony The potential target <code>Colony</code>.
+     * @return A reason for mission invalidity, or null if none found.
+     */
+    private static String invalidColonyReason(AIUnit aiUnit, Colony colony) {
+        String reason = invalidTargetReason(colony, aiUnit.getUnit().getOwner());
+        return (reason != null)
+            ? reason
+            : (!aiUnit.getUnit().canCashInTreasureTrain(colony.getTile()))
+            ? "cashin-impossible-at-location"
+            : null;
+    }
+
+    /**
+     * Why is this mission invalid with a given Europe target?
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param europe The potential target <code>Europe</code>.
+     * @return A reason for mission invalidity, or null if none found.
+     */
+    private static String invalidEuropeReason(AIUnit aiUnit, Europe europe) {
+        return invalidTargetReason(europe, aiUnit.getUnit().getOwner());
     }
 
     /**
@@ -253,10 +338,7 @@ public class CashInTreasureTrainMission extends Mission {
      * @return A reason for invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit) {
-        String reason;
-        return ((reason = Mission.invalidReason(aiUnit)) != null) ? reason
-            : ((reason = invalidCashinReason(aiUnit)) != null) ? reason
-            : null;
+        return invalidMissionReason(aiUnit);
     }
 
     /**
@@ -267,18 +349,13 @@ public class CashInTreasureTrainMission extends Mission {
      * @return A reason for invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit, Location loc) {
-        String reason;
-        return ((reason = invalidAIUnitReason(aiUnit)) != null) ? reason
-            : ((reason = invalidCashinReason(aiUnit)) != null) ? reason
+        String reason = invalidMissionReason(aiUnit);
+        return (reason != null)
+            ? reason
+            : (loc instanceof Colony)
+            ? invalidColonyReason(aiUnit, (Colony)loc)
             : (loc instanceof Europe)
-            ? (((reason = invalidTargetReason(loc,
-                            aiUnit.getUnit().getOwner())) != null) ? reason
-                : null)
-            : (loc instanceof Tile)
-            ? (((reason = invalidTargetReason(loc, null)) != null) ? reason
-                : (!aiUnit.getUnit().canCashInTreasureTrain((Tile)loc))
-                ? "cashin-impossible-at-location"
-                : null)
+            ? invalidEuropeReason(aiUnit, (Europe)loc)
             : Mission.TARGETINVALID;
     }
 
@@ -291,7 +368,7 @@ public class CashInTreasureTrainMission extends Mission {
         final Unit unit = getUnit();
         String reason = invalidReason();
         if (isTargetReason(reason)) {
-            if ((target = findTarget(getAIUnit())) == null) {
+            if ((target = findTarget(getAIUnit(), true)) == null) {
                 logger.finest(tag + " could not retarget: " + this);
                 return;
             }

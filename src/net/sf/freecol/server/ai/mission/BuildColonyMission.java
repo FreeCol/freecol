@@ -32,6 +32,7 @@ import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.networking.NetworkConstants;
@@ -172,31 +173,32 @@ public class BuildColonyMission extends Mission {
     /**
      * Makes a goal decider that checks colony sites.
      *
-     * @param aiUnit The <code>AIUnit</code> to find a colony site with.
-     * @param deferOK Keep track of the nearest of our colonies, to use
-     *     as a fallback destination.
+     * @param aiUnit The <code>AIUnit</code> to search with.
+     * @param deferOK Keep track of the nearest colonies to use as a
+     *     fallback destination.
      * @return A suitable <code>GoalDecider</code>.
      */
-    private static GoalDecider getColonyDecider(final AIUnit aiUnit,
-                                                final boolean deferOK) {
+    private static GoalDecider getGoalDecider(final AIUnit aiUnit,
+                                              final boolean deferOK) {
         return new GoalDecider() {
             private PathNode best = null;
             private int bestValue = 0;
             private PathNode backup = null;
             private int backupValue = 0;
 
-            public PathNode getGoal() { return (best != null) ? best : backup; }
+            public PathNode getGoal() {
+                return (best != null) ? best : backup;
+            }
             public boolean hasSubGoals() { return true; }
             public boolean check(Unit u, PathNode path) {
                 int value = scorePath(aiUnit, path);
-                Colony colony = path.getLocation().getColony();
-                if (colony != null && invalidReason(aiUnit, colony) == null) {
-                    if (deferOK && value > backupValue) {
-                        backupValue = value;
-                        backup = path;
-                        return true;
-                    }
-                    return false;
+                Colony colony;
+                if (deferOK
+                    && (colony = path.getLocation().getColony()) != null
+                    && invalidColonyReason(aiUnit, colony) == null
+                    && value > backupValue) {
+                    backupValue = value;
+                    backup = path;
                 }
                 if (value > bestValue) {
                     bestValue = value;
@@ -224,21 +226,24 @@ public class BuildColonyMission extends Mission {
 
         PathNode path;
         final Unit carrier = unit.getCarrier();
-        final GoalDecider colonyDecider = getColonyDecider(aiUnit, deferOK);
+        final GoalDecider gd = getGoalDecider(aiUnit, deferOK);
+        final CostDecider standardCd
+            = CostDeciders.avoidSettlementsAndBlockingUnits();
+        final CostDecider relaxedCd = CostDeciders.numberOfTiles();
 
         // Try for something sensible nearby.
-        path = unit.searchFullPath(startTile, colonyDecider,
-            CostDeciders.avoidIllegal(), MAX_TURNS, carrier);
+        path = unit.searchFullPath(startTile, gd, standardCd,
+                                   MAX_TURNS, carrier);
         if (path != null) return path;
 
         // Retry, but increase the range.
-        path = unit.searchFullPath(startTile, colonyDecider,
-            CostDeciders.avoidIllegal(), MAX_TURNS*3, carrier);
+        path = unit.searchFullPath(startTile, gd, standardCd,
+                                   MAX_TURNS*3, carrier);
         if (path != null) return path;
 
         // One more try with a relaxed cost decider and no range limit.
-        return unit.searchFullPath(startTile, colonyDecider,
-            CostDeciders.numberOfTiles(), INFINITY, carrier);
+        return unit.searchFullPath(startTile, gd, relaxedCd,
+                                   INFINITY, carrier);
     }
 
     /**
