@@ -32,6 +32,7 @@ import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.networking.NetworkConstants;
@@ -133,40 +134,32 @@ public class BuildColonyMission extends Mission {
     /**
      * Gets the value of a path to a colony building site.
      *
-     * The value is proportional to the general desirability of the
-     * site, and inversely proportional to the number of turns to get
-     * there.
-     *
      * @param aiUnit The <code>AIUnit</code> to build the colony.
      * @param path The <code>PathNode</code> to check.
      * @return A score for the target.
      */
     public static int scorePath(AIUnit aiUnit, PathNode path) {
-        final Location loc = extractTarget(aiUnit, path);
+        Location loc;
+        if (path == null
+            || !((loc = extractTarget(aiUnit, path)) instanceof Tile)) 
+            return Integer.MIN_VALUE;
 
-        if (loc instanceof Colony) {
-            return 1000 / (path.getTotalTurns() + 1);
-
-        } else if (loc instanceof Tile) {
-            final Tile tile = (Tile)loc;
-            final Player player = aiUnit.getUnit().getOwner();
-            float steal = 1.0f;
-            switch (player.canClaimToFoundSettlementReason(tile)) {
-            case NONE:
-                break;
-            case NATIVES:
-                // Penalize value when the tile will need to be stolen
-                int price = player.getLandPrice(tile);
-                if (price > 0 && !player.checkGold(price)) steal = 0.2f;
-                break;
-            default:
-                return Integer.MIN_VALUE;
-            }
-            return (int)(player.getColonyValue(tile) * steal
-                / (path.getTotalTurns() + 1));
+        final Tile tile = (Tile)loc;
+        final Player player = aiUnit.getUnit().getOwner();
+        float steal = 1.0f;
+        switch (player.canClaimToFoundSettlementReason(tile)) {
+        case NONE:
+            break;
+        case NATIVES:
+            // Penalize value when the tile will need to be stolen
+            int price = player.getLandPrice(tile);
+            if (price > 0 && !player.checkGold(price)) steal = 0.2f;
+            break;
+        default:
+            return Integer.MIN_VALUE;
         }
-
-        return Integer.MIN_VALUE;
+        return (int)(player.getColonyValue(tile) * steal
+            / (path.getTotalTurns() + 1));
     }
 
     /**
@@ -177,31 +170,36 @@ public class BuildColonyMission extends Mission {
      *     as a fallback destination.
      * @return A suitable <code>GoalDecider</code>.
      */
-    private static GoalDecider getColonyDecider(final AIUnit aiUnit,
-                                                final boolean deferOK) {
+    private static GoalDecider getGoalDecider(final AIUnit aiUnit,
+                                              final boolean deferOK) {
         return new GoalDecider() {
             private PathNode best = null;
             private int bestValue = 0;
             private PathNode backup = null;
-            private int backupValue = 0;
+            private float backupValue = 0.0f;
 
-            public PathNode getGoal() { return (best != null) ? best : backup; }
+            public PathNode getGoal() {
+                return (best != null) ? best : backup;
+            }
             public boolean hasSubGoals() { return true; }
             public boolean check(Unit u, PathNode path) {
-                int value = scorePath(aiUnit, path);
-                Colony colony = path.getLocation().getColony();
-                if (colony != null && invalidReason(aiUnit, colony) == null) {
-                    if (deferOK && value > backupValue) {
+                Location loc = path.getLastNode().getLocation();
+                if (deferOK && loc.getColony() != null) {
+                    float value = ((loc.getColony().isConnectedPort()) ? 2.0f
+                        : 1.0f) / (path.getTotalTurns() + 1);
+                    if (value > backupValue) {
                         backupValue = value;
                         backup = path;
+                    }
+                }
+                loc = extractTarget(aiUnit, path);
+                if (loc instanceof Tile) {
+                    int value = scorePath(aiUnit, path);
+                    if (value > bestValue) {
+                        bestValue = value;
+                        best = path;
                         return true;
                     }
-                    return false;
-                }
-                if (value > bestValue) {
-                    bestValue = value;
-                    best = path;
-                    return true;
                 }
                 return false;
             }
@@ -224,21 +222,24 @@ public class BuildColonyMission extends Mission {
 
         PathNode path;
         final Unit carrier = unit.getCarrier();
-        final GoalDecider colonyDecider = getColonyDecider(aiUnit, deferOK);
+        final GoalDecider gd = getGoalDecider(aiUnit, deferOK);
+        final CostDecider standardCd
+            = CostDeciders.avoidSettlementsAndBlockingUnits();
+        final CostDecider relaxedCd = CostDeciders.numberOfTiles();
 
         // Try for something sensible nearby.
-        path = unit.searchFullPath(startTile, colonyDecider,
-            CostDeciders.avoidIllegal(), MAX_TURNS, carrier);
+        path = unit.searchFullPath(startTile, gd, standardCd,
+                                   MAX_TURNS, carrier);
         if (path != null) return path;
 
         // Retry, but increase the range.
-        path = unit.searchFullPath(startTile, colonyDecider,
-            CostDeciders.avoidIllegal(), MAX_TURNS*3, carrier);
+        path = unit.searchFullPath(startTile, gd, standardCd,
+                                   MAX_TURNS*3, carrier);
         if (path != null) return path;
 
         // One more try with a relaxed cost decider and no range limit.
-        return unit.searchFullPath(startTile, colonyDecider,
-            CostDeciders.numberOfTiles(), INFINITY, carrier);
+        return unit.searchFullPath(startTile, gd, relaxedCd,
+                                   INFINITY, carrier);
     }
 
     /**
@@ -387,7 +388,7 @@ public class BuildColonyMission extends Mission {
         if (reason != null
             || (target instanceof Tile
                 && (player.getColonyValue((Tile)target)) < colonyValue)) {
-            if ((newTarget = findTarget(aiUnit, false)) == null) {
+            if ((newTarget = findTarget(aiUnit, true)) == null) {
                 setTarget(null);
                 logger.finest(tag + " unable to retarget: " + this);
                 return;
