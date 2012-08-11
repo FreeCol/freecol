@@ -35,6 +35,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
+import net.sf.freecol.common.model.pathfinding.GoalDeciders;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.ai.AIMain;
@@ -132,6 +133,40 @@ public class BuildColonyMission extends Mission {
     }
 
     /**
+     * Gets a <code>GoalDecider</code> for finding the best colony
+     * <code>Tile</code>, optionally falling back to the nearest colony.
+     *
+     * @param aiUnit The <code>AIUnit</code> that is searching.
+     * @param deferOK Enable colony fallback.
+     * @return A suitable <code>GoalDecider</code>.
+     */
+    private static GoalDecider getGoalDecider(final AIUnit aiUnit,
+                                              boolean deferOK) {
+        GoalDecider gd = new GoalDecider() {
+                private PathNode bestPath = null;
+                private int bestValue = 0;
+
+                public PathNode getGoal() { return bestPath; }
+                public boolean hasSubGoals() { return true; }
+                public boolean check(Unit u, PathNode path) {
+                    Location loc = extractTarget(aiUnit, path);
+                    if (loc instanceof Tile) {
+                        int value = scorePath(aiUnit, path);
+                        if (bestValue < value) {
+                            bestValue = value;
+                            bestPath = path;
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+            };
+        return (deferOK) ? GoalDeciders.getComposedGoalDecider(gd,
+            GoalDeciders.getOurClosestSettlementGoalDecider())
+            : gd;
+    }
+
+    /**
      * Gets the value of a path to a colony building site.
      *
      * @param aiUnit The <code>AIUnit</code> to build the colony.
@@ -162,50 +197,6 @@ public class BuildColonyMission extends Mission {
             / (path.getTotalTurns() + 1));
     }
 
-    /**
-     * Makes a goal decider that checks colony sites.
-     *
-     * @param aiUnit The <code>AIUnit</code> to find a colony site with.
-     * @param deferOK Keep track of the nearest of our colonies, to use
-     *     as a fallback destination.
-     * @return A suitable <code>GoalDecider</code>.
-     */
-    private static GoalDecider getGoalDecider(final AIUnit aiUnit,
-                                              final boolean deferOK) {
-        return new GoalDecider() {
-            private PathNode best = null;
-            private int bestValue = 0;
-            private PathNode backup = null;
-            private float backupValue = 0.0f;
-
-            public PathNode getGoal() {
-                return (best != null) ? best : backup;
-            }
-            public boolean hasSubGoals() { return true; }
-            public boolean check(Unit u, PathNode path) {
-                Location loc = path.getLastNode().getLocation();
-                if (deferOK && loc.getColony() != null) {
-                    float value = ((loc.getColony().isConnectedPort()) ? 2.0f
-                        : 1.0f) / (path.getTotalTurns() + 1);
-                    if (value > backupValue) {
-                        backupValue = value;
-                        backup = path;
-                    }
-                }
-                loc = extractTarget(aiUnit, path);
-                if (loc instanceof Tile) {
-                    int value = scorePath(aiUnit, path);
-                    if (value > bestValue) {
-                        bestValue = value;
-                        best = path;
-                        return true;
-                    }
-                }
-                return false;
-            }
-        };
-    }
-            
     /**
      * Finds a site for a new colony.  Favour closer sites.
      *
