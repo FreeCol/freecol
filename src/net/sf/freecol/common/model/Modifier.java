@@ -144,7 +144,8 @@ public class Modifier extends Feature implements Comparable<Modifier> {
      * @exception XMLStreamException if an error occurs
      */
     public Modifier(XMLStreamReader in, Specification specification) throws XMLStreamException {
-        readFromXMLImpl(in, specification);
+        setSpecification(specification);
+        readFromXML(in);
     }
 
     /**
@@ -473,10 +474,9 @@ public class Modifier extends Feature implements Comparable<Modifier> {
      *     during parsing.
      */
     @Override
-    protected void readAttributes(XMLStreamReader in,
-                                  Specification specification)
+    protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
-        super.readAttributes(in, specification);
+        super.readAttributes(in);
 
         String typeString = in.getAttributeValue(null, "type");
         setType(Enum.valueOf(Type.class, typeString.toUpperCase(Locale.US)));

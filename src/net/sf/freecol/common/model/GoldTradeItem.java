@@ -53,7 +53,7 @@ public class GoldTradeItem extends TradeItem {
      */
     public GoldTradeItem(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
-        readFromXMLImpl(in);
+        readFromXML(in);
     }
 
     /**
@@ -130,9 +130,9 @@ public class GoldTradeItem extends TradeItem {
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    protected void readFromXMLImpl(XMLStreamReader in)
+    public void readFromXML(XMLStreamReader in)
         throws XMLStreamException {
-        super.readFromXMLImpl(in);
+        super.readFromXML(in);
         this.gold = Integer.parseInt(in.getAttributeValue(null, "gold"));
         in.nextTag();
     }

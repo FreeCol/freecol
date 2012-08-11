@@ -468,7 +468,7 @@ public class ModelMessage extends StringTemplate {
      * @exception XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    public void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+    public void readFromXML(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
 
         // Remove this when the 0.9.x save hack (in Game.java) is gone.

@@ -228,11 +228,11 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String tag = in.getLocalName();
             if ("number".equals(tag)) {
-                number.readFromXMLImpl(in);
+                number.readFromXML(in);
             } else if ("unitType".equals(tag)) {
-                unitType.readFromXMLImpl(in);
+                unitType.readFromXML(in);
             } else if ("role".equals(tag)) {
-                role.readFromXMLImpl(in);
+                role.readFromXML(in);
             }
         }
 

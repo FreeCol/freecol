@@ -70,7 +70,7 @@ public class Effect extends FreeColGameObjectType {
      */
     public Effect(XMLStreamReader in, Specification specification) throws XMLStreamException {
         setSpecification(specification);
-        readFromXMLImpl(in, specification);
+        readFromXML(in);
     }
 
     public Effect(Effect template) {
@@ -139,14 +139,14 @@ public class Effect extends FreeColGameObjectType {
 
 
     @Override
-    protected void readAttributes(XMLStreamReader in, Specification specification)
+    protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
-        super.readAttributes(in, specification);
+        super.readAttributes(in);
         probability = getAttribute(in, "probability", 0);
     }
 
     @Override
-    protected void readChild(XMLStreamReader in, Specification specification)
+    protected void readChild(XMLStreamReader in)
         throws XMLStreamException {
         String childName = in.getLocalName();
         if (Scope.getXMLElementTagName().equals(childName)) {

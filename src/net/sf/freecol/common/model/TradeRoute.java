@@ -110,7 +110,7 @@ public class TradeRoute extends FreeColGameObject
     /**
      * Copy all fields from another trade route to this one. This is useful when
      * an updated route is received on the server side from the client.
-     * 
+     *
      * @param other The route to copy from.
      */
     public synchronized void updateFrom(TradeRoute other) {
@@ -124,7 +124,7 @@ public class TradeRoute extends FreeColGameObject
 
     /**
      * Get the <code>Modified</code> value.
-     * 
+     *
      * @return a <code>boolean</code> value
      */
     public final boolean isModified() {
@@ -133,7 +133,7 @@ public class TradeRoute extends FreeColGameObject
 
     /**
      * Set the <code>Modified</code> value.
-     * 
+     *
      * @param newModified The new Modified value.
      */
     public final void setModified(final boolean newModified) {
@@ -142,7 +142,7 @@ public class TradeRoute extends FreeColGameObject
 
     /**
      * Get the <code>Name</code> value.
-     * 
+     *
      * @return a <code>String</code> value
      */
     public final String getName() {
@@ -151,7 +151,7 @@ public class TradeRoute extends FreeColGameObject
 
     /**
      * Set the <code>Name</code> value.
-     * 
+     *
      * @param newName The new Name value.
      */
     public final void setName(final String newName) {
@@ -178,7 +178,7 @@ public class TradeRoute extends FreeColGameObject
 
     /**
      * Add a new <code>Stop</code> to this trade route.
-     * 
+     *
      * @param stop The <code>Stop</code> to add.
      */
     public void addStop(Stop stop) {
@@ -187,7 +187,7 @@ public class TradeRoute extends FreeColGameObject
 
     /**
      * Get the <code>Owner</code> value.
-     * 
+     *
      * @return a <code>Player</code> value
      */
     public final Player getOwner() {
@@ -196,7 +196,7 @@ public class TradeRoute extends FreeColGameObject
 
     /**
      * Set the <code>Owner</code> value.
-     * 
+     *
      * @param newOwner The new Owner value.
      */
     public final void setOwner(final Player newOwner) {
@@ -205,19 +205,19 @@ public class TradeRoute extends FreeColGameObject
 
     public List<Unit> getAssignedUnits(){
         List<Unit> list = new ArrayList<Unit>();
-        
+
         for(Unit unit : owner.getUnits()){
             if(unit.getTradeRoute() == this){
                 list.add(unit);
             }
         }
-        
+
         return list;
     }
-    
+
     /**
      * Get the <code>Stops</code> value.
-     * 
+     *
      * @return an <code>ArrayList<Stop></code> value
      */
     public final List<Stop> getStops() {
@@ -226,7 +226,7 @@ public class TradeRoute extends FreeColGameObject
 
     /**
      * Set the <code>Stops</code> value.
-     * 
+     *
      * @param newStops The new Stops value.
      */
     public final void setStops(final List<Stop> newStops) {
@@ -239,7 +239,7 @@ public class TradeRoute extends FreeColGameObject
      * The copied trade route has no reference back to the original and can
      * safely be used as a temporary copy. It is NOT registered with the game,
      * but will have the same unique id as the original.
-     * 
+     *
      * @return deep copy of trade route.
      */
     public TradeRoute clone() {
@@ -255,9 +255,9 @@ public class TradeRoute extends FreeColGameObject
     /**
      * Replace all the stops for this trade route with the stops passed from
      * another trade route.
-     * 
+     *
      * This method will create a deep copy as it creates new stops based on the given ones.
-     * 
+     *
      * @param otherStops The new stops to use.
      * @see #clone()
      */
@@ -271,7 +271,7 @@ public class TradeRoute extends FreeColGameObject
     public static boolean isStopValid(Unit unit, Stop stop) {
         return TradeRoute.isStopValid(unit.getOwner(), stop);
     }
-    
+
     public static boolean isStopValid(Player player, Stop stop) {
         return (stop == null) ? false : stop.isValid();
     }
@@ -294,7 +294,7 @@ public class TradeRoute extends FreeColGameObject
 
         /**
          * Copy constructor. Creates a stop based on the given one.
-         * 
+         *
          * @param other
          */
         public Stop(Stop other) {
@@ -316,7 +316,7 @@ public class TradeRoute extends FreeColGameObject
 
         /**
          * Get the <code>Modified</code> value.
-         * 
+         *
          * @return a <code>boolean</code> value
          */
         public final boolean isModified() {
@@ -325,7 +325,7 @@ public class TradeRoute extends FreeColGameObject
 
         /**
          * Set the <code>Modified</code> value.
-         * 
+         *
          * @param newModified The new Modified value.
          */
         public final void setModified(final boolean newModified) {
@@ -334,7 +334,7 @@ public class TradeRoute extends FreeColGameObject
 
         /**
          * Get the <code>Location</code> value.
-         * 
+         *
          * @return a <code>Location</code> value
          */
         public final Location getLocation() {
@@ -343,7 +343,7 @@ public class TradeRoute extends FreeColGameObject
 
         /**
          * Get the <code>Cargo</code> value.
-         * 
+         *
          * @return a cloned <code>ArrayList<Integer></code> value
          */
         public final List<GoodsType> getCargo() {
@@ -352,7 +352,7 @@ public class TradeRoute extends FreeColGameObject
 
         /**
          * Set the cargo values.
-         * 
+         *
          * @param cargo and arraylist of cargo values.
          */
         public final void setCargo(List<GoodsType> cargo) {
@@ -425,42 +425,42 @@ public class TradeRoute extends FreeColGameObject
 
     /**
      * Initialize this object from an XML-representation of this object.
-     * 
+     *
      * @param in The input stream with the XML.
      */
-    protected void readFromXMLImpl(XMLStreamReader in)
-        throws XMLStreamException {
-        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
         setName(in.getAttributeValue(null, "name"));
         String ownerID = in.getAttributeValue(null, "owner");
-        
+
         Game game = getGame();
         owner = game.getFreeColGameObject(ownerID, Player.class);
         if (owner == null) owner = new Player(game, ownerID);
 
         stops.clear();
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if (getStopXMLElementTagName().equals(in.getLocalName())) {
-                String locationId = in.getAttributeValue(null, "location");
-                Stop stop = new Stop(findLocation(game, locationId));
-                while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                    if (in.getLocalName().equals(CARGO_TAG)) {
-                        String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-                        if (id == null) {
-                            // TODO: remove support for old format
-                            List<GoodsType> goodsList = getSpecification().getGoodsTypeList();
-                            for (int cargoIndex : readFromArrayElement("cargo", in, new int[0])) {
-                                stop.addCargo(goodsList.get(cargoIndex));
-                            }
-                        } else {
-                            stop.addCargo(getSpecification().getGoodsType(id));
-                            in.nextTag();
+    }
+
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+        if (getStopXMLElementTagName().equals(in.getLocalName())) {
+            String locationId = in.getAttributeValue(null, "location");
+            Stop stop = new Stop(findLocation(getGame(), locationId));
+            while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                if (in.getLocalName().equals(CARGO_TAG)) {
+                    String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
+                    if (id == null) {
+                        // TODO: remove support for old format
+                        List<GoodsType> goodsList = getSpecification().getGoodsTypeList();
+                        for (int cargoIndex : readFromArrayElement("cargo", in, new int[0])) {
+                            stop.addCargo(goodsList.get(cargoIndex));
                         }
+                    } else {
+                        stop.addCargo(getSpecification().getGoodsType(id));
+                        in.nextTag();
                     }
                 }
-                // Do not test stop.isValid(), the colony may not exist yet
-                stops.add(stop);
             }
+            // Do not test stop.isValid(), the colony may not exist yet
+            stops.add(stop);
         }
     }
 
@@ -471,7 +471,7 @@ public class TradeRoute extends FreeColGameObject
 
     /**
      * Returns the tag name of the root element representing this object.
-     * 
+     *
      * @return "tradeRoute".
      */
     public static String getXMLElementTagName() {

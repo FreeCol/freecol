@@ -504,12 +504,15 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * Initialize this object from an XML-representation of this object.
      * @param in The input stream with the XML.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         setId(in.getAttributeValue(null, ID_ATTRIBUTE));
         storedGoods.clear();
         oldStoredGoods.clear();
-        Map<GoodsType, Integer> storage;
+    }
 
+    @Override
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        Map<GoodsType, Integer> storage;
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(STORED_GOODS_TAG)) {
                 storage = storedGoods;
@@ -551,7 +554,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * @throws XMLStreamException If there are problems reading the stream.
      */
     @Override
-    protected void readFromXMLPartialImpl(XMLStreamReader in)
+    public void readFromXMLPartialImpl(XMLStreamReader in)
         throws XMLStreamException {
         readFromXMLPartialByClass(in, getClass());
     }

@@ -275,7 +275,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      *      during parsing.
      */
     @Override
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+    public void readFromXML(XMLStreamReader in) throws XMLStreamException {
         final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
         editable = getAttribute(in, "editable", true);
         if (id != null) {

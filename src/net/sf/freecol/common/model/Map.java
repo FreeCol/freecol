@@ -2425,10 +2425,7 @@ public class Map extends FreeColGameObject implements Location {
      * @param in The input stream with the XML.
      */
     @Override
-    protected void readFromXMLImpl(XMLStreamReader in)
-            throws XMLStreamException {
-        boolean fixupHighSeas = false; // @compat 0.10.5
-        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         setLayer(Layer.valueOf(getAttribute(in, "layer", "ALL")));
 
         if (tiles == null) {
@@ -2441,7 +2438,11 @@ public class Map extends FreeColGameObject implements Location {
         minimumLatitude = getAttribute(in, "minimumLatitude", -90);
         maximumLatitude = getAttribute(in, "maximumLatitude", 90);
         calculateLatitudePerRow();
+    }
 
+    @Override
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        boolean fixupHighSeas = false; // @compat 0.10.5
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(Tile.getXMLElementTagName())) {
                 Tile t = updateFreeColGameObject(in, Tile.class);

@@ -174,7 +174,7 @@ abstract public class AbstractOption<T> extends FreeColObject
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+    public void readFromXML(XMLStreamReader in) throws XMLStreamException {
         readAttributes(in);
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             readChild(in);

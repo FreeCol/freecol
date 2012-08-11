@@ -383,11 +383,9 @@ public class Europe extends UnitLocation implements Ownable, Named {
      * @param in The input stream with the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
-    protected void readFromXMLImpl(XMLStreamReader in)
+    public void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
         setId(in.getAttributeValue(null, ID_ATTRIBUTE));
-
-        Specification spec = getSpecification();
 
         // @compat 0.10.0
         if (!hasAbility("model.ability.dressMissionary")) {
@@ -398,7 +396,7 @@ public class Europe extends UnitLocation implements Ownable, Named {
         for (int index = 0; index < recruitables.length; index++) {
             String unitTypeId = in.getAttributeValue(null, "recruit" + index);
             if (unitTypeId != null) {
-                recruitables[index] = spec.getUnitType(unitTypeId);
+                recruitables[index] = getSpecification().getUnitType(unitTypeId);
             }
         }
 
@@ -409,7 +407,6 @@ public class Europe extends UnitLocation implements Ownable, Named {
         recruitLowerCap = getAttribute(in, "recruitLowerCap", LOWER_CAP_INITIAL);
 
         unitPrices.clear();
-        readChildren(in);
     }
 
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
@@ -454,7 +451,7 @@ public class Europe extends UnitLocation implements Ownable, Named {
      * @throws XMLStreamException If there are problems reading the stream.
      */
     @Override
-    protected void readFromXMLPartialImpl(XMLStreamReader in)
+    public void readFromXMLPartialImpl(XMLStreamReader in)
         throws XMLStreamException {
         readFromXMLPartialByClass(in, getClass());
     }

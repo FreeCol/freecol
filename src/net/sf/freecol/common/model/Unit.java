@@ -3900,10 +3900,9 @@ public class Unit extends FreeColGameObject
      * @throws javax.xml.stream.XMLStreamException is thrown if
      *     something goes wrong.
      */
-    protected void readFromXMLImpl(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         Game game = getGame();
-        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
+        super.readAttributes(in);
         setName(in.getAttributeValue(null, "name"));
         UnitType oldUnitType = unitType;
         unitType = getSpecification().getUnitType(in.getAttributeValue(null, "unitType"));
@@ -3991,6 +3990,10 @@ public class Unit extends FreeColGameObject
         if (goodsContainer != null) goodsContainer.removeAll();
         equipment.clear();
         setWorkImprovement(null);
+    }
+
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        Game game = getGame();
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(UNITS_TAG_NAME)) {
                 units = new ArrayList<Unit>();
@@ -4060,7 +4063,7 @@ public class Unit extends FreeColGameObject
      * @throws XMLStreamException If there are problems reading the stream.
      */
     @Override
-    protected void readFromXMLPartialImpl(XMLStreamReader in)
+    public void readFromXMLPartialImpl(XMLStreamReader in)
         throws XMLStreamException {
         readFromXMLPartialByClass(in, getClass());
     }

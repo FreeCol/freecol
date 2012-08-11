@@ -217,7 +217,7 @@ public abstract class TradeItem extends FreeColObject {
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    protected void readFromXMLImpl(XMLStreamReader in)
+    public void readFromXML(XMLStreamReader in)
         throws XMLStreamException {
         setId(in.getAttributeValue(null, ID_ATTRIBUTE));
 

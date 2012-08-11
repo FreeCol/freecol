@@ -191,7 +191,7 @@ public class StringOption extends AbstractOption<String> {
         }
     }
 
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+    public void readFromXML(XMLStreamReader in) throws XMLStreamException {
         readAttributes(in);
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             readChild(in);

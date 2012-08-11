@@ -684,12 +684,10 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
     @Override
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
 
         buildingType = getSpecification().getBuildingType(in.getAttributeValue(null, "buildingType"));
-
-        super.readChildren(in);
     }
 
     /**
@@ -712,7 +710,7 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      * @throws XMLStreamException If there are problems reading the stream.
      */
     @Override
-    protected void readFromXMLPartialImpl(XMLStreamReader in)
+    public void readFromXMLPartialImpl(XMLStreamReader in)
         throws XMLStreamException {
         readFromXMLPartialByClass(in, getClass());
     }

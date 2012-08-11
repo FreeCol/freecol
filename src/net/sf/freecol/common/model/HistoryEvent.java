@@ -192,7 +192,7 @@ public class HistoryEvent extends StringTemplate {
      * @throws XMLStreamException if a problem was encountered
      *     during parsing.
      */
-    protected void readFromXMLImpl(XMLStreamReader in)
+    public void readFromXML(XMLStreamReader in)
         throws XMLStreamException {
         super.readAttributes(in);
 

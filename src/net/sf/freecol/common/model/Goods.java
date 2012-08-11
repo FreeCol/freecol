@@ -303,7 +303,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    protected void readFromXMLImpl(XMLStreamReader in)
+    public void readFromXML(XMLStreamReader in)
         throws XMLStreamException {
 
         String str = in.getAttributeValue(null, "type");

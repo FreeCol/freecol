@@ -70,7 +70,7 @@ public class AbstractUnit extends FreeColObject {
      * @exception XMLStreamException if an error occurs
      */
     public AbstractUnit(XMLStreamReader in) throws XMLStreamException {
-        readFromXMLImpl(in);
+        readFromXML(in);
     }
 
 

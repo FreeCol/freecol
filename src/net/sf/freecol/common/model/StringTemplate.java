@@ -540,7 +540,7 @@ public class StringTemplate extends FreeColObject {
                 in.nextTag();
             } else if (getXMLElementTagName().equals(in.getLocalName())) {
                 StringTemplate replacement = new StringTemplate();
-                replacement.readFromXMLImpl(in);
+                replacement.readFromXML(in);
                 replacements.add(replacement);
             } else if ("data".equals(in.getLocalName())) { // @compat 0.9.x
                 readOldFormat(readFromArrayElement("data", in, new String[0]));

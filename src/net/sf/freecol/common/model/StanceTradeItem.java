@@ -56,7 +56,7 @@ public class StanceTradeItem extends TradeItem {
      */
     public StanceTradeItem(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
-        readFromXMLImpl(in);
+        readFromXML(in);
     }
 
     /**
@@ -136,9 +136,9 @@ public class StanceTradeItem extends TradeItem {
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    protected void readFromXMLImpl(XMLStreamReader in)
+    public void readFromXML(XMLStreamReader in)
         throws XMLStreamException {
-        super.readFromXMLImpl(in);
+        super.readFromXML(in);
         this.stance = Enum.valueOf(Stance.class,
             in.getAttributeValue(null, "stance"));
         in.nextTag();

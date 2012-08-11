@@ -63,7 +63,7 @@ public class GoodsTradeItem extends TradeItem {
      */
     public GoodsTradeItem(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
-        readFromXMLImpl(in);
+        readFromXML(in);
     }
 
     /**
@@ -185,9 +185,9 @@ public class GoodsTradeItem extends TradeItem {
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    protected void readFromXMLImpl(XMLStreamReader in)
+    public void readFromXML(XMLStreamReader in)
         throws XMLStreamException {
-        super.readFromXMLImpl(in);
+        super.readFromXML(in);
 
         String settlementId = in.getAttributeValue(null, "settlement");
         this.settlement = game.getFreeColGameObject(settlementId,

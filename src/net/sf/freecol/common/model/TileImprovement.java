@@ -432,8 +432,7 @@ public class TileImprovement extends TileItem implements Named {
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
     @Override
-    protected void readFromXMLImpl(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         Game game = getGame();
 
         setId(in.getAttributeValue(null, ID_ATTRIBUTE));
@@ -455,7 +454,6 @@ public class TileImprovement extends TileItem implements Named {
 
         virtual = getAttribute(in, "virtual", false);
 
-        in.nextTag();
     }
 
     /**

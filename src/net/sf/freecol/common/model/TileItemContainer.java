@@ -599,11 +599,10 @@ public class TileItemContainer extends FreeColGameObject {
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    protected void readFromXMLImpl(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         Game game = getGame();
 
-        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
+        super.readAttributes(in);
 
         tile = game.getFreeColGameObject(in.getAttributeValue(null, "tile"),
                                          Tile.class);
@@ -612,7 +611,10 @@ public class TileItemContainer extends FreeColGameObject {
         }
 
         tileItems.clear();
+    }
 
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        Game game = getGame();
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             TileItem item = game.getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE),
                                                       TileItem.class);

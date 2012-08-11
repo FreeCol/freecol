@@ -37,7 +37,9 @@ import org.w3c.dom.Element;
 
 
 /**
- * The superclass of all game objects in FreeCol.
+ * The superclass of all game objects in FreeCol. All
+ * FreeColGameObjects need to be able to refer to the game they belong
+ * to. Therefore, the game attribute must not be null.
  */
 abstract public class FreeColGameObject extends FreeColObject {
 
@@ -535,7 +537,7 @@ abstract public class FreeColGameObject extends FreeColObject {
      *                 <code>Introspector</code>.
      * @throws XMLStreamException If there are problems reading the stream.
      */
-    protected void readFromXMLPartialByClass(XMLStreamReader in,
+    public void readFromXMLPartialByClass(XMLStreamReader in,
                                              Class<?> theClass)
         throws XMLStreamException {
         int n = in.getAttributeCount();

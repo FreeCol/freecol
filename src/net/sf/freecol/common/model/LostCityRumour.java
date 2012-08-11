@@ -325,8 +325,7 @@ public class LostCityRumour extends TileItem {
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
     @Override
-    protected void readFromXMLImpl(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         setId(in.getAttributeValue(null, ID_ATTRIBUTE));
 
         tile = getFreeColGameObject(in, "tile", Tile.class);
@@ -337,8 +336,6 @@ public class LostCityRumour extends TileItem {
         }
 
         name = getAttribute(in, "name", null);
-
-        in.nextTag();
     }
 
     /**

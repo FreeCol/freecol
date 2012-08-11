@@ -525,7 +525,6 @@ public class Game extends FreeColGameObject {
      * @return A vacant nation.
      */
     public Nation getVacantNation() {
-        //System.out.println("NationOptions: " + nationOptions);
         for (Entry<Nation, NationState> entry : nationOptions.getNations().entrySet()) {
             if (entry.getValue() == NationState.AVAILABLE) {
                 return entry.getKey();
@@ -1075,8 +1074,7 @@ public class Game extends FreeColGameObject {
      * @param in The input stream with the XML.
      */
     @Override
-    protected void readFromXMLImpl(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         setId(in.getAttributeValue(null, ID_ATTRIBUTE));
 
         String hs = in.getAttributeValue(null, "UUID");
@@ -1102,7 +1100,10 @@ public class Game extends FreeColGameObject {
         } else {
             currentPlayer = null;
         }
+    }
 
+    @Override
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
         citiesOfCibola = new ArrayList<String>(7);
         OptionGroup gameOptions = null;
         OptionGroup mapGeneratorOptions = null;
@@ -1165,7 +1166,7 @@ public class Game extends FreeColGameObject {
                 mapGeneratorOptions.readFromXML(in);
             } else if (Specification.getXMLElementTagName().equals(tagName)) {
                 Specification spec = new Specification();
-                spec.readFromXMLImpl(in);
+                spec.readFromXML(in);
                 if (specification == null) {
                     specification = spec;
                     specification.clean();
@@ -1237,7 +1238,7 @@ public class Game extends FreeColGameObject {
      * @throws XMLStreamException If there are problems reading the stream.
      */
     @Override
-    protected void readFromXMLPartialImpl(XMLStreamReader in)
+    public void readFromXMLPartialImpl(XMLStreamReader in)
         throws XMLStreamException {
         readFromXMLPartialByClass(in, getClass());
     }

@@ -215,7 +215,7 @@ public class ExportData extends FreeColObject {
      *
      * @param in The input stream with the XML.
      */
-    protected void readFromXMLImpl(XMLStreamReader in)
+    public void readFromXML(XMLStreamReader in)
         throws XMLStreamException {
         setId(in.getAttributeValue(null, ID_ATTRIBUTE));
         exported = Boolean.parseBoolean(in.getAttributeValue(null,

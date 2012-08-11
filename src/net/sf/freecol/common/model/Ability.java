@@ -242,7 +242,8 @@ public final class Ability extends Feature {
      */
     public Ability(XMLStreamReader in, Specification specification)
         throws XMLStreamException {
-        readFromXMLImpl(in, specification);
+        setSpecification(specification);
+        readFromXML(in);
     }
 
     /**
@@ -317,10 +318,9 @@ public final class Ability extends Feature {
      *     during parsing.
      */
     @Override
-    protected void readAttributes(XMLStreamReader in,
-                                  Specification specification)
+    protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
-        super.readAttributes(in, specification);
+        super.readAttributes(in);
 
         value = getAttribute(in, VALUE_TAG, true);
     }

@@ -252,7 +252,7 @@ public abstract class AIPlayer extends AIObject {
         }
         return ac;
     }
-        
+
     /**
      * Gets the AI unit corresponding to a given unit, if any.
      *
@@ -411,7 +411,7 @@ public abstract class AIPlayer extends AIObject {
 
         // Insist the attacker exists.
         if (attacker == null) return false;
-        
+
         Player attackerPlayer = attacker.getOwner();
 
         // Determine the defending player.
@@ -612,21 +612,18 @@ public abstract class AIPlayer extends AIObject {
      *             stream.
      */
     @Override
-    protected void readFromXMLImpl(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         final AIMain aiMain = getAIMain();
 
         String str = in.getAttributeValue(null, ID_ATTRIBUTE);
         ServerPlayer serverPlayer = aiMain.getGame().getFreeColGameObject(str,
             ServerPlayer.class);
         setPlayer(serverPlayer);
-        
+
         Random rnd = Utils.restoreRandomState(in.getAttributeValue(null,
                 "randomState"));
         aiRandom = (rnd != null) ? rnd
             : new Random(aiMain.getRandomSeed("Seed for " + getId()));
-
-        in.nextTag();
     }
 
     /**

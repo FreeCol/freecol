@@ -28,10 +28,16 @@ import net.sf.freecol.common.option.OptionGroup;
 
 
 /**
- * The base class for all types defined by the specification. It can
- * be instantiated in order to provide a source for modifiers and
+ * <p>The base class for all types defined by the specification. It
+ * can be instantiated in order to provide a source for modifiers and
  * abilities that are provided by the code rather than defined in the
  * specification, such as the "artillery in the open" penalty.
+ *
+ * <p>In general, a FreeColGameObjectType does not need a reference to
+ * the specification. However, if it has attributes or children that
+ * are themselves FreeColGameObjectTypes, then the specification must
+ * be set before the type is de-serialized, otherwise the IDs can not
+ * be resolved.
  */
 public class FreeColGameObjectType extends FreeColObject {
 

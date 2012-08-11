@@ -3681,9 +3681,8 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * @param in The input stream with the XML.
      */
-    protected void readFromXMLImpl(XMLStreamReader in)
-        throws XMLStreamException {
-        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
         name = in.getAttributeValue(null, "username");
         nationID = in.getAttributeValue(null, "nationID");
         if (!isUnknownEnemy()) {
@@ -3742,6 +3741,9 @@ public class Player extends FreeColGameObject implements Nameable {
         modelMessages.clear();
         lastSales = null;
         highSeas = null;
+    }
+
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(TENSION_TAG)) {
                 Player player = getGame().getFreeColGameObject(in.getAttributeValue(null, "player"),
@@ -3776,7 +3778,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 monarch = updateFreeColGameObject(in, Monarch.class);
             } else if (in.getLocalName().equals(HistoryEvent.getXMLElementTagName())) {
                 HistoryEvent event = new HistoryEvent();
-                event.readFromXMLImpl(in);
+                event.readFromXML(in);
                 getHistory().add(event);
             } else if (in.getLocalName().equals(TradeRoute.getXMLElementTagName())) {
                 TradeRoute route = updateFreeColGameObject(in, TradeRoute.class);
@@ -3786,11 +3788,11 @@ public class Player extends FreeColGameObject implements Nameable {
             } else if (in.getLocalName().equals(ModelMessage.getXMLElementTagName())) {
 
                 ModelMessage message = new ModelMessage();
-                message.readFromXMLImpl(in);
+                message.readFromXML(in);
                 addModelMessage(message);
             } else if (in.getLocalName().equals(LastSale.getXMLElementTagName())) {
                 LastSale lastSale = new LastSale();
-                lastSale.readFromXMLImpl(in);
+                lastSale.readFromXML(in);
                 saveSale(lastSale);
             } else if (Modifier.getXMLElementTagName().equals(in.getLocalName())) {
                 addModifier(new Modifier(in, getSpecification()));
@@ -3843,7 +3845,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @throws XMLStreamException If there are problems reading the stream.
      */
     @Override
-    protected void readFromXMLPartialImpl(XMLStreamReader in)
+    public void readFromXMLPartialImpl(XMLStreamReader in)
         throws XMLStreamException {
         readFromXMLPartialByClass(in, getClass());
     }

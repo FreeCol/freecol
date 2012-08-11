@@ -31,17 +31,17 @@ import javax.xml.stream.XMLStreamWriter;
 
 /**
  * This class contains the mutable tile data visible to a specific player.
- * 
+ *
  * Sometimes a tile contains information that should not be given to a
  * player. For instance; a settlement that was built after the player last
  * viewed the tile.
- * 
+ *
  * The <code>toXMLElement</code> of {@link Tile} uses information from
  * this class to hide information that is not available.
  */
 public class PlayerExploredTile extends FreeColGameObject {
 
-    private static final Logger logger = Logger.getLogger(PlayerExploredTile.class.getName()); 
+    private static final Logger logger = Logger.getLogger(PlayerExploredTile.class.getName());
 
     // The owner of this view.
     private Player player;
@@ -70,7 +70,7 @@ public class PlayerExploredTile extends FreeColGameObject {
 
     /**
      * Creates a new <code>PlayerExploredTile</code>.
-     * 
+     *
      * @param player The <code>Player</code> that owns this view.
      * @param tile The <code>Tile</code> to view.
      */
@@ -82,7 +82,7 @@ public class PlayerExploredTile extends FreeColGameObject {
 
     /**
      * Initialize this object from an XML-representation of this object.
-     * 
+     *
      * @param in The XML stream to read the data from.
      * @throws XMLStreamException if an error occurred during parsing.
      */
@@ -170,7 +170,7 @@ public class PlayerExploredTile extends FreeColGameObject {
         return wantedGoods;
     }
 
-    // Only needed for 0.9.x workaround in Tile.readFromXMLImpl.
+    // Only needed for 0.9.x workaround in Tile.readFromXML.
     public void setOwner(Player owner) {
         this.owner = owner;
     }
@@ -196,11 +196,11 @@ public class PlayerExploredTile extends FreeColGameObject {
     /**
      * This method writes an XML-representation of this object to the
      * given stream.
-     * 
+     *
      * Only attributes visible to the given <code>Player</code> will
      * be added to that representation if <code>showAll</code> is set
      * to <code>false</code>.
-     * 
+     *
      * @param out The target stream.
      * @param player The <code>Player</code> this XML-representation
      *            should be made for, or <code>null</code> if
@@ -265,16 +265,15 @@ public class PlayerExploredTile extends FreeColGameObject {
 
     /**
      * Initialize this object from an XML-representation of this object.
-     * 
+     *
      * @param in The input stream with the XML.
      * @throws XMLStreamException if an error occurred during parsing.
      */
-    public void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         Specification spec = getSpecification();
         Game game = getGame();
+        super.readAttributes(in);
 
-        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
-        
         player = getFreeColGameObject(in, "player", Player.class);
 
         tile = getFreeColGameObject(in, "tile", Tile.class);
@@ -299,49 +298,51 @@ public class PlayerExploredTile extends FreeColGameObject {
 
         tileItems.clear();
         missionary = null;
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if (in.getLocalName().equals(IndianSettlement.MISSIONARY_TAG_NAME)) {
-                in.nextTag(); // advance to the Unit tag
-                missionary = updateFreeColGameObject(in, Unit.class);
-                in.nextTag(); // close <missionary> tag
-            } else if (in.getLocalName().equals(Resource.getXMLElementTagName())) {
-                Resource resource = game.getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE),
-                                                              Resource.class);
-                if (resource != null) {
-                    resource.readFromXML(in);
-                } else {
-                    resource = new Resource(game, in);
-                }
-                tileItems.add(resource);
-            } else if (in.getLocalName().equals(LostCityRumour.getXMLElementTagName())) {
-                LostCityRumour lostCityRumour = game.getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE),
-                                                                          LostCityRumour.class);
-                if (lostCityRumour != null) {
-                    lostCityRumour.readFromXML(in);
-                } else {
-                    lostCityRumour = new LostCityRumour(game, in);
-                }
-                tileItems.add(lostCityRumour);
-            } else if (in.getLocalName().equals(TileImprovement.getXMLElementTagName())) {
-                TileImprovement ti = game.getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE),
-                                                               TileImprovement.class);
-                if (ti != null) {
-                    ti.readFromXML(in);
-                } else {
-                    ti = new TileImprovement(game, in);
-                }
-                tileItems.add(ti);
+    }
+
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+        Game game = getGame();
+        if (in.getLocalName().equals(IndianSettlement.MISSIONARY_TAG_NAME)) {
+            in.nextTag(); // advance to the Unit tag
+            missionary = updateFreeColGameObject(in, Unit.class);
+            in.nextTag(); // close <missionary> tag
+        } else if (in.getLocalName().equals(Resource.getXMLElementTagName())) {
+            Resource resource = game.getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE),
+                                                          Resource.class);
+            if (resource != null) {
+                resource.readFromXML(in);
             } else {
-                logger.warning("Unknown tag: " + in.getLocalName()
-                               + " loading PlayerExploredTile");
-                in.nextTag();
+                resource = new Resource(game, in);
             }
+            tileItems.add(resource);
+        } else if (in.getLocalName().equals(LostCityRumour.getXMLElementTagName())) {
+            LostCityRumour lostCityRumour = game.getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE),
+                                                                      LostCityRumour.class);
+            if (lostCityRumour != null) {
+                lostCityRumour.readFromXML(in);
+            } else {
+                lostCityRumour = new LostCityRumour(game, in);
+            }
+            tileItems.add(lostCityRumour);
+        } else if (in.getLocalName().equals(TileImprovement.getXMLElementTagName())) {
+            TileImprovement ti = game.getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE),
+                                                           TileImprovement.class);
+            if (ti != null) {
+                ti.readFromXML(in);
+            } else {
+                ti = new TileImprovement(game, in);
+            }
+            tileItems.add(ti);
+        } else {
+            logger.warning("Unknown tag: " + in.getLocalName()
+                           + " loading PlayerExploredTile");
+            in.nextTag();
         }
     }
 
     /**
      * Returns the tag name of the root element representing this object.
-     * 
+     *
      * @return "playerExploredTile".
      */
     public static String getXMLElementTagName() {

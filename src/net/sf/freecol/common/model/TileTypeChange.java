@@ -127,7 +127,7 @@ public class TileTypeChange {
      * @throws XMLStreamException if a problem was encountered
      *     during parsing.
      */
-    protected void readFromXML(XMLStreamReader in, Specification specification)
+    public void readFromXML(XMLStreamReader in, Specification specification)
         throws XMLStreamException {
         from = specification.getTileType(in.getAttributeValue(null, "from"));
         to = specification.getTileType(in.getAttributeValue(null, "to"));

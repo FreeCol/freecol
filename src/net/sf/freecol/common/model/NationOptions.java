@@ -182,34 +182,33 @@ public class NationOptions extends FreeColObject {
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    public final void readFromXMLImpl(XMLStreamReader in)
-        throws XMLStreamException {
-        //setId(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
 
         String advantages = getAttribute(in, "nationalAdvantages",
             "selectable").toUpperCase(Locale.US);
         nationalAdvantages = Enum.valueOf(Advantages.class, advantages);
+    }
 
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if (in.getLocalName().equals("Nations")) {
-                nations.clear();
-                while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                    if (in.getLocalName().equals("Nation")) {
-                        String nationId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-                        Nation nation = specification.getNation(nationId);
-                        NationState state = Enum.valueOf(NationState.class,
-                                                         in.getAttributeValue(null, "state"));
-                        nations.put(nation, state);
-                    }
-                    in.nextTag();
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+        if (in.getLocalName().equals("Nations")) {
+            nations.clear();
+            while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                if (in.getLocalName().equals("Nation")) {
+                    String nationId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
+                    Nation nation = specification.getNation(nationId);
+                    NationState state = Enum.valueOf(NationState.class,
+                                                     in.getAttributeValue(null, "state"));
+                    nations.put(nation, state);
                 }
+                in.nextTag();
             }
         }
     }
-    
+
     // debugging only
     public String toString() {
-        StringBuilder result = new StringBuilder(); 
+        StringBuilder result = new StringBuilder();
         result.append("nationalAdvantages: " + nationalAdvantages.toString() + "\n");
         result.append("Nations:\n");
         for (Map.Entry<Nation, NationState> entry : nations.entrySet()) {

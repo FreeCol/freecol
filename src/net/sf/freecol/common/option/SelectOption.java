@@ -148,7 +148,7 @@ public class SelectOption extends IntegerOption {
 
     /**
      * Gets the tag name of the item element This method is not static
-     * to ensure proper overriding in <code>readFromXMLImpl</code>.
+     * to ensure proper overriding in <code>readFromXML</code>.
      *
      * @return "selectValue".
      */

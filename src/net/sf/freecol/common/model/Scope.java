@@ -83,7 +83,7 @@ public class Scope extends FreeColObject implements Cloneable {
      * @exception XMLStreamException if an error occurs
      */
     public Scope(XMLStreamReader in) throws XMLStreamException {
-        readFromXMLImpl(in);
+        readFromXML(in);
     }
 
     /**

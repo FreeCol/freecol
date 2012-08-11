@@ -164,7 +164,7 @@ public class HighScore extends FreeColObject {
     }
 
     public HighScore(XMLStreamReader in) throws XMLStreamException {
-        readFromXMLImpl(in);
+        readFromXML(in);
     }
 
     public HighScore(Element element) throws XMLStreamException {
@@ -464,7 +464,7 @@ public class HighScore extends FreeColObject {
      *
      * @param in The input stream with the XML.
      */
-    protected void readFromXMLImpl(XMLStreamReader in)
+    public void readFromXML(XMLStreamReader in)
         throws XMLStreamException {
 
         try {

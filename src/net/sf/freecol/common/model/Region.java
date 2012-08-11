@@ -138,14 +138,14 @@ public class Region extends FreeColGameObject implements Nameable {
 
     /**
      * Initiates a new <code>Region</code> from an XML representation.
-     * 
+     *
      * @param game The <code>Game</code> this object belongs to.
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if an error occurred during parsing.
      */
     public Region(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
-        readFromXMLImpl(in);
+        readFromXML(in);
     }
 
     /**
@@ -453,14 +453,14 @@ public class Region extends FreeColGameObject implements Nameable {
     /**
      * This method writes an XML-representation of this object to the given
      * stream.
-     * 
+     *
      * <br>
      * <br>
-     * 
+     *
      * Only attributes visible to the given <code>Player</code> will be added
      * to that representation if <code>showAll</code> is set to
      * <code>false</code>.
-     * 
+     *
      * @param out The target stream.
      * @param player The <code>Player</code> this XML-representation should be
      *            made for, or <code>null</code> if
@@ -513,16 +513,15 @@ public class Region extends FreeColGameObject implements Nameable {
         }
         out.writeEndElement();
     }
-    
+
     /**
      * Initialize this object from an XML-representation of this object.
      * @param in The input stream with the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    protected void readFromXMLImpl(XMLStreamReader in)
-        throws XMLStreamException {
-        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
+    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
         nameKey = in.getAttributeValue(null, "nameKey");
         name = in.getAttributeValue(null, "name");
         claimable = getAttribute(in, "claimable", false);
@@ -536,9 +535,11 @@ public class Region extends FreeColGameObject implements Nameable {
         }
 
         discoveredBy = getFreeColGameObject(in, "discoveredBy", Player.class);
-
         parent = getFreeColGameObject(in, "parent", Region.class);
 
+    }
+
+    public void readChildren(XMLStreamReader in) throws XMLStreamException {
         children = new ArrayList<Region>();
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals("children")) {
@@ -555,7 +556,7 @@ public class Region extends FreeColGameObject implements Nameable {
         if (children.isEmpty()) {
             children = null;
         }
-    }            
+    }
 
     /**
      * {@inheritDoc}

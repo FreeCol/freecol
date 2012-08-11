@@ -403,11 +403,11 @@ public class MarketData extends FreeColGameObject {
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
-     * 
-     * Only attributes visible to the given <code>Player</code> will 
+     *
+     * Only attributes visible to the given <code>Player</code> will
      * be added to that representation if <code>showAll</code> is
      * set to <code>false</code>.
-     *  
+     *
      * @param out The target stream.
      * @param player The <code>Player</code> this XML-representation
      *      should be made for, or <code>null</code> if
@@ -445,8 +445,7 @@ public class MarketData extends FreeColGameObject {
      *
      * @param in The input stream with the XML.
      */
-    protected void readFromXMLImpl(XMLStreamReader in)
-        throws XMLStreamException {
+    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
         String goodsTypeStr = in.getAttributeValue(null, "goods-type");
         if (goodsTypeStr == null) { // @compat 0.9.x
             goodsTypeStr = in.getAttributeValue(null, ID_ATTRIBUTE);
@@ -469,7 +468,6 @@ public class MarketData extends FreeColGameObject {
         costToBuy = -1; // Disable price change clamping
         price();
         oldPrice = costToBuy;
-        in.nextTag();
     }
 
     /**
@@ -480,4 +478,4 @@ public class MarketData extends FreeColGameObject {
     public static String getXMLElementTagName() {
         return "marketData";
     }
-} 
+}

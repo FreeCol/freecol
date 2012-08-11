@@ -482,6 +482,7 @@ public abstract class FreeColObject {
      * @param specification a <code>Specification</code> value
      */
     public void readFromXMLElement(Element element, Specification specification) {
+        setSpecification(specification);
         XMLInputFactory xif = XMLInputFactory.newInstance();
         try {
             try {
@@ -492,7 +493,7 @@ public abstract class FreeColObject {
                 String xml = stringWriter.toString();
                 XMLStreamReader xsr = xif.createXMLStreamReader(new StringReader(xml));
                 xsr.nextTag();
-                readFromXMLImpl(xsr, specification);
+                readFromXML(xsr);
             } catch (TransformerException e) {
                 logger.log(Level.WARNING, "TransformerException", e);
                 throw new IllegalStateException("TransformerException");
@@ -515,7 +516,8 @@ public abstract class FreeColObject {
      */
     public void readFromXML(XMLStreamReader in) throws XMLStreamException {
         if (in.getAttributeValue(null, PARTIAL_ATTRIBUTE) == null) {
-            readFromXMLImpl(in);
+            readAttributes(in);
+            readChildren(in);
         } else {
             readFromXMLPartialImpl(in);
         }
@@ -751,34 +753,6 @@ public abstract class FreeColObject {
     }
 
     /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The XML input stream.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
-     */
-    protected void readFromXMLImpl(XMLStreamReader in)
-        throws XMLStreamException {
-        readAttributes(in);
-        readChildren(in);
-    }
-
-    /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The XML input stream.
-     * @param specification A <code>Specification</code> to use.
-     * @throws XMLStreamException if a problem was encountered
-     *     during parsing.
-     */
-    protected void readFromXMLImpl(XMLStreamReader in,
-                                   Specification specification)
-        throws XMLStreamException {
-        readAttributes(in, specification);
-        readChildren(in, specification);
-    }
-
-    /**
      * Reads the attributes of this object from an XML stream.
      *
      * @param in The XML input stream.
@@ -786,20 +760,6 @@ public abstract class FreeColObject {
      *     during parsing.
      */
     protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
-        readAttributes(in, null);
-    }
-
-    /**
-     * Reads the attributes of this object from an XML stream.
-     *
-     * @param in The XML input stream.
-     * @param specification A <code>Specification</code> to use.
-     * @throws XMLStreamException if a problem was encountered
-     *     during parsing.
-     */
-    protected void readAttributes(XMLStreamReader in,
-                                  Specification specification)
         throws XMLStreamException {
         String newId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
         // @compat 0.9.x
@@ -819,46 +779,18 @@ public abstract class FreeColObject {
      *     during parsing.
      */
     protected void readChildren(XMLStreamReader in) throws XMLStreamException {
-        readChildren(in, null);
-    }
-
-    /**
-     * Reads the children of this object from an XML stream.
-     *
-     * @param in The XML input stream.
-     * @param specification A <code>Specification</code> to use.
-     * @throws XMLStreamException if a problem was encountered
-     *     during parsing.
-     */
-    protected void readChildren(XMLStreamReader in,
-                                Specification specification)
-        throws XMLStreamException {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            readChild(in, specification);
+            readChild(in);
         }
     }
 
     /**
-     * Reads a single child object. This method does calls readChild
-     * with a null specification parameter.
+     * Reads a single child object.
      *
      * @param in The XML input stream.
      * @exception XMLStreamException if an error occurs
      */
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        readChild(in, null);
-    }
-
-    /**
-     * Reads a single child object. This method does nothing. Override
-     * it if necessary.
-     *
-     * @param in The XML input stream.
-     * @param specification a <code>Specification</code> value
-     * @exception XMLStreamException if an error occurs
-     */
-    protected void readChild(XMLStreamReader in, Specification specification)
-        throws XMLStreamException {
         // do nothing
     }
 
@@ -872,7 +804,7 @@ public abstract class FreeColObject {
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    protected void readFromXMLPartialImpl(XMLStreamReader in)
+    public void readFromXMLPartialImpl(XMLStreamReader in)
         throws XMLStreamException {
         throw new UnsupportedOperationException("Partial update of unsupported type");
     }

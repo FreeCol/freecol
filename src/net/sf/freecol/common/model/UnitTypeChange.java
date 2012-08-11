@@ -95,8 +95,8 @@ public class UnitTypeChange extends FreeColObject {
     public UnitTypeChange(XMLStreamReader in, Specification specification)
         throws XMLStreamException {
         setId(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
-        readAttributes(in, specification);
-        readChildren(in, specification);
+        setSpecification(specification);
+        readFromXML(in);
     }
 
     /**
@@ -217,19 +217,16 @@ public class UnitTypeChange extends FreeColObject {
      * Initialize this object from an XML-representation of this object.
      *
      * @param in The XML input stream.
-     * @param specification A <code>Specification</code> to use.
      * @throws XMLStreamException if a problem was encountered
      *     during parsing.
      */
-    @Override
-    protected void readAttributes(XMLStreamReader in,
-                                  Specification specification)
+    protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
         String newTypeId = in.getAttributeValue(null, "unit");
         if (newTypeId == null) {
             newUnitType = null;
         } else {
-            newUnitType = specification.getType(newTypeId, UnitType.class);
+            newUnitType = getSpecification().getType(newTypeId, UnitType.class);
             turnsToLearn = getAttribute(in, "turnsToLearn", UNDEFINED);
             if (turnsToLearn > 0) {
                 changeTypes.put(ChangeType.EDUCATION, 100);
@@ -261,8 +258,7 @@ public class UnitTypeChange extends FreeColObject {
      *     during parsing.
      */
     @Override
-    protected void readChildren(XMLStreamReader in, Specification specification)
-        throws XMLStreamException {
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String nodeName = in.getLocalName();
             if ("scope".equals(nodeName)) {

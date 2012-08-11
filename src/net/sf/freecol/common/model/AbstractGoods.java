@@ -153,7 +153,7 @@ public class AbstractGoods extends FreeColObject {
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    protected void readFromXMLImpl(XMLStreamReader in)
+    public void readFromXML(XMLStreamReader in)
         throws XMLStreamException {
         type = getSpecification().getGoodsType(in.getAttributeValue(null,
                 "type"));

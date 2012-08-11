@@ -327,10 +327,10 @@ public final class Limit extends FreeColGameObjectType {
         String childName = in.getLocalName();
         if ("leftHandSide".equals(childName)) {
             leftHandSide = new Operand();
-            leftHandSide.readFromXMLImpl(in);
+            leftHandSide.readFromXML(in);
         } else if ("rightHandSide".equals(childName)) {
             rightHandSide = new Operand();
-            rightHandSide.readFromXMLImpl(in);
+            rightHandSide.readFromXML(in);
         } else {
             logger.warning("Unsupported child element: " + childName);
         }

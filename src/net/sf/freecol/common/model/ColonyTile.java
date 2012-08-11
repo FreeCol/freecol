@@ -547,13 +547,9 @@ public class ColonyTile extends WorkLocation implements Ownable {
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    protected void readFromXMLImpl(XMLStreamReader in)
-        throws XMLStreamException {
+    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
-
         workTile = getFreeColGameObject(in, "workTile", Tile.class);
-
-        super.readChildren(in);
     }
 
     /**
@@ -576,7 +572,7 @@ public class ColonyTile extends WorkLocation implements Ownable {
      * @throws XMLStreamException If there are problems reading the stream.
      */
     @Override
-    protected void readFromXMLPartialImpl(XMLStreamReader in)
+    public void readFromXMLPartialImpl(XMLStreamReader in)
         throws XMLStreamException {
         readFromXMLPartialByClass(in, getClass());
     }

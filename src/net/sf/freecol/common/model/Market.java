@@ -526,25 +526,24 @@ public final class Market extends FreeColGameObject implements Ownable {
      * TODO: Get rid of the price() when the server sends all
      * price changes.
      */
-    protected void readFromXMLImpl(XMLStreamReader in)
-        throws XMLStreamException {
-        Game game = getGame();
-
-        setId(in.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE));
-
+    @Override
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
         owner = getFreeColGameObject(in, "owner", Player.class);
+    }
 
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if (in.getLocalName().equals(MarketData.getXMLElementTagName())) {
-                String id = in.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE);
-                MarketData data = game.getFreeColGameObject(id, MarketData.class);
-                if (data == null) {
-                    data = new MarketData(game, in);
-                } else {
-                    data.readFromXML(in);
-                }
-                putMarketData(data.getGoodsType(), data);
+    @Override
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+        if (in.getLocalName().equals(MarketData.getXMLElementTagName())) {
+            String id = in.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE);
+            Game game = getGame();
+            MarketData data = game.getFreeColGameObject(id, MarketData.class);
+            if (data == null) {
+                data = new MarketData(game, in);
+            } else {
+                data.readFromXML(in);
             }
+            putMarketData(data.getGoodsType(), data);
         }
     }
 

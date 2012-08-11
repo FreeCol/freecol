@@ -2867,12 +2867,9 @@ public class Colony extends Settlement implements Nameable {
      *
      * @param in The input stream with the XML.
      */
-    @Override
-    protected void readFromXMLImpl(XMLStreamReader in)
-        throws XMLStreamException {
+    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
 
-        int oldUnitCount = getUnitCount();
         owner.addSettlement(this);
         established = new Turn(getAttribute(in, "established", 0));
         sonsOfLiberty = getAttribute(in, "sonsOfLiberty", 0);
@@ -2886,7 +2883,10 @@ public class Colony extends Settlement implements Nameable {
         if (!landLocked) addAbility(HAS_PORT);
         unitCount = getAttribute(in, "unitCount", -1);
         stockadeKey = in.getAttributeValue(null, "stockadeKey");
+    }
 
+    public void readChildren(XMLStreamReader in) throws XMLStreamException {
+        int oldUnitCount = getUnitCount();
         // Clear containers
         colonyTiles.clear();
         buildingMap.clear();
@@ -2977,7 +2977,7 @@ public class Colony extends Settlement implements Nameable {
      * @throws XMLStreamException If there are problems reading the stream.
      */
     @Override
-    protected void readFromXMLPartialImpl(XMLStreamReader in)
+    public void readFromXMLPartialImpl(XMLStreamReader in)
         throws XMLStreamException {
         readFromXMLPartialByClass(in, getClass());
     }

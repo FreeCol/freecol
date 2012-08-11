@@ -332,7 +332,7 @@ public class DiplomaticTrade extends FreeColObject {
      * @param in The input stream with the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
-    protected void readFromXMLImpl(XMLStreamReader in)
+    public void readFromXML(XMLStreamReader in)
         throws XMLStreamException {
         String senderString = in.getAttributeValue(null, "sender");
         sender = game.getFreeColGameObject(senderString, Player.class);

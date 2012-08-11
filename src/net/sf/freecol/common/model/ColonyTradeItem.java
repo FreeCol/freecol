@@ -66,7 +66,7 @@ public class ColonyTradeItem extends TradeItem {
      */
     public ColonyTradeItem(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
-        readFromXMLImpl(in);
+        readFromXML(in);
     }
 
     /**
@@ -157,9 +157,9 @@ public class ColonyTradeItem extends TradeItem {
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    protected void readFromXMLImpl(XMLStreamReader in)
+    public void readFromXML(XMLStreamReader in)
         throws XMLStreamException {
-        super.readFromXMLImpl(in);
+        super.readFromXML(in);
 
         colonyName = in.getAttributeValue(null, "colonyName");
 

@@ -170,9 +170,9 @@ public class TradeRouteStop {
      * @param in The input stream with the XML.
      * @throws XMLStreamException is thrown if something goes wrong.
      */
-    protected void readFromXMLImpl(XMLStreamReader in)
+    public void readFromXML(XMLStreamReader in)
         throws XMLStreamException {
-        readFromXMLImpl(in, null);
+        readFromXML(in, null);
     }
 
     /**
@@ -181,7 +181,7 @@ public class TradeRouteStop {
      * @param in The input stream with the XML.
      * @throws XMLStreamException is thrown if something goes wrong.
      */
-    protected void readFromXMLImpl(XMLStreamReader in, Game game)
+    public void readFromXML(XMLStreamReader in, Game game)
         throws XMLStreamException {
         if (game != null) {
             String str = in.getAttributeValue(null, "location");

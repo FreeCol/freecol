@@ -219,7 +219,7 @@ public final class Specification {
         try {
             XMLStreamReader xsr = XMLInputFactory.newInstance().createXMLStreamReader(in);
             xsr.nextTag();
-            readFromXMLImpl(xsr);
+            readFromXML(xsr);
         } catch (Exception e) {
             logger.log(Level.WARNING, "Load exception", e);
             throw new RuntimeException("Error parsing specification: "
@@ -1296,7 +1296,7 @@ public final class Specification {
         out.writeEndElement();
     }
 
-    public void readFromXMLImpl(XMLStreamReader xsr) throws XMLStreamException {
+    public void readFromXML(XMLStreamReader xsr) throws XMLStreamException {
         String newId = xsr.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG);
         if (difficultyLevel == null) {
             difficultyLevel = xsr.getAttributeValue(null, "difficultyLevel");

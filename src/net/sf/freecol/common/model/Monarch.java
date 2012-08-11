@@ -624,10 +624,9 @@ public final class Monarch extends FreeColGameObject implements Named {
      *
      * @param in The input stream with the XML.
      */
-    protected void readFromXMLImpl(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         Game game = getGame();
-        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
+        super.readAttributes(in);
 
         player = game.getFreeColGameObject(in.getAttributeValue(null, "player"),
                                            Player.class);
@@ -640,6 +639,9 @@ public final class Monarch extends FreeColGameObject implements Named {
         supportSea = getAttribute(in, "supportSea", false);
 
         displeasure = getAttribute(in, "displeasure", false);
+    }
+
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String childName = in.getLocalName();
@@ -700,7 +702,7 @@ public final class Monarch extends FreeColGameObject implements Named {
      * @throws XMLStreamException If there are problems reading the stream.
      */
     @Override
-    protected void readFromXMLPartialImpl(XMLStreamReader in)
+    public void readFromXMLPartialImpl(XMLStreamReader in)
         throws XMLStreamException {
         readFromXMLPartialByClass(in, getClass());
     }

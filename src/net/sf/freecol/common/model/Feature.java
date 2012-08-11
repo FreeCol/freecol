@@ -408,30 +408,28 @@ public abstract class Feature extends FreeColObject {
      * Reads the attributes of this object from an XML stream.
      *
      * @param in The XML input stream.
-     * @param specification A <code>Specification</code> to use.
      * @throws XMLStreamException if a problem was encountered
      *     during parsing.
      */
     @Override
-    protected void readAttributes(XMLStreamReader in,
-                                  Specification specification)
+    protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
         // @compat 0.9.x
         if (in.getAttributeValue(null, ID_ATTRIBUTE_TAG) == null
             && "model.colony.colonyGoodsParty".equals(in.getAttributeValue(null, "source"))) {
             setId("model.modifier.colonyGoodsParty");
-            setSource(specification.getType("model.source.colonyGoodsParty"));
+            setSource(getSpecification().getType("model.source.colonyGoodsParty"));
         // end compatibility code
         } else {
-            super.readAttributes(in, specification);
+            super.readAttributes(in);
             String sourceId = in.getAttributeValue(null, "source");
             if (sourceId == null) {
                 setSource(null);
             } else if (sourceId.equals("model.monarch.colonyGoodsParty")) { // @compat 0.9.x
-                setSource(specification.getType("model.source.colonyGoodsParty"));
+                setSource(getSpecification().getType("model.source.colonyGoodsParty"));
             // end compatibility code
-            } else if (specification != null) {
-                setSource(specification.getType(sourceId));
+            } else if (getSpecification() != null) {
+                setSource(getSpecification().getType(sourceId));
             }
         }
 
@@ -453,13 +451,11 @@ public abstract class Feature extends FreeColObject {
      * Reads the children of this object from an XML stream.
      *
      * @param in The XML input stream.
-     * @param specification A <code>Specification</code> to use.
      * @throws XMLStreamException if a problem was encountered
      *     during parsing.
      */
     @Override
-    protected void readChildren(XMLStreamReader in,
-                                Specification specification)
+    protected void readChildren(XMLStreamReader in)
         throws XMLStreamException {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String childName = in.getLocalName();

@@ -187,7 +187,7 @@ public class ListOption<T> extends AbstractOption<List<AbstractOption<T>>> {
      *      during parsing.
      */
     @SuppressWarnings("unchecked")
-    protected void readFromXMLImpl(XMLStreamReader in)
+    public void readFromXML(XMLStreamReader in)
         throws XMLStreamException {
         setId(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
         maximumNumber = getAttribute(in, "maximumNumber", 1);

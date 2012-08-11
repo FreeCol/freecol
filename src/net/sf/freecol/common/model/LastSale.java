@@ -133,7 +133,7 @@ public final class LastSale extends FreeColObject {
      * @param in The input stream with the XML.
      * @throws XMLStreamException if there are any problems with the stream.
      */
-    public void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+    public void readFromXML(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
         when = new Turn(getAttribute(in, "when", 0));
         price = getAttribute(in, "price", 0);
