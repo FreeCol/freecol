@@ -332,19 +332,8 @@ public class FreeColDialog<T> extends FreeColPanel {
      */
     public static FreeColDialog<File> createLoadDialog(FreeColClient freeColClient, GUI gui, File directory,
                                                        FileFilter[] fileFilters) {
-        final FreeColDialog<File> loadDialog
-            = new FreeColDialog<File>(freeColClient, gui);
+        final FreeColDialog<File> loadDialog = new FreeColDialog<File>(freeColClient, gui);
         final JFileChooser fileChooser = new JFileChooser(directory);
-
-        loadDialog.okButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent event) {
-                    File selectedFile = fileChooser.getSelectedFile();
-                    if (selectedFile != null) {
-                        loadDialog.setResponse(selectedFile);
-                    }
-                }
-            });
-
         if (fileFilters.length > 0) {
             for (FileFilter fileFilter : fileFilters) {
                 fileChooser.addChoosableFileFilter(fileFilter);
@@ -355,16 +344,9 @@ public class FreeColDialog<T> extends FreeColPanel {
         fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         fileChooser.setFileHidingEnabled(false);
-        fileChooser.setControlButtonsAreShown(false);
-        loadDialog.setLayout(new MigLayout("fill", "", ""));
-        loadDialog.add(fileChooser, "grow");
-        loadDialog.add(loadDialog.okButton, "newline 20, split 2, tag ok");
-        loadDialog.add(loadDialog.cancelButton, "tag cancel");
-        loadDialog.cancelButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent event) {
-                    loadDialog.setResponse(null);
-                }
-            });
+        fileChooser.addActionListener(loadDialog);
+        loadDialog.setLayout(new BorderLayout());
+        loadDialog.add(fileChooser);
         loadDialog.setSize(480, 320);
 
         return loadDialog;
@@ -441,11 +423,12 @@ public class FreeColDialog<T> extends FreeColPanel {
      */
     public static FreeColDialog<File> createSaveDialog(FreeColClient freeColClient, GUI gui, File directory,
         final String standardName, FileFilter[] fileFilters, String defaultName) {
-        final FreeColDialog<File> saveDialog
-            = new FreeColDialog<File>(freeColClient, gui);
+
+        final FreeColDialog<File> saveDialog = new FreeColDialog<File>(freeColClient, gui);
         final JFileChooser fileChooser = new JFileChooser(directory);
         final File defaultFile = new File(defaultName);
 
+        fileChooser.putClientProperty("standardName", standardName);
         fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
         if (fileFilters.length > 0) {
             for (int i=0; i<fileFilters.length; i++) {
@@ -455,23 +438,9 @@ public class FreeColDialog<T> extends FreeColPanel {
             fileChooser.setAcceptAllFileFilterUsed(false);
         }
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        fileChooser.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                String actionCommand = event.getActionCommand();
-                if (actionCommand.equals(JFileChooser.APPROVE_SELECTION)) {
-                    File file = fileChooser.getSelectedFile();
-                    if (standardName != null && !file.getName().endsWith(standardName)) {
-                        file = new File(file.getAbsolutePath() + standardName);
-                    }
-                    saveDialog.setResponse(file);
-                }
-                else if (actionCommand.equals(JFileChooser.CANCEL_SELECTION)) {
-                    saveDialog.setResponse(null);
-                }
-            }
-        });
         fileChooser.setFileHidingEnabled(false);
         fileChooser.setSelectedFile(defaultFile);
+        fileChooser.addActionListener(saveDialog);
         saveDialog.setLayout(new BorderLayout());
         saveDialog.add(fileChooser);
         saveDialog.setSize(480, 320);
@@ -543,7 +512,24 @@ public class FreeColDialog<T> extends FreeColPanel {
     @Override
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
+        //TODO Java7 has switch words operates on string values
         if (CANCEL.equals(command)) {
+            setResponse(null);
+        } else if (JFileChooser.APPROVE_SELECTION.equals(command)) {
+            JFileChooser fileChooser = (JFileChooser) event.getSource();
+            File file = fileChooser.getSelectedFile();
+            if (fileChooser.getDialogType() == JFileChooser.SAVE_DIALOG) {
+                String standardName = (String) fileChooser.getClientProperty("standardName");
+                if (standardName != null && !file.getName().endsWith(standardName)) {
+                    file = new File(file.getAbsolutePath() + standardName);
+                }
+            }
+            @SuppressWarnings("unchecked")
+            T selectedFile = (T) file;
+            if (selectedFile != null) {
+                setResponse(selectedFile);
+            }
+        } else if (JFileChooser.CANCEL_SELECTION.equals(command)) {
             setResponse(null);
         } else {
             super.actionPerformed(event);

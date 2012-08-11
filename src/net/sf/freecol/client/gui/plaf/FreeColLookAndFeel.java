@@ -101,10 +101,11 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
 
         try {
             int offset = "FreeCol".length();
-            for (Class uiClass : new Class[] {
+            for (Class<?> uiClass : new Class[] {
                     FreeColButtonUI.class,
                     FreeColCheckBoxUI.class,
                     FreeColComboBoxUI.class,
+                    FreeColFileChooserUI.class,
                     FreeColLabelUI.class,
                     FreeColListUI.class,
                     FreeColMenuBarUI.class,
