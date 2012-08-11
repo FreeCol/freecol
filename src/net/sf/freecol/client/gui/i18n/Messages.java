@@ -32,6 +32,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.swing.UIManager;
+
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.Mods;
@@ -539,11 +541,11 @@ public class Messages {
     }
 
 
-    public static String getName(Option object) {
+    public static String getName(Option<?> object) {
         return message(object.getId() + ".name");
     }
 
-    public static String getDescription(Option object) {
+    public static String getDescription(Option<?> object) {
         for (String suffix : DESCRIPTION_KEYS) {
             String key = object.getId() + suffix;
             if (containsKey(key)) {
@@ -553,7 +555,7 @@ public class Messages {
         return object.getId();
     }
 
-    public static String getShortDescription(Option object) {
+    public static String getShortDescription(Option<?> object) {
         return message(object.getId() + ".shortDescription");
     }
 
@@ -817,6 +819,9 @@ public class Messages {
                     String value = line.substring(index + 1).trim()
                         .replace("\\n", "\n").replace("\\t", "\t");
                     messageBundle.put(key, value);
+                    if (key.startsWith("FileChooser.")) {
+                        UIManager.put(key, value);
+                    }
                 }
             }
         } catch (Exception e) {
