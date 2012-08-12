@@ -35,6 +35,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
+import net.sf.freecol.common.model.pathfinding.GoalDeciders;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIUnit;
@@ -106,8 +107,10 @@ public class CashInTreasureTrainMission extends Mission {
         if (path == null) return null;
         final Location loc = path.getLastNode().getLocation();
         Colony colony = loc.getColony();
-        return (invalidColonyReason(aiUnit, colony) == null) ? colony
-            : (loc instanceof Europe) ? loc
+        return (loc instanceof Europe
+            && invalidReason(aiUnit, loc) == null) ? loc
+            : (colony != null
+                && invalidReason(aiUnit, colony) == null) ? colony
             : null;
     }
 
@@ -120,11 +123,13 @@ public class CashInTreasureTrainMission extends Mission {
      * @return A score for the proposed mission.
      */
     public static int scorePath(AIUnit aiUnit, PathNode path) {
-        final Location loc = extractTarget(aiUnit, path);
-        return (loc instanceof Colony || loc instanceof Europe)
-            ? (aiUnit.getUnit().getTreasureAmount()
-                / (path.getTotalTurns() + 1))
-            : Integer.MIN_VALUE;
+        Location loc;
+        if (path == null
+            || (loc = extractTarget(aiUnit, path)) == null
+            || !(invalidFullColonyReason(aiUnit, loc.getColony()) == null
+                || loc instanceof Europe))
+            return Integer.MIN_VALUE;
+        return aiUnit.getUnit().getTreasureAmount() / (path.getTotalTurns()+1);
     }
 
     /**
@@ -137,40 +142,31 @@ public class CashInTreasureTrainMission extends Mission {
      */
     private static GoalDecider getGoalDecider(final AIUnit aiUnit,
                                               final boolean deferOK) {
-        final Player owner = aiUnit.getUnit().getOwner();
-
-        return new GoalDecider() {
-            private PathNode best = null;
+        GoalDecider gd = new GoalDecider() {
+            private PathNode bestPath = null;
             private int bestValue = 0;
-            private PathNode backup = null;
-            private int backupValue = 0;
 
-            public PathNode getGoal() {
-                return (best != null) ? best : backup;
-            }
+            public PathNode getGoal() { return bestPath; }
             public boolean hasSubGoals() { return true; }
             public boolean check(Unit u, PathNode path) {
-                int value;
-                Colony colony;
-                if (deferOK
-                    && (colony = path.getLocation().getColony()) != null
-                    && invalidTargetReason(colony, owner) == null) {
-                    value = 100 - path.getTotalTurns()
-                        + ((colony.isConnectedPort()) ? 50 : 0);
-                    if (value > backupValue) {
-                        backupValue = value;
-                        backup = path;
+                Location loc = extractTarget(aiUnit, path);
+                if ((loc instanceof Colony
+                        && invalidFullColonyReason(aiUnit, (Colony)loc)
+                        == null)
+                    || loc instanceof Europe) {
+                    int value = scorePath(aiUnit, path);
+                    if (bestValue < value) {
+                        bestValue = value;
+                        bestPath = path;
+                        return true;
                     }
-                }
-                value = scorePath(aiUnit, path);
-                if (value > bestValue) {
-                    bestValue = value;
-                    best = path;
-                    return true;
                 }
                 return false;
             }
         };
+        return (deferOK) ? GoalDeciders.getComposedGoalDecider(gd,
+            GoalDeciders.getOurClosestSettlementGoalDecider())
+            : gd;
     }
 
     /**
@@ -234,7 +230,6 @@ public class CashInTreasureTrainMission extends Mission {
      */
     public static Location findTarget(AIUnit aiUnit, boolean deferOK) {
         final Player player = aiUnit.getUnit().getOwner();
-        final Europe europe = player.getEurope();
         PathNode path = findTargetPath(aiUnit, deferOK);
         return (path != null) ? extractTarget(aiUnit, path)
             : null;
@@ -296,19 +291,34 @@ public class CashInTreasureTrainMission extends Mission {
     }
 
     /**
-     * Why is this mission invalid with a given colony target?
+     * Why is this mission invalid with a given colony target, given that
+     * intermediate colonies are excluded.
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param colony The potential target <code>Colony</code>.
+     * @return A reason for mission invalidity, or null if none found.
+     */
+    private static String invalidFullColonyReason(AIUnit aiUnit,
+                                                  Colony colony) {
+        String reason = invalidTargetReason(colony, 
+            aiUnit.getUnit().getOwner());
+        return (reason != null)
+            ? reason
+            : (!aiUnit.getUnit().canCashInTreasureTrain(colony.getTile()))
+            ? "cashin-impossible-at-location"
+            : null;
+    }
+
+    /**
+     * Why is this mission invalid with a given colony target, given that
+     * intermediate colonies are included.
      *
      * @param aiUnit The <code>AIUnit</code> to check.
      * @param colony The potential target <code>Colony</code>.
      * @return A reason for mission invalidity, or null if none found.
      */
     private static String invalidColonyReason(AIUnit aiUnit, Colony colony) {
-        String reason = invalidTargetReason(colony, aiUnit.getUnit().getOwner());
-        return (reason != null)
-            ? reason
-            : (!aiUnit.getUnit().canCashInTreasureTrain(colony.getTile()))
-            ? "cashin-impossible-at-location"
-            : null;
+        return invalidTargetReason(colony, aiUnit.getUnit().getOwner());
     }
 
     /**
@@ -404,8 +414,10 @@ public class CashInTreasureTrainMission extends Mission {
                     + " retargeting Europe: " + this);
             }
         } else {
-            logger.finest(tag + " waiting to cash in at "
-                + unit.getLocation() + ": " + this);
+            Location newTarget = findTarget(aiUnit, false);
+            logger.finest(tag + " arrived at " + target.getColony().getName()
+                + ", retargeting " + newTarget + ": " + this);
+            target = newTarget;
         }
     }
 
