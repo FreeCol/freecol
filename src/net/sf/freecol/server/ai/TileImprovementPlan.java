@@ -48,13 +48,13 @@ public class TileImprovementPlan extends ValuedAIObject {
      * The type of improvement, from TileImprovementTypes.
      */
     private TileImprovementType type;
-    
+
     /**
      * The pioneer which should make the improvement (if a
      * <code>Unit</code> has been assigned).
      */
     private AIUnit pioneer = null;
-    
+
     /**
      * The <code>Tile</code> to be improved.
      */
@@ -86,13 +86,13 @@ public class TileImprovementPlan extends ValuedAIObject {
      * @param target The target <code>Tile</code> for the improvement.
      * @param type The type of improvement.
      * @param value The value identifying the importance of
-     *        this <code>TileImprovementPlan</code> - a higher value 
+     *        this <code>TileImprovementPlan</code> - a higher value
      *        signals a higher importance.
      */
     public TileImprovementPlan(AIMain aiMain, Tile target,
                                TileImprovementType type, int value) {
         super(aiMain, getXMLElementTagName() + ":" + aiMain.getNextId());
-        
+
         this.target = target;
         this.type = type;
         setValue(value);
@@ -104,7 +104,7 @@ public class TileImprovementPlan extends ValuedAIObject {
      * XML-representation.
      *
      * @param aiMain The main AI-object.
-     * @param element The root element for the XML-representation 
+     * @param element The root element for the XML-representation
      *       of a <code>Wish</code>.
      */
     public TileImprovementPlan(AIMain aiMain, Element element) {
@@ -112,7 +112,7 @@ public class TileImprovementPlan extends ValuedAIObject {
 
         uninitialized = getType() == null || getTarget() == null;
     }
-    
+
     /**
      * Creates a new <code>TileImprovementPlan</code> from the given
      * XML-representation.
@@ -143,43 +143,43 @@ public class TileImprovementPlan extends ValuedAIObject {
         }
         pioneer = null;
         super.dispose();
-    }    
+    }
 
     /**
      * Gets the pioneer who have been assigned to making the
      * improvement described by this object.
-     * 
-     * @return The pioneer which should make the improvement, if 
-     *      such a <code>AIUnit</code> has been assigned, and 
+     *
+     * @return The pioneer which should make the improvement, if
+     *      such a <code>AIUnit</code> has been assigned, and
      *      <code>null</code> if nobody has been assigned this
      *      mission.
      */
     public AIUnit getPioneer() {
         return pioneer;
     }
-    
+
     /**
      * Sets the pioneer who have been assigned to making the
      * improvement described by this object.
-     * 
-     * @param pioneer The pioneer which should make the improvement, if 
-     *      such a <code>Unit</code> has been assigned, and 
+     *
+     * @param pioneer The pioneer which should make the improvement, if
+     *      such a <code>Unit</code> has been assigned, and
      *      <code>null</code> if nobody has been assigned this
      *      mission.
-     */    
+     */
     public void setPioneer(AIUnit pioneer) {
-        this.pioneer = pioneer;    
+        this.pioneer = pioneer;
     }
-    
+
     /**
      * Gets the <code>TileImprovementType</code> of this plan.
-     * 
+     *
      * @return The type of the improvement.
      */
     public TileImprovementType getType() {
         return type;
     }
-    
+
     /**
      * Sets the type of this <code>TileImprovementPlan</code>.
      *
@@ -189,7 +189,7 @@ public class TileImprovementPlan extends ValuedAIObject {
     public void setType(TileImprovementType type) {
         this.type = type;
     }
-    
+
     /**
      * Gets the target of this <code>TileImprovementPlan</code>.
      *
@@ -222,7 +222,7 @@ public class TileImprovementPlan extends ValuedAIObject {
                 // improvement types that expend more than one parcel
                 // of tools (e.g. plantForest), because PioneeringMission
                 // assumes this does not happen.
-                && impType.getExpendedAmount() <= 1 
+                && impType.getExpendedAmount() <= 1
                 && tile.findTileImprovementType(impType) == null) {
                 int value = impType.getImprovementValue(tile, goodsType);
                 if (value > bestValue) {
@@ -295,8 +295,7 @@ public class TileImprovementPlan extends ValuedAIObject {
      * @throws XMLStreamException if there are any problems reading
      *      from the stream.
      */
-    protected void readFromXMLImpl(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
 
         setId(in.getAttributeValue(null, ID_ATTRIBUTE));
 
@@ -304,7 +303,7 @@ public class TileImprovementPlan extends ValuedAIObject {
         type = getSpecification().getTileImprovementType(str);
 
         setValue(getAttribute(in, "value", -1));
-        
+
         str = in.getAttributeValue(null, "pioneer");
         if (str != null) {
             if ((pioneer = (AIUnit) getAIMain().getAIObject(str)) == null) {
@@ -316,8 +315,6 @@ public class TileImprovementPlan extends ValuedAIObject {
 
         str = in.getAttributeValue(null, "target");
         target = getAIMain().getGame().getFreeColGameObject(str, Tile.class);
-
-        in.nextTag();
     }
 
     /**
@@ -336,5 +333,5 @@ public class TileImprovementPlan extends ValuedAIObject {
      */
     public static String getXMLElementTagName() {
         return "tileImprovementPlan";
-    }    
+    }
 }

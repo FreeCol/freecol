@@ -357,8 +357,7 @@ public class AIGoods extends AIObject implements Transportable {
      * @throws XMLStreamException if there are any problems reading
      *      from the stream.
      */
-    protected void readFromXMLImpl(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         final AIMain aiMain = getAIMain();
 
         setId(in.getAttributeValue(null, ID_ATTRIBUTE));
@@ -375,15 +374,16 @@ public class AIGoods extends AIObject implements Transportable {
         } else {
             transport = null;
         }
-        in.nextTag();
+    }
 
-        if (goods != null) {
-            goods.readFromXML(in);
-        } else {
-            goods = new Goods(aiMain.getGame(), in);
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+        if (Goods.getXMLElementTagName().equals(in.getLocalName())) {
+            if (goods != null) {
+                goods.readFromXML(in);
+            } else {
+                goods = new Goods(getAIMain().getGame(), in);
+            }
         }
-
-        in.nextTag();
     }
 
     /**

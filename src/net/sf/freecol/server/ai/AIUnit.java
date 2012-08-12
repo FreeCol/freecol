@@ -137,7 +137,7 @@ public class AIUnit extends AIObject implements Transportable {
      * XML-representation.
      *
      * @param aiMain The main AI-object.
-     * @param element The root element for the XML-representation 
+     * @param element The root element for the XML-representation
      *       of a <code>Wish</code>.
      */
     public AIUnit(AIMain aiMain, Element element) {
@@ -145,7 +145,7 @@ public class AIUnit extends AIObject implements Transportable {
 
         uninitialized = getUnit() == null;
     }
-    
+
     /**
      * Creates a new <code>AIUnit</code> from the given
      * XML-representation.
@@ -526,7 +526,7 @@ public class AIUnit extends AIObject implements Transportable {
         }
     }
 
-   
+
     // Serialization
 
     /**
@@ -574,8 +574,7 @@ public class AIUnit extends AIObject implements Transportable {
      * @throws XMLStreamException if there are any problems reading from the
      *             stream.
      */
-    protected void readFromXMLImpl(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         final AIMain aiMain = getAIMain();
         String str, tag;
 
@@ -590,58 +589,51 @@ public class AIUnit extends AIObject implements Transportable {
         } else {
             transport = null;
         }
+    }
 
-        if (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            tag = in.getLocalName();
-            if (tag.equals(BuildColonyMission.getXMLElementTagName())) {
-                mission = new BuildColonyMission(aiMain, in);
-            } else if (tag.equals(CashInTreasureTrainMission.getXMLElementTagName())) {
-                mission = new CashInTreasureTrainMission(aiMain, in);
-            } else if (tag.equals(DefendSettlementMission.getXMLElementTagName())) {
-                mission = new DefendSettlementMission(aiMain, in);
-            } else if (tag.equals(IdleAtSettlementMission.getXMLElementTagName())
-                // @compat 0.10.5
-                || tag.equals("idleAtColonyMission")
-                // @end compatibility code
-                ) {
-                mission = new IdleAtSettlementMission(aiMain, in);
-            } else if (tag.equals(IndianBringGiftMission.getXMLElementTagName())) {
-                mission = new IndianBringGiftMission(aiMain, in);
-            } else if (tag.equals(IndianDemandMission.getXMLElementTagName())) {
-                mission = new IndianDemandMission(aiMain, in);
-            } else if (tag.equals(PioneeringMission.getXMLElementTagName())
-                // @compat 0.10.3
-                || tag.equals("tileImprovementPlanMission")) {
-                // @end compatibility code                
-                mission = new PioneeringMission(aiMain, in);
-            } else if (tag.equals(PrivateerMission.getXMLElementTagName())) {
-                mission = new PrivateerMission(aiMain, in);
-            } else if (tag.equals(ScoutingMission.getXMLElementTagName())) {
-                mission = new ScoutingMission(aiMain, in);
-            } else if (tag.equals(TransportMission.getXMLElementTagName())) {
-                mission = new TransportMission(aiMain, in);
-            } else if (tag.equals(UnitSeekAndDestroyMission.getXMLElementTagName())) {
-                mission = new UnitSeekAndDestroyMission(aiMain, in);
-            } else if (tag.equals(UnitWanderHostileMission.getXMLElementTagName())) {
-                mission = new UnitWanderHostileMission(aiMain, in);
-            } else if (tag.equals(UnitWanderMission.getXMLElementTagName())) {
-                mission = new UnitWanderMission(aiMain, in);
-            } else if (tag.equals(WishRealizationMission.getXMLElementTagName())) {
-                mission = new WishRealizationMission(aiMain, in);
-            } else if (tag.equals(WorkInsideColonyMission.getXMLElementTagName())) {
-                mission = new WorkInsideColonyMission(aiMain, in);
-            } else {
-                mission = null;
-                logger.warning("Could not find mission-class for: " + tag);
-            }
-
-            in.nextTag();
-        }
-
-        tag = in.getLocalName();
-        if (!tag.equals(getXMLElementTagName())) {
-            logger.warning("Expected end " + getXMLElementTagName()
-                + " tag, received: " + tag);
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+        final AIMain aiMain = getAIMain();
+        String tag = in.getLocalName();
+        if (tag.equals(BuildColonyMission.getXMLElementTagName())) {
+            mission = new BuildColonyMission(aiMain, in);
+        } else if (tag.equals(CashInTreasureTrainMission.getXMLElementTagName())) {
+            mission = new CashInTreasureTrainMission(aiMain, in);
+        } else if (tag.equals(DefendSettlementMission.getXMLElementTagName())) {
+            mission = new DefendSettlementMission(aiMain, in);
+        } else if (tag.equals(IdleAtSettlementMission.getXMLElementTagName())
+                   // @compat 0.10.5
+                   || tag.equals("idleAtColonyMission")
+                   // @end compatibility code
+                   ) {
+            mission = new IdleAtSettlementMission(aiMain, in);
+        } else if (tag.equals(IndianBringGiftMission.getXMLElementTagName())) {
+            mission = new IndianBringGiftMission(aiMain, in);
+        } else if (tag.equals(IndianDemandMission.getXMLElementTagName())) {
+            mission = new IndianDemandMission(aiMain, in);
+        } else if (tag.equals(PioneeringMission.getXMLElementTagName())
+                   // @compat 0.10.3
+                   || tag.equals("tileImprovementPlanMission")) {
+            // @end compatibility code
+            mission = new PioneeringMission(aiMain, in);
+        } else if (tag.equals(PrivateerMission.getXMLElementTagName())) {
+            mission = new PrivateerMission(aiMain, in);
+        } else if (tag.equals(ScoutingMission.getXMLElementTagName())) {
+            mission = new ScoutingMission(aiMain, in);
+        } else if (tag.equals(TransportMission.getXMLElementTagName())) {
+            mission = new TransportMission(aiMain, in);
+        } else if (tag.equals(UnitSeekAndDestroyMission.getXMLElementTagName())) {
+            mission = new UnitSeekAndDestroyMission(aiMain, in);
+        } else if (tag.equals(UnitWanderHostileMission.getXMLElementTagName())) {
+            mission = new UnitWanderHostileMission(aiMain, in);
+        } else if (tag.equals(UnitWanderMission.getXMLElementTagName())) {
+            mission = new UnitWanderMission(aiMain, in);
+        } else if (tag.equals(WishRealizationMission.getXMLElementTagName())) {
+            mission = new WishRealizationMission(aiMain, in);
+        } else if (tag.equals(WorkInsideColonyMission.getXMLElementTagName())) {
+            mission = new WorkInsideColonyMission(aiMain, in);
+        } else {
+            mission = null;
+            logger.warning("Could not find mission-class for: " + tag);
         }
     }
 

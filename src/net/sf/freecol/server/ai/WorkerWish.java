@@ -204,8 +204,7 @@ public class WorkerWish extends Wish {
      * @throws XMLStreamException if there are any problems reading
      *      from the stream.
      */
-    protected void readFromXMLImpl(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void readAttribues(XMLStreamReader in) throws XMLStreamException {
         final AIMain aiMain = getAIMain();
 
         setId(in.getAttributeValue(null, ID_ATTRIBUTE));
@@ -228,8 +227,6 @@ public class WorkerWish extends Wish {
         unitType = getSpecification().getUnitType(str);
 
         expertNeeded = getAttribute(in, "expertNeeded", false);
-
-        in.nextTag();
     }
 
     /**

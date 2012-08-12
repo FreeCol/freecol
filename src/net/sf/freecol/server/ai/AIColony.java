@@ -1434,13 +1434,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * @throws XMLStreamException if there are any problems reading from the
      *             stream.
      */
-    protected void readFromXMLImpl(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         final AIMain aiMain = getAIMain();
         final Game game = aiMain.getGame();
-        String tag, str;
-
-        str = in.getAttributeValue(null, ID_ATTRIBUTE);
+        String str = in.getAttributeValue(null, ID_ATTRIBUTE);
         if ((colony = game.getFreeColGameObject(str, Colony.class)) == null) {
             throw new IllegalStateException("Not a Colony: " + str);
         }
@@ -1449,60 +1446,56 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         tileImprovementPlans.clear();
         wishes.clear();
         colonyPlan = new ColonyPlan(aiMain, colony);
+    }
 
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            tag = in.getLocalName();
-            if (tag.equals(AIGoods.getXMLElementTagName() + LIST_ELEMENT)) {
-                str = in.getAttributeValue(null, ID_ATTRIBUTE);
-                AIGoods ag = (AIGoods)aiMain.getAIObject(str);
-                if (ag == null) ag = new AIGoods(aiMain, str);
-                aiGoods.add(ag);
-            } else if (tag.equals(TileImprovementPlan.getXMLElementTagName()
-                    + LIST_ELEMENT)
-                // @compat 0.10.3
-                || in.getLocalName().equals("tileimprovementplan"
-                    + LIST_ELEMENT)
-                // end compatibility code
-                ) {
-                str = in.getAttributeValue(null, ID_ATTRIBUTE);
-                TileImprovementPlan ti = (TileImprovementPlan)aiMain
-                    .getAIObject(str);
-                if (ti == null) ti = new TileImprovementPlan(aiMain, str);
-                tileImprovementPlans.add(ti);
-            } else if (tag.equals(GoodsWish.getXMLElementTagName()
-                    + LIST_ELEMENT)
-                // @compat 0.10.3
-                || in.getLocalName().equals(GoodsWish.getXMLElementTagName()
-                    + "Wish" + LIST_ELEMENT)
-                // end compatibility code
-                ) {
-                str = in.getAttributeValue(null, ID_ATTRIBUTE);
-                GoodsWish w = (GoodsWish)aiMain.getAIObject(str);
-                if (w == null) w = new GoodsWish(aiMain, str);
-                wishes.add(w);
-            } else if (tag.equals(WorkerWish.getXMLElementTagName()
-                    + LIST_ELEMENT)
-                // @compat 0.10.3
-                || in.getLocalName().equals(WorkerWish.getXMLElementTagName()
-                    + "Wish" + LIST_ELEMENT)
-                // end compatibility code
-                ) {
-                str = in.getAttributeValue(null, ID_ATTRIBUTE);
-                Wish w = (Wish)aiMain.getAIObject(str);
-                if (w == null) w = new WorkerWish(aiMain, str);
-                wishes.add(w);
-            } else {
-                logger.warning("Unknown tag name: " + in.getLocalName());
-            }
 
-            in.nextTag();
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+        final AIMain aiMain = getAIMain();
+        String tag = in.getLocalName();
+        String str;
+        if (tag.equals(AIGoods.getXMLElementTagName() + LIST_ELEMENT)) {
+            str = in.getAttributeValue(null, ID_ATTRIBUTE);
+            AIGoods ag = (AIGoods)aiMain.getAIObject(str);
+            if (ag == null) ag = new AIGoods(aiMain, str);
+            aiGoods.add(ag);
+        } else if (tag.equals(TileImprovementPlan.getXMLElementTagName()
+                              + LIST_ELEMENT)
+                   // @compat 0.10.3
+                   || in.getLocalName().equals("tileimprovementplan"
+                                               + LIST_ELEMENT)
+                   // end compatibility code
+                   ) {
+            str = in.getAttributeValue(null, ID_ATTRIBUTE);
+            TileImprovementPlan ti = (TileImprovementPlan)aiMain
+                .getAIObject(str);
+            if (ti == null) ti = new TileImprovementPlan(aiMain, str);
+            tileImprovementPlans.add(ti);
+        } else if (tag.equals(GoodsWish.getXMLElementTagName()
+                              + LIST_ELEMENT)
+                   // @compat 0.10.3
+                   || in.getLocalName().equals(GoodsWish.getXMLElementTagName()
+                                               + "Wish" + LIST_ELEMENT)
+                   // end compatibility code
+                   ) {
+            str = in.getAttributeValue(null, ID_ATTRIBUTE);
+            GoodsWish w = (GoodsWish)aiMain.getAIObject(str);
+            if (w == null) w = new GoodsWish(aiMain, str);
+            wishes.add(w);
+        } else if (tag.equals(WorkerWish.getXMLElementTagName()
+                              + LIST_ELEMENT)
+                   // @compat 0.10.3
+                   || in.getLocalName().equals(WorkerWish.getXMLElementTagName()
+                                               + "Wish" + LIST_ELEMENT)
+                   // end compatibility code
+                   ) {
+            str = in.getAttributeValue(null, ID_ATTRIBUTE);
+            Wish w = (Wish)aiMain.getAIObject(str);
+            if (w == null) w = new WorkerWish(aiMain, str);
+            wishes.add(w);
+        } else {
+            logger.warning("Unknown tag name: " + in.getLocalName());
         }
-
-        tag = in.getLocalName();
-        if (!tag.equals(getXMLElementTagName())) {
-            logger.warning("Expected end " + getXMLElementTagName()
-                + " tag, received: " + tag);
-        }
+        in.nextTag();
     }
 
     /**

@@ -109,7 +109,7 @@ public class AIMain extends FreeColObject
 
         readFromXML(in);
     }
-    
+
 
     /**
      * Gets the main controller object for the server.
@@ -377,7 +377,7 @@ public class AIMain extends FreeColObject
             }
         } else if (fcgo instanceof Unit) {
             new AIUnit(this, (Unit)fcgo);
-        } 
+        }
     }
 
     /**
@@ -491,15 +491,16 @@ public class AIMain extends FreeColObject
      * @param in The input stream with the XML.
      * @throws XMLStreamException if an error occured during parsing.
      */
-    protected void readFromXMLImpl(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         aiObjects.clear();
 
         if (!in.getLocalName().equals(getXMLElementTagName())) {
             logger.warning("Expected element name, got: " + in.getLocalName());
         }
         nextId = getAttribute(in, "nextID", 0);
+    }
 
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
         String lastTag = "";
         Wish wish;
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {

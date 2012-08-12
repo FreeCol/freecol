@@ -94,7 +94,7 @@ public class GoodsWish extends Wish {
      * XML-representation.
      *
      * @param aiMain The main AI-object.
-     * @param element The root element for the XML-representation 
+     * @param element The root element for the XML-representation
      *       of a <code>Wish</code>.
      */
     public GoodsWish(AIMain aiMain, Element element) {
@@ -102,7 +102,7 @@ public class GoodsWish extends Wish {
 
         uninitialized = getDestination() == null;
     }
-    
+
     /**
      * Creates a new <code>GoodsWish</code> from the given
      * XML-representation.
@@ -220,8 +220,7 @@ public class GoodsWish extends Wish {
      * @throws XMLStreamException if there are any problems reading
      *      from the stream.
      */
-    protected void readFromXMLImpl(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void readAttribues(XMLStreamReader in) throws XMLStreamException {
         setId(in.getAttributeValue(null, ID_ATTRIBUTE));
 
         String str = in.getAttributeValue(null, "destination");
@@ -243,8 +242,6 @@ public class GoodsWish extends Wish {
 
         amountRequested = getAttribute(in, "amountRequested",
                                        GoodsContainer.CARGO_SIZE);
-
-        in.nextTag();
     }
 
     /**

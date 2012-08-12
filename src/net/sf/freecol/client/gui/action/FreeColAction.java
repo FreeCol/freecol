@@ -303,7 +303,7 @@ public abstract class FreeColAction extends AbstractAction implements Option<Fre
      * @param in The input stream with the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         String id = in.getAttributeValue(null, "id");
         String acc = in.getAttributeValue(null, "accelerator");
 
@@ -317,7 +317,6 @@ public abstract class FreeColAction extends AbstractAction implements Option<Fre
         } else {
             putValue(ACCELERATOR_KEY, null);
         }
-        in.nextTag();
     }
 
     /**
@@ -339,7 +338,8 @@ public abstract class FreeColAction extends AbstractAction implements Option<Fre
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
     public void readFromXML(XMLStreamReader in) throws XMLStreamException {
-        readFromXMLImpl(in);
+        readAttributes(in);
+        in.nextTag();
     }
 
     public MenuKeyListener getMenuKeyListener() {
