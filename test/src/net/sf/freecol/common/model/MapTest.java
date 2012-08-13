@@ -27,6 +27,7 @@ import java.util.Random;
 import java.util.Set;
 
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Player.Stance;
@@ -472,9 +473,9 @@ public class MapTest extends FreeColTestCase {
                 }
             };
 
-        PathNode path = map.search(artillery, unitTile,
-                                   gd, CostDeciders.avoidIllegal(),
-                                   Integer.MAX_VALUE, galleon);
+        PathNode path = map.searchFullPath(artillery, unitTile,
+                                           gd, CostDeciders.avoidIllegal(),
+                                           FreeColObject.INFINITY, galleon);
         assertTrue("Should find the French colony via a drop off",
                    path != null && path.getTransportDropNode() != null
                    && path.getLastNode().getTile() == colonyTile);
@@ -485,9 +486,9 @@ public class MapTest extends FreeColTestCase {
             .colonyTile(colonyTile2).build();
         assertTrue("French colony not on the map",
                    colonyTile2.getSettlement() != null);
-        path = map.search(artillery, unitTile,
-                          gd, CostDeciders.avoidIllegal(),
-                          Integer.MAX_VALUE, galleon);
+        path = map.searchFullPath(artillery, unitTile,
+                                  gd, CostDeciders.avoidIllegal(),
+                                  FreeColObject.INFINITY, galleon);
         assertTrue("Should still find the first French colony via a drop off",
                    path != null && path.getTransportDropNode() != null
                    && path.getLastNode().getTile() == colonyTile);

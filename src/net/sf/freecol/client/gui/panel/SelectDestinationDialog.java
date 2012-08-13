@@ -94,7 +94,8 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
 
     private final JList destinationList;
 
-    private final List<Destination> destinations = new ArrayList<Destination>();
+    private final List<Destination> destinations
+        = new ArrayList<Destination>();
 
 
     /**
@@ -224,10 +225,8 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
             }
         }
 
-        if (destinationComparator == null) {
-            destinationComparator = new DestinationComparator(player);
-        }
-        Collections.sort(destinations, destinationComparator);
+        Collections.sort(destinations, (destinationComparator != null)
+            ? destinationComparator : new DestinationComparator(player));
         destinations.add(0, new Destination(map, unit.getSailTurns(), ""));
     }
 
@@ -236,29 +235,22 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         final Settlement inSettlement = unit.getSettlement();
 
         unit.search(unit.getTile(), new GoalDecider() {
-                public PathNode getGoal() {
-                    return null;
-                }
-
+                public PathNode getGoal() { return null; }
                 public boolean check(Unit u, PathNode p) {
                     Settlement settlement = p.getTile().getSettlement();
                     if (settlement != null && settlement != inSettlement) {
                         String extras = (settlement.getOwner() != u.getOwner())
                             ? getExtras(u, settlement, goodsTypes) : "";
-                        destinations.add(new Destination(settlement, p.getTurns(), extras));
+                        destinations.add(new Destination(settlement,
+                                p.getTurns(), extras));
                     }
                     return false;
                 }
-
-                public boolean hasSubGoals() {
-                    return false;
-                }
-            }, CostDeciders.avoidIllegal(), Integer.MAX_VALUE, null);
-
-        if (destinationComparator == null) {
-            destinationComparator = new DestinationComparator(getMyPlayer());
-        }
-        Collections.sort(destinations, destinationComparator);
+                public boolean hasSubGoals() { return false; }
+            }, CostDeciders.avoidIllegal(), FreeColObject.INFINITY, null);
+        Collections.sort(destinations, (destinationComparator != null)
+            ? destinationComparator
+            : new DestinationComparator(getMyPlayer()));
 
         final Europe europe = unit.getOwner().getEurope();
         if (unit.isNaval()
@@ -266,9 +258,8 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
             && europe != null) {
             int turns = unit.getTurnsToReach(europe);
             if (turns != FreeColObject.INFINITY) {
-                destinations.add(0,
-                    new Destination(europe, turns,
-                                    getExtras(unit, europe, goodsTypes)));
+                destinations.add(0, new Destination(europe, turns,
+                        getExtras(unit, europe, goodsTypes)));
             }
         }
     }
@@ -310,24 +301,27 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
      * @return A string containing interesting annotations about the visit
      *         or an empty string if nothing is of interest.
      */
-    private String getExtras(Unit unit, Location loc, List<GoodsType> goodsTypes) {
+    private String getExtras(Unit unit, Location loc,
+                             List<GoodsType> goodsTypes) {
+        Player owner = unit.getOwner();
         if (loc instanceof Europe && !goodsTypes.isEmpty()) {
-            Market market = unit.getOwner().getMarket();
+            Market market = owner.getMarket();
             List<String> sales = new ArrayList<String>();
             for (GoodsType goodsType : goodsTypes) {
                 sales.add(Messages.message(goodsType.getNameKey()) + " "
-                          + Integer.toString(market.getSalePrice(goodsType, 1)));
+                    + Integer.toString(market.getSalePrice(goodsType, 1)));
             }
             if (!sales.isEmpty()) {
                 return "[" + Utils.join(", ", sales) + "]";
             }
         } else if (loc instanceof Settlement
-            && ((Settlement)loc).getOwner().atWarWith(unit.getOwner())) {
+            && ((Settlement)loc).getOwner().atWarWith(owner)) {
             return "[" + Messages.message("model.stance.war") + "]";
         } else if (loc instanceof Settlement && !goodsTypes.isEmpty()) {
             List<String> sales = new ArrayList<String>();
             for (GoodsType goodsType : goodsTypes) {
-                String sale = unit.getOwner().getLastSaleString((Settlement) loc, goodsType);
+                String sale = owner.getLastSaleString((Settlement)loc,
+                                                      goodsType);
                 if (sale != null) {
                     sales.add(Messages.message(goodsType.getNameKey())
                               + " " + sale);
