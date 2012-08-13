@@ -234,7 +234,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         final List<GoodsType> goodsTypes) {
         final Settlement inSettlement = unit.getSettlement();
 
-        unit.search(unit.getTile(), new GoalDecider() {
+        unit.searchFullPath(unit.getTile(), new GoalDecider() {
                 public PathNode getGoal() { return null; }
                 public boolean check(Unit u, PathNode p) {
                     Settlement settlement = p.getTile().getSettlement();

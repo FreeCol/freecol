@@ -810,9 +810,9 @@ public class Map extends FreeColGameObject implements Location {
      *     if none found.
      */
     public Tile getBestEntryTile(Unit unit, Tile tile, Unit carrier) {
-        PathNode path = search(unit, tile, getHighSeasGoalDecider(),
-                               CostDeciders.avoidIllegal(), INFINITY,
-                               carrier, null);
+        PathNode path = searchFullPath(unit, tile, getHighSeasGoalDecider(),
+                                       CostDeciders.avoidIllegal(), INFINITY,
+                                       carrier);
         return (path == null) ? null : path.getLastNode().getTile();
     }
 
