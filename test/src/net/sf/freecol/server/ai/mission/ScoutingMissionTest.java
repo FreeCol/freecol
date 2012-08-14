@@ -80,7 +80,7 @@ public class ScoutingMissionTest extends FreeColTestCase {
         assertEquals("The Inca settlement should be a scouting target", null,
             ScoutingMission.invalidReason(aiUnit, is));
         assertEquals("The Inca settlement should be found as scouting target",
-            is, ScoutingMission.findTarget(aiUnit));
+            is, ScoutingMission.findTarget(aiUnit, false));
         assertEquals("Scouting mission should be assignable to scout", null,
             ScoutingMission.invalidReason(aiUnit));
         aiUnit.setMission(new ScoutingMission(aiMain, aiUnit));
@@ -116,6 +116,6 @@ public class ScoutingMissionTest extends FreeColTestCase {
         assertEquals("Scouting mission should be possible for this unit", null,
             ScoutingMission.invalidReason(aiUnit));
         assertEquals("The LCR tile should be a scouting target",
-            lcrTile, ScoutingMission.findTarget(aiUnit));
+            lcrTile, ScoutingMission.findTarget(aiUnit, false));
     }
 }
