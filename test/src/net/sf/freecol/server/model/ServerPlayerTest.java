@@ -19,6 +19,8 @@
 
 package net.sf.freecol.server.model;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import net.sf.freecol.common.model.Colony;
@@ -37,6 +39,7 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.util.test.FreeColTestCase;
+import net.sf.freecol.util.test.MockPseudoRandom;
 
 
 public class ServerPlayerTest extends FreeColTestCase {	
@@ -110,6 +113,10 @@ public class ServerPlayerTest extends FreeColTestCase {
         // Pretend time is passing.
         // Have to advance time as yearly goods removal is initially low.
         game.setTurn(new Turn(200));
+        List<Integer> setValues = new ArrayList<Integer>();
+        setValues.add(20);
+        MockPseudoRandom mockRandom = new MockPseudoRandom(setValues, true);
+        ServerTestHelper.setRandom(mockRandom);
         for (int i = 0; i < 100; i++) {
             igc.yearlyGoodsAdjust((ServerPlayer) french);
             igc.yearlyGoodsAdjust((ServerPlayer) english);
