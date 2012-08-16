@@ -578,7 +578,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                     || (unit.getRole() == Unit.Role.DEFAULT
                         && (unit.isInEurope() || unit.getColony() != null)
                         && aiUnit.equipForRole(Unit.Role.PIONEER, false)))
-                && (loc = PioneeringMission.findTarget(aiUnit)) != null) {
+                && (loc = PioneeringMission.findTarget(aiUnit, false)) != null) {
                 // TODO: pioneers to make roads between colonies
                 m = new PioneeringMission(aiMain, aiUnit, loc);
                 pioneersWanted--;

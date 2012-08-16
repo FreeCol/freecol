@@ -34,8 +34,10 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
+import net.sf.freecol.common.model.pathfinding.GoalDeciders;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
@@ -96,7 +98,7 @@ public class PioneeringMission extends Mission {
     public PioneeringMission(AIMain aiMain, AIUnit aiUnit) {
         super(aiMain, aiUnit);
 
-        setTarget(findTarget(aiUnit));
+        setTarget(findTarget(aiUnit, true));
         logger.finest(tag + " starts with target " + target + ": " + this);
         uninitialized = false;
     }
@@ -238,20 +240,18 @@ public class PioneeringMission extends Mission {
      * Extract a valid target for this mission from a path.
      *
      * @param aiUnit A <code>AIUnit</code> to perform the mission.
-     * @param path A <code>PathNode</code> to extract a target from,
-     *     (uses the unit location if null).
+     * @param path A <code>PathNode</code> to extract a target from.
      * @return A target for this mission, or null if none found.
      */
     public static Location extractTarget(AIUnit aiUnit, PathNode path) {
-        final Location loc = (path == null) ? aiUnit.getUnit().getLocation()
-            : path.getLastNode().getLocation();
+        if (path == null) return null;
+        final Location loc = path.getLastNode().getLocation();
         return (loc == null) ? null
-            : (Mission.invalidAIUnitReason(aiUnit) != null) ? null
-            : (hasTools(aiUnit))
-            ? ((invalidPioneeringTileReason(aiUnit, loc.getTile()) == null)
-                ? loc.getTile() : null)
-            : ((invalidPioneeringColonyReason(aiUnit, loc.getColony()) == null)
-                ? loc.getColony() : null);
+            : ((hasTools(aiUnit))
+                ? ((invalidReason(aiUnit, loc.getTile()) != null) ? null
+                    : loc.getTile())
+                : ((invalidReason(aiUnit, loc.getColony()) != null) ? null
+                    : loc.getColony()));
     }
 
     /**
@@ -263,86 +263,82 @@ public class PioneeringMission extends Mission {
      * @return A score for the proposed mission.
      */
     public static int scorePath(AIUnit aiUnit, PathNode path) {
-        int turns = (path == null) ? 1 : path.getTotalTurns() + 1;
-        Location loc = extractTarget(aiUnit, path);
-        return (loc instanceof Colony) ? (100 / turns)
-            : (loc instanceof Tile) ? (100 * getBestPlan(aiUnit, (Tile)loc)
-                .getValue() / turns)
-            : Integer.MIN_VALUE;
+        final Location loc = extractTarget(aiUnit, path);
+        if (hasTools(aiUnit)) {
+            TileImprovementPlan tip;
+            if (loc instanceof Tile
+                && (tip = getBestPlan(aiUnit, (Tile)loc)) != null) {
+                return 1000 * tip.getValue() / (path.getTotalTurns() + 1);
+            }
+        } else {
+            if (loc instanceof Colony) {
+                return 1000 / (path.getTotalTurns() + 1);
+            }
+        }
+        return Integer.MIN_VALUE;
     }
 
     /**
-     * Finds the closest colony within MAX_TURNS that can equip the unit.
+     * Makes a goal decider that checks pioneering sites.
      *
-     * @param aiUnit The <code>AIUnit</code> to equip.
-     * @return A path to the closest suitable colony.
+     * @param aiUnit The <code>AIUnit</code> to search with.
+     * @param deferOK Keep track of the nearest colonies to use as a
+     *     fallback destination.
+     * @return A suitable <code>GoalDecider</code>.
      */
-    private static PathNode findColonyPath(final AIUnit aiUnit) {
-        Unit unit = aiUnit.getUnit();
-        Tile startTile = unit.getPathStartTile();
+    private static GoalDecider getGoalDecider(final AIUnit aiUnit,
+                                              final boolean deferOK) {
+        final Player owner = aiUnit.getUnit().getOwner();
+        final GoalDecider gd = new GoalDecider() {
+                private PathNode bestPath = null;
+                private int bestValue = 0;
 
-        Colony colony = startTile.getColony();
-        if (colony != null
-            && invalidPioneeringColonyReason(aiUnit, colony) == null) {
-            return null;
-        }
-
-        final GoalDecider equipDecider = new GoalDecider() {
-                private PathNode best = null;
-                private int bestValue = INFINITY;
-
-                public PathNode getGoal() { return best; }
+                public PathNode getGoal() { return bestPath; }
                 public boolean hasSubGoals() { return true; }
                 public boolean check(Unit u, PathNode path) {
-                    Colony colony = path.getLocation().getColony();
-                    if (invalidPioneeringColonyReason(aiUnit, colony) == null
-                        && path.getTotalTurns() < bestValue) {
-                        bestValue = path.getTotalTurns();
-                        best = path;
+                    int value = scorePath(aiUnit, path);
+                    if (bestValue < value) {
+                        bestValue = value;
+                        bestPath = path;
                         return true;
                     }
                     return false;
                 }
             };
-        return unit.search(startTile, equipDecider,
-                           CostDeciders.avoidIllegal(), MAX_TURNS,
-                           unit.getCarrier());
-    }
-
-    /**
-     * Finds the best tile improvement plan for a supplied AI unit.
-     * Public for the test suite.
-     *
-     * @param aiUnit The <code>AIUnit</code> to find a plan for.
-     * @return A path to the best location to improve, or null if the
-     *     unit is not on the map or the unit location is a suitable target.
-     */
-    private static PathNode findTipPath(AIUnit aiUnit) {
-        final Unit unit = aiUnit.getUnit();
-        final Tile startTile = unit.getPathStartTile();
-        final GoalDecider pioneeringDecider
-            = getMissionGoalDecider(aiUnit, PioneeringMission.class);
-
-        return (startTile == null
-            || invalidPioneeringTileReason(aiUnit, startTile) == null) ? null
-            : unit.search(startTile, pioneeringDecider,
-                          CostDeciders.avoidIllegal(), MAX_TURNS,
-                          unit.getCarrier());
+        return (deferOK) ? GoalDeciders.getComposedGoalDecider(gd,
+            GoalDeciders.getOurClosestSettlementGoalDecider())
+            : gd;
     }
 
     /**
      * Finds a suitable pioneering target for the supplied unit.
      *
      * @param aiUnit The <code>AIUnit</code> to test.
+     * @param deferOK If true, allow the search to return a nearby existing
+     *     colony as a temporary target.     
      * @return A <code>PathNode</code> to the target, or null if none found.
      */
-    public static PathNode findTargetPath(final AIUnit aiUnit) {
-        Unit unit;
-        return (aiUnit == null
-            || (unit = aiUnit.getUnit()) == null || unit.isDisposed()
-            || (unit.getPathStartTile()) == null) ? null
-            : (hasTools(aiUnit)) ? findTipPath(aiUnit)
-            : findColonyPath(aiUnit);
+    public static PathNode findTargetPath(AIUnit aiUnit, boolean deferOK) {
+        if (invalidAIUnitReason(aiUnit) != null) return null;
+        final Unit unit = aiUnit.getUnit();
+        final Tile startTile = unit.getPathStartTile();
+        if (startTile == null) return null;
+
+        PathNode path;
+        final Unit carrier = unit.getCarrier();
+        final GoalDecider gd = getGoalDecider(aiUnit, deferOK);
+        final CostDecider standardCd
+            = CostDeciders.avoidSettlementsAndBlockingUnits();
+        final CostDecider relaxedCd = CostDeciders.numberOfTiles();
+
+        // Try for something sensible nearby.
+        path = unit.searchFullPath(startTile, gd, standardCd,
+                                   MAX_TURNS, carrier);
+        if (path != null) return path;
+
+        // One more try with a relaxed cost decider and no range limit.
+        return unit.searchFullPath(startTile, gd, relaxedCd,
+                                   INFINITY, carrier);
     }
 
     /**
@@ -353,16 +349,21 @@ public class PioneeringMission extends Mission {
      */
     private static Colony getBestPioneeringColony(AIUnit aiUnit) {
         EuropeanAIPlayer aiPlayer = (EuropeanAIPlayer)aiUnit.getAIOwner();
-        AIColony best = null;
+        AIColony bestColony = null;
         int bestValue = -1;
         for (AIColony aic : aiPlayer.getAIColonies()) {
             int value = aic.getTileImprovementPlans().size();
             if (value > bestValue) {
                 bestValue = value;
-                best = aic;
+                bestColony = aic;
             }
         }
-        return (best == null) ? null : best.getColony();
+        if (bestColony == null) return null;
+        Colony colony = bestColony.getColony();
+        if (colony.isConnectedPort()) return colony;
+        PathNode path = aiUnit.getUnit().findOurNearestPort();
+        return (path == null) ? colony
+            : path.getLastNode().getLocation().getColony();
     }
 
     /**
@@ -370,13 +371,13 @@ public class PioneeringMission extends Mission {
      * Falls back to the best settlement if the unit is not on the map.
      *
      * @param aiUnit The <code>AIUnit</code> to test.
+     * @param deferOK Enables deferring to a fallback colony.
      * @return A target for this mission.
      */
-    public static Location findTarget(AIUnit aiUnit) {
-        Location loc = extractTarget(aiUnit, findTargetPath(aiUnit));
-        return (loc != null) ? loc
-            : (!hasTools(aiUnit)) ? null
-            : (aiUnit.getUnit().isInEurope()) ? getBestPioneeringColony(aiUnit)
+    public static Location findTarget(AIUnit aiUnit, boolean deferOK) {
+        PathNode path = findTargetPath(aiUnit, deferOK);
+        return (path != null) ? extractTarget(aiUnit, path)
+            : (deferOK) ? getBestPioneeringColony(aiUnit)
             : null;
     }
 
@@ -415,8 +416,10 @@ public class PioneeringMission extends Mission {
      * @return A reason why the mission would be invalid with the unit,
      *     or null if none found.
      */
-    private static String invalidPioneeringReason(AIUnit aiUnit) {
-        return (!aiUnit.getUnit().isPerson()) ? Mission.UNITNOTAPERSON
+    private static String invalidMissionReason(AIUnit aiUnit) {
+        String reason = invalidAIUnitReason(aiUnit);
+        return (reason != null) ? reason
+            : (!aiUnit.getUnit().isPerson()) ? Mission.UNITNOTAPERSON
             : null;
     }
 
@@ -428,16 +431,15 @@ public class PioneeringMission extends Mission {
      * @return A reason why the mission would be invalid, or null if
      *     none found.
      */
-    private static String invalidPioneeringColonyReason(AIUnit aiUnit,
-                                                        Colony colony) {
-        String reason;
-        return ((reason = invalidTargetReason(colony,
-                    aiUnit.getUnit().getOwner())) != null) ? reason
-            : (aiUnit.getUnit().getTile() == null
-                || aiUnit.getUnit().isOnCarrier()) ? null 
-            : (!colony.canProvideEquipment(Unit.Role.PIONEER
-                    .getRoleEquipment(colony.getSpecification()))
-                && !hasTools(aiUnit)) ? "colony-can-not-provide-equipment"
+    private static String invalidColonyReason(AIUnit aiUnit, Colony colony) {
+        String reason = invalidTargetReason(colony,
+                                            aiUnit.getUnit().getOwner());
+        return (reason != null)
+            ? reason
+            : (!hasTools(aiUnit)
+                && !colony.canProvideEquipment(Unit.Role.PIONEER
+                    .getRoleEquipment(colony.getSpecification())))
+            ? "colony-can-not-provide-equipment"
             : null;
     }
 
@@ -464,10 +466,10 @@ public class PioneeringMission extends Mission {
      *
      * @param aiUnit The <code>AIUnit</code> to check.
      * @param tile The <code>Tile</code> to check.
-     * @return A reason why the mission would be invalid, or null if none found.
+     * @return A reason why the mission would be invalid, or null if
+     *      none found.
      */
-    private static String invalidPioneeringTileReason(AIUnit aiUnit,
-                                                      Tile tile) {
+    private static String invalidTileReason(AIUnit aiUnit, Tile tile) {
         return (tile == null) ? Mission.TARGETINVALID
             : (!hasTools(aiUnit)) ? "unit-needs-tools"
             : (getPlan(aiUnit, tile) == null
@@ -491,10 +493,7 @@ public class PioneeringMission extends Mission {
      * @return A reason for mission invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit) {
-        String reason;
-        return ((reason = Mission.invalidReason(aiUnit)) != null) ? reason
-            : ((reason = invalidPioneeringReason(aiUnit)) != null) ? reason
-            : null;
+        return invalidMissionReason(aiUnit);
     }
 
     /**
@@ -505,13 +504,15 @@ public class PioneeringMission extends Mission {
      * @return A reason for invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit, Location loc) {
-        String reason;
-        return ((reason = invalidAIUnitReason(aiUnit)) != null) ? reason
-            : ((reason = invalidPioneeringReason(aiUnit)) != null) ? reason
-            : (loc instanceof Colony)
-            ? invalidPioneeringColonyReason(aiUnit, (Colony)loc)
+        String reason = invalidMissionReason(aiUnit);
+        return (reason != null)
+            ? reason
             : (loc instanceof Tile)
-            ? invalidPioneeringTileReason(aiUnit, (Tile)loc)
+            ? invalidTileReason(aiUnit, (Tile)loc)
+            : (loc instanceof Colony)
+            ? ((aiUnit.getUnit().getLocation() instanceof Tile)
+                ? invalidColonyReason(aiUnit, (Colony)loc)
+                : invalidTargetReason((Colony)loc, aiUnit.getUnit().getOwner()))
             : Mission.TARGETINVALID;
     }
 
@@ -527,46 +528,45 @@ public class PioneeringMission extends Mission {
      * - Make the improvement.
      */
     public void doMission() {
-        final Unit unit = getUnit();
         String reason = invalidReason();
+        Location newTarget;
         if (isTargetReason(reason)) {
-            ; // handled below
+            if ((newTarget = findTarget(getAIUnit(), false)) == null) {
+                logger.finest(tag + " unable to retarget: " + this);
+                return;
+            }
+            setTarget(newTarget);
         } else if (reason != null) {
             logger.finest(tag + " broken(" + reason + "): " + this);
             return;
         }
 
         final AIUnit aiUnit = getAIUnit();
+        final Unit unit = getUnit();
         final Player player = unit.getOwner();
         final EuropeanAIPlayer aiPlayer = getEuropeanAIPlayer();
         Tile tile;
         String where;
-        // Get tools first.
-        while (!hasTools()) {
-            if (invalidTargetReason(target, player) != null) {
-                setTarget(extractTarget(aiUnit, findColonyPath(aiUnit)));
-                if (invalidTargetReason(target, player) != null) {
-                    logger.finest(tag + " unable to retarget: " + this);
-                    return;
-                }
-                logger.finest(tag + " retargeting for tools " + target
-                    + ": " + this);
-            }
-
+        while (!hasTools()) { // Get tools first.
             // Go there and clear target on arrival.
             if (travelToTarget(tag, target) != Unit.MoveType.MOVE) return;
             where = ((Colony)target).getName();
             setTarget(null);
 
-            // Equip
+            // Try to equip
             if (aiUnit.equipForRole(Unit.Role.PIONEER, false)
                 && hasTools()) {
+                newTarget = findTarget(aiUnit, false);
                 logger.finest(tag + " reached " + where
-                    + " and equips: " + this);
+                    + " and equips, retargeting " + newTarget + ": " + this);
             } else {
+                newTarget = findTarget(aiUnit, false);
                 logger.finest(tag + " reached " + where
-                    + " but fails to equip: " + this);
+                    + " but fails to equip, retargeting: " + newTarget
+                    + ": " + this);
             }
+            if (newTarget == null) return;
+            setTarget(newTarget);
         }
 
         // Going to an intermediate colony?
@@ -574,9 +574,11 @@ public class PioneeringMission extends Mission {
             && invalidTargetReason(target, player) == null) {
             if (travelToTarget(tag, target) != Unit.MoveType.MOVE) return;
             where = ((Colony)target).getName();
-            setTarget(null);
+            newTarget = findTarget(aiUnit, false);
             logger.finest(tag + " reached intermediate colony " + where
-                + ": " + this);
+                + ", retargeting " + newTarget + ": " + this);
+            if (newTarget == null) return;
+            setTarget(newTarget);
         }
 
         // Now insist on a tip-target.
@@ -585,14 +587,15 @@ public class PioneeringMission extends Mission {
             setTarget(null);
         }
         if (tileImprovementPlan == null) {
-            setTarget(extractTarget(aiUnit, findTipPath(aiUnit)));
-            if (tileImprovementPlan == null) {
+            newTarget = findTarget(aiUnit, false);
+            if (newTarget != null) setTarget(newTarget);
+            if (newTarget == null || tileImprovementPlan == null) {
                 logger.finest(tag + " at " + unit.getLocation() 
                     + " could not find improvement: " + this);
                 return;
             }
-            logger.finest(tag + " retargeting " + tileImprovementPlan
-                + ": " + this);
+            logger.finest(tag + " retargeting " + newTarget
+                + "/" + tileImprovementPlan + ": " + this);
         }
 
         // Go there.

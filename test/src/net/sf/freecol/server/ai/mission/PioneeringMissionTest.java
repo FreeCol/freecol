@@ -95,14 +95,14 @@ public class PioneeringMissionTest extends FreeColTestCase {
         assertEquals("Pioneering should be valid (despite no tools)", null,
             PioneeringMission.invalidReason(aiUnit));
         assertNull("Pioneering should find no targets though",
-            PioneeringMission.findTarget(aiUnit));
+            PioneeringMission.findTarget(aiUnit, false));
 
         // Add some tools to the colony, mission should become viable.
         colony.addGoods(toolsGoodsType, 100);
         assertTrue("Colony can provide tools",
             colony.canProvideEquipment(pioneerEquipment));
         assertEquals("Colony found", colony,
-            PioneeringMission.findTarget(aiUnit));
+            PioneeringMission.findTarget(aiUnit, false));
         assertEquals("Pioneer has no mission", null, aiUnit.getMission());
         assertEquals("Pioneering should be valid (tools present in colony)",
             null, PioneeringMission.invalidReason(aiUnit));
@@ -111,7 +111,7 @@ public class PioneeringMissionTest extends FreeColTestCase {
         colony.addGoods(toolsGoodsType, -100);
         colonist.changeEquipment(toolsEqType, 1);
         assertNotNull("TileImprovementPlan found",
-            PioneeringMission.findTarget(aiUnit));
+            PioneeringMission.findTarget(aiUnit, false));
         assertEquals("Pioneering should be valid (unit has tools)", null,
             PioneeringMission.invalidReason(aiUnit));
 
