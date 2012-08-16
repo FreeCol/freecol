@@ -226,6 +226,14 @@ abstract public class Settlement extends GoodsLocation
     abstract public Unit getDefendingUnit(Unit attacker);
 
     /**
+     * Gets a measure of the ratio between defence at this settlement,
+     * and the general settlement size.
+     *
+     * @return A ratio of defence power to settlement size.
+     */
+    abstract public float getDefenceRatio();
+
+    /**
      * Gets the range of gold plunderable when this settlement is captured.
      *
      * @param attacker The <code>Unit</code> that takes the settlement.
@@ -248,8 +256,11 @@ abstract public class Settlement extends GoodsLocation
     }
 
     /**
-     * Gets the <code>Tile</code> where this <code>Settlement</code> is located.
-     * @return The <code>Tile</code> where this <code>Settlement</code> is located.
+     * Gets the <code>Tile</code> where this <code>Settlement</code>
+     * is located.
+     *
+     * @return The <code>Tile</code> where this
+     *     <code>Settlement</code> is located.
      */
     public Tile getTile() {
         return tile;

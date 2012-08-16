@@ -1254,6 +1254,17 @@ public class Colony extends Settlement implements Nameable {
     }
 
     /**
+     * Gets a ratio of defence power to colony size.
+     * This is really arbitrary and needs tweaking.
+     * Useful as a weighting multiplier for mission comparison.
+     *
+     * @return A ratio of defensive power to colony size.
+     */
+    public float getDefenceRatio() {
+        return getTotalDefencePower() / (1 + getWorkLocationUnitCount());
+    }
+
+    /**
      * Determines whether this colony is sufficiently unprotected and
      * contains something worth pillaging.  To be called by CombatModels
      * when the attacker has defeated an unarmed colony defender.

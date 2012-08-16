@@ -619,6 +619,16 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
+     * Gets the ratio between defence power and settlement size.
+     *
+     * @return A measure of the defence at this settlement.
+     */
+    public float getDefenceRatio() {
+        return getUnitCount() * 2.0f / (getType().getMinimumSize()
+            + getType().getMaximumSize());
+    }
+
+    /**
      * Gets the range of gold plunderable when this settlement is captured.
      */
     public RandomRange getPlunderRange(Unit attacker) {
