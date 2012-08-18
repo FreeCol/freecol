@@ -47,6 +47,7 @@
         <!-- end @compat -->
         <xs:element name="expeditionaryForce" type="ForceType" />
         <xs:element name="interventionForce" type="ForceType" />
+        <xs:element name="mercenaryForce" type="ForceType" />
       </xs:choice>
 
       <xs:attribute name="ID" type="MonarchId" use="required"/>

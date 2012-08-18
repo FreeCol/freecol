@@ -84,8 +84,23 @@ public final class Monarch extends FreeColGameObject implements Named {
         OFFER_MERCENARIES, DISPLEASURE,
     }
 
+    /**
+     * The Royal Expeditionary Force, which the Monarch will send to
+     * crush the player's rebellion.
+     */
     private Force expeditionaryForce = new Force();
+
+    /**
+     * The Foreign Intervention Force, which some random country will
+     * send to support the player's rebellion.
+     */
     private Force interventionForce = new Force();
+
+    /**
+     * A force of mercenaries, which some random country will offer to
+     * send to support the player's rebellion.
+     */
+    private Force mercenaryForce = new Force();
 
 
     /**
@@ -154,6 +169,15 @@ public final class Monarch extends FreeColGameObject implements Named {
      * @return a <code>Force</code> value
      */
     public Force getInterventionForce() {
+        return interventionForce;
+    }
+
+    /**
+     * Returns the Mercenary Force.
+     *
+     * @return a <code>Force</code> value
+     */
+    public Force getMercenaryForce() {
         return interventionForce;
     }
 
@@ -615,6 +639,7 @@ public final class Monarch extends FreeColGameObject implements Named {
 
         expeditionaryForce.toXML(out, "expeditionaryForce");
         interventionForce.toXML(out, "interventionForce");
+        mercenaryForce.toXML(out, "mercenaryForce");
 
         out.writeEndElement();
     }
@@ -649,6 +674,8 @@ public final class Monarch extends FreeColGameObject implements Named {
                 expeditionaryForce.readFromXML(in);
             } else if ("interventionForce".equals(childName)) {
                 interventionForce.readFromXML(in);
+            } else if ("mercenaryForce".equals(childName)) {
+                interventionForce.readFromXML(in);
             } else {
                 // @compat 0.10.5
                 if ("navalUnits".equals(childName)) {
@@ -671,6 +698,10 @@ public final class Monarch extends FreeColGameObject implements Named {
         if (interventionForce.getUnits().isEmpty()) {
             interventionForce = new Force((UnitListOption) getSpecification()
                                           .getOption("model.option.interventionForce"), null);
+        }
+        if (mercenaryForce.getUnits().isEmpty()) {
+            mercenaryForce = new Force((UnitListOption) getSpecification()
+                                       .getOption("model.option.mercenaryForce"), null);
         }
         // end @compat
 

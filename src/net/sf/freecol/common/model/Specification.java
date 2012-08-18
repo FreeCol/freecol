@@ -1399,6 +1399,23 @@ public final class Specification {
             interventionForce.getValue().add(menOfWar);
             allOptions.put(id, interventionForce);
         }
+        id = "model.option.mercenaryForce";
+        if (allOptions.get(id) == null) {
+            UnitListOption mercenaryForce = new UnitListOption(id);
+            AbstractUnitOption regulars = new AbstractUnitOption(id + ".regulars");
+            regulars.setValue(new AbstractUnit("model.unit.veteranSoldier", Unit.Role.SOLDIER, 2));
+            mercenaryForce.getValue().add(regulars);
+            AbstractUnitOption dragoons = new AbstractUnitOption(id + ".dragoons");
+            dragoons.setValue(new AbstractUnit("model.unit.veteranSoldier", Unit.Role.DRAGOON, 2));
+            mercenaryForce.getValue().add(dragoons);
+            AbstractUnitOption artillery = new AbstractUnitOption(id + ".artillery");
+            artillery.setValue(new AbstractUnit("model.unit.artillery", Unit.Role.DEFAULT, 2));
+            mercenaryForce.getValue().add(artillery);
+            AbstractUnitOption menOfWar = new AbstractUnitOption(id + ".menOfWar");
+            menOfWar.setValue(new AbstractUnit("model.unit.manOWar", Unit.Role.DEFAULT, 2));
+            mercenaryForce.getValue().add(menOfWar);
+            allOptions.put(id, mercenaryForce);
+        }
         id = "model.option.goodGovernmentLimit";
         if (allOptions.get(id) == null) {
             IntegerOption goodGovernmentLimit = new IntegerOption(id);

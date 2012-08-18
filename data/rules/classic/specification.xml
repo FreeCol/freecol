@@ -1968,6 +1968,28 @@
               <number value="3" />
             </unitOption>
           </unitListOption>
+          <unitListOption id="model.option.mercenaryForce">
+            <unitOption id="model.option.mercenaryForce.regulars">
+              <unitType value="model.unit.veteranSoldier" />
+              <role value="SOLDIER" />
+              <number value="3" />
+            </unitOption>
+            <unitOption id="model.option.mercenaryForce.dragoons">
+              <unitType value="model.unit.veteranSoldier" />
+              <role value="DRAGOON" />
+              <number value="3" />
+            </unitOption>
+            <unitOption id="model.option.mercenaryForce.artillery">
+              <unitType value="model.unit.artillery" />
+              <role value="DEFAULT" />
+              <number value="3" />
+            </unitOption>
+            <unitOption id="model.option.mercenaryForce.menOfWar">
+              <unitType value="model.unit.manOWar" />
+              <role value="DEFAULT" />
+              <number value="2" />
+            </unitOption>
+          </unitListOption>
         </optionGroup>
         <optionGroup id="model.difficulty.government">
           <integerOption id="model.option.badGovernmentLimit" value="8"/>
@@ -2073,6 +2095,28 @@
               <number value="2" />
             </unitOption>
           </unitListOption>
+          <unitListOption id="model.option.mercenaryForce">
+            <unitOption id="model.option.mercenaryForce.regulars">
+              <unitType value="model.unit.veteranSoldier" />
+              <role value="SOLDIER" />
+              <number value="3" />
+            </unitOption>
+            <unitOption id="model.option.mercenaryForce.dragoons">
+              <unitType value="model.unit.veteranSoldier" />
+              <role value="DRAGOON" />
+              <number value="3" />
+            </unitOption>
+            <unitOption id="model.option.mercenaryForce.artillery">
+              <unitType value="model.unit.artillery" />
+              <role value="DEFAULT" />
+              <number value="3" />
+            </unitOption>
+            <unitOption id="model.option.mercenaryForce.menOfWar">
+              <unitType value="model.unit.manOWar" />
+              <role value="DEFAULT" />
+              <number value="2" />
+            </unitOption>
+          </unitListOption>
         </optionGroup>
         <optionGroup id="model.difficulty.government">
           <integerOption id="model.option.badGovernmentLimit" value="7"/>
@@ -2173,6 +2217,28 @@
               <number value="2" />
             </unitOption>
           </unitListOption>
+          <unitListOption id="model.option.mercenaryForce">
+            <unitOption id="model.option.mercenaryForce.regulars">
+              <unitType value="model.unit.veteranSoldier" />
+              <role value="SOLDIER" />
+              <number value="3" />
+            </unitOption>
+            <unitOption id="model.option.mercenaryForce.dragoons">
+              <unitType value="model.unit.veteranSoldier" />
+              <role value="DRAGOON" />
+              <number value="3" />
+            </unitOption>
+            <unitOption id="model.option.mercenaryForce.artillery">
+              <unitType value="model.unit.artillery" />
+              <role value="DEFAULT" />
+              <number value="3" />
+            </unitOption>
+            <unitOption id="model.option.mercenaryForce.menOfWar">
+              <unitType value="model.unit.manOWar" />
+              <role value="DEFAULT" />
+              <number value="2" />
+            </unitOption>
+          </unitListOption>
         </optionGroup>
         <optionGroup id="model.difficulty.government">
           <integerOption id="model.option.badGovernmentLimit" value="6"/>
@@ -2266,6 +2332,28 @@
             <number value="2" />
           </unitOption>
         </unitListOption>
+          <unitListOption id="model.option.mercenaryForce">
+            <unitOption id="model.option.mercenaryForce.regulars">
+              <unitType value="model.unit.veteranSoldier" />
+              <role value="SOLDIER" />
+              <number value="3" />
+            </unitOption>
+            <unitOption id="model.option.mercenaryForce.dragoons">
+              <unitType value="model.unit.veteranSoldier" />
+              <role value="DRAGOON" />
+              <number value="3" />
+            </unitOption>
+            <unitOption id="model.option.mercenaryForce.artillery">
+              <unitType value="model.unit.artillery" />
+              <role value="DEFAULT" />
+              <number value="3" />
+            </unitOption>
+            <unitOption id="model.option.mercenaryForce.menOfWar">
+              <unitType value="model.unit.manOWar" />
+              <role value="DEFAULT" />
+              <number value="2" />
+            </unitOption>
+          </unitListOption>
         </optionGroup>
         <optionGroup id="model.difficulty.government">
           <integerOption id="model.option.badGovernmentLimit" value="5"/>
@@ -2359,6 +2447,28 @@
               <number value="2" />
             </unitOption>
           </unitListOption>
+          <unitListOption id="model.option.mercenaryForce">
+            <unitOption id="model.option.mercenaryForce.regulars">
+              <unitType value="model.unit.veteranSoldier" />
+              <role value="SOLDIER" />
+              <number value="3" />
+            </unitOption>
+            <unitOption id="model.option.mercenaryForce.dragoons">
+              <unitType value="model.unit.veteranSoldier" />
+              <role value="DRAGOON" />
+              <number value="3" />
+            </unitOption>
+            <unitOption id="model.option.mercenaryForce.artillery">
+              <unitType value="model.unit.artillery" />
+              <role value="DEFAULT" />
+              <number value="3" />
+            </unitOption>
+            <unitOption id="model.option.mercenaryForce.menOfWar">
+              <unitType value="model.unit.manOWar" />
+              <role value="DEFAULT" />
+              <number value="2" />
+            </unitOption>
+          </unitListOption>
         </optionGroup>
         <optionGroup id="model.difficulty.government">
           <integerOption id="model.option.badGovernmentLimit" value="4"/>
@@ -2419,79 +2529,101 @@
           </rangeOption>
         </optionGroup>
         <optionGroup id="model.difficulty.monarch">
-        <integerOption id="model.option.monarchMeddling" value="4" minimumValue="0" maximumValue="10"/>
-        <integerOption id="model.option.taxAdjustment" value="4" minimumValue="0" maximumValue="5"/>
-        <integerOption id="model.option.mercenaryPrice" value="75" minimumValue="10" maximumValue="100"/>
-        <integerOption id="model.option.maximumTax" value="75" minimumValue="50" maximumValue="100"/>
-        <integerOption id="model.option.monarchSupport" value="0" minimumValue="0" maximumValue="4"/>
-        <integerOption id="model.option.treasureTransportFee" value="70" minimumValue="0" maximumValue="100"/>
-        <integerOption id="model.option.interventionBells" value="8000" minimumValue="0" maximumValue="100000" />
-        <integerOption id="model.option.interventionTurns" value="54" minimumValue="20" maximumValue="100" />
-        <unitListOption id="model.option.refSize">
-          <template>
-            <unitOption id="model.option.refSize.template">
+          <integerOption id="model.option.monarchMeddling" value="4" minimumValue="0" maximumValue="10"/>
+          <integerOption id="model.option.taxAdjustment" value="4" minimumValue="0" maximumValue="5"/>
+          <integerOption id="model.option.mercenaryPrice" value="75" minimumValue="10" maximumValue="100"/>
+          <integerOption id="model.option.maximumTax" value="75" minimumValue="50" maximumValue="100"/>
+          <integerOption id="model.option.monarchSupport" value="0" minimumValue="0" maximumValue="4"/>
+          <integerOption id="model.option.treasureTransportFee" value="70" minimumValue="0" maximumValue="100"/>
+          <integerOption id="model.option.interventionBells" value="8000" minimumValue="0" maximumValue="100000" />
+          <integerOption id="model.option.interventionTurns" value="54" minimumValue="20" maximumValue="100" />
+          <unitListOption id="model.option.refSize">
+            <template>
+              <unitOption id="model.option.refSize.template">
+                <unitType value="model.unit.kingsRegular" generate="UNITS" />
+                <role value="SOLDIER">
+                  <choice value="SOLDIER" />
+                  <choice value="DRAGOON" />
+                </role>
+                <number value="20" minimumValue="0" maximumValue="999" />
+              </unitOption>
+            </template>
+            <unitOption id="model.option.refSize.soldiers">
               <unitType value="model.unit.kingsRegular" generate="UNITS" />
               <role value="SOLDIER">
                 <choice value="SOLDIER" />
                 <choice value="DRAGOON" />
               </role>
+              <number value="60" minimumValue="0" maximumValue="999" />
+            </unitOption>
+            <unitOption id="model.option.refSize.dragoons">
+              <unitType value="model.unit.kingsRegular" generate="UNITS" />
+              <role value="DRAGOON" >
+                <choice value="SOLDIER" />
+                <choice value="DRAGOON" />
+              </role>
+              <number value="30" minimumValue="0" maximumValue="999" />
+            </unitOption>
+            <unitOption id="model.option.refSize.artillery">
+              <unitType value="model.unit.artillery" generate="UNITS" />
+              <role value="DEFAULT" />
+              <number value="30" minimumValue="0" maximumValue="999" />
+            </unitOption>
+            <unitOption id="model.option.refSize.menOfWar">
+              <unitType value="model.unit.manOWar" generate="UNITS" />
+              <role value="DEFAULT" />
               <number value="20" minimumValue="0" maximumValue="999" />
             </unitOption>
-          </template>
-          <unitOption id="model.option.refSize.soldiers">
-            <unitType value="model.unit.kingsRegular" generate="UNITS" />
-            <role value="SOLDIER">
-              <choice value="SOLDIER" />
-              <choice value="DRAGOON" />
-            </role>
-            <number value="60" minimumValue="0" maximumValue="999" />
-          </unitOption>
-          <unitOption id="model.option.refSize.dragoons">
-            <unitType value="model.unit.kingsRegular" generate="UNITS" />
-            <role value="DRAGOON" >
-              <choice value="SOLDIER" />
-              <choice value="DRAGOON" />
-            </role>
-            <number value="30" minimumValue="0" maximumValue="999" />
-          </unitOption>
-          <unitOption id="model.option.refSize.artillery">
-            <unitType value="model.unit.artillery" generate="UNITS" />
-            <role value="DEFAULT" />
-            <number value="30" minimumValue="0" maximumValue="999" />
-          </unitOption>
-          <unitOption id="model.option.refSize.menOfWar">
-            <unitType value="model.unit.manOWar" generate="UNITS" />
-            <role value="DEFAULT" />
-            <number value="20" minimumValue="0" maximumValue="999" />
-          </unitOption>
-        </unitListOption>
-        <unitListOption id="model.option.interventionForce">
-          <unitOption id="model.option.interventionForce.regulars">
-            <unitType value="model.unit.colonialRegular" generate="UNITS" />
-            <role value="SOLDIER" />
-            <number value="2" minimumValue="0" maximumValue="999" />
-          </unitOption>
-          <unitOption id="model.option.interventionForce.dragoons">
-            <unitType value="model.unit.colonialRegular" generate="UNITS" />
-            <role value="DRAGOON" />
-            <number value="1" minimumValue="0" maximumValue="999" />
-          </unitOption>
-          <unitOption id="model.option.interventionForce.artillery">
-            <unitType value="model.unit.artillery" generate="UNITS" />
-            <role value="DEFAULT" />
-            <number value="2" minimumValue="0" maximumValue="999" />
-          </unitOption>
-          <unitOption id="model.option.interventionForce.menOfWar">
-            <unitType value="model.unit.manOWar" generate="UNITS" />
-            <role value="DEFAULT" />
-            <number value="2" minimumValue="0" maximumValue="999" />
-          </unitOption>
-        </unitListOption>
+          </unitListOption>
+          <unitListOption id="model.option.interventionForce">
+            <unitOption id="model.option.interventionForce.regulars">
+              <unitType value="model.unit.colonialRegular" generate="UNITS" />
+              <role value="SOLDIER" />
+              <number value="2" minimumValue="0" maximumValue="999" />
+            </unitOption>
+            <unitOption id="model.option.interventionForce.dragoons">
+              <unitType value="model.unit.colonialRegular" generate="UNITS" />
+              <role value="DRAGOON" />
+              <number value="1" minimumValue="0" maximumValue="999" />
+            </unitOption>
+            <unitOption id="model.option.interventionForce.artillery">
+              <unitType value="model.unit.artillery" generate="UNITS" />
+              <role value="DEFAULT" />
+              <number value="2" minimumValue="0" maximumValue="999" />
+            </unitOption>
+            <unitOption id="model.option.interventionForce.menOfWar">
+              <unitType value="model.unit.manOWar" generate="UNITS" />
+              <role value="DEFAULT" />
+              <number value="2" minimumValue="0" maximumValue="999" />
+            </unitOption>
+          </unitListOption>
+          <unitListOption id="model.option.mercenaryForce">
+            <unitOption id="model.option.mercenaryForce.regulars">
+              <unitType value="model.unit.veteranSoldier" />
+              <role value="SOLDIER" />
+              <number value="3" />
+            </unitOption>
+            <unitOption id="model.option.mercenaryForce.dragoons">
+              <unitType value="model.unit.veteranSoldier" />
+              <role value="DRAGOON" />
+              <number value="3" />
+            </unitOption>
+            <unitOption id="model.option.mercenaryForce.artillery">
+              <unitType value="model.unit.artillery" />
+              <role value="DEFAULT" />
+              <number value="3" />
+            </unitOption>
+            <unitOption id="model.option.mercenaryForce.menOfWar">
+              <unitType value="model.unit.manOWar" />
+              <role value="DEFAULT" />
+              <number value="2" />
+            </unitOption>
+          </unitListOption>
         </optionGroup>
         <optionGroup id="model.difficulty.government">
           <integerOption id="model.option.badGovernmentLimit" value="4" minimumValue="0" maximumValue="100"/>
           <integerOption id="model.option.veryBadGovernmentLimit" value="8" minimumValue="0" maximumValue="100"/>
-          <!-- these limits are intentially higher than 100 %, so they can be effectively disabled -->
+          <!-- these limits are intentionally higher than 100 %, so they can be effectively disabled -->
           <integerOption id="model.option.goodGovernmentLimit" value="50" minimumValue="0" maximumValue="150"/>
           <integerOption id="model.option.veryGoodGovernmentLimit" value="100" minimumValue="0" maximumValue="150"/>
         </optionGroup>
