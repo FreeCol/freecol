@@ -106,6 +106,12 @@ public class NativeAIPlayer extends AIPlayer {
     public static final int MAX_NUMBER_OF_DEMANDS = 1;
 
     /**
+     * A settlement with a surplus chooses to send a gift GIFT_PERCENT
+     * of the time.
+     */
+    public static final int GIFT_PERCENT = 5;
+
+    /**
      * Stores temporary information for sessions (trading with another
      * player etc).
      */
@@ -473,6 +479,10 @@ public class NativeAIPlayer extends AIPlayer {
             Goods gift = is.getRandomGift(getAIRandom());
             if (gift == null) continue;
 
+            // Do not bring gifts all the time.
+            if (Utils.randomInt(logger, is.getName() + " bring gifts",
+                    getAIRandom(), 100) < GIFT_PERCENT) continue;
+
             // Check if there are available units, and if there are already
             // enough missions in operation.
             List<Unit> availableUnits = new ArrayList<Unit>();
@@ -495,9 +505,6 @@ public class NativeAIPlayer extends AIPlayer {
                 logger.finest(is.getName() + " has no gift units.");
                 continue;
             }
-            // Do not bring gifts all the time.
-            if (Utils.randomInt(logger, is.getName() + " bring gifts",
-                    getAIRandom(), 10) != 0) continue;
             // Pick a random available capable unit.
             Unit unit = null;
             AIUnit aiUnit = null;
