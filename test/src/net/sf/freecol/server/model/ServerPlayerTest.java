@@ -94,6 +94,7 @@ public class ServerPlayerTest extends FreeColTestCase {
         // is now considered "traded".
         english.sell(null, silverType, 1, new Random());
         assertTrue(englishMarket.hasBeenTraded(silverType));
+        int englishAmount = englishMarket.getAmountInMarket(silverType);
 
         // Sell heavily in the French market, price should drop.
         french.sell(null, silverType, 200, new Random());
@@ -101,14 +102,15 @@ public class ServerPlayerTest extends FreeColTestCase {
         assertTrue(frenchMarket.hasBeenTraded(silverType));
         assertTrue(frenchMarket.getSalePrice(silverType, 1) < silverPrice);
 
-        // Price should have dropped in the English market too, but
+        // Price might have dropped in the English market too, but
         // not as much as for the French.
-        // assertTrue(englishMarket.getSalePrice(silver, 1) < silverPrice);
-        // assertTrue(englishMarket.getSalePrice(silver, 1) >= frenchMarket.getSalePrice(silver, 1));
-        // This has never worked while the test was done client side,
-        // and had the comment: ``This does not work without real
-        // ModelControllers''.  TODO: Revisit when the client-server
-        // conversion of sales is complete.
+        assertTrue("English silver increases due to French sales",
+            englishMarket.getAmountInMarket(silverType) > englishAmount);
+        assertTrue("English silver price might drop due to French sales",
+            englishMarket.getSalePrice(silverType, 1) <= silverPrice);
+        assertTrue("English silver price should drop less than French",
+            englishMarket.getSalePrice(silverType, 1)
+            >= frenchMarket.getSalePrice(silverType, 1));
 
         // Pretend time is passing.
         // Have to advance time as yearly goods removal is initially low.
@@ -117,21 +119,24 @@ public class ServerPlayerTest extends FreeColTestCase {
         setValues.add(20);
         MockPseudoRandom mockRandom = new MockPseudoRandom(setValues, true);
         ServerTestHelper.setRandom(mockRandom);
+        boolean frenchRecovered = false;
+        boolean englishRecovered = false;
         for (int i = 0; i < 100; i++) {
             igc.yearlyGoodsAdjust((ServerPlayer) french);
+            if (frenchMarket.getSalePrice(silverType, 1) >= silverPrice) {
+                frenchRecovered = true;
+            }
             igc.yearlyGoodsAdjust((ServerPlayer) english);
+            if (englishMarket.getSalePrice(silverType, 1) >= silverPrice) {
+                englishRecovered = true;
+            }
         }
 
-        // Price should have recovered
-        int newPrice;
-        newPrice = frenchMarket.getSalePrice(silverType, 1);
-        assertTrue("French silver price " + newPrice
-                   + " should have recovered to " + silverPrice,
-                   newPrice >= silverPrice);
-        newPrice = englishMarket.getSalePrice(silverType, 1);
-        assertTrue("English silver price " + newPrice
-                   + " should have recovered to " + silverPrice,
-                   newPrice >= silverPrice);
+        // Prices should have recovered.
+        assertTrue("French silver price should have recovered",
+                   frenchRecovered);
+        assertTrue("English silver price should have recovered",
+                   englishRecovered);
     }
 
     public void testHasExploredTile() {
