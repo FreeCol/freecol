@@ -469,9 +469,9 @@ public class NativeAIPlayer extends AIPlayer {
         final Player player = getPlayer();
         final Map map = getGame().getMap();
         for (IndianSettlement is : player.getIndianSettlements()) {
-            // Do not bring gifts all the time.
-            if (Utils.randomInt(logger, is.getName() + " bring gifts",
-                    getAIRandom(), 10) != 0) continue;
+            // Check if the settlement has anything to give first.
+            Goods gift = is.getRandomGift(getAIRandom());
+            if (gift == null) continue;
 
             // Check if there are available units, and if there are already
             // enough missions in operation.
@@ -495,6 +495,9 @@ public class NativeAIPlayer extends AIPlayer {
                 logger.finest(is.getName() + " has no gift units.");
                 continue;
             }
+            // Do not bring gifts all the time.
+            if (Utils.randomInt(logger, is.getName() + " bring gifts",
+                    getAIRandom(), 10) != 0) continue;
             // Pick a random available capable unit.
             Unit unit = null;
             AIUnit aiUnit = null;

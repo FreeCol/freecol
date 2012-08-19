@@ -60,7 +60,9 @@ public class IndianBringGiftMission extends Mission {
 
     private static final String tag = "AI native gifter";
 
-    /** The <code>Colony</code> receiving the gift. */
+    /**
+     * The Colony to receive the gift.
+     */
     private Colony target;
 
     /** Decides whether this mission has been completed or not. */
@@ -104,6 +106,16 @@ public class IndianBringGiftMission extends Mission {
     }
 
 
+    /**
+     * Checks if the unit is carrying a gift (goods).
+     *
+     * @return True if the unit is carrying goods.
+     */
+    private boolean hasGift() {
+        return getUnit().getGoodsCount() > 0;
+    }
+
+
     // Mission interface
 
     /**
@@ -116,16 +128,18 @@ public class IndianBringGiftMission extends Mission {
     }
 
     /**
-     * Why would an IndianBringGiftMission be invalid with the given unit?
+     * Why would this mission be invalid with the given unit?
      *
      * @param aiUnit The <code>AIUnit</code> to test.
      * @return A reason why the mission would be invalid with the unit,
      *     or null if none found.
      */
-    private static String invalidGiftReason(AIUnit aiUnit) {
-        final Unit unit = aiUnit.getUnit();
-        return (unit.getIndianSettlement() == null) ? "home-destroyed"
-            : (unit.getTile() == null) ? Mission.UNITNOTONMAP
+    private static String invalidMissionReason(AIUnit aiUnit) {
+        String reason = invalidAIUnitReason(aiUnit);
+        return (reason != null)
+            ? reason
+            : (aiUnit.getUnit().getIndianSettlement() == null)
+            ? "home-destroyed"
             : null;
     }
 
@@ -138,8 +152,9 @@ public class IndianBringGiftMission extends Mission {
      * @return A reason why the mission would be invalid with the unit
      *     and colony or null if none found.
      */
-    private static String invalidGiftColonyReason(AIUnit aiUnit,
-                                                  Colony colony) {
+    private static String invalidColonyReason(AIUnit aiUnit, Colony colony) {
+        String reason = invalidTargetReason(colony);
+        if (reason != null) return reason;
         final Unit unit = aiUnit.getUnit();
         final Player owner = unit.getOwner();
         Player targetPlayer = colony.getOwner();
@@ -171,10 +186,7 @@ public class IndianBringGiftMission extends Mission {
      * @return A reason for mission invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit) {
-        String reason;
-        return ((reason = Mission.invalidReason(aiUnit)) != null) ? reason
-            : ((reason = invalidGiftReason(aiUnit)) != null) ? reason
-            : null;
+        return invalidMissionReason(aiUnit);
     }
 
     /**
@@ -185,13 +197,10 @@ public class IndianBringGiftMission extends Mission {
      * @return A reason for invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit, Location loc) {
-        String reason;
-        return ((reason = invalidAIUnitReason(aiUnit)) != null) ? reason
-            : ((reason = invalidGiftReason(aiUnit)) != null) ? reason
+        String reason = invalidMissionReason(aiUnit);
+        return (reason != null) ? reason
             : (loc instanceof Colony)
-            ? (((reason = invalidTargetReason(loc)) != null) ? reason
-                : ((reason = invalidGiftColonyReason(aiUnit, (Colony)loc))
-                    != null) ? reason : null)
+            ? invalidColonyReason(aiUnit, (Colony)loc)
             : Mission.TARGETINVALID;
     }
 
@@ -207,65 +216,67 @@ public class IndianBringGiftMission extends Mission {
             return;
         }
 
+        final AIUnit aiUnit = getAIUnit();
+        final Unit unit = getUnit();
+        final IndianSettlement is = unit.getIndianSettlement();
         if (!hasGift()) {
-            if (getUnit().getTile() != getUnit().getIndianSettlement().getTile()) {
-                // Move to the owning settlement:
-                Direction r = moveTowards(getUnit().getIndianSettlement().getTile());
-                if (r == null || !moveButDontAttack(r)) return;
+            Unit.MoveType mt = travelToTarget(tag, is);
+            switch (mt) {
+            case MOVE_NO_MOVES:
+                return;
+            case MOVE: // Arrived!
+                break;
+            default:
+                logger.warning(tag + " unexpected collection move type: " + mt
+                    + ": " + this);
+                moveRandomly(tag, null);
+                return;
+            }
+            // Load the goods.
+            Goods gift = is.getRandomGift(getAIRandom());
+            if (gift == null) {
+                logger.finest(tag + " found no gift to collect"
+                    + " at " + is.getName() + ": " + this);
             } else {
-                IndianSettlement is = getUnit().getIndianSettlement();
-                // Load the goods:
-                List<Goods> goodsList = new ArrayList<Goods>();
-                GoodsContainer gc = is.getGoodsContainer();
-                for (GoodsType goodsType : getSpecification().getNewWorldGoodsTypeList()) {
-                    if (gc.getGoodsCount(goodsType) >= IndianSettlement.KEEP_RAW_MATERIAL + 25) {
-                        Goods goods = new Goods(getGame(), is, goodsType,
-                            Utils.randomInt(logger, "Gift amount",
-                                getAIRandom(), 15) + 10);
-                        goodsList.add(goods);
-                    }
+                if (!AIMessage.askLoadCargo(aiUnit, gift)) {
+                    logger.finest(tag + " failed to collect gift "
+                        + " at " + is.getName() + ": " + this);
                 }
-
-                if (goodsList.size() == 0) {
-                    completed = true;
-                } else {
-                    Goods goods = goodsList.get(Utils.randomInt(logger,
-                            "Gift amount", getAIRandom(), goodsList.size()));
-                    AIMessage.askLoadCargo(getAIUnit(), goods);
-                }
+            }
+            if (!hasGift()) {
+                completed = true;
+                return;
             }
         } else {
             // Move to the target's colony and deliver
-            Direction r = moveTowards(target.getTile());
-            if (r != null
-                && getUnit().getTile().getNeighbourOrNull(r) == target.getTile()) {
-                // We have arrived.
-                if (AIMessage.askGetTransaction(getAIUnit(), target)
-                    && AIMessage.askDeliverGift(getAIUnit(), target,
-                                                getUnit().getGoodsIterator().next())) {
-                    AIMessage.askCloseTransaction(getAIUnit(), target);
-                    logger.finest(tag + " completed at " + target.getName()
-                        + ": " + this);
-                } else {
-                    logger.warning(tag + " failed at " + target.getName()
-                        + ": " + this);
-                }
-                completed = true;
+            Unit.MoveType mt = travelToTarget(tag, target.getTile());
+            switch (mt) {
+            case MOVE_NO_MOVES:
+                return;
+            case ATTACK_SETTLEMENT: // Arrived (do not really attack)
+                break;
+            default:
+                logger.finest(tag + " unexpected delivery move type: " + mt
+                    + ": " + this);
+                moveRandomly(tag, null);
+                return;
             }
+
+            if (!unit.getTile().isAdjacent(target.getTile())) {
+                throw new IllegalStateException("Not at target: " + target);
+            }
+            if (AIMessage.askGetTransaction(aiUnit, target)
+                && AIMessage.askDeliverGift(aiUnit, target,
+                    unit.getGoodsList().get(0))) {
+                AIMessage.askCloseTransaction(aiUnit, target);
+                logger.finest(tag + " completed at " + target.getName()
+                    + ": " + this);
+            } else {
+                logger.warning(tag + " failed at " + target.getName()
+                    + ": " + this);
+            }
+            completed = true;
         }
-
-        // Walk in a random direction if we have any moves left:
-        moveRandomly(tag, null);
-    }
-
-    /**
-     * Checks if the unit is carrying a gift (goods).
-     *
-     * @return <i>true</i> if <code>getUnit().getSpaceLeft() == 0</code> and
-     *         false otherwise.
-     */
-    private boolean hasGift() {
-        return (getUnit().getSpaceLeft() == 0);
     }
 
 

@@ -27,8 +27,15 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Random;
 import java.util.Set;
 import java.util.logging.Logger;
+
+import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsContainer;
+import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.util.Utils;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -1049,6 +1056,28 @@ public class IndianSettlement extends Settlement {
         potential += getTile().potential(type, null);
 
         return potential;
+    }
+
+    /**
+     * Gets a random goods gift from this settlement.
+     *
+     * @param random A pseudo random number source.
+     * @return A random goods gift, or null if none found.
+     */
+    public Goods getRandomGift(Random random) {
+        List<Goods> goodsList = new ArrayList<Goods>();
+        GoodsContainer gc = getGoodsContainer();
+        for (GoodsType goodsType : getSpecification().getNewWorldGoodsTypeList()) {
+            if (gc.getGoodsCount(goodsType)
+                >= IndianSettlement.KEEP_RAW_MATERIAL + 25) {
+                Goods goods = new Goods(getGame(), this, goodsType,
+                    Utils.randomInt(logger, "Gift amount", random, 15) + 10);
+                goodsList.add(goods);
+            }
+
+        }
+        return (goodsList.isEmpty()) ? null
+            : Utils.getRandomMember(logger, "Gift amount", goodsList, random);
     }
 
     /**
