@@ -86,6 +86,9 @@ public class IndianSettlement extends Settlement {
     /** The minimum gift amount. */
     public static final int GIFT_MINIMUM = 10;
 
+    /** The maximum gift amount. */
+    public static final int GIFT_MAXIMUM = 80;
+
     /**
      * This is the skill that can be learned by Europeans at this
      * settlement.  At the server side its value will be null when the
@@ -1081,8 +1084,8 @@ public class IndianSettlement extends Settlement {
             if (n >= GIFT_THRESHOLD) {
                 n -= GIFT_MINIMUM;
                 Goods goods = new Goods(getGame(), this, type,
-                    Utils.randomInt(logger, "Gift amount", random, n)
-                    + GIFT_MINIMUM);
+                    Math.min(Utils.randomInt(logger, "Gift amount", random, n)
+                        + GIFT_MINIMUM, GIFT_MAXIMUM));
                 goodsList.add(goods);
             }
 
