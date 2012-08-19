@@ -64,9 +64,9 @@ public class PrivateerMission extends Mission {
      */
     public PrivateerMission(AIMain aiMain, AIUnit aiUnit) {
         super(aiMain, aiUnit);
+
         Unit unit = aiUnit.getUnit();
-        logger.finest("Assigning PrivateerMission to unit=" + unit
-            + " at " + unit.getLocation());
+        logger.finest(tag + " begins at " + unit.getLocation() + ": " + this);
         uninitialized = false;
     }
 
@@ -107,7 +107,9 @@ public class PrivateerMission extends Mission {
      * @return A reason why the mission would be invalid with the unit,
      *     or null if none found.
      */
-    private static String invalidPrivateeringReason(AIUnit aiUnit) {
+    private static String invalidMissionReason(AIUnit aiUnit) {
+        String reason = invalidAIUnitReason(aiUnit);
+        if (reason != null) return reason;
         final Unit unit = aiUnit.getUnit();
         return (!unit.isCarrier()) ? "unit-not-a-carrier"
             : (!unit.isOffensiveUnit()) ? Mission.UNITNOTOFFENSIVE
@@ -133,10 +135,7 @@ public class PrivateerMission extends Mission {
      * @return A reason for mission invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit) {
-        String reason;
-        return ((reason = Mission.invalidReason(aiUnit)) != null) ? reason
-            : ((reason = invalidPrivateeringReason(aiUnit)) != null) ? reason
-            : null;
+        return invalidMissionReason(aiUnit);
     }
 
     /**
@@ -147,10 +146,7 @@ public class PrivateerMission extends Mission {
      * @return A reason for mission invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit, Location loc) {
-        String reason;
-        return ((reason = invalidAIUnitReason(aiUnit)) != null) ? reason
-            : ((reason = invalidPrivateeringReason(aiUnit)) != null) ? reason
-            : null;
+        return invalidMissionReason(aiUnit);
     }
 
     // Not a one-time mission, omit isOneTime().
@@ -163,18 +159,18 @@ public class PrivateerMission extends Mission {
     public void doMission() {
         Unit unit = getUnit();
         while(isValid() && unit.getMovesLeft() > 0){
-        	// Unit is between Europe and America, nothing to do
-        	if (unit.isAtSea()){
-                    unit.setMovesLeft(0);
-                    return;
-        	}
+            // Unit is between Europe and America, nothing to do
+            if (unit.isAtSea()){
+                unit.setMovesLeft(0);
+                return;
+            }
             switch(state){
-                case HUNTING:
-                    hunt4Target();
-                    break;
-                case TRANSPORTING:
-                    gotoNearestPort();
-                    break;
+            case HUNTING:
+                hunt4Target();
+                break;
+            case TRANSPORTING:
+                gotoNearestPort();
+                break;
             }
         }
     }
@@ -187,10 +183,9 @@ public class PrivateerMission extends Mission {
             unit.setMovesLeft(0);
             return;
         }
-        logger.finest("Privateer (" + unit.getId() + ") at " + unit.getLocation() + " hunting");
 
         // has captured goods, must get them to port
-        if(unit.getGoodsCount() > 0){
+        if (unit.getGoodsCount() > 0) {
             state = PrivateerMissionState.TRANSPORTING;
             return;
         }
@@ -199,40 +194,25 @@ public class PrivateerMission extends Mission {
         PathNode pathToTarget = findTarget(MAX_TURNS_TO_TARGET);
         // Found a target
         if (pathToTarget != null) {
-        	target = pathToTarget.getLastNode().getTile();
-            logger.finest("Privateer (" + unit.getId() + ") at "
-                          + unit.getTile() + " found target at " + target);
+            target = pathToTarget.getLastNode().getTile();
+            logger.finest(tag + " at " + unit.getTile()
+                + " found target at " + target + ": " + this);
             // We need to find an updated path to target
-            pathToTarget = unit.findPath(target);
-            Direction direction = moveTowards(pathToTarget);
-            if (direction == null) {
-                // some movement points may still remain due to some
-                // block or just not enough points for next node we need
-                // to make sure the unit has no points left, so the game
-                // can move to next unit
-                logger.finest("Ending privateer (" + unit.getId()
-                              + ") turn, moves=" + unit.getMovesLeft());
-                unit.setMovesLeft(0);
-                return;
-            }
-            // catch up with the prey
-            if (unit.getMoveType(direction) == MoveType.ATTACK_UNIT) {
-                logger.finest("Privateer (" + unit.getId() + ") at "
-                              + unit.getTile() + " attacking target");
+            Direction direction;
+            if (travelToTarget(tag, target) == MoveType.ATTACK_UNIT
+                && (direction = unit.getTile().getDirection(target)) != null) {
+                logger.finest(tag + " at " + unit.getTile()
+                    + " attacking " + target.getDefendingUnit(unit)
+                    + ": " + this);
                 AIMessage.askAttack(getAIUnit(), direction);
             }
         } else {
             // No target found, just make a random move
             target = null;
-            logger.finest("Privateer at " + unit.getTile()
-                          + " without target, wandering");
+            logger.finest(tag + " at " + unit.getTile()
+                + " without target, wandering");
             moveRandomly(tag, null);
         }
-        // some movement points may still remain
-    	//due to some block or just not enough points for next node
-    	// we need to make sure the unit has no points left,
-    	//so the game can move to next unit
-    	unit.setMovesLeft(0);
     }
 
     private void gotoNearestPort() {
@@ -247,7 +227,7 @@ public class PrivateerMission extends Mission {
         PathNode path = unit.findFullPath(nearestPort);
         if (path == null) {
             if ((path = unit.findOurNearestPort()) == null) {
-                logger.finest("Failed to find port for goods");
+                logger.finest(tag + " failed to find port for goods: " + this);
                 return;
             }
             nearestPort = path.getLastNode().getLocation();
@@ -276,21 +256,17 @@ public class PrivateerMission extends Mission {
     }
 
     private void dumpCargoInPort() {
-    	logger.finest("Dumping goods");
+        logger.finest(tag + " dumping goods: " + this);
         Unit unit = getUnit();
         boolean inEurope = unit.getLocation() instanceof Europe;
 
         List<Goods> goodsLst = new ArrayList<Goods>(unit.getGoodsList());
         for(Goods goods : goodsLst){
             if(inEurope){
-            	logger.finest("Before dumping: money=" + unit.getOwner().getGold());
-              goodsLeavesTransport(goods.getType(), goods.getAmount());
-            	logger.finest("After dumping: money=" + unit.getOwner().getGold());
-            } else{
-            	Colony colony = unit.getTile().getColony();
-            	logger.finest("Before dumping: " +  colony.getGoodsCount(goods.getType()) + " " + goods.getType());
+                goodsLeavesTransport(goods.getType(), goods.getAmount());
+            } else {
+                Colony colony = unit.getTile().getColony();
                 unloadCargoInColony(goods);
-            	logger.finest("After dumping: " +  colony.getGoodsCount(goods.getType()) + " " + goods.getType());
             }
         }
 
@@ -314,7 +290,7 @@ public class PrivateerMission extends Mission {
      *     the privateer
      */
     public static int getModifierValueForTarget(CombatModel combatModel,
-                                                Unit attacker, Unit defender) {
+        Unit attacker, Unit defender) {
         // pirates are greedy ;)
         int modifier = 100;
         modifier += defender.getGoodsCount() * 200;
@@ -361,7 +337,7 @@ public class PrivateerMission extends Mission {
         super.readAttributes(in);
 
         state = PrivateerMissionState.valueOf(in.getAttributeValue(null,
-                                                                   "state"));
+                "state"));
     }
 
     /**
