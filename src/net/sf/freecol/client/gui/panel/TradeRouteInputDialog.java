@@ -27,6 +27,8 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -95,10 +97,10 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
 
     private final JTextField tradeRouteName = new JTextField(Messages.message("traderouteDialog.newRoute"));
 
-    private final DefaultListModel listModel = new DefaultListModel();
+    private final DefaultListModel stopListModel = new DefaultListModel();
 
     @SuppressWarnings("unchecked") // FIXME in Java7
-    private final JList stopList = new JList(listModel);
+        private final JList stopList = new JList(stopListModel);
 
     private final JScrollPane tradeRouteView = new JScrollPane(stopList);
 
@@ -115,8 +117,8 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
      * @param newRoute The <code>TradeRoute</code> to operate on.
      */
     @SuppressWarnings("unchecked") // FIXME in Java7
-    public TradeRouteInputDialog(FreeColClient freeColClient, GUI gui,
-                                 TradeRoute newRoute) {
+        public TradeRouteInputDialog(FreeColClient freeColClient, GUI gui,
+                                     TradeRoute newRoute) {
         super(freeColClient, gui);
         originalRoute = newRoute;
 
@@ -128,67 +130,82 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
         stopList.setCellRenderer(new StopRenderer());
         stopList.setFixedCellHeight(48);
         stopList.addListSelectionListener(new ListSelectionListener() {
-            public void valueChanged(ListSelectionEvent e) {
-                updateButtons();
-            }
-        });
+                public void valueChanged(ListSelectionEvent e) {
+                    updateButtons();
+                }
+            });
+        stopList.addKeyListener(new KeyListener() {
+
+                @Override
+                public void keyTyped(KeyEvent e) {
+                    if (e.getKeyChar() == KeyEvent.VK_DELETE) {
+                        deleteCurrentlySelectedStops();
+                    }
+                }
+
+                @Override
+                public void keyPressed(KeyEvent e) {
+                    throw new UnsupportedOperationException("Not supported yet.");
+                }
+
+                @Override
+                public void keyReleased(KeyEvent e) {
+                    throw new UnsupportedOperationException("Not supported yet.");
+                }
+            });
 
         // button for adding new Stop
         addStopButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                int startIndex = -1;
-                int endIndex = -1;
-                if (destinationSelector.getSelectedIndex() == 0 ) {
-                    // All colonies + Europe
-                    startIndex = 1;
-                    endIndex = destinationSelector.getItemCount() - 1;
-                } else {
-                    // just 1 colony
-                    startIndex = destinationSelector.getSelectedIndex();
-                    endIndex = startIndex;
-                }
-                List<GoodsType> cargo = new ArrayList<GoodsType>();
-                for (Component comp : cargoPanel.getComponents()) {
-                    CargoLabel label = (CargoLabel) comp;
-                    cargo.add(label.getType());
-                }
-                int maxIndex = stopList.getMaxSelectionIndex();
-                for (int i = startIndex; i <= endIndex; i++) {
-                    Stop stop = originalRoute.new Stop((Location) destinationSelector.getItemAt(i));
-                    stop.setCargo(cargo);
-                    if (maxIndex < 0) {
-                        listModel.addElement(stop);
+                public void actionPerformed(ActionEvent e) {
+                    int startIndex = -1;
+                    int endIndex = -1;
+                    if (destinationSelector.getSelectedIndex() == 0 ) {
+                        // All colonies + Europe
+                        startIndex = 1;
+                        endIndex = destinationSelector.getItemCount() - 1;
                     } else {
-                        maxIndex++;
-                        listModel.add(maxIndex, stop);
+                        // just 1 colony
+                        startIndex = destinationSelector.getSelectedIndex();
+                        endIndex = startIndex;
+                    }
+                    List<GoodsType> cargo = new ArrayList<GoodsType>();
+                    for (Component comp : cargoPanel.getComponents()) {
+                        CargoLabel label = (CargoLabel) comp;
+                        cargo.add(label.getType());
+                    }
+                    int maxIndex = stopList.getMaxSelectionIndex();
+                    for (int i = startIndex; i <= endIndex; i++) {
+                        Stop stop = originalRoute.new Stop((Location) destinationSelector.getItemAt(i));
+                        stop.setCargo(cargo);
+                        if (maxIndex < 0) {
+                            stopListModel.addElement(stop);
+                        } else {
+                            maxIndex++;
+                            stopListModel.add(maxIndex, stop);
+                        }
                     }
                 }
-            }
-        });
+            });
 
         // button for deleting Stop
         removeStopButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                int count = 0;
-                for (int index : stopList.getSelectedIndices()) {
-                    listModel.remove(index - count);
-                    count++;
+                public void actionPerformed(ActionEvent e) {
+                    deleteCurrentlySelectedStops();
                 }
-            }
-        });
+            });
 
         stopList.setDragEnabled(true);
         stopList.setTransferHandler(new StopHandler());
         stopList.addListSelectionListener(new ListSelectionListener() {
-            public void valueChanged(ListSelectionEvent e) {
-                if (!e.getValueIsAdjusting()) {
-                    int[] indices = stopList.getSelectedIndices();
-                    if (indices.length > 0) {
-                        cargoPanel.initialize((Stop) listModel.get(indices[0]));
+                public void valueChanged(ListSelectionEvent e) {
+                    if (!e.getValueIsAdjusting()) {
+                        int[] indices = stopList.getSelectedIndices();
+                        if (indices.length > 0) {
+                            cargoPanel.initialize((Stop) stopListModel.get(indices[0]));
+                        }
                     }
                 }
-            }
-        });
+            });
 
         setLayout(new MigLayout("wrap 4, fill", "[]20[fill]rel"));
 
@@ -222,13 +239,13 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
 
         // add stops if any
         for (Stop stop : tradeRoute.getStops()) {
-            listModel.addElement(stop);
+            stopListModel.addElement(stop);
         }
 
         // update cargo panel if stop is selected
-        if (listModel.getSize() > 0) {
+        if (stopListModel.getSize() > 0) {
             stopList.setSelectedIndex(0);
-            Stop selectedStop = (Stop) listModel.firstElement();
+            Stop selectedStop = (Stop) stopListModel.firstElement();
             cargoPanel.initialize(selectedStop);
         }
 
@@ -240,6 +257,24 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
 
         restoreSavedSize(getPreferredSize());
 
+    }
+
+    private void deleteCurrentlySelectedStops() {
+        int count = 0;
+        int lastIndex = 0;
+        for (int index : stopList.getSelectedIndices()) {
+            stopListModel.remove(index - count);
+            count++;
+            lastIndex = index;
+        }
+
+        // if the remaining list is non-empty, make sure that
+        // the element beneath the last of the previously selected
+        // is selected (ie, delete one of many, the one -under- the deleted is selected)
+        // the user can then click in the list once, and continue deleting without having to click in the list again.
+        if (stopListModel.getSize() > 0) {
+            stopList.setSelectedIndex(lastIndex - count + 1);
+        }
     }
 
 
@@ -273,14 +308,14 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
         }
 
         // Verify that it has at least two stops
-        if (listModel.getSize() < 2) {
+        if (stopListModel.getSize() < 2) {
             getGUI().errorMessage("traderouteDialog.notEnoughStops");
             return false;
         }
 
         // Check that all stops are valid
-        for (int index = 0; index < listModel.getSize(); index++) {
-            Stop stop = (Stop) listModel.get(index);
+        for (int index = 0; index < stopListModel.getSize(); index++) {
+            Stop stop = (Stop) stopListModel.get(index);
             if (!TradeRoute.isStopValid(player, stop)) {
                 return false;
             }
@@ -302,8 +337,8 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
                 getGUI().removeFromCanvas(this);
                 originalRoute.setName(tradeRouteName.getText());
                 ArrayList<Stop> stops = new ArrayList<Stop>();
-                for (int index = 0; index < listModel.getSize(); index++) {
-                    stops.add((Stop) listModel.get(index));
+                for (int index = 0; index < stopListModel.getSize(); index++) {
+                    stops.add((Stop) stopListModel.get(index));
                 }
                 originalRoute.setStops(stops);
                 // TODO: update trade routes only if they have been modified
@@ -418,7 +453,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
                         cargoPanel.revalidate();
                         int[] indices = stopList.getSelectedIndices();
                         for (int index : indices) {
-                            Stop stop = (Stop) listModel.get(index);
+                            Stop stop = (Stop) stopListModel.get(index);
                             stop.addCargo(label.getType());
                             stop.setModified(true);
                         }
@@ -443,7 +478,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
                     cargoPanel.remove(label);
                     int[] indices = stopList.getSelectedIndices();
                     for (int stopIndex : indices) {
-                        Stop stop = (Stop) listModel.get(stopIndex);
+                        Stop stop = (Stop) stopListModel.get(stopIndex);
                         ArrayList<GoodsType> cargo = new ArrayList<GoodsType>(stop.getCargo());
                         for (int index = 0; index < cargo.size(); index++) {
                             if (cargo.get(index) == label.getType()) {
@@ -517,7 +552,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
         }
 
         @SuppressWarnings("unchecked") // FIXME in Java7
-        public boolean importData(JComponent target, Transferable data) {
+            public boolean importData(JComponent target, Transferable data) {
             if (canImport(target, data.getTransferDataFlavors())) {
                 try {
                     List stops = (List) data.getTransferData(STOP_FLAVOR);
