@@ -26,9 +26,11 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
@@ -40,6 +42,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
+import net.sf.freecol.common.model.pathfinding.GoalDeciders;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIUnit;
@@ -149,37 +152,25 @@ public class MissionaryMission extends Mission {
      */
     private static GoalDecider getGoalDecider(final AIUnit aiUnit,
                                               final boolean deferOK) {
-        return new GoalDecider() {
-            private PathNode best = null;
+        GoalDecider gd = new GoalDecider() {
+            private PathNode bestPath = null;
             private int bestValue = 0;
-            private PathNode backup = null;
-            private int backupValue = 0;
 
-            public PathNode getGoal() {
-                return (best != null) ? best : backup;
-            }
+            public PathNode getGoal() { return bestPath; }
             public boolean hasSubGoals() { return true; }
             public boolean check(Unit u, PathNode path) {
-                int value;
-                Colony colony;
-                if (deferOK
-                    && (colony = path.getLocation().getColony()) != null
-                    && invalidColonyReason(aiUnit, colony) == null) {
-                    value = MAX_TURNS - path.getTotalTurns();
-                    if (value > backupValue) {
-                        backupValue = value;
-                        backup = path;
-                    }
-                }
-                value = scorePath(aiUnit, path);
-                if (value > bestValue) {
+                int value = scorePath(aiUnit, path);
+                if (bestValue < value) {
                     bestValue = value;
-                    best = path;
+                    bestPath = path;
                     return true;
                 }
                 return false;
             }
         };
+        return (deferOK) ? GoalDeciders.getComposedGoalDecider(gd,
+            GoalDeciders.getOurClosestSettlementGoalDecider())
+            : gd;
     }
             
     /**
@@ -228,6 +219,26 @@ public class MissionaryMission extends Mission {
             : null;
     }
 
+    /**
+     * Prepare a unit for a Missionary mission.
+     *
+     * @param aiUnit The <code>AIUnit</code> to prepare.
+     * @return A reason why the unit can not perform this mission, or null
+     *     if none.
+     */
+    public static String prepare(AIUnit aiUnit) {
+        String reason = invalidReason(aiUnit);
+        if (reason != null) return reason;
+        final Unit unit = aiUnit.getUnit();
+        if (!unit.hasAbility("model.ability.establishMission")
+            && (((FreeColGameObject)unit.getLocation())
+                .hasAbility("model.ability.dressMissionary"))) {
+            aiUnit.equipForRole(Unit.Role.MISSIONARY, false);
+        }
+        return (unit.hasAbility("model.ability.establishMission"))
+            ? null
+            : "unit-can-not-establish-mission";
+    }
 
     // Fake Transportable interface
 
@@ -267,7 +278,7 @@ public class MissionaryMission extends Mission {
         final Unit unit = aiUnit.getUnit();
         return (!unit.isPerson()) ? Mission.UNITNOTAPERSON
             : (unit.getSkillLevel() >= -1
-                && !unit.hasAbility("model.ability.expertMissionary"))
+                && !unit.hasAbility(Ability.EXPERT_MISSIONARY))
             ? "unit-is-not-subskilled-or-expertMissionary"
             : (unit.isInEurope() || unit.isAtSea()) 
             ? ((unit.getOwner().getNumberOfSettlements() <= 0)
@@ -289,7 +300,8 @@ public class MissionaryMission extends Mission {
     }
 
     /**
-     * Why would a MissionaryMission be invalid with the given IndianSettlement?
+     * Why would a MissionaryMission be invalid with the given
+     * IndianSettlement?
      *
      * @param aiUnit The <code>AIUnit</code> to check.
      * @param indianSettlement The <code>IndianSettlement</code> to check.

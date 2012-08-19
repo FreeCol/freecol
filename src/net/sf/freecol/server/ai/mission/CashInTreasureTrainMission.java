@@ -213,12 +213,8 @@ public class CashInTreasureTrainMission extends Mission {
         if (path != null) return path;
 
         // One more try with a relaxed cost decider and no range limit.
-        path = unit.searchFullPath(startTile, gd, relaxedCd,
+        return unit.searchFullPath(startTile, gd, relaxedCd,
                                    INFINITY, carrier);
-        if (path == null) {
-            throw new IllegalStateException("Should have found a path!");
-        }
-        return path;
     }
 
     /**

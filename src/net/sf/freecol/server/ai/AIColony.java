@@ -255,8 +255,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     }
 
     /**
-     * Is the colony badly defended?
-     * Deliberately does not waste defenders on small colonies.
+     * Is a colony badly defended?
+     * Deliberately does not require defenders for small colonies.
      *
      * @param colony The <code>Colony</code> to consider.
      * @return True if the colony needs more defenders.
@@ -264,6 +264,15 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     public static boolean isBadlyDefended(Colony colony) {
         return colony.getTotalDefencePower()
             < 1.25f * colony.getWorkLocationUnitCount() - 2.5f;
+    }
+
+    /**
+     * Is this colony badly defended?
+     *
+     * @return True if this colony needs more defenders.
+     */
+    public boolean isBadlyDefended() {
+        return isBadlyDefended(colony);
     }
 
     /**
@@ -1114,7 +1123,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         // TODO: add missionaries
 
         // Improve defence.
-        if (isBadlyDefended(colony)) {
+        if (isBadlyDefended()) {
             UnitType bestDefender = colony.getBestDefenderType();
             if (bestDefender != null) {
                 requireWorkerWish(bestDefender, true, 100);
@@ -1176,7 +1185,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
         // Add materials required to build military equipment,
         // but make sure there is a unit present that can use it.
-        if (isBadlyDefended(colony)) {
+        if (isBadlyDefended()) {
             for (EquipmentType type : spec.getEquipmentTypeList()) {
                 if (!type.isMilitaryEquipment()) continue;
                 for (Unit unit : colony.getTile().getUnitList()) {

@@ -744,30 +744,8 @@ public class TransportMission extends Mission {
             throw new IllegalStateException("Carrier not in Europe");
         }
 
-        /*
-         * Quick fix for forcing the AI to build more colonies. This fix should
-         * be removed after a proper implementation has been created.
-         */
         final EuropeanAIPlayer aiPlayer = getEuropeanAIPlayer();
         final AIUnit aiUnit = getAIUnit();
-        if (aiPlayer.hasFewColonies()) {
-            // since we are in Europe, use the carrier entry point to
-            // search for a good settlement spot.
-            AIUnit newUnit;            
-            for (int space = getAvailableSpace(); space > 0;
-                 space -= newUnit.getUnit().getSpaceTaken()) {
-                newUnit = getCheapestUnitInEurope();
-                if (newUnit == null
-                    || BuildColonyMission.invalidReason(newUnit) != null) break;
-                addToTransportList(newUnit);
-                Location buildTarget = BuildColonyMission.findTarget(aiUnit, false);
-                if (buildTarget == null) break;
-                // send the colonist to build the new colony
-                newUnit.setMission(new BuildColonyMission(getAIMain(),
-                                   newUnit, buildTarget));
-            }
-        }
-
         /*
          * Add colonies containing wishes with the same destination as an item
          * in the transport list to the "aiColonies"-list:

@@ -276,7 +276,9 @@ public class AIUnit extends AIObject implements Transportable {
      */
     public void setMission(Mission mission) {
         final Mission oldMission = this.mission;
-        if (oldMission == null) {
+        if (mission == oldMission) {
+            return;
+        } else if (oldMission == null) {
             if (!mission.isOneTime()) {
                 logger.fine("Replacing null mission with " + mission);
             }
@@ -642,7 +644,7 @@ public class AIUnit extends AIObject implements Transportable {
      */
     @Override
     public String toString() {
-        return "[AIUnit " + unit + "]";
+        return unit.toString("AIUnit ");
     }
 
     /**

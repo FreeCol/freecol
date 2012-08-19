@@ -25,6 +25,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Location;
@@ -381,7 +382,26 @@ public class PioneeringMission extends Mission {
             : null;
     }
 
-    
+    /**
+     * Prepare a unit for this mission.
+     *
+     * @param aiUnit The <code>AIUnit</code> to prepare.
+     * @return A reason why the unit can not perform this mission, or null
+     *     if none.
+     */
+    public static String prepare(AIUnit aiUnit) {
+        String reason = invalidReason(aiUnit);
+        if (reason != null) return reason;
+        final Unit unit = aiUnit.getUnit();
+        if (!hasTools(aiUnit)) {
+            aiUnit.equipForRole(Unit.Role.PIONEER, false);
+        }
+        return (hasTools(aiUnit) || unit.hasAbility(Ability.EXPERT_PIONEER))
+            ? null
+            : "unit-missing-tools";
+    }
+
+
     // Fake Transportable interface.
 
     /**

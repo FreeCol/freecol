@@ -2865,13 +2865,13 @@ public class Unit extends FreeColGameObject
 
     /**
      * Checks if this unit is running a mission.
+     * TODO: units in missions have no location, should it be the settlement?
      *
      * @return True if this unit is running a mission.
      */
     public boolean isInMission() {
         return getRole() == Role.MISSIONARY
-            && getTile() == null
-            && !isOnCarrier();
+            && getLocation() == null;
     }
 
     public String getMovesAsString() {
@@ -4071,14 +4071,24 @@ public class Unit extends FreeColGameObject
     /**
      * Gets a string representation of this unit.
      *
+     * @param prefix A prefix (e.g. "AIUnit")
      * @return A string representation of this <code>Unit</code>.
      */
+    public String toString(String prefix) {
+        String rest = (isUninitialized()) ? "uninitialized"
+            : (isDisposed()) ? "disposed"
+            : (Utils.lastPart(owner.getNationID(), ".")
+                + " " + Utils.lastPart(getType().getId(), ".")
+                + ((getRole() == Role.DEFAULT) ? "" : "-" + getRole())
+                + " " + getMovesAsString());
+        return "[" + prefix + getId() + " " + rest + "]";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public String toString() {
-        return "[" + getId()
-            + " " + Utils.lastPart(owner.getNationID(), ".")
-            + " " + Utils.lastPart(getType().getId(), ".")
-            + ((getRole() == Role.DEFAULT) ? "" : "-" + getRole())
-            + " " + getMovesAsString() + "]";
+        return toString("");
     }
 
     /**

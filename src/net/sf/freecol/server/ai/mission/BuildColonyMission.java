@@ -247,7 +247,7 @@ public class BuildColonyMission extends Mission {
             : null;
     }
 
-       
+      
     // Fake Transportable interface
 
     /**
@@ -285,6 +285,8 @@ public class BuildColonyMission extends Mission {
         String reason = invalidAIUnitReason(aiUnit);
         return (reason != null)
             ? reason
+            : (!aiUnit.getUnit().getOwner().canBuildColonies())
+            ? "player-not-a-colony-founder"
             : (!aiUnit.getUnit().hasAbility("model.ability.foundColony"))
             ? "unit-not-a-colony-founder"
             : null;

@@ -36,6 +36,7 @@ import net.sf.freecol.server.ai.mission.DefendSettlementMission;
 import net.sf.freecol.server.ai.mission.Mission;
 import net.sf.freecol.server.ai.mission.TransportMission;
 import net.sf.freecol.server.ai.mission.UnitSeekAndDestroyMission;
+import net.sf.freecol.server.ai.mission.UnitWanderHostileMission;
 import net.sf.freecol.server.model.ServerPlayer;
 
 
@@ -279,11 +280,17 @@ public class REFAIPlayer extends EuropeanAIPlayer {
      */
     @Override
     public void giveNormalMissions() {
-        // Give military missions to all offensive units.
+        // Give military missions to all REF units.
         for (AIUnit aiu : getAIUnits()) {
             Unit u = aiu.getUnit();
             if (u.isNaval() || aiu.hasMission()) continue;
-            if (u.isOffensiveUnit()) giveMilitaryMission(aiu);
+            if (u.isOffensiveUnit()) {
+                Location target = UnitSeekAndDestroyMission.findTarget(aiu, 12);
+                Mission m = (target == null)
+                    ? new UnitWanderHostileMission(getAIMain(), aiu)
+                    : new UnitSeekAndDestroyMission(getAIMain(), aiu, target);
+                aiu.setMission(m);
+            }
         }
 
         // Fall back to the normal EuropeanAI behaviour for non-army.
