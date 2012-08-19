@@ -78,6 +78,15 @@ public class IndianSettlement extends Settlement {
     public static final int KEEP_RAW_MATERIAL = 50;
 
     /**
+     * Generate gifts from goods that exceed KEEP_RAW_MATERIAL +
+     * GIFT_THRESHOLD.
+     */
+    public static final int GIFT_THRESHOLD = 25;
+
+    /** The minimum gift amount. */
+    public static final int GIFT_MINIMUM = 10;
+
+    /**
      * This is the skill that can be learned by Europeans at this
      * settlement.  At the server side its value will be null when the
      * skill has already been taught to a European.  At the client
@@ -1067,17 +1076,19 @@ public class IndianSettlement extends Settlement {
     public Goods getRandomGift(Random random) {
         List<Goods> goodsList = new ArrayList<Goods>();
         GoodsContainer gc = getGoodsContainer();
-        for (GoodsType goodsType : getSpecification().getNewWorldGoodsTypeList()) {
-            if (gc.getGoodsCount(goodsType)
-                >= IndianSettlement.KEEP_RAW_MATERIAL + 25) {
-                Goods goods = new Goods(getGame(), this, goodsType,
-                    Utils.randomInt(logger, "Gift amount", random, 15) + 10);
+        for (GoodsType type : getSpecification().getNewWorldGoodsTypeList()) {
+            int n = gc.getGoodsCount(type) - KEEP_RAW_MATERIAL;
+            if (n >= GIFT_THRESHOLD) {
+                n -= GIFT_MINIMUM;
+                Goods goods = new Goods(getGame(), this, type,
+                    Utils.randomInt(logger, "Gift amount", random, n)
+                    + GIFT_MINIMUM);
                 goodsList.add(goods);
             }
 
         }
         return (goodsList.isEmpty()) ? null
-            : Utils.getRandomMember(logger, "Gift amount", goodsList, random);
+            : Utils.getRandomMember(logger, "Gift type", goodsList, random);
     }
 
     /**
