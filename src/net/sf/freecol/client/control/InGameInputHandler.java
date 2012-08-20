@@ -672,7 +672,8 @@ public final class InGameInputHandler extends InputHandler {
             new UpdateMenuBarSwingTask().invokeLater();
             break;
         case PROPOSE_TRADE:
-            DiplomaticTrade ourAgreement = gui.showNegotiationDialog(unit, settlement, agreement);
+            DiplomaticTrade ourAgreement
+                = gui.showNegotiationDialog(unit, settlement, agreement);
             if (ourAgreement == null) {
                 agreement.setStatus(TradeStatus.REJECT_TRADE);
             } else {

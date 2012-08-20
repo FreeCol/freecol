@@ -3048,10 +3048,14 @@ public final class InGameController extends Controller {
         switch (status = agreement.getStatus()) {
         case PROPOSE_TRADE:
             if (session == null) {
-                Unit.MoveType type = unit.getMoveType(settlement.getTile());
-                if (type != Unit.MoveType.ENTER_FOREIGN_COLONY_WITH_SCOUT) {
-                        return DOMMessage.clientError("Unable to enter "
-                            + settlement.getId() + ": " + type.whyIllegal());
+                Unit.MoveType mt = unit.getMoveType(settlement.getTile());
+                switch (mt) {
+                case ENTER_FOREIGN_COLONY_WITH_SCOUT:
+                case ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS:
+                    break;
+                default:
+                    return DOMMessage.clientError("Unable to enter "
+                        + settlement.getId() + ": " + mt.whyIllegal());
                 }
                 session = new DiplomacySession(unit, settlement);
                 unit.setMovesLeft(0);

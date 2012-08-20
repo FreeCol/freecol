@@ -93,6 +93,7 @@ public class DiplomaticTrade extends FreeColObject {
      */
     public DiplomaticTrade(Game game, Player sender, Player recipient,
                            List<TradeItem> items) {
+        setId("");
         this.game = game;
         this.sender = sender;
         this.recipient = recipient;
@@ -232,16 +233,28 @@ public class DiplomaticTrade extends FreeColObject {
 
 
     /**
+     * Get the items offered by a particular player.
+     *
+     * @param player The <code>Player</code> to check.
+     * @return A list of <code>TradeItem</code>s offered by the player.
+     */
+    public List<TradeItem> getItemsGivenBy(Player player) {
+        List<TradeItem> goodsList = new ArrayList<TradeItem>();
+        for (TradeItem ti : items) {
+            if (player == ti.getSource()) goodsList.add(ti);
+        }
+        return goodsList;
+    }
+
+    /**
      * Get the stance being offered.
      *
      * @return The <code>Stance</code> offered in this trade, or null if none.
      */
     public Stance getStance() {
-        Iterator<TradeItem> itemIterator = items.iterator();
-        while (itemIterator.hasNext()) {
-            TradeItem item = itemIterator.next();
-            if (item instanceof StanceTradeItem) {
-                return ((StanceTradeItem) item).getStance();
+        for (TradeItem ti : items) {
+            if (ti instanceof StanceTradeItem) {
+                return ((StanceTradeItem)ti).getStance();
             }
         }
         return null;
@@ -252,13 +265,11 @@ public class DiplomaticTrade extends FreeColObject {
      *
      * @return A list of <code>Goods</code> offered in this trade.
      */
-    public List<Goods> getGoodsGivenBy(Player player){
+    public List<Goods> getGoodsGivenBy(Player player) {
         List<Goods> goodsList = new ArrayList<Goods>();
-        Iterator<TradeItem> itemIterator = items.iterator();
-        while (itemIterator.hasNext()) {
-            TradeItem item = itemIterator.next();
-            if (item instanceof GoodsTradeItem && player == item.getSource()) {
-                goodsList.add(((GoodsTradeItem) item).getGoods());
+        for (TradeItem ti : items) {
+            if (ti instanceof GoodsTradeItem && player == ti.getSource()) {
+                goodsList.add(((GoodsTradeItem)ti).getGoods());
             }
         }
         return goodsList;
@@ -269,13 +280,11 @@ public class DiplomaticTrade extends FreeColObject {
      *
      * @return A list of <code>Colony</code>s offered in this trade.
      */
-    public List<Colony> getColoniesGivenBy(Player player){
+    public List<Colony> getColoniesGivenBy(Player player) {
         List<Colony> colonyList = new ArrayList<Colony>();
-        Iterator<TradeItem> itemIterator = items.iterator();
-        while (itemIterator.hasNext()) {
-            TradeItem item = itemIterator.next();
-            if (item instanceof ColonyTradeItem && player==item.getSource()) {
-                colonyList.add(((ColonyTradeItem) item).getColony());
+        for (TradeItem ti : items) {
+            if (ti instanceof ColonyTradeItem && player == ti.getSource()) {
+                colonyList.add(((ColonyTradeItem)ti).getColony());
             }
         }
         return colonyList;

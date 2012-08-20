@@ -136,25 +136,6 @@ public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
     }
 
     /**
-    * Returns a textual representation of this object.
-    * @return A <code>String</code> with the format:
-    *         <br>AMOUNT GOODSTYPE
-    *         <br><br>Example:
-    *         <br>15 Cotton
-    */
-    public String toString() {
-        return toString(this);
-    }
-
-    public static String toString(Goods goods) {
-        return toString(goods.getType(), goods.getAmount());
-    }
-
-    public static String toString(GoodsType goodsType, int amount) {
-        return Integer.toString(amount) + " " + goodsType.getId();
-    }
-
-    /**
      * Returns the name of this type of goods.
      *
      * @param sellable Whether this type of goods is sellable;
@@ -272,6 +253,20 @@ public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public String toString() {
+        return toString(this);
+    }
+
+    public static String toString(Goods goods) {
+        return toString(goods.getType(), goods.getAmount());
+    }
+
+    public static String toString(GoodsType goodsType, int amount) {
+        return Integer.toString(amount) + " " + goodsType.getId();
+    }
 
     /**
      * This method writes an XML-representation of this object to

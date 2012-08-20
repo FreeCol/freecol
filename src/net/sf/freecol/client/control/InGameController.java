@@ -419,7 +419,7 @@ public final class InGameController implements NetworkConstants {
             stop = unit.getStop();
             // Complain and return if the stop is no longer valid.
             if (!TradeRoute.isStopValid(unit, stop)) {
-                messages.add(new ModelMessage(ModelMessage.MessageType.GOODS_MOVEMENT,
+                messages.add(new ModelMessage(MessageType.GOODS_MOVEMENT,
                         "traderoute.broken", unit)
                     .addName("%route%", name));
                 clearOrders(unit);
@@ -467,7 +467,7 @@ public final class InGameController implements NetworkConstants {
                     if (index == next) break;
                     if (detailed) {
                         Location loc = stops.get(index).getLocation();
-                        messages.add(new ModelMessage(ModelMessage.MessageType.GOODS_MOVEMENT,
+                        messages.add(new ModelMessage(MessageType.GOODS_MOVEMENT,
                                 "traderoute.skipStop", unit)
                             .addName("%route%", name)
                             .addStringTemplate("%unit%",
@@ -488,7 +488,7 @@ public final class InGameController implements NetworkConstants {
                                 i++;
                             }
                         }
-                        messages.add(new ModelMessage(ModelMessage.MessageType.GOODS_MOVEMENT,
+                        messages.add(new ModelMessage(MessageType.GOODS_MOVEMENT,
                                 "traderoute.noWork", unit)
                             .addName("%route%", name)
                             .addStringTemplate("%unit%",
@@ -514,7 +514,7 @@ public final class InGameController implements NetworkConstants {
             PathNode path = unit.findFullPath(destination);
             if (path == null) {
                 StringTemplate dest = destination.getLocationNameFor(player);
-                messages.add(new ModelMessage(ModelMessage.MessageType.GOODS_MOVEMENT,
+                messages.add(new ModelMessage(MessageType.GOODS_MOVEMENT,
                         "traderoute.noPath", unit)
                     .addName("%route%", name)
                     .addStringTemplate("%unit%", Messages.getLabel(unit))
@@ -651,7 +651,7 @@ public final class InGameController implements NetworkConstants {
         } else {
             key = "traderoute.load";
         }
-        return new ModelMessage(ModelMessage.MessageType.GOODS_MOVEMENT, key, unit)
+        return new ModelMessage(MessageType.GOODS_MOVEMENT, key, unit)
             .addName("%route%", route)
             .addStringTemplate("%unit%", Messages.getLabel(unit))
             .addStringTemplate("%location%", loc.getLocationNameFor(player))
@@ -757,7 +757,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         StringTemplate loc = unit.getLocation().getLocationNameFor(unit.getOwner());
-        return new ModelMessage(ModelMessage.MessageType.GOODS_MOVEMENT, key,
+        return new ModelMessage(MessageType.GOODS_MOVEMENT, key,
             unit)
             .addName("%route%", unit.getTradeRoute().getName())
             .addStringTemplate("%unit%", Messages.getLabel(unit))
@@ -1571,18 +1571,18 @@ public final class InGameController implements NetworkConstants {
 
         ArrayList<ModelMessage> messages = new ArrayList<ModelMessage>();
         if (landLocked) {
-            messages.add(new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
+            messages.add(new ModelMessage(MessageType.MISSING_GOODS,
                     "buildColony.landLocked", unit,
                     getSpecification().getGoodsType("model.goods.fish")));
         }
         if (food < 8) {
-            messages.add(new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
+            messages.add(new ModelMessage(MessageType.MISSING_GOODS,
                     "buildColony.noFood", unit,
                     getSpecification().getPrimaryFoodType()));
         }
         for (Entry<GoodsType, Integer> entry : goodsMap.entrySet()) {
             if (!entry.getKey().isFoodType() && entry.getValue().intValue() < 4) {
-                messages.add(new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
+                messages.add(new ModelMessage(MessageType.MISSING_GOODS,
                         "buildColony.noBuildingMaterials",
                         unit, entry.getKey())
                     .add("%goods%", entry.getKey().getNameKey()));
@@ -1590,15 +1590,15 @@ public final class InGameController implements NetworkConstants {
         }
 
         if (ownedBySelf) {
-            messages.add(new ModelMessage(ModelMessage.MessageType.WARNING,
+            messages.add(new ModelMessage(MessageType.WARNING,
                     "buildColony.ownLand", unit));
         }
         if (ownedByEuropeans) {
-            messages.add(new ModelMessage(ModelMessage.MessageType.WARNING,
+            messages.add(new ModelMessage(MessageType.WARNING,
                     "buildColony.EuropeanLand", unit));
         }
         if (ownedByIndians) {
-            messages.add(new ModelMessage(ModelMessage.MessageType.WARNING,
+            messages.add(new ModelMessage(MessageType.WARNING,
                     "buildColony.IndianLand", unit));
         }
 
@@ -2955,33 +2955,34 @@ public final class InGameController implements NetworkConstants {
         DiplomaticTrade agreement = null;
         TradeStatus status;
         for (;;) {
-            ourAgreement = gui.showNegotiationDialog(unit, settlement, agreement);
-            if (ourAgreement == null) {
-                if (agreement == null) break;
-                agreement.setStatus(TradeStatus.REJECT_TRADE);
-            } else {
-                agreement = ourAgreement;
-            }
+            ourAgreement = gui.showNegotiationDialog(unit, settlement,
+                                                     agreement);
+            if (agreement == null && (ourAgreement == null
+                    || ourAgreement.getStatus() == TradeStatus.REJECT_TRADE))
+                break;
+            agreement = ourAgreement;
             if (agreement.getStatus() != TradeStatus.PROPOSE_TRADE) {
-                askServer().diplomacy(freeColClient.getGame(), unit, settlement, agreement);
+                askServer().diplomacy(freeColClient.getGame(), unit,
+                                      settlement, agreement);
                 gui.updateMenuBar();
                 break;
             }
 
-            agreement = askServer().diplomacy(freeColClient.getGame(), unit, settlement, agreement);
+            agreement = askServer().diplomacy(freeColClient.getGame(), unit,
+                                              settlement, agreement);
             status = (agreement == null) ? TradeStatus.REJECT_TRADE
                 : agreement.getStatus();
             switch (status) {
             case PROPOSE_TRADE:
                 continue; // counter proposal, try again
             case ACCEPT_TRADE:
-                m = new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                m = new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
                                      "negotiationDialog.offerAccepted",
                                      settlement)
                     .addName("%nation%", nation);
                 break;
             case REJECT_TRADE:
-                m = new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                m = new ModelMessage(MessageType.FOREIGN_DIPLOMACY,
                                      "negotiationDialog.offerRejected",
                                      settlement)
                     .addName("%nation%", nation);

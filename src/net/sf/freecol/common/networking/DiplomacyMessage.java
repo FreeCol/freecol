@@ -80,8 +80,8 @@ public class DiplomacyMessage extends DOMMessage {
      */
     public DiplomacyMessage(Game game, Element element) {
         String settlementId = element.getAttribute("settlement");
-        Settlement settlement = game.getFreeColGameObject(settlementId,
-                                                          Settlement.class);
+        settlement = game.getFreeColGameObject(settlementId,
+                                               Settlement.class);
 
         NodeList nodes = element.getChildNodes();
         this.agreement = (nodes.getLength() < 1) ? null
