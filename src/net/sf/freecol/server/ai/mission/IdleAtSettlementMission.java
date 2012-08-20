@@ -113,6 +113,10 @@ public class IdleAtSettlementMission extends Mission {
         return invalidAIUnitReason(getAIUnit());
     }
 
+    // No static invalidReason(AIUnit [,Location]) forms, as this is
+    // a targetless fallback mission that is never invalid.
+    // TODO: revise this, it could be invalid if there are no settlements?!?
+
     /**
      * Should this Mission only be carried out once?
      *

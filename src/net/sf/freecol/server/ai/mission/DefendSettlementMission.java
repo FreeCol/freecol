@@ -36,6 +36,8 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.WorkLocation;
+import net.sf.freecol.common.model.pathfinding.CostDeciders;
+import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIUnit;
@@ -43,9 +45,6 @@ import net.sf.freecol.server.ai.AIUnit;
 
 /**
  * Mission for defending a <code>Settlement</code>.
- *
- * TODO: This Mission should later use sub-missions for
- *       eliminating threats etc.
  */
 public class DefendSettlementMission extends Mission {
 
@@ -53,8 +52,11 @@ public class DefendSettlementMission extends Mission {
 
     private String tag = "AI defender";
 
-    /** The <code>Settlement</code> to be protected. */
-    private Settlement target;
+    /** Maximum number of turns to travel to the settlement. */
+    private static int MAX_TURNS = 20;
+
+    /** The settlement to be protected. */
+    private Settlement target = null;
 
 
     /**
@@ -68,6 +70,7 @@ public class DefendSettlementMission extends Mission {
     public DefendSettlementMission(AIMain aiMain, AIUnit aiUnit,
                                    Settlement settlement) {
         super(aiMain, aiUnit);
+
         this.target = settlement;
         logger.finest(tag + " started with " + target + ": " + this);
         uninitialized = false;
@@ -96,17 +99,15 @@ public class DefendSettlementMission extends Mission {
      * Extract a valid target for this mission from a path.
      *
      * @param aiUnit The <code>AIUnit</code> to perform the mission.
-     * @param path A <code>PathNode</code> to extract a target from,
-     *     (uses the unit location if null).
-     * @return A target for a <code>DefendSettlementMission</code> or null
+     * @param path A <code>PathNode</code> to extract a target from.
+     * @return A target for a <code>DefendSettlementMission</code>, or null
      *     if none found.
      */
     public static Location extractTarget(AIUnit aiUnit, PathNode path) {
-        final Location loc = (path == null) ? aiUnit.getUnit().getLocation()
-            : path.getLastNode().getLocation();
-        return (loc.getTile() == null) ? null
-            : (invalidReason(aiUnit, loc.getSettlement()) == null)
-            ? loc.getSettlement()
+        if (path == null) return null;
+        final Location loc = path.getLastNode().getLocation();
+        Settlement settlement = loc.getSettlement();
+        return (invalidReason(aiUnit, settlement) == null) ? settlement
             : null;
     }
 
@@ -118,50 +119,76 @@ public class DefendSettlementMission extends Mission {
      * @return A value for such a mission.
      */
     public static int scorePath(AIUnit aiUnit, PathNode path) {
-        Location loc;
-        if (aiUnit == null
-            || (loc = extractTarget(aiUnit, path)) == null
-            || !(loc instanceof Settlement)) {
-            return Integer.MIN_VALUE;
-        }
-        
-        final int turns = (path == null) ? 0 : path.getTotalTurns();
-        int value = 1025 - 100 * turns;
-        return value;
+        final Location loc = extractTarget(aiUnit, path);
+        return (loc instanceof Settlement)
+            ? (int)(1000 * ((Settlement)loc).getDefenceRatio()
+                / (path.getTotalTurns() + 1))
+            : Integer.MIN_VALUE;
+    }
+
+    /**
+     * Gets a <code>GoalDecider</code> for finding the best colony
+     * <code>Tile</code>, optionally falling back to the nearest colony.
+     *
+     * @param aiUnit The <code>AIUnit</code> that is searching.
+     * @return A suitable <code>GoalDecider</code>.
+     */
+    private static GoalDecider getGoalDecider(final AIUnit aiUnit) {
+        return new GoalDecider() {
+                private PathNode bestPath = null;
+                private int bestValue = 0;
+
+                public PathNode getGoal() { return bestPath; }
+                public boolean hasSubGoals() { return true; }
+                public boolean check(Unit u, PathNode path) {
+                    int value = scorePath(aiUnit, path);
+                    if (bestValue < value) {
+                        bestValue = value;
+                        bestPath = path;
+                        return true;
+                    }
+                    return false;
+                }
+            };
     }
 
     /**
      * Finds a path to the best nearby settlement to defend.
      *
      * @param aiUnit The <code>AIUnit</code> that is searching.
-     * @param range An upper bound on the number of moves.
+     * @param deferOK Not implemented in this mission.
      * @return A <code>PathNode</code> to take to the target,
      *     or null if none suitable.
      */
-    public static PathNode findTargetPath(AIUnit aiUnit, int range) {
-        return Mission.findTargetPath(aiUnit, range,
-                                      DefendSettlementMission.class);
+    public static PathNode findTargetPath(AIUnit aiUnit, boolean deferOK) {
+        if (invalidAIUnitReason(aiUnit) != null) return null;
+        final Unit unit = aiUnit.getUnit();
+        final Tile startTile = unit.getPathStartTile();
+        if (startTile == null) return null;
+
+        return unit.searchFullPath(startTile, getGoalDecider(aiUnit),
+            CostDeciders.avoidSettlementsAndBlockingUnits(),
+            MAX_TURNS, unit.getCarrier());
     }
 
     /**
      * Finds a path to the best nearby settlement to defend.
      *
      * @param aiUnit The <code>AIUnit</code> that is searching.
-     * @param range An upper bound on the number of moves.
+     * @param deferOK Enables deferral (not implemented in this mission).
      * @return A suitable target, or null if none found.
      */
-    public static Location findTarget(AIUnit aiUnit, int range) {
-        PathNode path = findTargetPath(aiUnit, range);
-        return (path == null) ? null : extractTarget(aiUnit, path);
+    public static Location findTarget(AIUnit aiUnit, boolean deferOK) {
+        PathNode path = findTargetPath(aiUnit, deferOK);
+        return (path != null) ? extractTarget(aiUnit, path)
+            : null;
     }
 
 
     // Fake Transportable interface
 
     /**
-     * Gets the transport destination for units with this mission.
-     *
-     * @return The destination for this <code>Transportable</code>.
+     * {@inheritDoc}
      */
     @Override
     public Location getTransportDestination() {
@@ -171,10 +198,7 @@ public class DefendSettlementMission extends Mission {
     }
 
     /**
-     * Returns the priority of getting the unit to the
-     * transport destination.
-     *
-     * @return The priority.
+     * {@inheritDoc}
      */
     public int getTransportPriority() {
         return (getTransportDestination() == null) ? 0
@@ -201,13 +225,27 @@ public class DefendSettlementMission extends Mission {
      * @return A reason why the mission would be invalid with the unit,
      *     or null if none found.
      */
-    private static String invalidDefendReason(AIUnit aiUnit) {
+    private static String invalidMissionReason(AIUnit aiUnit) {
+        String reason = invalidAIUnitReason(aiUnit);
+        if (reason != null) return reason;
         final Unit unit = aiUnit.getUnit();
         return (unit.getGame().getCombatModel()
             .getDefencePower(null, unit) <= 0.0f) ? "unit-not-defender"
             : null;
     }
     
+    /**
+     * Why is this mission invalid with a given settlement target?
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param settlement The potential target <code>Settlement</code>.
+     * @return A reason for mission invalidity, or null if none found.
+     */
+    private static String invalidSettlementReason(AIUnit aiUnit,
+                                                  Settlement settlement) {
+        return invalidTargetReason(settlement, aiUnit.getUnit().getOwner());
+    }
+
     /**
      * Why is this mission invalid?
      *
@@ -224,11 +262,11 @@ public class DefendSettlementMission extends Mission {
      * @return A reason for mission invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit) {
-        String reason;
-        return ((reason = Mission.invalidReason(aiUnit)) != null) ? reason
-            : ((reason = invalidDefendReason(aiUnit)) != null) ? reason
-            : (aiUnit.getUnit().getOwner()
-                .getNumberOfSettlements() <= 0) ? Mission.TARGETNOTFOUND
+        String reason = invalidMissionReason(aiUnit);
+        return (reason != null)
+            ? reason
+            : (aiUnit.getUnit().getOwner().getNumberOfSettlements() <= 0)
+            ? Mission.TARGETNOTFOUND
             : null;
     }
 
@@ -240,13 +278,11 @@ public class DefendSettlementMission extends Mission {
      * @return A reason for invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit, Location loc) {
-        String reason;
-        return ((reason = invalidAIUnitReason(aiUnit)) != null) ? reason
-            : ((reason = invalidDefendReason(aiUnit)) != null) ? reason
+        String reason = invalidMissionReason(aiUnit);
+        return (reason != null)
+            ? reason
             : (loc instanceof Settlement)
-            ? (((reason = invalidTargetReason(loc,
-                            aiUnit.getUnit().getOwner())) != null) ? reason
-                : null)
+            ? invalidSettlementReason(aiUnit, (Settlement)loc)
             : Mission.TARGETINVALID;
     }
 
@@ -256,9 +292,16 @@ public class DefendSettlementMission extends Mission {
      * Performs this mission.
      */
     public void doMission() {
-        final Unit unit = getUnit();
         String reason = invalidReason();
-        if (reason != null) {
+        if (isTargetReason(reason)) {
+            Location loc = findTarget(getAIUnit(), true);
+            if (loc instanceof Settlement) {
+                target = (Settlement)loc;
+            } else {
+                logger.finest(tag + " could not retarget: " + this);
+                return;
+            }
+        } else if (reason != null) {
             logger.finest(tag + " broken(" + reason + "): " + this);
             return;
         }
@@ -270,6 +313,7 @@ public class DefendSettlementMission extends Mission {
         // Change to supporting the settlement if the size is marginal.
         final AIMain aiMain = getAIMain();
         final AIUnit aiUnit = getAIUnit();
+        final Unit unit = getUnit();
         Mission m = null;
         if (target instanceof Colony) {
             Colony colony = (Colony)target;
@@ -295,7 +339,7 @@ public class DefendSettlementMission extends Mission {
         units.addAll(target.getTile().getUnitList());
         for (Unit u : units) {
             AIUnit aiu = getAIMain().getAIUnit(u);
-            if (invalidDefendReason(aiu) == null) {
+            if (invalidMissionReason(aiu) == null) {
                 defenderCount++;
                 if (u.getState() == UnitState.FORTIFIED) fortifiedCount++;
             }
@@ -314,7 +358,7 @@ public class DefendSettlementMission extends Mission {
             return;
         }
 
-        // The settlement is well enough defended.  See if the unit
+        // The target is well enough defended.  See if the unit
         // should attack a nearby hostile unit.  Remember to prevent a
         // sole unit attacking because if it loses, the settlement
         // will collapse (and the combat model does not understand that).
@@ -363,12 +407,7 @@ public class DefendSettlementMission extends Mission {
     // Serialization
 
     /**
-     * Writes all of the <code>AIObject</code>s and other AI-related
-     * information to an XML-stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * {@inheritDoc}
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         if (isValid()) {
@@ -394,7 +433,8 @@ public class DefendSettlementMission extends Mission {
         super.readAttributes(in);
 
         String str = in.getAttributeValue(null, "settlement");
-        target = getGame().getFreeColGameObject(str, Settlement.class);
+        target = (str == null) ? null
+            : getGame().getFreeColGameObject(str, Settlement.class);
     }
 
     /**
