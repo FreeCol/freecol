@@ -39,6 +39,8 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.pathfinding.CostDeciders;
+import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIUnit;
@@ -123,6 +125,34 @@ public class UnitSeekAndDestroyMission extends Mission {
                     u = t.getDefendingUnit(aiUnit.getUnit())) == null)
             ? u
             : null;
+    }
+
+    /**
+     * Gets a <code>GoalDecider</code> for finding the best colony
+     * <code>Tile</code>, optionally falling back to the nearest colony.
+     *
+     * @param aiUnit The <code>AIUnit</code> that is searching.
+     * @param deferOK Not used in this mission.
+     * @return A suitable <code>GoalDecider</code>.
+     */
+    private static GoalDecider getGoalDecider(final AIUnit aiUnit,
+                                              boolean deferOK) {
+        return new GoalDecider() {
+            private PathNode bestPath = null;
+            private int bestValue = 0;
+            
+            public PathNode getGoal() { return bestPath; }
+            public boolean hasSubGoals() { return true; }
+            public boolean check(Unit u, PathNode path) {
+                int value = scorePath(aiUnit, path);
+                if (bestValue < value) {
+                    bestValue = value;
+                    bestPath = path;
+                    return true;
+                }
+                return false;
+            }
+        };
     }
 
     /**
@@ -215,8 +245,6 @@ public class UnitSeekAndDestroyMission extends Mission {
      * Evaluate a potential seek and destroy mission for a given unit
      * to a given tile.
      *
-     * TODO: revisit and rebalance the mass of magic numbers.
-     *
      * @param aiUnit The <code>AIUnit</code> to do the mission.
      * @param path A <code>PathNode</code> to take to the target.
      * @return A score for the proposed mission.
@@ -238,8 +266,16 @@ public class UnitSeekAndDestroyMission extends Mission {
      * @return A path to the target, or null if none found.
      */
     public static PathNode findTargetPath(AIUnit aiUnit, int range) {
-        return Mission.findTargetPath(aiUnit, range,
-            UnitSeekAndDestroyMission.class);
+        if (invalidAIUnitReason(aiUnit) != null) return null;
+        final Unit unit = aiUnit.getUnit();
+        final Tile startTile = unit.getPathStartTile();
+        if (startTile == null) return null;
+
+        // Can the unit legally reach a valid target from where it
+        // currently is?
+        return unit.searchFullPath(startTile, getGoalDecider(aiUnit, false),
+                                   CostDeciders.avoidIllegal(),
+                                   range, unit.getCarrier());
     }
 
     /**
@@ -251,7 +287,8 @@ public class UnitSeekAndDestroyMission extends Mission {
      */
     public static Location findTarget(AIUnit aiUnit, int range) {
         PathNode path = findTargetPath(aiUnit, range);
-        return (path == null) ? null : extractTarget(aiUnit, path);
+        return (path != null) ? extractTarget(aiUnit, path)
+            : null;
     }
 
 
@@ -287,9 +324,10 @@ public class UnitSeekAndDestroyMission extends Mission {
      * @return A reason why the mission would be invalid, or null if
      *     none found.
      */
-    private static String invalidDestroyReason(AIUnit aiUnit) {
-        final Unit unit = aiUnit.getUnit();
-        return (!unit.isOffensiveUnit()) ? Mission.UNITNOTOFFENSIVE
+    private static String invalidMissionReason(AIUnit aiUnit) {
+        String reason = invalidAIUnitReason(aiUnit);
+        return (reason != null) ? reason
+            : (!aiUnit.getUnit().isOffensiveUnit()) ? Mission.UNITNOTOFFENSIVE
             : null;
     }
 
@@ -304,11 +342,12 @@ public class UnitSeekAndDestroyMission extends Mission {
      */
     private static String invalidStanceReason(AIUnit aiUnit, Player other) {
         final Player owner = aiUnit.getUnit().getOwner();
-        return (owner == other) ? Mission.TARGETOWNERSHIP
-            : (owner.getStance(other) == Stance.WAR) ? null
-            : (owner.isIndian() && owner.getTension(other).getLevel()
-                .compareTo(Tension.Level.CONTENT) > 0) ? null
-            : "target-at-peace";
+        return (owner.isIndian() && owner.getTension(other).getLevel()
+            .compareTo(Tension.Level.CONTENT) <= 0)
+            ? "target-native-tension-too-low"
+            : (owner.isEuropean() && owner.getStance(other) != Stance.WAR)
+            ? "target-european-war-absent"
+            : null;
     }
 
     /**
@@ -322,15 +361,14 @@ public class UnitSeekAndDestroyMission extends Mission {
      */
     private static String invalidSettlementReason(AIUnit aiUnit,
                                                   Settlement settlement) {
+        String reason = invalidTargetReason(settlement);
+        if (reason != null) return reason;
         final Unit unit = aiUnit.getUnit();
-        final Player player = unit.getOwner();
-        String reason;
-        return (unit.isNaval()) ? "unit-is-naval"
-            : ((reason = invalidTargetReason(settlement)) != null) ? reason
-            : (settlement.getOwner() == player) ? Mission.TARGETOWNERSHIP
-            : ((reason = invalidStanceReason(aiUnit, settlement.getOwner()))
-                != null) ? reason
-            : null;
+        return (unit.isNaval())
+            ? "unit-is-naval"
+            : (settlement.getOwner() == unit.getOwner())
+            ? Mission.TARGETOWNERSHIP
+            : invalidStanceReason(aiUnit, settlement.getOwner());
     }
 
     /**
@@ -338,21 +376,23 @@ public class UnitSeekAndDestroyMission extends Mission {
      * and target unit.
      *
      * @param aiUnit The <code>AIUnit</code> to seek-and-destroy with.
-     * @param target The target <code>Unit</code> to test.
+     * @param unit The target <code>Unit</code> to test.
      * @return A reason why the mission would be invalid, or null if
      *     none found.
      */
-    private static String invalidUnitReason(AIUnit aiUnit, Unit target) {
-        final Unit unit = aiUnit.getUnit();
-        Tile tile = target.getTile();
-        String reason;
-        return ((reason = invalidTargetReason(target)) != null) ? reason
-            : ((reason = invalidStanceReason(aiUnit, target.getOwner()))
-                != null) ? reason
-            : (tile == null) ? "target-not-on-map"
-            : (tile.getSettlement() != null) ? "target-in-settlement"
-            : (!unit.isTileAccessible(tile)) ? "target-incompatible"
-            : null;
+    private static String invalidUnitReason(AIUnit aiUnit, Unit unit) {
+        String reason = invalidTargetReason(unit);
+        if (reason != null) return reason;
+        final Tile tile = unit.getTile();
+        return (tile == null)
+            ? "target-not-on-map"
+            : (aiUnit.getUnit().getOwner() == unit.getOwner())
+            ? Mission.TARGETOWNERSHIP
+            : (tile.getSettlement() != null)
+            ? "target-in-settlement"
+            : (!aiUnit.getUnit().isTileAccessible(tile))
+            ? "target-incompatible"
+            : invalidStanceReason(aiUnit, unit.getOwner());
     }
 
     /**
@@ -371,10 +411,7 @@ public class UnitSeekAndDestroyMission extends Mission {
      * @return A reason for mission invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit) {
-        String reason;
-        return ((reason = Mission.invalidReason(aiUnit)) != null) ? reason
-            : ((reason = invalidDestroyReason(aiUnit)) != null) ? reason
-            : null;
+        return invalidMissionReason(aiUnit);
     }
 
     /**
@@ -385,9 +422,9 @@ public class UnitSeekAndDestroyMission extends Mission {
      * @return A reason for invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit, Location loc) {
-        String reason;
-        return ((reason = invalidAIUnitReason(aiUnit)) != null) ? reason
-            : ((reason = invalidDestroyReason(aiUnit)) != null) ? reason
+        String reason = invalidMissionReason(aiUnit);
+        return (reason != null)
+            ? reason                
             : (loc instanceof Settlement)
             ? invalidSettlementReason(aiUnit, (Settlement)loc)
             : (loc instanceof Unit)
@@ -406,7 +443,6 @@ public class UnitSeekAndDestroyMission extends Mission {
      */
     @Override
     public void doMission() {
-        final Unit unit = getUnit();
         String reason = invalidReason();
         if (isTargetReason(reason)) {
             target = null;
@@ -417,6 +453,7 @@ public class UnitSeekAndDestroyMission extends Mission {
 
         // Is there a target-of-opportunity?
         final AIUnit aiUnit = getAIUnit();
+        final Unit unit = getUnit();
         Location nearbyTarget = findTarget(aiUnit, 1);
         if (nearbyTarget != null) {
             if (target == null) {
@@ -436,7 +473,8 @@ public class UnitSeekAndDestroyMission extends Mission {
         }
 
         // Go to the target.
-        Location currentTarget = (nearbyTarget != null) ? nearbyTarget : target;
+        Location currentTarget = (nearbyTarget != null) ? nearbyTarget
+            : target;
         Unit.MoveType mt = travelToTarget(tag, currentTarget);
         switch (mt) {
         case MOVE_NO_MOVES: case MOVE_ILLEGAL:
@@ -502,7 +540,8 @@ public class UnitSeekAndDestroyMission extends Mission {
         super.readAttributes(in);
 
         String str = in.getAttributeValue(null, "target");
-        target = getGame().getFreeColLocation(str);
+        target = (str == null) ? null
+            : getGame().getFreeColLocation(str);
     }
 
     /**
