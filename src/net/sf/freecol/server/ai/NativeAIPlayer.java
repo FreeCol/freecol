@@ -109,7 +109,7 @@ public class NativeAIPlayer extends AIPlayer {
      * A settlement with a surplus chooses to send a gift GIFT_PERCENT
      * of the time.
      */
-    public static final int GIFT_PERCENT = 4;
+    public static final int GIFT_PERCENT = 10;
 
     /**
      * Stores temporary information for sessions (trading with another
@@ -481,7 +481,7 @@ public class NativeAIPlayer extends AIPlayer {
 
             // Do not bring gifts all the time.
             if (Utils.randomInt(logger, is.getName() + " bring gifts",
-                    getAIRandom(), 100) < GIFT_PERCENT) continue;
+                    getAIRandom(), 100) >= GIFT_PERCENT) continue;
 
             // Check if there are available units, and if there are already
             // enough missions in operation.
