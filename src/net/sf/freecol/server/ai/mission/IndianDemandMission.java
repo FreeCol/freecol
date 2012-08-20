@@ -222,7 +222,7 @@ public class IndianDemandMission extends Mission {
         final AIUnit aiUnit = getAIUnit();
         final Unit unit = getUnit();
         final IndianSettlement is = unit.getIndianSettlement();
-        for (;;) {
+        while (!completed) {
             if (hasTribute()) {
                 Unit.MoveType mt = travelToTarget(tag, is);
                 switch (mt) {
@@ -279,18 +279,24 @@ public class IndianDemandMission extends Mission {
             }
             demanded = true;
 
+            Direction d;
             boolean accepted
                 = AIMessage.askIndianDemand(aiUnit, target, goods, gold);
-            // Drop the mission if there is no tribute to return to
-            // the home settlement.
-            if (!accepted || (goods != null && !hasTribute())) {
-                completed = true;
-                // Also consider attacking if not content.
+            if (accepted && (gold > 0 || hasTribute())) {
+                if (goods != null) {
+                    logger.finest(tag + " accepted at " + target.getName()
+                        + " tribute: " + goods.toString() + ": " + this);
+                    continue; // Head for home
+                } else {
+                    logger.finest(tag + " completed at " + target.getName()
+                        + " tribute: " + gold + " gold: " + this);
+                }
+            } else { // Consider attacking if not content.
                 int unitTension = (is == null) ? 0
                     : is.getAlarm(enemy).getValue();
                 int tension = Math.max(unitTension,
                     unit.getOwner().getTension(enemy).getValue());
-                Direction d = unit.getTile().getDirection(target.getTile());
+                d = unit.getTile().getDirection(target.getTile());
                 boolean attack = tension >= Tension.Level.CONTENT.getLimit()
                     && d != null;
                 logger.finest(tag + " completed with refusal"
@@ -300,16 +306,10 @@ public class IndianDemandMission extends Mission {
                     AIMessage.askAttack(aiUnit, d);
                     return;
                 }
-            } else if (hasTribute()) {
-                logger.finest(tag + " accepted at " + target.getName()
-                    + " tribute: " + goods.toString() + ": " + this);
-                continue; // Head for home
-            } else {
-                logger.finest(tag + " completed at " + target.getName()
-                    + " tribute: " + gold + " gold: " + this);
-                completed = true;
             }
-            moveRandomly(tag, null); // Consume any remaining moves.
+            // Consume any remaining moves.
+            completed = true;
+            while ((d = moveRandomly(tag, null)) != null);
         }
     }
 
