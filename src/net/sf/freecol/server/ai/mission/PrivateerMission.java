@@ -192,18 +192,17 @@ public class PrivateerMission extends Mission {
 
         final int MAX_TURNS_TO_TARGET = 1;
         PathNode pathToTarget = findTarget(MAX_TURNS_TO_TARGET);
+        Direction direction = null;
         // Found a target
         if (pathToTarget != null) {
             target = pathToTarget.getLastNode().getTile();
             logger.finest(tag + " at " + unit.getTile()
                 + " found target at " + target + ": " + this);
             // We need to find an updated path to target
-            Direction direction;
             if (travelToTarget(tag, target) == MoveType.ATTACK_UNIT
                 && (direction = unit.getTile().getDirection(target)) != null) {
-                logger.finest(tag + " at " + unit.getTile()
-                    + " attacking " + target.getDefendingUnit(unit)
-                    + ": " + this);
+                logger.finest(tag + " completed hunt for target "
+                    + target.getDefendingUnit(unit) + ": " + this);
                 AIMessage.askAttack(getAIUnit(), direction);
             }
         } else {
@@ -211,7 +210,8 @@ public class PrivateerMission extends Mission {
             target = null;
             logger.finest(tag + " at " + unit.getTile()
                 + " without target, wandering");
-            moveRandomly(tag, null);
+            while ((direction = moveRandomly(tag, direction)) != null);
+            unit.setMovesLeft(0);
         }
     }
 
@@ -256,7 +256,6 @@ public class PrivateerMission extends Mission {
     }
 
     private void dumpCargoInPort() {
-        logger.finest(tag + " dumping goods: " + this);
         Unit unit = getUnit();
         boolean inEurope = unit.getLocation() instanceof Europe;
 
@@ -273,6 +272,8 @@ public class PrivateerMission extends Mission {
         for (Unit u : unit.getUnitList()) {
             unitLeavesTransport(getAIMain().getAIUnit(u), null);
         }
+        logger.finest(tag + " completed goods delivery"
+            + " at " + unit.getLocation() + ": " + this);
     }
 
     /**
