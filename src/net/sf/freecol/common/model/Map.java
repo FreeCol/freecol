@@ -616,32 +616,6 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Finds a shortest path between the given tiles.  The tile at the
-     * end will not be checked for validity.
-     *
-     * @param unit The <code>Unit</code> to find the path for.
-     * @param start The <code>Tile</code> in which the path starts from.
-     * @param end The <code>Tile</code> at the end of the path.
-     * @param carrier An optional naval carrier <code>Unit</code> to use.
-     * @param costDecider An optional <code>CostDecider</code> for
-     *     determining the movement costs (uses default cost deciders
-     *     for the unit/s if not provided).
-     * @return A <code>PathNode</code> for the path found, or null if
-     *     none found.
-     * @throws IllegalArgumentException If <code>start</code> equals end.
-     */
-    public PathNode findPath(final Unit unit, final Tile start,
-                             final Tile end, final Unit carrier,
-                             CostDecider costDecider) {
-        if (start == end) {
-            throw new IllegalArgumentException("start == end");
-        }
-
-        PathNode path = findFullPath(unit, start, end, carrier, costDecider);
-        return (path == null) ? null : path.next;
-    }
-
-    /**
      * Searches for a goal determined by the given <code>GoalDecider</code>.
      *
      * @param unit The <code>Unit</code> to find a path for.

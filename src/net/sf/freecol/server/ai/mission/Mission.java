@@ -283,52 +283,6 @@ public abstract class Mission extends AIObject {
 
 
     /**
-     * Moves the unit owning this mission towards the given
-     * <code>Tile</code>.  This is done in a loop until the tile is
-     * reached, there are no moves left, the path to the target cannot
-     * be found or that the next step is not a move.
-     *
-     * @param tile The <code>Tile</code> the unit should move towards.
-     * @return The direction to take the final move or null if the
-     *     move can not be made.
-     */
-    protected Direction moveTowards(Tile tile) {
-        PathNode pathNode = getUnit().findFullPath(tile);
-        return (pathNode == null) ? null : moveTowards(pathNode);
-    }
-
-    /**
-     * Moves the unit owning this mission using the given path.  This
-     * is done in a loop until the end of the path is reached, the
-     * next step is not a move or when there are no moves left.
-     *
-     * @param pathNode The first node of the path.
-     * @return The direction to continue moving the path or null if the
-     *     move can not be made.
-     */
-    protected Direction moveTowards(PathNode pathNode) {
-        final Unit unit = getUnit();
-        if (unit.getMovesLeft() <= 0) return null;
-
-        for (; pathNode.next != null && pathNode.getTurns() == 0;
-             pathNode = pathNode.next) {
-            if (pathNode.getLocation() == unit.getLocation()) continue;
-            if (!isValid()) return null;
-            if (!unit.getMoveType(pathNode.getDirection()).isProgress()) {
-                break;
-            }
-            if (!AIMessage.askMove(aiUnit, pathNode.getDirection())
-                || unit == null || unit.isDisposed()) {
-                return null;
-            }
-        }
-        return (pathNode.getTurns() == 0
-                && getUnit().getMoveType(pathNode.getDirection()).isLegal())
-            ? pathNode.getDirection()
-            : null;
-    }
-
-    /**
      * Moves a unit one step randomly.
      *
      * @param logMe A string to log the random number generation with.

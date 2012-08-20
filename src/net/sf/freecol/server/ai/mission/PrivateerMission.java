@@ -211,8 +211,8 @@ public class PrivateerMission extends Mission {
             logger.finest(tag + " at " + unit.getTile()
                 + " without target, wandering");
             while ((direction = moveRandomly(tag, direction)) != null);
-            unit.setMovesLeft(0);
         }
+        unit.setMovesLeft(0);
     }
 
     private void gotoNearestPort() {

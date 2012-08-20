@@ -531,24 +531,6 @@ public class TransportMission extends Mission {
     }
 
     /**
-     * Attack blocking ships.
-     *
-     * @return True if this ship is still capable of its mission.
-     */
-    private boolean attackIfEnemyShipIsBlocking(Direction direction) {
-        final Unit carrier = getUnit();
-        if (canAttackEnemyShips()
-            && carrier.getMoveType(direction) == MoveType.ATTACK_UNIT) {
-            final Tile newTile = carrier.getTile().getNeighbourOrNull(direction);
-            final Unit defender = newTile.getDefendingUnit(carrier);
-            if (canAttackPlayer(defender.getOwner())) {
-                AIMessage.askAttack(getAIUnit(), direction);
-            }
-        }
-        return isValid();
-    }
-
-    /**
      * Attack suitable enemy ships.
      *
      * @return True if this ship is still capable of its mission.
@@ -562,12 +544,13 @@ public class TransportMission extends Mission {
             // Do not search for a target if we have cargo onboard.
             return true;
         }
-        final PathNode pathToTarget = findNavalTarget(0);
-        if (pathToTarget != null) {
-            final Direction direction = moveTowards(pathToTarget);
-            if (direction != null
-                && carrier.getMoveType(direction) == MoveType.ATTACK_UNIT) {
-                AIMessage.askAttack(getAIUnit(), direction);
+        final PathNode path = findNavalTarget(0);
+        if (path != null) {
+            Tile tile = path.getLastNode().getTile();
+            Direction d;
+            if (travelToTarget(tag, tile) == MoveType.ATTACK_UNIT
+                && (d = carrier.getTile().getDirection(tile)) != null) {
+                AIMessage.askAttack(getAIUnit(), d);
             }
         }
         return isValid();
@@ -1021,15 +1004,16 @@ public class TransportMission extends Mission {
 
         PathNode path;
         if (locatable instanceof Unit && isCarrying(transportable)) {
-            path = ((Unit)locatable).findPath(start.getTile(),
-                                              destination.getTile(), carrier);
+            path = ((Unit)locatable).findFullPath(start.getTile(),
+                destination.getTile(), carrier, null);
             if (path == null || path.getTransportDropNode().previous == null) {
                 path = null;
             } else {
                 path.getTransportDropNode().previous.next = null;
             }
         } else {
-            path = carrier.findPath(start.getTile(), destination.getTile());
+            path = carrier.findFullPath(start.getTile(), destination.getTile(),
+                                        null, null);
         }
         return path;
     }
@@ -1141,8 +1125,8 @@ public class TransportMission extends Mission {
                         // Unload at destination tile
                         unload = true;
                         reason = "Arrived at " + destTile;
-                    } else if ((p = u.findPath(carrierTile, destTile,
-                                               carrier)) != null) {
+                    } else if ((p = u.findFullPath(carrierTile, destTile,
+                                                   carrier, null)) != null) {
                         final PathNode dropNode = p.getTransportDropNode();
                         Tile dropTile = (dropNode == null) ? null
                             : dropNode.getTile();
@@ -1484,28 +1468,14 @@ public class TransportMission extends Mission {
 
             // Move towards the next target:
             PathNode path = destination.getPath();
-            boolean moveToEurope = destination.moveToEurope();
-            Direction r = moveTowards(path);
-            if (r != null && carrier.getMoveType(r).isProgress()) {
-                if (carrier.getMoveType(r) == MoveType.MOVE_HIGH_SEAS
-                    && moveToEurope) {
-                    moveUnitToEurope();
-                } else {
-                    if (!moveButDontAttack(r)) {
-                        logger.finest(tag + " died moving: " + carrier);
-                        return;
-                    }
-                }
-
-                if (!(carrier.getLocation() instanceof Europe)) {
-                    moreWork = true;
-                }
-            }
-            if (r != null) {
-                if (!attackIfEnemyShipIsBlocking(r)) {
-                    logger.finest(tag + " died attacking: " + carrier);
-                    return;
-                }
+            switch (travelToTarget(tag, path.getLastNode().getLocation())) {
+            case MOVE_NO_MOVES: case MOVE_HIGH_SEAS:
+                return;
+            case MOVE:
+                break;
+            default:
+                logger.finest(tag + " unexpected move type: " + this);
+                break;
             }
             transportablesChanged = restockCargoAtDestination();
         }
