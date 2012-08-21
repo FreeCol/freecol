@@ -142,7 +142,7 @@ public class CreateMissionAtSettlementGoal extends Goal {
                             //Missionary is adjacent, use it to finish the goal.
                             if (((IndianSettlement)target).getMissionary()==null ||
                                 ((IndianSettlement)target).getMissionary().getOwner()!=player.getPlayer()) {
-                                PathNode pathNode = u.getUnit().findFullPath(target.getTile());
+                                PathNode pathNode = u.getUnit().findPath(target.getTile());
                                 u.getUnit().setMovesLeft(0);
                                                         
                                 AIMessage.askEstablishMission(u,

@@ -76,7 +76,7 @@ public class GotoAdjacentGoal extends Goal {
         nextUnit: while (uit.hasNext()) {
             AIUnit u = uit.next();
 
-            PathNode pathNode = u.getUnit().findFullPath(target);
+            PathNode pathNode = u.getUnit().findPath(target);
             if (pathNode==null) {
                 uit.remove();
                 addUnitToParent(u);            

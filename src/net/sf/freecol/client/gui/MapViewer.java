@@ -1577,7 +1577,7 @@ public final class MapViewer {
                        || Map.isSameLocation(activeUnit.getLocation(),
                                              activeUnit.getDestination()))
             ? null
-            : activeUnit.findFullPath(activeUnit.getDestination());
+            : activeUnit.findPath(activeUnit.getDestination());
     }
 
     /**

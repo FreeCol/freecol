@@ -703,8 +703,8 @@ public abstract class Mission extends AIObject {
         return tile != null
             && unit != null
             && unit.getTile() != tile
-            && ((path = unit.findFullPath(unit.getLocation(), tile,
-                                          unit.getCarrier(), null)) == null
+            && ((path = unit.findPath(unit.getLocation(), tile,
+                                      unit.getCarrier(), null)) == null
                 || path.usesCarrier());
     }
 
@@ -795,7 +795,7 @@ public abstract class Mission extends AIObject {
                         return MoveType.MOVE_ILLEGAL;
                     }
                 }
-                path = unit.findFullPath(unit.getLocation(), target, null,
+                path = unit.findPath(unit.getLocation(), target, null,
                     CostDeciders.avoidSettlementsAndBlockingUnits());
                 if (path == null) {
                     logger.fine(logMe + " no path from " + unit.getLocation()
@@ -826,7 +826,7 @@ public abstract class Mission extends AIObject {
         } else { // Moving on the map
             if (unit.getType().canMoveToHighSeas()) {
                 // If there is no path for a high seas capable unit, give up.
-                path = unit.findFullPath(unit.getTile(), targetTile, null,
+                path = unit.findPath(unit.getTile(), targetTile, null,
                     CostDeciders.avoidSettlementsAndBlockingUnits());
                 if (path == null) {
                     logger.fine(logMe + " no path from " + unit.getLocation()
@@ -835,7 +835,7 @@ public abstract class Mission extends AIObject {
                 }
             } else if (unit.isOnCarrier()) {
                 // Check if the carrier still has a useful path...
-                path = unit.findFullPath(unit.getTile(), targetTile, 
+                path = unit.findPath(unit.getTile(), targetTile, 
                     unit.getCarrier(),
                     CostDeciders.avoidSettlementsAndBlockingUnits());
                 if (path == null) {
@@ -847,7 +847,7 @@ public abstract class Mission extends AIObject {
                 inTransit = path.isOnCarrier() && path.next.isOnCarrier();
             } else {
                 // Not high seas capable.  If no path, it needs transport.
-                path = unit.findFullPath(unit.getTile(), targetTile, null,
+                path = unit.findPath(unit.getTile(), targetTile, null,
                     CostDeciders.avoidSettlementsAndBlockingUnits());
                 needTransport = path == null;
             }

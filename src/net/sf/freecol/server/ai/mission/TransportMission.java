@@ -1004,7 +1004,7 @@ public class TransportMission extends Mission {
 
         PathNode path;
         if (locatable instanceof Unit && isCarrying(transportable)) {
-            path = ((Unit)locatable).findFullPath(start.getTile(),
+            path = ((Unit)locatable).findPath(start.getTile(),
                 destination.getTile(), carrier, null);
             if (path == null || path.getTransportDropNode().previous == null) {
                 path = null;
@@ -1012,8 +1012,8 @@ public class TransportMission extends Mission {
                 path.getTransportDropNode().previous.next = null;
             }
         } else {
-            path = carrier.findFullPath(start.getTile(), destination.getTile(),
-                                        null, null);
+            path = carrier.findPath(start.getTile(), destination.getTile(),
+                                    null, null);
         }
         return path;
     }
@@ -1125,8 +1125,8 @@ public class TransportMission extends Mission {
                         // Unload at destination tile
                         unload = true;
                         reason = "Arrived at " + destTile;
-                    } else if ((p = u.findFullPath(carrierTile, destTile,
-                                                   carrier, null)) != null) {
+                    } else if ((p = u.findPath(carrierTile, destTile,
+                                               carrier, null)) != null) {
                         final PathNode dropNode = p.getTransportDropNode();
                         Tile dropTile = (dropNode == null) ? null
                             : dropNode.getTile();
@@ -1295,8 +1295,8 @@ public class TransportMission extends Mission {
      * @return A path to Europe, or null if none found.
      */
     private PathNode findPathToEurope(Unit unit) {
-        return unit.findFullPath(unit.getLocation(),unit.getOwner().getEurope(),
-                                 null, null);
+        return unit.findPath(unit.getLocation(),unit.getOwner().getEurope(),
+                             null, null);
     }
 
     /**
@@ -1308,8 +1308,8 @@ public class TransportMission extends Mission {
      * @return A path to Europe, or null if none found.
      */
     private PathNode findPathToEurope(Unit unit, Location start) {
-        return unit.findFullPath(start, unit.getOwner().getEurope(),
-                                 null, null);
+        return unit.findPath(start, unit.getOwner().getEurope(),
+                             null, null);
     }
 
 

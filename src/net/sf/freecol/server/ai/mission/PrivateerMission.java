@@ -224,7 +224,7 @@ public class PrivateerMission extends Mission {
             return;
         }
 
-        PathNode path = unit.findFullPath(nearestPort);
+        PathNode path = unit.findPath(nearestPort);
         if (path == null) {
             if ((path = unit.findOurNearestPort()) == null) {
                 logger.finest(tag + " failed to find port for goods: " + this);

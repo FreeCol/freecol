@@ -118,7 +118,7 @@ public class ManageMissionariesGoal extends Goal {
             if (u.getUnit().getRole() == Role.MISSIONARY) {
                 IndianSettlement i = findSettlement(u.getUnit().getTile());
                 if (i != null) {
-                    PathNode pathNode = u.getUnit().findFullPath(i.getTile());
+                    PathNode pathNode = u.getUnit().findPath(i.getTile());
                     if (pathNode != null) {
                         logger.info("Creating subgoal CreateMissionAtSettlementGoal.");
                         CreateMissionAtSettlementGoal g = new CreateMissionAtSettlementGoal(player,this,1,u,i);

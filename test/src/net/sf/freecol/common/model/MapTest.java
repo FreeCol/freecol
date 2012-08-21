@@ -312,7 +312,7 @@ public class MapTest extends FreeColTestCase {
                                        colonistType);
         colonist.setDestination(destinationTile);
 
-        PathNode path = colonist.findFullPath(destinationTile);
+        PathNode path = colonist.findPath(destinationTile);
         assertNull("No path should be available", path);
     }
 
@@ -340,7 +340,7 @@ public class MapTest extends FreeColTestCase {
                                        colonistType);
         colonist.setDestination(destinationTile);
 
-        PathNode path = colonist.findFullPath(destinationTile);
+        PathNode path = colonist.findPath(destinationTile);
         assertNull("No path should be available", path);
     }
 
@@ -394,7 +394,7 @@ public class MapTest extends FreeColTestCase {
                                        colonistType);
         colonist.setDestination(destinationTile);
 
-        PathNode path = map.findFullPath(colonist, colonist.getTile(),
+        PathNode path = map.findPath(colonist, colonist.getTile(),
             destinationTile, null,
             CostDeciders.avoidSettlementsAndBlockingUnits());
         assertNull("No path should be available", path);
@@ -419,7 +419,7 @@ public class MapTest extends FreeColTestCase {
         Tile destinationTile = map.getTile(3,7);
         colonist.setDestination(destinationTile);
 
-        PathNode path = colonist.findFullPath(destinationTile);
+        PathNode path = colonist.findPath(destinationTile);
         assertNotNull("A path should be available", path);
     }
 
@@ -552,8 +552,8 @@ public class MapTest extends FreeColTestCase {
         // Check colonist can find the trivial path
         Unit colonist = new ServerUnit(game, settlementTile, dutch,
                                        colonistType);
-        PathNode path = map.findFullPath(colonist, settlementTile,
-                                         settlementTile, null, null);
+        PathNode path = map.findPath(colonist, settlementTile,
+                                     settlementTile, null, null);
         assertNotNull("Trivial path should exist.", path);
         assertNull("Trivial path should be trivial.", path.next);
         assertEquals("Trivial path should start at settlement.",
@@ -561,15 +561,13 @@ public class MapTest extends FreeColTestCase {
 
         // Check colonist can not find a path into the sea
         Tile seaTile = map.getTile(13, 2);
-        path = map.findFullPath(colonist, settlementTile, seaTile,
-                                null, null);
+        path = map.findPath(colonist, settlementTile, seaTile, null, null);
         assertNull("Sea path should be illegal.", path);
 
         // Check that a naval unit can find that path.
         Unit galleon = new ServerUnit(game, settlementTile, dutch,
                                       galleonType);
-        path = map.findFullPath(galleon, settlementTile, seaTile,
-                                null, null);
+        path = map.findPath(galleon, settlementTile, seaTile, null, null);
         assertNotNull("Sea path should be legal for naval unit.", path);
         assertEquals("Sea path should start at settlement.", settlementTile,
             path.getTile());
@@ -578,8 +576,7 @@ public class MapTest extends FreeColTestCase {
 
         // Check giving the colonist access to a carrier makes the sea
         // path work.
-        path = map.findFullPath(colonist, settlementTile, seaTile,
-                                galleon, null);
+        path = map.findPath(colonist, settlementTile, seaTile, galleon, null);
         assertNotNull("Sea path should now be legal.", path);
         assertEquals("Sea path should start at settlement.", settlementTile,
             path.getTile());
@@ -589,8 +586,7 @@ public class MapTest extends FreeColTestCase {
         // Check the path still works if the colonist has to walk to
         // the carrier.
         Tile landTile = map.getTile(2, 2);
-        path = map.findFullPath(colonist, landTile, seaTile,
-                                galleon, null);
+        path = map.findPath(colonist, landTile, seaTile, galleon, null);
         assertNotNull("Sea path should still be legal.", path);
         assertEquals("Sea path should start at land tile.", landTile,
             path.getTile());
@@ -603,8 +599,8 @@ public class MapTest extends FreeColTestCase {
         // Check the colonist uses the carrier if it is quicker than walking.
         Tile shoreTile = map.getTile(9, 13);
         assertTrue("Shore tile should be on the shore.", shoreTile.isShore());
-        path = map.findFullPath(colonist, settlementTile, shoreTile,
-                                galleon, null);
+        path = map.findPath(colonist, settlementTile, shoreTile,
+                            galleon, null);
         assertNotNull("Shore path should be legal.", path);
         assertTrue("Shore path should have carrier moves.",
             path.usesCarrier());
@@ -613,23 +609,22 @@ public class MapTest extends FreeColTestCase {
 
         // Check the colonist does not use the carrier if it does not help.
         Tile midTile = map.getTile(9, 4);
-        path = map.findFullPath(colonist, map.getTile(2, 6), midTile,
-                                galleon, null);
+        path = map.findPath(colonist, map.getTile(2, 6), midTile,
+                            galleon, null);
         assertNotNull("Middle path should be legal.", path);
         assertFalse("Middle path should not not use carrier.",
             path.usesCarrier());
 
         // Check path to Europe.
         Europe europe = dutch.getEurope();
-        path = map.findFullPath(colonist, settlementTile, europe,
-                                galleon, null);
+        path = map.findPath(colonist, settlementTile, europe,
+                            galleon, null);
         assertNotNull("To-Europe path should be valid.", path);
         assertEquals("To-Europe path should end in Europe.", europe,
             path.getLastNode().getLocation());
 
         // Check path from Europe.
-        path = map.findFullPath(colonist, europe, landTile,
-                                galleon, null);
+        path = map.findPath(colonist, europe, landTile, galleon, null);
         assertNotNull("From-Europe path should be valid.", path);
         assertEquals("From-Europe path should start in Europe.", europe,
             path.getLocation());
@@ -642,8 +637,8 @@ public class MapTest extends FreeColTestCase {
         Tile anotherSettlementTile = map.getTile(7, 2);
         FreeColTestUtils.getColonyBuilder().player(dutch)
             .colonyTile(anotherSettlementTile).build();
-        path = map.findFullPath(galleon, anotherSettlementTile, europe,
-                                null, null);
+        path = map.findPath(galleon, anotherSettlementTile, europe,
+                            null, null);
         assertNotNull("From-lake-settlement path should be valid.", path);
         assertEquals("From-lake-settlement path should end in Europe.", europe,
             path.getLastNode().getLocation());
@@ -652,7 +647,7 @@ public class MapTest extends FreeColTestCase {
         // find a path inland.
         colonist.setLocation(galleon);
         galleon.setLocation(seaTile);
-        path = map.findFullPath(colonist, galleon, landTile, galleon, null);
+        path = map.findPath(colonist, galleon, landTile, galleon, null);
         assertNotNull("From-galleon path should be valid.", path);
         assertEquals("From-galleon path should start at sea.", seaTile,
             path.getLocation());

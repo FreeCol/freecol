@@ -1200,8 +1200,8 @@ public class Unit extends FreeColGameObject
      * @return A <code>PathNode</code> from the current location to the
      *     end location, or null if none found.
      */
-    public PathNode findFullPath(Location end) {
-        return findFullPath(getLocation(), end, null, null);
+    public PathNode findPath(Location end) {
+        return findPath(getLocation(), end, null, null);
     }
 
     /**
@@ -1216,10 +1216,10 @@ public class Unit extends FreeColGameObject
      *     for the unit/s if not provided).
      * @return A <code>PathNode</code>, or null if no path is found.
      */
-    public PathNode findFullPath(Location start, Location end, Unit carrier,
-                                 CostDecider costDecider) {
-        return getGame().getMap().findFullPath(this, start, end,
-                                               carrier, costDecider);
+    public PathNode findPath(Location start, Location end, Unit carrier,
+                             CostDecider costDecider) {
+        return getGame().getMap().findPath(this, start, end,
+                                           carrier, costDecider);
     }
 
     /**
@@ -1265,7 +1265,7 @@ public class Unit extends FreeColGameObject
      */
     public int getTurnsToReach(Location start, Location end, Unit carrier,
                                CostDecider costDecider) {
-        PathNode path = findFullPath(start, end, carrier, costDecider);
+        PathNode path = findPath(start, end, carrier, costDecider);
         return (path == null) ? INFINITY : path.getTotalTurns();
     }
 
@@ -1337,7 +1337,7 @@ public class Unit extends FreeColGameObject
         Europe europe = getOwner().getEurope();
         if (isNaval()) {
             if (isInEurope() || isAtSea()) return null;
-            ePath = (europe == null) ? null : findFullPath(europe);
+            ePath = (europe == null) ? null : findPath(europe);
             eTurns = (ePath == null) ? -1 : ePath.getTotalTurns();
         }
         PathNode sPath = findOurNearestSettlement(false, INFINITY, true);
@@ -1431,7 +1431,7 @@ public class Unit extends FreeColGameObject
                         PathNode reverse;
                         if (u.canAttack(unit)
                             && cm.calculateCombatOdds(u, unit).win >= threat
-                            && (reverse = u.findFullPath(start)) != null
+                            && (reverse = u.findPath(start)) != null
                             && reverse.getTotalTurns() < range) {
                             found = path;
                             return true;

@@ -511,7 +511,7 @@ public final class InGameController implements NetworkConstants {
 
             // Find a path to the stop.  Skip if none.
             Location destination = stop.getLocation();
-            PathNode path = unit.findFullPath(destination);
+            PathNode path = unit.findPath(destination);
             if (path == null) {
                 StringTemplate dest = destination.getLocationNameFor(player);
                 messages.add(new ModelMessage(MessageType.GOODS_MOVEMENT,
@@ -2290,7 +2290,7 @@ public final class InGameController implements NetworkConstants {
             }
 
             // Find a path to the destination.
-            PathNode path = unit.findFullPath(destination);
+            PathNode path = unit.findPath(destination);
             if (path == null) {
                 StringTemplate src = unit.getLocation()
                     .getLocationNameFor(player);

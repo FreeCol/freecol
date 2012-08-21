@@ -768,9 +768,9 @@ public class Map extends FreeColGameObject implements Location {
      *     start and end locations do not make sense, or the
      *     carrier/unit combination is bogus.
      */
-    public PathNode findFullPath(final Unit unit,
-                                 final Location start, final Location end,
-                                 final Unit carrier, CostDecider costDecider) {
+    public PathNode findPath(final Unit unit,
+                             final Location start, final Location end,
+                             final Unit carrier, CostDecider costDecider) {
         if (end == null) {
             throw new IllegalArgumentException("Null end.");
         } else if (!(end instanceof Europe || end.getTile() != null)) {

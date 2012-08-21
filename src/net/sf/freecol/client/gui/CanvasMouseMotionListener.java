@@ -75,7 +75,7 @@ public final class CanvasMouseMotionListener extends AbstractCanvasListener impl
                     Unit active = mapViewer.getActiveUnit();
                     lastTile = tile;
                     if (active != null && active.getTile() != tile) {
-                        PathNode dragPath = active.findFullPath(tile);
+                        PathNode dragPath = active.findPath(tile);
                         mapViewer.setGotoPath(dragPath);
                     } else {
                         mapViewer.setGotoPath(null);
@@ -106,7 +106,7 @@ public final class CanvasMouseMotionListener extends AbstractCanvasListener impl
                     if (lastTile != tile) {
                         lastTile = tile;
                         if (active.getTile() != tile) {
-                            PathNode dragPath = active.findFullPath(tile);
+                            PathNode dragPath = active.findPath(tile);
                             mapViewer.setGotoPath(dragPath);
                         } else {
                             mapViewer.setGotoPath(null);

@@ -202,8 +202,8 @@ public class CashInTreasureTrainMission extends Mission {
             return (europe == null)
                 ? null // Nowhere suitable at all!
                 : (carrier != null)
-                ? unit.findFullPath(startTile, europe, carrier, standardCd)
-                : unit.findFullPath(startTile, europe, null, relaxedCd);
+                ? unit.findPath(startTile, europe, carrier, standardCd)
+                : unit.findPath(startTile, europe, null, relaxedCd);
         }
 
         // Can the unit get to a cash in site?

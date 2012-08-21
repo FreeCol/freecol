@@ -185,7 +185,7 @@ public class GUI {
             if (pt != null) {
                 Tile tile = mapViewer.convertToMapTile(pt.x, pt.y);
                 if (tile != null && unit.getTile() != tile) {
-                    mapViewer.setGotoPath(unit.findFullPath(tile));
+                    mapViewer.setGotoPath(unit.findPath(tile));
                 }
             }
         }
