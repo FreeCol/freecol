@@ -1309,8 +1309,7 @@ public class Unit extends FreeColGameObject
                     return false;
                 }
             };
-        return searchFullPath(startTile, gd, CostDeciders.avoidIllegal(),
-                              range, null);
+        return search(startTile, gd, CostDeciders.avoidIllegal(), range, null);
     }
 
     /**
@@ -1373,11 +1372,10 @@ public class Unit extends FreeColGameObject
      * @param carrier An optional naval carrier <code>Unit</code> to use.
      * @return The path to a goal, or null if none can be found.
      */
-    public PathNode searchFullPath(Location start, GoalDecider gd,
-                                   CostDecider cd, int maxTurns,
-                                   Unit carrier) {
-        return getGame().getMap().searchFullPath(this, start, gd, cd, maxTurns,
-                                                 carrier);
+    public PathNode search(Location start, GoalDecider gd,
+                           CostDecider cd, int maxTurns, Unit carrier) {
+        return getGame().getMap().search(this, start, gd, cd, maxTurns,
+                                         carrier);
     }
 
     /**
@@ -1454,8 +1452,8 @@ public class Unit extends FreeColGameObject
             .getMovement()) / this.getInitialMovesLeft();
 
         return (start == null) ? null
-            : searchFullPath(start, threatDecider, CostDeciders.avoidIllegal(),
-                             reverseRange, getCarrier());
+            : search(start, threatDecider, CostDeciders.avoidIllegal(),
+                     reverseRange, getCarrier());
     }
     
     /**

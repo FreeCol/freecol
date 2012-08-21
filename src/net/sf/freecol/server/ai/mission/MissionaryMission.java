@@ -195,13 +195,11 @@ public class MissionaryMission extends Mission {
         final CostDecider relaxedCd = CostDeciders.numberOfTiles();
 
         // Is there a valid target available from the starting tile?
-        path = unit.searchFullPath(startTile, gd, standardCd,
-                                   MAX_TURNS, carrier);
+        path = unit.search(startTile, gd, standardCd, MAX_TURNS, carrier);
         if (path != null) return path;
 
         // One more try with a relaxed cost decider and no range limit.
-        return unit.searchFullPath(startTile, gd, relaxedCd,
-                                   MAX_TURNS, carrier);
+        return unit.search(startTile, gd, relaxedCd, MAX_TURNS, carrier);
     }
 
     /**

@@ -412,9 +412,8 @@ public abstract class Mission extends AIObject {
                 return false;
             }
         };
-        return getUnit().searchFullPath(getUnit().getTile(), gd,
-                                        CostDeciders.avoidIllegal(),
-                                        maxTurns, null);
+        return getUnit().search(getUnit().getTile(), gd,
+                                CostDeciders.avoidIllegal(), maxTurns, null);
     }
 
     /**
@@ -681,8 +680,9 @@ public abstract class Mission extends AIObject {
             || (unit = aiUnit.getUnit()) == null || unit.isDisposed() 
             || (startTile = unit.getPathStartTile()) == null)
             ? null
-            : unit.searchFullPath(startTile, getMissionGoalDecider(aiUnit, type),
-                CostDeciders.avoidIllegal(), range, unit.getCarrier());
+            : unit.search(startTile, getMissionGoalDecider(aiUnit, type),
+                          CostDeciders.avoidIllegal(),
+                          range, unit.getCarrier());
     }
 
     /**

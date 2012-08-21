@@ -174,8 +174,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                     return false;
                 }
             };
-        PathNode path = unit.searchFullPath(tile, gd, null, 10,
-                                            unit.getCarrier());
+        PathNode path = unit.search(tile, gd, null, 10, unit.getCarrier());
         if (path == null) {
             logger.warning("Can not find suitable REF landing site for: "
                 + colony);

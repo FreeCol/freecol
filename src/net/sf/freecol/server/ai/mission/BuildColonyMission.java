@@ -219,18 +219,15 @@ public class BuildColonyMission extends Mission {
         final CostDecider relaxedCd = CostDeciders.numberOfTiles();
 
         // Try for something sensible nearby.
-        path = unit.searchFullPath(startTile, gd, standardCd,
-                                   MAX_TURNS, carrier);
+        path = unit.search(startTile, gd, standardCd, MAX_TURNS, carrier);
         if (path != null) return path;
 
         // Retry, but increase the range.
-        path = unit.searchFullPath(startTile, gd, standardCd,
-                                   MAX_TURNS*3, carrier);
+        path = unit.search(startTile, gd, standardCd, MAX_TURNS*3, carrier);
         if (path != null) return path;
 
         // One more try with a relaxed cost decider and no range limit.
-        return unit.searchFullPath(startTile, gd, relaxedCd,
-                                   INFINITY, carrier);
+        return unit.search(startTile, gd, relaxedCd, INFINITY, carrier);
     }
 
     /**

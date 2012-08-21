@@ -611,9 +611,9 @@ public class TransportMission extends Mission {
                     return true;
                 }
             };
-        return getUnit().searchFullPath(getUnit().getTile(), gd,
-                                        CostDeciders.avoidSettlements(),
-                                        maxTurns, null);
+        return getUnit().search(getUnit().getTile(), gd,
+                                CostDeciders.avoidSettlements(),
+                                maxTurns, null);
     }
 
     /**

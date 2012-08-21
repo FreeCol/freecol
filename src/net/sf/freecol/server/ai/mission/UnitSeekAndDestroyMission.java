@@ -273,9 +273,9 @@ public class UnitSeekAndDestroyMission extends Mission {
 
         // Can the unit legally reach a valid target from where it
         // currently is?
-        return unit.searchFullPath(startTile, getGoalDecider(aiUnit, false),
-                                   CostDeciders.avoidIllegal(),
-                                   range, unit.getCarrier());
+        return unit.search(startTile, getGoalDecider(aiUnit, false),
+                           CostDeciders.avoidIllegal(),
+                           range, unit.getCarrier());
     }
 
     /**

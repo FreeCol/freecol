@@ -745,9 +745,8 @@ public class Map extends FreeColGameObject implements Location {
      *     if none found.
      */
     public Tile getBestEntryTile(Unit unit, Tile tile, Unit carrier) {
-        PathNode path = searchFullPath(unit, tile, getHighSeasGoalDecider(),
-                                       CostDeciders.avoidIllegal(), INFINITY,
-                                       carrier);
+        PathNode path = search(unit, tile, getHighSeasGoalDecider(),
+                               CostDeciders.avoidIllegal(), INFINITY, carrier);
         return (path == null) ? null : path.getLastNode().getTile();
     }
 
@@ -893,10 +892,10 @@ public class Map extends FreeColGameObject implements Location {
      *     start location does not make sense, or the carrier/unit
      *     combination is bogus.
      */
-    public PathNode searchFullPath(final Unit unit, Location start,
-                                   final GoalDecider goalDecider,
-                                   final CostDecider costDecider,
-                                   final int maxTurns, final Unit carrier) {
+    public PathNode search(final Unit unit, Location start,
+                           final GoalDecider goalDecider,
+                           final CostDecider costDecider,
+                           final int maxTurns, final Unit carrier) {
         Location entry = findRealStart(unit, start, carrier);
         int initialTurns = (!unit.isAtSea()) ? 0
             : (unit.isOnCarrier()) ? unit.getCarrier().getWorkLeft()

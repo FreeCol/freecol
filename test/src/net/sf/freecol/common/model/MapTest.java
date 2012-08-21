@@ -473,9 +473,9 @@ public class MapTest extends FreeColTestCase {
                 }
             };
 
-        PathNode path = map.searchFullPath(artillery, unitTile,
-                                           gd, CostDeciders.avoidIllegal(),
-                                           FreeColObject.INFINITY, galleon);
+        PathNode path = map.search(artillery, unitTile, gd,
+                                   CostDeciders.avoidIllegal(),
+                                   FreeColObject.INFINITY, galleon);
         assertTrue("Should find the French colony via a drop off",
                    path != null && path.getTransportDropNode() != null
                    && path.getLastNode().getTile() == colonyTile);
@@ -486,9 +486,9 @@ public class MapTest extends FreeColTestCase {
             .colonyTile(colonyTile2).build();
         assertTrue("French colony not on the map",
                    colonyTile2.getSettlement() != null);
-        path = map.searchFullPath(artillery, unitTile,
-                                  gd, CostDeciders.avoidIllegal(),
-                                  FreeColObject.INFINITY, galleon);
+        path = map.search(artillery, unitTile, gd,
+                          CostDeciders.avoidIllegal(),
+                          FreeColObject.INFINITY, galleon);
         assertTrue("Should still find the first French colony via a drop off",
                    path != null && path.getTransportDropNode() != null
                    && path.getLastNode().getTile() == colonyTile);

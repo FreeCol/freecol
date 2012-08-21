@@ -166,9 +166,9 @@ public class DefendSettlementMission extends Mission {
         final Tile startTile = unit.getPathStartTile();
         if (startTile == null) return null;
 
-        return unit.searchFullPath(startTile, getGoalDecider(aiUnit),
-            CostDeciders.avoidSettlementsAndBlockingUnits(),
-            MAX_TURNS, unit.getCarrier());
+        return unit.search(startTile, getGoalDecider(aiUnit),
+                           CostDeciders.avoidSettlementsAndBlockingUnits(),
+                           MAX_TURNS, unit.getCarrier());
     }
 
     /**

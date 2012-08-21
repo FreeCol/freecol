@@ -208,13 +208,11 @@ public class CashInTreasureTrainMission extends Mission {
 
         // Can the unit get to a cash in site?
         final GoalDecider gd = getGoalDecider(aiUnit, deferOK);
-        path = unit.searchFullPath(startTile, gd, standardCd,
-                                   MAX_TURNS, carrier);
+        path = unit.search(startTile, gd, standardCd, MAX_TURNS, carrier);
         if (path != null) return path;
 
         // One more try with a relaxed cost decider and no range limit.
-        return unit.searchFullPath(startTile, gd, relaxedCd,
-                                   INFINITY, carrier);
+        return unit.search(startTile, gd, relaxedCd, INFINITY, carrier);
     }
 
     /**

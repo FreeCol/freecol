@@ -195,15 +195,13 @@ public class ScoutingMission extends Mission {
 
         // Can the scout legally reach a valid target from where it
         // currently is?
-        path = unit.searchFullPath(startTile, gd, standardCd,
-                                   MAX_TURNS, carrier);
+        path = unit.search(startTile, gd, standardCd, MAX_TURNS, carrier);
         if (path != null) return path;
 
         // Search again, purely on distance in tiles, which allows
         // water tiles and thus potentially finds targets that require
         // a carrier to reach.
-        return unit.searchFullPath(startTile, gd, relaxedCd,
-                                   INFINITY, carrier);
+        return unit.search(startTile, gd, relaxedCd, INFINITY, carrier);
     }
 
     /**
