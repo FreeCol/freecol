@@ -616,45 +616,6 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Searches for a goal determined by the given <code>GoalDecider</code>.
-     *
-     * @param unit The <code>Unit</code> to find a path for.
-     * @param start The <code>Tile</code> to start the search from.
-     * @param goalDecider The object responsible for determining whether a
-     *     given <code>PathNode</code> is a goal or not.
-     * @param costDecider An optional <code>CostDecider</code>
-     *     responsible for determining the path cost.
-     * @param maxTurns The maximum number of turns the given
-     *     <code>Unit</code> is allowed to move. This is the
-     *     maximum search range for a goal.
-     * @param carrier An optional naval carrier <code>Unit</code> to use.
-     * @return The path to a goal or null if none can be found.
-     * @throws IllegalArgumentException If <code>start</code> or
-     *     <code>unit</code> are null.
-     */
-    public PathNode search(final Unit unit, final Tile start,
-                           final GoalDecider goalDecider,
-                           final CostDecider costDecider,
-                           final int maxTurns, final Unit carrier) {
-        if (unit == null) {
-            throw new IllegalArgumentException("Null unit.");
-        } else if (start == null) {
-            throw new IllegalArgumentException("Null start.");
-        } else if (carrier != null) {
-            if (!carrier.isNaval()) {
-                throw new IllegalArgumentException("Non-naval carrier: "
-                    + carrier);
-            } else if (unit.isNaval()) {
-                throw new IllegalArgumentException("Carrier for naval unit: "
-                    + unit);
-            }
-        }
-        PathNode path = search(unit, start, goalDecider, costDecider,
-                               maxTurns, carrier, null);
-        return (path == null) ? null : path.next;
-    }
-
-    /**
      * Builds a simple goal decider to find a single target location.
      *
      * @param target The target <code>Location</code>.
@@ -837,10 +798,10 @@ public class Map extends FreeColGameObject implements Location {
 
                 // Now search forward from there to get a path in the right
                 // order (the existing one might not be optimal if reversed!)
-                path = search(unit, tile,
-                              getLocationGoalDecider(end.getTile()),
-                              costDecider, INFINITY, carrier,
-                              getManhattenHeuristic(end.getTile()));
+                path = searchInternal(unit, tile,
+                                      getLocationGoalDecider(end.getTile()),
+                                      costDecider, INFINITY, carrier,
+                                      getManhattenHeuristic(end.getTile()));
                 if (path == null) {
                     throw new IllegalStateException("SEARCH-FAIL: " + unit
                         + "/" + carrier + " from " + tile + " to " + end);
@@ -860,8 +821,9 @@ public class Map extends FreeColGameObject implements Location {
                 if (!waterUnit.getType().canMoveToHighSeas()) return null;
                 
                 // Search forwards to the high seas.
-                path = search(unit, entry.getTile(), getHighSeasGoalDecider(),
-                              costDecider, INFINITY, carrier, null);
+                path = searchInternal(unit, entry.getTile(),
+                                      getHighSeasGoalDecider(),
+                                      costDecider, INFINITY, carrier, null);
                 if (path == null) return null;
 
                 // Add a final node for Europe and return the path.
@@ -882,12 +844,12 @@ public class Map extends FreeColGameObject implements Location {
                     // latter will usually be faster, but not always,
                     // e.g. mounted units on a good road system.
                     PathNode carrierPath;
-                    path = search(unit, startTile, gd, costDecider, INFINITY,
-                                  null, sh);
+                    path = searchInternal(unit, startTile, gd,
+                                          costDecider, INFINITY, null, sh);
                     if (carrier != null
-                        && (carrierPath = search(unit, startTile, gd,
-                                                 costDecider, INFINITY,
-                                                 carrier, sh)) != null
+                        && (carrierPath = searchInternal(unit, startTile, gd,
+                                                         costDecider, INFINITY,
+                                                         carrier, sh)) != null
                         && (path == null
                             || (path.getLastNode().getCost()
                                 > carrierPath.getLastNode().getCost()))) {
@@ -898,8 +860,9 @@ public class Map extends FreeColGameObject implements Location {
                     // use settlements and inland lakes are possible, but
                     // hard to capture with the contiguity test, so just
                     // allow the search to proceed.
-                    path = search(unit, startTile, gd, costDecider, INFINITY,
-                                  carrier, sh);
+                    path = searchInternal(unit, startTile, gd,
+                                          costDecider, INFINITY,
+                                          carrier, sh);
                 } else { // Otherwise, there is a connectivity failure.
                     path = null;
                 }
@@ -945,16 +908,18 @@ public class Map extends FreeColGameObject implements Location {
             // Fail fast if Europe is unattainable.
             if (!waterUnit.getType().canMoveToHighSeas()) return null;
 
-            path = search(unit, (Tile)waterUnit.getEntryLocation(),
-                          goalDecider, costDecider, maxTurns, carrier, null);
+            path = searchInternal(unit, (Tile)waterUnit.getEntryLocation(),
+                                  goalDecider, costDecider, maxTurns,
+                                  carrier, null);
             if (path == null) return null;
             path.addTurns(waterUnit.getSailTurns());
             path.previous = new PathNode(entry, waterUnit.getMovesLeft(),
                                          0, carrier != null, null, path);
             path = path.previous;
         } else {
-            path = search(unit, entry.getTile(), goalDecider, costDecider,
-                          maxTurns, carrier, null);
+            path = searchInternal(unit, entry.getTile(),
+                                  goalDecider, costDecider, maxTurns,
+                                  carrier, null);
         }
         if (path != null && initialTurns != 0) path.addTurns(initialTurns);
         return path;
@@ -1150,11 +1115,11 @@ public class Map extends FreeColGameObject implements Location {
      * @return The path to a goal determined by the given
      *     <code>GoalDecider</code>.
      */
-    private PathNode search(final Unit unit, final Tile start,
-                            final GoalDecider goalDecider,
-                            final CostDecider costDecider,
-                            final int maxTurns, final Unit carrier,
-                            final SearchHeuristic searchHeuristic) {
+    private PathNode searchInternal(final Unit unit, final Tile start,
+                                    final GoalDecider goalDecider,
+                                    final CostDecider costDecider,
+                                    final int maxTurns, final Unit carrier,
+                                    final SearchHeuristic searchHeuristic) {
         final HashMap<String, PathNode> openList
             = new HashMap<String, PathNode>();
         final HashMap<String, PathNode> closedList

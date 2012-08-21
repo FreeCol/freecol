@@ -1362,30 +1362,6 @@ public class Unit extends FreeColGameObject
      * Convenience wrapper for the
      * {@link net.sf.freecol.common.model.Map#search} function.
      *
-     * @param start The <code>Tile</code> to start the search from.
-     * @param gd The object responsible for determining whether a
-     *     given <code>PathNode</code> is a goal or not.
-     * @param cd An optional <code>CostDecider</code> responsible for
-     *     determining the path cost.
-     * @param maxTurns The maximum number of turns the given
-     *     <code>Unit</code> is allowed to move.
-     * @param carrier The carrier the <code>unit</code> is currently
-     *     onboard or <code>null</code> if the <code>unit</code> is
-     *     either not onboard a carrier or should not use the carrier
-     *     while finding the path.
-     * @return The path to a goal determined by the given
-     *        <code>GoalDecider</code>.
-     */
-    public PathNode search(Tile start, GoalDecider gd, CostDecider cd,
-                           int maxTurns, Unit carrier) {
-        return getGame().getMap().search(this, start, gd, cd, maxTurns,
-                                         carrier);
-    }
-
-    /**
-     * Convenience wrapper for the
-     * {@link net.sf.freecol.common.model.Map#search} function.
-     *
      * @param start The <code>Location</code> to start the search from.
      * @param goalDecider The object responsible for determining whether a
      *     given <code>PathNode</code> is a goal or not.
