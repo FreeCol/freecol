@@ -226,16 +226,18 @@ public class MissionaryMission extends Mission {
      */
     public static String prepare(AIUnit aiUnit) {
         String reason = invalidReason(aiUnit);
-        if (reason != null) return reason;
-        final Unit unit = aiUnit.getUnit();
-        if (!unit.hasAbility("model.ability.establishMission")
-            && (((FreeColGameObject)unit.getLocation())
-                .hasAbility("model.ability.dressMissionary"))) {
-            aiUnit.equipForRole(Unit.Role.MISSIONARY, false);
+        if (reason == null) {
+            final Unit unit = aiUnit.getUnit();
+            if (!unit.hasAbility("model.ability.establishMission")
+                && (((FreeColGameObject)unit.getLocation())
+                    .hasAbility("model.ability.dressMissionary"))) {
+                aiUnit.equipForRole(Unit.Role.MISSIONARY, false);
+            }
+            reason = (unit.hasAbility("model.ability.establishMission"))
+                ? null
+                : "unit-can-not-establish-mission";
         }
-        return (unit.hasAbility("model.ability.establishMission"))
-            ? null
-            : "unit-can-not-establish-mission";
+        return reason;
     }
 
     // Fake Transportable interface
@@ -310,7 +312,9 @@ public class MissionaryMission extends Mission {
         String reason = invalidTargetReason(is);
         if (reason != null) return reason;
         final Player owner = aiUnit.getUnit().getOwner();
-        return (is.getOwner().atWarWith(owner))
+        return (!owner.hasContacted(is.getOwner()))
+            ? "target-is-uncontacted"
+            : (is.getOwner().atWarWith(owner))
             ? "target-at-war"
             : (is.getMissionary() != null
                 && is.getMissionary().getOwner() == owner)
@@ -377,7 +381,7 @@ public class MissionaryMission extends Mission {
         // Go to the target.
         Unit.MoveType mt = travelToTarget(tag, target);
         switch (mt) {
-        case MOVE_NO_MOVES: case MOVE_NO_REPAIR:
+        case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_ILLEGAL:
             break;
         case MOVE:
             // Reached an intermediate colony.  Retarget, but do not

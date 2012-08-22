@@ -678,6 +678,9 @@
     <equipment-type id="model.equipment.missionary" role="missionary">
       <modifier id="model.modifier.movementBonus" type="additive" value="3"/>
       <ability id="model.ability.missionary" value="true"/>
+      <ability id="model.ability.establishMission" value="true"/>
+      <ability id="model.ability.denounceHeresy" value="true"/>
+      <ability id="model.ability.inciteNatives" value="true"/>
       <modifier id="model.modifier.missionaryTradeBonus" type="percentage" value="10"/>
       <required-ability id="model.ability.canBeEquipped" value="true"/>
       <required-ability id="model.ability.dressMissionary" value="true"/>
