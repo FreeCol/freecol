@@ -35,24 +35,34 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
+import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.MoveType;
+import net.sf.freecol.common.model.pathfinding.CostDeciders;
+import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIUnit;
 
 
+/**
+ * A mission for a Privateer unit.
+ */
 public class PrivateerMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(PrivateerMission.class.getName());
 
     private static String tag = "AI privateer";
 
-    private static enum PrivateerMissionState {HUNTING,TRANSPORTING};
-    private PrivateerMissionState state = PrivateerMissionState.HUNTING;
-    private Location nearestPort = null;
-    private Tile target = null;
+    /**
+     * The target for this mission.  Either a port location to drop off
+     * plunder, or a unit to attack.
+     */
+    private Location target = null;
 
 
     /**
@@ -89,6 +99,145 @@ public class PrivateerMission extends Mission {
     }
 
 
+    /**
+     * Is the unit carrying any cargo (units or goods).
+     *
+     * @param aiUnit The <code>AIUnit</code> that might have plundered.
+     * @return True if the unit has goods aboard.
+     */
+    private static boolean hasCargo(AIUnit aiUnit) {
+        return aiUnit.getUnit().getGoodsCount() > 0
+            || aiUnit.getUnit().getUnitCount() > 0;
+    }
+
+    /**
+     * Extract a valid target for this mission from a path.
+     *
+     * @param aiUnit A <code>AIUnit</code> to perform the mission.
+     * @param path A <code>PathNode</code> to extract a target from,
+     *     (uses the unit location if null).
+     * @return A target for this mission, or null if none found.
+     */
+    public static Location extractTarget(AIUnit aiUnit, PathNode path) {
+        if (path == null) return null;
+        final Unit unit = aiUnit.getUnit();
+        final Location loc = path.getLastNode().getLocation();
+        Settlement settlement = loc.getSettlement();
+        Tile tile = loc.getTile();
+        Unit other = (tile == null) ? null : tile.getDefendingUnit(unit);
+        return (hasCargo(aiUnit))
+            ? ((loc instanceof Europe) ? loc
+                : (settlement instanceof Colony) ? settlement
+                : null)
+            : ((other != null) ? other : null);
+    }
+
+    /**
+     * Gets a <code>GoalDecider</code> for this mission.
+     *
+     * @param aiUnit The <code>AIUnit</code> that is searching.
+     * @param deferOK Enable colony fallback (not implemented).
+     * @return A suitable <code>GoalDecider</code>.
+     */
+    private static GoalDecider getGoalDecider(final AIUnit aiUnit,
+                                              boolean deferOK) {
+        return new GoalDecider() {
+            private PathNode bestPath = null;
+            private int bestValue = 0;
+
+            public PathNode getGoal() { return bestPath; }
+            public boolean hasSubGoals() { return true; }
+            public boolean check(Unit u, PathNode path) {
+                int value = scorePath(aiUnit, path);
+                if (bestValue < value) {
+                    bestValue = value;
+                    bestPath = path;
+                    return true;
+                }
+                return false;
+            }
+        };
+    }
+
+    /**
+     * Evaluate a potential mission for a given unit and path.
+     *
+     * @param aiUnit The <code>AIUnit</code> to do the mission.
+     * @param path A <code>PathNode</code> to take to the target.
+     * @return A score for the proposed mission.
+     */
+    public static int scorePath(AIUnit aiUnit, PathNode path) {
+        Location loc = extractTarget(aiUnit, path);
+        if (loc instanceof Europe || loc instanceof Colony) {
+            return 1000 / (path.getTotalTurns() + 1);
+        } else if (loc instanceof Unit) {
+            Unit attacker = aiUnit.getUnit();
+            Unit defender = (Unit)loc;
+            int value = 1000;
+            // Pirates want cargo
+            value += defender.getGoodsCount() * 200;
+            value += defender.getUnitCount() * 100;
+            // But they are wary of danger
+            if (defender.isOffensiveUnit()) {
+                value -= attacker.getGame().getCombatModel()
+                    .getDefencePower(attacker, defender) * 100;
+            }
+            return value / (path.getTotalTurns() + 1);
+        } else {
+            return Integer.MIN_VALUE;
+        }
+    }
+
+    /**
+     * Finds a suitable privateering target for the supplied unit.
+     *
+     * @param aiUnit The <code>AIUnit</code> to find a path for.
+     * @param range The maximum number of turns to seek for a target.
+     * @param deferOK Not implemented in this mission.
+     * @return A path to the new target.
+     */
+    public static PathNode findTargetPath(AIUnit aiUnit, int range, 
+                                          boolean deferOK) {
+        if (invalidAIUnitReason(aiUnit) != null) return null;
+        final Unit unit = aiUnit.getUnit();
+        final Tile startTile = unit.getPathStartTile();
+        if (startTile == null) return null;
+
+        // Can the privateer legally reach a valid target from where
+        // it currently is?
+        return unit.search(startTile, getGoalDecider(aiUnit, deferOK),
+                           CostDeciders.avoidIllegal(), range, null);
+    }
+
+    /**
+     * Finds a suitable privateering target for the supplied unit.
+     *
+     * @param aiUnit The <code>AIUnit</code> to find a path for.
+     * @param range The maximum number of turns to seek for a target.
+     * @param deferOK Enables deferring to a fallback colony.
+     * @return A <code>PathNode</code> to the target, or null if none found.
+     */
+    public static Location findTarget(AIUnit aiUnit, int range,
+                                      boolean deferOK) {
+        PathNode path = findTargetPath(aiUnit, range, deferOK);
+        return (path != null) ? extractTarget(aiUnit, path)
+            : null;
+    }        
+
+
+    // Fake Transportable interface
+
+    /**
+     * Gets the transport destination for units with this mission.
+     *
+     * @return Always null, we never transport carrier units.
+     */
+    @Override
+    public Location getTransportDestination() {
+        return null;
+    }
+
+
     // Mission interface
 
     /**
@@ -114,8 +263,41 @@ public class PrivateerMission extends Mission {
         return (!unit.isCarrier()) ? "unit-not-a-carrier"
             : (!unit.isOffensiveUnit()) ? Mission.UNITNOTOFFENSIVE
             : (!unit.hasAbility(Ability.PIRACY)) ? "unit-not-a-pirate"
-            : (unit.getGoodsCount() > 0) ? "unit-has-goods"
-            : (unit.getUnitCount() > 0) ? "unit-has-units"
+            : null;
+    }
+
+    /**
+     * Is this a valid target because it is one of our colonies.
+     *
+     * @param aiUnit The <code>AIUnit</code> to test.
+     * @param settlement The <code>Settlement</code> to test.
+     * @return A reason why the mission would be invalid, or null if
+     *     none found.
+     */
+    private static String invalidSettlementReason(AIUnit aiUnit,
+                                                  Settlement settlement) {
+        return (settlement instanceof Colony)
+            ? invalidTargetReason(settlement, aiUnit.getUnit().getOwner())
+            : Mission.TARGETINVALID;
+    }
+
+    /**
+     * Is this a valid target because it is a hostile unit.
+     *
+     * @param aiUnit The <code>AIUnit</code> to test.
+     * @param settlement The <code>Settlement</code> to test.
+     * @return A reason why the mission would be invalid, or null if
+     *     none found.
+     */
+    private static String invalidUnitReason(AIUnit aiUnit, Unit unit) {
+        Player player = aiUnit.getUnit().getOwner();
+        Player other = unit.getOwner();
+        return (unit == null)
+            ? Mission.TARGETINVALID
+            : (player == other)
+            ? Mission.TARGETOWNERSHIP
+            : (player.getStance(other) == Stance.ALLIANCE)
+            ? "privateer-avoids-ally"
             : null;
     }
 
@@ -146,7 +328,20 @@ public class PrivateerMission extends Mission {
      * @return A reason for mission invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit, Location loc) {
-        return invalidMissionReason(aiUnit);
+        String reason = invalidMissionReason(aiUnit);
+        return (reason != null)
+            ? reason
+            : (aiUnit.getUnit().isInEurope())
+            ? null
+            : (hasCargo(aiUnit) && loc instanceof Europe)
+            ? invalidTargetReason(loc, aiUnit.getUnit().getOwner())
+            : (hasCargo(aiUnit) && loc instanceof Settlement)
+            ? invalidSettlementReason(aiUnit, (Settlement)loc)
+            : (!hasCargo(aiUnit) && loc == null)
+            ? null
+            : (!hasCargo(aiUnit) && loc instanceof Unit)
+            ? invalidUnitReason(aiUnit, (Unit)loc)
+            : Mission.TARGETINVALID;
     }
 
     // Not a one-time mission, omit isOneTime().
@@ -157,152 +352,82 @@ public class PrivateerMission extends Mission {
      * are found, then wander in a random direction.
      */
     public void doMission() {
-        Unit unit = getUnit();
-        while(isValid() && unit.getMovesLeft() > 0){
-            // Unit is between Europe and America, nothing to do
-            if (unit.isAtSea()){
-                unit.setMovesLeft(0);
-                return;
-            }
-            switch(state){
-            case HUNTING:
-                hunt4Target();
-                break;
-            case TRANSPORTING:
-                gotoNearestPort();
-                break;
-            }
-        }
-    }
-
-    private void hunt4Target() {
-        Unit unit = getUnit();
-
-        if (unit.getLocation() instanceof Europe){
-            getAIUnit().moveToAmerica();
-            unit.setMovesLeft(0);
+        final AIUnit aiUnit = getAIUnit();
+        String reason = invalidReason();
+        if (isTargetReason(reason)) {
+            target = null; // Handled below
+        } else if (reason != null) {
+            logger.finest(tag + " broken(" + reason + "): " + this);
             return;
         }
 
-        // has captured goods, must get them to port
-        if (unit.getGoodsCount() > 0) {
-            state = PrivateerMissionState.TRANSPORTING;
-            return;
-        }
-
-        final int MAX_TURNS_TO_TARGET = 1;
-        PathNode pathToTarget = findTarget(MAX_TURNS_TO_TARGET);
-        Direction direction = null;
-        // Found a target
-        if (pathToTarget != null) {
-            target = pathToTarget.getLastNode().getTile();
-            logger.finest(tag + " at " + unit.getTile()
-                + " found target at " + target + ": " + this);
-            // We need to find an updated path to target
-            if (travelToTarget(tag, target) == MoveType.ATTACK_UNIT
-                && (direction = unit.getTile().getDirection(target)) != null) {
-                logger.finest(tag + " completed hunt for target "
-                    + target.getDefendingUnit(unit) + ": " + this);
-                AIMessage.askAttack(getAIUnit(), direction);
-            }
-        } else {
-            // No target found, just make a random move
-            target = null;
-            logger.finest(tag + " at " + unit.getTile()
-                + " without target, wandering");
-            while ((direction = moveRandomly(tag, direction)) != null);
-        }
-        unit.setMovesLeft(0);
-    }
-
-    private void gotoNearestPort() {
         final Unit unit = getUnit();
+        if (unit.isAtSea()) return;
 
-        if (isUnitInPort()) {
-            dumpCargoInPort();
-            state = PrivateerMissionState.HUNTING;
-            return;
-        }
-
-        PathNode path = unit.findPath(nearestPort);
-        if (path == null) {
-            if ((path = unit.findOurNearestPort()) == null) {
-                logger.finest(tag + " failed to find port for goods: " + this);
+        Direction direction;
+        if (hasCargo(aiUnit)) { // Deliver the goods
+            if (isTargetReason(reason)
+                && (target = findTarget(aiUnit, 8, true)) == null) {
+                logger.finest(tag + " could not retarget: " + this);
                 return;
             }
-            nearestPort = path.getLastNode().getLocation();
-        }
+            Unit.MoveType mt = travelToTarget(tag, target);
+            switch (mt) {
+            case MOVE_NO_MOVES: case MOVE_HIGH_SEAS:
+                return;
+            case MOVE:
+                for (Goods g : unit.getGoodsList()) {
+                    if (unit.isInEurope()) {
+                        goodsLeavesTransport(g.getType(), g.getAmount());
+                    } else {
+                        Colony colony = unit.getTile().getColony();
+                        unloadCargoInColony(g);
+                    }
+                }
 
-        if (followPath(tag, path) != MoveType.MOVE) return;
+                for (Unit u : unit.getUnitList()) {
+                    unitLeavesTransport(getAIMain().getAIUnit(u), null);
+                }
 
-        if (isUnitInPort()) {
-            dumpCargoInPort();
-            state = PrivateerMissionState.HUNTING;
-        }
-    }
-
-    private boolean isUnitInPort(){
-        if(nearestPort == null){
-            return false;
-        }
-
-        Unit unit = getUnit();
-
-        if(nearestPort instanceof Europe){
-            return unit.getLocation() == nearestPort;
-        }
-
-        return unit.getTile() == nearestPort.getTile();
-    }
-
-    private void dumpCargoInPort() {
-        Unit unit = getUnit();
-        boolean inEurope = unit.getLocation() instanceof Europe;
-
-        List<Goods> goodsLst = new ArrayList<Goods>(unit.getGoodsList());
-        for(Goods goods : goodsLst){
-            if(inEurope){
-                goodsLeavesTransport(goods.getType(), goods.getAmount());
-            } else {
-                Colony colony = unit.getTile().getColony();
-                unloadCargoInColony(goods);
+                logger.finest(tag + " completed goods delivery"
+                    + " at " + unit.getLocation() + ": " + this);
+                target = findTarget(aiUnit, 1, false);
+                break;
+            default:
+                logger.warning(tag + " unexpected delivery move " + mt
+                    + ": " + this);
+                break;
+            }
+        } else if (unit.isInEurope()) {
+            Settlement settlement = getBestSettlement(unit.getOwner());
+            Tile tile = (settlement != null) ? settlement.getTile()
+                : unit.getFullEntryLocation();
+            unit.setDestination(tile);
+            aiUnit.moveToAmerica();
+        } else if ((target = findTarget(aiUnit, 1, true)) == null) {
+            moveRandomlyTurn(tag);
+        } else {
+            Unit.MoveType mt = travelToTarget(tag, target);
+            switch (mt) {
+            case MOVE_NO_MOVES:
+                return;
+            case ATTACK_UNIT:
+                direction = unit.getTile().getDirection(target.getTile());
+                if (direction != null) {
+                    logger.finest(tag + " completed hunt for target " + target
+                        + ": " + this);
+                    AIMessage.askAttack(aiUnit, direction);
+                } else {
+                    logger.warning(tag + " can not find direction to target "
+                        + target + ": " + this);
+                }
+                break;
+            default:
+                logger.warning(tag + " unexpected hunt move " + mt
+                    + ": " + this);
+                break;
             }
         }
-
-        for (Unit u : unit.getUnitList()) {
-            unitLeavesTransport(getAIMain().getAIUnit(u), null);
-        }
-        logger.finest(tag + " completed goods delivery"
-            + " at " + unit.getLocation() + ": " + this);
-    }
-
-    /**
-     * Calculates the modifier used when assessing the value of a
-     * target to a privateer.
-     * Note: it gives a modifier value, other parameters should be
-     * considered as well
-     * Note: we assume the unit given is a privateer, no test is made
-     *
-     * @param combatModel The <code>Combat Model</code> used.
-     * @param attacker The <code>Unit</code> attacking, should be a privateer.
-     * @param defender The <code>Unit</code> the attacker is considering
-     *            as a target.
-     * @return The modifier value the defender is worth as a target to
-     *     the privateer
-     */
-    public static int getModifierValueForTarget(CombatModel combatModel,
-        Unit attacker, Unit defender) {
-        // pirates are greedy ;)
-        int modifier = 100;
-        modifier += defender.getGoodsCount() * 200;
-        modifier += defender.getUnitCount() * 100;
-
-        // they are also coward
-        if (defender.isOffensiveUnit()) {
-            modifier -= combatModel.getDefencePower(attacker, defender) * 100;
-        }
-
-        return modifier;
     }
 
 
@@ -318,27 +443,6 @@ public class PrivateerMission extends Mission {
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         toXML(out, getXMLElementTagName());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
-        super.writeAttributes(out);
-
-        out.writeAttribute("state", state.toString());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
-        super.readAttributes(in);
-
-        state = PrivateerMissionState.valueOf(in.getAttributeValue(null,
-                "state"));
     }
 
     /**
