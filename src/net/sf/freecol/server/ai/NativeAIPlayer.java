@@ -109,7 +109,7 @@ public class NativeAIPlayer extends AIPlayer {
      * A settlement with a surplus chooses to send a gift GIFT_PERCENT
      * of the time.
      */
-    public static final int GIFT_PERCENT = 10;
+    public static final int GIFT_PERCENT = 5;
 
     /**
      * Stores temporary information for sessions (trading with another
