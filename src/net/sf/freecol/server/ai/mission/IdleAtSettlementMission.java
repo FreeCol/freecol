@@ -148,9 +148,8 @@ public class IdleAtSettlementMission extends Mission {
         PathNode path = unit.findOurNearestOtherSettlement();
         if (path != null) {
             travelToTarget(tag, path.getLastNode().getTile());
-        } else { // Just make a random move if no target can be found.
-            Direction d = Direction.getRandomDirection(tag, getAIRandom());
-            while ((d = moveRandomly(tag, d)) != null);
+        } else { // Just make a random moves if no target can be found.
+            moveRandomlyTurn(tag);
         }
     }
 

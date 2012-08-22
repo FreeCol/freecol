@@ -118,8 +118,7 @@ public class UnitWanderMission extends Mission {
             return;
         }
 
-        Direction d = Direction.getRandomDirection(tag, getAIRandom());
-        while ((d = moveRandomly(tag, d)) != null);
+        moveRandomlyTurn(tag);
     }
 
 

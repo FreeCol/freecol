@@ -309,7 +309,7 @@ public class IndianDemandMission extends Mission {
             }
             // Consume any remaining moves.
             completed = true;
-            while ((d = moveRandomly(tag, null)) != null);
+            moveRandomlyTurn(tag);
         }
     }
 

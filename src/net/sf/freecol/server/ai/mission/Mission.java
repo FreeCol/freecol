@@ -315,6 +315,17 @@ public abstract class Mission extends AIObject {
     }
 
     /**
+     * Moves a unit randomly for the rest of its turn.
+     *
+     * @param logMe A string to log the random number generation with.
+     */
+    protected void moveRandomlyTurn(String logMe) {
+        Direction direction = null;
+        while ((direction = moveRandomly(logMe, direction)) != null);
+        getUnit().setMovesLeft(0);
+    }
+
+    /**
      * Move in a specified direction, but do not attack.
      * Always check the return from this in case the unit blundered into
      * a lost city and died.
