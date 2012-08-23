@@ -479,7 +479,7 @@ public class UnitSeekAndDestroyMission extends Mission {
         // Go to the target.
         Location currentTarget = (nearbyTarget != null) ? nearbyTarget
             : target;
-        Unit.MoveType mt = travelToTarget(tag, currentTarget);
+        Unit.MoveType mt = travelToTarget(tag, currentTarget, null);
         switch (mt) {
         case MOVE_NO_MOVES: case MOVE_ILLEGAL:
             break;

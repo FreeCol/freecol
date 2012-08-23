@@ -563,11 +563,14 @@ public class PioneeringMission extends Mission {
         final Unit unit = getUnit();
         final Player player = unit.getOwner();
         final EuropeanAIPlayer aiPlayer = getEuropeanAIPlayer();
+        final CostDecider costDecider
+            = CostDeciders.avoidSettlementsAndBlockingUnits();
         Tile tile;
         String where;
         while (!hasTools()) { // Get tools first.
             // Go there and clear target on arrival.
-            if (travelToTarget(tag, target) != Unit.MoveType.MOVE) return;
+            if (travelToTarget(tag, target, costDecider)
+                != Unit.MoveType.MOVE) return;
             where = ((Colony)target).getName();
             setTarget(null);
 
@@ -590,7 +593,8 @@ public class PioneeringMission extends Mission {
         // Going to an intermediate colony?
         if (target instanceof Colony
             && invalidTargetReason(target, player) == null) {
-            if (travelToTarget(tag, target) != Unit.MoveType.MOVE) return;
+            if (travelToTarget(tag, target, costDecider)
+                != Unit.MoveType.MOVE) return;
             where = ((Colony)target).getName();
             newTarget = findTarget(aiUnit, false);
             logger.finest(tag + " reached intermediate colony " + where
@@ -617,7 +621,7 @@ public class PioneeringMission extends Mission {
         }
 
         // Go there.
-        Unit.MoveType mt = travelToTarget(tag, target);
+        Unit.MoveType mt = travelToTarget(tag, target, costDecider);
         switch (mt) {
         case MOVE_NO_MOVES:
             return;
@@ -672,7 +676,7 @@ public class PioneeringMission extends Mission {
             PathNode safe = unit.findOurNearestSettlement(false, 1, false);
             if (safe != null) {
                 travelToTarget(tag + " (evading)",
-                               safe.getLastNode().getTile());
+                               safe.getLastNode().getTile(), costDecider);
             }
             return;
         }

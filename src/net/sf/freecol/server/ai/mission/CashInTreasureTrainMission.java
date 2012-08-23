@@ -382,7 +382,9 @@ public class CashInTreasureTrainMission extends Mission {
         }
 
         // Go to the target.
-        if (travelToTarget(tag, target) != Unit.MoveType.MOVE) return;
+        if (travelToTarget(tag, target,
+                           CostDeciders.avoidSettlementsAndBlockingUnits())
+            != Unit.MoveType.MOVE) return;
 
         // Cash in now if:
         // - already in Europe

@@ -387,7 +387,9 @@ public class BuildColonyMission extends Mission {
         }
 
         // Go there.
-        if (travelToTarget(tag, target) != Unit.MoveType.MOVE) return;
+        if (travelToTarget(tag, target,
+                           CostDeciders.avoidSettlementsAndBlockingUnits())
+            != Unit.MoveType.MOVE) return;
 
         if (target instanceof Colony) {
             // If arrived at the target colony it is time to retarget

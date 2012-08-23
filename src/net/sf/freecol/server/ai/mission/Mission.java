@@ -44,6 +44,7 @@ import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.MoveType;
+import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.util.Utils;
@@ -667,9 +668,12 @@ public abstract class Mission extends AIObject {
      *
      * @param logMe A prefix string for the log messages.
      * @param target The destination <code>Location</code>.
+     * @param costDecider The <code>CostDecider</code> to use in any path
+     *     finding.
      * @return The type of move the unit stopped at.
      */
-    protected MoveType travelToTarget(String logMe, Location target) {
+    protected MoveType travelToTarget(String logMe, Location target,
+                                      CostDecider costDecider) {
         final Tile targetTile = target.getTile();
         if (!(target instanceof Europe) && targetTile == null) {
             throw new IllegalStateException("Target neither Europe nor Tile");
@@ -690,13 +694,10 @@ public abstract class Mission extends AIObject {
             if (target instanceof Europe) {
                 return MoveType.MOVE;
             } else if (!unit.getOwner().canMoveToEurope()) {
-                logger.fine(logMe + " impossible move from Europe"
-                    + ": " + this);
-                return MoveType.MOVE_ILLEGAL;
+                throw new IllegalStateException("Impossible move from Europe");
             }
         } else if (unit.getTile() == null) {
-            logger.fine(logMe + " null unit tile: " + this);
-            return MoveType.MOVE_ILLEGAL;
+            throw new IllegalStateException("Null unit tile: " + unit);
         } else {
             if (unit.getTile() == targetTile) {
                 return MoveType.MOVE;
@@ -723,8 +724,8 @@ public abstract class Mission extends AIObject {
                         return MoveType.MOVE_ILLEGAL;
                     }
                 }
-                path = unit.findPath(unit.getLocation(), target, null,
-                    CostDeciders.avoidSettlementsAndBlockingUnits());
+                path = unit.findPath(unit.getLocation(), target,
+                                     null, costDecider);
                 if (path == null) {
                     logger.fine(logMe + " no path from " + unit.getLocation()
                         + " to " + target + ": " + this);
@@ -754,8 +755,8 @@ public abstract class Mission extends AIObject {
         } else { // Moving on the map
             if (unit.getType().canMoveToHighSeas()) {
                 // If there is no path for a high seas capable unit, give up.
-                path = unit.findPath(unit.getTile(), targetTile, null,
-                    CostDeciders.avoidSettlementsAndBlockingUnits());
+                path = unit.findPath(unit.getTile(), targetTile,
+                                     null, costDecider);
                 if (path == null) {
                     logger.fine(logMe + " no path from " + unit.getLocation()
                         + " to " + target + ": " + this);
@@ -764,8 +765,7 @@ public abstract class Mission extends AIObject {
             } else if (unit.isOnCarrier()) {
                 // Check if the carrier still has a useful path...
                 path = unit.findPath(unit.getTile(), targetTile, 
-                    unit.getCarrier(),
-                    CostDeciders.avoidSettlementsAndBlockingUnits());
+                                     unit.getCarrier(), costDecider);
                 if (path == null) {
                     logger.fine(logMe + " no transit from " + unit.getLocation()
                         + " to " + target + ": " + this);
@@ -775,8 +775,8 @@ public abstract class Mission extends AIObject {
                 inTransit = path.isOnCarrier() && path.next.isOnCarrier();
             } else {
                 // Not high seas capable.  If no path, it needs transport.
-                path = unit.findPath(unit.getTile(), targetTile, null,
-                    CostDeciders.avoidSettlementsAndBlockingUnits());
+                path = unit.findPath(unit.getTile(), targetTile,
+                                     null, costDecider);
                 needTransport = path == null;
             }
         }

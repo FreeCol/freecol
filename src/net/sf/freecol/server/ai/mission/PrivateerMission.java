@@ -371,7 +371,8 @@ public class PrivateerMission extends Mission {
                 logger.finest(tag + " could not retarget: " + this);
                 return;
             }
-            Unit.MoveType mt = travelToTarget(tag, target);
+            Unit.MoveType mt = travelToTarget(tag, target,
+                CostDeciders.avoidSettlementsAndBlockingUnits());
             switch (mt) {
             case MOVE_NO_MOVES: case MOVE_HIGH_SEAS:
                 return;
@@ -407,7 +408,7 @@ public class PrivateerMission extends Mission {
         } else if ((target = findTarget(aiUnit, 1, true)) == null) {
             moveRandomlyTurn(tag);
         } else {
-            Unit.MoveType mt = travelToTarget(tag, target);
+            Unit.MoveType mt = travelToTarget(tag, target, null);
             switch (mt) {
             case MOVE_NO_MOVES:
                 return;

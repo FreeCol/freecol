@@ -220,7 +220,7 @@ public class IndianBringGiftMission extends Mission {
         final Unit unit = getUnit();
         final IndianSettlement is = unit.getIndianSettlement();
         if (!hasGift()) {
-            Unit.MoveType mt = travelToTarget(tag, is);
+            Unit.MoveType mt = travelToTarget(tag, is, null);
             switch (mt) {
             case MOVE_NO_MOVES:
                 return;
@@ -249,7 +249,7 @@ public class IndianBringGiftMission extends Mission {
             }
         } else {
             // Move to the target's colony and deliver
-            Unit.MoveType mt = travelToTarget(tag, target.getTile());
+            Unit.MoveType mt = travelToTarget(tag, target.getTile(), null);
             switch (mt) {
             case MOVE_NO_MOVES:
                 return;

@@ -224,7 +224,7 @@ public class IndianDemandMission extends Mission {
         final IndianSettlement is = unit.getIndianSettlement();
         while (!completed) {
             if (hasTribute()) {
-                Unit.MoveType mt = travelToTarget(tag, is);
+                Unit.MoveType mt = travelToTarget(tag, is, null);
                 switch (mt) {
                 case MOVE_NO_MOVES:
                     return;
@@ -249,7 +249,7 @@ public class IndianDemandMission extends Mission {
             }
 
             // Move to the target's colony and demand
-            Unit.MoveType mt = travelToTarget(tag, target);
+            Unit.MoveType mt = travelToTarget(tag, target, null);
             switch (mt) {
             case MOVE_NO_MOVES:
                 return;

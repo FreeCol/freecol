@@ -548,7 +548,7 @@ public class TransportMission extends Mission {
         if (path != null) {
             Tile tile = path.getLastNode().getTile();
             Direction d;
-            if (travelToTarget(tag, tile) == MoveType.ATTACK_UNIT
+            if (travelToTarget(tag, tile, null) == MoveType.ATTACK_UNIT
                 && (d = carrier.getTile().getDirection(tile)) != null) {
                 AIMessage.askAttack(getAIUnit(), d);
             }
@@ -1468,7 +1468,7 @@ public class TransportMission extends Mission {
 
             // Move towards the next target:
             PathNode path = destination.getPath();
-            switch (travelToTarget(tag, path.getLastNode().getLocation())) {
+            switch (travelToTarget(tag, path.getLastNode().getLocation(), null)) {
             case MOVE_NO_MOVES: case MOVE_HIGH_SEAS:
                 return;
             case MOVE:

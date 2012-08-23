@@ -385,7 +385,8 @@ public class ScoutingMission extends Mission {
         // Go to the target.
         final Unit unit = getUnit();
         Direction d;
-        Unit.MoveType mt = travelToTarget(tag, target);
+        Unit.MoveType mt = travelToTarget(tag, target,
+            CostDeciders.avoidSettlementsAndBlockingUnits());
         switch (mt) {
         case MOVE_ILLEGAL: case MOVE_NO_MOVES: case MOVE_NO_REPAIR:
             return;

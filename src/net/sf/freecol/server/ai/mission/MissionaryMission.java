@@ -379,7 +379,8 @@ public class MissionaryMission extends Mission {
         final Unit unit = getUnit();
 
         // Go to the target.
-        Unit.MoveType mt = travelToTarget(tag, target);
+        Unit.MoveType mt = travelToTarget(tag, target,
+            CostDeciders.avoidSettlementsAndBlockingUnits());
         switch (mt) {
         case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_ILLEGAL:
             break;

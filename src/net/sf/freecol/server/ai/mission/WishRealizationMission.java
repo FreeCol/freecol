@@ -30,6 +30,7 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIUnit;
@@ -167,7 +168,9 @@ public class WishRealizationMission extends Mission {
 
         // Move towards the target.
         Location target = getTarget();
-        if (travelToTarget(tag, target) != Unit.MoveType.MOVE) return;
+        if (travelToTarget(tag, target,
+                           CostDeciders.avoidSettlementsAndBlockingUnits())
+            != Unit.MoveType.MOVE) return;
 
         if (target instanceof Colony) {
             final Colony colony = (Colony)target;
