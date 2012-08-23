@@ -326,8 +326,12 @@ public class UnitSeekAndDestroyMission extends Mission {
      */
     private static String invalidMissionReason(AIUnit aiUnit) {
         String reason = invalidAIUnitReason(aiUnit);
-        return (reason != null) ? reason
-            : (!aiUnit.getUnit().isOffensiveUnit()) ? Mission.UNITNOTOFFENSIVE
+        return (reason != null)
+            ? reason
+            : (!aiUnit.getUnit().isOffensiveUnit())
+            ? Mission.UNITNOTOFFENSIVE
+            : (aiUnit.getUnit().hasAbility("model.ability.speakWithChief"))
+            ? "scouts-should-not-seek-and-destroy"
             : null;
     }
 
