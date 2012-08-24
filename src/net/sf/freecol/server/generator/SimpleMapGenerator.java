@@ -782,7 +782,9 @@ public class SimpleMapGenerator implements MapGenerator {
             int y = position.getY();
             for (int i = 0; i < 2 * map.getHeight(); i++) {
                 int offset = (i % 2 == 0) ? i / 2 : -(1 + i / 2);
-                startTile = findTileFor(map, y + offset, x, startAtSea);
+                int row = y + offset;
+                if (row < 0 || row >= map.getHeight()) continue;
+                startTile = findTileFor(map, row, x, startAtSea);
                 if (startTile != null) {
                     if (startingTiles.contains(startTile)) {
                         startTile = null;
@@ -792,10 +794,18 @@ public class SimpleMapGenerator implements MapGenerator {
                     }
                 }
             }
-
             if (startTile == null) {
-                throw new RuntimeException("Failed to find start tile for player "
-                                           + player);
+                String err = "Failed to find start tile "
+                    + ((startAtSea) ? "at sea" : "on land")
+                    + " for player " + player
+                    + " from (" + x + "," + y + ")"
+                    + " avoiding:";
+                for (Tile t : startingTiles) err += " " + t.toString();
+                err += " with map: ";
+                for (int xx = 0; xx < map.getWidth(); xx++) {
+                    err += map.getTile(xx, y);
+                }
+                throw new RuntimeException(err);
             }
 
             startTile.setExploredBy(player, true);
@@ -827,6 +837,28 @@ public class SimpleMapGenerator implements MapGenerator {
                 if (op != null) op.setValue(10000);
             }
         }
+    }
+
+    private Tile findTileFor(Map map, int row, int start, boolean startAtSea) {
+        Tile tile = null;
+        Tile seas = null;
+        int offset = (start == 0) ? 1 : -1;
+        for (int x = start; 0 <= x && x < map.getWidth(); x += offset) {
+            tile = map.getTile(x, row);
+            if (tile.isDirectlyHighSeasConnected()) {
+                seas = tile;
+            } else if (tile.isLand()) {
+                if (startAtSea) {
+                    if (seas == null) {
+                        logger.warning("No high seas in row " + row);
+                    }
+                    return seas;
+                }
+                return tile;
+            } 
+        }
+        logger.warning("No land in row " + row);
+        return null;
     }
 
     private void createDebugUnits(Map map, Player player, Tile startTile) {
@@ -1018,34 +1050,6 @@ public class SimpleMapGenerator implements MapGenerator {
             }
         }
         return positions;
-    }
-
-    private Tile findTileFor(Map map, int row, int start, boolean startAtSea) {
-        Tile tile = null;
-        if (0 <= row && row < map.getHeight()) {
-            Tile firstLand = null;
-            int offset = (start == 0) ? 1 : -1;
-            for (int x = start; 0 <= x && x < map.getWidth(); x += offset) {
-                tile = map.getTile(x, row);
-                if (tile.isLand()) {
-                    if (startAtSea) {
-                        firstLand = tile;
-                        start = x - offset;
-                        break;
-                    } else {
-                        return tile;
-                    }
-                }
-            }
-            if (firstLand != null) {
-                offset = -offset;
-                for (int x = start; 0 <= x && x < map.getWidth(); x += offset) {
-                    tile = map.getTile(x, row);
-                    if (tile.isDirectlyHighSeasConnected()) return tile;
-                }
-            }
-        }
-        return null;
     }
 
 
