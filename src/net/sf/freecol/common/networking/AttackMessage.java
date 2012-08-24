@@ -98,9 +98,8 @@ public class AttackMessage extends DOMMessage {
         }
 
         MoveType moveType = unit.getMoveType(tile);
-        if (((moveType == MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT
-              || moveType == MoveType.ENTER_FOREIGN_COLONY_WITH_SCOUT)
-             && unit.getRole() == Unit.Role.SCOUT)
+        if (moveType == MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT
+            || moveType == MoveType.ENTER_FOREIGN_COLONY_WITH_SCOUT
             || moveType.isAttack()) {
             ; // OK
         } else {

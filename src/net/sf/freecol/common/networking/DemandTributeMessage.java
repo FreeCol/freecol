@@ -90,7 +90,10 @@ public class DemandTributeMessage extends DOMMessage {
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }
-        if (!unit.isArmed() && unit.getRole() != Unit.Role.SCOUT) {
+        if (unit.isArmed()
+            || unit.hasAbility("model.ability.scoutIndianSettlement")) {
+            ; // ok
+        } else {
             return DOMMessage.clientError("Unit is neither armed nor a scout: "
                 + unitId);
         }

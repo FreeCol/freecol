@@ -75,8 +75,8 @@ public class ScoutingMissionTest extends FreeColTestCase {
         AIUnit aiUnit = aiMain.getAIUnit(scout);
         aiUnit.abortMission("test");
         assertNotNull("The scout should be an AI unit", aiUnit);
-        assertEquals("Scout should have the scout role", scout.getRole(),
-            Unit.Role.SCOUT);
+        assertTrue("Scout should have the scout role",
+            scout.hasAbility("model.ability.scoutIndianSettlement"));
         assertEquals("The Inca settlement should be a scouting target", null,
             ScoutingMission.invalidReason(aiUnit, is));
         assertEquals("The Inca settlement should be found as scouting target",
@@ -94,7 +94,7 @@ public class ScoutingMissionTest extends FreeColTestCase {
         // Invalidate the mission by losing the horses.
         scout.changeEquipment(horsesEqType, -1);
         assertFalse("Scout should not have the scout role",
-            Unit.Role.SCOUT == scout.getRole());
+            scout.hasAbility("model.ability.scoutIndianSettlement"));
         assertNotNull("Scouting mission should be invalid",
             aiUnit.getMission().invalidReason());
         assertNotNull("Scouting mission should be impossible for this unit",

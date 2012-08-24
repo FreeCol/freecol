@@ -49,8 +49,6 @@ import net.sf.freecol.server.ai.AIUnit;
 
 /**
  * Mission for controlling a scout.
- *
- * @see net.sf.freecol.common.model.Unit.Role#SCOUT
  */
 public class ScoutingMission extends Mission {
 
@@ -259,7 +257,7 @@ public class ScoutingMission extends Mission {
         String reason = invalidAIUnitReason(aiUnit);
         return (reason != null)
             ? reason
-            : (aiUnit.getUnit().getRole() != Unit.Role.SCOUT)
+            : (!aiUnit.getUnit().hasAbility("model.ability.scoutIndianSettlement"))
             ? "unit-not-a-SCOUT"
             : null;
     }

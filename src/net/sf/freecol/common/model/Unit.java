@@ -38,6 +38,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
@@ -66,6 +67,9 @@ public class Unit extends FreeColGameObject
 
     private static final Logger logger = Logger.getLogger(Unit.class.getName());
 
+    private static final EquipmentType horsesEq[] = { null, null };
+    private static final EquipmentType musketsEq[] = { null, null };
+    
     /** A comparator to order units by skill level. */
     private static Comparator<Unit> skillLevelComp
         = new Comparator<Unit>() {
@@ -2641,7 +2645,15 @@ public class Unit extends FreeColGameObject
      * @return True if the unit has arms.
      */
     public boolean isArmed() {
-        return getRole() == Role.SOLDIER || getRole() == Role.DRAGOON;
+        if (musketsEq[0] == null) {
+            Specification spec = getSpecification();
+            musketsEq[0] = spec.getEquipmentType("model.equipment.muskets");
+            musketsEq[1] = spec.getEquipmentType("model.equipment.indian.muskets");
+        }
+        for (EquipmentType et : musketsEq) {
+            if (getEquipmentCount(et) > 0) return true;
+        }
+        return false;
     }
 
     /**
@@ -2650,7 +2662,15 @@ public class Unit extends FreeColGameObject
      * @return True if the unit have a mount.
      */
     public boolean isMounted() {
-        return getRole() == Role.SCOUT || getRole() == Role.DRAGOON;
+        if (horsesEq[0] == null) {
+            Specification spec = getSpecification();
+            horsesEq[0] = spec.getEquipmentType("model.equipment.horses");
+            horsesEq[1] = spec.getEquipmentType("model.equipment.indian.horses");
+        }
+        for (EquipmentType et : horsesEq) {
+            if (getEquipmentCount(et) > 0) return true;
+        }
+        return false;
     }
 
     /**
@@ -2774,7 +2794,7 @@ public class Unit extends FreeColGameObject
      * @return True if this unit is running a mission.
      */
     public boolean isInMission() {
-        return getRole() == Role.MISSIONARY
+        return hasAbility("model.ability.missionary")
             && getLocation() == null;
     }
 
@@ -2835,7 +2855,8 @@ public class Unit extends FreeColGameObject
         for (EquipmentType type : equipment.keySet()) {
             role = role.newRole(type.getRole());
         }
-        if (getState() == UnitState.IMPROVING && role != Role.PIONEER) {
+        if (getState() == UnitState.IMPROVING
+            && !hasAbility("model.ability.improveTerrain")) {
             setStateUnchecked(UnitState.ACTIVE);
             setMovesLeft(0);
         }

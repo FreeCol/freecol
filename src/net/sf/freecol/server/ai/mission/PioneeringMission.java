@@ -50,8 +50,6 @@ import net.sf.freecol.server.ai.TileImprovementPlan;
 
 /**
  * Mission for controlling a pioneer.
- *
- * @see net.sf.freecol.common.model.Unit.Role#PIONEER
  */
 public class PioneeringMission extends Mission {
 

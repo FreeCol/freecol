@@ -132,7 +132,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 Unit unit = a.getUnit();
                 if (!unit.isColonist()) {
                     return -1000;
-                } else if (unit.hasAbility("model.ability.speakWithChief")) {
+                } else if (unit.hasAbility("model.ability.scoutIndianSettlement")) {
                     return 900 + ((unit.getTile() != null) ? 100 : 0);
                 } else if (unit.hasAbility("model.ability.expertScout")) {
                     return 600;
