@@ -34,9 +34,11 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Market;
+import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
 import net.sf.freecol.server.ai.AIUnit;
@@ -115,6 +117,7 @@ public class IndianDemandMission extends Mission {
     private static boolean hasTribute(AIUnit aiUnit) {
         return aiUnit.getUnit().getGoodsCount() > 0;
     }
+
 
     // Mission interface
 
@@ -224,7 +227,8 @@ public class IndianDemandMission extends Mission {
         final IndianSettlement is = unit.getIndianSettlement();
         while (!completed) {
             if (hasTribute()) {
-                Unit.MoveType mt = travelToTarget(tag, is, null);
+                Unit.MoveType mt = travelToTarget(tag, is,
+                    CostDeciders.avoidSettlementsAndBlockingUnits());
                 switch (mt) {
                 case MOVE_NO_MOVES:
                     return;
@@ -250,11 +254,28 @@ public class IndianDemandMission extends Mission {
 
             // Move to the target's colony and demand
             Unit.MoveType mt = travelToTarget(tag, target, null);
+            Direction d;
             switch (mt) {
             case MOVE_NO_MOVES:
                 return;
-            case ATTACK_SETTLEMENT: // Arrived (do not really attack).
-                break;
+            case ATTACK_SETTLEMENT:
+                d = unit.getTile().getDirection(target.getTile());
+                if (d != null) break; // Arrived at target, handled below.
+                // Fall through
+            case ATTACK_UNIT: // Something is blocking our path
+                Location blocker = resolveBlockage(aiUnit, target);
+                if (blocker == null) {
+                    logger.warning(tag + " could not resolve blockage"
+                        + ": " + this);
+                    moveRandomly(tag, null);
+                    unit.setMovesLeft(0);
+                } else {
+                    logger.finest(tag + " blocked by " + blocker
+                        + ", attacking: " + this);
+                    d = unit.getTile().getDirection(blocker.getTile());
+                    AIMessage.askAttack(aiUnit, d);
+                }                
+                return;
             default:
                 logger.warning(tag + " unexpected demand move type: " + mt
                     + ": " + this);
@@ -279,7 +300,6 @@ public class IndianDemandMission extends Mission {
             }
             demanded = true;
 
-            Direction d;
             boolean accepted
                 = AIMessage.askIndianDemand(aiUnit, target, goods, gold);
             if (accepted && (gold > 0 || hasTribute())) {

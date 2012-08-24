@@ -39,6 +39,7 @@ import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
@@ -282,6 +283,54 @@ public abstract class Mission extends AIObject {
             : null;
     }
 
+    /**
+     * Is another player a valid attack target?
+     *
+     * @param aiUnit The <code>AIUnit</code> that will attack.
+     * @param other The <code>Player</code> to attack.
+     * @return A reason why the attack would be invalid, or null if none found.
+     */
+    public static String invalidAttackReason(AIUnit aiUnit, Player other) {
+        final Unit unit = aiUnit.getUnit();
+        final Player player = unit.getOwner();
+        return (player == other)
+            ? Mission.TARGETOWNERSHIP
+            : (player.isIndian()
+                && player.getTension(other).getLevel()
+                .compareTo(Tension.Level.CONTENT) <= 0)
+            ? "target-native-tension-too-low"
+            : (player.isEuropean()
+                && !(player.getStance(other) == Stance.WAR
+                    || (unit.hasAbility(Ability.PIRACY)
+                        && player.getStance(other) != Stance.ALLIANCE)))
+            ? "target-european-war-absent"
+            : null;
+    }
+
+    /**
+     * We have been blocked on the way to a target.  Attack the blockage,
+     * or just try to avoid it?
+     *
+     * @param aiUnit The <code>AIUnit</code> that was blocked.
+     * @param target The target <code>Location</code>.
+     * @return The blockage to attack, or null if not.
+     */
+    public static Location resolveBlockage(AIUnit aiUnit, Location target) {
+        final Unit unit = aiUnit.getUnit();
+        PathNode path = unit.findPath(target.getTile());
+        Direction d = null;
+        if (path != null && path.next != null) {
+            Tile tile = path.next.getTile();
+            Settlement settlement = tile.getSettlement();
+            Unit defender = tile.getDefendingUnit(unit);
+            Location blocker = (settlement != null) ? settlement : unit;
+            if (UnitSeekAndDestroyMission.invalidReason(aiUnit, blocker)
+                == null) return blocker;
+        }
+        // Can not/decided not to attack.  Take one random step in
+        // roughly the right direction (if known).
+        return null;
+    }
 
     /**
      * Moves a unit one step randomly.
@@ -663,8 +712,8 @@ public abstract class Mission extends AIObject {
      *   and are not performed here, the calling mission code must
      *   handle them.
      *
-     * Logging is fine on failures, finest on valid return values other
-     * than normal path completion.
+     * Logging at `fine' on failures, `finest' on valid return values
+     * other than normal path completion.
      *
      * @param logMe A prefix string for the log messages.
      * @param target The destination <code>Location</code>.
@@ -774,7 +823,8 @@ public abstract class Mission extends AIObject {
                 // ...and whether the unit needs to stay on board.
                 inTransit = path.isOnCarrier() && path.next.isOnCarrier();
             } else {
-                // Not high seas capable.  If no path, it needs transport.
+                // Not high seas capable.  If no path, it needs transport,
+                // or is just blocked.
                 path = unit.findPath(unit.getTile(), targetTile,
                                      null, costDecider);
                 needTransport = path == null;

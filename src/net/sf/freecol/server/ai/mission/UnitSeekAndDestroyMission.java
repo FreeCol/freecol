@@ -34,7 +34,6 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
@@ -337,25 +336,6 @@ public class UnitSeekAndDestroyMission extends Mission {
 
     /**
      * Why would a UnitSeekAndDestroyMission be invalid with the given unit
-     * with respect to another player.
-     *
-     * @param aiUnit The <code>AIUnit</code> to test.
-     * @param other The other <code>Player</code> to test.
-     * @return A reason why the mission would be invalid, or null if
-     *     none found.
-     */
-    private static String invalidStanceReason(AIUnit aiUnit, Player other) {
-        final Player owner = aiUnit.getUnit().getOwner();
-        return (owner.isIndian() && owner.getTension(other).getLevel()
-            .compareTo(Tension.Level.CONTENT) <= 0)
-            ? "target-native-tension-too-low"
-            : (owner.isEuropean() && owner.getStance(other) != Stance.WAR)
-            ? "target-european-war-absent"
-            : null;
-    }
-
-    /**
-     * Why would a UnitSeekAndDestroyMission be invalid with the given unit
      * and settlement.
      *
      * @param aiUnit The <code>AIUnit</code> to seek-and-destroy with.
@@ -372,7 +352,7 @@ public class UnitSeekAndDestroyMission extends Mission {
             ? "unit-is-naval"
             : (settlement.getOwner() == unit.getOwner())
             ? Mission.TARGETOWNERSHIP
-            : invalidStanceReason(aiUnit, settlement.getOwner());
+            : invalidAttackReason(aiUnit, settlement.getOwner());
     }
 
     /**
@@ -396,7 +376,7 @@ public class UnitSeekAndDestroyMission extends Mission {
             ? "target-in-settlement"
             : (!aiUnit.getUnit().isTileAccessible(tile))
             ? "target-incompatible"
-            : invalidStanceReason(aiUnit, unit.getOwner());
+            : invalidAttackReason(aiUnit, unit.getOwner());
     }
 
     /**
@@ -479,7 +459,9 @@ public class UnitSeekAndDestroyMission extends Mission {
         // Go to the target.
         Location currentTarget = (nearbyTarget != null) ? nearbyTarget
             : target;
-        Unit.MoveType mt = travelToTarget(tag, currentTarget, null);
+        // Note avoiding other targets by choice of cost decider.
+        Unit.MoveType mt = travelToTarget(tag, currentTarget,
+            CostDeciders.avoidSettlementsAndBlockingUnits());
         switch (mt) {
         case MOVE_NO_MOVES: case MOVE_ILLEGAL:
             break;
@@ -498,7 +480,8 @@ public class UnitSeekAndDestroyMission extends Mission {
                 throw new IllegalStateException("No direction " + unitTile
                     + " to " + currentTarget.getTile());
             }
-            logger.finest(tag + " attacking " + currentTarget + ": " + this);
+            logger.finest(tag + " attacking " + currentTarget
+                + ": " + this);
             AIMessage.askAttack(aiUnit, dirn);
             break;
         default:

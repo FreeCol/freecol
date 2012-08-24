@@ -160,6 +160,27 @@ public class PrivateerMission extends Mission {
     }
 
     /**
+     * Score a potential attack on a unit.
+     *
+     * @param aiUnit The <code>AIUnit</code> that may attack.
+     * @param defender The <code>Unit</code> to attack.
+     * @return A score for the attack.
+     */
+    private static int scoreUnit(AIUnit aiUnit, Unit defender) {
+        Unit attacker = aiUnit.getUnit();
+        int value = 1000;
+        // Pirates want cargo
+        value += defender.getGoodsCount() * 200;
+        value += defender.getUnitCount() * 100;
+        // But they are wary of danger
+        if (defender.isOffensiveUnit()) {
+            value -= attacker.getGame().getCombatModel()
+                .getDefencePower(attacker, defender) * 100;
+        }
+        return value;
+    }
+
+    /**
      * Evaluate a potential mission for a given unit and path.
      *
      * @param aiUnit The <code>AIUnit</code> to do the mission.
@@ -171,18 +192,7 @@ public class PrivateerMission extends Mission {
         if (loc instanceof Europe || loc instanceof Colony) {
             return 1000 / (path.getTotalTurns() + 1);
         } else if (loc instanceof Unit) {
-            Unit attacker = aiUnit.getUnit();
-            Unit defender = (Unit)loc;
-            int value = 1000;
-            // Pirates want cargo
-            value += defender.getGoodsCount() * 200;
-            value += defender.getUnitCount() * 100;
-            // But they are wary of danger
-            if (defender.isOffensiveUnit()) {
-                value -= attacker.getGame().getCombatModel()
-                    .getDefencePower(attacker, defender) * 100;
-            }
-            return value / (path.getTotalTurns() + 1);
+            return scoreUnit(aiUnit, (Unit)loc) / (path.getTotalTurns() + 1);
         } else {
             return Integer.MIN_VALUE;
         }
@@ -416,11 +426,19 @@ public class PrivateerMission extends Mission {
                 direction = unit.getTile().getDirection(target.getTile());
                 if (direction != null) {
                     logger.finest(tag + " completed hunt for target " + target
-                        + ": " + this);
+                        + ", attacking: " + this);
                     AIMessage.askAttack(aiUnit, direction);
-                } else {
-                    logger.warning(tag + " can not find direction to target "
-                        + target + ": " + this);
+                } else { // Found something else in the way!
+                    Location blocker = resolveBlockage(aiUnit, target);
+                    if (blocker instanceof Unit
+                        && scoreUnit(aiUnit, (Unit)blocker) > 0) {
+                        logger.finest(tag + " bumped into " + blocker
+                            + ", attacking: " + this);
+                        AIMessage.askAttack(aiUnit,
+                            unit.getTile().getDirection(blocker.getTile()));
+                    } else { // Might be dangerous, try to confuse them:-)
+                        moveRandomlyTurn(tag);
+                    }
                 }
                 break;
             default:

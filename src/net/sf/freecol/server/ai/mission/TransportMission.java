@@ -1154,12 +1154,10 @@ public class TransportMission extends Mission {
                     while (transportables.remove(au)); // Make sure its gone!
                     transportablesChanged = true;
                 }
-                if (reason != null) {
-                    logger.finest(tag + " unloading(" + reason + "," + unload
-                        + ") " + u + " -> " + (u.getLocation() != carrier)
-                        + ": " + carrier);
-                }
-
+                logger.finest(tag + " " + ((reason == null) ? "completed"
+                        : "failed(" + reason + ")")
+                    + " unloading," + unload + " " + u + ": " + carrier);
+                
             } else if (t instanceof AIGoods) {
                 AIGoods ag = (AIGoods) t;
                 String locStr = (carrier.isInEurope()) ? "Europe"
@@ -1169,23 +1167,26 @@ public class TransportMission extends Mission {
                 if (ag.getTransportDestination() == null ||
                     (ag.getTransportDestination() != null
                      && ag.getTransportDestination().getTile() == carrier.getLocation().getTile())) {
-                    logger.finest(tag + " unloading " + ag + "/" + ag.getGoods()
-                        + " at " + locStr + ": " + carrier);
+                    boolean success = false;
                     if (carrier.isInEurope()) {
-                        boolean success = sellCargoInEurope(ag.getGoods());
-                        if(success){
+                        success = sellCargoInEurope(ag.getGoods());
+                        if (success) {
                             removeFromTransportList(ag);
                             ag.dispose();
                             transportablesChanged = true;
                         }
                     } else {
-                        boolean success = unloadCargoInColony(ag.getGoods());
+                        success = unloadCargoInColony(ag.getGoods());
                         if (success) {
                             removeFromTransportList(ag);
                             ag.dispose();
                             transportablesChanged = true;
                         }
                     }
+                    logger.finest(tag + ((success) ? " completed" : " failed")
+                        + " unloading " + ag + "/" + ag.getGoods()
+                        + " at " + locStr + ": " + carrier);
+
                 }
             } else {
                 logger.warning(tag + " unknown Transportable " + t

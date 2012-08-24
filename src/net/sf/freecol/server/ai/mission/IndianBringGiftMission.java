@@ -37,6 +37,7 @@ import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
@@ -226,6 +227,20 @@ public class IndianBringGiftMission extends Mission {
                 return;
             case MOVE: // Arrived!
                 break;
+            case ATTACK_SETTLEMENT: case ATTACK_UNIT: // A blockage!
+                Location blocker = resolveBlockage(aiUnit, is);
+                if (blocker == null) {
+                    logger.warning(tag + " could not resolve blockage"
+                        + ": " + this);
+                    moveRandomly(tag, null);
+                    unit.setMovesLeft(0);
+                } else {
+                    logger.finest(tag + " blocked by " + blocker
+                        + ", attacking: " + this);
+                    AIMessage.askAttack(aiUnit, unit.getTile()
+                        .getDirection(blocker.getTile()));
+                }
+                break;
             default:
                 logger.warning(tag + " unexpected collection move type: " + mt
                     + ": " + this);
@@ -248,8 +263,10 @@ public class IndianBringGiftMission extends Mission {
                 return;
             }
         } else {
-            // Move to the target's colony and deliver
-            Unit.MoveType mt = travelToTarget(tag, target.getTile(), null);
+            // Move to the target's colony and deliver, avoiding trouble
+            // by choice of cost decider.
+            Unit.MoveType mt = travelToTarget(tag, target.getTile(),
+                CostDeciders.avoidSettlementsAndBlockingUnits());
             switch (mt) {
             case MOVE_NO_MOVES:
                 return;

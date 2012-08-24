@@ -307,7 +307,9 @@ public class DefendSettlementMission extends Mission {
         }
 
         // Go to the target!
-        if (travelToTarget(tag, target, null) != Unit.MoveType.MOVE) return;
+        if (travelToTarget(tag, target,
+                CostDeciders.avoidSettlementsAndBlockingUnits())
+            != Unit.MoveType.MOVE) return;
 
         // Check if the mission should change?
         // Change to supporting the settlement if the size is marginal.
