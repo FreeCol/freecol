@@ -1153,10 +1153,9 @@ public class TransportMission extends Mission {
                     removeFromTransportList(au);
                     while (transportables.remove(au)); // Make sure its gone!
                     transportablesChanged = true;
+                    logger.finest(tag + " completed unloading (" + reason
+                        + ") " + u + ": " + this);
                 }
-                logger.finest(tag + " " + ((reason == null) ? "completed"
-                        : "failed(" + reason + ")")
-                    + " unloading," + unload + " " + u + ": " + carrier);
                 
             } else if (t instanceof AIGoods) {
                 AIGoods ag = (AIGoods) t;
