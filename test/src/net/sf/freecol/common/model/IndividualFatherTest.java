@@ -322,7 +322,7 @@ public class IndividualFatherTest extends FreeColTestCase {
 
         player.addFather(jefferson);
         assertEquals(1, player.getModifierSet("model.goods.bells").size());
-        assertEquals(2, colony.getModifierSet("model.goods.bells").size());
+        assertEquals(1, colony.getModifierSet("model.goods.bells").size());
         assertEquals(2, townHall.getProductionModifiers(bellsType, null).size());
         assertEquals(5, townHall.getTotalProductionOf(bellsType));
     }

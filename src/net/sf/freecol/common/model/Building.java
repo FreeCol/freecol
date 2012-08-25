@@ -135,11 +135,35 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     }
 
     /**
-     * {@inheritDoc}
+     * Is an ability present in this Building?
+     * Delegate to the type.
+     *
+     * @param id The id of the ability to test.
+     * @param fcgot An optional <code>FreeColGameObjectType</code> the
+     *     ability applies to.
+     * @param turn An optional applicable <code>Turn</code>.
+     * @return True if the ability is present.
      */
     @Override
-    public boolean hasAbility(String id) {
+    public boolean hasAbility(String id, FreeColGameObjectType type,
+                              Turn turn) {
         return getType().hasAbility(id);
+    }
+
+    /**
+     * Gets the set of modifiers with the given Id from this Building.
+     * Delegate to the type.
+     *
+     * @param id The id of the modifier to test.
+     * @param fcgot An optional <code>FreeColGameObjectType</code> the
+     *     modifier applies to.
+     * @param turn An optional applicable <code>Turn</code>.
+     * @return A set of modifiers.
+     */
+    @Override
+    public Set<Modifier> getModifierSet(String id, FreeColGameObjectType fcgot,
+                                        Turn turn) {
+        return getType().getModifierSet(id);
     }
 
     /**
@@ -561,10 +585,12 @@ public class Building extends WorkLocation implements Named, Comparable<Building
             // distinct goods, this works.
             mods.addAll(getColony().getModifierSet(id, type, turn));
             if (unitType != null) {
+                mods.add(getColony().getProductionModifier(goodsType));
                 mods.add(type.getProductionModifier());
                 mods.addAll(unitType.getModifierSet(id, type, turn));
                 // If a unit is present add unspecific owner bonuses
-                // (which includes things like the Building advantage).
+                // (which includes things like the Building national
+                // advantage).
                 if (owner != null) {
                     mods.addAll(owner.getModifierSet(id, null, turn));
                 }
@@ -625,14 +651,6 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     public int getPriority() {
         return getType().getPriority();
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Set<Modifier> getModifierSet(String id) {
-        return getType().getModifierSet(id);
-    }
-
 
     // Serialization
 

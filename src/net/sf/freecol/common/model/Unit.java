@@ -848,12 +848,16 @@ public class Unit extends FreeColGameObject
      * Does this unit or its owner satisfy the ability set identified
      * by <code>id</code>.
      *
-     * @param id The ability id to satisfy.
-     * @return True if the ability is satisfied.
+     * @param id The id of the ability to test.
+     * @param fcgot An optional <code>FreeColGameObjectType</code> the
+     *     ability applies to.
+     * @param turn An optional applicable <code>Turn</code>.
+     * @return True if the ability is present.
      */
-    public boolean hasAbility(String id) {
+    public boolean hasAbility(String id, FreeColGameObjectType fcgot,
+                              Turn turn) {
+        if (turn == null) turn = getGame().getTurn();
         Set<Ability> result = new HashSet<Ability>();
-        Turn turn = getGame().getTurn();
         // UnitType abilities always apply
         result.addAll(unitType.getAbilitySet(id));
         // The player's abilities require more qualification.
@@ -869,24 +873,27 @@ public class Unit extends FreeColGameObject
         // code. Units are also Locations, however, which complicates
         // the issue. We do not want Units aboard other Units to share
         // the abilities of the carriers.
-        if (getColony() != null) {
-            result.addAll(getColony().getAbilitySet(id, unitType, turn));
+        if (getSettlement() != null) {
+            result.addAll(getSettlement().getAbilitySet(id, unitType, turn));
         } else if (isInEurope()) {
             result.addAll(getOwner().getEurope().getAbilitySet(id, unitType, turn));
         }
         return FeatureContainer.hasAbility(result);
     }
 
-
     /**
-     * Get a modifier that applies to this Unit.
+     * Get the modifiers that apply to this Unit.
      *
-     * @param id a <code>String</code> value
-     * @return a <code>Modifier</code> value
+     * @param id The id of the modifier to test.
+     * @param fcgot An optional <code>FreeColGameObjectType</code> the
+     *     modifier applies to.
+     * @param turn An optional applicable <code>Turn</code>.
+     * @return A set of modifiers.
      */
-    public Set<Modifier> getModifierSet(String id) {
+    public Set<Modifier> getModifierSet(String id, FreeColGameObjectType fcgot,
+                                        Turn turn) {
+        if (turn == null) turn = getGame().getTurn();
         Set<Modifier> result = new HashSet<Modifier>();
-        Turn turn = getGame().getTurn();
         // UnitType modifiers always apply
         result.addAll(unitType.getModifierSet(id));
         // the player's modifiers may not apply
@@ -921,11 +928,7 @@ public class Unit extends FreeColGameObject
     }
 
     /**
-     * Add the given Feature to the Features Map. If the Feature given
-     * can not be combined with a Feature with the same ID already
-     * present, the old Feature will be replaced.
-     *
-     * @param feature a <code>Feature</code> value
+     * {@inheritDoc}
      */
     public void addFeature(Feature feature) {
         throw new UnsupportedOperationException("Can not add Feature to Unit directly!");

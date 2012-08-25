@@ -907,7 +907,7 @@ public abstract class FreeColObject {
      * Gets the feature container for this object, if any.
      * None is provided here, but select subclasses will override.
      *
-     * @return Null here, but subclasses will yield a feature container.
+     * @return Null.
      */
     public FeatureContainer getFeatureContainer() {
         return null;
@@ -919,9 +919,8 @@ public abstract class FreeColObject {
      * @param id The id of the ability to test.
      * @return True if the ability is present.
      */
-    public boolean hasAbility(String id) {
-        return FeatureContainer.hasAbility(getFeatureContainer(),
-                                           id, null, null);
+    public final boolean hasAbility(String id) {
+        return hasAbility(id, null);
     }
 
     /**
@@ -932,13 +931,14 @@ public abstract class FreeColObject {
      *     ability applies to.
      * @return True if the ability is present.
      */
-    public boolean hasAbility(String id, FreeColGameObjectType fcgot) {
-        return FeatureContainer.hasAbility(getFeatureContainer(),
-                                           id, fcgot, null);
+    public final boolean hasAbility(String id, FreeColGameObjectType fcgot) {
+        return hasAbility(id, fcgot, null);
     }
 
     /**
      * Is an ability present in this object?
+     * Subclasses with complex ability handling should override this
+     * routine.
      *
      * @param id The id of the ability to test.
      * @param fcgot An optional <code>FreeColGameObjectType</code> the
@@ -978,9 +978,8 @@ public abstract class FreeColObject {
      * @param id The id of the ability to test.
      * @return A set of abilities.
      */
-    public Set<Ability> getAbilitySet(String id) {
-        return FeatureContainer.getAbilitySet(getFeatureContainer(),
-                                              id, null, null);
+    public final Set<Ability> getAbilitySet(String id) {
+        return getAbilitySet(id, null);
     }
 
     /**
@@ -991,14 +990,15 @@ public abstract class FreeColObject {
      *     ability applies to.
      * @return A set of abilities.
      */
-    public Set<Ability> getAbilitySet(String id,
-                                      FreeColGameObjectType fcgot) {
-        return FeatureContainer.getAbilitySet(getFeatureContainer(),
-                                              id, fcgot, null);
+    public final Set<Ability> getAbilitySet(String id,
+                                            FreeColGameObjectType fcgot) {
+        return getAbilitySet(id, fcgot, null);
     }
 
     /**
      * Gets the set of abilities with the given Id from this object.
+     * Subclasses with complex ability handling should override this
+     * routine.
      *
      * @param id The id of the ability to test.
      * @param fcgot An optional <code>FreeColGameObjectType</code> the
@@ -1069,9 +1069,8 @@ public abstract class FreeColObject {
      * @param id The id of the modifier to test.
      * @return A set of modifiers.
      */
-    public Set<Modifier> getModifierSet(String id) {
-        return FeatureContainer.getModifierSet(getFeatureContainer(), 
-                                               id, null, null);
+    public final Set<Modifier> getModifierSet(String id) {
+        return getModifierSet(id, null);
     }
 
     /**
@@ -1082,14 +1081,15 @@ public abstract class FreeColObject {
      *     modifier applies to.
      * @return A set of modifiers.
      */
-    public Set<Modifier> getModifierSet(String id,
-                                        FreeColGameObjectType fcgot) {
-        return FeatureContainer.getModifierSet(getFeatureContainer(), 
-                                               id, fcgot, null);
+    public final Set<Modifier> getModifierSet(String id,
+                                              FreeColGameObjectType fcgot) {
+        return getModifierSet(id, fcgot, null);
     }
 
     /**
      * Gets the set of modifiers with the given Id from this object.
+     * Subclasses with complex modifier handling should override this
+     * routine.
      *
      * @param id The id of the modifier to test.
      * @param fcgot An optional <code>FreeColGameObjectType</code> the
@@ -1111,9 +1111,8 @@ public abstract class FreeColObject {
      * @param id The id of the modifiers to apply.
      * @return The modified number.
      */
-    public float applyModifier(float number, String id) {
-        return FeatureContainer.applyModifier(getFeatureContainer(),
-                                              number, id, null, null);
+    public final float applyModifier(float number, String id) {
+        return applyModifier(number, id, null);
     }
 
     /**
@@ -1125,10 +1124,9 @@ public abstract class FreeColObject {
      *     modifier applies to.
      * @return The modified number.
      */
-    public float applyModifier(float number, String id,
-                               FreeColGameObjectType fcgot) {
-        return FeatureContainer.applyModifier(getFeatureContainer(),
-                                              number, id, fcgot, null);
+    public final float applyModifier(float number, String id,
+                                     FreeColGameObjectType fcgot) {
+        return applyModifier(number, id, fcgot, null);
     }
 
     /**
@@ -1140,8 +1138,8 @@ public abstract class FreeColObject {
      *     modifier applies to.
      * @return The modified number.
      */
-    public float applyModifier(float number, String id,
-                               FreeColGameObjectType fcgot, Turn turn) {
+    public final float applyModifier(float number, String id,
+                                     FreeColGameObjectType fcgot, Turn turn) {
         return FeatureContainer.applyModifier(getFeatureContainer(),
                                               number, id, fcgot, turn);
     }

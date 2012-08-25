@@ -523,7 +523,13 @@ public class BuildingTest extends FreeColTestCase {
         owner.addFather(jefferson);
         assertTrue(colony.getOwner().getModifierSet("model.goods.bells")
                    .contains(bellsModifier));
-        assertTrue(colony.getModifierSet("model.goods.bells").contains(bellsModifier));
+        // The colony does not contain the bellsModifier, only the player...
+        assertFalse(colony.getModifierSet("model.goods.bells")
+            .contains(bellsModifier));
+        // ...but the Building.getModifierSet() routine does pull in the
+        // player modifiers.
+        assertTrue(building.getProductionModifiers(bellsType, freeColonistType)
+            .contains(bellsModifier));
 
         assertEquals(3, building.getUnitConsumption(colonist));
         // 3 from the colonist + 50% + 1 = 5.5

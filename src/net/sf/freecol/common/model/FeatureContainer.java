@@ -28,16 +28,23 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 
+/**
+ * A container to hold abilities and modifiers for some FreeColObject-subclass.
+ * FreeColGameObjectType, Europe, Player, Settlement are current implementors.
+ * Building delegates some functionality to its type.
+ * Unit fakes it by constructing one on the fly.
+ * FreeColObject itself implements a null version.
+ */
 public class FeatureContainer {
 
     private static final Logger logger = Logger.getLogger(FeatureContainer.class.getName());
 
     /** The abilities in the container. */
-    private Map<String, Set<Ability>> abilities
+    private final Map<String, Set<Ability>> abilities
         = new HashMap<String, Set<Ability>>();
 
     /** The modifiers in the container. */
-    private Map<String, Set<Modifier>> modifiers
+    private final Map<String, Set<Modifier>> modifiers
         = new HashMap<String, Set<Modifier>>();
 
 

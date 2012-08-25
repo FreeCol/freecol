@@ -1625,20 +1625,6 @@ public class Colony extends Settlement implements Nameable {
     }
 
     /**
-     * Returns the current production <code>Modifier</code>, which is
-     * generated from the current production bonus.
-     *
-     * @param goodsType a <code>GoodsType</code> value
-     * @return a <code>Modifier</code> value
-     */
-    public Modifier getProductionModifier(GoodsType goodsType) {
-        Modifier result = new Modifier(goodsType.getId(), SOL_MODIFIER_SOURCE,
-                                       productionBonus, Modifier.Type.ADDITIVE);
-        result.setIndex(Modifier.COLONY_PRODUCTION_INDEX);
-        return result;
-    }
-
-    /**
      * Gets a string representation of the Colony. Currently this method just
      * returns the name of the <code>Colony</code>, but that may change
      * later.
@@ -2456,44 +2442,35 @@ public class Colony extends Settlement implements Nameable {
     }
 
     /**
-     * Get the <code>Modifier</code> value.
-     *
-     * @param id a <code>String</code> value
-     * @return a <code>Modifier</code> value
-     */
-    public final Set<Modifier> getModifierSet(String id) {
-        Turn turn = getGame().getTurn();
-        Set<Modifier> result = new HashSet<Modifier>();
-        result.addAll(getModifierSet(id, null, turn));
-        if (owner != null) { // Null owner happens during dispose.
-            result.addAll(owner.getModifierSet(id, null, turn));
-        }
-        return result;
-    }
-
-    /**
      * Returns true if the Colony, or its owner has the ability
      * identified by <code>id</code>.
      *
-     * @param id a <code>String</code> value
-     * @return a <code>boolean</code> value
+     * @param id The id of the ability to test.
+     * @param fcgot An optional <code>FreeColGameObjectType</code> the
+     *     ability applies to.
+     * @param turn An optional applicable <code>Turn</code>.
+     * @return True if the ability is present.
      */
-    public boolean hasAbility(String id) {
-        return hasAbility(id, null);
-    }
-
-    /**
-     * Returns true if the Colony, or its owner has the ability
-     * identified by <code>id</code>.
-     *
-     * @param id a <code>String</code> value
-     * @param type a <code>FreeColGameObjectType</code> value
-     * @return a <code>boolean</code> value
-     */
-    public boolean hasAbility(String id, FreeColGameObjectType type) {
-        Turn turn = getGame().getTurn();
+    @Override
+    public boolean hasAbility(String id, FreeColGameObjectType type,
+                              Turn turn) {
+        if (turn == null) turn = getGame().getTurn();
         return super.hasAbility(id, type, turn)
             || (owner != null && owner.hasAbility(id, type, turn));
+    }
+
+    /**
+     * Returns the current production <code>Modifier</code>, which is
+     * generated from the current production bonus.
+     *
+     * @param goodsType a <code>GoodsType</code> value
+     * @return a <code>Modifier</code> value
+     */
+    public Modifier getProductionModifier(GoodsType goodsType) {
+        Modifier result = new Modifier(goodsType.getId(), SOL_MODIFIER_SOURCE,
+                                       productionBonus, Modifier.Type.ADDITIVE);
+        result.setIndex(Modifier.COLONY_PRODUCTION_INDEX);
+        return result;
     }
 
     /**

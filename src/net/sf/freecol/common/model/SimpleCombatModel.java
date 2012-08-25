@@ -378,7 +378,8 @@ public class SimpleCombatModel extends CombatModel {
         }
         Tile tile = defenderUnit.getTile();
         if (tile != null) {
-            if (tile.getSettlement() == null) { // In the open
+            Settlement settlement = tile.getSettlement();
+            if (settlement == null) { // In the open
                 // Terrain defensive bonus.
                 if (!isAmbush(attacker, defender)) {
                     result.addAll(tile.getType().getDefenceBonus());
@@ -389,8 +390,10 @@ public class SimpleCombatModel extends CombatModel {
                     result.addAll(spec.getModifiers(ARTILLERY_IN_THE_OPEN));
                 }
             } else { // In settlement
-                result.addAll(tile.getSettlement()
-                              .getModifierSet(Modifier.DEFENCE));
+                result.addAll(tile.getType().getDefenceBonus());
+                result.addAll(settlement.getModifierSet(Modifier.DEFENCE));
+                result.addAll(settlement.getOwner()
+                    .getModifierSet(Modifier.DEFENCE, settlement.getType()));
                 // Artillery defence bonus against an Indian raid
                 if (defenderUnit.hasAbility(Ability.BOMBARD)
                     && attacker != null

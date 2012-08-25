@@ -449,6 +449,7 @@ public class ColonyTile extends WorkLocation implements Ownable {
                 || tileType.isSecondaryGoodsType(goodsType)) {
                 result.addAll(workTile.getProductionModifiers(goodsType, null));
                 result.addAll(colony.getModifierSet(id, null, turn));
+                result.add(colony.getProductionModifier(goodsType));
                 if (owner != null) {
                     result.addAll(owner.getModifierSet(id, null, turn));
                 }
@@ -458,6 +459,7 @@ public class ColonyTile extends WorkLocation implements Ownable {
             if (FeatureContainer.applyModifiers(0f, turn, result) > 0) {
                 result.addAll(colony.getModifierSet(id, null, turn));
                 if (unitType != null) {
+                    result.add(colony.getProductionModifier(goodsType));
                     result.addAll(unitType.getModifierSet(id, tileType, turn));
                     if (owner != null) {
                         result.addAll(owner.getModifierSet(id, null, turn));
