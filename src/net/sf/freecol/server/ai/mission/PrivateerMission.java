@@ -308,6 +308,8 @@ public class PrivateerMission extends Mission {
             ? Mission.TARGETOWNERSHIP
             : (player.getStance(other) == Stance.ALLIANCE)
             ? "privateer-avoids-ally"
+            : (scoreUnit(aiUnit, unit) <= 0)
+            ? "privateer-avoids-trouble"
             : null;
     }
 
