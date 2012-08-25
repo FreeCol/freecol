@@ -409,63 +409,85 @@ public class NativeAIPlayer extends AIPlayer {
     private void giveNormalMissions() {
         final AIMain aiMain = getAIMain();
         final Specification spec = aiMain.getGame().getSpecification();
+        final int turnNumber = getGame().getTurn().getNumber();
         final List<EquipmentType> scoutEq
             = Unit.Role.SCOUT.getRoleEquipment(spec);
         final List<EquipmentType> soldierEq
             = Unit.Role.SOLDIER.getRoleEquipment(spec);
-        for (AIUnit aiUnit : getAIUnits()) {
+
+        List<AIUnit> aiUnits = getAIUnits();
+        String report = "";
+        int allUnits = aiUnits.size(), i = 0;
+        while (i < aiUnits.size()) {
+            final AIUnit aiUnit = aiUnits.get(i);
             final Unit unit = aiUnit.getUnit();
-
-            String reason = null;
-            if (unit.isUninitialized()) {
-                reason = "(unit uninitialized)";
-            } else if (unit.isDisposed()) {
-                reason = "(unit disposed)";
-            }
-            if (reason != null) {
-                logger.finest("Mission-Ignored " + reason + ": " + unit);
-                continue;
-            }
-
-            // Check the current mission, and assign a new one to m if needed.
-            Settlement settlement = unit.getSettlement();
-            IndianSettlement is;
             Mission m = aiUnit.getMission();
-            if (m != null && m.isValid() && !m.isOneTime()) {
-                m = null;
-            } else if (settlement != null && (settlement.getUnitCount()
-                    + unit.getTile().getUnitCount() <= 1)) {
-                m = new DefendSettlementMission(aiMain, aiUnit, settlement);
-                
-            } else if ((is = unit.getIndianSettlement()) != null
-                && ((!unit.isMounted() && is.canProvideEquipment(scoutEq))
-                    || (!unit.isArmed() && is.canProvideEquipment(soldierEq)))) {
-                // Go home for new equipment if the home settlement has them.
-                m = new DefendSettlementMission(aiMain, aiUnit, is);
+            String reason = null;
 
-            } else if (UnitWanderHostileMission.invalidReason(aiUnit) == null) {
-                if (m instanceof UnitWanderHostileMission) {
-                    m = null;
-                } else {
-                    m = new UnitWanderHostileMission(aiMain, aiUnit);
-                }
-            } else {
-                if (m instanceof IdleAtSettlementMission) {
-                    m = null;
-                } else {
-                    m = new IdleAtSettlementMission(aiMain, aiUnit);
-                }
+            if (unit.isUninitialized() || unit.isDisposed()) {
+                reason = "Invalid-" + aiUnit.toString();
+            } else if (m != null && m.isValid() && !m.isOneTime()) {
+                reason = "Valid-" + m.toString();
             }
-            if (m != null) {
-                if (!m.isOneTime()) {
-                    logger.fine("Mission-New " + m + ": " + unit);
-                }
-                aiUnit.setMission(m);
+
+            if (reason == null) {
+                i++;
             } else {
-                logger.finest("Mission-Continues " + aiUnit.getMission()
-                    + ": " + unit);
+                report += "\n  " + reason;
+                aiUnits.remove(i);
             }
         }
+        report = Utils.lastPart(getPlayer().getNationID(), ".")
+            + ".giveNormalMissions(turn=" + turnNumber
+            + " all-units=" + allUnits + " free-land-units=" + aiUnits.size()
+            + ")" + report;
+
+        i = 0;
+        while (i < aiUnits.size()) {
+            final AIUnit aiUnit = aiUnits.get(i);
+            final Unit unit = aiUnit.getUnit();
+            Mission m;
+            Settlement settlement = unit.getSettlement();
+            IndianSettlement is = unit.getIndianSettlement();
+
+            // First see to local settlement defence
+            if ((settlement != null && (settlement.getUnitCount()
+                        + unit.getTile().getUnitCount() <= 1)
+                    && (m = new DefendSettlementMission(aiMain, aiUnit,
+                                                        settlement)) != null)
+
+                // Go home for new equipment if the home settlement has them.
+                || (is != null
+                    && ((!unit.isMounted() && is.canProvideEquipment(scoutEq))
+                        || (!unit.isArmed() && is.canProvideEquipment(soldierEq)))
+                    && (m = new DefendSettlementMission(aiMain, aiUnit, is))
+                    != null)
+
+                // Go out looking for trouble
+                || (UnitWanderHostileMission.invalidReason(aiUnit) == null
+                    && (m = new UnitWanderHostileMission(aiMain, aiUnit))
+                    != null)
+                ) {
+                aiUnit.setMission(m);
+                report += "\n  New-" + m.toString();
+                aiUnits.remove(i);
+            } else {
+                i++;
+            }
+        }
+
+        for (AIUnit aiUnit : aiUnits) {
+            Mission m;
+            if (aiUnit.getMission() instanceof IdleAtSettlementMission) {
+                m = aiUnit.getMission();
+            } else {
+                m = new IdleAtSettlementMission(aiMain, aiUnit);
+                aiUnit.setMission(m);
+            }
+            report += "\n  UNUSED-" + m
+                + " at " + aiUnit.getUnit().getLocation();
+        }
+        logger.fine(report);
     }
 
     /**

@@ -260,8 +260,7 @@ public class AIUnit extends AIObject implements Transportable {
     public void abortMission(String why) {
         if (mission != null) {
             if (!mission.isOneTime()) {
-                logger.fine("Mission-ABORT " + mission + " (" + why + "): "
-                    + getUnit());
+                logger.fine("Mission-ABORT(" + why + "): " + mission);
             }
             mission.dispose();
             this.mission = null;

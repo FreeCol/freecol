@@ -190,8 +190,6 @@ public class UnitWanderHostileMission extends Mission {
         if (moved) {
             logger.finest(tag + " moved to " + unit.getLocation()
                 + ": " + this);
-        } else {
-            logger.finest(tag + " failed to move: " + this);
         }
     }
 

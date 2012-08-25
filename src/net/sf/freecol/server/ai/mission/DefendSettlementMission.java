@@ -399,9 +399,6 @@ public class DefendSettlementMission extends Mission {
             logger.finest(tag + " attacking " + bestTarget
                 + " from " + target.getName() + ": " + this);
             AIMessage.askAttack(getAIUnit(), bestDirection);
-        } else {
-            logger.finest(tag + " defending " + target.getName()
-                + ": " + this);
         }
     }
     
