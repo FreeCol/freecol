@@ -741,6 +741,9 @@ public abstract class Mission extends AIObject {
             return MoveType.MOVE_NO_MOVES;
         } else if (unit.isInEurope()) {
             if (target instanceof Europe) {
+                if (unit.getLocation() instanceof Unit) {
+                    unitLeavesTransport(aiUnit, null);
+                }
                 return MoveType.MOVE;
             } else if (!unit.getOwner().canMoveToEurope()) {
                 throw new IllegalStateException("Impossible move from Europe");
@@ -749,6 +752,9 @@ public abstract class Mission extends AIObject {
             throw new IllegalStateException("Null unit tile: " + unit);
         } else {
             if (unit.getTile() == targetTile) {
+                if (unit.getLocation() instanceof Unit) {
+                    unitLeavesTransport(aiUnit, null);
+                }
                 return MoveType.MOVE;
             } else if (target instanceof Europe) {
                 if (!unit.getOwner().canMoveToEurope()) {
@@ -841,7 +847,11 @@ public abstract class Mission extends AIObject {
         } else if (path == null) {
             throw new IllegalStateException("Path == null"); // Can not happen
         } else {
-            return followPath(logMe, path);
+            Unit.MoveType mt = followPath(logMe, path);
+            if (mt == MoveType.MOVE && unit.getLocation() instanceof Unit) {
+                unitLeavesTransport(aiUnit, null);
+            }
+            return mt;
         }
     }
 
@@ -896,7 +906,13 @@ public abstract class Mission extends AIObject {
             // On failure, fall through to the error report.
             switch (useEurope) {
             case NO_EUROPE:
-                if (unit.getTile() == path.getTile()) continue;
+                if (unit.getTile() == path.getTile()) {
+                    if (unit.getLocation() instanceof Unit
+                        && !path.isOnCarrier()) {
+                        unitLeavesTransport(aiUnit, null);
+                    }
+                    continue;
+                }
                 MoveType mt = unit.getMoveType(path.getDirection());
                 if (!mt.isProgress()) { // Special handling required.
                     logger.finest(logMe + " at " + unit.getTile()
