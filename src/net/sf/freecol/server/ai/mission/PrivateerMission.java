@@ -424,6 +424,11 @@ public class PrivateerMission extends Mission {
             switch (mt) {
             case MOVE_NO_MOVES:
                 return;
+            case MOVE_ILLEGAL: // Can happen when another unit blocks a river
+                logger.finest(tag + " hit unexpected blockage: " + this);
+                moveRandomly(tag, null);
+                unit.setMovesLeft(0);
+                return;
             case ATTACK_UNIT:
                 direction = unit.getTile().getDirection(target.getTile());
                 if (direction != null) {
@@ -439,6 +444,8 @@ public class PrivateerMission extends Mission {
                         AIMessage.askAttack(aiUnit,
                             unit.getTile().getDirection(blocker.getTile()));
                     } else { // Might be dangerous, try to confuse them:-)
+                        logger.finest(tag + " bumped into " + blocker
+                            + ", avoiding: " + this);
                         moveRandomlyTurn(tag);
                     }
                 }
