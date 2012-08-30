@@ -86,6 +86,13 @@ public interface Transportable {
 
 
     /**
+     * Gets the space taken by this transportable.
+     *
+     * @return The space taken.
+     */
+    public int getSpaceTaken();
+
+    /**
      * Returns the source for this <code>Transportable</code>.
      * This is normally the location of the
      * {@link #getTransportLocatable locatable}.

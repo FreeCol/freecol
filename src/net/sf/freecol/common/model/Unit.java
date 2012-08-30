@@ -1341,7 +1341,7 @@ public class Unit extends FreeColGameObject
         PathNode ePath = null;
         int eTurns = -1;
         Europe europe = getOwner().getEurope();
-        if (isNaval()) {
+        if (canMoveToHighSeas()) {
             if (isInEurope() || isAtSea()) return null;
             ePath = (europe == null) ? null : findPath(europe);
             eTurns = (ePath == null) ? -1 : ePath.getTotalTurns();
@@ -2443,12 +2443,10 @@ public class Unit extends FreeColGameObject
     /**
      * Checks if this <code>Unit</code> is able to carry {@link Locatable}s.
      *
-     * @return 'true' if this unit can carry goods or other units,
-     * 'false' otherwise.
+     * @return True if this unit can carry goods or other units.
      */
     public boolean isCarrier() {
-        return unitType.canCarryGoods() ||
-            unitType.canCarryUnits();
+        return unitType.canCarryGoods() || unitType.canCarryUnits();
     }
 
     /**

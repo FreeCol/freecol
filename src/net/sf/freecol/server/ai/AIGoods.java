@@ -192,6 +192,15 @@ public class AIGoods extends AIObject implements Transportable {
     // Transportable interface
 
     /**
+     * Gets the space taken by these AI goods.
+     *
+     * @return The space taken.
+     */
+    public int getSpaceTaken() {
+        return (goods == null) ? 0 : goods.getSpaceTaken();
+    }
+
+    /**
      * Returns the source for this <code>Transportable</code>.
      * This is normally the location of the
      * {@link #getTransportLocatable locatable}.
@@ -213,6 +222,17 @@ public class AIGoods extends AIObject implements Transportable {
      */
     public Location getTransportDestination() {
         return destination;
+    }
+
+    /**
+     * Sets the destination for this <code>Transportable</code>.
+     * This should only be called when a goods transportable destination
+     * becomes invalid and we need to retarget.
+     *
+     * @param destination The new destination <code>Location</code>.
+     */
+    public void setTransportDestination(Location destination) {
+        this.destination = destination;
     }
 
     /**

@@ -393,6 +393,15 @@ public class AIUnit extends AIObject implements Transportable {
     // Transportable interface
 
     /**
+     * Gets the space taken by this AI unit.
+     *
+     * @return The space taken.
+     */
+    public int getSpaceTaken() {
+        return (getUnit() == null) ? 0 : getUnit().getSpaceTaken();
+    }
+
+    /**
      * Returns the source for this <code>Transportable</code>. This is
      * normally the location of the {@link #getTransportLocatable locatable}.
      *
