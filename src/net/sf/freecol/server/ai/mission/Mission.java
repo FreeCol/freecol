@@ -32,6 +32,7 @@ import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
@@ -430,11 +431,13 @@ public abstract class Mission extends AIObject {
      * @return True if the unit is unloaded.
      */
     protected boolean unitLeavesTransport(AIUnit aiUnit, Direction direction) {
+        final Unit carrier = getUnit();
         final Unit unit = aiUnit.getUnit();
         boolean result = (direction == null)
             ? AIMessage.askDisembark(aiUnit)
             : AIMessage.askMove(aiUnit, direction);
         Colony colony = unit.getColony();
+        if (result) result = unit.getLocation() != carrier;
         if (result && colony != null) {
             AIColony ac = getAIMain().getAIColony(colony);
             if (ac != null) ac.completeWish(unit);
@@ -452,11 +455,11 @@ public abstract class Mission extends AIObject {
      * @return True if the unit is loaded.
      */
     protected boolean unitJoinsTransport(AIUnit aiUnit, Direction direction) {
+        final Unit carrier = getUnit();
         final Unit unit = aiUnit.getUnit();
         Colony colony = unit.getColony();
-        boolean result = (direction == null)
-            ? AIMessage.askEmbark(getAIUnit(), unit, direction)
-            : AIMessage.askMove(aiUnit, direction);
+        boolean result = AIMessage.askEmbark(getAIUnit(), unit, direction);
+        if (result) result = unit.getLocation() == carrier;
         if (result && colony != null) {
             colony.firePropertyChange(Colony.REARRANGE_WORKERS, true, false);
         }
@@ -476,8 +479,11 @@ public abstract class Mission extends AIObject {
             return false;
         }
         final AIUnit aiUnit = getAIUnit();
-        boolean result;
+        Colony colony = carrier.getColony();
+        GoodsContainer gc = carrier.getGoodsContainer();
+        int oldAmount = gc.getGoodsCount(type);
         Goods goods = new Goods(carrier.getGame(), carrier, type, amount);
+        boolean result;
         if (carrier.isInEurope()) {
             if (carrier.getOwner().canTrade(type)) {
                 result = AIMessage.askSellGoods(aiUnit, goods);
@@ -489,12 +495,22 @@ public abstract class Mission extends AIObject {
             }
         } else {
             result = AIMessage.askUnloadCargo(aiUnit, goods);
-            if (result) {
-                final Colony colony = carrier.getLocation().getColony();
-                final AIColony aiColony = getAIMain().getAIColony(colony);
-                if (aiColony != null) aiColony.completeWish(goods);
-                colony.firePropertyChange(Colony.REARRANGE_WORKERS, true, false);
+        }
+        if (result) {
+            int newAmount = gc.getGoodsCount(type);
+            if (oldAmount - newAmount != amount) {
+                logger.warning(carrier + " at " + carrier.getLocation()
+                    + " only unloaded " + (oldAmount - newAmount)
+                    + " " + type + " (" + amount + " expected)");
+                // TODO: sort this out.
+                // For now, do not tolerate partial unloads.
+                result = false;
             }
+        }   
+        if (result && colony != null) {
+            final AIColony aiColony = getAIMain().getAIColony(colony);
+            if (aiColony != null) aiColony.completeWish(goods);
+            colony.firePropertyChange(Colony.REARRANGE_WORKERS, true, false);
         }
         return result;
     }
@@ -507,20 +523,8 @@ public abstract class Mission extends AIObject {
      * @return True if the unload succeeds.
      */
     protected boolean goodsLeavesTransport(AIGoods aiGoods) {
-        final Unit carrier = getUnit();
         Goods goods = aiGoods.getGoods();
-        boolean result = goodsLeavesTransport(goods.getType(),
-                                              goods.getAmount());
-        if (result) {
-            Colony colony = carrier.getColony();
-            AIColony ac;
-            if (colony != null
-                && (ac = getAIMain().getAIColony(colony)) != null) {
-                ac.completeWish(goods);
-                colony.firePropertyChange(Colony.REARRANGE_WORKERS, true, false);
-            }
-        }
-        return result;
+        return goodsLeavesTransport(goods.getType(), goods.getAmount());
     }
 
     /**
@@ -535,19 +539,33 @@ public abstract class Mission extends AIObject {
         final Goods goods = aiGoods.getGoods();
         GoodsType goodsType = goods.getType();
         int goodsAmount = goods.getAmount();
+        GoodsContainer gc = carrier.getGoodsContainer();
+        int oldAmount = gc.getGoodsCount(goodsType);
         boolean result;
         if (carrier.isInEurope()) {
             result = AIMessage.askBuyGoods(aiUnit, goodsType, goodsAmount);
         } else {
             result = AIMessage.askLoadCargo(aiUnit, goods);
+        }
+        if (result) {
+            int newAmount = gc.getGoodsCount(goodsType);
+            if (newAmount - oldAmount != goodsAmount) {
+                logger.warning(carrier + " at " + carrier.getLocation()
+                    + " only loaded " + (newAmount - oldAmount)
+                    + " " + goodsType
+                    + " (" + goodsAmount + " expected)");
+                goodsAmount = newAmount - oldAmount;
+                // TODO: sort this out.  For now, tolerate partial loads.
+                result = goodsAmount > 0;
+            }
+        }
+        if (result) {
             Colony colony = carrier.getColony();
             if (colony != null) {
                 getAIMain().getAIColony(colony).removeAIGoods(aiGoods);
             }
-        }
-        if (result) {
             aiGoods.setGoods(new Goods(getGame(), carrier,
-                                       goodsType, goodsAmount));
+                             goodsType, goodsAmount));
         }
         return result;
     }
