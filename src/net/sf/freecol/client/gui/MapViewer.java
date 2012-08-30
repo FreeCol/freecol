@@ -1902,53 +1902,45 @@ public final class MapViewer {
      * @param gotoPath a <code>PathNode</code> value
      */
     private void displayGotoPath(Graphics2D g, PathNode gotoPath) {
-        PathNode temp = gotoPath;
-        Font font = ResourceManager.getFont("NormalFont", 12f);
-        while (temp != null) {
-            Point p = getTilePosition(temp.getTile());
-            if (p != null) {
-                Tile tile = temp.getTile();
-                Image image;
-                final Color textColor;
-                if (temp.getTurns() == 0) {
-                    g.setColor(Color.GREEN);
-                    image = lib.getPathImage(activeUnit);
-                    if (activeUnit != null
-                            && tile.isExplored()
-                            && activeUnit.isNaval()
-                            && tile.isLand()
-                            && (tile.getColony() == null || tile.getColony().getOwner() != activeUnit.getOwner())) {
-                        image = lib.getPathImage(activeUnit.getFirstUnit());
-                    }
-                    textColor = Color.BLACK;
-                } else {
-                    g.setColor(Color.RED);
-                    image = lib.getPathNextTurnImage(activeUnit);
-                    if (activeUnit != null
-                            && tile.isExplored()
-                            && activeUnit.isNaval()
-                            && tile.isLand()
-                            && (tile.getColony() == null || tile.getColony().getOwner() != activeUnit.getOwner())) {
-                        image = lib.getPathNextTurnImage(activeUnit.getFirstUnit());
-                    }
-                    textColor = Color.WHITE;
-                }
-                g.translate(p.x, p.y);
-                if (image != null) {
-                    centerImage(g, image);
-                } else {
-                    g.fillOval(halfWidth, halfHeight, 10, 10);
-                    g.setColor(Color.BLACK);
-                    g.drawOval(halfWidth, halfHeight, 10, 10);
-                }
-                if (temp.getTurns() > 0) {
-                    Image stringImage = createStringImage(g, Integer.toString(temp.getTurns()),
-                                                          textColor, font);
-                    centerImage(g, stringImage);
-                }
-                g.translate(-p.x, -p.y);
+        final Font font = ResourceManager.getFont("NormalFont", 12f);
+
+        for (PathNode temp = gotoPath; temp != null; temp = temp.next) {
+            Tile tile = temp.getTile();
+            if (tile == null) continue;
+
+            Image image;
+            Color textColor;
+            boolean showPassenger = activeUnit != null
+                && tile.isExplored()
+                && activeUnit.isNaval()
+                && tile.isLand()
+                && (tile.getColony() == null
+                    || tile.getColony().getOwner() != activeUnit.getOwner());
+            if (temp.getTurns() == 0) {
+                g.setColor(Color.GREEN);
+                image = lib.getPathImage((!showPassenger) ? activeUnit
+                    : activeUnit.getFirstUnit());
+                textColor = Color.BLACK;
+            } else {
+                g.setColor(Color.RED);
+                image = lib.getPathNextTurnImage((!showPassenger) ? activeUnit
+                    : activeUnit.getFirstUnit());
+                textColor = Color.WHITE;
             }
-            temp = temp.next;
+            g.translate(tile.getX(), tile.getY());
+            if (image != null) {
+                centerImage(g, image);
+            } else {
+                g.fillOval(halfWidth, halfHeight, 10, 10);
+                g.setColor(Color.BLACK);
+                g.drawOval(halfWidth, halfHeight, 10, 10);
+            }
+            if (temp.getTurns() > 0) {
+                Image stringImage = createStringImage(g,
+                    Integer.toString(temp.getTurns()), textColor, font);
+                centerImage(g, stringImage);
+            }
+            g.translate(-tile.getX(), -tile.getY());
         }
     }
 
