@@ -207,20 +207,28 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
     private void collectDestinationsFromEurope(Unit unit,
                                                List<GoodsType> goodsTypes) {
         final Player player = unit.getOwner();
+        final boolean canTrade = player.hasAbility("model.ability.tradeWithForeignColonies");
         final Europe europe = player.getEurope();
         final Game game = getGame();
         final Map map = game.getMap();
         for (Player p : game.getPlayers()) {
+            if (p == player) {
+                ; // ok
+            } else if (p.isEuropean()) {
+                if (!canTrade) continue;
+            } else {
+                if (!p.hasContacted(player)) continue;
+            }
             for (Settlement s : p.getSettlements()) {
-                if (s.isConnectedPort()
-                    || (s instanceof IndianSettlement
-                        && ((IndianSettlement)s).hasContactedSettlement(player))) {
-                    int turns = unit.getTurnsToReach(europe, s.getTile());
-                    if (turns != FreeColObject.INFINITY) {
-                        String extras = (s.getOwner() != unit.getOwner())
-                            ? getExtras(unit, s, goodsTypes) : "";
-                        destinations.add(new Destination(s, turns, extras));
-                    }
+                if (!s.isConnectedPort()) continue;
+                if (s instanceof IndianSettlement
+                    && !((IndianSettlement)s).hasContactedSettlement(player))
+                    continue;
+                int turns = unit.getTurnsToReach(s, europe);
+                if (turns != FreeColObject.INFINITY) {
+                    String extras = (s.getOwner() != unit.getOwner())
+                        ? getExtras(unit, s, goodsTypes) : "";
+                    destinations.add(new Destination(s, turns, extras));
                 }
             }
         }
