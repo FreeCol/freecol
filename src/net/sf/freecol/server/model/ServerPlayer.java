@@ -2687,21 +2687,22 @@ public class ServerPlayer extends Player implements ServerModelObject {
     private void csDamageShip(Unit ship, Location repair, ChangeSet cs) {
         ServerPlayer player = (ServerPlayer) ship.getOwner();
 
-        // Lose the units aboard
-        Unit u;
-        while ((u = ship.getFirstUnit()) != null) {
-            u.setLocation(null);
+        // Lose the goods and units aboard
+        for (Goods g : ship.getGoodsContainer().getCompactGoods()) {
+            ship.remove(g);
+        }
+        for (Unit u : ship.getUnitList()) {
+            ship.remove(u);
             cs.addDispose(See.only(player), null, u); // Only owner-visible
         }
 
         // Damage the ship and send it off for repair
-        ship.getGoodsContainer().removeAll();
         ship.setHitpoints(1);
         ship.setDestination(null);
         ship.setLocation(repair);
         ship.setState(Unit.UnitState.ACTIVE);
         ship.setMovesLeft(0);
-        cs.add(See.only(player), (FreeColGameObject) repair);
+        cs.add(See.only(player), (FreeColGameObject)repair);
     }
 
     /**
