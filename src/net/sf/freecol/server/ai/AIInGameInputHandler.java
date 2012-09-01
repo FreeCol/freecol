@@ -388,9 +388,9 @@ public final class AIInGameInputHandler implements MessageHandler {
             });
         List<Goods> loot = new ArrayList<Goods>();
         int space = unit.getSpaceLeft();
-        while (!goods.isEmpty() && space > 0) {
+        while (!goods.isEmpty()) {
             Goods g = goods.remove(0);
-            if (g.getSpaceTaken() > space) continue;
+            if (g.getSpaceTaken() > space) continue; // Approximate
             loot.add(g);
             space -= g.getSpaceTaken();
         }

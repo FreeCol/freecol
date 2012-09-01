@@ -592,7 +592,7 @@ public final class InGameController implements NetworkConstants {
 
         // Then fill any remaining empty cargo slots.
         for (GoodsType type : goodsTypesToLoad) {
-            if (unit.getSpaceLeft() <= 0) break; // Full
+            if (!unit.hasSpaceLeft()) break; // Full
             int toLoad = GoodsContainer.CARGO_SIZE;
             int present, atStop;
             if (unit.isInEurope()) {
@@ -1636,7 +1636,7 @@ public final class InGameController implements NetworkConstants {
 
         // Size check, if there are spare holds they can be filled, but...
         int toBuy = GoodsContainer.CARGO_SIZE;
-        if (carrier.getSpaceLeft() <= 0) {
+        if (!carrier.hasSpaceLeft()) {
             // ...if there are no spare holds, we can only fill a hold
             // already partially filled with this type, otherwise fail.
             int partial = carrier.getGoodsContainer().getGoodsCount(type)
@@ -2207,14 +2207,11 @@ public final class InGameController implements NetworkConstants {
         if (freeColClient.getClientOptions()
             .getBoolean(ClientOptions.AUTOLOAD_EMIGRANTS)
             && unit.isInEurope()) {
-            int spaceLeft = unit.getSpaceLeft();
             for (Unit u : unit.getOwner().getEurope().getUnitList()) {
-                if (spaceLeft <= 0) break;
                 if (!u.isNaval()
                     && u.getState() == UnitState.SENTRY
-                    && u.getType().getSpaceTaken() <= spaceLeft) {
+                    && unit.canAdd(u)) {
                     boardShip(u, unit);
-                    spaceLeft -= u.getType().getSpaceTaken();
                 }
             }
         }
@@ -2603,7 +2600,7 @@ public final class InGameController implements NetworkConstants {
         Unit carrier = null;
         List<ChoiceItem<Unit>> choices = new ArrayList<ChoiceItem<Unit>>();
         for (Unit u : destinationTile.getUnitList()) {
-            if (u.getSpaceLeft() >= unit.getType().getSpaceTaken()) {
+            if (u.canAdd(unit)) {
                 String m = Messages.message(Messages.getLabel(u));
                 choices.add(new ChoiceItem<Unit>(m, u));
                 carrier = u; // Save a default
@@ -2740,11 +2737,11 @@ public final class InGameController implements NetworkConstants {
      */
     private void moveMove(Unit unit, Direction direction) {
         // If we are in a colony, or Europe, load sentries.
-        if (unit.canCarryUnits() && unit.getSpaceLeft() > 0
+        if (unit.canCarryUnits() && unit.hasSpaceLeft()
             && (unit.getColony() != null || unit.isInEurope())) {
             for (Unit sentry : unit.getLocation().getUnitList()) {
                 if (sentry.getState() == UnitState.SENTRY) {
-                    if (sentry.getSpaceTaken() <= unit.getSpaceLeft()) {
+                    if (unit.canAdd(sentry)) {
                         boardShip(sentry, unit);
                         logger.finest("Unit " + unit.toString()
                             + " loaded sentry " + sentry.toString());
@@ -3020,9 +3017,9 @@ public final class InGameController implements NetworkConstants {
             // The session tracks buy/sell/gift events and disables
             // them when one happens.  So only offer such options if
             // the session allows it and the carrier is in good shape.
-            boolean buy = results[0] && unit.getSpaceLeft() > 0;
-            boolean sel = results[1] && unit.getGoodsCount() > 0;
-            boolean gif = results[2] && unit.getGoodsCount() > 0;
+            boolean buy = results[0] && unit.hasSpaceLeft();
+            boolean sel = results[1] && unit.hasGoodsCargo();
+            boolean gif = results[2] && unit.hasGoodsCargo();
             if (!buy && !sel && !gif) break;
 
             switch (gui.showIndianSettlementTradeDialog(settlement,
@@ -3762,9 +3759,8 @@ public final class InGameController implements NetworkConstants {
                 }
             }
             // Goods left here must be dumped.
-            if (unit.getGoodsCount() > 0) {
-                List<Goods> goodsList
-                    = gui.showDumpCargoDialog(unit);
+            if (unit.hasGoodsCargo()) {
+                List<Goods> goodsList = gui.showDumpCargoDialog(unit);
                 if (goodsList != null) {
                     for (Goods goods : goodsList) {
                         unloadCargo(goods, true);

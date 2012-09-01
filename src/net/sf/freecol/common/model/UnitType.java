@@ -279,9 +279,9 @@ public final class UnitType extends BuildableType
     }
 
     /**
-     * Get the <code>SpaceTaken</code> value.
+     * Gets the number of cargo slots a unit of this type takes on a carrier.
      *
-     * @return an <code>int</code> value
+     * @return The number of cargo slots.
      */
     public int getSpaceTaken() {
         return Math.max(spaceTaken, space + 1);

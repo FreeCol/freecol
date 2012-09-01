@@ -241,6 +241,15 @@ public class AIUnit extends AIObject implements Transportable {
     }
 
     /**
+     * Is this AI unit carrying any cargo (units or goods).
+     *
+     * @return True if the unit has cargo aboard.
+     */
+    public boolean hasCargo() {
+        return (unit == null) ? false : unit.hasCargo();
+    }
+
+    /**
      * Checks if this unit has been assigned a mission.
      *
      * @return <code>true</code> if this unit has a mission.
@@ -393,9 +402,9 @@ public class AIUnit extends AIObject implements Transportable {
     // Transportable interface
 
     /**
-     * Gets the space taken by this AI unit.
+     * Gets the number of cargo slots taken by this AI unit.
      *
-     * @return The space taken.
+     * @return The number of cargo slots taken.
      */
     public int getSpaceTaken() {
         return (getUnit() == null) ? 0 : getUnit().getSpaceTaken();

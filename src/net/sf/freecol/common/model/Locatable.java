@@ -55,9 +55,10 @@ public interface Locatable {
     public Tile getTile();
 
     /**
-     * Gets the amount of space this <code>Locatable</code> take.
+     * Gets the number of cargo slots consumed when this <code>Locatable</code>
+     * if put onto a carrier.
      *
-     * @return The space it takes on a carrier.
+     * @return The number of cargo slots required.
      */
     public int getSpaceTaken();
 }

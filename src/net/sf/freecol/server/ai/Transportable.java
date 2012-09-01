@@ -86,9 +86,9 @@ public interface Transportable {
 
 
     /**
-     * Gets the space taken by this transportable.
+     * Gets the number of cargo slots taken by this transportable.
      *
-     * @return The space taken.
+     * @return The number of cargo slots taken.
      */
     public int getSpaceTaken();
 

@@ -94,7 +94,7 @@ public class BuyGoodsMessage extends DOMMessage {
             return DOMMessage.clientError(e.getMessage());
         }
         if (!carrier.canCarryGoods()) {
-            return DOMMessage.clientError("Not a carrier: " + carrierId);
+            return DOMMessage.clientError("Not a goods carrier: " + carrierId);
         } else if (!carrier.isInEurope()) {
             return DOMMessage.clientError("Not in Europe: " + carrierId);
         }

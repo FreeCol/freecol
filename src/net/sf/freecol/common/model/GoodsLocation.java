@@ -111,24 +111,7 @@ public abstract class GoodsLocation extends UnitLocation {
         return goodsContainer.getCompactGoods();
     }
 
-    /**
-     * Gets the reason why a given <code>Locatable</code> can not be
-     * added to this Location.
-     *
-     * @param locatable The <code>Locatable</code> to test.
-     * @return The reason why adding would fail.
-     */
-    public NoAddReason getNoAddReason(Locatable locatable) {
-        if (locatable instanceof Goods) {
-            // WARNING: Goods can always be added to settlements. Any
-            // excess Goods will be removed during end-of-turn
-            // processing. If Units should inherit from GoodsLocation,
-            // this needs to be changed.
-            return NoAddReason.NONE;
-        } else {
-            return super.getNoAddReason(locatable);
-        }
-    }
+    // Defaulting to UnitLocation.getNoAddReason().
 
     /**
      * Adds a <code>Locatable</code> to this Location.
@@ -287,6 +270,19 @@ public abstract class GoodsLocation extends UnitLocation {
      */
     public void dispose() {
         disposeList();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public NoAddReason getNoAddReason(Locatable locatable) {
+        Goods goods = (locatable instanceof Goods) ? (Goods)locatable : null;
+        if (goods != null) {
+            // TODO: does not account for packing
+            if (goods.getSpaceTaken() + getSpaceTaken() > getGoodsCapacity())
+                return NoAddReason.CAPACITY_EXCEEDED;
+        }
+        return super.getNoAddReason(locatable);
     }
 
     /**

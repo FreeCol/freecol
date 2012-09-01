@@ -192,9 +192,9 @@ public class AIGoods extends AIObject implements Transportable {
     // Transportable interface
 
     /**
-     * Gets the space taken by these AI goods.
+     * Gets the number of cargo slots taken by these AI goods.
      *
-     * @return The space taken.
+     * @return The number of cargo slots.
      */
     public int getSpaceTaken() {
         return (goods == null) ? 0 : goods.getSpaceTaken();

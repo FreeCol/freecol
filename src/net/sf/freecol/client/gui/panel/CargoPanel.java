@@ -173,18 +173,14 @@ public class CargoPanel extends FreeColPanel
      * Update the title of this CargoPanel.
      */
     private void updateTitle() {
-        // sanitation
-        if (border == null) {
-            return;
-        }
+        if (border == null) return;
 
         if (carrier == null) {
             border.setTitle(Messages.message("cargoOnCarrier"));
         } else {
-            int spaceLeft = carrier.getSpaceLeft();
             StringTemplate t = StringTemplate.template("cargoOnCarrierLong")
                 .addStringTemplate("%name%", Messages.getLabel(carrier))
-                .addAmount("%space%", spaceLeft);
+                .addAmount("%space%", carrier.getSpaceLeft());
             border.setTitle(Messages.message(t));
         }
     }

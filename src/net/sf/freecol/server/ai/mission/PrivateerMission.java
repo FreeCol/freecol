@@ -100,17 +100,6 @@ public class PrivateerMission extends Mission {
 
 
     /**
-     * Is the unit carrying any cargo (units or goods).
-     *
-     * @param aiUnit The <code>AIUnit</code> that might have plundered.
-     * @return True if the unit has goods aboard.
-     */
-    private static boolean hasCargo(AIUnit aiUnit) {
-        return aiUnit.getUnit().getGoodsCount() > 0
-            || aiUnit.getUnit().getUnitCount() > 0;
-    }
-
-    /**
      * Extract a valid target for this mission from a path.
      *
      * @param aiUnit A <code>AIUnit</code> to perform the mission.
@@ -125,7 +114,7 @@ public class PrivateerMission extends Mission {
         Settlement settlement = loc.getSettlement();
         Tile tile = loc.getTile();
         Unit other = (tile == null) ? null : tile.getDefendingUnit(unit);
-        return (hasCargo(aiUnit))
+        return (aiUnit.hasCargo())
             ? ((loc instanceof Europe) ? loc
                 : (settlement instanceof Colony) ? settlement
                 : null)
@@ -170,8 +159,8 @@ public class PrivateerMission extends Mission {
         Unit attacker = aiUnit.getUnit();
         int value = 1000;
         // Pirates want cargo
-        value += defender.getGoodsCount() * 200;
-        value += defender.getUnitCount() * 100;
+        value += defender.getGoodsSpaceTaken() * 200;
+        value += defender.getUnitSpaceTaken() * 100;
         // But they are wary of danger
         if (defender.isOffensiveUnit()) {
             value -= attacker.getGame().getCombatModel()
@@ -345,13 +334,13 @@ public class PrivateerMission extends Mission {
             ? reason
             : (aiUnit.getUnit().isInEurope())
             ? null
-            : (hasCargo(aiUnit) && loc instanceof Europe)
+            : (aiUnit.hasCargo() && loc instanceof Europe)
             ? invalidTargetReason(loc, aiUnit.getUnit().getOwner())
-            : (hasCargo(aiUnit) && loc instanceof Settlement)
+            : (aiUnit.hasCargo() && loc instanceof Settlement)
             ? invalidSettlementReason(aiUnit, (Settlement)loc)
-            : (!hasCargo(aiUnit) && loc == null)
+            : (!aiUnit.hasCargo() && loc == null)
             ? null
-            : (!hasCargo(aiUnit) && loc instanceof Unit)
+            : (!aiUnit.hasCargo() && loc instanceof Unit)
             ? invalidUnitReason(aiUnit, (Unit)loc)
             : Mission.TARGETINVALID;
     }
@@ -377,7 +366,7 @@ public class PrivateerMission extends Mission {
         if (unit.isAtSea()) return;
 
         Direction direction;
-        if (hasCargo(aiUnit)) { // Deliver the goods
+        if (aiUnit.hasCargo()) { // Deliver the goods
             if (isTargetReason(reason)
                 && (target = findTarget(aiUnit, 8, true)) == null) {
                 logger.finest(tag + " could not retarget: " + this);

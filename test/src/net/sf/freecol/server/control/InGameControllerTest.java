@@ -283,11 +283,11 @@ public class InGameControllerTest extends FreeColTestCase {
         Tile tile = map.getTile(1, 1);
         Unit privateer = new ServerUnit(game, tile, dutch, privateerType);
         assertEquals("Privateer should not carry anything",
-                     0, privateer.getGoodsCount());
+                     0, privateer.getGoodsSpaceTaken());
         Goods cotton = new Goods(game,privateer,cottonType,100);
         privateer.add(cotton);
         assertEquals("Privateer should carry cotton",
-                     1, privateer.getGoodsCount());
+                     1, privateer.getGoodsSpaceTaken());
         assertTrue("Cotton should be aboard privateer",
                    cotton.getLocation() == privateer);
 
@@ -295,7 +295,7 @@ public class InGameControllerTest extends FreeColTestCase {
         igc.moveGoods(cotton, null);
 
         assertEquals("Privateer should no longer carry cotton",
-                     0, privateer.getGoodsCount());
+                     0, privateer.getGoodsSpaceTaken());
         assertNull("Cotton should have no location",
                    cotton.getLocation());
     }
@@ -458,12 +458,12 @@ public class InGameControllerTest extends FreeColTestCase {
         tile3.setExploredBy(french, true);
         Unit galleon = new ServerUnit(game, tile1, dutch, galleonType);
         Unit privateer = new ServerUnit(game, tile2, french, privateerType);
-        assertEquals("Galleon should be empty",
-                     galleon.getGoodsCount(), 0);
+        assertEquals("Galleon should be empty", 0,
+                     galleon.getGoodsSpaceTaken());
         Goods cargo = new Goods(game,galleon,musketType,100);
         galleon.add(cargo);
-        assertEquals("Galleon should be loaded",
-                     galleon.getGoodsCount(), 1);
+        assertEquals("Galleon should be loaded", 1,
+                     galleon.getGoodsSpaceTaken());
         assertFalse("Galleon should not be repairing",
                     galleon.isUnderRepair());
         galleon.setDestination(tile3);
@@ -483,10 +483,10 @@ public class InGameControllerTest extends FreeColTestCase {
 
         assertTrue("Galleon should be in Europe repairing",
                    galleon.isUnderRepair());
-        assertEquals("Galleon should be empty",
-                     galleon.getGoodsCount(), 0);
-        assertTrue("Galleon should no longer have a destination",
-                   galleon.getDestination() == null);
+        assertEquals("Galleon should be empty", 0,
+                     galleon.getGoodsSpaceTaken());
+        assertNull("Galleon should no longer have a destination",
+                   galleon.getDestination());
     }
 
     public void testUnarmedAttack() {

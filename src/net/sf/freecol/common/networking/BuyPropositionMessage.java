@@ -120,7 +120,7 @@ public class BuyPropositionMessage extends DOMMessage {
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }
-        if (unit.getSpaceLeft() == 0) {
+        if (!unit.hasSpaceLeft()) {
             return DOMMessage.clientError("No space left on unit: "
                 + unit.getId());
         }

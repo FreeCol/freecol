@@ -49,14 +49,20 @@ public class TradeSession extends TransactionSession {
     private boolean canGift;
 
 
+    /**
+     * Creates a new <code>TradeSession</code>.
+     *
+     * @param unit The <code>Unit</code> that is trading.
+     * @param settlement The <code>Settlement</code> to trade with.
+     */
     public TradeSession(Unit unit, Settlement settlement) {
         super(makeSessionKey(TradeSession.class, unit, settlement));
         movesLeft = unit.getMovesLeft();
         actionTaken = false;
         boolean atWar = settlement.getOwner().atWarWith(unit.getOwner());
         canBuy = !atWar;
-        canSell = !atWar && unit.getSpaceTaken() > 0;
-        canGift = true;            
+        canSell = !atWar && unit.hasGoodsCargo();
+        canGift = unit.hasGoodsCargo();
     }
 
     public void complete(ChangeSet cs) {

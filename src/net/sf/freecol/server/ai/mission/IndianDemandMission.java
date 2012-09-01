@@ -75,8 +75,9 @@ public class IndianDemandMission extends Mission {
 
         this.target = target;
 
-        if (!getUnit().getOwner().isIndian() || !getUnit().canCarryGoods()) {
-            throw new IllegalArgumentException("Only an indian which can carry goods can be given the mission: IndianBringGiftMission");
+        Unit unit = getUnit();
+        if (!unit.getOwner().isIndian() || !unit.canCarryGoods()) {
+            throw new IllegalArgumentException("Unsuitable unit: " + unit);
         }
         uninitialized = false;
     }
@@ -115,7 +116,7 @@ public class IndianDemandMission extends Mission {
      * @return True if the unit is carrying goods.
      */
     private static boolean hasTribute(AIUnit aiUnit) {
-        return aiUnit.getUnit().getGoodsCount() > 0;
+        return aiUnit.getUnit().hasGoodsCargo();
     }
 
 
@@ -287,7 +288,7 @@ public class IndianDemandMission extends Mission {
             Goods goods = selectGoods(target);
             int gold = 0;
             int oldGoods = (goods == null) ? 0
-                : unit.getGoodsContainer().getGoodsCount(goods.getType());
+                : unit.getGoodsCount(goods.getType());
             if (goods == null) {
                 if (!enemy.checkGold(1)) {
                     completed = true;

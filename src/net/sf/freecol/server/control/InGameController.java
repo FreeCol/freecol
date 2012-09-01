@@ -1854,9 +1854,8 @@ public final class InGameController extends Controller {
             return DOMMessage.clientError("Naval unit " + unit.getId()
                 + " can not embark.");
         }
-        if (carrier.getSpaceLeft() < unit.getSpaceTaken()) {
-            return DOMMessage.clientError("No space available for unit "
-                + unit.getId() + " to embark.");
+        if (!carrier.canAdd(unit)) {
+            return DOMMessage.clientError("Can not carry " + unit.getId());
         }
 
         ChangeSet cs = new ChangeSet();
@@ -2465,7 +2464,7 @@ public final class InGameController extends Controller {
         if (!session.getBuy()) {
             return DOMMessage.clientError("Trying to buy in a session where buying is not allowed.");
         }
-        if (unit.getSpaceLeft() <= 0) {
+        if (!unit.hasSpaceLeft()) {
             return DOMMessage.clientError("Unit is full, unable to buy.");
         }
 
@@ -3210,7 +3209,7 @@ public final class InGameController extends Controller {
         if (session == null) {
             return DOMMessage.clientError("Bogus looting!");
         }
-        if (winner.getSpaceLeft() == 0) {
+        if (!winner.hasSpaceLeft()) {
             return DOMMessage.clientError("No space to loot to: "
                 + winner.getId());
         }

@@ -67,15 +67,15 @@ public class UnloadAction extends MapboardAction {
     /**
      * Checks if this action should be enabled.
      *
-     * @return <code>true</code> if there is a carrier active
+     * @return True if there is an active carrier with cargo to unload.
      */
     @Override
     protected boolean shouldBeEnabled() {
-        Unit carrier = getUnit();
+        final Unit carrier = getUnit();
         return super.shouldBeEnabled()
             && carrier != null
             && carrier.isCarrier()
-            && carrier.getGoodsCount() > 0;
+            && carrier.getCargoSpaceTaken() > 0;
     }
 
     /**

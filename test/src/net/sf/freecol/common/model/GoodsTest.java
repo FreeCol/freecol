@@ -201,11 +201,10 @@ public class GoodsTest extends FreeColTestCase {
 
     public void testGetTakeSpace() {
         Map map = getTestMap(plainsType, true);
-
-        Unit wagon = new ServerUnit(getGame(), map.getTile(9, 10), dutch(), wagonTrainType);
+        Unit wagon = new ServerUnit(getGame(), map.getTile(9, 10), dutch(),
+                                    wagonTrainType);
 
         Goods cotton = new Goods(getGame(), wagon, cottonType, 75);
-
         assertEquals(1, cotton.getSpaceTaken());
     }
 

@@ -475,13 +475,10 @@ public abstract class Mission extends AIObject {
      */
     protected boolean goodsLeavesTransport(GoodsType type, int amount) {
         final Unit carrier = getUnit();
-        if (carrier.getGoodsContainer().getGoodsCount(type) < amount) {
-            return false;
-        }
+        if (carrier.getGoodsCount(type) < amount) return false;
         final AIUnit aiUnit = getAIUnit();
         Colony colony = carrier.getColony();
-        GoodsContainer gc = carrier.getGoodsContainer();
-        int oldAmount = gc.getGoodsCount(type);
+        int oldAmount = carrier.getGoodsCount(type);
         Goods goods = new Goods(carrier.getGame(), carrier, type, amount);
         boolean result;
         if (carrier.isInEurope()) {
@@ -497,7 +494,7 @@ public abstract class Mission extends AIObject {
             result = AIMessage.askUnloadCargo(aiUnit, goods);
         }
         if (result) {
-            int newAmount = gc.getGoodsCount(type);
+            int newAmount = carrier.getGoodsCount(type);
             if (oldAmount - newAmount != amount) {
                 logger.warning(carrier + " at " + carrier.getLocation()
                     + " only unloaded " + (oldAmount - newAmount)
@@ -539,8 +536,7 @@ public abstract class Mission extends AIObject {
         final Goods goods = aiGoods.getGoods();
         GoodsType goodsType = goods.getType();
         int goodsAmount = goods.getAmount();
-        GoodsContainer gc = carrier.getGoodsContainer();
-        int oldAmount = gc.getGoodsCount(goodsType);
+        int oldAmount = carrier.getGoodsCount(goodsType);
         boolean result;
         if (carrier.isInEurope()) {
             result = AIMessage.askBuyGoods(aiUnit, goodsType, goodsAmount);
@@ -548,7 +544,7 @@ public abstract class Mission extends AIObject {
             result = AIMessage.askLoadCargo(aiUnit, goods);
         }
         if (result) {
-            int newAmount = gc.getGoodsCount(goodsType);
+            int newAmount = carrier.getGoodsCount(goodsType);
             if (newAmount - oldAmount != goodsAmount) {
                 logger.warning(carrier + " at " + carrier.getLocation()
                     + " only loaded " + (newAmount - oldAmount)

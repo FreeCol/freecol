@@ -521,16 +521,6 @@ public class TransportMission extends Mission {
     }
 
     /**
-     * Checks if there is cargo on board the mission unit.
-     *
-     * @return True if there is cargo present.
-     */
-    private boolean hasCargo() {
-        final Unit carrier = getUnit();
-        return (carrier.getGoodsCount() + carrier.getUnitCount()) > 0;
-    }
-
-    /**
      * Attack suitable enemy ships.
      *
      * @return True if this ship is still capable of its mission.
@@ -540,7 +530,7 @@ public class TransportMission extends Mission {
             return true;
         }
         final Unit carrier = getUnit();
-        if (hasCargo()) {
+        if (getAIUnit().hasCargo()) {
             // Do not search for a target if we have cargo onboard.
             return true;
         }
@@ -603,7 +593,7 @@ public class TransportMission extends Mission {
                     if (!canAttackPlayer(defender.getOwner())) {
                         return false;
                     }
-                    final int value = 1 + defender.getUnitCount() + defender.getGoodsCount();
+                    final int value = 1 + defender.getCargoSpaceTaken();
                     if (value > bestValue) {
                         bestTarget = pathNode;
                         bestValue = value;
@@ -625,7 +615,7 @@ public class TransportMission extends Mission {
      */
     public Destination getNextDestination() {
         final Unit carrier = getUnit();
-        if (transportables.isEmpty() && !hasCargo()) {
+        if (transportables.isEmpty() && !carrier.hasCargo()) {
             logger.finest(tag + " next destination = default: " + carrier);
             return getDefaultDestination();
         }
@@ -1216,7 +1206,7 @@ public class TransportMission extends Mission {
         boolean transportablesChanged = false;
         Iterator<Transportable> tli = transportables.iterator();
         while (tli.hasNext()) {
-            if (carrier.getSpaceLeft() == 0) break;
+            if (!carrier.hasSpaceLeft()) break;
             Transportable t = tli.next();
             if (isCarrying(t)) continue; // To deliver, ignore.
 
@@ -1430,7 +1420,7 @@ public class TransportMission extends Mission {
         for (int i = 0; i < transportables.size() && moreWork || i == 0; i++) {
             if (carrier.getMovesLeft() == 0) break;
 
-            if (canAttackEnemyShips() && !hasCargo() && !attackEnemyShips()) {
+            if (canAttackEnemyShips() && !carrier.hasCargo() && !attackEnemyShips()) {
                 logger.finest(tag + " aborted by failed attack: " + carrier);
                 return;
             }

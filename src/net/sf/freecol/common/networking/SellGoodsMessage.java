@@ -95,7 +95,7 @@ public class SellGoodsMessage extends DOMMessage {
             return DOMMessage.clientError(e.getMessage());
         }
         if (!carrier.canCarryGoods()) {
-            return DOMMessage.clientError("Not a carrier: " + carrierId);
+            return DOMMessage.clientError("Not a goods carrier: " + carrierId);
         } else if (!carrier.isInEurope()) {
             return DOMMessage.clientError("Not in Europe: " + carrierId);
         }
@@ -118,7 +118,7 @@ public class SellGoodsMessage extends DOMMessage {
             return DOMMessage.clientError("Amount must be positive: "
                                        + amountString);
         }
-        int present = carrier.getGoodsContainer().getGoodsCount(type);
+        int present = carrier.getGoodsCount(type);
         if (present < amount) {
             return DOMMessage.clientError("Attempt to sell "
                 + Integer.toString(amount) + " " + type.getId()

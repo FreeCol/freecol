@@ -697,8 +697,8 @@ public class Map extends FreeColGameObject implements Location {
         } else if (carrier != null && !carrier.canCarryUnits()) {
             throw new IllegalArgumentException("Non-carrier carrier: "
                 + carrier);
-        } else if (carrier != null && !carrier.canCarryUnit(unit)) {
-            throw new IllegalArgumentException("Carrier can not carry unit: "
+        } else if (carrier != null && !carrier.couldCarry(unit)) {
+            throw new IllegalArgumentException("Carrier could not carry unit: "
                 + carrier + "/" + unit);
         }
         Location entry;

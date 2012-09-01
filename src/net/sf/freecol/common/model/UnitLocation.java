@@ -324,7 +324,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      * @return The reason why adding would fail.
      */
     public NoAddReason getNoAddReason(Locatable locatable) {
-        Unit unit = (locatable instanceof Unit) ? (Unit) locatable : null;
+        Unit unit = (locatable instanceof Unit) ? (Unit)locatable : null;
         return (unit == null)
             ? NoAddReason.WRONG_TYPE
             : (units == null)

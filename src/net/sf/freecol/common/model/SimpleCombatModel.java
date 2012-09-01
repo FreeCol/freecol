@@ -199,14 +199,14 @@ public class SimpleCombatModel extends CombatModel {
      */
     private void addNavalOffensiveModifiers(Unit attacker,
                                             Set<Modifier> result) {
-        int goodsCount = attacker.getGoodsCount();
-        if (goodsCount > 0) {
+        int count = attacker.getGoodsSpaceTaken();
+        if (count > 0) {
             // Penalty for every unit of cargo.
             // TODO: shouldn't this be -cargo/capacity?
             // TODO: magic number to spec
             result.add(new Modifier(Modifier.OFFENCE,
                                     Specification.CARGO_PENALTY_SOURCE,
-                                    -12.5f * goodsCount,
+                                    -12.5f * count,
                                     Modifier.Type.PERCENTAGE));
         }
     }

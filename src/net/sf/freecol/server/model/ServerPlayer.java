@@ -317,7 +317,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             hasGoods = false;
         for (Unit unit : getUnits()) {
             if (unit.isCarrier()) {
-                if (unit.getGoodsCount() > 0) hasGoods = true;
+                if (unit.hasGoodsCargo()) hasGoods = true;
                 hasCarrier = true;
                 continue;
             }
@@ -795,15 +795,17 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param random a PRNG
      * @return a list of units left over
      */
-    public List<Unit> loadShips(List<Unit> landUnits, List<Unit> navalUnits, Random random) {
+    public List<Unit> loadShips(List<Unit> landUnits, List<Unit> navalUnits,
+                                Random random) {
         List<Unit> leftOver = new ArrayList<Unit>();
         Collections.shuffle(navalUnits, random);
         Collections.shuffle(landUnits, random);
         landUnit: for (Unit unit : landUnits) {
             for (Unit carrier : navalUnits) {
-                if (unit.getSpaceTaken() <= carrier.getSpaceLeft()) {
+                if (carrier.canAdd(unit)) {
                     unit.setLocation(carrier);
-                    logger.finest("Loading " + unit + " onto carrier " + carrier);
+                    logger.finest("Loading " + unit
+                        + " onto carrier " + carrier);
                     continue landUnit;
                 }
             }
@@ -3028,7 +3030,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      */
     private void csLootShip(Unit winner, Unit loser, ChangeSet cs) {
         ServerPlayer winnerPlayer = (ServerPlayer) winner.getOwner();
-        if (loser.getGoodsList().size() > 0 && winner.getSpaceLeft() > 0) {
+        if (loser.getGoodsList().size() > 0 && winner.hasSpaceLeft()) {
             List<Goods> capture = new ArrayList<Goods>(loser.getGoodsList());
             for (Goods g : capture) g.setLocation(null);
             LootSession session = new LootSession(winner, loser);
@@ -3189,7 +3191,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 - shipList.size());
             goods.setAmount(Math.min(goods.getAmount() / 2, 50));
             colony.removeGoods(goods);
-            if (attacker.getSpaceLeft() > 0) attacker.add(goods);
+            if (attacker.canAdd(goods)) attacker.add(goods);
             cs.addMessage(See.only(colonyPlayer),
                 new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                     "model.unit.goodsStolen", colony, goods)

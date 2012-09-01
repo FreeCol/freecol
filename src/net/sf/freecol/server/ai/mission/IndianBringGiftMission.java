@@ -83,8 +83,9 @@ public class IndianBringGiftMission extends Mission {
         this.target = target;
         this.completed = false;
 
-        if (!getUnit().getOwner().isIndian() || !getUnit().canCarryGoods()) {
-            throw new IllegalArgumentException("Only an indian which can carry goods can be given the mission: IndianBringGiftMission");
+        Unit unit = getUnit();
+        if (!unit.getOwner().isIndian() || !unit.canCarryGoods()) {
+            throw new IllegalArgumentException("Unsuitable unit: " + unit);
         }
         uninitialized = false;
     }
@@ -113,7 +114,7 @@ public class IndianBringGiftMission extends Mission {
      * @return True if the unit is carrying goods.
      */
     private boolean hasGift() {
-        return getUnit().getGoodsCount() > 0;
+        return getUnit().hasGoodsCargo();
     }
 
 

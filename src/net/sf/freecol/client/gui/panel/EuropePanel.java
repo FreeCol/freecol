@@ -482,7 +482,7 @@ public final class EuropePanel extends PortPanel {
                     && unit.isInEurope()
                     && !(destination instanceof Europe)
                     && docksPanel.getComponentCount() > 0
-                    && unit.getSpaceLeft() > 0) {
+                    && unit.hasSpaceLeft()) {
                     boolean leave = getGUI().showConfirmDialog(null,
                         StringTemplate.template("europe.leaveColonists")
                             .addStringTemplate("%newWorld%",

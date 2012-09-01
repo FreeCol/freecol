@@ -179,8 +179,9 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
         int newAmount = oldAmount + amount;
 
         if (newAmount < 0) {
-            throw new IllegalStateException("Operation would leave " + (newAmount) + " goods of type "
-                                            + type.getNameKey() + " in Location " + parent);
+            throw new IllegalStateException("Operation would leave "
+                + newAmount + " goods of type "
+                + type.getNameKey() + " in Location " + parent);
         } else if (newAmount == 0) {
             storedGoods.remove(type);
         } else {
@@ -290,41 +291,37 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     }
 
     /**
-     * Returns the amount of one type of Goods in this container.
-     * @param type The type of Goods being looked for in this container.
-     * @return The amount of this type of Goods in this container.
+     * Gets the amount of one type of goods in this container.
+     *
+     * @param type The <code>GoodsType</code> being looked for.
+     * @return The amount of this type of goods in this container.
      */
     public int getGoodsCount(GoodsType type) {
-        if (storedGoods.containsKey(type)) {
-            return storedGoods.get(type).intValue();
-        } else {
-            return 0;
-        }
+        return (storedGoods.containsKey(type)) 
+            ? storedGoods.get(type).intValue()
+            : 0;
     }
 
     /**
-     * Returns the amount of one type of Goods at the beginning of the turn.
-     * @param type The type of Goods being looked for in this container.
-     * @return The amount of this type of Goods in this container. at the beginning of the turn
+     * Gets the amount of one type of goods at the beginning of the turn.
+     *
+     * @param type The <code>GoodsType</code> being looked for.
+     * @return The amount of this type of goods in this container at
+     *     the beginning of the turn
      */
     public int getOldGoodsCount(GoodsType type) {
-        if (oldStoredGoods.containsKey(type)) {
-            return oldStoredGoods.get(type).intValue();
-        } else {
-            return 0;
-        }
+        return (oldStoredGoods.containsKey(type))
+            ? oldStoredGoods.get(type).intValue()
+            : 0;
     }
-
-    public Goods getGoods(GoodsType goodsType) {
-        return new Goods(getGame(), parent, goodsType, getGoodsCount(goodsType));
-    }
-
 
     /**
-     * Gets the number of goods-packages. A goods package contain between 1-CARGO_SIZE.
-     * @return The number of goods packages.
+     * Gets the amount of space that the goods in this container will consume.
+     * Each occupied cargo slot contains an amount in [1, CARGO_SIZE].
+     *
+     * @return The amount of space taken by this containers goods.
      */
-    public int getGoodsCount() {
+    public int getSpaceTaken() {
         int count = 0;
         for (Integer amount : storedGoods.values()) {
             if (amount % CARGO_SIZE == 0) {

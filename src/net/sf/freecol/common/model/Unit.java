@@ -405,34 +405,6 @@ public class Unit extends FreeColGameObject
     }
 
     /**
-     * Returns <code>true</code> if the Unit can carry other Units.
-     *
-     * @return a <code>boolean</code> value
-     */
-    public boolean canCarryUnits() {
-        return hasAbility(Ability.CARRY_UNITS);
-    }
-
-    /**
-     * Is this unit able to carry a specified one?
-     *
-     * @param u The potential cargo <code>Unit</code>.
-     * @return True if this unit can carry the cargo unit.
-     */
-    public boolean canCarryUnit(Unit u) {
-        return canCarryUnits() && getType().getSpace() >= u.getSpaceTaken();
-    }
-
-    /**
-     * Returns <code>true</code> if the Unit can carry Goods.
-     *
-     * @return a <code>boolean</code> value
-     */
-    public boolean canCarryGoods() {
-        return hasAbility(Ability.CARRY_GOODS);
-    }
-
-    /**
      * Returns a name for this unit, as a location.
      *
      * @return A name for this unit, as a location.
@@ -1759,10 +1731,8 @@ public class Unit extends FreeColGameObject
             if (defender == null || !getOwner().owns(defender)) {
                 return MoveType.MOVE_NO_ACCESS_EMBARK;
             }
-            for (Unit unit : target.getUnitList()) {
-                if (unit.getSpaceLeft() >= getSpaceTaken()) {
-                    return MoveType.EMBARK;
-                }
+            for (Unit u : target.getUnitList()) {
+                if (u.canAdd(this)) return MoveType.EMBARK;
             }
             return MoveType.MOVE_NO_ACCESS_FULL;
         }
@@ -1786,7 +1756,7 @@ public class Unit extends FreeColGameObject
             // Do not block for war, bringing gifts is allowed
             return (!allowContact(settlement))
                 ? MoveType.MOVE_NO_ACCESS_CONTACT
-                : (goodsContainer.getGoodsCount() > 0)
+                : (hasGoodsCargo())
                 ? MoveType.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS
                 : MoveType.MOVE_NO_ACCESS_GOODS;
         } else {
@@ -1907,18 +1877,6 @@ public class Unit extends FreeColGameObject
     }
 
     /**
-     * Gets the amount of space this <code>Unit</code> takes when put on a
-     * carrier.
-     *
-     * @return The space this <code>Unit</code> takes.
-     */
-    public int getSpaceTaken() {
-        int space = unitType.getSpaceTaken() + getGoodsCount();
-        for (Unit u : units) space += u.getSpaceTaken();
-        return space;
-    }
-
-    /**
      * Gets the line of sight of this <code>Unit</code>. That is the distance
      * this <code>Unit</code> can spot new tiles, enemy unit e.t.c.
      *
@@ -2027,50 +1985,204 @@ public class Unit extends FreeColGameObject
     }
 
     /**
+     * Can this unit carry other units?
+     *
+     * @return True if the unit can carry units.
+     */
+    public boolean canCarryUnits() {
+        return hasAbility(Ability.CARRY_UNITS);
+    }
+
+    /**
+     * Could this unit carry a specified one?
+     * This ignores the current load.
+     *
+     * @param u The potential cargo <code>Unit</code>.
+     * @return True if this unit can carry the cargo.
+     */
+    public boolean couldCarry(Unit u) {
+        return canCarryUnits()
+            && getCargoCapacity() >= u.getSpaceTaken();
+    }
+
+    /**
+     * Can this unit carry goods.
+     *
+     * @return True if the unit can carry goods.
+     */
+    public boolean canCarryGoods() {
+        return hasAbility(Ability.CARRY_GOODS);
+    }
+
+    /**
+     * Could this unit carry some specified goods?
+     * This ignores the current load.
+     *
+     * @param g The potential cargo <code>Goods</code>.
+     * @return True if this unit can carry the cargo.
+     */
+    public boolean couldCarry(Goods g) {
+        return canCarryGoods()
+            && getCargoCapacity() >= g.getSpaceTaken();
+    }
+
+    /**
+     * Gets the number of free cargo slots left on this unit.
+     *
+     * @return The number of free cargo slots on this unit.
+     */
+    public int getSpaceLeft() {
+        return getCargoCapacity() - getCargoSpaceTaken();
+    }
+
+    /**
+     * Is there free space left on this unit?
+     *
+     * @return True if there is free space.
+     */
+    public boolean hasSpaceLeft() {
+        return getSpaceLeft() > 0;
+    }
+
+    /**
+     * Gets the number of space this <code>Unit</code> takes when put on a
+     * carrier.
+     *
+     * We do not have to consider what this unit is carrying because
+     * carriers can not be put onto carriers.  Yet.
+     *
+     * @return The space this <code>Unit</code> takes.
+     */
+    public int getSpaceTaken() {
+        return unitType.getSpaceTaken();
+    }
+
+    /**
+     * Gets the total space this unit has to carry cargo.
+     *
+     * @return The total space.
+     */
+    public int getCargoCapacity() {
+        return unitType.getSpace();
+    }
+
+    /**
+     * Gets the space occupied by goods in this unit.
+     *
+     * @return The number cargo slots occupied by goods.
+     */
+    public int getGoodsSpaceTaken() {
+        return (canCarryGoods()) ? goodsContainer.getSpaceTaken() : 0;
+    }
+
+    /**
+     * Gets the space occupied by units in this unit.
+     *
+     * @return The number of cargo slots occupied by units.
+     */
+    public int getUnitSpaceTaken() {
+        int space = 0;
+        if (canCarryUnits()) {
+            for (Unit u : getUnitList()) space += u.getSpaceTaken();
+        }
+        return space;
+    }
+
+    /**
+     * Gets the space occupied by cargo in this unit (both goods and units).
+     *
+     * @return The number of occupied cargo slots.
+     */
+    public int getCargoSpaceTaken() {
+        return getGoodsSpaceTaken() + getUnitSpaceTaken();
+    }
+
+    /**
+     * Is this unit carrying any goods cargo?
+     *
+     * @return True if the unit is carrying any goods cargo.
+     */
+    public boolean hasGoodsCargo() {
+        return getGoodsSpaceTaken() > 0;
+    }
+
+    /**
+     * Is this unit carrying any cargo (goods or unit).
+     *
+     * @return True if the unit is carrying any cargo.
+     */
+    public boolean hasCargo() {
+        return getCargoSpaceTaken() > 0;
+    }
+
+    /**
+     * Gets the extra amount of a specified type of goods that could
+     * be loaded onto this unit.  Includes empty cargo slots and any
+     * spare space in a slot partially filled with the specified
+     * goods.
+     *
+     * @param The <code>GoodsType</code> to examine.
+     * @return The amount of goods that could be loaded onto this unit.
+     */
+    public int getLoadableAmount(GoodsType type) {
+        if (!canCarryGoods()) return 0;
+        int result = getSpaceLeft() * GoodsContainer.CARGO_SIZE;
+        int count = getGoodsCount(type) % GoodsContainer.CARGO_SIZE;
+        if (count != 0) result += GoodsContainer.CARGO_SIZE - count;
+        return result;
+    }
+
+    /**
+     * Checks whether or not the specified locatable may be added to this
+     * <code>Unit</code>. The locatable cannot be added is this
+     * <code>Unit</code> if it is not a carrier or if there is no room left.
+     *
+     * It is not an error to try to add something that is already present
+     * (add() above will return success in that case).
+     *
+     * @param locatable The <code>Locatable</code> to test the addabillity of.
+     * @return The result.
+     */
+    public boolean canAdd(Locatable locatable) {
+        if (locatable == this) {
+            return false;
+        } else if (locatable instanceof Unit) {
+            if (units.equals(Collections.emptyList())) {
+                units = new ArrayList<Unit>();
+            }
+            return canCarryUnits()
+                && !units.contains((Unit)locatable)
+                && getSpaceLeft() >= ((Unit)locatable).getSpaceTaken();
+        } else if (locatable instanceof Goods) {
+            return canCarryGoods()
+                && (getLoadableAmount(((Goods)locatable).getType())
+                    > ((Goods)locatable).getAmount());
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Adds a locatable to this <code>Unit</code>.
      *
      * @param locatable The <code>Locatable</code> to add to this
      *            <code>Unit</code>.
      */
     public boolean add(Locatable locatable) {
-        if (locatable instanceof Unit) {
-            if (!canCarryUnits()) {
-                throw new IllegalStateException("Can not carry units: "
-                                                + this.toString());
-            }
-            Unit unit = (Unit) locatable;
-            if (getSpaceLeft() < unit.getSpaceTaken()) {
-                throw new IllegalStateException("Not enough space for "
-                                                + unit.toString()
-                                                + " on " + this.toString());
-            }
-            if (units.contains(locatable)) {
-                logger.warning("Already on carrier: " + unit.toString());
-                return true;
-            }
-
-            if (units.equals(Collections.emptyList())) {
-                units = new ArrayList<Unit>();
-            }
+        if (!canAdd(locatable)) {
+            return false;
+        } else if (locatable instanceof Unit) {
+            Unit unit = (Unit)locatable;
             spendAllMoves();
             unit.setState(UnitState.SENTRY);
             return units.add(unit);
         } else if (locatable instanceof Goods) {
-            if (!canCarryGoods()) {
-                throw new IllegalStateException("Can not carry goods: "
-                                                + this.toString());
-            }
             Goods goods = (Goods) locatable;
-            if (getLoadableAmount(goods.getType()) < goods.getAmount()){
-                throw new IllegalStateException("Not enough space for "
-                                                + goods.toString()
-                                                + " on " + this.toString());
-            }
             spendAllMoves();
             return goodsContainer.addGoods(goods);
         } else {
             throw new IllegalStateException("Can not be added to unit: "
-                                            + ((FreeColGameObject) locatable).toString());
+                + ((FreeColGameObject) locatable).toString());
         }
     }
 
@@ -2084,13 +2196,18 @@ public class Unit extends FreeColGameObject
         if (locatable == null) {
             throw new IllegalArgumentException("Locatable must not be 'null'.");
         } else if (locatable instanceof Unit && canCarryUnits()) {
-            spendAllMoves();
-            return units.remove(locatable);
+            if (units.remove((Unit)locatable)) {
+                spendAllMoves();
+                return true;
+            }
         } else if (locatable instanceof Goods && canCarryGoods()) {
-            spendAllMoves();
-            return goodsContainer.removeGoods((Goods) locatable) != null;
+            if (goodsContainer.removeGoods((Goods)locatable) != null) {
+                spendAllMoves();
+                return true;
+            }
         } else {
-            logger.warning("Tried to remove a 'Locatable' from a non-carrier unit.");
+            logger.warning("Tried to remove from unit: "
+                + ((FreeColGameObject)locatable));
         }
         return false;
     }
@@ -2100,62 +2217,26 @@ public class Unit extends FreeColGameObject
      * <code>Locatable</code>.
      *
      * @param locatable The <code>Locatable</code> to test the presence of.
-     * @return
-     *            <ul>
-     *            <li><i>true</i> if the specified <code>Locatable</code> is
-     *            on this <code>Unit</code> and
-     *            <li><i>false</i> otherwise.
-     *            </ul>
+     * @return True if the locatable is on board this carrier.
      */
     public boolean contains(Locatable locatable) {
         if (locatable instanceof Unit && canCarryUnits()) {
-            return units.contains(locatable);
+            return units.contains((Unit)locatable);
         } else if (locatable instanceof Goods && canCarryGoods()) {
-            return goodsContainer.contains((Goods) locatable);
+            return goodsContainer.contains((Goods)locatable);
         } else {
             return false;
         }
     }
 
     /**
-     * Checks wether or not the specified locatable may be added to this
-     * <code>Unit</code>. The locatable cannot be added is this
-     * <code>Unit</code> if it is not a carrier or if there is no room left.
+     * Gets the amount of goods of a specified type aboard this unit.
      *
-     * @param locatable The <code>Locatable</code> to test the addabillity of.
-     * @return The result.
+     * @param type The <code>GoodsType</code> to query.
+     * @return The amount of goods.
      */
-    public boolean canAdd(Locatable locatable) {
-        if (locatable == this) {
-            return false;
-        } else if (locatable instanceof Unit && canCarryUnits()) {
-            return getSpaceLeft() >= locatable.getSpaceTaken();
-        } else if (locatable instanceof Goods) {
-            Goods g = (Goods) locatable;
-            return (getLoadableAmount(g.getType()) >= g.getAmount());
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Returns the amount of a GoodsType that could be loaded.
-     *
-     * @param type a <code>GoodsType</code> value
-     * @return an <code>int</code> value
-     */
-    public int getLoadableAmount(GoodsType type) {
-        if (canCarryGoods()) {
-            int result = getSpaceLeft() * GoodsContainer.CARGO_SIZE;
-            int count = getGoodsContainer().getGoodsCount(type)
-                % GoodsContainer.CARGO_SIZE;
-            if (count > 0 && count < GoodsContainer.CARGO_SIZE) {
-                result += GoodsContainer.CARGO_SIZE - count;
-            }
-            return result;
-        } else {
-            return 0;
-        }
+    public int getGoodsCount(GoodsType type) {
+        return getGoodsContainer().getGoodsCount(type);
     }
 
     /**
@@ -3057,41 +3138,17 @@ public class Unit extends FreeColGameObject
     }
 
     /**
-     * Returns the amount of space left on this Unit.
-     *
-     * @return The amount of units/goods than can be moved onto this Unit.
-     */
-    public int getSpaceLeft() {
-        int space = unitType.getSpace() - getGoodsCount();
-
-        Iterator<Unit> unitIterator = getUnitIterator();
-        while (unitIterator.hasNext()) {
-            Unit u = unitIterator.next();
-            space -= u.getSpaceTaken();
-        }
-
-        return space;
-    }
-
-    /**
      * Returns the amount of goods that is carried by this unit.
      *
-     * @return The amount of goods carried by this <code>Unit</code>. This
-     *         value might different from the one returned by
-     *         {@link #getGoodsCount()} when the model is
-     *         {@link Game#getViewOwner() owned by a client} and cargo hiding
-     *         has been enabled.
+     * @return The amount of goods carried by this <code>Unit</code>.
+     *     This value might different from the one returned by
+     *     {@link getGoodsSpaceTaken()} when the model is
+     *     {@link Game#getViewOwner()} owned by a client and cargo
+     *     hiding has been enabled.
      */
     public int getVisibleGoodsCount() {
-        if (visibleGoodsCount >= 0) {
-            return visibleGoodsCount;
-        } else {
-            return getGoodsCount();
-        }
-    }
-
-    public int getGoodsCount() {
-        return canCarryGoods() ? goodsContainer.getGoodsCount() : 0;
+        return (visibleGoodsCount >= 0) ? visibleGoodsCount
+            : getGoodsSpaceTaken();
     }
 
     /**
@@ -3802,7 +3859,8 @@ public class Unit extends FreeColGameObject
             }
         } else {
             if (getType().canCarryGoods()) {
-                out.writeAttribute("visibleGoodsCount", Integer.toString(getGoodsCount()));
+                out.writeAttribute("visibleGoodsCount",
+                    Integer.toString(getGoodsSpaceTaken()));
                 goodsContainer.toXML(out, player, showAll, toSavedGame);
             }
         }

@@ -1120,7 +1120,7 @@ public class Colony extends Settlement implements Nameable {
                  && getShipList().isEmpty()
                  && (getLootableGoodsList().isEmpty()
                      || !attacker.getType().canCarryGoods()
-                     || attacker.getSpaceLeft() == 0)
+                     || !attacker.hasSpaceLeft())
                  && !canBePlundered());
     }
 

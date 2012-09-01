@@ -2059,7 +2059,7 @@ public class Player extends FreeColGameObject implements Nameable {
         final Player player = unit.getOwner();
         List<Unit> units = new ArrayList<Unit>();
         for (Unit u : player.getUnits()) {
-            if (u.canCarryUnit(unit)) units.add(u);
+            if (u.couldCarry(unit)) units.add(u);
         }
         return units;
     }

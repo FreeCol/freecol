@@ -49,17 +49,15 @@ public class LoadAction extends MapboardAction {
     /**
      * Checks if this action should be enabled.
      * 
-     * @return <code>true</code> if there is a carrier active
+     * @return True if there is an active carrier with space to load to.
      */
     @Override
     protected boolean shouldBeEnabled() {
-        if (super.shouldBeEnabled()) {
-            Unit unit = gui.getActiveUnit();
-            return (unit != null && unit.isCarrier()
-                    && unit.getGoodsCount() > 0
-                    && unit.getColony() != null);
-        }
-        return false;
+        final Unit carrier = gui.getActiveUnit();
+        return super.shouldBeEnabled()
+            && carrier != null
+            && carrier.isCarrier()
+            && carrier.hasSpaceLeft();
     }    
     
     /**

@@ -207,9 +207,12 @@ public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
 
 
     /**
-    * Gets the amount of space this <code>Goods</code> take.
-    * @return The amount.
-    */
+     * Gets the number of cargo slots this <code>Goods</code> takes on
+     * a carrier.  Currently all goods take one slot.  However, they
+     * do stack together so this might be an overestimate.
+     *
+     * @return 1.
+     */
     public int getSpaceTaken() {
         return 1;
     }

@@ -1007,7 +1007,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         }
 
         // Return true if there is space left, and something to load.
-        return getSpaceLeft() > 0 && cargoSize > 0;
+        return hasSpaceLeft() && cargoSize > 0;
     }
 
 

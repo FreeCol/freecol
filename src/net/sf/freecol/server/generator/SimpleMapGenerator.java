@@ -817,7 +817,7 @@ public class SimpleMapGenerator implements MapGenerator {
                 }
                 passengers: for (Unit unit : passengers) {
                     for (Unit carrier : carriers) {
-                        if (carrier.getSpaceLeft() >= unit.getSpaceTaken()) {
+                        if (carrier.canAdd(unit)) {
                             unit.setLocation(carrier);
                             continue passengers;
                         }

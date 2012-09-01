@@ -126,7 +126,9 @@ public final class QuickActionMenu extends JPopupMenu {
                 if(!tempUnit.isCarrier()){
                     if(tempUnit.getColony() != null){
                         for (Unit unit : tempUnit.getColony().getTile().getUnitList()) {
-                            if (unit.isCarrier() && unit.canCarryUnits() && (unit.getSpaceLeft() > 0) && !(unit.getUnitList().contains(tempUnit))){
+                            if (unit.isCarrier() && unit.canCarryUnits()
+                                && unit.canAdd(tempUnit)
+                                && !(unit.getUnitList().contains(tempUnit))) {
                                 final Unit funit = unit;
                                 JMenuItem menuItem = new JMenuItem(Messages.message("Board " + Messages.message(unit.getLabel())));
                                 menuItem.addActionListener(new ActionListener() {
@@ -160,7 +162,7 @@ public final class QuickActionMenu extends JPopupMenu {
     private boolean addCarrierItems(final UnitLabel unitLabel) {
         final Unit tempUnit = unitLabel.getUnit();
 
-        if (tempUnit.getSpaceLeft() < tempUnit.getType().getSpace()) {
+        if (tempUnit.hasCargo()) {
             JMenuItem cargo = new JMenuItem(Messages.message("cargoOnCarrier"));
             this.add(cargo);
 
@@ -436,8 +438,8 @@ public final class QuickActionMenu extends JPopupMenu {
         if(tempUnit.getColony() != null){
             if(!tempUnit.isCarrier()){
                 for (Unit unit : tempUnit.getColony().getTile().getUnitList()){
-                    if (unit.isCarrier() && unit.canCarryUnits()){
-                        if(tempUnit.isOnCarrier()){
+                    if (unit.isCarrier() && unit.canCarryUnits()) {
+                        if (tempUnit.isOnCarrier()) {
                             menuItem = new JMenuItem(Messages.message("leaveTown"));
                             menuItem.addActionListener(new ActionListener() {
                                 public void actionPerformed(ActionEvent e){
