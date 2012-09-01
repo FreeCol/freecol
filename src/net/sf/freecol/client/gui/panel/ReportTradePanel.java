@@ -154,7 +154,7 @@ public final class ReportTradePanel extends ReportPanel {
             for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
                 deltaUnits.incrementCount(goodsType, colony.getNetProductionOf(goodsType));
             }
-            for (Goods goods : colony.getGoodsContainer().getCompactGoods()) {
+            for (Goods goods : colony.getCompactGoods()) {
                 totalUnits.incrementCount(goods.getType(), goods.getAmount());
             }
             JButton colonyButton = createColonyButton(colony, colonyIndex);

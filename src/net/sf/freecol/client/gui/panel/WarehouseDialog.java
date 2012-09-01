@@ -146,7 +146,7 @@ public final class WarehouseDialog extends FreeColDialog<Boolean> {
 
             // goods label
             Goods goods = new Goods(colony.getGame(), colony, goodsType,
-                                    colony.getGoodsContainer().getGoodsCount(goodsType));
+                                    colony.getGoodsCount(goodsType));
             GoodsLabel goodsLabel = new GoodsLabel(goods, getGUI());
             goodsLabel.setHorizontalAlignment(JLabel.LEADING);
             add(goodsLabel, "span 1 2");

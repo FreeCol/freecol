@@ -948,9 +948,8 @@ public class IndianSettlement extends Settlement {
      */
     public Goods getRandomGift(Random random) {
         List<Goods> goodsList = new ArrayList<Goods>();
-        GoodsContainer gc = getGoodsContainer();
         for (GoodsType type : getSpecification().getNewWorldGoodsTypeList()) {
-            int n = gc.getGoodsCount(type) - KEEP_RAW_MATERIAL;
+            int n = getGoodsCount(type) - KEEP_RAW_MATERIAL;
             if (n >= GIFT_THRESHOLD) {
                 n -= GIFT_MINIMUM;
                 Goods goods = new Goods(getGame(), this, type,

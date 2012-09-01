@@ -166,7 +166,7 @@ abstract public class Settlement extends GoodsLocation
     public boolean isCapital() {
         return getType().isCapital();
     }
-    
+
     /**
      * Sets the capital value.
      *
@@ -177,7 +177,7 @@ abstract public class Settlement extends GoodsLocation
             setType(owner.getNationType().getSettlementType(isCapital));
         }
     }
-    
+
     /**
      * Get this settlement's feature container.
      *

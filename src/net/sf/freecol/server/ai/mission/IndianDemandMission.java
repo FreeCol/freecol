@@ -345,18 +345,16 @@ public class IndianDemandMission extends Mission {
             .getValue() + 1;
         GoodsType food = getSpecification().getPrimaryFoodType();
         Goods goods = null;
-        GoodsContainer warehouse = target.getGoodsContainer();
         if (tension.compareTo(Tension.Level.CONTENT) <= 0 &&
-            warehouse.getGoodsCount(food) >= GoodsContainer.CARGO_SIZE) {
-            int amount = (warehouse.getGoodsCount(food) * dx) / 6;
+            target.getGoodsCount(food) >= GoodsContainer.CARGO_SIZE) {
+            int amount = (target.getGoodsCount(food) * dx) / 6;
             if (amount > 0) {
                 return new Goods(getGame(), target, food, capAmount(amount, dx));
             }
         } else if (tension.compareTo(Tension.Level.DISPLEASED) <= 0) {
             Market market = target.getOwner().getMarket();
             int value = 0;
-            List<Goods> warehouseGoods = warehouse.getCompactGoods();
-            for (Goods currentGoods : warehouseGoods) {
+            for (Goods currentGoods : target.getCompactGoods()) {
                 int goodsValue = market.getSalePrice(currentGoods);
                 if (currentGoods.getType().isFoodType() ||
                     currentGoods.getType().isMilitaryGoods()) {
@@ -374,7 +372,7 @@ public class IndianDemandMission extends Mission {
             // military goods
             for (GoodsType preferred : getSpecification().getGoodsTypeList()) {
                 if (preferred.isMilitaryGoods()) {
-                    int amount = warehouse.getGoodsCount(preferred);
+                    int amount = target.getGoodsCount(preferred);
                     if (amount > 0) {
                         return new Goods(getGame(), target, preferred, capAmount(amount, dx));
                     }
@@ -383,7 +381,7 @@ public class IndianDemandMission extends Mission {
             // storable building materials (what do the natives need tools for?)
             for (GoodsType preferred : getSpecification().getGoodsTypeList()) {
                 if (preferred.isBuildingMaterial() && preferred.isStorable()) {
-                    int amount = warehouse.getGoodsCount(preferred);
+                    int amount = target.getGoodsCount(preferred);
                     if (amount > 0) {
                         return new Goods(getGame(), target, preferred, capAmount(amount, dx));
                     }
@@ -392,7 +390,7 @@ public class IndianDemandMission extends Mission {
             // trade goods
             for (GoodsType preferred : getSpecification().getGoodsTypeList()) {
                 if (preferred.isTradeGoods()) {
-                    int amount = warehouse.getGoodsCount(preferred);
+                    int amount = target.getGoodsCount(preferred);
                     if (amount > 0) {
                         return new Goods(getGame(), target, preferred, capAmount(amount, dx));
                     }
@@ -401,7 +399,7 @@ public class IndianDemandMission extends Mission {
             // refined goods
             for (GoodsType preferred : getSpecification().getGoodsTypeList()) {
                 if (preferred.isRefined() && preferred.isStorable()) {
-                    int amount = warehouse.getGoodsCount(preferred);
+                    int amount = target.getGoodsCount(preferred);
                     if (amount > 0) {
                         return new Goods(getGame(), target, preferred, capAmount(amount, dx));
                     }
@@ -412,8 +410,7 @@ public class IndianDemandMission extends Mission {
         // haven't found what we want
         Market market = target.getOwner().getMarket();
         int value = 0;
-        List<Goods> warehouseGoods = warehouse.getCompactGoods();
-        for (Goods currentGoods : warehouseGoods) {
+        for (Goods currentGoods : target.getCompactGoods()) {
             int goodsValue = market.getSalePrice(currentGoods);
             if (goodsValue > value) {
                 value = goodsValue;

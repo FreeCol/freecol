@@ -77,6 +77,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Colony.ColonyChangeEvent;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
@@ -1311,21 +1312,25 @@ public final class ColonyPanel extends PortPanel
          * Update this WarehousePanel.
          */
         private void update() {
+            ClientOptions options = getClientOptions();
             final int threshold = (FreeColDebugger.isInDebugMode()) ? 1
-                : getClientOptions().getInteger(ClientOptions.MIN_NUMBER_FOR_DISPLAYING_GOODS);
+                : options.getInteger(ClientOptions.MIN_NUMBER_FOR_DISPLAYING_GOODS);
+            final Colony colony = getColony();
+            final Game game = colony.getGame();
+            final Specification spec = colony.getSpecification();
+
             removeAll();
-            GoodsContainer container = getColony().getGoodsContainer();
-            for (GoodsType goodsType : getColony().getSpecification().getGoodsTypeList()) {
-                if (goodsType.isStorable()) {
-                    Goods goods = container.getGoods(goodsType);
-                    if (goods.getAmount() >= threshold) {
-                        GoodsLabel goodsLabel = new GoodsLabel(goods, getGUI());
-                        if (colonyPanel.isEditable()) {
-                            goodsLabel.setTransferHandler(defaultTransferHandler);
-                            goodsLabel.addMouseListener(pressListener);
-                        }
-                        add(goodsLabel, false);
+            for (GoodsType goodsType : spec.getGoodsTypeList()) {
+                if (!goodsType.isStorable()) continue;
+                int count = colony.getGoodsCount(goodsType);
+                if (count >= threshold) {
+                    Goods goods = new Goods(game, colony, goodsType, count);
+                    GoodsLabel goodsLabel = new GoodsLabel(goods, getGUI());
+                    if (colonyPanel.isEditable()) {
+                        goodsLabel.setTransferHandler(defaultTransferHandler);
+                        goodsLabel.addMouseListener(pressListener);
                     }
+                    add(goodsLabel, false);
                 }
             }
             revalidate();

@@ -344,7 +344,7 @@ public class ServerColony extends Colony implements ServerModelObject {
         // yet again in csYearlyGoodsAdjust.
         if (hasAbility(Ability.EXPORT)) {
             boolean gold = false;
-            for (Goods goods : container.getCompactGoods()) {
+            for (Goods goods : getCompactGoods()) {
                 GoodsType type = goods.getType();
                 ExportData data = getExportData(type);
                 if (data.isExported()
@@ -371,7 +371,7 @@ public class ServerColony extends Colony implements ServerModelObject {
         // levels that will be exceeded next turn
         int limit = getWarehouseCapacity();
         int adjustment = limit / GoodsContainer.CARGO_SIZE;
-        for (Goods goods : container.getCompactGoods()) {
+        for (Goods goods : getCompactGoods()) {
             GoodsType type = goods.getType();
             if (!type.isStorable()) continue;
             ExportData exportData = getExportData(type);

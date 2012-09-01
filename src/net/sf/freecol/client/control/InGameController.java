@@ -563,7 +563,7 @@ public final class InGameController implements NetworkConstants {
                 if (unit.isInEurope()) {
                     present = atStop = Integer.MAX_VALUE;
                 } else {
-                    present = colony.getGoodsContainer().getGoodsCount(type);
+                    present = colony.getGoodsCount(type);
                     atStop = colony.getExportAmount(type);
                 }
                 if (atStop > 0) {
@@ -598,7 +598,7 @@ public final class InGameController implements NetworkConstants {
             if (unit.isInEurope()) {
                 present = atStop = Integer.MAX_VALUE;
             } else {
-                present = colony.getGoodsContainer().getGoodsCount(type);
+                present = colony.getGoodsCount(type);
                 atStop = colony.getExportAmount(type);
             }
             if (atStop > 0) {
@@ -881,13 +881,12 @@ public final class InGameController implements NetworkConstants {
             return buyGoods(goods.getType(), goods.getAmount(), carrier);
         }
         GoodsType type = goods.getType();
-        GoodsContainer container = carrier.getGoodsContainer();
-        int oldAmount = container.getGoodsCount(type);
+        int oldAmount = carrier.getGoodsContainer().getGoodsCount(type);
         UnitWas unitWas = new UnitWas(carrier);
         Colony colony = carrier.getColony();
         ColonyWas colonyWas = (colony == null) ? null : new ColonyWas(colony);
         if (askServer().loadCargo(goods, carrier)
-            && container.getGoodsCount(type) != oldAmount) {
+            && carrier.getGoodsContainer().getGoodsCount(type) != oldAmount) {
             if (colonyWas != null) colonyWas.fireChanges();
             unitWas.fireChanges();
             return true;
@@ -909,12 +908,11 @@ public final class InGameController implements NetworkConstants {
             && carrier.getOwner().canTrade(goods)) return sellGoods(goods);
 
         GoodsType type = goods.getType();
-        GoodsContainer container = carrier.getGoodsContainer();
-        int oldAmount = container.getGoodsCount(type);
+        int oldAmount = carrier.getGoodsContainer().getGoodsCount(type);
         ColonyWas colonyWas = (colony == null) ? null : new ColonyWas(colony);
         UnitWas unitWas = new UnitWas(carrier);
         if (askServer().unloadCargo(goods)
-            && container.getGoodsCount(type) != oldAmount) {
+            && carrier.getGoodsContainer().getGoodsCount(type) != oldAmount) {
             if (colonyWas != null) colonyWas.fireChanges();
             unitWas.fireChanges();
             return true;

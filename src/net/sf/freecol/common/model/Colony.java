@@ -489,7 +489,7 @@ public class Colony extends Settlement implements Nameable {
      * @return The amount of this type of goods available for export.
      */
     public int getExportAmount(GoodsType goodsType) {
-        int present = getGoodsContainer().getGoodsCount(goodsType);
+        int present = getGoodsCount(goodsType);
         int exportable = getExportData(goodsType).getExportLevel();
         return (present < exportable) ? 0 : present - exportable;
     }
@@ -501,7 +501,7 @@ public class Colony extends Settlement implements Nameable {
      * @return The amount of this type of goods that can be imported.
      */
     public int getImportAmount(GoodsType goodsType) {
-        int present = getGoodsContainer().getGoodsCount(goodsType);
+        int present = getGoodsCount(goodsType);
         if (goodsType.isFoodType()) return Integer.MAX_VALUE;
         int capacity = getWarehouseCapacity();
         return (present > capacity) ? 0 : capacity - present;
