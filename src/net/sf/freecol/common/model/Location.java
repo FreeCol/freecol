@@ -71,7 +71,8 @@ public interface Location {
     /**
      * Removes a <code>Locatable</code> from this Location.
      *
-     * @param locatable The <code>Locatable</code> to remove from this Location.
+     * @param locatable The <code>Locatable</code> to remove from this
+     *     Location.
      * @return True if the locatable was removed.
      */
     public boolean remove(Locatable locatable);

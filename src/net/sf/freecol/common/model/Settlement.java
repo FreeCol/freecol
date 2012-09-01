@@ -150,14 +150,6 @@ abstract public class Settlement extends GoodsLocation
     }
 
     /**
-     * Gets the name of this <code>Settlement</code> for a particular player.
-     *
-     * @param player A <code>Player</code> to return the name for.
-     * @return The name as a <code>String</code>.
-     */
-    abstract public String getNameFor(Player player);
-
-    /**
      * Sets the name of this <code>Settlement</code>.
      *
      * @param newName The new name.
@@ -167,11 +159,6 @@ abstract public class Settlement extends GoodsLocation
     }
 
     /**
-     * Gets an image key for this settlement.
-     */
-    abstract public String getImageKey();
-
-     /**
      * Returns <code>true</code> if this is the Nation's capital.
      *
      * @return <code>true</code> if this is the Nation's capital.
@@ -179,8 +166,8 @@ abstract public class Settlement extends GoodsLocation
     public boolean isCapital() {
         return getType().isCapital();
     }
-
-     /**
+    
+    /**
      * Sets the capital value.
      *
      * @param isCapital a <code>boolean</code> value
@@ -190,8 +177,7 @@ abstract public class Settlement extends GoodsLocation
             setType(owner.getNationType().getSettlementType(isCapital));
         }
     }
-
-
+    
     /**
      * Get this settlement's feature container.
      *
@@ -201,7 +187,6 @@ abstract public class Settlement extends GoodsLocation
     public FeatureContainer getFeatureContainer() {
         return featureContainer;
     }
-
 
     /**
      * Gets this colony's line of sight.
@@ -214,34 +199,6 @@ abstract public class Settlement extends GoodsLocation
                                   "model.modifier.lineOfSightBonus");
     }
 
-
-    /**
-     * Gets the <code>Unit</code> that is currently defending this
-     * <code>Settlement</code>.
-     *
-     * @param attacker The unit be attacking this <code>Settlement</code>.
-     * @return The <code>Unit</code> that has been chosen to defend
-     * this <code>Settlement</code>.
-     */
-    abstract public Unit getDefendingUnit(Unit attacker);
-
-    /**
-     * Gets a measure of the ratio between defence at this settlement,
-     * and the general settlement size.
-     *
-     * @return A ratio of defence power to settlement size.
-     */
-    abstract public float getDefenceRatio();
-
-    /**
-     * Gets the range of gold plunderable when this settlement is captured.
-     *
-     * @param attacker The <code>Unit</code> that takes the settlement.
-     * @return A <code>RandomRange</code> encapsulating the range of plunder
-     *     available.
-     */
-    abstract public RandomRange getPlunderRange(Unit attacker);
-
     /**
      * Gets an amount of plunder when this settlement is taken.
      *
@@ -253,26 +210,6 @@ abstract public class Settlement extends GoodsLocation
         RandomRange range = getPlunderRange(attacker);
         return (range == null) ? 0
             : range.getAmount("Plunder " + getName(), random, false);
-    }
-
-    /**
-     * Gets the <code>Tile</code> where this <code>Settlement</code>
-     * is located.
-     *
-     * @return The <code>Tile</code> where this
-     *     <code>Settlement</code> is located.
-     */
-    public Tile getTile() {
-        return tile;
-    }
-
-    /**
-     * Returns this Settlement.
-     *
-     * @return this Settlement
-     */
-    public Settlement getSettlement() {
-        return this;
     }
 
     /**
@@ -448,39 +385,6 @@ abstract public class Settlement extends GoodsLocation
     }
 
     /**
-     * Gets the current Sons of Liberty in this settlement.
-     */
-    public abstract int getSoL();
-
-    /**
-     * Returns the amount of money necessary to maintain all of the
-     * settlement's buildings.
-     *
-     * @return an <code>int</code> value
-     */
-    public abstract int getUpkeep();
-
-    /**
-     * Propagates a global change in tension down to a settlement.
-     * Only apply the change if the settlement is aware of the player
-     * causing alarm.
-     *
-     * @param player The <code>Player</code> towards whom the alarm is felt.
-     * @param addToAlarm The amount to add to the current alarm level.
-     * @return True if the settlement alarm level changes as a result
-     *     of this change.
-     */
-    public abstract boolean propagateAlarm(Player player, int addToAlarm);
-
-    /**
-     * Gets the total production of the given type of goods in this settlement.
-     *
-     * @param goodsType The type of goods to get the production for.
-     * @return The total production of the given type of goods.
-     */
-    public abstract int getTotalProductionOf(GoodsType goodsType);
-
-    /**
      * Returns the number of goods of a given type used by the settlement
      * each turn.
      *
@@ -511,7 +415,6 @@ abstract public class Settlement extends GoodsLocation
         }
         return result;
     }
-
 
     /**
      * Gives the food needed to keep all units alive in this Settlement.
@@ -575,6 +478,159 @@ abstract public class Settlement extends GoodsLocation
         }
         return true;
     }
+
+    /**
+     * Gets the storage capacity of this settlement.
+     *
+     * @return The storage capacity of this settlement.
+     * @see #getGoodsCapacity
+     */
+    public int getWarehouseCapacity() {
+        return getGoodsCapacity();
+    }
+
+
+    // Interface Location
+
+    // getId() inherited from FreeColGameObject
+    // canAdd, getUnitCount, getUnitList, getColony inherited from UnitLocation
+    // add, remove, contains inherited from GoodsLocation
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final Tile getTile() {
+        return tile;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final Settlement getSettlement() {
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public StringTemplate getLocationName() {
+        return StringTemplate.name(getName());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public StringTemplate getLocationNameFor(Player player) {
+        return StringTemplate.name(getNameFor(player));
+    }
+
+
+    // UnitLocation routines
+    // getUnitCapacity inherited default from UnitLocation
+
+    /**
+     * {@inheritDoc}
+     */
+    public NoAddReason getNoAddReason(Locatable locatable) {
+        if (locatable instanceof Unit) {
+            // Tighter ownership test now possible.
+            if (((Unit)locatable).getOwner() != getOwner()) {
+                return NoAddReason.OWNED_BY_ENEMY;
+            }
+        } else if (locatable instanceof Goods) {
+            // Goods can always be added to settlements.  Any
+            // excess Goods will be removed during end-of-turn
+            // processing.
+            return NoAddReason.NONE;
+        }
+        return super.getNoAddReason(locatable);
+    }
+  
+    // GoodsLocation routines
+    // No need to implement getGoodsCapacity here, yet.
+
+
+    // Settlement routines to be implemented by subclasses.
+
+    /**
+     * Gets the name of this <code>Settlement</code> for a particular player.
+     *
+     * @param player A <code>Player</code> to return the name for.
+     * @return The name as a <code>String</code>.
+     */
+    abstract public String getNameFor(Player player);
+
+    /**
+     * Gets an image key for this settlement.
+     */
+    abstract public String getImageKey();
+
+    /**
+     * Gets the <code>Unit</code> that is currently defending this
+     * <code>Settlement</code>.
+     *
+     * @param attacker The unit be attacking this <code>Settlement</code>.
+     * @return The <code>Unit</code> that has been chosen to defend
+     * this <code>Settlement</code>.
+     */
+    abstract public Unit getDefendingUnit(Unit attacker);
+
+    /**
+     * Gets a measure of the ratio between defence at this settlement,
+     * and the general settlement size.
+     *
+     * @return A ratio of defence power to settlement size.
+     */
+    abstract public float getDefenceRatio();
+
+    /**
+     * Gets the range of gold plunderable when this settlement is captured.
+     *
+     * @param attacker The <code>Unit</code> that takes the settlement.
+     * @return A <code>RandomRange</code> encapsulating the range of plunder
+     *     available.
+     */
+    abstract public RandomRange getPlunderRange(Unit attacker);
+
+    /**
+     * Gets the current Sons of Liberty in this settlement.
+     */
+    abstract public int getSoL();
+
+    /**
+     * Returns the amount of money necessary to maintain all of the
+     * settlement's buildings.
+     *
+     * @return an <code>int</code> value
+     */
+    abstract public int getUpkeep();
+
+    /**
+     * Propagates a global change in tension down to a settlement.
+     * Only apply the change if the settlement is aware of the player
+     * causing alarm.
+     *
+     * @param player The <code>Player</code> towards whom the alarm is felt.
+     * @param addToAlarm The amount to add to the current alarm level.
+     * @return True if the settlement alarm level changes as a result
+     *     of this change.
+     */
+    abstract public boolean propagateAlarm(Player player, int addToAlarm);
+
+    /**
+     * Gets the total production of the given type of goods in this settlement.
+     *
+     * @param goodsType The type of goods to get the production for.
+     * @return The total production of the given type of goods.
+     */
+    abstract public int getTotalProductionOf(GoodsType goodsType);
+
+
+    // Serialization
 
     /**
      * Write the attributes of this object to a stream.

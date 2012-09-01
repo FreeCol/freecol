@@ -312,34 +312,6 @@ public class Colony extends Settlement implements Nameable {
 
 
     /**
-     * Gets the name of this <code>Settlement</code> for a particular player.
-     *
-     * @param player A <code>Player</code> to return the name for.
-     * @return The name as a <code>String</code>.
-     */
-    public String getNameFor(Player player) {
-        // Europeans can always work out the colony name.
-        return getName();
-    }
-
-    /**
-     * Gets the image key for this colony.
-     *
-     * @return The image key.
-     */
-    public String getImageKey() {
-        if (isUndead()) return "undead";
-
-        int count = getDisplayUnitCount();
-        String key = (count <= 3) ? "small"
-            : (count <= 7) ? "medium"
-            : "large";
-        String stockade = getStockadeKey();
-        if (stockade != null) key += stockade;
-        return "model.settlement." + key + ".image";
-    }
-
-    /**
      * Is a building type able to be automatically built at no cost.
      * True when the player has a modifier that collapses the cost to zero.
      *
@@ -809,28 +781,6 @@ public class Colony extends Settlement implements Nameable {
     }
 
     /**
-     * Adds a <code>Locatable</code> to this Location.
-     *
-     * @param locatable The <code>Locatable</code> to add to this Location.
-     */
-    public boolean add(Locatable locatable) {
-        return (locatable instanceof Unit) ? addUnit((Unit) locatable, null)
-            : super.add(locatable);
-    }
-
-    /**
-     * Removes a <code>Locatable</code> from this Location.
-     *
-     * @param locatable The <code>Locatable</code> to remove from this Location.
-     * @return True if the remove succeeded.
-     */
-    public boolean remove(Locatable locatable) {
-        return (locatable instanceof Unit) ? removeUnit((Unit) locatable)
-            : super.remove(locatable);
-    }
-
-
-    /**
      * Gets a work location within this colony to put a unit in.
      *
      * @param unit The <code>Unit</code> to place.
@@ -982,29 +932,6 @@ public class Colony extends Settlement implements Nameable {
     }
 
     /**
-     * Returns the amount of money necessary to maintain all of the
-     * colony's buildings.
-     *
-     * @return an <code>int</code> value
-     */
-    public int getUpkeep() {
-        int upkeep = 0;
-        for (Building building : buildingMap.values()) {
-            upkeep += building.getType().getUpkeep();
-        }
-        return upkeep;
-    }
-
-    /**
-     * Gets the number of units inside this colony.
-     *
-     * @return The number of <code>Unit</code>s in this colony.
-     */
-    public int getUnitCount() {
-        return (unitCount >= 0) ? unitCount : getWorkLocationUnitCount();
-    }
-
-    /**
      * Gets the total number of units in the work locations.
      *
      * @return The number of <code>Unit</code>s in the work locations.
@@ -1036,38 +963,6 @@ public class Colony extends Settlement implements Nameable {
      */
     public void setDisplayUnitCount(int displayUnitCount) {
         this.displayUnitCount = displayUnitCount;
-    }
-
-    /**
-     * Gets a list of all units in working in this colony.
-     *
-     * @return A list of <code>Unit</code>s in this colony.
-     */
-    public List<Unit> getUnitList() {
-        ArrayList<Unit> units = new ArrayList<Unit>();
-        for (WorkLocation wl : getCurrentWorkLocations()) {
-            units.addAll(wl.getUnitList());
-        }
-        return units;
-    }
-
-
-    public Iterator<Unit> getUnitIterator() {
-        return getUnitList().iterator();
-    }
-
-    public boolean contains(Locatable locatable) {
-        throw new UnsupportedOperationException();
-    }
-
-    public boolean canAdd(Locatable locatable) {
-        if (locatable instanceof Unit && ((Unit) locatable).getOwner() == getOwner()) {
-            return true;
-        } else if (locatable instanceof Goods) {
-            return true;
-        } else {
-            return false;
-        }
     }
 
     /**
@@ -1173,50 +1068,6 @@ public class Colony extends Settlement implements Nameable {
         return student;
     }
 
-    /**
-     * Gets the <code>Unit</code> that is currently defending this
-     * <code>Colony</code>.
-     * <p>
-     * Note that this function will only return a unit working inside the colony.
-     * Typically, colonies are also defended by units outside the colony on the same tile.
-     * To consider units outside the colony as well, use (@see Tile#getDefendingUnit) instead.
-     * <p>
-     * Returns an arbitrary unarmed land unit unless Paul Revere is present
-     * as founding father, in which case the unit can be armed as well.
-     *
-     * @param attacker The unit that would be attacking this colony.
-     * @return The <code>Unit</code> that has been chosen to defend this
-     *         colony, or <code>null</code> if the colony belongs to another
-     *         player and client is not permitted to view contents.
-     * @see Tile#getDefendingUnit(Unit)
-     * @throws IllegalStateException if there are units in the colony
-     */
-    @Override
-    public Unit getDefendingUnit(Unit attacker) {
-        List<Unit> unitList = getUnitList();
-
-        if (unitCount >= 0 && unitList.isEmpty()) {
-            // There are units, but we don't see them
-            return null;
-        }
-
-        Unit defender = null;
-        float defencePower = -1.0f;
-        for (Unit nextUnit : unitList) {
-            float unitPower = getGame().getCombatModel()
-                .getDefencePower(attacker, nextUnit);
-            if (Unit.betterDefender(defender, defencePower,
-                    nextUnit, unitPower)) {
-                defender = nextUnit;
-                defencePower = unitPower;
-            }
-        }
-        if (defender == null) {
-            throw new IllegalStateException("Colony " + getName() + " contains no units!");
-        } else {
-            return defender;
-        }
-    }
 
     /**
      * Gets the best defender type available to this colony.
@@ -1253,16 +1104,6 @@ public class Colony extends Settlement implements Nameable {
         return defence;
     }
 
-    /**
-     * Gets a ratio of defence power to colony size.
-     * This is really arbitrary and needs tweaking.
-     * Useful as a weighting multiplier for mission comparison.
-     *
-     * @return A ratio of defensive power to colony size.
-     */
-    public float getDefenceRatio() {
-        return getTotalDefencePower() / (1 + getWorkLocationUnitCount());
-    }
 
     /**
      * Determines whether this colony is sufficiently unprotected and
@@ -1365,21 +1206,6 @@ public class Colony extends Settlement implements Nameable {
             if (goods.getType().isStorable()) goodsList.add(goods);
         }
         return goodsList;
-    }
-
-    /**
-     * Gets the plunder range for this colony.
-     *
-     * @param attacker An attacking <code>Unit</code>.
-     * @return The plunder range.
-     */
-    public RandomRange getPlunderRange(Unit attacker) {
-        if (canBePlundered()) {
-            int upper = (owner.getGold() * (getUnitCount() + 1))
-                / (owner.getColoniesPopulation() + 1);
-            if (upper > 0) return new RandomRange(100, 1, upper+1, 1);
-        }
-        return null;
     }
 
     /**
@@ -1557,15 +1383,6 @@ public class Colony extends Settlement implements Nameable {
     }
 
     /**
-     * Returns the current SoL membership of the colony.
-     *
-     * @return The current SoL membership of the colony.
-     */
-    public int getSoL() {
-        return sonsOfLiberty;
-    }
-
-    /**
      * Calculates the current SoL membership of the colony based on
      * the liberty value and colonists.
      */
@@ -1638,25 +1455,6 @@ public class Colony extends Settlement implements Nameable {
     }
 
     /**
-     * Returns the name of this location.
-     *
-     * @return The name of this location.
-     */
-    public StringTemplate getLocationName() {
-        return StringTemplate.name(getName());
-    }
-
-    /**
-     * Returns a suitable name for this colony for a particular player.
-     *
-     * @param player The <code>Player</code> to prepare the name for.
-     * @return The name of this colony.
-     */
-    public StringTemplate getLocationNameFor(Player player) {
-        return StringTemplate.name(getNameFor(player));
-    }
-
-    /**
      * Gets the combined production of all food types.
      *
      * @return an <code>int</code> value
@@ -1667,21 +1465,6 @@ public class Colony extends Settlement implements Nameable {
             result += getTotalProductionOf(foodType);
         }
         return result;
-    }
-
-    /**
-     * Gets the total production of the given type of goods.
-     *
-     * @param goodsType The type of goods to get the production for.
-     * @return The production of the given type of goods the current turn by all
-     *     of the <code>WorkLocation</code>s in the colony.
-     */
-    public int getTotalProductionOf(GoodsType goodsType) {
-        int amount = 0;
-        for (WorkLocation workLocation : getCurrentWorkLocations()) {
-            amount += workLocation.getTotalProductionOf(goodsType);
-        }
-        return amount;
     }
 
     /**
@@ -2347,34 +2130,6 @@ public class Colony extends Settlement implements Nameable {
         }
     }
 
-    /**
-     * Propagates a global change in tension down to a settlement.
-     * No-op for European colonies.
-     *
-     * @param player The <code>Player</code> towards whom the alarm is felt.
-     * @param addToAlarm The amount to add to the current alarm level.
-     * @return True if the settlement alarm level changes as a result
-     *     of this change.
-     */
-    public boolean propagateAlarm(Player player, int addToAlarm) {
-        return false;
-    }
-
-    /**
-     * Returns the capacity of this colony's warehouse. All goods
-     * above this limit, except Food, will be removed by the
-     * end-of-turn processing.
-     *
-     * This will return 0 unless additive modifiers are present.  This
-     * is intentional.
-     *
-     * @return The capacity of this <code>Colony</code>'s warehouse.
-     */
-    public int getGoodsCapacity() {
-        return (int) applyModifier(0f, "model.modifier.warehouseStorage",
-                                   null, getGame().getTurn());
-    }
-
     public Building getWarehouse() {
         // TODO: it should search for more than one building?
         for (Building building : buildingMap.values()) {
@@ -2383,15 +2138,6 @@ public class Colony extends Settlement implements Nameable {
             }
         }
         return null;
-    }
-
-    /**
-     * Returns just this Colony itself.
-     *
-     * @return this colony.
-     */
-    public Colony getColony() {
-        return this;
     }
 
     /**
@@ -2753,6 +2499,234 @@ public class Colony extends Settlement implements Nameable {
         }
         return bestExpert;
     }
+
+
+    // Interface Location
+
+    // getId() inherited from FreeColGameObject
+    // Overrides the unit list operations.
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean add(Locatable locatable) {
+        if (locatable instanceof Unit) {
+            return addUnit((Unit)locatable, null);
+        }
+        return super.add(locatable);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean remove(Locatable locatable) {
+        if (locatable instanceof Unit) {
+            return removeUnit((Unit)locatable);
+        }
+        return super.remove(locatable);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean contains(Locatable locatable) {
+        if (locatable instanceof Unit) {
+            throw new UnsupportedOperationException(); // FIXME!
+        }
+        return super.contains(locatable);
+    }
+
+    /**
+     * Gets the unit count.
+     * Must handle the unitCount override for foreign colonies.
+     *
+     * @return The visible unit count.
+     */
+    @Override
+    public int getUnitCount() {
+        return (unitCount >= 0) ? unitCount : getUnitList().size();
+    }
+
+    /**
+     * Gets a list of all units in working in this colony.
+     *
+     * Totally ignores the unit list provided by the underlying UnitLocation.
+     *
+     * @return A list of <code>Unit</code>s in this colony.
+     */
+    @Override
+    public List<Unit> getUnitList() {
+        ArrayList<Unit> units = new ArrayList<Unit>();
+        for (WorkLocation wl : getCurrentWorkLocations()) {
+            units.addAll(wl.getUnitList());
+        }
+        return units;
+    }
+
+    /**
+     * Returns just this Colony itself.
+     *
+     * @return This colony.
+     */
+    @Override
+    public final Colony getColony() {
+        return this;
+    }
+
+    // UnitLocation routines
+    // getUnitCapacity inherited from UnitLocation
+    // getNoAddReason inherited from Settlement
+
+    // GoodsLocation routines
+
+    /**
+     * Returns the capacity of this colony's warehouse. All goods
+     * above this limit, except Food, will be removed by the
+     * end-of-turn processing.
+     *
+     * This will return 0 unless additive modifiers are present.  This
+     * is intentional.
+     *
+     * @return The capacity of this <code>Colony</code>'s warehouse.
+     */
+    public int getGoodsCapacity() {
+        return (int) applyModifier(0f, "model.modifier.warehouseStorage",
+                                   null, getGame().getTurn());
+    }
+
+
+    // Settlement routines
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getNameFor(Player player) {
+        // Europeans can always work out the colony name.
+        return getName();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getImageKey() {
+        if (isUndead()) return "undead";
+
+        int count = getDisplayUnitCount();
+        String key = (count <= 3) ? "small"
+            : (count <= 7) ? "medium"
+            : "large";
+        String stockade = getStockadeKey();
+        if (stockade != null) key += stockade;
+        return "model.settlement." + key + ".image";
+    }
+
+    /**
+     * Gets the <code>Unit</code> that is currently defending this
+     * <code>Colony</code>.
+     *
+     * Note that this function will only return a unit working inside
+     * the colony.  Typically, colonies are also defended by units
+     * outside the colony on the same tile.  To consider units outside
+     * the colony as well, use
+     * @see Tile#getDefendingUnit
+     * instead.
+     * 
+     * Returns an arbitrary unarmed land unit unless Paul Revere
+     * is present as founding father, in which case the unit can be
+     * armed as well.
+     *
+     * @param attacker The unit that would be attacking this colony.
+     * @return The <code>Unit</code> that has been chosen to defend this
+     *         colony, or <code>null</code> if the colony belongs to another
+     *         player and client is not permitted to view contents.
+     * @see Tile#getDefendingUnit(Unit)
+     * @throws IllegalStateException if there are units in the colony
+     */
+    @Override
+    public Unit getDefendingUnit(Unit attacker) {
+        List<Unit> unitList = getUnitList();
+
+        if (unitCount >= 0 && unitList.isEmpty()) {
+            // There are units, but we don't see them
+            return null;
+        }
+
+        Unit defender = null;
+        float defencePower = -1.0f;
+        for (Unit nextUnit : unitList) {
+            float unitPower = getGame().getCombatModel()
+                .getDefencePower(attacker, nextUnit);
+            if (Unit.betterDefender(defender, defencePower,
+                    nextUnit, unitPower)) {
+                defender = nextUnit;
+                defencePower = unitPower;
+            }
+        }
+        if (defender == null) {
+            throw new IllegalStateException("Colony " + getName()
+                + " contains no units!");
+        }
+        return defender;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public float getDefenceRatio() {
+        return getTotalDefencePower() / (1 + getWorkLocationUnitCount());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public RandomRange getPlunderRange(Unit attacker) {
+        if (canBePlundered()) {
+            int upper = (owner.getGold() * (getUnitCount() + 1))
+                / (owner.getColoniesPopulation() + 1);
+            if (upper > 0) return new RandomRange(100, 1, upper+1, 1);
+        }
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int getSoL() {
+        return sonsOfLiberty;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int getUpkeep() {
+        int upkeep = 0;
+        for (Building building : buildingMap.values()) {
+            upkeep += building.getType().getUpkeep();
+        }
+        return upkeep;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean propagateAlarm(Player player, int addToAlarm) {
+        return false; // No-op for European colonies.
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int getTotalProductionOf(GoodsType goodsType) {
+        int amount = 0;
+        for (WorkLocation workLocation : getCurrentWorkLocations()) {
+            amount += workLocation.getTotalProductionOf(goodsType);
+        }
+        return amount;
+    }
+
 
     // Serialization
 

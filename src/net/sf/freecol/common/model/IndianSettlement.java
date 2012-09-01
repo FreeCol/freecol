@@ -215,46 +215,21 @@ public class IndianSettlement extends Settlement {
         super(game, id);
     }
 
-    /**
-     * Gets the name of this <code>Settlement</code> for a particular player.
-     *
-     * @param player A <code>Player</code> to return the name for.
-     * @return The name as a <code>String</code>.
-     */
-    public String getNameFor(Player player) {
-        return (hasContactedSettlement(player)) ? getName()
-            : "indianSettlement.nameUnknown";
-    }
 
     /**
-     * Gets the image key for this native settlement.
+     * Dispose of this native settlement.
      *
-     * @return The image key.
+     * @return A list of disposed objects.
      */
-    public String getImageKey() {
-        return getOwner().getNationID()
-            + (isCapital() ? ".capital" : ".settlement")
-            + ((getMissionary() == null) ? "" : ".mission")
-            + ".image";
+    @Override
+    public List<FreeColGameObject> disposeList() {
+        // Orphan the units whose home settlement this is.
+        while (ownedUnits.size() > 0) {
+            ownedUnits.remove(0).setIndianSettlement(null);
+        }
+        return super.disposeList();
     }
 
-    /**
-     * Returns a suitable (non-unique) name.
-     * @return The name of this settlement.
-     */
-    public StringTemplate getLocationName() {
-        return StringTemplate.name(getName());
-    }
-
-    /**
-     * Returns a suitable (non-unique) name for a particular player.
-     *
-     * @param player The <code>Player</code> to prepare the name for.
-     * @return The name of this settlement.
-     */
-    public StringTemplate getLocationNameFor(Player player) {
-        return StringTemplate.name(getNameFor(player));
-    }
 
     /**
      * Get the year of the last tribute.
@@ -372,23 +347,6 @@ public class IndianSettlement extends Settlement {
          }
          return false;
      }
-
-    /**
-     * Propagates a global change in tension down to a settlement.
-     * Only apply the change if the settlement is aware of the player
-     * causing alarm.
-     *
-     * @param player The <code>Player</code> towards whom the alarm is felt.
-     * @param addToAlarm The amount to add to the current alarm level.
-     * @return True if the alarm level changes as a result of this change.
-     */
-    public boolean propagateAlarm(Player player, int addToAlarm) {
-        if (hasContactedSettlement(player)) {
-            return changeAlarm(player, addToAlarm);
-        }
-        return false;
-    }
-
 
     /**
      * Returns true if a European player has spoken with the chief of
@@ -612,56 +570,6 @@ public class IndianSettlement extends Settlement {
     }
 
 
-    /**
-     * Gets the <code>Unit</code> that is currently defending this
-     * <code>IndianSettlement</code>.
-     *
-     * @param attacker The unit that would be attacking this
-     *     <code>IndianSettlement</code>.
-     * @return The <code>Unit</code> that has been chosen to defend
-     *     this <code>IndianSettlement</code>.
-     */
-    @Override
-    public Unit getDefendingUnit(Unit attacker) {
-        Unit defender = null;
-        float defencePower = -1.0f;
-        for (Unit nextUnit : getUnitList()) {
-            float unitPower = attacker.getGame().getCombatModel()
-                .getDefencePower(attacker, nextUnit);
-            if (Unit.betterDefender(defender, defencePower,
-                    nextUnit, unitPower)) {
-                defender = nextUnit;
-                defencePower = unitPower;
-            }
-        }
-        return defender;
-    }
-
-    /**
-     * Gets the ratio between defence power and settlement size.
-     *
-     * @return A measure of the defence at this settlement.
-     */
-    public float getDefenceRatio() {
-        return getUnitCount() * 2.0f / (getType().getMinimumSize()
-            + getType().getMaximumSize());
-    }
-
-    /**
-     * Gets the range of gold plunderable when this settlement is captured.
-     */
-    public RandomRange getPlunderRange(Unit attacker) {
-        return getType().getPlunderRange(attacker);
-    }
-
-    /**
-     * Gets the storage capacity of this settlement.
-     *
-     * @return The storage capacity of this settlement.
-     */
-    public int getGoodsCapacity() {
-        return getType().getWarehouseCapacity();
-    }
 
     /**
      * Gets the amount of gold this <code>IndianSettlment</code>
@@ -1033,10 +941,163 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
-     * Gets the total production of a specified goods type for this settlement.
+     * Gets a random goods gift from this settlement.
      *
-     * @param type The <code>GoodsType</code> to produce.
-     * @return The production potention for the goods type.
+     * @param random A pseudo random number source.
+     * @return A random goods gift, or null if none found.
+     */
+    public Goods getRandomGift(Random random) {
+        List<Goods> goodsList = new ArrayList<Goods>();
+        GoodsContainer gc = getGoodsContainer();
+        for (GoodsType type : getSpecification().getNewWorldGoodsTypeList()) {
+            int n = gc.getGoodsCount(type) - KEEP_RAW_MATERIAL;
+            if (n >= GIFT_THRESHOLD) {
+                n -= GIFT_MINIMUM;
+                Goods goods = new Goods(getGame(), this, type,
+                    Math.min(Utils.randomInt(logger, "Gift amount", random, n)
+                        + GIFT_MINIMUM, GIFT_MAXIMUM));
+                goodsList.add(goods);
+            }
+
+        }
+        return (goodsList.isEmpty()) ? null
+            : Utils.getRandomMember(logger, "Gift type", goodsList, random);
+    }
+
+    public boolean checkForNewMissionaryConvert() {
+
+        /* Increase convert progress and generate convert if needed. */
+        if (missionary != null && getGame().getViewOwner() == null) {
+            int increment = 8;
+
+            // Update increment if missionary is an expert.
+            if (missionary.hasAbility("model.ability.expertMissionary")) {
+                increment = 13;
+            }
+
+            // Increase increment if alarm level is high.
+            increment += 2 * getAlarm(missionary.getOwner()).getValue() / 100;
+            convertProgress += increment;
+
+            if (convertProgress >= 100 && getUnitCount() > 2) {
+                convertProgress = 0;
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    // Interface location
+
+    // getId() inherited from FreeColGameObject
+    // canAdd, getUnitCount, getUnitList inherited from UnitLocation
+    // add, remove, contains inherited from GoodsLocation
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final Colony getColony() {
+        return null; // A native settlement can never be a colony.
+    }
+
+    // UnitLocation routines
+    // getNoAddReason in Settlement is adequate
+
+    // GoodsLocation routines
+
+    /**
+     * {@inheritDoc}
+     */
+    public int getGoodsCapacity() {
+        return getType().getWarehouseCapacity();
+    }
+
+
+    // Settlement routines
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getNameFor(Player player) {
+        return (hasContactedSettlement(player)) ? getName()
+            : "indianSettlement.nameUnknown";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getImageKey() {
+        return getOwner().getNationID()
+            + (isCapital() ? ".capital" : ".settlement")
+            + ((getMissionary() == null) ? "" : ".mission")
+            + ".image";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Unit getDefendingUnit(Unit attacker) {
+        Unit defender = null;
+        float defencePower = -1.0f;
+        for (Unit nextUnit : getUnitList()) {
+            float unitPower = attacker.getGame().getCombatModel()
+                .getDefencePower(attacker, nextUnit);
+            if (Unit.betterDefender(defender, defencePower,
+                    nextUnit, unitPower)) {
+                defender = nextUnit;
+                defencePower = unitPower;
+            }
+        }
+        return defender;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public float getDefenceRatio() {
+        return getUnitCount() * 2.0f / (getType().getMinimumSize()
+            + getType().getMaximumSize());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public RandomRange getPlunderRange(Unit attacker) {
+        return getType().getPlunderRange(attacker);
+    }
+
+    /**
+     * Native settlements do not generate SoL.
+     *
+     * @return 0.
+     */
+    public int getSoL() {
+        return 0;
+    }
+
+    /**
+     * Native settlements do not require upkeep.
+     *
+     * @return 0
+     */
+    public int getUpkeep() {
+        return 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean propagateAlarm(Player player, int addToAlarm) {
+        if (hasContactedSettlement(player)) {
+            return changeAlarm(player, addToAlarm);
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
      */
     public int getTotalProductionOf(GoodsType type) {
         if (type.isRefined()) {
@@ -1070,85 +1131,8 @@ public class IndianSettlement extends Settlement {
         return potential;
     }
 
-    /**
-     * Gets a random goods gift from this settlement.
-     *
-     * @param random A pseudo random number source.
-     * @return A random goods gift, or null if none found.
-     */
-    public Goods getRandomGift(Random random) {
-        List<Goods> goodsList = new ArrayList<Goods>();
-        GoodsContainer gc = getGoodsContainer();
-        for (GoodsType type : getSpecification().getNewWorldGoodsTypeList()) {
-            int n = gc.getGoodsCount(type) - KEEP_RAW_MATERIAL;
-            if (n >= GIFT_THRESHOLD) {
-                n -= GIFT_MINIMUM;
-                Goods goods = new Goods(getGame(), this, type,
-                    Math.min(Utils.randomInt(logger, "Gift amount", random, n)
-                        + GIFT_MINIMUM, GIFT_MAXIMUM));
-                goodsList.add(goods);
-            }
 
-        }
-        return (goodsList.isEmpty()) ? null
-            : Utils.getRandomMember(logger, "Gift type", goodsList, random);
-    }
-
-    /**
-     * Native settlements do not generate SoL.
-     *
-     * @return 0.
-     */
-    public int getSoL() {
-        return 0;
-    }
-
-    /**
-     * Native settlements do not require upkeep.
-     *
-     * @return 0
-     */
-    public int getUpkeep() {
-        return 0;
-    }
-
-    public boolean checkForNewMissionaryConvert() {
-
-        /* Increase convert progress and generate convert if needed. */
-        if (missionary != null && getGame().getViewOwner() == null) {
-            int increment = 8;
-
-            // Update increment if missionary is an expert.
-            if (missionary.hasAbility("model.ability.expertMissionary")) {
-                increment = 13;
-            }
-
-            // Increase increment if alarm level is high.
-            increment += 2 * getAlarm(missionary.getOwner()).getValue() / 100;
-            convertProgress += increment;
-
-            if (convertProgress >= 100 && getUnitCount() > 2) {
-                convertProgress = 0;
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Dispose of this native settlement.
-     *
-     * @return A list of disposed objects.
-     */
-    @Override
-    public List<FreeColGameObject> disposeList() {
-        // Orphan the units whose home settlement this is.
-        while (ownedUnits.size() > 0) {
-            ownedUnits.remove(0).setIndianSettlement(null);
-        }
-        return super.disposeList();
-    }
-
+    // Serialization
 
     /**
      * This method writes an XML-representation of this object to
