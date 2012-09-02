@@ -472,7 +472,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         cs.addMessage(See.only(this),
             new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                 "indianSettlement.mission.denounced", settlement)
-            .addName("%settlement%", settlement.getNameFor(this)));
+            .addStringTemplate("%settlement%", settlement.getLocationNameFor(this)));
     }
 
     /**
@@ -3074,7 +3074,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             .addStringTemplate("%location%", attackerLocation)
             .addStringTemplate("%nation%", attackerPlayer.getNationName())
             .addStringTemplate("%unit%", attacker.getLabel())
-            .addName("%settlement%", settlement.getNameFor(attackerPlayer))
+            .addStringTemplate("%settlement%", settlement.getLocationNameFor(attackerPlayer))
             .addStringTemplate("%enemyNation%", defenderNation)
             .addStringTemplate("%enemyUnit%", defender.getLabel()));
         cs.addMessage(See.only(defenderPlayer),
@@ -3083,7 +3083,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             .addStringTemplate("%location%", defenderLocation)
             .addStringTemplate("%nation%", defenderNation)
             .addStringTemplate("%unit%", defender.getLabel())
-            .addName("%settlement%", settlement.getNameFor(defenderPlayer))
+            .addStringTemplate("%settlement%", settlement.getLocationNameFor(defenderPlayer))
             .addStringTemplate("%enemyNation%", attackerNation)
             .addStringTemplate("%enemyUnit%", attacker.getLabel()));
     }

@@ -2242,7 +2242,7 @@ public final class InGameController extends Controller {
                              "indianSettlement.mission.enemyDenounce",
                              enemy, settlement)
                 .addStringTemplate("%enemy%", serverPlayer.getNationName())
-                .addName("%settlement%", settlement.getNameFor(enemy))
+                .addStringTemplate("%settlement%", settlement.getLocationNameFor(enemy))
                 .addStringTemplate("%nation%", owner.getNationName()));
         cs.add(See.perhaps().always(serverPlayer),
                (FreeColGameObject) unit.getLocation());

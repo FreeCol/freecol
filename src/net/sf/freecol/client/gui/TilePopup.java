@@ -487,7 +487,7 @@ public final class TilePopup extends JPopupMenu {
      * @param colony The colony that will be represented on the popup.
      */
     private void addColony(final Colony colony) {
-        String name = colony.getNameFor(freeColClient.getMyPlayer());
+        StringTemplate name = colony.getLocationNameFor(freeColClient.getMyPlayer());
         JMenuItem menuItem = new JMenuItem(Messages.message(name));
         menuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
@@ -517,7 +517,7 @@ public final class TilePopup extends JPopupMenu {
      *     represented on the popup.
      */
     private void addIndianSettlement(final IndianSettlement settlement) {
-        String name = settlement.getNameFor(freeColClient.getMyPlayer());
+        StringTemplate name = settlement.getLocationNameFor(freeColClient.getMyPlayer());
         JMenuItem menuItem = new JMenuItem(Messages.message(name));
         menuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {

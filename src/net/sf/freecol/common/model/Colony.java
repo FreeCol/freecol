@@ -2603,14 +2603,6 @@ public class Colony extends Settlement implements Nameable {
     /**
      * {@inheritDoc}
      */
-    public String getNameFor(Player player) {
-        // Europeans can always work out the colony name.
-        return getName();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public String getImageKey() {
         if (isUndead()) return "undead";
 
@@ -2621,6 +2613,15 @@ public class Colony extends Settlement implements Nameable {
         String stockade = getStockadeKey();
         if (stockade != null) key += stockade;
         return "model.settlement." + key + ".image";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public StringTemplate getLocationNameFor(Player player) {
+        // Everyone can always work out a colony name.
+        return StringTemplate.name(getName());
     }
 
     /**

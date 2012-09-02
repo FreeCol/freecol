@@ -520,15 +520,6 @@ abstract public class Settlement extends GoodsLocation
         return StringTemplate.name(getName());
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public StringTemplate getLocationNameFor(Player player) {
-        return StringTemplate.name(getNameFor(player));
-    }
-
-
     // UnitLocation routines
     // getUnitCapacity inherited default from UnitLocation
 
@@ -555,14 +546,6 @@ abstract public class Settlement extends GoodsLocation
 
 
     // Settlement routines to be implemented by subclasses.
-
-    /**
-     * Gets the name of this <code>Settlement</code> for a particular player.
-     *
-     * @param player A <code>Player</code> to return the name for.
-     * @return The name as a <code>String</code>.
-     */
-    abstract public String getNameFor(Player player);
 
     /**
      * Gets an image key for this settlement.

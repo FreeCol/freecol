@@ -2142,7 +2142,7 @@ public final class MapViewer {
                                    + settlement.getName());
                     continue;
                 }
-                String name = Messages.message(settlement.getNameFor(clientPlayer));
+                String name = Messages.message(settlement.getLocationNameFor(clientPlayer));
                 if (name != null) {
                     Color backgroundColor = lib.getColor(settlement.getOwner());
                     Font font = ResourceManager.getFont("NormalFont", 18f);

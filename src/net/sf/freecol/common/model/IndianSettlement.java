@@ -997,6 +997,16 @@ public class IndianSettlement extends Settlement {
      * {@inheritDoc}
      */
     @Override
+    public StringTemplate getLocationNameFor(Player player) {
+        return (hasContactedSettlement(player))
+            ? StringTemplate.name(getName())
+            : StringTemplate.label("indianSettlement.nameUnknown");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public final Colony getColony() {
         return null; // A native settlement can never be a colony.
     }
@@ -1015,14 +1025,6 @@ public class IndianSettlement extends Settlement {
 
 
     // Settlement routines
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getNameFor(Player player) {
-        return (hasContactedSettlement(player)) ? getName()
-            : "indianSettlement.nameUnknown";
-    }
 
     /**
      * {@inheritDoc}
