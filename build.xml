@@ -141,13 +141,29 @@
       </copy>
     </target>
 
-    <target name="manifest" description="Creates the Manifest file.">
+    <target name="svnproperties" unless="svn.Revision"
+            description="Creates the svn properties file using svn">
       <exec executable="svn" failifexecutionfails="false"
             output="${basedir}/build/svn.properties">
         <arg value="info"/>
         <arg value="."/>
       </exec>
       <property prefix="svn" file="build/svn.properties"/>
+    </target>
+
+    <target name="gitproperties" unless="svn.Revision"
+            description="Creates the svn properties file using git">
+      <exec executable="git" failifexecutionfails="false"
+            output="${basedir}/build/svn.properties">
+        <arg value="svn"/>
+        <arg value="info"/>
+        <arg value="."/>
+      </exec>
+      <property prefix="svn" file="build/svn.properties"/>
+    </target>
+            
+    <target name="manifest" depends="svnproperties,gitproperties"
+            description="Creates the Manifest file.">
       <manifest file="${basedir}/src/MANIFEST.MF">
         <attribute name="Created-By" value="FreeCol Team"/>
         <attribute name="Main-Class" value="net.sf.freecol.FreeCol"/>
