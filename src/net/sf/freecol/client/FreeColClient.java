@@ -505,9 +505,8 @@ public final class FreeColClient {
             } else {
                 return;
             }
-            gui.removeInGameComponents();
         }
-
+        gui.removeInGameComponents();
         gui.showNewPanel(specification);
     }
 
