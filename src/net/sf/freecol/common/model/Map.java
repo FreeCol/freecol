@@ -1344,26 +1344,20 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * Searches for land within the given radius.
      *
-     * @param x
-     *            X-component of the position to search from.
-     * @param y
-     *            Y-component of the position to search from.
-     * @param distance
-     *            The radius that should be searched for land, given in number
-     *            of {@link Tile tiles}.
-     * @return <code>true</code> if there is {@link Tile#isLand land} within
-     *         the given radius and <code>false</code> otherwise.
+     * @param x X-component of the position to search from.
+     * @param y Y-component of the position to search from.
+     * @param distance The radius in tiles that should be searched for land.
+     * @return The first land tile found within the radius, or null if none
+     *     found.
      */
-    public boolean isLandWithinDistance(int x, int y, int distance) {
+    public Tile getLandWithinDistance(int x, int y, int distance) {
         Iterator<Position> i = getCircleIterator(new Position(x, y), true,
                 distance);
         while (i.hasNext()) {
-            if (getTile(i.next()).isLand()) {
-                return true;
-            }
+            Tile t = getTile(i.next());
+            if (t.isLand()) return t;
         }
-
-        return false;
+        return null;
     }
 
 

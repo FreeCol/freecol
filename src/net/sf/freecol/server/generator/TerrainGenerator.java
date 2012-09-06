@@ -1048,19 +1048,57 @@ public class TerrainGenerator {
             throw new RuntimeException("TileType highSeas must be defined.");
         }
 
+        Tile t, seaL = null, seaR = null;
+        int totalL = 0, totalR = 0, distanceL = -1, distanceR = -1;
         for (int y = 0; y < map.getHeight(); y++) {
             for (int x = 0; x < maxDistanceToEdge && x < map.getWidth()
-                     && !map.isLandWithinDistance(x,y, distToLandFromHighSeas)
-                     && map.isValid(x, y); x++) {
-                Tile t = map.getTile(x, y);
-                if (t.getType() == ocean) t.setType(highSeas);
+                     && map.isValid(x, y)
+                     && (t = map.getTile(x, y)).getType() == ocean; x++) {
+                Tile other = map.getLandWithinDistance(x, y,
+                                                       distToLandFromHighSeas);
+                if (other == null) {
+                    t.setType(highSeas);
+                    totalL++;
+                } else {
+                    int distance = t.getDistanceTo(other);
+                    if (distanceL < distance) {
+                        distanceL = distance;
+                        seaL = t;
+                    }
+                }
             }
             for (int x = 1; x <= maxDistanceToEdge && x <= map.getWidth()-1
-                     && !map.isLandWithinDistance(map.getWidth()-x, y,
-                         distToLandFromHighSeas)
-                     && map.isValid(map.getWidth()-x, y); x++) {
-                Tile t = map.getTile(map.getWidth()-x, y);
-                if (t.getType() == ocean) t.setType(highSeas);
+                     && map.isValid(map.getWidth()-x, y)
+                     && (t = map.getTile(map.getWidth()-x, y))
+                     .getType() == ocean; x++) {
+                Tile other = map.getLandWithinDistance(map.getWidth()-x, y,
+                                                       distToLandFromHighSeas);
+                if (other == null) {
+                    t.setType(highSeas);
+                    totalR++;
+                } else {
+                    int distance = t.getDistanceTo(other);
+                    if (distanceR < distance) {
+                        distanceR = distance;
+                        seaR = t;
+                    }
+                }
+            }
+        }
+        if (totalL <= 0) {
+            if (seaL != null) {
+                seaL.setType(highSeas);
+            } else {
+                logger.warning("No high seas on left side of the map."
+                    + "  This can cause failures on small test maps.");
+            }
+        }
+        if (totalR <= 0) {
+            if (seaR != null) {
+                seaR.setType(highSeas);
+            } else {
+                logger.warning("No high seas on right side of the map."
+                    + "  This can cause failures on small test maps.");
             }
         }
     }
