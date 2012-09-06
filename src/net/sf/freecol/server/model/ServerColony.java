@@ -164,6 +164,8 @@ public class ServerColony extends Colony implements ServerModelObject {
         logger.finest("ServerColony.csNewTurn, for " + toString());
         ServerPlayer owner = (ServerPlayer) getOwner();
         Specification spec = getSpecification();
+        BuildQueue<?>[] queues = new BuildQueue<?>[] { buildQueue,
+                 populationQueue };
 
         // The AI is prone to removing all units from a colony.
         // Clean up such cases, to avoid other players seeing the
@@ -209,8 +211,7 @@ public class ServerColony extends Colony implements ServerModelObject {
         // production changes.
         List<BuildQueue<? extends BuildableType>> built
             = new ArrayList<BuildQueue<? extends BuildableType>>();
-        for (BuildQueue<?> queue : new BuildQueue<?>[] { buildQueue,
-                                                         populationQueue }) {
+        for (BuildQueue<?> queue : queues) {
             ProductionInfo info = getProductionInfo(queue);
             if (info == null) continue;
             if (info.getConsumption().isEmpty()) {
@@ -318,7 +319,7 @@ public class ServerColony extends Colony implements ServerModelObject {
         // built item from its build queue.
         if (!built.isEmpty()) {
             for (BuildQueue<? extends BuildableType> queue : built) {
-                switch(queue.getCompletionAction()) {
+                switch (queue.getCompletionAction()) {
                 case SHUFFLE:
                     if (queue.size() > 1) {
                         Collections.shuffle(queue.getValues(), random);
@@ -442,29 +443,30 @@ public class ServerColony extends Colony implements ServerModelObject {
             }
         }
 
-        // If the build queue is empty, check that we are not
-        // producing any goods types useful for BuildableTypes, except
-        // if that type is the input to some other form of production.
-        // (Note: isBuildingMaterial is also true for goods used to
-        // produce EquipmentTypes, hence neededForBuildableType).
-        // Such production probably means we forgot to reset the build
+        // If a build queue is empty, check that we are not producing
+        // any goods types useful for BuildableTypes, except if that
+        // type is the input to some other form of production.  (Note:
+        // isBuildingMaterial is also true for goods used to produce
+        // EquipmentTypes, hence neededForBuildableType).  Such
+        // production probably means we forgot to reset the build
         // queue.  Thus, if hammers are being produced it is worth
         // warning about, but not if producing tools.
-        if (buildQueue.isEmpty()) {
-            for (GoodsType g : spec.getGoodsTypeList()) {
-                if (g.isBuildingMaterial()
-                    && !g.isRawMaterial()
-                    && getAdjustedNetProductionOf(g) > 0
-                    && neededForBuildableType(g)) {
-                    cs.addMessage(See.only((ServerPlayer) owner),
-                        new ModelMessage(ModelMessage.MessageType.BUILDING_COMPLETED,
-                                         "model.colony.notBuildingAnything",
-                                         this)
-                            .addName("%colony%", getName()));
-                    break;
+        for (BuildQueue<?> queue : queues) {
+            if (queue.isEmpty()) {
+                for (GoodsType g : spec.getGoodsTypeList()) {
+                    if (g.isBuildingMaterial()
+                        && !g.isRawMaterial()
+                        && getAdjustedNetProductionOf(g) > 0
+                        && neededForBuildableType(g)) {
+                        cs.addMessage(See.only((ServerPlayer) owner),
+                            new ModelMessage(ModelMessage.MessageType.BUILDING_COMPLETED,
+                                             "model.colony.notBuildingAnything",
+                                             this)
+                                .addName("%colony%", getName()));
+                        break;
+                    }
                 }
             }
-        } else {
         }
 
         // Update SoL.
@@ -609,6 +611,7 @@ public class ServerColony extends Colony implements ServerModelObject {
         Specification spec = getSpecification();
         ServerPlayer owner = (ServerPlayer) getOwner();
         BuildableType buildable;
+        boolean invalidate = false;
 
         while ((buildable = queue.getCurrentlyBuilding()) != null) {
             switch (getNoBuildReason(buildable)) {
@@ -628,6 +631,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                     }
                 }
                 return null;
+                
             case POPULATION_TOO_SMALL:
                 cs.addMessage(See.only(owner),
                     new ModelMessage(ModelMessage.MessageType.WARNING,
@@ -646,7 +650,9 @@ public class ServerColony extends Colony implements ServerModelObject {
                 break;
             }
             queue.remove(0);
+            invalidate = true;
         }
+        if (invalidate) invalidateCache();
         return null;
     }
 
