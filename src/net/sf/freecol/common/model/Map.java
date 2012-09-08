@@ -1079,6 +1079,20 @@ public class Map extends FreeColGameObject implements Location {
             openList.put(dst.getId(), path);
             openListQueue.offer(path);
         }
+
+        /**
+         * Debug helper.
+         */
+        public String toString() {
+            return "[candidate unit=" + unit.toString()
+                + " dst=" + ((FreeColGameObject)dst).toString()
+                + " movesLeft=" + movesLeft
+                + " turns=" + turns
+                + " onCarrier=" + onCarrier
+                + " decider=" + decider
+                + " cost=" + cost
+                + "]";
+        }
     };
 
     /**
@@ -1311,7 +1325,6 @@ public class Map extends FreeColGameObject implements Location {
                     currentOnCarrier,
                     ((costDecider != null) ? costDecider
                         : CostDeciders.defaultCostDeciderFor(currentUnit)));
-
                 move.resetPath();
                 if (move.canImprove(openList.get(europe.getId()))) {
                     move.improve(openList, openListQueue, f, null);

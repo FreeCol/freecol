@@ -78,7 +78,7 @@ public final class CostDeciders {
 
     /**
      * A <code>CostDecider</code> that uses server-side knowledge of where
-     * a player has explored to searches.
+     * a player has explored to limit searches.
      */
     private static class ServerBaseCostDecider extends BaseCostDecider {
         @Override
@@ -86,7 +86,9 @@ public final class CostDeciders {
                            Location newLocation, int movesLeft) {
             int cost = super.getCost(unit, oldLocation, newLocation, movesLeft);
             if (cost != ILLEGAL_MOVE && cost != Map.COST_INFINITY) {
-                if (!newLocation.getTile().isExploredBy(unit.getOwner())) {
+                if (newLocation instanceof Europe) {
+                    ; // ok
+                } else if (!newLocation.getTile().isExploredBy(unit.getOwner())) {
                     return ILLEGAL_MOVE;
                 }
             }

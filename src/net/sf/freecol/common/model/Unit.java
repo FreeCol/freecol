@@ -1313,16 +1313,16 @@ public class Unit extends FreeColGameObject
         PathNode ePath = null;
         int eTurns = -1;
         Europe europe = getOwner().getEurope();
-        if (canMoveToHighSeas()) {
+        if (getType().canMoveToHighSeas()) {
             if (isInEurope() || isAtSea()) return null;
             ePath = (europe == null) ? null : findPath(europe);
             eTurns = (ePath == null) ? -1 : ePath.getTotalTurns();
         }
         PathNode sPath = findOurNearestSettlement(false, INFINITY, true);
         int sTurns = (sPath == null) ? -1 : sPath.getTotalTurns();
-        return (sPath == null && ePath == null) ? null
-            : (ePath == null || sTurns <= eTurns) ? sPath
-            : ePath;
+        return (ePath == null) ? sPath
+            : (sPath == null) ? ePath
+            : (sTurns <= eTurns) ? sPath : ePath;
     }
 
     /**
