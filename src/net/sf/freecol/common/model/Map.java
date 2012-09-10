@@ -41,6 +41,7 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
+import net.sf.freecol.common.model.pathfinding.GoalDeciders;
 import net.sf.freecol.common.util.Utils;
 
 
@@ -616,55 +617,6 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Builds a simple goal decider to find a single target location.
-     *
-     * @param target The target <code>Location</code>.
-     * @return A simple <code>GoalDecider</code> that only succeeds for the
-     *     target location.
-     */
-    private GoalDecider getLocationGoalDecider(final Location target) {
-        return new GoalDecider() {
-            private PathNode best = null;
-
-            public PathNode getGoal() { return best; }
-            public boolean hasSubGoals() { return false; }
-            public boolean check(Unit u, PathNode path) {
-                if (path.getLocation() == target) {
-                    if (best == null || path.getCost() < best.getCost()) {
-                        best = path;
-                    }
-                    return true;
-                }
-                return false;
-            }
-        };
-    }
-
-    /**
-     * Builds a simple goal decider to find a path to the high seas.
-     *
-     * @return A simple <code>GoalDecider</code> that finds high seas tiles.
-     */
-    private GoalDecider getHighSeasGoalDecider() {
-        return new GoalDecider() {
-            private PathNode best = null;
-
-            public PathNode getGoal() { return best; }
-            public boolean hasSubGoals() { return false; }
-            public boolean check(Unit u, PathNode path) {
-                if (path.getTile() != null
-                    && path.getTile().isDirectlyHighSeasConnected()) {
-                    if (best == null || path.getCost() < best.getCost()) {
-                        best = path;
-                    }
-                    return true;
-                }
-                return false;
-            }
-        };
-    }
-
-    /**
      * Gets a search heuristic using the Manhatten distance to an end tile.
      *
      * @param endTile The <code>Tile</code> to aim for.
@@ -745,7 +697,8 @@ public class Map extends FreeColGameObject implements Location {
      *     if none found.
      */
     public Tile getBestEntryTile(Unit unit, Tile tile, Unit carrier) {
-        PathNode path = search(unit, tile, getHighSeasGoalDecider(),
+        PathNode path = search(unit, tile,
+                               GoalDeciders.getHighSeasGoalDecider(),
                                CostDeciders.avoidIllegal(), INFINITY, carrier);
         return (path == null) ? null : path.getLastNode().getTile();
     }
@@ -798,9 +751,9 @@ public class Map extends FreeColGameObject implements Location {
                 // Now search forward from there to get a path in the right
                 // order (the existing one might not be optimal if reversed!)
                 path = searchInternal(unit, tile,
-                                      getLocationGoalDecider(end.getTile()),
-                                      costDecider, INFINITY, carrier,
-                                      getManhattenHeuristic(end.getTile()));
+                    GoalDeciders.getLocationGoalDecider(end.getTile()),
+                    costDecider, INFINITY, carrier,
+                    getManhattenHeuristic(end.getTile()));
                 if (path == null) {
                     throw new IllegalStateException("SEARCH-FAIL: " + unit
                         + "/" + carrier + " from " + tile + " to " + end);
@@ -821,20 +774,14 @@ public class Map extends FreeColGameObject implements Location {
                 
                 // Search forwards to the high seas.
                 path = searchInternal(unit, entry.getTile(),
-                                      getHighSeasGoalDecider(),
-                                      costDecider, INFINITY, carrier, null);
-                if (path == null) return null;
-
-                // Add a final node for Europe and return the path.
-                PathNode seas = path.getLastNode();
-                seas.next = new PathNode(end, unit.getInitialMovesLeft(),
-                    seas.getTurns() + waterUnit.getSailTurns(),
-                    seas.isOnCarrier(), seas, null);
+                    GoalDeciders.getLocationGoalDecider(end),
+                    costDecider, INFINITY, carrier, null);
 
             } else { // entry and end are Tiles
                 final Tile startTile = entry.getTile();
                 final Tile endTile = end.getTile();
-                final GoalDecider gd = getLocationGoalDecider(endTile);
+                final GoalDecider gd
+                    = GoalDeciders.getLocationGoalDecider(end);
                 final SearchHeuristic sh = getManhattenHeuristic(endTile);
                 if (startTile.getContiguity() == endTile.getContiguity()) {
                     // If the unit potentially could get to the
@@ -1319,7 +1266,6 @@ public class Map extends FreeColGameObject implements Location {
                 && currentUnit != null
                 && currentUnit.getType().canMoveToHighSeas()
                 && currentTile.isDirectlyHighSeasConnected()) {
-
                 MoveCandidate move = new MoveCandidate(currentUnit,
                     currentNode, europe, currentMovesLeft, currentTurns,
                     currentOnCarrier,
@@ -1944,7 +1890,7 @@ public class Map extends FreeColGameObject implements Location {
      *
      * @param l1 The first <code>Location</code>.
      * @param l2 The second <code>Location</code>.
-     * @return True if this location is the same or at the same tile.
+     * @return True if the locations are the same or at the same tile.
      */
     public static final boolean isSameLocation(Location l1, Location l2) {
         return (l1 == null || l2 == null) ? false
@@ -1953,6 +1899,19 @@ public class Map extends FreeColGameObject implements Location {
             : l1.getTile() == l2.getTile();
     }
 
+    /**
+     * Are two locations at least in the same contiguous land/sea-mass?
+     *
+     * @param l1 The first <code>Location</code>.
+     * @param l2 The second <code>Location</code>.
+     * @return True if the locations are the same or in the same land/sea-mass.
+     */
+    public static final boolean isSameContiguity(Location l1, Location l2) {
+        return (l1 == null || l2 == null) ? false
+            : (l1 == l2) ? true
+            : (l1.getTile() == null || l2.getTile() == null) ? false
+            : l1.getTile().getContiguity() == l2.getTile().getContiguity();
+    }            
 
     // Location interface
 

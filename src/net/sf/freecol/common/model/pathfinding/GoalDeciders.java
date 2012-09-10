@@ -34,7 +34,6 @@ import net.sf.freecol.common.model.Unit;
  */
 public final class GoalDeciders {
 
-
     /**
      * A Goal Decider to find the `closest' settlement owned by the
      * searching unit player, with connected ports weighted double.
@@ -62,6 +61,27 @@ public final class GoalDeciders {
                 }
             };
 
+    /**
+     * A goal decider to find the closest high seas tile to a target.
+     * Used when arriving on the map from Europe.
+     */
+    private static GoalDecider highSeasGoalDecider
+        = new GoalDecider() {
+                private PathNode best = null;
+
+                public PathNode getGoal() { return best; }
+                public boolean hasSubGoals() { return false; }
+                public boolean check(Unit u, PathNode path) {
+                    if (path.getTile() != null
+                        && path.getTile().isDirectlyHighSeasConnected()) {
+                        if (best == null || path.getCost() < best.getCost()) {
+                            best = path;
+                        }
+                        return true;
+                    }
+                    return false;
+                }
+            };
 
     /**
      * Gets a composite goal decider composed of two or more individual
@@ -105,5 +125,37 @@ public final class GoalDeciders {
      */
     public static GoalDecider getOurClosestSettlementGoalDecider() {
         return ourClosestSettlementGoalDecider;
+    }
+
+    /**
+     * Get the high seas goal decider.
+     *
+     * @return The high seas goal decider.
+     */
+    public static GoalDecider getHighSeasGoalDecider() {
+        return highSeasGoalDecider;
+    }
+
+    /**
+     * Builds a simple goal decider to find a single target location.
+     *
+     * @param target The target <code>Location</code>.
+     * @return A <code>GoalDecider</code> that only succeeds for the
+     *     target location.
+     */
+    public static GoalDecider getLocationGoalDecider(final Location target) {
+        return new GoalDecider() {
+            private PathNode best = null;
+
+            public PathNode getGoal() { return best; }
+            public boolean hasSubGoals() { return false; }
+            public boolean check(Unit u, PathNode path) {
+                if (Map.isSameLocation(path.getLocation(), target)) {
+                    best = path;
+                    return true;
+                }
+                return false;
+            }
+        };
     }
 }
