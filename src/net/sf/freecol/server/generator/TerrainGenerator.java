@@ -1067,11 +1067,11 @@ public class TerrainGenerator {
                     }
                 }
             }
-            for (int x = 1; x <= maxDistanceToEdge && x <= map.getWidth()-1
-                     && map.isValid(map.getWidth()-x, y)
-                     && (t = map.getTile(map.getWidth()-x, y))
+            for (int x = 0; x < maxDistanceToEdge && x < map.getWidth()
+                     && map.isValid(map.getWidth()-1-x, y)
+                     && (t = map.getTile(map.getWidth()-1-x, y))
                      .getType() == ocean; x++) {
-                Tile other = map.getLandWithinDistance(map.getWidth()-x, y,
+                Tile other = map.getLandWithinDistance(map.getWidth()-1-x, y,
                                                        distToLandFromHighSeas);
                 if (other == null) {
                     t.setType(highSeas);
@@ -1085,21 +1085,21 @@ public class TerrainGenerator {
                 }
             }
         }
-        if (totalL <= 0) {
-            if (seaL != null) {
-                seaL.setType(highSeas);
-            } else {
-                logger.warning("No high seas on left side of the map."
-                    + "  This can cause failures on small test maps.");
-            }
+        if (totalL <= 0 && seaL != null) {
+            seaL.setType(highSeas);
+            totalL++;
         }
-        if (totalR <= 0) {
-            if (seaR != null) {
-                seaR.setType(highSeas);
-            } else {
-                logger.warning("No high seas on right side of the map."
-                    + "  This can cause failures on small test maps.");
-            }
+        if (totalR <= 0 && seaR != null) {
+            seaR.setType(highSeas);
+            totalR++;
+        }
+        if (totalL <= 0 || totalR <= 0) {
+            logger.warning("No high seas on "
+                + ((totalL <= 0 && totalR <= 0) ? "either"
+                    : (totalL <= 0) ? "left"
+                    : (totalR <= 0) ? "right"
+                    : "BOGUS") + " side of the map."
+                + "  This can cause failures on small test maps.");
         }
     }
 
