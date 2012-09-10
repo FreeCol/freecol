@@ -20,11 +20,15 @@
 package net.sf.freecol.common.debug;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
+
 import java.util.logging.LogRecord;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.server.FreeColServer;
+
 
 /**
  * High-level debug handling.
@@ -214,5 +218,19 @@ public class FreeColDebugger {
      */
     public static void handleCrash(LogRecord record) {
         if (debugRunSave != null) signalEndDebugRun();
+    }
+
+
+    /**
+     * Emergency run time log to use when the normal logging is failing.
+     * It might as well be here.
+     *
+     * @param msg The message to log.
+     */
+    public static void debugLog(String msg) {
+        try {
+            new PrintStream(new FileOutputStream("/tmp/freecol.debug", true), 
+                            true).println(msg);
+        } catch (Exception e) {}
     }
 }
