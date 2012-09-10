@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.GUI;
 
 /**
@@ -31,6 +32,7 @@ import net.sf.freecol.client.gui.GUI;
 public class WaitAction extends UnitAction {
 
     public static final String id = "waitAction";
+    private final InGameController inGameController;
 
 
     /**
@@ -39,8 +41,9 @@ public class WaitAction extends UnitAction {
      * @param freeColClient The main controller object for the client.
      * @param gui 
      */
-    WaitAction(FreeColClient freeColClient, GUI gui) {
+    WaitAction(FreeColClient freeColClient, InGameController inGameController, GUI gui) {
         super(freeColClient, gui, id);
+        this.inGameController = inGameController;
         addImageIcons("wait");
     }
 
@@ -50,6 +53,6 @@ public class WaitAction extends UnitAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        getFreeColClient().getInGameController().waitActiveUnit();
+        inGameController.waitActiveUnit();
     }
 }

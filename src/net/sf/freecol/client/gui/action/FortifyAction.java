@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Unit;
 
@@ -32,6 +33,7 @@ import net.sf.freecol.common.model.Unit;
 public class FortifyAction extends UnitAction {
 
     public static final String id = "fortifyAction";
+    private final InGameController inGameController;
 
 
     /**
@@ -40,8 +42,9 @@ public class FortifyAction extends UnitAction {
      * @param freeColClient The main controller object for the client.
      * @param gui 
      */
-    FortifyAction(FreeColClient freeColClient, GUI gui) {
+    FortifyAction(FreeColClient freeColClient, InGameController inGameController, GUI gui) {
         super(freeColClient, gui, id);
+        this.inGameController = inGameController;
         addImageIcons("fortify");
     }
 
@@ -63,8 +66,7 @@ public class FortifyAction extends UnitAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        getFreeColClient().getInGameController()
-            .changeState(gui.getActiveUnit(),
+        inGameController.changeState(gui.getActiveUnit(),
                 Unit.UnitState.FORTIFYING);
     }
 }

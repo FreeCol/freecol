@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.GUI;
 
 
@@ -31,6 +32,7 @@ import net.sf.freecol.client.gui.GUI;
 public class ExecuteGotoOrdersAction extends MapboardAction {
 
     public static final String id = "executeGotoOrdersAction";
+    private final InGameController inGameController;
 
 
     /**
@@ -39,8 +41,9 @@ public class ExecuteGotoOrdersAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      * @param gui 
      */
-    ExecuteGotoOrdersAction(FreeColClient freeColClient, GUI gui) {
+    ExecuteGotoOrdersAction(FreeColClient freeColClient, InGameController inGameController, GUI gui) {
         super(freeColClient, gui, id);
+        this.inGameController = inGameController;
     }
 
     /**
@@ -49,6 +52,6 @@ public class ExecuteGotoOrdersAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        getFreeColClient().getInGameController().executeGotoOrders();
+        inGameController.executeGotoOrders();
     }
 }

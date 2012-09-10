@@ -474,7 +474,7 @@ public final class TilePopup extends JPopupMenu {
 
         if (hasGoods) {
             JMenuItem dumpItem = new JMenuItem(Messages.message("dumpCargo"));
-            dumpItem.setAction(new UnloadAction(freeColClient, gui, unit));
+            dumpItem.setAction(new UnloadAction(freeColClient, freeColClient.getInGameController(), gui, unit));
             menu.add(dumpItem);
             lineCount++;
         }

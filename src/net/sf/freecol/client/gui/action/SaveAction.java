@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.GUI;
 
 /**
@@ -31,6 +32,7 @@ import net.sf.freecol.client.gui.GUI;
 public class SaveAction extends FreeColAction {
 
     public static final String id = "saveAction";
+    private final InGameController inGameController;
 
 
     /**
@@ -39,8 +41,9 @@ public class SaveAction extends FreeColAction {
      * @param freeColClient The main controller object for the client.
      * @param gui 
      */
-    SaveAction(FreeColClient freeColClient, GUI gui) {
+    SaveAction(FreeColClient freeColClient, InGameController inGameController, GUI gui) {
         super(freeColClient, gui, id);
+        this.inGameController = inGameController;
     }
 
     /**
@@ -68,7 +71,7 @@ public class SaveAction extends FreeColAction {
      */
     public void actionPerformed(ActionEvent e) {
         if (!freeColClient.isMapEditor()) {
-            freeColClient.getInGameController().saveGame();
+            inGameController.saveGame();
         } else {
             freeColClient.getMapEditorController().saveGame();
         }

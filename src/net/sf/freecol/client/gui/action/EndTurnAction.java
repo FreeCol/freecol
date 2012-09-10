@@ -25,6 +25,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.GUI;
 
 /**
@@ -35,6 +36,7 @@ import net.sf.freecol.client.gui.GUI;
 public class EndTurnAction extends MapboardAction {
 
     public static final String id = "endTurnAction";
+    private final InGameController inGameController;
 
 
     /**
@@ -43,8 +45,9 @@ public class EndTurnAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      * @param gui 
      */
-    EndTurnAction(FreeColClient freeColClient, GUI gui) {
+    EndTurnAction(FreeColClient freeColClient, InGameController inGameController, GUI gui) {
         super(freeColClient, gui, id);
+        this.inGameController = inGameController;
         setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
     }
 
@@ -54,6 +57,6 @@ public class EndTurnAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        getFreeColClient().getInGameController().endTurn();
+        inGameController.endTurn();
     }
 }

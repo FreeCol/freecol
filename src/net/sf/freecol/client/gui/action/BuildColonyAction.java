@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Unit;
 
@@ -31,6 +32,7 @@ import net.sf.freecol.common.model.Unit;
 public class BuildColonyAction extends UnitAction {
 
     public static final String id = "buildColonyAction";
+    private final InGameController inGameController;
 
 
     /**
@@ -39,8 +41,9 @@ public class BuildColonyAction extends UnitAction {
      * @param freeColClient The main controller object for the client.
      * @param gui 
      */
-    BuildColonyAction(FreeColClient freeColClient, GUI gui) {
+    BuildColonyAction(FreeColClient freeColClient, InGameController inGameController, GUI gui) {
         super(freeColClient, gui, id);
+        this.inGameController = inGameController;
         addImageIcons("build");
     }
 
@@ -69,6 +72,6 @@ public class BuildColonyAction extends UnitAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        getFreeColClient().getInGameController().buildColony();
+        inGameController.buildColony();
     }
 }

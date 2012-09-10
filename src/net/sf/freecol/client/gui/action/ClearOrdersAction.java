@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.GUI;
 
 /**
@@ -30,6 +31,7 @@ import net.sf.freecol.client.gui.GUI;
 public class ClearOrdersAction extends UnitAction {
 
     public static final String id = "clearOrdersAction";
+    private final InGameController inGameController;
 
     /**
      * Creates this action.
@@ -37,8 +39,9 @@ public class ClearOrdersAction extends UnitAction {
      * @param freeColClient The main controller object for the client.
      * @param gui 
      */
-    ClearOrdersAction(FreeColClient freeColClient, GUI gui) {
+    ClearOrdersAction(FreeColClient freeColClient, InGameController inGameController, GUI gui) {
         super(freeColClient, gui, id);
+        this.inGameController = inGameController;
     }
 
     /**
@@ -47,6 +50,6 @@ public class ClearOrdersAction extends UnitAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        getFreeColClient().getInGameController().clearOrders(gui.getActiveUnit());
+        inGameController.clearOrders(gui.getActiveUnit());
     }
 }

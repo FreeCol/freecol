@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovementType;
@@ -34,6 +35,7 @@ import net.sf.freecol.common.model.Unit;
 public class ImprovementAction extends UnitAction {
 
     private TileImprovementType improvement;
+    private final InGameController inGameController;
     
     /**
      * Creates this action.
@@ -41,8 +43,9 @@ public class ImprovementAction extends UnitAction {
      * @param freeColClient The main controller object for the client.
      * @param improvement <code>TileImprovementType</code> ??
      */
-    public ImprovementAction(FreeColClient freeColClient, GUI gui, TileImprovementType improvement) {
+    public ImprovementAction(FreeColClient freeColClient, InGameController inGameController, GUI gui, TileImprovementType improvement) {
         super(freeColClient, gui, improvement.getShortId() + "Action");
+        this.inGameController = inGameController;
         this.improvement = improvement;
         addImageIcons(improvement.getShortId());
     }
@@ -71,9 +74,8 @@ public class ImprovementAction extends UnitAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        getFreeColClient().getInGameController()
-            .changeWorkImprovementType(gui.getActiveUnit(),
+        inGameController.changeWorkImprovementType(gui.getActiveUnit(),
                                        improvement);
-        getFreeColClient().getInGameController().nextActiveUnit();
+        inGameController.nextActiveUnit();
     }
 }

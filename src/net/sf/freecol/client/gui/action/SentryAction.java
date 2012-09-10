@@ -23,6 +23,7 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Unit;
 
@@ -33,14 +34,16 @@ import net.sf.freecol.common.model.Unit;
 public class SentryAction extends UnitAction {
 
     public static final String id = "sentryAction";
+    private final InGameController inGameController;
 
     /**
      * Creates this action.
      * @param freeColClient The main controller object for the client.
      * @param gui 
      */
-    public SentryAction(FreeColClient freeColClient, GUI gui) {
+    public SentryAction(FreeColClient freeColClient, InGameController inGameController, GUI gui) {
         super(freeColClient, gui, id);
+        this.inGameController = inGameController;
         addImageIcons("sentry");
     }
 
@@ -49,8 +52,7 @@ public class SentryAction extends UnitAction {
      * @param actionEvent The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent actionEvent) {
-        getFreeColClient().getInGameController()
-            .changeState(gui.getActiveUnit(),
+        inGameController.changeState(gui.getActiveUnit(),
                 Unit.UnitState.SENTRY);
     }
 

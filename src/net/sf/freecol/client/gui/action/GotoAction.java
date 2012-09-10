@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Unit;
 
@@ -34,6 +35,7 @@ import net.sf.freecol.common.model.Unit;
 public class GotoAction extends UnitAction {
 
     public static final String id = "gotoAction";
+    private final InGameController inGameController;
 
 
     /**
@@ -42,8 +44,9 @@ public class GotoAction extends UnitAction {
      * @param freeColClient The main controller object for the client.
      * @param gui 
      */
-    GotoAction(FreeColClient freeColClient, GUI gui) {
+    GotoAction(FreeColClient freeColClient, InGameController inGameController, GUI gui) {
         super(freeColClient, gui, id);
+        this.inGameController = inGameController;
     }
 
     /**
@@ -65,7 +68,7 @@ public class GotoAction extends UnitAction {
     public void actionPerformed(ActionEvent e) {
         Unit unit = gui.getActiveUnit();
         if (unit != null) {
-            getFreeColClient().getInGameController().selectDestination(unit);
+            inGameController.selectDestination(unit);
         }
     }
 }

@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.GUI;
 
 /**
@@ -31,6 +32,7 @@ import net.sf.freecol.client.gui.GUI;
 public class SkipUnitAction extends UnitAction {
 
     public static final String id = "skipUnitAction";
+    private final InGameController inGameController;
 
 
     /**
@@ -39,8 +41,9 @@ public class SkipUnitAction extends UnitAction {
      * @param freeColClient The main controller object for the client.
      * @param gui 
      */
-    SkipUnitAction(FreeColClient freeColClient, GUI gui) {
+    SkipUnitAction(FreeColClient freeColClient, InGameController inGameController, GUI gui) {
         super(freeColClient, gui,id);
+        this.inGameController = inGameController;
         addImageIcons("done");
     }
 
@@ -50,6 +53,6 @@ public class SkipUnitAction extends UnitAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        getFreeColClient().getInGameController().skipActiveUnit();
+        inGameController.skipActiveUnit();
     }
 }

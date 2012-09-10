@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Unit;
 
@@ -31,16 +32,19 @@ import net.sf.freecol.common.model.Unit;
 public class AssignTradeRouteAction extends UnitAction {
 
     public static final String id = "assignTradeRouteAction";
+    private final InGameController inGameController;
 
 
     /**
      * Creates this action.
      *
      * @param freeColClient The main controller object for the client.
+     * @param inGameController 
      * @param gui 
      */
-    AssignTradeRouteAction(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui, id); 
+    AssignTradeRouteAction(FreeColClient freeColClient, InGameController inGameController, GUI gui) {
+        super(freeColClient, gui, id);
+        this.inGameController = inGameController; 
     }
 
     /**
@@ -65,7 +69,7 @@ public class AssignTradeRouteAction extends UnitAction {
     public void actionPerformed(ActionEvent e) {
         Unit unit = gui.getActiveUnit();
         if (unit != null) {
-            getFreeColClient().getInGameController().assignTradeRoute(unit);
+            inGameController.assignTradeRoute(unit);
         }
     }
 }

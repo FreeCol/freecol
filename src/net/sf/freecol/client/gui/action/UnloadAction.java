@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Unit;
 
@@ -35,14 +36,16 @@ public class UnloadAction extends MapboardAction {
 
     private Unit unit = null;
 
+    private final InGameController inGameController;
+
     /**
      * Creates an action for unloading the currently selected unit.
      *
      * @param freeColClient The main controller object for the client.
      * @param gui 
      */
-    public UnloadAction(FreeColClient freeColClient, GUI gui) {
-        this(freeColClient, gui, null);
+    public UnloadAction(FreeColClient freeColClient, InGameController inGameController, GUI gui) {
+        this(freeColClient, inGameController, gui, null);
     }
 
     /**
@@ -54,8 +57,9 @@ public class UnloadAction extends MapboardAction {
      * @param unit an <code>Unit</code> value
      * @see net.sf.freecol.client.gui.MapViewer#getActiveUnit()
      */
-    public UnloadAction(FreeColClient freeColClient, GUI gui, Unit unit) {
+    public UnloadAction(FreeColClient freeColClient, InGameController inGameController, GUI gui, Unit unit) {
         super(freeColClient, gui, id);
+        this.inGameController = inGameController;
         this.unit = unit;
     }
 
@@ -85,7 +89,7 @@ public class UnloadAction extends MapboardAction {
     public void actionPerformed(ActionEvent e) {
         Unit carrier = getUnit();
         if (carrier != null) {
-            getFreeColClient().getInGameController().unload(carrier);
+            inGameController.unload(carrier);
             gui.updateMapControls();
         }
     }

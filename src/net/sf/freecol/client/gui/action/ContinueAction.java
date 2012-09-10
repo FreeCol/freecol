@@ -24,6 +24,7 @@ import java.io.File;
 
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 
@@ -33,6 +34,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 public class ContinueAction extends FreeColAction {
 
     public static final String id = "continueAction";
+    private final InGameController inGameController;
 
 
     /**
@@ -41,8 +43,9 @@ public class ContinueAction extends FreeColAction {
      * @param freeColClient The main controller object for the client.
      * @param gui 
      */
-    ContinueAction(FreeColClient freeColClient, GUI gui) {
+    ContinueAction(FreeColClient freeColClient, InGameController inGameController, GUI gui) {
         super(freeColClient, gui, id);
+        this.inGameController = inGameController;
         
         // interim solution to be replaced! redirect to identical NAME text
         putValue(NAME, Messages.message("victory.continue"));
@@ -56,7 +59,7 @@ public class ContinueAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-       File lastSave = freeColClient.getInGameController().getLastSaveGameFile();
+       File lastSave = inGameController.getLastSaveGameFile();
        if (lastSave != null) {
            freeColClient.getConnectController().loadGame(lastSave);
        }

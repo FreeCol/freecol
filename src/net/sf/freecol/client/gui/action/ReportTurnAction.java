@@ -25,6 +25,7 @@ import java.awt.event.ActionEvent;
 
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.GUI;
 
 
@@ -34,14 +35,16 @@ import net.sf.freecol.client.gui.GUI;
 public class ReportTurnAction extends FreeColAction {
 
     public static final String id = "reportTurnAction";
+    private final InGameController inGameController;
 
     /**
      * Creates this action.
      * @param freeColClient The main controller object for the client.
      * @param gui 
      */
-    ReportTurnAction(FreeColClient freeColClient, GUI gui) {
+    ReportTurnAction(FreeColClient freeColClient, InGameController inGameController, GUI gui) {
         super(freeColClient, gui,id);
+        this.inGameController = inGameController;
     }
 
     /**
@@ -49,6 +52,6 @@ public class ReportTurnAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        freeColClient.getInGameController().displayTurnReportMessages();
+        inGameController.displayTurnReportMessages();
     }
 }

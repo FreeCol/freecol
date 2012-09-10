@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Map.Direction;
 
@@ -34,14 +35,17 @@ public class MoveAction extends MapboardAction {
 
     private Direction direction;
 
+    private final InGameController inGameController;
+
     /**
      * Creates a new <code>MoveAction</code>.
      *
      * @param freeColClient The main controller object for the client.
      * @param direction a <code>Direction</code> value
      */
-    MoveAction(FreeColClient freeColClient, GUI gui, Direction direction) {
+    MoveAction(FreeColClient freeColClient, InGameController inGameController, GUI gui, Direction direction) {
         super(freeColClient, gui, id + direction);
+        this.inGameController = inGameController;
         this.direction = direction;
     }
 
@@ -52,9 +56,10 @@ public class MoveAction extends MapboardAction {
      * @param direction a <code>Direction</code> value
      * @param secondary a <code>boolean</code> value
      */
-    MoveAction(FreeColClient freeColClient, GUI gui, Direction direction, boolean secondary) {
+    MoveAction(FreeColClient freeColClient, InGameController inGameController, GUI gui, Direction direction, boolean secondary) {
         super(freeColClient, gui, id + direction + ".secondary");
         this.direction = direction;
+        this.inGameController = inGameController;
     }
 
     /**
@@ -65,10 +70,10 @@ public class MoveAction extends MapboardAction {
     public void actionPerformed(ActionEvent e) { 
         switch(gui.getCurrentViewMode()) {
         case GUI.MOVE_UNITS_MODE:
-            getFreeColClient().getInGameController().moveActiveUnit(direction);
+            inGameController.moveActiveUnit(direction);
             break;
         case GUI.VIEW_TERRAIN_MODE:
-            getFreeColClient().getInGameController().moveTileCursor(direction);
+            inGameController.moveTileCursor(direction);
             break;
         }
     }

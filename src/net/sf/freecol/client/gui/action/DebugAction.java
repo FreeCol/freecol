@@ -25,6 +25,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.debug.FreeColDebugger;
 
@@ -34,6 +35,7 @@ import net.sf.freecol.common.debug.FreeColDebugger;
 public class DebugAction extends FreeColAction {
 
     public static final String id = "debugAction";
+    private final InGameController inGameController;
 
     /**
      * Creates a new <code>DebugAction</code>.
@@ -41,8 +43,9 @@ public class DebugAction extends FreeColAction {
      * @param freeColClient The main controller object for the client.
      * @param gui 
      */
-    DebugAction(FreeColClient freeColClient, GUI gui) {
+    DebugAction(FreeColClient freeColClient, InGameController inGameController, GUI gui) {
         super(freeColClient, gui, id);
+        this.inGameController = inGameController;
         setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, KeyEvent.SHIFT_MASK | KeyEvent.CTRL_MASK));
     }
 
@@ -63,7 +66,7 @@ public class DebugAction extends FreeColAction {
      */
     public void actionPerformed(ActionEvent e) {
         if (shouldBeEnabled()) {
-            freeColClient.getInGameController().setInDebugMode(true);
+            inGameController.setInDebugMode(true);
             freeColClient.getConnectController().reconnect();
         }
     }

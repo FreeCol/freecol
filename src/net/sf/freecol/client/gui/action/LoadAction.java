@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 import java.util.Iterator;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
@@ -36,14 +37,16 @@ import net.sf.freecol.common.model.Unit;
 public class LoadAction extends MapboardAction {
 
     public static final String id = "loadAction";
+    private final InGameController inGameController;
 
     /**
      * Creates this action.
      * @param freeColClient The main controller object for the client.
      * @param gui 
      */
-    public LoadAction(FreeColClient freeColClient, GUI gui) {
+    public LoadAction(FreeColClient freeColClient, InGameController inGameController, GUI gui) {
         super(freeColClient, gui, id);
+        this.inGameController = inGameController;
     }
 
     /**
@@ -77,7 +80,7 @@ public class LoadAction extends MapboardAction {
                         int amount = Math.min(GoodsContainer.CARGO_SIZE - goods.getAmount(),
                             colony.getGoodsCount(goods.getType()));
                         Goods newGoods = new Goods(goods.getGame(), colony, goods.getType(), amount);
-                        getFreeColClient().getInGameController().loadCargo(newGoods, unit);
+                        inGameController.loadCargo(newGoods, unit);
                     }
                 }
             }

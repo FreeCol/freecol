@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.GUI;
 
 /**
@@ -30,6 +31,7 @@ import net.sf.freecol.client.gui.GUI;
 public class DisbandUnitAction extends UnitAction {
 
     public static final String id = "disbandUnitAction";
+    private final InGameController inGameController;
 
 
     /**
@@ -38,8 +40,9 @@ public class DisbandUnitAction extends UnitAction {
      * @param freeColClient The main controller object for the client.
      * @param gui 
      */
-    DisbandUnitAction(FreeColClient freeColClient, GUI gui) {
+    DisbandUnitAction(FreeColClient freeColClient, InGameController inGameController, GUI gui) {
         super(freeColClient, gui, id);
+        this.inGameController = inGameController;
         addImageIcons("disband");
     }
 
@@ -49,6 +52,6 @@ public class DisbandUnitAction extends UnitAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        getFreeColClient().getInGameController().disbandActiveUnit();
+        inGameController.disbandActiveUnit();
     }
 }
