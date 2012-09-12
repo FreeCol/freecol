@@ -96,6 +96,16 @@ public class CashInTreasureTrainMission extends Mission {
 
 
     /**
+     * Sets a new mission target.
+     *
+     * @param target The new target <code>Location</code>.
+     */
+    public void setTarget(Location target) {
+        removeTransportable("retargeted");
+        this.target = target;
+    }
+
+    /**
      * Extract a valid target for this mission from a path.
      *
      * @param aiUnit A <code>AIUnit</code> to perform the mission.
@@ -372,10 +382,12 @@ public class CashInTreasureTrainMission extends Mission {
         final Unit unit = getUnit();
         String reason = invalidReason();
         if (isTargetReason(reason)) {
-            if ((target = findTarget(getAIUnit(), true)) == null) {
+            Location loc = findTarget(getAIUnit(), true); 
+            if (loc == null) {
                 logger.finest(tag + " could not retarget: " + this);
                 return;
             }
+            setTarget(loc);
         } else if (reason != null) {
             logger.finest(tag + " broken(" + reason + "): " + this);
             return;
@@ -405,7 +417,7 @@ public class CashInTreasureTrainMission extends Mission {
                         + unit.getLocation() + ": " + this);
                 }
             } else {
-                target = europe;
+                setTarget(europe);
                 logger.finest(tag + " at " + unit.getLocation()
                     + " retargeting Europe: " + this);
             }
@@ -413,7 +425,7 @@ public class CashInTreasureTrainMission extends Mission {
             Location newTarget = findTarget(aiUnit, false);
             logger.finest(tag + " arrived at " + target.getColony().getName()
                 + ", retargeting " + newTarget + ": " + this);
-            target = newTarget;
+            setTarget(newTarget);
         }
     }
 

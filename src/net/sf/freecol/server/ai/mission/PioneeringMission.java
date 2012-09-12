@@ -98,7 +98,7 @@ public class PioneeringMission extends Mission {
         super(aiMain, aiUnit);
 
         setTarget(findTarget(aiUnit, true));
-        logger.finest(tag + " starts with target " + target + ": " + this);
+        logger.finest(tag + " starts with target " + getTarget() + ": " + this);
         uninitialized = false;
     }
 
@@ -117,7 +117,7 @@ public class PioneeringMission extends Mission {
         super(aiMain, aiUnit);
 
         setTarget(loc);
-        logger.finest(tag + " starts with target " + target + ": " + this);
+        logger.finest(tag + " starts with target " + getTarget() + ": " + this);
         uninitialized = false;
     }
 
@@ -166,6 +166,7 @@ public class PioneeringMission extends Mission {
      * @param target The new target for this mission.
      */
     public void setTarget(Location target) {
+        removeTransportable("retargeted");
         this.target = target;
         setTileImprovementPlan((target instanceof Tile)
             ? getBestPlan((Tile)target)
@@ -407,9 +408,9 @@ public class PioneeringMission extends Mission {
      */
     @Override
     public Location getTransportDestination() {
-        return (target == null
-            || !shouldTakeTransportToTile(target.getTile())) ? null
-            : target;
+        return (getTarget() == null
+            || !shouldTakeTransportToTile(getTarget().getTile())) ? null
+            : getTarget();
     }
 
 
@@ -499,7 +500,7 @@ public class PioneeringMission extends Mission {
      * @return A reason for mission invalidity, or null if none found.
      */
     public String invalidReason() {
-        return invalidReason(getAIUnit(), target);
+        return invalidReason(getAIUnit(), getTarget());
     }
 
     /**
@@ -567,9 +568,9 @@ public class PioneeringMission extends Mission {
         String where;
         while (!hasTools()) { // Get tools first.
             // Go there and clear target on arrival.
-            if (travelToTarget(tag, target, costDecider)
+            if (travelToTarget(tag, getTarget(), costDecider)
                 != Unit.MoveType.MOVE) return;
-            where = ((Colony)target).getName();
+            where = ((Colony)getTarget()).getName();
             setTarget(null);
 
             // Try to equip
@@ -589,11 +590,11 @@ public class PioneeringMission extends Mission {
         }
 
         // Going to an intermediate colony?
-        if (target instanceof Colony
-            && invalidTargetReason(target, player) == null) {
-            if (travelToTarget(tag, target, costDecider)
+        if (getTarget() instanceof Colony
+            && invalidTargetReason(getTarget(), player) == null) {
+            if (travelToTarget(tag, getTarget(), costDecider)
                 != Unit.MoveType.MOVE) return;
-            where = ((Colony)target).getName();
+            where = ((Colony)getTarget()).getName();
             newTarget = findTarget(aiUnit, false);
             logger.finest(tag + " reached intermediate colony " + where
                 + ", retargeting " + newTarget + ": " + this);
@@ -619,14 +620,14 @@ public class PioneeringMission extends Mission {
         }
 
         // Go there.
-        Unit.MoveType mt = travelToTarget(tag, target, costDecider);
+        Unit.MoveType mt = travelToTarget(tag, getTarget(), costDecider);
         switch (mt) {
         case MOVE_NO_MOVES:
             return;
         case MOVE_ILLEGAL:
             // Might be a temporary blockage due to an occupying unit
             // at the target.  Move randomly and retry if adjacent.
-            Direction d = unit.getTile().getDirection(target.getTile());
+            Direction d = unit.getTile().getDirection(getTarget().getTile());
             if (d != null) moveRandomly(tag, d);
             return;
         case MOVE:
@@ -638,7 +639,7 @@ public class PioneeringMission extends Mission {
         }
 
         // Take control of the land before proceeding to improve.
-        tile = target.getTile();
+        tile = getTarget().getTile();
         if (!player.owns(tile)) {
             // TODO: Better choice whether to pay or steal.
             // Currently always pay if we can, steal if we can not.
@@ -739,7 +740,7 @@ public class PioneeringMission extends Mission {
 
         // Do not use setTarget in serialization
         String str = in.getAttributeValue(null, "target");
-        target = getGame().getFreeColLocation(str);
+        target = (str == null) ? null : getGame().getFreeColLocation(str);
     }
 
     /**

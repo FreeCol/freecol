@@ -342,7 +342,7 @@ public abstract class Mission extends AIObject {
      */
     protected Direction moveRandomly(String logMe, Direction direction) {
         final Unit unit = getUnit();
-        if (unit.getMovesLeft() <= 0) return null;
+        if (unit.getMovesLeft() <= 0 || unit.getTile() == null) return null;
         if (logMe == null) logMe = "moveRandomly";
 
         Random aiRandom = getAIRandom();
@@ -807,7 +807,8 @@ public abstract class Mission extends AIObject {
             }
         } else if (unit.isInEurope()) { // Going to the map
             if (unit.getType().canMoveToHighSeas()) {
-                if (AIMessage.askMoveTo(aiUnit, targetTile)) {
+                unit.setDestination(target);
+                if (AIMessage.askMoveTo(aiUnit, target)) {
                     logger.finest(logMe + " sailed for " + target
                         + ": " + this);
                     return MoveType.MOVE_HIGH_SEAS;
@@ -958,6 +959,28 @@ public abstract class Mission extends AIObject {
         }
         return MoveType.MOVE; // Must have completed path normally, no log.
     }
+
+    /**
+     * If the unit in this mission is currently being transported, remove
+     * it from the carrier's transport mission.
+     *
+     * @param reason The reason to remove the transportable.
+     */
+    public void removeTransportable(String reason) {
+        Unit u = getUnit();
+        AIUnit aiUnit = getAIUnit();
+        if (aiUnit != null && u.getLocation() instanceof Unit) {
+            Unit carrier = (Unit)u.getLocation();
+            AIUnit aiCarrier = getAIMain().getAIUnit(carrier);
+            if (aiCarrier != null) {
+                Mission m = aiCarrier.getMission();
+                if (m instanceof TransportMission) {
+                    ((TransportMission)m).removeFromTransportList(aiUnit);
+                }
+            }
+        }
+    }
+            
 
     // Fake implementation of Transportable interface.
     // Missions are not actually Transportables but the units that are

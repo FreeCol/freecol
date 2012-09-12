@@ -105,9 +105,10 @@ public class BuildColonyMission extends Mission {
     /**
      * Sets the target of this mission.
      *
-     * @param target The new target.
+     * @param target The new target <code>Location</code>.
      */
     private void setTarget(Location target) {
+        removeTransportable("retargeted");
         this.target = target;
         this.colonyValue = (target instanceof Tile)
             ? getAIUnit().getUnit().getOwner().getColonyValue((Tile)target)

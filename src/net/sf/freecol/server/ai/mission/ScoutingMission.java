@@ -102,6 +102,16 @@ public class ScoutingMission extends Mission {
 
 
     /**
+     * Sets a new mission target.
+     *
+     * @param target The new target <code>Location</code>.
+     */
+    public void setTarget(Location target) {
+        removeTransportable("retargeted");
+        this.target = target;
+    }
+
+    /**
      * Extract a valid target for this mission from a path.
      *
      * @param aiUnit A <code>AIUnit</code> to perform the mission.
@@ -229,9 +239,9 @@ public class ScoutingMission extends Mission {
      */
     @Override
     public Location getTransportDestination() {
-        return (target != null && shouldTakeTransportToTile(target.getTile()))
-            ? target
-            : null;
+        return (getTarget() == null
+            || !shouldTakeTransportToTile(getTarget().getTile())) ? null
+            : target;
     }
 
 
@@ -331,7 +341,7 @@ public class ScoutingMission extends Mission {
      * @return A reason for mission invalidity, or null if none found.
      */
     public String invalidReason() {
-        return invalidReason(getAIUnit(), target);
+        return invalidReason(getAIUnit(), getTarget());
     }
 
     /**
@@ -371,10 +381,12 @@ public class ScoutingMission extends Mission {
         final AIUnit aiUnit = getAIUnit();
         String reason = invalidReason();
         if (isTargetReason(reason)) {
-            if ((target = findTarget(aiUnit, true)) == null) {
+            Location loc = findTarget(aiUnit, true);
+            if (loc == null) {
                 logger.finest(tag + " could not retarget: " + this);
                 return;
             }
+            setTarget(loc);
         } else if (reason != null) {
             logger.finest(tag + " broken(" + reason + "): " + this);
             return;
@@ -383,7 +395,7 @@ public class ScoutingMission extends Mission {
         // Go to the target.
         final Unit unit = getUnit();
         Direction d;
-        Unit.MoveType mt = travelToTarget(tag, target,
+        Unit.MoveType mt = travelToTarget(tag, getTarget(),
             CostDeciders.avoidSettlementsAndBlockingUnits());
         switch (mt) {
         case MOVE_ILLEGAL: case MOVE_NO_MOVES: case MOVE_NO_REPAIR:
@@ -392,27 +404,30 @@ public class ScoutingMission extends Mission {
             // Could be adjacent to the destination but it is
             // temporarily blocked by another unit.  Make a random
             // (directed if possible) move and try again.
-            moveRandomly(tag, unit.getTile().getDirection(target.getTile()));
+            moveRandomly(tag, unit.getTile()
+                .getDirection(getTarget().getTile()));
             return;
         case MOVE:
             break;
         case ENTER_INDIAN_SETTLEMENT_WITH_SCOUT:
-            if ((d = unit.getTile().getDirection(target.getTile())) == null) {
+            if ((d = unit.getTile()
+                    .getDirection(getTarget().getTile())) == null) {
                 throw new IllegalStateException("Unit not next to target "
-                    + target + ": " + unit + "/" + unit.getLocation());
+                    + getTarget() + ": " + unit + "/" + unit.getLocation());
             }
             if (!AIMessage.askScoutIndianSettlement(aiUnit, d)) {
-                logger.warning(tag + " unexpected failure at " + target
+                logger.warning(tag + " unexpected failure at " + getTarget()
                     + ": " + this);
             }
             break;
         case EXPLORE_LOST_CITY_RUMOUR:
-            if ((d = unit.getTile().getDirection(target.getTile())) == null) {
+            if ((d = unit.getTile()
+                    .getDirection(getTarget().getTile())) == null) {
                 throw new IllegalStateException("Unit not next to target "
-                    + target + ": " + unit + "/" + unit.getLocation());
+                    + getTarget() + ": " + unit + "/" + unit.getLocation());
             }
             if (!AIMessage.askMove(aiUnit, d)) {
-                logger.warning(tag + " unexpected failure at " + target
+                logger.warning(tag + " unexpected failure at " + getTarget()
                     + ": " + this);
             }
             break;
@@ -421,27 +436,27 @@ public class ScoutingMission extends Mission {
             return;
         }
         if (unit.isDisposed()) {
-            logger.finest(tag + " died at target " + target + ": " + this);
+            logger.finest(tag + " died at target " + getTarget() + ": " + this);
             return;
         }
 
         // Retarget on failure or complete, but do not retarget from
         // one colony to another, just drop equipment and invalidate
         // the mission.
-        Location completed = target;
-        target = findTarget(aiUnit, false);
+        Location completed = getTarget();
+        setTarget(findTarget(aiUnit, false));
         if (completed instanceof Colony) {
-            if (target == null) {
+            if (getTarget() == null) {
                 for (EquipmentType e : new ArrayList<EquipmentType>(unit
                         .getEquipment().keySet())) {
                     AIMessage.askEquipUnit(aiUnit, e, -unit.getEquipmentCount(e));
                 }
             }
             logger.finest(tag + " arrived at " + ((Colony)completed).getName()
-                + ", retargeting " + target + ": " + this);
+                + ", retargeting " + getTarget() + ": " + this);
         } else {
             logger.finest(tag + " completed target " + completed
-                + ", retargeting " + target + ": " + this);
+                + ", retargeting " + getTarget() + ": " + this);
         }
     }
 

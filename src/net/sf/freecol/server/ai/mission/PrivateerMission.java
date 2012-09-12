@@ -100,6 +100,16 @@ public class PrivateerMission extends Mission {
 
 
     /**
+     * Sets a new mission target.
+     *
+     * @param target The new target <code>Location</code>.
+     */
+    public void setTarget(Location target) {
+        removeTransportable("retargeted");
+        this.target = target;
+    }
+
+    /**
      * Extract a valid target for this mission from a path.
      *
      * @param aiUnit A <code>AIUnit</code> to perform the mission.
@@ -366,13 +376,16 @@ public class PrivateerMission extends Mission {
         if (unit.isAtSea()) return;
 
         Direction direction;
+        Location newTarget;
         if (aiUnit.hasCargo()) { // Deliver the goods
-            if (isTargetReason(reason)
-                && (target = findTarget(aiUnit, 8, true)) == null) {
-                logger.finest(tag + " could not retarget: " + this);
-                return;
+            if (isTargetReason(reason)) {
+                if ((newTarget = findTarget(aiUnit, 8, true)) == null) {
+                    logger.finest(tag + " could not retarget: " + this);
+                    return;
+                }
+                setTarget(newTarget);
             }
-            Unit.MoveType mt = travelToTarget(tag, target,
+            Unit.MoveType mt = travelToTarget(tag, getTarget(),
                 CostDeciders.avoidSettlementsAndBlockingUnits());
             switch (mt) {
             case MOVE_NO_MOVES: case MOVE_HIGH_SEAS:
@@ -393,7 +406,7 @@ public class PrivateerMission extends Mission {
 
                 logger.finest(tag + " completed goods delivery"
                     + " at " + unit.getLocation() + ": " + this);
-                target = findTarget(aiUnit, 1, false);
+                setTarget(findTarget(aiUnit, 1, false));
                 break;
             default:
                 logger.warning(tag + " unexpected delivery move " + mt
@@ -406,10 +419,11 @@ public class PrivateerMission extends Mission {
                 : unit.getFullEntryLocation();
             unit.setDestination(tile);
             aiUnit.moveToAmerica();
-        } else if ((target = findTarget(aiUnit, 1, true)) == null) {
+        } else if ((newTarget = findTarget(aiUnit, 1, true)) == null) {
             moveRandomlyTurn(tag);
         } else {
-            Unit.MoveType mt = travelToTarget(tag, target, null);
+            setTarget(newTarget);
+            Unit.MoveType mt = travelToTarget(tag, getTarget(), null);
             switch (mt) {
             case MOVE_NO_MOVES:
                 return;
@@ -419,13 +433,13 @@ public class PrivateerMission extends Mission {
                 unit.setMovesLeft(0);
                 return;
             case ATTACK_UNIT:
-                direction = unit.getTile().getDirection(target.getTile());
+                direction = unit.getTile().getDirection(getTarget().getTile());
                 if (direction != null) {
-                    logger.finest(tag + " completed hunt for target " + target
+                    logger.finest(tag + " completed hunt for target " + getTarget()
                         + ", attacking: " + this);
                     AIMessage.askAttack(aiUnit, direction);
                 } else { // Found something else in the way!
-                    Location blocker = resolveBlockage(aiUnit, target);
+                    Location blocker = resolveBlockage(aiUnit, getTarget());
                     if (blocker instanceof Unit
                         && scoreUnit(aiUnit, (Unit)blocker) > 0) {
                         logger.finest(tag + " bumped into " + blocker

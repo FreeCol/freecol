@@ -104,6 +104,16 @@ public class UnitSeekAndDestroyMission extends Mission {
 
 
     /**
+     * Sets a new mission target.
+     *
+     * @param target The new target <code>Location</code>.
+     */
+    public void setTarget(Location target) {
+        removeTransportable("retargeted");
+        this.target = target;
+    }
+
+    /**
      * Extract a valid target for this mission from a path.
      *
      * @param aiUnit The <code>AIUnit</code> to perform the mission.
@@ -249,11 +259,11 @@ public class UnitSeekAndDestroyMission extends Mission {
      * @return A score for the proposed mission.
      */
     public static int scorePath(AIUnit aiUnit, PathNode path) {
-        Location target = extractTarget(aiUnit, path);
-        return (target instanceof Settlement)
-            ? scoreSettlementPath(aiUnit, path, (Settlement)target)
-            : (target instanceof Unit)
-            ? scoreUnitPath(aiUnit, path, (Unit)target)
+        Location loc = extractTarget(aiUnit, path);
+        return (loc instanceof Settlement)
+            ? scoreSettlementPath(aiUnit, path, (Settlement)loc)
+            : (loc instanceof Unit)
+            ? scoreUnitPath(aiUnit, path, (Unit)loc)
             : Integer.MIN_VALUE;
     }
 
@@ -300,9 +310,9 @@ public class UnitSeekAndDestroyMission extends Mission {
      */
     @Override
     public Location getTransportDestination() {
-        return (target == null
-            || !shouldTakeTransportToTile(target.getTile())) ? null
-            : target;
+        return (getTarget() == null
+            || !shouldTakeTransportToTile(getTarget().getTile())) ? null
+            : getTarget();
     }
 
     // Mission interface
@@ -385,7 +395,7 @@ public class UnitSeekAndDestroyMission extends Mission {
      * @return A reason for mission invalidity, or null if none found.
      */
     public String invalidReason() {
-        return invalidReason(getAIUnit(), target);
+        return invalidReason(getAIUnit(), getTarget());
     }
 
     /**
@@ -429,7 +439,7 @@ public class UnitSeekAndDestroyMission extends Mission {
     public void doMission() {
         String reason = invalidReason();
         if (isTargetReason(reason)) {
-            target = null;
+            setTarget(null);
         } else if (reason != null) {
             logger.finest(tag + " broken(" + reason + "): " + this);
             return;
@@ -440,10 +450,10 @@ public class UnitSeekAndDestroyMission extends Mission {
         final Unit unit = getUnit();
         Location nearbyTarget = findTarget(aiUnit, 1);
         if (nearbyTarget != null) {
-            if (target == null) {
+            if (getTarget() == null) {
                 logger.finest(tag + " retargeted " + nearbyTarget
                     + ": " + this);
-                target = nearbyTarget;
+                setTarget(nearbyTarget);
                 nearbyTarget = null;
             } else if (nearbyTarget == target) {
                 nearbyTarget = null;
@@ -458,7 +468,7 @@ public class UnitSeekAndDestroyMission extends Mission {
 
         // Go to the target.
         Location currentTarget = (nearbyTarget != null) ? nearbyTarget
-            : target;
+            : getTarget();
         // Note avoiding other targets by choice of cost decider.
         Unit.MoveType mt = travelToTarget(tag, currentTarget,
             CostDeciders.avoidSettlementsAndBlockingUnits());
@@ -527,8 +537,7 @@ public class UnitSeekAndDestroyMission extends Mission {
         super.readAttributes(in);
 
         String str = in.getAttributeValue(null, "target");
-        target = (str == null) ? null
-            : getGame().getFreeColLocation(str);
+        target = (str == null) ? null : getGame().getFreeColLocation(str);
     }
 
     /**

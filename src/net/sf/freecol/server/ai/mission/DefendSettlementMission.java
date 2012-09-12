@@ -96,6 +96,16 @@ public class DefendSettlementMission extends Mission {
 
 
     /**
+     * Sets a new mission target.
+     *
+     * @param target The new target <code>Settlement</code>.
+     */
+    public void setTarget(Settlement target) {
+        removeTransportable("retargeted");
+        this.target = target;
+    }
+
+    /**
      * Extract a valid target for this mission from a path.
      *
      * @param aiUnit The <code>AIUnit</code> to perform the mission.
@@ -192,9 +202,9 @@ public class DefendSettlementMission extends Mission {
      */
     @Override
     public Location getTransportDestination() {
-        return (target == null
-            || !shouldTakeTransportToTile(target.getTile())) ? null
-            : target;
+        return (getTarget() == null
+            || !shouldTakeTransportToTile(getTarget().getTile())) ? null
+            : getTarget();
     }
 
     /**
@@ -252,7 +262,7 @@ public class DefendSettlementMission extends Mission {
      * @return A reason for mission invalidity, or null if none found.
      */
     public String invalidReason() {
-        return invalidReason(getAIUnit(), target);
+        return invalidReason(getAIUnit(), getTarget());
     }
 
     /**
@@ -296,7 +306,7 @@ public class DefendSettlementMission extends Mission {
         if (isTargetReason(reason)) {
             Location loc = findTarget(getAIUnit(), true);
             if (loc instanceof Settlement) {
-                target = (Settlement)loc;
+                setTarget((Settlement)loc);
             } else {
                 logger.finest(tag + " could not retarget: " + this);
                 return;
@@ -307,7 +317,7 @@ public class DefendSettlementMission extends Mission {
         }
 
         // Go to the target!
-        if (travelToTarget(tag, target,
+        if (travelToTarget(tag, getTarget(),
                 CostDeciders.avoidSettlementsAndBlockingUnits())
             != Unit.MoveType.MOVE) return;
 
@@ -317,10 +327,10 @@ public class DefendSettlementMission extends Mission {
         final AIUnit aiUnit = getAIUnit();
         final Unit unit = getUnit();
         Mission m = null;
-        if (target instanceof Colony) {
-            Colony colony = (Colony)target;
+        if (getTarget() instanceof Colony) {
+            Colony colony = (Colony)getTarget();
             if (unit.getLocation() instanceof WorkLocation
-                || (unit.isPerson() && target.getUnitCount() <= 1)) {
+                || (unit.isPerson() && colony.getUnitCount() <= 1)) {
                 m = new WorkInsideColonyMission(aiMain, aiUnit,
                     aiMain.getAIColony(colony));
                 aiUnit.setMission(m);
@@ -337,8 +347,8 @@ public class DefendSettlementMission extends Mission {
 
         // Check if the settlement is badly defended.  If so, try to fortify.
         int defenderCount = 0, fortifiedCount = 0;
-        List<Unit> units = target.getUnitList();
-        units.addAll(target.getTile().getUnitList());
+        List<Unit> units = getTarget().getUnitList();
+        units.addAll(getTarget().getTile().getUnitList());
         for (Unit u : units) {
             AIUnit aiu = getAIMain().getAIUnit(u);
             if (invalidMissionReason(aiu) == null) {
@@ -356,7 +366,8 @@ public class DefendSettlementMission extends Mission {
             } else {
                 logMe = " fortify failed at ";
             }
-            logger.finest(tag + logMe + target.getName() + ": " + this);
+            logger.finest(tag + logMe + ((Settlement)getTarget()).getName()
+                + ": " + this);
             return;
         }
 
@@ -397,7 +408,8 @@ public class DefendSettlementMission extends Mission {
         // Attack if a target is available.
         if (bestTarget != null) {
             logger.finest(tag + " attacking " + bestTarget
-                + " from " + target.getName() + ": " + this);
+                + " from " + ((Settlement)getTarget()).getName()
+                + ": " + this);
             AIMessage.askAttack(getAIUnit(), bestDirection);
         }
     }

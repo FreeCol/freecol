@@ -79,9 +79,10 @@ public class MissionaryMission extends Mission {
      */
     public MissionaryMission(AIMain aiMain, AIUnit aiUnit) {
         super(aiMain, aiUnit);
+
         target = findTarget(aiUnit, true);
         logger.finest(tag + " starts at " + aiUnit.getUnit().getLocation()
-            + " with target " + target + ": " + this);
+            + " with target " + getTarget() + ": " + this);
         uninitialized = false;
     }
 
@@ -103,6 +104,16 @@ public class MissionaryMission extends Mission {
         uninitialized = getAIUnit() == null;
     }
 
+
+    /**
+     * Sets a new mission target.
+     *
+     * @param target The new target <code>Location</code>.
+     */
+    public void setTarget(Location target) {
+        removeTransportable("retargeted");
+        this.target = target;
+    }
 
     /**
      * Extract a valid target for this mission from a path.
@@ -249,9 +260,9 @@ public class MissionaryMission extends Mission {
      */
     @Override
     public Location getTransportDestination() {
-        return (target == null
-            || !shouldTakeTransportToTile(target.getTile())) ? null
-            : target;
+        return (getTarget() == null
+            || !shouldTakeTransportToTile(getTarget().getTile())) ? null
+            : getTarget();
     }
 
 
@@ -328,7 +339,7 @@ public class MissionaryMission extends Mission {
      * @return A reason for mission invalidity, or null if none found.
      */
     public String invalidReason() {
-        return invalidReason(getAIUnit(), target);
+        return invalidReason(getAIUnit(), getTarget());
     }
 
     /**
@@ -367,10 +378,12 @@ public class MissionaryMission extends Mission {
     public void doMission() {
         String reason = invalidReason();
         if (isTargetReason(reason)) {
-            if ((target = findTarget(getAIUnit(), true)) == null) {
+            Location loc = findTarget(getAIUnit(), true);
+            if (loc == null) {
                 logger.finest(tag + " could not retarget: " + this);
                 return;
             }
+            setTarget(loc);
         } else if (reason != null) {
             logger.finest(tag + " broken(" + reason + "): " + this);
             return;
@@ -379,7 +392,7 @@ public class MissionaryMission extends Mission {
         final Unit unit = getUnit();
 
         // Go to the target.
-        Unit.MoveType mt = travelToTarget(tag, target,
+        Unit.MoveType mt = travelToTarget(tag, getTarget(),
             CostDeciders.avoidSettlementsAndBlockingUnits());
         switch (mt) {
         case MOVE_NO_MOVES: case MOVE_NO_REPAIR: case MOVE_ILLEGAL:
@@ -387,27 +400,29 @@ public class MissionaryMission extends Mission {
         case MOVE:
             // Reached an intermediate colony.  Retarget, but do not
             // accept fallback targets.
-            Location completed = target;
-            target = findTarget(aiUnit, false);
+            Location completed = getTarget();
+            setTarget(findTarget(aiUnit, false));
             logger.finest(tag + " reached colony target " + completed
-                + ", retargeting " + target + ": " + this);
+                + ", retargeting " + getTarget() + ": " + this);
             break;
         case ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY:
-            Direction d = unit.getTile().getDirection(target.getTile());
+            Direction d = unit.getTile().getDirection(getTarget().getTile());
             if (d == null) {
                 throw new IllegalStateException("Unit not next to target "
-                    + target + ": " + unit + "/" + unit.getLocation());
+                    + getTarget() + ": " + unit + "/" + unit.getLocation());
             }
-            IndianSettlement is = (IndianSettlement)target;
+            IndianSettlement is = (IndianSettlement)getTarget();
             AIMessage.askEstablishMission(aiUnit, d,
                                           is.getMissionary() != null);
             if (unit.isDisposed()) {
-                logger.finest(tag + " died at target " + target + ": " + this);
+                logger.finest(tag + " died at target " + getTarget() 
+                    + ": " + this);
             } else if (is.getMissionary() == unit && unit.isInMission()) {
-                logger.finest(tag + " completed at " + target + ": " + this);
+                logger.finest(tag + " completed at " + getTarget()
+                    + ": " + this);
                 target = null;
             } else {
-                logger.warning(tag + " unexpected failure at " + target
+                logger.warning(tag + " unexpected failure at " + getTarget()
                     + ": " + this);
             }
             break;
