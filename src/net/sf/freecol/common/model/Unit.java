@@ -3241,7 +3241,7 @@ public class Unit extends FreeColGameObject
      *     if none found.
      */
     public Tile getBestEntryTile(Tile tile) {
-        return getGame().getMap().getBestEntryTile(this, tile, null);
+        return getGame().getMap().getBestEntryTile(this, tile, null, null);
     }
 
     /**

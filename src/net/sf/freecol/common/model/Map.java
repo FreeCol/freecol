@@ -687,19 +687,36 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Gets the best (closest) entry location for this unit to reach a
-     * given tile.
+     * Gets the best (closest) path location for this unit to reach a
+     * given tile from off the map.
      *
      * @param unit The <code>Unit</code> to check.
      * @param tile The target <code>Tile</code>.
      * @param carrier An optional carrier <code>Unit</code>to use.
+     * @param costDecider An optional <code>CostDecider</code> to use.
+     * @return A path to the best entry location tile to arrive on the
+     *     map at, or null if none found.
+     */
+    private PathNode getBestEntryPath(Unit unit, Tile tile, Unit carrier,
+                                      CostDecider costDecider) {
+        return search(unit, tile, GoalDeciders.getHighSeasGoalDecider(),
+                      costDecider, INFINITY, carrier);
+    }
+
+    /**
+     * Gets the best (closest) entry location for this unit to reach a
+     * given tile from off the map.
+     *
+     * @param unit The <code>Unit</code> to check.
+     * @param tile The target <code>Tile</code>.
+     * @param carrier An optional carrier <code>Unit</code>to use.
+     * @param costDecider An optional <code>CostDecider</code> to use.
      * @return The best entry location tile to arrive on the map at, or null
      *     if none found.
      */
-    public Tile getBestEntryTile(Unit unit, Tile tile, Unit carrier) {
-        PathNode path = search(unit, tile,
-                               GoalDeciders.getHighSeasGoalDecider(),
-                               CostDeciders.avoidIllegal(), INFINITY, carrier);
+    public Tile getBestEntryTile(Unit unit, Tile tile, Unit carrier,
+                                 CostDecider costDecider) {
+        PathNode path = getBestEntryPath(unit, tile, carrier, costDecider);
         return (path == null) ? null : path.getLastNode().getTile();
     }
 
@@ -745,8 +762,10 @@ public class Map extends FreeColGameObject implements Location {
                 if (!waterUnit.getType().canMoveToHighSeas()) return null;
 
                 // Find the best place to enter the map from Europe.
-                Tile tile = getBestEntryTile(unit, end.getTile(), carrier);
-                if (tile == null) return null;
+                PathNode p = getBestEntryPath(unit, end.getTile(), carrier,
+                                              costDecider);
+                if (p == null) return null;
+                Tile tile = p.getLastNode().getTile();
 
                 // Now search forward from there to get a path in the right
                 // order (the existing one might not be optimal if reversed!)
@@ -756,7 +775,8 @@ public class Map extends FreeColGameObject implements Location {
                     getManhattenHeuristic(end.getTile()));
                 if (path == null) {
                     throw new IllegalStateException("SEARCH-FAIL: " + unit
-                        + "/" + carrier + " from " + tile + " to " + end);
+                        + "/" + carrier + " from " + tile + " to " + end
+                        + " original=" + p.fullPathToString());
                 }
 
                 // At the front of the path insert a node for the
