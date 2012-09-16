@@ -57,12 +57,7 @@ public class SerializationTest extends FreeColTestCase {
     private Source buildSource(FreeColObject object, Player player,
                                boolean showAll, boolean toSavedGame)
         throws Exception {
-        StringWriter sw = new StringWriter();
-        XMLOutputFactory xif = XMLOutputFactory.newInstance();
-        XMLStreamWriter out = xif.createXMLStreamWriter(sw);
-        object.toXML(out, player, showAll, toSavedGame);
-        out.close();
-        return new StreamSource(new StringReader(sw.toString()));
+        return new StreamSource(new StringReader(serialize(object, player, showAll, toSavedGame)));
     }
 
 
@@ -222,4 +217,5 @@ public class SerializationTest extends FreeColTestCase {
         assertEquals(farmed1.size(), farmed2.size());
         assertEquals(farmed1.get(0).getId(), farmed2.get(0).getId());
     }
+
 }
