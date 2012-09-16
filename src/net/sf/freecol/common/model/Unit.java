@@ -62,14 +62,14 @@ import org.w3c.dom.Element;
  * Every <code>Unit</code> is owned by a {@link Player} and has a
  * {@link Location}.
  */
-public class Unit extends FreeColGameObject
-    implements Consumer, Locatable, Location, Movable, Nameable, Ownable {
+public class Unit extends GoodsLocation
+    implements Consumer, Locatable, Movable, Nameable, Ownable {
 
     private static final Logger logger = Logger.getLogger(Unit.class.getName());
 
     private static final EquipmentType horsesEq[] = { null, null };
     private static final EquipmentType musketsEq[] = { null, null };
-    
+
     /** A comparator to order units by skill level. */
     private static Comparator<Unit> skillLevelComp
         = new Comparator<Unit>() {
@@ -285,10 +285,6 @@ public class Unit extends FreeColGameObject
 
     protected String ethnicity = null;
 
-    protected List<Unit> units = Collections.emptyList();
-
-    protected GoodsContainer goodsContainer;
-
     protected Location entryLocation;
 
     protected Location location;
@@ -431,6 +427,16 @@ public class Unit extends FreeColGameObject
      */
     public final UnitType getType() {
         return unitType;
+    }
+
+    /**
+     * Returns true if this unit can carry treasure (like a treasure train)
+     *
+     * @return <code>true</code> if this <code>Unit</code> is capable of
+     *         carrying treasure.
+     */
+    public boolean canCarryTreasure() {
+        return unitType.hasAbility(Ability.CARRY_TREASURE);
     }
 
     /**
@@ -1434,7 +1440,7 @@ public class Unit extends FreeColGameObject
             : search(start, threatDecider, CostDeciders.avoidIllegal(),
                      reverseRange, getCarrier());
     }
-    
+
     /**
      * Checks if there is a credible threatening unit to this unit
      * within a range of moves.
@@ -2072,7 +2078,7 @@ public class Unit extends FreeColGameObject
      * @return The number cargo slots occupied by goods.
      */
     public int getGoodsSpaceTaken() {
-        return (canCarryGoods()) ? goodsContainer.getSpaceTaken() : 0;
+        return (canCarryGoods()) ? getGoodsContainer().getSpaceTaken() : 0;
     }
 
     /**
@@ -2133,33 +2139,29 @@ public class Unit extends FreeColGameObject
     }
 
     /**
-     * Checks whether or not the specified locatable may be added to this
-     * <code>Unit</code>. The locatable cannot be added is this
-     * <code>Unit</code> if it is not a carrier or if there is no room left.
-     *
-     * It is not an error to try to add something that is already present
-     * (add() above will return success in that case).
-     *
-     * @param locatable The <code>Locatable</code> to test the addabillity of.
-     * @return The result.
+     * {@inheritDoc}
      */
-    public boolean canAdd(Locatable locatable) {
+    public NoAddReason getNoAddReason(Locatable locatable) {
         if (locatable == this) {
-            return false;
+            return NoAddReason.ALREADY_PRESENT;
         } else if (locatable instanceof Unit) {
-            if (units.equals(Collections.emptyList())) {
-                units = new ArrayList<Unit>();
-            }
-            return canCarryUnits()
-                && !units.contains((Unit)locatable)
-                && getSpaceLeft() >= ((Unit)locatable).getSpaceTaken();
+            return (!canCarryUnits())
+                ? NoAddReason.WRONG_TYPE
+                : (((Unit)locatable).getSpaceTaken() > getSpaceLeft())
+                ? NoAddReason.CAPACITY_EXCEEDED
+                : super.getNoAddReason(locatable);
         } else if (locatable instanceof Goods) {
-            return canCarryGoods()
-                && (getLoadableAmount(((Goods)locatable).getType())
-                    > ((Goods)locatable).getAmount());
-        } else {
-            return false;
+            Goods goods = (Goods)locatable;
+            return (!canCarryGoods())
+                ? NoAddReason.WRONG_TYPE
+                : (goods.getAmount() > getLoadableAmount(goods.getType()))
+                ? NoAddReason.CAPACITY_EXCEEDED
+                : NoAddReason.NONE;
+            // Do not call super.getNoAddReason for goods because
+            // the capacity test in GoodsLocation.getNoAddReason does not
+            // account for packing and is thus too conservative.
         }
+        return super.getNoAddReason(locatable);
     }
 
     /**
@@ -2173,17 +2175,22 @@ public class Unit extends FreeColGameObject
             return false;
         } else if (locatable instanceof Unit) {
             Unit unit = (Unit)locatable;
-            spendAllMoves();
-            unit.setState(UnitState.SENTRY);
-            return units.add(unit);
+            if (super.add(locatable)) {
+                spendAllMoves();
+                ((Unit)locatable).setState(UnitState.SENTRY);
+                return true;
+            }
         } else if (locatable instanceof Goods) {
-            Goods goods = (Goods) locatable;
-            spendAllMoves();
-            return goodsContainer.addGoods(goods);
+            Goods goods = (Goods)locatable;
+            if (super.addGoods(goods)) {
+                spendAllMoves();
+                return true;
+            }
         } else {
             throw new IllegalStateException("Can not be added to unit: "
-                + ((FreeColGameObject) locatable).toString());
+                + ((FreeColGameObject)locatable).toString());
         }
+        return false;
     }
 
     /**
@@ -2196,12 +2203,12 @@ public class Unit extends FreeColGameObject
         if (locatable == null) {
             throw new IllegalArgumentException("Locatable must not be 'null'.");
         } else if (locatable instanceof Unit && canCarryUnits()) {
-            if (units.remove((Unit)locatable)) {
+            if (super.remove((Unit)locatable)) {
                 spendAllMoves();
                 return true;
             }
         } else if (locatable instanceof Goods && canCarryGoods()) {
-            if (goodsContainer.removeGoods((Goods)locatable) != null) {
+            if (super.removeGoods((Goods)locatable) != null) {
                 spendAllMoves();
                 return true;
             }
@@ -2212,67 +2219,21 @@ public class Unit extends FreeColGameObject
         return false;
     }
 
+    // Superclass contains() should work, as should canAdd() because
+    // getNoAddReason() was provided above.
+
     /**
-     * Checks if this <code>Unit</code> contains the specified
-     * <code>Locatable</code>.
-     *
-     * @param locatable The <code>Locatable</code> to test the presence of.
-     * @return True if the locatable is on board this carrier.
+     * {@inheritDoc}
      */
-    public boolean contains(Locatable locatable) {
-        if (locatable instanceof Unit && canCarryUnits()) {
-            return units.contains((Unit)locatable);
-        } else if (locatable instanceof Goods && canCarryGoods()) {
-            return goodsContainer.contains((Goods)locatable);
+    public int getGoodsCapacity() {
+        throw new RuntimeException("Do not call this method, unless we implement spoilage.");
+    }
+
+    public List<Goods> getGoodsList() {
+        if (getGoodsContainer() == null) {
+            return new ArrayList<Goods>();
         } else {
-            return false;
-        }
-    }
-
-    /**
-     * Gets the amount of goods of a specified type aboard this unit.
-     *
-     * @param type The <code>GoodsType</code> to query.
-     * @return The amount of goods.
-     */
-    public int getGoodsCount(GoodsType type) {
-        return getGoodsContainer().getGoodsCount(type);
-    }
-
-    /**
-     * Gets the amount of Units at this Location.
-     *
-     * @return The amount of Units at this Location.
-     */
-    public int getUnitCount() {
-        return units.size();
-    }
-
-    /**
-     * Gets the first <code>Unit</code> beeing carried by this
-     * <code>Unit</code>.
-     *
-     * @return The <code>Unit</code>.
-     */
-    public Unit getFirstUnit() {
-        if (units.isEmpty()) {
-            return null;
-        } else {
-            return units.get(0);
-        }
-    }
-
-    /**
-     * Gets the last <code>Unit</code> beeing carried by this
-     * <code>Unit</code>.
-     *
-     * @return The <code>Unit</code>.
-     */
-    public Unit getLastUnit() {
-        if (units.isEmpty()) {
-            return null;
-        } else {
-            return units.get(units.size() - 1);
+            return getGoodsContainer().getGoods();
         }
     }
 
@@ -2294,55 +2255,6 @@ public class Unit extends FreeColGameObject
                 && !player.owns(settlement)) ? false
             : (isOnCarrier() && !player.owns(getCarrier())) ? false
             : true;
-    }
-
-    /**
-     * Gets a <code>Iterator</code> of every <code>Unit</code> directly
-     * located on this <code>Location</code>.
-     *
-     * @return The <code>Iterator</code>.
-     */
-    public Iterator<Unit> getUnitIterator() {
-        return new ArrayList<Unit>(units).iterator();
-    }
-
-    /**
-     * Gets a list of the units in this carrier unit.
-     *
-     * @return The list of units in this carrier unit.
-     */
-    public List<Unit> getUnitList() {
-        return new ArrayList<Unit>(units);
-    }
-
-    /**
-     * Gets a <code>Iterator</code> of every <code>Unit</code> directly
-     * located on this <code>Location</code>.
-     *
-     * @return The <code>Iterator</code>.
-     */
-    public Iterator<Goods> getGoodsIterator() {
-        if (canCarryGoods()) {
-            return goodsContainer.getGoodsIterator();
-        } else {
-            return EmptyIterator.getInstance();
-        }
-    }
-
-    /**
-     * Returns a <code>List</code> containing the goods carried by this unit.
-     * @return a <code>List</code> containing the goods carried by this unit.
-     */
-    public List<Goods> getGoodsList() {
-        if (canCarryGoods()) {
-            return goodsContainer.getGoods();
-        } else {
-            return Collections.emptyList();
-        }
-    }
-
-    public GoodsContainer getGoodsContainer() {
-        return goodsContainer;
     }
 
     /**
@@ -3152,18 +3064,6 @@ public class Unit extends FreeColGameObject
     }
 
     /**
-     * Move the given unit to the front of this carrier (make sure it'll be the
-     * first unit in this unit's unit list).
-     *
-     * @param u The unit to move to the front.
-     */
-    public void moveToFront(Unit u) {
-        if (canCarryUnits() && units.remove(u)) {
-            units.add(0, u);
-        }
-    }
-
-    /**
      * Gets the amount of work left.
      *
      * @return The amount of work left.
@@ -3348,16 +3248,6 @@ public class Unit extends FreeColGameObject
     }
 
     /**
-     * Returns true if this unit can carry treasure (like a treasure train)
-     *
-     * @return <code>true</code> if this <code>Unit</code> is capable of
-     *         carrying treasure.
-     */
-    public boolean canCarryTreasure() {
-        return unitType.hasAbility(Ability.CARRY_TREASURE);
-    }
-
-    /**
      * Returns true if this unit is a ship that can capture enemy goods.
      *
      * @return <code>true</code> if this <code>Unit</code> is capable of
@@ -3415,9 +3305,6 @@ public class Unit extends FreeColGameObject
      */
     public List<FreeColGameObject> disposeList() {
         List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
-        while (units.size() > 0) {
-            objects.addAll(units.remove(0).disposeList());
-        }
 
         if (location != null) {
             location.remove(this);
@@ -3438,19 +3325,8 @@ public class Unit extends FreeColGameObject
         getOwner().invalidateCanSeeTiles();
         getOwner().removeUnit(this);
 
-        if (unitType.canCarryGoods()) {
-            objects.addAll(goodsContainer.disposeList());
-        }
-
         objects.addAll(super.disposeList());
         return objects;
-    }
-
-    /**
-     * Removes all references to this object.
-     */
-    public void dispose() {
-        disposeList();
     }
 
     /**
@@ -3642,7 +3518,7 @@ public class Unit extends FreeColGameObject
         }
         return tile;
     }
-    
+
     /**
      * Get a settlement by id, validating as much as possible.
      * Designed for message unpacking where the id should not be trusted.
@@ -3655,7 +3531,7 @@ public class Unit extends FreeColGameObject
     public Settlement getAdjacentSettlementSafely(String settlementId)
         throws IllegalStateException {
         Game game = getOwner().getGame();
-        
+
         Settlement settlement = game.getFreeColGameObject(settlementId,
                                                           Settlement.class);
         if (settlement == null) {
@@ -3740,18 +3616,6 @@ public class Unit extends FreeColGameObject
     }
 
     // Serialization
-
-    private void unitsToXML(XMLStreamWriter out, Player player,
-                            boolean showAll, boolean toSavedGame)
-        throws XMLStreamException {
-        if (!units.isEmpty()) {
-            out.writeStartElement(UNITS_TAG_NAME);
-            for (Unit unit : units) {
-                unit.toXML(out, player, showAll, toSavedGame);
-            }
-            out.writeEndElement();
-        }
-    }
 
     /**
      * This method writes an XML-representation of this object to the given
@@ -3853,16 +3717,10 @@ public class Unit extends FreeColGameObject
 
         // Do not show enemy units hidden in a carrier:
         if (full) {
-            unitsToXML(out, player, showAll, toSavedGame);
-            if (getType().canCarryGoods()) {
-                goodsContainer.toXML(out, player, showAll, toSavedGame);
-            }
-        } else {
-            if (getType().canCarryGoods()) {
-                out.writeAttribute("visibleGoodsCount",
-                    Integer.toString(getGoodsSpaceTaken()));
-                goodsContainer.toXML(out, player, showAll, toSavedGame);
-            }
+            super.writeChildren(out, player, showAll, toSavedGame);
+        } else if (getType().canCarryGoods()) {
+            out.writeAttribute("visibleGoodsCount", Integer.toString(getVisibleGoodsCount()));
+            getGoodsContainer().toXML(out, player, showAll, toSavedGame);
         }
 
         if (!equipment.isEmpty()) {
@@ -3970,8 +3828,8 @@ public class Unit extends FreeColGameObject
         entryLocation = newLocation(in.getAttributeValue(null, "entryLocation"));
 
         location = newLocation(in.getAttributeValue(null, "location"));
-        units.clear();
-        if (goodsContainer != null) goodsContainer.removeAll();
+        clearUnitList();
+        if (getGoodsContainer() != null) getGoodsContainer().removeAll();
         equipment.clear();
         setWorkImprovement(null);
     }
@@ -3980,20 +3838,11 @@ public class Unit extends FreeColGameObject
         Game game = getGame();
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(UNITS_TAG_NAME)) {
-                units = new ArrayList<Unit>();
+                // @compat 0.10.5
                 while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                    if (in.getLocalName().equals(Unit.getXMLElementTagName())) {
-                        units.add(updateFreeColGameObject(in, Unit.class));
-                    }
+                    super.readChild(in);
                 }
-            } else if (in.getLocalName().equals(GoodsContainer.getXMLElementTagName())) {
-                goodsContainer = game.getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE),
-                    GoodsContainer.class);
-                if (goodsContainer != null) {
-                    goodsContainer.readFromXML(in);
-                } else {
-                    goodsContainer = new GoodsContainer(game, this, in);
-                }
+                // end compatibility code
             } else if (in.getLocalName().equals(EQUIPMENT_TAG)) {
                 String xLength = in.getAttributeValue(null, ARRAY_SIZE);
                 if (xLength == null) {
@@ -4011,15 +3860,14 @@ public class Unit extends FreeColGameObject
             } else if (in.getLocalName().equals(TileImprovement.getXMLElementTagName())) {
                 setWorkImprovement(updateFreeColGameObject(in, TileImprovement.class));
             } else {
-                logger.warning("Found unknown child element '" + in.getLocalName() + "' of Unit " + getId() + ", skipping to next tag.");
-                in.nextTag();
+                super.readChild(in);
             }
         }
 
         // ensure all carriers have a goods container, just in case
-        if (goodsContainer == null && getType().canCarryGoods()) {
+        if (getGoodsContainer() == null && getType().canCarryGoods()) {
             logger.warning("Carrier with ID " + getId() + " did not have a \"goodsContainer\"-tag.");
-            goodsContainer = new GoodsContainer(game, this);
+            setGoodsContainer(new GoodsContainer(game, this));
         }
 
         setRole();

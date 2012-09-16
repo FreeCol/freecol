@@ -573,24 +573,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
-     * Gets the first <code>Unit</code> on this tile.
-     *
-     * @return The first <code>Unit</code> on this tile.
-     */
-    public Unit getFirstUnit() {
-        return isEmpty() ? null : getUnitList().get(0);
-    }
-
-    /**
-     * Gets the last <code>Unit</code> on this tile.
-     *
-     * @return The last <code>Unit</code> on this tile.
-     */
-    public Unit getLastUnit() {
-        return isEmpty() ? null : getUnitList().get(getUnitCount() - 1);
-    }
-
-    /**
      * Returns the total amount of Units at this Location. This also includes
      * units in a carrier
      *

@@ -28,6 +28,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.w3c.dom.Element;
+
 /**
  * The <code>GoodsLocation</code> is a place where {@link Unit}s and
  * {@link Goods} can be put. The GoodsLocation can not store any other
@@ -68,6 +70,19 @@ public abstract class GoodsLocation extends UnitLocation {
      */
     public GoodsLocation(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
+    }
+
+    /**
+     * Initialize this object from an XML-representation of this object.
+     *
+     * @param game The <code>Game</code> in which this <code>Unit</code>
+     *            belong.
+     * @param e An XML-element that will be used to initialize this object.
+     */
+    // Only Unit needs this
+    public GoodsLocation(Game game, Element e) {
+        super(game, e);
+        readFromXMLElement(e);
     }
 
     /**
@@ -184,16 +199,6 @@ public abstract class GoodsLocation extends UnitLocation {
     }
 
     /**
-     * Gets the storage capacity of this settlement.
-     *
-     * @return The storage capacity of this settlement.
-     * @see #getGoodsCapacity
-     */
-    public int getWarehouseCapacity() {
-        return getGoodsCapacity();
-    }
-
-    /**
      * Removes a specified amount of a type of Goods from this Settlement.
      *
      * @param type The type of Goods to remove from this settlement.
@@ -262,14 +267,8 @@ public abstract class GoodsLocation extends UnitLocation {
             goodsContainer = null;
         }
         objects.addAll(super.disposeList());
-        return objects;
-    }
 
-    /**
-     * Dispose of this GoodsLocation.
-     */
-    public void dispose() {
-        disposeList();
+        return objects;
     }
 
     /**
@@ -278,9 +277,9 @@ public abstract class GoodsLocation extends UnitLocation {
     public NoAddReason getNoAddReason(Locatable locatable) {
         Goods goods = (locatable instanceof Goods) ? (Goods)locatable : null;
         if (goods != null) {
-            // TODO: does not account for packing
-            if (goods.getSpaceTaken() + getSpaceTaken() > getGoodsCapacity())
-                return NoAddReason.CAPACITY_EXCEEDED;
+            return (goods.getSpaceTaken() + getSpaceTaken()
+                > getGoodsCapacity()) ? NoAddReason.CAPACITY_EXCEEDED
+                : NoAddReason.NONE;
         }
         return super.getNoAddReason(locatable);
     }

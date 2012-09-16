@@ -640,4 +640,33 @@ public class UnitTest extends FreeColTestCase {
         spec().applyDifficultyLevel("model.difficulty.veryHard");
         assertEquals(0, treasureTrain.getTransportFee());
     }
+
+
+    public void testSerialization() {
+        Game game = getStandardGame();
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Map map = getTestMap(plains, true);
+        game.setMap(map);
+
+        Tile tile1 = map.getTile(6, 8);
+        Tile tile2 = map.getTile(6, 9);
+
+        Unit merchantman = new ServerUnit(game, tile1, dutch, merchantmanType);
+        Unit soldier = new ServerUnit(game, merchantman, dutch, veteranSoldierType);
+        Goods goods = new Goods(game, merchantman, cottonType, 44);
+        merchantman.add(goods);
+
+        Unit clone = cloneFreeColGameObject(Unit.class, merchantman);
+
+        assertFalse(merchantman == clone);
+        assertFalse(merchantman.getId().equals(clone.getId()));
+        assertEquals(merchantman.getType(), clone.getType());
+        assertEquals(1, merchantman.getUnitCount());
+        assertEquals(1, clone.getUnitCount());
+        assertEquals(44, merchantman.getGoodsCount(cottonType));
+        assertEquals(44, clone.getGoodsCount(cottonType));
+        assertEquals(merchantman.getUnitList().get(0), clone.getUnitList().get(0));
+
+    }
+
 }

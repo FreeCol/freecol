@@ -124,7 +124,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         visibleGoodsCount = -1;
 
         if (type.canCarryGoods()) {
-            goodsContainer = new GoodsContainer(game, this);
+            setGoodsContainer(new GoodsContainer(game, this));
         }
 
         UnitType newType = type.getTargetType(ChangeType.CREATION, owner);

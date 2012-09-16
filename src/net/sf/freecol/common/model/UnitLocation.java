@@ -29,6 +29,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.w3c.dom.Element;
+
 /**
  * The <code>UnitLocation</code> is a place where a <code>Unit</code>
  * can be put. The UnitLocation can not store any other Locatables,
@@ -136,6 +138,12 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
         super(game, id);
     }
 
+    // Only Unit needs this
+    public UnitLocation(Game game, Element e) {
+        super(game, e);
+        readFromXMLElement(e);
+    }
+
     /**
      * Removes all references to this object.
      *
@@ -148,13 +156,6 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
         }
         objects.addAll(super.disposeList());
         return objects;
-    }
-
-    /**
-     * Dispose of this UnitLocation.
-     */
-    public void dispose() {
-        disposeList();
     }
 
     /**
@@ -184,6 +185,37 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      */
     public boolean isFull() {
         return units.size() >= getUnitCapacity();
+    }
+
+    /**
+     * Gets the first <code>Unit</code> beeing carried by this
+     * <code>Unit</code>.
+     *
+     * @return The <code>Unit</code>.
+     */
+    public Unit getFirstUnit() {
+        List<Unit> units = getUnitList();
+        return (units.isEmpty()) ? null : units.get(0);
+    }
+
+    /**
+     * Gets the last <code>Unit</code> beeing carried by this
+     * <code>Unit</code>.
+     *
+     * @return The <code>Unit</code>.
+     */
+    public Unit getLastUnit() {
+        List<Unit> units = getUnitList();
+        return (units.isEmpty()) ? null : units.get(units.size()-1);
+    }
+
+    /**
+     * Move the given unit to the front of the units list.
+     *
+     * @param u The <code>Unit</code> to move to the front.
+     */
+    public void moveToFront(Unit u) {
+        if (units.remove(u)) units.add(0, u);
     }
 
 
@@ -303,6 +335,11 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      */
     public Colony getColony() {
         return null;
+    }
+
+    // @compat 0.10.5
+    protected void clearUnitList() {
+        units.clear();
     }
 
 
