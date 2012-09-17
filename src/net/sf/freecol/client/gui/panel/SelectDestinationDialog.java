@@ -245,8 +245,10 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         unit.search(unit.getTile(), new GoalDecider() {
                 public PathNode getGoal() { return null; }
                 public boolean check(Unit u, PathNode p) {
-                    Settlement settlement = p.getTile().getSettlement();
-                    if (settlement != null && settlement != inSettlement) {
+                    Settlement settlement;
+                    if (p != null && p.getTile() != null
+                        && (settlement = p.getTile().getSettlement()) != null
+                        && settlement != inSettlement) {
                         String extras = (settlement.getOwner() != u.getOwner())
                             ? getExtras(u, settlement, goodsTypes) : "";
                         destinations.add(new Destination(settlement,
