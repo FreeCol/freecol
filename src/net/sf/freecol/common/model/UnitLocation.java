@@ -141,7 +141,6 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     // Only Unit needs this
     public UnitLocation(Game game, Element e) {
         super(game, e);
-        readFromXMLElement(e);
     }
 
     /**

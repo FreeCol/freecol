@@ -82,7 +82,6 @@ public abstract class GoodsLocation extends UnitLocation {
     // Only Unit needs this
     public GoodsLocation(Game game, Element e) {
         super(game, e);
-        readFromXMLElement(e);
     }
 
     /**

@@ -19,13 +19,19 @@
 
 package net.sf.freecol.common.model;
 
+import java.io.ByteArrayInputStream;
+import java.lang.reflect.Field;
 import java.util.List;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
 
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.server.model.ServerColony;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 public class UnitTest extends FreeColTestCase {
 
@@ -666,6 +672,50 @@ public class UnitTest extends FreeColTestCase {
         assertEquals(44, merchantman.getGoodsCount(cottonType));
         assertEquals(44, clone.getGoodsCount(cottonType));
         assertEquals(merchantman.getUnitList().get(0), clone.getUnitList().get(0));
+
+    }
+
+    public void testElement() {
+        Game game = getStandardGame();
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Map map = getTestMap(plains, true);
+        game.setMap(map);
+
+        Tile tile1 = map.getTile(6, 8);
+        Tile tile2 = map.getTile(6, 9);
+
+        Unit merchantman = new ServerUnit(game, tile1, dutch, merchantmanType);
+        Unit soldier = new ServerUnit(game, merchantman, dutch, veteranSoldierType);
+        Goods goods = new Goods(game, merchantman, cottonType, 44);
+        merchantman.add(goods);
+
+        try {
+            String xml = serialize(merchantman, dutch, true, true);
+            Field nextId = Game.class.getDeclaredField("nextId");
+            nextId.setAccessible(true);
+            int id = nextId.getInt(game);
+            nextId.setInt(game, id + 1);
+            xml = xml.replace(merchantman.getId(), Unit.getXMLElementTagName() + ":" + id);
+
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(new ByteArrayInputStream(xml.getBytes()));
+            Element element = doc.getDocumentElement();
+            Unit clone = new Unit(game, element);
+
+            assertFalse(merchantman == clone);
+            assertFalse(merchantman.getId().equals(clone.getId()));
+            assertEquals(merchantman.getType(), clone.getType());
+            assertEquals(1, merchantman.getUnitCount());
+            assertEquals(1, clone.getUnitCount());
+            assertEquals(44, merchantman.getGoodsCount(cottonType));
+            assertEquals(44, clone.getGoodsCount(cottonType));
+            assertEquals(merchantman.getUnitList().get(0), clone.getUnitList().get(0));
+
+        } catch(Exception e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+        }
 
     }
 
