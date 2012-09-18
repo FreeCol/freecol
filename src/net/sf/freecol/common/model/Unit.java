@@ -3724,7 +3724,6 @@ public class Unit extends GoodsLocation
             super.writeChildren(out, player, showAll, toSavedGame);
         } else if (getType().canCarryGoods()) {
             out.writeAttribute("visibleGoodsCount", Integer.toString(getVisibleGoodsCount()));
-            getGoodsContainer().toXML(out, player, showAll, toSavedGame);
         }
 
         if (!equipment.isEmpty()) {
