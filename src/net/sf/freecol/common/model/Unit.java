@@ -2073,12 +2073,16 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Gets the space occupied by goods in this unit.
+     * Gets the space occupied by goods in this unit.  Must defend
+     * against goods container being null as this can be called in the
+     * client on foreign units, which will not have goods containers.
      *
      * @return The number cargo slots occupied by goods.
      */
     public int getGoodsSpaceTaken() {
-        return (canCarryGoods()) ? getGoodsContainer().getSpaceTaken() : 0;
+        if (!canCarryGoods()) return 0;
+        GoodsContainer gc = getGoodsContainer();
+        return (gc == null) ? 0 : gc.getSpaceTaken();
     }
 
     /**
