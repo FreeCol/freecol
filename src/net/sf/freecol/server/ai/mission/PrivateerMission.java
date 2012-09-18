@@ -169,8 +169,7 @@ public class PrivateerMission extends Mission {
         Unit attacker = aiUnit.getUnit();
         int value = 1000;
         // Pirates want cargo
-        value += defender.getGoodsSpaceTaken() * 200;
-        value += defender.getUnitSpaceTaken() * 100;
+        value += defender.getVisibleGoodsCount() * 200;
         // But they are wary of danger
         if (defender.isOffensiveUnit()) {
             value -= attacker.getGame().getCombatModel()
