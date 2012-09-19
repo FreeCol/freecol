@@ -1929,11 +1929,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                 // attribute, but it is now highSeasCount, the number of
                 // tiles to get to a tile where a unit can move
                 // directly to the high seas.
-                if (getAttribute(in, "connected", false)) {
-                    highSeasCount = Tile.FLAG_RECALCULATE;
-                } else
+                // When the compatibility code goes away, replace with
+                //   highSeasCount = -1;
+                highSeasCount = Tile.FLAG_RECALCULATE;
                 // @end compatibility code
-                    highSeasCount = -1;
             }
         }
 

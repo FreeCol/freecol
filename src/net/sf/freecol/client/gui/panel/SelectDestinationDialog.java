@@ -224,7 +224,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                 if (s instanceof IndianSettlement
                     && !((IndianSettlement)s).hasContactedSettlement(player))
                     continue;
-                int turns = unit.getTurnsToReach(s, europe);
+                int turns = unit.getTurnsToReach(europe, s);
                 if (turns != FreeColObject.INFINITY) {
                     String extras = (s.getOwner() != unit.getOwner())
                         ? getExtras(unit, s, goodsTypes) : "";
