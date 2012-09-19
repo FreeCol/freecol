@@ -776,7 +776,7 @@ public class Map extends FreeColGameObject implements Location {
                 if (path == null) {
                     throw new IllegalStateException("SEARCH-FAIL: " + unit
                         + "/" + carrier + " from " + tile + " to " + end
-                        + " original=" + p.fullPathToString());
+                        + "\n" + p.fullPathToString());
                 }
 
                 // At the front of the path insert a node for the
@@ -1115,7 +1115,8 @@ public class Map extends FreeColGameObject implements Location {
                 });
         final Europe europe = (unit == null) ? null
             : unit.getOwner().getEurope();
-        final List<Location> tracing = (traceSearch) ? new ArrayList<Location>()
+        final List<Location> tracing = (traceSearch)
+            ? new ArrayList<Location>()
             : null;
         Unit waterUnit = (carrier != null) ? carrier : unit;
         Unit currentUnit = (start.isLand())
@@ -1214,8 +1215,8 @@ public class Map extends FreeColGameObject implements Location {
                     ? ((carrierMove) ? MoveStep.BYWATER
                         : (unitMove) ? MoveStep.DISEMBARK
                         : MoveStep.FAIL)
-                    : ((carrierMove
-                            && !usedCarrier(currentNode)) ? MoveStep.EMBARK
+                    : ((carrierMove && !usedCarrier(currentNode))
+                        ? MoveStep.EMBARK
                         : (unitMove) ? ((unit.isNaval())
                             ? MoveStep.BYWATER
                             : MoveStep.BYLAND)

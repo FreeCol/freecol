@@ -146,4 +146,32 @@ public final class GoalDeciders {
             }
         };
     }
+
+    /**
+     * Builds a goal decider to find an adjacent tile to a target location.
+     *
+     * @param target The target <code>Location</code>.
+     * @return A <code>GoalDecider</code> that only succeeds for tiles adjacent
+     *     to the target location.
+     */
+    public static GoalDecider getAdjacentLocationGoalDecider(Location target) {
+        final Tile tile = target.getTile();
+        if (tile == null) return null;
+
+        return new GoalDecider() {
+            private PathNode best = null;
+
+            public PathNode getGoal() { return best; }
+            public boolean hasSubGoals() { return false; }
+            public boolean check(Unit u, PathNode path) {
+                Tile t = path.getTile();
+                if (t != null && t.isAdjacent(tile)) {
+                    best = path;
+                    return true;
+                }
+                return false;
+            }
+        };
+    }
 }
+

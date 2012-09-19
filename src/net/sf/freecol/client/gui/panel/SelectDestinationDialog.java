@@ -72,6 +72,7 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
+import net.sf.freecol.common.model.pathfinding.GoalDeciders;
 import net.sf.freecol.common.util.Utils;
 
 
@@ -224,12 +225,21 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                 if (s instanceof IndianSettlement
                     && !((IndianSettlement)s).hasContactedSettlement(player))
                     continue;
-                int turns = unit.getTurnsToReach(europe, s);
-                if (turns != FreeColObject.INFINITY) {
-                    String extras = (s.getOwner() != unit.getOwner())
-                        ? getExtras(unit, s, goodsTypes) : "";
-                    destinations.add(new Destination(s, turns, extras));
+                int turns;
+                if (p == player) {
+                    turns = unit.getTurnsToReach(s);
+                    if (turns == FreeColObject.INFINITY) continue;
+                } else {
+                    PathNode path = unit.search(europe,
+                        GoalDeciders.getAdjacentLocationGoalDecider(s),
+                        null, FreeColObject.INFINITY, null);
+                    if (path == null) continue;
+                    turns = path.getTotalTurns();
+                    if (path.getLastNode().getMovesLeft() <= 0) turns++;
                 }
+                String extras = (s.getOwner() != unit.getOwner())
+                    ? getExtras(unit, s, goodsTypes) : "";
+                destinations.add(new Destination(s, turns, extras));
             }
         }
 
