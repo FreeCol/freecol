@@ -342,7 +342,7 @@ public class Unit extends GoodsLocation
     protected Unit teacher;
 
     /** The equipment this Unit carries. */
-    protected TypeCountMap<EquipmentType> equipment
+    protected final TypeCountMap<EquipmentType> equipment
         = new TypeCountMap<EquipmentType>();
 
 
@@ -479,16 +479,16 @@ public class Unit extends GoodsLocation
      * Set the <code>Equipment</code> value.
      *
      * @param newEquipment The new Equipment value.
-     */
     public final void setEquipment(final TypeCountMap<EquipmentType> newEquipment) {
         this.equipment = newEquipment;
     }
+     */
 
     /**
      * Clears all <code>Equipment</code> held by this unit.
      */
     public void clearEquipment() {
-        setEquipment(new TypeCountMap<EquipmentType>());
+        equipment.clear();
     }
 
     /**
@@ -2717,27 +2717,24 @@ public class Unit extends GoodsLocation
      * @return a <code>String</code> value
      */
     public StringTemplate getEquipmentLabel() {
-        if (equipment != null && !equipment.isEmpty()) {
-            StringTemplate result = StringTemplate.label("/");
-            for (java.util.Map.Entry<EquipmentType, Integer> entry : equipment.getValues().entrySet()) {
-                EquipmentType type = entry.getKey();
-                int amount = entry.getValue().intValue();
-                if (type.getGoodsRequired().isEmpty()) {
+        if (equipment.isEmpty()) return null;
+        StringTemplate result = StringTemplate.label("/");
+        for (java.util.Map.Entry<EquipmentType, Integer> entry : equipment.getValues().entrySet()) {
+            EquipmentType type = entry.getKey();
+            int amount = entry.getValue().intValue();
+            if (type.getGoodsRequired().isEmpty()) {
+                result.addStringTemplate(StringTemplate.template("model.goods.goodsAmount")
+                    .add("%goods%", type.getNameKey())
+                    .addName("%amount%", Integer.toString(amount)));
+            } else {
+                for (AbstractGoods goods : type.getGoodsRequired()) {
                     result.addStringTemplate(StringTemplate.template("model.goods.goodsAmount")
-                                             .add("%goods%", type.getNameKey())
-                                             .addName("%amount%", Integer.toString(amount)));
-                } else {
-                    for (AbstractGoods goods : type.getGoodsRequired()) {
-                        result.addStringTemplate(StringTemplate.template("model.goods.goodsAmount")
-                                                 .add("%goods%", goods.getType().getNameKey())
-                                                 .addName("%amount%", Integer.toString(amount * goods.getAmount())));
-                    }
+                        .add("%goods%", goods.getType().getNameKey())
+                        .addName("%amount%", Integer.toString(amount * goods.getAmount())));
                 }
             }
-            return result;
-        } else {
-            return null;
         }
+        return result;
     }
 
 
@@ -3833,7 +3830,7 @@ public class Unit extends GoodsLocation
         location = newLocation(in.getAttributeValue(null, "location"));
         clearUnitList();
         if (getGoodsContainer() != null) getGoodsContainer().removeAll();
-        equipment.clear();
+        clearEquipment();
         setWorkImprovement(null);
     }
 

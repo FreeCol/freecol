@@ -527,9 +527,7 @@ public class InGameControllerTest extends FreeColTestCase {
                      colonial.getMoveType(tile2));
 
         // Colonial regulars should never be unarmed
-        TypeCountMap<EquipmentType> equipment = new TypeCountMap<EquipmentType>();
-        equipment.incrementCount(muskets, 1);
-        colonial.setEquipment(equipment);
+        colonial.changeEquipment(muskets, 1);
 
         // Veteran attacks and demotes the Colonial Regular
         crs = fakeAttackResult(CombatResult.WIN, soldier, colonial);
