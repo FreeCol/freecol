@@ -865,9 +865,8 @@ public class Map extends FreeColGameObject implements Location {
                            final int maxTurns, final Unit carrier) {
         Location entry = findRealStart(unit, start, carrier);
         int initialTurns = (!unit.isAtSea()) ? 0
-            : (unit.isOnCarrier()) ? unit.getCarrier().getWorkLeft()
-            : unit.getWorkLeft();
-
+            : ((unit.isOnCarrier()) ? unit.getCarrier() : unit).getWorkLeft();
+        
         PathNode path;
         if (entry instanceof Europe) {
             Unit waterUnit = (carrier != null) ? carrier : unit;

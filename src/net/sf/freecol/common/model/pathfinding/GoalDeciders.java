@@ -35,55 +35,6 @@ import net.sf.freecol.common.model.Unit;
 public final class GoalDeciders {
 
     /**
-     * A Goal Decider to find the `closest' settlement owned by the
-     * searching unit player, with connected ports weighted double.
-     */
-    private static GoalDecider ourClosestSettlementGoalDecider
-        = new GoalDecider() {
-                private PathNode bestPath = null;
-                private float bestValue = 0.0f;
-
-                public PathNode getGoal() { return bestPath; }
-                public boolean hasSubGoals() { return true; }
-                public boolean check(Unit u, PathNode path) {
-                    Location loc = path.getLastNode().getLocation();
-                    Settlement settlement = loc.getSettlement();
-                    if (settlement != null && settlement.getOwner().owns(u)) {
-                        float value = ((settlement.isConnectedPort()) ? 2.0f
-                            : 1.0f) / (path.getTotalTurns() + 1);
-                        if (bestValue < value) {
-                            bestValue = value;
-                            bestPath = path;
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-            };
-
-    /**
-     * A goal decider to find the closest high seas tile to a target.
-     * Used when arriving on the map from Europe.
-     */
-    private static GoalDecider highSeasGoalDecider
-        = new GoalDecider() {
-                private PathNode best = null;
-
-                public PathNode getGoal() { return best; }
-                public boolean hasSubGoals() { return false; }
-                public boolean check(Unit u, PathNode path) {
-                    if (path.getTile() != null
-                        && path.getTile().isDirectlyHighSeasConnected()) {
-                        if (best == null || path.getCost() < best.getCost()) {
-                            best = path;
-                        }
-                        return true;
-                    }
-                    return false;
-                }
-            };
-
-    /**
      * Gets a composite goal decider composed of two or more individual
      * goal deciders.  The first one dominates the second etc.
      *
@@ -119,21 +70,58 @@ public final class GoalDeciders {
     }
 
     /**
-     * Accessor for ourClosestSettlementGoalDecider.
+     * Gets a GoalDecider to find the `closest' settlement owned by the
+     * searching unit player, with connected ports weighted double.
      *
-     * @returns ourClosestSettlementGoalDecider.
+     * @return The closest settlement goal decider.
      */
     public static GoalDecider getOurClosestSettlementGoalDecider() {
-        return ourClosestSettlementGoalDecider;
+        return new GoalDecider() {
+            private PathNode bestPath = null;
+            private float bestValue = 0.0f;
+
+            public PathNode getGoal() { return bestPath; }
+            public boolean hasSubGoals() { return true; }
+            public boolean check(Unit u, PathNode path) {
+                Location loc = path.getLastNode().getLocation();
+                Settlement settlement = loc.getSettlement();
+                if (settlement != null && settlement.getOwner().owns(u)) {
+                    float value = ((settlement.isConnectedPort()) ? 2.0f
+                        : 1.0f) / (path.getTotalTurns() + 1);
+                    if (bestValue < value) {
+                        bestValue = value;
+                        bestPath = path;
+                        return true;
+                    }
+                }
+                return false;
+            }
+        };
     }
 
     /**
-     * Get the high seas goal decider.
+     * Gets a GoalDecider to find the closest high seas tile to a target.
+     * Used when arriving on the map from Europe.
      *
      * @return The high seas goal decider.
      */
     public static GoalDecider getHighSeasGoalDecider() {
-        return highSeasGoalDecider;
+        return new GoalDecider() {
+            private PathNode best = null;
+            
+            public PathNode getGoal() { return best; }
+            public boolean hasSubGoals() { return false; }
+            public boolean check(Unit u, PathNode path) {
+                if (path.getTile() != null
+                    && path.getTile().isDirectlyHighSeasConnected()) {
+                    if (best == null || path.getCost() < best.getCost()) {
+                        best = path;
+                    }
+                    return true;
+                }
+                return false;
+            }
+        };
     }
 
     /**
