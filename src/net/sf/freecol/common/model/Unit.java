@@ -3867,12 +3867,6 @@ public class Unit extends GoodsLocation
             }
         }
 
-        // ensure all carriers have a goods container, just in case
-        if (getGoodsContainer() == null && getType().canCarryGoods()) {
-            logger.warning("Carrier with ID " + getId() + " did not have a \"goodsContainer\"-tag.");
-            setGoodsContainer(new GoodsContainer(game, this));
-        }
-
         setRole();
         getOwner().setUnit(this);
         getOwner().invalidateCanSeeTiles();
