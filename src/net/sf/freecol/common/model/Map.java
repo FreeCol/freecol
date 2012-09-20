@@ -573,6 +573,35 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
+     * Are two locations non-null and either the same or at the same tile.
+     * This routine is here because Location is an interface.
+     *
+     * @param l1 The first <code>Location</code>.
+     * @param l2 The second <code>Location</code>.
+     * @return True if the locations are the same or at the same tile.
+     */
+    public static final boolean isSameLocation(Location l1, Location l2) {
+        return (l1 == null || l2 == null) ? false
+            : (l1 == l2) ? true
+            : (l1.getTile() == null) ? false
+            : l1.getTile() == l2.getTile();
+    }
+
+    /**
+     * Are two locations at least in the same contiguous land/sea-mass?
+     *
+     * @param l1 The first <code>Location</code>.
+     * @param l2 The second <code>Location</code>.
+     * @return True if the locations are the same or in the same land/sea-mass.
+     */
+    public static final boolean isSameContiguity(Location l1, Location l2) {
+        return (l1 == null || l2 == null) ? false
+            : (l1 == l2) ? true
+            : (l1.getTile() == null || l2.getTile() == null) ? false
+            : l1.getTile().getContiguity() == l2.getTile().getContiguity();
+    }            
+
+    /**
      * Gets the list of tiles that might be claimable by a settlement.
      * We can not do a simple iteration of the rings because this
      * allows settlements to claim tiles across unclaimable gaps
@@ -1320,140 +1349,19 @@ public class Map extends FreeColGameObject implements Location {
         return best;
     }
 
-    /**
-     * Searches for land within the given radius.
-     *
-     * @param x X-component of the position to search from.
-     * @param y Y-component of the position to search from.
-     * @param distance The radius in tiles that should be searched for land.
-     * @return The first land tile found within the radius, or null if none
-     *     found.
-     */
-    public Tile getLandWithinDistance(int x, int y, int distance) {
-        Iterator<Position> i = getCircleIterator(new Position(x, y), true,
-                distance);
-        while (i.hasNext()) {
-            Tile t = getTile(i.next());
-            if (t.isLand()) return t;
-        }
-        return null;
-    }
 
+    // Support for various kinds of iteration.
 
     /**
-     * Gets an <code>Iterator</code> of every <code>Tile</code> on the map.
-     *
-     * @return the <code>Iterator</code>.
-     */
-    public WholeMapIterator getWholeMapIterator() {
-        return new WholeMapIterator();
-    }
-
-
-    /**
-     * Get an adjacent iterator.
-     *
-     * @param centerPosition
-     *            The center position to iterate around
-     * @return Iterator
-     */
-    public Iterator<Position> getAdjacentIterator(Position centerPosition) {
-        return new AdjacentIterator(centerPosition);
-    }
-
-    /**
-     * Get a border adjacent iterator.
-     *
-     * @param centerPosition
-     *            The center position to iterate around
-     * @return Iterator
-     */
-    public Iterator<Position> getBorderAdjacentIterator(Position centerPosition) {
-        return new BorderAdjacentIterator(centerPosition);
-    }
-
-    /**
-     * Get a flood fill iterator.
-     *
-     * @param centerPosition
-     *            The center position to iterate around
-     * @return Iterator
-     */
-    public Iterator<Position> getFloodFillIterator(Position centerPosition) {
-        return new CircleIterator(centerPosition, true, INFINITY);
-    }
-
-    /**
-     * Get a circle iterator.
-     *
-     * @param center
-     *            The center position to iterate around
-     * @param isFilled
-     *            True to get all of the positions in the circle
-     * @param radius
-     *            Radius of circle
-     * @return Iterator
-     */
-    public CircleIterator getCircleIterator(Position center, boolean isFilled,
-            int radius) {
-        return new CircleIterator(center, isFilled, radius);
-    }
-
-    /**
-     * Checks whether a position is valid (within the map limits).
-     *
-     * @param position
-     *            The position
-     * @return True if it is valid
-     */
-    public boolean isValid(Position position) {
-        return isValid(position.x, position.y, getWidth(), getHeight());
-    }
-
-    /**
-     * Checks whether a position is valid (within the map limits).
-     *
-     * @param x
-     *            X coordinate
-     * @param y
-     *            Y coordinate
-     * @return True if it is valid
-     */
-    public boolean isValid(int x, int y) {
-        return isValid(x, y, getWidth(), getHeight());
-    }
-
-    /**
-     * Checks whether a position is valid.
-     *
-     * @param position The <code>Position</code> to check.
-     * @param width The width of the map.
-     * @param height The height of the map.
-     * @return True if the given position is within the bounds of the map.
-     */
-    public static boolean isValid(Position position, int width, int height) {
-        return isValid(position.x, position.y, width, height);
-    }
-
-    /**
-     * Checks if an (x,y) coordinate tuple is within a map of
-     * specified width and height.
-     *
-     * @param x The x-coordinate of the position.
-     * @param y The y-coordinate of the position.
-     * @param width The width of the map.
-     * @param height The height of the map.
-     * @return True if the given position is within the bounds of the map.
-     */
-    public static boolean isValid(int x, int y, int width, int height) {
-        return x >= 0 && x < width && y >= 0 && y < height;
-    }
-
-    /**
-     * Represents a position on the Map.
+     * A position on the Map.
      */
     public static final class Position {
+        
+        /**
+         * The coordinates of the position.
+         */
         public final int x, y;
+
 
         /**
          * Creates a new <code>Position</code> object with the given
@@ -1517,19 +1425,11 @@ public class Map extends FreeColGameObject implements Location {
         }
 
         /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String toString() {
-            return "(" + x + ", " + y + ")";
-        }
-
-        /**
          * Gets the position adjacent to a given position, in a given
          * direction.
          *
-         * @param direction The direction (N, NE, E, etc.)
-         * @return Adjacent position
+         * @param direction The <code>Direction</code> to check.
+         * @return The adjacent position.
          */
         public Position getAdjacent(Direction direction) {
             int x = this.x + (((this.y & 1) != 0) ? direction.getOddDX()
@@ -1546,8 +1446,8 @@ public class Map extends FreeColGameObject implements Location {
          * error.  It should cover all cases, but I wouldn't bet my
          * life on it.
          *
-         * @param position The <code>Position</code> to compare.
-         * @return The distance to the other position.
+         * @param position The other <code>Position</code> to compare.
+         * @return The distance in tiles to the other position.
          */
         public int getDistance(Position position) {
             int ay = getY();
@@ -1561,7 +1461,63 @@ public class Map extends FreeColGameObject implements Location {
             }
             return Math.max(Math.abs(ay - by + r), Math.abs(r));
         }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String toString() {
+            return "(" + x + ", " + y + ")";
+        }
     }
+
+    /**
+     * Checks if an (x,y) coordinate tuple is within a map of
+     * specified width and height.
+     *
+     * @param x The x-coordinate of the position.
+     * @param y The y-coordinate of the position.
+     * @param width The width of the map.
+     * @param height The height of the map.
+     * @return True if the given position is within the bounds of the map.
+     */
+    public static boolean isValid(int x, int y, int width, int height) {
+        return x >= 0 && x < width && y >= 0 && y < height;
+    }
+
+    /**
+     * Checks whether a position is valid within a given map size.
+     *
+     * @param position The <code>Position</code> to check.
+     * @param width The width of the map.
+     * @param height The height of the map.
+     * @return True if the given position is within the bounds of the map.
+     */
+    public static boolean isValid(Position position, int width, int height) {
+        return isValid(position.x, position.y, width, height);
+    }
+
+    /**
+     * Checks whether a position is valid (within the map limits).
+     *
+     * @param position The <code>Position</code> to check.
+     * @return True if the position is valid.
+     */
+    public boolean isValid(Position position) {
+        return isValid(position.x, position.y, getWidth(), getHeight());
+    }
+
+    /**
+     * Checks whether a position is valid (within the map limits).
+     *
+     * @param x The X coordinate to check.
+     * @param y The Y coordinate to check.
+     * @return True if the coordinates are valid.
+     */
+    public boolean isValid(int x, int y) {
+        return isValid(x, y, getWidth(), getHeight());
+    }
+
 
     /**
      * Base class for internal iterators.
@@ -1571,18 +1527,16 @@ public class Map extends FreeColGameObject implements Location {
         /**
          * Get the next position as a position rather as an object.
          *
-         * @return position.
-         * @throws NoSuchElementException
-         *             if iterator is exhausted.
+         * @return The next <code>Position</code>.
+         * @throws NoSuchElementException if the iterator is exhausted.
          */
         public abstract Position nextPosition() throws NoSuchElementException;
 
         /**
          * Returns the next element in the iteration.
          *
-         * @return the next element in the iteration.
-         * @exception NoSuchElementException
-         *                iteration has no more elements.
+         * @return The next element in the iteration.
+         * @exception NoSuchElementException if the iterator is exhausted.
          */
         public Position next() {
             return nextPosition();
@@ -1592,145 +1546,116 @@ public class Map extends FreeColGameObject implements Location {
          * Removes from the underlying collection the last element returned by
          * the iterator (optional operation).
          *
-         * @exception UnsupportedOperationException
-         *                no matter what.
+         * @exception UnsupportedOperationException no matter what.
          */
         public void remove() {
             throw new UnsupportedOperationException();
         }
     }
 
-    public final class WholeMapIterator extends MapIterator {
-        private int x;
-        private int y;
-
-        /**
-         * Default constructor.
-         */
-        public WholeMapIterator() {
-            x = 0;
-            y = 0;
-        }
-
-        /**
-         * Determine if the iterator has another position in it.
-         *
-         * @return True of there is another position
-         */
-        public boolean hasNext() {
-            return y < getHeight();
-        }
-
-        /**
-         * Obtain the next position to iterate over.
-         *
-         * @return Next position
-         * @throws java.util.NoSuchElementException
-         *             if last position already returned
-         */
-        @Override
-        public Position nextPosition() throws NoSuchElementException {
-            if (y < getHeight()) {
-                Position newPosition = new Position(x, y);
-                x++;
-                if (x == getWidth()) {
-                    x = 0;
-                    y++;
-                }
-                return newPosition;
-            }
-            throw new NoSuchElementException("Iterator exhausted");
-        }
-    }
-
+    /**
+     * An iterator for the valid tiles immediately around a base tile.
+     */
     private final class AdjacentIterator extends MapIterator {
-        // The starting tile position
+
+        /** The starting tile position */
         private Position basePosition;
-        // Index into the list of adjacent tiles
-        private int x = 0;
+
+        /** The index into the list of adjacent tiles. */
+        private int index = 0;
+
 
         /**
-         * The constructor to use.
+         * Create a new AdjacentIterator.
          *
-         * @param basePosition
-         *            The position around which to iterate
+         * @param basePosition The <code>Position</code> around which
+         *     to iterate.
          */
         public AdjacentIterator(Position basePosition) {
             this.basePosition = basePosition;
         }
 
         /**
-         * Determine if the iterator has another position in it.
+         * Checks if the iterator has another position in it.
          *
          * @return True of there is another position
          */
         public boolean hasNext() {
-            for (int i = x; i < Direction.NUMBER_OF_DIRECTIONS; i++) {
-                Position newPosition = basePosition.getAdjacent(Direction.values()[i]);
-                if (isValid(newPosition))
-                    return true;
+            for (int i = index; i < Direction.NUMBER_OF_DIRECTIONS; i++) {
+                Direction d = Direction.values()[i];
+                Position newPosition = basePosition.getAdjacent(d);
+                if (isValid(newPosition)) return true;
             }
             return false;
         }
 
         /**
-         * Obtain the next position to iterate over.
+         * Gets the next position in the iteration.
          *
-         * @return Next position
-         * @throws NoSuchElementException
-         *             if last position already returned
+         * @return The next <code>Position</code>.
+         * @throws NoSuchElementException if the iterator is exhausted.
          */
         @Override
         public Position nextPosition() throws NoSuchElementException {
-            for (int i = x; i < Direction.NUMBER_OF_DIRECTIONS; i++) {
-                Position newPosition = basePosition.getAdjacent(Direction.values()[i]);
+            for (int i = index; i < Direction.NUMBER_OF_DIRECTIONS; i++) {
+                Direction d = Direction.values()[i];
+                Position newPosition = basePosition.getAdjacent(d);
                 if (isValid(newPosition)) {
-                    x = i + 1;
+                    index = i + 1;
                     return newPosition;
                 }
             }
-            throw new NoSuchElementException("Iterator exhausted");
+            throw new NoSuchElementException("AdjacentIterator exhausted");
         }
     }
 
     /**
-     * An interator returning positions in a spiral starting at a given center
-     * tile. The center tile is never included in the positions returned, and
-     * all returned positions are valid.
+     * Get an iterator for the adjacent tiles to a center position.
      *
-     * @see Map.Position
+     * @param centerPosition The center <code>Position</code> to
+     *     iterate around.
+     * @return An adjacent tile iterator.
      */
-    public final class CircleIterator extends MapIterator {
+    public MapIterator getAdjacentIterator(Position centerPosition) {
+        return new AdjacentIterator(centerPosition);
+    }
+
+    /**
+     * An iterator returning positions in a spiral starting at a given
+     * center tile.  The center tile is never included in the
+     * positions returned, and all returned positions are valid.
+     */
+    private final class CircleIterator extends MapIterator {
+
+        /** The maximum radius. */
         private int radius;
+        /** The current radius of the iteration. */
         private int currentRadius;
-        private Position nextPosition = null;
-        // The current position in the circle with the current radius:
+        /** The current index in the circle with the current radius: */
         private int n;
+        /** The current position in the circle. */
+        private Position nextPosition = null;
+
 
         /**
-         * The constructor to use.
+         * Create a new Circle Iterator.
          *
-         * @param center
-         *            The center of the circle
-         * @param isFilled
-         *            True to get all of the positions within the circle
-         * @param radius
-         *            The radius of the circle
+         * @param center The center <code>Position</code> of the circle.
+         * @param isFilled True to get all of the positions within the circle.
+         * @param radius The radius of the circle.
          */
         public CircleIterator(Position center, boolean isFilled, int radius) {
-            this.radius = radius;
-
             if (center == null) {
                 throw new IllegalArgumentException("center must not be null.");
             }
-
+            this.radius = radius;
             n = 0;
 
             if (isFilled || radius == 1) {
                 nextPosition = center.getAdjacent(Direction.NE);
                 currentRadius = 1;
             } else {
-                currentRadius = radius;
+                this.currentRadius = radius;
                 nextPosition = center;
                 for (int i = 1; i < radius; i++) {
                     nextPosition = nextPosition.getAdjacent(Direction.N);
@@ -1743,10 +1668,10 @@ public class Map extends FreeColGameObject implements Location {
         }
 
         /**
-         * Returns the current radius of the circle.
+         * Gets the current radius of the circle.
          *
          * @return The distance from the center tile this
-         *         <code>CircleIterator</code> was initialized with.
+         *     <code>CircleIterator</code> was initialized with.
          */
         public int getCurrentRadius() {
             return currentRadius;
@@ -1756,7 +1681,7 @@ public class Map extends FreeColGameObject implements Location {
          * Finds the next position.
          */
         private void determineNextPosition() {
-            boolean positionReturned = (n != 0);
+            boolean positionReturned = n != 0;
             do {
                 n++;
                 final int width = currentRadius * 2;
@@ -1789,7 +1714,7 @@ public class Map extends FreeColGameObject implements Location {
                         break;
                     default:
                         throw new IllegalStateException("i=" + i + ", n=" + n
-                                + ", width=" + width);
+                                                        + ", width=" + width);
                     }
                     nextPosition = nextPosition.getAdjacent(direction);
                 }
@@ -1797,301 +1722,156 @@ public class Map extends FreeColGameObject implements Location {
         }
 
         /**
-         * Determine if the iterator has another position in it.
+         * Check if the iterator has another position in it.
          *
-         * @return <code>true</code> of there is another position and
-         *         <code>false</code> otherwise.
+         * @return True if there is another position.
          */
         public boolean hasNext() {
             return nextPosition != null;
         }
 
         /**
-         * Obtains the next position.
+         * Gets the next position.
          *
-         * @return The next position. This position is guaranteed to be
-         *         {@link Map#isValid(net.sf.freecol.common.model.Map.Position) valid}.
+         * @return The next valid position.
          */
         @Override
         public Position nextPosition() {
-            if (nextPosition != null) {
-                final Position p = nextPosition;
-                determineNextPosition();
-                return p;
-            } else {
-                return null;
-            }
+            if (nextPosition == null) return null;
+            final Position p = nextPosition;
+            determineNextPosition();
+            return p;
         }
     }
 
     /**
-     * Make the map usable as a parameter in the for-loop.
+     * Gets a circle iterator.
      *
-     * Returns all Tiles based on the order of the WholeMapIterator.
-     *
-     * @return An Iterable that can be used to get an iterator for all tiles of the map.
+     * @param center The center <code>Position</code> to iterate around.
+     * @param isFilled True to get all of the positions in the circle.
+     * @param radius The radius of circle.
+     * @return The circle iterator.
      */
-    public Iterable<Tile> getAllTiles() {
-        return new Iterable<Tile>(){
-            public Iterator<Tile> iterator(){
-                final WholeMapIterator m = getWholeMapIterator();
+    public CircleIterator getCircleIterator(Position center, boolean isFilled,
+                                            int radius) {
+        return new CircleIterator(center, isFilled, radius);
+    }
 
-                return new Iterator<Tile>(){
-                    public boolean hasNext() {
-                        return m.hasNext();
-                    }
+    /**
+     * An iterator for the whole map.
+     */
+    private final class WholeMapIterator extends MapIterator {
+       
+        /**
+         * The current coordinate position in the iteration.
+         */
+        private int x, y;
 
-                    public Tile next() {
-                        return getTile(m.next());
-                    }
 
-                    public void remove() {
-                        m.remove();
-                    }
+        /**
+         * Default constructor.
+         */
+        public WholeMapIterator() {
+            x = 0;
+            y = 0;
+        }
+
+        /**
+         * Checks if the iterator has another position in it.
+         *
+         * @return True of there is another position
+         */
+        public boolean hasNext() {
+            return y < getHeight();
+        }
+
+        /**
+         * Gets the next position in the iteration.
+         *
+         * @return The next <code>Position</code>.
+         * @throws NoSuchElementException if the iterator is exhausted.
+         */
+        @Override
+        public Position nextPosition() throws NoSuchElementException {
+            if (!hasNext()) {
+                throw new NoSuchElementException("WholeMapIterator exhausted");
+            }
+            Position newPosition = new Position(x, y);
+            x++;
+            if (x == getWidth()) {
+                x = 0;
+                y++;
+            }
+            return newPosition;
+        }
+    }
+
+    /**
+     * Gets an <code>Iterator</code> of every <code>Tile</code> on the map.
+     *
+     * @return The <code>Iterator</code>.
+     */
+    public MapIterator getWholeMapIterator() {
+        return new WholeMapIterator();
+    }
+
+    /**
+     * Makes an iterable version of a map iterator.
+     *
+     * @param m The <code>MapIterator</code>.
+     * @return A corresponding iterable.
+     */
+    private Iterable<Tile> makeMapIteratorIterable(final MapIterator m) {
+        return new Iterable<Tile>() {
+            public Iterator<Tile> iterator() {
+                return new Iterator<Tile>() {
+                    public boolean hasNext() { return m.hasNext(); }
+                    public Tile next() { return getTile(m.next()); }
+                    public void remove() { m.remove(); }
                 };
             }
         };
     }
 
-    private final class BorderAdjacentIterator extends MapIterator {
-        // The starting tile position
-        private Position basePosition;
-        // Index into the list of adjacent tiles
-        private int index;
-
-        /**
-         * The constructor to use.
-         *
-         * @param basePosition
-         *            The position around which to iterate
-         */
-        public BorderAdjacentIterator(Position basePosition) {
-            this.basePosition = basePosition;
-            index = 1;
-        }
-
-        /**
-         * Determine if the iterator has another position in it.
-         *
-         * @return True of there is another position
-         */
-        public boolean hasNext() {
-            for (int i = index; i < Direction.NUMBER_OF_DIRECTIONS; i += 2) {
-                Position newPosition = basePosition.getAdjacent(Direction.values()[i]);
-                if (isValid(newPosition))
-                    return true;
-            }
-            return false;
-        }
-
-        /**
-         * Obtain the next position to iterate over.
-         *
-         * @return Next position
-         * @throws NoSuchElementException
-         *             if last position already returned
-         */
-        @Override
-        public Position nextPosition() throws NoSuchElementException {
-            for (int i = index; i < Direction.NUMBER_OF_DIRECTIONS; i += 2) {
-                Position newPosition = basePosition.getAdjacent(Direction.values()[i]);
-                if (isValid(newPosition)) {
-                    index = i + 2;
-                    return newPosition;
-                }
-            }
-            throw new NoSuchElementException("Iterator exhausted");
-        }
+    /**
+     * Gets an iterable for all the tiles in the map on using an
+     * underlying WholeMapIterator.
+     *
+     * @return An <code>Iterable</code> for all tiles of the map.
+     */
+    public Iterable<Tile> getAllTiles() {
+        return makeMapIteratorIterable(getWholeMapIterator());
     }
 
     /**
-     * Are two locations non-null and either the same or at the same tile.
-     * This routine is here because Location is an interface.
+     * Searches for land within the given radius.
      *
-     * @param l1 The first <code>Location</code>.
-     * @param l2 The second <code>Location</code>.
-     * @return True if the locations are the same or at the same tile.
+     * @param x X-component of the position to search from.
+     * @param y Y-component of the position to search from.
+     * @param distance The radius in tiles that should be searched for land.
+     * @return The first land tile found within the radius, or null if none
+     *     found.
      */
-    public static final boolean isSameLocation(Location l1, Location l2) {
-        return (l1 == null || l2 == null) ? false
-            : (l1 == l2) ? true
-            : (l1.getTile() == null) ? false
-            : l1.getTile() == l2.getTile();
-    }
-
-    /**
-     * Are two locations at least in the same contiguous land/sea-mass?
-     *
-     * @param l1 The first <code>Location</code>.
-     * @param l2 The second <code>Location</code>.
-     * @return True if the locations are the same or in the same land/sea-mass.
-     */
-    public static final boolean isSameContiguity(Location l1, Location l2) {
-        return (l1 == null || l2 == null) ? false
-            : (l1 == l2) ? true
-            : (l1.getTile() == null || l2.getTile() == null) ? false
-            : l1.getTile().getContiguity() == l2.getTile().getContiguity();
-    }            
-
-    // Location interface
-
-    /**
-     * Returns <code>null</code>.
-     *
-     * @return <code>null</code>
-     */
-    public Tile getTile() {
+    public Tile getLandWithinDistance(int x, int y, int distance) {
+        MapIterator i = getCircleIterator(new Position(x, y), true, distance);
+        while (i.hasNext()) {
+            Tile t = getTile(i.next());
+            if (t.isLand()) return t;
+        }
         return null;
     }
 
     /**
-     * Returns the name of this location.
+     * Get a flood fill iterator.
+     * Simulated by making a filled circle iterator with an unlimited radius.
      *
-     * @return The name of this location.
+     * @param centerPosition The center <code>Position</code> to
+     *     iterate around.
+     * @return A simulated flood fill iterator.
      */
-    public StringTemplate getLocationName() {
-        return StringTemplate.key("NewWorld");
+    public MapIterator getFloodFillIterator(Position centerPosition) {
+        return new CircleIterator(centerPosition, true, INFINITY);
     }
-
-    /**
-     * Returns the name of this location for a particular player.
-     *
-     * @param player The <code>Player</code> to return the name for.
-     * @return The name of this location.
-     */
-    public StringTemplate getLocationNameFor(Player player) {
-        String name = player.getNewLandName();
-        if (name == null) {
-            return getLocationName();
-        } else {
-            return StringTemplate.name(name);
-        }
-    }
-
-    /**
-     * Adds a <code>Locatable</code> to this Location. It the given
-     * Locatable is a Unit, its location is set to its entry location,
-     * otherwise nothing happens.
-     *
-     * @param locatable
-     *            The <code>Locatable</code> to add to this Location.
-     */
-    public boolean add(Locatable locatable) {
-        if (locatable instanceof Unit) {
-            Unit unit = (Unit) locatable;
-            unit.setLocation(unit.getEntryLocation());
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Removes a <code>Locatable</code> from this Location.
-     *
-     * @param locatable
-     *            The <code>Locatable</code> to remove from this Location.
-     */
-    public boolean remove(Locatable locatable) {
-        if (locatable instanceof Unit) {
-            Tile tile = ((Unit) locatable).getTile();
-            if (tile != null) {
-                return tile.remove(locatable);
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Checks if this <code>Location</code> contains the specified
-     * <code>Locatable</code>.
-     *
-     * @param locatable
-     *            The <code>Locatable</code> to test the presence of.
-     * @return
-     *            <ul>
-     *            <li><i>true</i> if the specified <code>Locatable</code> is
-     *            on this <code>Location</code> and
-     *            <li><i>false</i> otherwise.
-     *            </ul>
-     */
-    public boolean contains(Locatable locatable) {
-        if (locatable.getLocation() == null) {
-            return false;
-        } else if (locatable.getLocation().getTile() == null) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    /**
-     * Checks whether or not the specified locatable may be added to this
-     * <code>Location</code>.
-     *
-     * @param locatable
-     *            The <code>Locatable</code> to add.
-     * @return The result.
-     */
-    public boolean canAdd(Locatable locatable) {
-        return (locatable instanceof Unit);
-    }
-
-    /**
-     * Returns <code>-1</code>
-     *
-     * @return <code>-1</code>
-     */
-    public int getUnitCount() {
-        return -1;
-    }
-
-    /**
-     * Returns an empty list.
-     *
-     * @return an empty list
-     */
-    public List<Unit> getUnitList() {
-        return Collections.emptyList();
-    }
-
-    /**
-     * Returns an <code>Iterator</code> for an empty list.
-     *
-     * @return The <code>Iterator</code>.
-     */
-    public Iterator<Unit> getUnitIterator() {
-        return getUnitList().iterator();
-    }
-
-    /**
-     * Gets the <code>GoodsContainer</code> this <code>Location</code> use
-     * for storing it's goods.
-     *
-     * @return The <code>GoodsContainer</code> or <code>null</code> if the
-     *         <code>Location</code> cannot store any goods.
-     */
-    public GoodsContainer getGoodsContainer() {
-        return null;
-    }
-
-    /**
-     * Returns <code>null</code>.
-     *
-     * @return <code>null</code>
-     */
-    public Settlement getSettlement() {
-        return null;
-    }
-
-    /**
-     * Returns <code>null</code>.
-     *
-     * @return <code>null</code>
-     */
-    public Colony getColony() {
-        return null;
-    }
-
 
     /**
      * Flood fills from a given <code>Position</code> p, based on
@@ -2270,34 +2050,127 @@ public class Map extends FreeColGameObject implements Location {
         }
     }
 
+    // Location interface.
+    // getId() inherited.
+
+    /**
+     * Gets the location tile.  Obviously not applicable to a Map.
+     *
+     * @return Null.
+     */
+    public Tile getTile() {
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public StringTemplate getLocationName() {
+        return StringTemplate.key("NewWorld");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public StringTemplate getLocationNameFor(Player player) {
+        String name = player.getNewLandName();
+        return (name == null) ? getLocationName() : StringTemplate.name(name);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean add(Locatable locatable) {
+        if (locatable instanceof Unit) {
+            Unit unit = (Unit)locatable;
+            unit.setLocation(unit.getEntryLocation());
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean remove(Locatable locatable) {
+        if (locatable instanceof Unit) {
+            Tile tile = ((Unit)locatable).getTile();
+            if (tile != null) return tile.remove(locatable);
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean contains(Locatable locatable) {
+        return locatable instanceof Unit
+            && locatable.getLocation() != null
+            && locatable.getLocation().getTile() != null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean canAdd(Locatable locatable) {
+        return locatable instanceof Unit;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int getUnitCount() {
+        return -1;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public List<Unit> getUnitList() {
+        return Collections.emptyList();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Iterator<Unit> getUnitIterator() {
+        return getUnitList().iterator();
+    }
+
+    /**
+     * Gets the GoodsContainer for this Location.  Obviously
+     * irrelevant for a Map.
+     *
+     * @return Null.
+     */
+    public GoodsContainer getGoodsContainer() {
+        return null;
+    }
+
+    /**
+     * Gets the Settlement for this Location.  Obviously irrelevant
+     * for a Map.
+     *
+     * @return Null.
+     */
+    public Settlement getSettlement() {
+        return null;
+    }
+
+    /**
+     * Gets the Colony for this Location.  Obviously irrelevant for a Map.
+     *
+     * @return Null.
+     */
+    public Colony getColony() {
+        return null;
+    }
+
+
     // Serialization
 
     /**
-     * This method writes an XML-representation of this object to the given
-     * stream.
-     *
-     * <br>
-     * <br>
-     *
-     * Only attributes visible to the given <code>Player</code> will be added
-     * to that representation if <code>showAll</code> is set to
-     * <code>false</code>.
-     *
-     * @param out
-     *            The target stream.
-     * @param player
-     *            The <code>Player</code> this XML-representation should be
-     *            made for, or <code>null</code> if
-     *            <code>showAll == true</code>.
-     * @param showAll
-     *            Only attributes visible to <code>player</code> will be added
-     *            to the representation if <code>showAll</code> is set to
-     *            <i>false</i>.
-     * @param toSavedGame
-     *            If <code>true</code> then information that is only needed
-     *            when saving a game is added.
-     * @throws XMLStreamException
-     *             if there are any problems writing to the stream.
+     * {@inheritDoc}
      */
     @Override
     protected void toXMLImpl(XMLStreamWriter out, Player player,
@@ -2319,8 +2192,10 @@ public class Map extends FreeColGameObject implements Location {
         out.writeAttribute("width", Integer.toString(getWidth()));
         out.writeAttribute("height", Integer.toString(getHeight()));
         out.writeAttribute("layer", layer.toString());
-        out.writeAttribute("minimumLatitude", Integer.toString(minimumLatitude));
-        out.writeAttribute("maximumLatitude", Integer.toString(maximumLatitude));
+        out.writeAttribute("minimumLatitude",
+                           Integer.toString(minimumLatitude));
+        out.writeAttribute("maximumLatitude",
+                           Integer.toString(maximumLatitude));
     }
 
     /**
@@ -2344,12 +2219,11 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
+     * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in)
+        throws XMLStreamException {
         setLayer(Layer.valueOf(getAttribute(in, "layer", "ALL")));
 
         if (tiles == null) {
@@ -2364,11 +2238,15 @@ public class Map extends FreeColGameObject implements Location {
         calculateLatitudePerRow();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readChildren(XMLStreamReader in) throws XMLStreamException {
         boolean fixupHighSeas = false; // @compat 0.10.5
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if (in.getLocalName().equals(Tile.getXMLElementTagName())) {
+            String tag = in.getLocalName();
+            if (Tile.getXMLElementTagName().equals(tag)) {
                 Tile t = updateFreeColGameObject(in, Tile.class);
                 setTile(t, t.getX(), t.getY());
                 // @compat 0.10.5
@@ -2376,10 +2254,10 @@ public class Map extends FreeColGameObject implements Location {
                     fixupHighSeas = true;
                 }
                 // @end compatibility code
-            } else if (in.getLocalName().equals(Region.getXMLElementTagName())) {
+            } else if (Region.getXMLElementTagName().equals(tag)) {
                 setRegion(updateFreeColGameObject(in, Region.class));
             } else {
-                logger.warning("Unknown tag: " + in.getLocalName() + " loading map");
+                logger.warning("Unknown tag: " + tag + " loading map");
                 in.nextTag();
             }
         }
