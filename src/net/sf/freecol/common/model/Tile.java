@@ -1720,10 +1720,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public Settlement getNearestSettlement(Player owner, int radius) {
         if (radius <= 0) radius = INFINITY;
         Map map = getGame().getMap();
-        Iterator<Position> iter = map.getCircleIterator(getPosition(), true,
-                                                        radius);
-        while (iter.hasNext()) {
-            Tile t = map.getTile(iter.next());
+        for (Tile t : map.getCircleTiles(this, true, radius)) {
             if (t == this) continue;
             Settlement settlement = t.getSettlement();
             if (settlement != null

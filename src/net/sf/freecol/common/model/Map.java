@@ -1554,6 +1554,24 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
+     * Makes an iterable version of a map iterator.
+     *
+     * @param m The <code>MapIterator</code>.
+     * @return A corresponding iterable.
+     */
+    private Iterable<Tile> makeMapIteratorIterable(final MapIterator m) {
+        return new Iterable<Tile>() {
+            public Iterator<Tile> iterator() {
+                return new Iterator<Tile>() {
+                    public boolean hasNext() { return m.hasNext(); }
+                    public Tile next() { return getTile(m.next()); }
+                    public void remove() { m.remove(); }
+                };
+            }
+        };
+    }
+
+    /**
      * An iterator for the valid tiles immediately around a base tile.
      */
     private final class AdjacentIterator extends MapIterator {
@@ -1758,6 +1776,21 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
+     * Gets an iterable for all the tiles in the map on using an
+     * underlying CircleIterator.
+     *
+     * @param center The center <code>Tile</code> to iterate around.
+     * @param isFilled True to get all of the positions in the circle.
+     * @param radius The radius of circle.
+     * @return An <code>Iterable</code> for a circle of tiles.
+     */
+    public Iterable<Tile> getCircleTiles(Tile center, boolean isFilled,
+                                         int radius) {
+        return makeMapIteratorIterable(getCircleIterator(center.getPosition(),
+                                                         isFilled, radius));
+    }
+
+    /**
      * An iterator for the whole map.
      */
     private final class WholeMapIterator extends MapIterator {
@@ -1816,24 +1849,6 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Makes an iterable version of a map iterator.
-     *
-     * @param m The <code>MapIterator</code>.
-     * @return A corresponding iterable.
-     */
-    private Iterable<Tile> makeMapIteratorIterable(final MapIterator m) {
-        return new Iterable<Tile>() {
-            public Iterator<Tile> iterator() {
-                return new Iterator<Tile>() {
-                    public boolean hasNext() { return m.hasNext(); }
-                    public Tile next() { return getTile(m.next()); }
-                    public void remove() { m.remove(); }
-                };
-            }
-        };
-    }
-
-    /**
      * Gets an iterable for all the tiles in the map on using an
      * underlying WholeMapIterator.
      *
@@ -1853,9 +1868,7 @@ public class Map extends FreeColGameObject implements Location {
      *     found.
      */
     public Tile getLandWithinDistance(int x, int y, int distance) {
-        MapIterator i = getCircleIterator(new Position(x, y), true, distance);
-        while (i.hasNext()) {
-            Tile t = getTile(i.next());
+        for (Tile t : getCircleTiles(getTile(x, y), true, distance)) {
             if (t.isLand()) return t;
         }
         return null;

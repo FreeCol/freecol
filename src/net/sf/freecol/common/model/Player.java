@@ -2585,10 +2585,10 @@ public class Player extends FreeColGameObject implements Nameable {
      * not overlapping with) another friendly colony. Penalties for enemy
      * units/colonies are added as well.
      *
-     * @param t The <code>Tile</code>
+     * @param tile The <code>Tile</code>
      * @return The value of building a colony on the given tile.
      */
-    public int getColonyValue(Tile t) {
+    public int getColonyValue(Tile tile) {
         //----- TODO: tune magic numbers
         //applied once
         final float MOD_HAS_RESOURCE           = 0.75f;
@@ -2631,16 +2631,17 @@ public class Player extends FreeColGameObject implements Nameable {
         //----- END MAGIC NUMBERS
 
         // Return -INFINITY if there is a settlement here or neighbouring.
-        for (Tile tile : t.getSurroundingTiles(0, 1)) {
-            if (tile.getSettlement() != null) return -INFINITY;
+        for (Tile t : tile.getSurroundingTiles(0, 1)) {
+            if (t.getSettlement() != null) return -INFINITY;
         }
 
         //initialize tile value
         int value = 0;
-        if (t.getType().getPrimaryGoods() != null) {
-            value += t.potential(t.getType().getPrimaryGoods().getType(), null) * PRIMARY_GOODS_VALUE;
+        if (tile.getType().getPrimaryGoods() != null) {
+            value += tile.potential(tile.getType().getPrimaryGoods().getType(),
+                                    null) * PRIMARY_GOODS_VALUE;
         }
-        //value += t.potential(t.secondaryGoods(), null) * t.secondaryGoods().getInitialSellPrice();
+        //value += tile.potential(tile.secondaryGoods(), null) * tile.secondaryGoods().getInitialSellPrice();
 
         //multiplicative modifier, to be applied to value later
         float advantage = 1f;
@@ -2657,17 +2658,15 @@ public class Player extends FreeColGameObject implements Nameable {
             foodMap.incrementCount(g, 0);
         }
 
-        //penalty for building on a resource tile,
-        //because production can not be improved much
-        if (t.hasResource()) {
-            advantage *= MOD_HAS_RESOURCE;
-        }
+        // Penalty for building on a resource tile, because production
+        // can not be improved much.
+        if (tile.hasResource()) advantage *= MOD_HAS_RESOURCE;
 
         // Penalty if there is no direct connection to the high seas, or
         // if it is too long.
         int tilesToHighSeas = Integer.MAX_VALUE;
-        for (Tile n : t.getSurroundingTiles(1)) {
-            int v = t.getHighSeasCount();
+        for (Tile n : tile.getSurroundingTiles(1)) {
+            int v = tile.getHighSeasCount();
             if (v >= 0 && v < tilesToHighSeas) tilesToHighSeas = v;
         }
         if (tilesToHighSeas == Integer.MAX_VALUE) {
@@ -2677,13 +2676,10 @@ public class Player extends FreeColGameObject implements Nameable {
         }
 
         boolean supportingColony = false;
-        Iterator<Position> it;
         for (int radius = 1; radius < 5; radius++) {
-            it = getGame().getMap().getCircleIterator(t.getPosition(), false, radius);
-            while (it.hasNext()) {
-                Tile tile = getGame().getMap().getTile(it.next());
-                Settlement set = tile.getSettlement(); //may be null!
-                Colony col = tile.getColony(); //may be null!
+            for (Tile t : getGame().getMap().getCircleTiles(tile, false, radius)) {
+                Settlement set = t.getSettlement(); //may be null!
+                Colony col = t.getColony(); //may be null!
 
                 if (radius==1) {
                     //already checked: no colony here - if set!=null, it's indian
@@ -2700,8 +2696,8 @@ public class Player extends FreeColGameObject implements Nameable {
                     //no settlement on neighbouring tile
                     } else {
                         //apply penalty for owned neighbouring tiles
-                        if (tile.getOwner() != null && !this.owns(tile)) {
-                            if (tile.getOwner().isEuropean()) {
+                        if (t.getOwner() != null && !this.owns(t)) {
+                            if (t.getOwner().isEuropean()) {
                                 advantage *= MOD_OWNED_EUROPEAN;
                             } else {
                                 advantage *= MOD_OWNED_NATIVE;
@@ -2709,11 +2705,11 @@ public class Player extends FreeColGameObject implements Nameable {
                         }
 
                         //count production
-                        if (tile.getType()!=null) {
-                            for (AbstractGoods production : tile.getType().getProduction()) {
+                        if (t.getType()!=null) {
+                            for (AbstractGoods production : t.getType().getProduction()) {
                                 GoodsType type = production.getType();
-                                int potential = tile.potential(type, null);
-                                value += potential * spec.getInitialPrice(type);
+                                int potential = t.potential(type, null);
+                                value += potential * type.getInitialSellPrice();
                                 // a few tiles with high production are better
                                 // than many tiles with low production
                                 int highProductionValue = 0;
@@ -2757,7 +2753,7 @@ public class Player extends FreeColGameObject implements Nameable {
                     }
                 }
 
-                Iterator<Unit> ui = tile.getUnitIterator();
+                Iterator<Unit> ui = t.getUnitIterator();
                 while (ui.hasNext()) {
                     Unit u = ui.next();
                     if (u.getOwner() != this && u.isOffensiveUnit()
