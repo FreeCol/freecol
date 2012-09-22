@@ -322,7 +322,7 @@ public final class QuickActionMenu extends JPopupMenu {
                                 + ")";
                         }
                         menuItem = new JMenuItem(assign, teacherIcon);
-                        menuItem.setActionCommand(UnitAction.ASSIGN.toString() + ":" + teacher.getId());
+                        menuItem.setActionCommand(UnitAction.ASSIGN.toString() + "/" + teacher.getId());
                         menuItem.addActionListener(unitLabel);
                     } else {
                         String teacherName = Messages.message(teacher.getType().getNameKey());
