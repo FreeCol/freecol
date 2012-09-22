@@ -1633,56 +1633,32 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
-     * Gets the position adjacent Tile to a given Tile, in a given
-     * direction.
+     * Gets the adjacent Tile in a given direction.
      *
-     * @param direction The direction (N, NE, E, etc.)
-     * @return Adjacent tile
+     * @param direction The <code>Direction</code> to check.
+     * @return The adjacent tile in the specified direction, or null
+     *     if invalid.
      */
     public Tile getAdjacentTile(Direction direction) {
-        int x = getX() + ((getY() & 1) != 0 ?
-            direction.getOddDX() : direction.getEvenDX());
-        int y = getY() + ((getY() & 1) != 0 ?
-            direction.getOddDY() : direction.getEvenDY());
-        return getMap().getTile(x, y);
+        return getMap().getAdjacentTile(getX(), getY(), direction);
     }
     
     /**
-     * Returns all the tiles surrounding this tile within the
-     * given range. This tile is not included.
+     * Gets all the tiles surrounding a tile within the given range.
+     * The center tile is not included.
      *
-     * @param range
-     *            How far away do we need to go starting from this.
+     * @param range How far away do we need to go starting from this.
      * @return The tiles surrounding this tile.
      */
-    public Iterable<Tile> getSurroundingTiles(final int range) {
-        return new Iterable<Tile>() {
-            public Iterator<Tile> iterator() {
-                final Iterator<Position> m = (range == 1)
-                    ? getMap().getAdjacentIterator(getPosition())
-                    : getMap().getCircleIterator(getPosition(), true, range);
-
-                return new Iterator<Tile>() {
-                    public boolean hasNext() {
-                        return m.hasNext();
-                    }
-
-                    public Tile next() {
-                        return getMap().getTile(m.next());
-                    }
-
-                    public void remove() {
-                        m.remove();
-                    }
-                };
-            }
-        };
+    public Iterable<Tile> getSurroundingTiles(int range) {
+        return getMap().getSurroundingTiles(this, range);
     }
 
     /**
-     * Returns all the tiles surrounding this tile within the
-     * given inclusive upper and lower bounds.
-     * getSurroundingTiles(r) is equivalent to getSurroundingTiles(1, r),
+     * Gets all the tiles surrounding this tile within the given
+     * inclusive upper and lower bounds.
+     *
+     * getSurroundingTiles(r) is equivalent to getSurroundingTiles(1, r), 
      * thus this tile is included if rangeMin is zero.
      *
      * @param rangeMin The inclusive minimum distance from this tile.

@@ -553,7 +553,7 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Returns the direction a unit needs to move in
+     * Gets the direction a unit needs to move in
      * order to get from <code>t1</code> to <code>t2</code>
      *
      * @param t1 The tile to move from.
@@ -565,11 +565,24 @@ public class Map extends FreeColGameObject implements Location {
      */
     public Direction getDirection(Tile t1, Tile t2) {
         for (Direction d : Direction.values()) {
-            if (t1.getNeighbourOrNull(d) == t2) {
-                return d;
-            }
+            if (t1.getNeighbourOrNull(d) == t2) return d;
         }
         return null;
+    }
+
+    /**
+     * Gets the adjacent Tile in a given direction.
+     *
+     * @param x The x coordinate to work from.
+     * @param y The y coordinate to work from.
+     * @param direction The <code>Direction</code> to check.
+     * @return The adjacent tile in the specified direction, or null
+     *     if invalid.
+     */
+    public Tile getAdjacentTile(int x, int y, Direction direction) {
+        x += ((y & 1) != 0) ? direction.getOddDX() : direction.getEvenDX();
+        y += ((y & 1) != 0) ? direction.getOddDY() : direction.getEvenDY();
+        return getTile(x, y);
     }
 
     /**
@@ -1776,7 +1789,7 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Gets an iterable for all the tiles in the map on using an
+     * Gets an iterable for all the tiles in a circle using an
      * underlying CircleIterator.
      *
      * @param center The center <code>Tile</code> to iterate around.
@@ -1856,6 +1869,32 @@ public class Map extends FreeColGameObject implements Location {
      */
     public Iterable<Tile> getAllTiles() {
         return makeMapIteratorIterable(getWholeMapIterator());
+    }
+
+
+    /**
+     * Gets all the tiles surrounding a tile within the given range.
+     * The center tile is not included.
+     *
+     * @param center The center <code>Tile</code>.
+     * @param range How far away do we need to go starting from this.
+     * @return The tiles surrounding this <code>Tile</code>.
+     */
+    public Iterable<Tile> getSurroundingTiles(final Tile center,
+                                              final int range) {
+        return new Iterable<Tile>() {
+            public Iterator<Tile> iterator() {
+                final Iterator<Position> m = (range == 1)
+                    ? getAdjacentIterator(center.getPosition())
+                    : getCircleIterator(center.getPosition(), true, range);
+
+                return new Iterator<Tile>() {
+                    public boolean hasNext() { return m.hasNext(); }
+                    public Tile next() { return getTile(m.next()); }
+                    public void remove() { m.remove(); }
+                };
+            }
+        };
     }
 
     /**
