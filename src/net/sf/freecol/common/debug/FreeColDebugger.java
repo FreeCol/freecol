@@ -233,4 +233,20 @@ public class FreeColDebugger {
                             true).println(msg);
         } catch (Exception e) {}
     }
+
+    /**
+     * Miscellaneous debug helper to get a string representation of
+     * the current call stack.
+     *
+     * @return A stack trace as a string.
+     */
+    public String stackTraceToString() {
+        StringBuilder sb = new StringBuilder();
+        for (StackTraceElement s : Thread.currentThread().getStackTrace()) {
+            sb.append(s.toString());
+            sb.append("\n");
+        }
+        sb.deleteCharAt(sb.length()-1);
+        return sb.toString();
+    }
 }
