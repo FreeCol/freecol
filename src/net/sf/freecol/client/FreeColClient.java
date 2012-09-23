@@ -241,7 +241,7 @@ public final class FreeColClient {
         }
 
         // Once resources are in place, get preloading started.
-        if (!headless) 
+        if (!headless)
             ResourceManager.preload(windowSize);
 
         // Start the GUI.
@@ -313,14 +313,18 @@ public final class FreeColClient {
     }
 
     public boolean currentPlayerIsMyPlayer() {
-        return inGame && game.getCurrentPlayer().equals(player);
+        return inGame
+            && game != null
+            && player != null
+            && game.getCurrentPlayer() != null
+            && game.getCurrentPlayer().equals(player);
     }
 
 
     public void updateActions() {
         actionManager.update();
     }
-    
+
 
     /**
      * Gets the <code>Client</code> that can be used to send messages to the
@@ -606,7 +610,7 @@ public final class FreeColClient {
     public void setMyPlayer(Player player) {
         this.player = player;
     }
-    
+
     /**
      * Sets whether or not this game is a single player game.
      *
@@ -617,20 +621,20 @@ public final class FreeColClient {
     public void setSinglePlayer(boolean singlePlayer) {
         this.singlePlayer = singlePlayer;
     }
-    
+
     /**
      * Start the game skipping turns.
      *
      * @param turns The number of turns to skip.
      */
     public void skipTurns(int turns) {
-        if (freeColServer == null) 
+        if (freeColServer == null)
             return;
         freeColServer.getInGameController().setSkippedTurns(turns);
         gui.closeMenus();
         askServer().startSkipping();
     }
-    
+
 
     private void exitActions () {
        try {
@@ -658,7 +662,7 @@ public final class FreeColClient {
           e.printStackTrace();
        }
     }
-    
+
 
     /**
      * Loads the client options.
@@ -719,13 +723,13 @@ public final class FreeColClient {
     public ActionManager getActionManager() {
         return actionManager;
     }
-    
+
     public void addSpecificationActions(Specification specification) {
         actionManager.addSpecificationActions(specification);
     }
 
 
-    
-    
-    
+
+
+
 }
