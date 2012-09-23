@@ -85,7 +85,6 @@ import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
 import net.sf.freecol.client.gui.panel.MainPanel;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel;
 import net.sf.freecol.client.gui.panel.MapGeneratorOptionsDialog;
-import net.sf.freecol.client.gui.panel.MapSize;
 import net.sf.freecol.client.gui.panel.MonarchPanel;
 import net.sf.freecol.client.gui.panel.NegotiationDialog;
 import net.sf.freecol.client.gui.panel.NewPanel;
@@ -187,7 +186,7 @@ import net.sf.freecol.common.resources.Video;
  * contrast, a <code>showXXXPanel</code>-method returns immediately.
  */
 public final class Canvas extends JDesktopPane {
-    
+
 
     public static enum BoycottAction {
         CANCEL,
@@ -258,7 +257,7 @@ public final class Canvas extends JDesktopPane {
         GIFT
     }
 
-  
+
 
     /**
      * A class for frames being used as tool boxes.
@@ -487,7 +486,7 @@ public final class Canvas extends JDesktopPane {
         if (messageID != null) {
             display = Messages.message(messageID);
         }
-        if (display == null || "".equals(display)) 
+        if (display == null || "".equals(display))
             display = message;
         ErrorPanel errorPanel = new ErrorPanel(freeColClient, gui, display);
         showSubPanel(errorPanel, true);
@@ -1369,11 +1368,11 @@ public final class Canvas extends JDesktopPane {
     }
 
     public void showMapEditorTransformPanel() {
-        
+
         JInternalFrame f = addAsFrame(new MapEditorTransformPanel(freeColClient, gui), true, PopupPosition.CENTERED, false);
         f.setLocation(f.getX(), 50);
-        repaint();    
-        
+        repaint();
+
     }
 
     public OptionGroup showMapGeneratorOptionsDialog(OptionGroup mgo, boolean editable, boolean loadCustomOptions) {
@@ -1569,7 +1568,7 @@ public final class Canvas extends JDesktopPane {
 
     public void showReportLabourDetailPanel(UnitType unitType, Map<UnitType, Map<Location, Integer>> data,
             TypeCountMap<UnitType> unitCount, List<Colony> colonies) {
-        
+
         ReportLabourDetailPanel details = new ReportLabourDetailPanel(freeColClient, gui, unitType, data, unitCount, colonies);
         details.initialize();
         showSubPanel(details, false);
@@ -2168,7 +2167,7 @@ public final class Canvas extends JDesktopPane {
             f.setSelected(true);
         } catch (java.beans.PropertyVetoException e) {
         }
-        
+
         f.setResizable(resizable);
 
         return f;
@@ -2294,7 +2293,7 @@ public final class Canvas extends JDesktopPane {
         remove(freeColDialog);
         return response;
     }
-    
+
     /**
      * Displays the given panel, making sure a tile is visible.
      *
@@ -2326,13 +2325,13 @@ public final class Canvas extends JDesktopPane {
         panel.requestFocus();
     }
 
- 
+
 
     public Parameters showParametersDialog() {
         return showFreeColDialog(new ParametersDialog(freeColClient, gui), null, false);
     }
 
-    public MapSize showScaleMapSizeDialog() {
+    public Dimension showScaleMapSizeDialog() {
         return showFreeColDialog(new ScaleMapSizeDialog(freeColClient, gui), null, false);
     }
 

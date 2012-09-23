@@ -19,11 +19,11 @@
 
 package net.sf.freecol.client.gui.action;
 
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.panel.MapSize;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
@@ -65,7 +65,7 @@ public class ScaleMapAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        MapSize ms = gui.showScaleMapSizeDialog();
+        Dimension ms = gui.showScaleMapSizeDialog();
         if (ms != null) {
             scaleMapTo(ms.width, ms.height);
         }

@@ -1,5 +1,6 @@
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,7 +18,7 @@ import net.sf.freecol.common.model.Map;
 
 
 
-public class ScaleMapSizeDialog extends FreeColDialog<MapSize> {
+public class ScaleMapSizeDialog extends FreeColDialog<Dimension> {
 
     public static final String COPYRIGHT = "Copyright (C) 2003-2012 The FreeCol Team";
 
@@ -40,7 +41,7 @@ public class ScaleMapSizeDialog extends FreeColDialog<MapSize> {
         /*
          * TODO: Extend this dialog. It should be possible to specify the sizes
          * using percentages.
-         * 
+         *
          * Add a panel containing information about the scaling (old size, new
          * size etc).
          */
@@ -58,7 +59,7 @@ public class ScaleMapSizeDialog extends FreeColDialog<MapSize> {
                     if (width <= 0 || height <= 0) {
                         throw new NumberFormatException();
                     }
-                    setResponse(new MapSize(width, height));
+                    setResponse(new Dimension(width, height));
                 } catch (NumberFormatException nfe) {
                     gui.errorMessage("integerAboveZero");
                 }

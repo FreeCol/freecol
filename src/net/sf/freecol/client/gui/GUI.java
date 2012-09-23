@@ -70,7 +70,6 @@ import net.sf.freecol.client.gui.panel.MiniMap;
 import net.sf.freecol.client.gui.panel.LabourData.UnitData;
 import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
 import net.sf.freecol.client.gui.panel.MapControls;
-import net.sf.freecol.client.gui.panel.MapSize;
 import net.sf.freecol.client.gui.panel.Parameters;
 import net.sf.freecol.client.gui.sound.SoundPlayer;
 import net.sf.freecol.common.ServerInfo;
@@ -123,7 +122,7 @@ public class GUI {
      */
     private static final int DEFAULT_WINDOW_SPACE = 50;
 
-    
+
 
     public static final int MOVE_UNITS_MODE = 0;
 
@@ -140,7 +139,7 @@ public class GUI {
     private Canvas canvas;
 
     private MapViewer mapViewer;
-    
+
     private MapControls mapControls;
 
     /**
@@ -220,9 +219,9 @@ public class GUI {
             frame.dispose();
         }
         setWindowed(windowed);
-        
+
         this.frame = FreeColFrame.createFreeColFrame(freeColClient, canvas, gd, windowed);
-        
+
         frame.setJMenuBar(menuBar);
         frame.setCanvas(canvas);
         frame.updateBounds(getWindowBounds());
@@ -405,7 +404,7 @@ public class GUI {
         return windowed;
     }
 
- 
+
     public boolean onScreen(Tile tileToCheck) {
         return mapViewer.onScreen(tileToCheck);
     }
@@ -811,7 +810,7 @@ public class GUI {
     public void showReportLabourDetailPanel(UnitType unitType, Map<UnitType, Map<Location, Integer>> data,
             TypeCountMap<UnitType> unitCount, List<Colony> colonies) {
         canvas.showReportLabourDetailPanel(unitType, data, unitCount, colonies);
-        
+
     }
 
 
@@ -1140,15 +1139,15 @@ public class GUI {
     }
 
     public Parameters showParametersDialog() {
-        return canvas.showParametersDialog(); 
+        return canvas.showParametersDialog();
     }
 
-    public MapSize showScaleMapSizeDialog() {
+    public Dimension showScaleMapSizeDialog() {
         return canvas.showScaleMapSizeDialog();
     }
 
-    
-    
+
+
 
     public void showMapControls(boolean value) {
         if (value && freeColClient.isInGame()) {
@@ -1178,12 +1177,12 @@ public class GUI {
             }
         }
     }
-    
+
     public void updateMapControls() {
-        if (mapControls != null) 
+        if (mapControls != null)
             mapControls.update();
     }
-    
+
     public void updateMapControlsInCanvas() {
         if (mapControls != null && mapControls.isShowing()) {
             mapControls.removeFromComponent(canvas);
@@ -1191,16 +1190,16 @@ public class GUI {
         }
     }
 
-    
+
 
     public void zoomInMapControls() {
         mapControls.zoomIn();
     }
-    
+
     public void zoomOutMapControls() {
         mapControls.zoomOut();
     }
-    
+
     public boolean canZoomInMapControls() {
         return mapControls != null && mapControls.canZoomInMapControls();
     }
@@ -1208,8 +1207,8 @@ public class GUI {
     public boolean canZoomOutMapControls() {
         return mapControls != null && mapControls.canZoomOutMapControls();
     }
-    
-    
+
+
     /**
      * Common utility routine to retrieve animation speed.
      *
@@ -1225,14 +1224,14 @@ public class GUI {
 
     public void animateUnitAttack(Unit unit, Unit defender, boolean success) {
         Animations.unitAttack(this, unit, defender, success);
-        
+
     }
 
     public void animateUnitMove(Unit unit, Tile sourceTile, Tile destinationTile) {
         Animations.unitMove(this, unit, sourceTile, destinationTile);
-        
+
     }
-    
+
     public BufferedImage createMiniMapThumbNail() {
         MiniMap miniMap = new MiniMap(freeColClient, this);
         miniMap.setTileSize(MiniMap.MAX_TILE_SIZE);
@@ -1254,5 +1253,5 @@ public class GUI {
         scaledImage.createGraphics().drawImage(image, 0, 0, (int) scaledWidth, 64, null);
         return scaledImage;
     }
-    
+
 }
