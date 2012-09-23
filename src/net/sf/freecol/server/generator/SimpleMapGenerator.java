@@ -555,7 +555,11 @@ public class SimpleMapGenerator implements MapGenerator {
         }
         String msg = "Settlement skills:";
         for (List<IndianSettlement> iss : isList) {
-            msg += "  " + iss.size() + " x " + iss.get(0).getLearnableSkill();
+            if (iss.isEmpty()) {
+                msg += "  0 x <none>";
+            } else {
+                msg += "  " + iss.size() + " x " + iss.get(0).getLearnableSkill();
+            }
         }
         logger.info(msg);
 
