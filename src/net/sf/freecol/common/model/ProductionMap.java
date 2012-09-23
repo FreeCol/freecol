@@ -111,24 +111,14 @@ public class ProductionMap {
         public int remove(AbstractGoods goods) {
             int consumed = goods.getAmount();
             if (goods.getType() == root.getType()) {
-                if (consumed > root.getAmount()) {
-                    consumed = root.getAmount();
-                    root.setAmount(0);
-                } else {
-                    root.setAmount(root.getAmount() - consumed);
-                }
+                root.setAmount(root.getAmount() - consumed);
                 for (AbstractGoods leaf : leafs) {
                     leaf.setAmount(Math.min(leaf.getAmount(), root.getAmount()));
                 }
             } else {
                 for (AbstractGoods leaf : leafs) {
                     if (leaf.getType() == goods.getType()) {
-                        if (consumed > leaf.getAmount()) {
-                            consumed = leaf.getAmount();
-                            leaf.setAmount(0);
-                        } else {
-                            leaf.setAmount(leaf.getAmount() - consumed);
-                        }
+                        leaf.setAmount(leaf.getAmount() - consumed);
                         root.setAmount(root.getAmount() - consumed);
                         break;
                     }

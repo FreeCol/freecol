@@ -22,6 +22,7 @@ package net.sf.freecol.server.model;
 import java.util.List;
 
 import net.sf.freecol.common.model.AbstractGoods;
+import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
@@ -187,6 +188,52 @@ public class ServerColonyTest extends FreeColTestCase {
         foodStored = colony.getGoodsCount(foodGoodsType);
         errMsg = "No food should be stored, colony has (" + String.valueOf(foodStored) + ")";
         assertTrue(errMsg,foodStored == 0);
+    }
+
+
+    public void testAvoidStarvation() {
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+        Map map = getTestMap(spec().getTileType("model.tile.marsh"));
+        game.setMap(map);
+
+        ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
+
+        ServerColony colony = new ServerColony(game, dutch, "New Amsterdam", map.getTile(5, 8));
+        dutch.addSettlement(colony);
+
+        UnitType pioneerType = spec().getUnitType("model.unit.hardyPioneer");
+        GoodsType bellsType = spec().getGoodsType("model.goods.bells");
+        Building townHall = colony.getBuildingForProducing(bellsType);
+
+        Unit unit1 = new ServerUnit(game, townHall, dutch, pioneerType);
+        Unit unit2 = new ServerUnit(game, townHall, dutch, pioneerType);
+        Unit unit3 = new ServerUnit(game, townHall, dutch, pioneerType);
+
+        int consumption = colony.getFoodConsumption();
+        int production = colony.getTile().getType().getPrimaryGoods().getAmount();
+        assertEquals(6, consumption);
+        assertEquals(3, production);
+        assertEquals(-3, colony.getNetProductionOf(foodType));
+        assertEquals(0, colony.getGoodsCount(foodType));
+        assertEquals(0, colony.getTile().getUnitCount());
+
+        colony.addGoods(foodType, 202);
+        ServerTestHelper.newTurn();
+        assertEquals(199, colony.getGoodsCount(foodType));
+        assertEquals(0, colony.getTile().getUnitCount());
+        assertEquals(3, colony.getUnitCount());
+        assertEquals(unit1.getId(), colony.getUnitList().get(0).getId());
+        assertEquals(unit2.getId(), colony.getUnitList().get(1).getId());
+        assertEquals(unit3.getId(), colony.getUnitList().get(2).getId());
+
+        colony.addGoods(foodType, 15);
+        ServerTestHelper.newTurn();
+        assertEquals(11, colony.getGoodsCount(foodType));
+        assertEquals(1, colony.getTile().getUnitCount());
+        assertEquals(unit1.getId(), colony.getUnitList().get(0).getId());
+        assertEquals(unit2.getId(), colony.getUnitList().get(1).getId());
+        assertEquals(unit3.getId(), colony.getUnitList().get(2).getId());
+
     }
 
     /**
