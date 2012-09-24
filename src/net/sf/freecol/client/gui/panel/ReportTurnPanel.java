@@ -62,7 +62,9 @@ import net.sf.freecol.common.option.BooleanOption;
  */
 public final class ReportTurnPanel extends ReportPanel {
 
-    private ModelMessage[] _messages;
+    /** The messages to display. */
+    private ModelMessage[] messages;
+
     private Hashtable<String, Vector<JComponent>> textPanesByMessage = new Hashtable<String, Vector<JComponent>>();
     private Hashtable<String, Vector<JComponent>> labelsByMessage = new Hashtable<String, Vector<JComponent>>();
 
@@ -78,22 +80,25 @@ public final class ReportTurnPanel extends ReportPanel {
                            ModelMessage... messages) {
         super(freeColClient, gui, Messages.message("reportTurnAction.name"));
 
-        ClientOptions options = getClientOptions();
-        this._messages = messages;
+        this.messages = messages;
+        
+        // Display Panel
+        reportPanel.removeAll();
+        reportPanel.setLayout(new MigLayout("wrap 4", "[center][550!]:push[][]", ""));
+        if (messages != null) displayMessages();
+    }
 
-        Comparator<ModelMessage> comparator
-            = options.getModelMessageComparator(freeColClient.getGame());
-        if (comparator != null) {
-            Arrays.sort(messages, comparator);
-        }
-
-        int groupBy = options.getInteger(ClientOptions.MESSAGES_GROUP_BY);
-
-        Object source = this;
-        ModelMessage.MessageType type = null;
-        Game game = getFreeColClient().getGame();
+    private void displayMessages() {
+        final Game game = getFreeColClient().getGame();
+        final ClientOptions options = getClientOptions();
+        final int groupBy = options.getInteger(ClientOptions.MESSAGES_GROUP_BY);
+        final Comparator<ModelMessage> comparator
+            = options.getModelMessageComparator(game);
 
         // count number of headlines
+        Object source = this;
+        ModelMessage.MessageType type = null;
+        if (comparator != null) Arrays.sort(messages, comparator);
         for (final ModelMessage message : messages) {
             if (groupBy == ClientOptions.MESSAGES_GROUP_BY_SOURCE) {
                 FreeColGameObject messageSource = game.getMessageSource(message);
@@ -101,18 +106,13 @@ public final class ReportTurnPanel extends ReportPanel {
                     source = messageSource;
                 }
             } else if (groupBy == ClientOptions.MESSAGES_GROUP_BY_TYPE
-                       && message.getMessageType() != type) {
+                && message.getMessageType() != type) {
                 type = message.getMessageType();
             }
         }
-
-        // Display Panel
-        reportPanel.removeAll();
-        reportPanel.setLayout(new MigLayout("wrap 4", "[center][550!]:push[][]", ""));
-
+        
         source = this;
         type = null;
-
         for (final ModelMessage message : messages) {
             // add headline if necessary
             if (groupBy == ClientOptions.MESSAGES_GROUP_BY_SOURCE) {
@@ -122,13 +122,13 @@ public final class ReportTurnPanel extends ReportPanel {
                     reportPanel.add(getHeadline(source), "newline 20, skip");
                 }
             } else if (groupBy == ClientOptions.MESSAGES_GROUP_BY_TYPE
-                       && message.getMessageType() != type) {
+                && message.getMessageType() != type) {
                 type = message.getMessageType();
                 JLabel headline = localizedLabel(message.getMessageTypeName());
                 headline.setFont(smallHeaderFont);
                 reportPanel.add(headline, "newline 20, skip, span");
             }
-
+            
             JComponent component = new JLabel();
             FreeColObject messageDisplay = game.getMessageDisplay(message);
             if (messageDisplay != null) {
@@ -140,7 +140,7 @@ public final class ReportTurnPanel extends ReportPanel {
                     image = image.getScaledInstance(newWidth, 40, Image.SCALE_SMOOTH);
                     icon.setImage(image);
                 }
-
+                
                 if (messageDisplay instanceof Colony) {
                     JButton button = new JButton();
                     button.setIcon(icon);
@@ -161,60 +161,61 @@ public final class ReportTurnPanel extends ReportPanel {
                     component = new JLabel(icon);
                 }
             }
+            
             reportPanel.add(component, "newline");
-
+            
             final JTextPane textPane = getDefaultTextPane();
-
+            
             insertMessage(textPane.getStyledDocument(), message, getMyPlayer());
             reportPanel.add(textPane);
-
+            
             boolean ignore = false;
             final JComponent label = component;
             if (message.getMessageType() == ModelMessage.MessageType.WAREHOUSE_CAPACITY) {
                 JButton ignoreButton = new JButton("x");
                 ignoreButton.setToolTipText(Messages.message(new StringTemplate("model.message.ignore", message)));
                 ignoreButton.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent event) {
-                        boolean flag = label.isEnabled();
-                        getController().ignoreMessage(message, flag);
-                        textPane.setEnabled(!flag);
-                        label.setEnabled(!flag);
-                    }
-                });
+                        public void actionPerformed(ActionEvent event) {
+                            boolean flag = label.isEnabled();
+                            getController().ignoreMessage(message, flag);
+                            textPane.setEnabled(!flag);
+                            label.setEnabled(!flag);
+                        }
+                    });
                 reportPanel.add(ignoreButton);
                 ignore = true;
             }
-
+            
             // So that we can iterate through rows in ActionListeners by message ID.
             if (!textPanesByMessage.containsKey(message.getId())) {
                 textPanesByMessage.put(message.getId(), new Vector<JComponent>());
             }
             textPanesByMessage.get(message.getId()).add(textPane);
-
+            
             if (!labelsByMessage.containsKey(message.getId())) {
                 labelsByMessage.put(message.getId(), new Vector<JComponent>());
             }
             textPanesByMessage.get(message.getId()).add(textPane);
             textPanesByMessage.get(message.getId()).add(label);
-
+            
             final BooleanOption filterOption = options.getBooleanOption(message);
             // Message type can be filtered
             if (filterOption != null) {
                 JButton filterButton = new JButton("X");
                 filterButton.setToolTipText(Messages.message(StringTemplate.template("model.message.filter")
-                                                             .add("%type%", message.getMessageTypeName())));
+                        .add("%type%", message.getMessageTypeName())));
                 filterButton.addActionListener(new ActionListener() {
-
-                    public void actionPerformed(ActionEvent event) {
-                        boolean flag = filterOption.getValue();
-                        filterOption.setValue(!flag);
-                        //textPane.setEnabled(!flag);
-                        //label.setEnabled(!flag);
-
-                        setEnabledByType(message.getMessageType(), !flag);
-                    }
-
-                });
+                        
+                        public void actionPerformed(ActionEvent event) {
+                            boolean flag = filterOption.getValue();
+                            filterOption.setValue(!flag);
+                            //textPane.setEnabled(!flag);
+                            //label.setEnabled(!flag);
+                            
+                            setEnabledByType(message.getMessageType(), !flag);
+                        }
+                        
+                    });
                 if (ignore) {
                     reportPanel.add(filterButton);
                 } else {
@@ -225,12 +226,12 @@ public final class ReportTurnPanel extends ReportPanel {
     }
 
     private void setEnabledByType(ModelMessage.MessageType type, boolean enabled) {
-        for (int i = 0; i < _messages.length; i++) {
-            if (_messages[i].getMessageType() == type) {
-                for (JComponent textPane: textPanesByMessage.get(_messages[i].getId())) {
+        for (int i = 0; i < messages.length; i++) {
+            if (messages[i].getMessageType() == type) {
+                for (JComponent textPane: textPanesByMessage.get(messages[i].getId())) {
                     textPane.setEnabled(enabled);
                 }
-                for (JComponent label: labelsByMessage.get(_messages[i].getId())) {
+                for (JComponent label: labelsByMessage.get(messages[i].getId())) {
                     label.setEnabled(enabled);
                 }
             }
