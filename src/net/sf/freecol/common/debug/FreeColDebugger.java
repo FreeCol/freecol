@@ -240,7 +240,7 @@ public class FreeColDebugger {
      *
      * @return A stack trace as a string.
      */
-    public String stackTraceToString() {
+    public static String stackTraceToString() {
         StringBuilder sb = new StringBuilder();
         for (StackTraceElement s : Thread.currentThread().getStackTrace()) {
             sb.append(s.toString());
