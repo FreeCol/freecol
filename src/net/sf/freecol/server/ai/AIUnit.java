@@ -45,6 +45,7 @@ import net.sf.freecol.server.ai.mission.IdleAtSettlementMission;
 import net.sf.freecol.server.ai.mission.IndianBringGiftMission;
 import net.sf.freecol.server.ai.mission.IndianDemandMission;
 import net.sf.freecol.server.ai.mission.Mission;
+import net.sf.freecol.server.ai.mission.MissionaryMission;
 import net.sf.freecol.server.ai.mission.PioneeringMission;
 import net.sf.freecol.server.ai.mission.PrivateerMission;
 import net.sf.freecol.server.ai.mission.ScoutingMission;
@@ -613,6 +614,7 @@ public class AIUnit extends AIObject implements Transportable {
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
         final AIMain aiMain = getAIMain();
         String tag = in.getLocalName();
+        mission = null;
         if (tag.equals(BuildColonyMission.getXMLElementTagName())) {
             mission = new BuildColonyMission(aiMain, in);
         } else if (tag.equals(CashInTreasureTrainMission.getXMLElementTagName())) {
@@ -629,10 +631,12 @@ public class AIUnit extends AIObject implements Transportable {
             mission = new IndianBringGiftMission(aiMain, in);
         } else if (tag.equals(IndianDemandMission.getXMLElementTagName())) {
             mission = new IndianDemandMission(aiMain, in);
+        } else if (tag.equals(MissionaryMission.getXMLElementTagName())) {
+            mission = new MissionaryMission(aiMain, in);
         } else if (tag.equals(PioneeringMission.getXMLElementTagName())
                    // @compat 0.10.3
                    || tag.equals("tileImprovementPlanMission")) {
-            // @end compatibility code
+                   // @end compatibility code
             mission = new PioneeringMission(aiMain, in);
         } else if (tag.equals(PrivateerMission.getXMLElementTagName())) {
             mission = new PrivateerMission(aiMain, in);
@@ -651,8 +655,7 @@ public class AIUnit extends AIObject implements Transportable {
         } else if (tag.equals(WorkInsideColonyMission.getXMLElementTagName())) {
             mission = new WorkInsideColonyMission(aiMain, in);
         } else {
-            mission = null;
-            logger.warning("Could not find mission-class for: " + tag);
+            throw new IllegalStateException("Unknown AIUnit child: " + tag);
         }
     }
 
