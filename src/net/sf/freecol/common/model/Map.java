@@ -1907,19 +1907,9 @@ public class Map extends FreeColGameObject implements Location {
      */
     public Iterable<Tile> getSurroundingTiles(final Tile center,
                                               final int range) {
-        return new Iterable<Tile>() {
-            public Iterator<Tile> iterator() {
-                final Iterator<Position> m = (range == 1)
-                    ? getAdjacentIterator(center.getPosition())
-                    : getCircleIterator(center.getPosition(), true, range);
-
-                return new Iterator<Tile>() {
-                    public boolean hasNext() { return m.hasNext(); }
-                    public Tile next() { return getTile(m.next()); }
-                    public void remove() { m.remove(); }
-                };
-            }
-        };
+        return makeMapIteratorIterable((range == 1)
+            ? getAdjacentIterator(center.getPosition())
+            : getCircleIterator(center.getPosition(), true, range));
     }
 
     /**
