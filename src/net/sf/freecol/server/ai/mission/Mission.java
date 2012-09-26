@@ -309,8 +309,34 @@ public abstract class Mission extends AIObject {
     }
 
     /**
-     * We have been blocked on the way to a target.  Attack the blockage,
-     * or just try to avoid it?
+     * Finds a target for a unit without considering its movement
+     * abilities.  This is used by missions when the current unit
+     * can not find a target with the normal path finding routines,
+     * and thus should consider targets that may require a carrier.
+     *
+     * @param aiUnit The <code>AIUnit</code> that is searching.
+     * @param gd The <code>GoalDecider</code> that selects targets.
+     * @param radius A maximum radius from the unit location to search within.
+     * @param deferOK If true, fall back to the nearest port to Europe.
+     * @return The best target <code>Tile</code> found, or null if none.
+     */
+    protected static Location findCircleTarget(final AIUnit aiUnit,
+                                               final GoalDecider gd,
+                                               final int radius,
+                                               boolean deferOK) {
+        final Unit unit = aiUnit.getUnit();
+        final Tile start = unit.getTile();
+        if (start == null) {
+            if (!deferOK) return null;
+            Settlement settlement = unit.getOwner().getClosestPortForEurope();
+            return (settlement == null) ? null : settlement;
+        }
+        return unit.getGame().getMap().searchCircle(start, gd, radius);
+    }
+
+    /**
+     * We have been blocked on the way to a target.  Is it valid to
+     * attack the blockage, or should it just be avoided?
      *
      * @param aiUnit The <code>AIUnit</code> that was blocked.
      * @param target The target <code>Location</code>.
@@ -328,8 +354,6 @@ public abstract class Mission extends AIObject {
             if (UnitSeekAndDestroyMission.invalidReason(aiUnit, blocker)
                 == null) return blocker;
         }
-        // Can not/decided not to attack.  Take one random step in
-        // roughly the right direction (if known).
         return null;
     }
 
@@ -342,7 +366,8 @@ public abstract class Mission extends AIObject {
      */
     protected Direction moveRandomly(String logMe, Direction direction) {
         final Unit unit = getUnit();
-        if (unit.getMovesLeft() <= 0 || unit.getTile() == null) return null;
+        if (unit.getMovesLeft() <= 0
+            || !(unit.getLocation() instanceof Tile)) return null;
         if (logMe == null) logMe = "moveRandomly";
 
         Random aiRandom = getAIRandom();

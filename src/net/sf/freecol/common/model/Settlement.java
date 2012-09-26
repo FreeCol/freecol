@@ -385,6 +385,23 @@ abstract public class Settlement extends GoodsLocation
     }
 
     /**
+     * Gets the minimum high seas count of the adjacent high-seas-connected
+     * tiles.  This is a measure of how close this settlement is to Europe.
+     *
+     * @return A high seas count, INFINITY if not connected.
+     */
+    public int getHighSeasCount() {
+        int best = INFINITY;
+        for (Tile t : getTile().getSurroundingTiles(1)) {
+            if (t.isLand() || t.getHighSeasCount() < 0) continue;
+            if (best > t.getHighSeasCount()) {
+                best = t.getHighSeasCount();
+            }
+        }
+        return best;
+    }
+        
+    /**
      * Returns the number of goods of a given type used by the settlement
      * each turn.
      *

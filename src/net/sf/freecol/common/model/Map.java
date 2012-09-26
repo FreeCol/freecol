@@ -1122,7 +1122,7 @@ public class Map extends FreeColGameObject implements Location {
      * with the minimal f (cost+heuristics). This gives O(1) on membership
      * test and O(log N) for remove-best and insertions.
      *
-     * @param unit The <code>Unit</code> to find a path for, which may be null!
+     * @param unit The <code>Unit</code> to find a path for.
      * @param start The <code>Tile</code> to start the search from.
      * @param goalDecider The object responsible for determining whether a
      *     given <code>PathNode</code> is a goal or not.
@@ -1133,7 +1133,7 @@ public class Map extends FreeColGameObject implements Location {
      *     maximum search range for a goal.
      * @param carrier An optional naval carrier <code>Unit</code> to use.
      * @param searchHeuristic An optional <code>SearchHeuristic</code>.
-     * @return The path to a goal determined by the given
+     * @return A path to a goal determined by the given
      *     <code>GoalDecider</code>.
      */
     private PathNode searchInternal(final Unit unit, final Tile start,
@@ -1155,8 +1155,7 @@ public class Map extends FreeColGameObject implements Location {
                             - f.get(p2.getLocation().getId()).intValue());
                     }
                 });
-        final Europe europe = (unit == null) ? null
-            : unit.getOwner().getEurope();
+        final Europe europe = unit.getOwner().getEurope();
         final List<Location> tracing = (traceSearch)
             ? new ArrayList<Location>()
             : null;
@@ -1249,8 +1248,7 @@ public class Map extends FreeColGameObject implements Location {
                 // disembark too early, so for now we live with the
                 // suboptimality.
                 //
-                boolean unitMove = unit == null
-                    || unit.isTileAccessible(moveTile);
+                boolean unitMove = unit.isTileAccessible(moveTile);
                 boolean carrierMove = carrier != null
                     && carrier.isTileAccessible(moveTile);
                 MoveStep step = (currentOnCarrier)
@@ -1362,7 +1360,34 @@ public class Map extends FreeColGameObject implements Location {
         return best;
     }
 
+    /**
+     * Searches for a tile within a radius of a starting tile.
+     *
+     * Does not use a unit, and thus does not consider movement validity.
+     *
+     * @param start The starting <code>Tile</code>.
+     * @param goalDecider A <code>GoalDecider</code> that chooses the goal,
+     *     which must be capable of tolerating a null unit.
+     * @param radius The maximum radius of tiles to search from the start.
+     * @return The goal tile as determined by the, or null if none found.
+     */
+    public Tile searchCircle(final Tile start, final GoalDecider goalDecider,
+                             final int radius) {
+        if (start == null || goalDecider == null || radius <= 0) return null;
 
+        for (Tile t : getCircleTiles(start, true, radius)) {
+            PathNode path = new PathNode(t, 0, start.getDistanceTo(t), false,
+                                         null, null);
+            if (goalDecider.check(null, path)
+                && !goalDecider.hasSubGoals())
+                break;
+        }
+        
+        PathNode best = goalDecider.getGoal();
+        return (best == null) ? null : best.getTile();
+    }
+
+    
     // Support for various kinds of iteration.
 
     /**

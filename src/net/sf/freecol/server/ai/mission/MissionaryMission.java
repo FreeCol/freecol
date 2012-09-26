@@ -198,19 +198,13 @@ public class MissionaryMission extends Mission {
         final Tile startTile = unit.getPathStartTile();
         if (startTile == null) return null;
 
-        PathNode path;
         final Unit carrier = unit.getCarrier();
         final GoalDecider gd = getGoalDecider(aiUnit, deferOK);
         final CostDecider standardCd
             = CostDeciders.avoidSettlementsAndBlockingUnits();
-        final CostDecider relaxedCd = CostDeciders.numberOfTiles();
 
         // Is there a valid target available from the starting tile?
-        path = unit.search(startTile, gd, standardCd, MAX_TURNS, carrier);
-        if (path != null) return path;
-
-        // One more try with a relaxed cost decider and no range limit.
-        return unit.search(startTile, gd, relaxedCd, MAX_TURNS, carrier);
+        return unit.search(startTile, gd, standardCd, MAX_TURNS, carrier);
     }
 
     /**
@@ -224,8 +218,8 @@ public class MissionaryMission extends Mission {
     public static Location findTarget(AIUnit aiUnit, boolean deferOK) {
         PathNode path = findTargetPath(aiUnit, deferOK);
         return (path != null) ? extractTarget(aiUnit, path)
-            : (deferOK) ? getBestSettlement(aiUnit.getUnit().getOwner())
-            : null;
+            : findCircleTarget(aiUnit, getGoalDecider(aiUnit, deferOK),
+                               MAX_TURNS*3, deferOK);
     }
 
     /**

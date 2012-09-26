@@ -217,18 +217,13 @@ public class BuildColonyMission extends Mission {
         final GoalDecider gd = getGoalDecider(aiUnit, deferOK);
         final CostDecider standardCd
             = CostDeciders.avoidSettlementsAndBlockingUnits();
-        final CostDecider relaxedCd = CostDeciders.numberOfTiles();
 
         // Try for something sensible nearby.
         path = unit.search(startTile, gd, standardCd, MAX_TURNS, carrier);
         if (path != null) return path;
 
         // Retry, but increase the range.
-        path = unit.search(startTile, gd, standardCd, MAX_TURNS*3, carrier);
-        if (path != null) return path;
-
-        // One more try with a relaxed cost decider and no range limit.
-        return unit.search(startTile, gd, relaxedCd, INFINITY, carrier);
+        return unit.search(startTile, gd, standardCd, MAX_TURNS*3, carrier);
     }
 
     /**
@@ -241,8 +236,8 @@ public class BuildColonyMission extends Mission {
     public static Location findTarget(AIUnit aiUnit, boolean deferOK) {
         PathNode path = findTargetPath(aiUnit, deferOK);
         return (path != null) ? extractTarget(aiUnit, path)
-            : (deferOK) ? getBestSettlement(aiUnit.getUnit().getOwner())
-            : null;
+            : findCircleTarget(aiUnit, getGoalDecider(aiUnit, deferOK),
+                               MAX_TURNS*3, deferOK);
     }
 
       

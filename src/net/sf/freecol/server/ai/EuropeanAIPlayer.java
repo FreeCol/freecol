@@ -452,7 +452,9 @@ public class EuropeanAIPlayer extends AIPlayer {
      */
     private void cheat() {
         logger.finest("Entering method cheat");
-        Specification spec = getSpecification();
+        final AIMain aiMain = getAIMain();
+        final Specification spec = getSpecification();
+
         Market market = getPlayer().getMarket();
         for (GoodsType goodsType : spec.getGoodsTypeList()) {
             if (market.getArrears(goodsType) > 0
@@ -473,12 +475,13 @@ public class EuropeanAIPlayer extends AIPlayer {
                         }
                     }
                 }
+                logger.finest("Cheat succeeded, removed boycott " + goodsType);
             }
         }
 
         // TODO: This seems to buy units the AIPlayer can't possibly
         // use (see BR#2566180)
-        if (getAIMain().getFreeColServer().isSinglePlayer()
+        if (aiMain.getFreeColServer().isSinglePlayer()
             && getPlayer().getPlayerType() == PlayerType.COLONIAL) {
             Europe europe = getPlayer().getEurope();
             List<UnitType> unitTypes = spec.getUnitTypeList();
@@ -490,6 +493,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 for (Unit u : europe.getUnitList()) {
                     if (u.getRole() == Unit.Role.DEFAULT
                         && getAIUnit(u).equipForRole(Unit.Role.SCOUT, true)) {
+                        logger.finest("Cheat succeeded, equip " + u);
                         break;
                     }
                 }
@@ -520,7 +524,9 @@ public class EuropeanAIPlayer extends AIPlayer {
                         if (unit != null && unit.isColonist()) {
                             aiUnit.equipForRole(Unit.Role.DRAGOON, true);
                         }
-                        aiUnit.setMission(new WishRealizationMission(getAIMain(), aiUnit, bestWish));
+                        aiUnit.setMission(new WishRealizationMission(aiMain,
+                                aiUnit, bestWish));
+                        logger.finest("Cheat succeeded, trained " + aiUnit);
                     }
                 }
             }
@@ -530,7 +536,8 @@ public class EuropeanAIPlayer extends AIPlayer {
                 int total = 0;
                 ArrayList<UnitType> navalUnits = new ArrayList<UnitType>();
                 for (UnitType unitType : unitTypes) {
-                    if (unitType.hasAbility(Ability.NAVAL_UNIT) && unitType.hasPrice()) {
+                    if (unitType.hasAbility(Ability.NAVAL_UNIT)
+                        && unitType.hasPrice()) {
                         navalUnits.add(unitType);
                         total += europe.getUnitPrice(unitType);
                     }
@@ -548,7 +555,10 @@ public class EuropeanAIPlayer extends AIPlayer {
                     }
                 }
                 getPlayer().modifyGold(europe.getUnitPrice(unitToPurchase));
-                this.trainAIUnitInEurope(unitToPurchase);
+                AIUnit aiUnit = trainAIUnitInEurope(unitToPurchase);
+                if (aiUnit != null) {
+                    logger.finest("Cheat succeeded, built " + aiUnit);
+                }
             }
         }
     }
@@ -651,6 +661,24 @@ public class EuropeanAIPlayer extends AIPlayer {
             + " nScouts=" + nScouts + ")"
             + report;
 
+        // Process the free naval units.
+        i = 0;
+        while (i < navalUnits.size()) {
+            final AIUnit aiUnit = navalUnits.get(i);
+            Mission m;
+            if ((m = getPrivateerMission(aiUnit)) != null
+                || (m = getTransportMission(aiUnit)) != null
+                || (m = getSeekAndDestroyMission(aiUnit, 8)) != null
+                || (m = getWanderHostileMission(aiUnit)) != null
+                ) {
+                aiUnit.setMission(m);
+                report += "\n  New-" + m.toString();
+                navalUnits.remove(i);
+            } else {
+                i++;
+            }
+        }
+
         // First try to satisfy the demand for missions with a defined quota.
         if (nBuilders > 0) {
             Collections.sort(aiUnits, builderComparator);
@@ -689,24 +717,6 @@ public class EuropeanAIPlayer extends AIPlayer {
             }
         }
 
-        // Process the free naval units.
-        i = 0;
-        while (i < navalUnits.size()) {
-            final AIUnit aiUnit = navalUnits.get(i);
-            Mission m;
-            if ((m = getPrivateerMission(aiUnit)) != null
-                || (m = getTransportMission(aiUnit)) != null
-                || (m = getSeekAndDestroyMission(aiUnit, 8)) != null
-                || (m = getWanderHostileMission(aiUnit)) != null
-                ) {
-                aiUnit.setMission(m);
-                report += "\n  New-" + m.toString();
-                navalUnits.remove(i);
-            } else {
-                i++;
-            }
-        }
-            
         // Sort the remaining units, putting naval/transport units at
         // the front so that we can rely on valid transport missions
         // for them when handling their passengers.  Then loop through
@@ -793,11 +803,9 @@ public class EuropeanAIPlayer extends AIPlayer {
      */
     private Mission getBuildColonyMission(AIUnit aiUnit) {
         final Unit unit = aiUnit.getUnit();
-        Location loc = (unit.getOwner().canBuildColonies()
-            && unit.isColonist()
-            && BuildColonyMission.invalidReason(aiUnit) == null)
-            ? BuildColonyMission.findTarget(aiUnit, unit.isInEurope())
-            : null;
+        String reason = BuildColonyMission.invalidReason(aiUnit);
+        if (reason != null) return null;
+        Location loc = BuildColonyMission.findTarget(aiUnit, unit.isInEurope());
         return (loc != null)
             ? new BuildColonyMission(getAIMain(), aiUnit, loc)
             : null;
@@ -810,9 +818,9 @@ public class EuropeanAIPlayer extends AIPlayer {
      * @return A new mission, or null if impossible.
      */
     private Mission getCashInTreasureTrainMission(AIUnit aiUnit) {
-        return (CashInTreasureTrainMission.invalidReason(aiUnit) == null)
-            ? new CashInTreasureTrainMission(getAIMain(), aiUnit)
-            : null;
+        String reason = CashInTreasureTrainMission.invalidReason(aiUnit);
+        return (reason != null) ? null
+            : new CashInTreasureTrainMission(getAIMain(), aiUnit);
     }
 
     /**
@@ -823,7 +831,8 @@ public class EuropeanAIPlayer extends AIPlayer {
      * @return A new mission, or null if impossible.
      */
     private Mission getDefendSettlementMission(AIUnit aiUnit, boolean relaxed) {
-        if (DefendSettlementMission.invalidReason(aiUnit) != null) return null;
+        String reason = DefendSettlementMission.invalidReason(aiUnit);
+        if (reason != null) return null;
         final Unit unit = aiUnit.getUnit();
         final Location loc = unit.getLocation();
         double worstValue = 1000000.0;
@@ -864,16 +873,17 @@ public class EuropeanAIPlayer extends AIPlayer {
     /**
      * Gets a new PioneeringMission for a unit.
      *
+     * TODO: pioneers to make roads between colonies
+     *
      * @param aiUnit The <code>AIUnit</code> to check.
      * @return A new mission, or null if impossible.
      */
     private Mission getPioneeringMission(AIUnit aiUnit) {
-        Location loc;
-        return (PioneeringMission.prepare(aiUnit) == null
-            && (loc = PioneeringMission.findTarget(aiUnit, true)) != null)
-            // TODO: pioneers to make roads between colonies
-            ? new PioneeringMission(getAIMain(), aiUnit, loc)
-            : null;
+        String reason = PioneeringMission.prepare(aiUnit);
+        if (reason != null) return null;
+        Location loc = PioneeringMission.findTarget(aiUnit, true);
+        return (loc == null) ? null
+            : new PioneeringMission(getAIMain(), aiUnit, loc);
     }
 
     /**
@@ -883,9 +893,9 @@ public class EuropeanAIPlayer extends AIPlayer {
      * @return A new mission, or null if impossible.
      */
     private Mission getPrivateerMission(AIUnit aiUnit) {
-        return (PrivateerMission.invalidReason(aiUnit) == null)
-            ? new PrivateerMission(getAIMain(), aiUnit)
-            : null;
+        String reason = PrivateerMission.invalidReason(aiUnit);
+        return (reason != null) ? null
+            : new PrivateerMission(getAIMain(), aiUnit);
     }
 
     /**
@@ -895,9 +905,11 @@ public class EuropeanAIPlayer extends AIPlayer {
      * @return A new mission, or null if impossible.
      */
     private Mission getScoutingMission(AIUnit aiUnit) {
-        return (ScoutingMission.invalidReason(aiUnit) == null)
-            ? new ScoutingMission(getAIMain(), aiUnit)
-            : null;
+        String reason = ScoutingMission.prepare(aiUnit);
+        if (reason != null) return null;
+        Location loc = ScoutingMission.findTarget(aiUnit, true);
+        return (loc == null) ? null
+            : new ScoutingMission(getAIMain(), aiUnit, loc);
     }
 
     /**
@@ -908,8 +920,8 @@ public class EuropeanAIPlayer extends AIPlayer {
      * @return A new mission, or null if impossible.
      */
     public Mission getSeekAndDestroyMission(AIUnit aiUnit, int range) {
-        if (UnitSeekAndDestroyMission.invalidReason(aiUnit)
-            != null) return null;
+        String reason = UnitSeekAndDestroyMission.invalidReason(aiUnit);
+        if (reason != null) return null;
         Location target = UnitSeekAndDestroyMission.findTarget(aiUnit, range);
         return (target == null) ? null
             : new UnitSeekAndDestroyMission(getAIMain(), aiUnit, target);
@@ -922,9 +934,9 @@ public class EuropeanAIPlayer extends AIPlayer {
      * @return A new mission, or null if impossible.
      */
     private Mission getTransportMission(AIUnit aiUnit) {
-        return (TransportMission.invalidReason(aiUnit) == null)
-            ? new TransportMission(getAIMain(), aiUnit)
-            : null;
+        String reason = TransportMission.invalidReason(aiUnit);
+        return (reason != null) ? null
+            : new TransportMission(getAIMain(), aiUnit);
     }
 
     /**
@@ -969,9 +981,9 @@ public class EuropeanAIPlayer extends AIPlayer {
      * @return A new mission, or null if impossible.
      */
     private Mission getWanderHostileMission(AIUnit aiUnit) {
-        return (UnitWanderHostileMission.invalidReason(aiUnit) == null)
-            ? new UnitWanderHostileMission(getAIMain(), aiUnit)
-            : null;
+        String reason = UnitWanderHostileMission.invalidReason(aiUnit);
+        return (reason != null) ? null
+            : new UnitWanderHostileMission(getAIMain(), aiUnit);
     }
 
     /**

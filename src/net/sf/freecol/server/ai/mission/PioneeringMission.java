@@ -324,19 +324,13 @@ public class PioneeringMission extends Mission {
         final Tile startTile = unit.getPathStartTile();
         if (startTile == null) return null;
 
-        PathNode path;
         final Unit carrier = unit.getCarrier();
         final GoalDecider gd = getGoalDecider(aiUnit, deferOK);
         final CostDecider standardCd
             = CostDeciders.avoidSettlementsAndBlockingUnits();
-        final CostDecider relaxedCd = CostDeciders.numberOfTiles();
 
         // Try for something sensible nearby.
-        path = unit.search(startTile, gd, standardCd, MAX_TURNS, carrier);
-        if (path != null) return path;
-
-        // One more try with a relaxed cost decider and no range limit.
-        return unit.search(startTile, gd, relaxedCd, INFINITY, carrier);
+        return unit.search(startTile, gd, standardCd, MAX_TURNS, carrier);
     }
 
     /**
@@ -373,10 +367,11 @@ public class PioneeringMission extends Mission {
      * @return A target for this mission.
      */
     public static Location findTarget(AIUnit aiUnit, boolean deferOK) {
-        PathNode path = findTargetPath(aiUnit, deferOK);
+        PathNode path = findTargetPath(aiUnit, false);
         return (path != null) ? extractTarget(aiUnit, path)
             : (deferOK) ? getBestPioneeringColony(aiUnit)
-            : null;
+            : findCircleTarget(aiUnit, getGoalDecider(aiUnit, deferOK),
+                               MAX_TURNS*3, deferOK);
     }
 
     /**
@@ -390,11 +385,9 @@ public class PioneeringMission extends Mission {
         String reason = invalidReason(aiUnit);
         if (reason != null) return reason;
         final Unit unit = aiUnit.getUnit();
-        if (!hasTools(aiUnit)) {
-            aiUnit.equipForRole(Unit.Role.PIONEER, false);
-        }
-        return (hasTools(aiUnit) || unit.hasAbility(Ability.EXPERT_PIONEER))
-            ? null
+        if (!hasTools(aiUnit)) aiUnit.equipForRole(Unit.Role.PIONEER, false);
+        return (hasTools(aiUnit)
+            || unit.hasAbility(Ability.EXPERT_PIONEER)) ? null
             : "unit-missing-tools";
     }
 

@@ -26,6 +26,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -78,7 +79,23 @@ public class ScoutingMission extends Mission {
     public ScoutingMission(AIMain aiMain, AIUnit aiUnit) {
         super(aiMain, aiUnit);
 
-        target = findTarget(aiUnit, true);
+        setTarget(findTarget(aiUnit, true));
+        logger.finest(tag + " starts at " + aiUnit.getUnit().getLocation()
+            + " with target " + target + ": " + this);
+        uninitialized = false;
+    }
+
+    /**
+     * Creates a mission for the given <code>AIUnit</code>.
+     *
+     * @param aiMain The main AI-object.
+     * @param aiUnit The <code>AIUnit</code> this mission is created for.
+     * @param loc The target <code>Location</code>.
+     */
+    public ScoutingMission(AIMain aiMain, AIUnit aiUnit, Location loc) {
+        super(aiMain, aiUnit);
+
+        setTarget(loc);
         logger.finest(tag + " starts at " + aiUnit.getUnit().getLocation()
             + " with target " + target + ": " + this);
         uninitialized = false;
@@ -109,6 +126,26 @@ public class ScoutingMission extends Mission {
     public void setTarget(Location target) {
         removeTransportable("retargeted");
         this.target = target;
+    }
+
+    /**
+     * Does a supplied unit have horses?
+     *
+     * @param aiUnit The scout <code>AIUnit</code> to check.
+     * @return True if the scout has horses.
+     */
+    private static boolean hasHorses(AIUnit aiUnit) {
+        return aiUnit.getUnit()
+            .hasAbility("model.ability.scoutIndianSettlement");
+    }
+
+    /**
+     * Does this scout have horses?
+     *
+     * @return True if the scout has horses.
+     */
+    private boolean hasHorses() {
+        return hasHorses(getAIUnit());
     }
 
     /**
@@ -195,28 +232,18 @@ public class ScoutingMission extends Mission {
         final Tile startTile = unit.getPathStartTile();
         if (startTile == null) return null;
 
-        PathNode path;
         final Unit carrier = unit.getCarrier();
         final GoalDecider gd = getGoalDecider(aiUnit, deferOK);
         final CostDecider standardCd = CostDeciders.avoidIllegal();
-        final CostDecider relaxedCd = CostDeciders.numberOfTiles();
 
         // Can the scout legally reach a valid target from where it
         // currently is?
-        path = unit.search(startTile, gd, standardCd, MAX_TURNS, carrier);
-        if (path != null) return path;
-
-        // Search again, purely on distance in tiles, which allows
-        // water tiles and thus potentially finds targets that require
-        // a carrier to reach.
-        return unit.search(startTile, gd, relaxedCd, INFINITY, carrier);
+        return unit.search(startTile, gd, standardCd, MAX_TURNS, carrier);
     }
 
     /**
      * Finds a suitable scouting target for the supplied unit.
      * Falls back to the best settlement if a path is not found.
-     *
-     * TODO: improve the fallback to an actual scouting target.
      *
      * @param aiUnit The <code>AIUnit</code> to test.
      * @param deferOK Enables deferring to a fallback colony.
@@ -225,10 +252,25 @@ public class ScoutingMission extends Mission {
     public static Location findTarget(AIUnit aiUnit, boolean deferOK) {
         PathNode path = findTargetPath(aiUnit, deferOK);
         return (path != null) ? extractTarget(aiUnit, path)
-            : (deferOK) ? getBestSettlement(aiUnit.getUnit().getOwner())
-            : null;
+            : findCircleTarget(aiUnit, getGoalDecider(aiUnit, deferOK),
+                               MAX_TURNS*3, deferOK);
     }        
 
+    /**
+     * Prepare a unit for this mission.
+     *
+     * @param aiUnit The <code>AIUnit</code> to prepare.
+     * @return A reason why the unit can not perform this mission, or null
+     *     if none.
+     */
+    public static String prepare(AIUnit aiUnit) {
+        String reason = invalidReason(aiUnit);
+        if (reason != null) return reason;
+        if (!hasHorses(aiUnit)) aiUnit.equipForRole(Unit.Role.SCOUT, false);
+        return (hasHorses(aiUnit)
+            || aiUnit.getUnit().hasAbility(Ability.EXPERT_SCOUT)) ? null
+            : "unit-not-a-SCOUT";
+    }
 
     // Fake Transportable interface
 
@@ -265,10 +307,8 @@ public class ScoutingMission extends Mission {
      */
     private static String invalidMissionReason(AIUnit aiUnit) {
         String reason = invalidAIUnitReason(aiUnit);
-        return (reason != null)
-            ? reason
-            : (!aiUnit.getUnit().hasAbility("model.ability.scoutIndianSettlement"))
-            ? "unit-not-a-SCOUT"
+        return (reason != null) ? reason
+            : (!hasHorses(aiUnit)) ? "unit-not-a-SCOUT"
             : null;
     }
 

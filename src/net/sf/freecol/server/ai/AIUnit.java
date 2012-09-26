@@ -357,7 +357,7 @@ public class AIUnit extends AIObject implements Transportable {
         final Specification spec = getSpecification();
         final Player player = unit.getOwner();
         Location loc = unit.getLocation();
-        Europe europe = (loc instanceof Europe) ? (Europe)loc : null;
+        Europe europe = (unit.isInEurope()) ? player.getEurope() : null;
         Settlement settlement = loc.getSettlement();
         if (settlement == null && europe == null) return false;
 

@@ -202,27 +202,17 @@ public class CashInTreasureTrainMission extends Mission {
         final Unit carrier = unit.getCarrier();
         final CostDecider standardCd
             = CostDeciders.avoidSettlementsAndBlockingUnits();
-        final CostDecider relaxedCd = CostDeciders.numberOfTiles();
 
         if (player.getNumberOfSettlements() <= 0) {
             // No settlements, so go straight to Europe.  If Europe does
-            // not exist then this mission is doomed.  If a carrier is
-            // present use it, otherwise relax the cost decider and at least
-            // start working on a path.
-            return (europe == null)
-                ? null // Nowhere suitable at all!
-                : (carrier != null)
-                ? unit.findPath(startTile, europe, carrier, standardCd)
-                : unit.findPath(startTile, europe, null, relaxedCd);
+            // not exist then this mission is doomed.
+            return (europe == null) ? null
+                : unit.findPath(startTile, europe, carrier, standardCd);
         }
 
         // Can the unit get to a cash in site?
         final GoalDecider gd = getGoalDecider(aiUnit, deferOK);
-        path = unit.search(startTile, gd, standardCd, MAX_TURNS, carrier);
-        if (path != null) return path;
-
-        // One more try with a relaxed cost decider and no range limit.
-        return unit.search(startTile, gd, relaxedCd, INFINITY, carrier);
+        return unit.search(startTile, gd, standardCd, MAX_TURNS, carrier);
     }
 
     /**
@@ -236,7 +226,8 @@ public class CashInTreasureTrainMission extends Mission {
         final Player player = aiUnit.getUnit().getOwner();
         PathNode path = findTargetPath(aiUnit, deferOK);
         return (path != null) ? extractTarget(aiUnit, path)
-            : null;
+            : findCircleTarget(aiUnit, getGoalDecider(aiUnit, deferOK),
+                               MAX_TURNS*3, deferOK);
     }
 
 
