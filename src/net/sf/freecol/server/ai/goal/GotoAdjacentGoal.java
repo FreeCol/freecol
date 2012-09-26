@@ -91,7 +91,7 @@ public class GotoAdjacentGoal extends Goal {
                                 logger.warning("Accidental rumour exploration!");
                             }
                         
-                            AIMessage.askMove(u, pathNode.getDirection());
+                            u.move(pathNode.getDirection());
                             if (u.getUnit() == null
                                 || u.getUnit().isDisposed()) {
                                 continue nextUnit;

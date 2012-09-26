@@ -356,11 +356,8 @@ public abstract class Mission extends AIObject {
             Direction d = directions[j];
             Tile moveTo = unit.getTile().getNeighbourOrNull(d);
             if (moveTo != null
-                && unit.getMoveType(d) == MoveType.MOVE) {
-                return (AIMessage.askMove(aiUnit, d)
-                    && unit.getTile() == moveTo) ? d
-                    : null; // Failed!
-            }
+                && unit.getMoveType(d) == MoveType.MOVE
+                && aiUnit.move(d)) return d;
         }
         return null; // Stuck!
     }
@@ -374,25 +371,6 @@ public abstract class Mission extends AIObject {
         Direction direction = null;
         while ((direction = moveRandomly(logMe, direction)) != null);
         getUnit().setMovesLeft(0);
-    }
-
-    /**
-     * Move in a specified direction, but do not attack.
-     * Always check the return from this in case the unit blundered into
-     * a lost city and died.
-     * The usual idiom is: "if (!moveButDontAttack(unit)) return;"
-     *
-     * @param direction The <code>Direction</code> to move.
-     * @return True if the unit doing this mission is still valid/alive.
-     */
-    protected boolean moveButDontAttack(Direction direction) {
-        final Unit unit = getUnit();
-        if (direction != null
-            && unit != null
-            && unit.getMoveType(direction).isProgress()) {
-            AIMessage.askMove(aiUnit, direction);
-        }
-        return getUnit() != null && !getUnit().isDisposed();
     }
 
     /**

@@ -32,9 +32,11 @@ import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Locatable;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.server.ai.goal.Goal;
@@ -387,6 +389,18 @@ public class AIUnit extends AIObject implements Transportable {
             AIMessage.askEquipUnit(this, e, 1);
         }
         return unit.getRole() == r;
+    }
+
+    /**
+     * Moves this AI unit.
+     *
+     * @param direction The <code>Direction</code> to move.
+     * @return True if the move succeeded.
+     */
+    public boolean move(Direction direction) {
+        Tile start = unit.getTile();
+        return AIMessage.askMove(this, direction)
+            && unit.getTile() != start;
     }
 
     /**

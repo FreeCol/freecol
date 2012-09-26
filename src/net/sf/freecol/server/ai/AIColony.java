@@ -593,7 +593,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                     if (explorers.isEmpty()) return;
                     Unit u = explorers.remove(0);
                     if (!u.getMoveType(t).isProgress()) continue;
-                    if (AIMessage.askMove(getAIUnit(u), direction)
+                    if (getAIUnit(u).move(direction)
                         && !t.hasLostCityRumour()) {
                         u.setDestination(tile);
                         break;
