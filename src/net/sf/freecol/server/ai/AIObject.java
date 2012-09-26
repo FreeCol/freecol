@@ -26,6 +26,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Specification;
 
 import org.w3c.dom.Element;
@@ -179,6 +180,18 @@ public abstract class AIObject extends FreeColObject {
             aiMain.addAIObject(getId(), this);
             uninitialized = false;
         }
+    }
+
+    /**
+     * Gets a location's settlement if it has one.  The intent is to
+     * increase the relevance of a location used as a target.
+     *
+     * @param loc The <code>Location</code> to test.
+     * @return The location settlement if any, otherwise, the original
+     *     location.
+     */
+    public static Location upLoc(Location loc) {
+        return (loc.getSettlement() != null) ? loc.getSettlement() : loc;
     }
 
 

@@ -25,7 +25,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -80,10 +83,11 @@ public class Utils {
      * 
      * @param one First object to compare
      * @param two Second object to compare
-     * @return <code>(one == null && two != null) || (one != null && one.equals(two))</code>
+     * @return True if the arguments are either both null or equal in the
+     *     sense of their equals() method.
      */
     public static boolean equals(Object one, Object two) {
-        return one == null ? two == null : one.equals(two);
+        return (one == null) ? (two == null) : one.equals(two);
     }
 
     /**
@@ -102,12 +106,84 @@ public class Utils {
     }
 
     /**
-     * Generalize this method instead of calling it directly elsewhere.
+     * Appends a value to a list member of a map with a given key.
+     *
+     * @param map The <code>Map</code> to add to.
+     * @param key The key with which to look up the list in the map.
+     * @param value The value to append.
+     */
+    public static <T,K> void appendToMapList(Map<K, List<T>> map,
+                                             K key, T val) {
+        List<T> l = map.get(key);
+        if (l == null) { 
+            l = new ArrayList<T>();
+            l.add(val);
+            map.put(key, l);
+        } else if (!l.contains(val)) {
+            l.add(val);
+        }
+    }
+
+    /**
+     * Given a list, return an iterable that yields all permutations
+     * of the original list.
+     *
+     * Obviously combinatorial explosion will occur, so use with
+     * caution only on lists that are known to be short.
+     *
+     * @param l The original list.
+     * @return A iterable yielding all the permutations of the original list.
+     */
+    public static <T> Iterable<List<T>> getPermutations(final List<T> l) {
+        if (l == null) return null;
+        return new Iterable<List<T>>() {
+            public Iterator<List<T>> iterator() {
+                return new Iterator<List<T>>() {
+                    private final List<T> original = new ArrayList<T>(l);
+                    private final int n = l.size();
+                    private final int np = factorial(n);
+                    private int index = 0;
+
+                    private int factorial(int n) {
+                        int total = n;
+                        while (--n > 1) total *= n;
+                        return total;
+                    }
+
+                    public boolean hasNext() {
+                        return index < np;
+                    }
+
+                    // TODO: see if we can do it with one array:-)
+                    public List<T> next() {
+                        List<T> pick = new ArrayList<T>(original);
+                        List<T> result = new ArrayList<T>();
+                        int current = index++;
+                        int divisor = np;
+                        for (int i = n; i > 0; i--) {
+                            divisor /= i;
+                            int j = current / divisor;
+                            result.add(pick.remove(j));
+                            current -= j * divisor;
+                        }
+                        return result;
+                    }
+
+                    public void remove() {
+                        throw new RuntimeException("remove() not implemented");
+                    }
+                };
+            }
+        };
+    }
+
+    /**
+     * Gets the user home directory name.
      * 
-     * @return			String
+     * @return The name of the user home directory.
      */
     public static String getUserDirectory() {
-    	return System.getProperty("user.home");
+        return System.getProperty("user.home");
     }
 
     /**

@@ -32,6 +32,7 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
@@ -53,10 +54,12 @@ import net.sf.freecol.common.networking.CloseTransactionMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.DeliverGiftMessage;
+import net.sf.freecol.common.networking.DisbandUnitMessage;
 import net.sf.freecol.common.networking.DisembarkMessage;
 import net.sf.freecol.common.networking.EmbarkMessage;
 import net.sf.freecol.common.networking.EmigrateUnitMessage;
 import net.sf.freecol.common.networking.EquipUnitMessage;
+import net.sf.freecol.common.networking.GetNationSummaryMessage;
 import net.sf.freecol.common.networking.GetTransactionMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.LoadCargoMessage;
@@ -338,9 +341,21 @@ public class AIMessage {
 
 
     /**
+     * An AIUnit disbands.
+     *
+     * @param aiUnit The <code>AIUnit</code> to disband.
+     * @return True if the message was sent, and a non-error reply returned.
+     */
+    public static boolean askDisband(AIUnit aiUnit) {
+        return sendMessage(aiUnit.getAIOwner().getConnection(),
+                           new DisbandUnitMessage(aiUnit.getUnit()));
+    }
+
+
+    /**
      * An AIUnit disembarks.
      *
-     * @param aiUnit The <code>AIUnit</code> delivering the gift.
+     * @param aiUnit The <code>AIUnit</code> disembarking.
      * @return True if the message was sent, and a non-error reply returned.
      */
     public static boolean askDisembark(AIUnit aiUnit) {
@@ -419,6 +434,24 @@ public class AIMessage {
         return sendMessage(aiUnit.getAIOwner().getConnection(),
                            new MissionaryMessage(aiUnit.getUnit(), direction,
                                                  denounce));
+    }
+
+
+    /**
+     * Gets a nation summary for a player.
+     *
+     * @param owner The <code>AIPlayer</code> making the inquiry.
+     * @param player The <code>Player</code> to summarize.
+     * @return A <code>NationSummary</code> if the message was sent,
+     *      and a non-error reply returned.
+     */
+    public static NationSummary askGetNationSummary(AIPlayer owner,
+                                                    Player player) {
+        Element reply = askMessage(owner.getConnection(),
+            new GetNationSummaryMessage(player).toXMLElement());
+        GetNationSummaryMessage message
+            = new GetNationSummaryMessage(reply);
+        return (message == null) ? null : message.getNationSummary();
     }
 
 
