@@ -239,19 +239,21 @@ public final class DefaultTransferHandler extends TransferHandler {
 
                 // Import the data.
                 if (label.isPartialChosen()) {
-                    int defaultAmount = -1;
-                    if (goods.getLocation() instanceof GoodsLocation) {
-                        GoodsLocation loc = (GoodsLocation)goods.getLocation();
-                        if (goods.getAmount() > loc.getGoodsCapacity()) {
-                            // If over capacity, favour the amount that would
-                            // correct the problem.
-                            defaultAmount = Math.min(goods.getAmount()
-                                - loc.getGoodsCapacity(),
-                                GoodsContainer.CARGO_SIZE);
-                        }
-                    }
-                    int amount = getAmount(goods.getType(),
-                                           goods.getAmount(), defaultAmount, false);
+                    int defaultAmount = goods.getAmount();
+                    // Disable the following until Unit.getGoodsCapacity
+                    // works properly.
+                    //if (goods.getLocation() instanceof GoodsLocation) {
+                    //    GoodsLocation loc = (GoodsLocation)goods.getLocation();
+                    //   if (goods.getAmount() > loc.getGoodsCapacity()) {
+                    //        // If over capacity, favour the amount that would
+                    //        // correct the problem.
+                    //        defaultAmount = Math.min(goods.getAmount()
+                    //            - loc.getGoodsCapacity(),
+                    //            GoodsContainer.CARGO_SIZE);
+                    //    }
+                    //}
+                    int amount = getAmount(goods.getType(), goods.getAmount(),
+                                           defaultAmount, false);
                     if (amount <= 0) return false;
                     goods.setAmount(amount);
                 } else if (goods.getAmount() > GoodsContainer.CARGO_SIZE) {
