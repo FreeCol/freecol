@@ -157,24 +157,18 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
         return objects;
     }
 
-    /**
-     * Gets the current space taken by the units in this location.
-     *
-     * @return The sum of the space taken by the units in this location.
-     */
-    public int getSpaceTaken() {
-        int space = 0;
-        for (Unit u : units) space += u.getSpaceTaken();
-        return space;
-    }
+
+    // Some useful utilities, marked final as they will work as long
+    // as working implementations of getUnitList(), getUnitCount(),
+    // and getUnitCapacity() are provided.
 
     /**
-     * Returns true if there are no Units present in this Location.
+     * Is this unit location empty?
      *
      * @return a <code>boolean</code> value
      */
-    public boolean isEmpty() {
-        return units.isEmpty();
+    public final boolean isEmpty() {
+        return getUnitCount() == 0;
     }
 
     /**
@@ -182,39 +176,30 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      *
      * @return True if this location is full.
      */
-    public boolean isFull() {
-        return units.size() >= getUnitCapacity();
+    public final boolean isFull() {
+        return getUnitCount() >= getUnitCapacity();
     }
 
     /**
-     * Gets the first <code>Unit</code> beeing carried by this
-     * <code>Unit</code>.
+     * Gets the first Unit at this unit location.
      *
-     * @return The <code>Unit</code>.
+     * @return The first <code>Unit</code>.
      */
-    public Unit getFirstUnit() {
+    public final Unit getFirstUnit() {
+        if (isEmpty()) return null;
         List<Unit> units = getUnitList();
-        return (units.isEmpty()) ? null : units.get(0);
+        return units.get(0);
     }
 
     /**
-     * Gets the last <code>Unit</code> beeing carried by this
-     * <code>Unit</code>.
+     * Gets the last Unit at this unit location.
      *
-     * @return The <code>Unit</code>.
+     * @return The last <code>Unit</code>.
      */
-    public Unit getLastUnit() {
+    public final Unit getLastUnit() {
+        if (isEmpty()) return null;
         List<Unit> units = getUnitList();
-        return (units.isEmpty()) ? null : units.get(units.size()-1);
-    }
-
-    /**
-     * Move the given unit to the front of the units list.
-     *
-     * @param u The <code>Unit</code> to move to the front.
-     */
-    public void moveToFront(Unit u) {
-        if (units.remove(u)) units.add(0, u);
+        return units.get(units.size()-1);
     }
 
 
@@ -284,7 +269,8 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      * {@inheritDoc}
      */
     public boolean contains(Locatable locatable) {
-        return units.contains(locatable);
+        return (locatable instanceof Unit) ? units.contains((Unit)locatable)
+            : false;
     }
 
     /**
@@ -310,8 +296,10 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
 
     /**
      * {@inheritDoc}
+     *
+     * Note: Marked final as this will always work if getUnitList() does.
      */
-    public Iterator<Unit> getUnitIterator() {
+    public final Iterator<Unit> getUnitIterator() {
         return getUnitList().iterator();
     }
 
@@ -336,13 +324,36 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
         return null;
     }
 
+
+    // Overrideable routines to be implemented by UnitLocation subclasses.
+
+    /**
+     * Gets the current space taken by the units in this location.
+     *
+     * Note that Units are also unit locations, but their space taken is
+     * derived from the spec, so this routine must be overrideable.
+     *
+     * @return The sum of the space taken by the units in this location.
+     */
+    public int getSpaceTaken() {
+        int space = 0;
+        for (Unit u : getUnitList()) space += u.getSpaceTaken();
+        return space;
+    }
+
+    /**
+     * Move the given unit to the front of the units list.
+     *
+     * @param u The <code>Unit</code> to move to the front.
+     */
+    public void moveToFront(Unit u) {
+        if (units.remove(u)) units.add(0, u);
+    }
+
     // @compat 0.10.5
     protected void clearUnitList() {
         units.clear();
     }
-
-
-    // Overrideable routines to be implemented by UnitLocation subclasses.
 
     /**
      * Gets the reason why a given <code>Locatable</code> can not be
