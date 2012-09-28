@@ -395,15 +395,12 @@ public class PioneeringMission extends Mission {
     // Fake Transportable interface.
 
     /**
-     * Gets the transport destination for units with this mission.
-     *
-     * @return The destination for this <code>Transportable</code>.
+     * {@inheritDoc}
      */
     @Override
     public Location getTransportDestination() {
-        return (getTarget() == null
-            || !shouldTakeTransportToTile(getTarget().getTile())) ? null
-            : getTarget();
+        return (getUnit().shouldTakeTransportTo(getTarget())) ? getTarget()
+            : null;
     }
 
 

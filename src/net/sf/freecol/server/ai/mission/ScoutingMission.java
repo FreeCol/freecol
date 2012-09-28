@@ -275,15 +275,12 @@ public class ScoutingMission extends Mission {
     // Fake Transportable interface
 
     /**
-     * Gets the transport destination for units with this mission.
-     *
-     * @return The destination for this <code>Transportable</code>.
+     * {@inheritDoc}
      */
     @Override
     public Location getTransportDestination() {
-        return (getTarget() == null
-            || !shouldTakeTransportToTile(getTarget().getTile())) ? null
-            : target;
+        return (getUnit().shouldTakeTransportTo(getTarget())) ? getTarget()
+            : null;
     }
 
 

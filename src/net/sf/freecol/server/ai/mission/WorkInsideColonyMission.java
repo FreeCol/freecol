@@ -95,15 +95,11 @@ public class WorkInsideColonyMission extends Mission {
     // Fake Transportable interface
 
     /**
-     * Gets the destination for units with this mission.
-     *
-     * @return Usually the colony tile unless the unit is there
-     *         already or can get there itself.
+     * {@inheritDoc}
      */
-    public Tile getTransportDestination() {
-        final Tile colonyTile = (Tile)getTarget();
-        return (shouldTakeTransportToTile(colonyTile))
-            ? colonyTile
+    @Override
+    public Location getTransportDestination() {
+        return (getUnit().shouldTakeTransportTo(getTarget())) ? getTarget()
             : null;
     }
 

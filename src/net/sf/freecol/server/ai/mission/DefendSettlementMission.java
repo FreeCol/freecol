@@ -202,9 +202,8 @@ public class DefendSettlementMission extends Mission {
      */
     @Override
     public Location getTransportDestination() {
-        return (getTarget() == null
-            || !shouldTakeTransportToTile(getTarget().getTile())) ? null
-            : getTarget();
+        return (getUnit().shouldTakeTransportTo(getTarget())) ? getTarget()
+            : null;
     }
 
     /**

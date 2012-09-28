@@ -89,7 +89,7 @@ public class IdleAtSettlementMission extends Mission {
             || unit.getTile().getSettlement() != null) return null;
         PathNode path = unit.findOurNearestOtherSettlement();
         Tile target = (path == null) ? null : path.getLastNode().getTile();
-        return (shouldTakeTransportToTile(target)) ? target : null;
+        return (unit.shouldTakeTransportTo(target)) ? target : null;
     }
 
 

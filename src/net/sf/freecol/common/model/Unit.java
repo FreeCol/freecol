@@ -1177,6 +1177,29 @@ public class Unit extends GoodsLocation
     }
 
     /**
+     * Should the unit use transport to get to a specified tile?
+     *
+     * True if:
+     * - The location is not null
+     * - The unit is not naval
+     * - The unit is not there already
+     * AND
+     *   - there is no path OR the path uses an existing carrier
+     *
+     * @param loc The <code>Location</code> to go to.
+     * @return True if the unit should use transport.
+     */
+    public boolean shouldTakeTransportTo(Location loc) {
+        PathNode path;
+        return loc != null
+            && !isNaval()
+            && !Map.isSameLocation(getLocation(), loc)
+            && ((path = findPath(getLocation(), loc,
+                                 getCarrier(), null)) == null
+                || path.usesCarrier());
+    }
+
+    /**
      * Finds the fastest path from the current location to the
      * specified one.  No carrier is provided, and the default cost
      * decider for this unit is used.

@@ -681,29 +681,6 @@ public abstract class Mission extends AIObject {
     }
 
     /**
-     * Should the unit use transport to get to a specified tile?
-     *
-     * True if:
-     * - The unit and tile are not null
-     * - The unit is not there already
-     * AND
-     *   - there is no path OR the path uses an existing carrier
-     *
-     * @param tile The <code>Tile</code> to go to.
-     * @return True if the unit should use transport.
-     */
-    protected boolean shouldTakeTransportToTile(Tile tile) {
-        final Unit unit = getUnit();
-        PathNode path;
-        return tile != null
-            && unit != null
-            && unit.getTile() != tile
-            && ((path = unit.findPath(unit.getLocation(), tile,
-                                      unit.getCarrier(), null)) == null
-                || path.usesCarrier());
-    }
-
-    /**
      * Tries to move this mission's unit to a target location.
      *
      * First check for units in transit, that is units on a carrier that

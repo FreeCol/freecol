@@ -234,15 +234,11 @@ public class CashInTreasureTrainMission extends Mission {
     // Fake Transportable interface
 
     /**
-     * Gets the transport destination for units with this mission.
-     *
-     * @return The destination for this <code>Transportable</code>.
+     * {@inheritDoc}
      */
     @Override
     public Location getTransportDestination() {
-        return (target instanceof Europe
-            || (target instanceof Colony
-                && shouldTakeTransportToTile(target.getTile()))) ? target
+        return (getUnit().shouldTakeTransportTo(getTarget())) ? getTarget()
             : null;
     }
 

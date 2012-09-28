@@ -244,15 +244,12 @@ public class BuildColonyMission extends Mission {
     // Fake Transportable interface
 
     /**
-     * Gets the transport destination for the unit with this mission.
-     *
-     * @return The destination for this <code>Transportable</code>.
+     * {@inheritDoc}
      */
     @Override
     public Location getTransportDestination() {
-        return (target == null
-            || !shouldTakeTransportToTile(target.getTile())) ? null
-            : target;
+        return (getUnit().shouldTakeTransportTo(getTarget())) ? getTarget()
+            : null;
     }
 
 
