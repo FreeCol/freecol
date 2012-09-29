@@ -853,20 +853,12 @@ public class Colony extends Settlement implements Nameable {
     }
 
     /**
-     * Add goods to this colony;
-     *
-     * @param goods an <code>AbstractGoods</code> value
-     */
-    public boolean addGoods(AbstractGoods goods) {
-        return addGoods(goods.getType(), goods.getAmount());
-    }
-
-    /**
      * Add goods to this colony.
      *
      * @param type a <code>GoodsType</code> value
      * @param amount an <code>int</code> value
      */
+    @Override
     public boolean addGoods(GoodsType type, int amount) {
         super.addGoods(type, amount);
         productionCache.invalidate(type);
@@ -879,32 +871,13 @@ public class Colony extends Settlement implements Nameable {
      *
      * @param type The type of Goods to remove from this settlement.
      * @param amount The amount of Goods to remove from this settlement.
+     * @return The goods removed, or null if none.
      */
+    @Override
     public Goods removeGoods(GoodsType type, int amount) {
         Goods removed = super.removeGoods(type, amount);
         productionCache.invalidate(type);
-        modifySpecialGoods(type, -removed.getAmount());
-        return removed;
-    }
-
-    /**
-     * Removes the given Goods from the Settlement.
-     *
-     * @param goods a <code>Goods</code> value
-     */
-    public Goods removeGoods(AbstractGoods goods) {
-        return removeGoods(goods.getType(), goods.getAmount());
-    }
-
-    /**
-     * Removes all Goods of the given type from the Settlement.
-     *
-     * @param type a <code>GoodsType</code> value
-     */
-    public Goods removeGoods(GoodsType type) {
-        Goods removed = super.removeGoods(type);
-        productionCache.invalidate(type);
-        modifySpecialGoods(type, -removed.getAmount());
+        if (removed != null) modifySpecialGoods(type, -removed.getAmount());
         return removed;
     }
 

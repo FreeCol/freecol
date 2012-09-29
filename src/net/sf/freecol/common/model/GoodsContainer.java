@@ -207,10 +207,12 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      *
      * @param type The type of goods to remove.
      * @param amount The type of amount to remove.
-     * @return A Goods with the requested or available amount that has been removed
+     * @return A Goods with the requested or available amount that has
+     *      been removed, or null if none was removed.
      */
     public Goods removeGoods(GoodsType type, int amount) {
         int oldAmount = getGoodsCount(type);
+        if (oldAmount <= 0) return null;
         int newAmount = oldAmount - amount;
         Goods removedGoods;
         if (newAmount > 0) {
