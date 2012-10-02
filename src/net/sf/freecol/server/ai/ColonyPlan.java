@@ -873,7 +873,7 @@ public class ColonyPlan {
             if (!colony.canBuild(unitType)) continue;
             if (unitType.hasAbility(Ability.NAVAL_UNIT)) {
                 ; // TODO: decide to build a ship
-            } else if (unitType.getDefence() > UnitType.DEFAULT_DEFENCE) {
+            } else if (unitType.isDefensive()) {
                 if (AIColony.isBadlyDefended(colony)) {
                     prioritize(unitType, DEFENCE_WEIGHT,
                         1.0/*FIXME: how badly defended?*/);

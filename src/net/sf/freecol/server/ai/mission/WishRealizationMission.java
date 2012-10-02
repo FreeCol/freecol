@@ -180,7 +180,7 @@ public class WishRealizationMission extends Mission {
             // military unit or a simple working one if not.  Beware
             // that setMission() will dispose of this mission which is
             // why this is done last.
-            if (unit.getType().getOffence() > UnitType.DEFAULT_OFFENCE) {
+            if (unit.getType().isOffensive()) {
                 aiUnit.setMission(new DefendSettlementMission(getAIMain(),
                                   aiUnit, colony));
             } else {                

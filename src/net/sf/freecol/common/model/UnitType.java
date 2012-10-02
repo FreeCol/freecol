@@ -198,6 +198,15 @@ public final class UnitType extends BuildableType
     }
 
     /**
+     * Is this an offensive unit type?
+     *
+     * @return True if offensive ability is greater than the default.
+     */
+    public boolean isOffensive() {
+        return getOffence() > UnitType.DEFAULT_OFFENCE;
+    }
+
+    /**
      * Set the <code>Offence</code> value.
      *
      * @param newOffence The new Offence value.
@@ -222,6 +231,15 @@ public final class UnitType extends BuildableType
      */
     public void setDefence(final int newDefence) {
         this.defence = newDefence;
+    }
+
+    /**
+     * Is this a defensive unit type?
+     *
+     * @return True if defensive ability is greater than the default.
+     */
+    public boolean isDefensive() {
+        return getDefence() > UnitType.DEFAULT_DEFENCE;
     }
 
     /**
