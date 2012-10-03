@@ -1342,7 +1342,6 @@ public class Unit extends GoodsLocation
         int eTurns = -1;
         Europe europe = getOwner().getEurope();
         if (getType().canMoveToHighSeas()) {
-            if (isInEurope() || isAtSea()) return null;
             ePath = (europe == null) ? null : findPath(europe);
             eTurns = (ePath == null) ? -1 : ePath.getTotalTurns();
         }

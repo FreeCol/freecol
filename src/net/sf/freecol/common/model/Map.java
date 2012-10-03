@@ -706,7 +706,7 @@ public class Map extends FreeColGameObject implements Location {
                 if (carrier == null) {
                     throw new IllegalArgumentException("Null carrier when starting on high seas: " + unit);
                 } else if (carrier != (Unit)start) {
-                    throw new IllegalArgumentException("Wrong carrier when starting on high seas: " + unit + "/" + carrier);
+                    throw new IllegalArgumentException("Wrong carrier when starting on high seas: " + unit + "/" + carrier + " != " + ((Unit)start));
                 }
                 entry = carrier.resolveDestination();
             } else {
@@ -1031,9 +1031,11 @@ public class Map extends FreeColGameObject implements Location {
 
         /**
          * Do not let the CostDecider (which may be conservative)
-         * block a final destination if it is still a legal move
-         * or only illegal because it is occupied by an enemy unit, which
-         * may be a temporary condition.
+         * block a final destination.  This allows planning routines
+         * to compute paths to tiles temporarily occupied by an enemy
+         * unit, or for an empty ship to find a compound path to a
+         * native settlement where the first step is to collect the
+         * cargo it needs to make the final move legal.
          *
          * @param goalDecider A <code>GoalDecider</code> to check the
          *     goal with.
@@ -1045,10 +1047,7 @@ public class Map extends FreeColGameObject implements Location {
                 && current.getTile() != null
                 && dst.getTile() != null
                 && goalDecider != null
-                && goalDecider.check(unit, path)
-                && ((mt = unit.getSimpleMoveType(current.getTile(),
-                                                 dst.getTile())).isLegal()
-                    || mt == Unit.MoveType.MOVE_NO_ATTACK_CIVILIAN)) {
+                && goalDecider.check(unit, path)) {
                 // Pretend it finishes the move.
                 movesLeft = unit.getInitialMovesLeft();
                 turns++;
