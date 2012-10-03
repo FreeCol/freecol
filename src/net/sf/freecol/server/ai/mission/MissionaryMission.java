@@ -306,7 +306,7 @@ public class MissionaryMission extends Mission {
      * IndianSettlement?
      *
      * @param aiUnit The <code>AIUnit</code> to check.
-     * @param indianSettlement The <code>IndianSettlement</code> to check.
+     * @param is The <code>IndianSettlement</code> to check.
      * @return A reason to not perform the mission, or null if none.
      */
     private static String invalidIndianSettlementReason(AIUnit aiUnit,

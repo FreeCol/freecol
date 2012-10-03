@@ -396,7 +396,7 @@ public final class FreeColServer {
     /**
      * Sets the mode of the game: single/multiplayer.
      *
-     * @param singleplayer Sets the game as single player (if <i>true</i>) or
+     * @param singlePlayer Sets the game as single player (if <i>true</i>) or
      *            multiplayer (if <i>false</i>).
      */
     public void setSinglePlayer(boolean singlePlayer) {

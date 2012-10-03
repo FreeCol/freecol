@@ -363,7 +363,7 @@ public class ScoutingMission extends Mission {
      * Is this a valid scouting target because it is a suitable tile.
      *
      * @param aiUnit The <code>AIUnit</code> to test.
-     * @param is The <code>IndianSettlement</code> to test.
+     * @param tile The <code>Tile</code> to test.
      * @return A reason why the mission would be invalid, or null if none found.
      */
     private static String invalidTileReason(AIUnit aiUnit, Tile tile) {

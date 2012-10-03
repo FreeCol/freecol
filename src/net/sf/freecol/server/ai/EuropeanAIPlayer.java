@@ -991,7 +991,6 @@ public class EuropeanAIPlayer extends AIPlayer {
      *
      * @param aiUnit The <code>AIUnit</code> to check.
      * @param workerWishes A map of unit type to wishes.
-     * @param best Optionally override the <code>WorkerWish</code>.
      * @return A new mission, or null if impossible.
      */
     private Mission getWishRealizationMission(AIUnit aiUnit,

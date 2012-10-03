@@ -293,7 +293,7 @@ public class PrivateerMission extends Mission {
      * Is this a valid target because it is a hostile unit.
      *
      * @param aiUnit The <code>AIUnit</code> to test.
-     * @param settlement The <code>Settlement</code> to test.
+     * @param unit The <code>Unit</code> to test.
      * @return A reason why the mission would be invalid, or null if
      *     none found.
      */

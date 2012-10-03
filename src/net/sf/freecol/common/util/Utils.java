@@ -47,7 +47,7 @@ public class Utils {
 
     /**
      * Joins the given strings.
-     * 
+     *
      * @param delimiter The delimiter to place between the individual strings.
      * @param strings The strings to be joined.
      * @return Each of the strings in the given array delimited by the given
@@ -68,7 +68,7 @@ public class Utils {
 
     /**
      * Joins the given strings.
-     * 
+     *
      * @param delimiter The delimiter to place between the individual strings.
      * @param strings The strings to be joined.
      * @return Each of the strings in the given array delimited by the given
@@ -80,7 +80,7 @@ public class Utils {
 
     /**
      * Will check if both objects are equal but also checks for null.
-     * 
+     *
      * @param one First object to compare
      * @param two Second object to compare
      * @return True if the arguments are either both null or equal in the
@@ -99,9 +99,9 @@ public class Utils {
      *     the delimiter, or the original string if the delimiter is
      *     not present.
      */
-    public static String lastPart(String s, String part) {
-        int last = (s == null) ? -1 : s.lastIndexOf(part);
-        return (last > 0) ? s.substring(last+part.length(), s.length())
+    public static String lastPart(String s, String delim) {
+        int last = (s == null) ? -1 : s.lastIndexOf(delim);
+        return (last > 0) ? s.substring(last+delim.length(), s.length())
             : s;
     }
 
@@ -113,14 +113,14 @@ public class Utils {
      * @param value The value to append.
      */
     public static <T,K> void appendToMapList(Map<K, List<T>> map,
-                                             K key, T val) {
+                                             K key, T value) {
         List<T> l = map.get(key);
-        if (l == null) { 
+        if (l == null) {
             l = new ArrayList<T>();
-            l.add(val);
+            l.add(value);
             map.put(key, l);
-        } else if (!l.contains(val)) {
-            l.add(val);
+        } else if (!l.contains(value)) {
+            l.add(value);
         }
     }
 
@@ -179,7 +179,7 @@ public class Utils {
 
     /**
      * Gets the user home directory name.
-     * 
+     *
      * @return The name of the user home directory.
      */
     public static String getUserDirectory() {

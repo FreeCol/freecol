@@ -270,7 +270,7 @@ public abstract class Mission extends AIObject {
      * Is a target a valid mission target?
      *
      * @param target The target <code>Location</code> to check.
-     * @param player A <code>Player</code> that should own
+     * @param owner A <code>Player</code> that should own
      *     the target.
      * @return A reason for the target to be invalid, or null if none found.
      */
