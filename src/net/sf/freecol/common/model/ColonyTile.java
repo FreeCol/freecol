@@ -584,11 +584,11 @@ public class ColonyTile extends WorkLocation implements Ownable {
      * addition to the FreeColObject.toString().
      *
      * @return A representation of a colony-tile that can be used for
-     *    debugging.
+     *     debugging.
      */
     public String toString() {
-        return "ColonyTile " + getWorkTile().getPosition().toString()
-            + " in '" + getColony().getName() + "'";
+        return "ColonyTile" + getWorkTile().getPosition().toString()
+            + "/" + getColony().getName();
     }
 
     /**

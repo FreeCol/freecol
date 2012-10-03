@@ -29,6 +29,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.util.Utils;
+
 
 /**
  * Represents a building in a colony.
@@ -740,7 +742,8 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      */
     @Override
     public String toString() {
-        return getType().getId() + " [" + getColony().getName() + "]";
+        return Utils.lastPart(getType().getId(), ".")
+            + "/" + getColony().getName();
     }
 
     /**
