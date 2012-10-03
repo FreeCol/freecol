@@ -437,8 +437,8 @@ public class Map extends FreeColGameObject implements Location {
      * @param key The key to lookup the region with.
      * @return The region with the given name key.
      */
-    public Region getRegion(final String id) {
-        return regions.get(id);
+    public Region getRegion(final String key) {
+        return regions.get(key);
     }
 
     /**
@@ -2248,7 +2248,13 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * {@inheritDoc}
+     * Serialize the attributes of the Map.
+     *
+     * @param out a <code>XMLStreamWriter</code> value
+     * @param player a <code>Player</code> value
+     * @param showAll a <code>boolean</code> value
+     * @param toSavedGame a <code>boolean</code> value
+     * @exception XMLStreamException if an error occurs
      */
     protected void writeAttributes(XMLStreamWriter out, Player player,
                                    boolean showAll, boolean toSavedGame)
@@ -2264,7 +2270,13 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * {@inheritDoc}
+     * Serialize the children (regions and tiles) of this Map.
+     *
+     * @param out a <code>XMLStreamWriter</code> value
+     * @param player a <code>Player</code> value
+     * @param showAll a <code>boolean</code> value
+     * @param toSavedGame a <code>boolean</code> value
+     * @exception XMLStreamException if an error occurs
      */
     protected void writeChildren(XMLStreamWriter out, Player player,
                                  boolean showAll, boolean toSavedGame)
