@@ -469,7 +469,6 @@ public class Modifier extends Feature implements Comparable<Modifier> {
      * Reads the attributes of this object from an XML stream.
      *
      * @param in The XML input stream.
-     * @param specification A <code>Specification</code> to use.
      * @exception XMLStreamException if a problem was encountered
      *     during parsing.
      */

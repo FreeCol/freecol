@@ -137,13 +137,14 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     }
 
     /**
-     * Is an ability present in this Building?
-     * Delegate to the type.
+     * Is an ability present in this Building? The method actually
+     * returns whether the type of the building has the required
+     * ability, since Buildings have no abilities independent of their
+     * type.
      *
      * @param id The id of the ability to test.
-     * @param fcgot An optional <code>FreeColGameObjectType</code> the
-     *     ability applies to.
-     * @param turn An optional applicable <code>Turn</code>.
+     * @param type A <code>FreeColGameObjectType</code> (ignored)
+     * @param turn An <code>Turn</code> (ignored)
      * @return True if the ability is present.
      */
     @Override

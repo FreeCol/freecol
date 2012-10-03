@@ -942,7 +942,6 @@ public class Player extends FreeColGameObject implements Nameable {
      * Optionally shuffles all but the first name so so as to provide
      * a stable starting ship name.
      *
-     * @param names A list of ship names with the fallback prefix first.
      * @param random A <code>Random</code> number source.
      */
     private void initializeShipNames(Random random) {

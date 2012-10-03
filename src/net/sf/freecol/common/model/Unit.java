@@ -905,7 +905,11 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * {@inheritDoc}
+     * Adds a feature to the Unit. This method always throws an
+     * <code>UnsupportedOperationException</code>, since features can
+     * not be added to Units directly.
+     *
+     * @param feature a <code>Feature</code> value
      */
     public void addFeature(Feature feature) {
         throw new UnsupportedOperationException("Can not add Feature to Unit directly!");
@@ -1368,9 +1372,9 @@ public class Unit extends GoodsLocation
      * {@link net.sf.freecol.common.model.Map#search} function.
      *
      * @param start The <code>Location</code> to start the search from.
-     * @param goalDecider The object responsible for determining whether a
+     * @param gd The object responsible for determining whether a
      *     given <code>PathNode</code> is a goal or not.
-     * @param costDecider An optional <code>CostDecider</code>
+     * @param cd An optional <code>CostDecider</code>
      *     responsible for determining the path cost.
      * @param maxTurns The maximum number of turns the given
      *     <code>Unit</code> is allowed to move. This is the
@@ -2152,7 +2156,7 @@ public class Unit extends GoodsLocation
      * spare space in a slot partially filled with the specified
      * goods.
      *
-     * @param The <code>GoodsType</code> to examine.
+     * @param type The <code>GoodsType</code> to examine.
      * @return The amount of goods that could be loaded onto this unit.
      */
     public int getLoadableAmount(GoodsType type) {
@@ -3076,7 +3080,7 @@ public class Unit extends GoodsLocation
      *
      * @return The amount of goods carried by this <code>Unit</code>.
      *     This value might different from the one returned by
-     *     {@link getGoodsSpaceTaken()} when the model is
+     *     {@link #getGoodsSpaceTaken()} when the model is
      *     {@link Game#getViewOwner()} owned by a client and cargo
      *     hiding has been enabled.
      */

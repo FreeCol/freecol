@@ -2165,7 +2165,7 @@ public class Colony extends Settlement implements Nameable {
      * identified by <code>id</code>.
      *
      * @param id The id of the ability to test.
-     * @param fcgot An optional <code>FreeColGameObjectType</code> the
+     * @param type An optional <code>FreeColGameObjectType</code> the
      *     ability applies to.
      * @param turn An optional applicable <code>Turn</code>.
      * @return True if the ability is present.
