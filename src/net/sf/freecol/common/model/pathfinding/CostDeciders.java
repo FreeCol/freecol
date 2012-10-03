@@ -33,6 +33,11 @@ import net.sf.freecol.common.model.Unit;
 public final class CostDeciders {
 
     /**
+     * The infinite cost.
+     */
+    public static final int COST_INFINITY = Integer.MIN_VALUE;
+
+    /**
      * A <code>CostDecider</code> that costs unit moves normally.
      */
     private static final CostDecider avoidIllegalCostDecider
@@ -85,7 +90,7 @@ public final class CostDeciders {
         public int getCost(Unit unit, Location oldLocation,
                            Location newLocation, int movesLeft) {
             int cost = super.getCost(unit, oldLocation, newLocation, movesLeft);
-            if (cost != ILLEGAL_MOVE && cost != Map.COST_INFINITY) {
+            if (cost != ILLEGAL_MOVE && cost != COST_INFINITY) {
                 if (newLocation instanceof Europe) {
                     ; // ok
                 } else if (!newLocation.getTile().isExploredBy(unit.getOwner())) {
@@ -111,7 +116,7 @@ public final class CostDeciders {
         public int getCost(Unit unit, Location oldLocation,
                            Location newLocation, int movesLeft) {
             int cost = super.getCost(unit, oldLocation, newLocation, movesLeft);
-            if (cost != ILLEGAL_MOVE && cost != Map.COST_INFINITY) {
+            if (cost != ILLEGAL_MOVE && cost != COST_INFINITY) {
                 Settlement settlement = newLocation.getSettlement();
                 if (settlement != null
                     && settlement.getOwner() != unit.getOwner()) {
@@ -140,7 +145,7 @@ public final class CostDeciders {
                            Location newLocation, int movesLeft) {
             int cost = super.getCost(unit, oldLocation, newLocation, movesLeft);
             Tile tile = newLocation.getTile();
-            if (cost != ILLEGAL_MOVE && cost != Map.COST_INFINITY
+            if (cost != ILLEGAL_MOVE && cost != COST_INFINITY
                 && tile != null) {
                 final Unit defender = tile.getFirstUnit();
                 if (defender != null

@@ -112,7 +112,7 @@ public class TransportMission extends Mission {
         public boolean moveToEurope() {
             return moveToEurope;
         }
-        
+
         public PathNode getPath() {
             return path;
         }
@@ -365,7 +365,7 @@ public class TransportMission extends Mission {
                     && carrier.getTile().getSettlement() != null)) {
                 AIMessage.askUnloadCargo(getAIUnit(), g);
             }
-        }           
+        }
     }
 
     /**
@@ -401,7 +401,7 @@ public class TransportMission extends Mission {
                     : carrier.getFullEntryLocation();
                 distToSource = getDistanceTo(t, tile, true);
                 // Carrier cant reach source
-                if (distToSource == Map.COST_INFINITY) return false;
+                if (distToSource == CostDeciders.COST_INFINITY) return false;
             }
             bestSourceIndex = 0;
             int bestSourceDistance = distToSource;
@@ -421,14 +421,14 @@ public class TransportMission extends Mission {
 
                 if (isCarrying(t1)){
                     int distToDestination = getDistanceTo(t, t1.getTransportDestination(), true);
-                    if (distToDestination == Map.COST_INFINITY) continue;
+                    if (distToDestination == CostDeciders.COST_INFINITY) continue;
                     if(distToDestination <= bestSourceDistance) {
                         bestSourceIndex = i;
                         bestSourceDistance = distToDestination;
                     }
                 } else{
                     distToSource = getDistanceTo(t, t1.getTransportSource(), true);
-                    if (distToSource == Map.COST_INFINITY) continue;
+                    if (distToSource == CostDeciders.COST_INFINITY) continue;
                     if (distToSource <= bestSourceDistance) {
                         bestSourceIndex = i;
                         bestSourceDistance = distToSource;
@@ -446,7 +446,7 @@ public class TransportMission extends Mission {
                 bestDestinationDistance = 0;
             } else {
                 int distToCarrier = getDistanceTo(t, carrier.getTile(), false);
-                if (distToCarrier != Map.COST_INFINITY) {
+                if (distToCarrier != CostDeciders.COST_INFINITY) {
                     bestDestinationDistance = distToCarrier;
                 }
             }
@@ -467,14 +467,14 @@ public class TransportMission extends Mission {
             Transportable t1 = transportables.get(i - 1);
             if (isCarrying(t1)){
                 int distToDestination = getDistanceTo(t, t1.getTransportDestination(), false);
-                if (distToDestination == Map.COST_INFINITY) continue;
+                if (distToDestination == CostDeciders.COST_INFINITY) continue;
                 if(distToDestination <= bestDestinationDistance) {
                     bestDestinationIndex = i;
                     bestDestinationDistance = distToDestination;
                 }
             } else{
                 int distToSource = getDistanceTo(t, t1.getTransportSource(), false);
-                if (distToSource == Map.COST_INFINITY) continue;
+                if (distToSource == CostDeciders.COST_INFINITY) continue;
                 if (distToSource <= bestDestinationDistance) {
                     bestDestinationIndex = i;
                     bestDestinationDistance =  distToSource;
@@ -505,7 +505,7 @@ public class TransportMission extends Mission {
     private int getDistanceTo(Transportable t, Location start, boolean source) {
         // TODO: This is too expensive - find another method:
         PathNode path = getTransportPath(t, start, source);
-        return (path == null) ? Map.COST_INFINITY : path.getTotalTurns();
+        return (path == null) ? CostDeciders.COST_INFINITY : path.getTotalTurns();
     }
 
     /**
@@ -629,13 +629,13 @@ public class TransportMission extends Mission {
 
             // Check if we already found this destination to be inaccessible.
             if (dst == null || unavailable.contains(dst)) continue;
-            
+
             PathNode path;
             if (dst.getTile() == null) {
                 if (dst instanceof Europe
                     && (path = findPathToEurope(carrier)) != null) {
                     logger.finest(tag + " next destination = " + dst
-                        + " (" + ((isCarrying(t)) ? "transport" : "collect") 
+                        + " (" + ((isCarrying(t)) ? "transport" : "collect")
                         + " " + t + "): " + carrier);
                     return new Destination(true, path);
                 }
@@ -647,7 +647,7 @@ public class TransportMission extends Mission {
                 }
                 if ((path = getTransportPath(t)) != null) {
                     logger.finest(tag + " next destination = " + dst
-                        + " (" + ((isCarrying(t)) ? "transport" : "collect") 
+                        + " (" + ((isCarrying(t)) ? "transport" : "collect")
                         + " " + t + "): " + carrier);
                     return new Destination(false, path);
                 }
@@ -987,7 +987,7 @@ public class TransportMission extends Mission {
             : transportable.getTransportDestination();
         if (destination == null) return null;
         if (destination.getTile() == null) {
-            return (destination instanceof Europe) 
+            return (destination instanceof Europe)
                 ? findPathToEurope(carrier, start.getTile())
                 : null;
         }
@@ -1146,7 +1146,7 @@ public class TransportMission extends Mission {
                     logger.finest(tag + " completed unloading (" + reason
                         + ") " + u + ": " + this);
                 }
-                
+
             } else if (t instanceof AIGoods) {
                 AIGoods ag = (AIGoods) t;
                 String locStr = (carrier.isInEurope()) ? "Europe"
@@ -1414,7 +1414,7 @@ public class TransportMission extends Mission {
             logger.finest(tag + " on the high seas: " + carrier);
             return;
         }
-        
+
         boolean transportablesChanged = false;
         boolean moreWork = true;
         for (int i = 0; i < transportables.size() && moreWork || i == 0; i++) {
