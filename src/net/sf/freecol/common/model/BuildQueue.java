@@ -69,13 +69,10 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
 
 
 
-    public BuildQueue(Colony colony, CompletionAction action, int priority, T... items) {
+    public BuildQueue(Colony colony, CompletionAction action, int priority) {
         this.colony = colony;
         this.completionAction = action;
         this.priority = priority;
-        for (T type : items) {
-            buildQueue.add(type);
-        }
     }
 
     /**
