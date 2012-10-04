@@ -360,6 +360,11 @@ public class ChangeSet {
             if (!attacker.isVisibleTo(serverPlayer)) {
                 element.appendChild(attacker.toXMLElement(serverPlayer, doc,
                                                           false, false));
+                if (attacker.getLocation() instanceof Unit) {
+                    Unit loc = (Unit)attacker.getLocation();
+                    element.appendChild(loc.toXMLElement(serverPlayer, doc,
+                                                         false, false));
+                }
             }
             if (!defender.isVisibleTo(serverPlayer)) {
                 element.appendChild(defender.toXMLElement(serverPlayer, doc,
@@ -512,8 +517,10 @@ public class ChangeSet {
         private boolean seeOld(ServerPlayer serverPlayer) {
             Tile oldTile = oldLocation.getTile();
             return unit.getOwner() == serverPlayer
-                || (oldTile != null && serverPlayer.canSee(oldTile)
-                    && oldTile.getSettlement() == null);
+                || (oldTile != null
+                    && serverPlayer.canSee(oldTile)
+                    && oldTile.getSettlement() == null
+                    && !(oldLocation instanceof Unit));
         }
 
         private boolean seeNew(ServerPlayer serverPlayer) {

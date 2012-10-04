@@ -2279,7 +2279,7 @@ public class Unit extends GoodsLocation
 
         return (player == getOwner()) ? true
             : ((unitTile = getTile()) == null) ? false
-            :  (!player.canSee(unitTile)) ? false
+            : (!player.canSee(unitTile)) ? false
             : ((settlement = getSettlement()) != null
                 && !player.owns(settlement)) ? false
             : (isOnCarrier() && !player.owns(getCarrier())) ? false
