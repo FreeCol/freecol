@@ -32,7 +32,7 @@ public class ModelMessage extends StringTemplate {
     /** Constants describing the type of message. */
     public static enum MessageType {
 
-        DEFAULT(null),
+        DEFAULT(""),
         WARNING("model.option.guiShowWarning"),
         SONS_OF_LIBERTY("model.option.guiShowSonsOfLiberty"),
         GOVERNMENT_EFFICIENCY("model.option.guiShowGovernmentEfficiency"),

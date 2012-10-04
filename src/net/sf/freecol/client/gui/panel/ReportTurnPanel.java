@@ -27,6 +27,8 @@ import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -61,6 +63,8 @@ import net.sf.freecol.common.option.BooleanOption;
  * This panel displays the Turn Report.
  */
 public final class ReportTurnPanel extends ReportPanel {
+
+    private static final Logger logger = Logger.getLogger(ReportTurnPanel.class.getName());
 
     /** The messages to display. */
     private ModelMessage[] messages;
@@ -292,7 +296,7 @@ public final class ReportTurnPanel extends ReportPanel {
 
     private void insertMessage(StyledDocument document, ModelMessage message, Player player) {
         try {
-            String input;
+            String input = null;
             String id = message.getId();
             if (id == null || id.equals(input = Messages.message(id))) {
                 // id not present, fallback to default
@@ -365,8 +369,8 @@ public final class ReportTurnPanel extends ReportPanel {
                 insertText(document, input.substring(start));
             }
 
-        } catch(Exception e) {
-            logger.warning(e.toString());
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Insert fail: " + message.toString(), e);
         }
     }
 
