@@ -32,10 +32,6 @@ import net.sf.freecol.common.model.Unit;
  */
 public final class CostDeciders {
 
-    /**
-     * The infinite cost.
-     */
-    public static final int COST_INFINITY = Integer.MIN_VALUE;
 
     /**
      * A <code>CostDecider</code> that costs unit moves normally.
@@ -50,7 +46,7 @@ public final class CostDeciders {
      * the legality of the move.
      */
     private static final CostDecider trivialCostDecider = new CostDecider() {
-            public int getCost(Unit unit, Location oldLocation, 
+            public int getCost(Unit unit, Location oldLocation,
                                Location newLocation, int movesLeft) {
                 return (newLocation == null) ? ILLEGAL_MOVE
                     : (newLocation instanceof Europe) ? 1
@@ -90,7 +86,7 @@ public final class CostDeciders {
         public int getCost(Unit unit, Location oldLocation,
                            Location newLocation, int movesLeft) {
             int cost = super.getCost(unit, oldLocation, newLocation, movesLeft);
-            if (cost != ILLEGAL_MOVE && cost != COST_INFINITY) {
+            if (cost != ILLEGAL_MOVE && cost != Map.INFINITY) {
                 if (newLocation instanceof Europe) {
                     ; // ok
                 } else if (!newLocation.getTile().isExploredBy(unit.getOwner())) {
@@ -116,7 +112,7 @@ public final class CostDeciders {
         public int getCost(Unit unit, Location oldLocation,
                            Location newLocation, int movesLeft) {
             int cost = super.getCost(unit, oldLocation, newLocation, movesLeft);
-            if (cost != ILLEGAL_MOVE && cost != COST_INFINITY) {
+            if (cost != ILLEGAL_MOVE && cost != Map.INFINITY) {
                 Settlement settlement = newLocation.getSettlement();
                 if (settlement != null
                     && settlement.getOwner() != unit.getOwner()) {
@@ -145,7 +141,7 @@ public final class CostDeciders {
                            Location newLocation, int movesLeft) {
             int cost = super.getCost(unit, oldLocation, newLocation, movesLeft);
             Tile tile = newLocation.getTile();
-            if (cost != ILLEGAL_MOVE && cost != COST_INFINITY
+            if (cost != ILLEGAL_MOVE && cost != Map.INFINITY
                 && tile != null) {
                 final Unit defender = tile.getFirstUnit();
                 if (defender != null
@@ -160,6 +156,7 @@ public final class CostDeciders {
             return cost;
         }
     };
+
     /**
      * An instance of the settlement+unit avoiding cost decider.
      */
@@ -174,7 +171,7 @@ public final class CostDeciders {
      * Selects a default <code>CostDecider</code> for the given unit
      * depending on the owner of the unit and if the unit can attack
      * other units.
-     * 
+     *
      * @param unit The <code>Unit</code> to choose a CostDecider for.
      * @return A suitable <code>CostDecider</code>.
      */
@@ -186,7 +183,7 @@ public final class CostDeciders {
 
     /**
      * The trivial <code>CostDecider</code>.
-     * 
+     *
      * @return The <code>CostDecider</code>.
      */
     public static CostDecider numberOfTiles() {
@@ -196,7 +193,7 @@ public final class CostDeciders {
     /**
      * A <code>CostDecider</code> only considering the number of tiles
      * visited when determining the cost.
-     * 
+     *
      * @return The <code>CostDecider</code>.
      */
     public static CostDecider numberOfLegalTiles() {
@@ -229,19 +226,19 @@ public final class CostDeciders {
      * A <code>CostDecider</code> returning only the cost of moving
      * across the terrain (no additional cost for blocking enemy units
      * etc) but excluding settlements.
-     * 
+     *
      * @return The <code>CostDecider</code>.
      */
     public static CostDecider avoidSettlements() {
         return avoidSettlementsCostDecider;
     }
-    
+
     /**
      * A <code>CostDecider</code> for avoiding using locations which have
      * blocking enemy units on them. Paths containing an enemy
      * settlement are considered illegal, and so are paths where the
      * next move has an enemy unit on it.
-     * 
+     *
      * @return The <code>CostDecider</code>.
      */
     public static CostDecider avoidSettlementsAndBlockingUnits() {
