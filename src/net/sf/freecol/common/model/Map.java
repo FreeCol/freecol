@@ -1939,6 +1939,18 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
+     * Gets all the tiles in a flood fill mode.
+     * Simulated by making a filled circle iterator with an unlimited radius.
+     *
+     * @param center The center <code>Tile</code> to start from.
+     * @return The tiles surrounding the center tile.
+     */
+    public Iterable<Tile> getFloodFillTiles(final Tile center) {
+        return makeMapIteratorIterable(getCircleIterator(center.getPosition(),
+                                                         true, INFINITY));
+    }
+
+    /**
      * Flood fills from a given <code>Position</code> p, based on
      * connectivity information encoded in boolmap
      *

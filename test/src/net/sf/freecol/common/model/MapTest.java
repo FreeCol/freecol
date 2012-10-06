@@ -175,38 +175,28 @@ public class MapTest extends FreeColTestCase {
         assertEquals(Direction.SE, Direction.NW.getReverseDirection());
     }
 
-    public void testGetWholeMapIterator() {
+    public void testGetAllTiles() {
         Game game = getStandardGame();
-
-        Tile[][] tiles = new Tile[5][6];
-
-        Set<Position> positions = new HashSet<Position>();
+        final int xmax = 5;
+        final int ymax = 6;
+        Tile[][] tiles = new Tile[xmax][ymax];
         Set<Tile> allTiles = new HashSet<Tile>();
-
-        for (int x = 0; x < 5; x++) {
-            for (int y = 0; y < 6; y++) {
+        for (int x = 0; x < xmax; x++) {
+            for (int y = 0; y < ymax; y++) {
                 Tile tile = new Tile(game, plainsType, x, y);
                 tiles[x][y] = tile;
                 allTiles.add(tile);
-                positions.add(new Position(x, y));
             }
         }
-
         Map map = new Map(game, tiles);
-
-        Iterator<Position> wholeMapIterator = map.getWholeMapIterator();
-        for (int i = 0; i < 30; i++) {
-            assertTrue(wholeMapIterator.hasNext());
-            assertTrue(positions.remove(wholeMapIterator.next()));
-        }
-        assertEquals(0, positions.size());
-        assertFalse(wholeMapIterator.hasNext());
-
-        // Check for-Iterator
-        for (Tile t : map.getAllTiles()){
+        
+        int i = 0;
+        for (Tile t : map.getAllTiles()) {
+            i++;
             assertTrue(allTiles.remove(t));
         }
-        assertEquals(0, positions.size());
+        assertTrue(allTiles.isEmpty());
+        assertEquals(xmax * ymax, i);
     }
 
     public void testGetAdjacent() {

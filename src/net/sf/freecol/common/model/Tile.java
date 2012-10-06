@@ -997,10 +997,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Determine whether this tile has adjacent tiles that are unexplored.
      *
-     * @return true if at least one neighbouring tiles is unexplored, otherwise false
+     * @return True if at least one neighbouring tiles is unexplored.
      */
     public boolean hasUnexploredAdjacent() {
-        for (Tile t: getSurroundingTiles(1)) {
+        for (Tile t : getSurroundingTiles(1)) {
             if (!t.isExplored()) return true;
         }
         return false;
@@ -1716,8 +1716,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return A vacant tile near this one.
      */
     public Tile getSafeTile(Player player, Random random) {
-        if ((getFirstUnit() == null || getFirstUnit().getOwner() == player)
-            && (getSettlement() == null || getSettlement().getOwner() == player)) {
+        if ((getFirstUnit() == null
+                || getFirstUnit().getOwner() == player)
+            && (getSettlement() == null
+                || getSettlement().getOwner() == player)) {
             return this;
         }
 
@@ -1725,8 +1727,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             List<Tile> tiles = getSurroundingTiles(r, r);
             if (random != null) Collections.shuffle(tiles, random);
             for (Tile t : tiles) {
-                if ((t.getFirstUnit() == null || t.getFirstUnit().getOwner() == player)
-                    && (t.getSettlement() == null || t.getSettlement().getOwner() == player)) {
+                if ((t.getFirstUnit() == null
+                        || t.getFirstUnit().getOwner() == player)
+                    && (t.getSettlement() == null
+                        || t.getSettlement().getOwner() == player)) {
                     return t;
                 }
             }

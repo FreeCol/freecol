@@ -361,6 +361,18 @@ public class TerrainGenerator {
         return null;
     }
 
+    /**
+     * Wrapper for getRandomLandPosition.
+     *
+     * @param map The <code>Map</code> to search in.
+     * @param random A <code>Random</code> number source.
+     * @return A random land tile, or null if none found.
+     */
+    public Tile getRandomLandTile(Map map, Random random) {
+        Position p = getRandomLandPosition(map, random);
+        return (p == null) ? null : map.getTile(p);
+    }
+
 
     // Main functionality, create the map.
 
@@ -1203,8 +1215,7 @@ public class TerrainGenerator {
                                                                    random);
                 int length = maximumLength - random.nextInt(maximumLength/2);
                 for (int index = 0; index < length; index++) {
-                    p = p.getAdjacent(direction);
-                    Tile nextTile = map.getTile(p);
+                    Tile nextTile = startTile.getNeighbourOrNull(direction);
                     if (nextTile == null || !nextTile.isLand()) continue;
                     nextTile.setType(mountains);
                     mountainRegion.addTile(nextTile);

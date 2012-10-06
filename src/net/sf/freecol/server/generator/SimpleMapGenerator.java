@@ -232,8 +232,7 @@ public class SimpleMapGenerator implements MapGenerator {
                 .getInteger("model.option.rumourDifficulty");
             for (int i = 0; i < number; i++) {
                 for (int tries=0; tries<100; tries++) {
-                    Position p = terrainGenerator.getRandomLandPosition(map, random);
-                    Tile t = map.getTile(p);
+                    Tile t = terrainGenerator.getRandomLandTile(map, random);
                     if (t.isPolar()) continue; // No polar lost cities
                     if (t.isLand() && !t.hasLostCityRumour()
                         && t.getSettlement() == null && t.getUnitCount() == 0) {
@@ -889,14 +888,8 @@ public class SimpleMapGenerator implements MapGenerator {
         Unit unit7 = new ServerUnit(game, unit4, player, unitType);
 
         Tile colonyTile = null;
-        Iterator<Position> cti
-            = map.getFloodFillIterator(startTile.getPosition());
-        while (cti.hasNext()) {
-            Tile tempTile = map.getTile(cti.next());
-            if (tempTile.isPolar()) {
-                // do not place the initial colony at the pole
-                continue;
-            }
+        for (Tile tempTile : map.getFloodFillTiles(startTile)) {
+            if (tempTile.isPolar()) continue; // No initial polar colonies
             if (player.canClaimToFoundSettlement(tempTile)) {
                 colonyTile = tempTile;
                 break;

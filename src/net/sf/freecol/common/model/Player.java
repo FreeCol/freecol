@@ -2770,9 +2770,7 @@ public class Player extends FreeColGameObject implements Nameable {
                     }
                 }
 
-                Iterator<Unit> ui = t.getUnitIterator();
-                while (ui.hasNext()) {
-                    Unit u = ui.next();
+                for (Unit u : t.getUnitList()) {
                     if (u.getOwner() != this && u.isOffensiveUnit()
                         && u.getOwner().isEuropean()
                         && atWarWith(u.getOwner())) {
