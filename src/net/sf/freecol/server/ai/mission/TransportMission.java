@@ -401,7 +401,7 @@ public class TransportMission extends Mission {
                     : carrier.getFullEntryLocation();
                 distToSource = getDistanceTo(t, tile, true);
                 // Carrier cant reach source
-                if (distToSource == CostDeciders.COST_INFINITY) return false;
+                if (distToSource == Map.INFINITY) return false;
             }
             bestSourceIndex = 0;
             int bestSourceDistance = distToSource;
@@ -421,14 +421,14 @@ public class TransportMission extends Mission {
 
                 if (isCarrying(t1)){
                     int distToDestination = getDistanceTo(t, t1.getTransportDestination(), true);
-                    if (distToDestination == CostDeciders.COST_INFINITY) continue;
+                    if (distToDestination == Map.INFINITY) continue;
                     if(distToDestination <= bestSourceDistance) {
                         bestSourceIndex = i;
                         bestSourceDistance = distToDestination;
                     }
                 } else{
                     distToSource = getDistanceTo(t, t1.getTransportSource(), true);
-                    if (distToSource == CostDeciders.COST_INFINITY) continue;
+                    if (distToSource == Map.INFINITY) continue;
                     if (distToSource <= bestSourceDistance) {
                         bestSourceIndex = i;
                         bestSourceDistance = distToSource;
@@ -446,7 +446,7 @@ public class TransportMission extends Mission {
                 bestDestinationDistance = 0;
             } else {
                 int distToCarrier = getDistanceTo(t, carrier.getTile(), false);
-                if (distToCarrier != CostDeciders.COST_INFINITY) {
+                if (distToCarrier != Map.INFINITY) {
                     bestDestinationDistance = distToCarrier;
                 }
             }
@@ -467,14 +467,14 @@ public class TransportMission extends Mission {
             Transportable t1 = transportables.get(i - 1);
             if (isCarrying(t1)){
                 int distToDestination = getDistanceTo(t, t1.getTransportDestination(), false);
-                if (distToDestination == CostDeciders.COST_INFINITY) continue;
+                if (distToDestination == Map.INFINITY) continue;
                 if(distToDestination <= bestDestinationDistance) {
                     bestDestinationIndex = i;
                     bestDestinationDistance = distToDestination;
                 }
             } else{
                 int distToSource = getDistanceTo(t, t1.getTransportSource(), false);
-                if (distToSource == CostDeciders.COST_INFINITY) continue;
+                if (distToSource == Map.INFINITY) continue;
                 if (distToSource <= bestDestinationDistance) {
                     bestDestinationIndex = i;
                     bestDestinationDistance =  distToSource;
@@ -505,7 +505,7 @@ public class TransportMission extends Mission {
     private int getDistanceTo(Transportable t, Location start, boolean source) {
         // TODO: This is too expensive - find another method:
         PathNode path = getTransportPath(t, start, source);
-        return (path == null) ? CostDeciders.COST_INFINITY : path.getTotalTurns();
+        return (path == null) ? Map.INFINITY : path.getTotalTurns();
     }
 
     /**
