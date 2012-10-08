@@ -691,11 +691,12 @@ public class Map extends FreeColGameObject implements Location {
         }
         Location entry;
         if (start == null) {
-            throw new IllegalArgumentException("Null start.");
+            throw new IllegalArgumentException("Null start: " + unit);
         } else if (start instanceof Unit) {
             Location unitLoc = ((Unit)start).getLocation();
             if (unitLoc == null) {
-                throw new IllegalArgumentException("Null on-carrier start.");
+                throw new IllegalArgumentException("Null on-carrier start: "
+                    + unit + "/" + ((Unit)start));
             } else if (unitLoc instanceof HighSeas) {
                 if (carrier == null) {
                     throw new IllegalArgumentException("Null carrier when starting on high seas: " + unit);

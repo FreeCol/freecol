@@ -170,6 +170,13 @@ public class HighSeas extends UnitLocation {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public String toString() {
+        return getId();
+    }
+
+    /**
      * Returns the tag name of this Object.
      *
      * @return "highSeas"
