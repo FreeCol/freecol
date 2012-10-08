@@ -741,6 +741,17 @@ public final class UnitType extends BuildableType
         return UNIT_PRIORITY;
     }
 
+    /**
+     * Is this unit type able to build a colony?
+     *
+     * @return True if this unit type can build colonies.
+     */
+    public boolean canBuildColony() {
+        return hasAbility(Ability.FOUND_COLONY);
+    }
+
+
+    // Serialization
 
     /**
      * Makes an XML-representation of this object.

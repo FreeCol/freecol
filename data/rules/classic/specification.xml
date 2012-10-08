@@ -1014,6 +1014,7 @@
                scoreValue="3" skill="0">
       <ability id="model.ability.person" value="true"/>
       <ability id="model.ability.convert" value="true"/>
+      <ability id="model.ability.foundColony" value="false"/>
       <modifier id="model.goods.grain" type="additive" value="1"/>
       <modifier id="model.goods.sugar" type="additive" value="1"/>
       <modifier id="model.goods.tobacco" type="additive" value="1"/>

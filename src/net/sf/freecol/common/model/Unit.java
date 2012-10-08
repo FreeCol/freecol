@@ -3049,17 +3049,14 @@ public class Unit extends GoodsLocation
      * @return <code>true</code> if this unit can build a colony.
      */
     public boolean canBuildColony() {
-        return unitType.hasAbility("model.ability.foundColony")
-            && getMovesLeft() > 0
+        return unitType.canBuildColony() && getMovesLeft() > 0
             && getTile() != null;
     }
 
     /**
-     * Returns the Tile where this Unit is located. Or null if its location is
-     * Europe.
+     * Gets the Tile where this Unit is located.
      *
-     * @return The Tile where this Unit is located. Or null if its location is
-     *         Europe.
+     * @return The Tile where this Unit is located or null if not on the map.
      */
     public Tile getTile() {
         return (location != null) ? location.getTile() : null;

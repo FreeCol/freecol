@@ -277,7 +277,7 @@ public class BuildColonyMission extends Mission {
             ? reason
             : (!aiUnit.getUnit().getOwner().canBuildColonies())
             ? "player-not-a-colony-founder"
-            : (!aiUnit.getUnit().hasAbility("model.ability.foundColony"))
+            : (!aiUnit.getUnit().canBuildColony())
             ? "unit-not-a-colony-founder"
             : null;
     }
