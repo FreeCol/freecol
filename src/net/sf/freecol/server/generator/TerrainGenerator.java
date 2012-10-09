@@ -1366,6 +1366,7 @@ public class TerrainGenerator {
                     && !map.getTile(x,y).isLand();
                 if (watermap[x][y] && map.getTile(x, y).getRegion() == null) {
                     lakes.add(new Position(x, y));
+                    logger.info("Adding lake at " + x + "," + y);
                 }
             }
         }
@@ -1393,6 +1394,9 @@ public class TerrainGenerator {
                     if (found[x][y]) {
                         Tile tt = map.getTile(x, y);
                         tt.setType(lakeType);
+                        if (tt.getRegion() != null) {
+                            logger.warning("Bogus lake fill at " + x + "," + y);
+                        }
                         tt.setRegion(lakeRegion);
                     }
                 }

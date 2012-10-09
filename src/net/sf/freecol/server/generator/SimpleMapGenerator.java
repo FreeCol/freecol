@@ -851,13 +851,7 @@ public class SimpleMapGenerator implements MapGenerator {
             if (tile.isDirectlyHighSeasConnected()) {
                 seas = tile;
             } else if (tile.isLand()) {
-                if (startAtSea) {
-                    if (seas == null) {
-                        logger.warning("No high seas in row " + row);
-                    }
-                    return seas;
-                }
-                return tile;
+                return (startAtSea) ? seas : tile;
             } 
         }
         logger.warning("No land in row " + row);
