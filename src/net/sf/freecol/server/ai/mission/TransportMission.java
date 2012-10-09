@@ -1144,7 +1144,7 @@ public class TransportMission extends Mission {
             }
             reason = aiu.getMission().invalidReason();
             if (reason != null) {
-                logger.warning(tag + "unit mission failed(" + reason + ")"
+                logger.warning(tag + " unit mission failed(" + reason + ")"
                     + " for " + t + ": " + this);
                 return CargoResult.TFAIL;
             }

@@ -244,7 +244,7 @@ public class EuropeanAIPlayer extends AIPlayer {
 
     /**
      * Stores temporary information for sessions (trading with another player
-     * etc).
+     * etc).  Do not serialize.
      */
     private final java.util.Map<String, Integer> sessionRegister
         = new HashMap<String, Integer>();
@@ -480,29 +480,31 @@ logger.finest("BTM " + aiu.toString() + "\n  -> "
             }
         }
 
-        StringBuilder sb = new StringBuilder("Supply:");
-        for (Location ls : transportSupply.keySet()) {
-            sb.append(" ");
-            sb.append(((FreeColGameObject)ls).toString());
-            sb.append("[");
-            for (Transportable t : transportSupply.get(ls)) {
+        if (logger.isLoggable(Level.FINEST)) {
+            StringBuilder sb = new StringBuilder("Supply:");
+            for (Location ls : transportSupply.keySet()) {
                 sb.append(" ");
-                sb.append(t.toString());
+                sb.append(((FreeColGameObject)ls).toString());
+                sb.append("[");
+                for (Transportable t : transportSupply.get(ls)) {
+                    sb.append(" ");
+                    sb.append(t.toString());
+                }
+                sb.append(" ]");
             }
-            sb.append(" ]");
-        }
-        sb.append("\nDemand:");
-        for (Location ld : transportDemand.keySet()) {
-            sb.append(" ");
-            sb.append(((FreeColGameObject)ld).toString());
-            sb.append("[");
-            for (Wish w : transportDemand.get(ld)) {
+            sb.append("\nDemand:");
+            for (Location ld : transportDemand.keySet()) {
                 sb.append(" ");
-                sb.append(w.toString());
+                sb.append(((FreeColGameObject)ld).toString());
+                sb.append("[");
+                for (Wish w : transportDemand.get(ld)) {
+                    sb.append(" ");
+                    sb.append(w.toString());
+                }
+                sb.append(" ]");
             }
-            sb.append(" ]");
+            logger.finest(sb.toString());
         }
-        logger.finest(sb.toString());
     }
 
     /**
@@ -790,6 +792,28 @@ logger.finest("BTM " + aiu.toString() + "\n  -> "
                 }
             }
         }
+
+        if (logger.isLoggable(Level.FINEST)) {
+            String logMe = "Wishes (workers) ";
+            for (UnitType ut : workerWishes.keySet()) {
+                List<WorkerWish> wl = workerWishes.get(ut);
+                if (!wl.isEmpty()) {
+                    logMe += "[";
+                    for (WorkerWish ww : wl) logMe += " " + ww.toString();
+                    logMe += " ]";
+                }
+            }
+            logMe += " (goods) ";
+            for (GoodsType gt : goodsWishes.keySet()) {
+                List<GoodsWish> gl = goodsWishes.get(gt);
+                if (!gl.isEmpty()) {
+                    logMe += "[";
+                    for (GoodsWish gw : gl) logMe += " " + gw.toString();
+                    logMe += " ]";
+                }
+            }
+            logger.finest(logMe);
+        }
     }
 
     /**
@@ -1012,25 +1036,26 @@ logger.finest("BTM " + aiu.toString() + "\n  -> "
             }
         }
 
-        if (Utils.randomInt(logger, "Cheat buy unit", air, 10) == 1) {
+        if (Utils.randomInt(logger, "Cheat buy land unit", air, 10) == 1) {
             WorkerWish bestWish = null;
             int bestValue = Integer.MIN_VALUE;
-            for (AIColony aic : getAIColonies()) {
-                for (WorkerWish ww : aic.getWorkerWishes()) {
-                    if (ww.getValue() > bestValue) {
-                        bestValue = ww.getValue();
-                        bestWish = ww;
-                    }
+            for (UnitType ut : workerWishes.keySet()) {
+                List<WorkerWish> wl = workerWishes.get(ut);
+                if (wl.isEmpty()
+                    || !ut.isAvailableTo(player)
+                    || europe.getUnitPrice(ut) == UNDEFINED) continue;
+                WorkerWish ww = wl.get(0);
+                if (bestValue < ww.getValue()) {
+                    bestValue = ww.getValue();
+                    bestWish = ww;
                 }
             }
 
             UnitType unitType;
             int cost;
-            if (bestWish != null
-                && (unitType = bestWish.getUnitType()) != null
-                && unitType.isAvailableTo(player)
-                && (cost = europe.getUnitPrice(unitType)) != UNDEFINED) {
-                ; // OK
+            if (bestWish != null) {
+                unitType = bestWish.getUnitType();
+                cost = europe.getUnitPrice(unitType);
             } else if (player.getImmigration()
                 < player.getImmigrationRequired() / 2) {
                 unitType = null;
@@ -1150,7 +1175,6 @@ logger.finest("BTM " + aiu.toString() + "\n  -> "
         nBuilders = buildersNeeded();
         nPioneers = pioneersNeeded();
         nScouts = scoutsNeeded();
-        buildWishMaps();
 
         // For all units, check if it is a candidate for a new
         // mission.  If it is not a candidate remove it from the
@@ -1352,15 +1376,17 @@ logger.finest("BTM " + aiu.toString() + "\n  -> "
         }
 
         // We are done.  Report.
-        for (AIUnit aiu : getAIUnits()) {
-            Unit u = aiu.getUnit();
-            String reason = reasons.get(u);
-            if (reason == null) {
-                putReason(aiu, "OMITTED");
+        if (logger.isLoggable(Level.FINE)) {
+            for (AIUnit aiu : getAIUnits()) {
+                Unit u = aiu.getUnit();
+                String reason = reasons.get(u);
+                if (reason == null) {
+                    putReason(aiu, "OMITTED");
+                }
+                report += "\n  " + reasons.get(u);
             }
-            report += "\n  " + reasons.get(u);
+            logger.fine(report);
         }
-        logger.fine(report);
     }
 
     private void putReason(AIUnit aiUnit, String reason) {
@@ -1468,10 +1494,6 @@ logger.finest("BTM " + aiu.toString() + "\n  -> "
                 break; // Only consider the first carriable transportable
             }
         }
-        String logMe = "getBestTransportable(" + carrier.toString()
-            + ") found: " + best;
-        if (best != null) logMe += " -> " + best.getTransportDestination();
-        logger.finest(logMe);
         return best;
     }
 
@@ -1773,9 +1795,9 @@ logger.finest("BTM " + aiu.toString() + "\n  -> "
     // AIPlayer interface
 
     /**
-     * Tells this <code>AIPlayer</code> to make decisions. The
-     * <code>AIPlayer</code> is done doing work this turn when this method
-     * returns.
+     * Tells this <code>AIPlayer</code> to make decisions.  The
+     * <code>AIPlayer</code> is done doing work this turn when this
+     * method returns.
      */
     public void startWorking() {
         Turn turn = getGame().getTurn();
@@ -1786,7 +1808,6 @@ logger.finest("BTM " + aiu.toString() + "\n  -> "
         determineStances();
         if (turn.isFirstTurn()) initializeMissions();
         buildTipMap();
-        cheat();
 
         for (AIColony aic : getAIColonies()) {
             aic.rearrangeWorkers();
@@ -1794,6 +1815,7 @@ logger.finest("BTM " + aiu.toString() + "\n  -> "
         }
         buildTransportMaps();
         buildWishMaps();
+        cheat();
 
         giveNormalMissions();
         bringGifts();
@@ -1803,7 +1825,6 @@ logger.finest("BTM " + aiu.toString() + "\n  -> "
         for (AIColony aic : getAIColonies()) aic.rearrangeWorkers();
         buildTransportMaps();
         buildWishMaps();
-
         giveNormalMissions();
         doMissions();
 
