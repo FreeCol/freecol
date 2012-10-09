@@ -20,6 +20,7 @@
 package net.sf.freecol.server.ai;
 
 import java.util.Random;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -28,11 +29,14 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.AbstractGoods;
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Locatable;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
@@ -131,7 +135,7 @@ public class AIUnit extends AIObject implements Transportable {
         this(aiMain, unit.getId());
 
         this.unit = unit;
-        mission = new UnitWanderHostileMission(aiMain, this);
+        mission = null;
         uninitialized = getUnit() == null;
     }
 
@@ -172,7 +176,7 @@ public class AIUnit extends AIObject implements Transportable {
     public void dispose() {
         getAIOwner().removeAIUnit(this);
         abortMission("AIUnit-disposed");
-        setTransport(null);
+        setTransport(null, "disposing");
         super.dispose();
     }
 
@@ -270,15 +274,46 @@ public class AIUnit extends AIObject implements Transportable {
      *     (e.g. "invalid").
      */
     public void abortMission(String why) {
-        if (mission != null) {
-            if (!mission.isOneTime()) {
-                logger.fine("Mission-ABORT(" + why + "): " + mission);
+        if (this.mission != null) {
+            if (!this.mission.isOneTime()) {
+                logger.fine("Mission-ABORT(" + why + "): " + this.mission);
             }
-            mission.dispose();
+            removeTransport(why);
+            this.mission.dispose();
             this.mission = null;
+            this.dynamicPriority = 0;
         }
     }
 
+    /**
+     * If this unit is scheduled for transport, deschedule.
+     *
+     * @param reason A reason why the unit is to be removed.
+     */
+    private void removeTransport(String reason) {
+        AIUnit transport = getTransport();
+        if (transport != null) {
+            Mission m = transport.getMission();
+            if (m instanceof TransportMission) {
+                ((TransportMission)m).removeTransportable(this, reason);
+            }
+        }
+        setTransport(null, reason);
+    }
+
+    /**
+     * If this unit has a transport, retarget.
+     */
+    private void retargetTransport() {
+        AIUnit transport = getTransport();
+        if (transport != null) {
+            Mission m = transport.getMission();
+            if (m instanceof TransportMission) {
+                ((TransportMission)m).retargetTransportable(this);
+            }
+        }
+    }
+        
     /**
      * Assigns a mission to unit. The dynamic priority is reset.
      * Do not call setMission(null), use abortMission above.
@@ -286,23 +321,14 @@ public class AIUnit extends AIObject implements Transportable {
      * @param mission The new <code>Mission</code>.
      */
     public void setMission(Mission mission) {
-        final Mission oldMission = this.mission;
-        if (mission == oldMission) {
+        if (this.mission == mission) {
             return;
-        } else if (oldMission == null) {
+        } else if (this.mission == null) {
             if (!mission.isOneTime()) {
                 logger.fine("Replacing null mission with " + mission);
             }
         } else {
-            String reason = oldMission.invalidReason();
-            reason = (reason != null) ? "(" + reason + ")"
-                : (oldMission.isOneTime()) ? "(oneTime)"
-                : "(forced)";
-            if (!(oldMission.isOneTime() && mission.isOneTime())) {
-                logger.fine("Replacing " + reason + " old mission "
-                    + oldMission + " with " + mission);
-            }
-            oldMission.dispose();
+            abortMission("replaced");
         }
         this.mission = mission;
         this.dynamicPriority = 0;
@@ -404,6 +430,18 @@ public class AIUnit extends AIObject implements Transportable {
     }
 
     /**
+     * Takes this unit one step along a path.
+     *
+     * @param path The path to follow.
+     * @return True if the step succeeds.
+     */
+    public boolean stepPath(PathNode path) {
+        return (unit.isOnCarrier() && !path.isOnCarrier())
+            ? leaveTransport(path.getDirection())
+            : move(path.getDirection());
+    }
+
+    /**
      * Checks the integrity of this AIUnit.
      *
      * @return True if the unit is intact.
@@ -438,11 +476,11 @@ public class AIUnit extends AIObject implements Transportable {
 
     /**
      * Returns the destination for this <code>Transportable</code>.
-     * This can either be the target {@link
-     * net.sf.freecol.common.model.Tile} of the transport or the
-     * target for the entire <code>Transportable</code>'s mission. The
-     * target for the tansport is determined by {@link
-     * TransportMission} in the latter case.
+     * This can either be the target
+     * {@link net.sf.freecol.common.model.Tile} of the transport or
+     * the target for the entire <code>Transportable</code>'s
+     * mission.  The target for the transport is determined by
+     * {@link TransportMission} in the latter case.
      *
      * @return The destination for this <code>Transportable</code>.
      */
@@ -520,28 +558,14 @@ public class AIUnit extends AIObject implements Transportable {
      *            <code>Transportable</code> in it's transport list. This
      *            <code>Transportable</code> has not been scheduled for
      *            transport if this value is <code>null</code>.
-     *
+     * @param reason A reason for changing the transport.
      */
-    public void setTransport(AIUnit transport) {
-        if (this.transport == transport) return;
-        AIUnit oldTransport = this.transport;
+    public void setTransport(AIUnit transport, String reason) {
+        if (this.transport != transport) {
+            logger.finest("setTransport " + this + " on " + transport
+                + ": " + reason);
+        }
         this.transport = transport;
-
-        if (oldTransport != null) {
-            // Remove from old carrier:
-            if (oldTransport.getMission() != null && oldTransport.getMission() instanceof TransportMission) {
-                TransportMission tm = (TransportMission) oldTransport.getMission();
-                if (tm.isOnTransportList(this)) {
-                    tm.removeFromTransportList(this);
-                }
-            }
-        }
-
-        if (transport != null && transport.getMission() instanceof TransportMission
-                && !((TransportMission) transport.getMission()).isOnTransportList(this)) {
-            // Add to new carrier:
-            ((TransportMission) transport.getMission()).addToTransportList(this);
-        }
     }
 
     /**
@@ -558,6 +582,73 @@ public class AIUnit extends AIObject implements Transportable {
         if (w.getTransportable() == this) {
             w.dispose();
         }
+    }
+
+    /**
+     * An AI unit leaves a ship.
+     * Fulfills a wish if possible.
+     *
+     * @param direction The <code>Direction</code> to move, if any.
+     * @return True if the unit is unloaded.
+     */
+    public boolean leaveTransport(Direction direction) {
+        if (!unit.isOnCarrier()) return false;
+        final Unit carrier = unit.getCarrier();
+        boolean result = (direction != null) ? move(direction)
+            : AIMessage.askDisembark(this)
+            && unit.getLocation() == carrier.getTile();
+
+        if (result) {
+            Colony colony = unit.getColony();
+            if (colony != null) {
+                AIColony ac = getAIMain().getAIColony(colony);
+                if (ac != null) ac.completeWish(unit);
+
+                colony.firePropertyChange(Colony.REARRANGE_WORKERS,
+                                          true, false);
+            }
+            removeTransport("disembarked");
+        }
+        return result;
+    }
+
+    /**
+     * An AI unit joins a ship.
+     *
+     * @param carrier The carrier <code>Unit</code> to join.
+     * @param direction The <code>Direction</code> to move, if any.
+     * @return True if the unit is loaded.
+     */
+    public boolean joinTransport(Unit carrier, Direction direction) {
+        AIUnit aiCarrier = getAIMain().getAIUnit(carrier);
+        if (aiCarrier == null) return false;
+        Location old = unit.getLocation();
+        boolean result = AIMessage.askEmbark(aiCarrier, unit, direction)
+            && unit.getLocation() == carrier;
+
+        if (result) {
+            Colony colony = unit.getColony();
+            if (colony != null) {
+                colony.firePropertyChange(Colony.REARRANGE_WORKERS,
+                                          true, false);
+            }
+            retargetTransport();
+
+            AIPlayer owner = getAIOwner();
+            if (owner instanceof EuropeanAIPlayer) {
+                if (!((EuropeanAIPlayer)owner).claimTransportable(this, old)) {
+                    logger.warning("Could not claim transportable: " + this);
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean carriableBy(Unit carrier) {
+        return carrier.couldCarry(unit);
     }
 
 
@@ -580,20 +671,17 @@ public class AIUnit extends AIObject implements Transportable {
                 logger.warning("transport.getUnit() == null");
             } else if (getAIMain().getAIObject(transport.getId()) == null) {
                 logger.warning("broken reference to transport");
-            } else if (transport.getMission() != null
-                && transport.getMission() instanceof TransportMission
-                && !((TransportMission) transport.getMission()).isOnTransportList(this)) {
-                logger.warning("We should not be on the transport list.");
             } else {
                 out.writeAttribute("transport", transport.getUnit().getId());
             }
         }
 
         if (mission != null) {
-            if (mission.isValid()) {
+            String reason = mission.invalidReason();
+            if (reason == null) {
                 mission.toXML(out);
             } else {
-                logger.warning("AI unit with " + mission.invalidReason()
+                logger.warning("AI unit with " + reason
                     + " mission " + mission);
             }
         }

@@ -56,33 +56,38 @@ public class UnitSeekAndDestroyMissionTest extends FreeColTestCase {
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
         
         // Create attacking player and unit
-        ServerPlayer player1 = (ServerPlayer) game.getPlayer("model.nation.dutch");
+        ServerPlayer player1
+            = (ServerPlayer)game.getPlayer("model.nation.dutch");
         Tile tile1 = map.getTile(2, 2);
         Unit attacker = new ServerUnit(game, tile1, player1, veteranType);
         AIUnit aiUnit = aiMain.getAIUnit(attacker);
         assertNotNull(aiUnit);
         
         // Create defending player and unit
-        ServerPlayer player2 = (ServerPlayer) game.getPlayer("model.nation.french");
+        ServerPlayer player2
+            = (ServerPlayer)game.getPlayer("model.nation.french");
         Tile tile2 = map.getTile(2, 1);
-        Unit defender = new ServerUnit(game, tile2, player2, veteranType, muskets);
+        Unit defender = new ServerUnit(game, tile2, player2,
+                                       veteranType, muskets);
         
         player1.setStance(player2, Stance.WAR);
         player2.setStance(player1, Stance.WAR);
         
-        UnitSeekAndDestroyMission mission = new UnitSeekAndDestroyMission(aiMain,aiUnit,defender);
+        UnitSeekAndDestroyMission mission
+            = new UnitSeekAndDestroyMission(aiMain,aiUnit,defender);
         aiUnit.setMission(mission);
-        boolean isSeekAndDestroyMission = aiUnit.getMission() instanceof UnitSeekAndDestroyMission;
-        assertTrue("Attacker should have a UnitSeekAndDestroyMission", isSeekAndDestroyMission);
+        assertTrue("Attacker should have a UnitSeekAndDestroyMission",
+                   aiUnit.getMission() instanceof UnitSeekAndDestroyMission);
                 
         // simulate capture
         attacker.setOwner(player2);
-        assertTrue("Attacking unit should have been captured", attacker.getOwner() == player2);
+        assertEquals("Attacking unit should have been captured",
+                     attacker.getOwner(), player2);
         
         // re-check unit mission
         aiUnit = aiMain.getAIUnit(attacker);
-        assertFalse("Captured unit should lose previous mission", aiUnit.getMission() == null);
-        
+        assertNull("Captured unit should lose previous mission",
+                   aiUnit.getMission());
     }
 	
     public void testDoNotPursueUnitsInColonies(){

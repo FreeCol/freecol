@@ -142,9 +142,6 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                 Unit ship = aiu.getUnit();
                 if (ship.getUnitCount() > 0) {
                     TransportMission tm = new TransportMission(aiMain, aiu);
-                    for (Unit u : ship.getUnitList()) {
-                        tm.addToTransportList(aiMain.getAIUnit(u));
-                    }
                     aiu.setMission(tm);
                 }
             }

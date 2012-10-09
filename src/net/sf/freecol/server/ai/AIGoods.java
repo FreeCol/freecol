@@ -33,7 +33,9 @@ import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Locatable;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.ai.mission.TransportMission;
 
 import org.w3c.dom.Element;
@@ -128,7 +130,7 @@ public class AIGoods extends AIObject implements Transportable {
      * Disposes this object.
      */
     public void dispose() {
-        setTransport(null);
+        setTransport(null, "disposing");
         if (destination != null) {
             if (destination instanceof Colony) {
                 AIColony aic = getAIMain().getAIColony((Colony)destination);
@@ -161,6 +163,25 @@ public class AIGoods extends AIObject implements Transportable {
     public void setGoods(Goods goods) {
         this.goods = goods;
     }
+
+    /**
+     * Gets the type of goods this <code>AIGoods</code> is controlling.
+     *
+     * @return The <code>GoodsType</code>.
+     */
+    public GoodsType getGoodsType() {
+        return goods.getType();
+    }
+
+    /**
+     * Gets the amount of goods this <code>AIGoods</code> is controlling.
+     *
+     * @return The amount of goods.
+     */
+    public int getGoodsAmount() {
+        return goods.getAmount();
+    }
+
 
     /**
      * Checks the integrity of a this AIGoods.
@@ -242,9 +263,7 @@ public class AIGoods extends AIObject implements Transportable {
      * @return The priority of the transport.
      */
     public int getTransportPriority() {
-        return (goods.getAmount() <= GoodsContainer.CARGO_SIZE)
-            ? goods.getAmount()
-            : transportPriority;
+        return transportPriority;
     }
 
     /**
@@ -296,29 +315,12 @@ public class AIGoods extends AIObject implements Transportable {
      *            <code>Transportable</code> in it's transport list. This
      *            <code>Transportable</code> has not been scheduled for
      *            transport if this value is <code>null</code>.
+     * @param reason A reason for changing the transport.
      */
-    public void setTransport(AIUnit transport) {
-        if (this.transport == transport) return;
-        AIUnit oldTransport = this.transport;
+    public void setTransport(AIUnit transport, String reason) {
+        logger.finest("setTransport " + this + " on " + transport
+            + ": " + reason);
         this.transport = transport;
-
-        if (oldTransport != null) {
-            // Remove from old carrier:
-            if (oldTransport.getMission() != null
-                    && oldTransport.getMission() instanceof TransportMission) {
-                TransportMission tm = (TransportMission) oldTransport.getMission();
-                if (tm.isOnTransportList(this)) {
-                    tm.removeFromTransportList(this);
-                }
-            }
-        }
-
-        if (transport != null
-                && transport.getMission() instanceof TransportMission
-                && !((TransportMission) transport.getMission()).isOnTransportList(this)) {
-            // Add to new carrier:
-            ((TransportMission) transport.getMission()).addToTransportList(this);
-        }
     }
 
     /**
@@ -329,6 +331,117 @@ public class AIGoods extends AIObject implements Transportable {
     public void abortWish(Wish w) {
         if (destination == w.getDestination()) destination = null;
         if (w.getTransportable() == this) w.dispose();
+    }
+
+    /**
+     * Goods leaves a ship.
+     *
+     * @param type The <code>GoodsType</code> to unload.
+     * @param amount The amount of goods to unload.
+     * @return True if the unload succeeds.
+     */
+    public boolean leaveTransport(int amount) {
+        if (!(goods.getLocation() instanceof Unit)) return false;
+        final Unit carrier = (Unit)goods.getLocation();
+        final GoodsType type = goods.getType();
+        if (carrier.getGoodsCount(type) < amount) return false;
+
+        final AIUnit aiCarrier = getAIMain().getAIUnit(carrier);
+        Colony colony = carrier.getColony();
+        int oldAmount = carrier.getGoodsCount(type);
+        Goods newGoods = new Goods(carrier.getGame(), carrier, type, amount);
+        boolean result;
+        if (carrier.isInEurope()) {
+            if (carrier.getOwner().canTrade(type)) {
+                result = AIMessage.askSellGoods(aiCarrier, newGoods);
+                logger.finest("Sell " + newGoods + " in Europe "
+                    + ((result) ? "succeeds" : "fails")
+                    + ": " + this);
+            } else { // dump
+                result = AIMessage.askUnloadCargo(aiCarrier, newGoods);
+            }
+        } else {
+            result = AIMessage.askUnloadCargo(aiCarrier, newGoods);
+        }
+        if (result) {
+            int newAmount = carrier.getGoodsCount(type);
+            if (oldAmount - newAmount != amount) {
+                logger.warning(carrier + " at " + carrier.getLocation()
+                    + " only unloaded " + (oldAmount - newAmount)
+                    + " " + type + " (" + amount + " expected)");
+                // TODO: sort this out.
+                // For now, do not tolerate partial unloads.
+                result = false;
+            }
+        }   
+        if (result && colony != null) {
+            final AIColony aiColony = getAIMain().getAIColony(colony);
+            if (aiColony != null) aiColony.completeWish(newGoods);
+            colony.firePropertyChange(Colony.REARRANGE_WORKERS, true, false);
+        }
+        return result;
+    }
+
+    /**
+     * Goods leaves a ship.
+     * Completes a wish if possible.
+     *
+     * @param direction The <code>Direction</code> to unload (not applicable).
+     * @return True if the unload succeeds.
+     */
+    public boolean leaveTransport(Direction direction) {
+        if (direction != null) return false;
+        return leaveTransport(goods.getAmount());
+    }
+
+    /**
+     * Goods joins a ship.
+     *
+     * @param carrier The carrier <code>Unit</code> to join.
+     * @param direction The <code>Direction</code> to unload (not applicable).
+     * @return True if the load succeeds.
+     */
+    public boolean joinTransport(Unit carrier, Direction direction) {
+        if (direction != null) return false;
+        final AIUnit aiCarrier = getAIMain().getAIUnit(carrier);
+        if (aiCarrier == null) return false;
+
+        GoodsType goodsType = goods.getType();
+        int goodsAmount = goods.getAmount();
+        int oldAmount = carrier.getGoodsCount(goodsType);
+        boolean result;
+        if (carrier.isInEurope()) {
+            result = AIMessage.askBuyGoods(aiCarrier, goodsType, goodsAmount);
+        } else {
+            result = AIMessage.askLoadCargo(aiCarrier, goods);
+        }
+        if (result) {
+            int newAmount = carrier.getGoodsCount(goodsType);
+            if (newAmount - oldAmount != goodsAmount) {
+                logger.warning(carrier + " at " + carrier.getLocation()
+                    + " only loaded " + (newAmount - oldAmount)
+                    + " " + goodsType
+                    + " (" + goodsAmount + " expected)");
+                goodsAmount = newAmount - oldAmount;
+                // TODO: sort this out.  For now, tolerate partial loads.
+                result = goodsAmount > 0;
+            }
+        }
+        if (result) {
+            Colony colony = carrier.getColony();
+            if (colony != null) {
+                getAIMain().getAIColony(colony).removeAIGoods(this);
+            }
+            setGoods(new Goods(getGame(), carrier, goodsType, goodsAmount));
+        }
+        return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean carriableBy(Unit carrier) {
+        return carrier.couldCarry(getGoods());
     }
 
 
@@ -356,10 +469,6 @@ public class AIGoods extends AIObject implements Transportable {
         if (transport != null) {
             if (getAIMain().getAIObject(transport.getId()) == null) {
                 logger.warning("broken reference to transport");
-            } else if (transport.getMission() != null
-                && transport.getMission() instanceof TransportMission
-                && !((TransportMission) transport.getMission()).isOnTransportList(this)) {
-                logger.warning("We should not be on the transport list.");
             } else {
                 out.writeAttribute("transport", transport.getId());
             }

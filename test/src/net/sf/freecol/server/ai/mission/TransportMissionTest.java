@@ -23,8 +23,10 @@ import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
@@ -37,7 +39,7 @@ import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
 import net.sf.freecol.server.ai.Transportable;
-import net.sf.freecol.server.ai.mission.TransportMission.Destination;
+import net.sf.freecol.server.ai.mission.TransportMission;
 import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerUnit;
@@ -137,24 +139,25 @@ public class TransportMissionTest extends FreeColTestCase {
         TransportMission mission = new TransportMission(aiMain, aiUnit);
         aiUnit.setMission(mission);
         Transportable goods = new AIGoods(aiMain,galleon, horsesType,50, colonyTile);
-        mission.addToTransportList(goods);
+        mission.queueTransportable(goods, false);
 
         // Exercise
-        Destination dest = mission.getNextDestination();
+        Location dest = mission.getTarget();
 
         // Test
-        assertNotNull("Unit should have a destination",dest);
-        assertTrue("Unit should be already at the destination", dest.isAtDestination());
+        assertNotNull("Unit should have a destination", dest);
+        assertTrue("Unit should be already at the destination",
+            Map.isSameLocation(dest, galleon.getLocation()));
     }
 
-    public void testGetNextStopIsEurope(){
+    public void testGetNextStopIsEurope() {
         Map map = getCoastTestMap(plainsType);
         Game game = ServerTestHelper.startServerGame(map);
         InGameController igc = ServerTestHelper.getInGameController();
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
         assertNotNull(aiMain);
 
-        ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
         Europe europe = dutch.getEurope();
         assertNotNull("Setup error, europe is null", europe);
 
@@ -169,26 +172,29 @@ public class TransportMissionTest extends FreeColTestCase {
         // assign transport mission to the ship
         TransportMission mission = new TransportMission(aiMain, aiUnit);
         aiUnit.setMission(mission);
-        Transportable goods = new AIGoods(aiMain, galleon, horsesType,50, europe);
-        mission.addToTransportList(goods);
+        Transportable goods = new AIGoods(aiMain, galleon, horsesType, 50,
+                                          europe);
+        mission.queueTransportable(goods, false);
+        mission.doMission();
 
         // Exercise
-        Destination dest = mission.getNextDestination();
+        Location dest = mission.getTarget();
 
         // Test
-        assertNotNull("Unit should have a destination",dest);
-        assertTrue("Destination should be Europe", dest.moveToEurope());
-        assertNotNull("Unit should have a path",dest.getPath());
+        assertNotNull("Unit should have a destination", dest);
+        assertEquals("Destination should be Europe", europe, dest);
+        assertFalse("Unit should have a path", 
+                    galleon.getTurnsToReach(dest) == FreeColObject.INFINITY);
     }
 
-    public void testGetNextStopIsColony(){
+    public void testGetNextStopIsColony() {
         Map map = getCoastTestMap(plainsType);
         Game game = ServerTestHelper.startServerGame(map);
         InGameController igc = ServerTestHelper.getInGameController();
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
         assertNotNull(aiMain);
 
-        ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
+        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
         Europe europe = dutch.getEurope();
         assertNotNull("Setup error, europe is null", europe);
 
@@ -204,18 +210,18 @@ public class TransportMissionTest extends FreeColTestCase {
         // assign transport mission to the ship
         TransportMission mission = new TransportMission(aiMain, aiUnit);
         aiUnit.setMission(mission);
-        Transportable goods = new AIGoods(aiMain, galleon, horsesType,50, colonyTile);
-        mission.addToTransportList(goods);
+        Transportable goods = new AIGoods(aiMain, galleon, horsesType, 50,
+                                          colonyTile);
+        mission.queueTransportable(goods, false);
+        mission.doMission();
 
         // Exercise
-        Destination dest = mission.getNextDestination();
+        Location dest = mission.getTarget();
 
         // Test
-        assertNotNull("Unit should have a destination",dest);
-        assertFalse("Destination should not be Europe", dest.moveToEurope());
-        PathNode destPath = dest.getPath();
-        assertNotNull("Unit should have a path", destPath);
-        assertEquals("Unit destiny should be the colony", destPath.getLastNode().getTile(),colonyTile);
+        assertNotNull("Unit should have a destination", dest);
+        assertEquals("Destination should be the colony",
+                     colonyTile.getColony(), dest);
     }
 
     public void testGetDefaultDestination() {
@@ -243,27 +249,27 @@ public class TransportMissionTest extends FreeColTestCase {
         assertTrue("Setup error, player should not have colonies", dutch.getColonies().isEmpty());
 
         // Exercise
-        Destination dest = mission.getDefaultDestination();
+        Location dest = mission.getTarget();
 
         // Test
-        assertNotNull("Unit should have a destination",dest);
-        assertTrue("Destination should be Europe", dest.moveToEurope());
+        assertNotNull("Unit should have a destination", dest);
+        assertTrue("Destination should be Europe", dest instanceof Europe);
 
         // add colony
         Tile colonyTile = map.getTile(9, 9);
         FreeColTestUtils.ColonyBuilder builder = FreeColTestUtils.getColonyBuilder();
         builder.colonyTile(colonyTile).initialColonists(1).player(dutch).build();
         assertFalse("Player should now have a colony", dutch.getColonies().isEmpty());
+        mission = new TransportMission(aiMain, aiUnit);
+        aiUnit.setMission(mission);
 
         // Exercise
-        dest = mission.getDefaultDestination();
+        dest = mission.getTarget();
 
         // Test
-        assertNotNull("Unit should have a destination",dest);
-        assertFalse("Destination should not be Europe", dest.moveToEurope());
-        PathNode destPath = dest.getPath();
-        assertNotNull("Unit should have a path", destPath);
-        assertEquals("Unit destiny should be the colony", destPath.getLastNode().getTile(),colonyTile);
+        assertNotNull("Unit should have a destination", dest);
+        assertEquals("Destination should be the colony",
+                     colonyTile.getColony(), dest);
     }
 
     public void testWagonTrain() {
@@ -276,34 +282,28 @@ public class TransportMissionTest extends FreeColTestCase {
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
         assertNotNull(aiMain);
 
-        Unit wagonTrain = new ServerUnit(game, one.getTile(), (ServerPlayer) one.getOwner(), wagonType);
+        Unit wagonTrain = new ServerUnit(game, one.getTile(),
+            (ServerPlayer) one.getOwner(), wagonType);
         AIUnit wagon = aiMain.getAIUnit(wagonTrain);
         assertNotNull(wagon);
 
         wagon.abortMission("test");
-        assertEquals("Transport mission valid", null,
-            TransportMission.invalidReason(wagon));
+        assertNull("Transport mission should be valid",
+                   TransportMission.invalidReason(wagon));
         TransportMission mission = new TransportMission(aiMain, wagon);
 
-        Destination destination = mission.getDefaultDestination();
-        assertNotNull(destination);
-        assertTrue("Wagon should already be in colony one.",
-                   destination.isAtDestination());
+        Location dest = mission.getTarget();
+        assertEquals("Destination should be colony one.", one, dest);
 
         wagonTrain.setLocation(one.getTile().getAdjacentTile(Map.Direction.NE));
-        destination = mission.getDefaultDestination();
-        assertNotNull(destination);
-        assertFalse(destination.isAtDestination());
-        assertNotNull(destination.getPath());
-        assertEquals("Default destination should be colony one.",
-                     one.getTile(), destination.getPath().getLastNode().getTile());
-
+        dest = mission.getTarget();
+        assertEquals("Destination should still be colony one.", one, dest);
 
         AIGoods goods = new AIGoods(aiMain, two, horsesType, 20, one);
-        mission.addToTransportList(goods);
-        assertEquals("Destination should now be colony two.",
-                     mission.getNextDestination().getPath().getLastNode().getTile(), two.getTile());
+        mission.queueTransportable(goods, false);
+        mission.doMission();
 
+        dest = mission.getTarget();
+        assertEquals("Destination should now be colony two.", two, dest);
     }
-
 }

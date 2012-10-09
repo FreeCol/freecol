@@ -89,13 +89,13 @@ public class UnitWanderHostileMission extends Mission {
     }
 
     /**
-     * Why would a UnitWanderHostileMission be invalid with the given unit.
+     * Why would this mission be invalid with the given unit.
      *
      * @param aiUnit The <code>AIUnit</code> to check.
      * @return A reason why the mission would be invalid with the unit,
      *     or null if none found.
      */
-    private static String invalidHostileReason(AIUnit aiUnit) {
+    private static String invalidMissionReason(AIUnit aiUnit) {
         final Unit unit = aiUnit.getUnit();
         return (!unit.isOffensiveUnit()) ? Mission.UNITNOTOFFENSIVE
             : (unit.isNaval()) ? "unit-is-naval"
@@ -121,7 +121,7 @@ public class UnitWanderHostileMission extends Mission {
     public static String invalidReason(AIUnit aiUnit) {
         String reason;
         return ((reason = Mission.invalidReason(aiUnit)) != null) ? reason
-            : ((reason = invalidHostileReason(aiUnit)) != null) ? reason
+            : ((reason = invalidMissionReason(aiUnit)) != null) ? reason
             : null;
     }
 
@@ -135,7 +135,7 @@ public class UnitWanderHostileMission extends Mission {
     public static String invalidReason(AIUnit aiUnit, Location loc) {
         String reason;
         return ((reason = invalidAIUnitReason(aiUnit)) != null) ? reason
-            : ((reason = invalidHostileReason(aiUnit)) != null) ? reason
+            : ((reason = invalidMissionReason(aiUnit)) != null) ? reason
             : null;
     }
 

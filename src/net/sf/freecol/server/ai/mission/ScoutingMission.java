@@ -77,12 +77,7 @@ public class ScoutingMission extends Mission {
      * @param aiUnit The <code>AIUnit</code> this mission is created for.
      */
     public ScoutingMission(AIMain aiMain, AIUnit aiUnit) {
-        super(aiMain, aiUnit);
-
-        setTarget(findTarget(aiUnit, true));
-        logger.finest(tag + " starts at " + aiUnit.getUnit().getLocation()
-            + " with target " + target + ": " + this);
-        uninitialized = false;
+        this(aiMain, aiUnit, findTarget(aiUnit, true));
     }
 
     /**
@@ -124,8 +119,9 @@ public class ScoutingMission extends Mission {
      * @param target The new target <code>Location</code>.
      */
     public void setTarget(Location target) {
-        removeTransportable("retargeted");
+        boolean retarget = this.target != null && this.target != target;
         this.target = target;
+        if (retarget) retargetTransportable();
     }
 
     /**

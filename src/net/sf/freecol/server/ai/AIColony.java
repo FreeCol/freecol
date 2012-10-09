@@ -745,7 +745,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         if (ag.getTransport() != null
             && ag.getTransport().getMission() instanceof TransportMission) {
             ((TransportMission)ag.getTransport().getMission())
-                .removeFromTransportList(ag);
+                .removeTransportable((Transportable)ag,
+                    "No longer required by " + colony.getName());
         }
         removeAIGoods(ag);
         ag.dispose();
@@ -888,6 +889,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     public boolean completeWish(Wish wish, String reason) {
         if (!wishes.remove(wish)) return false;
+        ((EuropeanAIPlayer)getAIOwner()).completeWish(wish);
         logger.finest(colony.getName() + " completes " + reason
             + " wish: " + wish);
         wish.dispose();

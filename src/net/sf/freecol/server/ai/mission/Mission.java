@@ -344,7 +344,7 @@ public abstract class Mission extends AIObject {
      */
     public static Location resolveBlockage(AIUnit aiUnit, Location target) {
         final Unit unit = aiUnit.getUnit();
-        PathNode path = unit.findPath(target.getTile());
+        PathNode path = unit.findPath(target);
         Direction d = null;
         if (path != null && path.next != null) {
             Tile tile = path.next.getTile();
@@ -423,175 +423,6 @@ public abstract class Mission extends AIObject {
             }
         }
         return (best == null) ? null : best;
-    }
-
-    /**
-     * A unit leaves a ship.
-     * Fulfills a wish if possible.
-     *
-     * @param aiUnit The <code>AIUnit</code> to unload.
-     * @param direction The <code>Direction</code> to move, if any.
-     * @return True if the unit is unloaded.
-     */
-    protected boolean unitLeavesTransport(AIUnit aiUnit, Direction direction) {
-        final Unit carrier = getUnit();
-        final Unit unit = aiUnit.getUnit();
-        boolean result = (direction == null)
-            ? AIMessage.askDisembark(aiUnit)
-            : AIMessage.askMove(aiUnit, direction);
-        Colony colony = unit.getColony();
-        if (result) result = unit.getLocation() != carrier;
-        if (result && colony != null) {
-            AIColony ac = getAIMain().getAIColony(colony);
-            if (ac != null) ac.completeWish(unit);
-
-            colony.firePropertyChange(Colony.REARRANGE_WORKERS, true, false);
-        }
-        return result;
-    }
-
-    /**
-     * A unit joins a ship.
-     *
-     * @param aiUnit The <code>AIUnit</code> to load.
-     * @param direction The <code>Direction</code> to move, if any.
-     * @return True if the unit is loaded.
-     */
-    protected boolean unitJoinsTransport(AIUnit aiUnit, Direction direction) {
-        final Unit carrier = getUnit();
-        final Unit unit = aiUnit.getUnit();
-        Colony colony = unit.getColony();
-        boolean result = AIMessage.askEmbark(getAIUnit(), unit, direction);
-        if (result) result = unit.getLocation() == carrier;
-        if (result && colony != null) {
-            colony.firePropertyChange(Colony.REARRANGE_WORKERS, true, false);
-        }
-        return result;
-    }
-
-    /**
-     * Goods leaves a ship.
-     *
-     * @param type The <code>GoodsType</code> to unload.
-     * @param amount The amount of goods to unload.
-     * @return True if the unload succeeds.
-     */
-    protected boolean goodsLeavesTransport(GoodsType type, int amount) {
-        final Unit carrier = getUnit();
-        if (carrier.getGoodsCount(type) < amount) return false;
-        final AIUnit aiUnit = getAIUnit();
-        Colony colony = carrier.getColony();
-        int oldAmount = carrier.getGoodsCount(type);
-        Goods goods = new Goods(carrier.getGame(), carrier, type, amount);
-        boolean result;
-        if (carrier.isInEurope()) {
-            if (carrier.getOwner().canTrade(type)) {
-                result = AIMessage.askSellGoods(aiUnit, goods);
-                logger.finest("Sell " + goods + " in Europe "
-                    + ((result) ? "succeeds" : "fails")
-                    + ": " + this);
-            } else { // dump
-                result = AIMessage.askUnloadCargo(aiUnit, goods);
-            }
-        } else {
-            result = AIMessage.askUnloadCargo(aiUnit, goods);
-        }
-        if (result) {
-            int newAmount = carrier.getGoodsCount(type);
-            if (oldAmount - newAmount != amount) {
-                logger.warning(carrier + " at " + carrier.getLocation()
-                    + " only unloaded " + (oldAmount - newAmount)
-                    + " " + type + " (" + amount + " expected)");
-                // TODO: sort this out.
-                // For now, do not tolerate partial unloads.
-                result = false;
-            }
-        }   
-        if (result && colony != null) {
-            final AIColony aiColony = getAIMain().getAIColony(colony);
-            if (aiColony != null) aiColony.completeWish(goods);
-            colony.firePropertyChange(Colony.REARRANGE_WORKERS, true, false);
-        }
-        return result;
-    }
-
-    /**
-     * Goods leaves a ship.
-     * Completes a wish if possible.
-     *
-     * @param aiGoods The <code>AIGoods</code> to unload.
-     * @return True if the unload succeeds.
-     */
-    protected boolean goodsLeavesTransport(AIGoods aiGoods) {
-        Goods goods = aiGoods.getGoods();
-        return goodsLeavesTransport(goods.getType(), goods.getAmount());
-    }
-
-    /**
-     * Goods joins a ship.
-     *
-     * @param aiGoods The <code>AIGoods</code> to load.
-     * @return True if the load succeeds.
-     */
-    protected boolean goodsJoinsTransport(AIGoods aiGoods) {
-        final Unit carrier = getUnit();
-        final AIUnit aiUnit = getAIUnit();
-        final Goods goods = aiGoods.getGoods();
-        GoodsType goodsType = goods.getType();
-        int goodsAmount = goods.getAmount();
-        int oldAmount = carrier.getGoodsCount(goodsType);
-        boolean result;
-        if (carrier.isInEurope()) {
-            result = AIMessage.askBuyGoods(aiUnit, goodsType, goodsAmount);
-        } else {
-            result = AIMessage.askLoadCargo(aiUnit, goods);
-        }
-        if (result) {
-            int newAmount = carrier.getGoodsCount(goodsType);
-            if (newAmount - oldAmount != goodsAmount) {
-                logger.warning(carrier + " at " + carrier.getLocation()
-                    + " only loaded " + (newAmount - oldAmount)
-                    + " " + goodsType
-                    + " (" + goodsAmount + " expected)");
-                goodsAmount = newAmount - oldAmount;
-                // TODO: sort this out.  For now, tolerate partial loads.
-                result = goodsAmount > 0;
-            }
-        }
-        if (result) {
-            Colony colony = carrier.getColony();
-            if (colony != null) {
-                getAIMain().getAIColony(colony).removeAIGoods(aiGoods);
-            }
-            aiGoods.setGoods(new Goods(getGame(), carrier,
-                             goodsType, goodsAmount));
-        }
-        return result;
-    }
-
-    // Deprecated, going away.
-    protected void unitLeavesShip(AIUnit aiUnit) {
-        unitLeavesTransport(aiUnit, null);
-    }
-
-    // Deprecated, going away.
-    protected boolean sellCargoInEurope(Goods goods) {
-        return goodsLeavesTransport(goods.getType(), goods.getAmount());
-    }
-
-    // Deprecated, going away.
-    protected boolean unloadCargoInColony(Goods goods) {
-        return goodsLeavesTransport(goods.getType(), goods.getAmount());
-    }
-
-    // Deprecated, going away.
-    protected boolean moveUnitToEurope() {
-        return getAIUnit().moveToEurope();
-    }
-
-    // Deprecated, going away.
-    protected boolean moveUnitToAmerica() {
-        return getAIUnit().moveToAmerica();
     }
 
     /**
@@ -735,27 +566,21 @@ public abstract class Mission extends AIObject {
             return MoveType.MOVE_NO_MOVES;
         } else if (unit.isInEurope()) {
             if (target instanceof Europe) {
-                if (unit.getLocation() instanceof Unit) {
-                    unitLeavesTransport(aiUnit, null);
-                }
+                if (unit.isOnCarrier()) aiUnit.leaveTransport(null);
                 return MoveType.MOVE;
             } else if (!unit.getOwner().canMoveToEurope()) {
                 throw new IllegalStateException("Impossible move from Europe");
             }
         } else if (unit.getTile() == null) {
             throw new IllegalStateException("Null unit tile: " + unit);
-        } else {
-            if (unit.getTile() == targetTile) {
-                if (unit.getLocation() instanceof Unit) {
-                    unitLeavesTransport(aiUnit, null);
-                }
-                return MoveType.MOVE;
-            } else if (target instanceof Europe) {
-                if (!unit.getOwner().canMoveToEurope()) {
-                    logger.fine(logMe + " impossible move to Europe"
-                        + ": " + this);
-                    return MoveType.MOVE_ILLEGAL;
-                }
+        } else if (unit.getTile() == targetTile) {
+            if (unit.isOnCarrier()) aiUnit.leaveTransport(null);
+            return MoveType.MOVE;
+        } else if (target instanceof Europe) {
+            if (!unit.getOwner().canMoveToEurope()) {
+                logger.fine(logMe + " impossible move to Europe"
+                    + ": " + this);
+                return MoveType.MOVE_ILLEGAL;
             }
         }
 
@@ -788,7 +613,7 @@ public abstract class Mission extends AIObject {
         } else if (unit.isInEurope()) { // Going to the map
             if (unit.getType().canMoveToHighSeas()) {
                 unit.setDestination(target);
-                if (AIMessage.askMoveTo(aiUnit, target)) {
+                if (AIMessage.askMoveTo(aiUnit, map)) {
                     logger.finest(logMe + " sailed for " + target
                         + ": " + this);
                     return MoveType.MOVE_HIGH_SEAS;
@@ -836,17 +661,46 @@ public abstract class Mission extends AIObject {
                 + " in transit to " + target + ": " + this);
             return MoveType.MOVE_NO_MOVES;
         } else if (needTransport) {
-            logger.finest(logMe + " at " + unit.getLocation()
-                + " needs transport to " + target + ": " + this);
-            return MoveType.MOVE_ILLEGAL;
+            if (aiUnit.getTransport() == null) {
+                logger.finest(logMe + " at " + unit.getLocation()
+                    + " needs transport to " + target + ": " + this);
+                return MoveType.MOVE_ILLEGAL;
+            }
+            Unit newCarrier = aiUnit.getTransport().getUnit();
+            boolean board = newCarrier.canAdd(unit);
+            Direction d = null;
+            if (board) {
+                if (unit.isAtLocation(newCarrier.getLocation())) {
+                    d = null;
+                } else if (unit.getTile() != null
+                    && unit.getMovesLeft() > 0
+                    && unit.getTile().isAdjacent(newCarrier.getTile())) {
+                    d = unit.getTile().getDirection(newCarrier.getTile());
+                } else {
+                    board = false;
+                }
+            }
+            if (!board) {
+                logger.finest(logMe + " at " + unit.getLocation()
+                    + " waiting for carrier " + newCarrier
+                    + " to transport it to " + target + ": " + this);
+                return MoveType.MOVE_ILLEGAL;
+            }
+            if (aiUnit.joinTransport(newCarrier, d)) {
+                logger.finest(logMe + " joined transport " + newCarrier
+                    + " at " + unit.getLocation() + ": " + this);
+                return MoveType.MOVE_NO_MOVES;
+            } else {
+                logger.finest(logMe + " at " + unit.getLocation()
+                    + " unexpected failure to board " + newCarrier
+                    + " at " + newCarrier.getLocation()
+                    + ": " + this);
+                return MoveType.MOVE_ILLEGAL;
+            }
         } else if (path == null) {
             throw new IllegalStateException("Path == null"); // Can not happen
         } else {
-            Unit.MoveType mt = followPath(logMe, path);
-            if (mt == MoveType.MOVE && unit.getLocation() instanceof Unit) {
-                unitLeavesTransport(aiUnit, null);
-            }
-            return mt;
+            return followPath(logMe, path);
         }
     }
 
@@ -881,6 +735,7 @@ public abstract class Mission extends AIObject {
                 return MoveType.MOVE_NO_MOVES;
             } else if (unit.isInEurope()) {
                 useEurope++;
+                unit.setDestination(path.getLocation());
             } else if (unit.getTile() == null) {
                 logger.fine(logMe + " null location tile: " + this);
                 return MoveType.MOVE_ILLEGAL;
@@ -901,11 +756,9 @@ public abstract class Mission extends AIObject {
             // On failure, fall through to the error report.
             switch (useEurope) {
             case NO_EUROPE:
+                boolean leave = unit.isOnCarrier() && !path.isOnCarrier();
                 if (unit.getTile() == path.getTile()) {
-                    if (unit.getLocation() instanceof Unit
-                        && !path.isOnCarrier()) {
-                        unitLeavesTransport(aiUnit, null);
-                    }
+                    if (leave) aiUnit.leaveTransport(null);
                     continue;
                 }
                 MoveType mt = unit.getMoveType(path.getDirection());
@@ -915,12 +768,13 @@ public abstract class Mission extends AIObject {
                         + ": " + this);
                     return mt;
                 }
-
-                if (AIMessage.askMove(aiUnit, path.getDirection())) continue;
+                if (aiUnit.stepPath(path)) continue;
                 break;
 
             case USES_EUROPE:
-                if (AIMessage.askMoveTo(aiUnit, path.getLocation())) {
+                Location dst = (unit.isInEurope()) ? unit.getGame().getMap()
+                    : path.getLocation();
+                if (AIMessage.askMoveTo(aiUnit, dst)) {
                     logger.finest(logMe + " now on high seas: " + this);
                     return MoveType.MOVE_HIGH_SEAS;
                 }
@@ -941,24 +795,23 @@ public abstract class Mission extends AIObject {
     }
 
     /**
-     * If the unit in this mission is currently being transported, remove
-     * it from the carrier's transport mission.
+     * If the unit in this mission is currently being transported, retarget
+     * its transport mission as needed.
      *
-     * @param reason The reason to remove the transportable.
+     * @return True if the transport is retargeted.
      */
-    public void removeTransportable(String reason) {
+    public boolean retargetTransportable() {
         Unit u = getUnit();
         AIUnit aiUnit = getAIUnit();
-        if (aiUnit != null && u.getLocation() instanceof Unit) {
-            Unit carrier = (Unit)u.getLocation();
-            AIUnit aiCarrier = getAIMain().getAIUnit(carrier);
-            if (aiCarrier != null) {
-                Mission m = aiCarrier.getMission();
-                if (m instanceof TransportMission) {
-                    ((TransportMission)m).removeFromTransportList(aiUnit);
-                }
-            }
-        }
+        if (aiUnit == null) return false;
+        AIUnit aiCarrier = (u.isOnCarrier())
+            ? getAIMain().getAIUnit(u.getCarrier())
+            : aiUnit.getTransport();
+        if (aiCarrier == null) return false;
+        Mission m = aiCarrier.getMission();
+        if (!(m instanceof TransportMission)) return false;
+
+        return ((TransportMission)m).retargetTransportable(aiUnit);
     }
             
 

@@ -93,6 +93,7 @@ import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.model.UnitLocation;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
@@ -1854,8 +1855,10 @@ public final class InGameController extends Controller {
             return DOMMessage.clientError("Naval unit " + unit.getId()
                 + " can not embark.");
         }
-        if (!carrier.canAdd(unit)) {
-            return DOMMessage.clientError("Can not carry " + unit.getId());
+        UnitLocation.NoAddReason reason = carrier.getNoAddReason(unit);
+        if (reason != UnitLocation.NoAddReason.NONE) {
+            return DOMMessage.clientError("Carrier: " + carrier.getId()
+                + " can not carry " + unit.getId() + ": " + reason.toString());
         }
 
         ChangeSet cs = new ChangeSet();

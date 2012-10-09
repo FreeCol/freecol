@@ -20,8 +20,10 @@
 package net.sf.freecol.server.ai.mission;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -31,6 +33,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Goods;
@@ -49,8 +52,10 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
+import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
+import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIGoods;
 import net.sf.freecol.server.ai.AIMain;
@@ -77,50 +82,326 @@ public class TransportMission extends Mission {
     private static final String tag = "AI transport";
 
     private static final String ELEMENT_TRANSPORTABLE = "transportable";
+    private static final String CARRIER_TAG = "carrier";
+    private static final String MODE_TAG = "mode";
+    private static final String TARGET_TAG = "target";
+    private static final String TURNS_TAG = "turns";
+    private static final String TRIES_TAG = "tries";
+    private static final String SPACELEFT_TAG = "space";
+
+
+    /**
+     * Insist transport lists remain simple by imposing an upper bound
+     * on the distinct destination locations to visit.
+     */
+    private static final int DESTINATION_UPPER_BOUND = 3;
+
+    /** Abandon cargo after three blockages. */
+    private static final int MAX_TRY = 3;
 
     private static final int MINIMUM_GOLD_TO_STAY_IN_EUROPE = 600;
 
-    /**
-     * A list of <code>Transportable</code>s to transport.
-     * Transportables are on this list twice, one for source/pickup,
-     * and once for destination/dropoff.  When a transportable is collected,
-     * the pickup entry is dropped.
-     */
-    private final List<Transportable> transportables
-        = new ArrayList<Transportable>();
+    private static enum CargoResult {
+        TCONTINUE,  // Cargo should continue
+        TDONE,      // Cargo completed successfully
+        TFAIL,      // Cargo failed badly
+        TNEXT,      // Cargo changed to its next state
+        TRETRY      // Cargo has blocked, retry
+    }
 
-    class Destination {
-        private boolean atDestination;
-        private boolean moveToEurope;
-        private PathNode path;
+    /** The actions to perform at the target. */
+    private static enum CargoMode {
+        LOAD,       // Go to target and load transportable
+        UNLOAD,     // Go to target and unload transportable
+        PICKUP,     // Go to drop node target, transportable unit to embark
+        DROPOFF,    // Go to drop node target, transportable unit to disembark
+        DUMP;       // Just dump this transportable at the next opportunity
 
-        /*
-         * Returns an "Already at destination"
-         */
-        public Destination() {
-            this.atDestination = true;
-            this.moveToEurope = false;
-            this.path = null;
-        }
-
-        public Destination(boolean moveToEurope, PathNode path) {
-            this.atDestination = false;
-            this.moveToEurope = moveToEurope;
-            this.path = path;
-        }
-
-        public boolean moveToEurope() {
-            return moveToEurope;
-        }
-
-        public PathNode getPath() {
-            return path;
-        }
-
-        public boolean isAtDestination() {
-            return atDestination;
+        public boolean isCollection() {
+            return this == LOAD || this == PICKUP;
         }
     }
+
+    /**
+     * An class describing the action needed to make progress in a
+     * transportation action for a specific transportable.
+     */
+    public class Cargo implements Comparable<Cargo> {
+
+        private Transportable transportable;
+        private Unit carrier;
+        private CargoMode mode;
+        private Location target;
+        private int turns;
+        private int tries;
+        private int spaceLeft;
+        private List<Cargo> wrapped;
+
+
+        /**
+         * Creates the new Cargo.
+         *
+         * Defaults to DUMP mode.  Call setTarget to do something useful.
+         *
+         * @param transportable The <code>Transportable</code> to cargo.
+         * @param carrier The carrier <code>Unit</code>.
+         */
+        public Cargo(Transportable transportable, Unit carrier) {
+            this(transportable, carrier, null);
+        }
+
+        /**
+         * Creates the new dumping Cargo to a given location.
+         *
+         * @param transportable The <code>Transportable</code> to transport.
+         * @param carrier The carrier <code>Unit</code>.
+         * @param target The target <code>Location</code>.
+         */
+        public Cargo(Transportable transportable, Unit carrier,
+                     Location target) {
+            this(transportable, carrier, CargoMode.DUMP, target, -1, 0, -1);
+        }
+
+        /**
+         * Creates the new Cargo with given mode and target.
+         *
+         * @param transportable The <code>Transportable</code> to transport.
+         * @param carrier The carrier <code>Unit</code>.
+         * @param mode The <code>CargoMode</code>.
+         * @param target The target <code>Location</code>.
+         * @param turns The turns required by the current path-estimate.
+         * @param tries The tries taken to find a path.
+         * @param spaceLeft The space left after this cargo action occurs.
+         */
+        public Cargo(Transportable transportable, Unit carrier, CargoMode mode,
+                     Location target, int turns, int tries, int spaceLeft) {
+            this.transportable = transportable;
+            this.carrier = carrier;
+            this.mode = mode;
+            this.target = target;
+            this.turns = turns;
+            this.tries = tries;
+            this.spaceLeft = spaceLeft;
+            this.wrapped = null;
+        }
+
+        public Transportable getTransportable() {
+            return transportable;
+        }
+
+        public Unit getCarrier() {
+            return carrier;
+        }
+
+        public CargoMode getMode() {
+            return mode;
+        }
+
+        public Location getTarget() {
+            return target;
+        }
+
+        public int getTurns() {
+            return turns;
+        }
+
+        public int getTries() {
+            return tries;
+        }
+
+        public int getSpaceLeft() {
+            return spaceLeft;
+        }
+
+        public void setSpaceLeft(int spaceLeft) {
+            this.spaceLeft = spaceLeft;
+        }
+
+        /**
+         * How much space would be needed to add this transportable?
+         *
+         * @return The extra space required.
+         */
+        public int getNewSpace() {
+            int ret = 0;
+            ret += (mode.isCollection()) ? getTransportable().getSpaceTaken()
+                : -getTransportable().getSpaceTaken();
+            if (hasWrapped()) {
+                for (Cargo t : wrapped) ret += t.getNewSpace();
+            }
+            return ret;
+        }
+
+        /**
+         * Does this cargo wrap others?
+         *
+         * @return True if wrapped transportables are present.
+         */
+        public boolean hasWrapped() {
+            return wrapped != null;
+        }
+
+        /**
+         * Transportables can be `wrapped' if they have the same target
+         * and advancing them reduces the space on the carrier.
+         *
+         * @param other The other <code>Transportable</code> to consider.
+         * @return True if the transportables can be wrapped.
+         */
+        public boolean couldWrap(Cargo other) {
+            return getTarget() == other.getTarget()
+                && getNewSpace() < 0 && other.getNewSpace() < 0;
+        }
+
+        /**
+         * Wrap a Cargo into this one.
+         *
+         * @param other The other <code>Cargo</code> to wrap.
+         */
+        public void wrap(Cargo other) {
+            if (other == this) {
+                throw new IllegalStateException("Autowrap at" + this);
+            }
+            if (wrapped == null) wrapped = new ArrayList<Cargo>();
+            wrapped.add(other);
+        }
+
+        /**
+         * Unwrap this cargo.
+         *
+         * @return The cargoes that were wrapped.
+         */
+        public List<Cargo> unwrap() {
+            if (wrapped == null) {
+                throw new IllegalStateException("Bogus unwrap " + this);
+            }
+            List<Cargo> result = wrapped;
+            wrapped = null;
+            return result;
+        }
+            
+        /**
+         * Should this <code>Cargo</code> be retried after encountering
+         * a blockage?  For now, just tries three times.
+         * TODO: be smarter.
+         *
+         * @return True if the <code>Cargo</code> should be retried.
+         */
+        public boolean retry() {
+            return tries++ < MAX_TRY;
+        }
+
+        /**
+         * Compares this cargo to another.  Cargoes that reduce the
+         * cargo amount should sort before those that do not.
+         *
+         * @param other The other <code>Cargo</code> to compare to.
+         * @return A comparison result.
+         */
+        public int compareTo(Cargo other) {
+            return getNewSpace() - other.getNewSpace();
+        }
+
+        /**
+         * Sets the target for this cargo, possibly also changing its mode.
+         *
+         * @return True if the retarget succeeded.  False if the
+         *     cargo is now invalid.
+         */
+        public boolean setTarget() {
+            final Location dst = transportable.getTransportDestination();
+            if (dst == null) return false;
+            PathNode path, drop;
+
+            if (transportable instanceof AIUnit) {
+                final Unit unit = ((AIUnit)transportable).getUnit();
+                if (unit.getLocation() == carrier) {
+                    // Can the carrier deliver the unit to the target?
+                    if ((path = unit.findPath(carrier.getLocation(), dst,
+                                              carrier, null)) == null) {
+                        return false;
+                    }
+                    // Drop node must exist, the unit is aboard
+                    drop = path.getTransportDropNode();
+                    if (upLoc(drop.getLocation()) instanceof Tile) {
+                        this.mode = CargoMode.DROPOFF;
+                        this.turns = drop.previous.getTotalTurns();
+                        this.target = upLoc(drop.previous.getLocation());
+                    } else {
+                        this.mode = CargoMode.UNLOAD;
+                        this.turns = drop.getTotalTurns();
+                        this.target = upLoc(drop.getLocation());
+                    }
+                } else {
+                    // Can the carrier get the unit to the target, and
+                    // does the unit need the carrier at all?
+                    if ((path = unit.findPath(unit.getLocation(), dst,
+                                              carrier, null)) == null
+                        || (drop = path.getCarrierMove()) == null) {
+                        return false;
+                    }
+                    // TODO: proper rendezvous paths, unit needs
+                    // to modify its target too!
+                    path = carrier.findPath(drop.getLocation());
+                    if (path == null) {
+                        return false;
+                    } else if (upLoc(drop.getLocation()) instanceof Tile) {
+                        this.mode = CargoMode.PICKUP;
+                        this.turns = drop.getTotalTurns();
+                        this.target = upLoc(drop.getLocation());
+                    } else {
+                        this.mode = CargoMode.LOAD;
+                        this.turns = drop.getTotalTurns();
+                        this.target = upLoc(drop.getLocation());
+                    }
+                }
+                return true;
+
+            } else if (transportable instanceof AIGoods) {
+                final Goods goods = ((AIGoods)transportable).getGoods();
+                if (goods.getLocation() == carrier) {
+                    path = carrier.findPath(dst);
+                    if (path == null) {
+                        return false;
+                    } else {
+                        this.mode = CargoMode.UNLOAD;
+                        this.turns = path.getLastNode().getTotalTurns();
+                        this.target = upLoc(path.getLastNode().getLocation());
+                    }
+                } else {
+                    path = carrier.findPath(goods.getLocation());
+                    if (path == null) {
+                        return false;
+                    } else {
+                        this.mode = CargoMode.LOAD;
+                        this.turns = path.getLastNode().getTotalTurns();
+                        this.target = upLoc(path.getLastNode().getLocation());
+                    }
+                }
+                return true;
+
+            } else throw new IllegalStateException("Bogus transportable: "
+                + transportable);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public String toString() {
+            return "[" + transportable.toString() + " mode=" + mode
+                + ((mode.isCollection()) ? " from " : " to ") + target
+                + " " + turns + "/" + tries
+                + " space=" + spaceLeft + ((wrapped==null) ? "" : " wrap")
+                + "]";
+        }            
+    };
+
+
+    /** A list of <code>Cargo</code>s to work on. */
+    private final List<Cargo> cargoes = new ArrayList<Cargo>();
+
+    /** The current target location to travel to. */
+    private Location target = null;
 
 
     /**
@@ -132,10 +413,9 @@ public class TransportMission extends Mission {
     public TransportMission(AIMain aiMain, AIUnit aiUnit) {
         super(aiMain, aiUnit);
 
-        if (!getUnit().isCarrier()) {
-            throw new IllegalArgumentException("Carrier required: " + aiUnit);
-        }
-        logger.finest(tag + " begins: " + getUnit());
+        checkCargoes();
+        retarget();
+        logger.finest(tag + " begins: " + toFullString());
         uninitialized = false;
     }
 
@@ -158,34 +438,33 @@ public class TransportMission extends Mission {
 
 
     /**
-     * Disposes this <code>Mission</code>.
+     * Disposes of this <code>Mission</code>.
      */
     public void dispose() {
-        List<Transportable> cargoList = new ArrayList<Transportable>();
-        List<Transportable> scheduledList = new ArrayList<Transportable>();
-        while (!transportables.isEmpty()) {
-            Transportable t = transportables.remove(0);
-            if (isCarrying(t)) {
-                // The cargo is on board, add to list to be disposed of
-                cargoList.add(t);
-            } else {
-                // The cargo was scheduled to be transported, cancel order
-                scheduledList.add(t);
-            }
-        }
-
-        for (Transportable t : cargoList) ((AIObject)t).dispose();
-        for (Transportable t : scheduledList) t.setTransport(null);
+        logger.finest(tag + " disposing (" + clearCargoes() + "): " + this);
         super.dispose();
+    }
+
+
+    // Simple internal utilities
+
+    /**
+     * Gets the trivial target for the carrier unit.
+     *
+     * @return A path to the trivial target, or null if none found.
+     */
+    private PathNode getTrivialPath() {
+        final Unit carrier = getUnit();
+        return (carrier.isNaval()) ? carrier.findOurNearestPort()
+            : carrier.findOurNearestSettlement();
     }
 
     /**
      * Checks if the carrier using this mission is carrying the given
      * <code>Transportable</code>.
      *
-     * @param t The <code>Transportable</code>.
-     * @return <code>true</code> if the given <code>Transportable</code> is
-     *         {@link Unit#getLocation located} in the carrier.
+     * @param t The <code>Transportable</code> to check.
+     * @return True if the carrier is carrying the transportable.
      */
     private boolean isCarrying(Transportable t) {
         return t != null
@@ -194,1113 +473,893 @@ public class TransportMission extends Mission {
     }
 
     /**
-     * Checks if the given <code>Transportable</code> is on the transport
-     * list.
+     * Is a transportable waiting for delivery on the cargoes list?
      *
-     * @param t The <code>Transportable</code> to be checked
-     * @return True if the transportable is on the transportables list.
+     * @param t The <code>Transportable</code> to check.
+     * @return True if the transportable is queued in this mission.
      */
-    public boolean isOnTransportList(Transportable t) {
-        return transportables.contains(t);
+    public boolean isTransporting(Transportable t) {
+        return tFind(t) != null;
     }
 
     /**
-     * Removes the given <code>Transportable</code> from the transport list.
-     * This method calls {@link Transportable#setTransport(AIUnit)}.
+     * Decide if this unit has a good chance of defeating another.
+     * If there is cargo aboard, be more conservative.
+     * TODO: magic numbers.
      *
-     * @param t The <code>Transportable</code> to remove.
+     * @param other The other <code>Unit</code> to attack.
+     * @return True if the attack should proceed.
      */
-    public void removeFromTransportList(Transportable t) {
-        logger.finest(tag + " removing transportable " + t + ": " + getUnit());
-        while (transportables.remove(t));
-        if (t.getTransport() == getAIUnit()) t.setTransport(null);
-    }
-
-    /**
-     * Checks the transportable locations.
-     * A location becomes invalid if:
-     *   - step is a null location
-     *   - step is disposed
-     *   - step is a captured settlement
-     *
-     * @param t The <code>Transportable</code> to test.
-     * @param checkSrc Whether to check the source location or not.
-     * @return An error string if there are problems, or null on success.
-     */
-    private String checkTransportable(Transportable t, boolean checkSrc) {
-        final Player owner = getUnit().getOwner();
-        final Locatable l = t.getTransportLocatable();
-        if (checkSrc) {
-            Location src = t.getTransportSource();
-            if (src == null) {
-                return "transportable " + l + " source missing";
-            } else if (((FreeColGameObject)src).isDisposed()) {
-                return "transportable " + l + " source " + src.getId()
-                    + " disposed";
-            } else if ((src instanceof Settlement)
-                && ((Settlement)src).getOwner() != null
-                && !owner.owns((Settlement)src)) {
-                return "transportable " + l + " source " + src.getId()
-                    + " captured";
-            }
-        }
-        Location dst = t.getTransportDestination();
-        if (dst == null) {
-            return "transportable " + l + " destination missing ";
-        } else if (((FreeColGameObject)dst).isDisposed()) {
-            return "transportable " + l + " destination " + dst.getId()
-                + " disposed";
-        } else if (((dst instanceof Settlement)
-                && ((Settlement)dst).getOwner() != null
-                && !owner.owns((Settlement)dst))) {
-            return "transportable " + l + " destination " + dst.getId()
-                + " captured";
-        }
-        return null;
-    }
-
-    /**
-     * Checks the list of transportables is valid, and that every
-     * <code>Goods</code> and <code>Unit</code> onboard is a valid
-     * transportable.
-     *
-     * @see Goods
-     * @see Unit
-     */
-    private void updateTransportables() {
+    private boolean shouldAttack(Unit other) {
+        if (invalidAttackReason(getAIUnit(),
+                                other.getOwner()) != null) return false;
         final Unit carrier = getUnit();
-        List<Goods> goods = new ArrayList<Goods>();
-        List<Unit> units = new ArrayList<Unit>();
+        final CombatModel cm = getGame().getCombatModel();
+        float offence = cm.getOffencePower(carrier, other)
+            * ((carrier.hasCargo()) ? 0.3f : 0.80f);
+        return offence > cm.getOffencePower(other, carrier);
+    }
 
-        // Remove items that should no longer be transported:
-        List<Transportable> carrying = new ArrayList<Transportable>();
-        List<Transportable> carried = new ArrayList<Transportable>();
-        int i = 0;
-        while (i < transportables.size()) {
-            Transportable t = transportables.get(i);
-            Locatable l = t.getTransportLocatable();
-            if (l == null) {
-                logger.warning(tag + " transportable lacks locatable " + t
-                    + ": " + carrier);
-                transportables.remove(i);
-                continue;
-            } else if (carried.contains(t)) {
-                logger.warning(tag + " repeated transportable " + t
-                    + ": " + carrier);
-                transportables.remove(i);
-                continue;
-            } else if (carrying.contains(t) || isCarrying(t)) {
-                String msg = checkTransportable(t, false);
-                carrying.remove(t);
-                carried.add(t);
-                if (msg != null) {
-                    logger.warning(tag + " " + msg + ": " + carrier);
-                    transportables.remove(i);
-                    continue;
-                }
-            } else {
-                String msg = checkTransportable(t, true);
-                if (msg != null) {
-                    logger.warning(tag + " " + msg + ": " + carrier);
-                    removeFromTransportList(t);
-                    continue;
-                }
-            }
-            if (l instanceof Unit) {
-                units.add((Unit)l);
-            } else if (l instanceof Goods) {
-                goods.add((Goods)l);
-            }
-            i++;
+
+    // Cargoes handling.
+    // *Nothing* should touch "cargoes" but these.
+    // It needs synchronization because of possible changes due to the
+    // carrier being destroyed.
+
+    /**
+     * Gets the cargoes.
+     *
+     * @return A copy of the list of cargoes.
+     */
+    private List<Cargo> tCopy() {
+        List<Cargo> nxt;
+        synchronized (cargoes) {
+            nxt = new ArrayList<Cargo>(cargoes);
         }
-
-        // Try to add all other units that happen to be on board.
-        for (Unit u : carrier.getUnitList()) {
-            if (units.contains(u)) continue;
-
-            AIUnit aiUnit = getAIMain().getAIUnit(u);
-            if (aiUnit == null) {
-                logger.warning(tag + " bogus unit on board " + u
-                    + ": " + carrier);
-                continue;
-            }
-            if (aiUnit.getTransportDestination() != null) {
-                addToTransportList(aiUnit);
-                continue;
-            }
-
-            // Unit has no destination, try to disembark it.
-            logger.warning(tag + " unexpected unit on board " + u
-                + ": " + carrier);
-            if (carrier.isInEurope()
-                || (carrier.getTile() != null && carrier.getTile().isLand())) {
-                unitLeavesShip(aiUnit);
-            } else if (u.getTile() != null && u.getMovesLeft() > 0) {
-                Tile tile = u.getTile();
-                Tile bestTile = null;
-                for (Tile t : tile.getSurroundingTiles(1)) {
-                    if (u.getMoveType(t).isLegal()) {
-                        if (bestTile == null
-                            || (bestTile.getSettlement() == null
-                                && t.getSettlement() != null)) {
-                            bestTile = t;
-                        }
-                    }
-                }
-                if (bestTile != null) {
-                    AIMessage.askMove(aiUnit, tile.getDirection(bestTile));
-                }
-            }
-        }
-
-        // Can not yet add goods because they are hard to find.
-        for (Goods g : carrier.getGoodsList()) {
-            if (goods.contains(g)) continue;
-
-            // Goods not attached to a transportable, unload when able.
-            logger.warning(tag + " unexpected goods on board " + g
-                + ": " + carrier);
-            if (carrier.isInEurope()
-                || (carrier.getTile() != null
-                    && carrier.getTile().getSettlement() != null)) {
-                AIMessage.askUnloadCargo(getAIUnit(), g);
-            }
-        }
+        return nxt;
     }
 
     /**
-     * Adds the given <code>Transportable</code> to the transport list.
+     * Clears the cargoes list.
      *
-     * Both the source and destination {@link Location} for the
-     * <code>Transportable</code> is entered into the transport list
-     * if the <code>Transportable</code> is not already loaded onto
-     * the transport.  If the <code>Transportable</code> is on board
-     * the transport, then only the destination is put on the
-     * transport list.
-     *
-     * @param t The <code>Transportable</code> to add.
-     * @return True if the <code>Transportable</code> was added (so check
-     *     isOnTransportList before calling this if really interested in
-     *     whether the transport is accepted).
+     * @return The old cargoes list.
      */
-    public boolean addToTransportList(Transportable t) {
-        final Unit carrier = getUnit();
-        Locatable l = t.getTransportLocatable();
-        Location src = t.getTransportSource();
-        Location dst = t.getTransportDestination();
-        if (l == null || dst == null || (src == null && !isCarrying(t))
-            || isOnTransportList(t)) return false;
+    private List<Cargo> tClear() {
+        List<Cargo> old = new ArrayList<Cargo>();
+        synchronized (cargoes) {
+            old.addAll(cargoes);
+            cargoes.clear();
+        }
+        return old;
+    }
 
-        int bestSourceIndex = -1;
-        if (!isCarrying(t)) {
-            int distToSource;
-            if (carrier.getLocation().getTile() == src.getTile()) {
-                distToSource = 0;
+    /**
+     * Sets the cargoes to a new list.
+     *
+     * @return The old cargoes list.
+     */
+    private List<Cargo> tSet(List<Cargo> nxt) {
+        List<Cargo> old = tClear();
+        synchronized (cargoes) {
+            cargoes.addAll(nxt);
+        }
+        return old;
+    }
+
+    /**
+     * Gets the size of the cargoes.
+     *
+     * @return The size of the cargoes.
+     */
+    private int tSize() {
+        int size;
+        synchronized (cargoes) {
+            size = cargoes.size();
+        }
+        return size;
+    }
+
+    /**
+     * Find a <code>Cargo</code> with the given <code>Transportable</code>.
+     *
+     * @param t The <code>Transportable</code> to look for.
+     * @return The <code>Cargo</code> found, or null if none found.
+     */
+    private Cargo tFind(Transportable t) {
+        Cargo result = null;
+        synchronized (cargoes) {
+            for (Cargo cargo : cargoes) {
+                if (cargo.getTransportable() == t) {
+                    result = cargo;
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Gets the first cargo.
+     *
+     * @return The first cargo, or null if none found.
+     */
+    private Cargo tFirst() {
+        Cargo cargo;
+        synchronized (cargoes) {
+            cargo = (cargoes.isEmpty()) ? null : cargoes.get(0);
+        }
+        return cargo;
+    }
+
+    /**
+     * Adds a cargo to the cargoes list.
+     *
+     * @param cargo The <code>Cargo</code> to add.
+     * @param index The position to add it.
+     * @return True if the addition succeeded.
+     */
+    private boolean tAdd(Cargo cargo, int index) {
+        if (tFind(cargo.getTransportable()) != null) return false;
+        synchronized (cargoes) {
+            if (index >= 0) {
+                cargoes.add(index, cargo); 
             } else {
-                Tile tile = (carrier.getTile() != null) ? carrier.getTile()
-                    : carrier.getFullEntryLocation();
-                distToSource = getDistanceTo(t, tile, true);
-                // Carrier cant reach source
-                if (distToSource == Map.INFINITY) return false;
+                cargoes.add(cargo);
             }
-            bestSourceIndex = 0;
-            int bestSourceDistance = distToSource;
-            for (int i = 1; i < transportables.size() && bestSourceDistance > 0; i++) {
-                Transportable t1 = transportables.get(i - 1);
-                if (t1.getTransportSource() != null && t1.getTransportSource().getTile() == src.getTile()
-                    || t1.getTransportDestination() != null
-                    && t1.getTransportDestination().getTile() == src.getTile()) {
-                    bestSourceIndex = i;
-                    bestSourceDistance = 0;
-                }
-
-            }
-
-            for (int i = 1; i < transportables.size() && bestSourceDistance > 0; i++) {
-                Transportable t1 = transportables.get(i - 1);
-
-                if (isCarrying(t1)){
-                    int distToDestination = getDistanceTo(t, t1.getTransportDestination(), true);
-                    if (distToDestination == Map.INFINITY) continue;
-                    if(distToDestination <= bestSourceDistance) {
-                        bestSourceIndex = i;
-                        bestSourceDistance = distToDestination;
-                    }
-                } else{
-                    distToSource = getDistanceTo(t, t1.getTransportSource(), true);
-                    if (distToSource == Map.INFINITY) continue;
-                    if (distToSource <= bestSourceDistance) {
-                        bestSourceIndex = i;
-                        bestSourceDistance = distToSource;
-                    }
-                }
-            }
-            transportables.add(bestSourceIndex, t);
-        }
-
-        int bestDestinationIndex = bestSourceIndex + 1;
-        int bestDestinationDistance = Integer.MAX_VALUE;
-        if (bestSourceIndex == -1) {
-            bestDestinationIndex = 0;
-            if (carrier.getTile() == src.getTile()) {
-                bestDestinationDistance = 0;
-            } else {
-                int distToCarrier = getDistanceTo(t, carrier.getTile(), false);
-                if (distToCarrier != Map.INFINITY) {
-                    bestDestinationDistance = distToCarrier;
-                }
-            }
-        }
-        for (int i = Math.max(bestSourceIndex, 1); i < transportables.size() && bestDestinationDistance > 0; i++) {
-            Transportable t1 = transportables.get(i - 1);
-            if ((t1.getTransportSource() != null
-                    && t1.getTransportSource().getTile()
-                    == dst.getTile())
-                || (t1.getTransportDestination() != null
-                    && t1.getTransportDestination().getTile()
-                    == dst.getTile())) {
-                bestDestinationIndex = i;
-                bestDestinationDistance = 0;
-            }
-        }
-        for (int i = Math.max(bestSourceIndex, 1); i < transportables.size() && bestDestinationDistance > 0; i++) {
-            Transportable t1 = transportables.get(i - 1);
-            if (isCarrying(t1)){
-                int distToDestination = getDistanceTo(t, t1.getTransportDestination(), false);
-                if (distToDestination == Map.INFINITY) continue;
-                if(distToDestination <= bestDestinationDistance) {
-                    bestDestinationIndex = i;
-                    bestDestinationDistance = distToDestination;
-                }
-            } else{
-                int distToSource = getDistanceTo(t, t1.getTransportSource(), false);
-                if (distToSource == Map.INFINITY) continue;
-                if (distToSource <= bestDestinationDistance) {
-                    bestDestinationIndex = i;
-                    bestDestinationDistance =  distToSource;
-                }
-            }
-        }
-        transportables.add(bestDestinationIndex, t);
-
-        if (t.getTransport() != getAIUnit()) {
-            t.setTransport(getAIUnit());
+            tSpace();
         }
         return true;
     }
 
     /**
-     * Gets the distance to the given <code>Transportable</code>.
+     * Remove a cargo from the cargoes list.
      *
-     * @param start The <code>Location</code> to check the distance from.
-     *            <code>Europe</code> is used instead of this location if
-     *            <code>start.getTile() == null</code>.
-     * @param source Sets wether the <code>Transportable</code>'s
-     *            {@link Transportable#getTransportSource source} or
-     *            {@link Transportable#getTransportDestination destination}
-     *            should be used.
-     * @return The distance from the given <code>Location</code> to the source
-     *         or destination of the given <code>Transportable</code>.
+     * @param cargo The <code>Cargo</code> to remove.
+     * @return True if the remove succeeded.
      */
-    private int getDistanceTo(Transportable t, Location start, boolean source) {
-        // TODO: This is too expensive - find another method:
-        PathNode path = getTransportPath(t, start, source);
-        return (path == null) ? Map.INFINITY : path.getTotalTurns();
+    private boolean tRemove(Cargo cargo) {
+        boolean result;
+        synchronized (cargoes) {
+            result = cargoes.remove(cargo);
+            tSpace();
+        }
+        return result;
     }
 
     /**
-     * Checks if the mission unit is capable of naval offence.
-     *
-     * @return True if this unit can make a naval attack.
+     * Sets the spaceLeft fields in the cargoes.
+     * To be called with synchronized (cargoes).
      */
-    private boolean canAttackEnemyShips() {
+    private void tSpace() {
         final Unit carrier = getUnit();
-        return carrier.getTile() != null
-            && carrier.isNaval()
-            && carrier.isOffensiveUnit();
+        final int maxHolds = carrier.getCargoCapacity();
+        int holds = carrier.getCargoSpaceTaken();
+        for (Cargo cargo : cargoes) {
+            holds += cargo.getNewSpace();
+            cargo.setSpaceLeft(maxHolds - holds);
+        }
     }
+
+    // Medium-level cargo and target manipulation, should be kept
+    // private to TransportMission.
 
     /**
-     * Attack suitable enemy ships.
-     *
-     * @return True if this ship is still capable of its mission.
+     * Retarget the mission using the cargoes list.
      */
-    private boolean attackEnemyShips() {
-        if (!canAttackEnemyShips()) {
-            return true;
-        }
-        final Unit carrier = getUnit();
-        if (getAIUnit().hasCargo()) {
-            // Do not search for a target if we have cargo onboard.
-            return true;
-        }
-        final PathNode path = findNavalTarget(0);
-        if (path != null) {
-            Tile tile = path.getLastNode().getTile();
-            Direction d;
-            if (travelToTarget(tag, tile, null) == MoveType.ATTACK_UNIT
-                && (d = carrier.getTile().getDirection(tile)) != null) {
-                AIMessage.askAttack(getAIUnit(), d);
-            }
-        }
-        return isValid();
-    }
-
-    private boolean canAttackPlayer(Player target) {
-        return getUnit().getOwner().atWarWith(target)
-            || getUnit().hasAbility(Ability.PIRACY);
-    }
-
-    /**
-     * Finds the best target to attack within the given range.
-     *
-     * @param maxTurns The maximum number of turns the unit is allowed
-     *      to spend in order to reach the target.
-     * @return The path to the target or <code>null</code> if no target
-     *      can be found.
-     */
-    protected PathNode findNavalTarget(final int maxTurns) {
-        if (!getUnit().isOffensiveUnit()) {
-            throw new IllegalStateException("A target can only be found for offensive units. You tried with: "
-                                            + getUnit().toString());
-        }
-        if (!getUnit().isNaval()) {
-            throw new IllegalStateException("A target can only be found for naval units. You tried with: "
-                                            + getUnit().toString());
-        }
-
-        final GoalDecider gd = new GoalDecider() {
-                private PathNode bestTarget = null;
-                private int bestValue = 0;
-
-                public PathNode getGoal() {
-                    return bestTarget;
-                }
-
-                public boolean hasSubGoals() {
-                    return true;
-                }
-
-                public boolean check(final Unit unit, final PathNode pathNode) {
-                    final Tile newTile = pathNode.getTile();
-                    if (newTile == null) return false;
-                    final Unit defender = newTile.getDefendingUnit(unit);
-                    if (newTile.isLand()
-                        || defender == null
-                        || defender.getOwner() == unit.getOwner()) {
-                        return false;
-                    }
-                    if (!canAttackPlayer(defender.getOwner())) {
-                        return false;
-                    }
-                    final int value = 1 + defender.getCargoSpaceTaken();
-                    if (value > bestValue) {
-                        bestTarget = pathNode;
-                        bestValue = value;
-                    }
-                    return true;
-                }
-            };
-        return getUnit().search(getUnit().getTile(), gd,
-                                CostDeciders.avoidSettlements(),
-                                maxTurns, null);
-    }
-
-    /**
-     * Works out the next destination the carrier should go to to
-     * make progress with its transport list.
-     *
-     * @return A new <code>Destination</code>, which may be null if none
-     *     is available.
-     */
-    public Destination getNextDestination() {
-        final Unit carrier = getUnit();
-        if (transportables.isEmpty() && !carrier.hasCargo()) {
-            logger.finest(tag + " next destination = default: " + carrier);
-            return getDefaultDestination();
-        }
-
-        // Cache unavailable destinations to avoid unnecessary path finding.
-        List<Location> unavailable = new ArrayList<Location>();
-        for (Transportable t : transportables) {
-            Location dst = (isCarrying(t))
-                ? t.getTransportDestination()
-                : t.getTransportLocatable().getLocation();
-
-            // Check if we already found this destination to be inaccessible.
-            if (dst == null || unavailable.contains(dst)) continue;
-
-            PathNode path;
-            if (dst.getTile() == null) {
-                if (dst instanceof Europe
-                    && (path = findPathToEurope(carrier)) != null) {
-                    logger.finest(tag + " next destination = " + dst
-                        + " (" + ((isCarrying(t)) ? "transport" : "collect")
-                        + " " + t + "): " + carrier);
-                    return new Destination(true, path);
-                }
-            } else {
-                if (dst.getTile() == carrier.getTile()) {
-                    logger.finest(tag + " next destination = already at " + dst
-                        + " (for " + t + "): " + carrier);
-                    return new Destination(); // Already at dst!
-                }
-                if ((path = getTransportPath(t)) != null) {
-                    logger.finest(tag + " next destination = " + dst
-                        + " (" + ((isCarrying(t)) ? "transport" : "collect")
-                        + " " + t + "): " + carrier);
-                    return new Destination(false, path);
-                }
-            }
-            unavailable.add(dst);
-        }
-        logger.finest(tag + " next destination = none found: " + carrier);
-        return null;
-    }
-
-    /**
-     * Gets the current default destination for the unit of this mission.
-     *
-     * @return The default <code>Destination</code> for the unit.
-     */
-    Destination getDefaultDestination() {
-        final Unit carrier = getUnit();
-        PathNode path = null;
-
-        // If in Europe, stay in Europe
-        if (carrier.getLocation() instanceof Europe) {
-            return new Destination();
-        }
-
-        // Otherwise should be on the map
-        if (carrier.getTile() == null) {
-            throw new IllegalStateException("Unit not on the map: "
-                                            + carrier.getId());
-        }
-
-        // Already at a settlement
-        if (carrier.getSettlement() != null) {
-            return new Destination();
-        }
-
-        // Try nearest colony
-        if ((path = carrier.findOurNearestOtherSettlement()) != null) {
-            return new Destination(false, path);
-        }
-
-        // Try Europe
-        if (carrier.isNaval() && carrier.getOwner().canMoveToEurope()) {
-            if (carrier.canMoveToHighSeas()) {
-                return new Destination(true, null);
-            }
-            if ((path = findPathToEurope(carrier)) != null) {
-                return new Destination(true, path);
-            }
-        }
-
-        // Can fail intermittantly.  For example: up river and blocked in.
-        logger.warning(tag + " could not get default destination: " + carrier);
-        return null;
-    }
-
-    /**
-     * Buys cargo (units and goods) when the carrier is in <code>Europe</code>.
-     *
-     * <br>
-     * <br>
-     *
-     * <b>Warning:</b> This method can only be called when the carrier is
-     * located in {@link Europe}.
-     */
-    private void buyCargo() {
-        if (!getUnit().isInEurope()) {
-            throw new IllegalStateException("Carrier not in Europe");
-        }
-
-        final EuropeanAIPlayer aiPlayer = getEuropeanAIPlayer();
-        final AIUnit aiUnit = getAIUnit();
-        /*
-         * Add colonies containing wishes with the same destination as an item
-         * in the transport list to the "aiColonies"-list:
-         */
-        List<AIColony> aiColonies = new ArrayList<AIColony>();
-        for (int i = 0; i < transportables.size(); i++) {
-            Transportable t = transportables.get(i);
-            if (t.getTransportDestination() != null
-                && t.getTransportDestination().getTile() != null
-                && t.getTransportDestination().getTile().getColony() != null
-                && t.getTransportDestination().getTile().getColony().getOwner() == getUnit().getOwner()) {
-                AIColony ac = getAIMain().getAIColony(t.getTransportDestination().getTile().getColony());
-                aiColonies.add(ac);
-            }
-        }
-
-        /*
-         * Add the colony containing the wish with the highest value to the
-         * "aiColonies"-list:
-         */
-        EuropeanAIPlayer player = (EuropeanAIPlayer) getAIMain().getAIPlayer(getUnit().getOwner());
-        for (Wish w : player.getWishes()) {
-            if (w.getTransportable() != null) continue;
-            if (w instanceof WorkerWish && w.getDestination() instanceof Colony) {
-                WorkerWish ww = (WorkerWish) w;
-                Colony c = (Colony) ww.getDestination();
-                AIColony ac = getAIMain().getAIColony(c);
-                if (!aiColonies.contains(ac)) {
-                    aiColonies.add(ac);
-                }
-            } else if (w instanceof GoodsWish && w.getDestination() instanceof Colony) {
-                GoodsWish gw = (GoodsWish) w;
-                Colony c = (Colony) gw.getDestination();
-                AIColony ac = getAIMain().getAIColony(c);
-                if (!aiColonies.contains(ac)) {
-                    aiColonies.add(ac);
-                }
-            } else {
-                logger.warning("Unknown type of wish: " + w);
-            }
-        }
-        for (int i = 0; i < aiColonies.size(); i++) {
-            AIColony ac = aiColonies.get(i);
-            // Assuming that all colonists which can be bought in Europe take
-            // the same space: TODO: fix this
-            int space = getAvailableSpace(getUnit().getType(), getUnit().getOwner().getEurope(), ac.getColony());
-            for (Wish w : ac.getWishes()) {
-                if (space <= 0) break;
-                if (w.getTransportable() != null) continue;
-                if (w instanceof WorkerWish) {
-                    WorkerWish ww = (WorkerWish) w;
-                    AIUnit newUnit = getUnitInEurope(ww.getUnitType());
-                    if (newUnit != null) {
-                        newUnit.setMission(new WishRealizationMission(getAIMain(), newUnit, ww));
-                        ww.setTransportable(newUnit);
-                        addToTransportList(newUnit);
-                        space--;
-                    }
-                } else if (w instanceof GoodsWish) {
-                    GoodsWish gw = (GoodsWish) w;
-                    AIGoods ag = buyGoodsInEurope(gw.getGoodsType(),
-                                                  GoodsContainer.CARGO_SIZE, gw.getDestination());
-                    if (ag != null) {
-                        gw.setTransportable(ag);
-                        addToTransportList(ag);
-                        space--;
-                    }
-                } else {
-                    logger.warning("Unknown type of wish: " + w);
-                }
-            }
-        }
-
-        // Fill the transport with cheap colonists:
-        int space = getAvailableSpace();
-        while (space > 0) {
-            AIUnit newUnit = getCheapestUnitInEurope();
-            if (newUnit != null) {
-                addToTransportList(newUnit);
-                space--;
-            } else {
-                break;
-            }
-        }
-    }
-
-    /**
-     * Buys the given cargo.
-     *
-     * <br>
-     * <br>
-     *
-     * <b>Warning:</b> This method can only be called when the carrier is
-     * located in {@link Europe}.
-     *
-     * @param type The type of goods to buy.
-     * @param amount The amount of goods to buy.
-     * @param destination The <code>Location</code> to which the goods should
-     *            be transported.
-     * @return The goods.
-     */
-    public AIGoods buyGoodsInEurope(GoodsType type, int amount, Location destination) {
-        AIPlayer aiPlayer = getAIMain().getAIPlayer(getUnit().getOwner());
-        Player player = aiPlayer.getPlayer();
-        Market market = player.getMarket();
-
-        if (!player.checkGold(market.getBidPrice(type, amount))) return null;
-
-        boolean success = AIMessage.askBuyGoods(getAIUnit(), type, amount);
-        return (success)
-            ? new AIGoods(getAIMain(), getUnit(), type, amount, destination)
-            : null;
-    }
-
-    /**
-     * Returns the given type of <code>Unit</code>.
-     *
-     * <br>
-     * <br>
-     *
-     * <b>Warning:</b> This method can only be called when the carrier is
-     * located in {@link Europe}.
-     *
-     * <br>
-     * <br>
-     *
-     * This sequence is used when trying to get the unit: <br>
-     * <br>
-     * <ol>
-     * <li>Getting the unit from the docks.
-     * <li>Recruiting the unit.
-     * <li>Training the unit.
-     * </ol>
-     *
-     * @param unitType The type of {@link Unit} to be found/recruited/trained.
-     * @return The <code>AIUnit</code>.
-     */
-    private AIUnit getUnitInEurope(UnitType unitType) {
-        EuropeanAIPlayer aiPlayer = (EuropeanAIPlayer) getAIMain().getAIPlayer(getUnit().getOwner());
-        Player player = aiPlayer.getPlayer();
-        Europe europe = player.getEurope();
-
-        if (!getUnit().isInEurope()) {
-            throw new IllegalStateException("Carrier not in Europe");
-        }
-
-        // Check if the given type of unit appear on the docks:
-        Iterator<Unit> ui = europe.getUnitIterator();
-        while (ui.hasNext()) {
-            Unit u = ui.next();
-            if (unitType == null || unitType == u.getType()) {
-                return getAIMain().getAIUnit(u);
-            }
-        }
-
-        int price = -1;
-        if (unitType.hasPrice() && europe.getUnitPrice(unitType) >= 0) {
-            price = europe.getUnitPrice(unitType);
-        }
-
-        // Try recruiting the unit, unless it would be cheaper to train.
-        final String selectAbility = "model.ability.selectRecruit";
-        if (player.checkGold(player.getRecruitPrice())
-            && price > player.getRecruitPrice()
-            && player.hasAbility(selectAbility)) {
-            for (int i = 0; i < Europe.RECRUIT_COUNT; i++) {
-                if (europe.getRecruitable(i) == unitType) {
-                    return aiPlayer.recruitAIUnitInEurope(i);
-                }
-            }
-        }
-
-        // Try training the unit:
-        if (price > 0 && player.checkGold(price)) {
-            return aiPlayer.trainAIUnitInEurope(unitType);
-        }
-
-        return null;
-    }
-
-    /**
-     * Returns the cheapest unit which can be bought in <code>Europe</code>.
-     *
-     * @return The <code>AIUnit</code>.
-     */
-    private AIUnit getCheapestUnitInEurope() {
-        EuropeanAIPlayer aiPlayer = (EuropeanAIPlayer) getAIMain().getAIPlayer(getUnit().getOwner());
-        Player player = aiPlayer.getPlayer();
-        Europe europe = player.getEurope();
-
-        if (!getUnit().isInEurope()) {
-            throw new IllegalStateException("Carrier not in Europe");
-        }
-        if (!player.canRecruitUnits()) {
-            return null;
-        }
-
-        // Check if there are any units on the docks:
-        Iterator<Unit> ui = europe.getUnitIterator();
-        while (ui.hasNext()) {
-            Unit u = ui.next();
-            if (!u.isCarrier() && getAIMain().getAIUnit(u).getTransport() == null) {
-                return getAIMain().getAIUnit(u);
-            }
-        }
-
-        int priceTrained = 0;
-        UnitType cheapestTrained = null;
-        List<UnitType> unitTypes = getSpecification().getUnitTypesTrainedInEurope();
-        for (UnitType unitType : unitTypes) {
-            int price = europe.getUnitPrice(unitType);
-            if (cheapestTrained == null || price < priceTrained) {
-            	cheapestTrained = unitType;
-            	priceTrained = price;
-            }
-        }
-        // Recruit a random unit.
-        if (player.checkGold(player.getRecruitPrice())
-            && cheapestTrained != null
-            && player.getRecruitPrice() < priceTrained) {
-            // TODO: Take the best unit (Seasoned scout, pioneer, soldier etc)
-            return aiPlayer.recruitAIUnitInEurope(-1);
-        }
-
-        // Try training the unit:
-        if (cheapestTrained != null && player.checkGold(priceTrained)) {
-            return aiPlayer.trainAIUnitInEurope(cheapestTrained);
-        }
-
-        return null;
-    }
-
-    /**
-     * Returns the path the carrier should use to get/drop the given
-     * <code>Transportable</code>.
-     *
-     * @param transportable The <code>Transportable</code>.
-     * @return The path.
-     */
-    public PathNode getTransportPath(Transportable transportable) {
-        return getTransportPath(transportable, getUnit().getTile(),
-            !isCarrying(transportable));
-    }
-
-    /**
-     * Returns the path the carrier should use to get/drop the given
-     * <code>Transportable</code>.
-     *
-     * @param transportable The <code>Transportable</code>.
-     * @param start The <code>Tile</code> to search from. If
-     *            <code>start == null</code> or
-     *            <code>start.getTile() == null</code> then the carrier's
-     *            {@link Unit#getEntryLocation entry location} is used instead.
-     * @param collect True if the transportable must be collected.
-     * @return The path.
-     */
-    private PathNode getTransportPath(Transportable transportable,
-                                      Location start, boolean collect) {
-        Unit carrier = getUnit();
-        if (start == null || start.getTile() == null) {
-            start = carrier.getFullEntryLocation();
-        }
-
-        Locatable locatable = transportable.getTransportLocatable();
-        Location destination = (collect) ? locatable.getLocation()
-            : transportable.getTransportDestination();
-        if (destination == null) return null;
-        if (destination.getTile() == null) {
-            return (destination instanceof Europe)
-                ? findPathToEurope(carrier, start.getTile())
-                : null;
-        }
-
+    private void retarget() {
+        Cargo cargo = tFirst();
         PathNode path;
-        if (locatable instanceof Unit && isCarrying(transportable)) {
-            path = ((Unit)locatable).findPath(start.getTile(),
-                destination.getTile(), carrier, null);
-            if (path == null || path.getTransportDropNode().previous == null) {
-                path = null;
+        target = (cargo != null) ? cargo.getTarget()
+            : ((path = getTrivialPath()) == null) ? null
+            : upLoc(path.getLastNode().getLocation());
+    }
+
+    /**
+     * Count distinct non-adjacent destinations in a list of cargoes.
+     *
+     * @return The number of distinct destinations.
+     */
+    private int destinationCount() {
+        Location now = null;
+        int ret = 0;
+        for (Cargo cargo : tCopy()) {
+            if (now == null) {
+                now = cargo.getTarget();
+            } else if (Map.isSameLocation(now, cargo.getTarget())) {
+                ; // do nothing
             } else {
-                path.getTransportDropNode().previous.next = null;
+                ret++;
+                now = cargo.getTarget();
             }
+        }
+        return ret;
+    }                
+
+    /**
+     * How many more destinations are desirable on the current cargoes list?
+     * Must be public!  This is checked in European AI player.
+     *
+     * @return The number of desired extra destinations.
+     */
+    public int destinationCapacity() {
+        return DESTINATION_UPPER_BOUND - destinationCount();
+    }
+
+    /**
+     * If this carrier is the current carrier of a transportable, drop it.
+     *
+     * @param t The <code>Transportable</code> to check.
+     * @param reason A reason for changing the carrier.
+     */
+    private void dropTransportable(Transportable t, String reason) {
+        AIUnit carrier = getAIUnit();
+        if (t.getTransport() == carrier) t.setTransport(null, reason);
+    }
+
+    /**
+     * If this carrier is the not the current carrier of a
+     * transportable, make it so.
+     *
+     * @param t The <code>Transportable</code> to check.
+     * @param reason A reason for changing the carrier.
+     */
+    private void takeTransportable(Transportable t, String reason) {
+        AIUnit carrier = getAIUnit();
+        if (t.getTransport() != carrier) t.setTransport(carrier, reason);
+    }
+
+    /**
+     * Wrap up the compatible cargoes in a list.
+     * O(N^2) alas.
+     *
+     * @return A wrapped list of cargoes.
+     */
+    private List<Cargo> wrapCargoes() {
+        List<Cargo> ts = tCopy();
+        String logMe = ":";
+        for (Cargo t : ts) logMe += "\n" + t.toString();
+        try {
+            for (int i = 0; i < ts.size(); i++) {
+                Cargo head = ts.get(i);
+                while (i+1 < ts.size() && head.couldWrap(ts.get(i+1))) {
+                    head.wrap(ts.remove(i+1));
+                }
+            }
+        } catch (Exception e) {
+            logMe = e.getMessage() + logMe;
+            throw new IllegalStateException(logMe);
+        }
+        return ts;
+    }
+
+    /**
+     * Unwrap a wrapped list of cargoes.
+     *
+     * @param ts The list of <code>Cargo</code>s to unwrap.
+     * @return The unwrapped list of cargoes.
+     */
+    private List<Cargo> unwrapCargoes(List<Cargo> ts) {
+        for (int i = 0; i < ts.size(); i++) {
+            Cargo t = ts.get(i);
+            if (t.hasWrapped()) {
+                List<Cargo> tl = t.unwrap();
+                ts.addAll(i+1, tl);
+                i += tl.size();
+            }
+        }
+        return ts;
+    }
+
+    /**
+     * Clears all the cargoes.
+     *
+     * @return A message about the cargoes being cleared.
+     */
+    private String clearCargoes() {
+        String log = "cargoes cleared: ";
+        for (Cargo cargo : tClear()) {
+            dropTransportable(cargo.getTransportable(), "cleared");
+            log += " " + cargo;
+        }
+        return log;
+    }
+
+    /**
+     * For a given transportable, work out where the carrier has to go to
+     * advance the cargo (target), and what to do there (mode), allowing
+     * a new <code>Cargo</code> to be defined.
+     *
+     * AIUnit cargo is harder than AIGoods, because AIUnits might have their
+     * own inland paths, and thus we need to consider drop nodes.
+     *
+     * @param t The <code>Transportable</code> to consider.
+     * @return A new <code>Cargo</code> defining the action to take
+     *     with the <code>Transportable</code>, or null if impossible.
+     */
+    public Cargo makeCargo(Transportable t) {
+        final Unit carrier = getUnit();
+        if (t.getTransportDestination() == null
+            || !t.carriableBy(getUnit())) return null;
+        Cargo cargo = new Cargo(t, carrier);
+        return (cargo.setTarget()) ? cargo : null;
+    }
+
+    /**
+     * Add the given Cargo to the cargoes list.
+     *
+     * @param t The <code>Cargo</code> to add.
+     * @param index The index of where to add the cargo.
+     * @return True if the cargo was added.
+     */
+    private boolean addCargo(Cargo cargo, int index) {
+        boolean result = tAdd(cargo, index);
+        if (result) {
+            takeTransportable(cargo.getTransportable(), "added");
+            retarget();
+        }
+
+        if (result) {
+            logger.finest(tag + " added"
+                + " (at " + ((index < 0) ? "end" : Integer.toString(index))
+                + "): " + toFullString());
         } else {
-            path = carrier.findPath(start.getTile(), destination.getTile(),
-                                    null, null);
+            logger.finest(tag + " add failed: " + toFullString());
         }
-        return path;
+        return result;
     }
 
     /**
-     * Returns the available space for the given <code>Transportable</code>.
+     * Removes the given Cargo from the cargoes list.
      *
-     * @param t The <code>Transportable</code>
-     * @return The space available for <code>Transportable</code>s with the
-     *         same source and
-     *         {@link Transportable#getTransportDestination destination}.
+     * @param t The <code>Transportable</code> to remove.
+     * @param reason The reason for its removal (if null, do not log, it has
+     *     already been mentioned).
+     * @return True if the removal succeeded.
      */
-    public int getAvailableSpace(Transportable t) {
-        UnitType type = (t.getTransportLocatable() instanceof Unit)
-            ? ((Unit)t.getTransportLocatable()).getType()
-            : null;
-        return getAvailableSpace(type, t.getTransportSource(),
-                                 t.getTransportDestination());
-    }
-
-    /**
-     * Returns the available space for the given type of <code>Unit</code> at
-     * the given <code>Location</code>.
-     *
-     * @param unitType The type of {@link Unit} or <code>null</code> for
-     *            {@link Goods}
-     * @param source The source for the unit. This is where the unit is
-     *            presently located.
-     * @param destination The destination for the unit.
-     * @return The space available
-     */
-    public int getAvailableSpace(UnitType unitType, Location source,
-                                 Location destination) {
-        // TODO: Implement this method properly:
-        return Math.max(0, getUnit().getSpaceLeft() - transportables.size());
-    }
-
-    /**
-     * Returns the available space for any type of unit going to any type of
-     * location.
-     *
-     * @return The space available
-     */
-    public int getAvailableSpace() {
-        // TODO: Implement this method properly:
-        return Math.max(0, getUnit().getSpaceLeft() - transportables.size());
-    }
-
-    /**
-     * Loads and unloads any <code>Transportable</code>.
-     *
-     * @return <code>true</code> if something has been loaded/unloaded and
-     *         <code>false</code>otherwise.
-     */
-    private boolean restockCargoAtDestination() {
-        return unloadCargoAtDestination() || loadCargoAtDestination();
-    }
-
-    /**
-     * Unloads any <code>Transportable</code>s which have reached their
-     * destination.
-     *
-     * @return <code>true</code> if something has been unloaded and
-     *         <code>false</code>otherwise.
-     */
-    private boolean unloadCargoAtDestination() {
-        Unit carrier = getUnit();
-        boolean transportablesChanged = false;
-
-        // Sanitation
-        if (carrier.isAtSea()) return false;
-
-        // Make a copy for iteration, the main list may change inside the loop
-        for (Transportable t : new ArrayList<Transportable>(transportables)) {
-            if (!isCarrying(t)) continue; // To pickup, ignore
-
-            if (t instanceof AIUnit) {
-                AIUnit au = (AIUnit) t;
-                Unit u = au.getUnit();
-                Mission mission = au.getMission();
-                String reason = null;
-                boolean unload = false;
-                Tile destTile;
-
-                if (mission == null || !mission.isValid()) {
-                    // Get rid of the unit ASAP if it has no mission
-                    unload = true;
-                    reason = "No valid mission";
-
-                } else if (au.getTransportDestination() == null) {
-                    // Get rid of the unit ASAP if it has no destination
-                    unload = true;
-                    reason = "No destination";
-
-                } else if (au.getTransportDestination() instanceof Europe) {
-                    if (carrier.isInEurope()) {
-                        // Unload at destination of Europe
-                        unload = true;
-                        reason = "Arrived in Europe";
-                    }
-
-                } else if ((destTile = au.getTransportDestination().getTile())
-                           != null) {
-                    PathNode p;
-                    Tile carrierTile = carrier.getTile();
-                    if (carrierTile == null) {
-                        ;// Get back on the map
-                    } else if (destTile == carrierTile) {
-                        // Unload at destination tile
-                        unload = true;
-                        reason = "Arrived at " + destTile;
-                    } else if ((p = u.findPath(carrierTile, destTile,
-                                               carrier, null)) != null) {
-                        final PathNode dropNode = p.getTransportDropNode();
-                        Tile dropTile = (dropNode == null) ? null
-                            : dropNode.getTile();
-                        if (dropTile != null
-                            && carrierTile.getDirection(dropTile) != null) {
-                            // Next to the drop node, proceed with mission
-                            mission.doMission();
-                            reason = "Next to drop node " + dropTile;
-                        }
-                    } else {
-                        // Destination has become unreachable
-                        unload = true;
-                        reason = "No path to destination: " + destTile;
-                    }
-                }
-
-                // If unloading, do not drop transported unit into the sea
-                if (unload && (carrier.getSettlement() != null
-                               || carrier.isInEurope())) {
-                    unitLeavesShip(au);
-                }
-                // If unload or doMission succeeded, update the transportables
-                if (u.getLocation() != carrier) {
-                    removeFromTransportList(au);
-                    while (transportables.remove(au)); // Make sure its gone!
-                    transportablesChanged = true;
-                    logger.finest(tag + " completed unloading (" + reason
-                        + ") " + u + ": " + this);
-                }
-
-            } else if (t instanceof AIGoods) {
-                AIGoods ag = (AIGoods) t;
-                String locStr = (carrier.isInEurope()) ? "Europe"
-                    : (carrier.getLocation().getSettlement() != null)
-                    ? carrier.getLocation().getSettlement().getName()
-                    : carrier.getLocation().toString();
-                if (ag.getTransportDestination() == null ||
-                    (ag.getTransportDestination() != null
-                     && ag.getTransportDestination().getTile() == carrier.getLocation().getTile())) {
-                    boolean success = false;
-                    if (carrier.isInEurope()) {
-                        success = sellCargoInEurope(ag.getGoods());
-                        if (success) {
-                            removeFromTransportList(ag);
-                            ag.dispose();
-                            transportablesChanged = true;
-                        }
-                    } else {
-                        success = unloadCargoInColony(ag.getGoods());
-                        if (success) {
-                            removeFromTransportList(ag);
-                            ag.dispose();
-                            transportablesChanged = true;
-                        }
-                    }
-                    logger.finest(tag + ((success) ? " completed" : " failed")
-                        + " unloading " + ag + "/" + ag.getGoods()
-                        + " at " + locStr + ": " + carrier);
-
-                }
-            } else {
-                logger.warning(tag + " unknown Transportable " + t
-                    + ": " + carrier);
-            }
-            // Kick the colony if the unit or goods available changes.
-            Colony colony = carrier.getColony();
-            if (colony != null) {
-                colony.firePropertyChange(Colony.REARRANGE_WORKERS, true, false);
-            }
+    private boolean removeCargo(Cargo cargo, String reason) {
+        boolean result = tRemove(cargo);
+        if (result) {
+            dropTransportable(cargo.getTransportable(), reason);
+            retarget();
         }
 
-        return transportablesChanged;
+        if (result) {
+            logger.finest(tag + " removed (" + reason + "): " + toFullString());
+        } else {
+            logger.finest(tag + " remove failed: " + toFullString());
+        }
+        return result;
     }
 
     /**
-     * Loads any <code>Transportable</code>s being in range of the carrier.
+     * Incrementally queue a cargo to the cargoes list.  Try
+     * place it with other cargoes with the same target, but do not
+     * break the space restrictions.  If this does not work, it has
+     * to go at the end.
      *
-     * @return <code>true</code> if something has been unloaded and
-     *         <code>false</code>otherwise.
+     * @param cargo The new <code>Cargo</code> to add.
+     * @param requireMatch Fail if an existing destination is not matched.
+     * @return True if the cargo was queued.
      */
-    private boolean loadCargoAtDestination() {
-        Unit carrier = getUnit();
-        if (carrier.isAtSea()) return false;
+    private boolean queueCargo(Cargo cargo, boolean requireMatch) {
+        final Unit carrier = getUnit();
+        final int maxHolds = carrier.getCargoCapacity();
+        final List<Cargo> ts = tCopy();
+        final int newSpace = cargo.getNewSpace();
+        final Transportable t = cargo.getTransportable();
 
-        // TODO: Add code for rendez-vous.
+        // Match an existing target?
+        int candidate = -1, holds;
+        outer: for (int i = 0; i < ts.size(); i++) {
+            Cargo tr = ts.get(i);
+            if (tr.getTarget() == cargo.getTarget()) {
+                for (int j = i; j < ts.size(); j++) {
+                    holds = newSpace + ts.get(j).getSpaceLeft();
+                    if (holds < 0 || holds > maxHolds) continue outer;
+                }
+                if (tr.getTransportable().getTransportPriority()
+                    < t.getTransportPriority()) {
+                    return addCargo(cargo, i);
+                }
+                candidate = i+1;
+            } else if (candidate >= 0) {
+                return addCargo(cargo, candidate);
+            }
+        }
+    
+        if (requireMatch) return false;
+        if (!ts.isEmpty() && !isCarrying(t)) {
+            holds = ts.get(ts.size()-1).getSpaceLeft() + newSpace;
+            if (holds < 0 || holds > maxHolds) return false;
+        }
+        return addCargo(cargo, -1);
+    }
 
-        boolean transportablesChanged = false;
-        Iterator<Transportable> tli = transportables.iterator();
-        while (tli.hasNext()) {
-            if (!carrier.hasSpaceLeft()) break;
-            Transportable t = tli.next();
-            if (isCarrying(t)) continue; // To deliver, ignore.
+    /**
+     * Retarget an existing cargo.
+     *
+     * @param cargo The <code>Cargo</code> to retarget.
+     * @return True if the retargeting succeeded.
+     */
+    private boolean retargetCargo(Cargo cargo) {
+        Transportable t = cargo.getTransportable();
+        Location dst = t.getTransportDestination();
+        int result = 0;
+        if (tRemove(cargo)) {
+            result++;
+            Cargo next = makeCargo(t);
+            if (next != null) {
+                cargo = next;
+                result++;
+                if (queueCargo(cargo, false)) {
+                    takeTransportable(t, "retarget/queued");
+                    result++;
+                } else {
+                    dropTransportable(t, "retarget/queuing failed");
+                }
+            }
+        }
+        retarget();
 
-            if (t instanceof AIUnit) {
-                AIUnit au = (AIUnit) t;
-                Unit u = au.getUnit();
-                if (u.isAtSea()) {
+        switch (result) {
+        case 0:
+            logger.finest(tag + " retarget failed to remove " + cargo
+                + ": " + toFullString());
+            break;
+        case 1:
+            logger.finest(tag + " retarget failed to remake " + cargo
+                + ": " + toFullString());
+            break;
+        case 2:
+            logger.finest(tag + " retarget failed to requeue " + cargo
+                + ": " + toFullString());
+            break;
+        case 3:
+            logger.finest(tag + " retarget succeeded for " + cargo
+                + " to " + dst + ": " + toFullString());
+            break;
+        }
+        return result == 3;
+    }
+
+    /**
+     * Checks for invalid cargoes, and units and goods on board but
+     * not in the cargoes list.  On exit from this routine, every
+     * cargo on board should be on the cargoes list but the list is
+     * not necessarily going to be in a sensible order.
+     */
+    private void checkCargoes() {
+        final Unit carrier = getUnit();
+        final AIUnit aiCarrier = getAIUnit();
+        List<Unit> unitsPresent = new ArrayList<Unit>(carrier.getUnitList());
+        List<Goods> goodsPresent
+            = new ArrayList<Goods>(carrier.getGoodsContainer().getCompactGoods());
+        // Check all cargoes are valid.
+        // Collect any non-cargo units and goods.
+        for (Cargo cargo : tCopy()) {
+            Transportable t = cargo.getTransportable();
+            String reason = invalidReason(aiCarrier, cargo.getTarget());
+            if (reason != null) {
+                removeCargo(cargo, reason);
+                continue;
+            }
+            Locatable l = t.getTransportLocatable();
+            if (l == null) {
+                removeCargo(cargo, "null locatable: " + t.toString());
+                continue;
+            }
+            Location tLoc = l.getLocation();
+            if (tLoc instanceof Unit && (Unit)tLoc != carrier) {
+                // On another carrier!
+                removeCargo(cargo, "carrier usurped");
+                continue;
+            }
+            PathNode path = carrier.findPath(cargo.getTarget());
+            if (path == null && !cargo.retry()) {
+                removeCargo(cargo, "no path " + cargo.getTarget());
+                continue;
+            }
+            // Redo the cargo in case the pickup/drop node needs
+            // updating in response to changes in moves left or the
+            // map situation.
+            if (carrier.getTile() != null) {
+                if (!cargo.setTarget() && !cargo.retry()) {
+                    removeCargo(cargo, "can not progress "
+                        + t.getTransportDestination());
                     continue;
-                } else if (carrier.getTile() == u.getTile()) {
-                    if (carrier.getTile() != null
-                        || (carrier.isInEurope() && u.isInEurope())) {
-                        // Drop the transportable from the transport
-                        // list without checking if embark succeeds or
-                        // not--- if it succeeds all is well, if it
-                        // fails it is likely to fail again for the
-                        // same unknown reason so we might as well
-                        // give up on it and do something else with
-                        // the carrier.  Similarly also for the goods
-                        // loads below.
-                        if (u.getLocation() instanceof WorkLocation
-                            && ((WorkLocation)u.getLocation()).getColony().getUnitCount() <= 1) {
-                            ; // Do not load sole units in colonies.
-                            // TODO: do this better.
-                        } else {
-                            AIMessage.askEmbark(getAIUnit(), u, null);
-                        }
-                        tli.remove();
-                        transportablesChanged = true;
-                    } else {
-                        throw new IllegalStateException("Bogus"
-                            + " carrier at: " + carrier.getLocation()
-                            + " unit at: " + u.getLocation());
-                    }
                 }
-            } else if (t instanceof AIGoods) {
-                AIGoods ag = (AIGoods) t;
-                if (carrier.getTile() == ag.getGoods().getTile()) {
-                    if (carrier.getTile() != null) {
-                        AIMessage.askLoadCargo(getAIUnit(), ag.getGoods());
-                        tli.remove();
-                        transportablesChanged = true;
-                    } else if (carrier.isInEurope()) {
-                        GoodsType goodsType = ag.getGoods().getType();
-                        int goodsAmount = ag.getGoods().getAmount();
-                        if (AIMessage.askBuyGoods(getAIUnit(), goodsType,
-                                                  goodsAmount)) {
-                            ag.setGoods(new Goods(getGame(), carrier,
-                                                  goodsType, goodsAmount));
-                        }
-                        tli.remove();
-                        transportablesChanged = true;
-                    } else {
-                        throw new IllegalStateException("Bogus carrier at: "
-                            + carrier.getLocation());
-                    }
-                }
-            } else {
-                logger.warning(tag + " unknown Transportable " + t
-                    + ": " + carrier);
             }
-            // Kick the colony if the unit or goods available changes.
-            Colony colony = carrier.getColony();
-            if (colony != null) {
-                colony.firePropertyChange(Colony.REARRANGE_WORKERS, true, false);
+            
+            if (t instanceof AIUnit) {
+                unitsPresent.remove(((AIUnit)t).getUnit());
+
+            } else if (t instanceof AIGoods) {
+                Goods goods = ((AIGoods)t).getGoods();
+                int i = 0;
+                while (i < goodsPresent.size()) {
+                    Goods g = goodsPresent.get(i);
+                    if (goods.getType() == g.getType()) {
+                        // TODO: handle size?
+                        goodsPresent.remove(i);
+                    } else {
+                        i++;
+                    }
+                }
+
+            } else throw new IllegalStateException("Bogus transportable: "+t);
+        }
+
+        // Ask the parent player to retarget transportables that are not
+        // on the list.
+        EuropeanAIPlayer euaip = getEuropeanAIPlayer();
+        List<Transportable> drop = new ArrayList<Transportable>();
+        for (Unit u : unitsPresent) {
+            AIUnit aiu = getAIMain().getAIUnit(u);
+            if (aiu == null) throw new IllegalStateException("Bogus:" + u);
+            logger.warning(tag + " found unexpected unit " + aiu
+                + " aboard: " + toFullString());
+            if (!euaip.retargetCargo(aiu, aiCarrier, tCopy())
+                || !queueTransportable(aiu, false)) {
+                drop.add(aiu);
+            }
+        }
+        for (Goods g : goodsPresent) {
+            AIGoods aig = new AIGoods(getAIMain(), carrier, g.getType(),
+                g.getAmount(), null);
+            logger.warning(tag + " found unexpected goods " + aig
+                + " aboard: " + toFullString());
+            if (!euaip.retargetCargo(aig, aiCarrier, tCopy())
+                || !queueTransportable(aig, false)) {
+                drop.add(aig);
             }
         }
 
-        return transportablesChanged;
+        if (!drop.isEmpty()) {
+            PathNode path = getTrivialPath();
+            if (path == null) {
+                while (!drop.isEmpty()) {
+                    Transportable t = drop.remove(0);
+                    dumpTransportable(t, true);
+                }
+            } else {
+                String log = tag + " will dump ";
+                for (Transportable t : drop) log += " " + t;
+                Location end = path.getLastNode().getLocation();
+                logger.warning(log + " at " + ((FreeColGameObject)end)
+                    + ": " + toFullString());
+                while (!drop.isEmpty()) {
+                    Transportable t = drop.remove(0);
+                    Cargo cargo = new Cargo(t, carrier, end);
+                    queueCargo(cargo, false);
+                }
+            }
+        }
     }
 
     /**
-     * Convenience wrapper to find a path to Europe for this unit.
-     * Does *not* use a carrier, a naval unit is expected.
+     * Check a <code>Cargo</code> for continued validity and
+     * whether action is needed at the current location.
      *
-     * @param unit The <code>Unit</code> to use.
-     * @return A path to Europe, or null if none found.
+     * @param cargo The <code>Cargo</code> to check.
+     * @return TCONTINUE if the <code>Cargo</code> should continue,
+     *      TDONE if it has completed,
+     *      TFAIL if it has failed,
+     *      TNEXT if it has progressed to the next stage,
+     *      TRETRY if a blockage has occurred and it should be retried,
      */
-    private PathNode findPathToEurope(Unit unit) {
-        return unit.findPath(unit.getLocation(),unit.getOwner().getEurope(),
-                             null, null);
+    private CargoResult tryCargo(Cargo cargo) {
+        final Unit carrier = getUnit();
+        final Location here = carrier.getLocation();
+        final Transportable t = cargo.getTransportable();
+        final Locatable l = t.getTransportLocatable();
+        AIUnit aiu;
+        AIGoods aig;
+
+        switch (cargo.getMode()) {
+        case LOAD:
+            if (!Map.isSameLocation(here, cargo.getTarget())) {
+                return CargoResult.TCONTINUE;
+            } else if (carrier.findPath(t.getTransportDestination()) == null) {
+                return CargoResult.TRETRY;
+            }
+            if (t instanceof AIUnit) {
+                aiu = (AIUnit)t;
+                if (!aiu.joinTransport(carrier, null)) {
+                    logger.warning(tag + "failed to load " + aiu
+                        + " at " + here + ": " + this);
+                    return CargoResult.TFAIL;
+                }
+            } else if (t instanceof AIGoods) {
+                aig = (AIGoods)t;
+                if (!aig.joinTransport(carrier, null)) {
+                    logger.warning(tag + "failed to load " + aig
+                        + " at " + here + ": " + this);
+                    return CargoResult.TFAIL;
+                }
+            } else throw new IllegalStateException("Bogus transportable: "+t);
+
+            logger.finest(tag + " loaded " + t + " at " + here
+                + ": " + this);
+            return (cargo.setTarget()) ? CargoResult.TNEXT
+                : CargoResult.TFAIL;
+
+        case UNLOAD:
+            if (!Map.isSameLocation(here, cargo.getTarget())) {
+                return CargoResult.TCONTINUE;
+            }
+            if (t instanceof AIUnit) {
+                aiu = (AIUnit)t;
+                if (aiu.leaveTransport(null)) {
+                    logger.finest(tag + " completed (unload) of " + aiu
+                        + " at " + here + ": " + this);
+                } else {
+                    logger.warning(tag + " failed to unload " + aiu
+                        + " at " + here + ": " + this);
+                    return CargoResult.TFAIL;
+                }
+                
+            } else if (t instanceof AIGoods) {
+                aig = (AIGoods)t;
+                if (aig.leaveTransport(null)) {
+                    logger.finest(tag + " completed (unload) of " + aig
+                        + " at " + here + ": " + this);
+                } else {
+                    logger.warning(tag + " failed to unload " + aig
+                        + " at " + here + ": " + this);
+                    return CargoResult.TFAIL;
+                }
+            } else throw new IllegalStateException("Bogus transportable: "+t);
+            return CargoResult.TDONE;
+
+        case PICKUP:
+            if (!Map.isSameLocation(here, cargo.getTarget())) {
+                return CargoResult.TCONTINUE;
+            } else if (carrier.findPath(t.getTransportDestination()) == null) {
+                return CargoResult.TRETRY;
+            }
+            aiu = (AIUnit)t;
+            if (isCarrying(t)) {
+                logger.finest(tag + " picked up " + aiu + " at " + here
+                    + ": " + this);
+                return (cargo.setTarget()) ? CargoResult.TNEXT
+                    : CargoResult.TFAIL;
+            }
+            String reason = aiu.getMission().invalidReason();
+            if (reason != null) {
+                logger.warning(tag + " unit mission failed(" + reason + ")"
+                    + " for " + t + ": " + this);
+                return CargoResult.TFAIL;
+            }
+            return CargoResult.TCONTINUE;
+
+        case DROPOFF:
+            if (!Map.isSameLocation(here, cargo.getTarget())) {
+                return CargoResult.TCONTINUE;
+            }
+            aiu = (AIUnit)t;
+            if (!isCarrying(t)) {
+                logger.finest(tag + " completed (dropoff) " + aiu
+                    + " at " + carrier.getLocation() + ": " + this);
+                return CargoResult.TDONE;
+            }
+            reason = aiu.getMission().invalidReason();
+            if (reason != null) {
+                logger.warning(tag + "unit mission failed(" + reason + ")"
+                    + " for " + t + ": " + this);
+                return CargoResult.TFAIL;
+            }
+            return CargoResult.TCONTINUE;
+
+        case DUMP:
+            return (dumpTransportable(t, false)) ? CargoResult.TDONE
+                : CargoResult.TCONTINUE;
+        }
+        throw new IllegalStateException("Can not happen");
     }
 
     /**
-     * Convenience wrapper to find a path to Europe for this unit.
-     * Does *not* use a carrier, a naval unit is expected.
+     * Calculates a score for a proposed list of
+     * <code>Cargo</code>s using the current unit.  Disallows
+     * routes that would overfill the carrier.
      *
-     * @param unit The <code>Unit</code> to use.
-     * @param start The <code>Location</code> to start from.
-     * @return A path to Europe, or null if none found.
+     * Useful for comparing proposed cargo delivery routes.  The
+     * score is based primarily on the number of turns it takes, but
+     * to break ties we also consider the hold*turn product to reduce
+     * the risk of losses due to enemy action.
+     *
+     * @param initialLocation The initial <code>Location</code>.
+     * @param order An ordering of <code>Cargo</code>s.
+     * @return A score for the cargo ordering.
      */
-    private PathNode findPathToEurope(Unit unit, Location start) {
-        return unit.findPath(start, unit.getOwner().getEurope(),
-                             null, null);
+    private float scoreCargoOrder(Location initialLocation, List<Cargo> order) {
+        final Unit carrier = getUnit();
+        final int maxHolds = carrier.getCargoCapacity();
+        int holds = carrier.getCargoSpaceTaken();
+        Location now = initialLocation;
+        float totalHoldTurns = 0.0f;
+        float totalTurns = 0.0f;
+        float favourEarly = 1.0f;
+
+        for (Cargo cargo : order) {
+            int turns = carrier.getTurnsToReach(now, cargo.getTarget());
+            totalTurns += turns; // Might be INFINITY!
+            totalHoldTurns += holds * turns * favourEarly;
+            holds += cargo.getNewSpace();
+            if (holds < 0 || holds > maxHolds) return -1.0f;
+            now = cargo.getTarget();
+            favourEarly += 0.1f; // Slight preference for large loads first
+        }
+        return totalTurns + 0.001f * totalHoldTurns;
     }
+
+    /**
+     * Sets the current target.
+     * Tries all permutations of cargoes and picks the fastest/safest one.
+     *
+     * Leaves the cargoes in the order they are expected to
+     * execute, with valid spaceLeft values.
+     */
+    private void optimizeCargoes() {
+        checkCargoes();
+        // We wrap/unwrap the list to minimize the number of nodes
+        // that need consideration.
+        List<Cargo> ts = wrapCargoes();
+        List<Cargo> best = null;
+        if (1 < ts.size() && ts.size() <= DESTINATION_UPPER_BOUND) {
+            // Try all the permutations of visiting order for the
+            // locations, and set the target to the first location
+            // of the best scoring route.
+            //
+            // The target may get recomputed every time a cargo change
+            // occurs, so there is no guarantee that the route chosen
+            // here is actually executed.  This seems rather
+            // inefficient, but we need to be adaptable.
+            //
+            final Location current = getUnit().getLocation();
+            float bestValue = INFINITY;
+            for (List<Cargo> tl : Utils.getPermutations(ts)) {
+                float value = scoreCargoOrder(current, tl);
+                if (value > 0.0f && bestValue > value) {
+                    bestValue = value;
+                    best = tl;
+                }
+            }
+        }
+        if (best != null) {
+            tSet(unwrapCargoes(best));
+            tSpace();
+        } else {
+            tSet(unwrapCargoes(ts));
+        }
+        retarget();
+    }
+
+    // End of cargoes handling.
+
+    // Publically accessible routines to manipulate a Transportable.
+
+    /**
+     * Adds the given <code>Transportable</code> to the cargo
+     * list.
+     *
+     * @param t The <code>Transportable</code> to add.
+     * @param index The index of where to add the cargo.
+     * @return True if the <code>Transportable</code> was added.
+     */
+    private boolean addTransportable(Transportable t, int index) {
+        if (tFind(t) != null) return false;
+
+        AIUnit oldCarrier = t.getTransport();
+        if (oldCarrier.getMission() instanceof TransportMission) {
+            ((TransportMission)oldCarrier.getMission())
+                .removeTransportable(t, "transferring to " + getUnit());
+        }
+
+        Cargo cargo = makeCargo(t);
+        return (cargo == null) ? false : addCargo(cargo, index);
+    }
+
+    /**
+     * Removes the given <code>Transportable</code> from the cargo list.
+     *
+     * @param t The <code>Transportable</code> to remove.
+     * @param reason The reason for its removal (if null, do not log, it has
+     *     already been mentioned).
+     * @return True if the removal succeeded.
+     */
+    public boolean removeTransportable(Transportable t, String reason) {
+        Cargo cargo = tFind(t);
+        return (cargo == null) ? false : removeCargo(cargo, reason);
+    }
+
+    /**
+     * Retargets a transportable that should already be on being transported.
+     *
+     * @param t The <code>Transportable</code> to retarget.
+     * @return True if the retargeting succeeded.
+     */
+    public boolean retargetTransportable(Transportable t) {
+        Cargo cargo = tFind(t);
+        return (cargo == null) ? false : retargetCargo(cargo);
+    }
+
+    /**
+     * Wrapper for queueCargo.
+     * Public for the benefit of EuropeanAIPlayer.allocateTransportables.
+     *
+     * @param t The <code>Transportable</code> to add.
+     * @param requireMatch Fail if an existing destination is not matched.
+     * @return True if the transportable was queued.
+     */
+    public boolean queueTransportable(Transportable t, boolean requireMatch) {
+        Cargo cargo = makeCargo(t);
+        return (cargo == null) ? false : queueCargo(cargo, requireMatch);
+    }
+
+    /**
+     * Gets rid of a transportable, possibly dumping it.
+     *
+     * @param t The <code>Transportable</code> to dump.
+     * @param force If true, disband units or dump goods at sea.
+     * @return True if the transportable was dumped.
+     */
+    private boolean dumpTransportable(Transportable t, boolean force) {
+        final Unit carrier = getUnit();
+        final AIUnit aiCarrier = getAIUnit();
+        final Location here = carrier.getLocation();
+        Locatable l = t.getTransportLocatable();
+        boolean canLeave = carrier.isInEurope()
+            || carrier.getLocation().getSettlement() != null;
+
+        if (t instanceof AIUnit) {
+            AIUnit aiu = (AIUnit)t;
+            Direction direction = null;
+            if (!canLeave) {
+                for (Tile tile : carrier.getTile().getSurroundingTiles(1)) {
+                    if (tile.isLand()
+                        && aiu.getUnit().getMoveType(tile).isProgress()) {
+                        direction = carrier.getTile().getDirection(tile);
+                        canLeave = true;
+                        break;
+                    }
+                }
+            }
+            if (canLeave && aiu.leaveTransport(direction)) {
+                logger.finest(tag + " completed (dump) of " + aiu
+                    + " at " + here + ": " + toFullString());
+            } else {
+                if (!force) {
+                    logger.warning(tag + " failed to dump " + aiu
+                        + " at " + here + ": " + toFullString());
+                    return false;
+                }
+                logger.warning(tag + " forcing dump(disband) " + aiu
+                    + " at " + here + ": " + toFullString());
+                return AIMessage.askDisband(aiu);
+            }
+                
+        } else if (t instanceof AIGoods) {
+            AIGoods aig = (AIGoods)t;
+            if (canLeave && aig.leaveTransport(null)) {
+                logger.finest(tag + " completed (dump) of " + aig
+                    + " at " + here + ": " + toFullString());
+            } else {
+                if (!force) {
+                    logger.warning(tag + " failed to dump " + aig
+                        + " at " + here + ": " + toFullString());
+                    return false;
+                }
+                logger.warning(tag + " forcing dump(goods) " + aig
+                    + " at " + here + ": " + toFullString());
+                return AIMessage.askUnloadCargo(aiCarrier, aig.getGoods());
+            }
+
+        } else throw new IllegalStateException("Bogus transportable: " + t);
+
+        return true;
+    }
+
+    // End of public Transportable manipulations
 
 
     // Fake Transportable interface
@@ -1310,6 +1369,7 @@ public class TransportMission extends Mission {
      *
      * @return Always null, we never transport carrier units.
      */
+    @Override
     public Tile getTransportDestination() {
         return null;
     }
@@ -1317,8 +1377,9 @@ public class TransportMission extends Mission {
     /**
      * Returns the priority of getting the unit to the transport destination.
      *
-     * @return 0.
+     * @return 0, the carrier is never transported.
      */
+    @Override
     public int getTransportPriority() {
         return 0;
     }
@@ -1332,7 +1393,7 @@ public class TransportMission extends Mission {
      * @return The mission target.
      */
     public Location getTarget() {
-        return null; // TODO
+        return target;
     }
 
     /**
@@ -1342,19 +1403,77 @@ public class TransportMission extends Mission {
      * @return A reason why the mission would be invalid with the unit,
      *     or null if none found.
      */
-    private static String invalidTransportReason(AIUnit aiUnit) {
-        final Unit unit = aiUnit.getUnit();
-        return (!unit.isCarrier()) ? "no-longer-a-carrier"
+    private static String invalidMissionReason(AIUnit aiUnit) {
+        String reason = invalidAIUnitReason(aiUnit);
+        return (reason != null)
+            ? reason
+            : (!aiUnit.getUnit().isCarrier())
+            ? "unit-not-a-carrier"
             : null;
     }
 
+    /**
+     * Why would this mission be invalid with a given transportable?
+     * Checks the transportable locations.
+     * A location becomes invalid if:
+     *   - step is a null location
+     *   - step is disposed
+     *   - step is a captured settlement
+     *
+     * @param aiUnit The <code>AIUnit</code> to test.
+     * @param t The <code>Transportable</code> to test.
+     * @return A reason why the mission would be invalid,
+     *     or null if none found.
+     */
+    private static String invalidTransportableReason(AIUnit aiUnit, 
+                                                     Transportable t) {
+        final Unit carrier = aiUnit.getUnit();
+        final Player owner = carrier.getOwner();
+        final Locatable l = t.getTransportLocatable();
+        if (l == null) {
+            return "null-transportable";
+        } else if (l.getLocation() == carrier) {
+            ; // OK so far
+        } else if (l.getLocation() instanceof Unit) {
+            return "transportable-on-other-carrier";
+        } else {
+            Location src = t.getTransportSource();
+            if (src == null) {
+                return "transportable-source-missing";
+            } else if (((FreeColGameObject)src).isDisposed()) {
+                return "transportable-source-disposed";
+            } else if ((src instanceof Settlement)
+                && ((Settlement)src).getOwner() != null
+                && !owner.owns((Settlement)src)) {
+                return "transportable-source-captured";
+            }
+        }
+        Location dst = t.getTransportDestination();
+        if (dst == null) {
+            return "transportable-destination-missing";
+        } else if (((FreeColGameObject)dst).isDisposed()) {
+            return "transportable-destination-disposed";
+        } else if (((dst instanceof Settlement)
+                && ((Settlement)dst).getOwner() != null
+                && !owner.owns((Settlement)dst))) {
+            return "transportable-destination-captured";
+        }
+        return (t instanceof AIUnit) ? invalidAIUnitReason((AIUnit)t)
+            : null;
+    }
+            
     /**
      * Why is this mission invalid?
      *
      * @return A reason for mission invalidity, or null if none found.
      */
     public String invalidReason() {
-        return invalidReason(getAIUnit(), getTarget());
+        final AIUnit aiUnit = getAIUnit();
+        String reason = invalidReason(aiUnit, getTarget());
+        Cargo cargo;
+        return (reason != null) ? reason
+            : ((cargo = tFirst()) == null) ? null
+            : invalidTransportableReason(aiUnit, cargo.getTransportable());
     }
 
     /**
@@ -1364,10 +1483,7 @@ public class TransportMission extends Mission {
      * @return A reason for mission invalidity, or null if none found.
      */
     public static String invalidReason(AIUnit aiUnit) {
-        String reason;
-        return ((reason = Mission.invalidReason(aiUnit)) != null) ? reason
-            : ((reason = invalidTransportReason(aiUnit)) != null) ? reason
-            : null;
+        return invalidMissionReason(aiUnit);
     }
 
     /**
@@ -1379,9 +1495,13 @@ public class TransportMission extends Mission {
      */
     public static String invalidReason(AIUnit aiUnit, Location loc) {
         String reason;
-        return ((reason = invalidAIUnitReason(aiUnit)) != null) ? reason
-            : ((reason = invalidTransportReason(aiUnit)) != null) ? reason
-            : null;
+        return ((reason = invalidMissionReason(aiUnit)) != null)
+            ? reason
+            : (loc instanceof Europe || loc instanceof Colony)
+            ? invalidTargetReason(loc, aiUnit.getUnit().getOwner())
+            : (loc instanceof Tile)
+            ? null
+            : Mission.TARGETINVALID;
     }
 
     // Not a one-time mission, omit isOneTime().
@@ -1390,106 +1510,171 @@ public class TransportMission extends Mission {
      * Performs the mission.
      */
     public void doMission() {
-        final Unit carrier = getUnit();
+        checkCargoes();
         String reason = invalidReason();
         if (reason != null) {
-            logger.finest(tag + " broken(" + reason + "): " + carrier);
-            return;
-        }
-        updateTransportables();
-
-        if (carrier.isInEurope()) { // Actually in Europe
-            restockCargoAtDestination();
-            buyCargo();
-            restockCargoAtDestination();
-            if (carrier.getOwner().checkGold(MINIMUM_GOLD_TO_STAY_IN_EUROPE)
-                && transportables.isEmpty()) {
-                logger.finest(tag + " waiting in Europe: " + carrier);
-            } else {
-                moveUnitToAmerica();
-                logger.finest(tag + " set sail from Europe: " + carrier);
+            retarget(); // Try to recover
+            if ((reason = invalidReason()) != null) {
+                optimizeCargoes();
+                if ((reason = invalidReason()) != null) {
+                    logger.finest(tag + " broken(" + reason + "): "
+                        + toFullString());
+                    return;
+                }
             }
-            return;
-        } else if (carrier.isAtSea()) {
-            logger.finest(tag + " on the high seas: " + carrier);
-            return;
         }
 
-        boolean transportablesChanged = false;
-        boolean moreWork = true;
-        for (int i = 0; i < transportables.size() && moreWork || i == 0; i++) {
-            if (carrier.getMovesLeft() == 0) break;
-
-            if (canAttackEnemyShips() && !carrier.hasCargo() && !attackEnemyShips()) {
-                logger.finest(tag + " aborted by failed attack: " + carrier);
-                return;
-            }
-
-            moreWork = false;
-            if (transportablesChanged) {
-                i = 0;
-                transportablesChanged = false;
-            }
-
-            // Special case, already on a tile which gives direct
-            // access to Europe path will be null.
-            Destination destination = getNextDestination();
-            boolean canMoveToEurope = destination != null
-                && destination.moveToEurope()
-                && carrier.canMoveToHighSeas();
-
-            if (destination == null
-                || (destination.getPath() == null && !canMoveToEurope)) {
-                break;
-            }
-
-            if (destination.isAtDestination()) {
-                transportablesChanged = restockCargoAtDestination();
-                continue;
-            }
-
-            // Already on a tile which gives direct access to Europe,
-            // just make the move
-            if (canMoveToEurope) {
-                moveUnitToEurope();
-                logger.finest(tag + " set sail for Europe: " + carrier);
-                return;
-            }
-
-            // Move towards the next target:
-            PathNode path = destination.getPath();
-            switch (travelToTarget(tag, path.getLastNode().getLocation(), null)) {
+        final AIUnit aiCarrier = getAIUnit();
+        final Unit carrier = getUnit();
+        final EuropeanAIPlayer euaip = getEuropeanAIPlayer();
+        final CostDecider fallBackDecider
+            = CostDeciders.avoidSettlementsAndBlockingUnits();
+        CostDecider costDecider = CostDeciders.defaultCostDeciderFor(carrier);
+        for (;;) {
+            logger.info("Travelling: " + toFullString());
+            Unit.MoveType mt = travelToTarget(tag, target, costDecider);
+            switch (mt) {
             case MOVE_NO_MOVES: case MOVE_HIGH_SEAS:
                 return;
+            case ATTACK_UNIT:
+                Location blocker = resolveBlockage(aiCarrier, target);
+                if (blocker instanceof Unit && shouldAttack((Unit)blocker)) {
+                    logger.finest(tag + " attacking " + blocker
+                        + ": " + this);
+                    AIMessage.askAttack(aiCarrier,
+                        carrier.getTile().getDirection(blocker.getTile()));
+                    break;
+                }
+                // Fall through
+            case MOVE_NO_ATTACK_CIVILIAN:
+                // TODO: See if the transportable can get around the
+                // blockage using its own path finding.
+                if (carrier.getTile().isAdjacent(target.getTile())
+                    || costDecider == fallBackDecider) {
+                    moveRandomly(tag, null);
+                    carrier.setMovesLeft(0);
+                    logger.finest(tag + " blocked at " + carrier.getLocation()
+                        + ", moving randomly: " + this);
+                    return;
+                }
+                logger.finest(tag + " blocked at " + carrier.getLocation()
+                    + ", retrying: " + this);
+                costDecider = fallBackDecider; // Retry
+                break;
             case MOVE:
+                // Arrived at a target.  Deliver what can be
+                // delivered.  Check other deliveries, we might be in
+                // port so this is a good time to decide to fail to
+                // deliver something.
+                String logMe = tag + " delivery-pass:";
+                List<Cargo> cont = new ArrayList<Cargo>();
+                for (Cargo cargo : tCopy()) {
+                    if (cargo.getNewSpace() > 0) continue;
+                    CargoResult result = tryCargo(cargo);
+                    logMe += "\n    " + cargo.toString() + " = " + result;
+                    switch (result) {
+                    case TCONTINUE:
+                    case TRETRY: // will check again below
+                        cont.add(cargo);
+                        break;
+                    case TDONE:
+                    case TFAIL: // failures will be retargeted below
+                        break;
+                    case TNEXT:
+                        throw new IllegalStateException("Can not happen");
+                    }
+                }
+                logger.finest(logMe);
+                // Rebuild the cargo list with the original members,
+                // less the transportables that were dropped.
+                tSet(cont);
+                tSpace();
+                optimizeCargoes(); // This will retarget failures
+                logger.finest(tag + " post-optimize " + target
+                    + ": " + toFullString());
+
+                // Now try again, this time collecting as well as delivering.
+                logMe = tag + " collection-pass:";
+                cont.clear();
+                List<Cargo> next = new ArrayList<Cargo>();
+                for (Cargo cargo : tCopy()) {
+                    CargoResult result = tryCargo(cargo);
+                    logMe += "\n    " + cargo.toString() + " = " + result;
+                    switch (result) {
+                    case TCONTINUE:
+                        cont.add(cargo);
+                        break;
+                    case TDONE:
+                        break;
+                    case TNEXT:
+                        next.add(cargo);
+                        break;
+                    case TRETRY:
+                        if (cargo.retry()) { // Can not reach the target.
+                            next.add(cargo); // Try again next turn.
+                            break;
+                        }
+                        // Fall through
+                    case TFAIL:
+                        break;
+                    }
+                }
+                logger.finest(logMe);
+
+                // Rebuild the cargo list with the original members,
+                // less the transportables that were dropped.
+                tSet(cont);
+                tSpace();
+
+                // Add the new and blocked cargoes incrementally with
+                // the current arrangement, which is likely to put them
+                // at the end.
+                while (!next.isEmpty()) {
+                    queueCargo(next.remove(0), false);
+                }
+
+                // See if the transportables need replenishing.
+                // First try to collect more transportables at the current
+                // location, then just add the best transportable for this
+                // carrier.
+                if (destinationCapacity() > 0) {
+                    Location here = upLoc(carrier.getLocation());
+                    List<Transportable> tl = euaip.getTransportablesAt(here);
+                    if (tl != null) {
+                        for (Transportable t : tl) {
+                            if (queueTransportable(t, true)) {
+                                euaip.claimTransportable(t);
+                            }
+                        }
+                    }
+                }
+                for (int n = destinationCapacity(); n > 0; n--) {
+                    Transportable t = euaip.getBestTransportable(carrier);
+                    if (t == null) break;
+                    if (queueTransportable(t, false)) {
+                        euaip.claimTransportable(t);
+                    }
+                }
+
+                retarget();
+                if (carrier.isAtLocation(target)) {
+                    logger.finest(tag + " waiting at " + target
+                        + ": " + toFullString());
+                    return;
+                }
                 break;
             default:
-                logger.finest(tag + " unexpected move type: " + this);
-                break;
+                logger.warning(tag + " unexpected move " + mt
+                    + ": " + toFullString());
+                return;
             }
-            transportablesChanged = restockCargoAtDestination();
         }
-
-        String doing = (transportables.isEmpty()) ? "waiting" : "idling";
-        Location loc = carrier.getLocation();
-        logger.finest(tag + " " + doing
-            + " at " + (((loc instanceof Tile)
-                    && ((Tile)loc).getColony() != null)
-                ? ((Tile)loc).getColony().getName()
-                : loc.toString())
-            + ": " + carrier);
     }
-
 
     // Serialization
 
     /**
-     * Writes all of the <code>AIObject</code>s and other AI-related
-     * information to an XML-stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
+     * {@inheritDoc}
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         toXML(out, getXMLElementTagName());
@@ -1500,12 +1685,36 @@ public class TransportMission extends Mission {
      */
     protected void writeChildren(XMLStreamWriter out)
         throws XMLStreamException {
-        for (Transportable t : transportables) {
-            out.writeStartElement(ELEMENT_TRANSPORTABLE);
+        for (Cargo cargo : tCopy()) {
+            // Do not bother writing cargoes that will be dumped.
+            // On restore, checkCargoes will work out what to do with them.
+            if (cargo.getMode() != CargoMode.DUMP) {
+                out.writeStartElement(ELEMENT_TRANSPORTABLE);
 
-            out.writeAttribute(ID_ATTRIBUTE, ((AIObject)t).getId());
+                AIObject aio = (AIObject)cargo.getTransportable();
+                out.writeAttribute(ID_ATTRIBUTE, aio.getId());
 
-            out.writeEndElement();
+                writeAttribute(out, CARRIER_TAG, cargo.getCarrier());
+
+                out.writeAttribute(MODE_TAG,
+                    cargo.getMode().toString().toLowerCase(Locale.US));
+                
+                if (cargo.getTarget() != null) {
+                    writeAttribute(out, TARGET_TAG,
+                        (FreeColGameObject)cargo.getTarget());
+                }
+
+                out.writeAttribute(TURNS_TAG,
+                    Integer.toString(cargo.getTurns()));
+
+                out.writeAttribute(TRIES_TAG,
+                    Integer.toString(cargo.getTries()));
+
+                out.writeAttribute(SPACELEFT_TAG,
+                    Integer.toString(cargo.getSpaceLeft()));
+
+                out.writeEndElement();
+            }
         }
     }
 
@@ -1514,30 +1723,56 @@ public class TransportMission extends Mission {
      */
     protected void readChildren(XMLStreamReader in)
         throws XMLStreamException {
-        transportables.clear();
+        List<Cargo> ts = new ArrayList<Cargo>();
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            String tag = in.getLocalName();
+            String str, tag = in.getLocalName();
             if (tag.equals(ELEMENT_TRANSPORTABLE)) {
                 String tid = in.getAttributeValue(null, ID_ATTRIBUTE);
-                AIObject ao = getAIMain().getAIObject(tid);
-                if (ao == null) {
+                AIObject aio = getAIMain().getAIObject(tid);
+                if (aio == null) {
                     if (tid.startsWith(Unit.getXMLElementTagName())) {
-                        ao = new AIUnit(getAIMain(), tid);
+                        aio = new AIUnit(getAIMain(), tid);
                     } else {
-                        ao = new AIGoods(getAIMain(), tid);
+                        aio = new AIGoods(getAIMain(), tid);
                     }
                 }
-                if (ao instanceof Transportable) {
-                    transportables.add((Transportable) ao);
+
+                str = in.getAttributeValue(null, "carrier");
+                AIObject aiCarrier = getAIMain().getAIObject(str);
+                Unit carrier = (aiCarrier instanceof AIUnit)
+                    ? ((AIUnit)aiCarrier).getUnit()
+                    : null;
+
+                str = in.getAttributeValue(null, MODE_TAG);
+                CargoMode mode = (str == null) ? CargoMode.DUMP
+                    : Enum.valueOf(CargoMode.class, str.toUpperCase(Locale.US));
+
+                str = in.getAttributeValue(null, TARGET_TAG);
+                Location target = getGame().getFreeColLocation(str);
+
+                int turns = getAttribute(in, TURNS_TAG, -1);
+
+                int tries = getAttribute(in, TRIES_TAG, 0);
+
+                int spaceLeft = getAttribute(in, SPACELEFT_TAG, -1);
+
+                if (aio instanceof Transportable) {
+                    // Let checkCargoes sort out dumping cases.
+                    if (mode != CargoMode.DUMP) {
+                        ts.add(new Cargo((Transportable)aio, carrier, mode,
+                                         target, turns, tries, spaceLeft));
+                    }
                 } else {
                     logger.warning("Transportable expected: " + tid);
                 }
                 in.nextTag(); // Consume closing tag
+
             } else {
                 logger.warning("Unknown TransportMission tag: " + tag);
             }
         }
+        tSet(ts);
     }
 
     /**
@@ -1546,38 +1781,21 @@ public class TransportMission extends Mission {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(super.toString());
-        sb.append("\nTransport list:\n");
-        List<Transportable> carrying = new ArrayList<Transportable>();
-        List<Transportable> carried = new ArrayList<Transportable>();
-        for (Transportable t : transportables) {
-            Locatable l = t.getTransportLocatable();
-            Location target;
-            if (l == null) {
-                sb.append(t.getId() + " NULL\n");
-                continue;
-            } else if (carried.contains(t)) {
-                sb.append(l.toString() + " DUPLICATED\n");
-                continue;
-            } else if (carrying.contains(t) || isCarrying(t)) {
-                sb.append(l.toString());
-                sb.append(" (to ");
-                target = t.getTransportDestination();
-                carrying.remove(t);
-                carried.add(t);
-            } else {
-                sb.append(l.toString());
-                sb.append(" (from ");
-                target = t.getTransportSource();
-                carrying.add(t);
-            }
-            if (target == null) {
-                sb.append("null");
-            } else if (target instanceof Europe) {
-                sb.append("Europe");
-            } else {
-                sb.append(target.toString());
-            }
-            sb.append(")\n");
+        sb.append(" -> ");
+        sb.append(target);
+        return sb.toString();
+    }
+
+    /**
+     * More verbose version of toString().
+     *
+     * @return A summary of this mission including its transportables.
+     */
+    public String toFullString() {
+        StringBuilder sb = new StringBuilder(this.toString());
+        for (Cargo cargo : tCopy()) {
+            sb.append("\n  ->");
+            sb.append(cargo.toString());
         }
         return sb.toString();
     }

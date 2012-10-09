@@ -24,6 +24,8 @@ import java.util.Comparator;
 
 import net.sf.freecol.common.model.Locatable;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Unit;
 
 
 /**
@@ -164,8 +166,9 @@ public interface Transportable {
      *     <code>Transportable</code> in it's transport list. This
      *     <code>Transportable</code> has not been scheduled for
      *     transport if this value is <code>null</code>.
+     * @param reason A reason for changing the transport.
      */
-    public void setTransport(AIUnit transport);
+    public void setTransport(AIUnit transport, String reason);
 
     /**
      * Aborts the given <code>Wish</code>.
@@ -183,4 +186,29 @@ public interface Transportable {
      *     object represents.
      */
     public String getId();
+
+    /**
+     * A Transportable leaves a carrier unit.
+     *
+     * @param direction The <code>Direction</code> to leave in.
+     * @return True if the unload succeeds.
+     */
+    public boolean leaveTransport(Direction direction);
+
+    /**
+     * A Transportable joins a carrier unit.
+     *
+     * @param carrier The carrier <code>Unit</code> to join.
+     * @param direction The <code>Direction</code> to move.
+     * @return True if the load succeeds.
+     */
+    public boolean joinTransport(Unit carrier, Direction direction);
+
+    /**
+     * Is a Transportable carriable by a carrier unit?
+     *
+     * @param carrier The carrier <code>Unit</code> to test.
+     * @return True if the transportable could be carried.
+     */
+    public boolean carriableBy(Unit carrier);
 }

@@ -101,8 +101,9 @@ public class CashInTreasureTrainMission extends Mission {
      * @param target The new target <code>Location</code>.
      */
     public void setTarget(Location target) {
-        removeTransportable("retargeted");
+        boolean retarget = this.target != null && this.target != target;
         this.target = target;
+        if (retarget) retargetTransportable();
     }
 
     /**

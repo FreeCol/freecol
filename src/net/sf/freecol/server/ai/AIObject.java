@@ -28,6 +28,7 @@ import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.Unit;
 
 import org.w3c.dom.Element;
 
@@ -183,14 +184,16 @@ public abstract class AIObject extends FreeColObject {
     }
 
     /**
-     * Gets a location's settlement if it has one.  The intent is to
-     * increase the relevance of a location used as a target.
+     * Gets a location's settlement if it has one, or failing that at
+     * least make sure the location is not just a carrier.  The intent
+     * is to increase the relevance of a location used as a target.
      *
      * @param loc The <code>Location</code> to test.
      * @return The location settlement if any, otherwise, the original
      *     location.
      */
     public static Location upLoc(Location loc) {
+        if (loc instanceof Unit) loc = ((Unit)loc).getLocation();
         return (loc.getSettlement() != null) ? loc.getSettlement() : loc;
     }
 

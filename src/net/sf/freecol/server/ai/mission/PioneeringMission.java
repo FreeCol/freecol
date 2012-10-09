@@ -95,11 +95,7 @@ public class PioneeringMission extends Mission {
      *        is created for.
      */
     public PioneeringMission(AIMain aiMain, AIUnit aiUnit) {
-        super(aiMain, aiUnit);
-
-        setTarget(findTarget(aiUnit, true));
-        logger.finest(tag + " starts with target " + getTarget() + ": " + this);
-        uninitialized = false;
+        this(aiMain, aiUnit, findTarget(aiUnit, true));
     }
 
     /**
@@ -166,11 +162,12 @@ public class PioneeringMission extends Mission {
      * @param target The new target for this mission.
      */
     public void setTarget(Location target) {
-        removeTransportable("retargeted");
+        boolean retarget = this.target != null && this.target != target;
         this.target = target;
         setTileImprovementPlan((target instanceof Tile)
             ? getBestPlan((Tile)target)
             : null);
+        if (retarget) retargetTransportable();
     }
 
     /**

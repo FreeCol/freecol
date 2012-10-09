@@ -101,8 +101,9 @@ public class DefendSettlementMission extends Mission {
      * @param target The new target <code>Settlement</code>.
      */
     public void setTarget(Settlement target) {
-        removeTransportable("retargeted");
+        boolean retarget = this.target != null && this.target != target;
         this.target = target;
+        if (retarget) retargetTransportable();
     }
 
     /**

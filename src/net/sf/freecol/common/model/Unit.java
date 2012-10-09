@@ -1196,7 +1196,7 @@ public class Unit extends GoodsLocation
         PathNode path;
         return loc != null
             && !isNaval()
-            && !Map.isSameLocation(getLocation(), loc)
+            && !isAtLocation(loc)
             && ((path = findPath(getLocation(), loc,
                                  getCarrier(), null)) == null
                 || path.usesCarrier());

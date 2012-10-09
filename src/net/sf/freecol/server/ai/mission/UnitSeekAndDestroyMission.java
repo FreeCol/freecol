@@ -109,8 +109,9 @@ public class UnitSeekAndDestroyMission extends Mission {
      * @param target The new target <code>Location</code>.
      */
     public void setTarget(Location target) {
-        removeTransportable("retargeted");
+        boolean retarget = this.target != null && this.target != target;
         this.target = target;
+        if (retarget) retargetTransportable();
     }
 
     /**
@@ -308,7 +309,9 @@ public class UnitSeekAndDestroyMission extends Mission {
      */
     @Override
     public Location getTransportDestination() {
-        return (getUnit().shouldTakeTransportTo(getTarget())) ? getTarget()
+        Location loc = getTarget();
+        return (loc == null) ? null
+            : (getUnit().shouldTakeTransportTo(loc.getTile())) ? loc.getTile()
             : null;
     }
 

@@ -105,8 +105,9 @@ public class PrivateerMission extends Mission {
      * @param target The new target <code>Location</code>.
      */
     public void setTarget(Location target) {
-        removeTransportable("retargeted");
+        boolean retarget = this.target != null && this.target != target;
         this.target = target;
+        if (retarget) retargetTransportable();
     }
 
     /**
@@ -392,15 +393,15 @@ public class PrivateerMission extends Mission {
             case MOVE:
                 for (Goods g : unit.getGoodsList()) {
                     if (unit.isInEurope()) {
-                        goodsLeavesTransport(g.getType(), g.getAmount());
+                        AIMessage.askSellGoods(aiUnit, g);
                     } else {
                         Colony colony = unit.getTile().getColony();
-                        unloadCargoInColony(g);
+                        AIMessage.askUnloadCargo(aiUnit, g);
                     }
                 }
 
                 for (Unit u : unit.getUnitList()) {
-                    unitLeavesTransport(getAIMain().getAIUnit(u), null);
+                    getAIMain().getAIUnit(u).leaveTransport(null);
                 }
 
                 logger.finest(tag + " completed goods delivery"
