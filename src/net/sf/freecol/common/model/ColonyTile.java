@@ -246,6 +246,7 @@ public class ColonyTile extends WorkLocation implements Ownable {
         } else {
             for (Unit unit : getUnitList()) {
                 GoodsType goodsType = unit.getWorkType();
+                if (goodsType == null) continue;
                 pi.addProduction(new AbstractGoods(goodsType,
                         getProductionOf(unit, goodsType)));
             }
