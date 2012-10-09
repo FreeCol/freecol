@@ -974,6 +974,10 @@ public class IndianSettlement extends Settlement {
                 increment = 13;
             }
 
+            if (missionary.getOwner() == null) {
+                throw new IllegalStateException("Null missionary owner at "
+                    + getName());
+            }
             // Increase increment if alarm level is high.
             increment += 2 * getAlarm(missionary.getOwner()).getValue() / 100;
             convertProgress += increment;
