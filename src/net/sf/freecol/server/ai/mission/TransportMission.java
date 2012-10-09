@@ -869,7 +869,7 @@ public class TransportMission extends Mission {
     
         if (requireMatch) return false;
         if (!ts.isEmpty() && !isCarrying(t)) {
-            holds = ts.get(ts.size()-1).getSpaceLeft() + newSpace;
+            holds = maxHolds - ts.get(ts.size()-1).getSpaceLeft() + newSpace;
             if (holds < 0 || holds > maxHolds) return false;
         }
         return addCargo(cargo, -1);
@@ -1531,7 +1531,6 @@ public class TransportMission extends Mission {
             = CostDeciders.avoidSettlementsAndBlockingUnits();
         CostDecider costDecider = CostDeciders.defaultCostDeciderFor(carrier);
         for (;;) {
-            logger.info("Travelling: " + toFullString());
             Unit.MoveType mt = travelToTarget(tag, target, costDecider);
             switch (mt) {
             case MOVE_NO_MOVES: case MOVE_HIGH_SEAS:

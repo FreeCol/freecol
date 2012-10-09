@@ -601,9 +601,6 @@ public class AIUnit extends AIObject implements Transportable {
         if (result) {
             Colony colony = unit.getColony();
             if (colony != null) {
-                AIColony ac = getAIMain().getAIColony(colony);
-                if (ac != null) ac.completeWish(unit);
-
                 colony.firePropertyChange(Colony.REARRANGE_WORKERS,
                                           true, false);
             }
