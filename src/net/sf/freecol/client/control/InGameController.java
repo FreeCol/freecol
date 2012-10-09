@@ -841,7 +841,7 @@ public final class InGameController implements NetworkConstants {
     private boolean followPath(Unit unit, PathNode path) {
         // Traverse the path to the destination.
         for (; path != null; path = path.next) {
-            if (path.getLocation() == unit.getLocation()) continue;
+            if (unit.isAtLocation(path.getLocation())) continue;
 
             if (path.getLocation() instanceof Europe) {
                 if (unit.getTile() != null
@@ -2177,10 +2177,11 @@ public final class InGameController implements NetworkConstants {
      *
      * @param unit The <code>Unit</code> to be moved.
      * @param destination The <code>Location</code> to be moved to.
+     * @return True if the unit can possibly move further.
      * @throws IllegalArgumentException if destination or unit are null.
      */
-    public void moveTo(Unit unit, Location destination) {
-        if (!requireOurTurn()) return;
+    public boolean moveTo(Unit unit, Location destination) {
+        if (!requireOurTurn()) return false;
 
         // Sanity check current state.
         if (unit == null || destination == null) {
@@ -2188,18 +2189,18 @@ public final class InGameController implements NetworkConstants {
         } else if (destination instanceof Europe) {
             if (unit.isInEurope()) {
                 gui.playSound("sound.event.illegalMove");
-                return;
+                return false;
             }
         } else if (destination instanceof Map) {
             if (unit.getTile() != null
                 && unit.getTile().getMap() == destination) {
                 gui.playSound("sound.event.illegalMove");
-                return;
+                return false;
             }
         } else if (destination instanceof Settlement) {
             if (unit.getTile() != null) {
                 gui.playSound("sound.event.illegalMove");
-                return;
+                return false;
             }
         }
 
@@ -2219,6 +2220,7 @@ public final class InGameController implements NetworkConstants {
         if (askServer().moveTo(unit, destination)) {
             nextActiveUnit();
         }
+        return false;
     }
 
     /**
@@ -2255,7 +2257,7 @@ public final class InGameController implements NetworkConstants {
                 }
             });
     }
-
+    
     /**
      * Moves the given unit towards its destination/s if possible.
      *
@@ -2280,7 +2282,7 @@ public final class InGameController implements NetworkConstants {
                 }
             } else if (destination.getTile() == null) {
                 break; // Not on the map, findPath* can not help.
-            } else if (unit.getTile() == destination.getTile()) {
+            } else if (unit.isAtLocation(destination)) {
                 break; // Arrived at on-map destination
             }
 
@@ -2304,11 +2306,7 @@ public final class InGameController implements NetworkConstants {
 
         // Clear ordinary destinations if arrived.
         if ((destination = unit.getDestination()) != null) {
-            if (unit.getTile() == null) {
-                if (unit.getLocation() == destination) {
-                    clearGotoOrders(unit);
-                }
-            } else if (unit.getTile() == destination.getTile()) {
+            if (unit.isAtLocation(destination)) {
                 clearGotoOrders(unit);
                 // Check cash-in, and if the unit has moves left
                 // and was not set to SKIPPED by moveDirection,
@@ -2335,66 +2333,77 @@ public final class InGameController implements NetworkConstants {
      */
     private boolean moveDirection(Unit unit, Direction direction,
                                   boolean interactive) {
+        // If this move would reach the unit destination but we
+        // discover that it would be permanently impossible to complete,
+        // clear the destination.
+        Unit.MoveType mt = unit.getMoveType(direction);
         Location destination = unit.getDestination();
+        boolean clearDestination = destination != null
+            && unit.getTile() != null
+            && Map.isSameLocation(unit.getTile().getNeighbourOrNull(direction),
+                                  destination);
 
-        // Consider all the move types
-        switch (unit.getMoveType(direction)) {
+        // Consider all the move types.
+        boolean result = mt.isLegal();
+        switch (mt) {
         case MOVE_HIGH_SEAS:
             if (destination == null) {
-                return moveHighSeas(unit, direction);
+                result = moveHighSeas(unit, direction);
+                break;
             } else if (destination instanceof Europe) {
-                moveTo(unit, destination);
-                return false;
+                result = moveTo(unit, destination);
+                break;
             }
             // Fall through
         case MOVE:
-            moveMove(unit, direction);
-            return unit.getMovesLeft() > 0;
+            result = moveMove(unit, direction);
+            break;
         case EXPLORE_LOST_CITY_RUMOUR:
-            moveExplore(unit, direction);
-            return false;
+            result = moveExplore(unit, direction);
+            break;
         case ATTACK_UNIT: case ATTACK_SETTLEMENT:
-            moveAttack(unit, direction);
-            return false;
+            result = moveAttack(unit, direction);
+            break;
         case EMBARK:
-            moveEmbark(unit, direction);
-            return false;
+            result = moveEmbark(unit, direction);
+            break;
         case ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST:
-            moveLearnSkill(unit, direction);
-            return false;
+            result = moveLearnSkill(unit, direction);
+            break;
         case ENTER_INDIAN_SETTLEMENT_WITH_SCOUT:
-            moveScoutIndianSettlement(unit, direction);
-            return false;
+            result = moveScoutIndianSettlement(unit, direction);
+            break;
         case ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY:
-            moveUseMissionary(unit, direction);
-            return false;
+            result = moveUseMissionary(unit, direction);
+            break;
         case ENTER_FOREIGN_COLONY_WITH_SCOUT:
-            moveScoutColony(unit, direction);
-            return false;
+            result = moveScoutColony(unit, direction);
+            break;
         case ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS:
-            moveTrade(unit, direction);
-            return false;
+            result = moveTrade(unit, direction);
+            break;
 
+        // Illegal moves
         case MOVE_NO_ACCESS_BEACHED:
-            if (interactive) {
+            if (interactive || clearDestination) {
                 gui.playSound("sound.event.illegalMove");
                 StringTemplate nation = getNationAt(unit.getTile(), direction);
                 gui.showInformationMessage(unit,
                     StringTemplate.template("move.noAccessBeached")
                     .addStringTemplate("%nation%", nation));
             }
-            return false;
+            break;
         case MOVE_NO_ACCESS_CONTACT:
-            if (interactive) {
+            if (interactive || clearDestination) {
                 gui.playSound("sound.event.illegalMove");
                 StringTemplate nation = getNationAt(unit.getTile(), direction);
                 gui.showInformationMessage(unit,
                     StringTemplate.template("move.noAccessContact")
                     .addStringTemplate("%nation%", nation));
             }
-            return false;
+            break;
         case MOVE_NO_ACCESS_GOODS:
-            if (interactive) {
+            if (interactive || clearDestination) {
                 gui.playSound("sound.event.illegalMove");
                 StringTemplate nation = getNationAt(unit.getTile(), direction);
                 gui.showInformationMessage(unit,
@@ -2402,16 +2411,16 @@ public final class InGameController implements NetworkConstants {
                     .addStringTemplate("%nation%", nation)
                     .addStringTemplate("%unit%", Messages.getLabel(unit)));
             }
-            return false;
+            break;
         case MOVE_NO_ACCESS_LAND:
             if (!moveDisembark(unit, direction)) {
                 if (interactive) {
                     gui.playSound("sound.event.illegalMove");
                 }
             }
-            return false;
+            break;
         case MOVE_NO_ACCESS_SETTLEMENT:
-            if (interactive) {
+            if (interactive || clearDestination) {
                 gui.playSound("sound.event.illegalMove");
                 StringTemplate nation = getNationAt(unit.getTile(), direction);
                 gui.showInformationMessage(unit,
@@ -2419,60 +2428,66 @@ public final class InGameController implements NetworkConstants {
                     .addStringTemplate("%unit%", Messages.getLabel(unit))
                     .addStringTemplate("%nation%", nation));
             }
-            return false;
+            break;
         case MOVE_NO_ACCESS_SKILL:
-            if (interactive) {
+            if (interactive || clearDestination) {
                 gui.playSound("sound.event.illegalMove");
                 gui.showInformationMessage(unit,
                     StringTemplate.template("move.noAccessSkill")
                     .addStringTemplate("%unit%", Messages.getLabel(unit)));
             }
-            return false;
+            break;
         case MOVE_NO_ACCESS_TRADE:
-            if (interactive) {
+            if (interactive || clearDestination) {
                 gui.playSound("sound.event.illegalMove");
                 StringTemplate nation = getNationAt(unit.getTile(), direction);
                 gui.showInformationMessage(unit,
                     StringTemplate.template("move.noAccessTrade")
                     .addStringTemplate("%nation%", nation));
             }
-            return false;
+            break;
         case MOVE_NO_ACCESS_WAR:
-            if (interactive) {
+            if (interactive || clearDestination) {
                 gui.playSound("sound.event.illegalMove");
                 StringTemplate nation = getNationAt(unit.getTile(), direction);
                 gui.showInformationMessage(unit,
                     StringTemplate.template("move.noAccessWar")
                     .addStringTemplate("%nation%", nation));
             }
-            return false;
+            break;
         case MOVE_NO_ACCESS_WATER:
-            if (interactive) {
+            if (interactive || clearDestination) {
                 gui.playSound("sound.event.illegalMove");
                 gui.showInformationMessage(unit,
                     StringTemplate.template("move.noAccessWater")
                     .addStringTemplate("%unit%", Messages.getLabel(unit)));
             }
-            return false;
+            break;
         case MOVE_NO_ATTACK_MARINE:
-            if (interactive) {
+            if (interactive || clearDestination) {
                 gui.playSound("sound.event.illegalMove");
                 gui.showInformationMessage(unit,
                     StringTemplate.template("move.noAttackWater")
                     .addStringTemplate("%unit%", Messages.getLabel(unit)));
             }
-            return false;
+            break;
         case MOVE_NO_MOVES:
             // The unit may have some moves left, but not enough
-            // to move to the next node.
+            // to move to the next node.  The move is illegal
+            // this turn, but might not be next turn, so do not cancel the
+            // destination but set the state to skipped instead.
+            clearDestination = false;
             unit.setState(UnitState.SKIPPED);
-            return false;
+            break;
         default:
-            if (interactive) {
+            if (interactive || clearDestination) {
                 gui.playSound("sound.event.illegalMove");
             }
-            return false;
+            result = false;
+            break;
         }
+        if (clearDestination) clearGotoOrders(unit);
+        return result;
     }
 
     /**
@@ -2481,8 +2496,9 @@ public final class InGameController implements NetworkConstants {
      *
      * @param unit The <code>Unit</code> to perform the attack.
      * @param direction The direction in which to attack.
+     * @return True if the unit could move further.
      */
-    private void moveAttack(Unit unit, Direction direction) {
+    private boolean moveAttack(Unit unit, Direction direction) {
         clearGotoOrders(unit);
 
         // Extra option with native settlement
@@ -2492,15 +2508,15 @@ public final class InGameController implements NetworkConstants {
         if (is != null && unit.isArmed()) {
             switch (gui.showArmedUnitIndianSettlementDialog(is)) {
             case CANCEL:
-                return;
+                return true;
             case INDIAN_SETTLEMENT_ATTACK:
                 break; // Go on to usual attack confirmation.
             case INDIAN_SETTLEMENT_TRIBUTE:
                 moveTribute(unit, direction);
-                return;
+                return false;
             default:
                 logger.warning("showArmedUnitIndianSettlementDialog failure.");
-                return;
+                return false;
             }
         }
 
@@ -2509,7 +2525,9 @@ public final class InGameController implements NetworkConstants {
             && confirmPreCombat(unit, target)) {
             askServer().attack(unit, direction);
             nextActiveUnit();
+            return false;
         }
+        return true;
     }
 
     /**
@@ -2520,7 +2538,7 @@ public final class InGameController implements NetworkConstants {
      * @param unit The carrier containing the unit to disembark.
      * @param direction The direction in which to disembark the unit.
      * @return True if the disembark "succeeds" (which deliberately includes
-     *         declined disembarks).
+     *     declined disembarks).
      */
     private boolean moveDisembark(Unit unit, final Direction direction) {
         Tile tile = unit.getTile().getNeighbourOrNull(direction);
@@ -2591,9 +2609,11 @@ public final class InGameController implements NetworkConstants {
      *
      * @param unit The <code>Unit</code> that wishes to embark.
      * @param direction The direction in which to embark.
+     * @return True if the unit could move further.
      */
-    private void moveEmbark(Unit unit, Direction direction) {
-        if (unit.getColony() != null && !gui.tryLeaveColony(unit)) return;
+    private boolean moveEmbark(Unit unit, Direction direction) {
+        if (unit.getColony() != null
+            && !gui.tryLeaveColony(unit)) return false;
 
         Tile sourceTile = unit.getTile();
         Tile destinationTile = sourceTile.getNeighbourOrNull(direction);
@@ -2616,7 +2636,7 @@ public final class InGameController implements NetworkConstants {
                 Messages.message("embark.text"),
                 Messages.message("embark.cancel"),
                 choices);
-            if (carrier == null) return; // User cancelled
+            if (carrier == null) return true; // User cancelled
         }
 
         // Proceed to embark
@@ -2629,6 +2649,7 @@ public final class InGameController implements NetworkConstants {
                 nextActiveUnit();
             }
         }
+        return false;
     }
 
     /**
@@ -2637,21 +2658,23 @@ public final class InGameController implements NetworkConstants {
      *
      * @param unit The <code>Unit</code> that is exploring.
      * @param direction The direction of a rumour.
+     * @param True if the unit can move further.
      */
-    private void moveExplore(Unit unit, Direction direction) {
+    private boolean moveExplore(Unit unit, Direction direction) {
         Tile tile = unit.getTile().getNeighbourOrNull(direction);
-        if (gui.showConfirmDialog(unit.getTile(),
+        if (!gui.showConfirmDialog(unit.getTile(),
                 StringTemplate.key("exploreLostCityRumour.text"),
                 "exploreLostCityRumour.yes", "exploreLostCityRumour.no")) {
-            if (tile.getLostCityRumour().getType()
-                == LostCityRumour.RumourType.MOUNDS
-                && !gui.showConfirmDialog(unit.getTile(),
-                    StringTemplate.key("exploreMoundsRumour.text"),
-                    "exploreLostCityRumour.yes", "exploreLostCityRumour.no")) {
-                askServer().declineMounds(unit, direction);
-            }
-            moveMove(unit, direction);
+            return true;
         }
+        if (tile.getLostCityRumour().getType()
+            == LostCityRumour.RumourType.MOUNDS
+            && !gui.showConfirmDialog(unit.getTile(),
+                StringTemplate.key("exploreMoundsRumour.text"),
+                "exploreLostCityRumour.yes", "exploreLostCityRumour.no")) {
+            askServer().declineMounds(unit, direction);
+        }
+        return moveMove(unit, direction);
     }
 
     /**
@@ -2661,6 +2684,7 @@ public final class InGameController implements NetworkConstants {
      *
      * @param unit The <code>Unit</code> to be moved.
      * @param direction The direction in which to move.
+     * @return True if the unit can move further.
      */
     private boolean moveHighSeas(Unit unit, Direction direction) {
         // Confirm moving to Europe if told to move to a null tile
@@ -2669,17 +2693,16 @@ public final class InGameController implements NetworkConstants {
         Tile oldTile = unit.getTile();
         Tile newTile = oldTile.getNeighbourOrNull(direction);
         if ((newTile == null
-             || (!oldTile.isDirectlyHighSeasConnected() && newTile.isDirectlyHighSeasConnected()))
+             || (!oldTile.isDirectlyHighSeasConnected()
+                 && newTile.isDirectlyHighSeasConnected()))
             && gui.showConfirmDialog(oldTile,
                 StringTemplate.template("highseas.text")
-                .addAmount("%number%", unit.getSailTurns()),
+                    .addAmount("%number%", unit.getSailTurns()),
                 "highseas.yes", "highseas.no")) {
             moveTo(unit, unit.getOwner().getEurope());
-            nextActiveUnit();
             return false;
         }
-        moveMove(unit, direction);
-        return true;
+        return moveMove(unit, direction);
     }
 
     /**
@@ -2690,13 +2713,14 @@ public final class InGameController implements NetworkConstants {
      *
      * @param unit The <code>Unit</code> to learn the skill.
      * @param direction The direction in which the Indian settlement lies.
+     * @return True if the unit can move further.
      */
-    private void moveLearnSkill(Unit unit, Direction direction) {
+    private boolean moveLearnSkill(Unit unit, Direction direction) {
         clearGotoOrders(unit);
         // Refresh knowledge of settlement skill.  It may have been
         // learned by another player.
         if (!askServer().askSkill(unit, direction)) {
-            return;
+            return false;
         }
 
         IndianSettlement settlement
@@ -2718,7 +2742,7 @@ public final class InGameController implements NetworkConstants {
                 if (unit.isDisposed()) {
                     gui.showInformationMessage(settlement, "learnSkill.die");
                     nextActiveUnit(unit.getTile());
-                    return;
+                    return false;
                 }
                 if (unit.getType() != skill) {
                     gui.showInformationMessage(settlement, "learnSkill.leave");
@@ -2726,6 +2750,7 @@ public final class InGameController implements NetworkConstants {
             }
         }
         nextActiveUnit();
+        return false;
     }
 
     /**
@@ -2734,8 +2759,9 @@ public final class InGameController implements NetworkConstants {
      *
      * @param unit The <code>Unit</code> to be moved.
      * @param direction The direction in which to move the Unit.
+     * @return True if the unit can move further.
      */
-    private void moveMove(Unit unit, Direction direction) {
+    private boolean moveMove(Unit unit, Direction direction) {
         // If we are in a colony, or Europe, load sentries.
         if (unit.canCarryUnits() && unit.hasSpaceLeft()
             && (unit.getColony() != null || unit.isInEurope())) {
@@ -2755,7 +2781,7 @@ public final class InGameController implements NetworkConstants {
 
         // Ask the server
         UnitWas unitWas = new UnitWas(unit);
-        if (!askServer().move(unit, direction)) return;
+        if (!askServer().move(unit, direction)) return false;
         unitWas.fireChanges();
 
         final Tile tile = unit.getTile();
@@ -2774,22 +2800,22 @@ public final class InGameController implements NetworkConstants {
         // Update the active unit and GUI.
         if (unit.isDisposed() || checkCashInTreasureTrain(unit)) {
             nextActiveUnit(tile);
-        } else {
-            if (tile.getColony() != null
-                && unit.isCarrier()
-                && unit.getTradeRoute() == null
-                && (unit.getDestination() == null
-                    || unit.getDestination().getTile() == tile.getTile())) {
-                gui.showColonyPanel(tile.getColony());
-            }
-            if (unit.getMovesLeft() == 0) {
-                nextActiveUnit();
-            } else {
-                displayModelMessages(false);
-                if (!gui.onScreen(tile))
-                    gui.setSelectedTile(tile, false);
-            }
+            return false;
         }
+        if (tile.getColony() != null
+            && unit.isCarrier()
+            && unit.getTradeRoute() == null
+            && (unit.getDestination() == null
+                || unit.getDestination().getTile() == tile.getTile())) {
+            gui.showColonyPanel(tile.getColony());
+        }
+        if (unit.getMovesLeft() <= 0) {
+            nextActiveUnit();
+            return false;
+        }
+        displayModelMessages(false);
+        if (!gui.onScreen(tile)) gui.setSelectedTile(tile, false);
+        return true;
     }
 
     /**
@@ -2800,24 +2826,22 @@ public final class InGameController implements NetworkConstants {
      *
      * @param unit The unit that will spy, negotiate or attack.
      * @param direction The direction in which the foreign colony lies.
+     * @return True if the unit can move further.
      */
-    private void moveScoutColony(Unit unit, Direction direction) {
+    private boolean moveScoutColony(Unit unit, Direction direction) {
         Colony colony = (Colony) getSettlementAt(unit.getTile(), direction);
         boolean canNeg = colony.getOwner() != unit.getOwner().getREFPlayer();
         clearGotoOrders(unit);
 
         switch (gui.showScoutForeignColonyDialog(colony, unit, canNeg)) {
         case CANCEL:
-            break;
+            return true;
         case FOREIGN_COLONY_ATTACK:
-            moveAttack(unit, direction);
-            break;
+            return moveAttack(unit, direction);
         case FOREIGN_COLONY_NEGOTIATE:
-            moveTradeColony(unit, direction);
-            break;
+            return moveTradeColony(unit, direction);
         case FOREIGN_COLONY_SPY:
-            moveSpy(unit, direction);
-            break;
+            return moveSpy(unit, direction);
         default:
             throw new IllegalArgumentException("showScoutForeignColonyDialog fail");
         }
@@ -2832,8 +2856,9 @@ public final class InGameController implements NetworkConstants {
      *
      * @param unit The <code>Unit</code> that is scouting.
      * @param direction The direction in which the Indian settlement lies.
+     * @return True if the unit can move further.
      */
-    private void moveScoutIndianSettlement(Unit unit, Direction direction) {
+    private boolean moveScoutIndianSettlement(Unit unit, Direction direction) {
         Tile unitTile = unit.getTile();
         Tile tile = unitTile.getNeighbourOrNull(direction);
         IndianSettlement settlement = tile.getIndianSettlement();
@@ -2844,23 +2869,22 @@ public final class InGameController implements NetworkConstants {
         String number = (ns == null) ? "many" : ns.getNumberOfSettlements();
         switch (gui.showScoutIndianSettlementDialog(settlement, number)) {
         case CANCEL:
-            return;
+            return true;
         case INDIAN_SETTLEMENT_ATTACK:
-            if (confirmPreCombat(unit, tile)) {
-                askServer().attack(unit, direction);
-            }
-            return;
+            if (!confirmPreCombat(unit, tile)) return true;
+            askServer().attack(unit, direction);
+            return false;
         case INDIAN_SETTLEMENT_SPEAK:
             Player player = unit.getOwner();
             final int oldGold = player.getGold();
             String result = askServer().scoutSpeak(unit, direction);
             if (result == null) {
-                return; // Fail
+                return false; // Fail
             } else if ("die".equals(result)) {
                 gui.showInformationMessage(settlement,
                     "scoutSettlement.speakDie");
                 nextActiveUnit(unitTile);
-                return;
+                return false;
             } else if ("expert".equals(result)) {
                 gui.showInformationMessage(settlement,
                     StringTemplate.template("scoutSettlement.expertScout")
@@ -2881,10 +2905,9 @@ public final class InGameController implements NetworkConstants {
                 logger.warning("Invalid result from askScoutSpeak: " + result);
             }
             nextActiveUnit();
-            break;
+            return false;
         case INDIAN_SETTLEMENT_TRIBUTE:
-            moveTribute(unit, direction);
-            break;
+            return moveTribute(unit, direction);
         default:
             throw new IllegalArgumentException("showScoutIndianSettlementDialog fail");
         }
@@ -2895,11 +2918,13 @@ public final class InGameController implements NetworkConstants {
      *
      * @param unit The <code>Unit</code> that is spying.
      * @param direction The <code>Direction</code> of a colony to spy on.
+     * @return True if the unit can move further.
      */
-    private void moveSpy(Unit unit, Direction direction) {
+    private boolean moveSpy(Unit unit, Direction direction) {
         if (askServer().spy(unit, direction)) {
             nextActiveUnit();
         }
+        return false;
     }
 
     /**
@@ -2908,17 +2933,19 @@ public final class InGameController implements NetworkConstants {
      *
      * @param unit The carrier.
      * @param direction The direction to the settlement.
+     * @return True if the unit can move further.
      */
-    private void moveTrade(Unit unit, Direction direction) {
+    private boolean moveTrade(Unit unit, Direction direction) {
         clearGotoOrders(unit);
 
         Settlement settlement = getSettlementAt(unit.getTile(), direction);
         if (settlement instanceof Colony) {
-            moveTradeColony(unit, direction);
+            return moveTradeColony(unit, direction);
         } else if (settlement instanceof IndianSettlement) {
-            moveTradeIndianSettlement(unit, direction);
+            return moveTradeIndianSettlement(unit, direction);
         } else {
-            logger.warning("Bogus settlement: " + settlement.getId());
+            throw new IllegalStateException("Bogus settlement: "
+                + settlement.getId());
         }
     }
 
@@ -2932,10 +2959,11 @@ public final class InGameController implements NetworkConstants {
      *
      * @param unit The <code>Unit</code> negotiating.
      * @param direction The direction of a settlement to negotiate with.
+     * @return True if the unit can move further.
      */
-    private void moveTradeColony(Unit unit, Direction direction) {
+    private boolean moveTradeColony(Unit unit, Direction direction) {
         Settlement settlement = getSettlementAt(unit.getTile(), direction);
-        if (settlement == null) return;
+        if (settlement == null) return false;
 
         // Can not negotiate with the REF.
         Player player = unit.getOwner();
@@ -2989,6 +3017,7 @@ public final class InGameController implements NetworkConstants {
             break; // only counter proposals should loop
         }
         nextActiveUnit();
+        return false;
     }
 
     /**
@@ -3005,8 +3034,9 @@ public final class InGameController implements NetworkConstants {
      *                there is no <code>Settlement</code> in the given
      *                direction.
      * @see Settlement
+     * @return True if the unit can move further.
      */
-    private void moveTradeIndianSettlement(Unit unit, Direction direction) {
+    private boolean moveTradeIndianSettlement(Unit unit, Direction direction) {
         Settlement settlement = getSettlementAt(unit.getTile(), direction);
         boolean[] results;
         boolean done = false;
@@ -3044,9 +3074,10 @@ public final class InGameController implements NetworkConstants {
         askServer().closeTransactionSession(unit, settlement);
         if (unit.getMovesLeft() > 0) { // May have been restored if no trade
             gui.setActiveUnit(unit);
-        } else {
-            nextActiveUnit();
+            return true;
         }
+        nextActiveUnit();
+        return false;
     }
 
     /**
@@ -3201,13 +3232,15 @@ public final class InGameController implements NetworkConstants {
      *
      * @param unit The <code>Unit</code> to perform the attack.
      * @param direction The direction in which to attack.
+     * @return True if the unit can move further.
      */
-    private void moveTribute(Unit unit, Direction direction) {
+    private boolean moveTribute(Unit unit, Direction direction) {
         if (askServer().demandTribute(unit, direction)) {
             // Assume tribute paid
             gui.updateMenuBar();
             nextActiveUnit();
         }
+        return false;
     }
 
     /**
@@ -3216,10 +3249,11 @@ public final class InGameController implements NetworkConstants {
      *
      * @param unit The <code>Unit</code> that will enter the settlement.
      * @param direction The direction in which the Indian settlement lies.
+     * @return True if the unit can move further.
      */
-    private void moveUseMissionary(Unit unit, Direction direction) {
+    private boolean moveUseMissionary(Unit unit, Direction direction) {
         IndianSettlement settlement
-            = (IndianSettlement) getSettlementAt(unit.getTile(), direction);
+            = (IndianSettlement)getSettlementAt(unit.getTile(), direction);
         Unit missionary = settlement.getMissionary();
         boolean canEstablish = missionary == null;
         boolean canDenounce = missionary != null
@@ -3230,7 +3264,7 @@ public final class InGameController implements NetworkConstants {
         switch (gui.showUseMissionaryDialog(unit, settlement,
                 canEstablish, canDenounce)) {
         case CANCEL:
-            return;
+            return true;
         case ESTABLISH_MISSION:
             if (askServer().missionary(unit, direction, false)) {
                 if (settlement.getMissionary() == unit) {
@@ -3257,7 +3291,7 @@ public final class InGameController implements NetworkConstants {
                 "missionarySettlement.inciteQuestion",
                 "missionarySettlement.cancel",
                 enemies);
-            if (enemy == null) return;
+            if (enemy == null) return true;
             int gold = askServer().incite(unit, direction, enemy, -1);
             if (gold < 0) {
                 // protocol fail
@@ -3283,6 +3317,7 @@ public final class InGameController implements NetworkConstants {
             logger.warning("showUseMissionaryDialog fail");
             break;
         }
+        return false;
     }
 
     // end move-consequents
