@@ -264,12 +264,15 @@ public final class UnitLabel extends JLabel
 
         if (unit.getLocation() instanceof ColonyTile) {
             GoodsType workType = unit.getWorkType();
-            int production = ((ColonyTile) unit.getLocation()).getTotalProductionOf(workType);
-
-            ProductionLabel pl = new ProductionLabel(freeColClient, gui, workType, production);
-            g.translate(0, 10);
-            pl.paintComponent(g);
-            g.translate(0, -10);
+            if (workType != null) {
+                int production = ((ColonyTile)unit.getLocation())
+                    .getTotalProductionOf(workType);
+                ProductionLabel pl = new ProductionLabel(freeColClient, gui,
+                                                         workType, production);
+                g.translate(0, 10);
+                pl.paintComponent(g);
+                g.translate(0, -10);
+            }
         } else if (getParent() instanceof ColonyPanel.OutsideColonyPanel ||
                    getParent() instanceof InPortPanel ||
                    getParent() instanceof EuropePanel.DocksPanel ||
