@@ -34,6 +34,7 @@ import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.option.MapGeneratorOptions;
@@ -324,9 +325,10 @@ public final class PreGameInputHandler extends InputHandler {
 
         Element mgoElement = (Element)element
             .getElementsByTagName("gameOptions").item(0);
-        OptionGroup gameOptions = game.getSpecification()
-            .getOptionGroup("gameOptions");
+        Specification spec = game.getSpecification();
+        OptionGroup gameOptions = spec.getOptionGroup("gameOptions");
         gameOptions.readFromXMLElement(mgoElement);
+        spec.clean();
 
         gui.updateGameOptions();
 

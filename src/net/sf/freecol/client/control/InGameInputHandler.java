@@ -500,7 +500,10 @@ public final class InGameInputHandler extends InputHandler {
 
 
         if (currTurn.isFirstSeasonTurn()) {
-            new ShowInformationMessageSwingTask(StringTemplate.key("twoTurnsPerYear")).invokeLater();
+            new ShowInformationMessageSwingTask(
+                StringTemplate.template("twoTurnsPerYear")
+                    .addName("%year%", Integer.toString(currTurn.getYear())))
+                .invokeLater();
         }
         new UpdateMenuBarSwingTask().invokeLater();
         return null;

@@ -317,11 +317,16 @@ public final class Specification {
 
         // Initialize the Turn class using GameOptions.
         try {
-            Turn.setStartingYear(getInteger(GameOptions.STARTING_YEAR));
-            Turn.setSeasonYear(getInteger(GameOptions.SEASON_YEAR));
-            logger.info("Initialized turn.");
-        } catch(Exception e) {
-            logger.warning("Failed to set year options: " + e.toString());
+            int startingYear = getInteger(GameOptions.STARTING_YEAR);
+            int seasonYear = getInteger(GameOptions.SEASON_YEAR);
+            if (seasonYear < startingYear) seasonYear = startingYear;
+            Turn.setStartingYear(startingYear);
+            Turn.setSeasonYear(seasonYear);
+            logger.info("Initialized turn"
+                + ", starting year=" + Integer.toString(Turn.getStartingYear())
+                + ", season year=" + Integer.toString(Turn.getSeasonYear()));
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Failed to set year options", e);
         }
 
         // generate dynamic game options

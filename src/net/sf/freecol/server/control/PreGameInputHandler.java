@@ -28,6 +28,7 @@ import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DOMMessage;
 import net.sf.freecol.common.networking.NoRouteToServerException;
@@ -112,10 +113,11 @@ public final class PreGameInputHandler extends InputHandler {
         if (!player.isAdmin()) {
             throw new IllegalStateException("Not an admin");
         }
-        OptionGroup gameOptions = getFreeColServer().getGame()
-            .getSpecification().getOptionGroup("gameOptions");
+        Specification spec = getFreeColServer().getGame().getSpecification();
+        OptionGroup gameOptions = spec.getOptionGroup("gameOptions");
         Element child = (Element)element.getChildNodes().item(0);
         gameOptions.readFromXMLElement(child);
+        spec.clean();
 
         Element up = DOMMessage.createMessage("updateGameOptions");
         up.appendChild(gameOptions.toXMLElement(up.getOwnerDocument()));

@@ -34,6 +34,7 @@ import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
@@ -149,8 +150,9 @@ public final class PreGameController {
      * This method should be called after updating that object.
      */
     public void sendGameOptions() {
-        OptionGroup gameOptions = freeColClient.getGame().getSpecification()
-            .getOptionGroup("gameOptions");
+        Specification spec = freeColClient.getGame().getSpecification();
+        OptionGroup gameOptions = spec.getOptionGroup("gameOptions");
+        spec.clean();
 
         freeColClient.askServer().updateGameOptions(gameOptions);
 
