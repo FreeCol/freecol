@@ -24,6 +24,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.Thread.UncaughtExceptionHandler;
+import java.net.URL;
+import java.net.JarURLConnection;
+
 import java.util.Locale;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
@@ -118,21 +121,28 @@ public final class FreeCol {
         // Hide constructor
     }
 
+    private static String readVersion(Class c) throws IOException {
+        String resourceName = "/" + c.getName().toString().replace('.', '/')
+            + ".class";
+        URL url = c.getResource(resourceName);
+        Manifest mf = ((JarURLConnection)url.openConnection()).getManifest();
+        return mf.getMainAttributes().getValue("Package-Version");
+    }
+
     /**
      * The entrypoint.
      *
      * @param args The command-line arguments.
      */
     public static void main(String[] args) {
-
+        FREECOL_REVISION = FREECOL_VERSION;
         try {
-            Manifest manifest = new Manifest(FreeCol.class.getResourceAsStream("/META-INF/MANIFEST.MF"));
-            Attributes attribs = manifest.getMainAttributes();
-            String revision = attribs.getValue("Revision");
-            FREECOL_REVISION = FREECOL_VERSION + " (Revision: " + revision + ")";
+            String revision = readVersion(FreeCol.class);
+            if (revision != null) {
+                FREECOL_REVISION += " (Revision: " + revision + ")";
+            }
         } catch (Exception e) {
-            System.out.println("Unable to load Manifest.");
-            FREECOL_REVISION = FREECOL_VERSION;
+            System.err.println("Unable to load Manifest: " + e.getMessage());
         }
 
         // parse command line arguments
