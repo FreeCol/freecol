@@ -1225,6 +1225,21 @@ public class Map extends FreeColGameObject implements Location {
     };
 
     /**
+     * Does this path include a non-carrier move within the last turn?
+     *
+     * @param p The <code>PathNode</code> to check.
+     * @param turn Paths with fewer turns than this are previous turns.
+     * @return True if there was a non-carrier move in the last turn.
+     */
+    private static boolean embarkedThisTurn(PathNode p, int turns) {
+        for (; p != null; p = p.previous) {
+            if (p.getTurns() < turns) return false;
+            if (!p.isOnCarrier()) return true;
+        }
+        return false;
+    }
+
+    /**
      * Searches for a path to a goal determined by the given
      * <code>GoalDecider</code>.
      *
@@ -1277,8 +1292,8 @@ public class Map extends FreeColGameObject implements Location {
                     }
                 });
         final Europe europe = unit.getOwner().getEurope();
-        final List<Location> tracing = (traceSearch)
-            ? new ArrayList<Location>()
+        final List<PathNode> tracing = (traceSearch)
+            ? new ArrayList<PathNode>()
             : null;
         Unit waterUnit = (carrier != null) ? carrier : unit;
         Unit currentUnit = (start.isLand())
@@ -1301,7 +1316,7 @@ public class Map extends FreeColGameObject implements Location {
             // Choose the node with the lowest f.
             final PathNode currentNode = openListQueue.poll();
             final Location currentLocation = currentNode.getLocation();
-            if (tracing != null) tracing.add(currentLocation);
+            if (tracing != null) tracing.add(currentNode);
             openList.remove(currentLocation.getId());
             closedList.put(currentLocation.getId(), currentNode);
 
@@ -1358,22 +1373,35 @@ public class Map extends FreeColGameObject implements Location {
                 // be useful to dock the carrier so it can collect new
                 // cargo.  OTOH if the carrier is just passing through
                 // the right thing is to keep the passenger on board.
-                // Still there is a suboptimality if the carrier ends
-                // its turn one short of a settlement where there is
-                // no useful cargo but we fail to consider an
-                // immediate move into the settlement by the
-                // passenger.  The trouble with looking for such
-                // special cases is that we do not know yet whether
-                // that settlement is worth disembarking the unit to.
-                // There have been nasty bugs where passengers would
-                // disembark too early, so for now we live with the
-                // suboptimality.
+                //
+                // The disembarkToGoal tests handle the case where the
+                // carrier ends its turn one short of a goal
+                // settlement, where we should consider an immediate
+                // move into the settlement by the passenger.
                 //
                 boolean unitMove = unit.isTileAccessible(moveTile);
                 boolean carrierMove = carrier != null
                     && carrier.isTileAccessible(moveTile);
+                boolean embarked = embarkedThisTurn(currentNode, currentTurns);
+
+                boolean disembarkToGoal = false;
+                if (unitMove && carrierMove && currentOnCarrier && !embarked
+                    && goalDecider.check(unit,
+                        new PathNode(moveTile, currentMovesLeft, currentTurns,
+                                     false, currentNode, null))) {
+                    // The unit has moves left, and is on a carrier
+                    // next to the goal, which both can move to.
+                    // Usually we will prefer to let the carrier
+                    // finish the job, unless it can not do it this turn.
+                    CostDecider cd = (costDecider != null) ? costDecider
+                        : CostDeciders.defaultCostDeciderFor(carrier);
+                    int cost = cd.getCost(carrier, currentNode.getLocation(),
+                                          moveTile, currentMovesLeft);
+                    disembarkToGoal = cost != CostDecider.ILLEGAL_MOVE
+                        && cd.getNewTurns() > 0;
+                }
                 MoveStep step = (currentOnCarrier)
-                    ? ((carrierMove) ? MoveStep.BYWATER
+                    ? ((carrierMove && !disembarkToGoal) ? MoveStep.BYWATER
                         : (unitMove) ? MoveStep.DISEMBARK
                         : MoveStep.FAIL)
                     : ((carrierMove && !usedCarrier(currentNode))
@@ -1404,19 +1432,12 @@ public class Map extends FreeColGameObject implements Location {
                     move.embarkUnit(carrier);
                     break;
                 case DISEMBARK:
-                    // Check if already embarked this turn.  If so, the
-                    // disembarking unit should have zero moves left,
-                    // if not, its full amount is available.
-                    int movesLeft = unit.getInitialMovesLeft();
-                    for (PathNode p = currentNode; p != null; p = p.previous) {
-                        if (p.getTurns() < currentTurns) break;
-                        if (!p.isOnCarrier()) {
-                            movesLeft = 0;
-                            break;
-                        }
-                    }
+                    // If already embarked this turn the disembarking
+                    // unit should have zero moves left, otherwise its
+                    // full amount is available.
                     move = new MoveCandidate(unit, currentNode, moveTile,
-                        movesLeft, currentTurns, false,
+                        ((embarked) ? 0 : unit.getInitialMovesLeft()),
+                        currentTurns, false,
                         ((costDecider != null) ? costDecider
                             : CostDeciders.defaultCostDeciderFor(unit)));
                     break;
@@ -1472,9 +1493,8 @@ public class Map extends FreeColGameObject implements Location {
         if (tracing != null) {
             String logMe = "Search trace(" + unit + ", " + start
                 + ", " + ((carrier == null) ? "null" : carrier) + "):";
-            for (Location t : tracing) logMe += " " + t;
-            logMe += "\n";
-            if (best != null) logMe += best.fullPathToString() + "\n";
+            for (PathNode p : tracing) logMe += "\n   " + p;
+            if (best != null) logMe += "\n" + best.fullPathToString();
             logger.info(logMe);
         }
 
