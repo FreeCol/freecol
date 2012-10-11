@@ -234,7 +234,8 @@ public class WorkerWish extends Wish {
      */
     @Override
     public String toString() {
-        return "[" + getId() + " " + unitType.getNameKey()
+        return "[" + getId()
+            + " " + ((unitType == null) ? "null" : unitType.getNameKey())
             + " (" + getValue() + (expertNeeded ? ", expert" : "") + ")]";
     }
 
