@@ -223,7 +223,10 @@ public class LandGenerator {
         p = new Position(x, y);
         for (Direction direction : Direction.longSides) {
             Position n = p.getAdjacent(direction);
-            if (Map.isValid(n, width, height) && isSingleTile(n.getX(),n.getY()) && n.getX()>preferredDistanceToEdge && n.getX()<width-preferredDistanceToEdge) {
+            if (n.isValid(width, height)
+                && isSingleTile(n.getX(), n.getY())
+                && n.getX() > preferredDistanceToEdge
+                && n.getX() < width-preferredDistanceToEdge) {
                 l.add(n);
             }
         }
@@ -242,7 +245,10 @@ public class LandGenerator {
                 //add all valid neighbour positions to list
                 for (Direction direction : Direction.longSides) {
                     Position n = p.getAdjacent(direction);
-                    if (Map.isValid(n, width, height) && isSingleTile(n.getX(),n.getY()) && n.getX()>preferredDistanceToEdge && n.getX()<width-preferredDistanceToEdge) {
+                    if (n.isValid(width, height)
+                        && isSingleTile(n.getX(), n.getY())
+                        && n.getX() > preferredDistanceToEdge
+                        && n.getX() < width-preferredDistanceToEdge) {
                         l.add(n);
                     }
                 }
@@ -311,7 +317,7 @@ public class LandGenerator {
 
         for (Direction direction : Direction.values()) {
             Position n = p.getAdjacent(direction);
-            if (Map.isValid(n, width, height) && map[n.getX()][n.getY()]) {
+            if (n.isValid(width, height) && map[n.getX()][n.getY()]) {
                 return false;
             }
         }
@@ -338,7 +344,7 @@ public class LandGenerator {
 
         for (Direction direction : Direction.longSides) {
             Position n = p.getAdjacent(direction);
-            if (Map.isValid(n, width, height)) {
+            if (n.isValid(width, height)) {
                 growLand(n.getX(), n.getY());
             }
         }
@@ -374,7 +380,7 @@ public class LandGenerator {
 
         for (Direction direction : Direction.values()) {
             Position n = p.getAdjacent(direction);
-            if (Map.isValid(n, width, height) && map[n.getX()][n.getY()]) {
+            if (n.isValid(width, height) && map[n.getX()][n.getY()]) {
                 sum++;
             }
         }

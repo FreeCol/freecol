@@ -30,6 +30,7 @@ import java.util.Queue;
 import java.util.Random;
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
@@ -335,42 +336,22 @@ public class TerrainGenerator {
     }
 
     /**
-     * Select a random land position on the map.
-     *
-     * Public so that map generators can also use it.  However:
-     * <b>warning</b> this method should not be used by any model
-     * object unless we have completed restructuring the model (making
-     * all model changes at the server). The reason is the use of
-     * random numbers in this method.
-     *
-     * @param map The <code>Map</code> to search in.
-     * @param random A <code>Random</code> number source.
-     * @return A random land position, or null if none found.
-     */
-    public Position getRandomLandPosition(Map map, Random random) {
-        int x = (map.getWidth() < 10) ? random.nextInt(map.getWidth())
-            : random.nextInt(map.getWidth() - 10) + 5;
-        int y = (map.getHeight() < 10) ? random.nextInt(map.getHeight())
-            : random.nextInt(map.getHeight() - 10) + 5;
-        Position centerPosition = new Position(x, y);
-        Iterator<Position> it = map.getFloodFillIterator(centerPosition);
-        while (it.hasNext()) {
-            Position p = it.next();
-            if (map.getTile(p).isLand()) return p;
-        }
-        return null;
-    }
-
-    /**
-     * Wrapper for getRandomLandPosition.
+     * Select a random land tile on the map.
      *
      * @param map The <code>Map</code> to search in.
      * @param random A <code>Random</code> number source.
      * @return A random land tile, or null if none found.
      */
     public Tile getRandomLandTile(Map map, Random random) {
-        Position p = getRandomLandPosition(map, random);
-        return (p == null) ? null : map.getTile(p);
+        int x = (map.getWidth() < 10) ? random.nextInt(map.getWidth())
+            : random.nextInt(map.getWidth() - 10) + 5;
+        int y = (map.getHeight() < 10) ? random.nextInt(map.getHeight())
+            : random.nextInt(map.getHeight() - 10) + 5;
+        for (Tile t : map.getCircleTiles(map.getTile(x, y), true,
+                                         FreeColObject.INFINITY)) {
+            if (t.isLand()) return t;
+        }
+        return null;
     }
 
 
@@ -433,7 +414,7 @@ public class TerrainGenerator {
             String ids = "";
             for (Region r : importGame.getMap().getRegions()) {
                 ServerRegion region = new ServerRegion(game, r);
-                map.setRegion(region);
+                map.putRegion(region);
                 regionMap.put(r.getId(), region);
                 ids += " " + region.getNameKey();
             }
@@ -555,41 +536,41 @@ public class TerrainGenerator {
             pacific = new ServerRegion(game,
                 "model.region.pacific", RegionType.OCEAN, null);
             pacific.setDiscoverable(true);
-            map.setRegion(pacific);
+            map.putRegion(pacific);
             pacific.setScoreValue(PACIFIC_SCORE_VALUE);
         }
         if (northPacific == null) {
             northPacific = new ServerRegion(game,
                 "model.region.northPacific", RegionType.OCEAN, pacific);
             northPacific.setDiscoverable(false);
-            map.setRegion(northPacific);
+            map.putRegion(northPacific);
         } else present++;
         if (southPacific == null) {
             southPacific = new ServerRegion(game,
                 "model.region.southPacific", RegionType.OCEAN, pacific);
             southPacific.setDiscoverable(false);
-            map.setRegion(southPacific);
+            map.putRegion(southPacific);
         } else present++;
         if (atlantic == null) {
             atlantic = new ServerRegion(game,
                 "model.region.atlantic", RegionType.OCEAN, null);
             atlantic.setPrediscovered(true);
             atlantic.setDiscoverable(false);
-            map.setRegion(atlantic);
+            map.putRegion(atlantic);
         }
         if (northAtlantic == null) {
             northAtlantic = new ServerRegion(game,
                 "model.region.northAtlantic", RegionType.OCEAN, atlantic);
             northAtlantic.setPrediscovered(true);
             northAtlantic.setDiscoverable(false);
-            map.setRegion(northAtlantic);
+            map.putRegion(northAtlantic);
         } else present++;
         if (southAtlantic == null) {
             southAtlantic = new ServerRegion(game,
                 "model.region.southAtlantic", RegionType.OCEAN, atlantic);
             southAtlantic.setPrediscovered(true);
             southAtlantic.setDiscoverable(false);
-            map.setRegion(southAtlantic);
+            map.putRegion(southAtlantic);
         } else present++;
 
         if (present == 4) {
@@ -732,7 +713,7 @@ public class TerrainGenerator {
             arctic = new ServerRegion(game,
                 "model.region.arctic", RegionType.LAND, null);
             arctic.setPrediscovered(true);
-            map.setRegion(arctic);
+            map.putRegion(arctic);
             for (int x = 0; x < map.getWidth(); x++) {
                 for (int y = 0; y < arcticHeight; y++) {
                     if (map.isValid(x, y)) {
@@ -748,7 +729,7 @@ public class TerrainGenerator {
             antarctic = new ServerRegion(game,
                 "model.region.antarctic", RegionType.LAND, null);
             antarctic.setPrediscovered(true);
-            map.setRegion(antarctic);
+            map.putRegion(antarctic);
             for (int x = 0; x < map.getWidth(); x++) {
                 for (int y = antarcticHeight; y < map.getHeight(); y++) {
                     if (map.isValid(x, y)) {
@@ -772,7 +753,7 @@ public class TerrainGenerator {
         if (northWest == null) {
             northWest = new ServerRegion(game,
                 "model.region.northWest", RegionType.LAND, null);
-            map.setRegion(northWest);
+            map.putRegion(northWest);
         }
         northWest.setBounds(new Rectangle(0,0,
                 thirdWidth,thirdHeight));
@@ -782,7 +763,7 @@ public class TerrainGenerator {
         if (north == null) {
             north = new ServerRegion(game,
                 "model.region.north", RegionType.LAND, null);
-            map.setRegion(north);
+            map.putRegion(north);
         }
         north.setBounds(new Rectangle(thirdWidth,0,
                 twoThirdWidth,thirdHeight));
@@ -792,7 +773,7 @@ public class TerrainGenerator {
         if (northEast == null) {
             northEast = new ServerRegion(game,
                 "model.region.northEast", RegionType.LAND, null);
-            map.setRegion(northEast);
+            map.putRegion(northEast);
         }
         northEast.setBounds(new Rectangle(twoThirdWidth,0,
                 map.getWidth(),thirdHeight));
@@ -802,7 +783,7 @@ public class TerrainGenerator {
         if (west == null) {
             west = new ServerRegion(game,
                 "model.region.west", RegionType.LAND, null);
-            map.setRegion(west);
+            map.putRegion(west);
         }
         west.setBounds(new Rectangle(0,thirdHeight,
                 thirdWidth,twoThirdHeight));
@@ -812,7 +793,7 @@ public class TerrainGenerator {
         if (center == null) {
             center = new ServerRegion(game,
                 "model.region.center", RegionType.LAND, null);
-            map.setRegion(center);
+            map.putRegion(center);
         }
         center.setBounds(new Rectangle(thirdWidth,thirdHeight,
                 twoThirdWidth,twoThirdHeight));
@@ -822,7 +803,7 @@ public class TerrainGenerator {
         if (east == null) {
             east = new ServerRegion(game,
                 "model.region.east", RegionType.LAND, null);
-            map.setRegion(east);
+            map.putRegion(east);
         }
         east.setBounds(new Rectangle(twoThirdWidth,thirdHeight,
                 map.getWidth(),twoThirdHeight));
@@ -832,7 +813,7 @@ public class TerrainGenerator {
         if (southWest == null) {
             southWest = new ServerRegion(game,
                 "model.region.southWest", RegionType.LAND, null);
-            map.setRegion(southWest);
+            map.putRegion(southWest);
         }
         southWest.setBounds(new Rectangle(0,twoThirdHeight,
                 thirdWidth,map.getHeight()));
@@ -842,7 +823,7 @@ public class TerrainGenerator {
         if (south == null) {
             south = new ServerRegion(game,
                 "model.region.south", RegionType.LAND, null);
-            map.setRegion(south);
+            map.putRegion(south);
         }
         south.setBounds(new Rectangle(thirdWidth,twoThirdHeight,
                 twoThirdWidth,map.getHeight()));
@@ -852,7 +833,7 @@ public class TerrainGenerator {
         if (southEast == null) {
             southEast = new ServerRegion(game,
                 "model.region.southEast", RegionType.LAND, null);
-            map.setRegion(southEast);
+            map.putRegion(southEast);
         }
         southEast.setBounds(new Rectangle(twoThirdWidth,twoThirdHeight,
                 map.getWidth(),map.getHeight()));
@@ -987,7 +968,7 @@ public class TerrainGenerator {
             landregions[c] = new ServerRegion(map.getGame(), id,
                 Region.RegionType.LAND, null);
             landregions[c].setDiscoverable(true);
-            map.setRegion(landregions[c]);
+            map.putRegion(landregions[c]);
         }
 
         // Add tiles to ServerRegions
@@ -1177,12 +1158,9 @@ public class TerrainGenerator {
         int counter = 0;
         nextTry: for (int tries = 0; tries < 100; tries++) {
             if (counter < number) {
-                Position p = getRandomLandPosition(map, random);
-                if (p == null) {
-                    // this can only happen if the map contains no land
-                    return;
-                }
-                Tile startTile = map.getTile(p);
+                Tile startTile = getRandomLandTile(map, random);
+                if (startTile == null) return; // No land found!
+
                 if (startTile.getType() == hills
                     || startTile.getType() == mountains) {
                     // already a high ground
@@ -1190,19 +1168,15 @@ public class TerrainGenerator {
                 }
 
                 // do not start a mountain range too close to another
-                for (Tile t: startTile.getSurroundingTiles(3)) {
-                    if (t.getType() == mountains) {
-                        continue nextTry;
-                    }
+                for (Tile t : startTile.getSurroundingTiles(3)) {
+                    if (t.getType() == mountains) continue nextTry;
                 }
 
                 // Do not add a mountain range too close to the
                 // ocean/lake this helps with good locations for
                 // building colonies on shore
-                for (Tile t: startTile.getSurroundingTiles(2)) {
-                    if (!t.isLand()) {
-                        continue nextTry;
-                    }
+                for (Tile t : startTile.getSurroundingTiles(2)) {
+                    if (!t.isLand()) continue nextTry;
                 }
 
                 ServerRegion mountainRegion = new ServerRegion(map.getGame(),
@@ -1210,7 +1184,7 @@ public class TerrainGenerator {
                     Region.RegionType.MOUNTAIN, startTile.getRegion());
                 mountainRegion.setDiscoverable(true);
                 mountainRegion.setClaimable(true);
-                map.setRegion(mountainRegion);
+                map.putRegion(mountainRegion);
                 Direction direction = Direction.getRandomDirection("getLand",
                                                                    random);
                 int length = maximumLength - random.nextInt(maximumLength/2);
@@ -1250,8 +1224,8 @@ public class TerrainGenerator {
         counter = 0;
         nextTry: for (int tries = 0; tries < 1000; tries++) {
             if (counter < number) {
-                Position p = getRandomLandPosition(map, random);
-                Tile t = map.getTile(p);
+                Tile t = getRandomLandTile(map, random);
+                if (t == null) return;
 
                 if (t.getType() == hills || t.getType() == mountains) {
                     continue; // Already on high ground
@@ -1296,31 +1270,31 @@ public class TerrainGenerator {
 
         for (int i = 0; i < number; i++) {
             nextTry: for (int tries = 0; tries < 100; tries++) {
-                Position position = getRandomLandPosition(map, random);
-                if (!map.getTile(position).getType()
-                    .canHaveImprovement(riverType)) {
+                Tile tile = getRandomLandTile(map, random);
+                if (tile == null) return;
+
+                if (!tile.getType().canHaveImprovement(riverType)) {
                     continue;
                 }
-                // check the river source/spring is not too close to the ocean
 
-                for (Tile neighborTile: map.getTile(position)
-                         .getSurroundingTiles(2)) {
+                // check the river source/spring is not too close to the ocean
+                for (Tile neighborTile : tile.getSurroundingTiles(2)) {
                     if (!neighborTile.isLand()) {
                         continue nextTry;
                     }
                 }
-                if (riverMap.get(position) == null) {
+                if (riverMap.get(tile.getPosition()) == null) {
                     // no river here yet
                     ServerRegion riverRegion = new ServerRegion(map.getGame(),
                         "model.region.river" + i, Region.RegionType.RIVER,
-                        map.getTile(position).getRegion());
+                        tile.getRegion());
                     riverRegion.setDiscoverable(true);
                     riverRegion.setClaimable(true);
                     River river = new River(map, riverMap, riverRegion, random);
-                    if (river.flowFromSource(position)) {
+                    if (river.flowFromSource(tile.getPosition())) {
                         logger.fine("Created new river with length "
                             + river.getLength());
-                        map.setRegion(riverRegion);
+                        map.putRegion(riverRegion);
                         rivers.add(river);
                         counter++;
                     } else {
@@ -1384,7 +1358,7 @@ public class TerrainGenerator {
             ServerRegion lakeRegion = new ServerRegion(game, id,
                                                        RegionType.LAKE, null);
             setGeographicRegion(lakeRegion);
-            map.setRegion(lakeRegion);
+            map.putRegion(lakeRegion);
             // Pretend lakes are discovered with the surrounding terrain?
             lakeRegion.setPrediscovered(false);
 

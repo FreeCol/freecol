@@ -220,8 +220,7 @@ abstract public class Settlement extends GoodsLocation
     public void placeSettlement(boolean maximal) {
         List<Tile> tiles;
         if (maximal) {
-            tiles = getGame().getMap()
-                .getClaimableTiles(owner, tile, getRadius());
+            tiles = owner.getClaimableTiles(tile, getRadius());
         } else {
             tiles = new ArrayList<Tile>();
             tiles.add(tile);

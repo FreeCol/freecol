@@ -132,7 +132,8 @@ public class Map extends FreeColGameObject implements Location {
         /**
          * Gets this direction rotated by n places.
          *
-         * @param n The number of places to rotate.
+         * @param n The number of places to rotate
+         *     (-#directions <= n <= #directions).
          * @return The rotated direction.
          */
         private Direction rotate(int n) {
@@ -159,7 +160,7 @@ public class Map extends FreeColGameObject implements Location {
         }
 
         /**
-         * Returns the reverse direction of the given direction.
+         * Gets the reverse direction of this one.
          *
          * @return The reverse <code>Direction</code>.
          */
@@ -213,9 +214,9 @@ public class Map extends FreeColGameObject implements Location {
          * of it (chosen randomly), and so on until the last entry
          * will be the complete reverse of the supplied direction.
          * 
-         * Useful if we to step in a particular direction, but if this
-         * fails to be able to try the closest other directions to the
-         * original one in order.
+         * Useful if we want to travel in a particular direction, but
+         * if this fails to be able to try the closest other
+         * directions to the original one in order.
          *
          * @param logMe A string to log with the random results.
          * @param random A <code>Random</code> number source.
@@ -245,6 +246,140 @@ public class Map extends FreeColGameObject implements Location {
         }
     }
 
+    /**
+     * A position on the Map.
+     */
+    public static final class Position {
+        
+        /**
+         * The coordinates of the position.
+         */
+        public final int x, y;
+
+
+        /**
+         * Creates a new <code>Position</code> object with the given
+         * coordinates.
+         *
+         * @param posX The x-coordinate for this position.
+         * @param posY The y-coordinate for this position.
+         */
+        public Position(int posX, int posY) {
+            x = posX;
+            y = posY;
+        }
+
+        /**
+         * Gets the x-coordinate of this Position.
+         *
+         * @return The x-coordinate of this Position.
+         */
+        public int getX() {
+            return x;
+        }
+
+        /**
+         * Gets the y-coordinate of this Position.
+         *
+         * @return The y-coordinate of this Position.
+         */
+        public int getY() {
+            return y;
+        }
+
+        /**
+         * Checks whether a position is valid within a given map size.
+         *
+         * @param width The width of the map.
+         * @param height The height of the map.
+         * @return True if the given position is within the bounds of the map.
+         */
+        public boolean isValid(int width, int height) {
+            return Map.isValid(x, y, width, height);
+        }
+
+        /**
+         * Compares the other Position based on the coordinates.
+         *
+         * @param other The other object to compare with.
+         * @return True iff the coordinates match.
+         */
+        @Override
+        public boolean equals(Object other) {
+            if (this == other) {
+                return true;
+            } else if (other == null) {
+                return false;
+            } else if (!(other instanceof Position)) {
+                return false;
+            } else {
+                return x == ((Position)other).x && y == ((Position)other).y;
+            }
+        }
+
+        /**
+         * Gets a hash code value.  The current implementation
+         * (which may change at any time) works well as long as the
+         * maximum coordinates fit in 16 bits.
+         *
+         * @return A hash code value for this object.
+         */
+        @Override
+        public int hashCode() {
+            return x | (y << 16);
+        }
+
+        /**
+         * Gets the position adjacent to a given position, in a given
+         * direction.
+         *
+         * @param direction The <code>Direction</code> to check.
+         * @return The adjacent position.
+         */
+        public Position getAdjacent(Direction direction) {
+            int x = this.x + (((this.y & 1) != 0) ? direction.getOddDX()
+                : direction.getEvenDX());
+            int y = this.y + (((this.y & 1) != 0) ? direction.getOddDY()
+                : direction.getEvenDY());
+            return new Position(x, y);
+        }
+
+        /**
+         * Gets the distance in tiles between two map positions.
+         * With an isometric map this is a non-trivial task.
+         * The formula below has been developed largely through trial and
+         * error.  It should cover all cases, but I wouldn't bet my
+         * life on it.
+         *
+         * @param position The other <code>Position</code> to compare.
+         * @return The distance in tiles to the other position.
+         */
+        public int getDistance(Position position) {
+            int ay = getY();
+            int by = position.getY();
+            int r = position.getX() - getX() - (ay - by) / 2;
+
+            if (by > ay && ay % 2 == 0 && by % 2 != 0) {
+                r++;
+            } else if (by < ay && ay % 2 != 0 && by % 2 == 0) {
+                r--;
+            }
+            return Math.max(Math.abs(ay - by + r), Math.abs(r));
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String toString() {
+            return "(" + x + ", " + y + ")";
+        }
+    }
+
+
+    /**
+     * The tiles that this map contains.
+     */
     private Tile[][] tiles;
 
     /**
@@ -279,6 +414,7 @@ public class Map extends FreeColGameObject implements Location {
 
     /**
      * The search tracing status.
+     * Do not serialize.
      */
     private boolean traceSearch = false;
 
@@ -286,13 +422,12 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * Create a new <code>Map</code> from a collection of tiles.
      *
-     * @param game
-     *            The <code>Game</code> this map belongs to.
-     * @param tiles
-     *            The 2D array of tiles.
+     * @param game The <code>Game</code> this map belongs to.
+     * @param tiles The 2D array of tiles to contain.
      */
     public Map(Game game, Tile[][] tiles) {
         super(game);
+
         this.tiles = tiles;
         setLayer(Layer.RESOURCES);
         calculateLatitudePerRow();
@@ -302,15 +437,13 @@ public class Map extends FreeColGameObject implements Location {
      * Create a new <code>Map</code> from an <code>Element</code> in a
      * DOM-parsed XML-tree.
      *
-     * @param game
-     *            The <code>Game</code> this map belongs to.
-     * @param in
-     *            The input stream containing the XML.
-     * @throws XMLStreamException
-     *             if a problem was encountered during parsing.
+     * @param game The <code>Game</code> this map belongs to.
+     * @param in The input stream containing the XML.
+     * @throws XMLStreamException if a problem was encountered during parsing.
      */
     public Map(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
+
         readFromXML(in);
     }
 
@@ -320,26 +453,113 @@ public class Map extends FreeColGameObject implements Location {
      * {@link #readFromXML(XMLStreamReader)} or
      * {@link #readFromXMLElement(Element)}.
      *
-     * @param game
-     *            The <code>Game</code> in which this object belong.
-     * @param id
-     *            The unique identifier for this object.
+     * @param game The <code>Game</code> in which this object belong.
+     * @param id The unique identifier for this object.
      */
     public Map(Game game, String id) {
         super(game, id);
     }
 
+
     /**
-     * Get the <code>Layer</code> value.
+     * Checks if an (x,y) coordinate tuple is within a map of
+     * specified width and height.
      *
-     * @return a <code>Layer</code> value
+     * @param x The x-coordinate of the position.
+     * @param y The y-coordinate of the position.
+     * @param width The width of the map.
+     * @param height The height of the map.
+     * @return True if the given position is within the bounds of the map.
+     */
+    public static boolean isValid(int x, int y, int width, int height) {
+        return x >= 0 && x < width && y >= 0 && y < height;
+    }
+
+    /**
+     * Checks whether a position is valid (within the map limits).
+     *
+     * @param x The X coordinate to check.
+     * @param y The Y coordinate to check.
+     * @return True if the coordinates are valid.
+     */
+    public boolean isValid(int x, int y) {
+        return isValid(x, y, getWidth(), getHeight());
+    }
+
+    /**
+     * Checks whether a position is valid (within the map limits).
+     *
+     * @param position The <code>Position</code> to check.
+     * @return True if the position is valid.
+     */
+    public boolean isValid(Position position) {
+        return isValid(position.getX(), position.getY());
+    }
+
+    /**
+     * Gets the Tile at position (x, y).  'x' specifies a column and
+     * 'y' specifies a row.  (0, 0) is the Tile at the top-left corner
+     * of the Map.
+     *
+     * @param x The x-coordinate of the <code>Tile</code>.
+     * @param y The y-coordinate of the <code>Tile</code>.
+     * @return The <code>Tile</code> at (x, y), or null if the
+     *     position is invalid.
+     */
+    public Tile getTile(int x, int y) {
+        return (isValid(x, y)) ? tiles[x][y] : null;
+    }
+
+    /**
+     * Gets the Tile at a requested position.
+     *
+     * @param p The <code>Position</code> to query.
+     * @return The <code>Tile</code> at the given position.
+     */
+    public Tile getTile(Position p) {
+        return getTile(p.getX(), p.getY());
+    }
+
+    /**
+     * Sets the tile at the given coordinates.
+     *
+     * @param x The x-coordinate of the <code>Tile</code>.
+     * @param y The y-coordinate of the <code>Tile</code>.
+     * @param tile The <code>Tile</code> to set.
+     */
+    public void setTile(Tile tile, int x, int y) {
+        tiles[x][y] = tile;
+    }
+
+    /**
+     * Gets the width of this map.
+     *
+     * @return The width of this map.
+     */
+    public int getWidth() {
+        return (tiles == null) ? 0 : tiles.length;
+    }
+
+    /**
+     * Gets the height of this map.
+     *
+     * @return The height of this map.
+     */
+    public int getHeight() {
+        return (tiles == null) ? 0 : tiles[0].length;
+    }
+
+    /**
+     * Gets the <code>Layer</code> value.
+     *
+     * @return The <code>Layer</code> value
      */
     public final Layer getLayer() {
         return layer;
     }
 
     /**
-     * Set the <code>Layer</code> value.
+     * Sets the <code>Layer</code> value.
      *
      * @param newLayer The new Layer value.
      */
@@ -348,18 +568,18 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Get the <code>MinimumLatitude</code> value.
+     * Gets the <code>MinimumLatitude</code> value.
      *
-     * @return an <code>int</code> value
+     * @return The minimum latitude of this map.
      */
     public final int getMinimumLatitude() {
         return minimumLatitude;
     }
 
     /**
-     * Set the <code>MinimumLatitude</code> value.
+     * Sets the <code>MinimumLatitude</code> value.
      *
-     * @param newMinimumLatitude The new MinimumLatitude value.
+     * @param newMinimumLatitude The new minimum latitude value.
      */
     public final void setMinimumLatitude(final int newMinimumLatitude) {
         this.minimumLatitude = newMinimumLatitude;
@@ -367,16 +587,16 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Get the <code>MaximumLatitude</code> value.
+     * Gets the <code>MaximumLatitude</code> value.
      *
-     * @return an <code>int</code> value
+     * @return The maximum latitude of this map.
      */
     public final int getMaximumLatitude() {
         return maximumLatitude;
     }
 
     /**
-     * Set the <code>MaximumLatitude</code> value.
+     * Sets the <code>MaximumLatitude</code> value.
      *
      * @param newMaximumLatitude The new MaximumLatitude value.
      */
@@ -386,9 +606,9 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Get the <code>LatitudePerRow</code> value.
+     * Gets the <code>LatitudePerRow</code> value.
      *
-     * @return a <code>float</code> value
+     * @return The latitude change between rows.
      */
     public final float getLatitudePerRow() {
         return latitudePerRow;
@@ -403,53 +623,55 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Get the latitude of the given map row.
+     * Gets the latitude of the given map row.
      *
-     * @param row an <code>int</code> value
-     * @return an <code>int</code> value
+     * @param row The row to check.
+     * @return The row latitude.
      */
     public int getLatitude(int row) {
         return minimumLatitude + (int) (row * latitudePerRow);
     }
 
     /**
-     * Get the map row with the given latitude.
+     * Gets the map row with the given latitude.
      *
-     * @param latitude an <code>int</code> value
-     * @return an <code>int</code> value
+     * @param latitude The latitude to find.
+     * @return The row closest to the supplied latitude.
      */
     public int getRow(int latitude) {
         return (int) ((latitude - minimumLatitude) / latitudePerRow);
     }
 
     /**
-     * Returns a Collection containing all map regions.
+     * Gets the regions in this map.
      *
-     * @return a Collection containing all map regions
+     * @return All the regions in this map.
      */
     public Collection<Region> getRegions() {
         return regions.values();
     }
 
     /**
-     * Returns the <code>Region</code> with the given key (the nameKey).
+     * Gets a <code>Region</code> by name key.
      *
-     * @param key The key to lookup the region with.
-     * @return The region with the given name key.
+     * @param key The name key to lookup the region with.
+     * @return The region with the given name key, or null if not found.
      */
     public Region getRegion(final String key) {
         return regions.get(key);
     }
 
     /**
-     * Returns the <code>Region</code> with the given name.
+     * Gets a <code>Region</code> by name.
      *
-     * @param id a <code>String</code> value
-     * @return a <code>Region</code> value
+     * @param name The region name.
+     * @return The <code>Region</code> with the given name, or null if
+     *     not found.
      */
-    public Region getRegionByName(final String id) {
+    public Region getRegionByName(final String name) {
+        if (name == null) return null;
         for (Region region : regions.values()) {
-            if (id.equals(region.getName())) {
+            if (name.equals(region.getName())) {
                 return region;
             }
         }
@@ -457,13 +679,44 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Describe <code>setRegion</code> method here.
+     * Puts a region into this map.
      *
-     * @param region a <code>Region</code> value
+     * @param region The <code>Region</code> to put.
      */
-    public void setRegion(final Region region) {
+    public void putRegion(final Region region) {
         regions.put(region.getNameKey(), region);
     }
+
+
+    /**
+     * Are two locations non-null and either the same or at the same tile.
+     * This routine is here because Location is an interface.
+     *
+     * @param l1 The first <code>Location</code>.
+     * @param l2 The second <code>Location</code>.
+     * @return True if the locations are the same or at the same tile.
+     */
+    public static final boolean isSameLocation(Location l1, Location l2) {
+        return (l1 == null || l2 == null) ? false
+            : (l1 == l2) ? true
+            : (l1.getTile() == null) ? false
+            : l1.getTile() == l2.getTile();
+    }
+
+    /**
+     * Are two locations at least in the same contiguous land/sea-mass?
+     * This routine is here because Location is an interface.
+     *
+     * @param l1 The first <code>Location</code>.
+     * @param l2 The second <code>Location</code>.
+     * @return True if the locations are the same or in the same land/sea-mass.
+     */
+    public static final boolean isSameContiguity(Location l1, Location l2) {
+        return (l1 == null || l2 == null) ? false
+            : (l1 == l2) ? true
+            : (l1.getTile() == null || l2.getTile() == null) ? false
+            : l1.getTile().getContiguity() == l2.getTile().getContiguity();
+    }            
 
     /**
      * Is a tile in the map in a polar region?
@@ -474,76 +727,6 @@ public class Map extends FreeColGameObject implements Location {
     public boolean isPolar(Tile tile) {
         return tile.getY() <= POLAR_HEIGHT
             || tile.getY() >= getHeight() - POLAR_HEIGHT - 1;
-    }
-
-    /**
-     * Returns the Tile at a requested position.
-     *
-     * @param p
-     *            The position.
-     * @return The Tile at the given position.
-     */
-    public Tile getTile(Position p) {
-        return getTile(p.getX(), p.getY());
-    }
-
-    /**
-     * Returns the Tile at position (x, y). 'x' specifies a column and 'y'
-     * specifies a row. (0, 0) is the Tile at the top-left corner of the Map.
-     *
-     * @param x
-     *            The x-coordinate of the <code>Tile</code>.
-     * @param y
-     *            The y-coordinate of the <code>Tile</code>.
-     * @return The Tile at position (x, y) or <code>null</code> if the
-     *         position is invalid.
-     */
-    public Tile getTile(int x, int y) {
-        if (isValid(x, y)) {
-            return tiles[x][y];
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Sets the given tile the the given coordinates.
-     *
-     * @param x
-     *            The x-coordinate of the <code>Tile</code>.
-     * @param y
-     *            The y-coordinate of the <code>Tile</code>.
-     * @param tile
-     *            The <code>Tile</code>.
-     */
-    public void setTile(Tile tile, int x, int y) {
-        tiles[x][y] = tile;
-    }
-
-    /**
-     * Returns the width of this Map.
-     *
-     * @return The width of this Map.
-     */
-    public int getWidth() {
-        if (tiles == null) {
-            return 0;
-        } else {
-            return tiles.length;
-        }
-    }
-
-    /**
-     * Returns the height of this Map.
-     *
-     * @return The height of this Map.
-     */
-    public int getHeight() {
-        if (tiles == null) {
-            return 0;
-        } else {
-            return tiles[0].length;
-        }
     }
 
     /**
@@ -579,71 +762,8 @@ public class Map extends FreeColGameObject implements Location {
         return getTile(x, y);
     }
 
-    /**
-     * Are two locations non-null and either the same or at the same tile.
-     * This routine is here because Location is an interface.
-     *
-     * @param l1 The first <code>Location</code>.
-     * @param l2 The second <code>Location</code>.
-     * @return True if the locations are the same or at the same tile.
-     */
-    public static final boolean isSameLocation(Location l1, Location l2) {
-        return (l1 == null || l2 == null) ? false
-            : (l1 == l2) ? true
-            : (l1.getTile() == null) ? false
-            : l1.getTile() == l2.getTile();
-    }
 
-    /**
-     * Are two locations at least in the same contiguous land/sea-mass?
-     *
-     * @param l1 The first <code>Location</code>.
-     * @param l2 The second <code>Location</code>.
-     * @return True if the locations are the same or in the same land/sea-mass.
-     */
-    public static final boolean isSameContiguity(Location l1, Location l2) {
-        return (l1 == null || l2 == null) ? false
-            : (l1 == l2) ? true
-            : (l1.getTile() == null || l2.getTile() == null) ? false
-            : l1.getTile().getContiguity() == l2.getTile().getContiguity();
-    }            
-
-    /**
-     * Gets the list of tiles that might be claimable by a settlement.
-     * We can not do a simple iteration of the rings because this
-     * allows settlements to claim tiles across unclaimable gaps
-     * (e.g. Aztecs owning tiles on nearby islands).  So we have to
-     * only allow tiles that are adjacent to a known connected tile.
-     *
-     * @param player The <code>Player</code> that intends to found a settlement.
-     * @param centerTile The intended settlement center <code>Tile</code>.
-     * @param radius The radius of the settlement.
-     * @return A list of potentially claimable tiles.
-     */
-    public List<Tile> getClaimableTiles(Player player, Tile centerTile,
-                                        int radius) {
-        List<Tile> tiles = new ArrayList<Tile>();
-        List<Tile> layer = new ArrayList<Tile>();
-        if (player.canClaimToFoundSettlement(centerTile)) {
-            layer.add(centerTile);
-            for (int r = 1; r <= radius; r++) {
-                List<Tile> lastLayer = new ArrayList<Tile>(layer);
-                tiles.addAll(layer);
-                layer.clear();
-                for (Tile have : lastLayer) {
-                    for (Tile next : have.getSurroundingTiles(1)) {
-                        if (!tiles.contains(next)
-                            && player.canClaimForSettlement(next)) {
-                            layer.add(next);
-                        }
-                    }
-                }
-            }
-            tiles.addAll(layer);
-        }
-        return tiles;
-    }
-
+    // Path-finding/searching infrastructure and routines
 
     /**
      * Simple interface to supply a heuristic to the A* routine.
@@ -1058,7 +1178,9 @@ public class Map extends FreeColGameObject implements Location {
          */
         public boolean canImprove(PathNode best) {
             return cost != CostDecider.ILLEGAL_MOVE
-                && (best == null || cost < best.getCost());
+                && (best == null || cost < best.getCost()
+                    || (cost == best.getCost()
+                        && best.getLength() < path.getLength()));
         }
 
         /**
@@ -1387,174 +1509,7 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     
-    // Support for various kinds of iteration.
-
-    /**
-     * A position on the Map.
-     */
-    public static final class Position {
-        
-        /**
-         * The coordinates of the position.
-         */
-        public final int x, y;
-
-
-        /**
-         * Creates a new <code>Position</code> object with the given
-         * coordinates.
-         *
-         * @param posX The x-coordinate for this position.
-         * @param posY The y-coordinate for this position.
-         */
-        public Position(int posX, int posY) {
-            x = posX;
-            y = posY;
-        }
-
-        /**
-         * Gets the x-coordinate of this Position.
-         *
-         * @return The x-coordinate of this Position.
-         */
-        public int getX() {
-            return x;
-        }
-
-        /**
-         * Gets the y-coordinate of this Position.
-         *
-         * @return The y-coordinate of this Position.
-         */
-        public int getY() {
-            return y;
-        }
-
-        /**
-         * Compares the other Position based on the coordinates.
-         *
-         * @param other The other object to compare with.
-         * @return True iff the coordinates match.
-         */
-        @Override
-        public boolean equals(Object other) {
-            if (this == other) {
-                return true;
-            } else if (other == null) {
-                return false;
-            } else if (!(other instanceof Position)) {
-                return false;
-            } else {
-                return x == ((Position)other).x && y == ((Position)other).y;
-            }
-        }
-
-        /**
-         * Gets a hash code value.  The current implementation
-         * (which may change at any time) works well as long as the
-         * maximum coordinates fit in 16 bits.
-         *
-         * @return A hash code value for this object.
-         */
-        @Override
-        public int hashCode() {
-            return x | (y << 16);
-        }
-
-        /**
-         * Gets the position adjacent to a given position, in a given
-         * direction.
-         *
-         * @param direction The <code>Direction</code> to check.
-         * @return The adjacent position.
-         */
-        public Position getAdjacent(Direction direction) {
-            int x = this.x + (((this.y & 1) != 0) ? direction.getOddDX()
-                : direction.getEvenDX());
-            int y = this.y + (((this.y & 1) != 0) ? direction.getOddDY()
-                : direction.getEvenDY());
-            return new Position(x, y);
-        }
-
-        /**
-         * Gets the distance in tiles between two map positions.
-         * With an isometric map this is a non-trivial task.
-         * The formula below has been developed largely through trial and
-         * error.  It should cover all cases, but I wouldn't bet my
-         * life on it.
-         *
-         * @param position The other <code>Position</code> to compare.
-         * @return The distance in tiles to the other position.
-         */
-        public int getDistance(Position position) {
-            int ay = getY();
-            int by = position.getY();
-            int r = position.getX() - getX() - (ay - by) / 2;
-
-            if (by > ay && ay % 2 == 0 && by % 2 != 0) {
-                r++;
-            } else if (by < ay && ay % 2 != 0 && by % 2 == 0) {
-                r--;
-            }
-            return Math.max(Math.abs(ay - by + r), Math.abs(r));
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String toString() {
-            return "(" + x + ", " + y + ")";
-        }
-    }
-
-    /**
-     * Checks if an (x,y) coordinate tuple is within a map of
-     * specified width and height.
-     *
-     * @param x The x-coordinate of the position.
-     * @param y The y-coordinate of the position.
-     * @param width The width of the map.
-     * @param height The height of the map.
-     * @return True if the given position is within the bounds of the map.
-     */
-    public static boolean isValid(int x, int y, int width, int height) {
-        return x >= 0 && x < width && y >= 0 && y < height;
-    }
-
-    /**
-     * Checks whether a position is valid within a given map size.
-     *
-     * @param position The <code>Position</code> to check.
-     * @param width The width of the map.
-     * @param height The height of the map.
-     * @return True if the given position is within the bounds of the map.
-     */
-    public static boolean isValid(Position position, int width, int height) {
-        return isValid(position.x, position.y, width, height);
-    }
-
-    /**
-     * Checks whether a position is valid (within the map limits).
-     *
-     * @param position The <code>Position</code> to check.
-     * @return True if the position is valid.
-     */
-    public boolean isValid(Position position) {
-        return isValid(position.x, position.y, getWidth(), getHeight());
-    }
-
-    /**
-     * Checks whether a position is valid (within the map limits).
-     *
-     * @param x The X coordinate to check.
-     * @param y The Y coordinate to check.
-     * @return True if the coordinates are valid.
-     */
-    public boolean isValid(int x, int y) {
-        return isValid(x, y, getWidth(), getHeight());
-    }
-
+    // Support for various kinds of map iteration.
 
     /**
      * Base class for internal iterators.
@@ -1562,7 +1517,7 @@ public class Map extends FreeColGameObject implements Location {
     private abstract class MapIterator implements Iterator<Position> {
 
         /**
-         * Get the next position as a position rather as an object.
+         * Gets the next position as a position rather as an object.
          *
          * @return The next <code>Position</code>.
          * @throws NoSuchElementException if the iterator is exhausted.
@@ -1570,9 +1525,9 @@ public class Map extends FreeColGameObject implements Location {
         public abstract Position nextPosition() throws NoSuchElementException;
 
         /**
-         * Returns the next element in the iteration.
+         * Gets the next position in the iteration.
          *
-         * @return The next element in the iteration.
+         * @return The next <code>Position</code> in the iteration.
          * @exception NoSuchElementException if the iterator is exhausted.
          */
         public Position next() {
@@ -1593,7 +1548,7 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * Makes an iterable version of a map iterator.
      *
-     * @param m The <code>MapIterator</code>.
+     * @param m The <code>MapIterator</code> to make iterable.
      * @return A corresponding iterable.
      */
     private Iterable<Tile> makeMapIteratorIterable(final MapIterator m) {
@@ -1896,6 +1851,8 @@ public class Map extends FreeColGameObject implements Location {
     }
 
 
+    // Useful customers for tile iteration.
+
     /**
      * Gets all the tiles surrounding a tile within the given range.
      * The center tile is not included.
@@ -1925,30 +1882,6 @@ public class Map extends FreeColGameObject implements Location {
             if (t.isLand()) return t;
         }
         return null;
-    }
-
-    /**
-     * Get a flood fill iterator.
-     * Simulated by making a filled circle iterator with an unlimited radius.
-     *
-     * @param centerPosition The center <code>Position</code> to
-     *     iterate around.
-     * @return A simulated flood fill iterator.
-     */
-    public MapIterator getFloodFillIterator(Position centerPosition) {
-        return new CircleIterator(centerPosition, true, INFINITY);
-    }
-
-    /**
-     * Gets all the tiles in a flood fill mode.
-     * Simulated by making a filled circle iterator with an unlimited radius.
-     *
-     * @param center The center <code>Tile</code> to start from.
-     * @return The tiles surrounding the center tile.
-     */
-    public Iterable<Tile> getFloodFillTiles(final Tile center) {
-        return makeMapIteratorIterable(getCircleIterator(center.getPosition(),
-                                                         true, INFINITY));
     }
 
     /**
@@ -1983,7 +1916,7 @@ public class Map extends FreeColGameObject implements Location {
         do {
             for (Direction direction : Direction.values()) {
                 Position n = p.getAdjacent(direction);
-                if (Map.isValid(n, boolmap.length, boolmap[0].length)
+                if (n.isValid(boolmap.length, boolmap[0].length)
                     && boolmap[n.getX()][n.getY()]
                     && !visited[n.getX()][n.getY()] && limit > 0) {
                     visited[n.getX()][n.getY()] = true;
@@ -2345,7 +2278,7 @@ public class Map extends FreeColGameObject implements Location {
                 }
                 // @end compatibility code
             } else if (Region.getXMLElementTagName().equals(tag)) {
-                setRegion(updateFreeColGameObject(in, Region.class));
+                putRegion(updateFreeColGameObject(in, Region.class));
             } else {
                 logger.warning("Unknown tag: " + tag + " loading map");
                 in.nextTag();

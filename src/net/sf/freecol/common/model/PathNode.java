@@ -186,6 +186,17 @@ public class PathNode {
     }
 
     /**
+     * Get the length of the path.
+     *
+     * @return The number of nodes in the path.
+     */
+    public int getLength() {
+        int n = 0;
+        for (PathNode temp = this; temp != null; temp = temp.next) n++;
+        return n;
+    }
+        
+    /**
      * Gets the direction to move in order to get to this path node.
      *
      * @return The direction to move on the map in order to get to the

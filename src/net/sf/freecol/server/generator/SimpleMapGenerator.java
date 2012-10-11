@@ -42,6 +42,7 @@ import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.EuropeanNationType;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
@@ -291,14 +292,14 @@ public class SimpleMapGenerator implements MapGenerator {
                 = ((IndianNationType) player.getNationType()).getRegionNames();
             Territory territory = null;
             if (regionNames == null || regionNames.isEmpty()) {
-                territory = new Territory(player, terrainGenerator.getRandomLandPosition(map, random));
+                territory = new Territory(player, terrainGenerator.getRandomLandTile(map, random).getPosition());
                 territoryMap.put(player.getId(), territory);
             } else {
                 for (String name : regionNames) {
                     if (territoryMap.get(name) == null) {
                         ServerRegion region = (ServerRegion) map.getRegion(name);
                         if (region == null) {
-                            territory = new Territory(player, terrainGenerator.getRandomLandPosition(map, random));
+                            territory = new Territory(player, terrainGenerator.getRandomLandTile(map, random).getPosition());
                         } else {
                             territory = new Territory(player, region);
                         }
@@ -330,7 +331,7 @@ public class SimpleMapGenerator implements MapGenerator {
                     if (territory == null) {
                         logger.warning("Unable to find free region for "
                                        + player.getName());
-                        territory = new Territory(player, terrainGenerator.getRandomLandPosition(map, random));
+                        territory = new Territory(player, terrainGenerator.getRandomLandTile(map, random).getPosition());
                         territoryMap.put(player.getId(), territory);
                     }
                 }
@@ -393,7 +394,7 @@ public class SimpleMapGenerator implements MapGenerator {
                 capitalTiles.remove(tile);
                 // Choose this tile if it is free and half the expected tile
                 // claim can succeed (preventing capitals on small islands).
-                if (map.getClaimableTiles(territory.player, tile, radius).size()
+                if (territory.player.getClaimableTiles(tile, radius).size()
                     >= (2 * radius + 1) * (2 * radius + 1) / 2) {
                     String name = (territory.region == null) ? "default region"
                         : territory.region.getNameKey();
@@ -431,7 +432,7 @@ public class SimpleMapGenerator implements MapGenerator {
             int radius = territory.player.getNationType().getSettlementType(false)
                 .getClaimableRadius();
             // Insist that the settlement can not be linear
-            if (map.getClaimableTiles(territory.player, tile, radius).size()
+            if (territory.player.getClaimableTiles(tile, radius).size()
                 > 2 * radius + 1) {
                 String name = (territory.region == null) ? "default region"
                     : territory.region.getNameKey();
@@ -882,7 +883,8 @@ public class SimpleMapGenerator implements MapGenerator {
         Unit unit7 = new ServerUnit(game, unit4, player, unitType);
 
         Tile colonyTile = null;
-        for (Tile tempTile : map.getFloodFillTiles(startTile)) {
+        for (Tile tempTile : map.getCircleTiles(startTile, true, 
+                                                FreeColObject.INFINITY)) {
             if (tempTile.isPolar()) continue; // No initial polar colonies
             if (player.canClaimToFoundSettlement(tempTile)) {
                 colonyTile = tempTile;
