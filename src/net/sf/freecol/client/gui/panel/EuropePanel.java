@@ -355,6 +355,7 @@ public final class EuropePanel extends PortPanel {
         if (unit != null && unit.isNaval()) {
             UnitLabel unitLabel = getSelectedUnitLabel();
             toAmericaPanel.add(unitLabel, true);
+            cargoPanel.setCarrier(null);
         }
         requestFocus();
     }
