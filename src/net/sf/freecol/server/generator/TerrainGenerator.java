@@ -1367,11 +1367,13 @@ public class TerrainGenerator {
                 for (int x = 0; x < map.getWidth(); x++) {
                     if (found[x][y]) {
                         Tile tt = map.getTile(x, y);
-                        tt.setType(lakeType);
-                        if (tt.getRegion() != null) {
-                            logger.warning("Bogus lake fill at " + x + "," + y);
+                        if (tt.getRegion() == null) {
+                            tt.setType(lakeType);
+                            tt.setRegion(lakeRegion);
+                        } else {
+                            logger.warning("Bogus lake filled from " + p
+                                + " at " + x + "," + y);
                         }
-                        tt.setRegion(lakeRegion);
                     }
                 }
             }
