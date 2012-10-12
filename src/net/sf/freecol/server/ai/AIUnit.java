@@ -619,7 +619,7 @@ public class AIUnit extends AIObject implements Transportable {
     public boolean joinTransport(Unit carrier, Direction direction) {
         AIUnit aiCarrier = getAIMain().getAIUnit(carrier);
         if (aiCarrier == null) return false;
-        Location old = unit.getLocation();
+        Location old = upLoc(unit.getLocation());
         boolean result = AIMessage.askEmbark(aiCarrier, unit, direction)
             && unit.getLocation() == carrier;
 
@@ -634,7 +634,8 @@ public class AIUnit extends AIObject implements Transportable {
             AIPlayer owner = getAIOwner();
             if (owner instanceof EuropeanAIPlayer) {
                 if (!((EuropeanAIPlayer)owner).claimTransportable(this, old)) {
-                    logger.warning("Could not claim transportable: " + this);
+                    logger.warning("Could not claim transportable from " + old
+                        + ": " + this);
                 }
             }
         }

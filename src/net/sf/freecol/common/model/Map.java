@@ -833,7 +833,7 @@ public class Map extends FreeColGameObject implements Location {
             } else if (unit.isNaval()) {
                 entry = unit.resolveDestination();
             } else {
-                throw new IllegalArgumentException("No carrier when starting on high seas: " + unit);
+                throw new IllegalArgumentException("No carrier when starting on high seas: " + unit + "/" + unit.getLocation());
             }
         } else if (start instanceof Europe || start.getTile() != null) {
             entry = start; // OK

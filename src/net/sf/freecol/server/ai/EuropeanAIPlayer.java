@@ -413,6 +413,28 @@ public class EuropeanAIPlayer extends AIPlayer {
     }
 
     /**
+     * Checks that the carrier assigned to a transportable is has a
+     * transport mission and the transport is queued thereon.
+     *
+     * @param t The <code>Transportable</code> to check.
+     * @return True if all is well.
+     */
+    private boolean checkTransport(Transportable t) {
+        AIUnit aiCarrier = t.getTransport();
+        if (aiCarrier != null) {
+            Mission m = aiCarrier.getMission();
+            if (m instanceof TransportMission) {
+                if (((TransportMission)m).isTransporting(t)) return true;
+                t.setTransport(null, "mission dropped");
+                return false;
+            }
+            t.setTransport(null, "no carrier transport mission");
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Rebuild the transport maps.
      * Count the number of transports requiring naval/land carriers.
      */
@@ -423,33 +445,22 @@ public class EuropeanAIPlayer extends AIPlayer {
 
         for (AIUnit aiu : getAIUnits()) {
             Unit u = aiu.getUnit();
-            /*
-logger.finest("BTM " + aiu.toString() + "\n  -> "
-    + ((u.isCarrier()) ? "is-carrier"
-        : (u.getCarrier() != null) ? "has-carrier=" + u.getCarrier().toString()
-        : (aiu.getTransport() != null)
-        ? ((aiu.getTransport().getMission() instanceof TransportMission)
-            ? ((((TransportMission)aiu.getTransport().getMission()).isTransporting((Transportable)aiu))
-                ? "transport=" + aiu.getTransport().toString()
-                : "###UNQUEUED###")
-            : "no-TransportMission" + aiu.getTransport().toString())
-        : (aiu.getTransportDestination() == null) ? "no-destination"
-        : (aiu.getTransportSource() == null) ? "no-source"
-        : ("TRANSPORT-REQUIRED from " + aiu.getTransportSource().toString() + " to " + aiu.getTransportDestination().toString() + " for " + aiu.getMission())
-       ));
-            */
             if (u.isCarrier()) {
                 if (u.isNaval()) nNavalCarrier--; else nLandCarrier--;
-            } else if (requestsTransport(aiu)) {
-                Utils.appendToMapList(transportSupply,
-                    upLoc(aiu.getTransportSource()), aiu);
-                aiu.increaseTransportPriority();
-                nNavalCarrier++;
+            } else {
+                checkTransport(aiu);
+                if (requestsTransport(aiu)) {
+                    Utils.appendToMapList(transportSupply,
+                        upLoc(aiu.getTransportSource()), aiu);
+                    aiu.increaseTransportPriority();
+                    nNavalCarrier++;
+                }
             }
         }
 
         for (AIColony aic : getAIColonies()) {
             for (AIGoods aig : aic.getAIGoods()) {
+                checkTransport(aig);
                 if (requestsTransport(aig)) {
                     Utils.appendToMapList(transportSupply,
                         upLoc(aig.getTransportSource()), aig);
@@ -534,7 +545,8 @@ logger.finest("BTM " + aiu.toString() + "\n  -> "
      * @return A list of transportables.
      */
     public List<Transportable> getTransportablesAt(Location loc) {
-        return transportSupply.get(loc);
+        List<Transportable> supply = transportSupply.get(upLoc(loc));
+        return (supply == null) ? supply : new ArrayList<Transportable>(supply);
     }
 
     /**
@@ -557,7 +569,7 @@ logger.finest("BTM " + aiu.toString() + "\n  -> "
      * @return True if the transportable was claimed from the supply map.
      */
     public boolean claimTransportable(Transportable t, Location loc) {
-        List<Transportable> tl = transportSupply.get(loc);
+        List<Transportable> tl = transportSupply.get(upLoc(loc));
         return tl != null && tl.remove(t);
     }
 
@@ -1380,10 +1392,14 @@ logger.finest("BTM " + aiu.toString() + "\n  -> "
             for (AIUnit aiu : getAIUnits()) {
                 Unit u = aiu.getUnit();
                 String reason = reasons.get(u);
-                if (reason == null) {
-                    putReason(aiu, "OMITTED");
-                }
-                report += "\n  " + reasons.get(u);
+                if (reason == null) reason = "OMITTED";
+                Mission m = aiu.getMission();
+                report += "\n  " + u.getLocation() + " " + reason + "-"
+                    + ((m == null)
+                        ? "NoMission"
+                        : (m instanceof TransportMission)
+                        ? ((TransportMission)m).toFullString()
+                        : m.toString());
             }
             logger.fine(report);
         }
@@ -1392,12 +1408,7 @@ logger.finest("BTM " + aiu.toString() + "\n  -> "
     private void putReason(AIUnit aiUnit, String reason) {
         final Unit unit = aiUnit.getUnit();
         final Mission mission = aiUnit.getMission();
-        reasons.put(unit, unit.getLocation() + " " + reason + "-"
-            + ((mission == null)
-                ? "NoMission"
-                : (mission instanceof TransportMission)
-                ? ((TransportMission)mission).toFullString()
-                : mission.toString()));
+        reasons.put(unit, reason);
     }
 
     /**
@@ -1546,6 +1557,7 @@ logger.finest("BTM " + aiu.toString() + "\n  -> "
                     }
                 } else {
                     logger.warning("Failed to queue " + t + " to " + best);
+                    missions.remove(best);
                 }
             }
         }

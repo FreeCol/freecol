@@ -305,12 +305,11 @@ public class TransportMission extends Mission {
         /**
          * Sets the target for this cargo, possibly also changing its mode.
          *
-         * @return True if the retarget succeeded.  False if the
-         *     cargo is now invalid.
+         * @return A reason the retarget failed, null if it succeeded.
          */
-        public boolean setTarget() {
+        public String setTarget() {
             final Location dst = transportable.getTransportDestination();
-            if (dst == null) return false;
+            if (dst == null) return "no-destination";
             PathNode path, drop;
 
             if (transportable instanceof AIUnit) {
@@ -319,7 +318,8 @@ public class TransportMission extends Mission {
                     // Can the carrier deliver the unit to the target?
                     if ((path = unit.findPath(carrier.getLocation(), dst,
                                               carrier, null)) == null) {
-                        return false;
+                        return "no-deliver " + unit.toString() + "/"
+                            + carrier.toString() + " -> " + dst;
                     }
                     // Drop node must exist, the unit is aboard
                     drop = path.getTransportDropNode();
@@ -336,15 +336,20 @@ public class TransportMission extends Mission {
                     // Can the carrier get the unit to the target, and
                     // does the unit need the carrier at all?
                     if ((path = unit.findPath(unit.getLocation(), dst,
-                                              carrier, null)) == null
-                        || (drop = path.getCarrierMove()) == null) {
-                        return false;
+                                              carrier, null)) == null) {
+                        return "no-collect " + unit.toString() + "/"
+                            + carrier.toString() + " -> " + dst;
+                    }
+                    if ((drop = path.getCarrierMove()) == null) {
+                        return "carrier not needed for " + unit.toString();
                     }
                     // TODO: proper rendezvous paths, unit needs
                     // to modify its target too!
                     path = carrier.findPath(drop.getLocation());
                     if (path == null) {
-                        return false;
+                        return "carrier can not reach collection point "
+                            + carrier.toString() + " -> "
+                            + ((FreeColGameObject)drop.getLocation()).toString();
                     } else if (upLoc(drop.getLocation()) instanceof Tile) {
                         this.mode = CargoMode.PICKUP;
                         this.turns = drop.getTotalTurns();
@@ -355,14 +360,15 @@ public class TransportMission extends Mission {
                         this.target = upLoc(drop.getLocation());
                     }
                 }
-                return true;
+                return null;
 
             } else if (transportable instanceof AIGoods) {
                 final Goods goods = ((AIGoods)transportable).getGoods();
                 if (goods.getLocation() == carrier) {
                     path = carrier.findPath(dst);
                     if (path == null) {
-                        return false;
+                        return "no-deliver for " + carrier.toString()
+                            + " -> " + dst.toString();
                     } else {
                         this.mode = CargoMode.UNLOAD;
                         this.turns = path.getLastNode().getTotalTurns();
@@ -371,14 +377,15 @@ public class TransportMission extends Mission {
                 } else {
                     path = carrier.findPath(goods.getLocation());
                     if (path == null) {
-                        return false;
+                        return "no-collect for " + carrier.toString()
+                            + " -> " + dst.toString();
                     } else {
                         this.mode = CargoMode.LOAD;
                         this.turns = path.getLastNode().getTotalTurns();
                         this.target = upLoc(path.getLastNode().getLocation());
                     }
                 }
-                return true;
+                return null;
 
             } else throw new IllegalStateException("Bogus transportable: "
                 + transportable);
@@ -781,7 +788,10 @@ public class TransportMission extends Mission {
         if (t.getTransportDestination() == null
             || !t.carriableBy(getUnit())) return null;
         Cargo cargo = new Cargo(t, carrier);
-        return (cargo.setTarget()) ? cargo : null;
+        String reason = cargo.setTarget();
+        if (reason == null) return cargo;
+        logger.finest("Failed to remake cargo " + t + ": " + reason);
+        return null;
     }
 
     /**
@@ -934,12 +944,12 @@ public class TransportMission extends Mission {
         List<Unit> unitsPresent = new ArrayList<Unit>(carrier.getUnitList());
         List<Goods> goodsPresent
             = new ArrayList<Goods>(carrier.getGoodsContainer().getCompactGoods());
+        String reason;
         // Check all cargoes are valid.
         // Collect any non-cargo units and goods.
         for (Cargo cargo : tCopy()) {
             Transportable t = cargo.getTransportable();
-            String reason = invalidReason(aiCarrier, cargo.getTarget());
-            if (reason != null) {
+            if ((reason = invalidReason(aiCarrier, cargo.getTarget())) != null) {
                 removeCargo(cargo, reason);
                 continue;
             }
@@ -963,9 +973,9 @@ public class TransportMission extends Mission {
             // updating in response to changes in moves left or the
             // map situation.
             if (carrier.getTile() != null) {
-                if (!cargo.setTarget() && !cargo.retry()) {
-                    removeCargo(cargo, "can not progress "
-                        + t.getTransportDestination());
+                if ((reason = cargo.setTarget()) != null && !cargo.retry()) {
+                    removeCargo(cargo, "can not progress (" + reason
+                        + ") to " + t.getTransportDestination());
                     continue;
                 }
             }
@@ -1054,6 +1064,7 @@ public class TransportMission extends Mission {
         final Locatable l = t.getTransportLocatable();
         AIUnit aiu;
         AIGoods aig;
+        String reason;
 
         switch (cargo.getMode()) {
         case LOAD:
@@ -1080,8 +1091,10 @@ public class TransportMission extends Mission {
 
             logger.finest(tag + " loaded " + t + " at " + here
                 + ": " + this);
-            return (cargo.setTarget()) ? CargoResult.TNEXT
-                : CargoResult.TFAIL;
+            if ((reason = cargo.setTarget()) == null) return CargoResult.TNEXT;
+            logger.finest(tag + " next fail(" + reason + ") " + t
+                + " at " + here + ": " + this);
+            return CargoResult.TFAIL;
 
         case UNLOAD:
             if (!Map.isSameLocation(here, cargo.getTarget())) {
@@ -1121,11 +1134,13 @@ public class TransportMission extends Mission {
             if (isCarrying(t)) {
                 logger.finest(tag + " picked up " + aiu + " at " + here
                     + ": " + this);
-                return (cargo.setTarget()) ? CargoResult.TNEXT
-                    : CargoResult.TFAIL;
+                if ((reason = cargo.setTarget()) == null)
+                    return CargoResult.TNEXT;
+                logger.finest(tag + " next fail(" + reason + ") " + t
+                    + " at " + here + ": " + this);
+                return CargoResult.TFAIL;
             }
-            String reason = aiu.getMission().invalidReason();
-            if (reason != null) {
+            if ((reason = aiu.getMission().invalidReason()) != null) {
                 logger.warning(tag + " unit mission failed(" + reason + ")"
                     + " for " + t + ": " + this);
                 return CargoResult.TFAIL;
@@ -1531,6 +1546,7 @@ public class TransportMission extends Mission {
             = CostDeciders.avoidSettlementsAndBlockingUnits();
         CostDecider costDecider = CostDeciders.defaultCostDeciderFor(carrier);
         for (;;) {
+            logger.info(tag + " travelling: " + toFullString());
             Unit.MoveType mt = travelToTarget(tag, target, costDecider);
             switch (mt) {
             case MOVE_NO_MOVES: case MOVE_HIGH_SEAS:
@@ -1568,8 +1584,9 @@ public class TransportMission extends Mission {
                 String logMe = tag + " delivery-pass:";
                 List<Cargo> cont = new ArrayList<Cargo>();
                 for (Cargo cargo : tCopy()) {
-                    if (cargo.getNewSpace() > 0) continue;
-                    CargoResult result = tryCargo(cargo);
+                    CargoResult result = (cargo.getMode().isCollection())
+                        ? CargoResult.TCONTINUE
+                        : tryCargo(cargo);
                     logMe += "\n    " + cargo.toString() + " = " + result;
                     switch (result) {
                     case TCONTINUE:
@@ -1597,7 +1614,9 @@ public class TransportMission extends Mission {
                 cont.clear();
                 List<Cargo> next = new ArrayList<Cargo>();
                 for (Cargo cargo : tCopy()) {
-                    CargoResult result = tryCargo(cargo);
+                    CargoResult result = (cargo.getMode().isCollection())
+                        ? tryCargo(cargo)
+                        : CargoResult.TCONTINUE;
                     logMe += "\n    " + cargo.toString() + " = " + result;
                     switch (result) {
                     case TCONTINUE:
