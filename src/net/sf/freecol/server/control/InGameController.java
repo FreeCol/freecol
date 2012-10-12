@@ -1757,7 +1757,9 @@ public final class InGameController extends Controller {
         boolean others = false; // Notify others?
         boolean invalid = false; // Not a highSeas move?
 
-        if (destination instanceof Europe) {
+        if (!unit.getType().canMoveToHighSeas()) {
+            invalid = true;
+        } else if (destination instanceof Europe) {
             if (!highSeas.getDestinations().contains(destination)) {
                 return DOMMessage.clientError("HighSeas does not connect to: "
                     + ((FreeColGameObject) destination).getId());
