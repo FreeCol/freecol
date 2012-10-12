@@ -39,7 +39,6 @@ import net.sf.freecol.server.ai.AIUnit;
  */
 public class UnitWanderHostileMission extends Mission {
 
-    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(UnitWanderHostileMission.class.getName());
 
     private static final String tag = "AI hostile-wanderer";
