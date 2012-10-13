@@ -1486,6 +1486,12 @@ public class EuropeanAIPlayer extends AIPlayer {
             if (tl.isEmpty()) continue;
             Collections.sort(tl, Transportable.transportableComparator);
             for (Transportable t : tl) {
+                if (upLoc(t.getTransportSource()) != loc) {
+                    logger.warning("Transportable " + t
+                        + " should have been claimed from " + loc
+                        + " now at " + t.getTransportLocatable().getLocation());
+                    continue;
+                }
                 if (!t.carriableBy(carrier)) continue;
                 if (Map.isSameLocation(src, loc)) {
                     best = t;
