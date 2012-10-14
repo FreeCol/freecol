@@ -2001,6 +2001,13 @@
           <integerOption id="model.option.goodGovernmentLimit" value="50"/>
           <integerOption id="model.option.veryGoodGovernmentLimit" value="100"/>
         </optionGroup>
+        <optionGroup id="model.difficulty.cheat">
+          <integerOption id="model.option.liftBoycottCheat" value="1"/>
+          <integerOption id="model.option.equipScoutCheat" value="1"/>
+          <integerOption id="model.option.landUnitCheat" value="1"/>
+          <integerOption id="model.option.offensiveNavalUnitCheat" value="1"/>
+          <integerOption id="model.option.transportNavalUnitCheat" value="1"/>
+        </optionGroup>
         <optionGroup id="model.difficulty.other">
           <integerOption id="model.option.startingMoney" value="1000"/>
           <integerOption id="model.option.foundingFatherFactor" value="24"/>
@@ -2128,6 +2135,13 @@
           <integerOption id="model.option.goodGovernmentLimit" value="50"/>
           <integerOption id="model.option.veryGoodGovernmentLimit" value="100"/>
         </optionGroup>
+        <optionGroup id="model.difficulty.cheat">
+          <integerOption id="model.option.liftBoycottCheat" value="5"/>
+          <integerOption id="model.option.equipScoutCheat" value="5"/>
+          <integerOption id="model.option.landUnitCheat" value="5"/>
+          <integerOption id="model.option.offensiveNavalUnitCheat" value="5"/>
+          <integerOption id="model.option.transportNavalUnitCheat" value="5"/>
+        </optionGroup>
         <optionGroup id="model.difficulty.other">
           <integerOption id="model.option.startingMoney" value="300"/>
           <integerOption id="model.option.foundingFatherFactor" value="32"/>
@@ -2250,6 +2264,13 @@
           <integerOption id="model.option.goodGovernmentLimit" value="50"/>
           <integerOption id="model.option.veryGoodGovernmentLimit" value="100"/>
         </optionGroup>
+        <optionGroup id="model.difficulty.cheat">
+          <integerOption id="model.option.liftBoycottCheat" value="10"/>
+          <integerOption id="model.option.equipScoutCheat" value="10"/>
+          <integerOption id="model.option.landUnitCheat" value="10"/>
+          <integerOption id="model.option.offensiveNavalUnitCheat" value="10"/>
+          <integerOption id="model.option.transportNavalUnitCheat" value="10"/>
+        </optionGroup>
         <optionGroup id="model.difficulty.other">
           <integerOption id="model.option.startingMoney" value="0"/>
           <integerOption id="model.option.foundingFatherFactor" value="40"/>
@@ -2364,6 +2385,13 @@
           <integerOption id="model.option.veryBadGovernmentLimit" value="9"/>
           <integerOption id="model.option.goodGovernmentLimit" value="50"/>
           <integerOption id="model.option.veryGoodGovernmentLimit" value="100"/>
+        </optionGroup>
+        <optionGroup id="model.difficulty.cheat">
+          <integerOption id="model.option.liftBoycottCheat" value="15"/>
+          <integerOption id="model.option.equipScoutCheat" value="15"/>
+          <integerOption id="model.option.landUnitCheat" value="15"/>
+          <integerOption id="model.option.offensiveNavalUnitCheat" value="15"/>
+          <integerOption id="model.option.transportNavalUnitCheat" value="15"/>
         </optionGroup>
         <optionGroup id="model.difficulty.other">
           <integerOption id="model.option.startingMoney" value="0"/>
@@ -2630,6 +2658,13 @@
           <!-- these limits are intentionally higher than 100 %, so they can be effectively disabled -->
           <integerOption id="model.option.goodGovernmentLimit" value="50" minimumValue="0" maximumValue="150"/>
           <integerOption id="model.option.veryGoodGovernmentLimit" value="100" minimumValue="0" maximumValue="150"/>
+        </optionGroup>
+        <optionGroup id="model.difficulty.cheat">
+          <integerOption id="model.option.liftBoycottCheat" value="20"/>
+          <integerOption id="model.option.equipScoutCheat" value="20"/>
+          <integerOption id="model.option.landUnitCheat" value="20"/>
+          <integerOption id="model.option.offensiveNavalUnitCheat" value="20"/>
+          <integerOption id="model.option.transportNavalUnitCheat" value="20"/>
         </optionGroup>
         <optionGroup id="model.difficulty.other">
           <integerOption id="model.option.startingMoney" value="0" minimumValue="0" maximumValue="100000"/>

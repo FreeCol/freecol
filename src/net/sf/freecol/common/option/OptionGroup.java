@@ -127,6 +127,23 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     }
 
     /**
+     * Gets the value of an option as an option group.
+     *
+     * @param id The id of the option.
+     * @return The value.
+     * @exception IllegalArgumentException If there is no option group
+     *            value associated with the specified option.
+     * @exception NullPointerException if the given <code>Option</code> does not exist.
+     */
+    public OptionGroup getOptionGroup(String id) {
+        try {
+            return ((OptionGroup) getOption(id)).getValue();
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException("No option group value associated with the specified option.");
+        }
+    }
+
+    /**
      * Gets the integer value of an option.
      *
      * @param id The id of the option.

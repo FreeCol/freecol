@@ -1173,14 +1173,16 @@ public final class FreeColServer {
 
         // @compat 0.9.x
         // Introduced: SAVEGAME_VERSION == 11
-        addIntegerOption("model.option.monarchSupport", "", 2);
+        addIntegerOption("model.option.monarchSupport",
+            "model.difficulty.monarch", 2, true);
         // Introduced: SAVEGAME_VERSION == 11
-        addStringOption("model.option.buildOnNativeLand", "",
-            "model.option.buildOnNativeLand.never");
+        addStringOption("model.option.buildOnNativeLand",
+            "model.difficulty.natives",
+            "model.option.buildOnNativeLand.never", true);
         // Introduced: SAVEGAME_VERSION == 11
         if (!spec.hasOption("model.option.amphibiousMoves")) {
             addBooleanOption("model.option.amphibiousMoves",
-                "gameOptions.map", false);
+                "gameOptions.map", false, false);
             spec.addModifier(new Modifier("model.modifier.amphibiousAttack",
                     Specification.AMPHIBIOUS_ATTACK_PENALTY_SOURCE,
                     -75.0f,
@@ -1188,27 +1190,27 @@ public final class FreeColServer {
         }
         // Introduced: SAVEGAME_VERSION == 11
         addBooleanOption("model.option.settlementActionsContactChief",
-            "gameOptions.map", false);
+            "gameOptions.map", false, false);
 
         // @compat 0.10.x
         // Introduced: SAVEGAME_VERSION == 12
         addBooleanOption("model.option.enhancedMissionaries",
-            "gameOptions.map", false);
+            "gameOptions.map", false, false);
         // Introduced: SAVEGAME_VERSION == 12
         addBooleanOption("model.option.continueFoundingFatherRecruitment",
-            "gameOptions.map", false);
+            "gameOptions.map", false, false);
         // Introduced: SAVEGAME_VERSION == 12
         addIntegerOption("model.option.settlementLimitModifier",
-            "gameOptions.map", 0);
+            "gameOptions.map", 0, false);
         // Introduced: SAVEGAME_VERSION == 12
         addIntegerOption("model.option.startingPositions",
-            "gameOptions.map", 0);
+            "gameOptions.map", 0, false);
         // Introduced: SAVEGAME_VERSION == 12
         addBooleanOption(GameOptions.TELEPORT_REF,
-            "gameOptions.map", false);
+            "gameOptions.map", false, false);
         // Introduced: SAVEGAME_VERSION == 12
         addIntegerOption(GameOptions.SHIP_TRADE_PENALTY,
-            "gameOptions.map", -30);
+            "gameOptions.map", -30, false);
         if (spec.getModifiers("model.modifier.shipTradePenalty") == null) {
             spec.addModifier(new Modifier("model.modifier.shipTradePenalty",
                     Specification.SHIP_TRADE_PENALTY_SOURCE,
@@ -1216,39 +1218,65 @@ public final class FreeColServer {
         }
         // Introduced: SAVEGAME_VERSION == 12
         addBooleanOption(GameOptions.ENABLE_UPKEEP,
-            "gameOptions.colony", false);
+            "gameOptions.colony", false, false);
         addIntegerOption(GameOptions.NATURAL_DISASTERS,
-            "gameOptions.colony", 0);
+            "gameOptions.colony", 0, false);
+        // Introduced: SAVEGAME_VERSION == 12
+        addOptionGroup("model.difficulty.cheat", true);
+        addIntegerOption("model.option.liftBoycottCheat",
+            "model.difficulty.cheat", 10, true);
+        addIntegerOption("model.option.equipScoutCheat",
+            "model.difficulty.cheat", 10, true);
+        addIntegerOption("model.option.landUnitCheat",
+            "model.difficulty.cheat", 10, true);
+        addIntegerOption("model.option.offensiveNavalUnitCheat",
+            "model.difficulty.cheat", 10, true);
+        addIntegerOption("model.option.transportNavalUnitCheat",
+            "model.difficulty.cheat", 10, true);
     }
 
-    private void addBooleanOption(String id, String gr, boolean defaultValue) {
+    private void addOptionGroup(String id, boolean difficulty) {
+        Specification spec = game.getSpecification();
+        if (difficulty) {
+            for (OptionGroup level : spec.getDifficultyLevels()) {
+                level.add(new OptionGroup(id, spec));
+            }
+        } else {
+            spec.addAbstractOption(new OptionGroup(id, spec));
+        }
+    }
+
+    private void addBooleanOption(String id, String gr, boolean defaultValue,
+                                  boolean difficulty) {
         BooleanOption op = new BooleanOption(id);
         op.setGroup(gr);
         op.setValue(defaultValue);
-        addOption(op);
+        addOption(op, difficulty);
     }
 
-    private void addIntegerOption(String id, String gr, int defaultValue) {
+    private void addIntegerOption(String id, String gr, int defaultValue,
+                                  boolean difficulty) {
         IntegerOption op = new IntegerOption(id);
         op.setGroup(gr);
         op.setValue(defaultValue);
-        addOption(op);
+        addOption(op, difficulty);
     }
 
-    private void addStringOption(String id, String gr, String defaultValue) {
+    private void addStringOption(String id, String gr, String defaultValue,
+                                 boolean difficulty) {
         StringOption op = new StringOption(id);
         op.setGroup(gr);
         op.setValue(defaultValue);
-        addOption(op);
+        addOption(op, difficulty);
     }
 
-    private void addOption(AbstractOption option) {
+    private void addOption(AbstractOption option, boolean difficulty) {
         Specification spec = game.getSpecification();
         if (!spec.hasOption(option.getId())) {
             spec.addAbstractOption(option);
-            if ("".equals(option.getGroup())) {
+            if (difficulty) {
                 for (OptionGroup level : spec.getDifficultyLevels()) {
-                    level.add(option);
+                    level.getOptionGroup(option.getGroup()).add(option);
                 }
             } else {
                 spec.getOptionGroup(option.getGroup()).add(option);

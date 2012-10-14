@@ -1011,10 +1011,21 @@ public class EuropeanAIPlayer extends AIPlayer {
         final Market market = player.getMarket();
         final Europe europe = player.getEurope();
         final Random air = getAIRandom();
+        final int liftBoycottCheatPercent
+            = spec.getInteger("model.option.liftBoycottCheat");
+        final int equipScoutCheatPercent
+            = spec.getInteger("model.option.liftBoycottCheat");
+        final int landUnitCheatPercent
+            = spec.getInteger("model.option.landUnitCheat");
+        final int offensiveNavalUnitCheatPercent
+            = spec.getInteger("model.option.offensiveNavalUnitCheat");
+        final int transportNavalUnitCheatPercent
+            = spec.getInteger("model.option.transportNavalUnitCheat");
 
         for (GoodsType goodsType : spec.getGoodsTypeList()) {
             if (market.getArrears(goodsType) > 0
-                && Utils.randomInt(logger, "Cheat boycott", air, 5) == 0) {
+                && Utils.randomInt(logger, "Lift Boycott Cheat", air, 100) 
+                < liftBoycottCheatPercent) {
                 market.setArrears(goodsType, 0);
                 // Just remove one goods party modifier (we can not
                 // currently identify which modifier applies to which
@@ -1038,7 +1049,8 @@ public class EuropeanAIPlayer extends AIPlayer {
         
         if (!europe.isEmpty()
             && scoutsNeeded() > 0
-            && Utils.randomInt(logger, "Cheat equip scout", air, 4) == 1) {
+            && Utils.randomInt(logger, "Equip Scout Cheat", air, 100)
+            < equipScoutCheatPercent) {
             for (Unit u : europe.getUnitList()) {
                 if (u.getRole() == Unit.Role.DEFAULT
                     && u.isPerson()
@@ -1048,7 +1060,8 @@ public class EuropeanAIPlayer extends AIPlayer {
             }
         }
 
-        if (Utils.randomInt(logger, "Cheat buy land unit", air, 10) == 1) {
+        if (Utils.randomInt(logger, "Land Unit Cheat", air, 100)
+            < landUnitCheatPercent) {
             WorkerWish bestWish = null;
             int bestValue = Integer.MIN_VALUE;
             for (UnitType ut : workerWishes.keySet()) {
@@ -1104,20 +1117,18 @@ public class EuropeanAIPlayer extends AIPlayer {
             }
         }
 
-        // Always cheat a new ship if the navy is destroyed, otherwise
-        // if the navy is below average the chance to cheat is
-        // proportional to how badly below average.
-        // Also buy in proportion to the demand for naval carriers.
+        // Always cheat a new armed ship if the navy is destroyed,
+        // otherwise if the navy is below average the chance to cheat
+        // is proportional to how badly below average.
         float naval = getNavalStrengthRatio();
-        int nNaval = (naval == 0.0f) ? 1
-            : (0.0f < naval && naval < 0.5f) ? Math.max(1, (int)(naval * 100))
-            : -1;
-        int nCarrier = (nNavalCarrier > 0) ? Math.max(1, 50 / nNavalCarrier)
+        int nNaval = (naval == 0.0f) ? 100
+            : (0.0f < naval && naval < 0.5f)
+            ? (int)(naval * offensiveNavalUnitCheatPercent)
             : -1;
         List<RandomChoice<UnitType>> rc 
             = new ArrayList<RandomChoice<UnitType>>();
-        if (nNaval > 0
-            && Utils.randomInt(logger, "Cheat build navy", air, nNaval) == 0) {
+        if (Utils.randomInt(logger, "Offensive Naval Unit Cheat", air, 100)
+            < nNaval) {
             rc.clear();
             List<UnitType> navalUnits = new ArrayList<UnitType>();
             for (UnitType unitType : spec.getUnitTypeList()) {
@@ -1133,9 +1144,11 @@ public class EuropeanAIPlayer extends AIPlayer {
             }
             cheatUnit(rc);
         }
-        if (nCarrier > 0
-            && Utils.randomInt(logger, "Cheat build merchant marine", air,
-                               nCarrier) == 0) {
+        // Only cheat carriers if they have work to do.
+        int nCarrier = (nNavalCarrier > 0) ? transportNavalUnitCheatPercent
+            : -1;
+        if (Utils.randomInt(logger, "Transport Naval Unit Cheat", air, 100)
+            < nCarrier) {
             rc.clear();
             List<UnitType> navalUnits = new ArrayList<UnitType>();
             for (UnitType unitType : spec.getUnitTypeList()) {

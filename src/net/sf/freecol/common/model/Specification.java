@@ -686,7 +686,7 @@ public final class Specification {
      * @param optionGroup <code>OptionGroup</code> to add
      * @param recursive a <code>boolean</code> value
      */
-    private void addOptionGroup(OptionGroup optionGroup, boolean recursive) {
+    public void addOptionGroup(OptionGroup optionGroup, boolean recursive) {
         // Add the options of the group
         Iterator<Option> iter = optionGroup.iterator();
 
