@@ -1237,13 +1237,7 @@ public final class FreeColServer {
 
     private void addOptionGroup(String id, boolean difficulty) {
         Specification spec = game.getSpecification();
-        if (difficulty) {
-            for (OptionGroup level : spec.getDifficultyLevels()) {
-                level.add(new OptionGroup(id, spec));
-            }
-        } else {
-            spec.addAbstractOption(new OptionGroup(id, spec));
-        }
+        spec.fixOptionGroup(new OptionGroup(id, spec), difficulty);
     }
 
     private void addBooleanOption(String id, String gr, boolean defaultValue,
