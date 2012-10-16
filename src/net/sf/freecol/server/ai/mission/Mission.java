@@ -638,6 +638,12 @@ public abstract class Mission extends AIObject {
                 return MoveType.MOVE_ILLEGAL;
             }
         }
+        if (path.next == null) {
+            throw new IllegalStateException("Trivial path found "
+                + path.fullPathToString()
+                + " from " + unit.getLocation() + " to target " + target
+                + " result=" +  unit.isAtLocation(target));
+        }            
         return followPath(logMe, path.next);
     }
 

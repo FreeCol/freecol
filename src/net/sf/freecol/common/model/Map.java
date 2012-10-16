@@ -1151,18 +1151,13 @@ public class Map extends FreeColGameObject implements Location {
          * unit, or for an empty ship to find a compound path to a
          * native settlement where the first step is to collect the
          * cargo it needs to make the final move legal.
-         *
-         * @param goalDecider A <code>GoalDecider</code> to check the
-         *     goal with.
          */
-        public void recoverGoal(GoalDecider goalDecider) {
+        public void recoverGoal() {
             Unit.MoveType mt;
             if (cost == CostDecider.ILLEGAL_MOVE
                 && unit != null
                 && current.getTile() != null
-                && dst.getTile() != null
-                && goalDecider != null
-                && goalDecider.check(unit, path)) {
+                && dst.getTile() != null) {
                 // Pretend it finishes the move.
                 movesLeft = unit.getInitialMovesLeft();
                 turns++;
@@ -1298,6 +1293,7 @@ public class Map extends FreeColGameObject implements Location {
         Unit waterUnit = (carrier != null) ? carrier : unit;
         Unit currentUnit = (start.isLand())
             ? ((start.getSettlement() != null
+                    && start.getSettlement().isConnectedPort()
                     && unit != null
                     && unit.getLocation() == carrier) ? carrier : unit)
             : waterUnit;
@@ -1358,6 +1354,9 @@ public class Map extends FreeColGameObject implements Location {
 
                 // Is this move possible?  Loop on failure.
                 //
+                // Allow some seemingly impossible moves if it is to the
+                // final destination (see the comment to recoverMove).
+                // 
                 // Check for a carrier change at the new tile,
                 // creating a MoveCandidate for each case.
                 //
@@ -1369,26 +1368,27 @@ public class Map extends FreeColGameObject implements Location {
                 // Note that we always favour using the carrier if
                 // both carrier and non-carrier moves are possible,
                 // which can only be true moving into a settlement.
-                // Usually when moving into a settlement it will
-                // be useful to dock the carrier so it can collect new
+                // Usually when moving into a settlement it will be
+                // useful to dock the carrier so it can collect new
                 // cargo.  OTOH if the carrier is just passing through
                 // the right thing is to keep the passenger on board.
+                // The exception is the disembarkToGoal tests, which
+                // handle the case where the carrier ends its turn one
+                // short of a goal settlement, where we should
+                // consider an immediate move into the settlement by
+                // the passenger.
                 //
-                // The disembarkToGoal tests handle the case where the
-                // carrier ends its turn one short of a goal
-                // settlement, where we should consider an immediate
-                // move into the settlement by the passenger.
-                //
+                boolean isGoal = goalDecider.check(unit,
+                    new PathNode(moveTile, currentMovesLeft, currentTurns,
+                                 false, currentNode, null));
                 boolean unitMove = unit.isTileAccessible(moveTile);
                 boolean carrierMove = carrier != null
                     && carrier.isTileAccessible(moveTile);
                 boolean embarked = embarkedThisTurn(currentNode, currentTurns);
 
                 boolean disembarkToGoal = false;
-                if (unitMove && carrierMove && currentOnCarrier && !embarked
-                    && goalDecider.check(unit,
-                        new PathNode(moveTile, currentMovesLeft, currentTurns,
-                                     false, currentNode, null))) {
+                if (unitMove && carrierMove && currentOnCarrier
+                    && !embarked && isGoal) {
                     // The unit has moves left, and is on a carrier
                     // next to the goal, which both can move to.
                     // Usually we will prefer to let the carrier
@@ -1397,8 +1397,11 @@ public class Map extends FreeColGameObject implements Location {
                         : CostDeciders.defaultCostDeciderFor(carrier);
                     int cost = cd.getCost(carrier, currentNode.getLocation(),
                                           moveTile, currentMovesLeft);
-                    disembarkToGoal = cost != CostDecider.ILLEGAL_MOVE
-                        && cd.getNewTurns() > 0;
+                    if (cost == CostDecider.ILLEGAL_MOVE) {
+                        carrierMove = false;
+                    } else {
+                        disembarkToGoal = cd.getNewTurns() > 0;
+                    }
                 }
                 MoveStep step = (currentOnCarrier)
                     ? ((carrierMove && !disembarkToGoal) ? MoveStep.BYWATER
@@ -1406,7 +1409,7 @@ public class Map extends FreeColGameObject implements Location {
                         : MoveStep.FAIL)
                     : ((carrierMove && !usedCarrier(currentNode))
                         ? MoveStep.EMBARK
-                        : (unitMove) ? ((unit.isNaval())
+                        : (unitMove || isGoal) ? ((unit.isNaval())
                             ? MoveStep.BYWATER
                             : MoveStep.BYLAND)
                         : MoveStep.FAIL);
@@ -1450,7 +1453,7 @@ public class Map extends FreeColGameObject implements Location {
                     move.resetPath();
 
                     // Special case when on the map.
-                    move.recoverGoal(goalDecider);
+                    if (isGoal) move.recoverGoal();
 
                     // Is this an improvement?  If not, ignore.
                     if (move.canImprove(openList.get(moveTile.getId()))) {
