@@ -308,35 +308,6 @@ public class EuropeanAIPlayer extends AIPlayer {
         uninitialized = getPlayer() == null;
     }
 
-
-    /**
-     * Weeds out a broken or obsolete tile improvement plan.
-     *
-     * @param tip The <code>TileImprovementPlan</code> to test.
-     * @return True if the plan survives this check.
-     */
-    public boolean validateTileImprovementPlan(TileImprovementPlan tip) {
-        if (tip == null) return false;
-        Tile target = tip.getTarget();
-        if (target == null) {
-            logger.warning("Removing targetless TileImprovementPlan");
-            tip.dispose();
-            return false;
-        }
-        if (target.hasImprovement(tip.getType())) {
-            logger.finest("Removing obsolete TileImprovementPlan");
-            tip.dispose();
-            return false;
-        }
-        if (tip.getPioneer() != null
-            && (tip.getPioneer().getUnit() == null
-                || tip.getPioneer().getUnit().isDisposed())) {
-            logger.warning("Clearing broken pioneer for TileImprovementPlan");
-            tip.setPioneer(null);
-        }
-        return true;
-    }
-
     /**
      * Rebuilds a map of locations to TileImprovementPlans.
      * Called by startWorking at the start of every turn.
@@ -346,7 +317,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         tipMap.clear();
         for (AIColony aic : getAIColonies()) {
             for (TileImprovementPlan tip : aic.getTileImprovementPlans()) {
-                if (!validateTileImprovementPlan(tip)) {
+                if (tip == null || !tip.validate()) {
                     aic.removeTileImprovementPlan(tip);
                     continue;
                 }

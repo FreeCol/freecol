@@ -590,8 +590,7 @@ public class PioneeringMission extends Mission {
         }
 
         // Now insist on a tip-target.
-        if (tileImprovementPlan != null
-            && !aiPlayer.validateTileImprovementPlan(tileImprovementPlan)) {
+        if (tileImprovementPlan != null && !tileImprovementPlan.validate()) {
             setTarget(null);
         }
         if (tileImprovementPlan == null) {

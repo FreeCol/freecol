@@ -251,6 +251,32 @@ public class TileImprovementPlan extends ValuedAIObject {
     }
 
     /**
+     * Weeds out a broken or obsolete tile improvement plan.
+     *
+     * @return True if the plan survives this check.
+     */
+    public boolean validate() {
+        Tile target = getTarget();
+        if (target == null) {
+            logger.warning("Removing targetless TileImprovementPlan");
+            dispose();
+            return false;
+        }
+        if (target.hasImprovement(getType())) {
+            logger.finest("Removing obsolete TileImprovementPlan");
+            dispose();
+            return false;
+        }
+        if (getPioneer() != null
+            && (getPioneer().getUnit() == null
+                || getPioneer().getUnit().isDisposed())) {
+            logger.warning("Clearing broken pioneer for TileImprovementPlan");
+            setPioneer(null);
+        }
+        return true;
+    }
+
+    /**
      * Checks the integrity of a this TileImprovementPlan.
      *
      * @return True if the plan is valid.
