@@ -1222,6 +1222,7 @@ public final class FreeColServer {
         addIntegerOption(GameOptions.NATURAL_DISASTERS,
             "gameOptions.colony", 0, false);
         // Introduced: SAVEGAME_VERSION == 12
+        addOptionGroup("model.difficulty.cheat", true);
         addIntegerOption("model.option.liftBoycottCheat",
             "model.difficulty.cheat", 10, true);
         addIntegerOption("model.option.equipScoutCheat",
@@ -1232,7 +1233,6 @@ public final class FreeColServer {
             "model.difficulty.cheat", 10, true);
         addIntegerOption("model.option.transportNavalUnitCheat",
             "model.difficulty.cheat", 10, true);
-        addOptionGroup("model.difficulty.cheat", true);
     }
 
     private void addOptionGroup(String id, boolean difficulty) {

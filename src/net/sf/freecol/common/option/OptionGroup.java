@@ -108,7 +108,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
         }
     }
 
-    public void addOptionGroup(OptionGroup group) {
+    private void addOptionGroup(OptionGroup group) {
         for (Option option : group.getOptions()) {
             optionMap.put(option.getId(), option);
             if (option instanceof OptionGroup) {
