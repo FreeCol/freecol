@@ -865,7 +865,9 @@ public class ColonyPlan {
             for (Colony c : player.getColonies()) {
                 if (!c.isConnectedPort()) inland++;
             }
-            if (inland > wagons) {
+            if (inland > wagons
+                // Make sure there is a nearby port!
+                && colony.getFirstUnit().findOurNearestPort() != null) {
                 wagonNeed = (double)(inland - wagons) / inland;
             }
         }
