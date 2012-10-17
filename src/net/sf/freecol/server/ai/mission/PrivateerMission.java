@@ -85,14 +85,15 @@ public class PrivateerMission extends Mission {
      * the given element.
      *
      * @param aiMain The main AI-object.
+     * @param aiUnit The <code>AIUnit</code> this mission is created for.
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      * @see net.sf.freecol.server.ai.AIObject#readFromXML
      */
-    public PrivateerMission(AIMain aiMain, XMLStreamReader in)
+    public PrivateerMission(AIMain aiMain, AIUnit aiUnit, XMLStreamReader in)
         throws XMLStreamException {
-        super(aiMain);
+        super(aiMain, aiUnit);
 
         readFromXML(in);
         uninitialized = getAIUnit() == null;

@@ -93,17 +93,6 @@ public abstract class Mission extends AIObject {
 
 
     /**
-     * Creates an uninitialized mission.
-     *
-     * @param aiMain The main AI-object.
-     */
-    public Mission(AIMain aiMain) {
-        super(aiMain);
-
-        this.aiUnit = null;
-    }
-
-    /**
      * Creates a mission for the given <code>AIUnit</code>.
      *
      * Note that missions are attached to their units, and thus do
@@ -951,25 +940,6 @@ public abstract class Mission extends AIObject {
 
 
     // Serialization
-
-    /**
-     * {@inheritDoc}
-     */
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
-
-        out.writeAttribute("unit", getUnit().getId());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
-
-        String unit = in.getAttributeValue(null, "unit");
-        setAIUnit((AIUnit)getAIMain().getAIObject(unit));
-    }
 
     /**
      * {@inheritDoc}

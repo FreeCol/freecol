@@ -716,44 +716,44 @@ public class AIUnit extends AIObject implements Transportable {
         String tag = in.getLocalName();
         mission = null;
         if (tag.equals(BuildColonyMission.getXMLElementTagName())) {
-            mission = new BuildColonyMission(aiMain, in);
+            mission = new BuildColonyMission(aiMain, this, in);
         } else if (tag.equals(CashInTreasureTrainMission.getXMLElementTagName())) {
-            mission = new CashInTreasureTrainMission(aiMain, in);
+            mission = new CashInTreasureTrainMission(aiMain, this, in);
         } else if (tag.equals(DefendSettlementMission.getXMLElementTagName())) {
-            mission = new DefendSettlementMission(aiMain, in);
+            mission = new DefendSettlementMission(aiMain, this, in);
         } else if (tag.equals(IdleAtSettlementMission.getXMLElementTagName())
                    // @compat 0.10.5
                    || tag.equals("idleAtColonyMission")
                    // @end compatibility code
                    ) {
-            mission = new IdleAtSettlementMission(aiMain, in);
+            mission = new IdleAtSettlementMission(aiMain, this, in);
         } else if (tag.equals(IndianBringGiftMission.getXMLElementTagName())) {
-            mission = new IndianBringGiftMission(aiMain, in);
+            mission = new IndianBringGiftMission(aiMain, this, in);
         } else if (tag.equals(IndianDemandMission.getXMLElementTagName())) {
-            mission = new IndianDemandMission(aiMain, in);
+            mission = new IndianDemandMission(aiMain, this, in);
         } else if (tag.equals(MissionaryMission.getXMLElementTagName())) {
-            mission = new MissionaryMission(aiMain, in);
+            mission = new MissionaryMission(aiMain, this, in);
         } else if (tag.equals(PioneeringMission.getXMLElementTagName())
                    // @compat 0.10.3
                    || tag.equals("tileImprovementPlanMission")) {
                    // @end compatibility code
-            mission = new PioneeringMission(aiMain, in);
+            mission = new PioneeringMission(aiMain, this, in);
         } else if (tag.equals(PrivateerMission.getXMLElementTagName())) {
-            mission = new PrivateerMission(aiMain, in);
+            mission = new PrivateerMission(aiMain, this, in);
         } else if (tag.equals(ScoutingMission.getXMLElementTagName())) {
-            mission = new ScoutingMission(aiMain, in);
+            mission = new ScoutingMission(aiMain, this, in);
         } else if (tag.equals(TransportMission.getXMLElementTagName())) {
-            mission = new TransportMission(aiMain, in);
+            mission = new TransportMission(aiMain, this, in);
         } else if (tag.equals(UnitSeekAndDestroyMission.getXMLElementTagName())) {
-            mission = new UnitSeekAndDestroyMission(aiMain, in);
+            mission = new UnitSeekAndDestroyMission(aiMain, this, in);
         } else if (tag.equals(UnitWanderHostileMission.getXMLElementTagName())) {
-            mission = new UnitWanderHostileMission(aiMain, in);
+            mission = new UnitWanderHostileMission(aiMain, this, in);
         } else if (tag.equals(UnitWanderMission.getXMLElementTagName())) {
-            mission = new UnitWanderMission(aiMain, in);
+            mission = new UnitWanderMission(aiMain, this, in);
         } else if (tag.equals(WishRealizationMission.getXMLElementTagName())) {
-            mission = new WishRealizationMission(aiMain, in);
+            mission = new WishRealizationMission(aiMain, this, in);
         } else if (tag.equals(WorkInsideColonyMission.getXMLElementTagName())) {
-            mission = new WorkInsideColonyMission(aiMain, in);
+            mission = new WorkInsideColonyMission(aiMain, this, in);
         } else {
             throw new IllegalStateException("Unknown AIUnit child: " + tag);
         }

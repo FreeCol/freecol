@@ -89,14 +89,16 @@ public class UnitSeekAndDestroyMission extends Mission {
      * the given element.
      *
      * @param aiMain The main AI-object.
+     * @param aiUnit The <code>AIUnit</code> this mission is created for.
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      * @see net.sf.freecol.server.ai.AIObject#readFromXML
      */
-    public UnitSeekAndDestroyMission(AIMain aiMain, XMLStreamReader in)
+    public UnitSeekAndDestroyMission(AIMain aiMain, AIUnit aiUnit,
+                                     XMLStreamReader in)
         throws XMLStreamException {
-        super(aiMain);
+        super(aiMain, aiUnit);
 
         readFromXML(in);
         uninitialized = getAIUnit() == null;
