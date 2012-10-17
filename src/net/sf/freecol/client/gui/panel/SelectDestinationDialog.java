@@ -85,6 +85,8 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(SelectDestinationDialog.class.getName());
 
+    private static final int INFINITY = FreeColObject.INFINITY;
+
     private static boolean showOnlyMyColonies = true;
 
     private static Comparator<Destination> destinationComparator = null;
@@ -116,11 +118,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         }
 
         destinations.clear();
-        if (unit.isInEurope()) {
-            collectDestinationsFromEurope(unit, goodsTypes);
-        } else {
-            collectDestinationsFromAmerica(unit, goodsTypes);
-        }
+        collectDestinations(unit, goodsTypes);
 
         MigLayout layout = new MigLayout("wrap 1, fill", "[align center]", "");
         setLayout(layout);
@@ -205,83 +203,55 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         setSize(getPreferredSize());
     }
 
-    private void collectDestinationsFromEurope(Unit unit,
-                                               List<GoodsType> goodsTypes) {
+    private void collectDestinations(Unit unit, List<GoodsType> goodsTypes) {
         final Player player = unit.getOwner();
+        final Settlement inSettlement = unit.getSettlement();
         final boolean canTrade = player.hasAbility("model.ability.tradeWithForeignColonies");
         final Europe europe = player.getEurope();
         final Game game = getGame();
         final Map map = game.getMap();
+        int turns;
+
+        if (unit.isInEurope() && !unit.getType().canMoveToHighSeas()) return;
         for (Player p : game.getPlayers()) {
-            if (p == player) {
-                ; // ok
-            } else if (p.isEuropean()) {
-                if (!canTrade) continue;
-            } else {
-                if (!p.hasContacted(player)) continue;
-            }
+            if (p != player
+                && (!p.hasContacted(player) 
+                    || (p.isEuropean() && !canTrade))) continue;
+
             for (Settlement s : p.getSettlements()) {
-                if (!s.isConnectedPort()) continue;
-                if (s instanceof IndianSettlement
-                    && !((IndianSettlement)s).hasContactedSettlement(player))
+                if (s == inSettlement
+                    || (unit.isNaval() && !s.isConnectedPort())
+                    || (s instanceof IndianSettlement
+                        && !((IndianSettlement)s).hasContactedSettlement(player)))
                     continue;
-                int turns;
                 if (p == player) {
-                    turns = unit.getTurnsToReach(s);
-                    if (turns == FreeColObject.INFINITY) continue;
+                    if ((turns = unit.getTurnsToReach(s)) == INFINITY) 
+                        continue;
                 } else {
                     PathNode path = unit.search(europe,
                         GoalDeciders.getAdjacentLocationGoalDecider(s),
-                        null, FreeColObject.INFINITY, null);
+                        null, INFINITY, null);
                     if (path == null) continue;
                     turns = path.getTotalTurns();
                     if (path.getLastNode().getMovesLeft() <= 0) turns++;
                 }
-                String extras = (s.getOwner() != unit.getOwner())
-                    ? getExtras(unit, s, goodsTypes) : "";
-                destinations.add(new Destination(s, turns, extras));
+                destinations.add(new Destination(s, turns,
+                        ((s.getOwner() == unit.getOwner()) ? ""
+                            : getExtras(unit, s, goodsTypes))));
             }
         }
-
-        Collections.sort(destinations, (destinationComparator != null)
-            ? destinationComparator : new DestinationComparator(player));
-        destinations.add(0, new Destination(map, unit.getSailTurns(), ""));
-    }
-
-    private void collectDestinationsFromAmerica(Unit unit,
-        final List<GoodsType> goodsTypes) {
-        final Settlement inSettlement = unit.getSettlement();
-
-        unit.search(unit.getTile(), new GoalDecider() {
-                public PathNode getGoal() { return null; }
-                public boolean check(Unit u, PathNode p) {
-                    Settlement settlement;
-                    if (p != null && p.getTile() != null
-                        && (settlement = p.getTile().getSettlement()) != null
-                        && settlement != inSettlement) {
-                        String extras = (settlement.getOwner() != u.getOwner())
-                            ? getExtras(u, settlement, goodsTypes) : "";
-                        destinations.add(new Destination(settlement,
-                                p.getTurns(), extras));
-                    }
-                    return false;
-                }
-                public boolean hasSubGoals() { return false; }
-            }, CostDeciders.avoidIllegal(), FreeColObject.INFINITY, null);
-        Collections.sort(destinations, (destinationComparator != null)
-            ? destinationComparator
-            : new DestinationComparator(getMyPlayer()));
-
-        final Europe europe = unit.getOwner().getEurope();
-        if (unit.isNaval()
-            && unit.getOwner().canMoveToEurope()
-            && europe != null) {
-            int turns = unit.getTurnsToReach(europe);
-            if (turns != FreeColObject.INFINITY) {
-                destinations.add(0, new Destination(europe, turns,
-                        getExtras(unit, europe, goodsTypes)));
-            }
+        if (unit.isInEurope()) {
+            destinations.add(new Destination(map, unit.getSailTurns(), ""));
+        } else if (europe != null
+            && player.canMoveToEurope()
+            && unit.getType().canMoveToHighSeas()
+            && (turns = unit.getTurnsToReach(europe)) != INFINITY) {
+            destinations.add(new Destination(europe, turns,
+                    getExtras(unit, europe, goodsTypes)));
         }
+        Collections.sort(destinations,
+            ((destinationComparator != null) ? destinationComparator
+                : new DestinationComparator(player)));
     }
 
     @Override
@@ -505,5 +475,4 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
             }
         }
     }
-
 }
