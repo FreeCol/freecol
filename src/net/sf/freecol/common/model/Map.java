@@ -1587,73 +1587,6 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * An iterator for the valid tiles immediately around a base tile.
-     */
-    private final class AdjacentIterator extends MapIterator {
-
-        /** The starting tile position */
-        private Position basePosition;
-
-        /** The index into the list of adjacent tiles. */
-        private int index = 0;
-
-
-        /**
-         * Create a new AdjacentIterator.
-         *
-         * @param basePosition The <code>Position</code> around which
-         *     to iterate.
-         */
-        public AdjacentIterator(Position basePosition) {
-            this.basePosition = basePosition;
-        }
-
-        /**
-         * Checks if the iterator has another position in it.
-         *
-         * @return True of there is another position
-         */
-        public boolean hasNext() {
-            for (int i = index; i < Direction.NUMBER_OF_DIRECTIONS; i++) {
-                Direction d = Direction.values()[i];
-                Position newPosition = basePosition.getAdjacent(d);
-                if (isValid(newPosition)) return true;
-            }
-            return false;
-        }
-
-        /**
-         * Gets the next position in the iteration.
-         *
-         * @return The next <code>Position</code>.
-         * @throws NoSuchElementException if the iterator is exhausted.
-         */
-        @Override
-        public Position nextPosition() throws NoSuchElementException {
-            for (int i = index; i < Direction.NUMBER_OF_DIRECTIONS; i++) {
-                Direction d = Direction.values()[i];
-                Position newPosition = basePosition.getAdjacent(d);
-                if (isValid(newPosition)) {
-                    index = i + 1;
-                    return newPosition;
-                }
-            }
-            throw new NoSuchElementException("AdjacentIterator exhausted");
-        }
-    }
-
-    /**
-     * Get an iterator for the adjacent tiles to a center position.
-     *
-     * @param centerPosition The center <code>Position</code> to
-     *     iterate around.
-     * @return An adjacent tile iterator.
-     */
-    public MapIterator getAdjacentIterator(Position centerPosition) {
-        return new AdjacentIterator(centerPosition);
-    }
-
-    /**
      * An iterator returning positions in a spiral starting at a given
      * center tile.  The center tile is never included in the
      * positions returned, and all returned positions are valid.
@@ -1875,21 +1808,6 @@ public class Map extends FreeColGameObject implements Location {
 
 
     // Useful customers for tile iteration.
-
-    /**
-     * Gets all the tiles surrounding a tile within the given range.
-     * The center tile is not included.
-     *
-     * @param center The center <code>Tile</code>.
-     * @param range How far away do we need to go starting from this.
-     * @return The tiles surrounding this <code>Tile</code>.
-     */
-    public Iterable<Tile> getSurroundingTiles(final Tile center,
-                                              final int range) {
-        return makeMapIteratorIterable((range == 1)
-            ? getAdjacentIterator(center.getPosition())
-            : getCircleIterator(center.getPosition(), true, range));
-    }
 
     /**
      * Searches for land within the given radius.

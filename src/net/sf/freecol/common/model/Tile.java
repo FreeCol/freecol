@@ -1651,7 +1651,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return The tiles surrounding this tile.
      */
     public Iterable<Tile> getSurroundingTiles(int range) {
-        return getMap().getSurroundingTiles(this, range);
+        return getMap().getCircleTiles(this, true, range);
     }
 
     /**
