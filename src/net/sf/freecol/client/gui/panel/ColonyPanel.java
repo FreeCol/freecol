@@ -69,6 +69,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.debug.DebugUtils;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
@@ -445,10 +446,13 @@ public final class ColonyPanel extends PortPanel
                     fill();
                     break;
                 case COLONY_UNITS:
-                	generateColonyUnitsMenu();
-                	break;
+                    generateColonyUnitsMenu();
+                    break;
                 case SETGOODS:
-                    debugSetGoods(colony);
+                    DebugUtils.setColonyGoods(getFreeColClient(), colony);
+                    updateConstructionPanel();
+                    updateProductionPanel();
+                    updateWarehousePanel();
                     break;
                 default:
                     logger.warning("Invalid action");
@@ -458,46 +462,6 @@ public final class ColonyPanel extends PortPanel
                 logger.warning("Invalid action number: " + command);
             }
         }
-    }
-
-    /**
-     * Interactive debug-mode change of goods amount in a colony.
-     *
-     * @param colony The <code>Colony</code> to set goods amounts in.
-     */
-    private void debugSetGoods(Colony colony) {
-        Specification spec = getSpecification();
-        List<ChoiceItem<GoodsType>> gtl
-            = new ArrayList<ChoiceItem<GoodsType>>();
-        for (GoodsType t : spec.getGoodsTypeList()) {
-            if (t.isFoodType() && t != spec.getPrimaryFoodType()) continue;
-            gtl.add(new ChoiceItem<GoodsType>(Messages.message(t.toString() + ".name"),
-                                              t));
-        }
-        GoodsType goodsType = getGUI().showChoiceDialog(null, "Select Goods Type",
-                                                      "Cancel", gtl);
-        if (goodsType == null) return;
-        String amount = getGUI().showInputDialog(null,
-                StringTemplate.name("Select Goods Amount"),
-                Integer.toString(colony.getGoodsCount(goodsType)),
-                "ok", "cancel", true);
-        if (amount == null) return;
-        int a;
-        try {
-            a = Integer.parseInt(amount);
-        } catch (NumberFormatException nfe) {
-            return;
-        }
-        GoodsType sGoodsType = getFreeColClient().getFreeColServer()
-            .getSpecification().getGoodsType(goodsType.getId());
-        GoodsContainer cgc = colony.getGoodsContainer();
-        GoodsContainer sgc = getFreeColClient().getFreeColServer()
-            .getGame().getFreeColGameObject(cgc.getId(), GoodsContainer.class);
-        cgc.setAmount(goodsType, a);
-        sgc.setAmount(sGoodsType, a);
-        updateConstructionPanel();
-        updateProductionPanel();
-        updateWarehousePanel();
     }
 
     /**

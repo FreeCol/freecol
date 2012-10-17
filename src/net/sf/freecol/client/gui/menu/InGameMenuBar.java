@@ -98,10 +98,7 @@ public class InGameMenuBar extends FreeColMenuBar {
         buildReportMenu();
         buildColopediaMenu();
 
-        // --> Debug
-        if (FreeColDebugger.isInDebugMode()) {
-            add(new DebugMenu(freeColClient, gui));
-        }
+        if (FreeColDebugger.isInDebugMode()) add(new DebugMenu(freeColClient));
 
         update();
     }

@@ -24,6 +24,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 
+import java.util.logging.Logger;
 import java.util.logging.LogRecord;
 
 import net.sf.freecol.client.FreeColClient;
@@ -49,6 +50,8 @@ import net.sf.freecol.server.FreeColServer;
  *   - FULL_COMMS turns on trace printing of c-s communications
  */
 public class FreeColDebugger {
+
+    private static final Logger logger = Logger.getLogger(FreeColDebugger.class.getName());
 
     public static final int DEBUG_OFF = 0;
 
