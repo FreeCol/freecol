@@ -1542,6 +1542,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             if (best != null) {
                 if (best.queueTransportable(t, false)) {
                     logger.finest("Queued " + t + " to " + best);
+                    claimTransportable(t);
                     if (best.destinationCapacity() <= 0) {
                         missions.remove(best);
                     }

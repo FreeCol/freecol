@@ -811,11 +811,13 @@ public class TransportMission extends Mission {
         }
 
         if (result) {
-            logger.finest(tag + " added"
+            logger.finest(tag + " added " + cargo.toString()
                 + " (at " + ((index < 0) ? "end" : Integer.toString(index))
                 + "): " + toFullString());
         } else {
-            logger.finest(tag + " add failed: " + toFullString());
+            logger.finest(tag + " add " + cargo.toString()
+                + " (at " + ((index < 0) ? "end" : Integer.toString(index))
+                + ") failed: " + toFullString());
         }
         return result;
     }
@@ -836,9 +838,11 @@ public class TransportMission extends Mission {
         }
 
         if (result) {
-            logger.finest(tag + " removed (" + reason + "): " + toFullString());
+            logger.finest(tag + " removed " + cargo.toString()
+                + " (" + reason + "): " + toFullString());
         } else {
-            logger.finest(tag + " remove failed: " + toFullString());
+            logger.finest(tag + " remove " + cargo.toString()
+                + " failed: " + toFullString());
         }
         return result;
     }
@@ -861,30 +865,32 @@ public class TransportMission extends Mission {
         final Transportable t = cargo.getTransportable();
 
         // Match an existing target?
-        int candidate = -1, holds;
+        int candidate = -1;
         outer: for (int i = 0; i < ts.size(); i++) {
             Cargo tr = ts.get(i);
-            if (tr.getTarget() == cargo.getTarget()) {
+            if (Map.isSameLocation(tr.getTarget(), cargo.getTarget())) {
                 for (int j = i; j < ts.size(); j++) {
-                    holds = newSpace + ts.get(j).getSpaceLeft();
+                    int holds = (j == 0) ? carrier.getCargoSpaceTaken()
+                        : maxHolds - ts.get(j-1).getSpaceLeft();
+                    holds += newSpace;
                     if (holds < 0 || holds > maxHolds) continue outer;
                 }
-                if (tr.getTransportable().getTransportPriority()
-                    < t.getTransportPriority()) {
-                    return addCargo(cargo, i);
+                if (cargo.compareTo(tr) <= 0) {
+                    candidate = i;
+                    break;
                 }
                 candidate = i+1;
-            } else if (candidate >= 0) {
-                return addCargo(cargo, candidate);
+            } else if (candidate >= 0) break;
+        }
+        if (candidate < 0) {
+            if (requireMatch) return false;
+            if (!ts.isEmpty() && !isCarrying(t)) {
+                int holds = maxHolds - ts.get(ts.size()-1).getSpaceLeft()
+                    + newSpace;
+                if (holds < 0 || holds > maxHolds) return false;
             }
         }
-    
-        if (requireMatch) return false;
-        if (!ts.isEmpty() && !isCarrying(t)) {
-            holds = maxHolds - ts.get(ts.size()-1).getSpaceLeft() + newSpace;
-            if (holds < 0 || holds > maxHolds) return false;
-        }
-        return addCargo(cargo, -1);
+        return addCargo(cargo, candidate);
     }
 
     /**
@@ -1077,6 +1083,11 @@ public class TransportMission extends Mission {
             }
             if (t instanceof AIUnit) {
                 aiu = (AIUnit)t;
+                switch (carrier.getNoAddReason(aiu.getUnit())) {
+                case NONE: break;
+                case CAPACITY_EXCEEDED: return CargoResult.TCONTINUE;
+                default: return CargoResult.TRETRY;
+                }
                 if (!aiu.joinTransport(carrier, null)) {
                     logger.warning(tag + "failed to load " + aiu
                         + " at " + here + ": " + this);
@@ -1084,6 +1095,11 @@ public class TransportMission extends Mission {
                 }
             } else if (t instanceof AIGoods) {
                 aig = (AIGoods)t;
+                switch (carrier.getNoAddReason(aig.getGoods())) {
+                case NONE: break;
+                case CAPACITY_EXCEEDED: return CargoResult.TCONTINUE;
+                default: return CargoResult.TRETRY;
+                }
                 if (!aig.joinTransport(carrier, null)) {
                     logger.warning(tag + "failed to load " + aig
                         + " at " + here + ": " + this);
@@ -1249,6 +1265,10 @@ public class TransportMission extends Mission {
             tSet(unwrapCargoes(ts));
         }
         retarget();
+        if (best != null) {
+            logger.finest(tag + " post-optimize " + target
+                + ": " + toFullString());
+        }
     }
 
     // End of cargoes handling.
@@ -1579,78 +1599,79 @@ public class TransportMission extends Mission {
                 costDecider = fallBackDecider; // Retry
                 break;
             case MOVE:
-                // Arrived at a target.  Deliver what can be
-                // delivered.  Check other deliveries, we might be in
-                // port so this is a good time to decide to fail to
-                // deliver something.
-                String logMe = tag + " delivery-pass:";
-                List<Cargo> cont = new ArrayList<Cargo>();
-                for (Cargo cargo : tCopy()) {
-                    CargoResult result = (cargo.getMode().isCollection())
-                        ? CargoResult.TCONTINUE
-                        : tryCargo(cargo);
-                    logMe += "\n    " + cargo.toString() + " = " + result;
-                    switch (result) {
-                    case TCONTINUE:
-                    case TRETRY: // will check again below
-                        cont.add(cargo);
-                        break;
-                    case TDONE:
-                    case TFAIL: // failures will be retargeted below
-                        break;
-                    case TNEXT:
-                        throw new IllegalStateException("Can not happen");
+                if (tSize() > 0) {
+                    // Arrived at a target.  Deliver what can be
+                    // delivered.  Check other deliveries, we might be
+                    // in port so this is a good time to decide to
+                    // fail to deliver something.
+                    String logMe = tag + " delivery-pass:";
+                    List<Cargo> cont = new ArrayList<Cargo>();
+                    for (Cargo cargo : tCopy()) {
+                        CargoResult result = (cargo.getMode().isCollection())
+                            ? CargoResult.TCONTINUE
+                            : tryCargo(cargo);
+                        logMe += "\n    " + cargo.toString() + " = " + result;
+                        switch (result) {
+                        case TCONTINUE:
+                        case TRETRY: // will check again below
+                            cont.add(cargo);
+                            break;
+                        case TDONE:
+                        case TFAIL: // failures will be retargeted below
+                            break;
+                        case TNEXT:
+                            throw new IllegalStateException("Can not happen");
+                        }
                     }
-                }
-                logger.finest(logMe);
-                // Rebuild the cargo list with the original members,
-                // less the transportables that were dropped.
-                tSet(cont);
-                tSpace();
-                optimizeCargoes(); // This will retarget failures
-                logger.finest(tag + " post-optimize " + target
-                    + ": " + toFullString());
+                    logger.finest(logMe);
+                    // Rebuild the cargo list with the original members,
+                    // less the transportables that were dropped.
+                    tSet(cont);
+                    tSpace();
+                    optimizeCargoes(); // This will retarget failures
 
-                // Now try again, this time collecting as well as delivering.
-                logMe = tag + " collection-pass:";
-                cont.clear();
-                List<Cargo> next = new ArrayList<Cargo>();
-                for (Cargo cargo : tCopy()) {
-                    CargoResult result = (cargo.getMode().isCollection())
-                        ? tryCargo(cargo)
-                        : CargoResult.TCONTINUE;
-                    logMe += "\n    " + cargo.toString() + " = " + result;
-                    switch (result) {
-                    case TCONTINUE:
-                        cont.add(cargo);
-                        break;
-                    case TDONE:
-                        break;
-                    case TNEXT:
-                        next.add(cargo);
-                        break;
-                    case TRETRY:
-                        if (cargo.retry()) { // Can not reach the target.
-                            next.add(cargo); // Try again next turn.
+                    // Now try again, this time collecting as well as
+                    // delivering.
+                    logMe = tag + " collection-pass:";
+                    cont.clear();
+                    List<Cargo> next = new ArrayList<Cargo>();
+                    for (Cargo cargo : tCopy()) {
+                        CargoResult result = (cargo.getMode().isCollection())
+                            ? tryCargo(cargo)
+                            : CargoResult.TCONTINUE;
+                        logMe += "\n    " + cargo.toString() + " = " + result;
+                        switch (result) {
+                        case TCONTINUE:
+                            cont.add(cargo);
+                            break;
+                        case TDONE:
+                            break;
+                        case TNEXT:
+                            next.add(cargo);
+                            break;
+                        case TRETRY:
+                            if (cargo.retry()) { // Can not reach the target.
+                                next.add(cargo); // Try again next turn.
+                                break;
+                            }
+                            // Fall through
+                        case TFAIL:
                             break;
                         }
-                        // Fall through
-                    case TFAIL:
-                        break;
                     }
-                }
-                logger.finest(logMe);
+                    logger.finest(logMe);
 
-                // Rebuild the cargo list with the original members,
-                // less the transportables that were dropped.
-                tSet(cont);
-                tSpace();
+                    // Rebuild the cargo list with the original members,
+                    // less the transportables that were dropped.
+                    tSet(cont);
+                    tSpace();
 
-                // Add the new and blocked cargoes incrementally with
-                // the current arrangement, which is likely to put them
-                // at the end.
-                while (!next.isEmpty()) {
-                    queueCargo(next.remove(0), false);
+                    // Add the new and blocked cargoes incrementally with
+                    // the current arrangement, which is likely to put them
+                    // at the end.
+                    while (!next.isEmpty()) {
+                        queueCargo(next.remove(0), false);
+                    }
                 }
 
                 // See if the transportables need replenishing.

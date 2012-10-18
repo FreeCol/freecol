@@ -706,9 +706,17 @@ public abstract class Mission extends AIObject {
                         + " to disembark: " + this);
                     return MoveType.MOVE_ILLEGAL;
                 }
+                MoveType mt = unit.getMoveType(d);
+                if (!mt.isProgress()) { // Special handling required.
+                    logger.finest(logMe + " at " + unit.getLocation()
+                        + " has special disembark " + mt
+                        + " to " + path.getTile() + ": " + this);
+                    return mt;
+                }
                 if (aiUnit.leaveTransport(d)) continue;
                 logger.warning(logMe + " at " + unit.getLocation()
-                    + " unexpected failure to disembark: " + this);
+                    + " unexpected failure to disembark: " + this
+                    + "\n" + path.fullPathToString());
                 return MoveType.MOVE_ILLEGAL;
 
             } else if (!unit.isOnCarrier() && path.isOnCarrier()) {
@@ -719,16 +727,16 @@ public abstract class Mission extends AIObject {
                     return MoveType.MOVE_ILLEGAL;
                 }
                 final Unit newCarrier = newAICarrier.getUnit();
-                if (!newCarrier.canAdd(unit)) {
-                    logger.warning(logMe + " at " + unit.getLocation()
-                        + " can not join assigned carrier " + newCarrier
-                        + ": " + this);
-                    return MoveType.MOVE_ILLEGAL;
-                }
                 if (!newCarrier.isAtLocation(path.getLocation())) {
                     logger.finest(logMe + " at " + unit.getLocation()
                         + " waiting for carrier " + newCarrier
                         + " to arrive and transport it to " + target
+                        + ": " + this);
+                    return MoveType.MOVE_ILLEGAL;
+                }
+                if (!newCarrier.canAdd(unit)) {
+                    logger.warning(logMe + " at " + unit.getLocation()
+                        + " can not join assigned carrier " + newCarrier
                         + ": " + this);
                     return MoveType.MOVE_ILLEGAL;
                 }
