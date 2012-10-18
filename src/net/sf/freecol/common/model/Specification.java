@@ -1454,6 +1454,18 @@ public final class Specification {
             veryGoodGovernmentLimit.setValue(100);
             allOptions.put(id, veryGoodGovernmentLimit);
         }
+        EquipmentType missionaryEquipment
+            = getEquipmentType("model.equipment.missionary");
+        if (missionaryEquipment != null) {
+            for (String as : new String[] { "model.ability.establishMission",
+                                            "model.ability.denounceHeresy",
+                                            "model.ability.inciteNatives" }) {
+                List<Ability> al = allAbilities.get(as);
+                if (al != null) {
+                    for (Ability a : al) missionaryEquipment.addAbility(a);
+                }
+            }
+        }
         // end compatibility code
 
         initialized = true;
