@@ -356,29 +356,30 @@ public class BuildColonyMission extends Mission {
      * Performs this mission.
      */
     public void doMission() {
-        String reason = invalidReason();
-        if (isTargetReason(reason)) {
-            ; // handled below
-        } else if (reason != null) {
-            logger.finest(tag + " broken(" + reason + "): " + this);
-            return;
-        }
-
-        // Check the target
         final AIMain aiMain = getAIMain();
         final AIUnit aiUnit = getAIUnit();
         final Unit unit = getUnit();
         final Player player = unit.getOwner();
+
+        String reason = invalidReason();
+        if (isTargetReason(reason)) {
+            ; // retarget below
+        } else if (reason != null) {
+            logger.finest(tag + " broken(" + reason + "): " + this);
+            return;
+        } else if (target instanceof Tile
+            && (player.getColonyValue((Tile)target)) < colonyValue) {
+            reason = "target tile " + target + " value fell";
+        }
+
+        // Retarget if required
         Location newTarget;
-        if (reason != null
-            || (target instanceof Tile
-                && (player.getColonyValue((Tile)target)) < colonyValue)) {
-            if ((newTarget = findTarget(aiUnit, true)) == null) {
-                setTarget(null);
-                logger.finest(tag + " unable to retarget: " + this);
-                return;
-            }
+        if (reason != null) {
+            newTarget = findTarget(aiUnit, true);
             setTarget(newTarget);
+            logger.finest(tag + " retargetting(" + reason
+                + ") -> " + newTarget + ": " + this);
+            if (newTarget == null) return;
         }
 
         // Go there.
