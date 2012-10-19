@@ -144,6 +144,7 @@ public final class AIInGameInputHandler implements MessageHandler {
                 } else if (type.equals("diplomacy")) {
                     reply = diplomaticTrade((DummyConnection) connection, element);
                 } else if (type.equals("addObject")) {
+                } else if (type.equals("featureChange")) {
                 } else if (type.equals("newLandName")) {
                     reply = newLandName((DummyConnection) connection, element);
                 } else if (type.equals("newRegionName")) {
