@@ -691,7 +691,14 @@ public final class Specification {
             for (Option option : allOptionGroups.get("difficultyLevels")
                      .getOptions()) {
                 if (option instanceof OptionGroup) {
-                    ((OptionGroup)option).add(optionGroup);
+                    OptionGroup level = (OptionGroup) option;
+                    if (level.hasOptionGroup()) {
+                        level.add(optionGroup);
+                    } else {
+                        for (Option o : optionGroup.getOptions()) {
+                            level.add(o);
+                        }
+                    }
                 }
             }
         } else {
@@ -700,7 +707,7 @@ public final class Specification {
             }
         }
     }
-        
+
     /**
      * Adds an <code>OptionGroup</code> to the specification
      *

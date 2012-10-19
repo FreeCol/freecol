@@ -126,6 +126,15 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
         return optionMap.get(id);
     }
 
+    public boolean hasOptionGroup() {
+        for (Option o : options) {
+            if (o instanceof OptionGroup) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Gets the value of an option as an option group.
      *

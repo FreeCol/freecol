@@ -1237,7 +1237,11 @@ public final class FreeColServer {
 
     private void addOptionGroup(String id, boolean difficulty) {
         Specification spec = game.getSpecification();
-        spec.fixOptionGroup(new OptionGroup(id, spec), difficulty);
+        try {
+            spec.getOptionGroup(id);
+        } catch(Exception e) {
+            spec.fixOptionGroup(new OptionGroup(id, spec), difficulty);
+        }
     }
 
     private void addBooleanOption(String id, String gr, boolean defaultValue,
@@ -1270,7 +1274,11 @@ public final class FreeColServer {
             spec.addAbstractOption(option);
             if (difficulty) {
                 for (OptionGroup level : spec.getDifficultyLevels()) {
-                    level.getOptionGroup(option.getGroup()).add(option);
+                    if (level.hasOptionGroup()) {
+                        level.getOptionGroup(option.getGroup()).add(option);
+                    } else {
+                        level.add(option);
+                    }
                 }
             } else {
                 spec.getOptionGroup(option.getGroup()).add(option);
