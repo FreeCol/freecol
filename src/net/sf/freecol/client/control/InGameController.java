@@ -2247,7 +2247,7 @@ public final class InGameController implements NetworkConstants {
     public void move(Unit unit, Direction direction) {
         if (!requireOurTurn()) return;
 
-        moveDirection(unit, direction, true);
+        if (!moveDirection(unit, direction, true)) nextActiveUnit();
 
         // TODO: check if this is necessary for all actions?
         SwingUtilities.invokeLater(new Runnable() {
@@ -2266,58 +2266,45 @@ public final class InGameController implements NetworkConstants {
      *     to make.
      */
     public boolean moveToDestination(Unit unit) {
-        if (!requireOurTurn()) return false;
-        if (unit.getTradeRoute() != null) return followTradeRoute(unit);
-        gui.setActiveUnit(unit);
-        Player player = freeColClient.getMyPlayer();
         Location destination;
-        while (unit.getMovesLeft() > 0
-            && unit.getState() != UnitState.SKIPPED) {
-            // Look for valid destinations
-            if ((destination = unit.getDestination()) == null) {
-                break; // No destination
-            } else if (destination instanceof Europe) {
-                if (unit.isInEurope() || unit.isAtSea()) {
-                    break; // Arrived in or between New World and Europe.
-                }
-            } else if (destination.getTile() == null) {
-                break; // Not on the map, findPath* can not help.
-            } else if (unit.isAtLocation(destination)) {
-                break; // Arrived at on-map destination
-            }
-
-            // Find a path to the destination.
-            PathNode path = unit.findPath(destination);
-            if (path == null) {
-                StringTemplate src = unit.getLocation()
-                    .getLocationNameFor(player);
-                StringTemplate dst = destination.getLocationNameFor(player);
-                gui.showInformationMessage(unit,
-                    StringTemplate.template("selectDestination.failed")
-                        .addStringTemplate("%unit%", Messages.getLabel(unit))
-                        .addStringTemplate("%location%", src)
-                        .addStringTemplate("%destination%", dst));
-                break;
-            }
-
-            // Try to follow the path.
-            if (!followPath(unit, path)) break;
+        if (!requireOurTurn()
+            || unit.isAtSea()
+            || unit.getMovesLeft() <= 0
+            || unit.getState() == UnitState.SKIPPED) {
+            return false;
+        } else if (unit.getTradeRoute() != null) {
+            return followTradeRoute(unit);
+        } else if ((destination = unit.getDestination()) == null) {
+            return unit.getMovesLeft() > 0;
         }
 
+        // Find a path to the destination and try to follow it.
+        final Player player = freeColClient.getMyPlayer();
+        PathNode path = unit.findPath(destination);
+        if (path == null) {
+            StringTemplate src = unit.getLocation()
+                .getLocationNameFor(player);
+            StringTemplate dst = destination.getLocationNameFor(player);
+            gui.showInformationMessage(unit,
+                StringTemplate.template("selectDestination.failed")
+                .addStringTemplate("%unit%", Messages.getLabel(unit))
+                .addStringTemplate("%location%", src)
+                .addStringTemplate("%destination%", dst));
+            return false;
+        }
+        gui.setActiveUnit(unit);
+        followPath(unit, path);
+
         // Clear ordinary destinations if arrived.
-        if ((destination = unit.getDestination()) != null) {
-            if (unit.isAtLocation(destination)) {
-                clearGotoOrders(unit);
-                // Check cash-in, and if the unit has moves left
-                // and was not set to SKIPPED by moveDirection,
-                // then make sure it remains selected to show that
-                // this unit could continue.
-                if (!checkCashInTreasureTrain(unit)
-                    && unit.getMovesLeft() > 0
-                    && unit.getState() != UnitState.SKIPPED) {
-                    gui.setActiveUnit(unit);
-                    return true;
-                }
+        if (destination != null && unit.isAtLocation(destination)) {
+            clearGotoOrders(unit);
+            // Check cash-in, and if the unit has moves left and was
+            // not set to SKIPPED by moveDirection, then return true
+            // to show that this unit could continue.
+            if (!checkCashInTreasureTrain(unit)
+                && unit.getMovesLeft() > 0
+                && unit.getState() != UnitState.SKIPPED) {
+                return true;
             }
         }
         return false;
@@ -2798,10 +2785,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Update the active unit and GUI.
-        if (unit.isDisposed() || checkCashInTreasureTrain(unit)) {
-            nextActiveUnit(tile);
-            return false;
-        }
+        if (unit.isDisposed() || checkCashInTreasureTrain(unit)) return false;
         if (tile.getColony() != null
             && unit.isCarrier()
             && unit.getTradeRoute() == null
@@ -2809,10 +2793,7 @@ public final class InGameController implements NetworkConstants {
                 || unit.getDestination().getTile() == tile.getTile())) {
             gui.showColonyPanel(tile.getColony());
         }
-        if (unit.getMovesLeft() <= 0) {
-            nextActiveUnit();
-            return false;
-        }
+        if (unit.getMovesLeft() <= 0) return false;
         displayModelMessages(false);
         if (!gui.onScreen(tile)) gui.setSelectedTile(tile, false);
         return true;
