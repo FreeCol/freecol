@@ -1300,17 +1300,15 @@ public final class MapViewer {
     public boolean setActiveUnit(Unit activeUnit) {
         // Don't select a unit with zero moves left. -sjm
         // The user might what to check the status of a unit - SG
-        boolean ret = false;
+        Tile tile = null;
 
-        if (activeUnit != null && !freeColClient.getMyPlayer().owns(activeUnit)) {
-            gui.getCanvas().repaint(0, 0, getWidth(), getHeight());
-            return ret;
+        if (activeUnit != null) {
+            tile = activeUnit.getTile();
+            if (!freeColClient.getMyPlayer().owns(activeUnit)) {
+                gui.getCanvas().repaint(0, 0, getWidth(), getHeight());
+                return false;
+            }
         }
-
-        if (activeUnit != null && activeUnit.getTile() == null) {
-            activeUnit = null;
-        }
-
         this.activeUnit = activeUnit;
 
         /*
@@ -1329,28 +1327,26 @@ public final class MapViewer {
             }
         }
         */
-        updateGotoPathForActiveUnit();
 
         // The user activated a unit
-        if (getView() == GUI.VIEW_TERRAIN_MODE
-            && activeUnit != null) {
+        if (getView() == GUI.VIEW_TERRAIN_MODE && activeUnit != null) {
             changeViewMode(GUI.MOVE_UNITS_MODE);
         }
 
-        if (activeUnit != null) {
-            Tile tile = activeUnit.getTile();
+        if (activeUnit == null) {
+            freeColClient.updateActions();
+            gui.updateMenuBar();
+            gui.updateMapControls();
+        } else if (tile != null) {
+            updateGotoPathForActiveUnit();
             if (!setSelectedTile(tile, false)
                 || freeColClient.getClientOptions()
                 .getBoolean(ClientOptions.JUMP_TO_ACTIVE_UNIT)) {
                 setFocus(tile);
-                ret = true;
+                return true;
             }
-        } else {
-            freeColClient.updateActions();
-            gui.updateMenuBar();
-            gui.updateMapControls();
         }
-        return ret;
+        return false;
     }
 
 
