@@ -116,4 +116,18 @@ public abstract class ValuedAIObject extends AIObject
     public final int compareTo(ValuedAIObject other) {
         return other.value - this.value;
     }
+
+
+    // Serialization
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readAttributes(XMLStreamReader in)
+        throws XMLStreamException {
+        super.readAttributes(in);
+
+        setValue(getAttribute(in, "value", -1));
+    }
 }

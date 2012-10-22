@@ -485,13 +485,10 @@ public class AIMain extends FreeColObject
     }
 
     /**
-     * Reads all the <code>AIObject</code>s and other AI-related information
-     * from XML data.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if an error occured during parsing.
+     * {@inheritDoc}
      */
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in)
+        throws XMLStreamException {
         aiObjects.clear();
 
         if (!in.getLocalName().equals(getXMLElementTagName())) {
@@ -500,12 +497,16 @@ public class AIMain extends FreeColObject
         nextId = getAttribute(in, "nextID", 0);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected void readChildren(XMLStreamReader in) throws XMLStreamException {
         String lastTag = "";
         Wish wish;
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             final String tagName = in.getLocalName();
             final String oid = in.getAttributeValue(null, ID_ATTRIBUTE);
+logger.warning("AI-child: " + tagName + " / " + oid);
             wish = null;
             try {
                 if (oid != null && aiObjects.containsKey(oid)) {
@@ -556,8 +557,8 @@ public class AIMain extends FreeColObject
                     AIColony ac = wish.getDestinationAIColony();
                     if (ac != null) ac.addWish(wish);
                 }
-
                 lastTag = in.getLocalName();
+
             } catch (Exception e) {
                 logger.log(Level.WARNING, "Exception reading AIObject("
                     + tagName + ", " + oid + ")", e);

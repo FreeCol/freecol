@@ -101,7 +101,7 @@ public class WorkerWish extends Wish {
     public WorkerWish(AIMain aiMain, Element element) {
         super(aiMain, element);
 
-        uninitialized = getDestination() == null;
+        uninitialized = unitType == null;
     }
     
     /**
@@ -117,7 +117,7 @@ public class WorkerWish extends Wish {
         throws XMLStreamException {
         super(aiMain, in);
 
-        uninitialized = getDestination() == null;
+        uninitialized = unitType == null;
     }
 
 
@@ -171,11 +171,7 @@ public class WorkerWish extends Wish {
     // Serialization
 
     /**
-     * Writes this object to an XML stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * {@inheritDoc}
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
@@ -198,32 +194,14 @@ public class WorkerWish extends Wish {
     }
 
     /**
-     * Reads information for this object from an XML stream.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if there are any problems reading
-     *      from the stream.
+     * {@inheritDoc}
      */
-    protected void readAttribues(XMLStreamReader in) throws XMLStreamException {
-        final AIMain aiMain = getAIMain();
+    @Override
+    protected void readAttributes(XMLStreamReader in)
+        throws XMLStreamException {
+        super.readAttributes(in);
 
-        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
-
-        String str = in.getAttributeValue(null, "destination");
-        destination = aiMain.getGame().getFreeColLocation(str);
-
-        if ((str = in.getAttributeValue(null, "transportable")) != null) {
-            if ((transportable = (AIUnit)aiMain.getAIObject(str)) == null) {
-                transportable = new AIUnit(aiMain, str);
-            }
-        } else {
-            transportable = null;
-        }
-
-        setValue(getAttribute(in, "value", -1));
-
-        str = in.getAttributeValue(null, "unitType");
-
+        String str = in.getAttributeValue(null, "unitType");
         unitType = getSpecification().getUnitType(str);
 
         expertNeeded = getAttribute(in, "expertNeeded", false);
@@ -240,7 +218,7 @@ public class WorkerWish extends Wish {
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "workerWish"
      */

@@ -170,4 +170,28 @@ public abstract class Wish extends ValuedAIObject {
             && (transportable == null
                 || ((AIObject)transportable).checkIntegrity());
     }
+
+
+    // Serialization
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readAttributes(XMLStreamReader in)
+        throws XMLStreamException {
+        super.readAttributes(in);
+
+        final AIMain aiMain = getAIMain();
+        String str = in.getAttributeValue(null, "destination");
+        destination = aiMain.getGame().getFreeColLocation(str);
+
+        if ((str = in.getAttributeValue(null, "transportable")) != null) {
+            if ((transportable = (AIUnit)aiMain.getAIObject(str)) == null) {
+                transportable = new AIUnit(aiMain, str);
+            }
+        } else {
+            transportable = null;
+        }
+    }
 }

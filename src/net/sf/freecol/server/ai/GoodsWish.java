@@ -100,7 +100,7 @@ public class GoodsWish extends Wish {
     public GoodsWish(AIMain aiMain, Element element) {
         super(aiMain, element);
 
-        uninitialized = getDestination() == null;
+        uninitialized = goodsType == null;
     }
 
     /**
@@ -116,7 +116,7 @@ public class GoodsWish extends Wish {
         throws XMLStreamException {
         super(aiMain, in);
 
-        uninitialized = getDestination() == null;
+        uninitialized = goodsType == null;
     }
 
 
@@ -187,11 +187,7 @@ public class GoodsWish extends Wish {
     // Serialization
 
     /**
-     * Writes this object to an XML stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * {@inheritDoc}
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
@@ -214,30 +210,14 @@ public class GoodsWish extends Wish {
     }
 
     /**
-     * Reads information for this object from an XML stream.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if there are any problems reading
-     *      from the stream.
+     * {@inheritDoc}
      */
-    protected void readAttribues(XMLStreamReader in) throws XMLStreamException {
-        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
+    @Override
+    protected void readAttributes(XMLStreamReader in)
+        throws XMLStreamException {
+        super.readAttributes(in);
 
-        String str = in.getAttributeValue(null, "destination");
-        destination = getAIMain().getGame().getFreeColLocation(str);
-
-        if ((str = in.getAttributeValue(null, "transportable")) != null) {
-            transportable = (Transportable) getAIMain().getAIObject(str);
-            if (transportable == null) {
-                transportable = new AIGoods(getAIMain(), str);
-            }
-        } else {
-            transportable = null;
-        }
-
-        setValue(getAttribute(in, "value", -1));
-
-        str = in.getAttributeValue(null, "goodsType");
+        String str = in.getAttributeValue(null, "goodsType");
         goodsType = getSpecification().getGoodsType(str);
 
         amountRequested = getAttribute(in, "amountRequested",
@@ -255,7 +235,7 @@ public class GoodsWish extends Wish {
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "goodsWish"
      */
