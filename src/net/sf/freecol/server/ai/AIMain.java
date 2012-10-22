@@ -506,7 +506,6 @@ public class AIMain extends FreeColObject
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             final String tagName = in.getLocalName();
             final String oid = in.getAttributeValue(null, ID_ATTRIBUTE);
-logger.warning("AI-child: " + tagName + " / " + oid);
             wish = null;
             try {
                 if (oid != null && aiObjects.containsKey(oid)) {
