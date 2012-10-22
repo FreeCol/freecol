@@ -415,92 +415,6 @@ public abstract class Mission extends AIObject {
     }
 
     /**
-     * Gets a standard mission-specific goal decider.
-     *
-     * @param aiUnit The <code>AIUnit</code> searching.
-     * @param type The specific mission class.
-     * @return A standard goal decider for the supplied mission type.
-     */
-    public static GoalDecider getMissionGoalDecider(final AIUnit aiUnit,
-                                                    final Class type) {
-        final AIPlayer aiPlayer = aiUnit.getAIMain()
-            .getAIPlayer(aiUnit.getUnit().getOwner());
-
-        return new GoalDecider() {
-            private int bestValue = -1;
-            private PathNode best = null;
-
-            public PathNode getGoal() { return best; }
-            public boolean hasSubGoals() { return true; }
-            public boolean check(Unit u, PathNode path) {
-                int value = aiPlayer.scoreMission(aiUnit, path, type);
-                if (value > bestValue) {
-                    bestValue = value;
-                    best = path;
-                    return true;
-                }
-                return false;
-            }
-        };
-    }
-
-    /**
-     * Evaluates a proposed mission type for a unit.
-     *
-     * This works out the basic mission-specific score.  The final
-     * result goes through further refinement in the fooAIPlayer
-     * specialized scoreMission routines.
-     *
-     * TODO: see if we can remove the requirement this routine be
-     * static (trouble is, we are trying to work out what sort of
-     * mission to use, so there is not yet a mission object to call a
-     * method of).  We could use introspection to call a static
-     * scoreTarget routine if it exists...
-     *
-     * @param aiUnit The <code>AIUnit</code> to perform the mission.
-     * @param path A <code>PathNode</code> to the target of this mission.
-     * @param type The mission class.
-     * @return A score representing the desirability of this mission.
-     */
-    public static int scorePath(AIUnit aiUnit, PathNode path, Class type) {
-        return (type == BuildColonyMission.class)
-            ? BuildColonyMission.scorePath(aiUnit, path)
-            : (type == CashInTreasureTrainMission.class)
-            ? CashInTreasureTrainMission.scorePath(aiUnit, path)
-            : (type == DefendSettlementMission.class)
-            ? DefendSettlementMission.scorePath(aiUnit, path)
-            : (type == MissionaryMission.class)
-            ? MissionaryMission.scorePath(aiUnit, path)
-            : (type == PioneeringMission.class)
-            ? PioneeringMission.scorePath(aiUnit, path)
-            : (type == ScoutingMission.class)
-            ? ScoutingMission.scorePath(aiUnit, path)
-            : (type == UnitSeekAndDestroyMission.class)
-            ? UnitSeekAndDestroyMission.scorePath(aiUnit, path)
-            : -1; // NYI
-    }
-
-    /**
-     * Finds a suitable seek-and-destroy target path for an AI unit.
-     *
-     * @param aiUnit The <code>AIUnit</code> to find a target for.
-     * @param range An upper bound on the number of moves.
-     * @param type The mission class.
-     * @return A path to the target, or null if none found.
-     */
-    public static PathNode findTargetPath(AIUnit aiUnit, int range, Class type) {
-        Unit unit;
-        Tile startTile;
-        return (aiUnit == null
-            || (unit = aiUnit.getUnit()) == null || unit.isDisposed() 
-            || (startTile = unit.getPathStartTile()) == null)
-            ? null
-            : unit.search(startTile, getMissionGoalDecider(aiUnit, type),
-                          CostDeciders.avoidIllegal(),
-                          range, unit.getCarrier());
-    }
-
-    /**
      * Tries to move this mission's unit to a target location.
      *
      * First check for units in transit, that is units on a carrier that
@@ -773,6 +687,10 @@ public abstract class Mission extends AIObject {
             switch (useEurope) {
             case NO_EUROPE:
                 MoveType mt = unit.getMoveType(path.getDirection());
+                if (mt == MoveType.MOVE_NO_MOVES) {
+                    unit.setMovesLeft(0);
+                    return MoveType.MOVE_NO_MOVES;
+                }
                 if (!mt.isProgress()) { // Special handling required.
                     logger.finest(logMe + " at " + unit.getTile()
                         + " has special move " + mt + " to " + path.getTile()
@@ -824,7 +742,21 @@ public abstract class Mission extends AIObject {
 
         return ((TransportMission)m).retargetTransportable(aiUnit);
     }
-            
+
+    /**
+     * Retarget a mission because of some problem.
+     *
+     * @param tag The mission tag.
+     * @param reason The reason for the retarget.
+     * @return True if a non-null target was found.
+     */
+    public boolean retargetMission(String tag, String reason) {
+        Location newTarget = findTarget();
+        setTarget(newTarget);
+        logger.finest(tag + " retargetting(" + reason + ") -> " + newTarget
+            + ": " + this);
+        return newTarget != null;
+    }
 
     // Fake implementation of Transportable interface.
     // Missions are not actually Transportables but the units that are
@@ -872,6 +804,20 @@ public abstract class Mission extends AIObject {
      * @return The target of this mission, or null if none.
      */
     public abstract Location getTarget();
+
+    /**
+     * Sets the target of this mission, if any.
+     *
+     * @param target The new target of this mission, or null if none.
+     */
+    public abstract void setTarget(Location target);
+
+    /**
+     * Finds a new target for this mission.
+     *
+     * @return A new target for this mission.
+     */
+    public abstract Location findTarget();
 
     /**
      * Why is this mission invalid?
@@ -948,6 +894,30 @@ public abstract class Mission extends AIObject {
 
 
     // Serialization
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
+        // This routine might look redundant, but if you let its
+        // default out up the tree, you reach
+        // FreeColObject.writeAttributes, which complains about
+        // objects without an id.  Missions do not have ids.
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readAttributes(XMLStreamReader in)
+        throws XMLStreamException {
+        // This routine might look redundant, but if you let its
+        // default out up the tree, you reach
+        // FreeColObject.readAttributes, which expects to find an id
+        // attribute.  Missions do not have ids.
+    }
 
     /**
      * {@inheritDoc}

@@ -40,6 +40,7 @@ public class WorkInsideColonyMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(WorkInsideColonyMission.class.getName());
 
+    /** The tag for this mission. */
     private static final String tag = "AI worker";
 
     /** The AI colony to work inside. */
@@ -109,13 +110,25 @@ public class WorkInsideColonyMission extends Mission {
     // Mission interface
 
     /**
-     * Gets the mission target.
-     *
-     * @return The mission target location.
+     * {@inheritDoc}
      */
     public Location getTarget() {
         return (aiColony == null || aiColony.getColony() == null) ? null
             : aiColony.getColony().getTile();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setTarget(Location target) {
+        throw new IllegalStateException("Target is fixed.");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Location findTarget() {
+        throw new IllegalStateException("Target is fixed.");
     }
 
     /**
@@ -137,9 +150,7 @@ public class WorkInsideColonyMission extends Mission {
     // Omitted invalidReason(AIUnit), not needed.
 
     /**
-     * Why is this mission invalid?
-     *
-     * @return A reason for mission invalidity, or null if none found.
+     * {@inheritDoc}
      */
     public String invalidReason() {
         return invalidReason(getAIUnit(), getTarget());
@@ -148,7 +159,7 @@ public class WorkInsideColonyMission extends Mission {
     // Not a one-time mission, omit isOneTime().
 
     /**
-     * Performs this mission.
+     * {@inheritDoc}
      */
     public void doMission() {
         String reason = invalidReason();
@@ -165,12 +176,7 @@ public class WorkInsideColonyMission extends Mission {
     // Serialization
 
     /**
-     * Writes all of the <code>AIObject</code>s and other AI-related
-     * information to an XML-stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * {@inheritDoc}
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         if (isValid()) {
@@ -181,6 +187,7 @@ public class WorkInsideColonyMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void writeAttributes(XMLStreamWriter out)
         throws XMLStreamException {
         super.writeAttributes(out);
@@ -191,6 +198,7 @@ public class WorkInsideColonyMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
         super.readAttributes(in);

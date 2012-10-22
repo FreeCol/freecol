@@ -55,17 +55,9 @@ public class PioneeringMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(PioneeringMission.class.getName());
 
+    /** The tag for this mission. */
     private static final String tag = "AI pioneer";
 
-    /**
-     * Maximum number of turns to travel to make progress on
-     * pioneering.  This is low-ish because it is usually more
-     * efficient to ship the tools where they are needed and either
-     * create a new pioneer on site or send a hardy pioneer on
-     * horseback.  The AI is probably smart enough to do the former
-     * already, and one day the latter.
-     */
-    private static final int MAX_TURNS = 10;
 
     /**
      * Default distance in turns to a threatening unit.
@@ -91,22 +83,7 @@ public class PioneeringMission extends Mission {
      * findTileImprovementPlan/findColonyWithTools succeed.
      *
      * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission
-     *        is created for.
-     */
-    public PioneeringMission(AIMain aiMain, AIUnit aiUnit) {
-        this(aiMain, aiUnit, findTarget(aiUnit, true));
-    }
-
-    /**
-     * Creates a pioneering mission for the given <code>AIUnit</code>.
-     * Note that PioneeringMission.isValid(aiUnit) should be called
-     * before this, to guarantee that
-     * findTileImprovementPlan/findColonyWithTools succeed.
-     *
-     * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission
-     *        is created for.
+     * @param aiUnit The <code>AIUnit</code> this mission is created for.
      * @param loc The target <code>Location</code>.
      */
     public PioneeringMission(AIMain aiMain, AIUnit aiUnit, Location loc) {
@@ -136,6 +113,7 @@ public class PioneeringMission extends Mission {
         uninitialized = getAIUnit() == null;
     }
 
+
     /**
      * Get the best improvement associated with a tile.
      *
@@ -154,21 +132,6 @@ public class PioneeringMission extends Mission {
      */
     private static TileImprovementPlan getBestPlan(AIUnit aiUnit, Tile tile) {
         return ((EuropeanAIPlayer)aiUnit.getAIOwner()).getBestPlan(tile);
-    }
-
-    /**
-     * Sets the target for this mission, and the tile improvement plan
-     * as required.
-     *
-     * @param target The new target for this mission.
-     */
-    public void setTarget(Location target) {
-        boolean retarget = this.target != null && this.target != target;
-        this.target = target;
-        setTileImprovementPlan((target instanceof Tile)
-            ? getBestPlan((Tile)target)
-            : null);
-        if (retarget) retargetTransportable();
     }
 
     /**
@@ -311,12 +274,13 @@ public class PioneeringMission extends Mission {
     /**
      * Finds a suitable pioneering target for the supplied unit.
      *
-     * @param aiUnit The <code>AIUnit</code> to test.
-     * @param deferOK If true, allow the search to return a nearby existing
-     *     colony as a temporary target.     
-     * @return A <code>PathNode</code> to the target, or null if none found.
+     * @param aiUnit The <code>AIUnit</code> to execute this mission.
+     * @param range An upper bound on the number of moves.
+     * @param deferOK Enables deferring to a fallback colony.
+     * @return A path to the new target, or null if none found.
      */
-    public static PathNode findTargetPath(AIUnit aiUnit, boolean deferOK) {
+    public static PathNode findTargetPath(AIUnit aiUnit, int range,
+                                          boolean deferOK) {
         if (invalidAIUnitReason(aiUnit) != null) return null;
         final Unit unit = aiUnit.getUnit();
         final Tile startTile = unit.getPathStartTile();
@@ -328,7 +292,7 @@ public class PioneeringMission extends Mission {
             = CostDeciders.avoidSettlementsAndBlockingUnits();
 
         // Try for something sensible nearby.
-        return unit.search(startTile, gd, standardCd, MAX_TURNS, carrier);
+        return unit.search(startTile, gd, standardCd, range, carrier);
     }
 
     /**
@@ -361,15 +325,18 @@ public class PioneeringMission extends Mission {
      * Falls back to the best settlement if the unit is not on the map.
      *
      * @param aiUnit The <code>AIUnit</code> to test.
+     * @param range An upper bound on the number of moves.
      * @param deferOK Enables deferring to a fallback colony.
      * @return A target for this mission.
      */
-    public static Location findTarget(AIUnit aiUnit, boolean deferOK) {
-        PathNode path = findTargetPath(aiUnit, false);
-        return (path != null) ? extractTarget(aiUnit, path)
-            : (deferOK) ? getBestPioneeringColony(aiUnit)
-            : findCircleTarget(aiUnit, getGoalDecider(aiUnit, deferOK),
-                               MAX_TURNS*3, deferOK);
+    public static Location findTarget(AIUnit aiUnit, int range,
+                                      boolean deferOK) {
+        PathNode path = findTargetPath(aiUnit, range, false);
+        if (path != null) return extractTarget(aiUnit, path);
+        if (deferOK) return getBestPioneeringColony(aiUnit);
+        Location loc = findCircleTarget(aiUnit, getGoalDecider(aiUnit, false),
+                                        range*3, false);
+        return (hasTools(aiUnit)) ? loc : upLoc(loc);
     }
 
     /**
@@ -405,15 +372,31 @@ public class PioneeringMission extends Mission {
     // Mission interface
 
     /**
-     * Gets the target for this mission, either the colony to go to,
-     * or the tile that needs improvement.
-     *
-     * @return The target for this mission.
+     * {@inheritDoc}
      */
     public Location getTarget() {
         return target;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void setTarget(Location target) {
+        boolean retarget = this.target != null && this.target != target;
+        this.target = target;
+        setTileImprovementPlan((target instanceof Tile)
+            ? getBestPlan((Tile)target)
+            : null);
+        if (retarget) retargetTransportable();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Location findTarget() {
+        return findTarget(getAIUnit(), 10, true);
+    }
+    
     /**
      * Why would a PioneeringMission be invalid with the given unit.
      *
@@ -483,15 +466,6 @@ public class PioneeringMission extends Mission {
     }
 
     /**
-     * Why is this mission invalid?
-     *
-     * @return A reason for mission invalidity, or null if none found.
-     */
-    public String invalidReason() {
-        return invalidReason(getAIUnit(), getTarget());
-    }
-
-    /**
      * Why would this mission be invalid with the given AI unit?
      *
      * @param aiUnit The <code>AIUnit</code> to check.
@@ -521,26 +495,22 @@ public class PioneeringMission extends Mission {
             : Mission.TARGETINVALID;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public String invalidReason() {
+        return invalidReason(getAIUnit(), getTarget());
+    }
+
     // Not a one-time mission, omit isOneTime().
 
     /**
-     * Performs this mission.
-     *
-     * - Gets tools if needed.
-     * - Makes sure we have a valid plan.
-     * - Get to the target.
-     * - Claim it if necessary.
-     * - Make the improvement.
+     * {@inheritDoc}
      */
     public void doMission() {
         String reason = invalidReason();
-        Location newTarget;
         if (isTargetReason(reason)) {
-            if ((newTarget = findTarget(getAIUnit(), false)) == null) {
-                logger.finest(tag + " unable to retarget: " + this);
-                return;
-            }
-            setTarget(newTarget);
+            if (!retargetMission(tag, reason)) return;
         } else if (reason != null) {
             logger.finest(tag + " broken(" + reason + "): " + this);
             return;
@@ -552,7 +522,9 @@ public class PioneeringMission extends Mission {
         final EuropeanAIPlayer aiPlayer = getEuropeanAIPlayer();
         final CostDecider costDecider
             = CostDeciders.avoidSettlementsAndBlockingUnits();
+
         Tile tile;
+        Location newTarget;
         String where;
         while (!hasTools()) { // Get tools first.
             // Go there and clear target on arrival.
@@ -564,11 +536,11 @@ public class PioneeringMission extends Mission {
             // Try to equip
             if (aiUnit.equipForRole(Unit.Role.PIONEER, false)
                 && hasTools()) {
-                newTarget = findTarget(aiUnit, false);
+                newTarget = findTarget(aiUnit, 10, false);
                 logger.finest(tag + " reached " + where
                     + " and equips, retargeting " + newTarget + ": " + this);
             } else {
-                newTarget = findTarget(aiUnit, false);
+                newTarget = findTarget(aiUnit, 10, false);
                 logger.finest(tag + " reached " + where
                     + " but fails to equip, retargeting: " + newTarget
                     + ": " + this);
@@ -583,7 +555,7 @@ public class PioneeringMission extends Mission {
             if (travelToTarget(tag, getTarget(), costDecider)
                 != Unit.MoveType.MOVE) return;
             where = ((Colony)getTarget()).getName();
-            newTarget = findTarget(aiUnit, false);
+            newTarget = findTarget(aiUnit, 5, false);
             logger.finest(tag + " reached intermediate colony " + where
                 + ", retargeting " + newTarget + ": " + this);
             if (newTarget == null) return;
@@ -595,7 +567,7 @@ public class PioneeringMission extends Mission {
             setTarget(null);
         }
         if (tileImprovementPlan == null) {
-            newTarget = findTarget(aiUnit, false);
+            newTarget = findTarget(aiUnit, 10, false);
             if (newTarget != null) setTarget(newTarget);
             if (newTarget == null || tileImprovementPlan == null) {
                 logger.finest(tag + " at " + unit.getLocation() 
@@ -695,12 +667,7 @@ public class PioneeringMission extends Mission {
     // Serialization
 
     /**
-     * Writes all of the <code>AIObject</code>s and other AI-related
-     * information to an XML-stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
+     * {@inheritDoc}
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         toXML(out, getXMLElementTagName());
@@ -709,6 +676,7 @@ public class PioneeringMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void writeAttributes(XMLStreamWriter out)
         throws XMLStreamException {
         super.writeAttributes(out);
@@ -721,6 +689,7 @@ public class PioneeringMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
         super.readAttributes(in);
@@ -731,7 +700,7 @@ public class PioneeringMission extends Mission {
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "pioneeringMission".
      */

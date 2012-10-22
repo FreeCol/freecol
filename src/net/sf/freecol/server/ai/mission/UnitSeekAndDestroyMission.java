@@ -52,6 +52,7 @@ public class UnitSeekAndDestroyMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(UnitSeekAndDestroyMission.class.getName());
 
+    /** The tag for this mission. */
     private static final String tag = "AI seek+destroyer";
 
     /**
@@ -65,21 +66,25 @@ public class UnitSeekAndDestroyMission extends Mission {
      * Creates a mission for the given <code>AIUnit</code>.
      *
      * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission
-     *        is created for.
-     * @param target The object we are trying to destroy. This can be either a
-     *        <code>Settlement</code> or a <code>Unit</code>.
+     * @param aiUnit The <code>AIUnit</code> this mission is created for.
+     */
+    public UnitSeekAndDestroyMission(AIMain aiMain, AIUnit aiUnit) {
+        this(aiMain, aiUnit, findTarget(aiUnit, 4, false));
+    }
+
+    /**
+     * Creates a mission for the given <code>AIUnit</code>.
+     *
+     * @param aiMain The main AI-object.
+     * @param aiUnit The <code>AIUnit</code> this mission is created for.
+     * @param target The object we are trying to destroy.  This can be
+     *     either a <code>Settlement</code> or a <code>Unit</code>.
      */
     public UnitSeekAndDestroyMission(AIMain aiMain, AIUnit aiUnit,
         Location target) {
         super(aiMain, aiUnit);
 
-        if (!(target instanceof Unit || target instanceof Settlement)) {
-            throw new IllegalArgumentException("Invalid seek+destroy target: "
-                + target);
-        }
-            
-        this.target = target;
+        setTarget(target);
         logger.finest(tag + " begins with target " + target + ": " + this);
         uninitialized = false;
     }
@@ -106,17 +111,6 @@ public class UnitSeekAndDestroyMission extends Mission {
 
 
     /**
-     * Sets a new mission target.
-     *
-     * @param target The new target <code>Location</code>.
-     */
-    public void setTarget(Location target) {
-        boolean retarget = this.target != null && this.target != target;
-        this.target = target;
-        if (retarget) retargetTransportable();
-    }
-
-    /**
      * Extract a valid target for this mission from a path.
      *
      * @param aiUnit The <code>AIUnit</code> to perform the mission.
@@ -140,34 +134,6 @@ public class UnitSeekAndDestroyMission extends Mission {
     }
 
     /**
-     * Gets a <code>GoalDecider</code> for finding the best colony
-     * <code>Tile</code>, optionally falling back to the nearest colony.
-     *
-     * @param aiUnit The <code>AIUnit</code> that is searching.
-     * @param deferOK Not used in this mission.
-     * @return A suitable <code>GoalDecider</code>.
-     */
-    private static GoalDecider getGoalDecider(final AIUnit aiUnit,
-                                              boolean deferOK) {
-        return new GoalDecider() {
-            private PathNode bestPath = null;
-            private int bestValue = 0;
-            
-            public PathNode getGoal() { return bestPath; }
-            public boolean hasSubGoals() { return true; }
-            public boolean check(Unit u, PathNode path) {
-                int value = scorePath(aiUnit, path);
-                if (bestValue < value) {
-                    bestValue = value;
-                    bestPath = path;
-                    return true;
-                }
-                return false;
-            }
-        };
-    }
-
-    /**
      * Scores a potential attack on a settlement.
      *
      * Do not cheat and look inside the settlement.
@@ -182,7 +148,7 @@ public class UnitSeekAndDestroyMission extends Mission {
      * @return A score of the desirability of the mission.
      */
     private static int scoreSettlementPath(AIUnit aiUnit, PathNode path,
-        Settlement settlement) {
+                                           Settlement settlement) {
         if (invalidSettlementReason(aiUnit, settlement) != null) {
             return Integer.MIN_VALUE;
         }
@@ -208,7 +174,8 @@ public class UnitSeekAndDestroyMission extends Mission {
             Tension tension = is.getAlarm(unit.getOwner());
             if (tension != null) value += tension.getValue() / 2;
         }
-        return value;
+        return aiUnit.getAIOwner().adjustMission(aiUnit, path, 
+            UnitSeekAndDestroyMission.class, value);
     }
 
     /**
@@ -250,7 +217,8 @@ public class UnitSeekAndDestroyMission extends Mission {
             if (defender.hasAbility(Ability.EXPERT_SOLDIER)
                 && !defender.isArmed()) value += 100;
         }
-        return value;
+        return aiUnit.getAIOwner().adjustMission(aiUnit, path,
+            UnitSeekAndDestroyMission.class, value);
     }
 
     /**
@@ -271,13 +239,43 @@ public class UnitSeekAndDestroyMission extends Mission {
     }
 
     /**
+     * Gets a <code>GoalDecider</code> for finding the best colony
+     * <code>Tile</code>, optionally falling back to the nearest colony.
+     *
+     * @param aiUnit The <code>AIUnit</code> that is searching.
+     * @param deferOK Not used in this mission.
+     * @return A suitable <code>GoalDecider</code>.
+     */
+    private static GoalDecider getGoalDecider(final AIUnit aiUnit,
+                                              boolean deferOK) {
+        return new GoalDecider() {
+            private PathNode bestPath = null;
+            private int bestValue = 0;
+            
+            public PathNode getGoal() { return bestPath; }
+            public boolean hasSubGoals() { return true; }
+            public boolean check(Unit u, PathNode path) {
+                int value = scorePath(aiUnit, path);
+                if (bestValue < value) {
+                    bestValue = value;
+                    bestPath = path;
+                    return true;
+                }
+                return false;
+            }
+        };
+    }
+
+    /**
      * Finds a suitable seek-and-destroy target path for an AI unit.
      *
      * @param aiUnit The <code>AIUnit</code> to find a target for.
      * @param range An upper bound on the number of moves.
+     * @param deferOK Not implemented in this mission.
      * @return A path to the target, or null if none found.
      */
-    public static PathNode findTargetPath(AIUnit aiUnit, int range) {
+    public static PathNode findTargetPath(AIUnit aiUnit, int range,
+                                          boolean deferOK) {
         if (invalidAIUnitReason(aiUnit) != null) return null;
         final Unit unit = aiUnit.getUnit();
         final Tile startTile = unit.getPathStartTile();
@@ -286,8 +284,7 @@ public class UnitSeekAndDestroyMission extends Mission {
         // Can the unit legally reach a valid target from where it
         // currently is?
         return unit.search(startTile, getGoalDecider(aiUnit, false),
-                           CostDeciders.avoidIllegal(),
-                           range, unit.getCarrier());
+            CostDeciders.avoidIllegal(), range, unit.getCarrier());
     }
 
     /**
@@ -295,10 +292,12 @@ public class UnitSeekAndDestroyMission extends Mission {
      *
      * @param aiUnit The <code>AIUnit</code> to find a target for.
      * @param range An upper bound on the number of moves.
+     * @param deferOK Not implemented in this mission.
      * @return A suitable target, or null if none found.
      */
-    public static Location findTarget(AIUnit aiUnit, int range) {
-        PathNode path = findTargetPath(aiUnit, range);
+    public static Location findTarget(AIUnit aiUnit, int range,
+                                      boolean deferOK) {
+        PathNode path = findTargetPath(aiUnit, range, deferOK);
         return (path != null) ? extractTarget(aiUnit, path)
             : null;
     }
@@ -321,12 +320,30 @@ public class UnitSeekAndDestroyMission extends Mission {
     // Mission interface
 
     /**
-     * Gets the target of this mission.
-     *
-     * @return The mission target.
+     * {@inheritDoc}
      */
     public Location getTarget() {
         return target;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setTarget(Location target) {
+        if (!(target instanceof Unit || target instanceof Settlement)) {
+            throw new IllegalArgumentException("Invalid seek+destroy target: "
+                + target);
+        }
+        boolean retarget = this.target != null && this.target != target;
+        this.target = target;
+        if (retarget) retargetTransportable();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Location findTarget() {
+        return findTarget(getAIUnit(), 4, false);
     }
 
     /**
@@ -393,15 +410,6 @@ public class UnitSeekAndDestroyMission extends Mission {
     }
 
     /**
-     * Why is this mission invalid?
-     *
-     * @return A reason for mission invalidity, or null if none found.
-     */
-    public String invalidReason() {
-        return invalidReason(getAIUnit(), getTarget());
-    }
-
-    /**
      * Why would this mission be invalid with the given AI unit?
      *
      * @param aiUnit The <code>AIUnit</code> to check.
@@ -429,20 +437,23 @@ public class UnitSeekAndDestroyMission extends Mission {
             : Mission.TARGETINVALID;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public String invalidReason() {
+        return invalidReason(getAIUnit(), getTarget());
+    }
+
     // Not a one-time mission, omit isOneTime().
 
     /**
-     * Performs the mission.
-     *
-     * Check for a target-of-opportunity within one turn and hit that
-     * if possible.  Otherwise, just continue on towards the real
-     * target.
+     * {@inheritDoc}
      */
     @Override
     public void doMission() {
         String reason = invalidReason();
         if (isTargetReason(reason)) {
-            setTarget(null);
+            if (!retargetMission(tag, reason)) return;
         } else if (reason != null) {
             logger.finest(tag + " broken(" + reason + "): " + this);
             return;
@@ -451,14 +462,14 @@ public class UnitSeekAndDestroyMission extends Mission {
         // Is there a target-of-opportunity?
         final AIUnit aiUnit = getAIUnit();
         final Unit unit = getUnit();
-        Location nearbyTarget = findTarget(aiUnit, 1);
+        Location nearbyTarget = findTarget(aiUnit, 1, false);
         if (nearbyTarget != null) {
             if (getTarget() == null) {
                 logger.finest(tag + " retargeted " + nearbyTarget
                     + ": " + this);
                 setTarget(nearbyTarget);
                 nearbyTarget = null;
-            } else if (nearbyTarget == target) {
+            } else if (nearbyTarget == getTarget()) {
                 nearbyTarget = null;
             } else {
                 logger.finest(tag + " found target-of-opportunity "
@@ -507,12 +518,7 @@ public class UnitSeekAndDestroyMission extends Mission {
     // Serialization
 
     /**
-     * Writes all of the <code>AIObject</code>s and other AI-related
-     * information to an XML-stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
+     * {@inheritDoc}
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         toXML(out, getXMLElementTagName());
@@ -544,7 +550,7 @@ public class UnitSeekAndDestroyMission extends Mission {
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "unitSeekAndDestroyMission".
      */

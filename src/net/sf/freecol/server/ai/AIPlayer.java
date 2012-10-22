@@ -464,17 +464,17 @@ public abstract class AIPlayer extends AIObject {
     public abstract void startWorking();
 
     /**
-     * Evaluates a proposed mission type for a unit.
+     * Adjusts the score of this proposed mission for this player type.
      * Subclasses should override and refine this.
      *
      * @param aiUnit The <code>AIUnit</code> to perform the mission.
      * @param path A <code>PathNode</code> to the target of this mission.
+     * @param value The proposed value.
      * @param type The mission type.
      * @return A score representing the desirability of this mission.
      */
-    public int scoreMission(AIUnit aiUnit, PathNode path, Class type) {
-        return Mission.scorePath(aiUnit, path, type);
-    }
+    public abstract int adjustMission(AIUnit aiUnit, PathNode path, Class type,
+                                      int value);
 
     /**
      * Resolves a native demand.

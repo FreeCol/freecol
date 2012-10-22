@@ -476,29 +476,24 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         for (Unit u : tile.getUnitList()) {
             AIUnit aiU = getAIUnit(u);
             if (aiU == null || aiU.getMission() != null) continue;
+            Mission m = null;
             switch (u.getRole()) {
             case SOLDIER: case DRAGOON:
-                aiU.setMission(new DefendSettlementMission(aiMain, aiU,
-                                                           colony));
+                m = new DefendSettlementMission(aiMain, aiU, colony);
                 break;
             case SCOUT:
-                if (preferScouts
-                    && ScoutingMission.invalidReason(aiU) == null) {
-                    aiU.setMission(new ScoutingMission(aiMain, aiU));
-                }
+                if (preferScouts) m = aip.getScoutingMission(aiU);
                 break;
             case PIONEER:
-                if (PioneeringMission.invalidReason(aiU) == null
-                    && ((pioneerTile = aip.getBestPlanTile(colony)) != null
-                        || pioneersWanted)) {
-                    aiU.setMission(new PioneeringMission(aiMain, aiU,
-                                                         pioneerTile));
-                }
+                if (pioneersWanted) m = aip.getPioneeringMission(aiU);
                 break;
-            // TODO: case MISSIONARY:
+            case MISSIONARY:
+                m = aip.getMissionaryMission(aiU);
+                break;
             default:
                 break;
             }
+            if (m != null) aiU.setMission(m);
         }
 
         // Change the export settings when required.

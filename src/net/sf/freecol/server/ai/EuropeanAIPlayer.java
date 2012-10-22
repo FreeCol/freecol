@@ -99,6 +99,29 @@ public class EuropeanAIPlayer extends AIPlayer {
 
     private static final Logger logger = Logger.getLogger(EuropeanAIPlayer.class.getName());
 
+    /** Maximum number of turns to travel to a building site. */
+    private static final int buildingRange = 5;
+
+    /** Maximum number of turns to travel to a cash in location. */
+    private static final int cashInRange = 20;
+
+    /** Maximum number of turns to travel to a missionary target. */
+    private static final int missionaryRange = 20;
+
+    /**
+     * Maximum number of turns to travel to make progress on
+     * pioneering.  This is low-ish because it is usually more
+     * efficient to ship the tools where they are needed and either
+     * create a new pioneer on site or send a hardy pioneer on
+     * horseback.  The AI is probably smart enough to do the former
+     * already, and one day the latter.
+     */
+    private static final int pioneeringRange = 10;
+
+    /** Maximum number of turns to travel to a scouting target. */
+    private static final int scoutingRange = 20;
+
+
     /**
      * A comparator to sort units by suitability for a BuildColonyMission.
      *
@@ -1561,12 +1584,13 @@ public class EuropeanAIPlayer extends AIPlayer {
      * @return A new mission, or null if impossible.
      */
     private Mission getBuildColonyMission(AIUnit aiUnit) {
-        final Unit unit = aiUnit.getUnit();
         String reason = BuildColonyMission.invalidReason(aiUnit);
         if (reason != null) return null;
-        Location loc = BuildColonyMission.findTarget(aiUnit, unit.isInEurope());
-        if (loc == null) return null;
-        return new BuildColonyMission(getAIMain(), aiUnit, loc);
+        final Unit unit = aiUnit.getUnit();
+        Location loc = BuildColonyMission.findTarget(aiUnit, buildingRange,
+                                                     unit.isInEurope());
+        return (loc == null) ? null
+            : new BuildColonyMission(getAIMain(), aiUnit, loc);
     }
 
     /**
@@ -1578,7 +1602,11 @@ public class EuropeanAIPlayer extends AIPlayer {
     private Mission getCashInTreasureTrainMission(AIUnit aiUnit) {
         String reason = CashInTreasureTrainMission.invalidReason(aiUnit);
         if (reason != null) return null;
-        return new CashInTreasureTrainMission(getAIMain(), aiUnit);
+        final Unit unit = aiUnit.getUnit();
+        Location loc = CashInTreasureTrainMission.findTarget(aiUnit,
+            cashInRange, unit.isInEurope());
+        return (loc == null) ? null
+            : new CashInTreasureTrainMission(getAIMain(), aiUnit, loc);
     }
 
     /**
@@ -1619,30 +1647,36 @@ public class EuropeanAIPlayer extends AIPlayer {
     /**
      * Gets a new MissionaryMission for a unit.
      *
+     * Public for AIColony.
+     *
      * @param aiUnit The <code>AIUnit</code> to check.
      * @return A new mission, or null if impossible.
      */
-    private Mission getMissionaryMission(AIUnit aiUnit) {
+    public Mission getMissionaryMission(AIUnit aiUnit) {
         String reason = MissionaryMission.prepare(aiUnit);
         if (reason != null) return null;
-        Location loc = MissionaryMission.findTarget(aiUnit, true);
-        if (loc == null) return null;
-        return new MissionaryMission(getAIMain(), aiUnit);
+        Location loc = MissionaryMission.findTarget(aiUnit, missionaryRange,
+                                                    true);
+        return (loc == null) ? null
+            : new MissionaryMission(getAIMain(), aiUnit);
     }
 
     /**
      * Gets a new PioneeringMission for a unit.
      * TODO: pioneers to make roads between colonies
      *
+     * Public for AIColony.
+     *
      * @param aiUnit The <code>AIUnit</code> to check.
      * @return A new mission, or null if impossible.
      */
-    private Mission getPioneeringMission(AIUnit aiUnit) {
+    public Mission getPioneeringMission(AIUnit aiUnit) {
         String reason = PioneeringMission.prepare(aiUnit);
         if (reason != null) return null;
-        Location loc = PioneeringMission.findTarget(aiUnit, true);
-        if (loc == null) return null;
-        return new PioneeringMission(getAIMain(), aiUnit, loc);
+        Location loc = PioneeringMission.findTarget(aiUnit, pioneeringRange,
+                                                    true);
+        return (loc == null) ? null
+            : new PioneeringMission(getAIMain(), aiUnit, loc);
     }
 
     /**
@@ -1660,15 +1694,17 @@ public class EuropeanAIPlayer extends AIPlayer {
     /**
      * Gets a new ScoutingMission for a unit.
      *
+     * Public for AIColony.
+     *
      * @param aiUnit The <code>AIUnit</code> to check.
      * @return A new mission, or null if impossible.
      */
-    private Mission getScoutingMission(AIUnit aiUnit) {
+    public Mission getScoutingMission(AIUnit aiUnit) {
         String reason = ScoutingMission.prepare(aiUnit);
         if (reason != null) return null;
-        Location loc = ScoutingMission.findTarget(aiUnit, true);
-        if (loc == null) return null;
-        return new ScoutingMission(getAIMain(), aiUnit, loc);
+        Location loc = ScoutingMission.findTarget(aiUnit, scoutingRange, true);
+        return (loc == null) ? null
+            : new ScoutingMission(getAIMain(), aiUnit, loc);
     }
 
     /**
@@ -1681,9 +1717,10 @@ public class EuropeanAIPlayer extends AIPlayer {
     public Mission getSeekAndDestroyMission(AIUnit aiUnit, int range) {
         String reason = UnitSeekAndDestroyMission.invalidReason(aiUnit);
         if (reason != null) return null;
-        Location loc = UnitSeekAndDestroyMission.findTarget(aiUnit, range);
-        if (loc == null) return null;
-        return new UnitSeekAndDestroyMission(getAIMain(), aiUnit, loc);
+        Location loc = UnitSeekAndDestroyMission.findTarget(aiUnit, range,
+                                                            false);
+        return (loc == null) ? null
+            : new UnitSeekAndDestroyMission(getAIMain(), aiUnit, loc);
     }
 
     /**
@@ -1779,7 +1816,8 @@ public class EuropeanAIPlayer extends AIPlayer {
             Unit u = aiu.getUnit();
             if (!u.isNaval() && !aiu.hasMission()) {
                 if (target == null) {
-                    target = BuildColonyMission.findTarget(aiu, false);
+                    target = BuildColonyMission.findTarget(aiu, 
+                        buildingRange*3, false);
                 }
                 aiu.setMission(new BuildColonyMission(aiMain, aiu, target));
             }
@@ -1833,6 +1871,11 @@ public class EuropeanAIPlayer extends AIPlayer {
 
         for (AIColony aic : getAIColonies()) aic.rearrangeWorkers();
         clearAIUnits();
+        tipMap.clear();
+        transportDemand.clear();
+        transportSupply.clear();
+        goodsWishes.clear();
+        workerWishes.clear();
     }
 
     /**
@@ -1862,21 +1905,18 @@ public class EuropeanAIPlayer extends AIPlayer {
     }
 
     /**
-     * Evaluates a proposed mission type for a unit, specialized for
-     * European players.
-     *
-     * @param aiUnit The <code>AIUnit</code> to perform the mission.
-     * @param path A <code>PathNode</code> to the target of this mission.
-     * @param type The mission type.
-     * @return A score representing the desirability of this mission.
+     * {@inheritDoc}
      */
-    public int scoreMission(AIUnit aiUnit, PathNode path, Class type) {
-        int value = super.scoreMission(aiUnit, path, type);
+    public int adjustMission(AIUnit aiUnit, PathNode path, Class type,
+                             int value) {
         if (value > 0) {
             if (type == DefendSettlementMission.class) {
                 // Reduce value in proportion to the number of defenders.
-                Colony colony = (Colony)DefendSettlementMission
-                    .extractTarget(aiUnit, path);
+                Location loc = DefendSettlementMission.extractTarget(aiUnit, path);
+                if (!(loc instanceof Colony)) {
+                    throw new IllegalStateException("European players defend colonies: " + loc);
+                }
+                Colony colony = (Colony)loc;
                 int defenders = getSettlementDefenders(colony);
                 value -= 25 * defenders;
                 // Reduce value according to the stockade level.

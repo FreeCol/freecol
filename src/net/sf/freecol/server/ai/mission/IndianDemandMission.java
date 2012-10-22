@@ -51,10 +51,11 @@ public class IndianDemandMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(IndianDemandMission.class.getName());
 
+    /** The tag for this mission. */
     private static final String tag = "AI native demander";
 
     /** The mission target, which is the colony to demand from. */
-    private Colony target;
+    private Location target;
 
     /** Whether this mission has been completed or not. */
     private boolean completed;
@@ -73,7 +74,9 @@ public class IndianDemandMission extends Mission {
     public IndianDemandMission(AIMain aiMain, AIUnit aiUnit, Colony target) {
         super(aiMain, aiUnit);
 
-        this.target = target;
+        this.target = target; // Sole place the target is to be set.
+        this.completed = false;
+        this.demanded = false;
 
         Unit unit = getUnit();
         if (!unit.getOwner().isIndian() || !unit.canCarryGoods()) {
@@ -119,221 +122,6 @@ public class IndianDemandMission extends Mission {
      */
     private static boolean hasTribute(AIUnit aiUnit) {
         return aiUnit.getUnit().hasGoodsCargo();
-    }
-
-
-    // Mission interface
-
-    /**
-     * Gets the mission target.
-     *
-     * @return The target <code>Colony</code>.
-     */
-    public Location getTarget() {
-        return target;
-    }
-
-    /**
-     * Why would this mission be invalid with the given unit?
-     *
-     * @param aiUnit The <code>AIUnit</code> to test.
-     * @return A reason why the mission would be invalid with the unit,
-     *     or null if none found.
-     */
-    private static String invalidMissionReason(AIUnit aiUnit) {
-        String reason = invalidAIUnitReason(aiUnit);
-        return (reason != null)
-            ? reason
-            : (aiUnit.getUnit().getIndianSettlement() == null)
-            ? "home-destroyed"
-            : null;
-    }
-
-    /**
-     * Why would an IndianDemandMission be invalid with the given
-     * unit and colony.
-     *
-     * @param aiUnit The <code>AIUnit</code> to test.
-     * @param colony The <code>Colony</code> to test.
-     * @return A reason why the mission would be invalid with the unit
-     *     and colony or null if none found.
-     */
-    private static String invalidColonyReason(AIUnit aiUnit, Colony colony) {
-        String reason = invalidTargetReason(colony);
-        if (reason != null) return reason;
-        final Unit unit = aiUnit.getUnit();
-        final Player owner = unit.getOwner();
-        Player targetPlayer = colony.getOwner();
-        switch (owner.getStance(targetPlayer)) {
-        case UNCONTACTED: case PEACE: case ALLIANCE:
-            return "bad-stance";
-        case WAR: case CEASE_FIRE:
-            Tension tension = unit.getIndianSettlement()
-                .getAlarm(targetPlayer);
-            if (tension != null && tension.getLevel()
-                .compareTo(Tension.Level.CONTENT) <= 0) return "happy";
-            break;
-        }
-        return null;
-    }
-
-    /**
-     * Why is this mission invalid?
-     *
-     * @return A reason for mission invalidity, or null if none found.
-     */
-    public String invalidReason() {
-        return (completed) ? "completed"
-            : invalidReason(getAIUnit(), target);
-    }
-
-    /**
-     * Why would this mission be invalid with the given AI unit?
-     *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @return A reason for invalidity, or null if none found.
-     */
-    public static String invalidReason(AIUnit aiUnit) {
-        return invalidMissionReason(aiUnit);
-    }
-
-    /**
-     * Why would this mission be invalid with the given AI unit and location?
-     *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @param loc The <code>Location</code> to check.
-     * @return A reason for invalidity, or null if none found.
-     */
-    public static String invalidReason(AIUnit aiUnit, Location loc) {
-        String reason = invalidMissionReason(aiUnit);
-        return (reason != null)
-            ? reason
-            : (loc instanceof Colony)
-            ? invalidColonyReason(aiUnit, (Colony)loc)
-            : Mission.TARGETINVALID;
-    }
-
-    // Not a one-time mission, omit isOneTime().
-
-    /**
-     * Performs the mission.
-     */
-    public void doMission() {
-        String reason = invalidReason();
-        if (reason != null) {
-            logger.finest(tag + " broken(" + reason + "): " + this);
-            return;
-        }
-
-        final AIUnit aiUnit = getAIUnit();
-        final Unit unit = getUnit();
-        final IndianSettlement is = unit.getIndianSettlement();
-        while (!completed) {
-            if (hasTribute()) {
-                Unit.MoveType mt = travelToTarget(tag, is,
-                    CostDeciders.avoidSettlementsAndBlockingUnits());
-                switch (mt) {
-                case MOVE_NO_MOVES:
-                    return;
-                case MOVE: // Arrived!
-                    break;
-                default:
-                    logger.warning(tag + " unexpected delivery move type: " + mt
-                        + ": " + this);
-                    moveRandomly(tag, null);
-                    return;
-                }
-                // Unload the goods
-                GoodsContainer container = unit.getGoodsContainer();
-                for (Goods goods : container.getCompactGoods()) {
-                    Goods tribute = container.removeGoods(goods.getType());
-                    is.addGoods(tribute);
-                }
-                logger.finest(tag + " completed unloading tribute at "
-                    + is.getName() + ": " + this);
-                completed = true;
-                return;
-            }
-
-            // Move to the target's colony and demand
-            Unit.MoveType mt = travelToTarget(tag, target, null);
-            Direction d;
-            switch (mt) {
-            case MOVE_NO_MOVES:
-                return;
-            case ATTACK_SETTLEMENT:
-                d = unit.getTile().getDirection(target.getTile());
-                if (d != null) break; // Arrived at target, handled below.
-                // Fall through
-            case ATTACK_UNIT: // Something is blocking our path
-                Location blocker = resolveBlockage(aiUnit, target);
-                if (blocker == null) {
-                    logger.warning(tag + " could not resolve blockage"
-                        + ": " + this);
-                    moveRandomly(tag, null);
-                    unit.setMovesLeft(0);
-                } else {
-                    logger.finest(tag + " blocked by " + blocker
-                        + ", attacking: " + this);
-                    d = unit.getTile().getDirection(blocker.getTile());
-                    AIMessage.askAttack(aiUnit, d);
-                }                
-                return;
-            default:
-                logger.warning(tag + " unexpected demand move type: " + mt
-                    + ": " + this);
-                moveRandomly(tag, null);
-                return;
-            }
-
-            Player enemy = target.getOwner();
-            Goods goods = selectGoods(target);
-            int gold = 0;
-            int oldGoods = (goods == null) ? 0
-                : unit.getGoodsCount(goods.getType());
-            if (goods == null) {
-                if (!enemy.checkGold(1)) {
-                    completed = true;
-                    logger.finest(tag + " completed empty handed"
-                        + " at " + target.getName() + ": " + this);
-                    return;
-                }
-                gold = enemy.getGold() / 20;
-                if (gold == 0) gold = enemy.getGold();
-            }
-            demanded = true;
-
-            boolean accepted
-                = AIMessage.askIndianDemand(aiUnit, target, goods, gold);
-            if (accepted && (gold > 0 || hasTribute())) {
-                if (goods != null) {
-                    logger.finest(tag + " accepted at " + target.getName()
-                        + " tribute: " + goods.toString() + ": " + this);
-                    continue; // Head for home
-                } else {
-                    logger.finest(tag + " completed at " + target.getName()
-                        + " tribute: " + gold + " gold: " + this);
-                }
-            } else { // Consider attacking if not content.
-                int unitTension = (is == null) ? 0
-                    : is.getAlarm(enemy).getValue();
-                int tension = Math.max(unitTension,
-                    unit.getOwner().getTension(enemy).getValue());
-                d = unit.getTile().getDirection(target.getTile());
-                boolean attack = tension >= Tension.Level.CONTENT.getLimit()
-                    && d != null;
-                logger.finest(tag + " completed with refusal"
-                    + " at " + target.getName()
-                    + ((attack) ? "(attacking)" : "") + ": " + this);
-                if (attack) {
-                    AIMessage.askAttack(aiUnit, d);
-                    return;
-                }
-            }
-            // Consume any remaining moves.
-            completed = true;
-            moveRandomlyTurn(tag);
-        }
     }
 
     /**
@@ -434,15 +222,235 @@ public class IndianDemandMission extends Mission {
     }
 
 
+    // Mission interface
+
+    /**
+     * {@inheritDoc}
+     */
+    public Location getTarget() {
+        return target;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setTarget(Location target) {
+        throw new IllegalStateException("Target is fixed");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Location findTarget() {
+        throw new IllegalStateException("Target is fixed");
+    }
+
+    /**
+     * Why would this mission be invalid with the given unit?
+     *
+     * @param aiUnit The <code>AIUnit</code> to test.
+     * @return A reason why the mission would be invalid with the unit,
+     *     or null if none found.
+     */
+    private static String invalidMissionReason(AIUnit aiUnit) {
+        String reason = invalidAIUnitReason(aiUnit);
+        return (reason != null)
+            ? reason
+            : (aiUnit.getUnit().getIndianSettlement() == null)
+            ? "home-destroyed"
+            : null;
+    }
+
+    /**
+     * Why would an IndianDemandMission be invalid with the given
+     * unit and colony.
+     *
+     * @param aiUnit The <code>AIUnit</code> to test.
+     * @param colony The <code>Colony</code> to test.
+     * @return A reason why the mission would be invalid with the unit
+     *     and colony or null if none found.
+     */
+    private static String invalidColonyReason(AIUnit aiUnit, Colony colony) {
+        String reason = invalidTargetReason(colony);
+        if (reason != null) return reason;
+        final Unit unit = aiUnit.getUnit();
+        final Player owner = unit.getOwner();
+        Player targetPlayer = colony.getOwner();
+        switch (owner.getStance(targetPlayer)) {
+        case UNCONTACTED: case PEACE: case ALLIANCE:
+            return "bad-stance";
+        case WAR: case CEASE_FIRE:
+            Tension tension = unit.getIndianSettlement()
+                .getAlarm(targetPlayer);
+            if (tension != null && tension.getLevel()
+                .compareTo(Tension.Level.CONTENT) <= 0) return "happy";
+            break;
+        }
+        return null;
+    }
+
+    /**
+     * Why would this mission be invalid with the given AI unit?
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @return A reason for invalidity, or null if none found.
+     */
+    public static String invalidReason(AIUnit aiUnit) {
+        return invalidMissionReason(aiUnit);
+    }
+
+    /**
+     * Why would this mission be invalid with the given AI unit and location?
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @param loc The <code>Location</code> to check.
+     * @return A reason for invalidity, or null if none found.
+     */
+    public static String invalidReason(AIUnit aiUnit, Location loc) {
+        String reason = invalidMissionReason(aiUnit);
+        return (reason != null)
+            ? reason
+            : (loc instanceof Colony)
+            ? invalidColonyReason(aiUnit, (Colony)loc)
+            : Mission.TARGETINVALID;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String invalidReason() {
+        return (completed) ? "completed" : invalidReason(getAIUnit(), target);
+    }
+
+    // Not a one-time mission, omit isOneTime().
+
+    /**
+     * {@inheritDoc}
+     */
+    public void doMission() {
+        String reason = invalidReason();
+        if (reason != null) {
+            logger.finest(tag + " broken(" + reason + "): " + this);
+            return;
+        }
+
+        final AIUnit aiUnit = getAIUnit();
+        final Unit unit = getUnit();
+        final IndianSettlement is = unit.getIndianSettlement();
+        while (!completed) {
+            if (hasTribute()) {
+                Unit.MoveType mt = travelToTarget(tag, is,
+                    CostDeciders.avoidSettlementsAndBlockingUnits());
+                switch (mt) {
+                case MOVE_NO_MOVES:
+                    return;
+                case MOVE: // Arrived!
+                    break;
+                default:
+                    logger.warning(tag + " unexpected delivery move type: " + mt
+                        + ": " + this);
+                    moveRandomly(tag, null);
+                    return;
+                }
+                // Unload the goods
+                GoodsContainer container = unit.getGoodsContainer();
+                for (Goods goods : container.getCompactGoods()) {
+                    Goods tribute = container.removeGoods(goods.getType());
+                    is.addGoods(tribute);
+                }
+                logger.finest(tag + " completed unloading tribute at "
+                    + is.getName() + ": " + this);
+                completed = true;
+                return;
+            }
+
+            // Move to the target's colony and demand
+            Unit.MoveType mt = travelToTarget(tag, target, null);
+            Direction d;
+            switch (mt) {
+            case MOVE_NO_MOVES:
+                return;
+            case ATTACK_SETTLEMENT:
+                d = unit.getTile().getDirection(target.getTile());
+                if (d != null) break; // Arrived at target, handled below.
+                // Fall through
+            case ATTACK_UNIT: // Something is blocking our path
+                Location blocker = resolveBlockage(aiUnit, target);
+                if (blocker == null) {
+                    logger.warning(tag + " could not resolve blockage"
+                        + ": " + this);
+                    moveRandomly(tag, null);
+                    unit.setMovesLeft(0);
+                } else {
+                    logger.finest(tag + " blocked by " + blocker
+                        + ", attacking: " + this);
+                    d = unit.getTile().getDirection(blocker.getTile());
+                    AIMessage.askAttack(aiUnit, d);
+                }                
+                return;
+            default:
+                logger.warning(tag + " unexpected demand move type: " + mt
+                    + ": " + this);
+                moveRandomly(tag, null);
+                return;
+            }
+
+            Colony colony = (Colony)getTarget();
+            Player enemy = colony.getOwner();
+            Goods goods = selectGoods(colony);
+            int gold = 0;
+            int oldGoods = (goods == null) ? 0
+                : unit.getGoodsCount(goods.getType());
+            if (goods == null) {
+                if (!enemy.checkGold(1)) {
+                    completed = true;
+                    logger.finest(tag + " completed empty handed"
+                        + " at " + colony.getName() + ": " + this);
+                    return;
+                }
+                gold = enemy.getGold() / 20;
+                if (gold == 0) gold = enemy.getGold();
+            }
+            demanded = true;
+
+            boolean accepted
+                = AIMessage.askIndianDemand(aiUnit, colony, goods, gold);
+            if (accepted && (gold > 0 || hasTribute())) {
+                if (goods != null) {
+                    logger.finest(tag + " accepted at " + colony.getName()
+                        + " tribute: " + goods.toString() + ": " + this);
+                    continue; // Head for home
+                } else {
+                    logger.finest(tag + " completed at " + colony.getName()
+                        + " tribute: " + gold + " gold: " + this);
+                }
+            } else { // Consider attacking if not content.
+                int unitTension = (is == null) ? 0
+                    : is.getAlarm(enemy).getValue();
+                int tension = Math.max(unitTension,
+                    unit.getOwner().getTension(enemy).getValue());
+                d = unit.getTile().getDirection(colony.getTile());
+                boolean attack = tension >= Tension.Level.CONTENT.getLimit()
+                    && d != null;
+                logger.finest(tag + " completed with refusal"
+                    + " at " + colony.getName()
+                    + ((attack) ? "(attacking)" : "") + ": " + this);
+                if (attack) {
+                    AIMessage.askAttack(aiUnit, d);
+                    return;
+                }
+            }
+            // Consume any remaining moves.
+            completed = true;
+            moveRandomlyTurn(tag);
+        }
+    }
+
+
     // Serialization
 
     /**
-     * Writes all of the <code>AIObject</code>s and other AI-related
-     * information to an XML-stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
+     * {@inheritDoc}
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         toXML(out, getXMLElementTagName());
@@ -451,6 +459,7 @@ public class IndianDemandMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void writeAttributes(XMLStreamWriter out)
         throws XMLStreamException {
         super.writeAttributes(out);
@@ -465,13 +474,9 @@ public class IndianDemandMission extends Mission {
     }
 
     /**
-     * Reads all the <code>AIObject</code>s and other AI-related information
-     * from XML data.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if there are any problems reading
-     *             from the stream.
+     * {@inheritDoc}
      */
+    @Override
     protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
         super.readAttributes(in);
@@ -487,7 +492,7 @@ public class IndianDemandMission extends Mission {
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "indianDemandMission".
      */

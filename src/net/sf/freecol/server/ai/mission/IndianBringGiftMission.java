@@ -35,6 +35,7 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
@@ -59,12 +60,13 @@ public class IndianBringGiftMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(IndianBringGiftMission.class.getName());
 
+    /** The tag for this mission. */
     private static final String tag = "AI native gifter";
 
     /**
      * The Colony to receive the gift.
      */
-    private Colony target;
+    private Location target = null;
 
     /** Decides whether this mission has been completed or not. */
     private boolean completed;
@@ -80,7 +82,7 @@ public class IndianBringGiftMission extends Mission {
     public IndianBringGiftMission(AIMain aiMain, AIUnit aiUnit, Colony target) {
         super(aiMain, aiUnit);
 
-        this.target = target;
+        this.target = target; // Sole place target is to be set.
         this.completed = false;
 
         Unit unit = getUnit();
@@ -123,12 +125,24 @@ public class IndianBringGiftMission extends Mission {
     // Mission interface
 
     /**
-     * Gets the mission target.
-     *
-     * @return The target <code>Colony</code>.
+     * {@inheritDoc}
      */
     public Location getTarget() {
         return target;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setTarget(Location target) {
+        throw new IllegalStateException("Target is fixed");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Location findTarget() {
+        throw new IllegalStateException("Target is fixed");
     }
 
     /**
@@ -175,15 +189,6 @@ public class IndianBringGiftMission extends Mission {
     }
 
     /**
-     * Why is this mission invalid?
-     *
-     * @return A reason for mission invalidity, or null if none found.
-     */
-    public String invalidReason() {
-        return invalidReason(getAIUnit(), target);
-    }
-
-    /**
      * Why would this mission be invalid with the given AI unit?
      *
      * @param aiUnit The <code>AIUnit</code> to check.
@@ -208,10 +213,17 @@ public class IndianBringGiftMission extends Mission {
             : Mission.TARGETINVALID;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public String invalidReason() {
+        return invalidReason(getAIUnit(), target);
+    }
+
     // Not a one-time mission, omit isOneTime().
 
     /**
-     * Performs the mission.
+     * {@inheritDoc}
      */
     public void doMission() {
         String reason = invalidReason();
@@ -268,7 +280,7 @@ public class IndianBringGiftMission extends Mission {
         } else {
             // Move to the target's colony and deliver, avoiding trouble
             // by choice of cost decider.
-            Unit.MoveType mt = travelToTarget(tag, target.getTile(),
+            Unit.MoveType mt = travelToTarget(tag, getTarget(),
                 CostDeciders.avoidSettlementsAndBlockingUnits());
             switch (mt) {
             case MOVE_NO_MOVES:
@@ -282,17 +294,19 @@ public class IndianBringGiftMission extends Mission {
                 return;
             }
 
-            if (!unit.getTile().isAdjacent(target.getTile())) {
-                throw new IllegalStateException("Not at target: " + target);
+            if (!unit.getTile().isAdjacent(getTarget().getTile())) {
+                throw new IllegalStateException("Not at target: "
+                    + getTarget());
             }
-            if (AIMessage.askGetTransaction(aiUnit, target)
-                && AIMessage.askDeliverGift(aiUnit, target,
+            Settlement settlement = (Settlement)getTarget();
+            if (AIMessage.askGetTransaction(aiUnit, settlement)
+                && AIMessage.askDeliverGift(aiUnit, settlement,
                     unit.getGoodsList().get(0))) {
-                AIMessage.askCloseTransaction(aiUnit, target);
-                logger.finest(tag + " completed at " + target.getName()
+                AIMessage.askCloseTransaction(aiUnit, settlement);
+                logger.finest(tag + " completed at " + settlement.getName()
                     + ": " + this);
             } else {
-                logger.warning(tag + " failed at " + target.getName()
+                logger.warning(tag + " failed at " + settlement.getName()
                     + ": " + this);
             }
             completed = true;
@@ -303,12 +317,7 @@ public class IndianBringGiftMission extends Mission {
     // Serialization
 
     /**
-     * Writes all of the <code>AIObject</code>s and other AI-related
-     * information to an XML-stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
+     * {@inheritDoc}
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         toXML(out, getXMLElementTagName());
@@ -317,6 +326,7 @@ public class IndianBringGiftMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void writeAttributes(XMLStreamWriter out)
         throws XMLStreamException {
         super.writeAttributes(out);
@@ -329,13 +339,9 @@ public class IndianBringGiftMission extends Mission {
     }
 
     /**
-     * Reads all the <code>AIObject</code>s and other AI-related information
-     * from XML data.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if there are any problems reading
-     *             from the stream.
+     * {@inheritDoc}
      */
+    @Override
     protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
         super.readAttributes(in);
@@ -351,7 +357,7 @@ public class IndianBringGiftMission extends Mission {
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "indianBringGiftMission".
      */

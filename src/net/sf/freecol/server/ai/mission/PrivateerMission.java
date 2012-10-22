@@ -31,6 +31,7 @@ import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
@@ -56,6 +57,7 @@ public class PrivateerMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(PrivateerMission.class.getName());
 
+    /** The tag for this mission. */
     private static String tag = "AI privateer";
 
     /**
@@ -69,12 +71,23 @@ public class PrivateerMission extends Mission {
      * Creates a mission for the given <code>AIUnit</code>.
      *
      * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission
-     *        is created for.
+     * @param aiUnit The <code>AIUnit</code> this mission is created for.
      */
     public PrivateerMission(AIMain aiMain, AIUnit aiUnit) {
+        this(aiMain, aiUnit, findTarget(aiUnit, 8, true));
+    }
+
+    /**
+     * Creates a mission for the given <code>AIUnit</code>.
+     *
+     * @param aiMain The main AI-object.
+     * @param aiUnit The <code>AIUnit</code> this mission is created for.
+     * @param target The target <code>Location</code> for this mission.
+     */
+    public PrivateerMission(AIMain aiMain, AIUnit aiUnit, Location target) {
         super(aiMain, aiUnit);
 
+        setTarget(target);
         Unit unit = aiUnit.getUnit();
         logger.finest(tag + " begins at " + unit.getLocation() + ": " + this);
         uninitialized = false;
@@ -101,17 +114,6 @@ public class PrivateerMission extends Mission {
 
 
     /**
-     * Sets a new mission target.
-     *
-     * @param target The new target <code>Location</code>.
-     */
-    public void setTarget(Location target) {
-        boolean retarget = this.target != null && this.target != target;
-        this.target = target;
-        if (retarget) retargetTransportable();
-    }
-
-    /**
      * Extract a valid target for this mission from a path.
      *
      * @param aiUnit A <code>AIUnit</code> to perform the mission.
@@ -122,42 +124,17 @@ public class PrivateerMission extends Mission {
     public static Location extractTarget(AIUnit aiUnit, PathNode path) {
         if (path == null) return null;
         final Unit unit = aiUnit.getUnit();
+        final Player owner = unit.getOwner();
         final Location loc = path.getLastNode().getLocation();
         Settlement settlement = loc.getSettlement();
         Tile tile = loc.getTile();
         Unit other = (tile == null) ? null : tile.getDefendingUnit(unit);
-        return (aiUnit.hasCargo())
-            ? ((loc instanceof Europe) ? loc
-                : (settlement instanceof Colony) ? settlement
-                : null)
-            : ((other != null) ? other : null);
-    }
-
-    /**
-     * Gets a <code>GoalDecider</code> for this mission.
-     *
-     * @param aiUnit The <code>AIUnit</code> that is searching.
-     * @param deferOK Enable colony fallback (not implemented).
-     * @return A suitable <code>GoalDecider</code>.
-     */
-    private static GoalDecider getGoalDecider(final AIUnit aiUnit,
-                                              boolean deferOK) {
-        return new GoalDecider() {
-            private PathNode bestPath = null;
-            private int bestValue = 0;
-
-            public PathNode getGoal() { return bestPath; }
-            public boolean hasSubGoals() { return true; }
-            public boolean check(Unit u, PathNode path) {
-                int value = scorePath(aiUnit, path);
-                if (bestValue < value) {
-                    bestValue = value;
-                    bestPath = path;
-                    return true;
-                }
-                return false;
-            }
-        };
+        return (loc instanceof Europe) ? loc
+            : (other != null
+                && invalidUnitReason(aiUnit, other) == null) ? other
+            : (settlement != null
+                && invalidTargetReason(settlement, owner) == null) ? settlement
+            : null;
     }
 
     /**
@@ -196,6 +173,33 @@ public class PrivateerMission extends Mission {
         } else {
             return Integer.MIN_VALUE;
         }
+    }
+
+    /**
+     * Gets a <code>GoalDecider</code> for this mission.
+     *
+     * @param aiUnit The <code>AIUnit</code> that is searching.
+     * @param deferOK Enable colony fallback (not implemented).
+     * @return A suitable <code>GoalDecider</code>.
+     */
+    private static GoalDecider getGoalDecider(final AIUnit aiUnit,
+                                              boolean deferOK) {
+        return new GoalDecider() {
+            private PathNode bestPath = null;
+            private int bestValue = 0;
+
+            public PathNode getGoal() { return bestPath; }
+            public boolean hasSubGoals() { return true; }
+            public boolean check(Unit u, PathNode path) {
+                int value = scorePath(aiUnit, path);
+                if (bestValue < value) {
+                    bestValue = value;
+                    bestPath = path;
+                    return true;
+                }
+                return false;
+            }
+        };
     }
 
     /**
@@ -238,9 +242,7 @@ public class PrivateerMission extends Mission {
     // Fake Transportable interface
 
     /**
-     * Gets the transport destination for units with this mission.
-     *
-     * @return Always null, we never transport carrier units.
+     * {@inheritDoc}
      */
     @Override
     public Location getTransportDestination() {
@@ -251,14 +253,28 @@ public class PrivateerMission extends Mission {
     // Mission interface
 
     /**
-     * Gets the target for this mission.
-     *
-     * @return The target for this mission.
+     * {@inheritDoc}
      */
     public Location getTarget() {
         return target;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void setTarget(Location target) {
+        boolean retarget = this.target != null && this.target != target;
+        this.target = target;
+        if (retarget) retargetTransportable();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Location findTarget() {
+        return findTarget(getAIUnit(), 8, true);
+    }
+    
     /**
      * Why would a PrivateeringMission be invalid with the given unit.
      *
@@ -304,6 +320,8 @@ public class PrivateerMission extends Mission {
         Player other = unit.getOwner();
         return (unit == null)
             ? Mission.TARGETINVALID
+            : (!unit.isNaval())
+            ? "privateer-ignores-land-unit"
             : (player == other)
             ? Mission.TARGETOWNERSHIP
             : (player.getStance(other) == Stance.ALLIANCE)
@@ -311,15 +329,6 @@ public class PrivateerMission extends Mission {
             : (scoreUnit(aiUnit, unit) <= 0)
             ? "privateer-avoids-trouble"
             : null;
-    }
-
-    /**
-     * Why is this mission invalid?
-     *
-     * @return A reason for the mission invalidity, or null if still valid.
-     */
-    public String invalidReason() {
-        return invalidReason(getAIUnit(), target);
     }
 
     /**
@@ -345,120 +354,99 @@ public class PrivateerMission extends Mission {
             ? reason
             : (aiUnit.getUnit().isInEurope())
             ? null
-            : (aiUnit.hasCargo() && loc instanceof Europe)
-            ? invalidTargetReason(loc, aiUnit.getUnit().getOwner())
-            : (aiUnit.hasCargo() && loc instanceof Settlement)
-            ? invalidSettlementReason(aiUnit, (Settlement)loc)
-            : (!aiUnit.hasCargo() && loc == null)
+            : (loc == null)
             ? null
-            : (!aiUnit.hasCargo() && loc instanceof Unit)
+            : (loc instanceof Europe)
+            ? invalidTargetReason(loc, aiUnit.getUnit().getOwner())
+            : (loc instanceof Settlement)
+            ? invalidSettlementReason(aiUnit, (Settlement)loc)
+            : (loc instanceof Unit)
             ? invalidUnitReason(aiUnit, (Unit)loc)
             : Mission.TARGETINVALID;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String invalidReason() {
+        return invalidReason(getAIUnit(), getTarget());
     }
 
     // Not a one-time mission, omit isOneTime().
 
     /**
-     * Performs the mission. This is done by searching for hostile units
-     * that are located within one tile and attacking them. If no such units
-     * are found, then wander in a random direction.
+     * {@inheritDoc}
      */
     public void doMission() {
+        final AIMain aiMain = getAIMain();
         final AIUnit aiUnit = getAIUnit();
+        if (aiUnit.hasCargo()) { // Deliver the goods
+            aiUnit.setMission(new TransportMission(aiMain, aiUnit));
+            aiUnit.getMission().doMission();
+            return;
+        }
+
         String reason = invalidReason();
         if (isTargetReason(reason)) {
-            target = null; // Handled below
+            if (!retargetMission(tag, reason)) return;
         } else if (reason != null) {
             logger.finest(tag + " broken(" + reason + "): " + this);
             return;
         }
-
         final Unit unit = getUnit();
         if (unit.isAtSea()) return;
 
-        Direction direction;
-        Location newTarget;
-        if (aiUnit.hasCargo()) { // Deliver the goods
-            if (isTargetReason(reason)) {
-                if ((newTarget = findTarget(aiUnit, 8, true)) == null) {
-                    logger.finest(tag + " could not retarget: " + this);
-                    return;
-                }
-                setTarget(newTarget);
-            }
-            Unit.MoveType mt = travelToTarget(tag, getTarget(),
-                CostDeciders.avoidSettlementsAndBlockingUnits());
-            switch (mt) {
-            case MOVE_NO_MOVES: case MOVE_HIGH_SEAS:
-                return;
-            case MOVE:
-                for (Goods g : unit.getGoodsList()) {
-                    if (unit.isInEurope()) {
-                        AIMessage.askSellGoods(aiUnit, g);
-                    } else {
-                        Colony colony = unit.getTile().getColony();
-                        AIMessage.askUnloadCargo(aiUnit, g);
-                    }
-                }
-
-                for (Unit u : unit.getUnitList()) {
-                    getAIMain().getAIUnit(u).leaveTransport(null);
-                }
-
-                logger.finest(tag + " completed goods delivery"
-                    + " at " + unit.getLocation() + ": " + this);
-                setTarget(findTarget(aiUnit, 1, false));
-                break;
-            default:
-                logger.warning(tag + " unexpected delivery move " + mt
-                    + ": " + this);
-                break;
-            }
-        } else if (unit.isInEurope()) {
+        if (unit.isInEurope()) {
             Settlement settlement = getBestSettlement(unit.getOwner());
             Tile tile = (settlement != null) ? settlement.getTile()
                 : unit.getFullEntryLocation();
             unit.setDestination(tile);
             aiUnit.moveToAmerica();
-        } else if ((newTarget = findTarget(aiUnit, 1, true)) == null) {
+            return;
+        }
+
+        Location newTarget = findTarget(aiUnit, 1, true);
+        if (newTarget == null) {
             moveRandomlyTurn(tag);
-        } else {
-            setTarget(newTarget);
-            Unit.MoveType mt = travelToTarget(tag, getTarget(), null);
-            switch (mt) {
-            case MOVE_NO_MOVES:
-                return;
-            case MOVE_ILLEGAL: // Can happen when another unit blocks a river
-                logger.finest(tag + " hit unexpected blockage: " + this);
-                moveRandomly(tag, null);
-                unit.setMovesLeft(0);
-                return;
-            case ATTACK_UNIT:
-                direction = unit.getTile().getDirection(getTarget().getTile());
-                if (direction != null) {
-                    logger.finest(tag + " completed hunt for target " + getTarget()
+            return;
+        }
+
+        setTarget(newTarget);
+        Unit.MoveType mt = travelToTarget(tag, getTarget(), null);
+        switch (mt) {
+        case MOVE: case MOVE_HIGH_SEAS: case MOVE_NO_MOVES:
+        case MOVE_NO_REPAIR:
+            return;
+        case MOVE_ILLEGAL: // Can happen when another unit blocks a river
+            logger.finest(tag + " hit unexpected blockage: " + this);
+            moveRandomly(tag, null);
+            unit.setMovesLeft(0);
+            return;
+        case ATTACK_UNIT:
+            Direction direction = unit.getTile()
+                .getDirection(getTarget().getTile());
+            if (direction != null) {
+                logger.finest(tag + " completed hunt for target " + getTarget()
+                    + ", attacking: " + this);
+                AIMessage.askAttack(aiUnit, direction);
+            } else { // Found something else in the way!
+                Location blocker = resolveBlockage(aiUnit, getTarget());
+                if (blocker instanceof Unit
+                    && scoreUnit(aiUnit, (Unit)blocker) > 0) {
+                    logger.finest(tag + " bumped into " + blocker
                         + ", attacking: " + this);
-                    AIMessage.askAttack(aiUnit, direction);
-                } else { // Found something else in the way!
-                    Location blocker = resolveBlockage(aiUnit, getTarget());
-                    if (blocker instanceof Unit
-                        && scoreUnit(aiUnit, (Unit)blocker) > 0) {
-                        logger.finest(tag + " bumped into " + blocker
-                            + ", attacking: " + this);
-                        AIMessage.askAttack(aiUnit,
-                            unit.getTile().getDirection(blocker.getTile()));
-                    } else { // Might be dangerous, try to confuse them:-)
-                        logger.finest(tag + " bumped into " + blocker
-                            + ", avoiding: " + this);
-                        moveRandomlyTurn(tag);
-                    }
+                    AIMessage.askAttack(aiUnit,
+                        unit.getTile().getDirection(blocker.getTile()));
+                } else { // Might be dangerous, try to confuse them:-)
+                    logger.finest(tag + " bumped into " + blocker
+                        + ", avoiding: " + this);
+                    moveRandomlyTurn(tag);
                 }
-                break;
-            default:
-                logger.warning(tag + " unexpected hunt move " + mt
-                    + ": " + this);
-                break;
             }
+            break;
+        default:
+            logger.warning(tag + " unexpected hunt move " + mt + ": " + this);
+            break;
         }
     }
 
@@ -466,19 +454,39 @@ public class PrivateerMission extends Mission {
     // Serialization
 
     /**
-     * Writes all of the <code>AIObject</code>s and other AI-related
-     * information to an XML-stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
+     * {@inheritDoc}
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         toXML(out, getXMLElementTagName());
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out)
+        throws XMLStreamException {
+        super.writeAttributes(out);
+
+        if (target != null) {
+            writeAttribute(out, "target", (FreeColGameObject)target);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readAttributes(XMLStreamReader in)
+        throws XMLStreamException {
+        super.readAttributes(in);
+
+        String str = in.getAttributeValue(null, "target");
+        target = (str == null) ? null : getGame().getFreeColLocation(str);
+    }
+
+    /**
+     * Gets the tag name of the root element representing this object.
      *
      * @return "privateerMission"
      */

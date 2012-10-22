@@ -25,6 +25,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
@@ -95,14 +96,14 @@ public class PioneeringMissionTest extends FreeColTestCase {
         assertEquals("Pioneering should be valid (despite no tools)", null,
             PioneeringMission.invalidReason(aiUnit));
         assertNull("Pioneering should find no targets though",
-            PioneeringMission.findTarget(aiUnit, false));
+            PioneeringMission.findTarget(aiUnit, 10, false));
 
         // Add some tools to the colony, mission should become viable.
         colony.addGoods(toolsGoodsType, 100);
         assertTrue("Colony can provide tools",
             colony.canProvideEquipment(pioneerEquipment));
         assertEquals("Colony found", colony,
-            PioneeringMission.findTarget(aiUnit, false));
+            PioneeringMission.findTarget(aiUnit, 10, false));
         assertEquals("Pioneer has no mission", null, aiUnit.getMission());
         assertEquals("Pioneering should be valid (tools present in colony)",
             null, PioneeringMission.invalidReason(aiUnit));
@@ -111,11 +112,14 @@ public class PioneeringMissionTest extends FreeColTestCase {
         colony.addGoods(toolsGoodsType, -100);
         colonist.changeEquipment(toolsEqType, 1);
         assertNotNull("TileImprovementPlan found",
-            PioneeringMission.findTarget(aiUnit, false));
+            PioneeringMission.findTarget(aiUnit, 10, false));
         assertEquals("Pioneering should be valid (unit has tools)", null,
             PioneeringMission.invalidReason(aiUnit));
 
-        PioneeringMission mission = new PioneeringMission(aiMain, aiUnit);
+        Location loc = PioneeringMission.findTarget(aiUnit, 10, false);
+        assertTrue("Pioneer should find a tile to improve",
+            loc instanceof Tile);
+        PioneeringMission mission = new PioneeringMission(aiMain, aiUnit, loc);
         assertTrue("Mission should be valid", mission.isValid());
         TileImprovementPlan tip = mission.getTileImprovementPlan();
         assertNotNull("Mission should have a plan", tip);

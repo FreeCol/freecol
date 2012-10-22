@@ -692,15 +692,10 @@ public class NativeAIPlayer extends AIPlayer {
 
 
     /**
-     * Evaluates a proposed mission type for a unit.
-     *
-     * @param aiUnit The <code>AIUnit</code> to perform the mission.
-     * @param path A <code>PathNode</code> to the target of this mission.
-     * @param type The mission type.
-     * @return A score representing the desirability of this mission.
+     * {@inheritDoc}
      */
-    public int scoreMission(AIUnit aiUnit, PathNode path, Class type) {
-        int value = super.scoreMission(aiUnit, path, type);
+    public int adjustMission(AIUnit aiUnit, PathNode path, Class type,
+                             int value) {
         if (type == DefendSettlementMission.class) {
             // Reduce value in proportion to the number of active defenders.
             Settlement settlement = (Settlement)DefendSettlementMission

@@ -194,7 +194,9 @@ public abstract class AIObject extends FreeColObject {
      */
     public static Location upLoc(Location loc) {
         if (loc instanceof Unit) loc = ((Unit)loc).getLocation();
-        return (loc.getSettlement() != null) ? loc.getSettlement() : loc;
+        return (loc == null) ? null
+            : (loc.getSettlement() != null) ? loc.getSettlement()
+            : loc;
     }
 
 

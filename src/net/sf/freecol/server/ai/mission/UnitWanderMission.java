@@ -38,6 +38,7 @@ public class UnitWanderMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(UnitWanderMission.class.getName());
 
+    /** The tag for this mission. */
     private static final String tag = "AI wanderer";
 
 
@@ -77,11 +78,21 @@ public class UnitWanderMission extends Mission {
     // Mission interface
 
     /**
-     * Gets the mission target.
-     *
-     * @return The target <code>Colony</code>.
+     * {@inheritDoc}
      */
     public Location getTarget() {
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setTarget(Location target) {}
+
+    /**
+     * {@inheritDoc}
+     */
+    public Location findTarget() {
         return null;
     }
 
@@ -89,18 +100,14 @@ public class UnitWanderMission extends Mission {
     // Omitted invalidReason(aiUnit), always true
 
     /**
-     * Why is this mission invalid?
-     *
-     * @return A reason for invalidity, or null if none found.
+     * {@inheritDoc}
      */
     public String invalidReason() {
         return invalidAIUnitReason(getAIUnit());
     }
 
     /**
-     * Should this mission only be carried out once?
-     *
-     * @return True.
+     * {@inheritDoc}
      */
     @Override
     public boolean isOneTime() {
@@ -108,8 +115,7 @@ public class UnitWanderMission extends Mission {
     }
 
     /**
-     * Performs the mission.  Just move in a random direction until
-     * the move points are zero or the unit gets stuck.
+     * {@inheritDoc}
      */
     public void doMission() {
         String reason = invalidReason();
@@ -118,6 +124,7 @@ public class UnitWanderMission extends Mission {
             return;
         }
 
+        // Just move in random directions.
         moveRandomlyTurn(tag);
     }
 
@@ -125,19 +132,14 @@ public class UnitWanderMission extends Mission {
     // Serialization
 
     /**
-     * Writes all of the <code>AIObject</code>s and other AI-related
-     * information to an XML-stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * {@inheritDoc}
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         toXML(out, getXMLElementTagName());
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "unitWanderMission".
      */

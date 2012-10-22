@@ -50,10 +50,8 @@ public class CashInTreasureTrainMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(CashInTreasureTrainMission.class.getName());
 
+    /** The tag for this mission. */
     private static final String tag = "AI treasureTrain";
-
-    /** Maximum number of turns to travel to a cash in location. */
-    private static final int MAX_TURNS = 20;
 
     /**
      * The location to cash this treasure train in at, either a Colony
@@ -66,12 +64,14 @@ public class CashInTreasureTrainMission extends Mission {
      * Creates a mission for the given <code>AIUnit</code>.
      *
      * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission
-     *        is created for.
+     * @param aiUnit The <code>AIUnit</code> this mission is created for.
+     * @param target The target <code>Location</code> for this mission.
      */
-    public CashInTreasureTrainMission(AIMain aiMain, AIUnit aiUnit) {
+    public CashInTreasureTrainMission(AIMain aiMain, AIUnit aiUnit,
+                                      Location target) {
         super(aiMain, aiUnit);
-        target = findTarget(aiUnit, true);
+
+        setTarget(target);
         logger.finest(tag + " starts at " + aiUnit.getUnit().getLocation()
             + " with target " + target + ": " + this);
         uninitialized = false;
@@ -96,17 +96,6 @@ public class CashInTreasureTrainMission extends Mission {
         readFromXML(in);
     }
 
-
-    /**
-     * Sets a new mission target.
-     *
-     * @param target The new target <code>Location</code>.
-     */
-    public void setTarget(Location target) {
-        boolean retarget = this.target != null && this.target != target;
-        this.target = target;
-        if (retarget) retargetTransportable();
-    }
 
     /**
      * Extract a valid target for this mission from a path.
@@ -139,8 +128,8 @@ public class CashInTreasureTrainMission extends Mission {
         Location loc;
         if (path == null
             || (loc = extractTarget(aiUnit, path)) == null
-            || !(invalidFullColonyReason(aiUnit, loc.getColony()) == null
-                || loc instanceof Europe))
+            || (loc instanceof Colony
+                && invalidFullColonyReason(aiUnit, loc.getColony()) != null))
             return Integer.MIN_VALUE;
         return aiUnit.getUnit().getTreasureAmount() / (path.getTotalTurns()+1);
     }
@@ -185,13 +174,15 @@ public class CashInTreasureTrainMission extends Mission {
     /**
      * Find a suitable cash in location for this unit.
      *
-     * @param aiUnit The <code>AIUnit</code> to execute a cash in mission.
+     * @param aiUnit The <code>AIUnit</code> to execute this mission.
+     * @param range The maximum number of moves to search.
      * @param deferOK Enables deferring to a fallback colony.
      * @return A <code>PathNode</code> to the target, or null if not found
      *     which includes the case when Europe should be preferred (because
      *     the unit can not get there by itself).
      */
-    private static PathNode findTargetPath(AIUnit aiUnit, boolean deferOK) {
+    private static PathNode findTargetPath(AIUnit aiUnit, int range,
+                                           boolean deferOK) {
         if (invalidAIUnitReason(aiUnit) != null) return null;
         final Unit unit = aiUnit.getUnit();
         final Tile startTile = unit.getPathStartTile();
@@ -215,22 +206,24 @@ public class CashInTreasureTrainMission extends Mission {
 
         // Can the unit get to a cash in site?
         final GoalDecider gd = getGoalDecider(aiUnit, deferOK);
-        return unit.search(startTile, gd, standardCd, MAX_TURNS, carrier);
+        return unit.search(startTile, gd, standardCd, range, carrier);
     }
 
     /**
      * Finds a suitable cashin target for the supplied unit.
      *
      * @param aiUnit The <code>AIUnit</code> to test.
+     * @param range The maximum number of moves to search.
      * @param deferOK Enables deferring to a fallback colony.
      * @return A <code>PathNode</code> to the target, or null if none found.
      */
-    public static Location findTarget(AIUnit aiUnit, boolean deferOK) {
+    public static Location findTarget(AIUnit aiUnit, int range, 
+                                      boolean deferOK) {
         final Player player = aiUnit.getUnit().getOwner();
-        PathNode path = findTargetPath(aiUnit, deferOK);
+        PathNode path = findTargetPath(aiUnit, range, deferOK);
         return (path != null) ? extractTarget(aiUnit, path)
-            : findCircleTarget(aiUnit, getGoalDecider(aiUnit, deferOK),
-                               MAX_TURNS*3, deferOK);
+            : upLoc(findCircleTarget(aiUnit, getGoalDecider(aiUnit, deferOK),
+                                     range*3, deferOK));
     }
 
 
@@ -246,10 +239,7 @@ public class CashInTreasureTrainMission extends Mission {
     }
 
     /**
-     * Gets the priority of getting the unit to the transport
-     * destination.
-     *
-     * @return The priority.
+     * {@inheritDoc}
      */
     public int getTransportPriority() {
         return (getTransportDestination() == null) ? 0
@@ -260,12 +250,30 @@ public class CashInTreasureTrainMission extends Mission {
     // Mission interface
 
     /**
-     * Gets the location we are aiming to cash in at.
-     *
-     * @return The location we are aiming to cash in at.
+     * {@inheritDoc}
      */
     public Location getTarget() {
         return target;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setTarget(Location target) {
+        if (target instanceof Europe || target instanceof Colony) {
+            boolean retarget = this.target != null && this.target != target;
+            this.target = target;
+            if (retarget) retargetTransportable();
+        } else {
+            throw new IllegalArgumentException("Bad cash in site: " + target);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Location findTarget() {
+        return findTarget(getAIUnit(), 20, true);
     }
 
     /**
@@ -327,25 +335,6 @@ public class CashInTreasureTrainMission extends Mission {
     }
 
     /**
-     * Why is this mission invalid?
-     *
-     * @return A reason for mission invalidity, or null if none found.
-     */
-    public String invalidReason() {
-        return invalidReason(getAIUnit(), target);
-    }
-
-    /**
-     * Why would this mission be invalid with the given AI unit?
-     *
-     * @param aiUnit The <code>AIUnit</code> to test.
-     * @return A reason for invalidity, or null if none found.
-     */
-    public static String invalidReason(AIUnit aiUnit) {
-        return invalidMissionReason(aiUnit);
-    }
-
-    /**
      * Why would this mission be invalid with the given AI unit and location?
      *
      * @param aiUnit The <code>AIUnit</code> to check.
@@ -363,29 +352,41 @@ public class CashInTreasureTrainMission extends Mission {
             : Mission.TARGETINVALID;
     }
 
+    /**
+     * Why would this mission be invalid with the given AI unit?
+     *
+     * @param aiUnit The <code>AIUnit</code> to test.
+     * @return A reason for invalidity, or null if none found.
+     */
+    public static String invalidReason(AIUnit aiUnit) {
+        return invalidMissionReason(aiUnit);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String invalidReason() {
+        return invalidReason(getAIUnit(), target);
+    }
+
     // Not a one-time mission, omit isOneTime().
     
     /**
-     * Performs this mission.
+     * {@inheritDoc}
      */
     public void doMission() {
         final Unit unit = getUnit();
         String reason = invalidReason();
         if (isTargetReason(reason)) {
-            Location loc = findTarget(getAIUnit(), true); 
-            if (loc == null) {
-                logger.finest(tag + " could not retarget: " + this);
-                return;
-            }
-            setTarget(loc);
+            if (!retargetMission(tag, reason)) return;
         } else if (reason != null) {
             logger.finest(tag + " broken(" + reason + "): " + this);
             return;
         }
 
         // Go to the target.
-        if (travelToTarget(tag, target,
-                           CostDeciders.avoidSettlementsAndBlockingUnits())
+        if (travelToTarget(tag, getTarget(),
+                CostDeciders.avoidSettlementsAndBlockingUnits())
             != Unit.MoveType.MOVE) return;
 
         // Cash in now if:
@@ -400,22 +401,23 @@ public class CashInTreasureTrainMission extends Mission {
         if (unit.canCashInTreasureTrain()) {
             if (unit.isInEurope()
                 || europe == null
-                || Player.getCarriersForUnit(unit).isEmpty()
-                || unit.getTransportFee() == 0) {
+                || unit.getTransportFee() == 0
+                || player.getCarriersForUnit(unit).isEmpty()) {
                 if (AIMessage.askCashInTreasureTrain(aiUnit)) {
                     logger.finest(tag + " completed cash in at "
-                        + unit.getLocation() + ": " + this);
+                        + upLoc(unit.getLocation()) + ": " + this);
+                } else {
+                    logger.warning(tag + " failed to cash in at "
+                        + upLoc(unit.getLocation()) + ": " + this);
                 }
             } else {
                 setTarget(europe);
-                logger.finest(tag + " at " + unit.getLocation()
+                logger.finest(tag + " at " + upLoc(unit.getLocation())
                     + " retargeting Europe: " + this);
             }
         } else {
-            Location newTarget = findTarget(aiUnit, false);
-            logger.finest(tag + " arrived at " + target.getColony().getName()
-                + ", retargeting " + newTarget + ": " + this);
-            setTarget(newTarget);
+            retargetMission(tag, "arrived at "
+                + unit.getLocation().getColony().getName());
         }
     }
 
@@ -423,12 +425,7 @@ public class CashInTreasureTrainMission extends Mission {
     // Serialization
 
     /**
-     * Writes all of the <code>AIObject</code>s and other AI-related
-     * information to an XML-stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * {@inheritDoc}
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         if (isValid()) {
@@ -439,6 +436,7 @@ public class CashInTreasureTrainMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void writeAttributes(XMLStreamWriter out)
         throws XMLStreamException {
         super.writeAttributes(out);
@@ -451,6 +449,7 @@ public class CashInTreasureTrainMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
         super.readAttributes(in);
@@ -460,7 +459,7 @@ public class CashInTreasureTrainMission extends Mission {
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "cashInTreasureTrainMission".
      */

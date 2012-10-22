@@ -55,12 +55,8 @@ public class MissionaryMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(MissionaryMission.class.getName());
 
+    /** The tag for this mission. */
     private static final String tag = "AI missionary";
-
-    /**
-     * Maximum number of turns to travel to a missionary target.
-     */
-    private static final int MAX_TURNS = 20;
 
     /**
      * The target to aim for, used for a TransportMission.
@@ -74,13 +70,23 @@ public class MissionaryMission extends Mission {
      * Creates a missionary mission for the given <code>AIUnit</code>.
      *
      * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission
-     *        is created for.
+     * @param aiUnit The <code>AIUnit</code> this mission is created for.
      */
     public MissionaryMission(AIMain aiMain, AIUnit aiUnit) {
+        this(aiMain, aiUnit, findTarget(aiUnit, 20, true));
+    }
+
+    /**
+     * Creates a missionary mission for the given <code>AIUnit</code>.
+     *
+     * @param aiMain The main AI-object.
+     * @param aiUnit The <code>AIUnit</code> this mission is created for.
+     * @param target The target <code>Location</code> for this mission.
+     */
+    public MissionaryMission(AIMain aiMain, AIUnit aiUnit, Location target) {
         super(aiMain, aiUnit);
 
-        target = findTarget(aiUnit, true);
+        setTarget(target);
         logger.finest(tag + " starts at " + aiUnit.getUnit().getLocation()
             + " with target " + getTarget() + ": " + this);
         uninitialized = false;
@@ -105,17 +111,6 @@ public class MissionaryMission extends Mission {
         uninitialized = getAIUnit() == null;
     }
 
-
-    /**
-     * Sets a new mission target.
-     *
-     * @param target The new target <code>Location</code>.
-     */
-    public void setTarget(Location target) {
-        boolean retarget = this.target != null && this.target != target;
-        this.target = target;
-        if (retarget) retargetTransportable();
-    }
 
     /**
      * Extract a valid target for this mission from a path.
@@ -189,12 +184,13 @@ public class MissionaryMission extends Mission {
     /**
      * Find a suitable mission location for this unit.
      *
-     * @param aiUnit The <code>AIUnit</code> to execute a cash in mission.
-     * @param deferOK If true, allow the search to return a nearby existing
-     *     colony as a temporary target.     
-     * @return A <code>PathNode</code> to the target, or null if not found.
+     * @param aiUnit The <code>AIUnit</code> to execute this mission.
+     * @param range An upper bound on the number of moves.
+     * @param deferOK Enables deferring to a fallback colony.
+     * @return A path to the new target, or null if none found.
      */
-    private static PathNode findTargetPath(AIUnit aiUnit, boolean deferOK) {
+    private static PathNode findTargetPath(AIUnit aiUnit, int range,
+                                           boolean deferOK) {
         if (invalidAIUnitReason(aiUnit) != null) return null;
         final Unit unit = aiUnit.getUnit();
         final Tile startTile = unit.getPathStartTile();
@@ -206,7 +202,7 @@ public class MissionaryMission extends Mission {
             = CostDeciders.avoidSettlementsAndBlockingUnits();
 
         // Is there a valid target available from the starting tile?
-        return unit.search(startTile, gd, standardCd, MAX_TURNS, carrier);
+        return unit.search(startTile, gd, standardCd, range, carrier);
     }
 
     /**
@@ -214,14 +210,16 @@ public class MissionaryMission extends Mission {
      * Falls back to the best colony if a path is not found.
      *
      * @param aiUnit The <code>AIUnit</code> to test.
+     * @param range An upper bound on the number of moves.
      * @param deferOK Enables deferring to a fallback colony.
      * @return A new target for this mission.
      */
-    public static Location findTarget(AIUnit aiUnit, boolean deferOK) {
-        PathNode path = findTargetPath(aiUnit, deferOK);
+    public static Location findTarget(AIUnit aiUnit, int range,
+                                      boolean deferOK) {
+        PathNode path = findTargetPath(aiUnit, range, deferOK);
         return (path != null) ? extractTarget(aiUnit, path)
-            : findCircleTarget(aiUnit, getGoalDecider(aiUnit, deferOK),
-                               MAX_TURNS*3, deferOK);
+            : upLoc(findCircleTarget(aiUnit, getGoalDecider(aiUnit, deferOK),
+                                     range*3, deferOK));
     }
 
     /**
@@ -247,6 +245,7 @@ public class MissionaryMission extends Mission {
         return reason;
     }
 
+
     // Fake Transportable interface
 
     /**
@@ -262,12 +261,26 @@ public class MissionaryMission extends Mission {
     // Mission interface
 
     /**
-     * Gets the location we are aiming to cash in at.
-     *
-     * @return The location we are aiming to cash in at.
+     * {@inheritDoc}
      */
     public Location getTarget() {
         return target;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setTarget(Location target) {
+        boolean retarget = this.target != null && this.target != target;
+        this.target = target;
+        if (retarget) retargetTransportable();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Location findTarget() {
+        return findTarget(getAIUnit(), 20, true);
     }
 
     /**
@@ -327,15 +340,6 @@ public class MissionaryMission extends Mission {
     }
 
     /**
-     * Why is this mission invalid?
-     *
-     * @return A reason for mission invalidity, or null if none found.
-     */
-    public String invalidReason() {
-        return invalidReason(getAIUnit(), getTarget());
-    }
-
-    /**
      * Why would this mission be invalid with the given AI unit?
      *
      * @param aiUnit The <code>AIUnit</code> to test.
@@ -363,28 +367,30 @@ public class MissionaryMission extends Mission {
             : Mission.TARGETINVALID;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public String invalidReason() {
+        return invalidReason(getAIUnit(), getTarget());
+    }
+
     // Not a one-time mission, omit isOneTime().
     
     /**
-     * Performs this mission.
+     * {@inheritDoc}
      */
     public void doMission() {
         String reason = invalidReason();
         if (isTargetReason(reason)) {
-            Location loc = findTarget(getAIUnit(), true);
-            if (loc == null) {
-                logger.finest(tag + " could not retarget: " + this);
-                return;
-            }
-            setTarget(loc);
+            if (!retargetMission(tag, reason)) return;
         } else if (reason != null) {
             logger.finest(tag + " broken(" + reason + "): " + this);
             return;
         }
-        final AIUnit aiUnit = getAIUnit();
-        final Unit unit = getUnit();
 
         // Go to the target.
+        final AIUnit aiUnit = getAIUnit();
+        final Unit unit = getUnit();
         Unit.MoveType mt = travelToTarget(tag, getTarget(),
             CostDeciders.avoidSettlementsAndBlockingUnits());
         switch (mt) {
@@ -394,7 +400,7 @@ public class MissionaryMission extends Mission {
             // Reached an intermediate colony.  Retarget, but do not
             // accept fallback targets.
             Location completed = getTarget();
-            setTarget(findTarget(aiUnit, false));
+            setTarget(findTarget(aiUnit, 20, false));
             logger.finest(tag + " reached colony target " + completed
                 + ", retargeting " + getTarget() + ": " + this);
             break;
@@ -413,7 +419,7 @@ public class MissionaryMission extends Mission {
             } else if (is.getMissionary() == unit && unit.isInMission()) {
                 logger.finest(tag + " completed at " + getTarget()
                     + ": " + this);
-                target = null;
+                setTarget(null);
             } else {
                 logger.warning(tag + " unexpected failure at " + getTarget()
                     + ": " + this);
@@ -430,12 +436,7 @@ public class MissionaryMission extends Mission {
     // Serialization
 
     /**
-     * Writes all of the <code>AIObject</code>s and other AI-related
-     * information to an XML-stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * {@inheritDoc}
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         if (isValid()) {
@@ -446,6 +447,7 @@ public class MissionaryMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void writeAttributes(XMLStreamWriter out)
         throws XMLStreamException {
         super.writeAttributes(out);
@@ -458,6 +460,7 @@ public class MissionaryMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
         super.readAttributes(in);
@@ -467,7 +470,7 @@ public class MissionaryMission extends Mission {
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "missionaryMission".
      */

@@ -2106,10 +2106,9 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param unit The <code>Unit</code> to carry.
      * @return A list of suitable carriers.
      */
-    public static List<Unit> getCarriersForUnit(Unit unit) {
-        final Player player = unit.getOwner();
+    public List<Unit> getCarriersForUnit(Unit unit) {
         List<Unit> units = new ArrayList<Unit>();
-        for (Unit u : player.getUnits()) {
+        for (Unit u : getUnits()) {
             if (u.couldCarry(unit)) units.add(u);
         }
         return units;

@@ -41,6 +41,7 @@ public class IdleAtSettlementMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(IdleAtSettlementMission.class.getName());
 
+    /** The tag for this mission. */
     private static final String tag = "AI idler";
 
 
@@ -81,9 +82,7 @@ public class IdleAtSettlementMission extends Mission {
     // Fake Transportable interface
 
     /**
-     * Gets the transport destination for units with this mission.
-     *
-     * @return The destination for this <code>Transportable</code>.
+     * {@inheritDoc}
      */
     public Location getTransportDestination() {
         final Unit unit = getUnit();
@@ -98,21 +97,23 @@ public class IdleAtSettlementMission extends Mission {
     // Mission interface
 
     /**
-     * Gets the mission target.
-     *
-     * @return Null.  There is no target.
+     * {@inheritDoc}
      */
     public Location getTarget() {
         return null;
     }
 
     /**
-     * Why is this mission invalid?
-     *
-     * @return A reason for mission invalidity, or null if none found.
+     * {@inheritDoc}
      */
-    public String invalidReason() {
-        return invalidAIUnitReason(getAIUnit());
+    public void setTarget(Location target) {}
+
+    /**
+     * {@inheritDoc}
+     */
+    public Location findTarget() {
+        PathNode path = getAIUnit().getUnit().findOurNearestOtherSettlement();
+        return (path == null) ? null : upLoc(path.getLastNode().getLocation());
     }
 
     // No static invalidReason(AIUnit [,Location]) forms, as this is
@@ -120,9 +121,14 @@ public class IdleAtSettlementMission extends Mission {
     // TODO: revise this, it could be invalid if there are no settlements?!?
 
     /**
-     * Should this Mission only be carried out once?
-     *
-     * @return True.
+     * {@inheritDoc}
+     */
+    public String invalidReason() {
+        return invalidAIUnitReason(getAIUnit());
+    }
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     public boolean isOneTime() {
@@ -130,8 +136,7 @@ public class IdleAtSettlementMission extends Mission {
     }
 
     /**
-     * Performs the mission. This is done by moving in a random direction
-     * until the move points are zero or the unit gets stuck.
+     * {@inheritDoc}
      */
     public void doMission() {
         final Unit unit = getUnit();
@@ -147,30 +152,26 @@ public class IdleAtSettlementMission extends Mission {
         // If our tile contains a settlement, idle.  No log, this is normal.
         if (unit.getTile().getSettlement() != null) return;
 
-        PathNode path = unit.findOurNearestOtherSettlement();
-        if (path != null) {
-            travelToTarget(tag, path.getLastNode().getTile(), null);
+        Location target = findTarget();
+        if (target != null) {
+            travelToTarget(tag, target, null);
         } else { // Just make a random moves if no target can be found.
             moveRandomlyTurn(tag);
         }
     }
 
+
     // Serialization
 
     /**
-     * Writes all of the <code>AIObject</code>s and other AI-related
-     * information to an XML-stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * {@inheritDoc}
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         toXML(out, getXMLElementTagName());
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "idleAtSettlementMission".
      */

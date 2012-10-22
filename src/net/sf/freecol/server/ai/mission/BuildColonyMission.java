@@ -52,10 +52,8 @@ public class BuildColonyMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(BuildColonyMission.class.getName());
 
+    /** The tag for this mission. */
     private static final String tag = "AI colony builder";
-
-    /** The maximum number of turns to travel to a building site. */
-    private static final int MAX_TURNS = 5;
 
     /**
      * The target of this mission.  It can either be a Tile where a
@@ -104,20 +102,6 @@ public class BuildColonyMission extends Mission {
 
 
     /**
-     * Sets the target of this mission.
-     *
-     * @param target The new target <code>Location</code>.
-     */
-    private void setTarget(Location target) {
-        boolean retarget = this.target != null && this.target != target;
-        this.target = target;
-        this.colonyValue = (target instanceof Tile)
-            ? getAIUnit().getUnit().getOwner().getColonyValue((Tile)target)
-            : -1;
-        if (retarget) retargetTransportable();
-    }
-
-    /**
      * Extract a valid target for this mission from a path.
      *
      * @param aiUnit A <code>AIUnit</code> to perform the mission.
@@ -133,6 +117,37 @@ public class BuildColonyMission extends Mission {
         return (invalidReason(aiUnit, tile) == null) ? tile
             : (invalidReason(aiUnit, colony) == null) ? colony
             : null;
+    }
+
+    /**
+     * Gets the value of a path to a colony building site.
+     *
+     * @param aiUnit The <code>AIUnit</code> to build the colony.
+     * @param path The <code>PathNode</code> to check.
+     * @return A score for the target.
+     */
+    public static int scorePath(AIUnit aiUnit, PathNode path) {
+        Location loc;
+        if (path == null
+            || !((loc = extractTarget(aiUnit, path)) instanceof Tile)) 
+            return Integer.MIN_VALUE;
+
+        final Tile tile = (Tile)loc;
+        final Player player = aiUnit.getUnit().getOwner();
+        float steal = 1.0f;
+        switch (player.canClaimToFoundSettlementReason(tile)) {
+        case NONE:
+            break;
+        case NATIVES:
+            // Penalize value when the tile will need to be stolen
+            int price = player.getLandPrice(tile);
+            if (price > 0 && !player.checkGold(price)) steal = 0.2f;
+            break;
+        default:
+            return Integer.MIN_VALUE;
+        }
+        return (int)(player.getColonyValue(tile) * steal
+            / (path.getTotalTurns() + 1));
     }
 
     /**
@@ -170,45 +185,15 @@ public class BuildColonyMission extends Mission {
     }
 
     /**
-     * Gets the value of a path to a colony building site.
-     *
-     * @param aiUnit The <code>AIUnit</code> to build the colony.
-     * @param path The <code>PathNode</code> to check.
-     * @return A score for the target.
-     */
-    public static int scorePath(AIUnit aiUnit, PathNode path) {
-        Location loc;
-        if (path == null
-            || !((loc = extractTarget(aiUnit, path)) instanceof Tile)) 
-            return Integer.MIN_VALUE;
-
-        final Tile tile = (Tile)loc;
-        final Player player = aiUnit.getUnit().getOwner();
-        float steal = 1.0f;
-        switch (player.canClaimToFoundSettlementReason(tile)) {
-        case NONE:
-            break;
-        case NATIVES:
-            // Penalize value when the tile will need to be stolen
-            int price = player.getLandPrice(tile);
-            if (price > 0 && !player.checkGold(price)) steal = 0.2f;
-            break;
-        default:
-            return Integer.MIN_VALUE;
-        }
-        return (int)(player.getColonyValue(tile) * steal
-            / (path.getTotalTurns() + 1));
-    }
-
-    /**
      * Finds a site for a new colony.  Favour closer sites.
      *
-     * @param aiUnit The <code>AIUnit</code> to find a colony site with.
-     * @param deferOK If true, allow the search to return a nearby existing
-     *     colony as a temporary target.     
-     * @return A path to the new colony or backup.
+     * @param aiUnit The <code>AIUnit</code> to execute this mission.
+     * @param range An upper bound on the number of moves.
+     * @param deferOK Enables deferring to a fallback colony.
+     * @return A path to the new target, or null if none found.
      */
-    public static PathNode findTargetPath(AIUnit aiUnit, boolean deferOK) {
+    public static PathNode findTargetPath(AIUnit aiUnit, int range,
+                                          boolean deferOK) {
         if (invalidAIUnitReason(aiUnit) != null) return null;
         final Unit unit = aiUnit.getUnit();
         final Tile startTile = unit.getPathStartTile();
@@ -221,25 +206,23 @@ public class BuildColonyMission extends Mission {
             = CostDeciders.avoidSettlementsAndBlockingUnits();
 
         // Try for something sensible nearby.
-        path = unit.search(startTile, gd, standardCd, MAX_TURNS, carrier);
-        if (path != null) return path;
-
-        // Retry, but increase the range.
-        return unit.search(startTile, gd, standardCd, MAX_TURNS*3, carrier);
+        return unit.search(startTile, gd, standardCd, range, carrier);
     }
 
     /**
      * Finds a site for a new colony or a backup colony to go to.
      *
      * @param aiUnit The <code>AIUnit</code> to find a colony site with.
+     * @param range An upper bound on the number of moves.
      * @param deferOK Enables deferring to a fallback colony.
      * @return A new target for this mission.
      */
-    public static Location findTarget(AIUnit aiUnit, boolean deferOK) {
-        PathNode path = findTargetPath(aiUnit, deferOK);
+    public static Location findTarget(AIUnit aiUnit, int range,
+                                      boolean deferOK) {
+        PathNode path = findTargetPath(aiUnit, range, deferOK);
         return (path != null) ? extractTarget(aiUnit, path)
-            : findCircleTarget(aiUnit, getGoalDecider(aiUnit, deferOK),
-                               MAX_TURNS*3, deferOK);
+            : upLoc(findCircleTarget(aiUnit, getGoalDecider(aiUnit, deferOK),
+                                     range*3, deferOK));
     }
 
       
@@ -258,12 +241,34 @@ public class BuildColonyMission extends Mission {
     // Mission interface
 
     /**
-     * Gets the target of this mission.
-     *
-     * @return The tile where a colony is to be built.
+     * {@inheritDoc}
      */
     public Location getTarget() {
         return target;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setTarget(Location target) {
+        if (target instanceof Colony || target instanceof Tile) {
+            boolean retarget = this.target != null && this.target != target;
+            this.target = target;
+            this.colonyValue = (target instanceof Tile)
+                ? getAIUnit().getUnit().getOwner().getColonyValue((Tile)target)
+                : -1;
+            if (retarget) retargetTransportable();
+        } else {
+            throw new IllegalArgumentException("Colony or tile expected: "
+                + target);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Location findTarget() {
+        return findTarget(getAIUnit(), 5, true);
     }
 
     /**
@@ -315,25 +320,6 @@ public class BuildColonyMission extends Mission {
     }
 
     /**
-     * Why is this mission invalid?
-     *
-     * @return A reason for mission invalidity, or null if none found.
-     */
-    public String invalidReason() {
-        return invalidReason(getAIUnit(), target);
-    }
-
-    /**
-     * Why would this mission be invalid with the given AI unit?
-     *
-     * @param aiUnit The <code>AIUnit</code> to check.
-     * @return A reason for mission invalidity, or null if none found.
-     */
-    public static String invalidReason(AIUnit aiUnit) {
-        return invalidMissionReason(aiUnit);
-    }
-
-    /**
      * Why would this mission be invalid with the given AI unit and location?
      *
      * @param aiUnit The <code>AIUnit</code> to check.
@@ -350,10 +336,27 @@ public class BuildColonyMission extends Mission {
             : Mission.TARGETINVALID;
     }
 
+    /**
+     * Why would this mission be invalid with the given AI unit?
+     *
+     * @param aiUnit The <code>AIUnit</code> to check.
+     * @return A reason for mission invalidity, or null if none found.
+     */
+    public static String invalidReason(AIUnit aiUnit) {
+        return invalidMissionReason(aiUnit);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String invalidReason() {
+        return invalidReason(getAIUnit(), target);
+    }
+
     // Not a one-time mission, omit isOneTime().
 
     /**
-     * Performs this mission.
+     * {@inheritDoc}
      */
     public void doMission() {
         final AIMain aiMain = getAIMain();
@@ -371,43 +374,33 @@ public class BuildColonyMission extends Mission {
             && (player.getColonyValue((Tile)target)) < colonyValue) {
             reason = "target tile " + target + " value fell";
         }
-
-        // Retarget if required
-        Location newTarget;
-        if (reason != null) {
-            newTarget = findTarget(aiUnit, true);
-            setTarget(newTarget);
-            logger.finest(tag + " retargetting(" + reason
-                + ") -> " + newTarget + ": " + this);
-            if (newTarget == null) return;
-        }
+        if (reason != null) retargetMission(tag, reason);
 
         // Go there.
-        if (travelToTarget(tag, target,
-                           CostDeciders.avoidSettlementsAndBlockingUnits())
+        if (travelToTarget(tag, getTarget(),
+                CostDeciders.avoidSettlementsAndBlockingUnits())
             != Unit.MoveType.MOVE) return;
 
-        if (target instanceof Colony) {
+        if (getTarget() instanceof Colony) {
             // If arrived at the target colony it is time to retarget
             // and insist on finding a building site.  On failure,
             // just work in the colony for the present.
-            String name = ((Colony)target).getName();
-            PathNode path = findTargetPath(aiUnit, false);
-            if (path != null
-                && (newTarget = extractTarget(aiUnit, path)) != null) {
+            String name = ((Colony)getTarget()).getName();
+            Location newTarget = findTarget(aiUnit, 5, false);
+            if (newTarget != null) {
                 setTarget(newTarget);
                 logger.finest(tag + " arrived at " + name
-                    + ", retargeting " + target + ": " + this);
+                    + ", retargeting " + newTarget + ": " + this);
             } else {
                 logger.finest(tag + " gives up and joins " + name
                     + ": " + this);
                 aiUnit.setMission(new WorkInsideColonyMission(aiMain, aiUnit,
-                        aiMain.getAIColony((Colony)target)));
+                        aiMain.getAIColony((Colony)getTarget())));
             }
             return;
 
-        } else if (target instanceof Tile) {
-            Tile tile = (Tile)target;
+        } else if (getTarget() instanceof Tile) {
+            Tile tile = (Tile)getTarget();
             if (tile.getOwner() == null) {
                 ; // All is well
             } else if (player.owns(tile)) { // Already ours, clear users
@@ -466,7 +459,7 @@ public class BuildColonyMission extends Mission {
             }
 
         } else {
-            throw new IllegalStateException("Bogus target: " + target);
+            throw new IllegalStateException("Bogus target: " + getTarget());
         }
     }
 
@@ -474,12 +467,7 @@ public class BuildColonyMission extends Mission {
     // Serialization
 
     /**
-     * Writes all of the <code>AIObject</code>s and other AI-related
-     * information to an XML-stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
+     * {@inheritDoc}
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         if (isValid()) {
@@ -490,6 +478,7 @@ public class BuildColonyMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void writeAttributes(XMLStreamWriter out)
         throws XMLStreamException {
         super.writeAttributes(out);
@@ -506,6 +495,7 @@ public class BuildColonyMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
         super.readAttributes(in);
@@ -517,7 +507,7 @@ public class BuildColonyMission extends Mission {
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "buildColonyMission".
      */

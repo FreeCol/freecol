@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
@@ -50,13 +51,14 @@ public class DefendSettlementMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(DefendSettlementMission.class.getName());
 
+    /** The tag for this mission. */
     private String tag = "AI defender";
 
     /** Maximum number of turns to travel to the settlement. */
     private static int MAX_TURNS = 20;
 
     /** The settlement to be protected. */
-    private Settlement target = null;
+    private Location target = null;
 
 
     /**
@@ -71,7 +73,7 @@ public class DefendSettlementMission extends Mission {
                                    Settlement settlement) {
         super(aiMain, aiUnit);
 
-        this.target = settlement;
+        setTarget(settlement);
         logger.finest(tag + " started with " + target + ": " + this);
         uninitialized = false;
     }
@@ -96,17 +98,6 @@ public class DefendSettlementMission extends Mission {
         uninitialized = getAIUnit() == null;
     }
 
-
-    /**
-     * Sets a new mission target.
-     *
-     * @param target The new target <code>Settlement</code>.
-     */
-    public void setTarget(Settlement target) {
-        boolean retarget = this.target != null && this.target != target;
-        this.target = target;
-        if (retarget) retargetTransportable();
-    }
 
     /**
      * Extract a valid target for this mission from a path.
@@ -134,8 +125,10 @@ public class DefendSettlementMission extends Mission {
     public static int scorePath(AIUnit aiUnit, PathNode path) {
         final Location loc = extractTarget(aiUnit, path);
         return (loc instanceof Settlement)
-            ? (int)(1000 * ((Settlement)loc).getDefenceRatio()
-                / (path.getTotalTurns() + 1))
+            ? aiUnit.getAIOwner().adjustMission(aiUnit, path,
+                DefendSettlementMission.class,
+                (int)(1000 * ((Settlement)loc).getDefenceRatio()
+                    / (path.getTotalTurns() + 1)))
             : Integer.MIN_VALUE;
     }
 
@@ -168,31 +161,34 @@ public class DefendSettlementMission extends Mission {
     /**
      * Finds a path to the best nearby settlement to defend.
      *
-     * @param aiUnit The <code>AIUnit</code> that is searching.
-     * @param deferOK Not implemented in this mission.
-     * @return A <code>PathNode</code> to take to the target,
-     *     or null if none suitable.
+     * @param aiUnit The <code>AIUnit</code> to execute this mission.
+     * @param range An upper bound on the number of moves.
+     * @param deferOK Enables deferring to a fallback colony.
+     * @return A path to the new target, or null if none found.
      */
-    public static PathNode findTargetPath(AIUnit aiUnit, boolean deferOK) {
+    public static PathNode findTargetPath(AIUnit aiUnit, int range,
+                                          boolean deferOK) {
         if (invalidAIUnitReason(aiUnit) != null) return null;
         final Unit unit = aiUnit.getUnit();
         final Tile startTile = unit.getPathStartTile();
         if (startTile == null) return null;
 
         return unit.search(startTile, getGoalDecider(aiUnit),
-                           CostDeciders.avoidSettlementsAndBlockingUnits(),
-                           MAX_TURNS, unit.getCarrier());
+            CostDeciders.avoidSettlementsAndBlockingUnits(),
+            range, unit.getCarrier());
     }
 
     /**
      * Finds a path to the best nearby settlement to defend.
      *
      * @param aiUnit The <code>AIUnit</code> that is searching.
+     * @param range An upper bound on the number of moves.
      * @param deferOK Enables deferral (not implemented in this mission).
      * @return A suitable target, or null if none found.
      */
-    public static Location findTarget(AIUnit aiUnit, boolean deferOK) {
-        PathNode path = findTargetPath(aiUnit, deferOK);
+    public static Location findTarget(AIUnit aiUnit, int range,
+                                      boolean deferOK) {
+        PathNode path = findTargetPath(aiUnit, range, deferOK);
         return (path != null) ? extractTarget(aiUnit, path)
             : null;
     }
@@ -221,13 +217,31 @@ public class DefendSettlementMission extends Mission {
     // Mission interface
 
     /**
-     * Gets the target settlement.
-     *
-     * @return The <code>Settlement</code> to be defended by
-     *     this <code>Mission</code>.
+     * {@inheritDoc}
      */
     public Location getTarget() {
         return target;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setTarget(Location target) {
+        if (target instanceof Settlement) {
+            boolean retarget = this.target != null && this.target != target;
+            this.target = target;
+            if (retarget) retargetTransportable();
+        } else {
+            throw new IllegalArgumentException("Target is not a settlement: "
+                + target);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Location findTarget() {
+        return findTarget(getAIUnit(), 4, true);
     }
 
     /**
@@ -256,15 +270,6 @@ public class DefendSettlementMission extends Mission {
     private static String invalidSettlementReason(AIUnit aiUnit,
                                                   Settlement settlement) {
         return invalidTargetReason(settlement, aiUnit.getUnit().getOwner());
-    }
-
-    /**
-     * Why is this mission invalid?
-     *
-     * @return A reason for mission invalidity, or null if none found.
-     */
-    public String invalidReason() {
-        return invalidReason(getAIUnit(), getTarget());
     }
 
     /**
@@ -298,21 +303,22 @@ public class DefendSettlementMission extends Mission {
             : Mission.TARGETINVALID;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public String invalidReason() {
+        return invalidReason(getAIUnit(), getTarget());
+    }
+
     // Not a one-time mission, omit isOneTime().
 
     /**
-     * Performs this mission.
+     * {@inheritDoc}
      */
     public void doMission() {
         String reason = invalidReason();
         if (isTargetReason(reason)) {
-            Location loc = findTarget(getAIUnit(), true);
-            if (loc instanceof Settlement) {
-                setTarget((Settlement)loc);
-            } else {
-                logger.finest(tag + " could not retarget: " + this);
-                return;
-            }
+            if (!retargetMission(tag, reason)) return;
         } else if (reason != null) {
             logger.finest(tag + " broken(" + reason + "): " + this);
             return;
@@ -348,9 +354,10 @@ public class DefendSettlementMission extends Mission {
         }
 
         // Check if the settlement is badly defended.  If so, try to fortify.
+        Settlement settlement = (Settlement)getTarget();
         int defenderCount = 0, fortifiedCount = 0;
-        List<Unit> units = getTarget().getUnitList();
-        units.addAll(getTarget().getTile().getUnitList());
+        List<Unit> units = settlement.getUnitList();
+        units.addAll(settlement.getTile().getUnitList());
         for (Unit u : units) {
             AIUnit aiu = getAIMain().getAIUnit(u);
             if (invalidMissionReason(aiu) == null) {
@@ -368,8 +375,7 @@ public class DefendSettlementMission extends Mission {
             } else {
                 logMe = " fortify failed at ";
             }
-            logger.finest(tag + logMe + ((Settlement)getTarget()).getName()
-                + ": " + this);
+            logger.finest(tag + logMe + settlement.getName() + ": " + this);
             return;
         }
 
@@ -431,16 +437,20 @@ public class DefendSettlementMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void writeAttributes(XMLStreamWriter out)
         throws XMLStreamException {
         super.writeAttributes(out);
 
-        writeAttribute(out, "settlement", target);
+        if (target != null) {
+            writeAttribute(out, "settlement", (FreeColGameObject)target);
+        }
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
         super.readAttributes(in);
@@ -451,7 +461,7 @@ public class DefendSettlementMission extends Mission {
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "defendSettlementMission".
      */

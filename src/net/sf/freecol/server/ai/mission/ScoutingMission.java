@@ -55,12 +55,8 @@ public class ScoutingMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(ScoutingMission.class.getName());
 
+    /** The tag for this mission. */
     private static final String tag = "AI scout";
-
-    /**
-     * Maximum number of turns to travel to a scouting target.
-     */
-    private static final int MAX_TURNS = 20;
 
     /**
      * The target for this mission.  Either a tile with an LCR, a
@@ -69,16 +65,6 @@ public class ScoutingMission extends Mission {
      */
     private Location target = null;
 
-
-    /**
-     * Creates a mission for the given <code>AIUnit</code>.
-     *
-     * @param aiMain The main AI-object.
-     * @param aiUnit The <code>AIUnit</code> this mission is created for.
-     */
-    public ScoutingMission(AIMain aiMain, AIUnit aiUnit) {
-        this(aiMain, aiUnit, findTarget(aiUnit, true));
-    }
 
     /**
      * Creates a mission for the given <code>AIUnit</code>.
@@ -113,17 +99,6 @@ public class ScoutingMission extends Mission {
         uninitialized = getAIUnit() == null;
     }
 
-
-    /**
-     * Sets a new mission target.
-     *
-     * @param target The new target <code>Location</code>.
-     */
-    public void setTarget(Location target) {
-        boolean retarget = this.target != null && this.target != target;
-        this.target = target;
-        if (retarget) retargetTransportable();
-    }
 
     /**
      * Does a supplied unit have horses?
@@ -165,6 +140,23 @@ public class ScoutingMission extends Mission {
     }
 
     /**
+     * Evaluate a potential scouting mission for a given unit and
+     * path.
+     *
+     * @param aiUnit The <code>AIUnit</code> to do the mission.
+     * @param path A <code>PathNode</code> to take to the target.
+     * @return A score for the proposed mission.
+     */
+    public static int scorePath(AIUnit aiUnit, PathNode path) {
+        Location loc;
+        if (path == null
+            || (loc = extractTarget(aiUnit, path)) == null
+            || !(loc instanceof IndianSettlement || loc instanceof Tile))
+            return Integer.MIN_VALUE;
+        return 1000 / (path.getTotalTurns() + 1);
+    }
+
+    /**
      * Gets a <code>GoalDecider</code> for finding the best colony
      * <code>Tile</code>, optionally falling back to the nearest colony.
      *
@@ -200,30 +192,15 @@ public class ScoutingMission extends Mission {
     }
 
     /**
-     * Evaluate a potential scouting mission for a given unit and
-     * path.
-     *
-     * @param aiUnit The <code>AIUnit</code> to do the mission.
-     * @param path A <code>PathNode</code> to take to the target.
-     * @return A score for the proposed mission.
-     */
-    public static int scorePath(AIUnit aiUnit, PathNode path) {
-        Location loc;
-        if (path == null
-            || (loc = extractTarget(aiUnit, path)) == null
-            || !(loc instanceof IndianSettlement || loc instanceof Tile))
-            return Integer.MIN_VALUE;
-        return 1000 / (path.getTotalTurns() + 1);
-    }
-
-    /**
      * Finds a suitable scouting target for the supplied unit.
      *
-     * @param deferOK If true, allow the search to return a nearby existing
-     *     colony as a temporary target.     
-     * @return A path to the new colony or backup.
+     * @param aiUnit The <code>AIUnit</code> to execute this mission.
+     * @param range An upper bound on the number of moves.
+     * @param deferOK Enables deferring to a fallback colony.
+     * @return A path to the new target, or null if none found.
      */
-    public static PathNode findTargetPath(AIUnit aiUnit, boolean deferOK) {
+    public static PathNode findTargetPath(AIUnit aiUnit, int range,
+                                          boolean deferOK) {
         if (invalidAIUnitReason(aiUnit) != null) return null;
         final Unit unit = aiUnit.getUnit();
         final Tile startTile = unit.getPathStartTile();
@@ -235,7 +212,7 @@ public class ScoutingMission extends Mission {
 
         // Can the scout legally reach a valid target from where it
         // currently is?
-        return unit.search(startTile, gd, standardCd, MAX_TURNS, carrier);
+        return unit.search(startTile, gd, standardCd, range, carrier);
     }
 
     /**
@@ -243,15 +220,17 @@ public class ScoutingMission extends Mission {
      * Falls back to the best settlement if a path is not found.
      *
      * @param aiUnit The <code>AIUnit</code> to test.
+     * @param range An upper bound on the number of moves.
      * @param deferOK Enables deferring to a fallback colony.
      * @return A <code>PathNode</code> to the target, or null if none found.
      */
-    public static Location findTarget(AIUnit aiUnit, boolean deferOK) {
-        PathNode path = findTargetPath(aiUnit, deferOK);
+    public static Location findTarget(AIUnit aiUnit, int range,
+                                      boolean deferOK) {
+        PathNode path = findTargetPath(aiUnit, range, deferOK);
         return (path != null) ? extractTarget(aiUnit, path)
-            : findCircleTarget(aiUnit, getGoalDecider(aiUnit, deferOK),
-                               MAX_TURNS*3, deferOK);
-    }        
+            : upLoc(findCircleTarget(aiUnit, getGoalDecider(aiUnit, deferOK),
+                                     range*3, deferOK));
+    }
 
     /**
      * Prepare a unit for this mission.
@@ -269,6 +248,7 @@ public class ScoutingMission extends Mission {
             : "unit-not-a-SCOUT";
     }
 
+
     // Fake Transportable interface
 
     /**
@@ -284,12 +264,26 @@ public class ScoutingMission extends Mission {
     // Mission interface
 
     /**
-     * Gets the target for this mission.
-     *
-     * @return The mission target.
+     * {@inheritDoc}
      */
     public Location getTarget() {
         return target;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setTarget(Location target) {
+        boolean retarget = this.target != null && this.target != target;
+        this.target = target;
+        if (retarget) retargetTransportable();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Location findTarget() {
+        return findTarget(getAIUnit(), 20, true);
     }
 
     /**
@@ -370,15 +364,6 @@ public class ScoutingMission extends Mission {
     }
 
     /**
-     * Why is this mission invalid?
-     *
-     * @return A reason for mission invalidity, or null if none found.
-     */
-    public String invalidReason() {
-        return invalidReason(getAIUnit(), getTarget());
-    }
-
-    /**
      * Why would this mission be invalid with the given AI unit?
      *
      * @param aiUnit The <code>AIUnit</code> to check.
@@ -406,27 +391,29 @@ public class ScoutingMission extends Mission {
             : Mission.TARGETINVALID;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public String invalidReason() {
+        return invalidReason(getAIUnit(), getTarget());
+    }
+
     // Not a one-time mission, omit isOneTime().
 
     /**
-     * Performs this mission.
+     * {@inheritDoc}
      */
     public void doMission() {
-        final AIUnit aiUnit = getAIUnit();
         String reason = invalidReason();
         if (isTargetReason(reason)) {
-            Location loc = findTarget(aiUnit, true);
-            if (loc == null) {
-                logger.finest(tag + " could not retarget: " + this);
-                return;
-            }
-            setTarget(loc);
+            if (!retargetMission(tag, reason)) return;
         } else if (reason != null) {
             logger.finest(tag + " broken(" + reason + "): " + this);
             return;
         }
 
         // Go to the target.
+        final AIUnit aiUnit = getAIUnit();
         final Unit unit = getUnit();
         Direction d;
         Unit.MoveType mt = travelToTarget(tag, getTarget(),
@@ -478,7 +465,7 @@ public class ScoutingMission extends Mission {
         // one colony to another, just drop equipment and invalidate
         // the mission.
         Location completed = getTarget();
-        setTarget(findTarget(aiUnit, false));
+        setTarget(findTarget(aiUnit, 20, false));
         if (completed instanceof Colony) {
             if (getTarget() == null) {
                 for (EquipmentType e : new ArrayList<EquipmentType>(unit
@@ -498,12 +485,7 @@ public class ScoutingMission extends Mission {
     // Serialization
 
     /**
-     * Writes all of the <code>AIObject</code>s and other AI-related
-     * information to an XML-stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
+     * {@inheritDoc}
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         if (isValid()) {
@@ -514,6 +496,7 @@ public class ScoutingMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void writeAttributes(XMLStreamWriter out)
         throws XMLStreamException {
         super.writeAttributes(out);
@@ -526,6 +509,7 @@ public class ScoutingMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
         super.readAttributes(in);
@@ -535,7 +519,7 @@ public class ScoutingMission extends Mission {
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "scoutingMission".
      */

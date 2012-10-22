@@ -49,6 +49,8 @@ public class REFAIPlayer extends EuropeanAIPlayer {
 
     private static final Logger logger = Logger.getLogger(REFAIPlayer.class.getName());
 
+    private static int seekAndDestroyRange = 12;
+
 
     /**
      * Creates a new <code>REFAIPlayer</code>.
@@ -119,7 +121,8 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         final Unit unit = aiUnit.getUnit();
 
         // Find the best coastal colony.
-        Location target = UnitSeekAndDestroyMission.findTarget(aiUnit,INFINITY);
+        Location target = UnitSeekAndDestroyMission.findTarget(aiUnit,
+            INFINITY, false);
         if (!(target instanceof Colony)) {
             logger.warning("Rebels have no connected colonies?!?");
             return null;
@@ -218,16 +221,10 @@ public class REFAIPlayer extends EuropeanAIPlayer {
     }
 
     /**
-     * Evaluates a proposed mission type for a unit, specialized for
-     * REF players.
-     *
-     * @param aiUnit The <code>AIUnit</code> to perform the mission.
-     * @param path A <code>PathNode</code> to the target of this mission.
-     * @param type The mission type.
-     * @return A score representing the desirability of this mission.
+     * {@inheritDoc}
      */
-    public int scoreMission(AIUnit aiUnit, PathNode path, Class type) {
-        int value = super.scoreMission(aiUnit, path, type);
+    public int adjustMission(AIUnit aiUnit, PathNode path, Class type,
+                             int value) {
         if (value > 0) {
             if (type == DefendSettlementMission.class) {
                 // REF garrisons thinly.
@@ -281,7 +278,8 @@ public class REFAIPlayer extends EuropeanAIPlayer {
             Unit u = aiu.getUnit();
             if (u.isNaval() || aiu.hasMission()) continue;
             if (u.isOffensiveUnit()) {
-                Location target = UnitSeekAndDestroyMission.findTarget(aiu, 12);
+                Location target = UnitSeekAndDestroyMission.findTarget(aiu, 
+                    seekAndDestroyRange, false);
                 Mission m = (target == null)
                     ? new UnitWanderHostileMission(getAIMain(), aiu)
                     : new UnitSeekAndDestroyMission(getAIMain(), aiu, target);

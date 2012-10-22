@@ -41,6 +41,7 @@ public class UnitWanderHostileMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(UnitWanderHostileMission.class.getName());
 
+    /** The tag for this mission. */
     private static final String tag = "AI hostile-wanderer";
 
 
@@ -81,11 +82,21 @@ public class UnitWanderHostileMission extends Mission {
     // Mission interface
 
     /**
-     * Gets the mission target.
-     *
-     * @return Null.
+     * {@inheritDoc}
      */
     public Location getTarget() {
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setTarget(Location target) {}
+
+    /**
+     * {@inheritDoc}
+     */
+    public Location findTarget() {
         return null;
     }
 
@@ -102,15 +113,6 @@ public class UnitWanderHostileMission extends Mission {
             : (unit.isNaval()) ? "unit-is-naval"
             : (unit.getTile() == null) ? Mission.UNITNOTONMAP
             : null;
-    }
-
-    /**
-     * Why is this mission invalid?
-     *
-     * @return A reason for mission invalidity, or null if none found.
-     */
-    public String invalidReason() {
-        return invalidReason(getAIUnit(), null);
     }
 
     /**
@@ -141,9 +143,14 @@ public class UnitWanderHostileMission extends Mission {
     }
 
     /**
-     * Should this mission only be carried out once?
-     *
-     * @return True.
+     * {@inheritDoc}
+     */
+    public String invalidReason() {
+        return invalidReason(getAIUnit(), null);
+    }
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     public boolean isOneTime() {
@@ -151,12 +158,9 @@ public class UnitWanderHostileMission extends Mission {
     }
 
     /**
-     * Performs the mission.  Search for hostile targets that are
-     * located within one move and attack them, otherwise wander in a
-     * random direction.
+     * {@inheritDoc}
      */
     public void doMission() {
-        final Unit unit = getUnit();
         String reason = invalidReason();
         if (reason != null) {
             logger.finest(tag + " broken(" + reason + "): " + this);
@@ -165,6 +169,7 @@ public class UnitWanderHostileMission extends Mission {
 
         // Make random moves in a reasonably consistent direction,
         // checking for a target along the way.
+        final Unit unit = getUnit();
         final AIMain aiMain = getAIMain();
         final AIUnit aiUnit = getAIUnit();
         int check = 0, checkTurns = Utils.randomInt(logger, "Hostile",
@@ -175,7 +180,8 @@ public class UnitWanderHostileMission extends Mission {
         while (unit.getMovesLeft() > 0) {
             // Every checkTurns, look for a target of opportunity.
             if (check == 0) {
-                Location loc = UnitSeekAndDestroyMission.findTarget(aiUnit, 1);
+                Location loc = UnitSeekAndDestroyMission.findTarget(aiUnit, 1,
+                                                                    false);
                 if (loc != null) {
                     m = new UnitSeekAndDestroyMission(aiMain, aiUnit, loc);
                     aiUnit.setMission(m);
@@ -198,19 +204,14 @@ public class UnitWanderHostileMission extends Mission {
     // Serialization
 
     /**
-     * Writes all of the <code>AIObject</code>s and other AI-related
-     * information to an XML-stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * {@inheritDoc}
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         toXML(out, getXMLElementTagName());
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "unitWanderHostileMission".
      */

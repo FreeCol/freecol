@@ -46,6 +46,7 @@ public class WishRealizationMission extends Mission {
 
     private static final Logger logger = Logger.getLogger(WishRealizationMission.class.getName());
 
+    /** The tag for this mission. */
     private static final String tag = "AI wisher";
 
     /** The wish to be realized. */
@@ -118,22 +119,24 @@ public class WishRealizationMission extends Mission {
     // Mission interface
 
     /**
-     * Gets the target of this mission.
-     *
-     * @return The target of this mission, or null if none.
+     * {@inheritDoc}
      */
     public Location getTarget() {
         return (wish == null) ? null : wish.getDestination();
     }
 
     /**
-     * Why is this mission invalid?
-     *
-     * @return A reason for mission invalidity, or null if none found.
+     * {@inheritDoc}
      */
-    public String invalidReason() {
-        return (wish == null) ? "wish-null"
-            : invalidReason(getAIUnit(), getTarget());
+    public void setTarget(Location target) {
+        throw new IllegalStateException("Target is fixed.");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Location findTarget() {
+        throw new IllegalStateException("Target is fixed.");
     }
 
     // Omitted invalidReason(AIUnit), not needed
@@ -153,10 +156,18 @@ public class WishRealizationMission extends Mission {
             : null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public String invalidReason() {
+        return (wish == null) ? "wish-null"
+            : invalidReason(getAIUnit(), getTarget());
+    }
+
     // Not a one-time mission, omit isOneTime().
 
     /**
-     * Performs this mission.
+     * {@inheritDoc}
      */
     public void doMission() {
         final Unit unit = getUnit();
@@ -201,15 +212,10 @@ public class WishRealizationMission extends Mission {
     // Serialization
 
     /**
-     * Writes all of the <code>AIObject</code>s and other AI-related
-     * information to an XML-stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
+     * {@inheritDoc}
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        if (wish.shouldBeStored()) {
+        if (wish != null && wish.shouldBeStored()) {
             toXML(out, getXMLElementTagName());
         }
     }
@@ -217,6 +223,7 @@ public class WishRealizationMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void writeAttributes(XMLStreamWriter out)
         throws XMLStreamException {
         super.writeAttributes(out);
@@ -227,6 +234,7 @@ public class WishRealizationMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
         super.readAttributes(in);
@@ -250,7 +258,7 @@ public class WishRealizationMission extends Mission {
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return The <code>String</code> "wishRealizationMission".
      */
