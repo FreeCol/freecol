@@ -1777,18 +1777,17 @@ public class TransportMission extends Mission {
                     }
                 }
 
-                str = in.getAttributeValue(null, "carrier");
-                AIObject aiCarrier = getAIMain().getAIObject(str);
-                Unit carrier = (aiCarrier instanceof AIUnit)
-                    ? ((AIUnit)aiCarrier).getUnit()
-                    : null;
+                str = in.getAttributeValue(null, CARRIER_TAG);
+                Unit carrier = (str == null) ? null
+                    : getGame().getFreeColGameObject(str, Unit.class);
 
                 str = in.getAttributeValue(null, MODE_TAG);
                 CargoMode mode = (str == null) ? CargoMode.DUMP
                     : Enum.valueOf(CargoMode.class, str.toUpperCase(Locale.US));
 
                 str = in.getAttributeValue(null, TARGET_TAG);
-                Location target = getGame().getFreeColLocation(str);
+                Location target = (str == null) ? null
+                    : getGame().getFreeColLocation(str);
 
                 int turns = getAttribute(in, TURNS_TAG, -1);
 
@@ -1797,11 +1796,8 @@ public class TransportMission extends Mission {
                 int spaceLeft = getAttribute(in, SPACELEFT_TAG, -1);
 
                 if (aio instanceof Transportable) {
-                    // Let checkCargoes sort out dumping cases.
-                    if (mode != CargoMode.DUMP) {
-                        ts.add(new Cargo((Transportable)aio, carrier, mode,
-                                         target, turns, tries, spaceLeft));
-                    }
+                    ts.add(new Cargo((Transportable)aio, carrier, mode,
+                                     target, turns, tries, spaceLeft));
                 } else {
                     logger.warning("Transportable expected: " + tid);
                 }
