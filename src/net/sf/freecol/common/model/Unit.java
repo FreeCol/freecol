@@ -1981,7 +1981,7 @@ public class Unit extends GoodsLocation
             && tradeRoute == null
             && !isUnderRepair()
             && !isAtSea()
-            && !(isInEurope() && isOnCarrier())
+            && !isOnCarrier()
             // this should never happen anyway, since these units
             // should have state IN_COLONY, but better safe than sorry
             && !(location instanceof WorkLocation);

@@ -3636,10 +3636,9 @@ public final class InGameController extends Controller {
                                UnitState state) {
         ChangeSet cs = new ChangeSet();
 
-        if (state == UnitState.FORTIFYING) {
-            Tile tile = unit.getTile();
-            ServerColony colony
-                = (tile.getOwningSettlement() instanceof Colony)
+        Tile tile;
+        if (state == UnitState.FORTIFYING && (tile = unit.getTile()) != null) {
+            ServerColony colony = (tile.getOwningSettlement() instanceof Colony)
                 ? (ServerColony) tile.getOwningSettlement()
                 : null;
             if (colony != null
@@ -3650,7 +3649,7 @@ public final class InGameController extends Controller {
         }
 
         unit.setState(state);
-        cs.add(See.perhaps(), unit.getTile());
+        cs.add(See.perhaps(), (FreeColGameObject)unit.getLocation());
 
         // Others might be able to see the unit.
         sendToOthers(serverPlayer, cs);

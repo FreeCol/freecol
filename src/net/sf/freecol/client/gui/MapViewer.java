@@ -1333,11 +1333,11 @@ public final class MapViewer {
             changeViewMode(GUI.MOVE_UNITS_MODE);
         }
 
-        if (activeUnit == null) {
+        if (activeUnit == null || tile == null) {
             freeColClient.updateActions();
             gui.updateMenuBar();
             gui.updateMapControls();
-        } else if (tile != null) {
+        } else {
             updateGotoPathForActiveUnit();
             if (!setSelectedTile(tile, false)
                 || freeColClient.getClientOptions()
