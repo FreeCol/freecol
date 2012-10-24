@@ -110,16 +110,20 @@ public class IndianSettlement extends Settlement {
     protected Set<Player> spokenTo = new HashSet<Player>();
 
     /** Units that belong to this settlement. */
-    protected ArrayList<Unit> ownedUnits = new ArrayList<Unit>();
+    protected List<Unit> ownedUnits = new ArrayList<Unit>();
 
     /** The missionary at this settlement. */
     protected Unit missionary = null;
+
 
     /** Used for monitoring the progress towards creating a convert. */
     protected int convertProgress = 0;
 
     /** The number of the turn during which the last tribute was paid. */
     protected int lastTribute = 0;
+
+    /** The most hated nation. */
+    protected Player mostHated = null;
 
     /**
      * Stores the alarm levels. <b>Only used by AI.</b>
@@ -129,7 +133,7 @@ public class IndianSettlement extends Settlement {
      * has never been contacted by a player, alarm.get(player) will be null.
      * Acts causing contact initialize this variable.
      */
-    private java.util.Map<Player, Tension> alarm
+    private final java.util.Map<Player, Tension> alarm
         = new HashMap<Player, Tension>();
 
     // When choosing what goods to buy, sort goods types descending by price.
@@ -190,7 +194,8 @@ public class IndianSettlement extends Settlement {
 
 
     /**
-     * Initiates a new <code>IndianSettlement</code> from an <code>Element</code>.
+     * Initiates a new <code>IndianSettlement</code> from an
+     * <code>Element</code>.
      *
      * @param game The <code>Game</code> in which this object belong.
      * @param in The input stream containing the XML.
@@ -203,9 +208,8 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
-     * Initiates a new <code>IndianSettlement</code>
-     * with the given ID. The object should later be
-     * initialized by calling either
+     * Initiates a new <code>IndianSettlement</code> with the given
+     * ID. The object should later be initialized by calling either
      * {@link #readFromXML(XMLStreamReader)}.
      *
      * @param game The <code>Game</code> in which this object belong.
@@ -266,7 +270,10 @@ public class IndianSettlement extends Settlement {
      * @param newAlarm The new alarm value.
      */
     public void setAlarm(Player player, Tension newAlarm) {
-        if (player != null && player != owner) alarm.put(player, newAlarm);
+        if (player != null && player != owner) {
+            alarm.put(player, newAlarm);
+            updateMostHated();
+        }
     }
 
     /**
@@ -276,7 +283,10 @@ public class IndianSettlement extends Settlement {
      * @param player The <code>Player</code> to remove the alarm for.
      */
     public void removeAlarm(Player player) {
-        if (player != null) alarm.remove(player);
+        if (player != null) {
+            alarm.remove(player);
+            updateMostHated();
+        }
     }
 
     /**
@@ -291,6 +301,7 @@ public class IndianSettlement extends Settlement {
         Tension alarm = getAlarm(player);
         Level oldLevel = alarm.getLevel();
         alarm.modify(amount);
+        updateMostHated();
         return oldLevel != alarm.getLevel();
     }
 
@@ -462,11 +473,21 @@ public class IndianSettlement extends Settlement {
 
 
     /**
-     * Returns the skill that can be learned at this settlement.
+     * Gets the skill that can be learned at this settlement.
+     *
      * @return The skill that can be learned at this settlement.
      */
     public UnitType getLearnableSkill() {
         return learnableSkill;
+    }
+
+    /**
+     * Sets the learnable skill for this Indian settlement.
+     *
+     * @param skill The new learnable skill for this Indian settlement.
+     */
+    public void setLearnableSkill(UnitType skill) {
+        learnableSkill = skill;
     }
 
     /**
@@ -515,6 +536,33 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
+     * Gets the most hated nation of this settlement.
+     *
+     * @return The most hated nation.
+     */
+    public Player getMostHated() {
+        return mostHated;
+    }
+
+    /**
+     * Updates the most hated nation of this settlement.
+     */
+    public void updateMostHated() {
+        mostHated = null;
+        int bestValue = Integer.MIN_VALUE;
+        for (Player p : getGame().getLiveEuropeanPlayers()) {
+            Tension alarm = getAlarm(p);
+            if (alarm == null
+                || alarm.getLevel() == Tension.Level.HAPPY) continue;
+            int value = alarm.getValue();
+            if (bestValue < value) {
+                bestValue = value;
+                mostHated = p;
+            }
+        }
+    }
+
+    /**
      * Gets the convert progress status for this settlement.
      *
      * @return The convert progress status.
@@ -541,14 +589,6 @@ public class IndianSettlement extends Settlement {
         if (0 <= index && index < wantedGoods.length) {
             wantedGoods[index] = type;
         }
-    }
-
-    /**
-     * Sets the learnable skill for this Indian settlement.
-     * @param skill The new learnable skill for this Indian settlement.
-     */
-    public void setLearnableSkill(UnitType skill) {
-        learnableSkill = skill;
     }
 
 
@@ -1187,6 +1227,10 @@ public class IndianSettlement extends Settlement {
                     out.writeAttribute(tag, wantedGoods[i].getId());
                 }
             }
+            Player hated = getMostHated();
+            if (hated != null) {
+                out.writeAttribute("mostHated", hated.getId());
+            }
         } else if (pet != null) {
             writeAttribute(out, "learnableSkill", pet.getSkill());
             GoodsType[] wanted = pet.getWantedGoods();
@@ -1197,6 +1241,10 @@ public class IndianSettlement extends Settlement {
                     out.writeAttribute(tag, wanted[i].getId());
                     j++;
                 }
+            }
+            Player hated = pet.getMostHated();
+            if (hated != null) {
+                out.writeAttribute("mostHated", hated.getId());
             }
         }
 
@@ -1259,14 +1307,11 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
+     * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in)
+        throws XMLStreamException {
         super.readAttributes(in);
 
         owner.addSettlement(this);
@@ -1281,26 +1326,35 @@ public class IndianSettlement extends Settlement {
 
         convertProgress = getAttribute(in, "convertProgress", 0);
         lastTribute = getAttribute(in, "lastTribute", 0);
-        learnableSkill = getSpecification().getType(in, "learnableSkill", UnitType.class, null);
+        learnableSkill = getSpecification().getType(in, "learnableSkill",
+                                                    UnitType.class, null);
+        mostHated = getFreeColGameObject(in, "mostHated", Player.class, null);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected void readChildren(XMLStreamReader in) throws XMLStreamException {
         spokenTo.clear();
-        alarm = new HashMap<Player, Tension>();
+        alarm.clear();
         missionary = null;
         ownedUnits.clear();
         super.readChildren(in);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
+        final Game game = getGame();
         if (IS_VISITED_TAG_NAME.equals(in.getLocalName())) {
-            Player player = getGame().getFreeColGameObject(in.getAttributeValue(null, "player"),
-                                                           Player.class);
+            Player player = game.getFreeColGameObject(in.getAttributeValue(null, "player"),
+                                                      Player.class);
             spokenTo.add(player);
             in.nextTag(); // close tag is always generated.
         } else if (ALARM_TAG_NAME.equals(in.getLocalName())) {
-            Player player = getGame().getFreeColGameObject(in.getAttributeValue(null, "player"),
-                                                           Player.class);
+            Player player = game.getFreeColGameObject(in.getAttributeValue(null, "player"),
+                                                      Player.class);
             alarm.put(player, new Tension(getAttribute(in, VALUE_TAG, 0)));
             in.nextTag(); // close element
         } else if (WANTED_GOODS_TAG_NAME.equals(in.getLocalName())) {
@@ -1370,6 +1424,9 @@ public class IndianSettlement extends Settlement {
         readFromXMLPartialByClass(in, getClass());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder(getName());
@@ -1379,7 +1436,7 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "indianSettlement".
      */

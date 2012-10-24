@@ -66,6 +66,7 @@ public class PlayerExploredTile extends FreeColGameObject {
     private UnitType skill = null;
     private GoodsType[] wantedGoods = { null, null, null };
     private Unit missionary = null;
+    private Player mostHated = null;
 
 
     /**
@@ -125,6 +126,7 @@ public class PlayerExploredTile extends FreeColGameObject {
             missionary = null;
             skill = null;
             wantedGoods = new GoodsType[] { null, null, null };
+            mostHated = null;
         } else {
             missionary = is.getMissionary();
             if (full) {
@@ -133,6 +135,7 @@ public class PlayerExploredTile extends FreeColGameObject {
             // Do not hide.  Has to be visible for the pre-speak-to-chief
             // dialog message.  Yes this is odd.
             wantedGoods = is.getWantedGoods();
+            mostHated = is.getMostHated();
         }
     }
 
@@ -170,6 +173,10 @@ public class PlayerExploredTile extends FreeColGameObject {
         return wantedGoods;
     }
 
+    public Player getMostHated() {
+        return mostHated;
+    }
+
     // Only needed for 0.9.x workaround in Tile.readFromXML.
     public void setOwner(Player owner) {
         this.owner = owner;
@@ -192,6 +199,8 @@ public class PlayerExploredTile extends FreeColGameObject {
     }
     // End 0.9.x workarounds.
 
+
+    // Serialization
 
     /**
      * This method writes an XML-representation of this object to the
@@ -250,6 +259,9 @@ public class PlayerExploredTile extends FreeColGameObject {
         if (wantedGoods[2] != null) {
             writeAttribute(out, "wantedGoods2", wantedGoods[2]);
         }
+        if (mostHated != null) {
+            out.writeAttribute("mostHated", mostHated.getId());
+        }
         // Attributes end here
         if (missionary != null) {
             out.writeStartElement("missionary");
@@ -264,10 +276,7 @@ public class PlayerExploredTile extends FreeColGameObject {
     }
 
     /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if an error occurred during parsing.
+     * {@inheritDoc}
      */
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         Specification spec = getSpecification();
@@ -296,10 +305,15 @@ public class PlayerExploredTile extends FreeColGameObject {
         wantedGoods[2] = spec.getType(in, "wantedGoods2", GoodsType.class,
                                       null);
 
+        mostHated = getFreeColGameObject(in, "mostHated", Player.class, null);
+
         tileItems.clear();
         missionary = null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
         Game game = getGame();
         if (in.getLocalName().equals(IndianSettlement.MISSIONARY_TAG_NAME)) {
@@ -341,7 +355,7 @@ public class PlayerExploredTile extends FreeColGameObject {
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "playerExploredTile".
      */

@@ -109,6 +109,7 @@ public final class ReportIndianPanel extends ReportPanel {
             reportPanel.add(localizedLabel("mission"));
             reportPanel.add(localizedLabel("report.indian.tension"));
             reportPanel.add(localizedLabel("report.indian.skillTaught"));
+            reportPanel.add(localizedLabel("report.indian.mostHated"));
             reportPanel.add(localizedLabel("report.indian.tradeInterests"));
             List<IndianSettlement> settlements = new ArrayList<IndianSettlement>(knownNumberOfSettlements);
             for (IndianSettlement settlement : nativeSettlements) {
@@ -137,8 +138,8 @@ public final class ReportIndianPanel extends ReportPanel {
                     boolean expert = missionary.hasAbility(Ability.EXPERT_MISSIONARY);
                     missionLabel.setIcon(new ImageIcon(getLibrary().getMissionChip(missionary, expert, 1)));
                     String text = Messages.message(StringTemplate.template("model.unit.nationUnit")
-                                                   .addStringTemplate("%nation%", missionary.getOwner().getNationName())
-                                                   .addStringTemplate("%unit%", Messages.getLabel(missionary)));
+                        .addStringTemplate("%nation%", missionary.getOwner().getNationName())
+                        .addStringTemplate("%unit%", Messages.getLabel(missionary)));
                     missionLabel.setToolTipText(text);
                 }
                 reportPanel.add(missionLabel);
@@ -162,6 +163,19 @@ public final class ReportIndianPanel extends ReportPanel {
                 }
                 skillLabel.setText(Messages.message(skillString));
                 reportPanel.add(skillLabel);
+
+                JLabel mostHatedLabel;
+                Player mostHated = settlement.getMostHated();
+                if (visited) {
+                    if (mostHated == null) {
+                        mostHatedLabel = localizedLabel("indianSettlement.mostHatedNone");
+                    } else {
+                        mostHatedLabel = localizedLabel(mostHated.getNationName());
+                    }
+                } else {
+                    mostHatedLabel = localizedLabel("indianSettlement.mostHatedUnknown");
+                }
+                reportPanel.add(mostHatedLabel);
 
                 GoodsType[] wantedGoods = settlement.getWantedGoods();
                 if (!visited) {

@@ -61,11 +61,12 @@ public final class IndianSettlementPanel extends FreeColPanel {
         Player indian = settlement.getOwner();
         Player player = getMyPlayer();
         boolean visited = player.hasVisited(settlement);
-        String text = Messages.message(settlement.getLocationNameFor(player)) + ", "
+        String text = Messages.message(settlement.getLocationNameFor(player))
+            + ", "
             + Messages.message(StringTemplate.template(settlement.isCapital()
                                                        ? "indianCapital"
                                                        : "indianSettlement")
-                               .addStringTemplate("%nation%", indian.getNationName()));
+                .addStringTemplate("%nation%", indian.getNationName()));
         String messageId = settlement.getShortAlarmLevelMessageId(player);
         text += " (" + Messages.message(messageId) + ")";
         settlementLabel.setText(text);
@@ -74,8 +75,8 @@ public final class IndianSettlementPanel extends FreeColPanel {
         Unit missionary = settlement.getMissionary();
         if (missionary != null) {
             String missionaryName = Messages.message(StringTemplate.template("model.unit.nationUnit")
-                                                     .addStringTemplate("%nation%", missionary.getOwner().getNationName())
-                                                     .addStringTemplate("%unit%", missionary.getLabel()));
+                .addStringTemplate("%nation%", missionary.getOwner().getNationName())
+                .addStringTemplate("%unit%", missionary.getLabel()));
             add(new JLabel(missionaryName, gui.getImageIcon(missionary, true), JLabel.CENTER));
         }
 
@@ -90,6 +91,19 @@ public final class IndianSettlementPanel extends FreeColPanel {
             }
         } else {
             add(localizedLabel("indianSettlement.skillUnknown"));
+        }
+
+        add(localizedLabel("indianSettlement.mostHated"), "newline");
+        Player mostHated = settlement.getMostHated();
+        if (visited) {
+            if (mostHated == null) {
+                add(localizedLabel("indianSettlement.mostHatedNone"));
+            } else {
+                add(new JLabel(Messages.message(mostHated.getNationName()),
+                        gui.getImageIcon(mostHated, true), JLabel.CENTER));
+            }
+        } else {
+            add(localizedLabel("indianSettlement.mostHatedUnknown"));
         }
 
         GoodsType[] wantedGoods = settlement.getWantedGoods();

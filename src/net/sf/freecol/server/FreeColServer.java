@@ -1045,7 +1045,15 @@ public final class FreeColServer {
         // @compat 0.10.x
         if (savegameVersion < 12) {
             for (Player p : game.getPlayers()) {
-                if(!p.isIndian() && p.getEurope() != null) {
+                // @compat 0.10.5
+                if (p.isIndian()) {
+                    for (IndianSettlement is : p.getIndianSettlements()) {
+                        is.updateMostHated();
+                    }
+                }
+                // end compatibility code
+
+                if (!p.isIndian() && p.getEurope() != null) {
                     p.initializeHighSeas();
 
                     for (Unit u : p.getEurope().getUnitList()) {

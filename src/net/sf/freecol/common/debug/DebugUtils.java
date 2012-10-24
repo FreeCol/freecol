@@ -851,11 +851,14 @@ public class DebugUtils {
 
         StringBuilder sb = new StringBuilder(sis.getName());
         sb.append("\n\nAlarm\n");
+        Player mostHated = sis.getMostHated();
         for (Player p : sGame.getLiveEuropeanPlayers()) {
             Tension tension = sis.getAlarm(p);
             sb.append(Messages.message(p.getNationName())
                 + " " + ((tension == null) ? "(none)"
                     : Integer.toString(tension.getValue()))
+                + " " + ((mostHated == null) ? "(peaceful)"
+                    : "(hate " + Messages.message(mostHated.getNationID()) + ")")
                 + " " + Messages.message(sis.getShortAlarmLevelMessageId(p))
                 + " " + ((sis.hasSpokenToChief(p)) ? "(spoke to chief)" : "")
                 + "\n");
