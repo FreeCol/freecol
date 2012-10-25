@@ -266,6 +266,13 @@ public class EuropeanAIPlayer extends AIPlayer {
         = new HashMap<UnitType, List<WorkerWish>>();
 
     /**
+     * A mapping of contiguity number to number of wagons needed in
+     * that landmass.
+     */
+    private final java.util.Map<Integer, Integer> wagonsNeeded
+        = new HashMap<Integer, Integer>();
+
+    /**
      * Stores temporary information for sessions (trading with another player
      * etc).  Do not serialize.
      */
@@ -298,10 +305,6 @@ public class EuropeanAIPlayer extends AIPlayer {
      * Count of the number of transports needing a naval unit.
      */
     private int nNavalCarrier = 0;
-    /**
-     * Count of the number of transports needing a land unit.
-     */
-    private int nLandCarrier = 0;
 
 
     /**
@@ -429,18 +432,68 @@ public class EuropeanAIPlayer extends AIPlayer {
     }
 
     /**
+     * Gets the needed wagons for a tile/contiguity.
+     *
+     * @param tile The <code>Tile</code> to derive the contiguity from.
+     * @return The number of wagons needed.
+     */
+    public int getNeededWagons(Tile tile) {
+        if (tile != null) {
+            int contig = tile.getContiguity();
+            if (contig > 0) {
+                Integer i = wagonsNeeded.get(contig);
+                if (i != null) return i.intValue();
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * Changes the needed wagons map for a specified tile/contiguity.
+     * If the change is zero, that is a special flag that a connected
+     * port is available, and thus that the map should be initialized
+     * for that contiguity.
+     *
+     * @param tile The <code>Tile</code> to derive the contiguity from.
+     * @param amount The change to make.
+     */
+    private void changeNeedWagon(Tile tile, int amount) {
+        if (tile == null) return;
+        int contig = tile.getContiguity();
+        if (contig > 0) {
+            Integer i = wagonsNeeded.get(contig);
+            if (i == null) {
+                if (amount == 0) wagonsNeeded.put(contig, new Integer(0));
+            } else {
+                wagonsNeeded.put(contig, new Integer(i.intValue() + amount));
+            }
+        }
+    }
+
+    /**
      * Rebuild the transport maps.
      * Count the number of transports requiring naval/land carriers.
      */
     private void buildTransportMaps() {
         transportDemand.clear();
         transportSupply.clear();
-        nNavalCarrier = nLandCarrier = 0;
+        wagonsNeeded.clear();
+        nNavalCarrier = 0;
+
+        // Prime the wagonsNeeded map with contiguities with a connected port
+        for (AIColony aic : getAIColonies()) {
+            Colony colony = aic.getColony();
+            if (colony.isConnectedPort()) changeNeedWagon(colony.getTile(), 0);
+        }
 
         for (AIUnit aiu : getAIUnits()) {
             Unit u = aiu.getUnit();
             if (u.isCarrier()) {
-                if (u.isNaval()) nNavalCarrier--; else nLandCarrier--;
+                if (u.isNaval()) {
+                    nNavalCarrier--;
+                } else {
+                    changeNeedWagon(u.getTile(), -1);
+                }                    
             } else {
                 checkTransport(aiu);
                 if (requestsTransport(aiu)) {
@@ -461,18 +514,14 @@ public class EuropeanAIPlayer extends AIPlayer {
                     aig.increaseTransportPriority();
                     Location src = aig.getTransportSource();
                     Location dst = aig.getTransportDestination();
-                    if (Map.isSameContiguity(src, dst)) {
-                        nLandCarrier++;
-                    } else {
+                    if (!Map.isSameContiguity(src, dst)) {
                         nNavalCarrier++;
-                        Tile t1 = src.getTile();
-                        Tile t2 = dst.getTile();
-                        if ((t1 != null && !t1.isHighSeasConnected())
-                            || (t2 != null && !t2.isHighSeasConnected())) {
-                            nLandCarrier++;
-                        }
                     }
                 }
+            }
+            Colony colony = aic.getColony();
+            if (!colony.isConnectedPort()) {
+                changeNeedWagon(colony.getTile(), 1);
             }
         }
 
@@ -1266,7 +1315,6 @@ public class EuropeanAIPlayer extends AIPlayer {
             + " builders=" + nBuilders
             + " pioneers=" + nPioneers
             + " scouts=" + nScouts
-            + " land-carriers=" + nLandCarrier
             + " naval-carriers=" + nNavalCarrier
             + ")";
 
@@ -1874,6 +1922,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         tipMap.clear();
         transportDemand.clear();
         transportSupply.clear();
+        wagonsNeeded.clear();
         goodsWishes.clear();
         workerWishes.clear();
     }

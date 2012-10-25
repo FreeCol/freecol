@@ -54,6 +54,7 @@ import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
+import net.sf.freecol.server.ai.EuropeanAIPlayer;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -732,8 +733,9 @@ public class ColonyPlan {
      * Updates the build plans for this colony.
      */
     private void updateBuildableTypes() {
-        String advantage = getAIMain().getAIPlayer(colony.getOwner())
-            .getAIAdvantage();
+        final EuropeanAIPlayer euaip = (EuropeanAIPlayer)getAIMain()
+            .getAIPlayer(colony.getOwner());
+        String advantage = euaip.getAIAdvantage();
         buildPlans.clear();
 
         int maxLevel;
@@ -856,20 +858,9 @@ public class ColonyPlan {
         
         double wagonNeed = 0.0;
         if (!colony.isConnectedPort()) { // Inland colonies need transportation
-            int wagons = 0;
-            for (Unit u : player.getUnits()) {
-                if (u.hasAbility(Ability.CARRY_GOODS)
-                    && !u.isNaval()) wagons++;
-            }
-            int inland = 0;
-            for (Colony c : player.getColonies()) {
-                if (!c.isConnectedPort()) inland++;
-            }
-            if (inland > wagons
-                // Make sure there is a nearby port!
-                && colony.getFirstUnit().findOurNearestPort() != null) {
-                wagonNeed = (double)(inland - wagons) / inland;
-            }
+            int wagons = euaip.getNeededWagons(colony.getTile());
+            wagonNeed = (wagons <= 0) ? 0.0 : (wagons > 3) ? 1.0
+                : wagons / 3.0;
         }
         for (UnitType unitType : spec().getUnitTypeList()) {
             if (!colony.canBuild(unitType)) continue;
