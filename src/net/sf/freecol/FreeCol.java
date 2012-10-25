@@ -535,14 +535,18 @@ public final class FreeCol {
             }
             if (line.hasOption("debug")) {
                 // If the optional argument is supplied use limited mode.
-                FreeColDebugger.configureDebugLevel(line.getOptionValue("debug"));
+                String arg = line.getOptionValue("debug");
+                if (arg == null || "".equals(arg)) {
+                    FreeColDebugger.enableDebugMode(FreeColDebugger.DebugMode.MENUS);
+                } else {                
+                    FreeColDebugger.setDebugModes(arg);
+                }
                 // user set log level has precedence
-                if (!line.hasOption("log-level")) {
-                    logLevel = Level.FINEST;
-                }
-                if (line.hasOption("debug-run")) {
-                    FreeColDebugger.configureDebugRun(line.getOptionValue("debug-run"));
-                }
+                if (!line.hasOption("log-level")) logLevel = Level.FINEST;
+            }
+            if (line.hasOption("debug-run")) {
+                FreeColDebugger.enableDebugMode(FreeColDebugger.DebugMode.MENUS);
+                FreeColDebugger.configureDebugRun(line.getOptionValue("debug-run"));
             }
             if (line.hasOption("server")) {
                 standAloneServer = true;

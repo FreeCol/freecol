@@ -24,7 +24,7 @@ public class UserServerAPI extends ServerAPI {
 
     @Override
     protected void doRaiseErrorMessage(String complaint) {
-        if (FreeColDebugger.isInDebugMode()) {
+        if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.COMMS)) {
             gui.errorMessage(null, complaint);
         }
     }

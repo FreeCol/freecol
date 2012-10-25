@@ -24,6 +24,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 
+import java.util.Locale;
 import java.util.logging.Logger;
 import java.util.logging.LogRecord;
 
@@ -33,35 +34,23 @@ import net.sf.freecol.server.FreeColServer;
 
 /**
  * High-level debug handling.
- * Throughout the code, routines check getDebugLevel().  The level enables
- * various things:
- *   - OFF turns on nothing
- *   - LIMITED turns on lots of miscellaneous stuff
- *     - debug menu actions including turn skipping
- *     - extra commands
- *       - Set Goods in ColonyPanel
- *       - Take Ownership in TilePopup
- *       - DebugForeignColony in Canvas
- *     - extra displays
- *       - goods-in-market tooltip in MarketLabel
- *       - display of region and mission in MapViewer
- *     - verbose (non-i18n) server error message display
- *   - FULL turns on the prepopulated colony in new games
- *   - FULL_COMMS turns on trace printing of c-s communications
  */
 public class FreeColDebugger {
 
     private static final Logger logger = Logger.getLogger(FreeColDebugger.class.getName());
 
-    public static final int DEBUG_OFF = 0;
+    public static enum DebugMode {
+        COMMS, // Trace print full c-s communications, and verbose
+               // (non-i18n) server errors.
+        MENUS, // Enable the Debug menu, the extra commands in
+               // ColonyPanel and TilePopup, the goods-in-market
+               // tooltip in MarketLabel the region and Mission
+               // displays in MapViewer, and turn skipping.
+        INIT   // An initial colony is made, and goods added to all
+               // native settlements.
+    }
 
-    public static final int DEBUG_LIMITED = 1;
-
-    public static final int DEBUG_FULL = 2;
-
-    public static final int DEBUG_FULL_COMMS = 3;
-
-    private static int debugLevel = DEBUG_OFF;
+    private static int debugMode = 0;
 
     /**
      * The number of turns to run without stopping.
@@ -75,17 +64,90 @@ public class FreeColDebugger {
 
 
     /**
-     * Configures the debug level.
+     * Is a debug mode enabled in this game?
+     *
+     * @return True if any debug mode is enabled.
+     */
+    public static boolean isInDebugMode() {
+        return FreeColDebugger.debugMode != 0;
+    }
+
+    /**
+     * Is a particular debug mode enabled in this game?
+     *
+     * @param mode The <code>DebugMode</code> to test.
+     * @return True if the specified mode is enabled.
+     */
+    public static boolean isInDebugMode(DebugMode mode) {
+        return ((1 << mode.ordinal()) & FreeColDebugger.debugMode) != 0;
+    }
+
+    /**
+     * Sets the debug mode
+     *
+     * @param mode The new debug mode.
+     */
+    private static void setDebugMode(int mode) {
+        FreeColDebugger.debugMode = mode;
+    }
+
+    /**
+     * Enables a particular debug mode.
+     *
+     * @param mode The <code>DebugMode</code> to enable.
+     */
+    public static void enableDebugMode(DebugMode mode) {
+        FreeColDebugger.debugMode |= 1 << mode.ordinal();
+    }
+
+    /**
+     * Gets the debug modes.
+     *
+     * @return A string containing the modes as csv.
+     */
+    public static String getDebugModes() {
+        String ret = "";
+        for (DebugMode mode : DebugMode.values()) {
+            if (isInDebugMode(mode)) ret += "," + mode.toString();
+        }
+        return (ret.length() > 0) ? ret.substring(1, ret.length())
+            : ret;
+    }
+
+    /**
+     * Configures the debug modes.
      *
      * @param optionValue The command line option.
      */
-    public static void configureDebugLevel(String optionValue) {
+    public static void setDebugModes(String optionValue) {
+        if (optionValue == null) return;
+        // @compat 0.10.x
         try {
-            setDebugLevel(Math.min(Math.max(Integer.parseInt(optionValue),
-                                            DEBUG_OFF),
-                                   DEBUG_FULL_COMMS));
-        } catch (NumberFormatException e) {
-            setDebugLevel(DEBUG_FULL);
+            int i = Integer.parseInt(optionValue);
+            switch (i) {
+            case 3:
+                enableDebugMode(DebugMode.COMMS);
+                // Fall through
+            case 2:
+                enableDebugMode(DebugMode.INIT);
+                // Fall through
+            case 1:
+                enableDebugMode(DebugMode.MENUS);
+                return;
+            default:
+                break;
+            }
+        } catch (NumberFormatException nfe) {}
+        // @end compatibility code
+
+        for (String s : optionValue.split(",")) {
+            try {
+                DebugMode mode = Enum.valueOf(DebugMode.class,
+                                              s.toUpperCase(Locale.US));
+                enableDebugMode(mode);
+            } catch (Exception e) {
+                logger.warning("Unrecognized debug mode: " + optionValue);
+            }
         }
     }
 
@@ -96,50 +158,14 @@ public class FreeColDebugger {
      */
     public static void configureDebugRun(String option) {
         int comma = option.indexOf(",");
-        String turns = option.substring(0, (comma < 0) ? option.length() : comma);
+        String turns = option.substring(0, (comma < 0) ? option.length()
+            : comma);
         try {
             setDebugRunTurns(Integer.parseInt(turns));
         } catch (NumberFormatException e) {
             setDebugRunTurns(-1);
         }
         if (comma > 0) setDebugRunSave(option.substring(comma + 1));
-    }
-
-    /**
-     * Gets the debug level.
-     *
-     * @return The debug level.
-     */
-    public static int getDebugLevel() {
-        return FreeColDebugger.debugLevel;
-    }
-
-    /**
-     * Sets the debug level.
-     *
-     * @param level The new debug level.
-     */
-    private static void setDebugLevel(int level) {
-        FreeColDebugger.debugLevel = level;
-    }
-
-    /**
-     * Checks if the program is in debug mode.
-     *
-     * @return True if the program is in debug mode.
-     */
-    public static boolean isInDebugMode() {
-        return getDebugLevel() > DEBUG_OFF;
-    }
-
-    /**
-     * Sets the "debug mode" to be active or not.
-     *
-     * @param debug Should be <code>true</code> in order to active
-     *      debug mode and <code>false</code> otherwise.
-     */
-    public static void setInDebugMode(boolean debug) {
-        setDebugLevel((debug) ? DEBUG_FULL : DEBUG_OFF);
     }
 
     /**

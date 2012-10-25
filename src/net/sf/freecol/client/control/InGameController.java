@@ -163,15 +163,10 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Sets the "debug mode" to be active or not. Calls
-     * {@link FreeColDebugger#setInDebugMode(boolean)} and reinitialize the
-     * <code>FreeColMenuBar</code>.
-     *
-     * @param debug Set to <code>true</code> to enable debug mode.
+     * Sets the debug mode to include the extra menu commands.
      */
-    public void setInDebugMode(boolean debug) {
-        FreeColDebugger.setInDebugMode(debug);
-        logger.info("Debug mode set to " + debug);
+    public void setInDebugMode() {
+        FreeColDebugger.enableDebugMode(FreeColDebugger.DebugMode.MENUS);
         gui.updateMenuBar();
     }
 

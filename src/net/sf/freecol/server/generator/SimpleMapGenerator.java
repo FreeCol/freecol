@@ -668,7 +668,7 @@ public class SimpleMapGenerator implements MapGenerator {
         }
         settlement.placeSettlement(true);
 
-        if (FreeColDebugger.getDebugLevel() >= FreeColDebugger.DEBUG_FULL) {
+        if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.INIT)) {
             for (GoodsType type : map.getSpecification().getGoodsTypeList()) {
                 if (type.isNewWorldGoodsType()) settlement.addGoods(type, 150);
             }
@@ -835,7 +835,7 @@ public class SimpleMapGenerator implements MapGenerator {
                 }
             }
 
-            if (FreeColDebugger.getDebugLevel() >= FreeColDebugger.DEBUG_FULL) {
+            if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.INIT)) {
                 createDebugUnits(map, player, startTile);
                 IntegerOption op = spec.getIntegerOption(GameOptions.STARTING_MONEY);
                 if (op != null) op.setValue(10000);

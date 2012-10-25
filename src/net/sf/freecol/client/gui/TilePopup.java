@@ -207,7 +207,7 @@ public final class TilePopup extends JPopupMenu {
             add(activateAllItem);
         }
 
-        if (FreeColDebugger.isInDebugMode()
+        if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)
             && freeColClient.getFreeColServer() != null) {
             addDebugItems(freeColClient, tile);
         }

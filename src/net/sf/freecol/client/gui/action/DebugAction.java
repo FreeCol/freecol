@@ -56,7 +56,7 @@ public class DebugAction extends FreeColAction {
      */
     @Override
     public boolean shouldBeEnabled() {
-        return !FreeColDebugger.isInDebugMode();
+        return !FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS);
     }
 
     /**
@@ -66,7 +66,7 @@ public class DebugAction extends FreeColAction {
      */
     public void actionPerformed(ActionEvent e) {
         if (shouldBeEnabled()) {
-            inGameController.setInDebugMode(true);
+            inGameController.setInDebugMode();
             freeColClient.getConnectController().reconnect();
         }
     }

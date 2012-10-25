@@ -452,7 +452,7 @@ public final class InGameInputHandler extends InputHandler {
         final Player newPlayer = getGame()
             .getFreeColGameObject(element.getAttribute("player"), Player.class);
         final boolean newTurn = player.equals(newPlayer);
-        if (FreeColDebugger.isInDebugMode()
+        if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)
             && fcc.currentPlayerIsMyPlayer()) closeMenus();
         FreeColDebugger.finishDebugRun(fcc, false);
 

@@ -1825,7 +1825,7 @@ public final class Canvas extends JDesktopPane {
         if (s instanceof Colony) {
             if (s.getOwner().equals(freeColClient.getMyPlayer())) {
                 showColonyPanel((Colony) s);
-            } else if (FreeColDebugger.isInDebugMode()) {
+            } else if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
                 debugForeignColony(s);
             }
         } else if (s instanceof IndianSettlement) {

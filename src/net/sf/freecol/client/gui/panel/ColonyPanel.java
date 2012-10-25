@@ -155,7 +155,8 @@ public final class ColonyPanel extends PortPanel
 
     private JButton colonyUnitsButton = new JButton(Messages.message("Colony Units"));
 
-    private JButton setGoodsButton = (FreeColDebugger.isInDebugMode())
+    private JButton setGoodsButton
+        = (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS))
         ? new JButton("Set Goods") : null;
 
 
@@ -1276,7 +1277,8 @@ public final class ColonyPanel extends PortPanel
          */
         private void update() {
             ClientOptions options = getClientOptions();
-            final int threshold = (FreeColDebugger.isInDebugMode()) ? 1
+            final int threshold = (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS))
+                ? 1
                 : options.getInteger(ClientOptions.MIN_NUMBER_FOR_DISPLAYING_GOODS);
             final Colony colony = getColony();
             final Game game = colony.getGame();

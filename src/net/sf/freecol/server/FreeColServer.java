@@ -51,6 +51,7 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.FreeColSeed;
+import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
@@ -860,9 +861,11 @@ public final class FreeColServer {
             xsw.writeAttribute("singleplayer", Boolean.toString(singlePlayer));
             xsw.writeAttribute("version", Integer.toString(SAVEGAME_VERSION));
             xsw.writeAttribute("randomState", Utils.getRandomState(random));
+            xsw.writeAttribute("debug", FreeColDebugger.getDebugModes());
             if (getActiveUnit() != null) {
                 xsw.writeAttribute("activeUnit", getActiveUnit().getId());
             }
+            
             // Add server side model information:
             xsw.writeStartElement("serverObjects");
             for (ServerModelObject smo : game.getServerModelObjects()) {
@@ -962,6 +965,7 @@ public final class FreeColServer {
                         "publicServer", false));
                 String randomState = xsr.getAttributeValue(null, "randomState");
                 server.setServerRandom(Utils.restoreRandomState(randomState));
+                FreeColDebugger.setDebugModes(xsr.getAttributeValue(null, "debug"));
                 server.setOwner(xsr.getAttributeValue(null, "owner"));
                 active = xsr.getAttributeValue(null, "activeUnit");
             }
@@ -1481,6 +1485,7 @@ public final class FreeColServer {
      * @return a <code>boolean</code> value
      */
     public boolean newHighScore(Player player) {
+        if (FreeColDebugger.isInDebugMode()) return false;
         getHighScores();
         if (!highScores.isEmpty() && player.getScore() <= highScores.get(highScores.size() - 1).getScore()) {
             return false;

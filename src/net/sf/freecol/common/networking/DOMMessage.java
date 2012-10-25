@@ -110,7 +110,7 @@ public class DOMMessage {
         throws SAXException, IOException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         Document tempDocument = null;
-        boolean dumpMsgOnError = true; // FreeCol.isInDebugMode();
+        boolean dumpMsgOnError = true;
         if (dumpMsgOnError) {
             /*
              * inputSource.setByteStream( new
@@ -399,7 +399,9 @@ public class DOMMessage {
      */
     public static Element clientError(String message) {
         logger.warning(message);
-        if (FreeColDebugger.isInDebugMode()) Thread.dumpStack();
+        if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.COMMS)) {
+            Thread.dumpStack();
+        }
         return createMessage("error",
             "messageID", "server.reject",
             "message", message);

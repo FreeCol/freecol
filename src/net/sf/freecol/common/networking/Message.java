@@ -96,7 +96,8 @@ public class Message {
     private Message(InputSource inputSource) throws SAXException, IOException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         Document tempDocument = null;
-        boolean dumpMsgOnError = FreeColDebugger.isInDebugMode();
+        boolean dumpMsgOnError
+            = FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.COMMS);
         if (dumpMsgOnError) {
             /*
              * inputSource.setByteStream( new

@@ -1116,7 +1116,7 @@ public abstract class ServerAPI {
             String messageId = reply.getAttribute("messageID");
             String messageText = reply.getAttribute("message");
             if (messageId != null && messageText != null
-                && FreeColDebugger.isInDebugMode()) {
+                && FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.COMMS)) {
                 // If debugging suppress the bland but i18n compliant
                 // failure message in favour of the higher detail
                 // non-i18n text.

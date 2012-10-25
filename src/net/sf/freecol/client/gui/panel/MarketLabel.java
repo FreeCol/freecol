@@ -112,7 +112,7 @@ public final class MarketLabel extends AbstractGoodsLabel implements Draggable {
             toolTipText = Messages.message(getType().getLabel(false));
             setEnabled(false);
         }
-        if (FreeColDebugger.isInDebugMode()) {
+        if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
             toolTipText += " " + market.getAmountInMarket(getType());
         }
         setToolTipText(toolTipText);

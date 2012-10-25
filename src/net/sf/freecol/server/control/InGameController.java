@@ -173,7 +173,8 @@ public final class InGameController extends Controller {
      * @return The number of terms to skip.
      */
     public int getSkippedTurns() {
-        return (FreeColDebugger.isInDebugMode()) ? debugOnlyAITurns : -1;
+        return (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS))
+            ? debugOnlyAITurns : -1;
     }
 
     /**
@@ -182,7 +183,7 @@ public final class InGameController extends Controller {
      * @param turns The number of turns to skip through.
      */
     public void setSkippedTurns(int turns) {
-        if (FreeColDebugger.isInDebugMode()) {
+        if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
             debugOnlyAITurns = turns;
         }
     }
@@ -194,7 +195,7 @@ public final class InGameController extends Controller {
      * @param action The <code>MonarchAction</code> to be taken.
      */
     public void setMonarchAction(Player player, MonarchAction action) {
-        if (FreeColDebugger.isInDebugMode()) {
+        if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
             debugMonarchPlayer = (ServerPlayer) player;
             debugMonarchAction = action;
         }

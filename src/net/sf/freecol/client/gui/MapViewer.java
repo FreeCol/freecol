@@ -2319,7 +2319,7 @@ public final class MapViewer {
             break;
         case ClientOptions.DISPLAY_TILE_TEXT_REGIONS:
             if (tile.getRegion() != null) {
-                if (FreeColDebugger.isInDebugMode()
+                if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)
                     && tile.getRegion().getName() == null) {
                     text = Utils.lastPart(tile.getRegion().getNameKey(), ".");
                 } else {
@@ -2618,7 +2618,7 @@ public final class MapViewer {
 
         // FOR DEBUGGING
         net.sf.freecol.server.ai.AIUnit au;
-        if (FreeColDebugger.isInDebugMode()
+        if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)
             && !freeColClient.getMyPlayer().owns(unit)
             && freeColClient.getFreeColServer() != null
             && (au = freeColClient.getFreeColServer().getAIMain()

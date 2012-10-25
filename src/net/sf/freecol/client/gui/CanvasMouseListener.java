@@ -75,7 +75,7 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
         try {
             if (e.getClickCount() > 1) {
                 Tile tile = mapViewer.convertToMapTile(e.getX(), e.getY());
-                if (FreeColDebugger.isInDebugMode()) {
+                if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
                     if (tile.getSettlement() != null) {
                         canvas.debugForeignColony(tile.getSettlement());
                     }
