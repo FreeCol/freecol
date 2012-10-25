@@ -1003,8 +1003,12 @@ public class IndianSettlement extends Settlement {
             : Utils.getRandomMember(logger, "Gift type", goodsList, random);
     }
 
+    /**
+     * Is a new convert available at this settlement?
+     *
+     * @return True if a new convert is available.
+     */
     public boolean checkForNewMissionaryConvert() {
-
         /* Increase convert progress and generate convert if needed. */
         if (missionary != null && getGame().getViewOwner() == null) {
             int increment = 8;
@@ -1014,10 +1018,6 @@ public class IndianSettlement extends Settlement {
                 increment = 13;
             }
 
-            if (missionary.getOwner() == null) {
-                throw new IllegalStateException("Null missionary owner at "
-                    + getName());
-            }
             // Increase increment if alarm level is high.
             increment += 2 * getAlarm(missionary.getOwner()).getValue() / 100;
             convertProgress += increment;

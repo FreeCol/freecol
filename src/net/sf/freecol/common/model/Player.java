@@ -723,6 +723,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Gets a fresh list of all colonies this player owns.
+     * It is an error to call this on non-European players.
      *
      * @return A fresh list of the colonies this player owns.
      */
@@ -792,12 +793,14 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Returns a list of all IndianSettlements this player owns.
+     * Gets a list of all the IndianSettlements this player owns.
+     * It is an error to call this on non-native players.
      *
      * @return The indian settlements this player owns.
      */
     public List<IndianSettlement> getIndianSettlements() {
-        ArrayList<IndianSettlement> indianSettlements = new ArrayList<IndianSettlement>();
+        List<IndianSettlement> indianSettlements
+            = new ArrayList<IndianSettlement>();
         for (Settlement s : settlements) {
             if (s instanceof IndianSettlement) {
                 indianSettlements.add((IndianSettlement) s);
@@ -834,7 +837,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *     mission type.
      */
     public List<IndianSettlement> getIndianSettlementsWithMission(Player other) {
-        ArrayList<IndianSettlement> indianSettlements
+        List<IndianSettlement> indianSettlements
             = new ArrayList<IndianSettlement>();
         for (Settlement s : settlements) {
             Unit missionary;

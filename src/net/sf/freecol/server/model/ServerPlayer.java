@@ -1457,27 +1457,26 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 .getUnitTypesWithAbility("model.ability.convert");
             StringTemplate nation = getNationName();
             for (IndianSettlement settlement : allSettlements) {
-                if (settlement.checkForNewMissionaryConvert()) {
-                    Unit missionary = settlement.getMissionary();
-                    ServerPlayer other = (ServerPlayer) missionary.getOwner();
-                    Settlement colony = settlement.getTile()
-                        .getNearestSettlement(other, MAX_CONVERT_DISTANCE);
-                    if (colony != null && converts.size() > 0) {
-                        Unit brave = settlement.getUnitList().get(0);
-                        brave.clearEquipment();
-                        brave.setOwner(other);
-                        brave.setIndianSettlement(null);
-                        brave.setNationality(other.getNationID());
-                        brave.setType(Utils.getRandomMember(logger,
-                                "Choose brave", converts, random));
-                        brave.setLocation(colony.getTile());
-                        cs.add(See.perhaps(), colony.getTile(), settlement);
-                        cs.addMessage(See.only(other),
-                            new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
-                                "model.colony.newConvert", brave)
+                if (!settlement.checkForNewMissionaryConvert()) continue;
+                Unit missionary = settlement.getMissionary();
+                ServerPlayer other = (ServerPlayer) missionary.getOwner();
+                Settlement colony = settlement.getTile()
+                    .getNearestSettlement(other, MAX_CONVERT_DISTANCE);
+                if (colony != null && converts.size() > 0) {
+                    Unit brave = settlement.getUnitList().get(0);
+                    brave.clearEquipment();
+                    brave.setOwner(other);
+                    brave.setIndianSettlement(null);
+                    brave.setNationality(other.getNationID());
+                    brave.setType(Utils.getRandomMember(logger,
+                                  "Choose brave", converts, random));
+                    brave.setLocation(colony.getTile());
+                    cs.add(See.perhaps(), colony.getTile(), settlement);
+                    cs.addMessage(See.only(other),
+                        new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
+                            "model.colony.newConvert", brave)
                             .addStringTemplate("%nation%", nation)
                             .addName("%colony%", colony.getName()));
-                    }
                 }
             }
         }

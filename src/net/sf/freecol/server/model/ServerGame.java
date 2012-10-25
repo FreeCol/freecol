@@ -39,6 +39,7 @@ import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColGameObjectListener;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
+import net.sf.freecol.common.model.HighSeas;
 import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Limit;
@@ -290,12 +291,16 @@ public class ServerGame extends Game implements ServerModelObject {
                 + " cedes to " + strongestAIPlayer.getName()
                 + ":";
             for (Player player : getPlayers()) {
+                if (!player.isIndian()) continue;
                 for (IndianSettlement settlement
                          : player.getIndianSettlementsWithMission(weakestAIPlayer)) {
                     logMe += " " + settlement.getName() + "(mission)";
+                    settlement.makeContactSettlement(strongestAIPlayer);
                     Unit missionary = settlement.getMissionary();
                     missionary.setOwner(strongestAIPlayer);
-                    settlement.getTile().updatePlayerExploredTiles();
+                    Tile t = settlement.getTile();
+                    t.updatePlayerExploredTile(strongestAIPlayer, true);
+                    t.updatePlayerExploredTiles();
                     cs.add(See.perhaps().always((ServerPlayer)strongestAIPlayer),
                            settlement);
                 }
@@ -312,6 +317,8 @@ public class ServerGame extends Game implements ServerModelObject {
                 logMe += " " + unit.getId();
                 if (unit.getLocation() instanceof Europe) {
                     unit.setLocation(strongestAIPlayer.getEurope());
+                } else if (unit.getLocation() instanceof HighSeas) {
+                    unit.setLocation(strongestAIPlayer.getHighSeas());
                 }
                 cs.add(See.perhaps(), unit);
             }
