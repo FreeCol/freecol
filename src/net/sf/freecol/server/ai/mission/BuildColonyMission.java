@@ -251,16 +251,14 @@ public class BuildColonyMission extends Mission {
      * {@inheritDoc}
      */
     public void setTarget(Location target) {
-        if (target instanceof Colony || target instanceof Tile) {
+        if (target == null
+            || target instanceof Colony || target instanceof Tile) {
             boolean retarget = this.target != null && this.target != target;
             this.target = target;
             this.colonyValue = (target instanceof Tile)
                 ? getAIUnit().getUnit().getOwner().getColonyValue((Tile)target)
                 : -1;
             if (retarget) retargetTransportable();
-        } else {
-            throw new IllegalArgumentException("Colony or tile expected: "
-                + target);
         }
     }
 
@@ -374,7 +372,7 @@ public class BuildColonyMission extends Mission {
             && (player.getColonyValue((Tile)target)) < colonyValue) {
             reason = "target tile " + target + " value fell";
         }
-        if (reason != null) retargetMission(tag, reason);
+        if (reason != null && !retargetMission(tag, reason)) return;
 
         // Go there.
         if (travelToTarget(tag, getTarget(),

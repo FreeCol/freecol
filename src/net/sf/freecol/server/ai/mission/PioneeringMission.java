@@ -382,12 +382,15 @@ public class PioneeringMission extends Mission {
      * {@inheritDoc}
      */
     public void setTarget(Location target) {
-        boolean retarget = this.target != null && this.target != target;
-        this.target = target;
-        setTileImprovementPlan((target instanceof Tile)
-            ? getBestPlan((Tile)target)
-            : null);
-        if (retarget) retargetTransportable();
+        if (target == null
+            || target instanceof Colony || target instanceof Tile) {
+            boolean retarget = this.target != null && this.target != target;
+            this.target = target;
+            setTileImprovementPlan((target instanceof Tile)
+                ? getBestPlan((Tile)target)
+                : null);
+            if (retarget) retargetTransportable();
+        }
     }
 
     /**

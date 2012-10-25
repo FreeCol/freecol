@@ -271,9 +271,11 @@ public class MissionaryMission extends Mission {
      * {@inheritDoc}
      */
     public void setTarget(Location target) {
-        boolean retarget = this.target != null && this.target != target;
-        this.target = target;
-        if (retarget) retargetTransportable();
+        if (target == null || target instanceof Settlement) {
+            boolean retarget = this.target != null && this.target != target;
+            this.target = target;
+            if (retarget) retargetTransportable();
+        }
     }
 
     /**

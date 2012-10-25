@@ -330,13 +330,12 @@ public class UnitSeekAndDestroyMission extends Mission {
      * {@inheritDoc}
      */
     public void setTarget(Location target) {
-        if (!(target instanceof Unit || target instanceof Settlement)) {
-            throw new IllegalArgumentException("Invalid seek+destroy target: "
-                + target);
+        if (target == null
+            || target instanceof Unit || target instanceof Settlement) {
+            boolean retarget = this.target != null && this.target != target;
+            this.target = target;
+            if (retarget) retargetTransportable();
         }
-        boolean retarget = this.target != null && this.target != target;
-        this.target = target;
-        if (retarget) retargetTransportable();
     }
 
     /**

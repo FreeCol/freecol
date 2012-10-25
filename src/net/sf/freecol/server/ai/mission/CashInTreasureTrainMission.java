@@ -260,12 +260,11 @@ public class CashInTreasureTrainMission extends Mission {
      * {@inheritDoc}
      */
     public void setTarget(Location target) {
-        if (target instanceof Europe || target instanceof Colony) {
+        if (target == null
+            || target instanceof Europe || target instanceof Colony) {
             boolean retarget = this.target != null && this.target != target;
             this.target = target;
             if (retarget) retargetTransportable();
-        } else {
-            throw new IllegalArgumentException("Bad cash in site: " + target);
         }
     }
 

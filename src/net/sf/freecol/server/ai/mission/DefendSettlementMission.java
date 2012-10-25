@@ -227,13 +227,10 @@ public class DefendSettlementMission extends Mission {
      * {@inheritDoc}
      */
     public void setTarget(Location target) {
-        if (target instanceof Settlement) {
+        if (target == null || target instanceof Settlement) {
             boolean retarget = this.target != null && this.target != target;
             this.target = target;
             if (retarget) retargetTransportable();
-        } else {
-            throw new IllegalArgumentException("Target is not a settlement: "
-                + target);
         }
     }
 
