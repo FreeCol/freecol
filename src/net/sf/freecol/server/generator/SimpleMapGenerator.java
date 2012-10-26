@@ -646,8 +646,7 @@ public class SimpleMapGenerator implements MapGenerator {
             = generateSkillForLocation(map, tile, player.getNationType());
         IndianSettlement settlement
             = new ServerIndianSettlement(map.getGame(), player, name, tile,
-                                         capital, skill,
-                                         new HashSet<Player>(), null);
+                                         capital, skill, null);
         player.addSettlement(settlement);
         logger.fine("Generated skill: " + settlement.getLearnableSkill());
 

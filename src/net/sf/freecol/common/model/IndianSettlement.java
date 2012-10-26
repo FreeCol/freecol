@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
@@ -54,6 +55,7 @@ public class IndianSettlement extends Settlement {
 
     public static final int TALES_RADIUS = 6;
 
+    public static final String CONTACT_LEVEL_TAG_NAME = "contactLevel";
     public static final String OWNED_UNITS_TAG_NAME = "ownedUnits";
     public static final String IS_VISITED_TAG_NAME = "isVisited";
     public static final String ALARM_TAG_NAME = "alarm";
@@ -99,22 +101,27 @@ public class IndianSettlement extends Settlement {
     protected UnitType learnableSkill = null;
 
     /** The goods this settlement wants. */
-    protected GoodsType[] wantedGoods = new GoodsType[] {null, null, null};
+    protected GoodsType[] wantedGoods = new GoodsType[] { null, null, null };
 
+    /**
+     * The level of contact between a player and this settlement.
+     */
+    public static enum ContactLevel { UNCONTACTED, CONTACTED, SCOUTED };
+        
     /**
      * A map that tells if a player has spoken to the chief of this settlement.
      *
      * At the client side, only the information regarding the player
      * on that client should be included.
      */
-    protected Set<Player> spokenTo = new HashSet<Player>();
+    protected final java.util.Map<Player, ContactLevel> contactLevels
+        = new HashMap<Player, ContactLevel>();
 
     /** Units that belong to this settlement. */
     protected List<Unit> ownedUnits = new ArrayList<Unit>();
 
     /** The missionary at this settlement. */
     protected Unit missionary = null;
-
 
     /** Used for monitoring the progress towards creating a convert. */
     protected int convertProgress = 0;
@@ -254,225 +261,6 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
-     * Gets the alarm level towards the given player.
-     *
-     * @param player The <code>Player</code> to get the alarm level for.
-     * @return The current alarm level or null if the settlement has not
-     *     encoutered the player.
-     */
-    public Tension getAlarm(Player player) {
-        return alarm.get(player);
-    }
-
-    /**
-     * Sets alarm towards the given player.
-     *
-     * @param newAlarm The new alarm value.
-     */
-    public void setAlarm(Player player, Tension newAlarm) {
-        if (player != null && player != owner) {
-            alarm.put(player, newAlarm);
-            updateMostHated();
-        }
-    }
-
-    /**
-     * Removes all alarm towards the given player.  Used the a player leaves
-     * the game.
-     *
-     * @param player The <code>Player</code> to remove the alarm for.
-     */
-    public void removeAlarm(Player player) {
-        if (player != null) {
-            alarm.remove(player);
-            updateMostHated();
-        }
-    }
-
-    /**
-     * Change the alarm level of this settlement by a given amount.
-     *
-     * @param player The <code>Player</code> the alarm level changes wrt.
-     * @param amount The amount to change the alarm by.
-     * @return True if the <code>Tension.Level</code> of the
-     *     settlement alarm changes as a result of this change.
-     */
-    protected boolean changeAlarm(Player player, int amount) {
-        Tension alarm = getAlarm(player);
-        Level oldLevel = alarm.getLevel();
-        alarm.modify(amount);
-        updateMostHated();
-        return oldLevel != alarm.getLevel();
-    }
-
-    /**
-     * Gets a messageId for a short alarm message associated with the
-     * alarm level of this player.
-     *
-     * @param player The other <code>Player</code>.
-     * @return The alarm messageId.
-     */
-    public String getShortAlarmLevelMessageId(Player player) {
-        return (!player.hasContacted(owner)) ? "tension.wary"
-            : (hasContactedSettlement(player)) ? getAlarm(player).getKey()
-            : "indianSettlement.tensionUnknown";
-    }
-
-    /**
-     * Gets a messageId for an alarm message associated with the
-     * alarm level of this player.
-     *
-     * @param player The other <code>Player</code>.
-     * @return The alarm messageId.
-     */
-    public String getAlarmLevelMessageId(Player player) {
-        Tension alarm = (hasContactedSettlement(player)) ? getAlarm(player)
-            : new Tension(Tension.TENSION_MIN);
-        return "indianSettlement.alarm." + alarm.getKey();
-    }
-
-    /**
-     * Has a player contacted this settlement?
-     *
-     * @param player The <code>Player</code> to check.
-     * @return True if the player has contacted this settlement.
-     */
-    public boolean hasContactedSettlement(Player player) {
-        return getAlarm(player) != null;
-    }
-
-    /**
-     * Make contact with this settlement (if it has not been
-     * previously contacted).  Initialize tension level to the general
-     * level with respect to the contacting player--- effectively the
-     * average reputation of this player with the overall tribe.
-     *
-     * @param player The <code>Player</code> making contact.
-     * @return True if this was indeed the first contact between settlement
-     *     and player.
-     */
-    public boolean makeContactSettlement(Player player) {
-        if (!hasContactedSettlement(player)) {
-            setAlarm(player, new Tension(owner.getTension(player).getValue()));
-            return true;
-         }
-         return false;
-     }
-
-    /**
-     * Returns true if a European player has spoken with the chief of
-     * this settlement.
-     *
-     * @return True if a European player has spoken with the chief.
-     */
-    public boolean hasSpokenToChief() {
-        Iterator<Player> playerIterator = spokenTo.iterator();
-        while (playerIterator.hasNext()) {
-            if (playerIterator.next().isEuropean()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Returns true if a the given player has spoken with the chief of
-     * this settlement.
-     *
-     * @param player The <code>Player</code> to check.
-     * @return True if the player has visited this settlement to speak
-     *     with the chief.
-     */
-    public boolean hasSpokenToChief(Player player) {
-        return spokenTo.contains(player);
-    }
-
-    /**
-     * Sets the spoken-to status of this settlement to true, indicating
-     * that a European player has had a chat with the chief.
-     *
-     * @param player The visiting <code>Player</code>.
-     */
-    public void setSpokenToChief(Player player) {
-        if (!hasSpokenToChief(player)) {
-            makeContactSettlement(player); // Just to be sure
-            spokenTo.add(player);
-        }
-    }
-
-    /**
-     * Is a unit permitted to make contact with this settlement?
-     * The unit must be from a nation that has already made contact,
-     * or in the first instance, must be arriving by land, with the
-     * exception of trading ships.
-     *
-     * @param unit The <code>Unit</code> that proposes to contact this
-     *             settlement.
-     * @return True if the settlement accepts such contact.
-     */
-    public boolean allowContact(Unit unit) {
-        return unit.getOwner().hasContacted(owner)
-            || !unit.isNaval()
-            || unit.hasGoodsCargo();
-    }
-
-
-    /**
-     * Adds the given <code>Unit</code> to the list of units that belongs to this
-     * <code>IndianSettlement</code>.
-     *
-     * @param unit The <code>Unit</code> to be added.
-     */
-    public void addOwnedUnit(Unit unit) {
-        if (unit == null) {
-            throw new IllegalArgumentException("Parameter 'unit' must not be 'null'.");
-        }
-
-        if (!ownedUnits.contains(unit)) {
-            ownedUnits.add(unit);
-        }
-    }
-
-
-    /**
-     * Gets a list of the units native to this settlement.
-     *
-     * @return The list of units native to this settlement.
-     */
-    public List<Unit> getOwnedUnits() {
-        return new ArrayList<Unit>(ownedUnits);
-    }
-
-    /**
-     * Gets an iterator over all the units this
-     * <code>IndianSettlement</code> is owning.
-     *
-     * @return The <code>Iterator</code>.
-     */
-    public Iterator<Unit> getOwnedUnitsIterator() {
-        return ownedUnits.iterator();
-    }
-
-
-    /**
-     * Removes the given <code>Unit</code> to the list of units that
-     * belongs to this <code>IndianSettlement</code>. Returns true if
-     * the Unit was removed.
-     *
-     * @param unit The <code>Unit</code> to be removed from the
-     *       list of the units this <code>IndianSettlement</code>
-     *       owns.
-     * @return a <code>boolean</code> value
-     */
-    public boolean removeOwnedUnit(Unit unit) {
-        if (unit == null) {
-            throw new IllegalArgumentException("Parameter 'unit' must not be 'null'.");
-        }
-        return ownedUnits.remove(unit);
-    }
-
-
-    /**
      * Gets the skill that can be learned at this settlement.
      *
      * @return The skill that can be learned at this settlement.
@@ -500,6 +288,19 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
+     * Gets the missionary from this settlement if there is one and
+     * it is owned by a specified player.
+     *
+     * @param player The player purported to own the missionary
+     * @return The missionary from this settlement if there is one and
+     *     it is owned by the specified player, otherwise null.
+     */
+    public Unit getMissionary(Player player) {
+        return (missionary == null || missionary.getOwner() != player) ? null
+            : missionary;
+    }
+
+    /**
      * Sets the missionary for this settlement.
      *
      * @param missionary The missionary for this settlement.
@@ -523,16 +324,43 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
-     * Gets the missionary from this settlement if there is one and
-     * it is owned by a specified player.
+     * Gets the convert progress status for this settlement.
      *
-     * @param player The player purported to own the missionary
-     * @return The missionary from this settlement if there is one and
-     *     it is owned by the specified player, otherwise null.
+     * @return The convert progress status.
      */
-    public Unit getMissionary(Player player) {
-        return (missionary == null || missionary.getOwner() != player) ? null
-            : missionary;
+    public int getConvertProgress() {
+        return convertProgress;
+    }
+
+    /**
+     * Sets the convert progress status for this settlement.
+     *
+     * @param progress The new convert progress status.
+     */
+    public void setConvertProgress(int progress) {
+        convertProgress = progress;
+    }
+
+
+    /**
+     * Gets the goods wanted by this settlement.
+     *
+     * @return The wanted goods list.
+     */
+    public GoodsType[] getWantedGoods() {
+        return wantedGoods;
+    }
+
+    /**
+     * Sets the goods wanted by this settlement.
+     *
+     * @param index Which of the (usually 3) goods to set.
+     * @param type The <code>GoodsType</code> wanted.
+     */
+    public void setWantedGoods(int index, GoodsType type) {
+        if (0 <= index && index < wantedGoods.length) {
+            wantedGoods[index] = type;
+        }
     }
 
     /**
@@ -563,32 +391,247 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
-     * Gets the convert progress status for this settlement.
+     * Gets the contact level between this settlement and a player.
      *
-     * @return The convert progress status.
+     * @param player The <code>Player</code> to check.
+     * @return The contact level.
      */
-    public int getConvertProgress() {
-        return convertProgress;
+    public ContactLevel getContactLevel(Player player) {
+        ContactLevel cl = contactLevels.get(player);
+        return (cl == null) ? ContactLevel.UNCONTACTED : cl;
     }
 
     /**
-     * Sets the convert progress status for this settlement.
+     * Has a player contacted this settlement?
      *
-     * @param progress The new convert progress status.
+     * @param player The <code>Player</code> to check.
+     * @return True if the player has contacted this settlement.
      */
-    public void setConvertProgress(int progress) {
-        convertProgress = progress;
+    public boolean hasContacted(Player player) {
+        return getContactLevel(player) != ContactLevel.UNCONTACTED;
     }
 
-
-    public GoodsType[] getWantedGoods() {
-        return wantedGoods;
-    }
-
-    public void setWantedGoods(int index, GoodsType type) {
-        if (0 <= index && index < wantedGoods.length) {
-            wantedGoods[index] = type;
+    /**
+     * Make contact with this settlement (if it has not been
+     * previously contacted).  Initialize tension level to the general
+     * level with respect to the contacting player--- effectively the
+     * average reputation of this player with the overall tribe.
+     *
+     * @param player The <code>Player</code> making contact.
+     * @return True if this was indeed the first contact between settlement
+     *     and player.
+     */
+    public boolean setContacted(Player player) {
+        if (!hasContacted(player)) {
+            contactLevels.put(player, ContactLevel.CONTACTED);
+            initializeAlarm(player);
+            return true;
         }
+        return false;
+    }
+
+    /**
+     * Has a player has spoken with the chief of this settlement.
+     *
+     * @param player The <code>Player</code> to check.
+     * @return True if the player has visited this settlement to speak
+     *     with the chief.
+     */
+    public boolean hasScouted(Player player) {
+        return getContactLevel(player) == ContactLevel.SCOUTED;
+    }
+
+    /**
+     * Sets the contact level of this settlement to indicate
+     * that a European player has had a chat with the chief.
+     *
+     * @param player The visiting <code>Player</code>.
+     * @return True if this was the first time the settlement was scouted
+     *     by the player.
+     */
+    public boolean setScouted(Player player) {
+        if (!hasScouted(player)) {
+            if (!hasContacted(player)) initializeAlarm(player);
+            contactLevels.put(player, ContactLevel.SCOUTED);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Has any European player spoken with the chief of this settlement.
+     *
+     * @return True if any European player has spoken with the chief.
+     */
+    public boolean hasAnyScouted() {
+        for (Player p : contactLevels.keySet()) {
+            if (hasScouted(p)) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Gets the alarm level towards the given player.
+     *
+     * @param player The <code>Player</code> to get the alarm level for.
+     * @return The current alarm level or null if the settlement has not
+     *     encoutered the player.
+     */
+    public Tension getAlarm(Player player) {
+        return alarm.get(player);
+    }
+
+    /**
+     * Sets alarm towards the given player.
+     *
+     * @param player The <code>Player</code> to set the alarm level for.
+     * @param newAlarm The new alarm value.
+     */
+    public void setAlarm(Player player, Tension newAlarm) {
+        if (player != null && player != owner) {
+            alarm.put(player, newAlarm);
+            updateMostHated();
+        }
+    }
+
+    /**
+     * Removes all alarm towards the given player.  Used the a player leaves
+     * the game.
+     *
+     * @param player The <code>Player</code> to remove the alarm for.
+     */
+    public void removeAlarm(Player player) {
+        if (player != null) {
+            alarm.remove(player);
+            updateMostHated();
+        }
+    }
+
+    /**
+     * Initialize the alarm at this settlement with respect to a
+     * player with the current national tension.
+     *
+     * @param player The <code>Player</code> to set the alarm level for.
+     */
+    private void initializeAlarm(Player player) {
+        Tension tension = owner.getTension(player);
+        setAlarm(player, new Tension((tension == null) ? 0
+                : tension.getValue()));
+    }
+
+    /**
+     * Change the alarm level of this settlement by a given amount.
+     *
+     * @param player The <code>Player</code> the alarm level changes wrt.
+     * @param amount The amount to change the alarm by.
+     * @return True if the <code>Tension.Level</code> of the
+     *     settlement alarm changes as a result of this change.
+     */
+    protected boolean changeAlarm(Player player, int amount) {
+        Tension alarm = getAlarm(player);
+        if (alarm == null) {
+            initializeAlarm(player);
+            alarm = getAlarm(player);
+        }
+        Level oldLevel = alarm.getLevel();
+        alarm.modify(amount);
+        updateMostHated();
+        return oldLevel != alarm.getLevel();
+    }
+
+    /**
+     * Gets a messageId for a short alarm message associated with the
+     * alarm level of this player.
+     *
+     * @param player The other <code>Player</code>.
+     * @return The alarm messageId.
+     */
+    public String getShortAlarmLevelMessageId(Player player) {
+        return (!player.hasContacted(owner)) ? "tension.wary"
+            : (hasContacted(player)) ? getAlarm(player).getKey()
+            : "indianSettlement.tensionUnknown";
+    }
+
+    /**
+     * Gets a messageId for an alarm message associated with the
+     * alarm level of this player.
+     *
+     * @param player The other <code>Player</code>.
+     * @return The alarm messageId.
+     */
+    public String getAlarmLevelMessageId(Player player) {
+        Tension alarm = (hasContacted(player)) ? getAlarm(player)
+            : new Tension(Tension.TENSION_MIN);
+        return "indianSettlement.alarm." + alarm.getKey();
+    }
+
+    /**
+     * Is a unit permitted to make contact with this settlement?
+     * The unit must be from a nation that has already made contact,
+     * or in the first instance, must be arriving by land, with the
+     * exception of trading ships.
+     *
+     * @param unit The <code>Unit</code> that proposes to contact this
+     *             settlement.
+     * @return True if the settlement accepts such contact.
+     */
+    public boolean allowContact(Unit unit) {
+        return unit.getOwner().hasContacted(owner)
+            || !unit.isNaval()
+            || unit.hasGoodsCargo();
+    }
+
+
+    /**
+     * Adds the given <code>Unit</code> to the list of units that
+     * belongs to this <code>IndianSettlement</code>.
+     *
+     * @param unit The <code>Unit</code> to be added.
+     */
+    public void addOwnedUnit(Unit unit) {
+        if (unit == null) {
+            throw new IllegalArgumentException("Parameter 'unit' must not be 'null'.");
+        }
+
+        if (!ownedUnits.contains(unit)) {
+            ownedUnits.add(unit);
+        }
+    }
+
+    /**
+     * Gets a list of the units native to this settlement.
+     *
+     * @return The list of units native to this settlement.
+     */
+    public List<Unit> getOwnedUnits() {
+        return new ArrayList<Unit>(ownedUnits);
+    }
+
+    /**
+     * Gets an iterator over all the units this
+     * <code>IndianSettlement</code> is owning.
+     *
+     * @return The <code>Iterator</code>.
+     */
+    public Iterator<Unit> getOwnedUnitsIterator() {
+        return ownedUnits.iterator();
+    }
+
+    /**
+     * Removes the given <code>Unit</code> to the list of units that
+     * belongs to this <code>IndianSettlement</code>. Returns true if
+     * the Unit was removed.
+     *
+     * @param unit The <code>Unit</code> to be removed from the
+     *       list of the units this <code>IndianSettlement</code>
+     *       owns.
+     * @return a <code>boolean</code> value
+     */
+    public boolean removeOwnedUnit(Unit unit) {
+        if (unit == null) {
+            throw new IllegalArgumentException("Parameter 'unit' must not be 'null'.");
+        }
+        return ownedUnits.remove(unit);
     }
 
 
@@ -608,7 +651,6 @@ public class IndianSettlement extends Settlement {
         }
         return result;
     }
-
 
 
     /**
@@ -1042,8 +1084,7 @@ public class IndianSettlement extends Settlement {
      */
     @Override
     public StringTemplate getLocationNameFor(Player player) {
-        return (hasContactedSettlement(player))
-            ? StringTemplate.name(getName())
+        return (hasContacted(player)) ? StringTemplate.name(getName())
             : StringTemplate.label("indianSettlement.nameUnknown");
     }
 
@@ -1135,10 +1176,8 @@ public class IndianSettlement extends Settlement {
      * {@inheritDoc}
      */
     public boolean propagateAlarm(Player player, int addToAlarm) {
-        if (hasContactedSettlement(player)) {
-            return changeAlarm(player, addToAlarm);
-        }
-        return false;
+        return (hasContacted(player)) ? changeAlarm(player, addToAlarm)
+            : false;
     }
 
     /**
@@ -1262,8 +1301,10 @@ public class IndianSettlement extends Settlement {
         PlayerExploredTile pet;
 
         if (showAll || toSavedGame || player == getOwner()) {
-            for (Player p : spokenTo) {
-                out.writeStartElement(IS_VISITED_TAG_NAME);
+            for (Player p : contactLevels.keySet()) {
+                out.writeStartElement(CONTACT_LEVEL_TAG_NAME);
+                out.writeAttribute("level",
+                    contactLevels.get(p).toString().toLowerCase(Locale.US));
                 out.writeAttribute("player", p.getId());
                 out.writeEndElement();
             }
@@ -1287,15 +1328,19 @@ public class IndianSettlement extends Settlement {
             super.writeChildren(out, player, showAll, toSavedGame);
 
         } else if ((pet = getTile().getPlayerExploredTile(player)) != null) {
-            if (hasSpokenToChief(player)) {
-                out.writeStartElement(IS_VISITED_TAG_NAME);
+            ContactLevel cl = contactLevels.get(player);
+            if (cl != null) {
+                out.writeStartElement(CONTACT_LEVEL_TAG_NAME);
+                out.writeAttribute("level",
+                    cl.toString().toLowerCase(Locale.US));
                 out.writeAttribute("player", player.getId());
                 out.writeEndElement();
             }
             if (getAlarm(player) != null) {
                 out.writeStartElement(ALARM_TAG_NAME);
                 out.writeAttribute("player", player.getId());
-                out.writeAttribute(VALUE_TAG, String.valueOf(getAlarm(player).getValue()));
+                out.writeAttribute(VALUE_TAG,
+                    String.valueOf(getAlarm(player).getValue()));
                 out.writeEndElement();
             }
             if (pet.getMissionary() != null) {
@@ -1335,7 +1380,7 @@ public class IndianSettlement extends Settlement {
      * {@inheritDoc}
      */
     protected void readChildren(XMLStreamReader in) throws XMLStreamException {
-        spokenTo.clear();
+        contactLevels.clear();
         alarm.clear();
         missionary = null;
         ownedUnits.clear();
@@ -1347,31 +1392,49 @@ public class IndianSettlement extends Settlement {
      */
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
         final Game game = getGame();
-        if (IS_VISITED_TAG_NAME.equals(in.getLocalName())) {
-            Player player = game.getFreeColGameObject(in.getAttributeValue(null, "player"),
-                                                      Player.class);
-            spokenTo.add(player);
-            in.nextTag(); // close tag is always generated.
-        } else if (ALARM_TAG_NAME.equals(in.getLocalName())) {
-            Player player = game.getFreeColGameObject(in.getAttributeValue(null, "player"),
-                                                      Player.class);
+        final String tag = in.getLocalName();
+
+        if (ALARM_TAG_NAME.equals(tag)) {
+            Player player = getFreeColGameObject(in, "player", Player.class);
+            // @compat 0.10.5
+            setContacted(player); // Alarm used to imply contact
+            // @end compatibility code
             alarm.put(player, new Tension(getAttribute(in, VALUE_TAG, 0)));
             in.nextTag(); // close element
-        } else if (WANTED_GOODS_TAG_NAME.equals(in.getLocalName())) {
-            String[] wantedGoodsID = readFromArrayElement(WANTED_GOODS_TAG_NAME,
-                                                          in, new String[0]);
+
+        } else if (CONTACT_LEVEL_TAG_NAME.equals(tag)) {
+            String levelString = in.getAttributeValue(null, "level");
+            ContactLevel cl = Enum.valueOf(ContactLevel.class,
+                levelString.toUpperCase(Locale.US));
+            Player player = getFreeColGameObject(in, "player", Player.class);
+            contactLevels.put(player, cl);
+            in.nextTag(); // close element
+
+        // @compat 0.10.5
+        } else if (IS_VISITED_TAG_NAME.equals(tag)) {
+            Player player = getFreeColGameObject(in, "player", Player.class);
+            setScouted(player);
+            in.nextTag(); // close element
+        // @end compatibility code
+
+        } else if (WANTED_GOODS_TAG_NAME.equals(tag)) {
+            String[] wantedGoodsID
+                = readFromArrayElement(WANTED_GOODS_TAG_NAME, in,
+                                       new String[0]);
             for (int i = 0; i < wantedGoods.length; i++) {
                 String goodsId = (i < wantedGoodsID.length) ? wantedGoodsID[i]
                     : null;
                 wantedGoods[i] = (goodsId == null || "".equals(goodsId)) ? null
                     : getSpecification().getGoodsType(goodsId);
             }
-        } else if (MISSIONARY_TAG_NAME.equals(in.getLocalName())) {
+
+        } else if (MISSIONARY_TAG_NAME.equals(tag)) {
             in.nextTag();
             missionary = updateFreeColGameObject(in, Unit.class);
             missionary.setLocationNoUpdate(this);
-            in.nextTag();
-        } else if (UNITS_TAG_NAME.equals(in.getLocalName())) {
+            in.nextTag(); // close element
+
+        } else if (UNITS_TAG_NAME.equals(tag)) {
             while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 if (in.getLocalName().equals(Unit.getXMLElementTagName())) {
                     Unit unit = updateFreeColGameObject(in, Unit.class);
@@ -1384,7 +1447,8 @@ public class IndianSettlement extends Settlement {
                     add(unit);
                 }
             }
-        } else if (OWNED_UNITS_TAG_NAME.equals(in.getLocalName())) {
+
+        } else if (OWNED_UNITS_TAG_NAME.equals(tag)) {
             Unit unit = getFreeColGameObject(in, ID_ATTRIBUTE, Unit.class);
             if (unit.getOwner() != null && !owner.owns(unit)) {
                 logger.warning("Error in savegame: unit " + unit.getId()
@@ -1393,7 +1457,8 @@ public class IndianSettlement extends Settlement {
                 ownedUnits.add(unit);
                 owner.setUnit(unit);
             }
-            in.nextTag();
+            in.nextTag(); // close element
+
         } else {
             super.readChild(in);
         }

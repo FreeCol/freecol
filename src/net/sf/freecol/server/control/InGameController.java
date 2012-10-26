@@ -631,11 +631,10 @@ public final class InGameController extends Controller {
     private void csSpeakToChief(ServerPlayer serverPlayer, IndianSettlement is,
                                 boolean scout, ChangeSet cs) {
         serverPlayer.csContact((ServerPlayer) is.getOwner(), null, cs);
-        is.makeContactSettlement(serverPlayer);
+        is.setContacted(serverPlayer);
         if (scout || getGame().getSpecification()
-            .getBooleanOption("model.option.settlementActionsContactChief")
-            .getValue()) {
-            is.setSpokenToChief(serverPlayer);
+            .getBoolean("model.option.settlementActionsContactChief")) {
+            is.setScouted(serverPlayer);
         }
     }
 
@@ -2111,7 +2110,7 @@ public final class InGameController extends Controller {
                                          IndianSettlement settlement) {
         ChangeSet cs = new ChangeSet();
         Tile tile = settlement.getTile();
-        boolean tileDirty = settlement.makeContactSettlement(serverPlayer);
+        boolean tileDirty = settlement.setContacted(serverPlayer);
         String result;
 
         // Hateful natives kill the scout right away.
@@ -2131,7 +2130,7 @@ public final class InGameController extends Controller {
             int radius = unit.getLineOfSight();
             UnitType skill = settlement.getLearnableSkill();
             int rnd = Utils.randomInt(logger, "scouting", random, 10);
-            if (settlement.hasSpokenToChief()) {
+            if (settlement.hasAnyScouted()) {
                 // Do nothing if already spoken to.
                 result = "nothing";
             } else if (scoutSkill != null
@@ -2817,9 +2816,7 @@ public final class InGameController extends Controller {
                                               scouts, random);
             }
             settlement = new ServerIndianSettlement(game, serverPlayer, name,
-                                                    tile, false, skill,
-                                                    new HashSet<Player>(),
-                                                    null);
+                                                    tile, false, skill, null);
             serverPlayer.addSettlement(settlement);
             settlement.placeSettlement(true);
             for (Player p : getGame().getPlayers()) {

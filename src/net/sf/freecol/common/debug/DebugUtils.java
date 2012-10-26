@@ -860,7 +860,7 @@ public class DebugUtils {
                 + " " + ((mostHated == null) ? "(peaceful)"
                     : "(hate " + Messages.message(mostHated.getNationID()) + ")")
                 + " " + Messages.message(sis.getShortAlarmLevelMessageId(p))
-                + " " + ((sis.hasSpokenToChief(p)) ? "(spoke to chief)" : "")
+                + " " + ((sis.hasScouted(p)) ? "(spoke to chief)" : "")
                 + "\n");
         }
 

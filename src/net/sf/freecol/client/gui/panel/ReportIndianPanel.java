@@ -121,7 +121,7 @@ public final class ReportIndianPanel extends ReportPanel {
             }
             for (IndianSettlement settlement : settlements) {
                 boolean known = settlement.getTile().isExplored();
-                boolean visited = player.hasVisited(settlement);
+                boolean contacted = settlement.hasContacted(player);
                 String locationName = Messages.message(settlement.getLocationNameFor(player));
                 if (known && settlement.isCapital()) {
                     locationName += "*";
@@ -150,7 +150,7 @@ public final class ReportIndianPanel extends ReportPanel {
                 JLabel skillLabel = new JLabel();
                 UnitType skillType = settlement.getLearnableSkill();
                 String skillString;
-                if (visited) {
+                if (contacted) {
                     if (skillType == null) {
                         skillString = "indianSettlement.skillNone";
                     } else {
@@ -166,7 +166,7 @@ public final class ReportIndianPanel extends ReportPanel {
 
                 JLabel mostHatedLabel;
                 Player mostHated = settlement.getMostHated();
-                if (visited) {
+                if (contacted) {
                     if (mostHated == null) {
                         mostHatedLabel = localizedLabel("indianSettlement.mostHatedNone");
                     } else {
@@ -178,24 +178,26 @@ public final class ReportIndianPanel extends ReportPanel {
                 reportPanel.add(mostHatedLabel);
 
                 GoodsType[] wantedGoods = settlement.getWantedGoods();
-                if (!visited) {
-                    reportPanel.add(localizedLabel("indianSettlement.wantedGoodsUnknown"));
-                } else if (wantedGoods[0] == null) {
-                    reportPanel.add(localizedLabel("indianSettlement.wantedGoodsNone"));
-                } else {
-                    JLabel goodsLabel = localizedLabel(wantedGoods[0].getNameKey());
-                    goodsLabel.setIcon(new ImageIcon(getLibrary().getGoodsImage(wantedGoods[0], 0.66)));
-                    String split = "split " + String.valueOf(wantedGoods.length);
-                    reportPanel.add(goodsLabel, split);
-                    for (int i = 1; i < wantedGoods.length; i++) {
-                        if (wantedGoods[i] != null) {
-                            String sale = player.getLastSaleString(settlement, wantedGoods[i]);
-                            goodsLabel = new JLabel(Messages.message(wantedGoods[i].getNameKey())
-                                                    + ((sale == null) ? "" : " " + sale));
-                            goodsLabel.setIcon(getLibrary().getScaledGoodsImageIcon(wantedGoods[i], 0.5));
-                            reportPanel.add(goodsLabel);
+                if (contacted) {
+                    if (wantedGoods[0] == null) {
+                        reportPanel.add(localizedLabel("indianSettlement.wantedGoodsNone"));
+                    } else {
+                        JLabel goodsLabel = localizedLabel(wantedGoods[0].getNameKey());
+                        goodsLabel.setIcon(new ImageIcon(getLibrary().getGoodsImage(wantedGoods[0], 0.66)));
+                        String split = "split " + String.valueOf(wantedGoods.length);
+                        reportPanel.add(goodsLabel, split);
+                        for (int i = 1; i < wantedGoods.length; i++) {
+                            if (wantedGoods[i] != null) {
+                                String sale = player.getLastSaleString(settlement, wantedGoods[i]);
+                                goodsLabel = new JLabel(Messages.message(wantedGoods[i].getNameKey())
+                                    + ((sale == null) ? "" : " " + sale));
+                                goodsLabel.setIcon(getLibrary().getScaledGoodsImageIcon(wantedGoods[i], 0.5));
+                                reportPanel.add(goodsLabel);
+                            }
                         }
                     }
+                } else {
+                    reportPanel.add(localizedLabel("indianSettlement.wantedGoodsUnknown"));
                 }
             }
         } else {

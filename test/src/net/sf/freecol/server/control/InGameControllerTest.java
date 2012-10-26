@@ -250,6 +250,8 @@ public class InGameControllerTest extends FreeColTestCase {
         FreeColTestCase.IndianSettlementBuilder builder
             = new FreeColTestCase.IndianSettlementBuilder(game);
         IndianSettlement camp = builder.build();
+        camp.setContacted(dutch);
+        camp.setContacted(french);
         Tile tile = camp.getTile().getNeighbourOrNull(Map.Direction.N);
         Unit dutchJesuit = new ServerUnit(game, tile, dutch, missionaryType);
         Unit frenchJesuit = new ServerUnit(game, tile, french, missionaryType);
@@ -1672,7 +1674,7 @@ public class InGameControllerTest extends FreeColTestCase {
         FreeColTestCase.IndianSettlementBuilder builder
             = new FreeColTestCase.IndianSettlementBuilder(game);
         IndianSettlement camp = builder.player(inca).build();
-        camp.makeContactSettlement(dutch);
+        camp.setContacted(dutch);
 
         assertEquals("Inca should be at peace with dutch",
                      Stance.PEACE, inca.getStance(dutch));
@@ -1865,7 +1867,7 @@ public class InGameControllerTest extends FreeColTestCase {
         IndianSettlement camp = builder.build();
         Player indian = camp.getOwner();
         Player.makeContact(indian, player);
-        camp.makeContactSettlement(player);
+        camp.setContacted(player);
 
         assertEquals("Initially, camp should be happy",
             camp.getAlarm(player).getLevel(), Tension.Level.HAPPY);

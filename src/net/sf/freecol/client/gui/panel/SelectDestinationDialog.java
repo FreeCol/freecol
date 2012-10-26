@@ -222,7 +222,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                 if (s == inSettlement
                     || (unit.isNaval() && !s.isConnectedPort())
                     || (s instanceof IndianSettlement
-                        && !((IndianSettlement)s).hasContactedSettlement(player)))
+                        && !((IndianSettlement)s).hasContacted(player)))
                     continue;
                 if (p == player) {
                     if ((turns = unit.getTurnsToReach(s)) == INFINITY) 

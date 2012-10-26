@@ -1362,7 +1362,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 oldLevels.put(settlement, oldLevel);
                 for (Player enemy : game.getLiveEuropeanPlayers()) {
                     Tension alarm = settlement.getAlarm(enemy);
-                    if (alarm != null) oldLevel.put(enemy, alarm.getLevel());
+                    oldLevel.put(enemy,
+                        (alarm == null) ? null : alarm.getLevel());
                 }
             }
 
@@ -1443,10 +1444,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     = oldLevels.get(settlement);
                 for (Entry<Player, Tension.Level> entry : oldLevel.entrySet()) {
                     Player enemy = entry.getKey();
-                    Tension.Level newLevel
-                        = settlement.getAlarm(enemy).getLevel();
+                    Tension newTension = settlement.getAlarm(enemy);
+                    Tension.Level newLevel = (newTension == null) ? null
+                        : newTension.getLevel();
                     if (entry.getValue() != newLevel) {
-                        cs.add(See.only(null).perhaps((ServerPlayer) enemy),
+                        cs.add(See.only(null).perhaps((ServerPlayer)enemy),
                                settlement);
                     }
                 }
@@ -1604,11 +1606,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     if (!p.isDead() && p.isIndian() && p.hasContacted(this)) {
                         p.setTension(this, new Tension(Tension.TENSION_MIN));
                         for (IndianSettlement is : p.getIndianSettlements()) {
-                            if (is.hasContactedSettlement(this)) {
-                                is.setAlarm(this,
-                                            new Tension(Tension.TENSION_MIN));
-                                cs.add(See.only(this), is);
-                            }
+                            is.setAlarm(this, new Tension(Tension.TENSION_MIN));
+                            cs.add(See.only(this), is);
                         }
                         csChangeStance(Stance.PEACE, p, true, cs);
                     }
@@ -2207,7 +2206,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             cs.add(See.perhaps().always(this), defenderPlayer); // TODO: just the tension
             csChangeStance(Stance.PEACE, defenderPlayer, true, cs);
             for (IndianSettlement is : defenderPlayer.getIndianSettlements()) {
-                if (is.hasContactedSettlement(this)) {
+                if (is.hasContacted(this)) {
                     is.getAlarm(this).setValue(Tension.SURRENDERED);
                     // Only update attacker with settlements that have
                     // been seen, as contact can occur with its members.

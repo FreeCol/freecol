@@ -469,7 +469,6 @@ public class FreeColTestCase extends TestCase {
         private static int settlementNumber = 1;
 
         private boolean isCapital;
-        private Set<Player> isVisited;
         private Unit residentMissionary;
 
         public IndianSettlementBuilder(Game game){
@@ -487,7 +486,6 @@ public class FreeColTestCase extends TestCase {
             settlementTile = null;
             skillTaught = "model.unit.masterCottonPlanter";
             isCapital = false;
-            isVisited = new HashSet<Player>();
             residentMissionary = null;
         }
 
@@ -520,18 +518,6 @@ public class FreeColTestCase extends TestCase {
 
         public IndianSettlementBuilder capital(boolean isCapital){
             this.isCapital = isCapital;
-
-            return this;
-        }
-
-        public IndianSettlementBuilder isVisitedByPlayer(Player player, boolean isVisited){
-            if (player != null) {
-                if (isVisited) {
-                    this.isVisited.add(player);
-                } else {
-                    this.isVisited.remove(player);
-                }
-            }
 
             return this;
         }
@@ -582,8 +568,7 @@ public class FreeColTestCase extends TestCase {
                 = new ServerIndianSettlement(game, indianPlayer,
                                              getSimpleName(indianPlayer, isCapital),
                                              settlementTile, isCapital,
-                                             skillToTeach, isVisited,
-                                             residentMissionary);
+                                             skillToTeach, residentMissionary);
             indianPlayer.addSettlement(camp);
 
             // Add braves

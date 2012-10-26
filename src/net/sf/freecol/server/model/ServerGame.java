@@ -295,7 +295,7 @@ public class ServerGame extends Game implements ServerModelObject {
                 for (IndianSettlement settlement
                          : player.getIndianSettlementsWithMission(weakestAIPlayer)) {
                     logMe += " " + settlement.getName() + "(mission)";
-                    settlement.makeContactSettlement(strongestAIPlayer);
+                    settlement.setContacted(strongestAIPlayer);
                     Unit missionary = settlement.getMissionary();
                     missionary.setOwner(strongestAIPlayer);
                     Tile t = settlement.getTile();

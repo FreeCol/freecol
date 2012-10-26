@@ -2949,21 +2949,6 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Has a player visited a native settlement?
-     *
-     * This is needed by the native report and settlement popup to
-     * clarify whether the skill at the settlement is null because it
-     * has been depleted, or because we just have not found out what
-     * it is yet.
-     *
-     * @param settlement The <code>IndianSettlement</code> to query.
-     * @return True if the player has visited the settlement.
-     */
-    public boolean hasVisited(IndianSettlement settlement) {
-        return settlement.hasContactedSettlement(this);
-    }
-
-    /**
      * Gets the price for a recruit in europe.
      *
      * @return The price of a single recruit in {@link Europe}.

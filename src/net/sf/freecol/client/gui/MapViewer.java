@@ -2102,8 +2102,7 @@ public final class MapViewer {
         ======
         Display the colony names.
         */
-        if (settlements.size() > 0
-            && colonyLabels != ClientOptions.COLONY_LABELS_NONE) {
+        if (settlements.size() > 0 && colonyLabels != ClientOptions.COLONY_LABELS_NONE) {
             Player clientPlayer = freeColClient.getMyPlayer();
             for (int index = 0; index < settlements.size(); index++) {
                 final Settlement settlement = settlements.get(index);
@@ -2113,85 +2112,87 @@ public final class MapViewer {
                     continue;
                 }
                 String name = Messages.message(settlement.getLocationNameFor(clientPlayer));
-                if (name == null) continue;
-                Color backgroundColor = lib.getColor(settlement.getOwner());
-                Font font = ResourceManager.getFont("NormalFont", 18f);
-                Font productionFont = ResourceManager.getFont("NormalFont", 12f);
-                // int yOffset = lib.getSettlementImage(settlement).getHeight(null) + 1;
-                int yOffset = tileHeight;
-                g.setTransform(settlementTransforms.get(index));
-                switch (colonyLabels) {
-                case ClientOptions.COLONY_LABELS_CLASSIC:
-                    Image stringImage = createStringImage(g, name, backgroundColor, font);
-                    g.drawImage(stringImage, (tileWidth - stringImage.getWidth(null))/2 + 1, yOffset, null);
-                    break;
-                case ClientOptions.COLONY_LABELS_MODERN:
-                default:
-                    backgroundColor = new Color(backgroundColor.getRed(), backgroundColor.getGreen(), backgroundColor.getBlue(), 128);
-                    
-                    TextSpecification[] specs = new TextSpecification[1];
-                    if (settlement instanceof Colony && settlement.getOwner() == clientPlayer) {
-                        Colony colony = (Colony) settlement;
-                        BuildableType buildable = colony.getCurrentlyBuilding();
-                        if (buildable != null) {
-                            specs = new TextSpecification[2];
-                            String turnsStr = Messages.getTurnsText(colony.getTurnsToComplete(buildable));
-                            String nowBuilding = Messages.message(buildable.getNameKey()) + " " + turnsStr;
-                            specs[1] = new TextSpecification(nowBuilding, productionFont);
+                if (name != null) {
+                    Color backgroundColor = lib.getColor(settlement.getOwner());
+                    Font font = ResourceManager.getFont("NormalFont", 18f);
+                    Font productionFont = ResourceManager.getFont("NormalFont", 12f);
+//                    int yOffset = lib.getSettlementImage(settlement).getHeight(null) + 1;
+                    int yOffset = tileHeight;
+                    g.setTransform(settlementTransforms.get(index));
+                    switch(colonyLabels) {
+                    case ClientOptions.COLONY_LABELS_CLASSIC:
+                        Image stringImage = createStringImage(g, name, backgroundColor, font);
+                        g.drawImage(stringImage, (tileWidth - stringImage.getWidth(null))/2 + 1, yOffset, null);
+                        break;
+                    case ClientOptions.COLONY_LABELS_MODERN:
+                    default:
+                        backgroundColor = new Color(backgroundColor.getRed(), backgroundColor.getGreen(), backgroundColor.getBlue(), 128);
+
+                        TextSpecification[] specs = new TextSpecification[1];
+                        if (settlement instanceof Colony && settlement.getOwner() == clientPlayer) {
+                            Colony colony = (Colony) settlement;
+                            BuildableType buildable = colony.getCurrentlyBuilding();
+                            if (buildable != null) {
+                                specs = new TextSpecification[2];
+                                String turnsStr = Messages.getTurnsText(colony.getTurnsToComplete(buildable));
+                                String nowBuilding = Messages.message(buildable.getNameKey()) + " " + turnsStr;
+                                specs[1] = new TextSpecification(nowBuilding, productionFont);
+                            }
                         }
-                    }
-                    specs[0] = new TextSpecification(name, font);
-                    
-                    Image nameImage = createLabel(g, specs, backgroundColor);
-                    if (nameImage != null) {
-                        int spacing = 3;
-                        Image leftImage = null;
-                        Image rightImage = null;
-                        if (settlement instanceof Colony) {
-                            String size = Integer.toString(((Colony) settlement).getDisplayUnitCount());
-                            leftImage = createLabel(g, size, font, backgroundColor);
-                            
-                            if (clientPlayer.owns(settlement)) {
-                                int bonusProduction = ((Colony) settlement).getProductionBonus();
-                                if (bonusProduction != 0) {
-                                    String bonus = bonusProduction > 0 ? "+" + bonusProduction : Integer.toString(bonusProduction);
-                                    rightImage = createLabel(g, bonus, font, backgroundColor);
+                        specs[0] = new TextSpecification(name, font);
+
+                        Image nameImage = createLabel(g, specs, backgroundColor);
+                        if (nameImage != null) {
+                            int spacing = 3;
+                            Image leftImage = null;
+                            Image rightImage = null;
+                            if (settlement instanceof Colony) {
+                                String size = Integer.toString(((Colony) settlement).getDisplayUnitCount());
+                                leftImage = createLabel(g, size, font, backgroundColor);
+
+                                if (clientPlayer.owns(settlement)) {
+                                    int bonusProduction = ((Colony) settlement).getProductionBonus();
+                                    if (bonusProduction != 0) {
+                                        String bonus = bonusProduction > 0 ? "+" + bonusProduction : Integer.toString(bonusProduction);
+                                        rightImage = createLabel(g, bonus, font, backgroundColor);
+                                    }
+                                }
+                            } else if (settlement instanceof IndianSettlement) {
+                                IndianSettlement nativeSettlement = (IndianSettlement) settlement;
+                                if (nativeSettlement.getType().isCapital()) {
+                                    leftImage = createCapitalLabel(nameImage.getHeight(null), 5, backgroundColor);
+                                }
+
+                                Unit missionary = nativeSettlement.getMissionary();
+                                if (missionary != null) {
+                                    boolean expert = missionary.hasAbility(Ability.EXPERT_MISSIONARY);
+                                    backgroundColor = lib.getColor(missionary.getOwner());
+                                    backgroundColor = new Color(backgroundColor.getRed(), backgroundColor.getGreen(), backgroundColor.getBlue(), 128);
+                                    rightImage = createReligiousMissionLabel(nameImage.getHeight(null), 5, backgroundColor, expert);
                                 }
                             }
-                        } else if (settlement instanceof IndianSettlement) {
-                            IndianSettlement nativeSettlement = (IndianSettlement) settlement;
-                            if (nativeSettlement.getType().isCapital()) {
-                                leftImage = createCapitalLabel(nameImage.getHeight(null), 5, backgroundColor);
+
+                            int width = (int) ((nameImage.getWidth(null)*lib.getScalingFactor())
+                                + (leftImage != null ? (leftImage.getWidth(null)*lib.getScalingFactor()) + spacing : 0)
+                                + (rightImage != null ? (rightImage.getWidth(null)*lib.getScalingFactor()) + spacing : 0));
+                            int labelOffset = (tileWidth - width)/2;
+                            yOffset -= (nameImage.getHeight(null)*lib.getScalingFactor())/2;
+                            if (leftImage != null) {
+                                g.drawImage(leftImage, labelOffset, yOffset, null);
+                                labelOffset += (leftImage.getWidth(null)*lib.getScalingFactor()) + spacing;
                             }
-                            
-                            Unit missionary = nativeSettlement.getMissionary();
-                            if (missionary != null) {
-                                boolean expert = missionary.hasAbility(Ability.EXPERT_MISSIONARY);
-                                backgroundColor = lib.getColor(missionary.getOwner());
-                                backgroundColor = new Color(backgroundColor.getRed(), backgroundColor.getGreen(), backgroundColor.getBlue(), 128);
-                                rightImage = createReligiousMissionLabel(nameImage.getHeight(null), 5, backgroundColor, expert);
+                            g.drawImage(nameImage, labelOffset, yOffset, null);
+                            if (rightImage != null) {
+                                labelOffset += (nameImage.getWidth(null)*lib.getScalingFactor()) + spacing;
+                                g.drawImage(rightImage, labelOffset, yOffset, null);
                             }
+                            break;
                         }
-                        
-                        int width = (int) ((nameImage.getWidth(null)*lib.getScalingFactor())
-                            + (leftImage != null ? (leftImage.getWidth(null)*lib.getScalingFactor()) + spacing : 0)
-                            + (rightImage != null ? (rightImage.getWidth(null)*lib.getScalingFactor()) + spacing : 0));
-                        int labelOffset = (tileWidth - width)/2;
-                        yOffset -= (nameImage.getHeight(null)*lib.getScalingFactor())/2;
-                        if (leftImage != null) {
-                            g.drawImage(leftImage, labelOffset, yOffset, null);
-                            labelOffset += (leftImage.getWidth(null)*lib.getScalingFactor()) + spacing;
-                        }
-                        g.drawImage(nameImage, labelOffset, yOffset, null);
-                        if (rightImage != null) {
-                            labelOffset += (nameImage.getWidth(null)*lib.getScalingFactor()) + spacing;
-                            g.drawImage(rightImage, labelOffset, yOffset, null);
-                        }
-                        break;
                     }
                 }
             }
         }
+
         g.setTransform(originTransform);
 
         /*
@@ -2199,6 +2200,7 @@ public final class MapViewer {
         ======
         Display goto path
         */
+
         if (currentPath != null)
             displayGotoPath(g, currentPath);
         if (gotoPath != null)
@@ -2292,7 +2294,7 @@ public final class MapViewer {
             break;
         case ClientOptions.DISPLAY_TILE_TEXT_REGIONS:
             if (tile.getRegion() != null) {
-                if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)
+                if (FreeColDebugger.isInDebugMode()
                     && tile.getRegion().getName() == null) {
                     text = Utils.lastPart(tile.getRegion().getNameKey(), ".");
                 } else {
@@ -2447,11 +2449,11 @@ public final class MapViewer {
      */
     private Image getAlarmChip(IndianSettlement is) {
         Player player = freeColClient.getMyPlayer();
-        if (player == null || !is.hasContactedSettlement(player)) return null;
+        if (player == null || !is.hasContacted(player)) return null;
         Player enemy = is.getMostHated();
         Color background = lib.getColor((enemy == null) ? is.getOwner()
             : enemy);
-        return lib.createChip(((is.hasSpokenToChief(player)) ? "!" : "?"),
+        return lib.createChip(((is.hasScouted(player)) ? "!" : "?"),
                               Color.BLACK,
                               background, getForegroundColor(background));
     }
@@ -2591,7 +2593,7 @@ public final class MapViewer {
 
         // FOR DEBUGGING
         net.sf.freecol.server.ai.AIUnit au;
-        if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)
+        if (FreeColDebugger.isInDebugMode()
             && !freeColClient.getMyPlayer().owns(unit)
             && freeColClient.getFreeColServer() != null
             && (au = freeColClient.getFreeColServer().getAIMain()

@@ -108,7 +108,7 @@ public class ScoutingMissionTest extends FreeColTestCase {
             aiUnit.getMission().isValid());
 
         // Complete the mission, should be invalid.
-        is.setSpokenToChief(dutch);
+        is.setScouted(dutch);
         assertFalse("Scouting mission should be invalid lacking target",
             aiUnit.getMission().isValid());
 

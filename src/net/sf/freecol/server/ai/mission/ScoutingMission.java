@@ -328,7 +328,7 @@ public class ScoutingMission extends Mission {
         Tension tension;
         String reason = invalidTargetReason(is);
         return (reason != null) ? reason
-            : (is.hasSpokenToChief(owner))
+            : (is.hasScouted(owner))
             ? "settlement-contacted"
             : ((tension = is.getAlarm(owner)) != null
                 && tension.getValue() >= Tension.Level.HATEFUL.getLimit())

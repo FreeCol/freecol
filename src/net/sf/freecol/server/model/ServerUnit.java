@@ -883,8 +883,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 // Initialize alarm for native settlements.
                 if (settlement instanceof IndianSettlement) {
                     IndianSettlement is = (IndianSettlement) settlement;
-                    if (!is.hasContactedSettlement(serverPlayer)) {
-                        is.makeContactSettlement(serverPlayer);
+                    if (is.setContacted(serverPlayer)) {
                         cs.add(See.only(serverPlayer), is);
                     }
                 }

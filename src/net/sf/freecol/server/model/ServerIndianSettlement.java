@@ -76,13 +76,12 @@ public class ServerIndianSettlement extends IndianSettlement
     public ServerIndianSettlement(Game game, Player owner, String name,
                                   Tile tile, boolean isCapital,
                                   UnitType learnableSkill,
-                                  Set<Player> spokenTo, Unit missionary) {
+                                  Unit missionary) {
         super(game, owner, name, tile);
 
         setGoodsContainer(new GoodsContainer(game, this));
         this.learnableSkill = learnableSkill;
         setCapital(isCapital);
-        this.spokenTo = spokenTo;
         this.missionary = missionary;
 
         convertProgress = 0;
@@ -195,8 +194,7 @@ public class ServerIndianSettlement extends IndianSettlement
      * @return A list of settlements whose alarm level has changed.
      */
     public List<FreeColGameObject> modifyAlarm(Player player, int addToAlarm) {
-        boolean change = makeContactSettlement(player);
-        change |= changeAlarm(player, addToAlarm);
+        boolean change = changeAlarm(player, addToAlarm);
 
         // Propagate alarm upwards.  Capital has a greater impact.
         List<FreeColGameObject> modified = owner.modifyTension(player,

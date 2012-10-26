@@ -227,7 +227,8 @@ public class UnitTest extends FreeColTestCase {
         FreeColTestCase.IndianSettlementBuilder builder
             = new FreeColTestCase.IndianSettlementBuilder(game);
         IndianSettlement s = builder.player(sioux).settlementTile(tile)
-            .capital(true).isVisitedByPlayer(dutch, true).build();
+            .capital(true).build();
+        s.setContacted(dutch);
 
         // add the missionary
         s.setMissionary(jesuit);
