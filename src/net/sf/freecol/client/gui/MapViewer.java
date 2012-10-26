@@ -1287,46 +1287,20 @@ public final class MapViewer {
             
     }
 
-
     /**
-    * Sets the active unit. Invokes {@link #setSelectedTile(Tile, boolean)} if the
-    * selected tile is another tile than where the <code>activeUnit</code>
-    * is located.
-    *
-    * @param activeUnit The new active unit.
-    * @return True if the focus was set.
-    * @see #setSelectedTile(Tile, boolean)
-    */
+     * Sets the active unit.  
+     * Invokes {@link #setSelectedTile(Tile, boolean)} if the selected
+     * tile is another tile than where the <code>activeUnit</code> is located.
+     *
+     * @param activeUnit The new active <code>Unit</code>.
+     * @return True if the focus was set.
+     * @see #setSelectedTile(Tile, boolean)
+     */
     public boolean setActiveUnit(Unit activeUnit) {
         // Don't select a unit with zero moves left. -sjm
         // The user might what to check the status of a unit - SG
-        Tile tile = null;
-
-        if (activeUnit != null) {
-            tile = activeUnit.getTile();
-            if (!freeColClient.getMyPlayer().owns(activeUnit)) {
-                gui.getCanvas().repaint(0, 0, getWidth(), getHeight());
-                return false;
-            }
-        }
+        Tile tile = (activeUnit == null) ? null : activeUnit.getTile();
         this.activeUnit = activeUnit;
-
-        /*
-          This is quite old code, but it is interfering with some
-          automated moves by clearing their destinations (BR#3518130).
-          Disabling experimentally, to see if it is still needed.
-          It would be good to lose callouts to the controller.          
-
-        if (activeUnit != null) {
-            if (freeColClient.currentPlayerIsMyPlayer()) {
-                if (activeUnit.getState() != Unit.UnitState.ACTIVE) {
-                    freeColClient.getInGameController().clearOrders(activeUnit);
-                }
-            } else {
-                freeColClient.getInGameController().clearGotoOrders(activeUnit);
-            }
-        }
-        */
 
         // The user activated a unit
         if (getView() == GUI.VIEW_TERRAIN_MODE && activeUnit != null) {
@@ -1348,7 +1322,6 @@ public final class MapViewer {
         }
         return false;
     }
-
 
     /**
     * Sets the focus of the map.
