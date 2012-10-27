@@ -1877,26 +1877,32 @@ public final class MapViewer {
             Tile tile = p.getTile();
             if (tile == null) continue;
 
-            Image image, turns = null;
-            boolean showPassenger = activeUnit != null && activeUnit.isNaval()
+            Unit show = (activeUnit != null && activeUnit.isNaval()
                 && tile.isExplored() && tile.isLand()
                 && (tile.getColony() == null
-                    || !tile.getColony().getOwner().owns(activeUnit));
+                    || !tile.getColony().getOwner().owns(activeUnit)))
+                ? activeUnit.getFirstUnit()
+                : activeUnit;
+            Image image = null, turns = null;
             if (p.getTurns() == 0) {
                 g.setColor(Color.GREEN);
-                image = lib.getPathImage((!showPassenger) ? activeUnit
-                    : activeUnit.getFirstUnit());
+                if (show != null) image = lib.getPathImage(show);
             } else {
                 g.setColor(Color.RED);
-                image = lib.getPathNextTurnImage((!showPassenger) ? activeUnit
-                    : activeUnit.getFirstUnit());
+                image = lib.getPathNextTurnImage(show);
                 turns = createStringImage(g, Integer.toString(p.getTurns()), 
                                           Color.WHITE, font);
             }
             Point point = getTilePosition(tile);
             g.translate(point.x, point.y);
-            centerImage(g, image);
-            if (turns != null) centerImage(g, turns);
+            if (image == null) {
+                g.fillOval(halfWidth, halfHeight, 10, 10);
+                g.setColor(Color.BLACK);
+                g.drawOval(halfWidth, halfHeight, 10, 10);
+            } else {
+                centerImage(g, image);
+                if (turns != null) centerImage(g, turns);
+            }
             g.translate(-point.x, -point.y);
         }
     }
