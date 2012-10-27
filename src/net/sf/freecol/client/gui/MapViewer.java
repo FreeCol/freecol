@@ -1873,43 +1873,31 @@ public final class MapViewer {
     private void displayGotoPath(Graphics2D g, PathNode gotoPath) {
         final Font font = ResourceManager.getFont("NormalFont", 12f);
 
-        for (PathNode temp = gotoPath; temp != null; temp = temp.next) {
-            Tile tile = temp.getTile();
+        for (PathNode p = gotoPath; p != null; p = p.next) {
+            Tile tile = p.getTile();
             if (tile == null) continue;
 
-            Image image;
-            Color textColor;
-            boolean showPassenger = activeUnit != null
-                && tile.isExplored()
-                && activeUnit.isNaval()
-                && tile.isLand()
+            Image image, turns = null;
+            boolean showPassenger = activeUnit != null && activeUnit.isNaval()
+                && tile.isExplored() && tile.isLand()
                 && (tile.getColony() == null
-                    || tile.getColony().getOwner() != activeUnit.getOwner());
-            if (temp.getTurns() == 0) {
+                    || !tile.getColony().getOwner().owns(activeUnit));
+            if (p.getTurns() == 0) {
                 g.setColor(Color.GREEN);
                 image = lib.getPathImage((!showPassenger) ? activeUnit
                     : activeUnit.getFirstUnit());
-                textColor = Color.BLACK;
             } else {
                 g.setColor(Color.RED);
                 image = lib.getPathNextTurnImage((!showPassenger) ? activeUnit
                     : activeUnit.getFirstUnit());
-                textColor = Color.WHITE;
+                turns = createStringImage(g, Integer.toString(p.getTurns()), 
+                                          Color.WHITE, font);
             }
-            g.translate(tile.getX(), tile.getY());
-            if (image != null) {
-                centerImage(g, image);
-            } else {
-                g.fillOval(halfWidth, halfHeight, 10, 10);
-                g.setColor(Color.BLACK);
-                g.drawOval(halfWidth, halfHeight, 10, 10);
-            }
-            if (temp.getTurns() > 0) {
-                Image stringImage = createStringImage(g,
-                    Integer.toString(temp.getTurns()), textColor, font);
-                centerImage(g, stringImage);
-            }
-            g.translate(-tile.getX(), -tile.getY());
+            Point point = getTilePosition(tile);
+            g.translate(point.x, point.y);
+            centerImage(g, image);
+            if (turns != null) centerImage(g, turns);
+            g.translate(-point.x, -point.y);
         }
     }
 
