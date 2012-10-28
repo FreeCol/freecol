@@ -343,14 +343,18 @@ public class EuropeanAIPlayer extends AIPlayer {
         tipMap.clear();
         for (AIColony aic : getAIColonies()) {
             for (TileImprovementPlan tip : aic.getTileImprovementPlans()) {
-                if (tip == null || !tip.validate()) {
+                if (tip == null || tip.isComplete()) {
                     aic.removeTileImprovementPlan(tip);
-                    continue;
-                }
-                if (tip.getPioneer() != null) continue;
-                TileImprovementPlan other = tipMap.get(tip.getTarget());
-                if (other == null || other.getValue() < tip.getValue()) {
-                    tipMap.put(tip.getTarget(), tip);
+                } else if (tip.getPioneer() != null) {
+                    ; // Do nothing, remove when complete
+                } else if (!tip.validate()) {
+                    aic.removeTileImprovementPlan(tip);
+                    tip.dispose();
+                } else {
+                    TileImprovementPlan other = tipMap.get(tip.getTarget());
+                    if (other == null || other.getValue() < tip.getValue()) {
+                        tipMap.put(tip.getTarget(), tip);
+                    }
                 }
             }
         }

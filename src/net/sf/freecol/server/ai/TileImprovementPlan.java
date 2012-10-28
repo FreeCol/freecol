@@ -251,6 +251,15 @@ public class TileImprovementPlan extends ValuedAIObject {
     }
 
     /**
+     * Is this improvement complete?
+     *
+     * @return True if the tile improvement has been completed.
+     */
+    public boolean isComplete() {
+        return target.hasImprovement(getType());
+    }
+
+    /**
      * Weeds out a broken or obsolete tile improvement plan.
      *
      * @return True if the plan survives this check.
@@ -259,11 +268,6 @@ public class TileImprovementPlan extends ValuedAIObject {
         Tile target = getTarget();
         if (target == null) {
             logger.warning("Removing targetless TileImprovementPlan");
-            dispose();
-            return false;
-        }
-        if (target.hasImprovement(getType())) {
-            logger.finest("Removing obsolete TileImprovementPlan");
             dispose();
             return false;
         }

@@ -1459,7 +1459,7 @@ public class Unit extends GoodsLocation
         int reverseRange = range * (((isNaval())
                 ? getSpecification().getFastestNavalUnitType()
                 : getSpecification().getFastestLandUnitType())
-            .getMovement()) / this.getInitialMovesLeft();
+            .getMovement()) / this.getType().getMovement();
 
         return (start == null) ? null
             : search(start, threatDecider, CostDeciders.avoidIllegal(),

@@ -274,13 +274,13 @@ public class AIUnit extends AIObject implements Transportable {
      *     (e.g. "invalid").
      */
     public void abortMission(String why) {
-        if (this.mission != null) {
-            if (!this.mission.isOneTime()) {
-                logger.fine("Mission-ABORT(" + why + "): " + this.mission);
+        if (mission != null) {
+            if (!mission.isOneTime()) {
+                logger.fine("Mission-ABORT(" + why + "): " + mission);
             }
             removeTransport(why);
-            this.mission.dispose();
-            this.mission = null;
+            mission.dispose();
+            mission = null;
             this.dynamicPriority = 0;
         }
     }

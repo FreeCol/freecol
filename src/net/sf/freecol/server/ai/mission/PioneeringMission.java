@@ -160,6 +160,7 @@ public class PioneeringMission extends Mission {
             if (tileImprovementPlan != null) {
                 tileImprovementPlan.setPioneer(aiUnit);
             }
+            // TODO getEuropeanAIPlayer().claimTileImprovementPlan(tip);
         }
     }
 
@@ -502,6 +503,9 @@ public class PioneeringMission extends Mission {
      * {@inheritDoc}
      */
     public String invalidReason() {
+        // Prevent invalidation for improvements that are just completing.
+        if (tileImprovementPlan != null
+            && tileImprovementPlan.isComplete()) return null;
         return invalidReason(getAIUnit(), getTarget());
     }
 
@@ -511,6 +515,27 @@ public class PioneeringMission extends Mission {
      * {@inheritDoc}
      */
     public void doMission() {
+        // Check for completion and tileImprovement failure up front.
+        final AIUnit aiUnit = getAIUnit();
+        Location newTarget;
+        if (tileImprovementPlan != null) {
+            String logMe = null;
+            if (tileImprovementPlan.isComplete()) {
+                logMe = tag + " completed improvement " + getTarget()
+                    + "/" + tileImprovementPlan;
+            } else if (!tileImprovementPlan.validate()) {
+                logMe = tag + " abandoned invalid plan " + getTarget()
+                    + "/" + tileImprovementPlan;
+            }
+            if (logMe != null) {
+                setTarget(newTarget = findTarget(aiUnit, 10, false));
+                logMe += ", retargeting " + newTarget
+                    + "/" + tileImprovementPlan + ": " + this;
+                logger.finest(logMe);
+                if (newTarget == null) return;
+            }
+        }
+
         String reason = invalidReason();
         if (isTargetReason(reason)) {
             if (!retargetMission(tag, reason)) return;
@@ -519,7 +544,6 @@ public class PioneeringMission extends Mission {
             return;
         }
 
-        final AIUnit aiUnit = getAIUnit();
         final Unit unit = getUnit();
         final Player player = unit.getOwner();
         final EuropeanAIPlayer aiPlayer = getEuropeanAIPlayer();
@@ -527,29 +551,24 @@ public class PioneeringMission extends Mission {
             = CostDeciders.avoidSettlementsAndBlockingUnits();
 
         Tile tile;
-        Location newTarget;
         String where;
         while (!hasTools()) { // Get tools first.
             // Go there and clear target on arrival.
             if (travelToTarget(tag, getTarget(), costDecider)
                 != Unit.MoveType.MOVE) return;
             where = ((Colony)getTarget()).getName();
-            setTarget(null);
 
             // Try to equip
-            if (aiUnit.equipForRole(Unit.Role.PIONEER, false)
-                && hasTools()) {
-                newTarget = findTarget(aiUnit, 10, false);
-                logger.finest(tag + " reached " + where
-                    + " and equips, retargeting " + newTarget + ": " + this);
-            } else {
-                newTarget = findTarget(aiUnit, 10, false);
-                logger.finest(tag + " reached " + where
-                    + " but fails to equip, retargeting: " + newTarget
-                    + ": " + this);
-            }
+            String logMe = tag + " reached " + where;
+            logMe += (aiUnit.equipForRole(Unit.Role.PIONEER, false)
+                && hasTools())
+                ? " and equips"
+                : " but fails to equip";
+            setTarget(newTarget = findTarget(aiUnit, 10, false));
+            logMe += ", retargeting " + newTarget
+                + "/" + tileImprovementPlan + ": " + this;
+            logger.finest(logMe);
             if (newTarget == null) return;
-            setTarget(newTarget);
         }
 
         // Going to an intermediate colony?
@@ -558,35 +577,44 @@ public class PioneeringMission extends Mission {
             if (travelToTarget(tag, getTarget(), costDecider)
                 != Unit.MoveType.MOVE) return;
             where = ((Colony)getTarget()).getName();
-            newTarget = findTarget(aiUnit, 5, false);
+            setTarget(newTarget = findTarget(aiUnit, 10, false));
             logger.finest(tag + " reached intermediate colony " + where
-                + ", retargeting " + newTarget + ": " + this);
+                + ", retargeting " + newTarget
+                + "/" + tileImprovementPlan + ": " + this);
             if (newTarget == null) return;
-            setTarget(newTarget);
         }
 
-        // Now insist on a tip-target.
-        if (tileImprovementPlan != null && !tileImprovementPlan.validate()) {
-            setTarget(null);
+        // Check for threats.
+
+        // The code below is very conservative.  When enabled it
+        // reduces the number of completed improvements by a factor of
+        // 4 -- 5, which is unacceptable.  Therefore, disabled for
+        // now.  TODO: something better.
+        /*
+        int turnsNeeded = DEFAULT_THREAT_TURNS;
+        if (unit.getWorkImprovement() != null) {
+            turnsNeeded = Math.min(turnsNeeded, unit.getWorkLeft());
         }
-        if (tileImprovementPlan == null) {
-            newTarget = findTarget(aiUnit, 10, false);
-            if (newTarget != null) setTarget(newTarget);
-            if (newTarget == null || tileImprovementPlan == null) {
-                logger.finest(tag + " at " + unit.getLocation() 
-                    + " could not find improvement: " + this);
+        if (unit.isInDanger(turnsNeeded, 0.25f)) {
+            if (unit.getTile().getColony() != null) {
+                logger.finest(tag + " avoiding danger: " + this);
                 return;
             }
-            logger.finest(tag + " retargeting " + newTarget
-                + "/" + tileImprovementPlan + ": " + this);
+            PathNode safe = unit.findOurNearestSettlement(false, 1, false);
+            if (safe != null) {
+                travelToTarget(tag + " (evading)",
+                               safe.getLastNode().getTile(), costDecider);
+                return;
+            }
         }
+        */
 
-        // Go there.
+        // Going to a tile to perform an improvement.
         Unit.MoveType mt = travelToTarget(tag, getTarget(), costDecider);
         switch (mt) {
         case MOVE_NO_MOVES:
             return;
-        case MOVE_ILLEGAL:
+        case MOVE_ILLEGAL: case MOVE_NO_ATTACK_CIVILIAN:
             // Might be a temporary blockage due to an occupying unit
             // at the target.  Move randomly and retry if adjacent.
             Direction d = unit.getTile().getDirection(getTarget().getTile());
@@ -626,20 +654,6 @@ public class PioneeringMission extends Mission {
                     + ": " + this);
                 return;
             }
-        }
-
-        // Check for threats
-        int turnsNeeded = DEFAULT_THREAT_TURNS;
-        if (unit.getWorkImprovement() != null) {
-            turnsNeeded = Math.min(turnsNeeded, unit.getWorkLeft());
-        }
-        if (unit.isInDanger(turnsNeeded, 0.25f)) {
-            PathNode safe = unit.findOurNearestSettlement(false, 1, false);
-            if (safe != null) {
-                travelToTarget(tag + " (evading)",
-                               safe.getLastNode().getTile(), costDecider);
-            }
-            return;
         }
 
         // Work on the improvement
