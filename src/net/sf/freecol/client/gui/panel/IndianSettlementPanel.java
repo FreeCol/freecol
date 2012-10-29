@@ -61,6 +61,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
         Player indian = settlement.getOwner();
         Player player = getMyPlayer();
         boolean contacted = settlement.hasContacted(player);
+        boolean visited = settlement.hasVisited(player);
         String text = Messages.message(settlement.getLocationNameFor(player))
             + ", "
             + Messages.message(StringTemplate.template(settlement.isCapital()
@@ -82,7 +83,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
 
         add(localizedLabel("indianSettlement.learnableSkill"), "newline");
         UnitType skillType = settlement.getLearnableSkill();
-        if (contacted) {
+        if (visited) {
             if (skillType == null) {
                 add(localizedLabel("indianSettlement.skillNone"));
             } else {

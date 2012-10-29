@@ -122,6 +122,7 @@ public final class ReportIndianPanel extends ReportPanel {
             for (IndianSettlement settlement : settlements) {
                 boolean known = settlement.getTile().isExplored();
                 boolean contacted = settlement.hasContacted(player);
+                boolean visited = settlement.hasVisited(player);
                 String locationName = Messages.message(settlement.getLocationNameFor(player));
                 if (known && settlement.isCapital()) {
                     locationName += "*";
@@ -150,7 +151,7 @@ public final class ReportIndianPanel extends ReportPanel {
                 JLabel skillLabel = new JLabel();
                 UnitType skillType = settlement.getLearnableSkill();
                 String skillString;
-                if (contacted) {
+                if (visited) {
                     if (skillType == null) {
                         skillString = "indianSettlement.skillNone";
                     } else {

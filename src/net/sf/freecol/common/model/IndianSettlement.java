@@ -106,7 +106,12 @@ public class IndianSettlement extends Settlement {
     /**
      * The level of contact between a player and this settlement.
      */
-    public static enum ContactLevel { UNCONTACTED, CONTACTED, SCOUTED };
+    public static enum ContactLevel {
+        UNCONTACTED,     // Nothing known other than location?
+        CONTACTED,       // Name, wanted-goods now visible
+        VISITED,         // Skill now known
+        SCOUTED          // Scouting bonus consumed
+    };
         
     /**
      * A map that tells if a player has spoken to the chief of this settlement.
@@ -425,6 +430,34 @@ public class IndianSettlement extends Settlement {
         if (!hasContacted(player)) {
             contactLevels.put(player, ContactLevel.CONTACTED);
             initializeAlarm(player);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Has a player visited this settlement?
+     *
+     * @param player The <code>Player</code> to check.
+     * @return True if the player has contacted this settlement.
+     */
+    public boolean hasVisited(Player player) {
+        return getContactLevel(player).ordinal()
+            >= ContactLevel.VISITED.ordinal();
+    }
+
+    /**
+     * Sets the contact level of this settlement to indicate
+     * that a European player has visited the settlement.
+     *
+     * @param player The visiting <code>Player</code>.
+     * @return True if this was the first time the settlement was visited
+     *     by the player.
+     */
+    public boolean setVisited(Player player) {
+        if (!hasVisited(player)) {
+            if (!hasContacted(player)) initializeAlarm(player);
+            contactLevels.put(player, ContactLevel.VISITED);
             return true;
         }
         return false;
