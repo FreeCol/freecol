@@ -33,6 +33,7 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.FoundingFather;
+import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
@@ -587,47 +588,48 @@ public abstract class AIPlayer extends AIObject {
     // Serialization
 
     /**
-     * Writes this object to an XML stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
+     * {@inheritDoc}
      */
     @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute(ID_ATTRIBUTE, getId());
-
-        out.writeAttribute("randomState", Utils.getRandomState(aiRandom));
+        writeAttributes(out);
 
         out.writeEndElement();
     }
 
     /**
-     * Reads information for this object from an XML stream.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if there are any problems reading from the
-     *             stream.
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        super.writeAttributes(out);
+
+        out.writeAttribute("randomState", Utils.getRandomState(aiRandom));
+    }
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         final AIMain aiMain = getAIMain();
+        final Game game = aiMain.getGame();
 
         String str = in.getAttributeValue(null, ID_ATTRIBUTE);
-        ServerPlayer serverPlayer = aiMain.getGame().getFreeColGameObject(str,
-            ServerPlayer.class);
-        setPlayer(serverPlayer);
+        if ((player = game.getFreeColGameObject(str, ServerPlayer.class)) == null) {
+            throw new IllegalStateException("Not a Player: " + str);
+        }
 
         Random rnd = Utils.restoreRandomState(in.getAttributeValue(null,
-                "randomState"));
+                                              "randomState"));
         aiRandom = (rnd != null) ? rnd
             : new Random(aiMain.getRandomSeed("Seed for " + getId()));
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return the tag name.
      */

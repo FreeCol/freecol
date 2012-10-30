@@ -1392,20 +1392,18 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     // Serialization
 
     /**
-     * Writes this object to an XML stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
+     * {@inheritDoc}
      */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute(ID_ATTRIBUTE, getId());
+        super.writeAttributes(out);
 
         for (AIGoods ag : aiGoods) {
             if (!ag.checkIntegrity()) continue;
-            out.writeStartElement(AIGoods.getXMLElementTagName() + LIST_ELEMENT);
+            out.writeStartElement(AIGoods.getXMLElementTagName()
+                                  + LIST_ELEMENT);
             out.writeAttribute(ID_ATTRIBUTE, ag.getId());
             out.writeEndElement();
         }
@@ -1425,7 +1423,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
         for (TileImprovementPlan tip : tileImprovementPlans) {
             if (!tip.checkIntegrity()) continue;
-            out.writeStartElement(TileImprovementPlan.getXMLElementTagName() + LIST_ELEMENT);
+            out.writeStartElement(TileImprovementPlan.getXMLElementTagName()
+                                  + LIST_ELEMENT);
             out.writeAttribute(ID_ATTRIBUTE, tip.getId());
             out.writeEndElement();
         }
@@ -1434,15 +1433,13 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     }
 
     /**
-     * Reads information for this object from an XML stream.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if there are any problems reading from the
-     *             stream.
+     * {@inheritDoc}
      */
+    @Override
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         final AIMain aiMain = getAIMain();
         final Game game = aiMain.getGame();
+
         String str = in.getAttributeValue(null, ID_ATTRIBUTE);
         if ((colony = game.getFreeColGameObject(str, Colony.class)) == null) {
             throw new IllegalStateException("Not a Colony: " + str);
@@ -1454,13 +1451,16 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         colonyPlan = new ColonyPlan(aiMain, colony);
     }
 
-
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
         final AIMain aiMain = getAIMain();
-        String tag = in.getLocalName();
-        String str;
+
+        final String tag = in.getLocalName();
         if (tag.equals(AIGoods.getXMLElementTagName() + LIST_ELEMENT)) {
-            str = in.getAttributeValue(null, ID_ATTRIBUTE);
+            String str = in.getAttributeValue(null, ID_ATTRIBUTE);
             AIGoods ag = (AIGoods)aiMain.getAIObject(str);
             if (ag == null) ag = new AIGoods(aiMain, str);
             aiGoods.add(ag);
@@ -1471,9 +1471,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                                                + LIST_ELEMENT)
                    // end compatibility code
                    ) {
-            str = in.getAttributeValue(null, ID_ATTRIBUTE);
-            TileImprovementPlan ti = (TileImprovementPlan)aiMain
-                .getAIObject(str);
+            String str = in.getAttributeValue(null, ID_ATTRIBUTE);
+            TileImprovementPlan ti
+                = (TileImprovementPlan)aiMain.getAIObject(str);
             if (ti == null) ti = new TileImprovementPlan(aiMain, str);
             tileImprovementPlans.add(ti);
         } else if (tag.equals(GoodsWish.getXMLElementTagName()
@@ -1483,10 +1483,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                                                + "Wish" + LIST_ELEMENT)
                    // end compatibility code
                    ) {
-            str = in.getAttributeValue(null, ID_ATTRIBUTE);
-            GoodsWish w = (GoodsWish)aiMain.getAIObject(str);
-            if (w == null) w = new GoodsWish(aiMain, str);
-            wishes.add(w);
+            String str = in.getAttributeValue(null, ID_ATTRIBUTE);
+            GoodsWish gw = (GoodsWish)aiMain.getAIObject(str);
+            if (gw == null) gw = new GoodsWish(aiMain, str);
+            wishes.add(gw);
         } else if (tag.equals(WorkerWish.getXMLElementTagName()
                               + LIST_ELEMENT)
                    // @compat 0.10.3
@@ -1494,10 +1494,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                                                + "Wish" + LIST_ELEMENT)
                    // end compatibility code
                    ) {
-            str = in.getAttributeValue(null, ID_ATTRIBUTE);
-            Wish w = (Wish)aiMain.getAIObject(str);
-            if (w == null) w = new WorkerWish(aiMain, str);
-            wishes.add(w);
+            String str = in.getAttributeValue(null, ID_ATTRIBUTE);
+            Wish ww = (Wish)aiMain.getAIObject(str);
+            if (ww == null) ww = new WorkerWish(aiMain, str);
+            wishes.add(ww);
         } else {
             logger.warning("Unknown tag name: " + in.getLocalName());
         }
@@ -1505,7 +1505,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "aiColony"
      */

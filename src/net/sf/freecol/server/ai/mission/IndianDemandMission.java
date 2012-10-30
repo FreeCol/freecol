@@ -452,8 +452,11 @@ public class IndianDemandMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        toXML(out, getXMLElementTagName());
+        if (isValid()) {
+            toXML(out, getXMLElementTagName());
+        }
     }
 
     /**

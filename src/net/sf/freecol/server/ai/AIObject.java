@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
@@ -177,10 +178,7 @@ public abstract class AIObject extends FreeColObject {
      * Adds this object to the AI main if it has a non-null id.
      */
     protected void addAIObjectWithId() {
-        if (getId() != null) {
-            aiMain.addAIObject(getId(), this);
-            uninitialized = false;
-        }
+        if (getId() != null) aiMain.addAIObject(getId(), this);
     }
 
     /**
@@ -203,20 +201,25 @@ public abstract class AIObject extends FreeColObject {
     // Serialization
 
     /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream containing the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
+     * {@inheritDoc}
      */
-    public final void readFromXML(XMLStreamReader in)
-        throws XMLStreamException {
+    @Override
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        out.writeAttribute(ID_ATTRIBUTE, getId());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final void readFromXML(XMLStreamReader in) throws XMLStreamException {
         super.readFromXML(in);
+
         uninitialized = false;
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "AIObject".
      */

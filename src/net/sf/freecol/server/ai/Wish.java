@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -173,6 +174,20 @@ public abstract class Wish extends ValuedAIObject {
 
 
     // Serialization
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        super.writeAttributes(out);
+
+        out.writeAttribute("destination", destination.getId());
+
+        if (transportable != null) {
+            out.writeAttribute("transportable", transportable.getId());
+        }
+    }
 
     /**
      * {@inheritDoc}

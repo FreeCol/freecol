@@ -448,16 +448,24 @@ public class AIGoods extends AIObject implements Transportable {
     // Serialization
 
     /**
-     * Writes this object to an XML stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * {@inheritDoc}
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute(ID_ATTRIBUTE, getId());
+        writeAttributes(out);
+
+        goods.toXML(out);
+
+        out.writeEndElement();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        super.writeAttributes(out);
 
         if (destination != null) {
             out.writeAttribute("destination", destination.getId());
@@ -473,19 +481,12 @@ public class AIGoods extends AIObject implements Transportable {
                 out.writeAttribute("transport", transport.getId());
             }
         }
-
-        goods.toXML(out);
-
-        out.writeEndElement();
     }
 
     /**
-     * Reads information for this object from an XML stream.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if there are any problems reading
-     *      from the stream.
+     * {@inheritDoc}
      */
+    @Override
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         final AIMain aiMain = getAIMain();
 
@@ -496,15 +497,18 @@ public class AIGoods extends AIObject implements Transportable {
 
         transportPriority = getAttribute(in, "transportPriority", -1);
 
-        if ((str = in.getAttributeValue(null, "transport")) != null) {
-            if ((transport = (AIUnit)aiMain.getAIObject(str)) == null) {
-                transport = new AIUnit(aiMain, str);
-            }
-        } else {
+        if ((str = in.getAttributeValue(null, "transport")) == null) {
             transport = null;
+        } else {
+            transport = (AIUnit)aiMain.getAIObject(str);
+            if (transport == null) transport = new AIUnit(aiMain, str);
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
         if (Goods.getXMLElementTagName().equals(in.getLocalName())) {
             if (goods != null) {
@@ -529,7 +533,7 @@ public class AIGoods extends AIObject implements Transportable {
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "aiGoods"
      */

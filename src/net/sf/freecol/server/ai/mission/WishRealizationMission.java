@@ -214,8 +214,9 @@ public class WishRealizationMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        if (wish != null && wish.shouldBeStored()) {
+        if (isValid() && wish.shouldBeStored()) {
             toXML(out, getXMLElementTagName());
         }
     }

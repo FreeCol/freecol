@@ -423,40 +423,26 @@ public class AIMain extends FreeColObject
     // Serialization
 
     /**
-     * Writes all of the <code>AIObject</code>s and other AI-related
-     * information to an XML-stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * {@inheritDoc}
      */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         super.toXML(out, getXMLElementTagName());
     }
 
     /**
-     * Write the attributes of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *     to the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         out.writeAttribute("nextID", Integer.toString(nextId));
     }
 
     /**
-     * Write the children of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *     to the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
         super.writeChildren(out);
 
         // Using a copy of the objects defensively against races.
@@ -487,8 +473,8 @@ public class AIMain extends FreeColObject
     /**
      * {@inheritDoc}
      */
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
+    @Override
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         aiObjects.clear();
 
         if (!in.getLocalName().equals(getXMLElementTagName())) {
@@ -500,6 +486,7 @@ public class AIMain extends FreeColObject
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void readChildren(XMLStreamReader in) throws XMLStreamException {
         String lastTag = "";
         Wish wish;
@@ -508,7 +495,9 @@ public class AIMain extends FreeColObject
             final String oid = in.getAttributeValue(null, ID_ATTRIBUTE);
             wish = null;
             try {
+System.err.println("AT " + oid + " / " + aiObjects.containsKey(oid));
                 if (oid != null && aiObjects.containsKey(oid)) {
+System.err.println("READFROMXML " + oid);
                     getAIObject(oid).readFromXML(in);
                 } else if (tagName.equals(AIUnit.getXMLElementTagName())) {
                     new AIUnit(this, in);
@@ -547,6 +536,7 @@ public class AIMain extends FreeColObject
                     || tagName.equals("tileimprovementplan")
                     // end compatibility code
                     ) {
+System.err.println("NEW " + oid);
                     new TileImprovementPlan(this, in);
                 } else {
                     throw new IllegalStateException("Unknown AI-object read: "
@@ -581,7 +571,7 @@ public class AIMain extends FreeColObject
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "aiMain"
      */

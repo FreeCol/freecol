@@ -32,6 +32,7 @@ import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Locatable;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
@@ -653,26 +654,13 @@ public class AIUnit extends AIObject implements Transportable {
     // Serialization
 
     /**
-     * Writes this object to an XML stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
+     * {@inheritDoc}
      */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute(ID_ATTRIBUTE, getId());
-
-        if (transport != null) {
-            if (transport.getUnit() == null) {
-                logger.warning("transport.getUnit() == null");
-            } else if (getAIMain().getAIObject(transport.getId()) == null) {
-                logger.warning("broken reference to transport");
-            } else {
-                out.writeAttribute("transport", transport.getUnit().getId());
-            }
-        }
+        writeAttributes(out);
 
         if (mission != null) {
             String reason = mission.invalidReason();
@@ -688,29 +676,48 @@ public class AIUnit extends AIObject implements Transportable {
     }
 
     /**
-     * Reads information for this object from an XML stream.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if there are any problems reading from the
-     *             stream.
+     * {@inheritDoc}
      */
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        final AIMain aiMain = getAIMain();
-        String str, tag;
+    @Override
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        super.writeAttributes(out);
 
-        str = in.getAttributeValue(null, ID_ATTRIBUTE);
-        unit = aiMain.getGame().getFreeColGameObject(str, Unit.class);
-
-        str = in.getAttributeValue(null, "transport");
-        if (str != null) {
-            if ((transport = (AIUnit)aiMain.getAIObject(str)) == null) {
-                transport = new AIUnit(aiMain, str);
+        if (transport != null) {
+            if (transport.getUnit() == null) {
+                logger.warning("transport.getUnit() == null");
+            } else if (getAIMain().getAIObject(transport.getId()) == null) {
+                logger.warning("broken reference to transport");
+            } else {
+                out.writeAttribute("transport", transport.getUnit().getId());
             }
-        } else {
-            transport = null;
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        final AIMain aiMain = getAIMain();
+        final Game game = aiMain.getGame();
+
+        String str = in.getAttributeValue(null, ID_ATTRIBUTE);
+        if ((unit = game.getFreeColGameObject(str, Unit.class)) == null) {
+            throw new IllegalStateException("Not a Unit: " + str);
+        }
+
+        if ((str = in.getAttributeValue(null, "transport")) == null) {
+            transport = null;
+        } else {
+            transport = (AIUnit)aiMain.getAIObject(str);
+            if (transport == null) transport = new AIUnit(aiMain, str);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
         final AIMain aiMain = getAIMain();
         String tag = in.getLocalName();
@@ -768,7 +775,7 @@ public class AIUnit extends AIObject implements Transportable {
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "aiUnit"
      */

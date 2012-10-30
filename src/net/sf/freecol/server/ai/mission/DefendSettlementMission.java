@@ -425,6 +425,7 @@ public class DefendSettlementMission extends Mission {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         if (isValid()) {
             toXML(out, getXMLElementTagName());

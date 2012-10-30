@@ -43,6 +43,7 @@ import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIMessage;
+import net.sf.freecol.server.ai.AIObject;
 import net.sf.freecol.server.ai.AIUnit;
 import net.sf.freecol.server.ai.EuropeanAIPlayer;
 import net.sf.freecol.server.ai.TileImprovementPlan;
@@ -686,20 +687,10 @@ public class PioneeringMission extends Mission {
     /**
      * {@inheritDoc}
      */
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        toXML(out, getXMLElementTagName());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
-        super.writeAttributes(out);
-
-        if (target != null) {
-            writeAttribute(out, "target", (FreeColGameObject)target);
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        if (isValid()) {
+            toXML(out, getXMLElementTagName());
         }
     }
 
@@ -707,13 +698,38 @@ public class PioneeringMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        super.writeAttributes(out);
+
+        if (target != null) {
+            writeAttribute(out, "target", (FreeColGameObject)target);
+            if (tileImprovementPlan != null) {
+                out.writeAttribute("tileImprovementPlan",
+                                   tileImprovementPlan.getId());
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
 
         // Do not use setTarget in serialization
         String str = in.getAttributeValue(null, "target");
         target = (str == null) ? null : getGame().getFreeColLocation(str);
+
+        str = in.getAttributeValue(null, "tileImprovementPlan");
+        if (str == null) {
+            tileImprovementPlan = null;
+        } else {
+            AIObject aio = getAIMain().getAIObject(str);
+            tileImprovementPlan = (aio instanceof TileImprovementPlan)
+                ? (TileImprovementPlan)aio
+                : new TileImprovementPlan(getAIMain(), str);
+        }
     }
 
     /**

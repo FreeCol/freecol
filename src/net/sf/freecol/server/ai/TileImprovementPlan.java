@@ -50,15 +50,15 @@ public class TileImprovementPlan extends ValuedAIObject {
     private TileImprovementType type;
 
     /**
+     * The <code>Tile</code> to be improved.
+     */
+    private Tile target;
+
+    /**
      * The pioneer which should make the improvement (if a
      * <code>Unit</code> has been assigned).
      */
     private AIUnit pioneer = null;
-
-    /**
-     * The <code>Tile</code> to be improved.
-     */
-    private Tile target;
 
 
     /**
@@ -75,8 +75,8 @@ public class TileImprovementPlan extends ValuedAIObject {
         super(aiMain, id);
 
         type = null;
-        pioneer = null;
         target = null;
+        pioneer = null;
     }
 
     /**
@@ -95,6 +95,7 @@ public class TileImprovementPlan extends ValuedAIObject {
 
         this.target = target;
         this.type = type;
+        this.pioneer = null;
         setValue(value);
         uninitialized = getType() == null || getTarget() == null;
     }
@@ -242,8 +243,7 @@ public class TileImprovementPlan extends ValuedAIObject {
      * @return True if the plan is still viable.
      */
     public boolean update(GoodsType goodsType) {
-        TileImprovementType type
-            = getBestTileImprovementType(target, goodsType);
+        TileImprovementType type = getBestTileImprovementType(target, goodsType);
         if (type == null) return false;
         setType(type);
         setValue(type.getImprovementValue(target, goodsType));
@@ -256,7 +256,7 @@ public class TileImprovementPlan extends ValuedAIObject {
      * @return True if the tile improvement has been completed.
      */
     public boolean isComplete() {
-        return target.hasImprovement(getType());
+        return target != null && target.hasImprovement(getType());
     }
 
     /**
@@ -265,7 +265,11 @@ public class TileImprovementPlan extends ValuedAIObject {
      * @return True if the plan survives this check.
      */
     public boolean validate() {
-        Tile target = getTarget();
+        if (type == null) {
+            logger.warning("Removing typeless TileImprovementPlan");
+            dispose();
+            return false;
+        }
         if (target == null) {
             logger.warning("Removing targetless TileImprovementPlan");
             dispose();
@@ -287,6 +291,8 @@ public class TileImprovementPlan extends ValuedAIObject {
      */
     public boolean checkIntegrity() {
         return super.checkIntegrity()
+            && type != null
+            && target != null
             && (pioneer == null || pioneer.checkIntegrity());
     }
 
@@ -294,49 +300,45 @@ public class TileImprovementPlan extends ValuedAIObject {
     // Serialization
 
     /**
-     * Writes this object to an XML stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * {@inheritDoc}
      */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
+        if (validate()) {
+            toXML(out, getXMLElementTagName());
+        }
+    }
 
-        out.writeAttribute(ID_ATTRIBUTE, getId());
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        super.writeAttributes(out);
 
         out.writeAttribute("type", type.getId());
 
-        out.writeAttribute("value", Integer.toString(getValue()));
+        out.writeAttribute("target", target.getId());
 
         if (pioneer != null && pioneer.checkIntegrity()) {
             out.writeAttribute("pioneer", pioneer.getId());
         }
-
-        out.writeAttribute("target", target.getId());
-
-        out.writeEndElement();
     }
 
     /**
-     * Reads information for this object from an XML stream.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if there are any problems reading
-     *      from the stream.
+     * {@inheritDoc}
      */
+    @Override
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-
-        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
-
+        super.readAttributes(in);
+        
         String str = in.getAttributeValue(null, "type");
-        type = getSpecification().getTileImprovementType(str);
-
-        setValue(getAttribute(in, "value", -1));
+        type = (str == null) ? null
+            : getSpecification().getTileImprovementType(str);
 
         str = in.getAttributeValue(null, "pioneer");
         if (str != null) {
-            if ((pioneer = (AIUnit) getAIMain().getAIObject(str)) == null) {
+            if ((pioneer = (AIUnit)getAIMain().getAIObject(str)) == null) {
                 pioneer = new AIUnit(getAIMain(), str);
             }
         } else {
@@ -344,7 +346,8 @@ public class TileImprovementPlan extends ValuedAIObject {
         }
 
         str = in.getAttributeValue(null, "target");
-        target = getAIMain().getGame().getFreeColGameObject(str, Tile.class);
+        target = (str == null) ? null
+            : getAIMain().getGame().getFreeColGameObject(str, Tile.class);
     }
 
     /**
@@ -353,11 +356,11 @@ public class TileImprovementPlan extends ValuedAIObject {
     @Override
     public String toString() {
         return "[" + getId() + " " + type.getNameKey()
-            + " at " + target + " /" + getValue() + "]";
+            + " at " + target + "/" + getValue() + "]";
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "tileImprovementPlan"
      */

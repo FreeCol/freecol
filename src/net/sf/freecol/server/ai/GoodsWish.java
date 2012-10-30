@@ -189,24 +189,25 @@ public class GoodsWish extends Wish {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute(ID_ATTRIBUTE, getId());
+        writeAttributes(out);
 
-        out.writeAttribute("destination", destination.getId());
+        out.writeEndElement();
+    }
 
-        if (transportable != null) {
-            out.writeAttribute("transportable", transportable.getId());
-        }
-
-        out.writeAttribute("value", Integer.toString(getValue()));
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        super.writeAttributes(out);
 
         out.writeAttribute("goodsType", goodsType.getId());
 
         out.writeAttribute("amountRequested", Integer.toString(amountRequested));
-
-        out.writeEndElement();
     }
 
     /**

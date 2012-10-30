@@ -173,22 +173,11 @@ public class WorkerWish extends Wish {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute(ID_ATTRIBUTE, getId());
-
-        out.writeAttribute("destination", destination.getId());
-
-        if (transportable != null) {
-            out.writeAttribute("transportable", transportable.getId());
-        }
-
-        out.writeAttribute("value", Integer.toString(getValue()));
-
-        out.writeAttribute("unitType", unitType.getId());
-
-        out.writeAttribute("expertNeeded", Boolean.toString(expertNeeded));
+        writeAttributes(out);
 
         out.writeEndElement();
     }
@@ -197,8 +186,19 @@ public class WorkerWish extends Wish {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        super.writeAttributes(out);
+
+        out.writeAttribute("unitType", unitType.getId());
+
+        out.writeAttribute("expertNeeded", Boolean.toString(expertNeeded));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
 
         String str = in.getAttributeValue(null, "unitType");

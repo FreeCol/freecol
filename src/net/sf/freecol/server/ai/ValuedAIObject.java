@@ -21,6 +21,7 @@ package net.sf.freecol.server.ai;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Element;
 
@@ -124,8 +125,17 @@ public abstract class ValuedAIObject extends AIObject
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        super.writeAttributes(out);
+
+        out.writeAttribute("value", Integer.toString(value));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
 
         setValue(getAttribute(in, "value", -1));
