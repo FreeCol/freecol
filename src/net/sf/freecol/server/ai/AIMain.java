@@ -495,9 +495,7 @@ public class AIMain extends FreeColObject
             final String oid = in.getAttributeValue(null, ID_ATTRIBUTE);
             wish = null;
             try {
-System.err.println("AT " + oid + " / " + aiObjects.containsKey(oid));
                 if (oid != null && aiObjects.containsKey(oid)) {
-System.err.println("READFROMXML " + oid);
                     getAIObject(oid).readFromXML(in);
                 } else if (tagName.equals(AIUnit.getXMLElementTagName())) {
                     new AIUnit(this, in);
