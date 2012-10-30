@@ -61,7 +61,9 @@ public final class CanvasMouseMotionListener extends AbstractCanvasListener impl
      */
     public void mouseMoved(MouseEvent e) {
 
-    	performAutoScrollIfActive(e);
+    	if (e.getY() >= AUTO_SCROLLSPACE){
+    		performAutoScrollIfActive(e);
+    	}
 
         if (mapViewer.isGotoStarted()) {
             if (mapViewer.getActiveUnit() == null) {

@@ -77,6 +77,9 @@ public class MapEditorMenuBar extends FreeColMenuBar {
     public MapEditorMenuBar(final FreeColClient freeColClient, GUI gui) {
         super(freeColClient, gui);
 
+        //add a mouse listener so that autoscrolling can happen in this menubar
+        this.addMouseMotionListener(new MenuMouseMotionListener(freeColClient, gui.getMapViewer()));
+      
         reset();
     }
 

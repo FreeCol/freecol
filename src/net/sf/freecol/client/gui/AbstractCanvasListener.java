@@ -12,7 +12,7 @@ public class AbstractCanvasListener {
     protected ScrollThread scrollThread;
     protected FreeColClient freeColClient;
     private static final int DRAG_SCROLLSPACE = 100;
-    private static final int AUTO_SCROLLSPACE = 1;
+    protected static final int AUTO_SCROLLSPACE = 1;
 
     public AbstractCanvasListener(FreeColClient freeColClient, MapViewer mapViewer) {
         this.freeColClient = freeColClient;
@@ -32,7 +32,7 @@ public class AbstractCanvasListener {
         if (e.getComponent().isEnabled()
           && freeColClient.getClientOptions()
           .getBoolean(ClientOptions.AUTO_SCROLL)) {
-    			autoScroll(e.getX(), e.getY());
+    		autoScroll(e.getX(), e.getY());
         } else
             stopScrollIfScrollIsActive();
     }

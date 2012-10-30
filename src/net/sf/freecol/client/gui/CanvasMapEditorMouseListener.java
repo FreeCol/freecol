@@ -250,7 +250,9 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener i
         if (getMap() == null) {
             return;
         }
-        
+        if (e.getY() < AUTO_SCROLLSPACE){
+        	return; // handle this in the menu bar
+        }
         performAutoScrollIfActive(e);
     }
 
