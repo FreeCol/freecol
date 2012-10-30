@@ -49,9 +49,9 @@ public class UnitWas implements Comparable<UnitWas> {
 
 
     /**
-     * Main constructor.
+     * Record the state of a unit.
      *
-     * @param unit The <code>Unit</code> to check changes to.
+     * @param unit The <code>Unit</code> to remember.
      */
     public UnitWas(Unit unit) {
         this.unit = unit;
@@ -176,11 +176,11 @@ public class UnitWas implements Comparable<UnitWas> {
             }
         }
 
+        FreeColGameObject oldFcgo = (FreeColGameObject)loc;
+        FreeColGameObject newFcgo = (FreeColGameObject)newLoc;
         if (loc != newLoc) {
-            FreeColGameObject oldFcgo = (FreeColGameObject) loc;
             oldFcgo.firePropertyChange(change(oldFcgo), unit, null);
             if (newLoc != null) {
-                FreeColGameObject newFcgo = (FreeColGameObject) newLoc;
                 newFcgo.firePropertyChange(change(newFcgo), null, unit);
             }
         }
@@ -191,21 +191,19 @@ public class UnitWas implements Comparable<UnitWas> {
             } else if (role != newRole && newRole != null) {
                 String pc = Tile.UNIT_CHANGE.toString();
                 colony.firePropertyChange(pc, role.toString(),
-                    newRole.toString());
+                                          newRole.toString());
             }
-            if (work == newWork) {
-                if (work != null && workAmount != newWorkAmount) {
-                    colony.firePropertyChange(work.getId(),
-                        workAmount, newWorkAmount);
+            if (work != newWork) {
+                if (work != null && oldFcgo != null && workAmount != 0) {
+                    oldFcgo.firePropertyChange(work.getId(), workAmount, 0);
                 }
-            } else {
-                if (work != null) {
-                    colony.firePropertyChange(work.getId(), workAmount, 0);
+                if (newWork != null && newFcgo != null && newWorkAmount != 0) {
+                    newFcgo.firePropertyChange(newWork.getId(),
+                                               0, newWorkAmount);
                 }
-                if (newWork != null) {
-                    colony.firePropertyChange(newWork.getId(),
-                        0, newWorkAmount);
-                }
+            } else if (workAmount != newWorkAmount) {
+                newFcgo.firePropertyChange(newWork.getId(),
+                                           workAmount, newWorkAmount);
             }
         }
         if (newEquipment != null) {
@@ -237,7 +235,13 @@ public class UnitWas implements Comparable<UnitWas> {
 
     // TODO: fix this non-OO nastiness
     private int getAmount(Location location, GoodsType goodsType) {
-        if (goodsType != null) {
+        if (goodsType != null && location instanceof WorkLocation) {
+            ProductionInfo info = ((WorkLocation)location).getProductionInfo();
+            for (AbstractGoods ag : info.getProduction()) {
+logger.warning("GETAMOUNT " + ag);
+                if (ag.getType() == goodsType) return ag.getAmount();
+            }
+            /*
             if (location instanceof Building) {
                 Building building = (Building) location;
                 ProductionInfo info = building.getProductionInfo();
@@ -247,6 +251,7 @@ public class UnitWas implements Comparable<UnitWas> {
             } else if (location instanceof ColonyTile) {
                 return ((ColonyTile)location).getTotalProductionOf(goodsType);
             }
+            */
         }
         return 0;
     }

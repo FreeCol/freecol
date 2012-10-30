@@ -29,6 +29,7 @@ import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Event;
@@ -87,6 +88,8 @@ public class InGameControllerTest extends FreeColTestCase {
         = spec().getGoodsType("model.goods.bells");
     private static final GoodsType cottonType
         = spec().getGoodsType("model.goods.cotton");
+    private static final GoodsType grainType
+        = spec().getGoodsType("model.goods.grain");
     private static final GoodsType foodType
         = spec().getPrimaryFoodType();
     private static final GoodsType musketType
@@ -1941,10 +1944,13 @@ public class InGameControllerTest extends FreeColTestCase {
         InGameController igc = ServerTestHelper.getInGameController();
 
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
+        Colony colony = getStandardColony(1);
         Unit colonist = new ServerUnit(game, map.getTile(6, 8), dutch,
                                        colonistType);
-
-        colonist.setWorkType(foodType);
+        colonist.setWorkType(grainType);
+        ColonyTile ct = colony.getVacantColonyTileFor(colonist, true, grainType);
+        assertNotNull(ct);
+        colonist.setLocation(ct);
         colonist.modifyExperience(10);
         assertTrue("Colonist should some initial experience",
                    colonist.getExperience() > 0);

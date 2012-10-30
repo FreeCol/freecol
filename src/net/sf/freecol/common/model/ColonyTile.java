@@ -479,7 +479,7 @@ public class ColonyTile extends WorkLocation implements Ownable {
      * {@inheritDoc}
      */
     public GoodsType getBestWorkType(Unit unit) {
-        GoodsType workType = unit.getWorkType();
+        GoodsType workType = null;
         int amount = 0;
         for (GoodsType g : getSpecification().getFarmedGoodsTypeList()) {
             int newAmount = getPotentialProduction(g, unit.getType());

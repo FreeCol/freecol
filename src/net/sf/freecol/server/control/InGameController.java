@@ -3587,8 +3587,8 @@ public final class InGameController extends Controller {
             unit.setWorkType(type);
         }
 
-        // Private update of the unit.
-        return new ChangeSet().add(See.only(serverPlayer), unit)
+        // Private update of the colony.
+        return new ChangeSet().add(See.only(serverPlayer), unit.getColony())
             .build(serverPlayer);
     }
 

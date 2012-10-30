@@ -40,6 +40,11 @@ public class ColonyWas {
     private List<BuildableType> buildQueue;
 
 
+    /**
+     * Record the state of a colony.
+     *
+     * @param colony The <code>Colony</code> to remember.
+     */
     public ColonyWas(Colony colony) {
         this.colony = colony;
         this.population = colony.getUnitCount();

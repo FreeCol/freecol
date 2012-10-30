@@ -334,16 +334,15 @@ public final class UnitLabel extends JLabel
             if (args.length < 3) break;
             ColonyTile colonyTile
                 = game.getFreeColGameObject(args[1], ColonyTile.class);
-            if (colonyTile == unit.getLocation()) break;
-            // Claim tile if needed, then change workType first for
-            // the benefit of change listeners, before finally
-            // committing to work.
             if (args.length >= 4 && "!".equals(args[3])) {
+                // Claim tile if needed
                 if (!inGameController.claimLand(colonyTile.getWorkTile(), 
                                                 unit.getColony(), 0)) break;
             }
+            if (colonyTile != unit.getLocation()) {
+                inGameController.work(unit, colonyTile);
+            }
             inGameController.changeWorkType(unit, spec.getGoodsType(args[2]));
-            inGameController.work(unit, colonyTile);
             break;
         case WORK_BUILDING:
             if (args.length < 3) break;

@@ -1496,22 +1496,20 @@ public final class ColonyPanel extends PortPanel
             }
 
             /**
-             * Updates the description label The description label is a tooltip
-             * with the terrain type, road and plow indicator if any
+             * Updates the description label, which is a tooltip with
+             * the terrain type, road and plow indicator, if any.
              *
-             * If a unit is on it update the tooltip of it instead
+             * If a unit is on it update the tooltip of it instead.
              */
             private void updateDescriptionLabel(UnitLabel unit, boolean toAdd) {
-                String tileDescription = Messages.message(this.colonyTile.getLabel());
-
+                String tileMsg = Messages.message(colonyTile.getLabel());
                 if (unit == null) {
-                    setToolTipText(tileDescription);
+                    setToolTipText(tileMsg);
                 } else {
-                    String unitDescription = Messages.message(Messages.getLabel(unit.getUnit()));
-                    if (toAdd) {
-                        unitDescription = tileDescription + " [" + unitDescription + "]";
-                    }
-                    unit.setDescriptionLabel(unitDescription);
+                    String unitMsg
+                        = Messages.message(Messages.getLabel(unit.getUnit()));
+                    if (toAdd) unitMsg = tileMsg + " [" + unitMsg + "]";
+                    unit.setDescriptionLabel(unitMsg);
                 }
             }
 
@@ -1529,7 +1527,6 @@ public final class ColonyPanel extends PortPanel
             }
 
             private void initialize() {
-
                 removeAll();
                 UnitLabel unitLabel = null;
                 for (Unit unit : colonyTile.getUnitList()) {
@@ -1553,9 +1550,10 @@ public final class ColonyPanel extends PortPanel
             }
 
             /**
-             * Adds a component to this CargoPanel and makes sure that the unit
-             * or good that the component represents gets modified so that it is
-             * on board the currently selected ship.
+             * Adds a component to this CargoPanel and makes sure that
+             * the unit or good that the component represents gets
+             * modified so that it is on board the currently selected
+             * ship.
              *
              * @param comp The component to add to this CargoPanel.
              * @param editState Must be set to 'true' if the state of the
@@ -1582,14 +1580,7 @@ public final class ColonyPanel extends PortPanel
                     }
                 }
 
-                /*
-                 * At this point, the panel has already been updated
-                 * via the property change listener.
-                 *
-                 removeAll();
-                 Component c = super.add(comp);
-                 refresh();
-                */
+                initialize();
                 return comp;
             }
 
@@ -1645,14 +1636,29 @@ public final class ColonyPanel extends PortPanel
                 // FTM, do not change the work type unless explicitly
                 // told to as this destroys experience (TODO: allow
                 // multiple experience accumulation?).
-                GoodsType workType = unit.getWorkType();
-                if (workType == null) {
-                    // Try to use expertise, then tile-specific
-                    workType = unit.getType().getExpertProduction();
-                    if (workType == null) {
-                        workType = colonyTile.getBestWorkType(unit);
-                    }
+                GoodsType workType;
+                if ((workType = unit.getWorkType()) != null
+                    && colonyTile.getProductionOf(unit, workType) <= 0) {
+                    workType = null;
                 }
+                if (workType == null // Try experience.
+                    && (workType = unit.getExperienceType()) != null
+                    && colonyTile.getProductionOf(unit, workType) <= 0) {
+                    workType = null;
+                }
+                if (workType == null // Try expertise?
+                    && (workType = unit.getType().getExpertProduction()) != null
+                    && colonyTile.getProductionOf(unit, workType) <= 0) {
+                    workType = null;
+                }
+                // Try best work type?
+                if (workType == null
+                    && (workType = colonyTile.getBestWorkType(unit)) != null
+                    && colonyTile.getProductionOf(unit, workType) <= 0) {
+                    workType = null;
+                }
+                // No good, just leave it alone then.
+                if (workType == null) workType = unit.getWorkType();
                 // Set the unit to work.  Note this might upgrade the
                 // unit, and possibly even change its work type as the
                 // server has the right to maintain consistency.

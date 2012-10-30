@@ -473,6 +473,8 @@ public class Building extends WorkLocation implements Named, Comparable<Building
 
         if (super.add(unit)) {
             unit.setState(Unit.UnitState.IN_COLONY);
+            // TODO: remove this if we ever allow buildings to produce
+            // more than one goods type.
             unit.setWorkType(getGoodsOutputType());
 
             getColony().invalidateCache();
