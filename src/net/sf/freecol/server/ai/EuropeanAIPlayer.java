@@ -40,6 +40,7 @@ import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.GoldTradeItem;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsTradeItem;
@@ -1059,15 +1060,15 @@ public class EuropeanAIPlayer extends AIPlayer {
         final Europe europe = player.getEurope();
         final Random air = getAIRandom();
         final int liftBoycottCheatPercent
-            = spec.getInteger("model.option.liftBoycottCheat");
+            = spec.getInteger(GameOptions.LIFT_BOYCOTT_CHEAT);
         final int equipScoutCheatPercent
-            = spec.getInteger("model.option.liftBoycottCheat");
+            = spec.getInteger(GameOptions.EQUIP_SCOUT_CHEAT);
         final int landUnitCheatPercent
-            = spec.getInteger("model.option.landUnitCheat");
+            = spec.getInteger(GameOptions.LAND_UNIT_CHEAT);
         final int offensiveNavalUnitCheatPercent
-            = spec.getInteger("model.option.offensiveNavalUnitCheat");
+            = spec.getInteger(GameOptions.OFFENSIVE_NAVAL_UNIT_CHEAT);
         final int transportNavalUnitCheatPercent
-            = spec.getInteger("model.option.transportNavalUnitCheat");
+            = spec.getInteger(GameOptions.TRANSPORT_NAVAL_UNIT_CHEAT);
 
         for (GoodsType goodsType : spec.getGoodsTypeList()) {
             if (market.getArrears(goodsType) > 0

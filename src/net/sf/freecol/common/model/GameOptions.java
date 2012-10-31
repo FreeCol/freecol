@@ -133,4 +133,13 @@ public class GameOptions {
     public static final String ENABLE_UPKEEP = "model.option.enableUpkeep";
 
     public static final String NATURAL_DISASTERS = "model.option.naturalDisasters";
+
+    /**
+     * The various cheat options.
+     */
+    public static final String LIFT_BOYCOTT_CHEAT = "model.option.liftBoycottCheat";
+    public static final String EQUIP_SCOUT_CHEAT = "model.option.equipScoutCheat";
+    public static final String LAND_UNIT_CHEAT = "model.option.landUnitCheat";
+    public static final String OFFENSIVE_NAVAL_UNIT_CHEAT = "model.option.offensiveNavalUnitCheat";
+    public static final String TRANSPORT_NAVAL_UNIT_CHEAT = "model.option.transportNavalUnitCheat";
 }
