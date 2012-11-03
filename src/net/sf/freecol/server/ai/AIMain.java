@@ -534,7 +534,6 @@ public class AIMain extends FreeColObject
                     || tagName.equals("tileimprovementplan")
                     // end compatibility code
                     ) {
-System.err.println("NEW " + oid);
                     new TileImprovementPlan(this, in);
                 } else {
                     throw new IllegalStateException("Unknown AI-object read: "
