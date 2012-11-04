@@ -44,15 +44,26 @@ import net.sf.freecol.common.model.UnitType;
  */
 public final class ReportIndianPanel extends ReportPanel {
 
+    private static final String[] headlines = new String[] {
+        "Settlement",
+        "mission",
+        "report.indian.tension",
+        "report.indian.skillTaught",
+        "report.indian.mostHated",
+        "report.indian.tradeInterests"
+    };
+
+
+
     /**
      * The constructor that will add the items to this panel.
-     * @param freeColClient 
+     * @param freeColClient
      * @param gui The parent of this panel.
      */
     public ReportIndianPanel(FreeColClient freeColClient, GUI gui) {
         super(freeColClient, gui, Messages.message("reportIndianAction.name"));
         Player player = getMyPlayer();
-        reportPanel.setLayout(new MigLayout("wrap 5, fillx, insets 0", "[]20px[center]", ""));
+        reportPanel.setLayout(new MigLayout("wrap 6, fillx, insets 0", "[]20px[center]", "[top]"));
         boolean needsSeperator = false;
         for (Player opponent : getGame().getPlayers()) {
             if (opponent.isIndian() && !opponent.isDead() && player.hasContacted(opponent)) {
@@ -85,32 +96,39 @@ public final class ReportIndianPanel extends ReportPanel {
         numSettlements = (knownNumberOfSettlements > 0)
             ? "" + knownNumberOfSettlements + " / " + trueNumberOfSettlements
             : "" + knownNumberOfSettlements;
-        
+
         JLabel villageLabel = new JLabel();
         villageLabel.setIcon(new ImageIcon(getLibrary().getSettlementImage(opponent.getNationType().getCapitalType(), 0.66)));
         reportPanel.add(villageLabel, "span, split 2");
         JLabel headline = localizedLabel(opponent.getNationName());
         headline.setFont(smallHeaderFont);
         reportPanel.add(headline, "wrap 20");
-        reportPanel.add(localizedLabel("report.indian.chieftain"));
+        JLabel label = localizedLabel("report.indian.chieftain");
+        label.setFont(boldFont);
+        reportPanel.add(label);
         reportPanel.add(new JLabel(Messages.message(opponent.getName())), "left, wrap");
-        reportPanel.add(localizedLabel("report.indian.typeOfSettlements"));
+        label = localizedLabel("report.indian.typeOfSettlements");
+        label.setFont(boldFont);
+        reportPanel.add(label);
         reportPanel.add(localizedLabel(opponent.getNationType().getCapitalType().getId() + ".name"), "left, wrap");
-        reportPanel.add(localizedLabel("report.indian.numberOfSettlements"));
+        label = localizedLabel("report.indian.numberOfSettlements");
+        reportPanel.add(label);
+        label.setFont(boldFont);
         reportPanel.add(new JLabel(numSettlements), "left, wrap");
-        reportPanel.add(new JLabel(Messages.message("report.indian.tribeTension")));
+        label = localizedLabel("report.indian.tribeTension");
+        reportPanel.add(label);
+        label.setFont(boldFont);
         reportPanel.add(new JLabel(Messages.message("tension." + opponent.getTension(player).getKey())
                 + "/"
                 + Messages.message(Messages.getStanceAsString(opponent.getStance(player)))),
             "left, wrap 20");
 
         if (knownNumberOfSettlements > 0) {
-            reportPanel.add(localizedLabel("Settlement"), "newline 10");
-            reportPanel.add(localizedLabel("mission"));
-            reportPanel.add(localizedLabel("report.indian.tension"));
-            reportPanel.add(localizedLabel("report.indian.skillTaught"));
-            reportPanel.add(localizedLabel("report.indian.mostHated"));
-            reportPanel.add(localizedLabel("report.indian.tradeInterests"));
+            for (String key : headlines) {
+                JLabel head = localizedLabel(key);
+                head.setFont(boldFont);
+                reportPanel.add(head);
+            }
             List<IndianSettlement> settlements = new ArrayList<IndianSettlement>(knownNumberOfSettlements);
             for (IndianSettlement settlement : nativeSettlements) {
                 if (settlement.isCapital()) {
@@ -149,6 +167,8 @@ public final class ReportIndianPanel extends ReportPanel {
                 reportPanel.add(localizedLabel(messageId));
 
                 JLabel skillLabel = new JLabel();
+                skillLabel.setVerticalTextPosition(JLabel.TOP);
+                skillLabel.setHorizontalTextPosition(JLabel.CENTER);
                 UnitType skillType = settlement.getLearnableSkill();
                 String skillString;
                 if (visited) {
@@ -185,7 +205,7 @@ public final class ReportIndianPanel extends ReportPanel {
                     } else {
                         JLabel goodsLabel = localizedLabel(wantedGoods[0].getNameKey());
                         goodsLabel.setIcon(new ImageIcon(getLibrary().getGoodsImage(wantedGoods[0], 0.66)));
-                        String split = "split " + String.valueOf(wantedGoods.length);
+                        String split = "flowy, split " + String.valueOf(wantedGoods.length);
                         reportPanel.add(goodsLabel, split);
                         for (int i = 1; i < wantedGoods.length; i++) {
                             if (wantedGoods[i] != null) {

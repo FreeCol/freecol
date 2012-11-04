@@ -103,6 +103,7 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
 
     // Font to use for text areas
     protected static final Font defaultFont = ResourceManager.getFont("NormalFont", 13f);
+    protected static final Font boldFont = defaultFont.deriveFont(Font.BOLD);
 
     // Fonts to use for report headers, etc.
     protected static final Font  smallHeaderFont = ResourceManager.getFont("HeaderFont", 24f);
