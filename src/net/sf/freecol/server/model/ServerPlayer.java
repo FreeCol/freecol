@@ -2350,7 +2350,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
             Unit missionary = s.getMissionary(attackerPlayer);
             if (missionary != null) {
                 s.changeMissionary(null);
-                if (s != settlement) cs.add(See.perhaps(), s.getTile());
+                cs.addDispose(See.perhaps().always(attackerPlayer),
+                    (s == settlement) ? null : settlement.getTile(),
+                    missionary);
             }
         }
     }
