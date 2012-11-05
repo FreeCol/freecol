@@ -391,6 +391,26 @@ public class TransportMission extends Mission {
         }
 
         /**
+         * Check the integrity of this carrier.
+         *
+         * @param aiCarrier The <code>AIUnit</code> version of the carrier.
+         * @return A reason for integrity failure, or null if none.
+         */
+        public String check(AIUnit aiCarrier) {
+            String reason = invalidReason(aiCarrier, target);
+            if (reason != null) return reason;
+
+            Locatable l = transportable.getTransportLocatable();
+            if (l == null) return "null locatable: " + transportable.toString();
+
+            Location tLoc = l.getLocation();
+            if (tLoc instanceof Unit && (Unit)tLoc != carrier) {
+                return "carrier usurped"; // On another carrier!
+            }
+            return null;
+        }
+
+        /**
          * {@inheritDoc}
          */
         public String toString() {
@@ -962,20 +982,8 @@ public class TransportMission extends Mission {
         // Check all cargoes are valid.
         // Collect any non-cargo units and goods.
         for (Cargo cargo : tCopy()) {
-            Transportable t = cargo.getTransportable();
-            if ((reason = invalidReason(aiCarrier, cargo.getTarget())) != null) {
+            if ((reason = cargo.check(aiCarrier)) != null) {
                 removeCargo(cargo, reason);
-                continue;
-            }
-            Locatable l = t.getTransportLocatable();
-            if (l == null) {
-                removeCargo(cargo, "null locatable: " + t.toString());
-                continue;
-            }
-            Location tLoc = l.getLocation();
-            if (tLoc instanceof Unit && (Unit)tLoc != carrier) {
-                // On another carrier!
-                removeCargo(cargo, "carrier usurped");
                 continue;
             }
             PathNode path = carrier.findPath(cargo.getTarget());
@@ -986,6 +994,7 @@ public class TransportMission extends Mission {
             // Redo the cargo in case the pickup/drop node needs
             // updating in response to changes in moves left or the
             // map situation.
+            Transportable t = cargo.getTransportable();
             if (carrier.getTile() != null) {
                 if ((reason = cargo.setTarget()) != null && !cargo.retry()) {
                     removeCargo(cargo, "can not progress (" + reason
@@ -1724,9 +1733,16 @@ public class TransportMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
+        final AIUnit aiCarrier = getAIUnit();
         for (Cargo cargo : tCopy()) {
+            // Sanity check first.  Another nation might have captured
+            // or destroyed a target colony.
+            String reason = cargo.check(aiCarrier);
+            if (reason != null) {
+                removeCargo(cargo, reason);
+                continue;
+            }
             // Do not bother writing cargoes that will be dumped.
             // On restore, checkCargoes will work out what to do with them.
             if (cargo.getMode() != CargoMode.DUMP) {
