@@ -56,6 +56,7 @@ public class AllTests {
 	suite.addTestSuite(SerializationTest.class);
 	suite.addTestSuite(SettlementTest.class);
 	suite.addTestSuite(SoLTest.class);
+	suite.addTestSuite(TileImprovementTest.class);
 	suite.addTestSuite(TileItemContainerTest.class);
 	suite.addTestSuite(TileTest.class);
 	suite.addTestSuite(UnitTest.class);
