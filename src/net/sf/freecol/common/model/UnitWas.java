@@ -238,7 +238,6 @@ public class UnitWas implements Comparable<UnitWas> {
         if (goodsType != null && location instanceof WorkLocation) {
             ProductionInfo info = ((WorkLocation)location).getProductionInfo();
             for (AbstractGoods ag : info.getProduction()) {
-logger.warning("GETAMOUNT " + ag);
                 if (ag.getType() == goodsType) return ag.getAmount();
             }
             /*
