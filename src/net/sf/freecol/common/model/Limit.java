@@ -194,13 +194,12 @@ public final class Limit extends FreeColGameObjectType {
      * @return a <code>boolean</code> value
      */
     public boolean evaluate(Settlement settlement) {
+        final Specification spec = getSpecification();
         Integer lhs = null;
         switch(leftHandSide.getScopeLevel()) {
         case SETTLEMENT:
             lhs = leftHandSide.getValue(settlement);
-            lhs += getSpecification()
-                .getIntegerOption("model.option.settlementLimitModifier")
-                .getValue();
+            lhs += spec.getInteger("model.option.settlementLimitModifier");
             break;
         case PLAYER:
             lhs = leftHandSide.getValue(settlement.getOwner());

@@ -1546,6 +1546,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *         ours, unclaimed or unwanted, negative if it is not for sale.
      */
     public int getLandPrice(Tile tile) {
+        final Specification spec = getSpecification();
         Player nationOwner = tile.getOwner();
         int price = 0;
 
@@ -1561,14 +1562,14 @@ public class Player extends FreeColGameObject implements Nameable {
                 return 0; // Claim abandoned or only by tile improvement
             }
         } // Else, native ownership
-        for (GoodsType type : getSpecification().getGoodsTypeList()) {
-            if (type == getSpecification().getPrimaryFoodType()) {
+        for (GoodsType type : spec.getGoodsTypeList()) {
+            if (type == spec.getPrimaryFoodType()) {
                 // Only consider specific food types, not the aggregation.
                 continue;
             }
             price += tile.potential(type, null);
         }
-        price *= getSpecification().getIntegerOption("model.option.landPriceFactor").getValue();
+        price *= spec.getInteger("model.option.landPriceFactor");
         price += 100;
         return (int) applyModifier(price, "model.modifier.landPaymentModifier",
                                    null, getGame().getTurn());
@@ -1909,8 +1910,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * @see #incrementLiberty
      */
     public int getTotalFoundingFatherCost() {
-        int base = getSpecification()
-            .getIntegerOption("model.option.foundingFatherFactor").getValue();
+        final Specification spec = getSpecification();
+        int base = spec.getInteger("model.option.foundingFatherFactor");
         int count = getFatherCount();
         return ((count + 1) * (count + 2) - 1) * base + count;
     }
@@ -2421,12 +2422,12 @@ public class Player extends FreeColGameObject implements Nameable {
      * from <code>Europe</code>.
      */
     public void updateImmigrationRequired() {
-        if (!canRecruitUnits()) {
-            return;
-        }
-        immigrationRequired += (int)applyModifier(getSpecification()
-                           .getIntegerOption("model.option.crossesIncrement").getValue(),
-                           "model.modifier.religiousUnrestBonus");
+        if (!canRecruitUnits()) return;
+
+        final Specification spec = getSpecification();
+        int base = spec.getInteger("model.option.crossesIncrement");
+        immigrationRequired += (int)applyModifier(base,
+            "model.modifier.religiousUnrestBonus");
         // The book I have tells me the crosses needed is:
         // [(colonist count in colonies + total colonist count) * 2] + 8.
         // So every unit counts as 2 unless they're in a colony,

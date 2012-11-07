@@ -36,6 +36,7 @@ import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
@@ -131,9 +132,9 @@ public class IndianDemandMission extends Mission {
      * @return The goods to demand.
      */
     public Goods selectGoods(Colony target) {
+        final Specification spec = getSpecification();
         Tension.Level tension = getUnit().getOwner().getTension(target.getOwner()).getLevel();
-        int dx = getSpecification().getIntegerOption("model.option.nativeDemands")
-            .getValue() + 1;
+        int dx = spec.getInteger("model.option.nativeDemands") + 1;
         GoodsType food = getSpecification().getPrimaryFoodType();
         Goods goods = null;
         if (tension.compareTo(Tension.Level.CONTENT) <= 0 &&

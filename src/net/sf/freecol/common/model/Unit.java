@@ -2925,11 +2925,10 @@ public class Unit extends GoodsLocation
      * @return The number of turns to sail to/from Europe.
      */
     public int getSailTurns() {
-        float base = getSpecification()
-            .getIntegerOption("model.option.turnsToSail").getValue();
-        return (int) getOwner().applyModifier(base,
-                                              "model.modifier.sailHighSeas",
-                                              unitType, getGame().getTurn());
+        float base = getSpecification().getInteger("model.option.turnsToSail");
+        return (int)getOwner().applyModifier(base,
+                                             "model.modifier.sailHighSeas",
+                                             unitType, getGame().getTurn());
     }
 
 
@@ -3466,12 +3465,11 @@ public class Unit extends GoodsLocation
      * @return A probability of conversion.
      */
     public float getConvertProbability() {
-        Specification spec = getSpecification();
-        int opt = spec.getIntegerOption("model.option.nativeConvertProbability")
-            .getValue();
+        final Specification spec = getSpecification();
+        int opt = spec.getInteger("model.option.nativeConvertProbability");
         return 0.01f * FeatureContainer.applyModifierSet(opt,
-                                                         getGame().getTurn(),
-                                                         getModifierSet("model.modifier.nativeConvertBonus"));
+            getGame().getTurn(),
+            getModifierSet("model.modifier.nativeConvertBonus"));
     }
 
     /**
@@ -3482,8 +3480,8 @@ public class Unit extends GoodsLocation
      */
     public float getBurnProbability() {
         // TODO: enhance burn probability proportionally with tension
-        return 0.01f * getSpecification()
-            .getIntegerOption("model.option.burnProbability").getValue();
+        final Specification spec = getSpecification();
+        return 0.01f * spec.getInteger("model.option.burnProbability");
     }
 
     /**

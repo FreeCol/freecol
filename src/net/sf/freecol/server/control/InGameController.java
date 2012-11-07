@@ -3441,9 +3441,9 @@ public final class InGameController extends Controller {
      */
     public Element indianDemand(final ServerPlayer serverPlayer, Unit unit,
                                 Colony colony, Goods goods, int gold) {
+        final Specification spec = getGame().getSpecification();
         ServerPlayer victim = (ServerPlayer) colony.getOwner();
-        int difficulty = getGame().getSpecification()
-            .getIntegerOption("model.option.nativeDemands").getValue();
+        int difficulty = spec.getInteger("model.option.nativeDemands");
         ChangeSet cs = new ChangeSet();
 
         DOMMessage reply = askTimeout(victim,
@@ -3755,8 +3755,8 @@ public final class InGameController extends Controller {
      * @return An <code>Element</code> encapsulating this action.
      */
     public Element getREFUnits(ServerPlayer serverPlayer) {
-        Game game = getGame();
-        Specification spec = game.getSpecification();
+        final Game game = getGame();
+        final Specification spec = game.getSpecification();
         List<AbstractUnit> units = new ArrayList<AbstractUnit>();
         final UnitType defaultType = spec.getDefaultUnitType();
 

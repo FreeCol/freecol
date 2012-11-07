@@ -282,9 +282,9 @@ public class Europe extends UnitLocation implements Ownable, Named {
      * Only called from the server side.
      */
     public void increaseRecruitmentDifficulty() {
-        Specification spec = getSpecification();
-        recruitPrice += spec.getIntegerOption("model.option.recruitPriceIncrease").getValue();
-        recruitLowerCap += spec.getIntegerOption("model.option.lowerCapIncrease").getValue();
+        final Specification spec = getSpecification();
+        recruitPrice += spec.getInteger("model.option.recruitPriceIncrease");
+        recruitLowerCap += spec.getInteger("model.option.lowerCapIncrease");
     }
 
     /**

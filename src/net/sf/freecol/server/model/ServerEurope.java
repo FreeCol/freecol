@@ -110,16 +110,13 @@ public class ServerEurope extends Europe implements ServerModelObject {
      * @param price The current price of the unit
      */
     public void increasePrice(UnitType unitType, int price) {
-        Specification spec = getSpecification();
+        final Specification spec = getSpecification();
         String baseOption = "model.option.priceIncreasePerType";
-        String name
-            = unitType.getId().substring(unitType.getId().lastIndexOf('.'));
+        String name = unitType.getId().substring(unitType.getId().lastIndexOf('.'));
         String option = (spec.getBooleanOption(baseOption).getValue())
             ? "model.option.priceIncrease" + name
             : "model.option.priceIncrease";
-        int increase = (spec.hasOption(option))
-            ? spec.getIntegerOption(option).getValue()
-            : 0;
+        int increase = (spec.hasOption(option)) ? spec.getInteger(option) : 0;
         if (increase != 0) {
             unitPrices.put(unitType, new Integer(price + increase));
         }

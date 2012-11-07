@@ -229,10 +229,11 @@ public final class Monarch extends FreeColGameObject implements Named {
 
     /**
      * Gets the maximum tax rate in this game.
+     *
+     * @return The maximum tax rate in the game.
      */
     private int taxMaximum() {
-        return getSpecification().getIntegerOption("model.option.maximumTax")
-            .getValue();
+        return getSpecification().getInteger("model.option.maximumTax");
     }
 
     /**
@@ -315,10 +316,10 @@ public final class Monarch extends FreeColGameObject implements Named {
      * @return A weighted list of monarch actions.
      */
     public List<RandomChoice<MonarchAction>> getActionChoices() {
+        final Specification spec = getSpecification();
         List<RandomChoice<MonarchAction>> choices
             = new ArrayList<RandomChoice<MonarchAction>>();
-        int dx = 1 + getSpecification()
-            .getIntegerOption("model.option.monarchMeddling").getValue();
+        int dx = 1 + spec.getInteger("model.option.monarchMeddling");
         int turn = getGame().getTurn().getNumber();
         int grace = (6 - dx) * 10; // 10-50
 
@@ -364,8 +365,8 @@ public final class Monarch extends FreeColGameObject implements Named {
      * @return The new tax rate.
      */
     public int raiseTax(Random random) {
-        int taxAdjustment = getSpecification()
-            .getIntegerOption("model.option.taxAdjustment").getValue();
+        final Specification spec = getSpecification();
+        int taxAdjustment = spec.getInteger("model.option.taxAdjustment");
         int turn = getGame().getTurn().getNumber();
         int oldTax = player.getTax();
         int adjust = Math.max(1, (6 - taxAdjustment) * 10); // 20-60
@@ -381,8 +382,8 @@ public final class Monarch extends FreeColGameObject implements Named {
      * @return The new tax rate.
      */
     public int lowerTax(Random random) {
-        int taxAdjustment = getSpecification()
-            .getIntegerOption("model.option.taxAdjustment").getValue();
+        final Specification spec = getSpecification();
+        int taxAdjustment = spec.getInteger("model.option.taxAdjustment");
         int oldTax = player.getTax();
         int adjust = Math.max(1, 10 - taxAdjustment); // 5-10
         adjust = 1 + Utils.randomInt(logger, "Tax reduction", random, adjust);
@@ -550,8 +551,7 @@ public final class Monarch extends FreeColGameObject implements Named {
             }
         }
 
-        int mercPrice = spec.getIntegerOption("model.option.mercenaryPrice")
-            .getValue();
+        int mercPrice = spec.getInteger("model.option.mercenaryPrice");
         List<AbstractUnit> mercs = new ArrayList<AbstractUnit>();
         int price = 0;
         int limit = unitTypes.size();

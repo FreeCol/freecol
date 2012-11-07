@@ -259,8 +259,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     public void startGame(Random random) {
         Specification spec = getGame().getSpecification();
         if (isEuropean() && !isREF()) {
-            modifyGold(spec.getIntegerOption(GameOptions.STARTING_MONEY)
-                       .getValue());
+            modifyGold(spec.getInteger(GameOptions.STARTING_MONEY));
             ((ServerEurope) getEurope()).initializeMigration(random);
             getMarket().randomizeInitialPrice(random);
         }
@@ -3481,8 +3480,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             colony.removeGoods(goodsType, amount);
 
             int arrears = market.getPaidForSale(goodsType)
-                * spec.getIntegerOption("model.option.arrearsFactor")
-                .getValue();
+                * spec.getInteger("model.option.arrearsFactor");
             Market market = getMarket();
             market.setArrears(goodsType, arrears);
 

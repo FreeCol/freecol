@@ -158,33 +158,33 @@ public class SerializationTest extends FreeColTestCase {
     }
 
     public void testDifficulty() throws Exception {
-        Specification specification1 = null;
-        Specification specification2 = null;
+        Specification spec1 = null;
+        Specification spec2 = null;
         try {
-            specification1 = new FreeColTcFile("classic").getSpecification();
-            specification1.applyDifficultyLevel("model.difficulty.veryEasy");
+            spec1 = new FreeColTcFile("classic").getSpecification();
+            spec1.applyDifficultyLevel("model.difficulty.veryEasy");
             StringWriter sw = new StringWriter();
             XMLOutputFactory xif = XMLOutputFactory.newInstance();
             XMLStreamWriter out = xif.createXMLStreamWriter(sw);
-            specification1.toXMLImpl(out);
+            spec1.toXMLImpl(out);
             out.close();
-            specification2 = new Specification(new ByteArrayInputStream(sw.toString().getBytes()));
+            spec2 = new Specification(new ByteArrayInputStream(sw.toString().getBytes()));
         } catch(Exception e) {
             fail(e.getMessage());
         }
 
-        assertNotNull(specification1);
-        assertNotNull(specification2);
+        assertNotNull(spec1);
+        assertNotNull(spec2);
 
-        OptionGroup level1 = specification1.getDifficultyLevel();
-        OptionGroup level2 = specification2.getDifficultyLevel();
+        OptionGroup level1 = spec1.getDifficultyLevel();
+        OptionGroup level2 = spec2.getDifficultyLevel();
         assertNotNull(level1);
         assertNotNull(level2);
         assertEquals(level1.getId(), level2.getId());
 
         try {
-            int increment1 = specification1.getIntegerOption("model.option.crossesIncrement").getValue();
-            int increment2 = specification2.getIntegerOption("model.option.crossesIncrement").getValue();
+            int increment1 = spec1.getInteger("model.option.crossesIncrement");
+            int increment2 = spec2.getInteger("model.option.crossesIncrement");
             assertEquals(increment1, increment2);
         } catch (Exception e) {
             fail(e.getMessage());
@@ -192,28 +192,28 @@ public class SerializationTest extends FreeColTestCase {
     }
 
     public void testGeneratedLists() throws Exception {
-        Specification specification1 = null;
-        Specification specification2 = null;
+        Specification spec1 = null;
+        Specification spec2 = null;
         try {
-            specification1 = new FreeColTcFile("classic").getSpecification();
-            specification1.applyDifficultyLevel("model.difficulty.veryEasy");
+            spec1 = new FreeColTcFile("classic").getSpecification();
+            spec1.applyDifficultyLevel("model.difficulty.veryEasy");
             StringWriter sw = new StringWriter();
             XMLOutputFactory xif = XMLOutputFactory.newInstance();
             XMLStreamWriter out = xif.createXMLStreamWriter(sw);
-            specification1.toXMLImpl(out);
+            spec1.toXMLImpl(out);
             out.close();
-            specification2 = new Specification(new ByteArrayInputStream(sw.toString().getBytes()));
+            spec2 = new Specification(new ByteArrayInputStream(sw.toString().getBytes()));
         } catch (Exception e) {
             fail(e.getMessage());
         }
 
-        List<GoodsType> food1 = specification1.getFoodGoodsTypeList();
-        List<GoodsType> food2 = specification2.getFoodGoodsTypeList();
+        List<GoodsType> food1 = spec1.getFoodGoodsTypeList();
+        List<GoodsType> food2 = spec2.getFoodGoodsTypeList();
         assertEquals(food1.size(), food2.size());
         assertEquals(food1.get(0).getId(), food2.get(0).getId());
 
-        List<GoodsType> farmed1 = specification1.getFarmedGoodsTypeList();
-        List<GoodsType> farmed2 = specification2.getFarmedGoodsTypeList();
+        List<GoodsType> farmed1 = spec1.getFarmedGoodsTypeList();
+        List<GoodsType> farmed2 = spec2.getFarmedGoodsTypeList();
         assertEquals(farmed1.size(), farmed2.size());
         assertEquals(farmed1.get(0).getId(), farmed2.get(0).getId());
     }
