@@ -2707,6 +2707,15 @@
         <!-- Missionaries grant visibility and enhance trade and training -->
         <booleanOption id="model.option.enhancedMissionaries"
                        defaultValue="false"/>
+        <!-- Per turn probability that a peaceful native settlement
+             with a surplus will decide to offer some of it as a gift. -->
+        <integerOption id="model.option.giftProbability" defaultValue="5"
+                       minimumValue="0" maximumValue="100"/>
+        <!-- Per turn probability that an angry native settlement will
+             decide to demand tribute from an annoying European
+             settlement. -->
+        <integerOption id="model.option.demandProbability" defaultValue="10"
+                       minimumValue="0" maximumValue="100"/>
         <!-- Founding father recruitment continues after declaring
              independence -->
         <booleanOption id="model.option.continueFoundingFatherRecruitment"

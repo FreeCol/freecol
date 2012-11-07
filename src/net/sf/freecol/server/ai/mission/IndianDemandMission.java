@@ -319,7 +319,11 @@ public class IndianDemandMission extends Mission {
      * {@inheritDoc}
      */
     public String invalidReason() {
-        return (completed) ? "completed" : invalidReason(getAIUnit(), target);
+        String reason = invalidReason(getAIUnit(), target);
+        return (reason != null) ? reason
+            : (completed)
+            ? "completed"
+            : null;
     }
 
     // Not a one-time mission, omit isOneTime().

@@ -73,7 +73,7 @@ public final class CostDeciders {
                     : ILLEGAL_MOVE;
             }
             public int getMovesLeft() { return 0; }
-            public int getNewTurns() { return 0; }
+            public int getNewTurns() { return 1; }
         };
 
 

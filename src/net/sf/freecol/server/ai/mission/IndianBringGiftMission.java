@@ -217,7 +217,11 @@ public class IndianBringGiftMission extends Mission {
      * {@inheritDoc}
      */
     public String invalidReason() {
-        return invalidReason(getAIUnit(), target);
+        String reason = invalidReason(getAIUnit(), target);
+        return (reason != null) ? reason
+            : (completed)
+            ? "completed"
+            : null;
     }
 
     // Not a one-time mission, omit isOneTime().

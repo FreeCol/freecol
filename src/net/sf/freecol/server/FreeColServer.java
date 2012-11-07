@@ -1245,6 +1245,11 @@ public final class FreeColServer {
             "model.difficulty.cheat", 10, true);
         addIntegerOption("model.option.transportNavalUnitCheat",
             "model.difficulty.cheat", 10, true);
+        // Introduced: SAVEGAME_VERSION == 12
+        addIntegerOption("model.option.giftProbability",
+            "gameOptions.map", 5, false);
+        addIntegerOption("model.option.demandProbability",
+            "gameOptions.map", 10, false);
     }
 
     private void addOptionGroup(String id, boolean difficulty) {

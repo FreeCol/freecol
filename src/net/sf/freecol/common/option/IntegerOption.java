@@ -184,18 +184,25 @@ public class IntegerOption extends AbstractOption<Integer> {
     }
 
 
+    // Serialization
+
     /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * {@inheritDoc}
      */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         toXMLImpl(out, getXMLElementTagName());
     }
 
+    /**
+     * This method writes an XML-representation of this object to the given
+     * stream.
+     *
+     * @param out The target stream.
+     * @param tag A tag for the element to write.
+     * @throws XMLStreamException if there are any problems writing to the
+     *             stream.
+     */
     protected void toXMLImpl(XMLStreamWriter out, String tag) throws XMLStreamException {
         out.writeStartElement(tag);
 
@@ -213,10 +220,19 @@ public class IntegerOption extends AbstractOption<Integer> {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
         minimumValue = getAttribute(in, "minimumValue", Integer.MIN_VALUE);
         maximumValue = getAttribute(in, "maximumValue", Integer.MAX_VALUE);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return getXMLElementTagName() + " [value=" + value + "]";
     }
 
     /**
@@ -227,9 +243,4 @@ public class IntegerOption extends AbstractOption<Integer> {
     public static String getXMLElementTagName() {
         return "integerOption";
     }
-
-    public String toString() {
-        return getXMLElementTagName() + " [value=" + value + "]";
-    }
-
 }

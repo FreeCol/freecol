@@ -60,8 +60,10 @@ import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.UnitTradeItem;
+import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.networking.NetworkConstants;
+import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.ai.mission.DefendSettlementMission;
 import net.sf.freecol.server.ai.mission.IdleAtSettlementMission;
@@ -104,12 +106,6 @@ public class NativeAIPlayer extends AIPlayer {
     public static final int MAX_DISTANCE_TO_MAKE_DEMANDS = 5;
 
     public static final int MAX_NUMBER_OF_DEMANDS = 1;
-
-    /**
-     * A settlement with a surplus chooses to send a gift GIFT_PERCENT
-     * of the time.
-     */
-    public static final int GIFT_PERCENT = 5;
 
     /**
      * Stores temporary information for sessions (trading with another
@@ -496,14 +492,18 @@ public class NativeAIPlayer extends AIPlayer {
     private void bringGifts() {
         final Player player = getPlayer();
         final Map map = getGame().getMap();
-        for (IndianSettlement is : player.getIndianSettlements()) {
-            // Check if the settlement has anything to give first.
-            Goods gift = is.getRandomGift(getAIRandom());
-            if (gift == null) continue;
+        final CostDecider cd = CostDeciders.numberOfLegalTiles();
+        final int giftProbability = getGame().getSpecification()
+            .getInteger("model.option.giftProbability");
 
+        for (IndianSettlement is : player.getIndianSettlements()) {
             // Do not bring gifts all the time.
             if (Utils.randomInt(logger, is.getName() + " bring gifts",
-                    getAIRandom(), 100) >= GIFT_PERCENT) continue;
+                    getAIRandom(), 100) >= giftProbability) continue;
+
+            // Check if the settlement has anything to give.
+            Goods gift = is.getRandomGift(getAIRandom());
+            if (gift == null) continue;
 
             // Check if there are available units, and if there are already
             // enough missions in operation.
@@ -530,6 +530,7 @@ public class NativeAIPlayer extends AIPlayer {
             // Pick a random available capable unit.
             Unit unit = null;
             AIUnit aiUnit = null;
+            Tile home = is.getTile();
             while (unit == null && !availableUnits.isEmpty()) {
                 Unit u = availableUnits.get(Utils.randomInt(logger,
                         "Choose gift unit", getAIRandom(),
@@ -537,8 +538,7 @@ public class NativeAIPlayer extends AIPlayer {
                 availableUnits.remove(u);
                 aiUnit = getAIUnit(u);
                 if (IndianBringGiftMission.invalidReason(aiUnit) == null
-                    && u.findPath(u.getTile(), is.getTile(), null,
-                                  CostDeciders.numberOfLegalTiles()) != null) {
+                    && u.findPath(u.getTile(), home, null, cd) != null) {
                     unit = u;
                 }
             }
@@ -547,32 +547,38 @@ public class NativeAIPlayer extends AIPlayer {
                 continue;
             }
 
-            // Collect nearby colonies.  Filter out ones which are unreachable
-            // or with which the settlement is on bad terms.
-            List<Colony> nearbyColonies = new ArrayList<Colony>();
-            for (Tile t : is.getTile()
-                     .getSurroundingTiles(MAX_DISTANCE_TO_BRING_GIFTS)) {
+            // Collect nearby colonies.  Filter out ones which are uncontacted,
+            // unreachable or otherwise unsuitable.  Score the rest on alarm
+            // and distance.
+            List<RandomChoice<Colony>> nearbyColonies
+                = new ArrayList<RandomChoice<Colony>>();
+            for (Tile t : home.getSurroundingTiles(MAX_DISTANCE_TO_BRING_GIFTS)) {
                 Colony c = t.getColony();
-                if (c != null
-                    && is.getAlarm(c.getOwner()) != null
-                    && IndianBringGiftMission.invalidReason(aiUnit, c) == null
-                    && unit.findPath(is.getTile(), c.getTile(), null,
-                                     CostDeciders.numberOfLegalTiles()) != null) {
-                    nearbyColonies.add(c);
-                }
+                PathNode path;
+                if (c == null
+                    || !is.hasContacted(c.getOwner())
+                    || IndianBringGiftMission.invalidReason(aiUnit, c) != null
+                    || (path = unit.findPath(home, c.getTile(),
+                                             null, cd)) == null) continue;
+                int alarm = Math.max(1, is.getAlarm(c.getOwner()).getValue());
+                nearbyColonies.add(new RandomChoice<Colony>(c,
+                        1000000 / alarm / path.getTotalTurns()));
             }
+        
             // If there are any suitable colonies, pick a random one
             // to send a gift to.
             if (nearbyColonies.isEmpty()) {
                 logger.finest(is.getName() + " has no nearby gift colonies.");
                 continue;
             }
-            Colony target = nearbyColonies.get(Utils.randomInt(logger,
-                    "Choose gift colony", getAIRandom(),
-                    nearbyColonies.size()));
+            Colony target = RandomChoice.getWeightedRandom(logger,
+                "Choose gift colony", getAIRandom(), nearbyColonies);
+            if (target == null) {
+                throw new IllegalStateException("No gift target!?!");
+            }
 
             // Send the unit.
-            logger.finest("Assigning gift from " + is.getName()
+            logger.finest("Assigning gift " + gift + " from " + is.getName()
                 + " to " + target.getName() + ": " + unit);
             aiUnit.setMission(new IndianBringGiftMission(getAIMain(),
                               aiUnit, target));
@@ -585,10 +591,14 @@ public class NativeAIPlayer extends AIPlayer {
     private void demandTribute() {
         final Map map = getGame().getMap();
         final Player player = getPlayer();
+        final CostDecider cd = CostDeciders.numberOfLegalTiles();
+        final int demandProbability = getGame().getSpecification()
+            .getInteger("model.option.demandProbability");
+
         for (IndianSettlement is : player.getIndianSettlements()) {
             // Do not demand tribute all of the time.
             if (Utils.randomInt(logger, is.getName() + " demand tribute",
-                    getAIRandom(), 10) != 0) continue;
+                    getAIRandom(), 100) >= demandProbability) continue;
 
             // Check if there are available units, and if there are already
             // enough missions in operation.
@@ -613,6 +623,7 @@ public class NativeAIPlayer extends AIPlayer {
                 continue;
             }
             // Pick a random available capable unit.
+            Tile home = is.getTile();
             Unit unit = null;
             AIUnit aiUnit = null;
             while (unit == null && !availableUnits.isEmpty()) {
@@ -622,8 +633,7 @@ public class NativeAIPlayer extends AIPlayer {
                 availableUnits.remove(u);
                 aiUnit = getAIUnit(u);
                 if (IndianDemandMission.invalidReason(aiUnit) == null
-                    && u.findPath(u.getTile(), is.getTile(), null,
-                                  CostDeciders.numberOfLegalTiles()) != null) {
+                    && u.findPath(u.getTile(), home, null, cd) != null) {
                     unit = u;
                 }
             }
@@ -634,17 +644,21 @@ public class NativeAIPlayer extends AIPlayer {
 
             // Collect nearby colonies.  Filter out ones which are unreachable
             // or with which the settlement is on adequate terms.
-            List<Colony> nearbyColonies = new ArrayList<Colony>();
-            for (Tile t : is.getTile()
-                     .getSurroundingTiles(MAX_DISTANCE_TO_MAKE_DEMANDS)) {
+            List<RandomChoice<Colony>> nearbyColonies
+                = new ArrayList<RandomChoice<Colony>>();
+            for (Tile t : home.getSurroundingTiles(MAX_DISTANCE_TO_MAKE_DEMANDS)) {
                 Colony c = t.getColony();
-                if (c != null
-                    && is.getAlarm(c.getOwner()) != null
-                    && IndianDemandMission.invalidReason(aiUnit, c) == null
-                    && unit.findPath(is.getTile(), c.getTile(), null,
-                                     CostDeciders.numberOfLegalTiles()) != null) {
-                    nearbyColonies.add(c);
-                }
+                PathNode path;
+                if (c == null
+                    || !is.hasContacted(c.getOwner())
+                    || IndianDemandMission.invalidReason(aiUnit, c) != null
+                    || (path = unit.findPath(home, c.getTile(),
+                                             null, cd)) == null) continue;
+                int alarm = is.getAlarm(c.getOwner()).getValue();
+                int defence = c.getUnitCount() + ((c.getStockade() == null) ? 1
+                    : (c.getStockade().getLevel() * 10));
+                nearbyColonies.add(new RandomChoice<Colony>(c,
+                        alarm * (1000000 / defence / path.getTotalTurns())));
             }
             // If there are any suitable colonies, pick one to demand from.
             // Sometimes a random one, sometimes the weakest, sometimes the
@@ -653,33 +667,10 @@ public class NativeAIPlayer extends AIPlayer {
                 logger.finest(is.getName() + " has no nearby demand colonies.");
                 continue;
             }
-            int rnd = Utils.randomInt(logger, "Choose demand colony",
-                                      getAIRandom(), 3 * nearbyColonies.size());
-            Colony target = null;
-            if (rnd < nearbyColonies.size()) {
-                target = nearbyColonies.get(rnd);
-            } else if (rnd < 2 * nearbyColonies.size()) {
-                int bestValue = Integer.MAX_VALUE;
-                for (Colony c : nearbyColonies) {
-                    int value = ((c.getStockade() == null) ? 0
-                        : (c.getStockade().getLevel() * 10))
-                        + c.getUnitCount();
-                    if (value < bestValue) {
-                        value = bestValue;
-                        target = c;
-                    }
-                }
-            } else {
-                int bestValue = -1;
-                for (Colony c : nearbyColonies) {
-                    if (is.getAlarm(c.getOwner()).getValue() > bestValue) {
-                        bestValue = is.getAlarm(c.getOwner()).getValue();
-                        target = c;
-                    }
-                }
-            }
+            Colony target = RandomChoice.getWeightedRandom(logger,
+                "Choose demand colony", getAIRandom(), nearbyColonies);
             if (target == null) {
-                throw new IllegalStateException("No target!?!");
+                throw new IllegalStateException("No demand target!?!");
             }
 
             // Send the unit.
