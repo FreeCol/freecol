@@ -290,8 +290,27 @@ public final class InGameInputHandler extends InputHandler {
 
 
     /**
+     * Select a child element with the given FreeCol ID from a parent element.
+     *
+     * @param parent The parent <code>Element</code>.
+     * @param id The id to search for.
+     * @return An <code>Element</code> with matching id, or null if none found.
+     */
+    private static Element selectElement(Element parent, String id) {
+        NodeList nodes = parent.getChildNodes();
+        for (int i = 0; i < nodes.getLength(); i++) {
+            Element e = (Element)nodes.item(i);
+            if (id.equals(e.getAttribute(FreeColObject.ID_ATTRIBUTE))) {
+                return e;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Sometimes units appear which the client does not know about,
      * and are passed in as the children of the parent element.
+     * Worse, if their location is a Unit, that unit has to be passed in too.
      *
      * @param game The <code>Game</code> to add the unit to.
      * @param element The <code>Element</code> to find a unit in.
@@ -300,14 +319,19 @@ public final class InGameInputHandler extends InputHandler {
      */
     private static Unit selectUnitFromElement(Game game, Element element,
                                               String id) {
-        NodeList nodes = element.getChildNodes();
-        for (int i = 0; i < nodes.getLength(); i++) {
-            Element e = (Element) nodes.item(i);
-            if (id.equals(e.getAttribute(FreeColObject.ID_ATTRIBUTE))) {
-                return new Unit(game, e);
+        Element e = selectElement(element, id);
+        Unit u = null;
+        if (e != null) {
+            u = new Unit(game, e);
+            if (u.getLocation() == null) {
+                throw new IllegalStateException("NULL LOC: " + u);
+                /*String locId = e.getAttribute("location");
+                  if (locId.startsWith("unit:")) {
+                  selectUnitFromElement(game, element, locId);
+                  }*/
             }
         }
-        return null;
+        return u;
     }
 
     /**

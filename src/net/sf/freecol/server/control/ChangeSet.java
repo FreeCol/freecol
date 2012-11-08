@@ -310,7 +310,8 @@ public class ChangeSet {
          * @param defender The <code>Unit</code> that is defending.
          * @param success Did the attack succeed.
          */
-        AttackChange(See see, Unit attacker, Unit defender, boolean success) {
+        public AttackChange(See see, Unit attacker, Unit defender,
+                            boolean success) {
             super(see);
             this.attacker = attacker;
             this.defender = defender;
@@ -398,7 +399,7 @@ public class ChangeSet {
          * @param key A key <code>String</code>.
          * @param value The corresponding value as a <code>String</code>.
          */
-        AttributeChange(See see, String key, String value) {
+        public AttributeChange(See see, String key, String value) {
             super(see);
             this.key = key;
             this.value = value;
@@ -469,7 +470,8 @@ public class ChangeSet {
          * @param priority The priority of the change.
          * @param message The <code>Message</code> to add.
          */
-        MessageChange(See see, ChangePriority priority, DOMMessage message) {
+        public MessageChange(See see, ChangePriority priority,
+                             DOMMessage message) {
             super(see);
             this.priority = priority;
             this.message = message;
@@ -537,8 +539,8 @@ public class ChangeSet {
          * @param oldLocation The location from which the unit is moving.
          * @param newTile The <code>Tile</code> to which the unit is moving.
          */
-        MoveChange(See see, Unit unit, Location oldLocation,
-                   Tile newTile) {
+        public MoveChange(See see, Unit unit, Location oldLocation,
+                          Tile newTile) {
             super(see);
             this.unit = unit;
             this.oldLocation = oldLocation;
@@ -634,7 +636,7 @@ public class ChangeSet {
          * @param see The visibility of this change.
          * @param fcgo The <code>FreeColGameObject</code> to update.
          */
-        ObjectChange(See see, FreeColGameObject fcgo) {
+        public ObjectChange(See see, FreeColGameObject fcgo) {
             super(see);
             this.fcgo = fcgo;
         }
@@ -718,8 +720,8 @@ public class ChangeSet {
          * @param fcgo The <code>FreeColGameObject</code> to update.
          * @param fields The fields to update.
          */
-        PartialObjectChange(See see, FreeColGameObject fcgo,
-                            String... fields) {
+        public PartialObjectChange(See see, FreeColGameObject fcgo,
+                                   String... fields) {
             super(see, fcgo);
             this.fields = fields;
         }
@@ -783,8 +785,8 @@ public class ChangeSet {
          * @param loc The <code>Location</code> where the object was.
          * @param objects The <code>FreeColGameObject</code>s to remove.
          */
-        RemoveChange(See see, Location loc,
-                     List<FreeColGameObject> objects) {
+        public RemoveChange(See see, Location loc,
+                            List<FreeColGameObject> objects) {
             super(see);
             this.tile = (loc instanceof Tile) ? (Tile) loc : null;
             this.fcgo = objects.remove(objects.size() - 1);
@@ -865,7 +867,7 @@ public class ChangeSet {
          * @param see The visibility of this change.
          * @param fco The <code>FreeColObject</code> to update.
          */
-        OwnedChange(See see, FreeColObject fco) {
+        public OwnedChange(See see, FreeColObject fco) {
             super(see);
             this.fco = fco;
         }
@@ -922,7 +924,8 @@ public class ChangeSet {
          * @param feature a <code>Feature</code> value to add or remove.
          * @param add a <code>boolean</code> value
          */
-        FeatureChange(See see, FreeColGameObject object, Feature feature, boolean add) {
+        public FeatureChange(See see, FreeColGameObject object,
+                             Feature feature, boolean add) {
             super(see);
             this.object = object;
             this.feature = feature;
@@ -978,7 +981,7 @@ public class ChangeSet {
          * @param see The visibility of this change.
          * @param settlement The <code>Settlement</code> to spy on.
          */
-        SpyChange(See see, Settlement settlement) {
+        public SpyChange(See see, Settlement settlement) {
             super(see);
             tile = settlement.getTile();
         }
@@ -1037,7 +1040,8 @@ public class ChangeSet {
          * @param stance The <code>Stance</code> to change to.
          * @param second The <code>Player</code> wrt with to change.
          */
-        StanceChange(See see, Player first, Stance stance, Player second) {
+        public StanceChange(See see, Player first, Stance stance,
+                            Player second) {
             super(see);
             this.first = first;
             this.stance = stance;
@@ -1096,7 +1100,8 @@ public class ChangeSet {
          * @param name The name of the element.
          * @param priority The sort priority of this change.
          */
-        TrivialChange(See see, String name, int priority, String[] attributes) {
+        public TrivialChange(See see, String name, int priority,
+                             String[] attributes) {
             super(see);
             if ((attributes.length & 1) == 1) {
                 throw new IllegalArgumentException("Attributes must be even sized");

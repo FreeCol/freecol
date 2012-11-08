@@ -1866,14 +1866,14 @@ public final class InGameController extends Controller {
         Location oldLocation = unit.getLocation();
         unit.setLocation(carrier);
         unit.setMovesLeft(0);
-        cs.add(See.only(serverPlayer), (FreeColGameObject) oldLocation);
+        cs.add(See.only(serverPlayer), (FreeColGameObject)oldLocation);
         if (carrier.getLocation() != oldLocation) {
             cs.add(See.only(serverPlayer), carrier);
         }
         if (oldLocation instanceof Tile) {
-            cs.addMove(See.only(serverPlayer), unit, (Tile) oldLocation,
-                carrier.getTile());
-            cs.addDisappear(serverPlayer, (Tile) oldLocation, unit);
+            cs.addMove(See.only(serverPlayer), unit, (Tile)oldLocation,
+                       carrier.getTile());
+            cs.addDisappear(serverPlayer, (Tile)oldLocation, unit);
         }
 
         // Others might see the unit disappear, or the carrier capacity.
@@ -1907,7 +1907,7 @@ public final class InGameController extends Controller {
             : ((ServerUnit) unit).collectNewTiles(newLocation.getTile());
         unit.setLocation(newLocation);
         unit.setMovesLeft(0); // In Col1 disembark consumes whole move.
-        cs.add(See.perhaps(), (FreeColGameObject) newLocation);
+        cs.add(See.perhaps(), (FreeColGameObject)newLocation);
         if (newTiles != null) {
             serverPlayer.csSeeNewTiles(newTiles, cs);
         }
