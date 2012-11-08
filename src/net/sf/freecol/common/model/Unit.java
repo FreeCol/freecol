@@ -1869,8 +1869,8 @@ public class Unit extends GoodsLocation
      * @return True if the move is allowed.
      */
     private boolean allowMoveFrom(Tile from) {
-        return from.isLand() || getSpecification()
-            .getBooleanOption("model.option.amphibiousMoves").getValue();
+        return from.isLand()
+            || getSpecification().getBoolean("model.option.amphibiousMoves");
     }
 
     /**

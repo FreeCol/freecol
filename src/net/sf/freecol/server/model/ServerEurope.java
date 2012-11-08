@@ -113,7 +113,7 @@ public class ServerEurope extends Europe implements ServerModelObject {
         final Specification spec = getSpecification();
         String baseOption = "model.option.priceIncreasePerType";
         String name = unitType.getId().substring(unitType.getId().lastIndexOf('.'));
-        String option = (spec.getBooleanOption(baseOption).getValue())
+        String option = (spec.getBoolean(baseOption))
             ? "model.option.priceIncrease" + name
             : "model.option.priceIncrease";
         int increase = (spec.hasOption(option)) ? spec.getInteger(option) : 0;

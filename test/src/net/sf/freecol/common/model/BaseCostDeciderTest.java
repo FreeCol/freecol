@@ -212,8 +212,7 @@ public class BaseCostDeciderTest extends FreeColTestCase {
         Unit colonist = new ServerUnit(game, galleon, game.getCurrentPlayer(),
                                        colonistType);
         cost = base.getCost(colonist, unitTile, settlementTile, 4);
-        if (spec().getBooleanOption("model.option.amphibiousMoves")
-            .getValue()) {
+        if (spec().getBoolean("model.option.amphibiousMoves")) {
             assertFalse("Move valid, direct from carrier to settlement",
                         cost == CostDecider.ILLEGAL_MOVE);
         } else {

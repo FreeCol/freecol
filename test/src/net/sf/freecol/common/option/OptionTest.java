@@ -37,10 +37,10 @@ public class OptionTest extends FreeColTestCase {
         assertNotNull(gameOptions.getOption("model.option.fogOfWar"));
         assertFalse(((BooleanOption) gameOptions.getOption(GameOptions.CUSTOM_IGNORE_BOYCOTT))
                     .getValue());
-        assertFalse(spec().getBooleanOption(GameOptions.CUSTOM_IGNORE_BOYCOTT).getValue());
-        assertFalse(spec().getBooleanOption(GameOptions.EXPERTS_HAVE_CONNECTIONS).getValue());
-        assertFalse(spec().getBooleanOption(GameOptions.SAVE_PRODUCTION_OVERFLOW).getValue());
-        assertTrue(spec().getBooleanOption(GameOptions.ALLOW_STUDENT_SELECTION).getValue());
+        assertFalse(spec().getBoolean(GameOptions.CUSTOM_IGNORE_BOYCOTT));
+        assertFalse(spec().getBoolean(GameOptions.EXPERTS_HAVE_CONNECTIONS));
+        assertFalse(spec().getBoolean(GameOptions.SAVE_PRODUCTION_OVERFLOW));
+        assertTrue(spec().getBoolean(GameOptions.ALLOW_STUDENT_SELECTION));
     }
 
     public void testCloneIntegerOption() {
