@@ -1301,8 +1301,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return True if the tile can be claimed.
      */
     private boolean canClaimFreeCenterTile(Tile tile) {
-        String build = getGame().getSpecification()
-            .getStringOption("model.option.buildOnNativeLand").getValue();
+        final Specification spec = getGame().getSpecification();
+        String build = spec.getString("model.option.buildOnNativeLand");
         return isEuropean()
             && tile.getOwner() != null
             && tile.getOwner().isIndian()

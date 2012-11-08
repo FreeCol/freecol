@@ -90,7 +90,7 @@ public class ServerEurope extends Europe implements ServerModelObject {
             for (int index = 0; index < Europe.RECRUIT_COUNT; index++) {
                 String optionId = "model.option.recruitable.slot" + index;
                 if (spec.hasOption(optionId)) {
-                    String unitTypeId = spec.getStringOption(optionId).getValue();
+                    String unitTypeId = spec.getString(optionId);
                     if (unitTypeId != null) {
                         setRecruitable(index, spec.getUnitType(unitTypeId));
                         continue;
