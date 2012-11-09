@@ -208,6 +208,15 @@ public class Player extends FreeColGameObject implements Nameable {
                 throw new IllegalStateException("Bogus newStance");
             }
         }
+
+        /**
+         * Gets a message id for this stance.
+         *
+         * @return A message id string.
+         */
+        public String getKey() {
+            return "model.stance." + toString().toLowerCase(Locale.US);
+        }
     }
 
 

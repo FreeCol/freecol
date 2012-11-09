@@ -118,9 +118,8 @@ public final class ReportIndianPanel extends ReportPanel {
         label = localizedLabel("report.indian.tribeTension");
         reportPanel.add(label);
         label.setFont(boldFont);
-        reportPanel.add(new JLabel(Messages.message("tension." + opponent.getTension(player).getKey())
-                + "/"
-                + Messages.message(Messages.getStanceAsString(opponent.getStance(player)))),
+        reportPanel.add(new JLabel(Messages.message(opponent.getTension(player).getKey())
+                + "/" + Messages.message(opponent.getStance(player).getKey())),
             "left, wrap 20");
 
         if (knownNumberOfSettlements > 0) {

@@ -325,7 +325,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade>
         String description = null;
         if (item instanceof StanceTradeItem) {
             StanceTradeItem i = (StanceTradeItem)item;
-            description = Messages.getStanceAsString(i.getStance());
+            description = Messages.message(i.getStance().getKey());
         } else if (item instanceof GoldTradeItem) {
             int gold = ((GoldTradeItem)item).getGold();
             description = Messages
@@ -749,7 +749,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade>
 
             @Override
             public String toString() {
-                return Messages.getStanceAsString(value);
+                return Messages.message(value.getKey());
             }
 
             public Stance getValue() {

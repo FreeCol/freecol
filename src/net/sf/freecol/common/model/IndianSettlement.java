@@ -582,7 +582,7 @@ public class IndianSettlement extends Settlement {
     public String getShortAlarmLevelMessageId(Player player) {
         return (!player.hasContacted(owner)) ? "tension.wary"
             : (hasContacted(player)) ? getAlarm(player).getKey()
-            : "indianSettlement.tensionUnknown";
+            : "tension.unknown";
     }
 
     /**
@@ -595,7 +595,7 @@ public class IndianSettlement extends Settlement {
     public String getAlarmLevelMessageId(Player player) {
         Tension alarm = (hasContacted(player)) ? getAlarm(player)
             : new Tension(Tension.TENSION_MIN);
-        return "indianSettlement.alarm." + alarm.getKey();
+        return "indianSettlement." + alarm.getKey();
     }
 
     /**

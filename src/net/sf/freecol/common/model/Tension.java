@@ -142,12 +142,12 @@ public class Tension {
     }
 
     /**
-     * Gets a string suitable for use in a message id.
+     * Gets a message id for this tension.
      *
      * @return A message id string.
      */
     public String getKey() {
-        return toString().toLowerCase(Locale.US);
+        return "tension." + toString().toLowerCase(Locale.US);
     }
 
     /**

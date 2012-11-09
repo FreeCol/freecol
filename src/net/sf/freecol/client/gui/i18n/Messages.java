@@ -656,16 +656,6 @@ public class Messages {
     }
 
     /**
-     * Returns a string describing the given stance.
-     *
-     * @param stance The stance.
-     * @return A matching string.
-     */
-    public static String getStanceAsString(Player.Stance stance) {
-        return message("model.stance." + stance.toString().toLowerCase());
-    }
-
-    /**
      * Gets a string describing the number of turns left for a colony
      * to finish building something.
      *
