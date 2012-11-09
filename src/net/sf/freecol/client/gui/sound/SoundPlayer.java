@@ -23,7 +23,11 @@ package net.sf.freecol.client.gui.sound;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,17 +74,44 @@ public class SoundPlayer {
         }
         mixerOption.addPropertyChangeListener(new PropertyChangeListener() {
                 public void propertyChange(PropertyChangeEvent e) {
-                    setMixer((MixerWrapper) e.getNewValue());
+                    setMixer((MixerWrapper)e.getNewValue());
                 }
             });
         setVolume(volumeOption.getValue());
         volumeOption.addPropertyChangeListener(new PropertyChangeListener() {
                 public void propertyChange(PropertyChangeEvent e) {
-                    setVolume((Integer) e.getNewValue());
+                    setVolume((Integer)e.getNewValue());
                 }
             });
         soundPlayerThread = new SoundPlayerThread();
         soundPlayerThread.start();
+    }
+
+    /**
+     * Gets an audio input stream given a file, hopefully containing audio data.
+     *
+     * @param file The <code>File</code> to test.
+     * @return An <code>AudioInputStream</code>, or null on failure.
+     * @throws Assorted exceptions if the file does not contain valid audio.
+     */
+    public static AudioInputStream getAudioInputStream(File file)
+        throws Exception {
+        AudioInputStream in;
+        if (file.getName().endsWith(".ogg")) {
+            // We used to use tritonus to provide ogg (strictly,
+            // Vorbis-audio-in-ogg-container) decoding to the Java
+            // sound system.  It was buggy and appears to be
+            // unmaintained since 2009.  So now for ogg we have our
+            // own jorbis-based decoder.
+            in = new OggVorbisDecoderFactory().getOggStream(file);
+        } else {
+            in = AudioSystem.getAudioInputStream(file);
+        }
+        if (in == null) {
+            throw new IllegalArgumentException("Not an audio file: "
+                + file.getName());
+        }
+        return in;
     }
 
     /**
@@ -121,8 +152,12 @@ public class SoundPlayer {
      */
     public void playOnce(File file) {
         if (getMixer() == null) return; // Fail faster.
-        soundPlayerThread.add(file);
-        soundPlayerThread.awaken();
+        try {
+            soundPlayerThread.add(getAudioInputStream(file));
+            soundPlayerThread.awaken();
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Unable to play: " + file.getName());
+        }
     }
 
     /**
@@ -138,11 +173,15 @@ public class SoundPlayer {
      */
     private class SoundPlayerThread extends Thread {
 
-        private final List<File> playList = new ArrayList<File>();
+        private final int BUFSIZ = 8192;
+
+        private final byte[] data = new byte[BUFSIZ];
+
+        private final List<AudioInputStream> playList
+            = new ArrayList<AudioInputStream>();
 
         private boolean playDone = true;
 
-        private byte[] data = new byte[8192];
 
 
         public SoundPlayerThread() {
@@ -169,8 +208,8 @@ public class SoundPlayer {
             playDone = true;
         }
 
-        public synchronized void add(File file) {
-            playList.add(file);
+        public synchronized void add(AudioInputStream ais) {
+            playList.add(ais);
         }
 
         public void run() {
@@ -182,7 +221,14 @@ public class SoundPlayer {
                         continue;
                     }
                 } else {
-                    playSound(playList.remove(0));
+                    AudioInputStream in = playList.remove(0);
+                    try {
+                        playSound(in);
+                    } catch (IOException e) {
+                        logger.log(Level.WARNING, "Failure playing audio.", e);
+                    } finally {
+                        try { in.close(); } catch (IOException e) {}
+                    }
                 }
             }
         }
@@ -192,26 +238,54 @@ public class SoundPlayer {
         }
 
         private void setVolume(SourceDataLine line, int vol) {
+            FloatControl.Type type
+                = (line.isControlSupported(FloatControl.Type.VOLUME))
+                ? FloatControl.Type.VOLUME
+                : (line.isControlSupported(FloatControl.Type.MASTER_GAIN))
+                ? FloatControl.Type.MASTER_GAIN
+                : null;
+            if (type == null) {
+                logger.warning("No volume or master gain controls.");
+                return;
+            }
+            FloatControl control;
             try {
-                FloatControl control = (FloatControl) line
-                    .getControl(FloatControl.Type.MASTER_GAIN);
-                if (control != null) {
-                    // The gain (dB) and volume (percent) are log related.
-                    //   50% volume  = -6dB
-                    //   10% volume  = -20dB
-                    //   1% volume   = -40dB
-                    // Use max/min for 100,0%.
-                    float gain = (vol <= 0) ? control.getMinimum()
-                        : (vol >= 100) ? control.getMaximum()
-                        : 20.0f * (float) Math.log10(0.01f * vol);
-                    control.setValue(gain);
-                    logger.finest("Using volume " + vol + "%, gain = " + gain);
-                } else {
-                    logger.warning("No master gain control,"
-                        + " unable to change the volume.");
-                }
+                control = (FloatControl)line.getControl(type);
+            } catch (IllegalArgumentException e) {
+                return; // Should not happen
+            }
+            //
+            // The units of MASTER_GAIN seem to consistently be dB, but
+            // in the case of VOLUME this is unclear (there is even a query
+            // to that effect in the source).  getUnits() says "pulseaudio
+            // units" on my boxen, and the PulseAudio doco talks about dB
+            // so for now we are assuming that the controls we are using
+            // are both logarithmic:
+            //
+            //   gain = A.log_10(k.vol)
+            // So scale vol <= 1 to gain_min and vol >= 100 to gain_max
+            //   gain_min = A.log_10(k.1)
+            //   gain_max = A.log_10(k.100)
+            // Solving for A,k yields:
+            //   A = (gain_max - gain_min)/2
+            //   k = 10^(gain_min/A)
+            // =>
+            //   gain = gain_min + (gain_max - gain_min)/2 * log_10(vol)
+            //
+            float min = control.getMinimum();
+            float max = control.getMaximum();
+            float gain = (vol <= 0) ? min
+                : (vol >= 100) ? max
+                : min + 0.5f * (max - min) * (float)Math.log10(vol);
+            try {
+                control.setValue(gain);
+                logger.finest("Using volume " + vol + "%, "
+                    + control.getUnits() + "=" + gain
+                    + " control=" + type);
             } catch (Exception e) {
-                logger.log(Level.WARNING, "Could not set volume", e);
+                logger.log(Level.WARNING, "Could not set volume "
+                    + " (control=" + type + " in [" + min + "," + max + "])"
+                    + " to " + gain + control.getUnits(), e);
             }
         }
 
@@ -219,90 +293,47 @@ public class SoundPlayer {
             SourceDataLine line = null;
             DataLine.Info info = new DataLine.Info(SourceDataLine.class,
                                                    audioFormat);
+            if (!mixer.isLineSupported(info)) {
+                logger.log(Level.WARNING, "Mixer does not support " + info);
+                return null;
+            }
             try {
                 line = (SourceDataLine)mixer.getLine(info);
-                line.open(audioFormat);
+                line.open(audioFormat, BUFSIZ);
+                line.start();
+                setVolume(line, volume);
             } catch (Exception e) {
                 logger.log(Level.WARNING, "Can not open SourceDataLine", e);
                 return null;
             }
-            line.start();
-            setVolume(line, volume);
             return line;
         }
 
-        private boolean playSound(File file) {
+        /**
+         * Play a sound.
+         *
+         * @param in The <code>AudioInputStream</code> to play.
+         * @return True if the stream was played without incident.
+         */
+        private boolean playSound(AudioInputStream in) throws IOException {
             boolean ret = false;
 
-            AudioInputStream in = null;
-            try {
-                in = AudioSystem.getAudioInputStream(file);
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "No audio input stream for: "
-                    + file.getName(), e);
-            }
-
-            AudioInputStream din = null;
-            AudioFormat decodedFormat = null;
-            if (in != null) {
-                AudioFormat baseFormat = in.getFormat();
-                decodedFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED,
-                    baseFormat.getSampleRate(),
-                    16,
-                    baseFormat.getChannels(),
-                    baseFormat.getChannels() * (16 / 8),
-                    baseFormat.getSampleRate(),
-                    baseFormat.isBigEndian());
-                din = AudioSystem.getAudioInputStream(decodedFormat, in);
-                if (din == null) {
-                    logger.warning("Can not get decoded audio stream for: "
-                        + file.getName());
+            SourceDataLine line = openLine(in.getFormat());
+            if (line == null) return false;
+            try { 
+                startPlaying();
+                int rd;
+                while (keepPlaying() && (rd = in.read(data)) > 0) {
+                    line.write(data, 0, rd);
                 }
+                ret = true;
+            } finally {
+                stopPlaying();
+                line.drain();
+                line.stop();
+                line.close();
             }
-
-            SourceDataLine line = null;
-            if (din != null) {
-                line = openLine(din.getFormat());
-            }
-
-            if (line != null) {
-                try { 
-                    startPlaying();
-                    rawPlay(din, line);
-                    ret = true;
-                } catch (IOException e) {
-                    logger.log(Level.WARNING, "Error playing: "
-                        + file.getName(), e);
-                } finally {
-                    stopPlaying();
-                    line.drain();
-                    line.stop();
-                    line.close();
-                    try {
-                        din.close();
-                        in.close();
-                    } catch (IOException e) {}
-                }
-            } 
-
             return ret;
-        }
-
-        private void rawPlay(AudioInputStream in, SourceDataLine lin)
-            throws IOException {
-            for (;;) {
-                if (!keepPlaying()) {
-                    break;
-                }
-                int read = in.read(data, 0, data.length);
-                if (read < 0) {
-                    break;
-                } else if (read > 0) {
-                    lin.write(data, 0, read);
-                } else {
-                    sleep(50);
-                }
-            }
         }
     }
 }

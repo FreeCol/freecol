@@ -46,12 +46,9 @@
         <pathelement location="${basedir}/${cli.jar}"/>
         <!-- Cortado Video Applet -->
         <pathelement location="${basedir}/${cortado.jar}"/>
-    </path>
-    <path id="soundlibs.classpath">
-      <pathelement location="${basedir}/jars/jogg-0.0.7.jar"/>
-      <pathelement location="${basedir}/jars/jorbis-0.0.15.jar"/>
-      <pathelement location="${basedir}/jars/tritonus_share.jar"/>
-      <pathelement location="${basedir}/jars/vorbisspi1.0.3.jar"/>
+        <!-- JOgg/JOrbis libraries -->
+        <pathelement location="${basedir}/jars/jogg-0.0.7.jar"/>
+        <pathelement location="${basedir}/jars/jorbis-0.0.15.jar"/>
     </path>
     <path id="junit.classpath">
         <pathelement location="${basedir}/test/lib/junit.jar" />
@@ -67,7 +64,6 @@
         <pathelement location="${freecol.build.dir}" />
         <path refid="junit.classpath"/>
         <path refid="libraries.classpath" />
-        <path refid="soundlibs.classpath" />
     </path>
 
     <condition property="isOsUnixLike">

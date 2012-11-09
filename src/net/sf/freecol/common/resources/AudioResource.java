@@ -30,6 +30,8 @@ import java.util.logging.Logger;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 
+import net.sf.freecol.client.gui.sound.SoundPlayer;
+
 
 /**
  * A <code>Resource</code> wrapping a <code>File</code> containing sounds.
@@ -52,28 +54,12 @@ public class AudioResource extends Resource {
      * @param resourceLocator The <code>URI</code> used when loading this
      *      resource.
      * @see ResourceFactory#createResource(URI)
+     * @throws Assorted exceptions from the underlying audio components
      */
-    AudioResource(URI resourceLocator) throws Exception {
+    public AudioResource(URI resourceLocator) throws Exception {
         super(resourceLocator);
         File f = new File(resourceLocator);
-        BufferedInputStream bis = null;
-        AudioInputStream ais = null;
-        try {
-            bis = new BufferedInputStream(new FileInputStream(f));
-            bis.mark(1000); bis.skip(1); bis.reset();
-            ais = AudioSystem.getAudioInputStream(bis);
-            this.file = f;
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Not an audio file: " + f.getPath(), e);
-            this.file = null;
-        } finally {
-            try { // Close input streams
-                if (ais != null) ais.close();
-                if (bis != null) bis.close();
-            } catch (IOException e) {
-                logger.log(Level.WARNING, "Error closing audio stream", e);
-            }
-        }
+        if (SoundPlayer.getAudioInputStream(f) != null) this.file = f;
     }
 
     /**
