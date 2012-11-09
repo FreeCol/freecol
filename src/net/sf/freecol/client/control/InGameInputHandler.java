@@ -578,12 +578,12 @@ public final class InGameInputHandler extends InputHandler {
     private Element gameEnded(Element element) {
         FreeColClient freeColClient = getFreeColClient();
         FreeColDebugger.finishDebugRun(freeColClient, true);
-        Player winner = getGame().getFreeColGameObject(element.getAttribute("winner"),
-                                                       Player.class);
+        String str = element.getAttribute("winner");
+        Player winner = (str == null) ? null
+            : getGame().getFreeColGameObject(str, Player.class);
         if (winner == freeColClient.getMyPlayer()) {
             new ShowVictoryPanelSwingTask().invokeLater();
         } // else: The client has already received the message of defeat.
-
         return null;
     }
 

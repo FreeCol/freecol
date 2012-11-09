@@ -690,8 +690,16 @@ public final class InGameController extends Controller {
                 }
             }
             if (!human) {
+                if (debugOnlyAITurns > 0) { // Complete debug runs
+                    FreeColDebugger.signalEndDebugRun();
+                }
                 game.setCurrentPlayer(null);
-                return null;
+
+                ChangeSet cs = new ChangeSet();
+                cs.addTrivial(See.all(), "gameEnded",
+                              ChangePriority.CHANGE_NORMAL);
+                sendToOthers(serverPlayer, cs);
+                return cs.build(serverPlayer);
             }
 
             // ATM AI player colony-rearrangements do not use the standard
