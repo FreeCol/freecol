@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -1082,10 +1083,10 @@ public class TransportMission extends Mission {
      *
      * @param cargo The <code>Cargo</code> to check.
      * @return TCONTINUE if the <code>Cargo</code> should continue,
-     *      TDONE if it has completed,
-     *      TFAIL if it has failed,
-     *      TNEXT if it has progressed to the next stage,
-     *      TRETRY if a blockage has occurred and it should be retried,
+     *     TDONE if it has completed,
+     *     TFAIL if it has failed,
+     *     TNEXT if it has progressed to the next stage,
+     *     TRETRY if a blockage has occurred and it should be retried,
      */
     private CargoResult tryCargo(Cargo cargo) {
         final Unit carrier = getUnit();
@@ -1100,7 +1101,7 @@ public class TransportMission extends Mission {
         case LOAD:
             if (!Map.isSameLocation(here, l.getLocation())) {
                 return CargoResult.TCONTINUE;
-            } else if (carrier.findPath(t.getTransportDestination()) == null) {
+            } else if (carrier.findPath(l.getLocation()) == null) {
                 return CargoResult.TRETRY;
             }
             switch (carrier.getNoAddReason(l)) {
@@ -1139,8 +1140,10 @@ public class TransportMission extends Mission {
         case PICKUP:
             if (!Map.isSameLocation(here, cargo.getTarget())) {
                 return CargoResult.TCONTINUE;
-            } else if (carrier.findPath(t.getTransportDestination()) == null) {
-                return CargoResult.TRETRY;
+            } else {
+                if (carrier.findPath(cargo.getTarget()) == null) {
+                    return CargoResult.TRETRY;
+                }
             }
             if (isCarrying(t)) {
                 logger.finest(tag + " picked up " + t + " at " + here
@@ -1169,8 +1172,7 @@ public class TransportMission extends Mission {
                 return CargoResult.TDONE;
             }
             aiu = (AIUnit)t;
-            reason = aiu.getMission().invalidReason();
-            if (reason != null) {
+            if ((reason = aiu.getMission().invalidReason()) != null) {
                 logger.warning(tag + " unit mission failed(" + reason + ")"
                     + " for " + t + ": " + this);
                 return CargoResult.TFAIL;
