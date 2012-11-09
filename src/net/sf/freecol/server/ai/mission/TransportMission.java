@@ -1799,7 +1799,7 @@ public class TransportMission extends Mission {
                 }
 
                 str = in.getAttributeValue(null, CARRIER_TAG);
-                Unit carrier = (str == null) ? null
+                Unit carrier = (str == null) ? getUnit()
                     : getGame().getFreeColGameObject(str, Unit.class);
 
                 str = in.getAttributeValue(null, MODE_TAG);
