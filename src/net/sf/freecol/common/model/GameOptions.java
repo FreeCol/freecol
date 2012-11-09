@@ -120,6 +120,18 @@ public class GameOptions {
     public static final int STARTING_POSITIONS_HISTORICAL = 2;
 
     /**
+     * Allow amphibious moves.
+     */
+    public static final String AMPHIBIOUS_MOVES
+        = "model.option.amphibiousMoves";
+
+    /**
+     * Allow empty units to trade.
+     */
+    public static final String EMPTY_TRADERS
+        = "model.option.emptyTraders";
+
+    /**
      * Do missionaries provide extra benefits.
      */
     public static final String ENHANCED_MISSIONARIES

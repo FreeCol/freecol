@@ -22,6 +22,7 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
+import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
 
@@ -30,12 +31,22 @@ import net.sf.freecol.util.test.FreeColTestCase;
  * Tests for the {@link BaseCostDecider} class.
  */
 public class BaseCostDeciderTest extends FreeColTestCase {
-    private UnitType pioneerType = spec().getUnitType("model.unit.hardyPioneer");
-    private UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
-    private UnitType galleonType = spec().getUnitType("model.unit.galleon");
-    private GoodsType tradeGoodsType = spec().getGoodsType("model.goods.tradeGoods");
+
+    private static final GoodsType tradeGoodsType
+        = spec().getGoodsType("model.goods.tradeGoods");
+
+    private static final TileType plainsType
+        = spec().getTileType("model.tile.plains");
+
+    private static final UnitType colonistType
+        = spec().getUnitType("model.unit.freeColonist");
+    private static final UnitType galleonType
+        = spec().getUnitType("model.unit.galleon");
+    private static final UnitType pioneerType
+        = spec().getUnitType("model.unit.hardyPioneer");
     
     private Game game;
+
 
     @Override
     public void setUp() {
@@ -51,7 +62,6 @@ public class BaseCostDeciderTest extends FreeColTestCase {
      * Checks that the decider returns the right cost for a plain to plain move.
      */
     public void testGetCostLandLand() {
-        TileType plainsType = spec().getTileType("model.tile.plains");
         Map map = getTestMap(plainsType);
         game.setMap(map);
     	
@@ -74,7 +84,6 @@ public class BaseCostDeciderTest extends FreeColTestCase {
      * a move.
      */
     public void testGetRemainingMovesAndNewTurn() {
-        TileType plainsType = spec().getTileType("model.tile.plains");
         Map map = getTestMap(plainsType);
         game.setMap(map);
         
@@ -94,7 +103,6 @@ public class BaseCostDeciderTest extends FreeColTestCase {
      */
     public void testInvalidMoveOfLandUnitToAnOceanTile() {
         // For this test we need a different map
-        TileType plainsType = spec().getTileType("model.tile.plains");
         Map map = getCoastTestMap(plainsType);
         game.setMap(map);
         
@@ -117,7 +125,6 @@ public class BaseCostDeciderTest extends FreeColTestCase {
      */
     public void testInvalidMoveOfNavalUnitToALandTile() {
         // For this test we need a different map
-        TileType plainsType = spec().getTileType("model.tile.plains");
         Map map = getCoastTestMap(plainsType);
         game.setMap(map);
         
@@ -140,7 +147,6 @@ public class BaseCostDeciderTest extends FreeColTestCase {
      * Verifies that is invalid
      */
     public void testInvalidMoveThroughTileWithSettlement() {
-        TileType plainsType = spec().getTileType("model.tile.plains");
         Map map = getTestMap(plainsType);
         game.setMap(map);
 
@@ -167,19 +173,20 @@ public class BaseCostDeciderTest extends FreeColTestCase {
      */
     public void testNavalUnitMoveToTileWithSettlement() {
         // For this test we need a different map
-        TileType plainsType = spec().getTileType("model.tile.plains");
         Map map = getCoastTestMap(plainsType);
         game.setMap(map);
-        
+
         Tile unitTile = map.getTile(10, 9);
         assertFalse("Unit tile should be ocean",unitTile.isLand());
 
-        Unit galleon = new ServerUnit(game, unitTile, game.getCurrentPlayer(), galleonType);
+        Unit galleon = new ServerUnit(game, unitTile, game.getCurrentPlayer(),
+                                      galleonType);
         
         Tile settlementTile = map.getTile(9, 9);
         assertTrue("Tile should be land", settlementTile.isLand());
         
-        FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
+        FreeColTestCase.IndianSettlementBuilder builder
+            = new FreeColTestCase.IndianSettlementBuilder(game);
         Settlement settlement = builder.settlementTile(settlementTile).build();
 
         // galleon is trying go to settlement
@@ -190,14 +197,25 @@ public class BaseCostDeciderTest extends FreeColTestCase {
 
         // Try to find a path
         cost = base.getCost(galleon, unitTile, settlementTile, 4);
-        assertTrue("Move should be invalid, no contact or goods to trade",
-                   cost == CostDecider.ILLEGAL_MOVE);
+        assertEquals("Move should be invalid, no contact or goods to trade",
+                     CostDecider.ILLEGAL_MOVE, cost);
 
-        // Add contact
+        // Add contact, but disallow empty traders
         Player.makeContact(galleon.getOwner(), settlement.getOwner());
+        ((BooleanOption)spec().getOption(GameOptions.EMPTY_TRADERS))
+            .setValue(Boolean.FALSE);
         cost = base.getCost(galleon, unitTile, settlementTile, 4);
-        assertTrue("Move should be invalid, no goods to trade",
-                   cost == CostDecider.ILLEGAL_MOVE);
+        assertEquals("Move should be invalid, no goods to trade",
+                     CostDecider.ILLEGAL_MOVE, cost);
+
+        // Test empty traders
+        ((BooleanOption)spec().getOption(GameOptions.EMPTY_TRADERS))
+            .setValue(Boolean.TRUE);
+        cost = base.getCost(galleon, unitTile, settlementTile, 4);
+        assertTrue("Move should be valid, no goods to trade",
+                   cost != CostDecider.ILLEGAL_MOVE);
+        ((BooleanOption)spec().getOption(GameOptions.EMPTY_TRADERS))
+            .setValue(Boolean.FALSE);
 
         // Add goods to trade
         Goods goods = new Goods(game, null, tradeGoodsType, 50);

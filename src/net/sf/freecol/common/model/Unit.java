@@ -40,6 +40,7 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
@@ -1787,7 +1788,8 @@ public class Unit extends GoodsLocation
             // Do not block for war, bringing gifts is allowed
             return (!allowContact(settlement))
                 ? MoveType.MOVE_NO_ACCESS_CONTACT
-                : (hasGoodsCargo())
+                : (hasGoodsCargo() || getSpecification()
+                    .getBoolean(GameOptions.EMPTY_TRADERS))
                 ? MoveType.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS
                 : MoveType.MOVE_NO_ACCESS_GOODS;
         } else {
@@ -1870,7 +1872,7 @@ public class Unit extends GoodsLocation
      */
     private boolean allowMoveFrom(Tile from) {
         return from.isLand()
-            || getSpecification().getBoolean("model.option.amphibiousMoves");
+            || getSpecification().getBoolean(GameOptions.AMPHIBIOUS_MOVES);
     }
 
     /**

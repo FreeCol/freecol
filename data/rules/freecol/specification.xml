@@ -92,6 +92,8 @@
         <integerOption id="model.option.turnsToSail" defaultValue="3" minimumValue="1" maximumValue="10"/>
         <!-- Whether amphibious moves are allowed. -->
         <booleanOption id="model.option.amphibiousMoves" defaultValue="true"/>
+        <!-- Allow trading with empty units. -->
+        <booleanOption id="model.option.emptyTraders" defaultValue="true"/>
         <!-- Missionaries grant visibility and enhance trade and training -->
         <booleanOption id="model.option.enhancedMissionaries"
                        defaultValue="true"/>

@@ -1250,6 +1250,9 @@ public final class FreeColServer {
             "gameOptions.map", 5, false);
         addIntegerOption("model.option.demandProbability",
             "gameOptions.map", 10, false);
+        // Introduced: SAVEGAME_VERSION == 12
+        addBooleanOption(GameOptions.EMPTY_TRADERS,
+            "gameOptions.map", false, false);
     }
 
     private void addOptionGroup(String id, boolean difficulty) {

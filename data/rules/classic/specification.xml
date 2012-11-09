@@ -2700,6 +2700,8 @@
         <booleanOption id="model.option.explorationPoints" defaultValue="false"/>
         <!-- Whether amphibious moves are allowed. -->
         <booleanOption id="model.option.amphibiousMoves" defaultValue="false"/>
+        <!-- Allow trading with empty units. -->
+        <booleanOption id="model.option.emptyTraders" defaultValue="false"/>
         <!-- Whether all interactions with a native settlement contact the
              chief and thus consume the scouting bonus -->
         <booleanOption id="model.option.settlementActionsContactChief"
