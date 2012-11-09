@@ -45,6 +45,7 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TileType;
@@ -247,11 +248,11 @@ public final class UnitLabel extends JLabel
      * @param g The graphics context in which to do the painting.
      */
     public void paintComponent(Graphics g) {
-
+        final Player player = freeColClient.getMyPlayer();
         if (ignoreLocation || selected
             || (!unit.isCarrier() && unit.getState() != Unit.UnitState.SENTRY)) {
             setEnabled(true);
-        } else if (unit.getOwner() != freeColClient.getMyPlayer()
+        } else if (unit.getOwner() != player
             && unit.getColony() == null) {
             setEnabled(true);
         } else {
@@ -277,7 +278,9 @@ public final class UnitLabel extends JLabel
                    getParent() instanceof InPortPanel ||
                    getParent() instanceof EuropePanel.DocksPanel ||
                    getParent().getParent() instanceof ReportPanel) {
-            g.drawImage(gui.getMapViewer().getOccupationIndicatorImage(g, unit), 0, 0, null);
+            String text = Messages.message(unit.getOccupationKey(player.owns(unit)));
+            ImageLibrary lib = gui.getImageLibrary();
+            g.drawImage(lib.getOccupationIndicatorChip(unit, text), 0, 0, null);
 
             if (unit.isUnderRepair()) {
                 String underRepair = Messages.message(StringTemplate.template("underRepair")
@@ -285,10 +288,8 @@ public final class UnitLabel extends JLabel
                 String underRepair1 = underRepair.substring(0, underRepair.indexOf('(')).trim();
                 String underRepair2 = underRepair.substring(underRepair.indexOf('(')).trim();
                 Font font = ResourceManager.getFont("NormalFont", 14f);
-                Image repairImage1 = gui.getMapViewer()
-                    .createStringImage((Graphics2D)g, underRepair1, Color.RED, font);
-                Image repairImage2 = gui.getMapViewer()
-                    .createStringImage((Graphics2D)g, underRepair2, Color.RED, font);
+                Image repairImage1 = lib.getStringImage((Graphics2D)g, underRepair1, Color.RED, font);
+                Image repairImage2 = lib.getStringImage((Graphics2D)g, underRepair2, Color.RED, font);
                 int textHeight = repairImage1.getHeight(null) + repairImage2.getHeight(null);
                 int leftIndent = Math.min(5, Math.min(getWidth() - repairImage1.getWidth(null),
                                                       getWidth() - repairImage2.getWidth(null)));

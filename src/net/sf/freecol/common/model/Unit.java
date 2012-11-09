@@ -2860,6 +2860,32 @@ public class Unit extends GoodsLocation
     }
 
     /**
+     * Gets a key for the unit occupation.
+     *
+     * @param owner True if the key should be for the owner of the unit.
+     * @return A message key.
+     */
+    public String getOccupationKey(boolean owner) {
+        return (owner)
+            ? ((isUnderRepair())
+                ? "model.unit.occupation.underRepair"
+                : (getTradeRoute() != null)
+                ? "model.unit.occupation.inTradeRoute"
+                : (getDestination() != null)
+                ? "model.unit.occupation.goingSomewhere"
+                : (getState() == Unit.UnitState.IMPROVING
+                    && getWorkImprovement() != null)
+                ? (getWorkImprovement().getType().getId() + ".occupationString")
+                : (getState() == Unit.UnitState.ACTIVE && getMovesLeft() <= 0)
+                ? "model.unit.occupation.activeNoMovesLeft"
+                : ("model.unit.occupation."
+                    + getState().toString().toLowerCase(Locale.US)))
+            : (isNaval())
+            ? Integer.toString(getVisibleGoodsCount())
+            : "model.unit.occupation.activeNoMovesLeft";
+    }
+
+    /**
      * Gets the <code>Role</code> of this <code>Unit</code>.
      *
      * @return The <code>role</code> of this <code>Unit</code>.

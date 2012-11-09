@@ -81,8 +81,6 @@ public class ResourceFactory {
                 if ("urn".equals(uri.getScheme())) {
                     if (uri.getSchemeSpecificPart().startsWith(ColorResource.SCHEME)) {
                         r = new ColorResource(uri);
-                    } else if (uri.getSchemeSpecificPart().startsWith(ChipResource.SCHEME)) {
-                        r = new ChipResource(uri);
                     } else if (uri.getSchemeSpecificPart().startsWith(FontResource.SCHEME)) {
                         r = new FontResource(uri);
                     }
@@ -110,5 +108,4 @@ public class ResourceFactory {
         }
         return r;
     }
-
 }

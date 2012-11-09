@@ -32,6 +32,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -49,17 +50,25 @@ public class ImageResource extends Resource {
     private final Object loadingLock = new Object();
     private static final Component _c = new Component() {};
     
+
     /**
      * Do not use directly.
+     *
      * @param resourceLocator The <code>URI</code> used when loading this
      *      resource.
      * @see ResourceFactory#createResource(URI)
      */
-    ImageResource(URI resourceLocator) {
+    public ImageResource(URI resourceLocator) {
         super(resourceLocator);
     }
 
+    /**
+     * Create a new image resource to contain an image.
+     *
+     * @param image The <code>Image</code> to contain.
+     */
     public ImageResource(Image image) {
+        super(null);
         this.image = image;
     }
     
@@ -85,8 +94,8 @@ public class ImageResource extends Resource {
                         image = im;
                     }
                 } catch (Exception e) {
-                    logger.warning("Failed to load image from: " + getResourceLocator()
-                                   + "\r\nProblem: " + e );
+                    logger.log(Level.WARNING, "Failed to load image from: "
+                        + getResourceLocator(), e);
                 }
             }
         }
@@ -103,49 +112,53 @@ public class ImageResource extends Resource {
     }
     
     /**
-     * Returns the image using the specified scale.
+     * Gets the image using the specified scale.
      * 
-     * @param scale The size of the requested image (with 1 being normal size,
-     *      2 twice the size, 0.5 half the size etc). Rescaling
-     *      will be performed unless using 1.
+     * @param scale The size of the requested image (with 1 being
+     *     normal size, 2 twice the size, 0.5 half the size etc).
      * @return The scaled <code>Image</code>.
      */
     public Image getImage(double scale) {
         final Image im = getImage();
-        if (im == null) return im;
-        return getImage(new Dimension((int) (im.getWidth(null) * scale), (int) (im.getHeight(null) * scale)));    
+        return (im == null) ? null
+            : getImage(new Dimension((int)(im.getWidth(null) * scale),
+                                     (int)(im.getHeight(null) * scale)));    
     }
     
     /**
-     * Returns the image using the specified dimension.
+     * Gets the image using the specified dimension.
      * 
-     * @param d The dimension of the requested image. Rescaling
-     *      will be performed if necessary.
-     * @return The <code>Image</code>.
+     * @param d The <code>Dimension</code> of the requested
+     *      image.  Rescaling will be performed if necessary.
+     * @return The <code>Image</code> with the required dimension.
      */
     public Image getImage(Dimension d) {
         final Image im = getImage();
         if (im == null
-            || ((im.getWidth(null)==d.width && im.getHeight(null)==d.height))) {
-            return im;
-        }
-        final Image cachedScaledImage = scaledImages.get(d);
-        if (cachedScaledImage != null) return cachedScaledImage;
+            || (im.getWidth(null) == d.width
+                && im.getHeight(null) == d.height)) return im;
+
         synchronized (loadingLock) {
             final Image cached = scaledImages.get(d);
             if (cached != null) return cached;
+
             MediaTracker mt = new MediaTracker(_c);
             try {
-                //use SCALE_REPLICATE instead of SCALE_SMOOTH to avoid ClassCastException
-                //TODO (perhaps): find better solution
-                Image scaledVersion = im.getScaledInstance(d.width, d.height,
-                                                           Image.SCALE_REPLICATE);
-                mt.addImage(scaledVersion, 0, d.width, d.height);
+                // Use SCALE_REPLICATE instead of SCALE_SMOOTH to avoid
+                // ClassCastException.
+                // TODO (perhaps): find a better solution.
+                Image scaled = im.getScaledInstance(d.width, d.height,
+                                                    Image.SCALE_REPLICATE);
+                mt.addImage(scaled, 0, d.width, d.height);
                 mt.waitForID(0);
-                if (mt.statusID(0, false) == MediaTracker.COMPLETE) {
-                    scaledImages.put(d, scaledVersion);
-                    return scaledVersion;
+                int result = mt.statusID(0, false);
+                if (result == MediaTracker.COMPLETE) {
+                    scaledImages.put(d, scaled);
+                } else {
+                    logger.warning("Scaling image: " + getResourceLocator()
+                        + " => " + result);
                 }
+                return scaled;
             } catch (Exception e) {
                 logger.warning("Failed to scale image: " + getResourceLocator()
                                + "\r\nProblem: " + e );

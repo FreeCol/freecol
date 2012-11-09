@@ -25,7 +25,6 @@ import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -763,73 +762,6 @@ public final class MapViewer {
     }
 
     /**
-     * Creates an image with a string of a given color and with
-     * a black border around the glyphs.
-     *
-     * @param g A <code>Graphics</code>-object for getting a
-     *       <code>Font</code>.
-     * @param nameString The <code>String</code> to make an image of.
-     * @param color The <code>Color</code> to use when displaying
-     *       the <code>nameString</code>.
-     * @param font a <code>Font</code> value
-     * @return The image that was created.
-     */
-    public Image createStringImage(Graphics g, String nameString, Color color, Font font) {
-        if (color == null) {
-            logger.warning("createStringImage called with color null");
-            color = Color.WHITE;
-        }
-
-        // Lookup in the cache if the image has been generated already
-        String key = "dynamic.stringImage." + nameString
-            + "." + font.getFontName().replace(' ', '-')
-            + "." + Integer.toString(font.getSize())
-            + "." + Integer.toHexString(color.getRGB());
-        Image image = (Image) ResourceManager.getImage(key);//, lib.getScalingFactor());
-        if (image != null) {
-            return image;
-        }
-
-        // create an image of the appropriate size
-        FontMetrics fontMetrics = g.getFontMetrics(font);
-        BufferedImage bi = new BufferedImage(fontMetrics.stringWidth(nameString) + 4,
-                                             fontMetrics.getMaxAscent() + fontMetrics.getMaxDescent(),
-                                             BufferedImage.TYPE_INT_ARGB);
-        // draw the string with selected color
-        Graphics2D big = bi.createGraphics();
-        big.setColor(color);
-        big.setFont(font);
-        big.drawString(nameString, 2, fontMetrics.getMaxAscent());
-
-        // draw the border around letters
-        int textColor = color.getRGB();
-        int borderColor = getStringBorderColor(color).getRGB();
-        for (int biX = 0; biX < bi.getWidth(); biX++) {
-            for (int biY = 0; biY < bi.getHeight(); biY++) {
-                int r = bi.getRGB(biX, biY);
-
-                if (r == textColor) {
-                    continue;
-                }
-
-                for (int cX = -1; cX <= 1; cX++) {
-                    for (int cY = -1; cY <= 1; cY++) {
-                        if (biX+cX >= 0 && biY+cY >= 0
-                            && biX+cX < bi.getWidth() && biY+cY < bi.getHeight()
-                            && bi.getRGB(biX + cX, biY + cY) == textColor) {
-                            bi.setRGB(biX, biY, borderColor);
-                            continue;
-                        }
-                    }
-                }
-            }
-        }
-        ResourceManager.addGameMapping(key, new ImageResource(bi));
-        return (Image) ResourceManager.getImage(key);//, lib.getScalingFactor());
-    }
-
-
-    /**
      * Displays this GUI onto the given Graphics2D.
      * @param g The Graphics2D on which to display this GUI.
      */
@@ -890,11 +822,11 @@ public final class MapViewer {
      */
     public void displayColonyTile(Graphics2D g, Tile tile, Colony colony) {
         boolean tileCannotBeWorked = false;
-        Unit occupyingUnit = null;
+        Unit unit = null;
         int price = 0;
         if (colony != null) {
             ColonyTile colonyTile = colony.getColonyTile(tile);
-            occupyingUnit = colonyTile.getOccupyingUnit();
+            unit = colonyTile.getOccupyingUnit();
             price = colony.getOwner().getLandPrice(tile);
             switch (colonyTile.getNoWorkReason()) {
             case NONE: case COLONY_CENTER: case CLAIM_REQUIRED:
@@ -916,13 +848,15 @@ public final class MapViewer {
             centerImage(g, image);
         }
 
-        if (occupyingUnit != null) {
-            ImageIcon image = lib.getUnitImageIcon(occupyingUnit, 0.5);
+        if (unit != null) {
+            ImageIcon image = lib.getUnitImageIcon(unit, 0.5);
             g.drawImage(image.getImage(), tileWidth/4 - image.getIconWidth() / 2,
                         halfHeight - image.getIconHeight() / 2, null);
             // Draw an occupation and nation indicator.
-            g.drawImage(getOccupationIndicatorImage(g, occupyingUnit),
-                        (int) (STATE_OFFSET_X * lib.getScalingFactor()), 0, null);
+            String text = Messages.message(unit.getOccupationKey(freeColClient.getMyPlayer().owns(unit)));
+            g.drawImage(lib.getOccupationIndicatorChip(unit, text),
+                        (int)(STATE_OFFSET_X * lib.getScalingFactor()),
+                        0, null);
         }
     }
 
@@ -986,7 +920,7 @@ public final class MapViewer {
      *
      * @return a <code>TerrainCursor</code> value
      */
-    public TerrainCursor getCursor(){
+    public TerrainCursor getCursor() {
         return cursor;
     }
 
@@ -1029,62 +963,11 @@ public final class MapViewer {
     }
 
     /**
-     * Returns an occupation indicator, i.e. a small image with a
-     * single letter or symbol that indicates the Unit's state.
+     * Gets the selected tile.
      *
-     * @param g a <code>Graphics</code> value
-     * @param unit an <code>Unit</code> value
-     * @return an <code>Image</code> value
+     * @return The <code>Tile</code> selected.
+     * @see #setSelectedTile(Tile, boolean)
      */
-    public Image getOccupationIndicatorImage(Graphics g, Unit unit) {
-        Color backgroundColor = lib.getColor(unit.getOwner());
-        Color foregroundColor = getForegroundColor(backgroundColor);
-        String occupationString;
-        if (!freeColClient.getMyPlayer().owns(unit)) {
-            occupationString = (unit.isNaval())
-                ? Integer.toString(unit.getVisibleGoodsCount())
-                : Messages.message("model.unit.occupation.activeNoMovesLeft");
-        } else {
-            occupationString = (unit.isUnderRepair())
-                ? "model.unit.occupation.underRepair"
-                : (unit.getTradeRoute() != null)
-                ? "model.unit.occupation.inTradeRoute"
-                : (unit.getDestination() != null)
-                ? "model.unit.occupation.goingSomewhere"
-                : (unit.getState() == Unit.UnitState.IMPROVING
-                    && unit.getWorkImprovement() != null)
-                ? (unit.getWorkImprovement().getType().getId()
-                    + ".occupationString")
-                : (unit.getState() == Unit.UnitState.ACTIVE
-                    && unit.getMovesLeft() == 0)
-                ? "model.unit.occupation.activeNoMovesLeft"
-                : ("model.unit.occupation."
-                    + unit.getState().toString().toLowerCase(Locale.US));
-            occupationString = Messages.message(occupationString);
-            if (unit.getState() == Unit.UnitState.FORTIFIED) {
-                foregroundColor = Color.GRAY;
-            }
-        }
-
-        // Lookup in the cache if the image has been generated already
-        String key = "dynamic.occupationIndicator." + occupationString
-            + "." + Integer.toHexString(backgroundColor.getRGB());
-        Image img = (Image) ResourceManager.getImage(key,
-                                                     lib.getScalingFactor());
-        if (img == null) {
-            img = lib.createChip(occupationString, Color.BLACK,
-                                 backgroundColor, foregroundColor);
-            ResourceManager.addGameMapping(key, new ImageResource(img));
-        }
-        return img;
-    }
-
-    /**
-    * Gets the selected tile.
-    *
-    * @return The <code>Tile</code> selected.
-    * @see #setSelectedTile(Tile, boolean)
-    */
     public Tile getSelectedTile() {
         return selectedTile;
     }
@@ -1698,7 +1581,7 @@ public final class MapViewer {
 
         g2.setColor(backgroundColor);
         g2.fill(new RoundRectangle2D.Float(0, 0, width, height, radius, radius));
-        g2.setColor(getForegroundColor(backgroundColor));
+        g2.setColor(lib.getForegroundColor(backgroundColor));
         int offset = 0;
         for (i = 0; i < labels.length; i++) {
             if (i > 0) offset += labels[i - 1].getAscent() + linePadding + vPadding/2;
@@ -1710,8 +1593,8 @@ public final class MapViewer {
 
 
     /**
-     * Draws a cross indicating a religious mission is present in the native village.
-     *
+     * Draws a cross indicating a religious mission is present in the
+     * native village.
      */
     private Image createReligiousMissionLabel(int extent, int padding, Color backgroundColor, boolean expertMissionary) {
         String key = "dynamic.label.religiousMission"
@@ -1752,7 +1635,7 @@ public final class MapViewer {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setColor(backgroundColor);
         g.fill(new RoundRectangle2D.Float(0, 0, extent, extent, padding, padding));
-        g.setColor(getForegroundColor(backgroundColor));
+        g.setColor(lib.getForegroundColor(backgroundColor));
         if (expertMissionary) {
             g.setStroke(new BasicStroke(2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
             g.draw(circle);
@@ -1890,8 +1773,8 @@ public final class MapViewer {
             } else {
                 g.setColor(Color.RED);
                 image = lib.getPathNextTurnImage(show);
-                turns = createStringImage(g, Integer.toString(p.getTurns()), 
-                                          Color.WHITE, font);
+                turns = lib.getStringImage(g, Integer.toString(p.getTurns()), 
+                                           Color.WHITE, font);
             }
             Point point = getTilePosition(tile);
             g.translate(point.x, point.y);
@@ -1909,11 +1792,14 @@ public final class MapViewer {
 
 
     /**
-     * Displays the Map onto the given Graphics2D object. The Tile at
+     * Displays the Map onto the given Graphics2D object.  The Tile at
      * location (x, y) is displayed in the center.
+     *
      * @param g The Graphics2D object on which to draw the Map.
      */
     private void displayMap(Graphics2D g) {
+        final ClientOptions options = freeColClient.getClientOptions();
+        final Player player = freeColClient.getMyPlayer();
         AffineTransform originTransform = g.getTransform();
         Rectangle clipBounds = g.getClipBounds();
         Map map = freeColClient.getGame().getMap();
@@ -1942,10 +1828,12 @@ public final class MapViewer {
         int clipLeftX = leftColumnX + firstColumn * tileWidth;
         firstColumn = leftColumn + firstColumn;
 
-        int lastRow = (clipBounds.y + clipBounds.height - topRowY) / (halfHeight);
+        int lastRow = (clipBounds.y + clipBounds.height - topRowY)
+            / (halfHeight);
         lastRow = topRow + lastRow;
 
-        int lastColumn = (clipBounds.x + clipBounds.width - leftColumnX) / tileWidth;
+        int lastColumn = (clipBounds.x + clipBounds.width - leftColumnX)
+            / tileWidth;
         lastColumn = leftColumn + lastColumn;
 
         /*
@@ -1953,7 +1841,7 @@ public final class MapViewer {
         =======
         Create a GeneralPath to draw the grid with, if needed.
         */
-        if (freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_GRID)) {
+        if (options.getBoolean(ClientOptions.DISPLAY_GRID)) {
             gridPath = new GeneralPath();
             gridPath.moveTo(0, 0);
             int nextX = halfWidth;
@@ -1973,7 +1861,8 @@ public final class MapViewer {
         */
 
         g.setColor(Color.black);
-        g.fillRect(clipBounds.x, clipBounds.y, clipBounds.width, clipBounds.height);
+        g.fillRect(clipBounds.x, clipBounds.y,
+                   clipBounds.width, clipBounds.height);
 
         /*
         PART 2a
@@ -2011,10 +1900,11 @@ public final class MapViewer {
         List<Unit> units = new ArrayList<Unit>();
         List<AffineTransform> unitTransforms = new ArrayList<AffineTransform>();
         List<Settlement> settlements = new ArrayList<Settlement>();
-        List<AffineTransform> settlementTransforms = new ArrayList<AffineTransform>();
+        List<AffineTransform> settlementTransforms
+            = new ArrayList<AffineTransform>();
 
-        int colonyLabels = freeColClient.getClientOptions().getInteger(ClientOptions.COLONY_LABELS);
-        boolean withNumbers = (colonyLabels == ClientOptions.COLONY_LABELS_CLASSIC);
+        int colonyLabels = options.getInteger(ClientOptions.COLONY_LABELS);
+        boolean withNumbers = colonyLabels == ClientOptions.COLONY_LABELS_CLASSIC;
         // Row per row; start with the top modified row
         for (int row = firstRow; row <= lastRow; row++) {
             rowTransform = g.getTransform();
@@ -2022,7 +1912,7 @@ public final class MapViewer {
                 g.translate(halfWidth, 0);
             }
 
-            if (freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_GRID)) {
+            if (options.getBoolean(ClientOptions.DISPLAY_GRID)) {
                 // Display the grid.
                 g.translate(0, halfHeight);
                 g.setStroke(gridStroke);
@@ -2096,8 +1986,8 @@ public final class MapViewer {
         ======
         Display the colony names.
         */
-        if (settlements.size() > 0 && colonyLabels != ClientOptions.COLONY_LABELS_NONE) {
-            Player clientPlayer = freeColClient.getMyPlayer();
+        if (settlements.size() > 0
+            && colonyLabels != ClientOptions.COLONY_LABELS_NONE) {
             for (int index = 0; index < settlements.size(); index++) {
                 final Settlement settlement = settlements.get(index);
                 if (settlement.isDisposed()) {
@@ -2105,88 +1995,103 @@ public final class MapViewer {
                                    + settlement.getName());
                     continue;
                 }
-                String name = Messages.message(settlement.getLocationNameFor(clientPlayer));
-                if (name != null) {
-                    Color backgroundColor = lib.getColor(settlement.getOwner());
-                    Font font = ResourceManager.getFont("NormalFont", 18f);
-                    Font productionFont = ResourceManager.getFont("NormalFont", 12f);
-//                    int yOffset = lib.getSettlementImage(settlement).getHeight(null) + 1;
-                    int yOffset = tileHeight;
-                    g.setTransform(settlementTransforms.get(index));
-                    switch(colonyLabels) {
-                    case ClientOptions.COLONY_LABELS_CLASSIC:
-                        Image stringImage = createStringImage(g, name, backgroundColor, font);
-                        g.drawImage(stringImage, (tileWidth - stringImage.getWidth(null))/2 + 1, yOffset, null);
+                String name = Messages.message(settlement.getLocationNameFor(player));
+                if (name == null) continue;
+                Color backgroundColor = lib.getColor(settlement.getOwner());
+                Font font = ResourceManager.getFont("NormalFont", 18f);
+                Font productionFont = ResourceManager.getFont("NormalFont", 12f);
+                // int yOffset = lib.getSettlementImage(settlement).getHeight(null) + 1;
+                int yOffset = tileHeight;
+                g.setTransform(settlementTransforms.get(index));
+                switch (colonyLabels) {
+                case ClientOptions.COLONY_LABELS_CLASSIC:
+                    Image img = lib.getStringImage(g, name, backgroundColor, font);
+                    g.drawImage(img, (tileWidth - img.getWidth(null))/2 + 1,
+                                yOffset, null);
+                    break;
+                case ClientOptions.COLONY_LABELS_MODERN:
+                default:
+                    backgroundColor = new Color(backgroundColor.getRed(),
+                                                backgroundColor.getGreen(),
+                                                backgroundColor.getBlue(), 128);
+                    TextSpecification[] specs = new TextSpecification[1];
+                    if (settlement instanceof Colony
+                        && settlement.getOwner() == player) {
+                        Colony colony = (Colony) settlement;
+                        BuildableType buildable = colony.getCurrentlyBuilding();
+                        if (buildable != null) {
+                            specs = new TextSpecification[2];
+                            String t = Messages.message(buildable.getNameKey())
+                                + " " + Messages.getTurnsText(colony.getTurnsToComplete(buildable));
+                            specs[1] = new TextSpecification(t, productionFont);
+                        }
+                    }
+                    specs[0] = new TextSpecification(name, font);
+                    
+                    Image nameImage = createLabel(g, specs, backgroundColor);
+                    if (nameImage != null) {
+                        int spacing = 3;
+                        Image leftImage = null;
+                        Image rightImage = null;
+                        if (settlement instanceof Colony) {
+                            String size = Integer.toString(((Colony)settlement)
+                                .getDisplayUnitCount());
+                            leftImage = createLabel(g, size, font,
+                                                    backgroundColor);
+                            if (player.owns(settlement)) {
+                                int bonusProduction = ((Colony)settlement).getProductionBonus();
+                                if (bonusProduction != 0) {
+                                    String bonus = (bonusProduction > 0)
+                                        ? "+" + bonusProduction
+                                        : Integer.toString(bonusProduction);
+                                    rightImage = createLabel(g, bonus, font,
+                                                             backgroundColor);
+                                }
+                            }
+                        } else if (settlement instanceof IndianSettlement) {
+                            IndianSettlement is = (IndianSettlement) settlement;
+                            if (is.getType().isCapital()) {
+                                leftImage = createCapitalLabel(nameImage.getHeight(null), 5, backgroundColor);
+                            }
+                            
+                            Unit missionary = is.getMissionary();
+                            if (missionary != null) {
+                                boolean expert = missionary.hasAbility(Ability.EXPERT_MISSIONARY);
+                                backgroundColor = lib.getColor(missionary.getOwner());
+                                backgroundColor = new Color(backgroundColor.getRed(), backgroundColor.getGreen(), backgroundColor.getBlue(), 128);
+                                rightImage = createReligiousMissionLabel(nameImage.getHeight(null), 5, backgroundColor, expert);
+                            }
+                        }
+                        
+                        int width = (int)((nameImage.getWidth(null)
+                                * lib.getScalingFactor())
+                            + ((leftImage != null)
+                                ? (leftImage.getWidth(null)
+                                    * lib.getScalingFactor()) + spacing
+                                : 0)
+                            + ((rightImage != null)
+                                ? (rightImage.getWidth(null)
+                                    * lib.getScalingFactor()) + spacing
+                                : 0));
+                        int labelOffset = (tileWidth - width)/2;
+                        yOffset -= (nameImage.getHeight(null)
+                            * lib.getScalingFactor())/2;
+                        if (leftImage != null) {
+                            g.drawImage(leftImage, labelOffset, yOffset, null);
+                            labelOffset += (leftImage.getWidth(null)
+                                * lib.getScalingFactor()) + spacing;
+                        }
+                        g.drawImage(nameImage, labelOffset, yOffset, null);
+                        if (rightImage != null) {
+                            labelOffset += (nameImage.getWidth(null)
+                                * lib.getScalingFactor()) + spacing;
+                            g.drawImage(rightImage, labelOffset, yOffset, null);
+                        }
                         break;
-                    case ClientOptions.COLONY_LABELS_MODERN:
-                    default:
-                        backgroundColor = new Color(backgroundColor.getRed(), backgroundColor.getGreen(), backgroundColor.getBlue(), 128);
-
-                        TextSpecification[] specs = new TextSpecification[1];
-                        if (settlement instanceof Colony && settlement.getOwner() == clientPlayer) {
-                            Colony colony = (Colony) settlement;
-                            BuildableType buildable = colony.getCurrentlyBuilding();
-                            if (buildable != null) {
-                                specs = new TextSpecification[2];
-                                String turnsStr = Messages.getTurnsText(colony.getTurnsToComplete(buildable));
-                                String nowBuilding = Messages.message(buildable.getNameKey()) + " " + turnsStr;
-                                specs[1] = new TextSpecification(nowBuilding, productionFont);
-                            }
-                        }
-                        specs[0] = new TextSpecification(name, font);
-
-                        Image nameImage = createLabel(g, specs, backgroundColor);
-                        if (nameImage != null) {
-                            int spacing = 3;
-                            Image leftImage = null;
-                            Image rightImage = null;
-                            if (settlement instanceof Colony) {
-                                String size = Integer.toString(((Colony) settlement).getDisplayUnitCount());
-                                leftImage = createLabel(g, size, font, backgroundColor);
-
-                                if (clientPlayer.owns(settlement)) {
-                                    int bonusProduction = ((Colony) settlement).getProductionBonus();
-                                    if (bonusProduction != 0) {
-                                        String bonus = bonusProduction > 0 ? "+" + bonusProduction : Integer.toString(bonusProduction);
-                                        rightImage = createLabel(g, bonus, font, backgroundColor);
-                                    }
-                                }
-                            } else if (settlement instanceof IndianSettlement) {
-                                IndianSettlement nativeSettlement = (IndianSettlement) settlement;
-                                if (nativeSettlement.getType().isCapital()) {
-                                    leftImage = createCapitalLabel(nameImage.getHeight(null), 5, backgroundColor);
-                                }
-
-                                Unit missionary = nativeSettlement.getMissionary();
-                                if (missionary != null) {
-                                    boolean expert = missionary.hasAbility(Ability.EXPERT_MISSIONARY);
-                                    backgroundColor = lib.getColor(missionary.getOwner());
-                                    backgroundColor = new Color(backgroundColor.getRed(), backgroundColor.getGreen(), backgroundColor.getBlue(), 128);
-                                    rightImage = createReligiousMissionLabel(nameImage.getHeight(null), 5, backgroundColor, expert);
-                                }
-                            }
-
-                            int width = (int) ((nameImage.getWidth(null)*lib.getScalingFactor())
-                                + (leftImage != null ? (leftImage.getWidth(null)*lib.getScalingFactor()) + spacing : 0)
-                                + (rightImage != null ? (rightImage.getWidth(null)*lib.getScalingFactor()) + spacing : 0));
-                            int labelOffset = (tileWidth - width)/2;
-                            yOffset -= (nameImage.getHeight(null)*lib.getScalingFactor())/2;
-                            if (leftImage != null) {
-                                g.drawImage(leftImage, labelOffset, yOffset, null);
-                                labelOffset += (leftImage.getWidth(null)*lib.getScalingFactor()) + spacing;
-                            }
-                            g.drawImage(nameImage, labelOffset, yOffset, null);
-                            if (rightImage != null) {
-                                labelOffset += (nameImage.getWidth(null)*lib.getScalingFactor()) + spacing;
-                                g.drawImage(rightImage, labelOffset, yOffset, null);
-                            }
-                            break;
-                        }
                     }
                 }
             }
         }
-
         g.setTransform(originTransform);
 
         /*
@@ -2194,7 +2099,6 @@ public final class MapViewer {
         ======
         Display goto path
         */
-
         if (currentPath != null)
             displayGotoPath(g, currentPath);
         if (gotoPath != null)
@@ -2204,26 +2108,23 @@ public final class MapViewer {
         PART 5
         ======
         Grey out the map if it is not my turn (and a multiplayer game).
-         */
+        */
         Canvas canvas = gui.getCanvas();
 
         if (!freeColClient.isMapEditor()
             && freeColClient.getGame() != null
             && !freeColClient.currentPlayerIsMyPlayer()) {
 
-            if (greyLayer == null) {
-                greyLayer = new GrayLayer(lib);
-            }
+            if (greyLayer == null) greyLayer = new GrayLayer(lib);
             if (greyLayer.getParent() == null) { // Not added to the canvas yet.
                 canvas.addToCanvas(greyLayer, JLayeredPane.DEFAULT_LAYER);
                 canvas.moveToFront(greyLayer);
             }
 
-            greyLayer.setBounds(0,0,canvas.getSize().width, canvas.getSize().height);
+            greyLayer.setBounds(0, 0, canvas.getSize().width, 
+                                canvas.getSize().height);
             greyLayer.setPlayer(freeColClient.getGame().getCurrentPlayer());
-
-        }
-        else {
+        } else {
             if (greyLayer != null && greyLayer.getParent() != null) {
                 canvas.removeFromCanvas(greyLayer);
             }
@@ -2240,14 +2141,16 @@ public final class MapViewer {
             synchronized (this) {
                 Font font = ResourceManager.getFont("NormalFont", 12f);
                 GUIMessage message = getMessage(0);
-                Image si = createStringImage(g, message.getMessage(), message.getColor(), font);
-
-                int yy = size.height - 300 - getMessageCount() * si.getHeight(null);
+                Image si = lib.getStringImage(g, message.getMessage(),
+                                              message.getColor(), font);
+                int yy = size.height - 300 - getMessageCount()
+                    * si.getHeight(null);
                 int xx = 40;
 
                 for (int i = 0; i < getMessageCount(); i++) {
                     message = getMessage(i);
-                    g.drawImage(createStringImage(g, message.getMessage(), message.getColor(), font),
+                    g.drawImage(lib.getStringImage(g, message.getMessage(),
+                                                   message.getColor(), font),
                                 xx, yy, null);
                     yy += si.getHeight(null);
                 }
@@ -2288,7 +2191,7 @@ public final class MapViewer {
             break;
         case ClientOptions.DISPLAY_TILE_TEXT_REGIONS:
             if (tile.getRegion() != null) {
-                if (FreeColDebugger.isInDebugMode()
+                if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)
                     && tile.getRegion().getName() == null) {
                     text = Utils.lastPart(tile.getRegion().getNameKey(), ".");
                 } else {
@@ -2344,27 +2247,30 @@ public final class MapViewer {
      * Displays the given Tile onto the given Graphics2D object at the
      * location specified by the coordinates. Settlements and Lost City
      * Rumours will be shown.
+     *
      * @param g The Graphics2D object on which to draw the Tile.
      * @param tile The Tile to draw.
-     * @param withNumber a <code>boolean</code> value
+     * @param withNumber Whether to display the number of units present.
      */
     private void displaySettlement(Graphics2D g, Tile tile, boolean withNumber) {
-        Settlement settlement = tile.getSettlement();
+        final Settlement settlement = tile.getSettlement();
 
         if (settlement != null) {
             if (settlement instanceof Colony) {
-                Image colonyImage = lib.getSettlementImage(settlement);
                 // Draw image of colony in center of the tile.
+                Image colonyImage = lib.getSettlementImage(settlement);
                 centerImage(g, colonyImage);
+
                 if (withNumber) {
                     String populationString = Integer.toString(((Colony)settlement).getDisplayUnitCount());
                     int bonus = ((Colony)settlement).getProductionBonus();
                     Color theColor = ResourceManager.getProductionColor(bonus);
                     Font font = ResourceManager.getFont("SimpleFont", Font.BOLD, 12f);
-                    Image stringImage = createStringImage(g, populationString, theColor, font);
+                    Image stringImage = lib.getStringImage(g, populationString,
+                                                           theColor, font);
                     centerImage(g, stringImage);
                 }
-                //g.setColor(Color.BLACK);
+
             } else if (settlement instanceof IndianSettlement) {
                 IndianSettlement is = (IndianSettlement)settlement;
                 Image settlementImage = lib.getSettlementImage(settlement);
@@ -2375,87 +2281,47 @@ public final class MapViewer {
                 String text = null;
                 Image chip = null;
                 Color background = lib.getColor(is.getOwner());
-                Color foreground = getForegroundColor(background);
+                Color foreground = lib.getForegroundColor(background);
                 float xOffset = STATE_OFFSET_X * lib.getScalingFactor();
                 float yOffset = STATE_OFFSET_Y * lib.getScalingFactor();
                 int colonyLabels = freeColClient.getClientOptions()
                     .getInteger(ClientOptions.COLONY_LABELS);
                 if (colonyLabels != ClientOptions.COLONY_LABELS_MODERN) {
                     // Draw the settlement chip
-                    chip = getIndianSettlementChip(is);
-                    g.drawImage(chip, (int) xOffset, (int) yOffset, null);
+                    chip = lib.getIndianSettlementChip(is,
+                        Messages.message("indianSettlement."
+                            + ((is.getType().isCapital()) ? "capital"
+                                : "normal")));
+                    g.drawImage(chip, (int)xOffset, (int)yOffset, null);
                     xOffset += chip.getWidth(null) + 2;
 
                     // Draw the mission chip if needed.
-                    if ((chip = getMissionChip(is)) != null) {
+                    if ((chip = lib.getMissionChip(is)) != null) {
                         g.drawImage(chip, (int)xOffset, (int)yOffset, null);
                         xOffset += chip.getWidth(null) + 2;
                     }
                 }
 
                 // Draw the alarm chip if needed.
-                chip = getAlarmChip(is);
-                if (chip != null) {
+                Player player = freeColClient.getMyPlayer();
+                if (player != null && is.hasContacted(player)) {
+                    chip = lib.getAlarmChip(is, player,
+                        Messages.message((is.hasScouted(player))
+                            ? "indianSettlement.scouted"
+                            : "indianSettlement.contacted"));
                     g.drawImage(chip, (int)xOffset, (int)yOffset, null);
                 }
             } else {
-                logger.warning("Requested to draw unknown settlement type.");
+                logger.warning("Bogus settlement: " + settlement);
             }
         }
-
-    }
-
-    /**
-     * Gets the owner chip for the settlement.
-     *
-     * @param settlement The <code>IndianSettlement</code> to check.
-     * @return A chip.
-     */
-    private Image getIndianSettlementChip(IndianSettlement is) {
-        Color background = lib.getColor(is.getOwner());
-        return lib.createChip((is.getType().isCapital()) ? "*" : "-",
-                              Color.BLACK,
-                              background, getForegroundColor(background));
-    }
-
-    /**
-     * Gets a chip image for the mission in an Indian settlement.
-     *
-     * @param settlement The <code>IndianSettlement</code> to check.
-     * @return A missionary chip, or null if none suitable.
-     */
-    private Image getMissionChip(IndianSettlement is) {
-        Unit missionary = is.getMissionary();
-        if (missionary == null) return null;
-        boolean expert = missionary.hasAbility(Ability.EXPERT_MISSIONARY);
-        return lib.createChip("\u271D", Color.BLACK,
-                              (expert) ? Color.BLACK : Color.GRAY,
-                              lib.getColor(missionary.getOwner()));
-    }
-
-    /**
-     * Gets a chip image for the alarm at an Indian settlement.
-     * The background is either the native owner's, or that of the
-     * most hated nation if any.
-     *
-     * @param settlement The <code>IndianSettlement</code> to check.
-     * @return An alarm chip, or null if none suitable.
-     */
-    private Image getAlarmChip(IndianSettlement is) {
-        Player player = freeColClient.getMyPlayer();
-        if (player == null || !is.hasContacted(player)) return null;
-        Player enemy = is.getMostHated();
-        Color background = lib.getColor((enemy == null) ? is.getOwner()
-            : enemy);
-        return lib.createChip(((is.hasScouted(player)) ? "!" : "?"),
-                              Color.BLACK,
-                              background, getForegroundColor(background));
     }
 
     /**
      * Displays the given Tile onto the given Graphics2D object at the
-     * location specified by the coordinates. Addtions and improvements to
-     * Tile will be drawn.
+     * location specified by the coordinates.  Addtions and
+     * improvements to Tile will be drawn.
+     *
      * @param g The Graphics2D object on which to draw the Tile.
      * @param tile The Tile to draw.
      */
@@ -2509,23 +2375,27 @@ public final class MapViewer {
 
     /**
      * Displays the given Tile onto the given Graphics2D object at the
-     * location specified by the coordinates. Everything located on the
-     * Tile will also be drawn except for units because their image can
-     * be larger than a Tile.
+     * location specified by the coordinates.  Everything located on
+     * the Tile will also be drawn except for units because their
+     * image can be larger than a Tile.
+     *
      * @param g The Graphics2D object on which to draw the Tile.
      * @param tile The Tile to draw.
      * @param drawUnexploredBorders If true; draws border between explored and
-     *        unexplored terrain.
-     * @param withNumber indicates if the number of inhabitants should be drawn too.
+     *     unexplored terrain.
+     * @param withNumber indicates if the number of inhabitants should
+     *     be drawn too.
      */
     private void displayTileOverlays(Graphics2D g, Tile tile,
-                                     boolean drawUnexploredBorders, boolean withNumber) {
+                                     boolean drawUnexploredBorders,
+                                     boolean withNumber) {
         if (tile != null && tile.isExplored()) {
             if (drawUnexploredBorders) {
                 for (Direction direction : Direction.values()) {
                     Tile borderingTile = tile.getAdjacentTile(direction);
-                    if (borderingTile != null && !borderingTile.isExplored()){
-                        g.drawImage(lib.getBorderImage(null, direction, tile.getX(), tile.getY()), 0, 0, null);
+                    if (borderingTile != null && !borderingTile.isExplored()) {
+                        g.drawImage(lib.getBorderImage(null, direction,
+                                tile.getX(), tile.getY()), 0, 0, null);
                     }
                 }
             }
@@ -2543,6 +2413,7 @@ public final class MapViewer {
      * @param unit The Unit to draw.
      */
     private void displayUnit(Graphics2D g, Unit unit) {
+        final Player player = freeColClient.getMyPlayer();
         try {
             // Draw the 'selected unit' image if needed.
             //if ((unit == getActiveUnit()) && cursor) {
@@ -2554,14 +2425,16 @@ public final class MapViewer {
             // If unit is sentry, draw in grayscale
             boolean fade = (unit.getState() == Unit.UnitState.SENTRY)
                 || (unit.getTile() != null
-                    && !freeColClient.getMyPlayer().canSee(unit.getTile()));
+                    && !player.canSee(unit.getTile()));
             Image image = lib.getUnitImageIcon(unit, fade).getImage();
             Point p = getUnitImagePositionInTile(image);
             g.drawImage(image, p.x, p.y, null);
 
             // Draw an occupation and nation indicator.
-            g.drawImage(getOccupationIndicatorImage(g, unit),
-                        (int) (STATE_OFFSET_X * lib.getScalingFactor()), 0, null);
+            String text = Messages.message(unit.getOccupationKey(player.owns(unit)));
+            g.drawImage(lib.getOccupationIndicatorChip(unit, text),
+                        (int)(STATE_OFFSET_X * lib.getScalingFactor()), 0,
+                        null);
 
             // Draw one small line for each additional unit (like in civ3).
             int unitsOnTile = 0;
@@ -2587,7 +2460,7 @@ public final class MapViewer {
 
         // FOR DEBUGGING
         net.sf.freecol.server.ai.AIUnit au;
-        if (FreeColDebugger.isInDebugMode()
+        if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)
             && !freeColClient.getMyPlayer().owns(unit)
             && freeColClient.getFreeColServer() != null
             && (au = freeColClient.getFreeColServer().getAIMain()
@@ -2741,28 +2614,6 @@ public final class MapViewer {
     }
 
     /**
-     * Describe <code>getForegroundColor</code> method here.
-     *
-     * @param background a <code>Color</code> value
-     * @return a <code>Color</code> value
-     */
-    private Color getForegroundColor(Color background) {
-        /*
-         * Our eyes have different sensitivity towards
-         * red, green and blue. We want a foreground
-         * color with the inverse brightness.
-         */
-        if (background.getRed() * 0.3
-                + background.getGreen() * 0.59
-                + background.getBlue() * 0.11 < 126) {
-            return Color.WHITE;
-        } else {
-            return Color.BLACK;
-        }
-    }
-
-
-    /**
      * Returns the amount of columns that are to the left of the Tile
      * that is displayed in the center of the Map.
      * @return The amount of columns that are to the left of the Tile
@@ -2848,27 +2699,6 @@ public final class MapViewer {
         }
 
         return rightColumns;
-    }
-
-    /**
-     * Describe <code>getStringBorderColor</code> method here.
-     *
-     * @param color a <code>Color</code> value
-     * @return a <code>Color</code> value
-     */
-    private Color getStringBorderColor(Color color) {
-        /*
-         * I think string border colors should be black
-         * unless the color of the string is
-         * really dark.
-         */
-        if (color.getRed() * 0.3
-                + color.getGreen() * 0.59
-                + color.getBlue() * 0.11 < 10) {
-            return Color.WHITE;
-        } else {
-            return Color.BLACK;
-        }
     }
 
     /**

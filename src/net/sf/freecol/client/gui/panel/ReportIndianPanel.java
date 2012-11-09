@@ -152,10 +152,9 @@ public final class ReportIndianPanel extends ReportPanel {
                 JLabel missionLabel = new JLabel();
                 Unit missionary = settlement.getMissionary();
                 if (missionary == null) {
-                    missionLabel.setText(Messages.message("indianSettlement.skillNone"));   // FIXME
+                    missionLabel.setText("");
                 } else {
-                    boolean expert = missionary.hasAbility(Ability.EXPERT_MISSIONARY);
-                    missionLabel.setIcon(new ImageIcon(getLibrary().getMissionChip(missionary, expert, 1)));
+                    missionLabel.setIcon(new ImageIcon(getLibrary().getMissionChip(settlement)));
                     String text = Messages.message(StringTemplate.template("model.unit.nationUnit")
                         .addStringTemplate("%nation%", missionary.getOwner().getNationName())
                         .addStringTemplate("%unit%", Messages.getLabel(missionary)));

@@ -415,28 +415,6 @@ public class ResourceManager {
     }
 
     /**
-     * Returns the <code>Image</code> with the given name.
-     *
-     * @param resource The name of the resource to return.
-     * @return An <code>Image</code> created with the image
-     *      identified by <code>resource</code> or
-     *      <code>null</code> if there is no image identified
-     *      by that name.
-     * @see #getImage(String)
-     */
-    public static Image getChip(final String resource) {
-        final ChipResource r = getResource(resource, ChipResource.class);
-        return (r != null) ? r.getImage() : null;
-    }
-
-
-    public static Image getChip(final String resource, double scale) {
-        final ChipResource r = getResource(resource, ChipResource.class);
-        return (r != null) ? r.getImage(scale) : null;
-    }
-
-
-    /**
      * Gets the font with the given name.
      *
      * @param resource The name of the resource to query.

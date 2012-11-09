@@ -206,10 +206,10 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
 
         public UpkeepLabel(int number) {
             super(gui.getImageLibrary().getMiscImageIcon("coin"));
-            image = gui.getMapViewer()
-                .createStringImage(gui.getCanvas().getGraphics(),
-                                   Integer.toString(number), getForeground(),
-                                   ResourceManager.getFont("SimpleFont", Font.BOLD, 12f));
+            image = gui.getImageLibrary()
+                .getStringImage(gui.getCanvas().getGraphics(),
+                                Integer.toString(number), getForeground(),
+                                ResourceManager.getFont("SimpleFont", Font.BOLD, 12f));
         }
 
         @Override

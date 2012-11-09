@@ -38,7 +38,6 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
-import net.sf.freecol.common.resources.ChipResource;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.resources.ResourceMapping;
 
@@ -171,32 +170,9 @@ public final class PreGameController {
     }
 
     /**
-     * Add player-specific resources to the resource manager.
-     *
-     * @param nationId The player nation identifier.
-     * @param mapping The mapping to add to.
-     */
-    private void addPlayerResources(String nationId, ResourceMapping mapping) {
-        Color color = ResourceManager.getColor(nationId + ".color");
-        mapping.add(nationId + ".chip", ChipResource.colorChip(color));
-        mapping.add(nationId + ".mission.chip",
-                    ChipResource.missionChip(color, false));
-        mapping.add(nationId + ".mission.expert.chip",
-                    ChipResource.missionChip(color, true));
-    }
-
-    /**
      * Starts the game.
      */
     public void startGame() {
-        ResourceMapping gameMapping = new ResourceMapping();
-        for (Player player : freeColClient.getGame().getPlayers()) {
-            addPlayerResources(player.getNationID(), gameMapping);
-        }
-        // Unknown nation is not in getPlayers() list.
-        addPlayerResources(Nation.UNKNOWN_NATION_ID, gameMapping);
-        ResourceManager.addGameMapping(gameMapping);
-
         Player myPlayer = freeColClient.getMyPlayer();
         if (!freeColClient.isHeadless()) {
             gui.closeMainPanel();
@@ -224,9 +200,9 @@ public final class PreGameController {
             && FreeColDebugger.getDebugRunTurns() > 0) {
             freeColClient.skipTurns(FreeColDebugger.getDebugRunTurns());
         } else if (freeColClient.getGame().getTurn().getNumber() == 1) {
-            ModelMessage message =
-                new ModelMessage(ModelMessage.MessageType.TUTORIAL,
-                                 "tutorial.startGame", myPlayer);
+            ModelMessage message
+                = new ModelMessage(ModelMessage.MessageType.TUTORIAL,
+                                   "tutorial.startGame", myPlayer);
             String direction = myPlayer.getNation().startsOnEastCoast()
                 ? "west" : "east";
             message.add("%direction%", direction);

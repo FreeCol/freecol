@@ -21,6 +21,7 @@ package net.sf.freecol.client.gui;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
@@ -37,10 +38,12 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Ownable;
@@ -54,6 +57,7 @@ import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.resources.ImageResource;
 import net.sf.freecol.common.resources.ResourceManager;
 
 
@@ -73,6 +77,133 @@ public final class ImageLibrary {
                                LOST_CITY_RUMOUR = "lostCityRumour.image",
                                DARKNESS = "halo.dark.image";
 
+    /**
+     * The scaling factor used when creating this
+     * <code>ImageLibrary</code>.  The value <code>1</code> is used if
+     * this object is not a result of a scaling operation.
+     */
+    private final float scalingFactor;
+
+
+    /**
+     * The constructor to use.
+     */
+    public ImageLibrary() {
+        this(1);
+    }
+
+    public ImageLibrary(float scalingFactor) {
+        this.scalingFactor = scalingFactor;
+    }
+
+
+    /**
+     * Create a "chip" with the given text and colors.
+     *
+     * @param text The text to display.
+     * @param border The border <code>Color</code>.
+     * @param background The background <code>Color</code>.
+     * @param foreground The foreground <code>Color</code>.
+     * @return A chip.
+     */
+    private Image createChip(String text, Color border,
+                             Color background, Color foreground) {
+        // Draw it and put it in the cache
+        Font font = ResourceManager.getFont("SimpleFont", Font.BOLD,
+            (float)Math.rint(12 * getScalingFactor()));
+        // hopefully, this is big enough
+        BufferedImage bi = new BufferedImage(100, 100,
+                                             BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = bi.createGraphics();
+        TextLayout label = new TextLayout(text, font, 
+                                          g2.getFontRenderContext());
+        float padding = 6 * getScalingFactor();
+        int width = (int)(label.getBounds().getWidth() + padding);
+        int height = (int)(label.getAscent() + label.getDescent() + padding);
+        g2.setColor(border);
+        g2.fillRect(0, 0, width, height);
+        g2.setColor(background);
+        g2.fillRect(1, 1, width - 2, height - 2);
+        g2.setColor(foreground);
+        label.draw(g2, (float)(padding/2 - label.getBounds().getX()),
+                   label.getAscent() + padding/2);
+        g2.dispose();
+        return bi.getSubimage(0, 0, width, height);
+    }
+
+    /**
+     * Create a filled "chip" with the given text and colors.
+     *
+     * @param text The text to display.
+     * @param border The border <code>Color</code>.
+     * @param background The background <code>Color</code>.
+     * @param amount How much to fill the chip with the fill color
+     * @param fill The fill <code>Color</code>.
+     * @param foreground The foreground <code>Color</code>.
+     * @return A chip.
+     */
+    private Image createFilledChip(String text, Color border, Color background,
+                                   double amount, Color fill,
+                                   Color foreground) {
+        // Draw it and put it in the cache
+        Font font = ResourceManager.getFont("SimpleFont", Font.BOLD,
+            (float)Math.rint(12 * getScalingFactor()));
+        // hopefully, this is big enough
+        BufferedImage bi = new BufferedImage(100, 100,
+                                             BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = bi.createGraphics();
+        TextLayout label = new TextLayout(text, font, 
+                                          g2.getFontRenderContext());
+        float padding = 6 * getScalingFactor();
+        int width = (int)(label.getBounds().getWidth() + padding);
+        int height = (int)(label.getAscent() + label.getDescent() + padding);
+        g2.setColor(border);
+        g2.fillRect(0, 0, width, height);
+        g2.setColor(background);
+        g2.fillRect(1, 1, width - 2, height - 2);
+        if (amount > 0.0 && amount <= 1.0) {
+            g2.setColor(fill);
+            g2.fillRect(1, 1, width - 2, (int)((height - 2) * amount));
+        }
+        g2.setColor(foreground);
+        label.draw(g2, (float)(padding/2 - label.getBounds().getX()),
+                   label.getAscent() + padding/2);
+        g2.dispose();
+        return bi.getSubimage(0, 0, width, height);
+    }
+
+
+    /**
+     * Gets a suitable foreground color given a background color.
+     *
+     * Our eyes have different sensitivity towards red, green and
+     * blue.  We want a foreground color with the inverse brightness.
+     *
+     * @param background The background <code>Color</code> to complement.
+     * @return A suitable foreground <code>Color</code>.
+     */
+    public Color getForegroundColor(Color background) {
+        return (background.getRed() * 0.3
+                + background.getGreen() * 0.59
+                + background.getBlue() * 0.11 < 126) ? Color.WHITE
+            : Color.BLACK;
+    }
+
+    /**
+     * Describe <code>getStringBorderColor</code> method here.
+     *
+     * The string border colors should be black unless the color of
+     * the string is really dark.
+     *
+     * @param color The <code>Color</code> to complement.
+     * @return A suitable border <code>Color</code>.
+     */
+    public Color getStringBorderColor(Color color) {
+        return (color.getRed() * 0.3
+            + color.getGreen() * 0.59
+            + color.getBlue() * 0.11 < 10) ? Color.WHITE
+            : Color.BLACK;
+    }
 
     /**
      * Draw a (usually small) background image into a (usually larger)
@@ -119,41 +250,52 @@ public final class ImageLibrary {
 
 
     /**
-     * The scaling factor used when creating this
-     * <code>ImageLibrary</code>. The value
-     * <code>1</code> is used if this object is not
-     * a result of a scaling operation.
-     */
-    private final float scalingFactor;
-
-    /**
-     * The constructor to use.
+     * Gets a chip image for the alarm at an Indian settlement.
+     * The background is either the native owner's, or that of the
+     * most hated nation if any.
      *
+     * @param settlement The <code>IndianSettlement</code> to check.
+     * @param player The <code>Player</code> viewing the settlement.
+     * @param text The text for the chip.
+     * @return An alarm chip, or null if none suitable.
      */
-    public ImageLibrary() {
-        this(1);
-    }
-
-
-    public ImageLibrary(float scalingFactor) {
-        this.scalingFactor = scalingFactor;
-    }
-
-    /**
-     * Returns the alarm chip with the given color.
-     *
-     * @param alarm The alarm level.
-     * @param visited a <code>boolean</code> value
-     * @param scale a <code>double</code> value
-     * @return The alarm chip.
-     */
-    public Image getAlarmChip(Tension.Level alarm, final boolean visited, double scale) {
-        if (visited) {
-            return ResourceManager.getChip("alarmChip.visited."
-                                           + alarm.toString().toLowerCase(), scale);
-        } else {
-            return ResourceManager.getChip("alarmChip." + alarm.toString().toLowerCase(), scale);
+    public Image getAlarmChip(IndianSettlement is, Player player, String text) {
+        Color ownerColor = getColor(is.getOwner());
+        Color foreground = getForegroundColor(ownerColor);
+        Color enemyColor = null;
+        int amount = 0;
+        Player enemy = is.getMostHated();
+        Tension alarm;
+        if (player != null && (alarm = is.getAlarm(player)) != null) {
+            enemyColor = getColor(player);
+            // Set amount to [0-4] corresponding to HAPPY, CONTENT,
+            // DISPLEASED, ANGRY, HATEFUL.
+            amount = alarm.getLevel().ordinal() - Tension.Level.HAPPY.ordinal();
+            if (amount >= 2) foreground = getForegroundColor(enemyColor);
         }
+        String key = "dynamic.alarm." + text + "." + ownerColor.getRGB()
+            + "." + Integer.toString(amount) + "." + enemyColor.getRGB();
+        Image img = (Image)ResourceManager.getImage(key);
+        if (img == null) {
+            img = createFilledChip(text, Color.BLACK, ownerColor,
+                                   amount/4.0, enemyColor, foreground);
+            ResourceManager.addGameMapping(key, new ImageResource(img));
+        }
+        return img;
+    }
+
+    /**
+     * Returns true if the tile with the given coordinates is to be
+     * considered "even".  This is useful to select different images
+     * for the same tile type in order to prevent big stripes or a
+     * checker-board effect.
+     *
+     * @param x an <code>int</code> value
+     * @param y an <code>int</code> value
+     * @return a <code>boolean</code> value
+     */
+    private boolean isEven(int x, int y) {
+        return ((y % 8 <= 2) || ((x + y) % 2 == 0 ));
     }
 
     /**
@@ -166,7 +308,8 @@ public final class ImageLibrary {
      */
     public Image getBeachCornerImage(int index, int x, int y) {
         return ResourceManager.getImage("model.tile.beach.corner" + index
-                                        + (isEven(x, y) ? "_even" : "_odd"), scalingFactor);
+                                        + ((isEven(x, y)) ? "_even" : "_odd"),
+                                        scalingFactor);
     }
 
     /**
@@ -179,9 +322,16 @@ public final class ImageLibrary {
      */
     public Image getBeachEdgeImage(int index, int x, int y) {
         return ResourceManager.getImage("model.tile.beach.edge" + index
-                                        + (isEven(x, y) ? "_even" : "_odd"), scalingFactor);
+                                        + ((isEven(x, y)) ? "_even" : "_odd"),
+                                        scalingFactor);
     }
 
+    /**
+     * Gets the bonus image of the given type.
+     *
+     * @param type The <code>ResourceType</code> to look up.
+     * @return The bonus image.
+     */
     public Image getBonusImage(ResourceType type) {
         return getBonusImage(type, scalingFactor);
     }
@@ -193,15 +343,13 @@ public final class ImageLibrary {
     /**
      * Returns the bonus-image for the given tile.
      *
-     * @param tile
-     * @return the bonus-image for the given tile.
+     * @param tile The <code>Tile</code> with the image on it. 
+     * @return The bonus-image for the given tile.
      */
     public Image getBonusImage(Tile tile) {
-        if (tile.hasResource()) {
-            return getBonusImage(tile.getTileItemContainer().getResource().getType());
-        } else {
-            return null;
-        }
+        return (tile.hasResource()) ? getBonusImage(tile.getTileItemContainer()
+            .getResource().getType())
+            : null;
     }
 
     /**
@@ -220,31 +368,17 @@ public final class ImageLibrary {
      * @param type The type of the terrain-image to return.
      * @param direction a <code>Direction</code> value
      * @param x The x-coordinate of the location of the tile that is being
-     *            drawn.
+     *     drawn.
      * @param y The x-coordinate of the location of the tile that is being
-     *            drawn.
+     *     drawn.
      * @return The terrain-image at the given index.
      */
-    public Image getBorderImage(TileType type, Direction direction, int x, int y) {
+    public Image getBorderImage(TileType type, Direction direction,
+                                int x, int y) {
         String key = (type == null) ? "model.tile.unexplored" : type.getId();
         return ResourceManager.getImage(key + ".border_" + direction
-                                        + (isEven(x, y) ?  "_even" : "_odd")
+                                        + ((isEven(x, y)) ?  "_even" : "_odd")
                                         + ".image", scalingFactor);
-    }
-
-
-    /**
-     * Returns true if the tile with the given coordinates is to be
-     * considered "even". This is useful to select different images
-     * for the same tile type in order to prevent big stripes or
-     * a checker-board effect.
-     *
-     * @param x an <code>int</code> value
-     * @param y an <code>int</code> value
-     * @return a <code>boolean</code> value
-     */
-    private boolean isEven(int x, int y) {
-        return ((y % 8 <= 2) || ((x + y) % 2 == 0 ));
     }
 
     /**
@@ -282,17 +416,6 @@ public final class ImageLibrary {
     }
 
     /**
-     * Returns the color chip with the given color.
-     *
-     * @param ownable an <code>Ownable</code> value
-     * @param scale a <code>double</code> value
-     * @return The color chip with the given color.
-     */
-    public Image getColorChip(Ownable ownable, double scale) {
-        return ResourceManager.getChip(ownable.getOwner().getNationID() + ".chip", scale);
-    }
-
-    /**
      * Returns the scaled terrain-image for a terrain type (and position 0, 0).
      *
      * @param type The type of the terrain-image to return.
@@ -303,12 +426,14 @@ public final class ImageLibrary {
         // Currently used for hills and mountains
         Image terrainImage = getTerrainImage(type, 0, 0, scale);
         Image overlayImage = getOverlayImage(type, 0, 0, scale);
-        Image forestImage = type.isForested() ? getForestImage(type, scale) : null;
+        Image forestImage = type.isForested() ? getForestImage(type, scale)
+            : null;
         if (overlayImage == null && forestImage == null) {
             return terrainImage;
         } else {
-            GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment()
-                .getDefaultScreenDevice().getDefaultConfiguration();
+            GraphicsConfiguration gc
+                = GraphicsEnvironment.getLocalGraphicsEnvironment()
+                    .getDefaultScreenDevice().getDefaultConfiguration();
             int width = terrainImage.getWidth(null);
             int height = terrainImage.getHeight(null);
             if (overlayImage != null) {
@@ -317,38 +442,24 @@ public final class ImageLibrary {
             if (forestImage != null) {
                 height = Math.max(height, forestImage.getHeight(null));
             }
-            BufferedImage compositeImage = gc.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
+            BufferedImage compositeImage
+                = gc.createCompatibleImage(width, height,
+                                           Transparency.TRANSLUCENT);
             Graphics2D g = compositeImage.createGraphics();
-            g.drawImage(terrainImage, 0, height - terrainImage.getHeight(null), null);
+            g.drawImage(terrainImage, 0,
+                        height - terrainImage.getHeight(null), null);
             if (overlayImage != null) {
-                g.drawImage(overlayImage, 0, height - overlayImage.getHeight(null), null);
+                g.drawImage(overlayImage, 0, 
+                            height - overlayImage.getHeight(null), null);
             }
             if (forestImage != null) {
-                g.drawImage(forestImage, 0, height - forestImage.getHeight(null), null);
+                g.drawImage(forestImage, 0,
+                            height - forestImage.getHeight(null), null);
             }
             g.dispose();
             return compositeImage;
         }
     }
-
-
-    /**
-     * Converts an image to grayscale
-     *
-     * @param image Source image to convert
-     * @return The image in grayscale
-     */
-    /*
-    private ImageIcon convertToGrayscale(Image image) {
-        int width = image.getWidth(null);
-        int height = image.getHeight(null);
-
-        ColorConvertOp filter = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
-        BufferedImage srcImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        srcImage.createGraphics().drawImage(image, 0, 0, null);
-        return new ImageIcon(filter.filter(srcImage, null));
-    }
-    */
 
     /**
      * Returns the height of the terrain-image including overlays and
@@ -407,6 +518,26 @@ public final class ImageLibrary {
 
     public Image getGoodsImage(GoodsType goodsType, double scale) {
         return ResourceManager.getImage(goodsType.getId() + ".image", scale);
+    }
+
+    /**
+     * Gets the owner chip for the settlement.
+     *
+     * @param settlement The <code>IndianSettlement</code> to check.
+     * @param text The text for the chip.
+     * @return A chip.
+     */
+    public Image getIndianSettlementChip(IndianSettlement is, String text) {
+        Color background = getColor(is.getOwner());
+        String key = "dynamic.indianSettlement." + text + "."
+             + Integer.toHexString(background.getRGB());
+        Image img = ResourceManager.getImage(key);
+        if (img == null) {
+            img = createChip(text, Color.BLACK, background,
+                             getForegroundColor(background));
+            ResourceManager.addGameMapping(key, new ImageResource(img));
+        }
+        return img;
     }
 
     /**
@@ -508,22 +639,30 @@ public final class ImageLibrary {
     }
 
     /**
-     * Returns the mission chip with the given color.
+     * Gets the mission chip for a native settlement.
      *
-     * @param ownable an <code>Ownable</code> value
-     * @param expertMission Indicates whether or not the missionary is an
-     *            expert.
-     * @param scale a <code>double</code> value
-     * @return The color chip with the given color.
+     * @param is The <code>IndianSettlement</code> to produce a chip for.
+     * @return A suitable chip, or null if no mission is present.
      */
-    public Image getMissionChip(Ownable ownable, boolean expertMission, double scale) {
-        if (expertMission) {
-            return ResourceManager.getChip(ownable.getOwner().getNationID()
-                                           + ".mission.expert.chip", scale);
-        } else {
-            return ResourceManager.getChip(ownable.getOwner().getNationID()
-                                           + ".mission.chip", scale);
+    public Image getMissionChip(IndianSettlement is) {
+        Unit missionary = is.getMissionary();
+        if (missionary == null) return null;
+
+        boolean expert = missionary.hasAbility(Ability.EXPERT_MISSIONARY);
+        Color background = getColor(missionary.getOwner());
+        String key = "dynamic.mission." + ((expert) ? "expert" : "normal")
+            + "." + Integer.toHexString(background.getRGB());
+        Image img = ResourceManager.getImage(key, 1.0);
+        if (img == null) {
+            Color foreground = ResourceManager.getColor("mission."
+                + ((expert) ? "expert" : "normal") + ".foreground.color");
+            if (foreground == null) {
+                foreground = (expert) ? Color.BLACK : Color.GRAY;
+            }
+            img = createChip("\u271D", Color.BLACK, background, foreground);
+            ResourceManager.addGameMapping(key, new ImageResource(img));
         }
+        return img;
     }
 
     /**
@@ -544,6 +683,29 @@ public final class ImageLibrary {
      */
     public ImageIcon getMonarchImageIcon(Nation nation) {
         return ResourceManager.getImageIcon(nation.getId() + ".monarch.image");
+    }
+
+    /**
+     * Gets a chip for an occupation indicator, i.e. a small image with a
+     * single letter or symbol that indicates the Unit's state.
+     *
+     * @param unit The <code>Unit</code> with the occupation.
+     * @param text The text for the chip.
+     * @return A suitable chip.
+     */
+    public Image getOccupationIndicatorChip(Unit unit, String text) {
+        Color backgroundColor = getColor(unit.getOwner());
+        Color foregroundColor = (unit.getState() == Unit.UnitState.FORTIFIED)
+            ? Color.GRAY : getForegroundColor(backgroundColor);
+        String key = "dynamic.occupationIndicator." + text
+            + "." + Integer.toHexString(backgroundColor.getRGB());
+        Image img = ResourceManager.getImage(key, getScalingFactor());
+        if (img == null) {
+            img = createChip(text, Color.BLACK,
+                             backgroundColor, foregroundColor);
+            ResourceManager.addGameMapping(key, new ImageResource(img));
+        }
+        return img;
     }
 
     /**
@@ -588,11 +750,8 @@ public final class ImageLibrary {
      * @return The <code>Image</code>.
      */
     public Image getPathImage(Unit u) {
-        if (u == null) {
-            return null;
-        } else {
-            return ResourceManager.getImage("path." + getPathType(u) + ".image");
-        }
+        return (u == null) ? null
+            : ResourceManager.getImage("path." + getPathType(u) + ".image");
     }
 
     /**
@@ -602,11 +761,8 @@ public final class ImageLibrary {
      * @return The <code>Image</code>.
      */
     public Image getPathNextTurnImage(Unit u) {
-        if (u == null) {
-            return null;
-        } else {
-            return ResourceManager.getImage("path." + getPathType(u) + ".nextTurn.image");
-        }
+        return (u == null) ? null
+            : ResourceManager.getImage("path." + getPathType(u) + ".nextTurn.image");
     }
 
     /**
@@ -634,8 +790,10 @@ public final class ImageLibrary {
      *            drawn (ignored).
      * @return The terrain-image at the given index.
      */
-    public Image getRiverMouthImage(Direction direction, int magnitude, int x, int y) {
-        String key = "model.tile.delta_" + direction + (magnitude == 1 ? "_small" : "_large");
+    public Image getRiverMouthImage(Direction direction, int magnitude,
+                                    int x, int y) {
+        String key = "model.tile.delta_" + direction
+            + (magnitude == 1 ? "_small" : "_large");
         return ResourceManager.getImage(key, scalingFactor);
     }
 
@@ -661,7 +819,8 @@ public final class ImageLibrary {
      * @return A new <code>ImageLibrary</code>.
      * @throws FreeColException
      */
-    public ImageLibrary getScaledImageLibrary(float scalingFactor) throws FreeColException {
+    public ImageLibrary getScaledImageLibrary(float scalingFactor)
+        throws FreeColException {
         return new ImageLibrary(scalingFactor);
     }
 
@@ -698,15 +857,79 @@ public final class ImageLibrary {
     /**
      * Returns the graphics that will represent the given settlement.
      *
-     * @param settlementType The type of settlement whose graphics type is needed.
+     * @param settlementType The type of settlement whose graphics
+     *     type is needed.
      * @return The graphics that will represent the given settlement.
      */
     public Image getSettlementImage(SettlementType settlementType) {
         return getSettlementImage(settlementType, scalingFactor);
     }
 
-    public Image getSettlementImage(SettlementType settlementType, double scale) {
-        return ResourceManager.getImage(settlementType.getId() + ".image", scale);
+    public Image getSettlementImage(SettlementType settlementType,
+                                    double scale) {
+        return ResourceManager.getImage(settlementType.getId() + ".image",
+                                        scale);
+    }
+
+    /**
+     * Gets an image with a string of a given color and with
+     * a black border around the glyphs.
+     *
+     * @param g A <code>Graphics</code>-object for getting the font metrics.
+     * @param text The <code>String</code> to make an image of.
+     * @param color The <code>Color</code> to use for the text.
+     * @param font The <code>Font</code> to display the text with.
+     * @return The image that was created.
+     */
+    public Image getStringImage(Graphics g, String text, Color color,
+                                Font font) {
+        if (color == null) {
+            logger.warning("createStringImage called with color null");
+            color = Color.WHITE;
+        }
+
+        // Lookup in the cache if the image has been generated already
+        String key = "dynamic.stringImage." + text
+            + "." + font.getFontName().replace(' ', '-')
+            + "." + Integer.toString(font.getSize())
+            + "." + Integer.toHexString(color.getRGB());
+        Image img = ResourceManager.getImage(key);// ,getScalingFactor());
+        if (img == null) {
+            // create an image of the appropriate size
+            FontMetrics fm = g.getFontMetrics(font);
+            BufferedImage bi = new BufferedImage(fm.stringWidth(text) + 4,
+                fm.getMaxAscent() + fm.getMaxDescent(),
+                BufferedImage.TYPE_INT_ARGB);
+            // draw the string with selected color
+            Graphics2D big = bi.createGraphics();
+            big.setColor(color);
+            big.setFont(font);
+            big.drawString(text, 2, fm.getMaxAscent());
+
+            // draw the border around letters
+            int textColor = color.getRGB();
+            int borderColor = getStringBorderColor(color).getRGB();
+            for (int biX = 0; biX < bi.getWidth(); biX++) {
+                for (int biY = 0; biY < bi.getHeight(); biY++) {
+                    int r = bi.getRGB(biX, biY);
+                    if (r == textColor) continue;
+
+                    for (int cX = -1; cX <= 1; cX++) {
+                        for (int cY = -1; cY <= 1; cY++) {
+                            if (biX+cX >= 0 && biY+cY >= 0
+                                && biX+cX < bi.getWidth() && biY+cY < bi.getHeight()
+                                && bi.getRGB(biX + cX, biY + cY) == textColor) {
+                                bi.setRGB(biX, biY, borderColor);
+                                continue;
+                            }
+                        }
+                    }
+                }
+            }
+            ResourceManager.addGameMapping(key, new ImageResource(bi));
+            img = ResourceManager.getImage(key);//, getScalingFactor());
+        }
+        return img;
     }
 
     /**
@@ -725,8 +948,8 @@ public final class ImageLibrary {
 
     public Image getTerrainImage(TileType type, int x, int y, double scale) {
         String key = (type == null) ? "model.tile.unexplored" : type.getId();
-        return ResourceManager.getImage(key + ".center" + (isEven(x, y) ? "0" : "1")
-                                        + ".image", scale);
+        return ResourceManager.getImage(key + ".center"
+            + (isEven(x, y) ? "0" : "1") + ".image", scale);
     }
 
     /**
@@ -756,19 +979,24 @@ public final class ImageLibrary {
      * @return an <code>ImageIcon</code> value
      */
     public ImageIcon getUnitImageIcon(Unit unit) {
-        return getUnitImageIcon(unit.getType(), unit.getRole(), unit.hasNativeEthnicity(), false, scalingFactor);
+        return getUnitImageIcon(unit.getType(), unit.getRole(),
+            unit.hasNativeEthnicity(), false, scalingFactor);
     }
 
     public ImageIcon getUnitImageIcon(Unit unit, boolean grayscale) {
-        return getUnitImageIcon(unit.getType(), unit.getRole(), unit.hasNativeEthnicity(), grayscale, scalingFactor);
+        return getUnitImageIcon(unit.getType(), unit.getRole(),
+            unit.hasNativeEthnicity(), grayscale, scalingFactor);
     }
 
-    public ImageIcon getUnitImageIcon(Unit unit, boolean grayscale, double scale) {
-        return getUnitImageIcon(unit.getType(), unit.getRole(), unit.hasNativeEthnicity(), grayscale, scale);
+    public ImageIcon getUnitImageIcon(Unit unit, boolean grayscale,
+                                      double scale) {
+        return getUnitImageIcon(unit.getType(), unit.getRole(),
+            unit.hasNativeEthnicity(), grayscale, scale);
     }
 
     public ImageIcon getUnitImageIcon(Unit unit, double scale) {
-        return getUnitImageIcon(unit.getType(), unit.getRole(), unit.hasNativeEthnicity(), false, scale);
+        return getUnitImageIcon(unit.getType(), unit.getRole(),
+            unit.hasNativeEthnicity(), false, scale);
     }
 
     /**
@@ -778,15 +1006,19 @@ public final class ImageLibrary {
      * @return an <code>ImageIcon</code> value
      */
     public ImageIcon getUnitImageIcon(UnitType unitType) {
-        return getUnitImageIcon(unitType, Role.DEFAULT, false, false, scalingFactor);
+        return getUnitImageIcon(unitType, Role.DEFAULT, false, false,
+                                scalingFactor);
     }
 
     public ImageIcon getUnitImageIcon(UnitType unitType, boolean grayscale) {
-        return getUnitImageIcon(unitType, Role.DEFAULT, false, grayscale, scalingFactor);
+        return getUnitImageIcon(unitType, Role.DEFAULT, false, grayscale,
+                                scalingFactor);
     }
 
-    public ImageIcon getUnitImageIcon(UnitType unitType, boolean grayscale, double scale) {
-        return getUnitImageIcon(unitType, Role.DEFAULT, false, grayscale, scale);
+    public ImageIcon getUnitImageIcon(UnitType unitType, boolean grayscale,
+                                      double scale) {
+        return getUnitImageIcon(unitType, Role.DEFAULT, false, grayscale,
+                                scale);
     }
 
     public ImageIcon getUnitImageIcon(UnitType unitType, double scale) {
@@ -798,12 +1030,15 @@ public final class ImageLibrary {
     }
 
 
-    public ImageIcon getUnitImageIcon(UnitType unitType, Role role, boolean grayscale) {
-        return getUnitImageIcon(unitType, role, false, grayscale, scalingFactor);
+    public ImageIcon getUnitImageIcon(UnitType unitType, Role role,
+                                      boolean grayscale) {
+        return getUnitImageIcon(unitType, role, false, grayscale,
+                                scalingFactor);
     }
 
     /**
-     * Returns the ImageIcon that will represent a unit with the given specifics.
+     * Returns the ImageIcon that will represent a unit with the given
+     * specifics.
      *
      * @param unitType the type of unit to be represented
      * @param role unit has equipment that affects its abilities/appearance
@@ -811,14 +1046,18 @@ public final class ImageLibrary {
      * @param grayscale draws the icon in an inactive/disabled-looking state
      * @return an <code>ImageIcon</code> value
      */
-    public ImageIcon getUnitImageIcon(UnitType unitType, Role role, boolean nativeEthnicity, boolean grayscale, double scale) {
+    public ImageIcon getUnitImageIcon(UnitType unitType, Role role,
+                                      boolean nativeEthnicity,
+                                      boolean grayscale, double scale) {
         // units that can only be native don't need the .native key part
         if (unitType.getId().equals("model.unit.indianConvert")
             || unitType.getId().equals("model.unit.brave")) {
             nativeEthnicity = false;
         }
-        else for (Entry<String, Boolean> entry : unitType.getAbilitiesRequired().entrySet()) {
-            if (entry.getKey().equals("model.ability.native") && entry.getValue() == true) {
+        else for (Entry<String, Boolean> entry
+                      : unitType.getAbilitiesRequired().entrySet()) {
+            if (entry.getKey().equals("model.ability.native")
+                && entry.getValue() == true) {
                 nativeEthnicity = false;
             }
         }
@@ -859,7 +1098,8 @@ public final class ImageLibrary {
         return new ImageIcon(image);
     }
 
-    public ImageIcon getUnitImageIcon(UnitType unitType, Role role, boolean grayscale, double scale) {
+    public ImageIcon getUnitImageIcon(UnitType unitType, Role role,
+                                      boolean grayscale, double scale) {
         return getUnitImageIcon(unitType, role, false, grayscale, scale);
     }
 
@@ -885,41 +1125,8 @@ public final class ImageLibrary {
      * @param scale The scale for the image.
      * @return A suitable <code>Image</code>.
      */
-    public ImageIcon getUnitImageIcon(UnitType unitType, Role role, double scale) {
+    public ImageIcon getUnitImageIcon(UnitType unitType, Role role,
+                                      double scale) {
         return getUnitImageIcon(unitType, role, false, false, scale);
-    }
-
-    /**
-     * Create a "chip" with the given text and colors.
-     *
-     * @param text The text to display.
-     * @param border The border <code>Color</code>.
-     * @param background The background <code>Color</code>.
-     * @param foreground The foreground <code>Color</code>.
-     * @return A chip.
-     */
-    public Image createChip(String text, Color border,
-                            Color background, Color foreground) {
-        // Draw it and put it in the cache
-        Font font = ResourceManager.getFont("SimpleFont", Font.BOLD,
-            (float)Math.rint(12 * getScalingFactor()));
-        // hopefully, this is big enough
-        BufferedImage bi = new BufferedImage(100, 100,
-                                             BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2 = bi.createGraphics();
-        TextLayout label = new TextLayout(text, font, 
-                                          g2.getFontRenderContext());
-        float padding = 6 * getScalingFactor();
-        int width = (int)(label.getBounds().getWidth() + padding);
-        int height = (int)(label.getAscent() + label.getDescent() + padding);
-        g2.setColor(border);
-        g2.fillRect(0, 0, width, height);
-        g2.setColor(background);
-        g2.fillRect(1, 1, width - 2, height - 2);
-        g2.setColor(foreground);
-        label.draw(g2, (float)(padding/2 - label.getBounds().getX()),
-                   label.getAscent() + padding/2);
-        g2.dispose();
-        return bi.getSubimage(0, 0, width, height);
     }
 }
