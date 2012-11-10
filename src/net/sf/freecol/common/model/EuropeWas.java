@@ -39,6 +39,10 @@ public class EuropeWas {
         this.unitCount = europe.getUnitCount();
     }
 
+    public int getUnitCount() {
+        return unitCount;
+    }
+
     /**
      * Fire any property changes resulting from actions in Europe.
      */

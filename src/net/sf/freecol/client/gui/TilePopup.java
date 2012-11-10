@@ -89,12 +89,12 @@ public final class TilePopup extends JPopupMenu {
 
         final Player player = freeColClient.getMyPlayer();
         final Unit activeUnit = gui.getActiveUnit();
-        if (activeUnit != null) {
-            Tile unitTile = activeUnit.getTile();
+        Tile unitTile;
+        if (activeUnit != null && (unitTile = activeUnit.getTile()) != null) {
             JMenuItem gotoMenuItem = null;
-            if (activeUnit.isOffensiveUnit() &&
-                unitTile.isAdjacent(tile) &&
-                activeUnit.getMoveType(tile).isAttack()) {
+            if (activeUnit.isOffensiveUnit()
+                && unitTile.isAdjacent(tile)
+                && activeUnit.getMoveType(tile).isAttack()) {
                 CombatOdds combatOdds = activeUnit.getGame().getCombatModel()
                     .calculateCombatOdds(activeUnit, tile.getDefendingUnit(activeUnit));
 
