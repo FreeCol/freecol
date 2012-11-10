@@ -1016,16 +1016,12 @@ public final class MapViewer {
      */
     public Point getTilePosition(Tile t) {
         repositionMapIfNeeded();
-        if (isTileVisible(t)) {
-            int x = ((t.getX() - leftColumn) * tileWidth) + leftColumnX;
-            int y = ((t.getY() - topRow) * halfHeight) + topRowY;
-            if ((t.getY() % 2) != 0) {
-                x += halfWidth;
-            }
-            return new Point(x, y);
-        } else {
-            return null;
-        }
+        if (!isTileVisible(t)) return null;
+
+        int x = ((t.getX() - leftColumn) * tileWidth) + leftColumnX;
+        int y = ((t.getY() - topRow) * halfHeight) + topRowY;
+        if ((t.getY() % 2) != 0) x += halfWidth;
+        return new Point(x, y);
     }
 
 
@@ -1777,16 +1773,18 @@ public final class MapViewer {
                                            Color.WHITE, font);
             }
             Point point = getTilePosition(tile);
-            g.translate(point.x, point.y);
-            if (image == null) {
-                g.fillOval(halfWidth, halfHeight, 10, 10);
-                g.setColor(Color.BLACK);
-                g.drawOval(halfWidth, halfHeight, 10, 10);
-            } else {
-                centerImage(g, image);
-                if (turns != null) centerImage(g, turns);
+            if (point != null) {
+                g.translate(point.x, point.y);
+                if (image == null) {
+                    g.fillOval(halfWidth, halfHeight, 10, 10);
+                    g.setColor(Color.BLACK);
+                    g.drawOval(halfWidth, halfHeight, 10, 10);
+                } else {
+                    centerImage(g, image);
+                    if (turns != null) centerImage(g, turns);
+                }
+                g.translate(-point.x, -point.y);
             }
-            g.translate(-point.x, -point.y);
         }
     }
 
