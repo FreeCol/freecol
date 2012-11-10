@@ -818,7 +818,7 @@ public final class InGameController implements NetworkConstants {
      * @param slot The slot to emigrate from.
      * @return The unit that emigrated, or null on failure.
      */
-    private boolean emigrate(Player player, int slot) {
+    private Unit emigrate(Player player, int slot) {
         Europe europe = player.getEurope();
         EuropeWas europeWas = new EuropeWas(europe);
         if (askServer().emigrate(slot)) {

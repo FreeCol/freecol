@@ -51,20 +51,18 @@ public class EuropeWas {
         if (europe.getUnitCount() < unitCount+1) return null;
         Unit newUnit = null;
         int idMax = 0;
-        final String unitPrefix = Unit.getXMLElementName() + ":";
+        final String unitPrefix = Unit.getXMLElementTagName() + ":";
         for (Unit u : europe.getUnitList()) {
             String uid = u.getId();
-            if (uid.startsWith(unitPrefix)) {
-                try {
-                    int id = Integer.parseInt(uid.substring(unitPrefix.size()));
-                    if (idMax < id) {
-                        idMax = id;
-                        newUnit = u;
-                    }
-                } catch (NumberFormatException nfe) {}
-            }
+            if (!uid.startsWith(unitPrefix)) continue;
+            try {
+                int id = Integer.parseInt(uid.substring(unitPrefix.length()));
+                if (idMax < id) {
+                    idMax = id;
+                    newUnit = u;
+                }
+            } catch (NumberFormatException nfe) {}
         }
-System.err.println("FOUND " + newUnit);
         return newUnit;        
     }
 
