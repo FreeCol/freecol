@@ -816,7 +816,7 @@ public final class InGameController implements NetworkConstants {
      *
      * @param player The <code>Player</code> that owns the unit.
      * @param slot The slot to emigrate from.
-     * @return True if a unit was added.
+     * @return The unit that emigrated, or null on failure.
      */
     private boolean emigrate(Player player, int slot) {
         Europe europe = player.getEurope();
@@ -824,9 +824,9 @@ public final class InGameController implements NetworkConstants {
         if (askServer().emigrate(slot)) {
             europeWas.fireChanges();
             gui.updateMenuBar();
-            return europeWas.getUnitCount() < europe.getUnitCount();
+            return europeWas.getNewUnit();
         }
-        return false;
+        return null;
     }
 
     /**
@@ -3470,8 +3470,10 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        if (emigrate(player, index + 1)) {
-            player.setNextActiveEuropeanUnit();
+        Unit newUnit = emigrate(player, index + 1);
+        if (newUnit != null) {
+            player.setNextActiveUnit(newUnit);
+            gui.setActiveUnit(newUnit);
         }
     }
 
@@ -3738,8 +3740,10 @@ public final class InGameController implements NetworkConstants {
         if (askServer().trainUnitInEurope(unitType)) {
             gui.updateMenuBar();
             europeWas.fireChanges();
-            if (europeWas.getUnitCount() < europe.getUnitCount()) {
-                player.setNextActiveEuropeanUnit();
+            Unit newUnit = europeWas.getNewUnit();
+            if (newUnit != null) {
+                player.setNextActiveUnit(newUnit);
+                gui.setActiveUnit(newUnit);
             }
         }
     }

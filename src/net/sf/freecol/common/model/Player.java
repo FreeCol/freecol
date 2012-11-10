@@ -2147,22 +2147,6 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Sets a new active unit from Europe.
-     * This is called after a new unit is added, so favour the last unit.
-     *
-     * @return True if the operation succeeded.
-     */
-    public boolean setNextActiveEuropeanUnit() {
-        Europe europe = getEurope();
-        if (europe == null) return false;
-        Unit unit = null;
-        for (Unit u : europe.getUnitList()) {
-            if (u.getMovesLeft() > 0) unit = u;
-        }
-        return (unit == null) ? false : nextActiveUnitIterator.setNext(unit);
-    }
-
-    /**
      * Gets a new going_to unit.
      *
      * @return A <code>Unit</code> that can be made active.

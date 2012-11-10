@@ -39,8 +39,33 @@ public class EuropeWas {
         this.unitCount = europe.getUnitCount();
     }
 
-    public int getUnitCount() {
-        return unitCount;
+    /**
+     * Gets a unit added to Europe since this EuropeWas was sampled.
+     *
+     * Simply makes sure there is at least one new unit, then picks the one
+     * with the highest numeric id.
+     *
+     * @return A new unit.
+     */
+    public Unit getNewUnit() {
+        if (europe.getUnitCount() < unitCount+1) return null;
+        Unit newUnit = null;
+        int idMax = 0;
+        final String unitPrefix = Unit.getXMLElementName() + ":";
+        for (Unit u : europe.getUnitList()) {
+            String uid = u.getId();
+            if (uid.startsWith(unitPrefix)) {
+                try {
+                    int id = Integer.parseInt(uid.substring(unitPrefix.size()));
+                    if (idMax < id) {
+                        idMax = id;
+                        newUnit = u;
+                    }
+                } catch (NumberFormatException nfe) {}
+            }
+        }
+System.err.println("FOUND " + newUnit);
+        return newUnit;        
     }
 
     /**
