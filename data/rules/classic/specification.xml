@@ -1320,6 +1320,7 @@
       <required-goods id="model.goods.hammers" value="240"/>
       <required-goods id="model.goods.tools" value="100"/>
       <required-ability id="model.ability.buildFactory"/>
+      <modifier id="model.goods.muskets" type="percentage" value="50"/>
       <ability id="model.ability.expertsUseConnections" value="true"/>
     </building-type>
     <building-type id="model.building.chapel" workplaces="0" produces="model.goods.crosses">
