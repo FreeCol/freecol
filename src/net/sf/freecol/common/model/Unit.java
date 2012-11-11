@@ -1527,12 +1527,13 @@ public class Unit extends GoodsLocation
         // here.
 
         // TODO: also pass direction, so that we can check for rivers
+        // more easily
 
         int cost = target.getType().getBasicMoveCost();
         if (target.isLand()) {
             TileItemContainer container = target.getTileItemContainer();
             if (container != null) {
-                cost = container.getMoveCost(cost, from);
+                cost = container.getMoveCost(from, target, cost);
             }
         }
 

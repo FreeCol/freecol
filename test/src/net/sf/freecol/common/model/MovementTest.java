@@ -134,7 +134,7 @@ public class MovementTest extends FreeColTestCase {
         Map map = getTestMap(plains);
         game.setMap(map);
         Tile tile1 = map.getTile(5, 8);
-        Tile tile2 = map.getTile(4, 8);
+        Tile tile2 = tile1.getAdjacentTile(Map.Direction.NE);
         tile1.setExploredBy(dutch, true);
         tile2.setExploredBy(dutch, true);
 
@@ -155,7 +155,24 @@ public class MovementTest extends FreeColTestCase {
 
         Unit colonist = new ServerUnit(game, tile1, dutch, colonistType);
 
-        int moveCost = 1;
+        // rivers run parallel, no cost reduction
+        river1.setStyle(TileImprovementStyle.getInstance("0101"));
+        river2.setStyle(TileImprovementStyle.getInstance("0101"));
+
+        int moveCost = 3;
+        assertEquals(moveCost, colonist.getMoveCost(tile2));
+        assertEquals(Math.min(moveCost, colonistType.getMovement()),
+                     colonist.getMoveCost(tile2));
+
+        // rivers are connected, cost reduction applies
+        river1.setStyle(TileImprovementStyle.getInstance("1000"));
+        assertEquals(Map.Direction.NE, map.getDirection(tile1, tile2));
+        assertTrue(tile1.getRiver().getStyle().isConnectedTo(Map.Direction.NE));
+        river2.setStyle(TileImprovementStyle.getInstance("0010"));
+        assertEquals(Map.Direction.SW, map.getDirection(tile2, tile1));
+        assertTrue(tile2.getRiver().getStyle().isConnectedTo(Map.Direction.SW));
+
+        moveCost = 1;
         assertEquals(moveCost, colonist.getMoveCost(tile2));
         assertEquals(Math.min(moveCost, colonistType.getMovement()),
                      colonist.getMoveCost(tile2));

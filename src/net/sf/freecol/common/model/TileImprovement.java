@@ -238,27 +238,26 @@ public class TileImprovement extends TileItem implements Named {
     }
 
     /**
-     * Performs reduction of the movement-cost.
+     * Calculates the movement cost on the basis of connected tile
+     * improvements.
+     *
+     * @param fromTile a <code>Tile</code> value
+     * @param targetTile a <code>Tile</code> value
      * @param moveCost Original movement cost
      * @return The movement cost after any change
      */
-    public int getMovementCost(int moveCost, Tile fromTile) {
-        if (!isComplete()) {
-            return moveCost;
-        }
-        String typeId = type.getId();
-        if (typeId == null) {
-            // No checking for matching type
-            return type.getMovementCost(moveCost);
-        }
-        // Find matching type
-        for (TileImprovement improvement : fromTile.getTileImprovements()) {
-            if (improvement.getType().getId().equals(typeId)) {
-                // Matched
-                return type.getMovementCost(moveCost);
+    public int getMoveCost(Tile fromTile, Tile targetTile, int moveCost) {
+        if (isComplete()) {
+            if (style == null) {
+                // implicitly connected to all neighbouring tiles
+                return type.getMoveCost(moveCost);
+            } else {
+                Direction direction = targetTile.getMap().getDirection(targetTile, fromTile);
+                if (style.isConnectedTo(direction)) {
+                    return type.getMoveCost(moveCost);
+                }
             }
         }
-        // No match
         return moveCost;
     }
 
