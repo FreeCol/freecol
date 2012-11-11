@@ -58,7 +58,7 @@ public class TileImprovement extends TileItem implements Named {
      * @see Map
      * @see net.sf.freecol.server.generator.River
      */
-    private int style;
+    private TileImprovementStyle style;
 
     /**
      * Whether this is a virtual improvement granted by some structure
@@ -277,7 +277,7 @@ public class TileImprovement extends TileItem implements Named {
      * Returns the Style of this Improvement - used for Rivers
      * @return The style
      */
-    public int getStyle() {
+    public TileImprovementStyle getStyle() {
         return style;
     }
 
@@ -285,78 +285,19 @@ public class TileImprovement extends TileItem implements Named {
      * Sets the Style of this Improvement - used for Rivers
      * @param style The style
      */
-    public void setStyle(int style) {
+    public void setStyle(TileImprovementStyle style) {
         this.style = style;
     }
 
     /**
-     * Returns an int[NUMBER_OF_DIRECTIONS] array based on the
-     * baseNumber and the 'active' directions given.
+     * Returns <code>true</code> if this TileImprovement is connected
+     * to a similar TileImprovement on the given tile.
      *
-     * @param directions An int[] that gives the active directions eg
-     * {Map.N, Map.NE, Map.E, Map.SE, Map.S, Map.SW, Map.W, Map.NW},
-     * or {Map.E, Map.SW};
-     * @param baseNumber The base to be used to create the base array.
-     * @return A base array that can create unique identifiers for any
-     * combination
+     * @param direction a <code>Direction</code> value
+     * @return a <code>boolean</code> value
      */
-    public static int[] getBase(Direction[] directions, int baseNumber) {
-        Direction[] allDirections = Direction.values();
-        int[] base = new int[allDirections.length];
-        int n = 1;
-        for (int i = 0; i < allDirections.length; i++) {
-            base[i] = 0;
-            for (Direction direction : directions) {
-                if (direction == allDirections[i]) {
-                    base[i] = n;
-                    n *= baseNumber;
-                    break;
-                }
-            }
-        }
-        return base;
-    }
-
-    /**
-     * Breaks the Style of this Improvement into 8 directions - used for Rivers (at the moment)
-     * @param directions An int[] that gives the active directions
-     * eg {Map.N, Map.NE, Map.E, Map.SE, Map.S, Map.SW, Map.W, Map.NW},
-     * or {Map.E, Map.SW};
-     * @param baseNumber The base to be used to create the base array.
-     * @return An int[] with the magnitude in each direction.
-     */
-    public int[] getStyleBreakdown(Direction[] directions, int baseNumber) {
-        return getStyleBreakdown(getBase(directions, baseNumber));
-    }
-
-    /**
-     * Breaks the Style of this Improvement into 8 directions - used for Rivers (at the moment)
-     * Possible TODO: Modify this later should we modify the usage of Style.
-     * @param base Use {@link #getBase}
-     * @return An int[] with the magnitude in each direction.
-     */
-    public int[] getStyleBreakdown(int[] base) {
-        int[] result = new int[8];
-        int tempStyle = style;
-        for (int i = base.length - 1; i >= 0; i--) {
-            if (base[i] == 0) {
-                continue;                       // Skip this direction
-            }
-            result[i] = tempStyle / base[i];    // Get an integer value 0-2 for a direction
-            tempStyle -= result[i] * base[i];   // Remove the component of this direction
-        }
-        return result;
-    }
-
-    public void compileStyleBreakdown(int[] base, int[] breakdown) {
-        if (base.length != breakdown.length) {
-            logger.warning("base.length != breakdown.length");
-            return;
-        }
-        style = 0;
-        for (int i = 0; i < base.length; i++) {
-            style += base[i] * breakdown[i];
-        }
+    public boolean isConnectedTo(Direction direction) {
+        return style == null ? false : style.isConnectedTo(direction);
     }
 
     /**
@@ -416,7 +357,9 @@ public class TileImprovement extends TileItem implements Named {
         out.writeAttribute("type", getType().getId());
         out.writeAttribute("turns", Integer.toString(turnsToComplete));
         out.writeAttribute("magnitude", Integer.toString(magnitude));
-        out.writeAttribute("style", Integer.toString(style));
+        if (style != null) {
+            out.writeAttribute("style", style.toString());
+        }
         if (virtual) {
             out.writeAttribute("virtual", Boolean.toString(virtual));
         }
@@ -450,7 +393,7 @@ public class TileImprovement extends TileItem implements Named {
 
         magnitude = Integer.parseInt(in.getAttributeValue(null, "magnitude"));
 
-        style = Integer.parseInt(in.getAttributeValue(null, "style"));
+        style = TileImprovementStyle.getInstance(in.getAttributeValue(null, "style"));
 
         virtual = getAttribute(in, "virtual", false);
 

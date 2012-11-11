@@ -53,6 +53,7 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.SettlementType;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileImprovementStyle;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.Role;
@@ -766,17 +767,35 @@ public final class ImageLibrary {
     }
 
     /**
-     * Returns the river image at the given index.
+     * Returns the river image with the given style.
      *
-     * @param index The index of the image to return.
-     * @return The image at the given index.
+     * @param style a <code>TileImprovementStyle</code> value
+     * @return The image with the given style.
      */
-    public Image getRiverImage(int index) {
-        return getRiverImage(index, scalingFactor);
+    public Image getRiverImage(TileImprovementStyle style) {
+        return getRiverImage(style, scalingFactor);
     }
 
-    public Image getRiverImage(int index, double scale) {
-        return ResourceManager.getImage("model.tile.river" + index, scale);
+    /**
+     * Returns the river image with the given style.
+     *
+     * @param style a <code>TileImprovementStyle</code> value
+     * @param scale a <code>double</code> value
+     * @return The image with the given style.
+     */
+    public Image getRiverImage(TileImprovementStyle style, double scale) {
+        return getRiverImage(style.getString(), scale);
+    }
+
+    /**
+     * Returns the river image with the given style.
+     *
+     * @param style a <code>String</code> value
+     * @param scale a <code>double</code> value
+     * @return The image with the given style.
+     */
+    public Image getRiverImage(String style, double scale) {
+        return ResourceManager.getImage("model.tile.river" + style, scale);
     }
 
     /**

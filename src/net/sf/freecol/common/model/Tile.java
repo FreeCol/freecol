@@ -962,15 +962,15 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Returns the style of a river <code>TileImprovement</code> on this <code>Tile</code>.
      *
-     * @return an <code>int</code> value
+     * @return an <code>TileImprovementStyle</code> value
      */
-    public int getRiverStyle() {
+    public TileImprovementStyle getRiverStyle() {
         if (tileItemContainer == null) {
-            return 0;
+            return null;
         } else {
             TileImprovement river = tileItemContainer.getRiver();
             if (river == null) {
-                return 0;
+                return null;
             } else {
                 return river.getStyle();
             }

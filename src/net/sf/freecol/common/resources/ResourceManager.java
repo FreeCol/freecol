@@ -42,9 +42,6 @@ public class ResourceManager {
 
     private static final Logger logger = Logger.getLogger(ResourceManager.class.getName());
 
-    // the number of different river styles
-    public static final int RIVER_STYLES = 81;
-
     /*
      * The following fields are mappings from resource IDs
      * to resources. A mapping is defined within a specific
@@ -172,7 +169,7 @@ public class ResourceManager {
             return; // Do not preload in headless mode
         }
         if (lastWindowSize == null) return; // Wait for initial preload.
-        
+
         preloadThread = new Thread(FreeCol.CLIENT_THREAD+"Resource loader") {
                 public void run() {
                     // Make a local copy of the resources to load.
@@ -253,6 +250,17 @@ public class ResourceManager {
 
     public static Map<String, Resource> getResources() {
         return mergedContainer.getResources();
+    }
+
+
+    /**
+     * Returns a list of all keys starting with the given prefix.
+     *
+     * @param prefix the prefix
+     * @return a list of all keys starting with the given prefix
+     */
+    public static List<String> getKeys(String prefix) {
+        return mergedContainer.getKeys(prefix);
     }
 
 

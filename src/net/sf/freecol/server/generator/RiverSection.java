@@ -21,6 +21,7 @@ package net.sf.freecol.server.generator;
 
 //import java.util.logging.Logger;
 
+import java.util.EnumMap;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.TileImprovement;
@@ -39,18 +40,15 @@ public class RiverSection {
 
 //    private static final Logger logger = Logger.getLogger(RiverImprovementBuilder.class.getName());
 
-    /**
-     * Base numbers used to encode/decode the river style
-     */
-    private static int[] base = {1, 3, 9, 27};
+    private static final char[] template = new char[] {
+        '0', '1', '2', '3'
+    };
 
     /**
      * River magnitude (size) for each direction toward the edges of the tile
      */
-    private int branch[] = {TileImprovement.NO_RIVER,
-                            TileImprovement.NO_RIVER,
-                            TileImprovement.NO_RIVER,
-                            TileImprovement.NO_RIVER};
+    private java.util.Map<Direction, Integer> branches =
+        new EnumMap<Direction, Integer>(Direction.class);
 
     /**
      * River magnitude (size) at the center of the tile
@@ -68,12 +66,13 @@ public class RiverSection {
     private Map.Position position;
 
     /**
-     * Constructor used by the MapEditor to encode/decode the style
+     * Creates a new RiverSection with the given branches. This
+     * constructor is used by the MapEditor.
      *
-     * @param style The encoded style
+     * @param branches The encoded style
      */
-    public RiverSection(int style) {
-        decodeStyle(style);
+    public RiverSection(java.util.Map<Direction, Integer> branches) {
+        this.branches = branches;
     }
 
     /**
@@ -105,82 +104,41 @@ public class RiverSection {
     }
 
     /**
-     * Decodes the style
-     * @param style
-     */
-    public void decodeStyle(int style) {
-        int tempStyle = style;
-        for (int i = base.length - 1; i >= 0; i--) {
-            if (tempStyle>0) {
-                branch[i] = tempStyle / base[i];    // Get an integer value for a direction
-                tempStyle -= branch[i] * base[i];   // Remove the component of this direction
-            }
-        }
-    }
-
-    /**
-     * Encodes the style as a four-digit base-three number. The digits
-     * correspond to the four directions valid for rivers, namely
-     * north east, south east, south west and north west. Each digit
-     * is either zero (no river), one (minor river) or two (major
-     * river).
-     *
-     * @return style
-     */
-    public int encodeStyle() {
-        int style = 0;
-        for (int i = 0; i < base.length; i++) {
-            style += base[i] * branch[i];
-        }
-        return style;
-    }
-
-    /**
      * Sets the size of a branch
      */
     public void setBranch(Direction direction, int size) {
         if (size != TileImprovement.SMALL_RIVER) {
             size = TileImprovement.LARGE_RIVER;
         }
-        for (int i=0; i<Direction.longSides.length; i++) {
-            if (Direction.longSides[i]==direction) {
-                branch[i] = size;
-                break;
-            }
-        }
+        branches.put(direction, size);
     }
 
     /**
      * Gets the size of a branch
      */
     public int getBranch(Direction direction) {
-        for (int i=0; i<Direction.longSides.length; i++) {
-            if (Direction.longSides[i]==direction) {
-                return branch[i];
-            }
+        if (branches.containsKey(direction)) {
+            return branches.get(direction);
+        } else {
+            return TileImprovement.NO_RIVER;
         }
-        return TileImprovement.NO_RIVER;
     }
 
     /**
      * Removes a branch
      */
     public void removeBranch(Direction direction) {
-        setBranch(direction, TileImprovement.NO_RIVER);
+        branches.remove(direction);
     }
 
     /**
      * Increases the size a branch
      */
     public void growBranch(Direction direction, int increment) {
-        for (int i=0; i<Direction.longSides.length; i++) {
-            if (Direction.longSides[i] == direction) {
-                branch[i] = Math.min(TileImprovement.LARGE_RIVER,
-                                     Math.max(TileImprovement.NO_RIVER,
-                                              branch[i] + increment));
-                break;
-            }
-        }
+        int newSize = Math.min(TileImprovement.LARGE_RIVER,
+                               Math.max(TileImprovement.NO_RIVER,
+                                        getBranch(direction) + increment));
+        setBranch(direction, newSize);
     }
 
     /**
@@ -190,4 +148,15 @@ public class RiverSection {
         this.size++;
         setBranch(direction, TileImprovement.LARGE_RIVER);
     }
+
+
+    public String encodeStyle() {
+        String result = new String();
+        for (Direction direction : Direction.longSides) {
+            result = result.concat(Integer.toString(getBranch(direction), Character.MAX_RADIX));
+        }
+        return result;
+    }
+
+
 }

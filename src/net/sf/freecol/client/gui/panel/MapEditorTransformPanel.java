@@ -53,6 +53,7 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.SettlementType;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
+import net.sf.freecol.common.model.TileImprovementStyle;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileItemContainer;
 import net.sf.freecol.common.model.TileType;
@@ -136,10 +137,10 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                                       Messages.message(type.getNameKey()),
                                       new TileTypeTransform(type)));
         }
-        listPanel.add(buildButton(getLibrary().getRiverImage(10, 0.5),
+        listPanel.add(buildButton(getLibrary().getRiverImage("0101", 0.5),
                                   Messages.message("minorRiver"),
                                   new RiverTransform(TileImprovement.SMALL_RIVER)));
-        listPanel.add(buildButton(getLibrary().getRiverImage(20, 0.5),
+        listPanel.add(buildButton(getLibrary().getRiverImage("0202", 0.5),
                                   Messages.message("majorRiver"),
                                   new RiverTransform(TileImprovement.LARGE_RIVER)));
         listPanel.add(buildButton(getLibrary().getBonusImage(getSpecification()
@@ -283,13 +284,14 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                 TileImprovement river = tic.getRiver();
                 if (river == null) {
                     river = new TileImprovement(tile.getGame(), tile, riverType);
+                    river.setStyle(TileImprovementStyle.getInstance("0000"));
                 } else {
                     oldMagnitude = river.getMagnitude();
                 }
 
                 if (magnitude != oldMagnitude) {
                     tic.addRiver(magnitude, river.getStyle());
-                    RiverSection mysection = new RiverSection(river.getStyle());
+                    RiverSection mysection = new RiverSection(river.getStyle().getConnections());
                     // for each neighboring tile
                     for (Direction direction : Direction.longSides) {
                         Tile t = tile.getNeighbourOrNull(direction);
@@ -306,15 +308,16 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                         if (otherRiver != null) {
                             // update the other tile river branch
                             Direction otherDirection = direction.getReverseDirection();
-                            RiverSection oppositesection = new RiverSection(otherRiver.getStyle());
+                            RiverSection oppositesection =
+                                new RiverSection(otherRiver.getStyle().getConnections());
                             oppositesection.setBranch(otherDirection, tile.getRiver().getMagnitude());
-                            otherRiver.setStyle(oppositesection.encodeStyle());
+                            otherRiver.setStyle(TileImprovementStyle.getInstance(oppositesection.encodeStyle()));
                             // update the current tile river branch
                             mysection.setBranch(direction, tile.getRiver().getMagnitude());
                         }
                         // else the neighbor tile doesn't have a river, nothing to do
                     }
-                    tile.getRiver().setStyle(mysection.encodeStyle());
+                    tile.getRiver().setStyle(TileImprovementStyle.getInstance(mysection.encodeStyle()));
                 }
             }
         }

@@ -27,7 +27,7 @@ public class TileImprovementTest extends FreeColTestCase {
 
     public void testRiverNoExtras() {
 
-        TileImprovementStyle style = new TileImprovementStyle("0102");
+        TileImprovementStyle style = TileImprovementStyle.getInstance("0102");
         assertEquals("0102", style.getString());
         assertEquals("0101", style.getMask());
         assertFalse(style.isConnectedTo(Direction.N));
@@ -44,8 +44,8 @@ public class TileImprovementTest extends FreeColTestCase {
     public void testRiverWithExtras() {
 
         // has three characters of additional style information
-        TileImprovementStyle style = new TileImprovementStyle("7!70_&?");
-        assertEquals("7!70_&?", style.getString());
+        TileImprovementStyle style = TileImprovementStyle.getInstance("7170_&?");
+        assertEquals("7170_&?", style.getString());
         assertEquals("1110", style.getMask());
         assertFalse(style.isConnectedTo(Direction.N));
         assertTrue(style.isConnectedTo(Direction.NE));
@@ -61,8 +61,8 @@ public class TileImprovementTest extends FreeColTestCase {
     public void testAllFrills() {
 
         // has three characters of additional style information
-        TileImprovementStyle style = new TileImprovementStyle("7!70110X_&?");
-        assertEquals("7!70110X_&?", style.getString());
+        TileImprovementStyle style = TileImprovementStyle.getInstance("7170110X_&?");
+        assertEquals("7170110X_&?", style.getString());
         assertEquals("11101101", style.getMask());
         assertTrue(style.isConnectedTo(Direction.N));
         assertTrue(style.isConnectedTo(Direction.NE));
@@ -79,23 +79,51 @@ public class TileImprovementTest extends FreeColTestCase {
     public void testOldStyle() {
         TileImprovementStyle style;
 
-        style = new TileImprovementStyle("0");
+        style = TileImprovementStyle.getInstance("0");
         assertEquals("0000", style.getString());
-        style = new TileImprovementStyle("1");
+        style = TileImprovementStyle.getInstance("1");
         assertEquals("1000", style.getString());
-        style = new TileImprovementStyle("3");
+        style = TileImprovementStyle.getInstance("3");
         assertEquals("0100", style.getString());
-        style = new TileImprovementStyle("9");
+        style = TileImprovementStyle.getInstance("9");
         assertEquals("0010", style.getString());
-        style = new TileImprovementStyle("27");
+        style = TileImprovementStyle.getInstance("27");
         assertEquals("0001", style.getString());
-        style = new TileImprovementStyle("54");
+        style = TileImprovementStyle.getInstance("54");
         assertEquals("0002", style.getString());
-        style = new TileImprovementStyle("67");
+        style = TileImprovementStyle.getInstance("67");
         assertEquals("1112", style.getString());
-        style = new TileImprovementStyle("80");
+        style = TileImprovementStyle.getInstance("80");
         assertEquals("2222", style.getString());
 
+    }
+
+    public void testEquality() {
+
+        TileImprovementStyle style1, style2;
+        style1 = TileImprovementStyle.getInstance("0");
+        style2 = TileImprovementStyle.getInstance("0000");
+        assertTrue(style1 == style2);
+        style1 = TileImprovementStyle.getInstance("1");
+        style2 = TileImprovementStyle.getInstance("1000");
+        assertTrue(style1 == style2);
+        style1 = TileImprovementStyle.getInstance("3");
+        style2 = TileImprovementStyle.getInstance("0100");
+        assertTrue(style1 == style2);
+        style1 = TileImprovementStyle.getInstance("9");
+        style2 = TileImprovementStyle.getInstance("0010");
+        assertTrue(style1 == style2);
+        style1 = TileImprovementStyle.getInstance("27");
+        style2 = TileImprovementStyle.getInstance("0001");
+        assertTrue(style1 == style2);
+        style1 = TileImprovementStyle.getInstance("54");
+        style2 = TileImprovementStyle.getInstance("0002");
+        assertTrue(style1 == style2);
+        style1 = TileImprovementStyle.getInstance("67");
+        style2 = TileImprovementStyle.getInstance("1112");
+        assertTrue(style1 == style2);
+        style1 = TileImprovementStyle.getInstance("80");
+        style2 = TileImprovementStyle.getInstance("2222");
 
     }
 

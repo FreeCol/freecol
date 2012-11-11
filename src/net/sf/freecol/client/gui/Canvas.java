@@ -1618,7 +1618,7 @@ public final class Canvas extends JDesktopPane {
         showSubPanel(new ReportTurnPanel(freeColClient, gui, messages), false);
     }
 
-    public int showRiverStyleDialog() {
+    public String showRiverStyleDialog() {
         return showFreeColDialog(new RiverStylePanel(freeColClient, gui), null, true);
     }
 

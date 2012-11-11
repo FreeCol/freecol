@@ -32,22 +32,25 @@ import javax.swing.JComponent;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.MapEditorController;
+import net.sf.freecol.client.gui.panel.RiverStylePanel;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.TileTypeTransform;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
+import net.sf.freecol.common.model.TileImprovementStyle;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.server.generator.TerrainGenerator;
 
 /**
  * Listens to the mouse being moved at the level of the Canvas.
  */
-public final class CanvasMapEditorMouseListener extends AbstractCanvasListener implements MouseListener, MouseMotionListener {
+public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
+    implements MouseListener, MouseMotionListener {
 
     private static final Logger logger = Logger.getLogger(CanvasMapEditorMouseListener.class.getName());
 
     private final Canvas canvas;
-    
+
     private Point oldPoint;
     private Point startPoint;
 
@@ -135,15 +138,13 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener i
                 if (tile != null) {
                     if (tile.hasRiver()) {
                         TileImprovement river = tile.getRiver();
-                        int style = canvas.showRiverStyleDialog();
-                        if (style == -1) {
-                            // user canceled
-                        } else if (style == 0) {
-                            tile.getTileItemContainer().removeTileItem(river);
-                        } else if (0 < style && style < ResourceManager.RIVER_STYLES) {
-                            river.setStyle(style);
-                        } else {
-                            logger.warning("Unknown river style: " + style);
+                        String style = canvas.showRiverStyleDialog();
+                         if (style == null) {
+                             tile.getTileItemContainer().removeTileItem(river);
+                         } else if (style.equals(RiverStylePanel.CANCEL)) {
+                             // user canceled
+                         } else {
+                             river.setStyle(TileImprovementStyle.getInstance(style));
                         }
                     }
                     if (tile.getIndianSettlement() != null) {
@@ -271,7 +272,7 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener i
         drawBox(component, startPoint, oldPoint);
         oldPoint = e.getPoint();
         drawBox(component, startPoint, oldPoint);
-        
+
         performDragScrollIfActive(e);
 
         gui.refresh();

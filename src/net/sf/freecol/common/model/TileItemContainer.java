@@ -512,7 +512,7 @@ public class TileItemContainer extends FreeColGameObject {
      * @param style an <code>int</code> value
      * @return The new river added, or the existing river TileImprovement
      */
-    public TileImprovement addRiver(int magnitude, int style) {
+    public TileImprovement addRiver(int magnitude, TileImprovementStyle style) {
         if (magnitude == TileImprovement.NO_RIVER) {
             return null;
         }

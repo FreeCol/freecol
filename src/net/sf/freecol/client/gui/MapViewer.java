@@ -1692,14 +1692,10 @@ public final class MapViewer {
                             g.drawImage(lib.getBorderImage(borderingTile.getType(), direction,
                                                            x, y), 0, 0, null);
                             TileImprovement river = borderingTile.getRiver();
-                            if (river != null && (direction == Direction.SE || direction == Direction.SW ||
-                                                  direction == Direction.NE || direction == Direction.NW)) {
-                                int[] branches = river.getStyleBreakdown(Direction.longSides, 3);
-                                if (branches[direction.getReverseDirection().ordinal()] > 0) {
-                                    g.drawImage(lib.getRiverMouthImage(direction, borderingTile.getRiver()
-                                                                       .getMagnitude(), x,
-                                                                       y), 0, 0, null);
-                                }
+                            if (river != null && river.isConnectedTo(direction.getReverseDirection())) {
+                                g.drawImage(lib.getRiverMouthImage(direction, borderingTile.getRiver()
+                                                                   .getMagnitude(), x,
+                                                                   y), 0, 0, null);
                             }
                         } else if (borderingTile.isExplored()) {
                             if (lib.getTerrainImage(tile.getType(), 0, 0)

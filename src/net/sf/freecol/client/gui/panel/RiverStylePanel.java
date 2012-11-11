@@ -39,17 +39,19 @@ import net.sf.freecol.common.resources.ResourceManager;
  * A panel for adjusting the river style.
  *
  * <br><br>
- * 
+ *
  * This panel is only used when running in
  * {@link net.sf.freecol.client.FreeColClient#isMapEditor() map editor mode}.
  */
-public final class RiverStylePanel extends FreeColDialog<Integer> {
+public final class RiverStylePanel extends FreeColDialog<String> {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(RiverStylePanel.class.getName());
-    
-    private static final int CANCEL = -1;
-    private static final int DELETE = 0;
+
+    public static final String CANCEL = "CANCEL";
+    public static final String DELETE = "DELETE";
+
+    private static final String PREFIX = "model.tile.river";
 
 
     /**
@@ -61,21 +63,21 @@ public final class RiverStylePanel extends FreeColDialog<Integer> {
     public RiverStylePanel(FreeColClient freeColClient, GUI gui) {
         super(freeColClient, gui);
         setLayout(new BorderLayout());
-        
+
         JPanel stylesPanel = new JPanel(new GridLayout(9, 9));
         JButton deleteButton = new JButton(new ImageIcon(getLibrary().getMiscImage(ImageLibrary.DELETE, 0.5)));
-        deleteButton.setActionCommand(String.valueOf(DELETE));
+        deleteButton.setActionCommand(DELETE);
         deleteButton.addActionListener(this);
         stylesPanel.add(deleteButton);
-        for (int index = 1; index < ResourceManager.RIVER_STYLES; index++) {
-            JButton riverButton = new JButton(new ImageIcon(getLibrary().getRiverImage(index, 0.5)));
-            riverButton.setActionCommand(String.valueOf(index));
+        for (String key : ResourceManager.getKeys(PREFIX)) {
+            JButton riverButton = new JButton(new ImageIcon(ResourceManager.getImage(key, 0.5)));
+            riverButton.setActionCommand(key);
             riverButton.addActionListener(this);
             stylesPanel.add(riverButton);
         }
         this.add(stylesPanel, BorderLayout.CENTER);
         JButton cancelButton = new JButton(Messages.message("cancel"));
-        cancelButton.setActionCommand(String.valueOf(CANCEL));
+        cancelButton.setActionCommand(CANCEL);
         cancelButton.addActionListener(this);
         cancelButton.setMnemonic('C');
         this.add(cancelButton, BorderLayout.SOUTH);
@@ -86,11 +88,14 @@ public final class RiverStylePanel extends FreeColDialog<Integer> {
     /**
      * This function analyses an event and calls the right methods to take care
      * of the user's requests.
-     * 
+     *
      * @param event The incoming ActionEvent.
      */
     public void actionPerformed(ActionEvent event) {
-        int style = Integer.parseInt(event.getActionCommand());
-        setResponse(new Integer(style));
+        String style = event.getActionCommand();
+        if (style.startsWith(PREFIX)) {
+            style = style.substring(PREFIX.length());
+        }
+        setResponse(style);
     }
 }

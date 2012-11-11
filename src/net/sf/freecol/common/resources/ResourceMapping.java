@@ -19,13 +19,15 @@
 
 package net.sf.freecol.common.resources;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Represents a mapping between IDs and resources.
- * 
+ *
  * @see Resource
  */
 public class ResourceMapping {
@@ -33,30 +35,30 @@ public class ResourceMapping {
     /** Mappings between an ID and a resource. */
     protected Map<String, Resource> resources;
 
-    
+
     /**
      * Creates a new empty <code>ResourceMapping</code>.
      */
     public ResourceMapping() {
         resources = new HashMap<String, Resource>();
     }
-    
-    
+
+
     /**
      * Adds a mapping between the given ID and a <code>Resource</code>.
-     * 
-     * @param id The ID identifying the given resource in the mapping. 
+     *
+     * @param id The ID identifying the given resource in the mapping.
      * @param value The <code>Resource</code> identified by the ID
      *      in the mapping,.
      */
     public void add(String id, Resource value) {
         resources.put(id, value);
     }
-    
+
     /**
      * Adds all mappings from the given <code>ResourceMapping</code> to
      * this object.
-     * 
+     *
      * @param rc The <code>ResourceMapping</code>.
      */
     public void addAll(ResourceMapping rc) {
@@ -72,21 +74,33 @@ public class ResourceMapping {
     /**
      * Returns all the mappings between IDs and <code>Resource</code>s
      * that are kept by this object.
-     * 
+     *
      * @return An unmodifiable <code>Map</code>.
      */
     public Map<String, Resource> getResources() {
         return Collections.unmodifiableMap(resources);
     }
-    
+
     /**
      * Gets the <code>Resource</code> identified by the
      * given id.
-     * 
+     *
      * @param id The ID.
      * @return The <code>Resource</code>.
      */
     public Resource get(String id) {
         return resources.get(id);
     }
+
+    public List<String> getKeys(String prefix) {
+        List<String> result = new ArrayList<String>();
+        for (String key : resources.keySet()) {
+            if (key.startsWith(prefix)) {
+                result.add(key);
+            }
+        }
+        return result;
+    }
+
+
 }
