@@ -306,7 +306,7 @@ public class TransportMission extends Mission {
         /**
          * Sets the target for this cargo, possibly also changing its mode.
          *
-         * @return A reason the retarget failed, null if it succeeded.
+         * @return A reason the targeting failed, null if it succeeded.
          */
         public String setTarget() {
             Location dst = transportable.getTransportDestination();
@@ -320,8 +320,8 @@ public class TransportMission extends Mission {
                     // Can the carrier deliver the unit to the target?
                     if ((path = unit.findPath(carrier.getLocation(), dst,
                                               carrier, null)) == null) {
-                        return "no-deliver " + unit + "/"
-                            + carrier + " -> " + dst;
+                        return "no-deliver " + unit + "/" + carrier
+                            + " -> " + dst;
                     }
                     // Drop node must exist, the unit is aboard
                     drop = path.getTransportDropNode();
@@ -334,25 +334,28 @@ public class TransportMission extends Mission {
                         this.turns = drop.getTotalTurns();
                         this.target = upLoc(drop.getLocation());
                     }
+if (carrier.getOwner().isREF()) {
+    logger.warning("REFTARGET " + unit + "/" + carrier + " drop=" + drop + " target=" + this.target + " path=" + path.fullPathToString());
+}
                 } else {
                     // Can the carrier get the unit to the target, and
                     // does the unit need the carrier at all?
                     if ((path = unit.findPath(unit.getLocation(), dst,
                                               carrier, null)) == null) {
-                        return "no-collect " + unit + "/"
-                            + carrier + " -> " + dst;
+                        return "no-collect " + unit + "/" + carrier
+                            + " -> " + dst;
                     }
                     if ((drop = path.getCarrierMove()) == null) {
                         return "carrier not needed for " + unit.toString();
                     }
                     // TODO: proper rendezvous paths, unit needs
                     // to modify its target too!
-                    path = carrier.findPath(drop.getLocation());
-                    if (path == null) {
+                    if ((path = carrier.findPath(drop.getLocation())) == null) {
                         return "carrier can not reach collection point "
                             + carrier + " -> "
                             + ((FreeColGameObject)drop.getLocation());
-                    } else if (upLoc(drop.getLocation()) instanceof Tile) {
+                    }
+                    if (upLoc(drop.getLocation()) instanceof Tile) {
                         this.mode = CargoMode.PICKUP;
                         this.turns = drop.getTotalTurns();
                         this.target = upLoc(drop.getLocation());
@@ -677,9 +680,10 @@ public class TransportMission extends Mission {
     private void retarget() {
         Cargo cargo = tFirst();
         PathNode path;
-        setTarget((cargo != null) ? cargo.getTarget()
+        Location loc = (cargo != null) ? cargo.getTarget()
             : ((path = getTrivialPath()) == null) ? null
-            : upLoc(path.getLastNode().getLocation()));
+            : upLoc(path.getLastNode().getLocation());
+        setTarget(loc);    
     }
 
     /**
@@ -1101,8 +1105,6 @@ public class TransportMission extends Mission {
         case LOAD:
             if (!Map.isSameLocation(here, l.getLocation())) {
                 return CargoResult.TCONTINUE;
-            } else if (carrier.findPath(l.getLocation()) == null) {
-                return CargoResult.TRETRY;
             }
             switch (carrier.getNoAddReason(l)) {
             case NONE: break;
@@ -1115,10 +1117,12 @@ public class TransportMission extends Mission {
                     + " at " + here + ": " + this);
                 return CargoResult.TFAIL;
             }
-            logger.finest(tag + " loaded " + t + " at " + here
-                + ": " + this);
+            logger.finest(tag + " loaded " + t
+                + " at " + here + ": " + this);
 
-            if ((reason = cargo.setTarget()) == null) return CargoResult.TNEXT;
+            if ((reason = cargo.setTarget()) == null) {
+                return CargoResult.TNEXT;
+            }
             logger.finest(tag + " next fail(" + reason + ") " + t
                 + " at " + here + ": " + this);
             return CargoResult.TFAIL;
@@ -1131,8 +1135,8 @@ public class TransportMission extends Mission {
                 logger.finest(tag + " completed (unload) of " + t
                     + " at " + here + ": " + this);
             } else {
-                logger.warning(tag + " failed to unload " + t + " at " + here
-                    + ": " + this);
+                logger.warning(tag + " failed to unload " + t
+                    + " at " + here + ": " + this);
                 return CargoResult.TFAIL;
             }
             return CargoResult.TDONE;
@@ -1140,24 +1144,21 @@ public class TransportMission extends Mission {
         case PICKUP:
             if (!Map.isSameLocation(here, cargo.getTarget())) {
                 return CargoResult.TCONTINUE;
-            } else {
-                if (carrier.findPath(cargo.getTarget()) == null) {
-                    return CargoResult.TRETRY;
-                }
             }
             if (isCarrying(t)) {
-                logger.finest(tag + " picked up " + t + " at " + here
-                    + ": " + this);
-                if ((reason = cargo.setTarget()) == null)
+                logger.finest(tag + " picked up " + t
+                    + " at " + here + ": " + this);
+                if ((reason = cargo.setTarget()) == null) {
                     return CargoResult.TNEXT;
+                }
                 logger.finest(tag + " next fail(" + reason + ") " + t
                     + " at " + here + ": " + this);
                 return CargoResult.TFAIL;
             }
             aiu = (AIUnit)t;
             if ((reason = aiu.getMission().invalidReason()) != null) {
-                logger.warning(tag + " unit mission failed(" + reason + ")"
-                    + " for " + t + ": " + this);
+                logger.warning(tag + " unit mission failed(" + reason
+                    + ") for " + t + ": " + this);
                 return CargoResult.TFAIL;
             }
             return CargoResult.TCONTINUE;
@@ -1173,8 +1174,8 @@ public class TransportMission extends Mission {
             }
             aiu = (AIUnit)t;
             if ((reason = aiu.getMission().invalidReason()) != null) {
-                logger.warning(tag + " unit mission failed(" + reason + ")"
-                    + " for " + t + ": " + this);
+                logger.warning(tag + " unit mission failed(" + reason
+                    + ") for " + t + ": " + this);
                 return CargoResult.TFAIL;
             }
             return CargoResult.TCONTINUE;
