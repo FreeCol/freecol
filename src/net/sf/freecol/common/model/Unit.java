@@ -1873,7 +1873,8 @@ public class Unit extends GoodsLocation
      */
     private boolean allowMoveFrom(Tile from) {
         return from.isLand()
-            || getSpecification().getBoolean(GameOptions.AMPHIBIOUS_MOVES);
+            || (!getOwner().isREF()
+                && getSpecification().getBoolean(GameOptions.AMPHIBIOUS_MOVES));
     }
 
     /**
