@@ -1206,7 +1206,7 @@ public final class FreeColServer {
 
         // @compat 0.10.x
         // Introduced: SAVEGAME_VERSION == 12
-        addBooleanOption("model.option.enhancedMissionaries",
+        addBooleanOption(GameOptions.ENHANCED_MISSIONARIES,
             "gameOptions.map", false, false);
         // Introduced: SAVEGAME_VERSION == 12
         addBooleanOption("model.option.continueFoundingFatherRecruitment",

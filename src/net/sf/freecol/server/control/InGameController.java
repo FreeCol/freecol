@@ -1998,6 +1998,7 @@ public final class InGameController extends Controller {
         }
 
         // Try to learn
+        final Specification spec = getGame().getSpecification();
         ChangeSet cs = new ChangeSet();
         unit.setMovesLeft(0);
         csVisit(serverPlayer, settlement, false, cs);
@@ -2017,8 +2018,7 @@ public final class InGameController extends Controller {
             unit.setType(skill);
             if (!settlement.isCapital()
                 && !(settlement.getMissionary(serverPlayer) != null
-                    && getGame().getSpecification()
-                    .getBoolean("model.option.enhancedMissionaries"))) {
+                    && spec.getBoolean(GameOptions.ENHANCED_MISSIONARIES))) {
                 settlement.setLearnableSkill(null);
             }
             break;
@@ -2281,7 +2281,8 @@ public final class InGameController extends Controller {
         Unit missionary = settlement.getMissionary();
         if (missionary != null) {
             ServerPlayer enemy = (ServerPlayer) missionary.getOwner();
-            enemy.csKillMissionary(settlement, cs);
+            enemy.csKillMissionary(settlement,
+                                   "indianSettlement.mission.denounced", cs);
         }
 
         // Result depends on tension wrt this settlement.
@@ -2295,7 +2296,7 @@ public final class InGameController extends Controller {
             break;
         case HAPPY: case CONTENT: case DISPLEASED:
             cs.add(See.perhaps().always(serverPlayer), unit.getTile());
-            unit.setLocation(null);
+            unit.setLocation(settlement);
             unit.setMovesLeft(0);
             cs.add(See.only(serverPlayer), unit);
             settlement.changeMissionary(unit);

@@ -216,8 +216,15 @@ public class ServerUnit extends Unit implements ServerModelObject {
             setAttrition(0);
         }
 
-        setMovesLeft((isUnderRepair() || isInMission()) ? 0
-                     : getInitialMovesLeft());
+        // Update moves left.
+        if (isInMission()) {
+            getLocation().getTile().updatePlayerExploredTile(owner, true);
+            setMovesLeft(0);
+        } else if (isUnderRepair()) {
+            setMovesLeft(0);
+        } else {
+            setMovesLeft(getInitialMovesLeft());
+        }
 
         if (getWorkLeft() > 0) {
             unitDirty = true;

@@ -2111,8 +2111,9 @@ public class EuropeanAIPlayer extends AIPlayer {
             int price = ((IndianSettlement) settlement).getPriceToSell(goods)
                 + getPlayer().getTension(buyer).getValue();
             Unit missionary = ((IndianSettlement) settlement).getMissionary(buyer);
-            if (missionary != null && getSpecification()
-                .getBoolean("model.option.enhancedMissionaries")) {
+            final Specification spec = getSpecification(); 
+            if (missionary != null
+                && spec.getBoolean(GameOptions.ENHANCED_MISSIONARIES)) {
                 // 10% bonus for missionary, 20% if expert
                 int bonus = (missionary.hasAbility(Ability.EXPERT_MISSIONARY)) ? 8
                     : 9;

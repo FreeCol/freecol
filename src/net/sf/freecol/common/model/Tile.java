@@ -1568,6 +1568,23 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         }
     }
 
+    /**
+     * This is a hack.  When a missionary is removed, its player
+     * disposes of it.  However they can still exist in the PETs.
+     * Ideally players that can not see the change should still see
+     * the old missionary, but referring to a disposed unit is a Bad
+     * Thing.  For now, we clean up the PET-missionaries but do not
+     * explicitly update the rest of the PET.  This needs to go away
+     * at next save-break when we properly virtualize the settlements.
+     *
+     * @param old The old missionary <code>Unit</code> to fix.
+     */
+    public void fixMissionary(Unit old) {
+        for (PlayerExploredTile pet : playerExploredTiles.values()) {
+            if (pet.getMissionary() == old) pet.setMissionary(null);
+        }
+    }
+
 
     /**
      * Returns the number of turns it takes for a non-expert pioneer to perform

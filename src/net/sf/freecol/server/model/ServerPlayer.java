@@ -454,13 +454,15 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     /**
-     * Kills the missionary in a settlement.
+     * Kills this players missionary in a settlement.
      *
      * @param settlement The <code>IndianSettlement</code> to kill the
      *     missionary from.
+     * @param messageId An optional messageId to send.
      * @param cs A <code>ChangeSet</code> to update.
      */
-    public void csKillMissionary(IndianSettlement settlement, ChangeSet cs) {
+    public void csKillMissionary(IndianSettlement settlement, String messageId,
+                                 ChangeSet cs) {
         Unit missionary = settlement.getMissionary();
         settlement.changeMissionary(null);
 
@@ -468,10 +470,19 @@ public class ServerPlayer extends Player implements ServerModelObject {
         cs.add(See.only(this), settlement);
         cs.addDispose(See.perhaps().always(this),
             settlement.getTile(), missionary);
-        cs.addMessage(See.only(this),
-            new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                "indianSettlement.mission.denounced", settlement)
-            .addStringTemplate("%settlement%", settlement.getLocationNameFor(this)));
+        if ("indianSettlement.mission.denounced".equals(messageId)) {
+            cs.addMessage(See.only(this),
+                new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                 messageId, settlement)
+                    .addStringTemplate("%settlement%", 
+                        settlement.getLocationNameFor(this)));
+        } else if ("indianSettlement.mission.destroyed".equals(messageId)) {
+            cs.addMessage(See.only(this),
+                new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
+                                 messageId, settlement)
+                    .addStringTemplate("%settlement%", 
+                        settlement.getLocationNameFor(this)));
+        }
     }
 
     /**
@@ -492,7 +503,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     Unit unit = s.getMissionary();
                     if (unit != null
                         && ((ServerPlayer) unit.getOwner()) == this) {
-                        csKillMissionary(s, cs);
+                        csKillMissionary(s, null, cs);
                     }
                     s.removeAlarm(this);
                 }
@@ -2346,12 +2357,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         // Burn down the missions
         for (IndianSettlement s : nativePlayer.getIndianSettlements()) {
-            Unit missionary = s.getMissionary(attackerPlayer);
-            if (missionary != null) {
-                s.changeMissionary(null);
-                cs.addDispose(See.perhaps().always(attackerPlayer),
-                    (s == settlement) ? null : settlement.getTile(),
-                    missionary);
+            if (s.getMissionary(attackerPlayer) != null) {
+                csKillMissionary(s, null, cs);
             }
         }
     }
@@ -2826,6 +2833,13 @@ public class ServerPlayer extends Player implements ServerModelObject {
         boolean capital = settlement.isCapital();
         int plunder = settlement.getPlunder(attacker, random);
 
+        // Get rid of the any missionary first.
+        Unit missionary = settlement.getMissionary();
+        if (missionary != null) {
+            ((ServerPlayer)missionary.getOwner()).csKillMissionary(settlement,
+                "indianSettlement.mission.destroyed", cs);
+        }
+            
         // Destroy the settlement, update settlement tiles.
         csDisposeSettlement(settlement, cs);
 
@@ -2849,27 +2863,27 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // Finish with messages and history.
         cs.addMessage(See.only(attackerPlayer),
             new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
-                "model.unit.indianTreasure", attacker)
-            .addName("%settlement%", settlementName)
-            .addAmount("%amount%", plunder));
+                             "model.unit.indianTreasure", attacker)
+                .addName("%settlement%", settlementName)
+                .addAmount("%amount%", plunder));
         cs.addHistory(attackerPlayer,
             new HistoryEvent(game.getTurn(),
-                HistoryEvent.EventType.DESTROY_SETTLEMENT)
-            .addStringTemplate("%nation%", nativeNation)
-            .addName("%settlement%", settlementName));
+                             HistoryEvent.EventType.DESTROY_SETTLEMENT)
+                .addStringTemplate("%nation%", nativeNation)
+                .addName("%settlement%", settlementName));
         if (capital) {
             cs.addMessage(See.only(attackerPlayer),
                 new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                    "indianSettlement.capitalBurned", attacker)
-                .addName("%name%", settlementName)
-                .addStringTemplate("%nation%", nativeNation));
+                                 "indianSettlement.capitalBurned", attacker)
+                    .addName("%name%", settlementName)
+                    .addStringTemplate("%nation%", nativeNation));
         }
         if (nativePlayer.checkForDeath() == IS_DEAD) {
             cs.addGlobalHistory(game,
                 new HistoryEvent(game.getTurn(),
-                    HistoryEvent.EventType.DESTROY_NATION)
-                .addStringTemplate("%nation%", attackerNation)
-                .addStringTemplate("%nativeNation%", nativeNation));
+                                 HistoryEvent.EventType.DESTROY_NATION)
+                    .addStringTemplate("%nation%", attackerNation)
+                    .addStringTemplate("%nativeNation%", nativeNation));
         }
         cs.addAttribute(See.only(attackerPlayer), "sound",
             "sound.event.destroySettlement");

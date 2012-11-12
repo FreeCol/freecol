@@ -2813,13 +2813,12 @@ public class Unit extends GoodsLocation
 
     /**
      * Checks if this unit is running a mission.
-     * TODO: units in missions have no location, should it be the settlement?
      *
      * @return True if this unit is running a mission.
      */
     public boolean isInMission() {
         return hasAbility("model.ability.missionary")
-            && getLocation() == null;
+            && getLocation() instanceof IndianSettlement;
     }
 
     public String getMovesAsString() {

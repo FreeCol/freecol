@@ -1731,9 +1731,10 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A canSeeTiles array.
      */
     private boolean[][] makeCanSeeTiles(Map map) {
+        final Specification spec = getSpecification();
         boolean[][] cST = new boolean[map.getWidth()][map.getHeight()];
 
-        if (!getSpecification().getBoolean(GameOptions.FOG_OF_WAR)) {
+        if (!spec.getBoolean(GameOptions.FOG_OF_WAR)) {
             for (Tile t : getGame().getMap().getAllTiles()) {
                 if (t != null) {
                     cST[t.getX()][t.getY()] = hasExplored(t);
@@ -1762,17 +1763,16 @@ public class Player extends FreeColGameObject implements Nameable {
                     }
                 }
             }
-            if (isEuropean() && getSpecification()
-                .getBoolean("model.option.enhancedMissionaries")) {
+            if (isEuropean()
+                && spec.getBoolean(GameOptions.ENHANCED_MISSIONARIES)) {
                 for (Player other : getGame().getPlayers()) {
                     if (this.equals(other) || !other.isIndian()) continue;
                     for (Settlement settlement : other.getSettlements()) {
                         IndianSettlement is = (IndianSettlement) settlement;
-                        if (is.getMissionary(this) != null) {
-                            for (Tile t : is.getTile().getSurroundingTiles(is.getLineOfSight())) {
-                                if (t != null) {
-                                    cST[t.getX()][t.getY()] = hasExplored(t);
-                                }
+                        if (is.getMissionary(this) == null) continue;
+                        for (Tile t : is.getTile().getSurroundingTiles(is.getLineOfSight())) {
+                            if (t != null) {
+                                cST[t.getX()][t.getY()] = hasExplored(t);
                             }
                         }
                     }

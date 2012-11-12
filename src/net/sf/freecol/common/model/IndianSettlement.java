@@ -320,12 +320,17 @@ public class IndianSettlement extends Settlement {
      * @param missionary The new missionary for this settlement.
      */
     public void changeMissionary(Unit missionary) {
+        Unit old = getMissionary();
         setMissionary(missionary);
         getTile().updatePlayerExploredTiles();
+        // Full updates for the old and new missionary owners.
         if (missionary != null) {
-            // Full update for the new missionary owner
             getTile().updatePlayerExploredTile(missionary.getOwner(), true);
         }
+        if (old != null) {
+            getTile().updatePlayerExploredTile(old.getOwner(), true);
+        }
+        if (old != null && old != missionary) getTile().fixMissionary(old);
     }
 
     /**
