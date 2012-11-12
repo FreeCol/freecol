@@ -153,7 +153,7 @@ public final class ColonyPanel extends PortPanel
 
     private JButton buildQueueButton = new JButton(Messages.message("colonyPanel.buildQueue"));
 
-    private JButton colonyUnitsButton = new JButton(Messages.message("Colony Units"));
+    private JButton colonyUnitsButton = new JButton(Messages.message("colonyPanel.colonyUnits"));
 
     private JButton setGoodsButton
         = (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS))
@@ -687,9 +687,10 @@ public final class ColonyPanel extends PortPanel
                 GoodsType goodsType = unit.getWorkType();
                 int producing = workingOnLand.getProductionOf(unit, goodsType);
                 unitIcon = imageLibrary.getUnitImageIcon(unit, 0.5);
-                String menuTitle = new String(Messages.message(unit.getLabel())
-                    + " Producing: " + producing + " "
-                    + Messages.message(goodsType.getId() + ".name"));
+                String nominative = Messages.message(StringTemplate.template(
+                    unit.getWorkType() + ".name").addAmount("%amount%", producing));
+                String menuTitle = new String(Messages.message(unit.getLabel()) + " " +
+                    Messages.message("producing.name") + " " + producing + " " + nominative);
                 subMenu = new JMenuItem(menuTitle, unitIcon);
   	            subMenu.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
@@ -705,8 +706,10 @@ public final class ColonyPanel extends PortPanel
                     GoodsType goodsType = unit.getWorkType();
                     int producing = workingInBuilding.getProductionOf(unit, workingInBuilding.getGoodsOutputType());
                     unitIcon = imageLibrary.getUnitImageIcon(unit, 0.5);
-                    String menuTitle = new String(Messages.message(unit.getLabel()) + " Producing: " + producing + " " +
-                                                  Messages.message(goodsType.getId() + ".name"));
+                    String nominative = Messages.message(StringTemplate.template(
+                        goodsType.getId() + ".name").addAmount("%amount%", producing));
+                    String menuTitle = new String(Messages.message(unit.getLabel()) + " " +
+                        Messages.message("producing.name") + " " + producing + " " + nominative);
                     subMenu = new JMenuItem(menuTitle, unitIcon);
                     subMenu.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
@@ -723,7 +726,8 @@ public final class ColonyPanel extends PortPanel
         for (final Unit unit : colonyTile.getUnitList()) {
             if(unit.isCarrier()){
                 unitIcon = imageLibrary.getUnitImageIcon(unit, 0.5);
-                String menuTitle = new String(Messages.message(unit.getLabel()) + " In Port");
+                String menuTitle = new String(Messages.message(unit.getLabel()) +
+                    " " + Messages.message("inPort.name"));
                 subMenu = new JMenuItem(menuTitle, unitIcon);
                 subMenu.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
@@ -739,7 +743,7 @@ public final class ColonyPanel extends PortPanel
                         menuTitle = new String(Messages.message(innerUnit.getLabel()) + " Cargo On " + Messages.message(unit.getLabel()));
                         subMenu = new JMenuItem(menuTitle, unitIcon);
                         subMenu.addActionListener(new ActionListener() {
-    	                   public void actionPerformed(ActionEvent e) {
+    	                    public void actionPerformed(ActionEvent e) {
                                 unitMenu.createUnitMenu(new UnitLabel(getFreeColClient(), innerUnit, getGUI()));
                                 unitMenu.show(getGUI().getCanvas(), 0, 0);
                             }
@@ -750,10 +754,11 @@ public final class ColonyPanel extends PortPanel
                 }
             }else if(!unit.isOnCarrier()){
                 unitIcon = imageLibrary.getUnitImageIcon(unit, 0.5);
-                String menuTitle = new String(Messages.message(unit.getLabel()) + " Outside of Colony");
+                String menuTitle = new String(Messages.message(unit.getLabel()) +
+                        " " + Messages.message("outsideOfColony.name"));
                 subMenu = new JMenuItem(menuTitle, unitIcon);
                 subMenu.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
+                    public void actionPerformed(ActionEvent e) {
                         unitMenu.createUnitMenu(new UnitLabel(getFreeColClient(), unit, getGUI()));
                         unitMenu.show(getGUI().getCanvas(), 0, 0);
                         }
