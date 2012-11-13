@@ -1381,7 +1381,9 @@ public class Map extends FreeColGameObject implements Location {
                 boolean isGoal = goalDecider.check(unit,
                     new PathNode(moveTile, currentMovesLeft, currentTurns,
                                  false, currentNode, null));
-                boolean unitMove = unit.isTileAccessible(moveTile);
+                Unit.MoveType umt = unit.getSimpleMoveType(currentTile,
+                                                           moveTile);
+                boolean unitMove = (isGoal) ? umt.isLegal() : umt.isProgress();
                 boolean carrierMove = carrier != null
                     && carrier.isTileAccessible(moveTile);
                 boolean embarked = embarkedThisTurn(currentNode, currentTurns);
