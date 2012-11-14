@@ -22,6 +22,7 @@ package net.sf.freecol.server.model;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +62,11 @@ import net.sf.freecol.server.control.ChangeSet.See;
 public class ServerGame extends Game implements ServerModelObject {
 
     private static final Logger logger = Logger.getLogger(ServerGame.class.getName());
+
+    // Timestamp of last move, if any.
+    // Do not serialize.
+    private long lastTime = -1L;
+
 
     /**
      * Creates a new game model.
@@ -226,11 +232,19 @@ public class ServerGame extends Game implements ServerModelObject {
      * @param cs A <code>ChangeSet</code> to update.
      */
     public void csNewTurn(Random random, ChangeSet cs) {
+        String duration = null;
+        long now = new Date().getTime();
+        if (lastTime >= 0) {
+            duration = ", previous turn duration = " + (now - lastTime) + "ms";
+        }
+        lastTime = now;
+
         TransactionSession.completeAll(cs);
         setTurn(getTurn().next());
+        logger.finest("ServerGame.csNewTurn, turn is "
+            + getTurn().toString() + duration);
         cs.addTrivial(See.all(), "newTurn", ChangePriority.CHANGE_NORMAL,
                       "turn", Integer.toString(getTurn().getNumber()));
-        logger.finest("ServerGame.csNewTurn, turn is " + getTurn().toString());
 
         for (Player player : getPlayers()) {
             if (!player.isUnknownEnemy() && !player.isDead()) {
