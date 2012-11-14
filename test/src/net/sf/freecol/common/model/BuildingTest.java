@@ -688,8 +688,11 @@ public class BuildingTest extends FreeColTestCase {
         assertEquals(6, smithy.getType().getBasicProduction());
         assertEquals(18, smithy.getTotalProductionOf(toolsType));
         assertEquals(6, armory.getType().getBasicProduction());
-        assertEquals("According to bug report #3430371, the arsenal does not enjoy "
-                     + "the usual factory level production bonus of 50%",
-            12, armory.getTotalProductionOf(musketsType));
+        //assertEquals("According to bug report #3430371, the arsenal does not enjoy "
+        //            + "the usual factory level production bonus of 50%",
+        //    12, armory.getTotalProductionOf(musketsType));
+        // #3430371 has been reverted until we can work out what arsenal
+        // did that differed from magazine
+        assertEquals(18, armory.getTotalProductionOf(musketsType));
     }
 }
