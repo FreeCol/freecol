@@ -334,9 +334,6 @@ public class TransportMission extends Mission {
                         this.turns = drop.getTotalTurns();
                         this.target = upLoc(drop.getLocation());
                     }
-if (carrier.getOwner().isREF()) {
-    logger.warning("REFTARGET " + unit + "/" + carrier + " drop=" + drop + " target=" + this.target + " path=" + path.fullPathToString());
-}
                 } else {
                     // Can the carrier get the unit to the target, and
                     // does the unit need the carrier at all?
@@ -443,7 +440,7 @@ if (carrier.getOwner().isREF()) {
     public TransportMission(AIMain aiMain, AIUnit aiUnit) {
         super(aiMain, aiUnit);
 
-        checkCargoes();
+        checkCargoes(false);
         retarget();
         logger.finest(tag + " begins: " + toFullString());
         uninitialized = false;
@@ -683,7 +680,7 @@ if (carrier.getOwner().isREF()) {
         Location loc = (cargo != null) ? cargo.getTarget()
             : ((path = getTrivialPath()) == null) ? null
             : upLoc(path.getLastNode().getLocation());
-        setTarget(loc);    
+        setTarget(loc);
     }
 
     /**
@@ -877,6 +874,22 @@ if (carrier.getOwner().isREF()) {
     }
 
     /**
+     * Is there space available for a new cargo?
+     *
+     * @param cargo The <code>Cargo</code> to check.
+     * @return True if there is space available for this cargo.
+     */
+    public boolean spaceAvailable(Cargo cargo) {
+        final List<Cargo> ts = tCopy();
+        final int newSpace = cargo.getTransportable().getSpaceTaken();
+
+        for (int i = ts.size()-1; i >= 0; i--) {
+            if (ts.get(i).getSpaceLeft() < newSpace) return false;
+        }
+        return true;
+    }
+
+    /**
      * Incrementally queue a cargo to the cargoes list.  Try
      * place it with other cargoes with the same target, but do not
      * break the space restrictions.  If this does not work, it has
@@ -974,8 +987,10 @@ if (carrier.getOwner().isREF()) {
      * not in the cargoes list.  On exit from this routine, every
      * cargo on board should be on the cargoes list but the list is
      * not necessarily going to be in a sensible order.
+     *
+     * @param complain Complain if unexpected units are found.
      */
-    private void checkCargoes() {
+    private void checkCargoes(boolean complain) {
         final Unit carrier = getUnit();
         if (carrier.isAtSea()) return; // Let it emerge.
 
@@ -1034,8 +1049,10 @@ if (carrier.getOwner().isREF()) {
         for (Unit u : unitsPresent) {
             AIUnit aiu = getAIMain().getAIUnit(u);
             if (aiu == null) throw new IllegalStateException("Bogus:" + u);
-            logger.warning(tag + " found unexpected unit " + aiu
-                + " aboard: " + toFullString());
+            if (complain) {
+                logger.warning(tag + " found unexpected unit " + aiu
+                    + " aboard: " + toFullString());
+            }
             if (euaip.retargetCargo(aiu, aiCarrier, tCopy())) {
                 Cargo cargo = makeCargo(aiu);
                 if (cargo == null) {
@@ -1050,8 +1067,10 @@ if (carrier.getOwner().isREF()) {
         for (Goods g : goodsPresent) {
             AIGoods aig = new AIGoods(getAIMain(), carrier, g.getType(),
                 g.getAmount(), null);
-            logger.warning(tag + " found unexpected goods " + aig
-                + " aboard: " + toFullString());
+            if (complain) {
+                logger.warning(tag + " found unexpected goods " + aig
+                    + " aboard: " + toFullString());
+            }
             if (!euaip.retargetCargo(aig, aiCarrier, tCopy())
                 || !queueTransportable(aig, false)) {
                 drop.add(aig);
@@ -1230,7 +1249,7 @@ if (carrier.getOwner().isREF()) {
      * execute, with valid spaceLeft values.
      */
     private void optimizeCargoes() {
-        checkCargoes();
+        checkCargoes(true);
         // We wrap/unwrap the list to minimize the number of nodes
         // that need consideration.
         List<Cargo> ts = wrapCargoes();
@@ -1555,7 +1574,7 @@ if (carrier.getOwner().isREF()) {
      * {@inheritDoc}
      */
     public void doMission() {
-        checkCargoes();
+        checkCargoes(true);
         String reason = invalidReason();
         if (reason != null) {
             retarget(); // Try to recover
