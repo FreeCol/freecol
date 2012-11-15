@@ -64,7 +64,9 @@ public class SetDestinationMessage extends DOMMessage {
      */
     public SetDestinationMessage(Game game, Element element) {
         this.unitId = element.getAttribute("unit");
-        this.destinationId = element.getAttribute("destination");
+        this.destinationId = (element.hasAttribute("destination"))
+            ? element.getAttribute("destination")
+            : null;
     }
 
     /**
