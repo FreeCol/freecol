@@ -210,6 +210,7 @@ public abstract class Mission extends AIObject {
      */
     public static String invalidUnitReason(Unit unit) {
         return (unit == null) ? "unit-null"
+            : (unit.isUninitialized()) ? "unit-uninitialized"
             : (unit.isDisposed()) ? "unit-disposed"
             : (unit.isUnderRepair()) ? "unit-under-repair"
             : null;

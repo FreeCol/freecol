@@ -662,13 +662,12 @@ public class AIUnit extends AIObject implements Transportable {
 
         writeAttributes(out);
 
-        if (mission != null) {
+        if (mission != null && !mission.isOneTime()) {
             String reason = mission.invalidReason();
-            if (reason == null) {
-                mission.toXML(out);
+            if (reason != null) {
+                abortMission(reason);
             } else {
-                logger.warning("AI unit with " + reason
-                    + " mission " + mission);
+                mission.toXML(out);
             }
         }
 
