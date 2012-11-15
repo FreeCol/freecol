@@ -840,9 +840,10 @@ public class ServerUnit extends Unit implements ServerModelObject {
         serverPlayer.csSeeNewTiles(newTiles, cs);
 
         if (newTile.isLand()) {
-            // Claim land for tribe?
             Settlement settlement;
+            Unit unit = null;
             int d;
+            // Claim land for tribe?
             if (newTile.getOwner() == null
                 && serverPlayer.isIndian()
                 && (settlement = getIndianSettlement()) != null
@@ -877,9 +878,9 @@ public class ServerUnit extends Unit implements ServerModelObject {
 
                 settlement = t.getSettlement();
                 ServerPlayer other = (settlement != null)
-                    ? (ServerPlayer) t.getSettlement().getOwner()
-                    : (t.getFirstUnit() != null)
-                    ? (ServerPlayer) t.getFirstUnit().getOwner()
+                    ? (ServerPlayer)settlement.getOwner()
+                    : ((unit = t.getFirstUnit()) != null)
+                    ? (ServerPlayer)unit.getOwner()
                     : null;
                 if (other == null
                     || other == serverPlayer) continue; // No contact
@@ -887,12 +888,29 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 if (serverPlayer.csContact(other, newTile, cs) != null) {
                     welcomer = other;
                 }
-                // Initialize alarm for native settlements.
-                if (settlement instanceof IndianSettlement) {
-                    IndianSettlement is = (IndianSettlement) settlement;
-                    if (is.setContacted(serverPlayer)) {
-                        cs.add(See.only(serverPlayer), is);
-                    }
+                // Initialize alarm for native settlements or units and
+                // notify of contact.
+                ServerPlayer contactPlayer = serverPlayer;
+                IndianSettlement is = (settlement instanceof IndianSettlement)
+                    ? (IndianSettlement)settlement
+                    : null;
+                if (is != null
+                    || (unit != null
+                        && (is = unit.getIndianSettlement()) != null)
+                    || (unit != null
+                        && (is = getIndianSettlement()) != null
+                        && (contactPlayer = (ServerPlayer)unit.getOwner())
+                        .isEuropean())) {
+                    if (is.setContacted(contactPlayer)) {
+                        cs.add(See.only(contactPlayer), is);
+                        // First European contact with native settlement.
+                        StringTemplate nation = is.getOwner().getNationName();
+                        cs.addMessage(See.only(contactPlayer),
+                            new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                "model.unit.nativeSettlementContact", this, is)
+                                .addStringTemplate("%nation%", nation)
+                                .addName("%settlement%", is.getName()));
+                    }                   
                 }
                 csActivateSentries(t, cs);
             }

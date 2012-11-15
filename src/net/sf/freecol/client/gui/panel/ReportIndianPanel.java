@@ -34,6 +34,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
@@ -86,16 +87,11 @@ public final class ReportIndianPanel extends ReportPanel {
      * @param opponent a <code>Player</code> value
      */
     private void buildIndianAdvisorPanel(Player player, Player opponent) {
+        final NationSummary ns = getController().getNationSummary(opponent);
         List<IndianSettlement> nativeSettlements
             = opponent.getIndianSettlements();
-        String numSettlements = getController().getNationSummary(opponent)
-            .getNumberOfSettlements();
-        int trueNumberOfSettlements = (numSettlements == null) ? 0
-            : Integer.parseInt(numSettlements);
-        int knownNumberOfSettlements = nativeSettlements.size();
-        numSettlements = (knownNumberOfSettlements > 0)
-            ? "" + knownNumberOfSettlements + " / " + trueNumberOfSettlements
-            : "" + knownNumberOfSettlements;
+        String numSettlements = "" + nativeSettlements.size() + " / "
+            + ns.getNumberOfSettlements();
 
         JLabel villageLabel = new JLabel();
         villageLabel.setIcon(new ImageIcon(getLibrary().getSettlementImage(opponent.getNationType().getCapitalType(), 0.66)));
@@ -122,13 +118,14 @@ public final class ReportIndianPanel extends ReportPanel {
                 + "/" + Messages.message(opponent.getStance(player).getKey())),
             "left, wrap 20");
 
-        if (knownNumberOfSettlements > 0) {
+        if (!nativeSettlements.isEmpty()) {
             for (String key : headlines) {
                 JLabel head = localizedLabel(key);
                 head.setFont(boldFont);
                 reportPanel.add(head);
             }
-            List<IndianSettlement> settlements = new ArrayList<IndianSettlement>(knownNumberOfSettlements);
+            List<IndianSettlement> settlements
+                = new ArrayList<IndianSettlement>(nativeSettlements.size());
             for (IndianSettlement settlement : nativeSettlements) {
                 if (settlement.isCapital()) {
                     settlements.add(0, settlement);
