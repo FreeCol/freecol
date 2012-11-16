@@ -110,7 +110,6 @@ public class UnitWanderHostileMission extends Mission {
     private static String invalidMissionReason(AIUnit aiUnit) {
         final Unit unit = aiUnit.getUnit();
         return (!unit.isOffensiveUnit()) ? Mission.UNITNOTOFFENSIVE
-            : (unit.isNaval()) ? "unit-is-naval"
             : (unit.getTile() == null) ? Mission.UNITNOTONMAP
             : null;
     }
