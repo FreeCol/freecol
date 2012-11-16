@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- XSD for specification version 0.68
+<!-- XSD for specification version 0.71
      CHANGELOG:
      0.26: add capture-equipment
      0.27: add limits
@@ -46,6 +46,7 @@
      0.68: add role as a game object type
      0.69: add attribute editable to option group
      0.70: add disasters, and duration to features
+     0.71: exportData is a FreeColObject, should use id attribute, not ID
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 

@@ -27,7 +27,7 @@
 
   <xs:element name="exportData">
     <xs:complexType>
-      <xs:attribute name="ID" type="GoodsTypeId" use="required" />
+      <xs:attribute name="id" type="GoodsTypeId" use="required" />
       <xs:attribute name="exported" type="xs:boolean" use="required" />
       <xs:attribute name="highLevel" type="xs:int" use="required" />
       <xs:attribute name="lowLevel" type="xs:int" use="required" />

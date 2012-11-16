@@ -181,54 +181,60 @@ public class ExportData extends FreeColObject {
     }
 
 
+    // Serialization
+
     /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *
-     * @param out The target stream.
-     * @exception XMLStreamException if there are any problems writing
-     *      to the stream.
+     * {@inheritDoc}
      */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         super.toXML(out, getXMLElementTagName());
     }
 
     /**
-     * Write the attributes of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *     to the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
-        out.writeAttribute(ID_ATTRIBUTE, getId());
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        super.writeAttributes(out);
+
         out.writeAttribute("exported", Boolean.toString(exported));
+
         out.writeAttribute("highLevel", Integer.toString(highLevel));
+
         out.writeAttribute("lowLevel", Integer.toString(lowLevel));
+
         out.writeAttribute("exportLevel", Integer.toString(exportLevel));
     }
 
     /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
+     * {@inheritDoc}
      */
-    public void readFromXML(XMLStreamReader in)
-        throws XMLStreamException {
-        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
+    @Override
+    public void readFromXML(XMLStreamReader in) throws XMLStreamException {
+        // @compat 0.10.5
+        String id = in.getAttributeValue(null, ID_ATTRIBUTE);
+        if (id != null) {
+            setId(id);
+        } else {
+        // @end compatibility code
+            super.readAttributes(in);
+        }
+
         exported = Boolean.parseBoolean(in.getAttributeValue(null,
                 "exported"));
+
         highLevel = Integer.parseInt(in.getAttributeValue(null, "highLevel"));
+
         lowLevel = Integer.parseInt(in.getAttributeValue(null, "lowLevel"));
+
         exportLevel = Integer.parseInt(in.getAttributeValue(null,
                 "exportLevel"));
         in.nextTag();
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "exportData".
      */
