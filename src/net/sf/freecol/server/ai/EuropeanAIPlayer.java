@@ -1596,7 +1596,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             boolean present = false;
             for (TransportMission tm : missions) {
                 Cargo cargo = tm.makeCargo(t);
-                if (cargo == null) continue;
+                if (cargo == null || !tm.spaceAvailable(cargo)) continue;
                 int turns = cargo.getTurns();
                 float value;
                 if (turns == 0) {
@@ -1608,7 +1608,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 } else if (present) {
                     continue;
                 } else {
-                    value = t.getTransportPriority() / turns;
+                    value = (float)t.getTransportPriority() / turns;
                 }
                 if (bestValue < value) {
                     bestValue = value;
@@ -1857,32 +1857,36 @@ public class EuropeanAIPlayer extends AIPlayer {
      */
     private void initializeMissions() {
         List<AIUnit> aiUnits = getAIUnits();
-        if (aiUnits.size() > 3) {
-            return; // Not in the standard starting configuration
-        }
-
         final AIMain aiMain = getAIMain();
 
-        // Find a colony site, give the land units build colony missions.
-        Location target = null;
-        for (AIUnit aiu : aiUnits) {
-            Unit u = aiu.getUnit();
-            if (!u.isNaval() && !aiu.hasMission()) {
+        // Find all the carriers with potential colony builders on board,
+        // give them missions.
+        List<Unit> carriers = new ArrayList<Unit>();
+        Location target;
+        carrier: for (AIUnit aiCarrier : aiUnits) {
+            if (aiCarrier.hasMission()) continue;
+            Unit carrier = aiCarrier.getUnit();
+            if (!carrier.isNaval()) continue;
+            target = null;
+            for (Unit u : carrier.getUnitList()) {
+                AIUnit aiu = aiMain.getAIUnit(u);
                 if (target == null) {
-                    target = BuildColonyMission.findTarget(aiu, 
+                    target = BuildColonyMission.findTarget(aiu,
                         buildingRange*3, false);
+                    if (target == null) continue carrier;
                 }
                 aiu.setMission(new BuildColonyMission(aiMain, aiu, target));
             }
+            if (target != null) {
+                aiCarrier.setMission(new TransportMission(aiMain, aiCarrier));
+            }
         }
 
-        // Now that the land units have valid missions, give the ship
-        // a transport mission.
+        // Put in some backup missions.
         for (AIUnit aiu : aiUnits) {
-            Unit u = aiu.getUnit();
-            if (u.isNaval() && !aiu.hasMission()) {
-                aiu.setMission(new TransportMission(aiMain, aiu));
-            }
+            if (aiu.hasMission()) continue;
+            Mission m = getSimpleMission(aiu);
+            if (m != null) aiu.setMission(m);
         }
     }
 
