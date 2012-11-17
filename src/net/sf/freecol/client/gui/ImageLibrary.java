@@ -493,8 +493,20 @@ public final class ImageLibrary {
         return getForestImage(type, scalingFactor);
     }
 
+    public Image getForestImage(TileType type, TileImprovementStyle riverStyle) {
+        return getForestImage(type, riverStyle, scalingFactor);
+    }
+
     public Image getForestImage(TileType type, double scale) {
         return ResourceManager.getImage(type.getId() + ".forest", scale);
+    }
+
+    public Image getForestImage(TileType type, TileImprovementStyle riverStyle, double scale) {
+        if (riverStyle == null) {
+            return ResourceManager.getImage(type.getId() + ".forest", scale);
+        } else {
+            return ResourceManager.getImage(type.getId() + ".forest" + riverStyle.getMask(), scale);
+        }
     }
 
     /**

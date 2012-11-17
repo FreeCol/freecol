@@ -2356,7 +2356,7 @@ public final class MapViewer {
             }
             // Forest
             if (tile.isForested()) {
-                Image forestImage = lib.getForestImage(tile.getType());
+                Image forestImage = lib.getForestImage(tile.getType(), tile.getRiverStyle());
                 g.drawImage(forestImage, 0, (tileHeight - forestImage.getHeight(null)), null);
             }
 
