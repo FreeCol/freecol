@@ -688,7 +688,7 @@ public final class ColonyPanel extends PortPanel
                 int producing = workingOnLand.getProductionOf(unit, goodsType);
                 unitIcon = imageLibrary.getUnitImageIcon(unit, 0.5);
                 String nominative = Messages.message(StringTemplate.template(
-                    unit.getWorkType() + ".name").addAmount("%amount%", producing));
+                    goodsType.getNameKey()).addAmount("%amount%", producing));
                 String menuTitle = new String(Messages.message(unit.getLabel()) + " " +
                     Messages.message("producing.name") + " " + producing + " " + nominative);
                 subMenu = new JMenuItem(menuTitle, unitIcon);
@@ -707,7 +707,7 @@ public final class ColonyPanel extends PortPanel
                     int producing = workingInBuilding.getProductionOf(unit, workingInBuilding.getGoodsOutputType());
                     unitIcon = imageLibrary.getUnitImageIcon(unit, 0.5);
                     String nominative = Messages.message(StringTemplate.template(
-                        goodsType.getId() + ".name").addAmount("%amount%", producing));
+                        goodsType.getNameKey()).addAmount("%amount%", producing));
                     String menuTitle = new String(Messages.message(unit.getLabel()) + " " +
                         Messages.message("producing.name") + " " + producing + " " + nominative);
                     subMenu = new JMenuItem(menuTitle, unitIcon);
