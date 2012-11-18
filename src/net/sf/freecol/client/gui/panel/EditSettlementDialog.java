@@ -185,11 +185,17 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
                 return;
             }
             // Dispose of units and settlement on tile
-            Tile t = settlement.getTile();
-            for (Unit unit : t.getUnitList()) {
+            Tile tile = settlement.getTile();
+            for (Unit unit : tile.getUnitList()) {
                 unit.dispose();
             }
-            t.setSettlement(null);
+            tile.setSettlement(null);
+            tile.setOwner(null);
+            for (Tile owned : tile.getMap().getCircleTiles(tile, true, settlement.getRadius())) {
+                if (owned.getOwningSettlement() == settlement) {
+                    owned.changeOwnership(null, null);
+                }
+            }
             settlement.dispose();
         }
         getGUI().removeFromCanvas(this);
