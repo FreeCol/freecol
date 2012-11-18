@@ -190,11 +190,9 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
                 unit.dispose();
             }
             tile.setSettlement(null);
-            tile.setOwner(null);
-            for (Tile owned : tile.getMap().getCircleTiles(tile, true, settlement.getRadius())) {
-                if (owned.getOwningSettlement() == settlement) {
-                    owned.changeOwnership(null, null);
-                }
+            tile.changeOwnership(null, null);
+            for (Tile owned : settlement.getOwnedTiles()) {
+                owned.changeOwnership(null, null);
             }
             settlement.dispose();
         }
