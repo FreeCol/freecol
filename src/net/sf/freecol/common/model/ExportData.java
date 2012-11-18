@@ -212,14 +212,7 @@ public class ExportData extends FreeColObject {
      */
     @Override
     public void readFromXML(XMLStreamReader in) throws XMLStreamException {
-        // @compat 0.10.5
-        String id = in.getAttributeValue(null, ID_ATTRIBUTE);
-        if (id != null) {
-            setId(id);
-        } else {
-        // @end compatibility code
-            super.readAttributes(in);
-        }
+        super.readAttributes(in);
 
         exported = Boolean.parseBoolean(in.getAttributeValue(null,
                 "exported"));
