@@ -388,8 +388,8 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                     String name = nativePlayer.getSettlementName(null);
                     settlement = new ServerIndianSettlement(t.getGame(),
                         nativePlayer, name, t, false, skill, null);
+                    settlement.placeSettlement(true);
                     nativePlayer.addSettlement(settlement);
-                    t.setSettlement(settlement);
                     UnitType brave = getSpecification().getUnitType("model.unit.brave");
                     for (int index = 0; index < 5; index++) {
                         settlement.add(new ServerUnit(settlement.getGame(),
