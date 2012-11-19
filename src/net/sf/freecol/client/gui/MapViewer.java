@@ -2408,6 +2408,7 @@ public final class MapViewer {
      */
     private void displayUnit(Graphics2D g, Unit unit) {
         final Player player = freeColClient.getMyPlayer();
+ 
         try {
             // Draw the 'selected unit' image if needed.
             //if ((unit == getActiveUnit()) && cursor) {
@@ -2419,13 +2420,14 @@ public final class MapViewer {
             // If unit is sentry, draw in grayscale
             boolean fade = (unit.getState() == Unit.UnitState.SENTRY)
                 || (unit.getTile() != null
+                    && player != null
                     && !player.canSee(unit.getTile()));
             Image image = lib.getUnitImageIcon(unit, fade).getImage();
             Point p = getUnitImagePositionInTile(image);
             g.drawImage(image, p.x, p.y, null);
 
             // Draw an occupation and nation indicator.
-            String text = Messages.message(unit.getOccupationKey(player.owns(unit)));
+            String text = Messages.message(unit.getOccupationKey(player != null && player.owns(unit)));
             g.drawImage(lib.getOccupationIndicatorChip(unit, text),
                         (int)(STATE_OFFSET_X * lib.getScalingFactor()), 0,
                         null);
@@ -2455,7 +2457,8 @@ public final class MapViewer {
         // FOR DEBUGGING
         net.sf.freecol.server.ai.AIUnit au;
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)
-            && !freeColClient.getMyPlayer().owns(unit)
+            && player != null
+            && !player.owns(unit)
             && freeColClient.getFreeColServer() != null
             && (au = freeColClient.getFreeColServer().getAIMain()
                 .getAIUnit(unit)) != null) {
