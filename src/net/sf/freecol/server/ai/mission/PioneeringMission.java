@@ -505,8 +505,10 @@ public class PioneeringMission extends Mission {
      */
     public String invalidReason() {
         // Prevent invalidation for improvements that are just completing.
-        if (tileImprovementPlan != null
-            && tileImprovementPlan.isComplete()) return null;
+        if (tileImprovementPlan != null) {
+            if (tileImprovementPlan.isComplete()) return null;
+            if (tileImprovementPlan.isDisposed()) return "plan-disposed";
+        }
         return invalidReason(getAIUnit(), getTarget());
     }
 

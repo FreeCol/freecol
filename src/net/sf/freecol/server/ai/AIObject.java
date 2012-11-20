@@ -118,6 +118,15 @@ public abstract class AIObject extends FreeColObject {
     }
 
     /**
+     * Has this AIObject been disposed?
+     *
+     * @return True if this AIObject was disposed.
+     */
+    public boolean isDisposed() {
+        return getAIMain().getAIObject(getId()) == null;
+    }
+
+    /**
      * Convenience accessor for the main AI-object.
      *
      * @return The <code>AIMain</code>.
