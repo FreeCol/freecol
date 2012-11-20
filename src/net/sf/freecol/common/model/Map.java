@@ -931,6 +931,13 @@ public class Map extends FreeColGameObject implements Location {
                     costDecider, INFINITY, carrier,
                     getManhattenHeuristic(end.getTile()));
                 if (path == null) {
+                    boolean old = traceSearch;
+                    setSearchTrace(true);
+                    path = searchInternal(unit, tile,
+                        GoalDeciders.getLocationGoalDecider(end.getTile()),
+                        costDecider, INFINITY, carrier,
+                        getManhattenHeuristic(end.getTile()));
+                    setSearchTrace(old);
                     throw new IllegalStateException("SEARCH-FAIL: " + unit
                         + "/" + carrier + " from " + tile + " to " + end
                         + "\n" + p.fullPathToString());
