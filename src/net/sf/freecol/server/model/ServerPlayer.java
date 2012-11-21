@@ -2898,69 +2898,68 @@ public class ServerPlayer extends Player implements ServerModelObject {
     public void csDisposeSettlement(Settlement settlement, ChangeSet cs) {
         logger.finest("Disposing of " + settlement.getName());
         ServerPlayer owner = (ServerPlayer) settlement.getOwner();
-        HashMap<Settlement, Integer> votes = new HashMap<Settlement, Integer>();
 
         // Try to reassign the tiles
         List<Tile> owned = settlement.getOwnedTiles();
         Tile centerTile = settlement.getTile();
         Settlement centerClaimant = null;
+        HashMap<Settlement, Integer> votes = new HashMap<Settlement,Integer>();
+        HashMap<Tile, Settlement> claims = new HashMap<Tile, Settlement>();
+        Settlement claimant;
 
         while (!owned.isEmpty()) {
             Tile tile = owned.remove(0);
             votes.clear();
             for (Tile t : tile.getSurroundingTiles(1)) {
-                // For each lost tile, find any neighbouring
-                // settlements and give them a shout at claiming the tile.
-                // Note that settlements now can own tiles outside
-                // their radius--- if we encounter any of these clean
-                // them up too.
-                Settlement s = t.getOwningSettlement();
-                if (s == null) {
-                    ;
-                } else if (s.isDisposed() || s.getOwner() == null) {
-                    // BR#3375773 found a case where tiles were still
-                    // owned by a settlement that had been previously
-                    // destroyed.  Keep things simple and just clear
-                    // the ownership on these.  The bug occurred
-                    // because settlement.getOwnedTiles() was missing
-                    // some tiles, which should be fixed, but we can
-                    // be defensive here.
-                    t.setOwningSettlement(null);
-                } else if (s == settlement) {
-                    // Add this to the tiles to process if its not
-                    // there already.
-                    if (!owned.contains(t)) owned.add(t);
-                } else if (s.getOwner().canOwnTile(tile)
-                           && (s.getOwner().isIndian()
-                               || s.getTile().getDistanceTo(tile) <= s.getRadius())) {
+                claimant = t.getOwningSettlement();
+                if (claimant != null && claimant != settlement
+                    // BR#3375773 found a case where tiles were
+                    // still owned by a settlement that had been
+                    // previously destroyed.  These should be gone, but...
+                    && !claimant.isDisposed()
+                    && claimant.getOwner() != null
+                    && claimant.getOwner().canOwnTile(tile)
+                    && (claimant.getOwner().isIndian()
+                        || claimant.getTile().getDistanceTo(tile)
+                        <= claimant.getRadius())) {
                     // Weight claimant settlements:
                     //   settlements owned by the same player
                     //     > settlements owned by same type of player
                     //     > other settlements
-                    int value = (s.getOwner() == owner) ? 3
-                        : (s.getOwner().isEuropean() == owner.isEuropean()) ? 2
+                    int value = (claimant.getOwner() == owner) ? 3
+                        : (claimant.getOwner().isEuropean()
+                            == owner.isEuropean()) ? 2
                         : 1;
-                    if (votes.get(s) != null) value += votes.get(s).intValue();
-                    votes.put(s, new Integer(value));
+                    if (votes.get(claimant) != null) {
+                        value += votes.get(claimant).intValue();
+                    }
+                    votes.put(claimant, new Integer(value));
                 }
             }
-            Settlement bestClaimant = null;
-            int bestClaim = 0;
-            for (Entry<Settlement, Integer> vote : votes.entrySet()) {
-                if (vote.getValue().intValue() > bestClaim) {
-                    bestClaimant = vote.getKey();
-                    bestClaim = vote.getValue().intValue();
+            claimant = null;
+            if (!votes.isEmpty()) {
+                int bestValue = 0;
+                for (Settlement key : votes.keySet()) {
+                    int value = votes.get(key).intValue();
+                    if (bestValue < value) {
+                        bestValue = value;
+                        claimant = key;
+                    }
                 }
             }
-            if (tile == centerTile) {
-                centerClaimant = bestClaimant; // Defer until settlement gone
+            claims.put(tile, claimant);
+        }
+        for (Tile t : claims.keySet()) {
+            claimant = claims.get(t);
+            if (t == centerTile) {
+                centerClaimant = claimant; // Defer until settlement gone
             } else {
-                if (bestClaimant == null) {
-                    tile.changeOwnership(null, null);
+                if (claimant == null) {
+                    t.changeOwnership(null, null);
                 } else {
-                    tile.changeOwnership(bestClaimant.getOwner(), bestClaimant);
+                    t.changeOwnership(claimant.getOwner(), claimant);
                 }
-                cs.add(See.perhaps().always(owner), tile);
+                cs.add(See.perhaps().always(owner), t);
             }
         }
 
