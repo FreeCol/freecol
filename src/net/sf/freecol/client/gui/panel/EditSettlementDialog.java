@@ -48,6 +48,8 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.common.util.RandomChoice;
+import net.sf.freecol.server.control.ChangeSet;
+import net.sf.freecol.server.model.ServerPlayer;
 
 /**
  * This dialog is used to edit an Indian settlement (map editor only).
@@ -153,6 +155,8 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
             Nation newNation = (Nation) owner.getSelectedItem();
             if (newNation != settlement.getOwner().getNation()) {
                 Player newPlayer = settlement.getGame().getPlayer(newNation.getId());
+                // TODO: recalculate tile ownership properly, taking
+                // settlement radius into account
                 settlement.changeOwner(newPlayer);
                 MapEditorTransformPanel.setNativePlayer(newPlayer);
             }
@@ -189,12 +193,10 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
             for (Unit unit : tile.getUnitList()) {
                 unit.dispose();
             }
-            tile.setSettlement(null);
-            tile.changeOwnership(null, null);
-            for (Tile owned : settlement.getOwnedTiles()) {
-                owned.changeOwnership(null, null);
-            }
-            settlement.dispose();
+            /*
+             * TODO: improve recalculation of tile ownership
+             */
+            ((ServerPlayer) settlement.getOwner()).csDisposeSettlement(settlement, new ChangeSet());
         }
         getGUI().removeFromCanvas(this);
     }
