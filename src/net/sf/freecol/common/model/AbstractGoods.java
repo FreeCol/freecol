@@ -25,36 +25,34 @@ import javax.xml.stream.XMLStreamWriter;
 
 
 /**
- * Represents a certain amount of a GoodsType. It does not correspond
- * to actual cargo present in a Location. It is intended to represent
- * things such as the amount of Lumber necessary to build something,
- * or the amount of cargo to load at a certain Location.
+ * Represents a certain amount of a GoodsType.  This does not
+ * correspond to actual cargo present in a Location, but is intended
+ * to represent things such as the amount of Lumber necessary to build
+ * something, or the amount of cargo to load at a certain Location.
  */
 public class AbstractGoods extends FreeColObject {
 
     /**
-     * Describe type here.
+     * The type of goods.
      */
     private GoodsType type;
 
     /**
-     * Describe amount here.
+     * The amount of goods.
      */
     private int amount;
 
+
     /**
-     * Creates a new <code>AbstractGoods</code> instance.
-     *
+     * Empty constructor.
      */
-    public AbstractGoods() {
-        // empty constructor
-    }
+    public AbstractGoods() {}
 
     /**
      * Creates a new <code>AbstractGoods</code> instance.
      *
-     * @param type a <code>GoodsType</code> value
-     * @param amount an <code>int</code> value
+     * @param type The <code>GoodsType</code> to create.
+     * @param amount The amount of goods to create.
      */
     public AbstractGoods(GoodsType type, int amount) {
         setId(type.getId());
@@ -65,7 +63,7 @@ public class AbstractGoods extends FreeColObject {
     /**
      * Creates a new <code>AbstractGoods</code> instance.
      *
-     * @param other an <code>AbstractGoods</code> value
+     * @param other Another <code>AbstractGoods</code> to copy.
      */
     public AbstractGoods(AbstractGoods other) {
         setId(other.type.getId());
@@ -74,93 +72,102 @@ public class AbstractGoods extends FreeColObject {
     }
 
     /**
-     * Get the <code>Type</code> value.
+     * Gets a key for message routines.
      *
-     * @return a <code>GoodsType</code> value
+     * @return The name key.
      */
-    public final GoodsType getType() {
-        return type;
-    }
-
     public String getNameKey() {
         return getType().getNameKey();
     }
 
     /**
-     * Set the <code>Type</code> value.
+     * Get the goods type.
      *
-     * @param newType The new Type value.
+     * @return The <code>GoodsType</code>.
+     */
+    public final GoodsType getType() {
+        return type;
+    }
+
+    /**
+     * Set the goods type.
+     *
+     * @param newType The new <code>GoodsType</code>.
      */
     public final void setType(final GoodsType newType) {
         this.type = newType;
     }
 
     /**
-     * Get the <code>Amount</code> value.
+     * Get the goods amount.
      *
-     * @return an <code>int</code> value
+     * @return The goods amount.
      */
     public final int getAmount() {
         return amount;
     }
 
     /**
-     * Set the <code>Amount</code> value.
+     * Set the goods amount.
      *
-     * @param newAmount The new Amount value.
+     * @param newAmount The new goods amount.
      */
     public final void setAmount(final int newAmount) {
         this.amount = newAmount;
     }
 
+    /**
+     * Compare this AbstractGoods to another.
+     *
+     * @param other The <code>AbstractGoods</code> to compare to.
+     * @return True if the goods are equal.
+     */
     public boolean equals(AbstractGoods other) {
         return type == other.type && amount == other.amount;
     }
 
 
+    // Serialization
+
+    private static final String TYPE_TAG = "type";
+    private static final String AMOUNT_TAG = "amount";
+
     /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * {@inheritDoc}
      */
-    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+    @Override
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         super.toXML(out, getXMLElementTagName());
     }
 
     /**
-     * Write the attributes of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *     to the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
-        out.writeAttribute("type", getId());
-        out.writeAttribute("amount", Integer.toString(amount));
+        out.writeAttribute(TYPE_TAG, getId());
+
+        out.writeAttribute(AMOUNT_TAG, Integer.toString(amount));
     }
 
     /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
+     * {@inheritDoc}
      */
-    public void readFromXML(XMLStreamReader in)
-        throws XMLStreamException {
-        type = getSpecification().getGoodsType(in.getAttributeValue(null,
-                "type"));
-        amount = Integer.parseInt(in.getAttributeValue(null, "amount"));
-        in.nextTag();
+    @Override
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
+
+        final Specification spec = getSpecification();
+        type = spec.getGoodsType(in.getAttributeValue(null, TYPE_TAG));
+
+        amount = getAttribute(in, AMOUNT_TAG, 0);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return Integer.toString(amount) + " " + type.getId();

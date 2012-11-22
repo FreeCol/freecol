@@ -45,22 +45,34 @@ public class AbstractUnit extends FreeColObject {
      */
     private int number = 1;
 
-    public AbstractUnit() {
-        // empty constructor
-    }
 
+    /**
+     * Empty constructor.
+     */
+    public AbstractUnit() {}
+
+    /**
+     * Create a new AbstractUnit.
+     *
+     * @param id The unit id.
+     * @param someRole The unit <code>Role</code>.
+     * @param someNumber The number of units.
+     */
     public AbstractUnit(String id, Role someRole, int someNumber) {
         setId(id);
         this.role = someRole;
         this.number = someNumber;
     }
 
+    /**
+     * Create a new AbstractUnit.
+     *
+     * @param unitType The type of unit to create.
+     * @param someRole The unit <code>Role</code>.
+     * @param someNumber The number of units.
+     */
     public AbstractUnit(UnitType unitType, Role someRole, int someNumber) {
         this(unitType.getId(), someRole, someNumber);
-    }
-
-    public AbstractUnit clone() {
-        return new AbstractUnit(getId(), getRole(), getNumber());
     }
 
     /**
@@ -74,10 +86,16 @@ public class AbstractUnit extends FreeColObject {
     }
 
 
+    public AbstractUnit clone() {
+        return new AbstractUnit(getId(), getRole(), getNumber());
+    }
+
+
     /**
      * Get the <code>UnitType</code> value.
      *
-     * @return an <code>UnitType</code> value
+     * @param specification A <code>Specification</code> to search in.
+     * @return The unit type.
      */
     public final UnitType getUnitType(Specification specification) {
         return specification.getUnitType(getId());
@@ -86,7 +104,7 @@ public class AbstractUnit extends FreeColObject {
     /**
      * Get the <code>Role</code> value.
      *
-     * @return a <code>Role</code> value
+     * @return The unit role.
      */
     public final Role getRole() {
         return role;
@@ -95,35 +113,35 @@ public class AbstractUnit extends FreeColObject {
     /**
      * Set the <code>Role</code> value.
      *
-     * @param newRole The new Role value.
+     * @param newRole The new <code>Role</code> value.
      */
     public final void setRole(final Role newRole) {
         this.role = newRole;
     }
 
     /**
-     * Get the <code>Number</code> value.
+     * Get the number of units.
      *
-     * @return an <code>int</code> value
+     * @return The number of units.
      */
     public final int getNumber() {
         return number;
     }
 
     /**
-     * Set the <code>Number</code> value.
+     * Set the number of units.
      *
-     * @param newNumber The new Number value.
+     * @param newNumber The new number of units.
      */
     public final void setNumber(final int newNumber) {
         this.number = newNumber;
     }
 
     /**
-     * Describe <code>getLabel</code> method here.
+     * Gets a description of this abstract unit.
      *
      * @param spec A <code>Specification<code> to query.
-     * @return a <code>StringTemplate</code> value
+     * @return A label.
      */
     public StringTemplate getLabel(Specification spec) {
         return StringTemplate.template("abstractUnit")
@@ -132,85 +150,83 @@ public class AbstractUnit extends FreeColObject {
     }
 
     /**
-     * Returns the Equipment necessary to create a Unit with the same
+     * Gets the equipment necessary to create a Unit with the same
      * type and role as this AbstractUnit.
      *
-     * @return an <code>EquipmentType[]</code> value
+     * @param spec A <code>Specification<code> to query.
+     * @return An array of equipment types.
      */
-    public EquipmentType[] getEquipment(Specification specification) {
+    public EquipmentType[] getEquipment(Specification spec) {
         List<EquipmentType> equipment = new ArrayList<EquipmentType>();
-        switch(role) {
+        switch (role) {
         case PIONEER:
-            EquipmentType tools = specification.getEquipmentType("model.equipment.tools");
+            EquipmentType tools = spec.getEquipmentType("model.equipment.tools");
             for (int count = 0; count < tools.getMaximumCount(); count++) {
                 equipment.add(tools);
             }
             break;
         case MISSIONARY:
-            equipment.add(specification.getEquipmentType("model.equipment.missionary"));
+            equipment.add(spec.getEquipmentType("model.equipment.missionary"));
             break;
         case SOLDIER:
-            equipment.add(specification.getEquipmentType("model.equipment.muskets"));
+            equipment.add(spec.getEquipmentType("model.equipment.muskets"));
             break;
         case SCOUT:
-            equipment.add(specification.getEquipmentType("model.equipment.horses"));
+            equipment.add(spec.getEquipmentType("model.equipment.horses"));
             break;
         case DRAGOON:
-            equipment.add(specification.getEquipmentType("model.equipment.muskets"));
-            equipment.add(specification.getEquipmentType("model.equipment.horses"));
+            equipment.add(spec.getEquipmentType("model.equipment.muskets"));
+            equipment.add(spec.getEquipmentType("model.equipment.horses"));
             break;
         case DEFAULT:
         default:
+            break;
         }
         return equipment.toArray(new EquipmentType[equipment.size()]);
     }
 
 
+    // Serialization
+
+    private static final String ROLE_TAG = "role";
+    private static final String NUMBER_TAG = "number";
+
     /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * {@inheritDoc}
      */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         super.toXML(out, getXMLElementTagName());
     }
 
     /**
-     * Write the attributes of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *     to the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
-        out.writeAttribute("role", role.toString().toLowerCase(Locale.US));
-        out.writeAttribute("number", String.valueOf(number));
+        out.writeAttribute(ROLE_TAG, role.toString().toLowerCase(Locale.US));
+
+        out.writeAttribute(NUMBER_TAG, String.valueOf(number));
     }
 
     /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
+     * {@inheritDoc}
      */
     @Override
-    protected final void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
+    protected final void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
 
-        role = Enum.valueOf(Role.class, getAttribute(in, "role",
-                "default").toUpperCase(Locale.US));
-        number = getAttribute(in, "number", 1);
+        role = Enum.valueOf(Role.class, 
+            getAttribute(in, ROLE_TAG, "default").toUpperCase(Locale.US));
+
+        number = getAttribute(in, NUMBER_TAG, 1);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return Integer.toString(number) + " " + getId()
@@ -218,7 +234,7 @@ public class AbstractUnit extends FreeColObject {
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "abstractUnit".
      */
