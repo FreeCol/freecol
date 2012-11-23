@@ -971,7 +971,8 @@ public final class FreeColServer {
             }
 
             while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                if (xsr.getLocalName().equals("serverObjects")) {
+                String tag = xsr.getLocalName();
+                if ("serverObjects".equals(tag)) {
                     serverStrings = new ArrayList<String>();
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                         serverStrings.add(xsr.getLocalName());
@@ -983,8 +984,9 @@ public final class FreeColServer {
                     if (savegameVersion < 11) {
                         v11FixServerObjects(serverStrings, fis);
                     }
-                    // end compatibility code
-                } else if (xsr.getLocalName().equals(Game.getXMLElementTagName())) {
+                    // @end compatibility code
+
+                } else if (Game.getXMLElementTagName().equals(tag)) {
                     // @compat 0.9.x
                     if (savegameVersion < 9 && specification == null) {
                         specification = new FreeColTcFile(defaultSpec)
@@ -993,7 +995,7 @@ public final class FreeColServer {
                             + " (version: " + savegameVersion
                             + "), using " + defaultSpec + " specification.");
                     }
-                    // end compatibility code
+                    // @end compatibility code
                     // Read the game
                     game = new ServerGame(null, xsr, serverStrings,
                         specification);
@@ -1005,13 +1007,14 @@ public final class FreeColServer {
                         game.getSpecification().applyDifficultyLevel("model.difficulty.medium");
                         logger.info("Applying default difficulty of medium.");
                     }
-                    // end compatibility code
-                } else if (xsr.getLocalName().equals(AIMain.getXMLElementTagName())) {
+                    // @end compatibility code
+
+                } else if (AIMain.getXMLElementTagName().equals(tag)) {
                     if (server == null) break;
                     server.setAIMain(new AIMain(server, xsr));
+
                 } else {
-                    throw new XMLStreamException("Unknown tag: "
-                        + xsr.getLocalName());
+                    throw new XMLStreamException("Unknown tag: " + tag);
                 }
             }
 
