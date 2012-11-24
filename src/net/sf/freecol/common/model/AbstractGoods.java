@@ -147,7 +147,7 @@ public class AbstractGoods extends FreeColObject {
     protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
-        out.writeAttribute(TYPE_TAG, getId());
+        writeAttribute(out, TYPE_TAG, type);
 
         out.writeAttribute(AMOUNT_TAG, Integer.toString(amount));
     }

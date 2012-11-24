@@ -3745,8 +3745,8 @@ public class Player extends FreeColGameObject implements Nameable {
         playerType = Enum.valueOf(PlayerType.class, in.getAttributeValue(null, "playerType"));
         currentFather = getSpecification().getType(in, "currentFather", FoundingFather.class, null);
         immigrationRequired = getAttribute(in, "immigrationRequired", 12);
-        newLandName = getAttribute(in, "newLandName", null);
-        independentNationName = getAttribute(in, "independentNationName", null);
+        newLandName = getAttribute(in, "newLandName", (String)null);
+        independentNationName = getAttribute(in, "independentNationName", (String)null);
 
         attackedByPrivateers = getAttribute(in, "attackedByPrivateers", false);
         final String entryLocationStr = in.getAttributeValue(null, "entryLocation");

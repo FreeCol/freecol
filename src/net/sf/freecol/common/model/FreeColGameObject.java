@@ -294,6 +294,21 @@ abstract public class FreeColGameObject extends FreeColObject {
         return getId().hashCode();
     }
 
+    /**
+     * Gets a <code>FreeColGameObject</code> value or the default value.
+     *
+     * @param in The <code>XMLStreamReader</code> to read from.
+     * @param attributeName The attribute name.
+     * @param returnType The <code>FreeColObject</code> type to expect.
+     * @param defaultValue The default value.
+     * @return The <code>FreeColGameObject</code> found, or the
+     *     default value if not.
+     */
+    public <T extends FreeColGameObject> T getAttribute(XMLStreamReader in,
+        String attributeName, Class<T> returnType, T defaultValue) {
+        return getAttribute(in, attributeName, getGame(),
+                            returnType, defaultValue);
+    }
 
     public <T extends FreeColGameObject> T getFreeColGameObject(XMLStreamReader in, String attributeName,
                                                                 Class<T> returnClass) {

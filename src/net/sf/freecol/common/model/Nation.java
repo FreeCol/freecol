@@ -219,7 +219,7 @@ public class Nation extends FreeColGameObjectType {
         selectable = getAttribute(in, "selectable", false);
         preferredLatitude = getAttribute(in, "preferredLatitude", 0);
         startsOnEastCoast = getAttribute(in, "startsOnEastCoast", true);
-        String refId = getAttribute(in, "ref", null);
+        String refId = getAttribute(in, "ref", (String)null);
         if (refId != null) {
             refNation = getSpecification().getNation(refId);
         }

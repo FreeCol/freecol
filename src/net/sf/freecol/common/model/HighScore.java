@@ -483,7 +483,7 @@ public class HighScore extends FreeColObject {
         score = getAttribute(in, "score", 0);
         level = Enum.valueOf(Level.class,
                              getAttribute(in, "level", "PARASITIC_WORM"));
-        nationName = getAttribute(in, "nationName", null);
+        nationName = getAttribute(in, "nationName", "Freedonia");
         newLandName = getAttribute(in, "newLandName", "New World");
         difficulty = getAttribute(in, "difficulty", "model.difficulty.medium");
         units = getAttribute(in, "units", 0);

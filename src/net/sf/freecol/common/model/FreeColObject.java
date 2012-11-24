@@ -33,6 +33,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -623,132 +624,244 @@ public abstract class FreeColObject {
     }
 
     /**
-     * Return an attribute value or the default value.
+     * Is there an attribute present in a stream?
      *
-     * @param in a <code>XMLStreamReader</code> value
+     * @param in The <code>XMLStreamReader</code> to read from.
      * @param attributeName An attribute name
-     * @return an <code>int</code> value
+     * @return True if the attribute is present.
      */
-    public boolean hasAttribute(XMLStreamReader in, String attributeName) {
-        final String attributeString = in.getAttributeValue(null, attributeName);
-        return attributeString != null;
+    public static boolean hasAttribute(XMLStreamReader in, String attributeName) {
+        final String attrib = in.getAttributeValue(null, attributeName);
+        return attrib != null;
     }
 
     /**
-     * Return an attribute value or the default value.
+     * Gets a boolean from an attribute in a stream.
      *
-     * @param in a <code>XMLStreamReader</code> value
-     * @param attributeName An attribute name
-     * @param defaultValue an <code>int</code> value
-     * @return an <code>int</code> value
+     * @param in The <code>XMLStreamReader</code> to read from.
+     * @param attributeName The attribute name.
+     * @param defaultValue The default value.
+     * @return The boolean attribute value, or the default value if none found.
      */
-    public int getAttribute(XMLStreamReader in, String attributeName, int defaultValue) {
-        final String attributeString = in.getAttributeValue(null, attributeName);
-        int result = defaultValue;
-        if (attributeString != null) {
-            try {
-                result = Integer.parseInt(attributeString);
-            } catch(NumberFormatException e) {
-                logger.warning("Attribute '" + attributeName + "' should be an integer, not '"
-                               + attributeString + "'.");
-            }
-        }
-        return result;
+    public static boolean getAttribute(XMLStreamReader in, String attributeName,
+                                       boolean defaultValue) {
+        final String attrib = in.getAttributeValue(null, attributeName);
+
+        return (attrib == null) ? defaultValue
+            : Boolean.parseBoolean(attrib);
     }
 
     /**
-     * Return an attribute value or the default value.
+     * Gets a float from an attribute in a stream.
      *
-     * @param in a <code>XMLStreamReader</code> value
-     * @param attributeName An attribute name
-     * @param defaultValue an <code>int</code> value
-     * @return an <code>int</code> value
+     * @param in The <code>XMLStreamReader</code> to read from.
+     * @param attributeName The attribute name.
+     * @param defaultValue The default value.
+     * @return The float attribute value, or the default value if none found.
      */
-    public <T extends Enum<T>> T getAttribute(XMLStreamReader in, String attributeName,
-                                              Class<T> returnType, T defaultValue) {
-        final String attributeString = in.getAttributeValue(null, attributeName);
-        T result = defaultValue;
-        if (attributeString != null) {
-            try {
-                result = Enum.valueOf(returnType, attributeString);
-            } catch(NumberFormatException e) {
-                logger.warning("Attribute '" + attributeName + "' should be a "
-                               + defaultValue.getClass().getName() + " value, not '"
-                               + attributeString + "'.");
-            }
-        }
-        return result;
-    }
+    public static float getAttribute(XMLStreamReader in, String attributeName,
+                                     float defaultValue) {
+        final String attrib = in.getAttributeValue(null, attributeName);
 
-    /**
-     * Return an attribute value or the default value.
-     *
-     * @param in a <code>XMLStreamReader</code> value
-     * @param attributeName An attribute name
-     * @param defaultValue a <code>float</code> value
-     * @return an <code>int</code> value
-     */
-    public float getAttribute(XMLStreamReader in, String attributeName, float defaultValue) {
-        final String attributeString = in.getAttributeValue(null, attributeName);
         float result = defaultValue;
-        if (attributeString != null) {
+        if (attrib != null) {
             try {
-                result = Float.parseFloat(attributeString);
-            } catch(NumberFormatException e) {
-                logger.warning("Attribute '" + attributeName + "' should be a float, not '"
-                               + attributeString + "'.");
+                result = Float.parseFloat(attrib);
+            } catch (NumberFormatException e) {
+                logger.warning("Attribute '" + attributeName
+                    + "' should be a float, not '" + attrib + "'.");
             }
         }
         return result;
     }
 
     /**
-     * Return an attribute value or the default value.
+     * Gets an int from an attribute in a stream.
      *
-     * @param in a <code>XMLStreamReader</code> value
-     * @param attributeName An attribute name
-     * @param defaultValue a <code>boolean</code> value
-     * @return an <code>boolean</code> value
+     * @param in The <code>XMLStreamReader</code> to read from.
+     * @param attributeName The attribute name.
+     * @param defaultValue The default value.
+     * @return The int attribute value, or the default value if none found.
      */
-    public static boolean getAttribute(XMLStreamReader in, String attributeName, boolean defaultValue) {
-        final String attributeString = in.getAttributeValue(null, attributeName);
-        if (attributeString != null) {
-            return Boolean.parseBoolean(attributeString);
-        } else {
-            return defaultValue;
+    public static int getAttribute(XMLStreamReader in, String attributeName,
+                                   int defaultValue) {
+        final String attrib = in.getAttributeValue(null, attributeName);
+
+        int result = defaultValue;
+        if (attrib != null) {
+            try {
+                result = Integer.parseInt(attrib);
+            } catch (NumberFormatException e) {
+                logger.warning("Attribute '" + attributeName
+                    + "' should be an integer, not '" + attrib + "'.");
+            }
         }
+        return result;
     }
 
     /**
-     * Return an attribute value or the default value.
+     * Gets a string from an attribute in a stream.
      *
-     * @param in a <code>XMLStreamReader</code> value
-     * @param attributeName An attribute name
-     * @param defaultValue an <code>String</code> value
-     * @return an <code>String</code> value
+     * @param in The <code>XMLStreamReader</code> to read from.
+     * @param attributeName The attribute name.
+     * @param defaultValue The default value.
+     * @return The string attribute value, or the default value if none found.
      */
-    public String getAttribute(XMLStreamReader in, String attributeName, String defaultValue) {
-        final String attributeString = in.getAttributeValue(null, attributeName);
-        if (attributeString != null) {
-            return attributeString;
-        } else {
-            return defaultValue;
-        }
+    public static String getAttribute(XMLStreamReader in, String attributeName,
+                                      String defaultValue) {
+        final String attrib = in.getAttributeValue(null, attributeName);
+
+        return (attrib == null) ? defaultValue
+            : attrib;
     }
 
     /**
-     * Write an ID attribute if object is not null.
+     * Gets an enum from an attribute in a stream.
      *
-     * @param out a <code>XMLStreamWriter</code> value
-     * @param attributeName a <code>String</code> value
-     * @param object a <code>FreeColObject</code> value
+     * @param in The <code>XMLStreamReader</code> to read from.
+     * @param attributeName The attribute name.
+     * @param returnType The type of the return value.
+     * @param defaultValue The default value.
+     * @return The enum attribute value, or the default value if none found.
+     */
+    public static <T extends Enum<T>> T
+        getAttribute(XMLStreamReader in, String attributeName,
+                     Class<T> returnType, T defaultValue) {
+        final String attrib = in.getAttributeValue(null, attributeName);
+
+        T result = defaultValue;
+        if (attrib != null) {
+            try {
+                result = Enum.valueOf(returnType,
+                                      attrib.toUpperCase(Locale.US));
+            } catch (Exception e) {
+                logger.warning("Attribute '" + attributeName
+                    + "' should be a " + defaultValue.getClass().getName()
+                    + " value, not '" + attrib + "'.");
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Gets a FreeCol object from an attribute in a stream.
+     *
+     * @param in The <code>XMLStreamReader</code> to read from.
+     * @param attributeName The attribute name.
+     * @param game The <code>Game</code> to look in.
+     * @param returnType The <code>FreeColObject</code> type to expect.
+     * @param defaultValue The default value.
+     * @return The <code>FreeColObject</code>, or the default
+     *     value if not.
+     */
+    public static <T extends FreeColGameObject> T
+        getAttribute(XMLStreamReader in, String attributeName, Game game,
+                     Class<T> returnType, T defaultValue) {
+        final String attrib = in.getAttributeValue(null, attributeName);
+
+        return (attrib == null) ? defaultValue
+            : game.getFreeColGameObject(attrib, returnType);
+    }
+
+    /**
+     * Gets a FreeCol location from an attribute in a stream.
+     *
+     * @param in The <code>XMLStreamReader</code> to read from.
+     * @param attributeName The attribute name.
+     * @param game The <code>Game</code> to look in.
+     * @return The <code>Location</code>, or null if none found.
+     */
+    public static Location getLocationAttribute(XMLStreamReader in,
+                                                String attributeName,
+                                                Game game) {
+        final String attrib = in.getAttributeValue(null, attributeName);
+        
+        return (attrib == null) ? null
+            : game.getFreeColLocation(attrib);
+    }
+        
+    /**
+     * Write a boolean attribute to a stream.
+     *
+     * @param out The <code>XMLStreamWriter</code> to write to.
+     * @param attributeName The attribute name.
+     * @param value A boolean to write.
      * @exception XMLStreamException if an error occurs
      */
     public void writeAttribute(XMLStreamWriter out, String attributeName,
-        FreeColObject object)
+                               boolean value) throws XMLStreamException {
+        out.writeAttribute(attributeName, String.valueOf(value));
+    }
+
+    /**
+     * Write a float attribute to a stream.
+     *
+     * @param out The <code>XMLStreamWriter</code> to write to.
+     * @param attributeName The attribute name.
+     * @param value A float to write.
+     * @exception XMLStreamException if an error occurs
+     */
+    public void writeAttribute(XMLStreamWriter out, String attributeName,
+                               float value) throws XMLStreamException {
+        out.writeAttribute(attributeName, String.valueOf(value));
+    }
+
+    /**
+     * Write an integer attribute to a stream.
+     *
+     * @param out The <code>XMLStreamWriter</code> to write to.
+     * @param attributeName The attribute name.
+     * @param value An integer to write.
+     * @exception XMLStreamException if an error occurs
+     */
+    public void writeAttribute(XMLStreamWriter out, String attributeName,
+                               int value) throws XMLStreamException {
+        out.writeAttribute(attributeName, String.valueOf(value));
+    }
+
+    /**
+     * Write an Object attribute to a stream.
+     *
+     * @param out The <code>XMLStreamWriter</code> to write to.
+     * @param attributeName The attribute name.
+     * @param value The <code>Object</code> to write.
+     * @exception XMLStreamException if an error occurs
+     */
+    public void writeAttribute(XMLStreamWriter out, String attributeName,
+                               Object value) throws XMLStreamException {
+        out.writeAttribute(attributeName, String.valueOf(value));
+    }
+
+    /**
+     * Write the id attribute of a non-null FreeColObject to a stream.
+     *
+     * @param out The <code>XMLStreamWriter</code> to write to.
+     * @param attributeName The attribute name.
+     * @param value The <code>FreeColObject</code> to write the id of.
+     * @exception XMLStreamException if an error occurs
+     */
+    public void writeAttribute(XMLStreamWriter out, String attributeName,
+                               FreeColObject value) throws XMLStreamException {
+        if (value != null) {
+            out.writeAttribute(attributeName, value.getId());
+        }
+    }
+
+    /**
+     * Write the id attribute of a non-null Location to a stream.
+     *
+     * @param out The <code>XMLStreamWriter</code> to write to.
+     * @param attributeName The attribute name.
+     * @param value The <code>Location</code> to write the id of.
+     * @exception XMLStreamException if an error occurs
+     */
+    public void writeLocationAttribute(XMLStreamWriter out,
+                                       String attributeName,
+                                       Location value)
         throws XMLStreamException {
-        if (object != null) {
-            out.writeAttribute(attributeName, object.getId());
+        if (value != null) {
+            out.writeAttribute(attributeName,
+                               ((FreeColGameObject)value).getId());
         }
     }
 

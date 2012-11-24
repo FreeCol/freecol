@@ -1402,7 +1402,7 @@ public class IndianSettlement extends Settlement {
 
         for (int i = 0; i < wantedGoods.length; i++) {
             String tag = WANTED_GOODS_TAG_NAME + Integer.toString(i);
-            String wantedGoodsId = getAttribute(in, tag, null);
+            String wantedGoodsId = getAttribute(in, tag, (String)null);
             wantedGoods[i] = (wantedGoodsId == null) ? null
                 : getSpecification().getGoodsType(wantedGoodsId);
         }
