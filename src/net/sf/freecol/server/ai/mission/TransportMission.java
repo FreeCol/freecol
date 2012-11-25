@@ -37,6 +37,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
@@ -81,15 +82,6 @@ public class TransportMission extends Mission {
     private static final Logger logger = Logger.getLogger(TransportMission.class.getName());
 
     private static final String tag = "AI transport";
-
-    private static final String ELEMENT_TRANSPORTABLE = "transportable";
-    private static final String CARRIER_TAG = "carrier";
-    private static final String MODE_TAG = "mode";
-    private static final String TARGET_TAG = "target";
-    private static final String TURNS_TAG = "turns";
-    private static final String TRIES_TAG = "tries";
-    private static final String SPACELEFT_TAG = "space";
-
 
     /**
      * Insist transport lists remain simple by imposing an upper bound
@@ -1739,7 +1731,16 @@ public class TransportMission extends Mission {
         }
     }
 
+
     // Serialization
+
+    private static final String CARGO_TAG = "cargo";
+    private static final String CARRIER_TAG = "carrier";
+    private static final String MODE_TAG = "mode";
+    private static final String TARGET_TAG = "target";
+    private static final String TURNS_TAG = "turns";
+    private static final String TRIES_TAG = "tries";
+    private static final String SPACELEFT_TAG = "space";
 
     /**
      * {@inheritDoc}
@@ -1748,6 +1749,18 @@ public class TransportMission extends Mission {
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         if (isValid()) {
             toXML(out, getXMLElementTagName());
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        super.writeAttributes(out);
+
+        if (target != null) {
+            writeLocationAttribute(out, TARGET_TAG, target);
         }
     }
 
@@ -1768,29 +1781,24 @@ public class TransportMission extends Mission {
             // Do not bother writing cargoes that will be dumped.
             // On restore, checkCargoes will work out what to do with them.
             if (cargo.getMode() != CargoMode.DUMP) {
-                out.writeStartElement(ELEMENT_TRANSPORTABLE);
+                out.writeStartElement(CARGO_TAG);
 
                 AIObject aio = (AIObject)cargo.getTransportable();
-                out.writeAttribute(ID_ATTRIBUTE, aio.getId());
+                writeAttribute(out, ID_ATTRIBUTE, aio.getId());
 
                 writeAttribute(out, CARRIER_TAG, cargo.getCarrier());
 
-                out.writeAttribute(MODE_TAG,
-                    cargo.getMode().toString().toLowerCase(Locale.US));
+                writeAttribute(out, MODE_TAG, cargo.getMode());
                 
                 if (cargo.getTarget() != null) {
-                    writeAttribute(out, TARGET_TAG,
-                        (FreeColGameObject)cargo.getTarget());
+                    writeLocationAttribute(out, TARGET_TAG, cargo.getTarget());
                 }
 
-                out.writeAttribute(TURNS_TAG,
-                    Integer.toString(cargo.getTurns()));
+                writeAttribute(out, TURNS_TAG, cargo.getTurns());
 
-                out.writeAttribute(TRIES_TAG,
-                    Integer.toString(cargo.getTries()));
+                writeAttribute(out, TRIES_TAG, cargo.getTries());
 
-                out.writeAttribute(SPACELEFT_TAG,
-                    Integer.toString(cargo.getSpaceLeft()));
+                writeAttribute(out, SPACELEFT_TAG, cargo.getSpaceLeft());
 
                 out.writeEndElement();
             }
@@ -1801,54 +1809,67 @@ public class TransportMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in)
-        throws XMLStreamException {
-        List<Cargo> ts = new ArrayList<Cargo>();
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
 
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            String str, tag = in.getLocalName();
-            if (tag.equals(ELEMENT_TRANSPORTABLE)) {
-                String tid = in.getAttributeValue(null, ID_ATTRIBUTE);
-                AIObject aio = getAIMain().getAIObject(tid);
-                if (aio == null) {
+        target = getLocationAttribute(in, TARGET_TAG, getGame());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        // Clear containers
+        tClear();
+
+        super.readChildren(in);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+        final Game game = getGame();
+        final String tag = in.getLocalName();
+
+        if (CARGO_TAG.equals(tag)) {
+            String tid = getAttribute(in, ID_ATTRIBUTE, (String)null);
+            AIObject aio = null;
+            if (tid != null) {
+                if ((aio = getAIMain().getAIObject(tid)) == null) {
                     if (tid.startsWith(Unit.getXMLElementTagName())) {
                         aio = new AIUnit(getAIMain(), tid);
-                    } else {
+                    } else if (tid.startsWith(AIGoods.getXMLElementTagName())) {
                         aio = new AIGoods(getAIMain(), tid);
                     }
                 }
-
-                str = in.getAttributeValue(null, CARRIER_TAG);
-                Unit carrier = (str == null) ? getUnit()
-                    : getGame().getFreeColGameObject(str, Unit.class);
-
-                str = in.getAttributeValue(null, MODE_TAG);
-                CargoMode mode = (str == null) ? CargoMode.DUMP
-                    : Enum.valueOf(CargoMode.class, str.toUpperCase(Locale.US));
-
-                str = in.getAttributeValue(null, TARGET_TAG);
-                Location target = (str == null) ? null
-                    : getGame().getFreeColLocation(str);
-
-                int turns = getAttribute(in, TURNS_TAG, -1);
-
-                int tries = getAttribute(in, TRIES_TAG, 0);
-
-                int spaceLeft = getAttribute(in, SPACELEFT_TAG, -1);
-
-                if (aio instanceof Transportable) {
-                    ts.add(new Cargo((Transportable)aio, carrier, mode,
-                                     target, turns, tries, spaceLeft));
-                } else {
-                    logger.warning("Transportable expected: " + tid);
-                }
-                in.nextTag(); // Consume closing tag
-
-            } else {
-                logger.warning("Unknown TransportMission tag: " + tag);
             }
+            if (aio == null) {
+                throw new XMLStreamException("Transportable expected: " + tid);
+            }
+
+            Unit carrier = game.getFreeColGameObject(in, CARRIER_TAG, Unit.class, getUnit());
+
+            CargoMode mode = getAttribute(in, MODE_TAG, 
+                                          CargoMode.class, CargoMode.DUMP);
+            
+            Location target = getLocationAttribute(in, TARGET_TAG, game);
+            
+            int turns = getAttribute(in, TURNS_TAG, -1);
+            
+            int tries = getAttribute(in, TRIES_TAG, 0);
+            
+            int spaceLeft = getAttribute(in, SPACELEFT_TAG, -1);
+            
+            tAdd(new Cargo((Transportable)aio, carrier, mode,
+                           target, turns, tries, spaceLeft), -1);
+            in.nextTag(); // Consume closing tag
+
+        } else {
+            super.readChild(in);
         }
-        tSet(ts);
     }
 
     /**
