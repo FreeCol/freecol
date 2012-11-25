@@ -383,6 +383,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
             if (t.isLand()) {
                 Settlement settlement = t.getSettlement();
                 if (settlement == null) {
+                    logger.info("Adding settlement to tile " + t);
                     UnitType skill = ((IndianNationType) nativePlayer.getNationType()).getSkills().get(0)
                         .getObject();
                     String name = nativePlayer.getSettlementName(null);
@@ -392,6 +393,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                     nativePlayer.addSettlement(settlement);
                     UnitType brave = getSpecification().getUnitType("model.unit.brave");
                     for (int index = 0; index < 5; index++) {
+                        logger.info("Adding unit " + brave + " to settlement.");
                         settlement.add(new ServerUnit(settlement.getGame(),
                                 settlement, settlement.getOwner(), brave));
                     }

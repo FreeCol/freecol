@@ -92,6 +92,8 @@ public final class MapEditorController {
         try {
             FreeColTcFile tcData = new FreeColTcFile(tc);
             Specification specification = tcData.getSpecification();
+            // TODO: fixme! Difficulty level must also be known in advance
+            specification.applyDifficultyLevel("model.difficulty.medium");
             freeColClient.setMapEditor(true);
             final FreeColServer freeColServer = new FreeColServer(specification, false, false, 0, null);
             freeColClient.setFreeColServer(freeColServer);
@@ -103,7 +105,6 @@ public final class MapEditorController {
             gui.closeMenus();
             freeColClient.setInGame(true);
 
-            
             gui.startMapEditorGUI();
         } catch (NoRouteToServerException e) {
             gui.errorMessage("server.noRouteToServer");
