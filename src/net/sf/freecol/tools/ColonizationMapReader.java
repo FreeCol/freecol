@@ -35,11 +35,19 @@ public class ColonizationMapReader {
     private static final char[] tiletypes = new char[256];
 
     /**
-     * It seems that the two nibbles of each byte are considered
-     * separately. The less significant nibble encodes the terrain
-     * type, and the more significant nibble encodes overlays such as
-     * forests, hills, mountains and rivers. Ice, oceans and sea lanes
-     * seem to be handled differently.
+     * It seems that the least significant three bits encodes the
+     * terrain type, and the more significant bits encodes overlays
+     * such as forests, hills, mountains and rivers. Ice, oceans and
+     * sea lanes seem to be handled differently.
+     *
+     * bits 0-2: tile type
+     * bit 3: forest
+     * bit 4: mountain
+     * bits 3+4: special (since forest + mountain is not supported)
+     * bit 5: hill
+     * bit 6: minor river
+     * bit 7: unknown
+     * bits 6+7: major river
      */
     static {
         Arrays.fill(tiletypes, '?');
@@ -82,6 +90,15 @@ public class ColonizationMapReader {
         tiletypes[37] = '^'; // savannah with hill
         tiletypes[38] = '^'; // marsh with hill
         tiletypes[39] = '^'; // swamp with hill
+
+        tiletypes[48] = '^'; // tundra with hill
+        tiletypes[49] = '^'; // desert with hill
+        tiletypes[50] = '^'; // plains with hill
+        tiletypes[51] = '^'; // prairie with hill
+        tiletypes[52] = '^'; // grassland with hill
+        tiletypes[53] = '^'; // savannah with hill
+        tiletypes[54] = '^'; // marsh with hill
+        tiletypes[55] = '^'; // swamp with hill
 
         tiletypes[64] = '~'; // tundra with minor river
         tiletypes[65] = '~'; // desert with minor river
