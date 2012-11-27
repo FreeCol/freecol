@@ -1867,6 +1867,12 @@ public class TransportMission extends Mission {
                            target, turns, tries, spaceLeft), -1);
             in.nextTag(); // Consume closing tag
 
+        // @compat 0.10.5
+        } else if ("transportable".equals(tag)) {
+            // Ignore the old format, let checkCargoes sort it out
+            in.nextTag(); // Consume closing tag
+        // @end compatibility code
+
         } else {
             super.readChild(in);
         }
