@@ -30,10 +30,14 @@ import java.util.logging.Logger;
 
 /**
  * A container to hold abilities and modifiers for some FreeColObject-subclass.
- * FreeColGameObjectType, Europe, Player, Settlement are current implementors.
- * Building delegates some functionality to its type.
- * Unit fakes it by constructing one on the fly.
- * FreeColObject itself implements a null version.
+ *
+ * - FreeColGameObjectType, Europe, Player, Settlement are current implementors.
+ * 
+ * - Building delegates some functionality to its type.
+ *
+ * - Unit fakes it by constructing one on the fly.
+ *
+ * - FreeColObject itself implements a null version.
  */
 public class FeatureContainer {
 
@@ -450,6 +454,14 @@ public class FeatureContainer {
                 }
             }
         }
+    }
+
+    /**
+     * Clear this feature container.
+     */
+    public void clear() {
+        abilities.clear();
+        modifiers.clear();
     }
 
     /**
