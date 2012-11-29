@@ -230,7 +230,7 @@ public class IndianNationType extends NationType {
         throws XMLStreamException {
         super.readAttributes(in);
 
-        String extendString = in.getAttributeValue(null, "extends");
+        String extendString = in.getAttributeValue(null, EXTENDS_TAG);
         IndianNationType parent = (extendString == null) ? this :
             getSpecification().getType(extendString, IndianNationType.class);
         if (parent != this) {

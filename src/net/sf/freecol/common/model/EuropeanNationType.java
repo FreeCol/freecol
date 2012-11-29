@@ -220,7 +220,7 @@ public class EuropeanNationType extends NationType {
         throws XMLStreamException {
         super.readAttributes(in);
 
-        String extendString = in.getAttributeValue(null, "extends");
+        String extendString = in.getAttributeValue(null, EXTENDS_TAG);
         EuropeanNationType parent = (extendString == null) ? this :
             (EuropeanNationType) getSpecification().getNationType(extendString);
         ref = getAttribute(in, "ref", parent.ref);

@@ -177,7 +177,7 @@ public abstract class NationType extends FreeColGameObjectType {
         throws XMLStreamException {
         super.readAttributes(in);
 
-        String extendString = in.getAttributeValue(null, "extends");
+        String extendString = in.getAttributeValue(null, EXTENDS_TAG);
         NationType parent = (extendString == null) ? this :
             getSpecification().getType(extendString, NationType.class);
         String valueString = in.getAttributeValue(null,

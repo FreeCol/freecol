@@ -39,6 +39,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColTcFile;
+import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.option.AbstractOption;
 import net.sf.freecol.common.option.AbstractUnitOption;
 import net.sf.freecol.common.option.BooleanOption;
@@ -1377,7 +1378,7 @@ public final class Specification {
             id = newId;
         }
         logger.fine("Reading specification " + newId);
-        String parentId = xsr.getAttributeValue(null, "extends");
+        String parentId = xsr.getAttributeValue(null, FreeColGameObjectType.EXTENDS_TAG);
         if (parentId != null) {
             try {
                 FreeColTcFile parent = new FreeColTcFile(parentId);

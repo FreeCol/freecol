@@ -122,7 +122,7 @@ public class Disaster extends FreeColGameObjectType {
     protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
         super.readAttributes(in);
-        String extendString = in.getAttributeValue(null, "extends");
+        String extendString = in.getAttributeValue(null, EXTENDS_TAG);
         Disaster parent = (extendString == null) ? this :
             getSpecification().getDisaster(extendString);
 
