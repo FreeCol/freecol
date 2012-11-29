@@ -60,14 +60,14 @@ public class ColonizationMapReader {
         tiletypes[6]  = 'm'; // marsh
         tiletypes[7]  = 's'; // swamp
 
-        tiletypes[8]  = 'T'; // boreal
-        tiletypes[9]  = 'D'; // scrub
-        tiletypes[10] = 'P'; // mixed
-        tiletypes[11] = 'R'; // broadleaf
-        tiletypes[12] = 'G'; // conifer
-        tiletypes[13] = 'V'; // tropical
-        tiletypes[14] = 'M'; // wetland
-        tiletypes[15] = 'S'; // rain
+        tiletypes[8]  = 'T'; // boreal (tundra with forest)
+        tiletypes[9]  = 'D'; // scrub (desert with forest)
+        tiletypes[10] = 'P'; // mixed (plains with forest)
+        tiletypes[11] = 'R'; // broadleaf (prairie with forest)
+        tiletypes[12] = 'G'; // conifer (grassland with forest)
+        tiletypes[13] = 'V'; // tropical (savannah with forest)
+        tiletypes[14] = 'M'; // wetland (marsh with forest)
+        tiletypes[15] = 'S'; // rain (swamp with forest)
 
         tiletypes[16] = '*'; // tundra with mountain
         tiletypes[17] = '*'; // desert with mountain
@@ -205,37 +205,59 @@ public class ColonizationMapReader {
 
     }
 
-    private static final byte[] header = new byte[6];
+    private static final byte[] header = new byte[] {
+        58, 0, 72, 0, 4, 0
+    };
     private static byte[] layer1;
 
     public static void main(String[] args) throws Exception {
 
-        StringBuilder unknown = new StringBuilder();
-        RandomAccessFile reader = new RandomAccessFile(args[0], "r");
-        reader.read(header);
-
-        System.out.println(String.format("Map width:  %02d", (int) header[WIDTH]));
-        System.out.println(String.format("Map height: %02d", (int) header[HEIGHT]));
-
-        int size = header[WIDTH] * header[HEIGHT];
-        layer1 = new byte[size];
-        reader.read(layer1);
-
-        int index = 0;
-        for (int y = 0; y < header[HEIGHT]; y++) {
-            for (int x = 0; x < header[WIDTH]; x++) {
-                int decimal = layer1[index] & 0xff;
-                char terrain = tiletypes[decimal];
-                System.out.print(terrain);
-                if (terrain == '?') {
-                    unknown.append(x + ", " + y + ": " + decimal + "\n");
+        if ("--palette".equals(args[0])) {
+            RandomAccessFile writer = new RandomAccessFile(args[1], "rw");
+            byte width = 58;
+            byte height = 72;
+            int size = width * height * 3 + header.length;
+            layer1 = new byte[size];
+            for (int i = 0; i < header.length; i++) {
+                layer1[i] = header[i];
+            }
+            Arrays.fill(layer1, header.length, header.length + width * height, (byte) 25); // fill with ocean
+            int offset = header.length + width + 1;
+            for (int x = 0; x < 16; x++) {
+                for (int y = 0; y < 16; y++) {
+                    layer1[offset + y] = (byte) (16 * x + y);
                 }
-                index++;
+                offset += width;
+            }
+            writer.write(layer1);
+        } else {
+            StringBuilder unknown = new StringBuilder();
+            RandomAccessFile reader = new RandomAccessFile(args[0], "r");
+            reader.read(header);
+
+            System.out.println(String.format("Map width:  %02d", (int) header[WIDTH]));
+            System.out.println(String.format("Map height: %02d", (int) header[HEIGHT]));
+
+            int size = header[WIDTH] * header[HEIGHT];
+            layer1 = new byte[size];
+            reader.read(layer1);
+
+            int index = 0;
+            for (int y = 0; y < header[HEIGHT]; y++) {
+                for (int x = 0; x < header[WIDTH]; x++) {
+                    int decimal = layer1[index] & 0xff;
+                    char terrain = tiletypes[decimal];
+                    System.out.print(terrain);
+                    if (terrain == '?') {
+                        unknown.append(x + ", " + y + ": " + decimal + "\n");
+                    }
+                    index++;
+                }
+                System.out.println("\n");
             }
             System.out.println("\n");
+            System.out.println(unknown.toString());
         }
-        System.out.println("\n");
-        System.out.println(unknown.toString());
     }
 
 }
