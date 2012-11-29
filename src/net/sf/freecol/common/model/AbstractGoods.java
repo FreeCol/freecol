@@ -160,7 +160,7 @@ public class AbstractGoods extends FreeColObject {
         super.readAttributes(in);
 
         final Specification spec = getSpecification();
-        type = spec.getGoodsType(in.getAttributeValue(null, TYPE_TAG));
+        type = spec.getType(in, TYPE_TAG, GoodsType.class, (GoodsType)null);
 
         amount = getAttribute(in, AMOUNT_TAG, 0);
     }

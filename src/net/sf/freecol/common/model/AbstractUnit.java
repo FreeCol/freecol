@@ -21,7 +21,6 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -206,9 +205,9 @@ public class AbstractUnit extends FreeColObject {
     protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
-        out.writeAttribute(ROLE_TAG, role.toString().toLowerCase(Locale.US));
+        writeAttribute(out, ROLE_TAG, role);
 
-        out.writeAttribute(NUMBER_TAG, String.valueOf(number));
+        writeAttribute(out, NUMBER_TAG, number);
     }
 
     /**
@@ -218,8 +217,7 @@ public class AbstractUnit extends FreeColObject {
     protected final void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
 
-        role = Enum.valueOf(Role.class, 
-            getAttribute(in, ROLE_TAG, "default").toUpperCase(Locale.US));
+        role = getAttribute(in, ROLE_TAG, Role.class, Role.DEFAULT);
 
         number = getAttribute(in, NUMBER_TAG, 1);
     }
