@@ -2833,13 +2833,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
         boolean capital = settlement.isCapital();
         int plunder = settlement.getPlunder(attacker, random);
 
-        // Get rid of the any missionary first.
-        Unit missionary = settlement.getMissionary();
-        if (missionary != null) {
-            ((ServerPlayer)missionary.getOwner()).csKillMissionary(settlement,
-                "indianSettlement.mission.destroyed", cs);
-        }
-            
         // Destroy the settlement, update settlement tiles.
         csDisposeSettlement(settlement, cs);
 
@@ -2899,6 +2892,16 @@ public class ServerPlayer extends Player implements ServerModelObject {
         logger.finest("Disposing of " + settlement.getName());
         ServerPlayer owner = (ServerPlayer) settlement.getOwner();
 
+        // Get rid of the any missionary first.
+        if (settlement instanceof IndianSettlement) {
+            Unit missionary = ((IndianSettlement)settlement).getMissionary();
+            if (missionary != null) {
+                ((ServerPlayer)missionary.getOwner())
+                    .csKillMissionary((IndianSettlement)settlement,
+                        "indianSettlement.mission.destroyed", cs);
+            }
+        }
+            
         // Try to reassign the tiles
         List<Tile> owned = settlement.getOwnedTiles();
         Tile centerTile = settlement.getTile();
