@@ -88,6 +88,8 @@ public class Modifier extends Feature implements Comparable<Modifier> {
 
     /**
      * Use this only for reading from DOM Elements.
+     *
+     * @param specification The <code>Specification</code> to read within.
      */
     public Modifier(Specification specification) {
         setSpecification(specification);
@@ -363,6 +365,10 @@ public class Modifier extends Feature implements Comparable<Modifier> {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public int hashCode() {
         int hash = super.hashCode();
         hash = hash + 31 * Float.floatToIntBits(value);
@@ -373,6 +379,10 @@ public class Modifier extends Feature implements Comparable<Modifier> {
         return hash;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean equals(Object o) {
         if (o == this) {
             return true;
@@ -412,95 +422,89 @@ public class Modifier extends Feature implements Comparable<Modifier> {
     }
 
     /**
-     * Compares this object with the specified object for
-     * order. Returns a negative integer, zero, or a positive integer
-     * as this object is less than, equal to, or greater than the
-     * specified object.
+     * Compares this object with the specified object for order.
      *
-     * @param modifier a <code>Modifier</code> value
-     * @return an <code>int</code> value
+     * @param modifier The <code>Modifier</code> to compare to.
+     * @return A comparison result.
      */
     public int compareTo(Modifier modifier) {
-        if (index == modifier.index) {
-            return type.compareTo(modifier.type);
-        } else {
-            return (index - modifier.index);
-        }
+        return (index == modifier.index) ? type.compareTo(modifier.type)
+            : (index - modifier.index);
     }
 
 
+    // Serialization
+
+    private static final String INCREMENT_TAG = "increment";
+    private static final String INCREMENT_TYPE_TAG = "incrementType";
+    private static final String INDEX_TAG = "index";
+    private static final String TYPE_TAG = "type";
+
     /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * {@inheritDoc}
      */
+    @Override
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         super.toXML(out, getXMLElementTagName());
     }
 
     /**
-     * Write the attributes of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to
-     *     the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
-        out.writeAttribute(VALUE_TAG, String.valueOf(value));
-        out.writeAttribute("type", type.toString().toLowerCase(Locale.US));
+        writeAttribute(out, VALUE_TAG, value);
+
+        writeAttribute(out, TYPE_TAG, type);
+
         if (incrementType != null) {
-            out.writeAttribute("incrementType",
-                incrementType.toString().toLowerCase(Locale.US));
-            out.writeAttribute("increment", String.valueOf(increment));
+            writeAttribute(out, INCREMENT_TYPE_TAG, incrementType);
+
+            writeAttribute(out, INCREMENT_TAG, increment);
         }
+
         if (index >= 0) {
-            out.writeAttribute("index", Integer.toString(index));
+            writeAttribute(out, INDEX_TAG, index);
         }
     }
 
     /**
-     * Reads the attributes of this object from an XML stream.
-     *
-     * @param in The XML input stream.
-     * @exception XMLStreamException if a problem was encountered
-     *     during parsing.
+     * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
 
-        String typeString = in.getAttributeValue(null, "type");
-        setType(Enum.valueOf(Type.class, typeString.toUpperCase(Locale.US)));
-        value = Float.parseFloat(in.getAttributeValue(null, VALUE_TAG));
-        String incrementString = in.getAttributeValue(null, "incrementType");
-        if (incrementString != null) {
-            setIncrementType(Enum.valueOf(Type.class,
-                    incrementString.toUpperCase(Locale.US)));
-            increment = Float.parseFloat(in.getAttributeValue(null,
-                    "increment"));
+        type = getAttribute(in, TYPE_TAG, Type.class, (Type)null);
+
+        value = getAttribute(in, VALUE_TAG, UNKNOWN);
+
+        if (hasAttribute(in, INCREMENT_TYPE_TAG)) {
+            incrementType = getAttribute(in, INCREMENT_TYPE_TAG,
+                                         Type.class, (Type)null);
+
+            increment = getAttribute(in, INCREMENT_TAG, UNKNOWN);
         }
-        index = getAttribute(in, "index", -1);
+
+        index = getAttribute(in, INDEX_TAG, -1);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
-        return getId() + ((getSource() == null) ? " "
-            : " (" + getSource().getId() + ") ")
+        return getId()
+            + ((getSource() == null) ? " " : " (" + getSource().getId() + ") ")
             + type + " " + value;
     }
 
     /**
-     * Returns the XML tag name for this element.
+     * Gets the XML tag name for this element.
      *
-     * @return a <code>String</code> value
+     * @return "modifier".
      */
     public static String getXMLElementTagName() {
         return "modifier";

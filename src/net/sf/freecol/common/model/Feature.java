@@ -65,199 +65,206 @@ public abstract class Feature extends FreeColObject {
 
     /**
      * A list of Scopes limiting the applicability of this Feature.
+	 * Allocated on demand.
      */
-    private List<Scope> scopes;
+    private List<Scope> scopes = null;
 
-    /**
-     * Get the <code>TimeLimit</code> value.
-     *
-     * @return a <code>boolean</code> value
-     */
-    public final boolean hasTimeLimit() {
-        return (firstTurn != null || lastTurn != null);
+
+    protected void copy(Feature other) {
+        setId(other.getId());
+        this.source = other.source;
+        this.firstTurn = other.firstTurn;
+        this.lastTurn = other.lastTurn;
+        this.duration = other.duration;
+        this.temporary = other.temporary;
+        setScopes(other.getScopes());
     }
 
     /**
-     * Get the <code>Scope</code> value.
+     * Gets a name key for this feature.
      *
-     * @return a <code>boolean</code> value
-     */
-    public final boolean hasScope() {
-        return !(scopes == null || scopes.isEmpty());
-    }
-
-    /**
-     * Describe <code>getNameKey</code> method here.
-     *
-     * @return a <code>String</code> value
+     * @return A name key.
      */
     public String getNameKey() {
         return getId() + ".name";
     }
 
     /**
-     * Get the <code>Scopes</code> value.
+     * Does this feature have a time limit?
      *
-     * @return a <code>List<Scope></code> value
+     * @return True if the feature is time limited.
      */
-    public final List<Scope> getScopes() {
-        return scopes;
+    public final boolean hasTimeLimit() {
+        return (firstTurn != null || lastTurn != null);
     }
 
     /**
-     * Set the <code>Scopes</code> value.
+     * Get the first turn of a time limit.
      *
-     * @param newScopes The new Scopes value.
-     */
-    public final void setScopes(final List<Scope> newScopes) {
-        this.scopes = newScopes;
-    }
-
-    /**
-     * Get the <code>firstTurn</code> value.
-     *
-     * @return a <code>Turn</code> value
+     * @return The first turn, or null if none.
      */
     public final Turn getFirstTurn() {
         return firstTurn;
     }
 
     /**
-     * Set the <code>firstTurn</code> value.
+     * Set the first turn of a time limit.
      *
-     * @param newFirstTurn The new FirstTurn value.
+     * @param newFirstTurn The new first turn value.
      */
     public final void setFirstTurn(final Turn newFirstTurn) {
         this.firstTurn = newFirstTurn;
     }
 
     /**
-     * Get the <code>LastTurn</code> value.
+     * Get the last turn of a time limit.
      *
-     * @return a <code>Turn</code> value
+     * @return The last turn, or null if none.
      */
     public final Turn getLastTurn() {
         return lastTurn;
     }
 
     /**
-     * Set the <code>LastTurn</code> value.
+     * Set the last turn of a time limit.
      *
-     * @param newLastTurn The new LastTurn value.
+     * @param newLastTurn The new last turn value.
      */
     public final void setLastTurn(final Turn newLastTurn) {
         this.lastTurn = newLastTurn;
     }
 
     /**
-     * Get the <code>Source</code> value.
+     * Does this feature have a scope?
      *
-     * @return a <code>String</code> value
+     * @return True if there are any scopes attached to this feature.
+     */
+    public final boolean hasScope() {
+        return scopes != null && !scopes.isEmpty();
+    }
+
+    /**
+     * Get the scopes for this feature.
+     *
+     * @return A list of <code>Scope</code>s.
+     */
+    public final List<Scope> getScopes() {
+        return (scopes == null) ? new ArrayList<Scope>()
+            : scopes;
+    }
+
+    /**
+     * Set the scopes for this feature.
+     *
+     * @param scopes A list of new <code>Scope</code>s.
+     */
+    public final void setScopes(List<Scope> scopes) {
+        this.scopes = scopes;
+    }
+
+    /**
+     * Get the source of this feature.
+     *
+     * @return The source object.
      */
     public final FreeColObject getSource() {
         return source;
     }
 
     /**
-     * Set the <code>Source</code> value.
+     * Set the source of this feature.
      *
-     * @param newSource The new Source value.
+     * @param newSource The new source.
      */
     public final void setSource(final FreeColObject newSource) {
         this.source = newSource;
     }
 
     /**
-     * Get the <code>Duration</code> value.
+     * Get the duration of this feature.
      *
-     * @return an <code>int</code> value
+     * @return The number of turns this feature lasts.
      */
     public final int getDuration() {
         return duration;
     }
 
     /**
-     * Set the <code>Duration</code> value.
+     * Set the duration of this feature.
      *
-     * @param newDuration The new Duration value.
+     * @param newDuration The new duration.
      */
     public final void setDuration(final int newDuration) {
         this.duration = newDuration;
     }
 
     /**
-     * Get the <code>Temporary</code> value.
+     * Is this a temporary feature?
      *
-     * @return a <code>boolean</code> value
+     * True if this is a temporary feature.
      */
     public final boolean isTemporary() {
         return temporary;
     }
 
     /**
-     * Set the <code>Temporary</code> value.
+     * Set the temporary status.
      *
-     * @param newTemporary The new Temporary value.
+     * @param newTemporary The new temporary status.
      */
     public final void setTemporary(final boolean newTemporary) {
         this.temporary = newTemporary;
     }
 
     /**
-     * Returns true if the <code>appliesTo</code> method of at least
-     * one <code>Scope</code> object returns true.
+     * Does this feature apply to a given object type?
      *
-     * @param objectType a <code>FreeColGameObjectType</code> value
-     * @return a <code>boolean</code> value
+     * @param objectType The <code>FreeColGameObjectType</code> to test.
+     * @return True if there are no scopes, or at least one scope is
+     *     applicable to the object.
      */
     public boolean appliesTo(final FreeColGameObjectType objectType) {
-        if (!hasScope()) {
-            return true;
-        } else {
-            for (Scope scope : scopes) {
-                if (scope.appliesTo(objectType)) {
-                    return true;
-                }
-            }
-            return false;
+        if (!hasScope()) return true;
+        for (Scope scope : scopes) {
+            if (scope.appliesTo(objectType)) return true;
         }
+        return false;
     }
 
     /**
-     * Returns whether this Feature applies to the given Turn.
+     * Does this feature apply to a given turn?
      *
-     * @param turn a <code>Turn</code> value
-     * @return a <code>boolean</code> value
+     * @param turn The <code>Turn</code> to test.
+     * @return True if the turn is not outside a valid time limit.
      */
-    protected boolean appliesTo(Turn turn) {
-        return !(turn != null &&
-                 (firstTurn != null && turn.getNumber() < firstTurn.getNumber() ||
-                  lastTurn != null && turn.getNumber() > lastTurn.getNumber()));
+    protected boolean appliesTo(final Turn turn) {
+        return !(turn != null
+            && (firstTurn != null && turn.getNumber() < firstTurn.getNumber()
+                || lastTurn != null && turn.getNumber() > lastTurn.getNumber()));
     }
 
-
     /**
-     * Returns true if this Feature applies to both the given
-     * FreeColGameObjectType and the given Turn.
+     * Does this feature apply to a given object type and turn.
      *
-     * @param objectType a <code>FreeColGameObjectType</code> value
-     * @param turn a <code>Turn</code> value
-     * @return a <code>boolean</code> value
+     * @param objectType The <code>FreeColGameObjectType</code> to test.
+     * @param turn The <code>Turn</code> to test.
+     * @return True if the feature applies.
      */
-    protected boolean appliesTo(final FreeColGameObjectType objectType, Turn turn) {
+    protected boolean appliesTo(final FreeColGameObjectType objectType,
+                                final Turn turn) {
         return appliesTo(turn) && appliesTo(objectType);
     }
 
     /**
-     * Returns true if the Feature has an lastTurn turn smaller than the
-     * turn given.
+     * Is this feature out of date with respect to a given turn?
      *
-     * @param turn a <code>Turn</code> value
-     * @return a <code>boolean</code> value
+     * @param turn The <code>Turn</code> to compare to.
+     * @return True if the Feature has an lastTurn turn smaller than the
+     *     given turn.
      */
     public boolean isOutOfDate(Turn turn) {
-        return (turn != null &&
-                (lastTurn != null && turn.getNumber() > lastTurn.getNumber()));
+        return turn != null && lastTurn != null
+            && turn.getNumber() > lastTurn.getNumber();
     }
 
     /**
@@ -343,136 +350,126 @@ public abstract class Feature extends FreeColObject {
     }
 
 
-    protected void copy(Feature other) {
-        setId(other.getId());
-        this.source = other.source;
-        this.firstTurn = other.firstTurn;
-        this.lastTurn = other.lastTurn;
-        this.duration = other.duration;
-        this.temporary = other.temporary;
-        setScopes(other.getScopes());
-    }
+    // Serialization
 
+    private static final String DURATION_TAG = "duration";
+    private static final String FIRST_TURN_TAG = "firstTurn";
+    private static final String LAST_TURN_TAG = "lastTurn";
+    private static final String SOURCE_TAG = "source";
+    private static final String TEMPORARY_TAG = "temporary";
 
     /**
-     * Write the attributes of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *     to the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
         if (getSource() != null) {
-            out.writeAttribute("source", getSource().getId());
+            writeAttribute(out, SOURCE_TAG, getSource());
         }
+
         if (getFirstTurn() != null) {
-            out.writeAttribute("firstTurn",
-                String.valueOf(getFirstTurn().getNumber()));
+            writeAttribute(out, FIRST_TURN_TAG, getFirstTurn().getNumber());
         }
+
         if (getLastTurn() != null) {
-            out.writeAttribute("lastTurn",
-                String.valueOf(getLastTurn().getNumber()));
+            writeAttribute(out, LAST_TURN_TAG, getLastTurn().getNumber());
         }
+
         if (duration != 0) {
-            out.writeAttribute("duration", Integer.toString(duration));
+            writeAttribute(out, DURATION_TAG, duration);
         }
+
         if (temporary) {
-            out.writeAttribute("temporary", "true");
+            writeAttribute(out, TEMPORARY_TAG, temporary);
         }
     }
 
     /**
-     * Write the children of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *     to the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
         super.writeChildren(out);
 
-        if (getScopes() != null) {
-            for (Scope scope : getScopes()) {
+        if (scopes != null) {
+            for (Scope scope : scopes) {
                 scope.toXMLImpl(out);
             }
         }
     }
 
     /**
-     * Reads the attributes of this object from an XML stream.
-     *
-     * @param in The XML input stream.
-     * @throws XMLStreamException if a problem was encountered
-     *     during parsing.
+     * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
+
+        final Specification spec = getSpecification();
+
+        String str = getAttribute(in, SOURCE_TAG, (String)null);
         // @compat 0.9.x
-        if (in.getAttributeValue(null, ID_ATTRIBUTE_TAG) == null
-            && "model.colony.colonyGoodsParty".equals(in.getAttributeValue(null, "source"))) {
+        if (!hasAttribute(in, ID_ATTRIBUTE_TAG)
+            && "model.colony.colonyGoodsParty".equals(str)) {
             setId("model.modifier.colonyGoodsParty");
-            setSource(getSpecification().getType("model.source.colonyGoodsParty"));
-        // end compatibility code
+            setSource(spec.getType("model.source.colonyGoodsParty"));
+        // @end compatibility code
         } else {
-            super.readAttributes(in);
-            String sourceId = in.getAttributeValue(null, "source");
-            if (sourceId == null) {
+            if (str == null) {
                 setSource(null);
-            } else if (sourceId.equals("model.monarch.colonyGoodsParty")) { // @compat 0.9.x
-                setSource(getSpecification().getType("model.source.colonyGoodsParty"));
-            // end compatibility code
-            } else if (getSpecification() != null) {
-                setSource(getSpecification().getType(sourceId));
+            // @compat 0.9.x
+            } else if ("model.monarch.colonyGoodsParty".equals(str)) {
+                setSource(spec.getType("model.source.colonyGoodsParty"));
+            // @end compatibility code
+            } else if (spec != null) {
+                setSource(spec.getType(str));
             }
         }
 
-        String firstTurn = in.getAttributeValue(null, "firstTurn");
-        if (firstTurn != null) {
-            setFirstTurn(new Turn(Integer.parseInt(firstTurn)));
+        int firstTurn = getAttribute(in, FIRST_TURN_TAG, UNDEFINED);
+        if (firstTurn != UNDEFINED) {
+            setFirstTurn(new Turn(firstTurn));
         }
 
-        String lastTurn = in.getAttributeValue(null, "lastTurn");
-        if (lastTurn != null) {
-            setLastTurn(new Turn(Integer.parseInt(lastTurn)));
+        int lastTurn = getAttribute(in, LAST_TURN_TAG, UNDEFINED);
+        if (lastTurn != UNDEFINED) {
+            setLastTurn(new Turn(lastTurn));
         }
 
-        duration = getAttribute(in, "duration", 0);
-        temporary = getAttribute(in, "temporary", false);
+        duration = getAttribute(in, DURATION_TAG, 0);
+
+        temporary = getAttribute(in, TEMPORARY_TAG, false);
     }
 
     /**
-     * Reads the children of this object from an XML stream.
-     *
-     * @param in The XML input stream.
-     * @throws XMLStreamException if a problem was encountered
-     *     during parsing.
+     * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in)
-        throws XMLStreamException {
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            String childName = in.getLocalName();
-            if (Scope.getXMLElementTagName().equals(childName)) {
-                Scope scope = new Scope(in);
-                if (getScopes() == null) {
-                    setScopes(new ArrayList<Scope>());
-                }
-                getScopes().add(scope);
-            } else {
-                logger.finest("Parsing of " + childName
-                    + " is not implemented yet");
-                while (in.nextTag() != XMLStreamConstants.END_ELEMENT ||
-                       !in.getLocalName().equals(childName)) {
-                    in.nextTag();
-                }
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        // Clear container
+        scopes = null;
+
+        super.readChildren(in);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+        final String tag = in.getLocalName();
+
+        if (Scope.getXMLElementTagName().equals(tag)) {
+            Scope scope = new Scope(in);
+            if (scope != null) {
+                if (scopes == null) scopes = new ArrayList<Scope>();
+                scopes.add(scope);
             }
+
+        } else {
+            super.readChild(in);
         }
     }
 }

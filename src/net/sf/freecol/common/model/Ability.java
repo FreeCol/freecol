@@ -307,7 +307,7 @@ public final class Ability extends Feature {
     protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
-        out.writeAttribute(VALUE_TAG, String.valueOf(value));
+        writeAttribute(out, VALUE_TAG, value);
     }
 
     /**

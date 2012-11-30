@@ -820,6 +820,20 @@ public abstract class FreeColObject {
     }
 
     /**
+     * Write an enum attribute to a stream.
+     *
+     * @param out The <code>XMLStreamWriter</code> to write to.
+     * @param attributeName The attribute name.
+     * @param value The <code>Enum</code> to write.
+     * @exception XMLStreamException if an error occurs
+     */
+    public void writeAttribute(XMLStreamWriter out, String attributeName,
+                               Enum<?> value) throws XMLStreamException {
+        out.writeAttribute(attributeName,
+                           value.toString().toLowerCase(Locale.US));
+    }
+
+    /**
      * Write an Object attribute to a stream.
      *
      * @param out The <code>XMLStreamWriter</code> to write to.
