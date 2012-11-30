@@ -32,10 +32,10 @@ import java.util.logging.Logger;
  * A container to hold abilities and modifiers for some FreeColObject-subclass.
  *
  * - FreeColGameObjectType, Europe, Player, Settlement are current implementors.
- * 
+ *
  * - Building delegates some functionality to its type.
  *
- * - Unit fakes it by constructing one on the fly.
+ * - Unit fakes it by constructing a FeatureContainer on the fly.
  *
  * - FreeColObject itself implements a null version.
  */
@@ -44,13 +44,25 @@ public class FeatureContainer {
     private static final Logger logger = Logger.getLogger(FeatureContainer.class.getName());
 
     /** The abilities in the container. */
-    private final Map<String, Set<Ability>> abilities
-        = new HashMap<String, Set<Ability>>();
+    private Map<String, Set<Ability>> abilities = null;
 
     /** The modifiers in the container. */
-    private final Map<String, Set<Modifier>> modifiers
-        = new HashMap<String, Set<Modifier>>();
+    private Map<String, Set<Modifier>> modifiers = null;
 
+
+    /**
+     * On demand creation of the abilities set.
+     */
+    private void requireAbilities() {
+        if (abilities == null) abilities = new HashMap<String, Set<Ability>>();
+    }
+
+    /**
+     * On demand creation of the modifiers set.
+     */
+    private void requireModifiers() {
+        if (modifiers == null) modifiers = new HashMap<String, Set<Modifier>>();
+    }
 
     /**
      * Is an ability present in this container?
@@ -64,9 +76,9 @@ public class FeatureContainer {
      */
     public static boolean hasAbility(FeatureContainer fc, String id,
                                      FreeColGameObjectType fcgot, Turn turn) {
-        if (fc == null) return false;
-        Set<Ability> abilitySet = fc.abilities.get(id);
-        if (abilitySet == null) return false;
+        Set<Ability> abilitySet;
+        if (fc == null || fc.abilities == null
+            || (abilitySet = fc.abilities.get(id)) == null) return false;
         boolean ret = false;
         for (Ability ability : abilitySet) {
             if (ability.appliesTo(fcgot, turn)) {
@@ -84,7 +96,7 @@ public class FeatureContainer {
      * @return True if the ability set is `satisfied'.
      */
     public static boolean hasAbility(Set<Ability> abilitySet) {
-        if (abilitySet.isEmpty()) return false;
+        if (abilitySet == null || abilitySet.isEmpty()) return false;
         for (Ability ability : abilitySet) {
             if (!ability.getValue()) return false;
         }
@@ -99,7 +111,8 @@ public class FeatureContainer {
      * @return True if the key is present.
      */
     public static boolean containsAbilityKey(FeatureContainer fc, String key) {
-        return (fc == null) ? false : fc.abilities.containsKey(key);
+        return (fc == null || fc.abilities == null) ? false
+            : fc.abilities.containsKey(key);
     }
 
     /**
@@ -110,7 +123,7 @@ public class FeatureContainer {
      */
     public static Set<Ability> getAbilities(FeatureContainer fc) {
         Set<Ability> result = new HashSet<Ability>();
-        if (fc != null) {
+        if (fc != null && fc.abilities != null) {
             for (Set<Ability> abilitySet : fc.abilities.values()) {
                 result.addAll(abilitySet);
             }
@@ -132,12 +145,11 @@ public class FeatureContainer {
                                              FreeColGameObjectType fcgot,
                                              Turn turn) {
         Set<Ability> result = new HashSet<Ability>();
-        if (fc != null) {
-            Set<Ability> abilitySet = fc.abilities.get(id);
-            if (abilitySet != null) {
-                for (Ability ability : abilitySet) {
-                    if (ability.appliesTo(fcgot, turn)) result.add(ability);
-                }
+        Set<Ability> abilitySet;
+        if (fc != null && fc.abilities != null
+            && (abilitySet = fc.abilities.get(id)) != null) {
+            for (Ability ability : abilitySet) {
+                if (ability.appliesTo(fcgot, turn)) result.add(ability);
             }
         }
         return result;
@@ -152,6 +164,7 @@ public class FeatureContainer {
      */
     public static boolean addAbility(FeatureContainer fc, Ability ability) {
         if (fc == null || ability == null) return false;
+        fc.requireAbilities();
         Set<Ability> abilitySet = fc.abilities.get(ability.getId());
         if (abilitySet == null) {
             abilitySet = new HashSet<Ability>();
@@ -168,7 +181,7 @@ public class FeatureContainer {
      * @return The ability removed.
      */
     public static Ability removeAbility(FeatureContainer fc, Ability ability) {
-        if (fc == null || ability == null) return null;
+        if (fc == null || fc.abilities == null || ability == null) return null;
         Set<Ability> abilitySet = fc.abilities.get(ability.getId());
         return (abilitySet == null || !abilitySet.remove(ability)) ? null
             : ability;
@@ -181,7 +194,7 @@ public class FeatureContainer {
      * @param id The id of the abilities to remove.
      */
     public static void removeAbilities(FeatureContainer fc, String id) {
-        if (fc != null) fc.abilities.remove(id);
+        if (fc != null && fc.abilities != null) fc.abilities.remove(id);
     }
 
 
@@ -193,7 +206,8 @@ public class FeatureContainer {
      * @return True if the key is present.
      */
     public static boolean containsModifierKey(FeatureContainer fc, String key) {
-        return (fc == null) ? false : fc.modifiers.containsKey(key);
+        return (fc == null || fc.modifiers == null) ? false
+            : fc.modifiers.containsKey(key);
     }
 
     /**
@@ -204,7 +218,7 @@ public class FeatureContainer {
      */
     public static Set<Modifier> getModifiers(FeatureContainer fc) {
         Set<Modifier> result = new HashSet<Modifier>();
-        if (fc != null) {
+        if (fc != null && fc.modifiers != null) {
             for (Set<Modifier> modifierSet : fc.modifiers.values()) {
                 result.addAll(modifierSet);
             }
@@ -225,7 +239,7 @@ public class FeatureContainer {
     public static Set<Modifier> getModifierSet(FeatureContainer fc, String id,
                                                FreeColGameObjectType fcgot,
                                                Turn turn) {
-        return (fc == null) ? new HashSet<Modifier>()
+        return (fc == null || fc.modifiers == null) ? new HashSet<Modifier>()
             : fc.getModifierSet(id, fcgot, turn);
     }
 
@@ -242,8 +256,8 @@ public class FeatureContainer {
                                         FreeColGameObjectType fcgot,
                                         Turn turn) {
         Set<Modifier> result = new HashSet<Modifier>();
-        Set<Modifier> modifierSet = modifiers.get(id);
-        if (modifierSet != null) {
+        Set<Modifier> modifierSet;
+        if (modifiers != null && (modifierSet = modifiers.get(id)) != null) {
             if (fcgot == null) {
                 result.addAll(modifierSet);
             } else {
@@ -269,7 +283,7 @@ public class FeatureContainer {
     public static float applyModifier(FeatureContainer fc,
                                       float number, String id,
                                       FreeColGameObjectType fcgot, Turn turn) {
-        return (fc == null) ? number
+        return (fc == null || fc.modifiers == null) ? number
             : fc.applyModifier(number, id, fcgot, turn);
     }
 
@@ -309,11 +323,8 @@ public class FeatureContainer {
         float result = number;
         for (Modifier modifier : modifiers) {
             float value = modifier.getValue(turn);
-            if (value == Modifier.UNKNOWN) {
-                return value;
-            } else {
-                result = modifier.apply(result, value);
-            }
+            if (value == Modifier.UNKNOWN) return value;
+            result = modifier.apply(result, value);
         }
         return result;
     }
@@ -333,9 +344,7 @@ public class FeatureContainer {
         float additive = 0, percentage = 0, multiplicative = 1;
         for (Modifier modifier : modifiers) {
             float value = modifier.getValue(turn);
-            if (value == Modifier.UNKNOWN) {
-                return Modifier.UNKNOWN;
-            }
+            if (value == Modifier.UNKNOWN) return Modifier.UNKNOWN;
             switch (modifier.getType()) {
             case ADDITIVE:
                 additive += value;
@@ -367,6 +376,7 @@ public class FeatureContainer {
     public static boolean addModifier(FeatureContainer fc,
                                       Modifier modifier) {
         if (fc == null || modifier == null) return false;
+        fc.requireModifiers();
         Set<Modifier> modifierSet = fc.modifiers.get(modifier.getId());
         if (modifierSet == null) {
             modifierSet = new HashSet<Modifier>();
@@ -384,7 +394,7 @@ public class FeatureContainer {
      */
     public static Modifier removeModifier(FeatureContainer fc,
                                           Modifier modifier) {
-        if (fc == null || modifier == null) return null;
+        if (fc == null || fc.modifiers == null || modifier == null) return null;
         Set<Modifier> modifierSet = fc.modifiers.get(modifier.getId());
         return (modifierSet == null || !modifierSet.remove(modifier)) ? null
             : modifier;
@@ -397,7 +407,7 @@ public class FeatureContainer {
      * @param id The Id of the modifiers to remove.
      */
     public static void removeModifiers(FeatureContainer fc, String id) {
-        if (fc != null) fc.modifiers.remove(id);
+        if (fc != null && fc.modifiers != null) fc.modifiers.remove(id);
     }
 
 
@@ -409,7 +419,9 @@ public class FeatureContainer {
      */
     public static void addFeatures(FeatureContainer fc, FreeColObject fco) {
         FeatureContainer c = fco.getFeatureContainer();
-        if (fc != null && c != null) {
+        if (fc == null || c == null) return;
+        if (c.abilities != null) {
+            fc.requireAbilities();
             for (Entry<String, Set<Ability>> entry : c.abilities.entrySet()) {
                 Set<Ability> abilitySet = fc.abilities.get(entry.getKey());
                 if (abilitySet == null) {
@@ -419,6 +431,9 @@ public class FeatureContainer {
                     abilitySet.addAll(entry.getValue());
                 }
             }
+        }
+        if (c.modifiers != null) {
+            fc.requireModifiers();
             for (Entry<String, Set<Modifier>> entry : c.modifiers.entrySet()) {
                 Set<Modifier> modifierSet = fc.modifiers.get(entry.getKey());
                 if (modifierSet == null) {
@@ -440,13 +455,16 @@ public class FeatureContainer {
      */
     public static void removeFeatures(FeatureContainer fc, FreeColObject fco) {
         FeatureContainer c = fco.getFeatureContainer();
-        if (fc != null && c != null) {
+        if (fc == null || c == null) return;
+        if (c.abilities != null && fc.abilities != null) {
             for (Entry<String, Set<Ability>> entry : c.abilities.entrySet()) {
                 Set<Ability> abilitySet = fc.abilities.get(entry.getKey());
                 if (abilitySet != null) {
                     abilitySet.removeAll(entry.getValue());
                 }
             }
+        }
+        if (c.modifiers != null && fc.modifiers != null) {
             for (Entry<String, Set<Modifier>> entry : c.modifiers.entrySet()) {
                 Set<Modifier> modifierSet = fc.modifiers.get(entry.getKey());
                 if (modifierSet != null) {
@@ -492,19 +510,29 @@ public class FeatureContainer {
     }
 
     /**
-     * Debug helper.
+     * {@inheritDoc}
      */
+    @Override
     public String toString() {
         StringBuilder result = new StringBuilder();
-        result.append("[FeatureContainer [abilities");
-        for (Ability ability : getAbilities(this)) {
-            result.append(" " + ability.toString());
+        result.append("[FeatureContainer");
+        if (abilities != null) {
+            result.append("[abilities");
+            for (Ability ability : getAbilities(this)) {
+                result.append(" ");
+                result.append(ability.toString());
+            }
+            result.append("]");
         }
-        result.append("][modifiers");
-        for (Modifier modifier : getModifiers(this)) {
-            result.append(" " + modifier.toString());
+        if (modifiers != null) {
+            result.append("[modifiers");
+            for (Modifier modifier : getModifiers(this)) {
+                result.append(" ");
+                result.append(modifier.toString());
+            }
+            result.append("]");
         }
-        result.append("]]");
+        result.append("]");
         return result.toString();
     }
 }
