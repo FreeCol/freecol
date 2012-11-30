@@ -26,184 +26,80 @@ import java.util.Arrays;
 
 /**
  * Just pass the name of a Colonization map file (with extension ".MP").
+ *
+ * The map file starts with a six-byte header. Byte zero encodes the
+ * map width, byte two encodes the map height. The function of the
+ * other bytes is unknown, their values, however, are fixed. The
+ * header is followed by three "layers", each the size of the map. The
+ * first "layer" encodes the terrain type. The function of the other
+ * layers is unknown. They are filled with zero bytes.
+ *
+ * It seems that the least significant three bits encode the basic
+ * terrain type, the next two bits encode the forest overlay and
+ * the special tile types ice, ocean and sea lanes. The three most
+ * significant bits encode combinations of the hill, mountain and
+ * river overlays.
+ *
+ * bits 0-2: tile type
+ * bit 3 (8): forest
+ * bit 4 (16): forest
+ * bits 3+4 (24): special, values larger than 26 are not defined
+ *
+ * bits 5-7: overlays
+ * 0: nothing
+ * 1: hill
+ * 2: minor river
+ * 3: hill + minor river (extremely rare)
+ * 4: nothing
+ * 5: mountain
+ * 6: major river
+ * 7: mountain + major river (never seen)
+ *
+ *
  */
 public class ColonizationMapReader {
 
     public static final int WIDTH = 0;
     public static final int HEIGHT = 2;
 
-    private static final char[] tiletypes = new char[256];
+    private static final char[] tiletypes = new char[] {
+        't', // tundra
+        'd', // desert
+        'p', // plains
+        'r', // prairie
+        'g', // grassland
+        'v', // savannah
+        'm', // marsh
+        's', // swamp
 
-    /**
-     * It seems that the least significant three bits encodes the
-     * terrain type, and the more significant bits encodes overlays
-     * such as forests, hills, mountains and rivers. Ice, oceans and
-     * sea lanes seem to be handled differently.
-     *
-     * bits 0-2: tile type
-     * bit 3 (8): forest
-     * bit 4 (16): mountain
-     * bits 3+4 (24): special (since forest + mountain is not supported)
-     * bit 5 (32): hill
-     * bit 6 (64): minor river
-     * bit 7 (128): unknown
-     * bits 6+7 (192): major river
-     */
-    static {
-        Arrays.fill(tiletypes, '?');
-        tiletypes[0]  = 't'; // tundra
-        tiletypes[1]  = 'd'; // desert
-        tiletypes[2]  = 'p'; // plains
-        tiletypes[3]  = 'r'; // prairie
-        tiletypes[4]  = 'g'; // grassland
-        tiletypes[5]  = 'v'; // savannah
-        tiletypes[6]  = 'm'; // marsh
-        tiletypes[7]  = 's'; // swamp
+        'B', // boreal (tundra with forest)
+        'S', // scrub (desert with forest)
+        'M', // mixed (plains with forest)
+        'L', // broadleaf (prairie with forest)
+        'C', // conifer (grassland with forest)
+        'T', // tropical (savannah with forest)
+        'W', // wetland (marsh with forest)
+        'R', // rain (swamp with forest)
 
-        tiletypes[8]  = 'T'; // boreal (tundra with forest)
-        tiletypes[9]  = 'D'; // scrub (desert with forest)
-        tiletypes[10] = 'P'; // mixed (plains with forest)
-        tiletypes[11] = 'R'; // broadleaf (prairie with forest)
-        tiletypes[12] = 'G'; // conifer (grassland with forest)
-        tiletypes[13] = 'V'; // tropical (savannah with forest)
-        tiletypes[14] = 'M'; // wetland (marsh with forest)
-        tiletypes[15] = 'S'; // rain (swamp with forest)
+        'B', // boreal (tundra with forest)
+        'S', // scrub (desert with forest)
+        'M', // mixed (plains with forest)
+        'L', // broadleaf (prairie with forest)
+        'C', // conifer (grassland with forest)
+        'T', // tropical (savannah with forest)
+        'W', // wetland (marsh with forest)
+        'R', // rain (swamp with forest)
 
-        tiletypes[16] = '*'; // tundra with mountain
-        tiletypes[17] = '*'; // desert with mountain
-        tiletypes[18] = '*'; // plains with mountain
-        tiletypes[19] = '*'; // prairie with mountain
-        tiletypes[20] = '*'; // grassland with mountain
-        tiletypes[21] = '*'; // savannah with mountain
-        tiletypes[22] = '*'; // marsh with mountain
-        tiletypes[23] = '*'; // swamp with mountain
+        '_', // ice
+        '.', // ocean
+        ':', // sea lane
+        '?', // undefined
+        '?', // undefined
+        '?', // undefined
+        '?', // undefined
+        '?', // undefined
+    };
 
-        tiletypes[24] = '_'; // ice
-        tiletypes[25] = '.'; // ocean
-        tiletypes[26] = ':'; // sea lane
-
-        tiletypes[32] = '^'; // tundra with hill
-        tiletypes[33] = '^'; // desert with hill
-        tiletypes[34] = '^'; // plains with hill
-        tiletypes[35] = '^'; // prairie with hill
-        tiletypes[36] = '^'; // grassland with hill
-        tiletypes[37] = '^'; // savannah with hill
-        tiletypes[38] = '^'; // marsh with hill
-        tiletypes[39] = '^'; // swamp with hill
-
-        tiletypes[40] = '^'; // tundra with hill
-        tiletypes[41] = '^'; // desert with hill
-        tiletypes[42] = '^'; // plains with hill
-        tiletypes[43] = '^'; // prairie with hill
-        tiletypes[44] = '^'; // grassland with hill
-        tiletypes[45] = '^'; // savannah with hill
-        tiletypes[46] = '^'; // marsh with hill
-        tiletypes[47] = '^'; // swamp with hill
-
-        tiletypes[48] = '^'; // tundra with hill
-        tiletypes[49] = '^'; // desert with hill
-        tiletypes[50] = '^'; // plains with hill
-        tiletypes[51] = '^'; // prairie with hill
-        tiletypes[52] = '^'; // grassland with hill
-        tiletypes[53] = '^'; // savannah with hill
-        tiletypes[54] = '^'; // marsh with hill
-        tiletypes[55] = '^'; // swamp with hill
-
-        tiletypes[64] = '~'; // tundra with minor river
-        tiletypes[65] = '~'; // desert with minor river
-        tiletypes[66] = '~'; // plains with minor river
-        tiletypes[67] = '~'; // prairie with minor river
-        tiletypes[68] = '~'; // grassland with minor river
-        tiletypes[69] = '~'; // savannah with minor river
-        tiletypes[70] = '~'; // marsh with minor river
-        tiletypes[71] = '~'; // swamp with minor river
-
-        tiletypes[72] = '~'; // boreal forest with minor river
-        tiletypes[73] = '~'; // scrub forest with minor river
-        tiletypes[74] = '~'; // mixed forest with minor river
-        tiletypes[75] = '~'; // broadleaf forest with minor river
-        tiletypes[76] = '~'; // conifer forest with minor river
-        tiletypes[77] = '~'; // tropical forest with minor river
-        tiletypes[78] = '~'; // wetland forest with minor river
-        tiletypes[79] = '~'; // rain forest with minor river
-
-        tiletypes[80] = '~'; // boreal forest with minor river
-        tiletypes[81] = '~'; // scrub forest with minor river
-        tiletypes[82] = '~'; // mixed forest with minor river
-        tiletypes[83] = '~'; // broadleaf forest with minor river
-        tiletypes[84] = '~'; // conifer forest with minor river
-        tiletypes[85] = '~'; // tropical forest with minor river
-        tiletypes[86] = '~'; // wetland forest with minor river
-        tiletypes[87] = '~'; // rain forest with minor river
-
-        tiletypes[89] = '~'; // ocean with minor river
-
-        tiletypes[112]  = 'x'; // tundra with hill and minor river
-        tiletypes[113]  = 'x'; // desert with hill and minor river
-        tiletypes[114]  = 'x'; // plains with hill and minor river
-        tiletypes[115]  = 'x'; // prairie with hill and minor river
-        tiletypes[116]  = 'x'; // grassland with hill and minor river
-        tiletypes[117]  = 'x'; // savannah with hill and minor river
-        tiletypes[118]  = 'x'; // marsh with hill and minor river
-        tiletypes[119]  = 'x'; // swamp with hill and minor river
-
-        tiletypes[160] = '*'; // tundra with mountain
-        tiletypes[161] = '*'; // desert with mountain
-        tiletypes[162] = '*'; // plains with mountain
-        tiletypes[163] = '*'; // prairie with mountain
-        tiletypes[164] = '*'; // grassland with mountain
-        tiletypes[165] = '*'; // savannah with mountain
-        tiletypes[166] = '*'; // marsh with mountain
-        tiletypes[167] = '*'; // swamp with mountain
-
-        tiletypes[168] = '*'; // tundra with mountain
-        tiletypes[169] = '*'; // desert with mountain
-        tiletypes[170] = '*'; // plains with mountain
-        tiletypes[171] = '*'; // prairie with mountain
-        tiletypes[172] = '*'; // grassland with mountain
-        tiletypes[173] = '*'; // savannah with mountain
-        tiletypes[174] = '*'; // marsh with mountain
-        tiletypes[175] = '*'; // swamp with mountain
-
-        tiletypes[176] = '*'; // tundra with mountain
-        tiletypes[177] = '*'; // desert with mountain
-        tiletypes[178] = '*'; // plains with mountain
-        tiletypes[179] = '*'; // prairie with mountain
-        tiletypes[180] = '*'; // grassland with mountain
-        tiletypes[181] = '*'; // savannah with mountain
-        tiletypes[182] = '*'; // marsh with mountain
-        tiletypes[183] = '*'; // swamp with mountain
-
-        tiletypes[192] = '='; // tundra with major river
-        tiletypes[193] = '='; // desert with major river
-        tiletypes[194] = '='; // plains with major river
-        tiletypes[195] = '='; // prairie with major river
-        tiletypes[196] = '='; // grassland with major river
-        tiletypes[197] = '='; // savannah with major river
-        tiletypes[198] = '='; // marsh with major river
-        tiletypes[199] = '='; // swamp with major river
-
-        tiletypes[200] = '='; // boreal forest with major river
-        tiletypes[201] = '='; // scrub forest with major river
-        tiletypes[202] = '='; // mixed forest with major river
-        tiletypes[203] = '='; // broadleaf forest with major river
-        tiletypes[204] = '='; // conifer forest with major river
-        tiletypes[205] = '='; // tropical forest with major river
-        tiletypes[206] = '='; // wetland forest with major river
-        tiletypes[207] = '='; // rain forest with major river
-
-        tiletypes[208] = '='; // boreal forest with major river
-        tiletypes[209] = '='; // scrub forest with major river
-        tiletypes[210] = '='; // mixed forest with major river
-        tiletypes[211] = '='; // broadleaf forest with major river
-        tiletypes[212] = '='; // conifer forest with major river
-        tiletypes[213] = '='; // tropical forest with major river
-        tiletypes[214] = '='; // wetland forest with major river
-        tiletypes[215] = '='; // rain forest with major river
-
-        tiletypes[217] = '='; // ocean with major river
-
-    }
 
     private static final byte[] header = new byte[] {
         58, 0, 72, 0, 4, 0
@@ -222,16 +118,22 @@ public class ColonizationMapReader {
                 layer1[i] = header[i];
             }
             Arrays.fill(layer1, header.length, header.length + width * height, (byte) 25); // fill with ocean
+            int ROWS = 32;
+            int COLUMNS = 8;
             int offset = header.length + width + 1;
-            for (int x = 0; x < 16; x++) {
-                for (int y = 0; y < 16; y++) {
-                    layer1[offset + y] = (byte) (16 * x + y);
+            for (int y = 0; y < ROWS; y++) {
+                for (int x = 0; x < COLUMNS; x++) {
+                    byte value = (byte) (COLUMNS * y + x);
+                    if ((value & 24) == 24 && x > 2) {
+                        // undefined
+                        value = 26;
+                    }
+                    layer1[offset + x] = value;
                 }
                 offset += width;
             }
             writer.write(layer1);
         } else {
-            StringBuilder unknown = new StringBuilder();
             RandomAccessFile reader = new RandomAccessFile(args[0], "r");
             reader.read(header);
 
@@ -246,17 +148,27 @@ public class ColonizationMapReader {
             for (int y = 0; y < header[HEIGHT]; y++) {
                 for (int x = 0; x < header[WIDTH]; x++) {
                     int decimal = layer1[index] & 0xff;
-                    char terrain = tiletypes[decimal];
+                    char terrain = tiletypes[decimal & 31];
+                    int overlay = decimal >> 5;
+                    switch(overlay) {
+                    case 1: terrain = '^'; // hill
+                        break;
+                    case 2: terrain = '~'; // minor river
+                        break;
+                    case 3: terrain = 'x'; // hill + minor river
+                        break;
+                    case 5: terrain = '*'; // mountain
+                        break;
+                    case 6: terrain = '='; // major river
+                        break;
+                    case 7: terrain = 'X'; // mountain + major river
+                    };
                     System.out.print(terrain);
-                    if (terrain == '?') {
-                        unknown.append(x + ", " + y + ": " + decimal + "\n");
-                    }
                     index++;
                 }
                 System.out.println("\n");
             }
             System.out.println("\n");
-            System.out.println(unknown.toString());
         }
     }
 
