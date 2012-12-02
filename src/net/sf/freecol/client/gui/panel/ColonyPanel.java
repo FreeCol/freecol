@@ -632,11 +632,11 @@ public final class ColonyPanel extends PortPanel
         } else {
             BuildableType buildable = getColony().getCurrentlyBuilding();
             if (buildable != null
-                && buildable.getPopulationRequired() > getColony().getUnitCount()
+                && buildable.getRequiredPopulation() > getColony().getUnitCount()
                 && !getGUI().showConfirmDialog(null,
                     StringTemplate.template("colonyPanel.reducePopulation")
                         .addName("%colony%", getColony().getName())
-                        .addAmount("%number%", buildable.getPopulationRequired())
+                        .addAmount("%number%", buildable.getRequiredPopulation())
                         .add("%buildable%", buildable.getNameKey()),
                     "ok", "cancel")) {
                 return;

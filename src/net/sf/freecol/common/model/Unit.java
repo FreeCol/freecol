@@ -2393,7 +2393,7 @@ public class Unit extends GoodsLocation
      *         <code>EquipmentType</code> at the current location.
      */
     public boolean canBeEquippedWith(EquipmentType equipmentType) {
-        for (Entry<String, Boolean> entry : equipmentType.getUnitAbilitiesRequired().entrySet()) {
+        for (Entry<String, Boolean> entry : equipmentType.getRequiredAbilities().entrySet()) {
             if (hasAbility(entry.getKey()) != entry.getValue()) {
                 return false;
             }
@@ -2751,12 +2751,12 @@ public class Unit extends GoodsLocation
         for (java.util.Map.Entry<EquipmentType, Integer> entry : equipment.getValues().entrySet()) {
             EquipmentType type = entry.getKey();
             int amount = entry.getValue().intValue();
-            if (type.getGoodsRequired().isEmpty()) {
+            if (!type.needsGoodsToBuild()) {
                 result.addStringTemplate(StringTemplate.template("model.goods.goodsAmount")
                     .add("%goods%", type.getNameKey())
                     .addName("%amount%", Integer.toString(amount)));
             } else {
-                for (AbstractGoods goods : type.getGoodsRequired()) {
+                for (AbstractGoods goods : type.getRequiredGoods()) {
                     result.addStringTemplate(StringTemplate.template("model.goods.goodsAmount")
                         .add("%goods%", goods.getType().getNameKey())
                         .addName("%amount%", Integer.toString(amount * goods.getAmount())));
@@ -3437,8 +3437,8 @@ public class Unit extends GoodsLocation
                 }
 
                 boolean hasReqGoods = true;
-                for(AbstractGoods goods : equipment.getGoodsRequired()){
-                    if(settlement.getGoodsCount(goods.getType()) < goods.getAmount()){
+                for (AbstractGoods ag : equipment.getRequiredGoods()) {
+                    if (settlement.getGoodsCount(ag.getType()) < ag.getAmount()){
                         hasReqGoods = false;
                         break;
                     }

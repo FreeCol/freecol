@@ -277,11 +277,12 @@ public class ServerColonyTest extends FreeColTestCase {
         assertTrue("Colony should be building lumber mill",
                    colony.getCurrentlyBuilding() == lumberMillType);
         // add sufficient goods to build lumber mill
-        for (AbstractGoods reqGoods : lumberMillType.getGoodsRequired()) {
-            GoodsType type = reqGoods.getType();
-            int amount = reqGoods.getAmount() + 1;
+        for (AbstractGoods ag : lumberMillType.getRequiredGoods()) {
+            GoodsType type = ag.getType();
+            int amount = ag.getAmount() + 1;
             colony.addGoods(type, amount);
-            assertEquals("Wrong quantity of " + type, amount, colony.getGoodsCount(type));
+            assertEquals("Wrong quantity of " + type, amount,
+                         colony.getGoodsCount(type));
         }
 
         // test

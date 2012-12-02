@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -41,6 +42,7 @@ import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.Modifier;
@@ -187,9 +189,10 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
         }
 
         // Requires - prerequisites to build
-        if (!type.getAbilitiesRequired().isEmpty()) {
+        Map<String, Boolean> abilities = type.getRequiredAbilities();
+        if (!abilities.isEmpty()) {
             panel.add(localizedLabel("colopedia.unit.requirements"), "newline, top");
-            String key = type.getAbilitiesRequired().keySet().iterator().next();
+            String key = abilities.keySet().iterator().next();
             try {
                 JTextPane textPane = getDefaultTextPane();
                 StyledDocument doc = textPane.getStyledDocument();
@@ -219,15 +222,16 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
             panel.add(productionPanel, "span");
         }
 
-        if (!type.getGoodsRequired().isEmpty()) {
+        if (type.needsGoodsToBuild()) {
             panel.add(localizedLabel("colopedia.unit.goodsRequired"),
                             "newline 20");
-            AbstractGoods goods = type.getGoodsRequired().get(0);
-            if (type.getGoodsRequired().size() > 1) {
+            List<AbstractGoods> required = type.getRequiredGoods();
+            AbstractGoods goods = required.get(0);
+            if (required.size() > 1) {
                 panel.add(getGoodsButton(goods.getType(), goods.getAmount()),
-                                "span, split " + type.getGoodsRequired().size());
-                for (int index = 1; index < type.getGoodsRequired().size(); index++) {
-                    goods = type.getGoodsRequired().get(index);
+                                "span, split " + required.size());
+                for (int index = 1; index < required.size(); index++) {
+                    goods = required.get(index);
                     panel.add(getGoodsButton(goods.getType(), goods.getAmount()));
                 }
             } else {

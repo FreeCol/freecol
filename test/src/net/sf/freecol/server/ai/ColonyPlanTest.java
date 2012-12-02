@@ -222,7 +222,7 @@ public class ColonyPlanTest extends FreeColTestCase {
         ColonyPlan plan = new ColonyPlan(aiMain, colony);
         plan.update();
         colony.addGoods(hammersType,
-            blacksmithShopType.getAmountRequiredOf(hammersType));
+            blacksmithShopType.getRequiredAmountOf(hammersType));
         colony.setCurrentlyBuilding(blacksmithShopType);
         plan.refine(blacksmithShopType);
 
@@ -261,7 +261,7 @@ public class ColonyPlanTest extends FreeColTestCase {
         // with a tools requirement.
         plan.update();
         colony.addGoods(hammersType,
-            blacksmithShopType.getAmountRequiredOf(hammersType));
+            blacksmithShopType.getRequiredAmountOf(hammersType));
         colony.setCurrentlyBuilding(blacksmithShopType);
         plan.refine(blacksmithShopType);
 

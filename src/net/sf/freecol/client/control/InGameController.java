@@ -1999,10 +1999,9 @@ public final class InGameController implements NetworkConstants {
         if (!requireOurTurn() || amount == 0) return;
 
         Player player = freeColClient.getMyPlayer();
-        List<AbstractGoods> requiredGoods = type.getGoodsRequired();
         Colony colony = null;
         if (unit.isInEurope()) {
-            for (AbstractGoods goods : requiredGoods) {
+            for (AbstractGoods goods : type.getRequiredGoods()) {
                 GoodsType goodsType = goods.getType();
                 if (!player.canTrade(goodsType) && !payArrears(goodsType)) {
                     return; // payment failed for some reason

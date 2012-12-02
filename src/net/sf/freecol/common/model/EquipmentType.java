@@ -154,15 +154,6 @@ public class EquipmentType extends BuildableType {
     }
 
     /**
-     * Returns the abilities required by this Type.
-     *
-     * @return the abilities required by this Type.
-     */
-    public Map<String, Boolean> getUnitAbilitiesRequired() {
-        return getAbilitiesRequired();
-    }
-
-    /**
      * Returns true if this type of equipment is compatible with the
      * given type of equipment.
      *
@@ -321,7 +312,7 @@ public class EquipmentType extends BuildableType {
             if (modifier.getId().equals(Modifier.OFFENCE) ||
                 modifier.getId().equals(Modifier.DEFENCE)) {
                 militaryEquipment = true;
-                for (AbstractGoods goods : getGoodsRequired()) {
+                for (AbstractGoods goods : getRequiredGoods()) {
                     goods.getType().setMilitaryGoods(true);
                 }
                 break;
@@ -341,8 +332,9 @@ public class EquipmentType extends BuildableType {
         if ("required-location-ability".equals(nodeName)) {
             // @compat 0.10.0
             String abilityId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-            boolean value = getAttribute(in, VALUE_TAG, true);
-            getAbilitiesRequired().put(abilityId, value);
+            Map<String, Boolean> required = getRequiredAbilities();
+            required.put(abilityId, getAttribute(in, VALUE_TAG, true));
+            setRequiredAbilities(required);
             getSpecification().addAbility(abilityId);
             in.nextTag(); // close this element
             // end compatibility code

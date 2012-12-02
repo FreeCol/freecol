@@ -482,8 +482,8 @@ public final class QuickActionMenu extends JPopupMenu {
             if (count > 0) {
                 // "remove current equipment" action
                 JMenuItem newItem = new JMenuItem(Messages.message(equipmentType.getId() + ".remove"));
-                if (!equipmentType.getGoodsRequired().isEmpty()) {
-                    GoodsType goodsType = equipmentType.getGoodsRequired().get(0).getType();
+                if (equipmentType.needsGoodsToBuild()) {
+                    GoodsType goodsType = equipmentType.getRequiredGoods().get(0).getType();
                     newItem.setIcon(imageLibrary.getScaledGoodsImageIcon(goodsType, 0.66f));
                 }
                 final int items = count;
@@ -500,17 +500,17 @@ public final class QuickActionMenu extends JPopupMenu {
                 // "add new equipment" action
                 JMenuItem newItem = null;
                 count = equipmentType.getMaximumCount() - count;
-                if (equipmentType.getGoodsRequired().isEmpty()) {
+                if (!equipmentType.needsGoodsToBuild()) {
                     newItem = new JMenuItem();
                     newItem.setText(Messages.message(equipmentType.getId() + ".add"));
                 } else if (tempUnit.isInEurope() &&
                            tempUnit.getOwner().getEurope().canBuildEquipment(equipmentType)) {
                     int price = 0;
                     newItem = new JMenuItem();
-                    for (AbstractGoods goodsRequired : equipmentType.getGoodsRequired()) {
-                        price += tempUnit.getOwner().getMarket().getBidPrice(goodsRequired.getType(),
-                                                                             goodsRequired.getAmount());
-                        newItem.setIcon(imageLibrary.getScaledGoodsImageIcon(goodsRequired.getType(), 0.66f));
+                    for (AbstractGoods ag : equipmentType.getRequiredGoods()) {
+                        price += tempUnit.getOwner().getMarket().getBidPrice(ag.getType(),
+                                                                             ag.getAmount());
+                        newItem.setIcon(imageLibrary.getScaledGoodsImageIcon(ag.getType(), 0.66f));
                     }
                     while (!tempUnit.getOwner().checkGold(count * price)) {
                         count--;
@@ -522,13 +522,13 @@ public final class QuickActionMenu extends JPopupMenu {
                 } else if (tempUnit.getColony() != null &&
                            tempUnit.getColony().canBuildEquipment(equipmentType)) {
                     newItem = new JMenuItem();
-                    for (AbstractGoods goodsRequired : equipmentType.getGoodsRequired()) {
-                        int present = tempUnit.getColony().getGoodsCount(goodsRequired.getType()) /
-                            goodsRequired.getAmount();
+                    for (AbstractGoods ag : equipmentType.getRequiredGoods()) {
+                        int present = tempUnit.getColony()
+                            .getGoodsCount(ag.getType()) / ag.getAmount();
                         if (present < count) {
                             count = present;
                         }
-                        newItem.setIcon(imageLibrary.getScaledGoodsImageIcon(goodsRequired.getType(), 0.66f));
+                        newItem.setIcon(imageLibrary.getScaledGoodsImageIcon(ag.getType(), 0.66f));
                     }
                     newItem.setText(Messages.message(equipmentType.getId() + ".add"));
                 }

@@ -824,11 +824,11 @@ public class IndianSettlement extends Settlement {
             if (type == spec.getGoodsType("model.goods.muskets")) {
                 for (Unit u : ownedUnits) if (!u.isArmed()) need++;
                 toArm = spec.getEquipmentType("model.equipment.indian.muskets")
-                    .getAmountRequiredOf(type);
+                    .getRequiredAmountOf(type);
             } else if (type == spec.getGoodsType("model.goods.horses")) {
                 for (Unit u : ownedUnits) if (!u.isMounted()) need++;
                 toArm = spec.getEquipmentType("model.equipment.indian.horses")
-                    .getAmountRequiredOf(type);
+                    .getRequiredAmountOf(type);
             }
             return need * toArm;
         }

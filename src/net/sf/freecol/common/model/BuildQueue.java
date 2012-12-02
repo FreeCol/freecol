@@ -154,7 +154,7 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
      */
     public boolean consumes(GoodsType goodsType) {
         return getCurrentlyBuilding() != null
-            && getCurrentlyBuilding().getAmountRequiredOf(goodsType) > 0;
+            && getCurrentlyBuilding().getRequiredAmountOf(goodsType) > 0;
     }
 
     /**
@@ -164,11 +164,8 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
      */
     public List<AbstractGoods> getConsumedGoods() {
         T current = getCurrentlyBuilding();
-        if (current == null) {
-            return new ArrayList<AbstractGoods>();
-        } else {
-            return current.getGoodsRequired();
-        }
+        return (current == null) ? new ArrayList<AbstractGoods>()
+            : current.getRequiredGoods();
     }
 
     /**
@@ -186,15 +183,15 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
             boolean overflow = colony.getSpecification()
                 .getBoolean(GameOptions.SAVE_PRODUCTION_OVERFLOW);
             List<AbstractGoods> consumption = new ArrayList<AbstractGoods>();
-            for (AbstractGoods required : current.getGoodsRequired()) {
+            for (AbstractGoods ag : current.getRequiredGoods()) {
                 boolean satisfied = false;
                 for (AbstractGoods available : input) {
-                    if (required.getType() == available.getType()
-                        && required.getAmount() <= available.getAmount()) {
-                        int amount = (overflow || required.getType().isStorable())
-                            ? required.getAmount()
+                    if (ag.getType() == available.getType()
+                        && ag.getAmount() <= available.getAmount()) {
+                        int amount = (overflow || ag.getType().isStorable())
+                            ? ag.getAmount()
                             : available.getAmount();
-                        consumption.add(new AbstractGoods(required.getType(), amount));
+                        consumption.add(new AbstractGoods(ag.getType(), amount));
                         satisfied = true;
                         break;
                     }

@@ -149,9 +149,9 @@ public class BuildingDetailPanel extends ColopediaGameObjectTypePanel<BuildingTy
                 doc.insertString(doc.getLength(), " ", doc.getStyle("button"));
                 doc.insertString(doc.getLength(), "\n", doc.getStyle("regular"));
             }
-            if (buildingType.getPopulationRequired() > 0) {
+            if (buildingType.getRequiredPopulation() > 0) {
                 StringTemplate template = StringTemplate.template("colonist")
-                    .addAmount("%number%", buildingType.getPopulationRequired());
+                    .addAmount("%number%", buildingType.getRequiredPopulation());
                 doc.insertString(doc.getLength(),
                                  Messages.message(template) + "\n",
                                  doc.getStyle("regular"));
@@ -166,16 +166,17 @@ public class BuildingDetailPanel extends ColopediaGameObjectTypePanel<BuildingTy
 
         // Costs to build - Hammers & Tools
         panel.add(localizedLabel("colopedia.buildings.cost"));
-        if (buildingType.getGoodsRequired().isEmpty()) {
+        if (!buildingType.needsGoodsToBuild()) {
             panel.add(localizedLabel("colopedia.buildings.autoBuilt"), "span");
         } else {
-            AbstractGoods goodsRequired = buildingType.getGoodsRequired().get(0);
-            if (buildingType.getGoodsRequired().size() > 1) {
+            List<AbstractGoods> required = buildingType.getRequiredGoods(); 
+            AbstractGoods goodsRequired = required.get(0);
+            if (required.size() > 1) {
                 panel.add(getGoodsButton(goodsRequired.getType(), goodsRequired.getAmount()),
-                                "span, split " + buildingType.getGoodsRequired().size());
+                                "span, split " + required.size());
 
-                for (int index = 1; index < buildingType.getGoodsRequired().size(); index++) {
-                    goodsRequired = buildingType.getGoodsRequired().get(index);
+                for (int index = 1; index < required.size(); index++) {
+                    goodsRequired = required.get(index);
                     panel.add(getGoodsButton(goodsRequired.getType(), goodsRequired.getAmount()));
                 }
             } else {

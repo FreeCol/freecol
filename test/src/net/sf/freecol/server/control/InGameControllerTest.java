@@ -936,7 +936,7 @@ public class InGameControllerTest extends FreeColTestCase {
                         .getFoundingFather("model.foundingFather.paulRevere"));
         java.util.Map<GoodsType,Integer> goodsAdded
             = new HashMap<GoodsType,Integer>();
-        for (AbstractGoods goods : muskets.getGoodsRequired()) {
+        for (AbstractGoods goods : muskets.getRequiredGoods()) {
             colony.addGoods(goods);
             goodsAdded.put(goods.getType(), goods.getAmount());
         }
@@ -953,7 +953,7 @@ public class InGameControllerTest extends FreeColTestCase {
                     colonist.isDisposed());
         assertFalse("Colonist should not be captured",
                     colonist.getOwner() == attacker.getOwner());
-        for (AbstractGoods goods : muskets.getGoodsRequired()) {
+        for (AbstractGoods goods : muskets.getRequiredGoods()) {
             boolean goodsLost = colony.getGoodsCount(goods.getType())
                 < goodsAdded.get(goods.getType());
             assertTrue("Colony should have lost " + goods.getType().toString(),
@@ -1708,9 +1708,9 @@ public class InGameControllerTest extends FreeColTestCase {
             = new FreeColTestCase.IndianSettlementBuilder(game);
         IndianSettlement camp = builder.build();
         ServerPlayer indian = (ServerPlayer) camp.getOwner();
-        int horsesReqPerUnit = indianHorses.getAmountRequiredOf(horsesType);
-        int musketsReqPerUnit = indianMuskets.getAmountRequiredOf(musketType);
-        int toolsReqPerUnit = tools.getAmountRequiredOf(toolsType);
+        int horsesReqPerUnit = indianHorses.getRequiredAmountOf(horsesType);
+        int musketsReqPerUnit = indianMuskets.getRequiredAmountOf(musketType);
+        int toolsReqPerUnit = tools.getRequiredAmountOf(toolsType);
 
         // Setup
         camp.addGoods(horsesType,horsesReqPerUnit);
@@ -1761,8 +1761,8 @@ public class InGameControllerTest extends FreeColTestCase {
         IndianSettlement camp = builder.build();
         ServerPlayer indian = (ServerPlayer) camp.getOwner();
 
-        int horsesAvail = indianHorses.getAmountRequiredOf(horsesType) / 2;
-        int musketsAvail = indianMuskets.getAmountRequiredOf(musketType) / 2;
+        int horsesAvail = indianHorses.getRequiredAmountOf(horsesType) / 2;
+        int musketsAvail = indianMuskets.getRequiredAmountOf(musketType) / 2;
 
         // Setup
         camp.addGoods(horsesType,horsesAvail);
@@ -1892,18 +1892,21 @@ public class InGameControllerTest extends FreeColTestCase {
         Player player = colony.getOwner();
         assertEquals(2, colony.getUnitCount());
 
-        // the colony has no stockade initially
-        Building b = colony.getBuilding(stockadeType);
-        assertNull(b);
+        // The colony has no stockade initially
+        assertNull("Colony should have no stockade",
+            colony.getBuilding(stockadeType));
+        assertEquals("Population of 3 to required to build stockade", 3,
+            stockadeType.getRequiredPopulation());
 
-        // adding LaSalle should have no effect when population is 2
+        // Adding LaSalle should have no effect when population is 2
         FoundingFather father
             = spec().getFoundingFather("model.foundingFather.laSalle");
         assertEquals("model.building.stockade",
                      father.getEvents().get(0).getValue());
         igc.addFoundingFather((ServerPlayer) player, father);
         ServerTestHelper.newTurn();
-        assertNull(colony.getBuilding(stockadeType));
+        assertNull("Colony still should have no stockade", 
+            colony.getBuilding(stockadeType));
 
         // increasing population to 3 should give access to stockade
         Unit unit = new ServerUnit(getGame(), colony.getTile(), player,
@@ -1913,7 +1916,8 @@ public class InGameControllerTest extends FreeColTestCase {
         unit.setLocation(colony.getBuildingsForProducing(bellsType).get(0));
         ServerTestHelper.newTurn();
 
-        assertNotNull(colony.getBuilding(stockadeType));
+        assertNotNull("Colony should now have a stockade",
+            colony.getBuilding(stockadeType));
     }
 
     public void testBuildingBonus() {

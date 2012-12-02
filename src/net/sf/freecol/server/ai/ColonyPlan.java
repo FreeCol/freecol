@@ -364,16 +364,15 @@ public class ColonyPlan {
      */
     public List<AbstractGoods> getRequiredGoods(BuildableType buildable) {
         List<AbstractGoods> required = new ArrayList<AbstractGoods>();
-        if (buildable != null && buildable.getGoodsRequired() != null) {
-            for (AbstractGoods ag : buildable.getGoodsRequired()) {
-                int amount = ag.getAmount();
-                GoodsType type = ag.getType();
-                while (type != null) {
-                    if (amount <= colony.getGoodsCount(type)) break; // Shortcut
-                    required.add(0, new AbstractGoods(type,
-                            amount - colony.getGoodsCount(type)));
-                    type = type.getRawMaterial();
-                }
+        if (buildable == null) return required;
+        for (AbstractGoods ag : buildable.getRequiredGoods()) {
+            int amount = ag.getAmount();
+            GoodsType type = ag.getType();
+            while (type != null) {
+                if (amount <= colony.getGoodsCount(type)) break; // Shortcut
+                required.add(0, new AbstractGoods(type,
+                        amount - colony.getGoodsCount(type)));
+                type = type.getRawMaterial();
             }
         }
         return required;
@@ -884,7 +883,7 @@ public class ColonyPlan {
         // Weight by lower required goods.
         for (BuildPlan bp : buildPlans) {
             double difficulty = 0.0f;
-            for (AbstractGoods ag : bp.type.getGoodsRequired()) {
+            for (AbstractGoods ag : bp.type.getRequiredGoods()) {
                 GoodsType g = ag.getType();
                 int need = ag.getAmount() - colony.getGoodsCount(g);
                 if (need > 0) {
@@ -1347,7 +1346,7 @@ public class ColonyPlan {
         // Greedy assignment of other workers to plans.
         List<AbstractGoods> buildGoods = new ArrayList<AbstractGoods>();
         BuildableType build = colony.getCurrentlyBuilding();
-        if (build != null) buildGoods.addAll(build.getGoodsRequired());
+        if (build != null) buildGoods.addAll(build.getRequiredGoods());
         List<WorkLocationPlan> wlps;
         WorkLocationPlan wlp;
         boolean done = false;

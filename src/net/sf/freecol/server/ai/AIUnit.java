@@ -395,7 +395,7 @@ public class AIUnit extends AIObject implements Transportable {
             }
             // Check that this should succeed before querying server.
             if (europe != null) {
-                for (AbstractGoods ag : e.getGoodsRequired()) {
+                for (AbstractGoods ag : e.getRequiredGoods()) {
                     if (player.getMarket().getArrears(ag.getType()) > 0) {
                         continue eq; // Boycott prevents purchase.
                     }

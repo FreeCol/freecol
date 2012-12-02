@@ -386,16 +386,16 @@ public final class InfoPanel extends FreeColPanel {
                     }
                 } else {
                     for (EquipmentType equipment : unit.getEquipment().keySet()) {
-                        for (AbstractGoods goods : equipment.getGoodsRequired()) {
-                            int amount = goods.getAmount() * unit.getEquipment().getCount(equipment);
+                        for (AbstractGoods ag : equipment.getRequiredGoods()) {
+                            int amount = ag.getAmount() * unit.getEquipment().getCount(equipment);
                             JLabel equipmentLabel =
                                 new JLabel(Integer.toString(amount),
-                                           getLibrary().getScaledGoodsImageIcon(goods.getType(), 0.66f),
+                                           getLibrary().getScaledGoodsImageIcon(ag.getType(), 0.66f),
                                            JLabel.CENTER);
                             equipmentLabel
                                 .setToolTipText(Messages.message(StringTemplate.template("model.goods.goodsAmount")
                                                                  .addAmount("%amount%", amount)
-                                                                 .add("%goods%", goods.getNameKey())));
+                                                                 .add("%goods%", ag.getNameKey())));
                             add(equipmentLabel);
                         }
                     }

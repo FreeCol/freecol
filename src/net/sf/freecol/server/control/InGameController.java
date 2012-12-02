@@ -3300,7 +3300,7 @@ public final class InGameController extends Controller {
         boolean tileDirty = false;
         if (unit.isInEurope()) {
             // Refuse to trade in boycotted goods
-            for (AbstractGoods goods : type.getGoodsRequired()) {
+            for (AbstractGoods goods : type.getRequiredGoods()) {
                 GoodsType goodsType = goods.getType();
                 if (!serverPlayer.canTrade(goodsType)) {
                     return DOMMessage.clientError("No equip of " + type.getId()
@@ -3325,7 +3325,7 @@ public final class InGameController extends Controller {
         // Process adding equipment first, so as to settle what has to
         // be removed.
         if (amount > 0) {
-            for (AbstractGoods goods : type.getGoodsRequired()) {
+            for (AbstractGoods goods : type.getRequiredGoods()) {
                 GoodsType goodsType = goods.getType();
                 int n = amount * goods.getAmount();
                 if (unit.isInEurope()) {

@@ -537,7 +537,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 }
             }
             for (EquipmentType e : spec.getEquipmentTypeList()) {
-                for (AbstractGoods ag : e.getGoodsRequired()) {
+                for (AbstractGoods ag : e.getRequiredGoods()) {
                     if (fullExport.contains(ag.getType())) {
                         fullExport.remove(ag.getType());
                         partExport.add(ag.getType());
@@ -1143,7 +1143,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         // Add building materials.
         if (colony.getCurrentlyBuilding() != null) {
             for (AbstractGoods ag : colony.getCurrentlyBuilding()
-                     .getGoodsRequired()) {
+                     .getRequiredGoods()) {
                 if (colony.getAdjustedNetProductionOf(ag.getType()) <= 0) {
                     required.incrementCount(ag.getType(), ag.getAmount());
                 }
@@ -1152,8 +1152,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
         // Add materials required to improve tiles.
         for (TileImprovementPlan plan : tileImprovementPlans) {
-            for (AbstractGoods ag : plan.getType().getExpendedEquipmentType()
-                     .getGoodsRequired()) {
+            for (AbstractGoods ag : plan.getType()
+                     .getExpendedEquipmentType().getRequiredGoods()) {
                 required.incrementCount(ag.getType(), ag.getAmount());
             }
         }
@@ -1188,7 +1188,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 if (!type.isMilitaryEquipment()) continue;
                 for (Unit unit : colony.getTile().getUnitList()) {
                     if (!unit.canBeEquippedWith(type)) continue;
-                    for (AbstractGoods ag : type.getGoodsRequired()) {
+                    for (AbstractGoods ag : type.getRequiredGoods()) {
                         required.incrementCount(ag.getType(), ag.getAmount());
                     }
                     break;

@@ -344,8 +344,9 @@ public final class DefaultTransferHandler extends TransferHandler {
         if (unit.hasAbility(Ability.CAN_BE_EQUIPPED)) {
             for (EquipmentType equipment : freeColClient.getGame().getSpecification()
                      .getEquipmentTypeList()) {
-                if (unit.canBeEquippedWith(equipment) && equipment.getGoodsRequired().size() == 1) {
-                    AbstractGoods requiredGoods = equipment.getGoodsRequired().get(0);
+                if (unit.canBeEquippedWith(equipment)
+                    && equipment.getRequiredGoods().size() == 1) {
+                    AbstractGoods requiredGoods = equipment.getRequiredGoods().get(0);
                     if (requiredGoods.getType().equals(goods.getType())
                         && requiredGoods.getAmount() <= goods.getAmount()) {
                         int amount = Math.min(goods.getAmount() / requiredGoods.getAmount(),

@@ -300,7 +300,6 @@ public final class BuildingType extends BuildableType
             upgradesFrom.upgradesTo = this;
             level = upgradesFrom.level + 1;
         }
-        setPopulationRequired(getAttribute(in, "required-population", parent.getPopulationRequired()));
 
         workPlaces = getAttribute(in, "workplaces", parent.workPlaces);
         basicProduction = getAttribute(in, "basicProduction", parent.basicProduction);
@@ -320,6 +319,10 @@ public final class BuildingType extends BuildableType
         upkeep = getAttribute(in, "upkeep", parent.upkeep);
 
         if (parent != this) {
+            if (!hasAttribute(in, "required-population")) {
+                setRequiredPopulation(getAttribute(in, "required-population",
+                        parent.getRequiredPopulation()));
+            }
             addFeatures(parent);
             if (parent.isAbstractType()) {
                 getFeatureContainer().replaceSource(parent, this);

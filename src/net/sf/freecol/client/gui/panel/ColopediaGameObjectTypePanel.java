@@ -261,7 +261,8 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
 
     public void appendRequiredAbilities(StyledDocument doc, BuildableType buildableType)
         throws BadLocationException {
-        for (Entry<String, Boolean> entry : buildableType.getAbilitiesRequired().entrySet()) {
+        for (Entry<String, Boolean> entry
+                 : buildableType.getRequiredAbilities().entrySet()) {
             doc.insertString(doc.getLength(),
                              Messages.message(entry.getKey() + ".name"),
                              doc.getStyle("regular"));

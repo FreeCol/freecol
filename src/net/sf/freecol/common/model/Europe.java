@@ -161,10 +161,11 @@ public class Europe extends UnitLocation implements Ownable, Named {
      * @return a <code>boolean</code> value
      */
     public boolean canBuildEquipment(EquipmentType equipmentType) {
-        for (AbstractGoods requiredGoods : equipmentType.getGoodsRequired()) {
-            GoodsType goodsType = requiredGoods.getType();
+        Market market = getOwner().getMarket();
+        for (AbstractGoods ag : equipmentType.getRequiredGoods()) {
+            GoodsType goodsType = ag.getType();
             if (!(getOwner().canTrade(goodsType)
-                  && getOwner().checkGold(getOwner().getMarket().getBidPrice(goodsType, requiredGoods.getAmount())))) {
+                  && getOwner().checkGold(market.getBidPrice(goodsType, ag.getAmount())))) {
                 return false;
             }
         }

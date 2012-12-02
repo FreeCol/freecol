@@ -507,23 +507,6 @@ public final class UnitType extends BuildableType
     }
 
     /**
-     * Returns true if the UnitType is available to the given
-     * Player.
-     *
-     * @param player a <code>Player</code> value
-     * @return a <code>boolean</code> value
-     */
-    public boolean isAvailableTo(Player player) {
-        java.util.Map<String, Boolean> requiredAbilities = getAbilitiesRequired();
-        for (Entry<String, Boolean> entry : requiredAbilities.entrySet()) {
-            if (player.hasAbility(entry.getKey()) != entry.getValue()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
      * Describe <code>getUnitTypeChange</code> method here.
      *
      * @param changeType an <code>UnitTypeChange.Type</code> value
@@ -673,16 +656,6 @@ public final class UnitType extends BuildableType
      */
     public boolean hasSkill() {
         return skill != UNDEFINED;
-    }
-
-
-    /**
-     * Returns true if this UnitType can be built.
-     *
-     * @return a <code>boolean</code> value
-     */
-    public boolean canBeBuilt() {
-        return getGoodsRequired().isEmpty() == false;
     }
 
 
@@ -869,15 +842,16 @@ public final class UnitType extends BuildableType
             parent.recruitProbability);
         skill = getAttribute(in, "skill", parent.skill);
 
-        setPopulationRequired(getAttribute(in, "population-required",
-                parent.getPopulationRequired()));
-
         price = getAttribute(in, "price", parent.price);
 
         expertProduction = getSpecification().getType(in, "expert-production",
             GoodsType.class, parent.expertProduction);
 
         if (parent != this) {
+            if (!hasAttribute(in, "population-required")) {
+                setRequiredPopulation(getAttribute(in, "population-required",
+                        parent.getRequiredPopulation()));
+            }
             typeChanges.addAll(parent.typeChanges);
             defaultEquipment = parent.defaultEquipment;
             consumption.putAll(parent.consumption);

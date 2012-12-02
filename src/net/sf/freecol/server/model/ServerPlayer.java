@@ -2546,7 +2546,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 // to give the capturing unit a go-home-with-plunder mission.
                 IndianSettlement settlement = winner.getIndianSettlement();
                 if (settlement != null) {
-                    for (AbstractGoods goods : equip.getGoodsRequired()) {
+                    for (AbstractGoods goods : equip.getRequiredGoods()) {
                         settlement.addGoods(goods);
                         logger.finest("CHEAT teleporting " + goods.toString()
                                       + " back to " + settlement.getName());
@@ -3080,7 +3080,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         // Autoequipment is not actually with the unit, it is stored
         // in the settlement of the unit.  Remove it from there.
-        for (AbstractGoods goods : equip.getGoodsRequired()) {
+        for (AbstractGoods goods : equip.getRequiredGoods()) {
             settlement.removeGoods(goods);
         }
 

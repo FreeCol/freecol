@@ -298,7 +298,7 @@ public class CombatTest extends FreeColTestCase {
 
         dutch.addFather(spec().getFoundingFather("model.foundingFather.paulRevere"));
         for (EquipmentType equipment : dragoonEquipment) {
-            for (AbstractGoods goods : equipment.getGoodsRequired()) {
+            for (AbstractGoods goods : equipment.getRequiredGoods()) {
                 colony.addGoods(goods);
             }
         }
@@ -338,7 +338,7 @@ public class CombatTest extends FreeColTestCase {
         Unit attacker = new ServerUnit(game, tile2, dutch, colonistType, horses, muskets);
 
         for (EquipmentType equipment : dragoonEquipment) {
-            for (AbstractGoods goods : equipment.getGoodsRequired()) {
+            for (AbstractGoods goods : equipment.getRequiredGoods()) {
                 settlement.addGoods(goods);
             }
         }

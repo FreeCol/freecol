@@ -128,11 +128,11 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
             add(new JLabel(Messages.message(StringTemplate.template("turnsToComplete.long")
                                             .addName("%number%", turnsStr))));
 
-            for (AbstractGoods requiredGoods : buildable.getGoodsRequired()) {
-                int amountNeeded = requiredGoods.getAmount();
-                int amountAvailable = colony.getGoodsCount(requiredGoods.getType());
-                int amountProduced = colony.getAdjustedNetProductionOf(requiredGoods.getType());
-                add(new FreeColProgressBar(gui, requiredGoods.getType(), 0,
+            for (AbstractGoods ag : buildable.getRequiredGoods()) {
+                int amountNeeded = ag.getAmount();
+                int amountAvailable = colony.getGoodsCount(ag.getType());
+                int amountProduced = colony.getAdjustedNetProductionOf(ag.getType());
+                add(new FreeColProgressBar(gui, ag.getType(), 0,
                                            amountNeeded, amountAvailable, amountProduced),
                     "height 20:");
             }

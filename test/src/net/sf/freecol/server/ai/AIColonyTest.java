@@ -106,7 +106,7 @@ public class AIColonyTest extends FreeColTestCase {
         Colony colony = aiColony.getColony();
         for (BuildableType b : aiColony.getColonyPlan().getBuildableTypes()) {
             if (colony.canBuild(b)
-                && b.getAmountRequiredOf(toolsType) > 0) return b;
+                && b.getRequiredAmountOf(toolsType) > 0) return b;
             if (b instanceof BuildingType) {
                 colony.addBuilding(new ServerBuilding(colony.getGame(), colony,
                         (BuildingType)b));
@@ -154,7 +154,7 @@ public class AIColonyTest extends FreeColTestCase {
         // Simulate that enough hammers have been gathered, re-arrange
         // and re-check.
         colony.addGoods(hammersType,
-            lumberMillType.getAmountRequiredOf(hammersType));
+            lumberMillType.getRequiredAmountOf(hammersType));
         aiColony.propertyChange(null); // force rearranging workers
         aiColony.rearrangeWorkers();
 
@@ -266,7 +266,7 @@ public class AIColonyTest extends FreeColTestCase {
         // Simulate that enough hammers have been gathered, re-arrange
         // and re-check
         colony.addGoods(hammersType,
-            lumberMillType.getAmountRequiredOf(hammersType));
+            lumberMillType.getRequiredAmountOf(hammersType));
         aiColony.propertyChange(null); // force rearranging workers
         aiColony.rearrangeWorkers();
 

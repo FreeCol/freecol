@@ -62,8 +62,8 @@ public class StandardAIPlayerTest extends FreeColTestCase {
         game.setCurrentPlayer(camp.getOwner());
 
         int bravesToEquip = camp.getUnitCount();
-        int horsesReqPerUnit = indianHorsesEqType.getAmountRequiredOf(horsesType);
-        int musketsReqPerUnit = indianMusketsEqType.getAmountRequiredOf(musketsType);
+        int horsesReqPerUnit = indianHorsesEqType.getRequiredAmountOf(horsesType);
+        int musketsReqPerUnit = indianMusketsEqType.getRequiredAmountOf(musketsType);
         int totalHorsesReq = bravesToEquip * horsesReqPerUnit;
         int totalMusketsReq = bravesToEquip * musketsReqPerUnit;
         int totalHorsesAvail = totalHorsesReq*2;
@@ -118,8 +118,8 @@ public class StandardAIPlayerTest extends FreeColTestCase {
         game.setCurrentPlayer(camp.getOwner());
 
         int bravesToEquip = camp.getUnitCount() - 1;
-        int horsesReqPerUnit = indianHorsesEqType.getAmountRequiredOf(horsesType);
-        int musketsReqPerUnit = indianMusketsEqType.getAmountRequiredOf(musketsType);
+        int horsesReqPerUnit = indianHorsesEqType.getRequiredAmountOf(horsesType);
+        int musketsReqPerUnit = indianMusketsEqType.getRequiredAmountOf(musketsType);
         int totalHorsesAvail = bravesToEquip * horsesReqPerUnit
             + horsesType.getBreedingNumber();
         int totalMusketsAvail = bravesToEquip * musketsReqPerUnit;

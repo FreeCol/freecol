@@ -183,10 +183,11 @@ public class Role extends BuildableType {
     public List<AbstractGoods> getDowngradeGoods() {
         List<AbstractGoods> result = new ArrayList<AbstractGoods>();
         if (downgrade != null) {
-            for (AbstractGoods goods : getGoodsRequired()) {
-                int amount = goods.getAmount() - downgrade.getAmountRequiredOf(goods.getType());
+            for (AbstractGoods ag : getRequiredGoods()) {
+                int amount = ag.getAmount()
+                    - downgrade.getRequiredAmountOf(ag.getType());
                 if (amount > 0) {
-                    result.add(new AbstractGoods(goods.getType(), amount));
+                    result.add(new AbstractGoods(ag.getType(), amount));
                 }
             }
         }

@@ -1086,7 +1086,7 @@ public final class ImageLibrary {
             nativeEthnicity = false;
         }
         else for (Entry<String, Boolean> entry
-                      : unitType.getAbilitiesRequired().entrySet()) {
+                      : unitType.getRequiredAbilities().entrySet()) {
             if (entry.getKey().equals("model.ability.native")
                 && entry.getValue() == true) {
                 nativeEthnicity = false;

@@ -979,9 +979,9 @@ public class ServerUnit extends Unit implements ServerModelObject {
         ServerPlayer serverPlayer = (ServerPlayer) getOwner();
         for (EquipmentType e : remove) {
             int a = (amount > 0) ? amount : getEquipmentCount(e);
-            for (AbstractGoods goods : e.getGoodsRequired()) {
-                GoodsType goodsType = goods.getType();
-                int n = goods.getAmount() * a;
+            for (AbstractGoods ag : e.getRequiredGoods()) {
+                GoodsType goodsType = ag.getType();
+                int n = ag.getAmount() * a;
                 if (isInEurope()) {
                     if (serverPlayer.canTrade(goodsType,
                                               Market.Access.EUROPE)) {

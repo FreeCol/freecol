@@ -365,7 +365,7 @@ public class Colony extends Settlement implements Nameable {
     @Override
     public boolean canProvideEquipment(EquipmentType equipmentType) {
         BuildableType buildable = getCurrentlyBuilding();
-        for (AbstractGoods goods : equipmentType.getGoodsRequired()) {
+        for (AbstractGoods goods : equipmentType.getRequiredGoods()) {
             int available = getGoodsCount(goods.getType());
 
             int breedingNumber = goods.getType().getBreedingNumber();
@@ -374,7 +374,7 @@ public class Colony extends Settlement implements Nameable {
             }
 
             if (buildable != null) {
-                for (AbstractGoods ag : buildable.getGoodsRequired()) {
+                for (AbstractGoods ag : buildable.getRequiredGoods()) {
                     if (ag.getType() == goods.getType()) {
                         available -= ag.getAmount();
                         break;
@@ -394,7 +394,7 @@ public class Colony extends Settlement implements Nameable {
      * @param n The number of pieces of equipment (may be negative).
      */
     public void addEquipmentGoods(EquipmentType type, int n) {
-        for (AbstractGoods ag : type.getGoodsRequired()) {
+        for (AbstractGoods ag : type.getRequiredGoods()) {
             if (ag.getType().isStorable()) {
                 addGoods(ag.getType(), n * ag.getAmount());
             }
@@ -1191,7 +1191,7 @@ public class Colony extends Settlement implements Nameable {
         ArrayList<UnitType> buildableUnits = new ArrayList<UnitType>();
         List<UnitType> unitTypes = getSpecification().getUnitTypeList();
         for (UnitType unitType : unitTypes) {
-            if (unitType.getGoodsRequired().isEmpty() == false && canBuild(unitType)) {
+            if (unitType.needsGoodsToBuild() && canBuild(unitType)) {
                 buildableUnits.add(unitType);
             }
         }
@@ -1247,17 +1247,15 @@ public class Colony extends Settlement implements Nameable {
         boolean productionMissing = false;
 
         ProductionInfo info = productionCache.getProductionInfo(buildQueue);
-        for (AbstractGoods requiredGoods : buildable.getGoodsRequired()) {
-            int amountNeeded = requiredGoods.getAmount();
-            int amountAvailable = getGoodsCount(requiredGoods.getType());
-            if (amountAvailable >= amountNeeded) {
-                continue;
-            }
+        for (AbstractGoods ag : buildable.getRequiredGoods()) {
+            int amountNeeded = ag.getAmount();
+            int amountAvailable = getGoodsCount(ag.getType());
+            if (amountAvailable >= amountNeeded) continue;
             goodsMissing = true;
-            int amountProduced = productionCache.getNetProductionOf(requiredGoods.getType());
+            int amountProduced = productionCache.getNetProductionOf(ag.getType());
             if (info != null) {
                 for (AbstractGoods consumed : info.getConsumption()) {
-                    if (consumed.getType() == requiredGoods.getType()) {
+                    if (consumed.getType() == ag.getType()) {
                         // add the amount the build queue itself will consume
                         amountProduced += consumed.getAmount();
                         break;
@@ -1267,8 +1265,8 @@ public class Colony extends Settlement implements Nameable {
             if (amountProduced <= 0) {
                 productionMissing = true;
                 if (needed != null) {
-                    needed.setType(requiredGoods.getType());
-                    needed.setAmount(requiredGoods.getAmount());
+                    needed.setType(ag.getType());
+                    needed.setAmount(ag.getAmount());
                 }
                 continue;
             }
@@ -1712,14 +1710,13 @@ public class Colony extends Settlement implements Nameable {
     public NoBuildReason getNoBuildReason(BuildableType buildableType) {
         if (buildableType == null) {
             return NoBuildReason.NOT_BUILDING;
-        } else if (buildableType.getGoodsRequired().isEmpty()) {
+        } else if (!buildableType.needsGoodsToBuild()) {
             return NoBuildReason.NOT_BUILDABLE;
-        } else if (buildableType.getPopulationRequired() > getUnitCount()) {
+        } else if (buildableType.getRequiredPopulation() > getUnitCount()) {
             return NoBuildReason.POPULATION_TOO_SMALL;
         } else {
-            java.util.Map<String, Boolean> requiredAbilities
-                = buildableType.getAbilitiesRequired();
-            for (Entry<String, Boolean> entry : requiredAbilities.entrySet()) {
+            for (Entry<String, Boolean> entry
+                     : buildableType.getRequiredAbilities().entrySet()) {
                 if (hasAbility(entry.getKey()) != entry.getValue()) {
                     return NoBuildReason.MISSING_ABILITY;
                 }
@@ -1813,7 +1810,7 @@ public class Colony extends Settlement implements Nameable {
      */
     public HashMap<GoodsType, Integer> getGoodsForBuilding(BuildableType type) {
         HashMap<GoodsType, Integer> result = new HashMap<GoodsType, Integer>();
-        for (AbstractGoods goods : type.getGoodsRequired()) {
+        for (AbstractGoods goods : type.getRequiredGoods()) {
             GoodsType goodsType = goods.getType();
             int remaining = goods.getAmount() - getGoodsCount(goodsType);
             if (remaining > 0) {
@@ -1882,7 +1879,7 @@ public class Colony extends Settlement implements Nameable {
 
         BuildableType currentlyBuilding = getCurrentlyBuilding();
         if (currentlyBuilding != null) {
-            for (AbstractGoods goods : currentlyBuilding.getGoodsRequired()) {
+            for (AbstractGoods goods : currentlyBuilding.getRequiredGoods()) {
                 if (goods.getType().equals(goodsType) && amount < goods.getAmount()) {
                     result.add(StringTemplate.template("model.colony.buildableNeedsGoods")
                                .addName("%colony%", getName())
@@ -2874,7 +2871,7 @@ public class Colony extends Settlement implements Nameable {
         if (populationQueue.isEmpty()) {
             for (UnitType unitType : getSpecification().getUnitTypesWithAbility(Ability.BORN_IN_COLONY)) {
                 GoodsType food = getSpecification().getGoodsType("model.goods.food");
-                List<AbstractGoods> required = unitType.getGoodsRequired();
+                List<AbstractGoods> required = unitType.getRequiredGoods();
                 boolean found = false;
                 for (AbstractGoods goods : required) {
                     if (goods.getType() == food) {
@@ -2884,7 +2881,7 @@ public class Colony extends Settlement implements Nameable {
                 }
                 if (!found) {
                     required.add(new AbstractGoods(food, FOOD_PER_COLONIST));
-                    unitType.setGoodsRequired(required);
+                    unitType.setRequiredGoods(required);
                 }
                 populationQueue.add(unitType);
             }

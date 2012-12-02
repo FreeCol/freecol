@@ -449,10 +449,8 @@ abstract public class Settlement extends GoodsLocation
      * @return True if the equipment can be built.
      */
     public boolean canBuildEquipment(EquipmentType equipmentType) {
-        for (AbstractGoods requiredGoods : equipmentType.getGoodsRequired()) {
-            if (getGoodsCount(requiredGoods.getType()) < requiredGoods.getAmount()) {
-                return false;
-            }
+        for (AbstractGoods ag : equipmentType.getRequiredGoods()) {
+            if (getGoodsCount(ag.getType()) < ag.getAmount()) return false;
         }
         return true;
     }
@@ -467,15 +465,14 @@ abstract public class Settlement extends GoodsLocation
      * @see Settlement#canBuildEquipment(EquipmentType equipmentType)
      */
     public boolean canProvideEquipment(EquipmentType equipmentType) {
-        for (AbstractGoods goods : equipmentType.getGoodsRequired()) {
-            int available = getGoodsCount(goods.getType());
+        for (AbstractGoods ag : equipmentType.getRequiredGoods()) {
+            int available = getGoodsCount(ag.getType());
 
-            int breedingNumber = goods.getType().getBreedingNumber();
+            int breedingNumber = ag.getType().getBreedingNumber();
             if (breedingNumber != GoodsType.INFINITY) {
                 available -= breedingNumber;
             }
-
-            if (available < goods.getAmount()) return false;
+            if (available < ag.getAmount()) return false;
         }
         return true;
     }
