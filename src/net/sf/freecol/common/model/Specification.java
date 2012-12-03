@@ -57,11 +57,6 @@ import net.sf.freecol.common.option.UnitListOption;
  */
 public final class Specification {
 
-    /**
-     * XML attribute tag to denote attribute preservation.
-     */
-    private static final String PRESERVE_ATTRIBUTES_TAG = "preserveAttributes";
-
     public static final FreeColGameObjectType MOVEMENT_PENALTY_SOURCE =
         new FreeColGameObjectType("model.source.movementPenalty");
     public static final FreeColGameObjectType ARTILLERY_PENALTY_SOURCE =
@@ -418,14 +413,15 @@ public final class Specification {
                 } else {
                     T object = getType(xsr.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG), type);
                     // If this an existing object (with id) and the
-                    // PRESERVE_ATTRIBUTES tag is present, then leave
-                    // the attributes intact and only read the child
+                    // PRESERVE tag is present, then leave the
+                    // attributes intact and only read the child
                     // elements, otherwise do a full attribute
                     // inclusive read.  This allows mods and spec
                     // extensions to not have to re-specify all the
-                    // attributes when just changing the children.            
+                    // attributes when just changing the children.
                     if (object.getId() != null
-                        && xsr.getAttributeValue(null, PRESERVE_ATTRIBUTES_TAG) != null) {
+                        && FreeColObject.hasAttribute(xsr,
+                            FreeColGameObjectType.PRESERVE_TAG)) {
                         object.readChildren(xsr);
                     } else {
                         object.readFromXML(xsr);

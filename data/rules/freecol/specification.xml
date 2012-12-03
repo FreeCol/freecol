@@ -25,7 +25,7 @@
 <freecol-specification id="freecol" extends="classic">
 
   <building-types>
-    <building-type id="model.building.stockade" preserveAttributes="true">
+    <building-type id="model.building.stockade" preserve="true">
       <modifier id="model.modifier.minimumColonySize" delete="true" />
       <modifier id="model.modifier.minimumColonySize" type="additive" value="0"/>
     </building-type>

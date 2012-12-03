@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- XSD for specification version 0.72
+<!-- XSD for specification version 0.73
      CHANGELOG:
      0.26: add capture-equipment
      0.27: add limits
@@ -48,6 +48,7 @@
      0.70: add disasters, and duration to features
      0.71: exportData is a FreeColObject, should use id attribute, not ID
      0.72: allow preserveAttributes attribute to aid spec fragment authors
+     0.73: generalize preserveAttributes to preserve
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 
@@ -95,7 +96,7 @@
         <xs:element maxOccurs="1" ref="market"/>
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:ID"/>
-      <xs:attribute name="preserveAttributes" use="optional" type="xs:boolean"/>
+      <xs:attribute name="preserve" use="optional" type="xs:boolean"/>
       <xs:attribute name="is-farmed" type="xs:boolean"/>
       <xs:attribute name="ignore-limit" type="xs:boolean"/>
       <xs:attribute name="is-food" type="xs:boolean"/>
@@ -132,7 +133,7 @@
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="modifier"/>
       </xs:sequence>
       <xs:attribute name="id" use="required" type="xs:ID"/>
-      <xs:attribute name="preserveAttributes" use="optional" type="xs:boolean"/>
+      <xs:attribute name="preserve" use="optional" type="xs:boolean"/>
       <xs:attribute name="minimum-value" type="xs:nonNegativeInteger"/>
       <xs:attribute name="maximum-value" type="xs:nonNegativeInteger"/>
     </xs:complexType>
@@ -166,7 +167,7 @@
         </xs:element>
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:ID"/>
-      <xs:attribute name="preserveAttributes" use="optional" type="xs:boolean"/>
+      <xs:attribute name="preserve" use="optional" type="xs:boolean"/>
       <xs:attribute name="basic-move-cost" use="required" type="xs:nonNegativeInteger"/>
       <xs:attribute name="basic-work-turns" use="required" type="xs:nonNegativeInteger"/>
       <xs:attribute name="is-forest" type="xs:boolean"/>
@@ -243,7 +244,7 @@
         <xs:element ref="required-goods"/>
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:ID"/>
-      <xs:attribute name="preserveAttributes" use="optional" type="xs:boolean"/>
+      <xs:attribute name="preserve" use="optional" type="xs:boolean"/>
       <xs:attribute name="maximumCount" type="xs:nonNegativeInteger"/>
       <xs:attribute name="downgrade" type="RoleId"/>
       <xs:attribute name="expertUnit" type="UnitTypeId"/>
@@ -272,7 +273,7 @@
         <xs:element ref="limit"/>
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:ID"/>
-      <xs:attribute name="preserveAttributes" use="optional" type="xs:boolean"/>
+      <xs:attribute name="preserve" use="optional" type="xs:boolean"/>
       <xs:attribute name="abstract" use="optional" type="xs:boolean" />
       <xs:attribute name="extends" use="optional" type="xs:string" />
       <xs:attribute name="combat-loss-priority" type="xs:int"/>
@@ -330,7 +331,7 @@
         </xs:choice>
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:ID"/>
-      <xs:attribute name="preserveAttributes" use="optional" type="xs:boolean"/>
+      <xs:attribute name="preserve" use="optional" type="xs:boolean"/>
       <xs:attribute name="natural" type="xs:boolean"/>
       <xs:attribute name="add-work-turns" type="xs:nonNegativeInteger"/>
       <xs:attribute name="occupation-string" type="xs:string"/>
@@ -386,7 +387,7 @@
         <xs:element ref="consumes"/>
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:ID"/>
-      <xs:attribute name="preserveAttributes" use="optional" type="xs:boolean"/>
+      <xs:attribute name="preserve" use="optional" type="xs:boolean"/>
       <xs:attribute name="abstract" use="optional" type="xs:boolean" />
       <xs:attribute name="extends" use="optional" type="xs:string" />
       <xs:attribute name="offence" use="optional" type="xs:nonNegativeInteger"/>
@@ -427,7 +428,7 @@
         <xs:element ref="limit"/>
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:ID"/>
-      <xs:attribute name="preserveAttributes" use="optional" type="xs:boolean"/>
+      <xs:attribute name="preserve" use="optional" type="xs:boolean"/>
       <xs:attribute name="abstract" use="optional" type="xs:boolean" />
       <xs:attribute name="extends" use="optional" type="xs:string" />
       <xs:attribute name="workplaces" use="optional" type="xs:nonNegativeInteger"/>
@@ -481,7 +482,7 @@
         </xs:element>
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:ID"/>
-      <xs:attribute name="preserveAttributes" use="optional" type="xs:boolean"/>
+      <xs:attribute name="preserve" use="optional" type="xs:boolean"/>
       <xs:attribute name="type" use="required">
         <xs:simpleType>
           <xs:restriction base="xs:token">
@@ -515,7 +516,7 @@
         <xs:element ref="modifier" />
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:ID"/>
-      <xs:attribute name="preserveAttributes" use="optional" type="xs:boolean"/>
+      <xs:attribute name="preserve" use="optional" type="xs:boolean"/>
       <xs:attribute name="value" type="xs:string"/>
       <xs:attribute name="scoreValue" type="xs:integer"/>
     </xs:complexType>
@@ -535,7 +536,7 @@
         <xs:element ref="effect" />
       </xs:sequence>
       <xs:attribute name="id" use="required" type="xs:string"/>
-      <xs:attribute name="preserveAttributes" use="optional" type="xs:boolean"/>
+      <xs:attribute name="preserve" use="optional" type="xs:boolean"/>
       <xs:attribute name="extends" type="xs:string"/>
       <xs:attribute name="abstract" type="xs:boolean" />
       <xs:attribute name="natural" type="xs:boolean" />
@@ -558,7 +559,7 @@
         <xs:element ref="scope" />
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:string" />
-      <xs:attribute name="preserveAttributes" use="optional" type="xs:boolean"/>
+      <xs:attribute name="preserve" use="optional" type="xs:boolean"/>
       <xs:attribute name="probability" type="xs:int" />
     </xs:complexType>
   </xs:element>
@@ -623,7 +624,7 @@
 
   <xs:complexType name="nation-type">
     <xs:attribute name="id" use="required" type="xs:string"/>
-    <xs:attribute name="preserveAttributes" use="optional" type="xs:boolean"/>
+    <xs:attribute name="preserve" use="optional" type="xs:boolean"/>
     <xs:attribute name="abstract" type="xs:boolean" />
     <xs:attribute name="extends" type="xs:string" />
     <xs:attribute name="number-of-settlements">
@@ -684,7 +685,7 @@
         <xs:element name="gifts" type="RandomRange"/>
       </xs:choice>
       <xs:attribute name="id" use="required" type="SettlementTypeId"/>
-      <xs:attribute name="preserveAttributes" use="optional" type="xs:boolean"/>
+      <xs:attribute name="preserve" use="optional" type="xs:boolean"/>
       <xs:attribute name="capital" type="xs:boolean"/>
       <xs:attribute name="claimableRadius" type="xs:integer"/>
       <xs:attribute name="extraClaimableRadius" type="xs:integer"/>
@@ -704,7 +705,7 @@
         <xs:element maxOccurs="unbounded" name="nation">
           <xs:complexType>
             <xs:attribute name="id" use="required" type="xs:ID"/>
-            <xs:attribute name="preserveAttributes" use="optional" type="xs:boolean"/>
+            <xs:attribute name="preserve" use="optional" type="xs:boolean"/>
             <xs:attribute name="nation-type" use="required" type="NationTypeId"/>
             <xs:attribute name="selectable" type="xs:boolean"/>
             <xs:attribute name="preferredLatitude" type="xs:int"/>
@@ -925,7 +926,7 @@
         </xs:element>
       </xs:sequence>
       <xs:attribute name="id" type="xs:string"/>
-      <xs:attribute name="preserveAttributes" use="optional" type="xs:boolean"/>
+      <xs:attribute name="preserve" use="optional" type="xs:boolean"/>
       <xs:attribute name="defaultValue" type="xs:string"/>
       <xs:attribute name="value" type="xs:string"/>
       <xs:attribute name="generate">
@@ -965,7 +966,7 @@
       <xs:element minOccurs="0" maxOccurs="unbounded" ref="scope"/>
     </xs:sequence>
     <xs:attribute name="id" use="required" type="xs:string"/>
-    <xs:attribute name="preserveAttributes" use="optional" type="xs:boolean"/>
+    <xs:attribute name="preserve" use="optional" type="xs:boolean"/>
     <xs:attribute name="delete" type="xs:boolean"/>
     <xs:attribute name="source" type="xs:string"/>
     <xs:attribute name="duration" type="xs:int"/>

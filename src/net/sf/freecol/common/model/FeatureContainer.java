@@ -478,8 +478,8 @@ public class FeatureContainer {
      * Clear this feature container.
      */
     public void clear() {
-        abilities.clear();
-        modifiers.clear();
+        if (abilities != null) abilities.clear();
+        if (modifiers != null) modifiers.clear();
     }
 
     /**

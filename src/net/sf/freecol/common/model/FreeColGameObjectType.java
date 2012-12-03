@@ -56,6 +56,11 @@ public class FreeColGameObjectType extends FreeColObject {
     protected static final String EXTENDS_TAG = "extends";
 
     /**
+     * XML attribute tag to denote preservation of attributes and children.
+     */
+    public static final String PRESERVE_TAG = "preserve";
+
+    /**
      * The index imposes a total ordering consistent with equals on
      * each class extending FreeColGameObjectType, but this ordering
      * is nothing but the order in which the objects of the respective
@@ -293,7 +298,8 @@ public class FreeColGameObjectType extends FreeColObject {
      * @return True if the containers should be cleared.
      */
     protected boolean readShouldClearContainers(XMLStreamReader in) {
-        return !hasAttribute(in, EXTENDS_TAG);
+        return !hasAttribute(in, EXTENDS_TAG)
+            && !hasAttribute(in, PRESERVE_TAG);
     }
 
     /**
