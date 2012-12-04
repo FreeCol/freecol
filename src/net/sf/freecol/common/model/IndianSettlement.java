@@ -362,6 +362,15 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
+     * Sets the goods wanted by this Settlement.
+     *
+     * @param wantedGoods a <code>GoodsType</code> value
+     */
+    public void setWantedGoods(GoodsType[] wantedGoods) {
+        this.wantedGoods = wantedGoods;
+    }
+
+    /**
      * Sets the goods wanted by this settlement.
      *
      * @param index Which of the (usually 3) goods to set.

@@ -73,6 +73,7 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerBuilding;
 import net.sf.freecol.server.model.ServerColony;
 import net.sf.freecol.server.model.ServerIndianSettlement;
+import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerRegion;
 import net.sf.freecol.server.model.ServerUnit;
 
@@ -158,9 +159,13 @@ public class SimpleMapGenerator implements MapGenerator {
         terrainGenerator.createMap(game, importGame, landMap);
 
         Map map = game.getMap();
-        createIndianSettlements(map, game.getPlayers());
-        createEuropeanUnits(map, game.getPlayers());
+        if (game.getSpecification().getBoolean("model.option.importSettlements")) {
+            importIndianSettlements(map, importGame);
+        } else {
+            createIndianSettlements(map, game.getPlayers());
+        }
         createLostCityRumours(map, importGame);
+        createEuropeanUnits(map, game.getPlayers());
     }
 
     /**
@@ -210,8 +215,8 @@ public class SimpleMapGenerator implements MapGenerator {
             for (Tile importTile : importGame.getMap().getAllTiles()) {
             	LostCityRumour rumor = importTile.getLostCityRumour();
             	// no rumor
-            	if(rumor == null){
-            		continue;
+            	if (rumor == null) {
+                    continue;
             	}
                 final Position p = importTile.getPosition();
                 if (map.isValid(p)) {
@@ -254,6 +259,73 @@ public class SimpleMapGenerator implements MapGenerator {
                         + " lost city rumours of maximum " + number + ".");
         }
     }
+
+    private void importIndianSettlements(Map map, Game importGame) {
+        Game game = map.getGame();
+        boolean hasSettlements = false;
+        for (Player player : importGame.getPlayers()) {
+            if (player.isIndian()) {
+                Player indian = game.getPlayer(player.getNationID());
+                if (indian == null) {
+                    Nation nation = game.getSpecification().getNation(player.getNationID());
+                    indian = new ServerPlayer(game, null, false, nation, null, null);
+                    game.addPlayer(indian);
+                }
+                for (IndianSettlement template : player.getIndianSettlements()) {
+                    Tile tile = map.getTile(template.getTile().getPosition());
+                    if (tile != null) {
+                        UnitType skill = template.getLearnableSkill();
+                        IndianSettlement settlement =
+                            new ServerIndianSettlement(game, indian, template.getName(), tile,
+                                                       template.isCapital(), skill, null);
+                        tile.setSettlement(settlement);
+                        indian.addSettlement(settlement);
+                        // TODO: the template settlement might have additional owned
+                        // units elsewhere on the map
+                        for (Unit unit: template.getUnitList()) {
+                            UnitType type = game.getSpecification().getUnitType(unit.getType().getId());
+                            Unit newUnit = new ServerUnit(game, settlement, indian, type);
+                            settlement.add(newUnit);
+                            settlement.addOwnedUnit(newUnit);
+                        }
+                        /* what about European influences?
+                        Unit missionary = template.getMissionary();
+                        if (missionary != null) {
+                            UnitType type = game.getSpecification().getUnitType(missionary.getType().getId());
+                            Player owner = game.getPlayer(missionary.getOwner().getNationID());
+                            settlement.setMissionary(new ServerUnit(game, settlement, owner, type));
+                        }
+                        settlement.setConvertProgress(template.getConvertProgress());
+                        settlement.setLastTribute(template.getLastTribute());
+                        */
+                        for (Goods goods : template.getCompactGoods()) {
+                            GoodsType type = game.getSpecification().getGoodsType(goods.getType().getId());
+                            settlement.addGoods(type, goods.getAmount());
+                        }
+                        settlement.setWantedGoods(template.getWantedGoods());
+                        hasSettlements = true;
+                    }
+                }
+            }
+        }
+
+        if (hasSettlements) {
+            for (Tile template : importGame.getMap().getAllTiles()) {
+                if (template.getOwner() != null) {
+                    String nationID = template.getOwner().getNationID();
+                    Player owner = game.getPlayer(nationID);
+                    Tile tile = map.getTile(template.getPosition());
+                    if (owner != null && tile != null) {
+                        tile.setOwner(owner);
+                        if (template.getOwningSettlement() != null) {
+                            tile.setOwningSettlement(game.getSettlement(template.getOwningSettlement().getName()));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 
     /**
      * Create the Indian settlements, at least a capital for every nation and
