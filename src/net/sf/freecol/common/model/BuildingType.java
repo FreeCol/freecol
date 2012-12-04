@@ -42,10 +42,11 @@ public final class BuildingType extends BuildableType
     private int upkeep = 0;
     private int priority = Consumer.BUILDING_PRIORITY;
 
-    private GoodsType consumes, produces;
+    private GoodsType consumes = null;
+    private GoodsType produces = null;
     private Modifier productionModifier = null;
-    private BuildingType upgradesFrom;
-    private BuildingType upgradesTo;
+    private BuildingType upgradesFrom = null;
+    private BuildingType upgradesTo = null;
 
 
     /**
@@ -56,93 +57,45 @@ public final class BuildingType extends BuildableType
      */
     public BuildingType(String id, Specification specification) {
         super(id, specification);
+
         setModifierIndex(Modifier.BUILDING_PRODUCTION_INDEX);
     }
 
 
     /**
-     * Returns the BuildingType this BuildingType upgrades from.
+     * Get the level of this BuildingType.
      *
-     * @return a <code>BuildingType</code> value
-     */
-    public BuildingType getUpgradesFrom() {
-        return upgradesFrom;
-    }
-
-    /**
-     * Returns the BuildingType this BuildingType upgrades to.
-     *
-     * @return a <code>BuildingType</code> value
-     */
-    public BuildingType getUpgradesTo() {
-        return upgradesTo;
-    }
-
-    /**
-     * Returns the first level of this BuildingType.
-     *
-     * @return a <code>BuildingType</code> value
-     */
-    public BuildingType getFirstLevel() {
-        BuildingType buildingType = this;
-        while (buildingType.getUpgradesFrom() != null) {
-            buildingType = buildingType.getUpgradesFrom();
-        }
-        return buildingType;
-    }
-
-    /**
-     * Returns the number of workplaces, that is the maximum number of
-     * Units that can work in this BuildingType.
-     *
-     * @return an <code>int</code> value
-     */
-    public int getWorkPlaces() {
-        return workPlaces;
-    }
-
-    /**
-     * Returns the production of a single Unit in this BuildingType
-     * before any modifiers are applied.
-     *
-     * @return an <code>int</code> value
-     */
-    public int getBasicProduction() {
-        return basicProduction;
-    }
-
-    /**
-     * Returns the type of goods consumed by this BuildingType.
-     *
-     * @return an <code>GoodsType</code> value
-     */
-    public GoodsType getConsumedGoodsType() {
-        return consumes;
-    }
-
-    /**
-     * Returns the type of goods produced by this BuildingType.
-     *
-     * @return an <code>GoodsType</code> value
-     */
-    public GoodsType getProducedGoodsType() {
-        return produces;
-    }
-
-    /**
-     * Returns the level of this BuildingType.
-     *
-     * @return an <code>int</code> value
+     * @return The building level.
      */
     public int getLevel() {
         return level;
     }
 
     /**
-     * Returns the amount of gold necessary to maintain a Building of
+     * Gets the number of workplaces, that is the maximum number of
+     * Units that can work in this BuildingType.
+     *
+     * @return The number of work places.
+     */
+    public int getWorkPlaces() {
+        return workPlaces;
+    }
+
+    /**
+     * Get the production of a single Unit in this BuildingType before
+     * any modifiers are applied.
+     *
+     * @return The base production of this building type.
+     */
+    public int getBasicProduction() {
+        return basicProduction;
+    }
+
+    /**
+     * Gets the amount of gold necessary to maintain a Building of
      * this type for one turn.
      *
-     * @return an <code>int</code> value
+     * @return The per turn upkeep for this building type.
      */
     public int getUpkeep() {
         return upkeep;
@@ -153,49 +106,17 @@ public final class BuildingType extends BuildableType
      * the priority, the earlier will the Consumer be allowed to
      * consume the goods it requires.
      *
-     * @return an <code>int</code> value
+     * @return The consumption priority.
      */
     public int getPriority() {
         return priority;
     }
 
-
     /**
-     * Describe <code>getType</code> method here.
+     * Can a unit of a given type be added to a Building of this type?
      *
-     * @return a <code>FreeColGameObjectType</code> value
-     */
-    public FreeColGameObjectType getType() {
-        return this;
-    }
-
-    /**
-     * Describe <code>getProductionModifier</code> method here.
-     *
-     * @return a <code>Modifier</code> value
-     */
-    public Modifier getProductionModifier() {
-        return productionModifier;
-    }
-
-    /**
-     * Compares this BuildingType to another. BuildingTypes are sorted
-     * according to the order in which they are defined in the
-     * specification.
-     *
-     * @param other a <code>BuildingType</code> value
-     * @return an <code>int</code> value
-     */
-    public int compareTo(BuildingType other) {
-        return getIndex() - other.getIndex();
-    }
-
-    /**
-     * Returns true if the given UnitType could be added to a Building
-     * of this type.
-     *
-     * @param unitType an <code>UnitType</code> value
-     * @return a <code>boolean</code> value
+     * @param unitType The <code>UnitType</code> to check.
+     * @return True if the unit type can be added.
      */
     public boolean canAdd(UnitType unitType) {
         return workPlaces > 0
@@ -205,19 +126,87 @@ public final class BuildingType extends BuildableType
     }
 
     /**
+     * Gets the type of the building type, which is trivially just this
+     * object.
+     *
+     * @return This.
+     */
+    public FreeColGameObjectType getType() {
+        return this;
+    }
+
+    /**
+     * Gets the base production modifier for this building type.
+     *
+     * @return The base modifier if any.
+     */
+    public Modifier getProductionModifier() {
+        return productionModifier;
+    }
+
+    /**
+     * Gets the BuildingType this BuildingType upgrades from.
+     *
+     * @return The <code>BuildingType</code> that upgrades to this one.
+     */
+    public BuildingType getUpgradesFrom() {
+        return upgradesFrom;
+    }
+
+    /**
+     * Get the BuildingType this BuildingType upgrades to.
+     *
+     * @return The <code>BuildingType</code> to upgrade to from this one.
+     */
+    public BuildingType getUpgradesTo() {
+        return upgradesTo;
+    }
+
+    /**
+     * Gets the first level of this BuildingType.
+     *
+     * @return The base <code>BuildingType</code>.
+     */
+    public BuildingType getFirstLevel() {
+        BuildingType buildingType = this;
+        while (buildingType.getUpgradesFrom() != null) {
+            buildingType = buildingType.getUpgradesFrom();
+        }
+        return buildingType;
+    }
+
+    /**
      * Is this building type automatically built in any colony?
      *
-     * @return a <code>boolean</code> value
+     * @return True if this building type is automatically built.
      */
     public boolean isAutomaticBuild() {
         return !needsGoodsToBuild() && getUpgradesFrom() == null;
     }
 
     /**
+     * Get the type of goods consumed by this BuildingType.
+     *
+     * @return The consumed <code>GoodsType</code>.
+     */
+    public GoodsType getConsumedGoodsType() {
+        return consumes;
+    }
+
+    /**
+     * Gets the type of goods produced by this BuildingType.
+     *
+     * @return The produced <code>GoodsType</code>.
+     */
+    public GoodsType getProducedGoodsType() {
+        return produces;
+    }
+
+    /**
      * Get the index for the given Modifier.
      *
-     * @param modifier a <code>Modifier</code> value
-     * @return an <code>int</code> value
+     * @param modifier The <code>Modifier</code> to check.
+     * @return A modifier index.
      */
     @Override
     public final int getModifierIndex(Modifier modifier) {
@@ -229,100 +218,131 @@ public final class BuildingType extends BuildableType
     }
 
 
+    // Interface Comparable
+
     /**
-     * Makes an XML-representation of this object.
+     * Compares this BuildingType to another.  BuildingTypes are
+     * simply sorted according to the order in which they are defined
+     * in the specification.
      *
-     * @param out The output stream.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
+     * @param other The other <code>BuildingType</code> to compare with.
+     * @return A comparison result.
      */
+    public int compareTo(BuildingType other) {
+        return getIndex() - other.getIndex();
+    }
+
+
+    // Serialization
+
+    private static final String BASIC_PRODUCTION_TAG = "basicProduction";
+    private static final String CONSUMES_TAG = "consumes";
+    private static final String MAX_SKILL_TAG = "maxSkill";
+    private static final String MIN_SKILL_TAG = "minSkill";
+    private static final String PRIORITY_TAG = "priority";
+    private static final String PRODUCES_TAG = "produces";
+    private static final String UPGRADES_FROM_TAG = "upgradesFrom";
+    private static final String UPKEEP_TAG = "upkeep";
+    private static final String WORKPLACES_TAG = "workplaces";
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         super.toXML(out, getXMLElementTagName());
     }
 
     /**
-     * Write the attributes of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to
-     *     the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
         if (upgradesFrom != null) {
-            out.writeAttribute("upgradesFrom", upgradesFrom.getId());
+            writeAttribute(out, UPGRADES_FROM_TAG, upgradesFrom);
         }
-        out.writeAttribute("workplaces", Integer.toString(workPlaces));
-        out.writeAttribute("basicProduction", Integer.toString(basicProduction));
-        if (minSkill > UNDEFINED) {
-            out.writeAttribute("minSkill", Integer.toString(minSkill));
+
+        writeAttribute(out, WORKPLACES_TAG, workPlaces);
+
+        writeAttribute(out, BASIC_PRODUCTION_TAG, basicProduction);
+
+        if (minSkill != UNDEFINED) {
+            writeAttribute(out, MIN_SKILL_TAG, minSkill);
         }
+
         if (maxSkill < INFINITY) {
-            out.writeAttribute("maxSkill", Integer.toString(maxSkill));
+            writeAttribute(out, MAX_SKILL_TAG, maxSkill);
         }
+
         if (upkeep > 0) {
-            out.writeAttribute("upkeep", Integer.toString(upkeep));
+            writeAttribute(out, UPKEEP_TAG, upkeep);
         }
+
         if (priority != Consumer.BUILDING_PRIORITY) {
-            out.writeAttribute("priority", Integer.toString(priority));
+            writeAttribute(out, PRIORITY_TAG, priority);
         }
+
         if (consumes != null) {
-            out.writeAttribute("consumes", consumes.getId());
+            writeAttribute(out, CONSUMES_TAG, consumes);
         }
+
         if (produces != null) {
-            out.writeAttribute("produces", produces.getId());
+            writeAttribute(out, PRODUCES_TAG, produces);
         }
     }
 
     /**
-     * Reads the attributes of this object from an XML stream.
-     *
-     * @param in The XML input stream.
-     * @throws XMLStreamException if a problem was encountered
-     *     during parsing.
+     * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        final Specification spec = getSpecification();
+
         super.readAttributes(in);
 
-        String extendString = in.getAttributeValue(null, "extends");
-        BuildingType parent = (extendString == null) ? this :
-            getSpecification().getBuildingType(extendString);
-        String upgradeString = in.getAttributeValue(null, "upgradesFrom");
-        if (upgradeString == null) {
+        BuildingType parent = spec.getType(in, EXTENDS_TAG, 
+                                           BuildingType.class, this);
+
+        upgradesFrom = spec.getType(in, UPGRADES_FROM_TAG,
+                                    BuildingType.class, (BuildingType)null);
+        if (upgradesFrom == null) {
             level = 1;
         } else {
-            upgradesFrom = getSpecification().getBuildingType(upgradeString);
             upgradesFrom.upgradesTo = this;
             level = upgradesFrom.level + 1;
         }
 
-        workPlaces = getAttribute(in, "workplaces", parent.workPlaces);
-        basicProduction = getAttribute(in, "basicProduction", parent.basicProduction);
+        workPlaces = getAttribute(in, WORKPLACES_TAG, parent.workPlaces);
 
-        consumes = getSpecification().getType(in, "consumes", GoodsType.class, parent.consumes);
-        produces = getSpecification().getType(in, "produces", GoodsType.class, parent.produces);
+        basicProduction = getAttribute(in, BASIC_PRODUCTION_TAG,
+                                       parent.basicProduction);
 
+        minSkill = getAttribute(in, MIN_SKILL_TAG, parent.minSkill);
+
+        maxSkill = getAttribute(in, MAX_SKILL_TAG, parent.maxSkill);
+
+        upkeep = getAttribute(in, UPKEEP_TAG, parent.upkeep);
+
+        priority = getAttribute(in, PRIORITY_TAG, parent.priority);
+
+        consumes = spec.getType(in, CONSUMES_TAG, GoodsType.class,
+                                parent.consumes);
+
+        produces = spec.getType(in, PRODUCES_TAG, GoodsType.class,
+                                parent.produces);
         if (produces != null && basicProduction > 0) {
-            productionModifier = new Modifier(produces.getId(), this, basicProduction,
+            productionModifier = new Modifier(produces.getId(), this,
+                                              basicProduction,
                                               Modifier.Type.ADDITIVE);
         }
 
-        minSkill = getAttribute(in, "minSkill", parent.minSkill);
-        maxSkill = getAttribute(in, "maxSkill", parent.maxSkill);
-
-        priority = getAttribute(in, "priority", parent.priority);
-        upkeep = getAttribute(in, "upkeep", parent.upkeep);
-
-        if (parent != this) {
-            if (!hasAttribute(in, "required-population")) {
-                setRequiredPopulation(getAttribute(in, "required-population",
-                        parent.getRequiredPopulation()));
+        if (parent != this) { // Handle "extends" for super-type fields
+            if (!hasAttribute(in, REQUIRED_POPULATION_TAG)) {
+                setRequiredPopulation(parent.getRequiredPopulation());
             }
+
             addFeatures(parent);
             if (parent.isAbstractType()) {
                 getFeatureContainer().replaceSource(parent, this);
@@ -330,26 +350,12 @@ public final class BuildingType extends BuildableType
         }
     }
 
-    /**
-     * Reads the children of this object from an XML stream.
-     *
-     * @param in The XML input stream.
-     * @throws XMLStreamException if a problem was encountered
-     *     during parsing.
-     */
-    @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            readChild(in);
-        }
-    }
-
+    // @compat 0.9.x
     /**
      * Compatibility hack, called from the specification reader when
      * it is finishing up.
      */
     public void fixup09x() {
-        // @compat 0.9.x
         try {
             if (hasAbility(Ability.AUTO_PRODUCTION)) {
                 if (!hasAbility(Ability.AVOID_EXCESS_PRODUCTION)) {
@@ -376,16 +382,12 @@ public final class BuildingType extends BuildableType
                     getSpecification().addModifier(modifier);
                 }
             }
-        } catch(Exception e) {
-            // no such ability, we don't care
-        }
-        // @end compatibility code
+        } catch (Exception e) {} // no such ability, we don't care
     }
+    // @end compatibility code
 
     /**
      * Gets the tag name of the root element representing this object.
-     * This method should be overwritten by any sub-class, preferably
-     * with the name of the class with the first letter in lower case.
      *
      * @return "building-type".
      */
