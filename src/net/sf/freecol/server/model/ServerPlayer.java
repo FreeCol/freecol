@@ -2833,6 +2833,12 @@ public class ServerPlayer extends Player implements ServerModelObject {
         boolean capital = settlement.isCapital();
         int plunder = settlement.getPlunder(attacker, random);
 
+        // Remaining units lose their home.
+        for (Unit u : settlement.getOwnedUnits()) {
+            u.setIndianSettlement(null);
+            cs.add(See.only(nativePlayer), u);
+        }
+                
         // Destroy the settlement, update settlement tiles.
         csDisposeSettlement(settlement, cs);
 
@@ -2977,7 +2983,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
         cs.addDispose(See.perhaps().always(owner), centerTile, settlement);
         // Now the settlement is gone, the center tile can be claimed.
-        if (centerClaimant != null) {
+        if (centerClaimant == null) {
+            centerTile.changeOwnership(null, null);
+        } else {
             centerTile.changeOwnership(centerClaimant.getOwner(),
                                        centerClaimant);
         }
