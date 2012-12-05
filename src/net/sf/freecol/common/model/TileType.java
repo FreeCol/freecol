@@ -36,6 +36,13 @@ import net.sf.freecol.common.util.RandomChoice;
 
 public final class TileType extends FreeColGameObjectType {
 
+    /**
+     * Use these tile types only for "land maps", i.e. maps that only
+     * distinguish water and land.
+     */
+    public static final TileType WATER = new TileType("WATER", true);
+    public static final TileType LAND  = new TileType("LAND", false);
+
     private boolean forest;
     private boolean water;
     private boolean canSettle;
@@ -98,6 +105,11 @@ public final class TileType extends FreeColGameObjectType {
 
     public TileType(String id, Specification specification) {
         super(id, specification);
+    }
+
+    private TileType(String id, boolean water) {
+        super(id, null);
+        this.water = water;
     }
 
     // ------------------------------------------------------------ retrieval methods

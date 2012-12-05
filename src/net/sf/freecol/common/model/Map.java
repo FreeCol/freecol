@@ -75,7 +75,7 @@ public class Map extends FreeColGameObject implements Location {
      * layer includes Lost City Rumours as well as settlements.
      */
     public static enum Layer {
-        NONE, LAND, TERRAIN, RIVERS, RESOURCES, NATIVES, ALL;
+        NONE, LAND, TERRAIN, REGIONS, RIVERS, RESOURCES, NATIVES, ALL;
     };
 
     /**
