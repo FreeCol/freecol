@@ -800,6 +800,7 @@ public class Map extends FreeColGameObject implements Location {
      */
     private Location findRealStart(final Unit unit, final Location start,
                                    final Unit carrier) {
+        // Unit checks.
         if (unit == null) {
             throw new IllegalArgumentException("Null unit.");
         } else if (carrier != null && !carrier.canCarryUnits()) {
@@ -809,6 +810,7 @@ public class Map extends FreeColGameObject implements Location {
             throw new IllegalArgumentException("Carrier could not carry unit: "
                 + carrier + "/" + unit);
         }
+
         Location entry;
         if (start == null) {
             throw new IllegalArgumentException("Null start: " + unit);
@@ -827,6 +829,7 @@ public class Map extends FreeColGameObject implements Location {
             } else {
                 entry = unitLoc;
             }
+            
         } else if (start instanceof HighSeas) {
             if (unit.isOnCarrier()) {
                 entry = unit.getCarrier().resolveDestination();
@@ -840,7 +843,28 @@ public class Map extends FreeColGameObject implements Location {
         } else {
             throw new IllegalArgumentException("Invalid start: " + start);
         }
-        return entry;
+        // Valid result, reduce to tile if possible.
+        return (entry.getTile() != null) ? entry.getTile() : entry;
+    }
+
+    /**
+     * Destination argument test for path searches.  Find the actual
+     * destination of a path.
+     *
+     * @param end The candidate end <code>Location</code>.
+     * @return The actual end location.
+     * @throws IllegalArgumentException If there are any argument problems.
+     */
+    private Location findRealEnd(Location end) {
+        if (end == null) {
+            throw new IllegalArgumentException("Null end.");
+        } else if (end instanceof Europe) {
+            return end;
+        } else if (end.getTile() != null) {
+            return end.getTile();
+        } else {
+            throw new IllegalArgumentException("Invalid end: " + end);
+        }
     }
 
     /**
@@ -856,8 +880,8 @@ public class Map extends FreeColGameObject implements Location {
      */
     private PathNode getBestEntryPath(Unit unit, Tile tile, Unit carrier,
                                       CostDecider costDecider) {
-        return search(unit, tile, GoalDeciders.getHighSeasGoalDecider(),
-                      costDecider, INFINITY, carrier);
+        return searchMap(unit, tile, GoalDeciders.getHighSeasGoalDecider(),
+                         costDecider, INFINITY, carrier, null);
     }
 
     /**
@@ -878,8 +902,59 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Version of findPath that includes the start tile and generalized
-     * start and end locations.
+     * Find the quickest path for a unit (with optional carrier) from
+     * a start tile to an end tile.
+     *
+     * @param unit The <code>Unit</code> to find the path for.
+     * @param start The <code>Tile</code> in which the path starts from.
+     * @param end The <code>Tile</code> at the end of the path.
+     * @param carrier An optional naval carrier <code>Unit</code> to use.
+     * @param costDecider An optional <code>CostDecider</code> for
+     *     determining the movement costs (uses default cost deciders
+     *     for the unit/s if not provided).
+     * @return A path starting at the start tile and ending at the end
+     *     tile, or null if none found.
+     */
+    private PathNode findMapPath(Unit unit, Tile start, Tile end, Unit carrier,
+                                 CostDecider costDecider) {
+        final Unit offMapUnit = (carrier != null) ? carrier : unit;
+        final GoalDecider gd = GoalDeciders.getLocationGoalDecider(end);
+        final SearchHeuristic sh = getManhattenHeuristic(end);
+
+        PathNode path;
+        if (start.getContiguity() == end.getContiguity()) {
+            // If the unit potentially could get to the destination
+            // without a carrier, compare both with-carrier and
+            // without-carrier paths.  The latter will usually be
+            // faster, but not always, e.g. mounted units on a good
+            // road system.
+            path = searchMap(unit, start, gd, costDecider,
+                             INFINITY, null, sh);
+            PathNode carrierPath = (carrier == null) ? null
+                : searchMap(unit, start, gd, costDecider,
+                            INFINITY, carrier, sh);
+            if (carrierPath != null
+                && (path == null
+                    || (path.getLastNode().getCost()
+                        > carrierPath.getLastNode().getCost()))) {
+                path = carrierPath;
+            }
+        } else if (offMapUnit != null) {
+            // If there is a water unit then complex paths which use
+            // settlements and inland lakes are possible, but hard to
+            // capture with the contiguity test, so just allow the
+            // search to proceed.
+            path = searchMap(unit, start, gd, costDecider,
+                             INFINITY, carrier, sh);
+        } else { // Otherwise, there is a connectivity failure.
+            path = null;
+        }
+        return path;
+    }
+
+    /**
+     * Find the quickest path for a unit (with optional carrier) from
+     * a start location to an end location.
      *
      * @param unit The <code>Unit</code> to find the path for.
      * @param start The <code>Location</code> in which the path starts from.
@@ -888,122 +963,92 @@ public class Map extends FreeColGameObject implements Location {
      * @param costDecider An optional <code>CostDecider</code> for
      *     determining the movement costs (uses default cost deciders
      *     for the unit/s if not provided).
-     * @return A <code>PathNode</code> starting at the start location and
-     *     ending at the end location, or null if no path is found.
-     * @throws IllegalArgumentException If the unit is null, or the
-     *     start and end locations do not make sense, or the
-     *     carrier/unit combination is bogus.
+     * @return A path starting at the start location and ending at the
+     *     end location, or null if none found.
+     * @throws IllegalArgumentException For many reasons, see
+     *     {@link findRealStart}.
      */
     public PathNode findPath(final Unit unit,
                              final Location start, final Location end,
                              final Unit carrier, CostDecider costDecider) {
-        if (end == null) {
-            throw new IllegalArgumentException("Null end.");
-        } else if (!(end instanceof Europe || end.getTile() != null)) {
-            throw new IllegalArgumentException("Invalid end: " + end);
-        }
-        Location entry = findRealStart(unit, start, carrier);
-        int initialTurns = (!unit.isAtSea()) ? 0
-            : (unit.isOnCarrier()) ? unit.getCarrier().getWorkLeft()
-            : unit.getWorkLeft();
+        // Validate the arguments, reducing to either Europe or a Tile.
+        final Location realStart = findRealStart(unit, start, carrier);
+        final Location realEnd = findRealEnd(end);
+        // Get the unit that will be used for off-map travel.
+        final Unit offMapUnit = (carrier != null) ? carrier : unit;
 
-        PathNode path;
-        Unit waterUnit = (carrier != null) ? carrier : unit;
-        if (entry instanceof Europe) {
-            if (end instanceof Europe) { // The trivial(Europe) path.
-                path = new PathNode(entry, unit.getMovesLeft(), 0,
-                                    false, null, null);
+        PathNode path = null;
+        // There are four cases...
+        if (realStart instanceof Europe && realEnd instanceof Europe) {
+            // 0: Europe->Europe
+            // Create a trivial path.
+            path = new PathNode(realStart, unit.getMovesLeft(), 0,
+                                false, null, null);
 
-            } else { // Start in Europe, end on a Tile
-                // Fail fast without capable water unit.
-                if (!waterUnit.getType().canMoveToHighSeas()) return null;
+        } else if (realStart instanceof Europe && realEnd instanceof Tile) {
+            // 1: Europe->Tile
+            // Fail fast without an off map unit.
+            if (offMapUnit == null
+                || !offMapUnit.getType().canMoveToHighSeas()) return null;
 
-                // Find the best place to enter the map from Europe.
-                PathNode p = getBestEntryPath(unit, end.getTile(), carrier,
-                                              costDecider);
-                if (p == null) return null;
-                Tile tile = p.getLastNode().getTile();
+            // Find the best place to enter the map from Europe.
+            PathNode p = getBestEntryPath(unit, (Tile)realEnd, carrier,
+                                          costDecider);
+            if (p == null) return null;
+            Tile tile = p.getLastNode().getTile();
 
-                // Now search forward from there to get a path in the right
-                // order (the existing one might not be optimal if reversed!)
-                path = searchInternal(unit, tile,
-                    GoalDeciders.getLocationGoalDecider(end.getTile()),
-                    costDecider, INFINITY, carrier,
-                    getManhattenHeuristic(end.getTile()));
-                if (path == null) {
-                    boolean old = traceSearch;
-                    setSearchTrace(true);
-                    path = searchInternal(unit, tile,
-                        GoalDeciders.getLocationGoalDecider(end.getTile()),
-                        costDecider, INFINITY, carrier,
-                        getManhattenHeuristic(end.getTile()));
-                    setSearchTrace(old);
-                    throw new IllegalStateException("SEARCH-FAIL: " + unit
-                        + "/" + carrier + " from " + tile + " to " + end
-                        + "\n" + p.fullPathToString());
-                }
+            // Now search forward from there to get a path in the
+            // right order (path costs are not symmetric).
+            path = findMapPath(unit, tile, (Tile)realEnd, carrier, costDecider);
+            if (path == null) {
+                boolean old = traceSearch;
+                setSearchTrace(true);
+                path = findMapPath(unit, tile, (Tile)realEnd, carrier, costDecider);
+                setSearchTrace(old);
+                throw new IllegalStateException("FINDPATH-FAIL: " + unit
+                    + "/" + carrier + " from " + tile + " to " + end
+                    + "\n" + p.fullPathToString());
+            }
 
-                // At the front of the path insert a node for the
-                // starting location in Europe, correcting for the turns
-                // to sail to the entry location.
-                path.addTurns(waterUnit.getSailTurns());
-                path.previous = new PathNode(entry, unit.getMovesLeft(),
-                                             0, carrier != null, null, path);
+            // At the front of the path insert a node for the starting
+            // location in Europe, correcting for the turns to sail to
+            // the entry location.
+            path.addTurns(offMapUnit.getSailTurns());
+            path.previous = new PathNode(realStart, unit.getMovesLeft(),
+                                         0, carrier != null, null, path);
+            path = path.previous;
+            if (unit.getLocation() != carrier) {
+                path.previous = new PathNode(realStart, unit.getMovesLeft(),
+                                             0, false, null, path);
                 path = path.previous;
-                if (unit.getLocation() != carrier) {
-                    path.previous = new PathNode(entry, unit.getMovesLeft(),
-                                                 0, false, null, path);
-                    path = path.previous;
-                }
             }
-        } else { // entry has Tile
-            if (end instanceof Europe) {
-                // Fail fast if Europe is unattainable.
-                if (!waterUnit.getType().canMoveToHighSeas()) return null;
-                
-                // Search forwards to the high seas.
-                path = searchInternal(unit, entry.getTile(),
-                    GoalDeciders.getLocationGoalDecider(end),
-                    costDecider, INFINITY, carrier, null);
 
-            } else { // entry and end are Tiles
-                final Tile startTile = entry.getTile();
-                final Tile endTile = end.getTile();
-                final GoalDecider gd
-                    = GoalDeciders.getLocationGoalDecider(end);
-                final SearchHeuristic sh = getManhattenHeuristic(endTile);
-                if (startTile.getContiguity() == endTile.getContiguity()) {
-                    // If the unit potentially could get to the
-                    // destination without a carrier, compare both
-                    // with-carrier and without-carrier paths.  The
-                    // latter will usually be faster, but not always,
-                    // e.g. mounted units on a good road system.
-                    PathNode carrierPath;
-                    path = searchInternal(unit, startTile, gd,
-                                          costDecider, INFINITY, null, sh);
-                    if (carrier != null
-                        && (carrierPath = searchInternal(unit, startTile, gd,
-                                                         costDecider, INFINITY,
-                                                         carrier, sh)) != null
-                        && (path == null
-                            || (path.getLastNode().getCost()
-                                > carrierPath.getLastNode().getCost()))) {
-                        path = carrierPath;
-                    }
-                } else if (waterUnit != null) {
-                    // If there is a water unit then complex paths which
-                    // use settlements and inland lakes are possible, but
-                    // hard to capture with the contiguity test, so just
-                    // allow the search to proceed.
-                    path = searchInternal(unit, startTile, gd,
-                                          costDecider, INFINITY,
-                                          carrier, sh);
-                } else { // Otherwise, there is a connectivity failure.
-                    path = null;
-                }
-            }
+        } else if (realStart instanceof Tile && realEnd instanceof Europe) {
+            // 2: Tile->Europe
+            // Fail fast if Europe is unattainable.
+            if (offMapUnit == null
+                || !offMapUnit.getType().canMoveToHighSeas()) return null;
+                
+            // Search forwards to the high seas.
+            path = searchMap(unit, (Tile)realStart,
+                             GoalDeciders.getLocationGoalDecider(realEnd),
+                             costDecider, INFINITY, carrier, null);
+
+        } else if (realStart instanceof Tile && realEnd instanceof Tile) {
+            // 3: Tile->Tile
+            path = findMapPath(unit, (Tile)realStart, (Tile)realEnd, carrier,
+                               costDecider);
+
+        } else {
+            throw new IllegalStateException("Can not happen: " + realStart
+                                            + ", " + realEnd);
         }
-        if (path != null && initialTurns != 0) path.addTurns(initialTurns);
+
+        if (path != null) { // Add the turns remaining on the high seas.
+            final int initialTurns = (!unit.isAtSea()) ? 0
+                : ((unit.isOnCarrier()) ? unit.getCarrier() : unit).getWorkLeft();
+            if (initialTurns != 0) path.addTurns(initialTurns);
+        }
         return path;
     }
 
@@ -1032,30 +1077,34 @@ public class Map extends FreeColGameObject implements Location {
                            final GoalDecider goalDecider,
                            final CostDecider costDecider,
                            final int maxTurns, final Unit carrier) {
-        Location entry = findRealStart(unit, start, carrier);
-        int initialTurns = (!unit.isAtSea()) ? 0
-            : ((unit.isOnCarrier()) ? unit.getCarrier() : unit).getWorkLeft();
+        final Location realStart = findRealStart(unit, start, carrier);
         
         PathNode path;
-        if (entry instanceof Europe) {
-            Unit waterUnit = (carrier != null) ? carrier : unit;
+        if (realStart instanceof Europe) {
             // Fail fast if Europe is unattainable.
-            if (!waterUnit.getType().canMoveToHighSeas()) return null;
+            Unit offMapUnit = (carrier != null) ? carrier : unit;
+            if (offMapUnit == null
+                || !offMapUnit.getType().canMoveToHighSeas()) return null;
 
-            path = searchInternal(unit, (Tile)waterUnit.getEntryLocation(),
-                                  goalDecider, costDecider, maxTurns,
-                                  carrier, null);
-            if (path == null) return null;
-            path.addTurns(waterUnit.getSailTurns());
-            path.previous = new PathNode(entry, waterUnit.getMovesLeft(),
-                                         0, carrier != null, null, path);
-            path = path.previous;
+            path = searchMap(unit, (Tile)offMapUnit.getEntryLocation(),
+                             goalDecider, costDecider, maxTurns, carrier, null);
+            if (path != null) {
+                path.addTurns(offMapUnit.getSailTurns());
+                path.previous = new PathNode(realStart,
+                                             offMapUnit.getMovesLeft(), 0,
+                                             carrier != null, null, path);
+                path = path.previous;
+            }
         } else {
-            path = searchInternal(unit, entry.getTile(),
-                                  goalDecider, costDecider, maxTurns,
-                                  carrier, null);
+            path = searchMap(unit, realStart.getTile(), goalDecider,
+                             costDecider, maxTurns, carrier, null);
         }
-        if (path != null && initialTurns != 0) path.addTurns(initialTurns);
+
+        if (path != null) { // Add the turns remaining on the high seas.
+            final int initialTurns = (!unit.isAtSea()) ? 0
+                : ((unit.isOnCarrier()) ? unit.getCarrier() : unit).getWorkLeft();
+            if (initialTurns != 0) path.addTurns(initialTurns);
+        }
         return path;
     }
 
@@ -1274,11 +1323,11 @@ public class Map extends FreeColGameObject implements Location {
      * @return A path to a goal determined by the given
      *     <code>GoalDecider</code>.
      */
-    private PathNode searchInternal(final Unit unit, final Tile start,
-                                    final GoalDecider goalDecider,
-                                    final CostDecider costDecider,
-                                    final int maxTurns, final Unit carrier,
-                                    final SearchHeuristic searchHeuristic) {
+    private PathNode searchMap(final Unit unit, final Tile start,
+                               final GoalDecider goalDecider,
+                               final CostDecider costDecider,
+                               final int maxTurns, final Unit carrier,
+                               final SearchHeuristic searchHeuristic) {
         final HashMap<String, PathNode> openList
             = new HashMap<String, PathNode>();
         final HashMap<String, PathNode> closedList
@@ -1297,13 +1346,13 @@ public class Map extends FreeColGameObject implements Location {
         final List<PathNode> tracing = (traceSearch)
             ? new ArrayList<PathNode>()
             : null;
-        Unit waterUnit = (carrier != null) ? carrier : unit;
+        Unit offMapUnit = (carrier != null) ? carrier : unit;
         Unit currentUnit = (start.isLand())
             ? ((start.getSettlement() != null
                     && start.getSettlement().isConnectedPort()
                     && unit != null
                     && unit.getLocation() == carrier) ? carrier : unit)
-            : waterUnit;
+            : offMapUnit;
 
         // Create the start node and put it on the open list.
         final PathNode firstNode = new PathNode(start,
@@ -1431,10 +1480,10 @@ public class Map extends FreeColGameObject implements Location {
                             : CostDeciders.defaultCostDeciderFor(unit)));
                     break;
                 case BYWATER:
-                    move = new MoveCandidate(waterUnit, currentNode, moveTile,
+                    move = new MoveCandidate(offMapUnit, currentNode, moveTile,
                         currentMovesLeft, currentTurns, currentOnCarrier,
                         ((costDecider != null) ? costDecider
-                            : CostDeciders.defaultCostDeciderFor(waterUnit)));
+                            : CostDeciders.defaultCostDeciderFor(offMapUnit)));
                     break;
                 case EMBARK:
                     move = new MoveCandidate(unit, currentNode, moveTile,
