@@ -41,42 +41,46 @@ public class IndianNationType extends NationType {
     /**
      * Stores the ids of the skills taught by this Nation.
      */
-    private List<RandomChoice<UnitType>> skills =
-        new ArrayList<RandomChoice<UnitType>>();
+    private List<RandomChoice<UnitType>> skills = null;
 
     /**
-     * The regions that can be settled by this Nation.
+     * Identifiers for the regions that can be settled by this Nation.
      */
-    private List<String> regions = new ArrayList<String>();
+    private List<String> regions = null;
 
 
-
+    /**
+     * Create a new native nation type.
+     *
+     * @param id The nation type identifier.
+     * @param specification The containing <code>Specification</code>.
+     */
     public IndianNationType(String id, Specification specification) {
         super(id, specification);
     }
 
     /**
-     * Returns false.
+     * Is this a European nation type?
      *
-     * @return a <code>boolean</code> value
+     * @return False.
      */
     public boolean isEuropean() {
         return false;
     }
 
     /**
-     * Returns true.
+     * Is this a native nation type?
      *
-     * @return a <code>boolean</code> value
+     * @return True.
      */
     public boolean isIndian() {
         return true;
     }
 
     /**
-     * Returns false.
+     * Is this a REF nation type?
      *
-     * @return a <code>boolean</code> value
+     * @return False.
      */
     public boolean isREF() {
         return false;
@@ -93,16 +97,17 @@ public class IndianNationType extends NationType {
     }
 
     /**
-     * Returns the list of regions in which this tribe my settle.
+     * Gets the list of regions in which this tribe may settle.
      *
-     * @return the list of regions in which this tribe my settle.
+     * @return A list of regions identifiers.
      */
     public List<String> getRegionNames() {
-        return regions;
+        return (regions == null) ? new ArrayList<String>()
+            : regions;
     }
 
     /**
-     * Returns true if this Nation can settle the given Tile.
+     * Can this Nation can settle the given Tile?
      *
      * @param tile a <code>Tile</code> value
      * @return a <code>boolean</code> value
@@ -117,7 +122,7 @@ public class IndianNationType extends NationType {
     }
     */
     /**
-     * Returns true if this Nation can settle the given Region.
+     * Can this Nation can settle the given Region?
      *
      * @param region a <code>Region</code> value
      * @return a <code>boolean</code> value
@@ -135,6 +140,16 @@ public class IndianNationType extends NationType {
         }
     }
     */
+
+    /**
+     * Gets a list of this Nation's skills.
+     *
+     * @return A list of national skills.
+     */
+    public List<RandomChoice<UnitType>> getSkills() {
+        return (skills == null) ? new ArrayList<RandomChoice<UnitType>>()
+            : skills;
+    }
 
     /**
      * Generates choices for skill that could be taught from a settlement on
@@ -170,119 +185,131 @@ public class IndianNationType extends NationType {
         return scaledSkills;
     }
 
-    /**
-     * Returns a list of this Nation's skills.
-     *
-     * @return a list of this Nation's skills.
-     */
-    public List<RandomChoice<UnitType>> getSkills() {
-        return skills;
-    }
 
+    // Serialization
+
+    private static final String PROBABILITY_TAG = "probability";
+    private static final String SKILL_TAG = "skill";
 
     /**
-     * Makes an XML-representation of this object.
-     *
-     * @param out The output stream.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
+     * {@inheritDoc}
      */
-    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+    @Override
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         super.toXML(out, getXMLElementTagName());
     }
 
     /**
-     * Write the children of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to
-     *     the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
         super.writeChildren(out);
 
-        for (RandomChoice<UnitType> choice : skills) {
-            out.writeStartElement("skill");
-            out.writeAttribute(ID_ATTRIBUTE_TAG, choice.getObject().getId());
-            out.writeAttribute("probability",
-                Integer.toString(choice.getProbability()));
+        for (RandomChoice<UnitType> choice : getSkills()) {
+            out.writeStartElement(SKILL_TAG);
+
+            writeAttribute(out, ID_ATTRIBUTE_TAG, choice.getObject());
+
+            writeAttribute(out, PROBABILITY_TAG, choice.getProbability());
+
             out.writeEndElement();
         }
 
-        for (String region : regions) {
+        for (String region : getRegionNames()) {
             out.writeStartElement(Region.getXMLElementTagName());
-            out.writeAttribute(ID_ATTRIBUTE_TAG, region);
+
+            writeAttribute(out, ID_ATTRIBUTE_TAG, region);
+
             out.writeEndElement();
         }
     }
 
     /**
-     * Reads the attributes of this object from an XML stream.
-     *
-     * @param in The XML input stream.
-     * @throws XMLStreamException if a problem was encountered
-     *     during parsing.
-     */
-    @Override
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
-        super.readAttributes(in);
-
-        String extendString = in.getAttributeValue(null, EXTENDS_TAG);
-        IndianNationType parent = (extendString == null) ? this :
-            getSpecification().getType(extendString, IndianNationType.class);
-        if (parent != this) {
-            skills.addAll(parent.skills);
-        }
-
-    }
-
-    /**
-     * Reads the children of this object from an XML stream.
-     *
-     * @param in The XML input stream.
-     * @throws XMLStreamException if a problem was encountered
-     *     during parsing.
+     * {@inheritDoc}
      */
     @Override
     protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        if (readShouldClearContainers(in)) {
+            // Clear containers.
+            skills = null;
+            regions = null;
+        }
+
+        final Specification spec = getSpecification();
+        IndianNationType parent = spec.getType(in, EXTENDS_TAG,
+                                               IndianNationType.class, this);
+
         super.readChildren(in);
 
-        // sort skill according to probability
-        Collections.sort(skills, new Comparator<RandomChoice<UnitType>>() {
-                public int compare(RandomChoice<UnitType> choice1,
-                                   RandomChoice<UnitType> choice2) {
-                    return choice2.getProbability() - choice1.getProbability();
+        if (parent != this) {
+            if (parent.skills != null && !parent.skills.isEmpty()) {
+                if (skills == null) {
+                    skills = new ArrayList<RandomChoice<UnitType>>();
                 }
-            });
+                skills.addAll(parent.skills);
+            }
+
+            if (parent.regions != null && !parent.regions.isEmpty()) {
+                if (regions == null) {
+                    regions = new ArrayList<String>();
+                }
+                regions.addAll(parent.regions);
+            }
+        }
+
+        if (skills != null) {
+            // sort skill according to probability
+            Collections.sort(skills, new Comparator<RandomChoice<UnitType>>() {
+                    public int compare(RandomChoice<UnitType> c1,
+                                       RandomChoice<UnitType> c2) {
+                        return c2.getProbability() - c1.getProbability();
+                    }
+                });
+        }
     }
 
     /**
-     * Reads a child object.
-     *
-     * @param in The XML stream to read.
-     * @exception XMLStreamException if an error occurs
+     * {@inheritDoc}
      */
     @Override
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        String childName = in.getLocalName();
-        if ("skill".equals(childName)) {
-            UnitType unitType = getSpecification().getUnitType(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
-            int probability = getAttribute(in, "probability", 0);
-            skills.add(new RandomChoice<UnitType>(unitType, probability));
+        final Specification spec = getSpecification();
+        final String tag = in.getLocalName();
+
+        if (SKILL_TAG.equals(tag)) {
+            UnitType unitType = spec.getType(in, ID_ATTRIBUTE_TAG,
+                                             UnitType.class, (UnitType)null);
+
+            int probability = getAttribute(in, PROBABILITY_TAG, 0);
+
+            if (unitType != null && probability > 0) {
+                if (skills == null) {
+                    skills = new ArrayList<RandomChoice<UnitType>>();
+                }
+                skills.add(new RandomChoice<UnitType>(unitType, probability));
+            }
+
             in.nextTag(); // close this element
-        } else if (Region.getXMLElementTagName().equals(childName)) {
-            regions.add(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
+
+        } else if (Region.getXMLElementTagName().equals(tag)) {
+            String id = getAttribute(in, ID_ATTRIBUTE_TAG, (String)null);
+            if (id != null) {
+                if (regions == null) {
+                    regions = new ArrayList<String>();
+                }
+                regions.add(id);
+            }
+
             in.nextTag(); // close this element
+
         } else {
             super.readChild(in);
         }
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "indian-nation-type".
      */

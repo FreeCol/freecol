@@ -34,6 +34,7 @@ import javax.xml.stream.XMLStreamWriter;
 public abstract class NationType extends FreeColGameObjectType {
 
     public static enum SettlementNumber { LOW, AVERAGE, HIGH }
+
     public static enum AggressionLevel { LOW, AVERAGE, HIGH }
 
 
@@ -50,43 +51,56 @@ public abstract class NationType extends FreeColGameObjectType {
     /**
      * The types of settlement this Nation has.
      */
-    private List<SettlementType> settlementTypes = new ArrayList<SettlementType>();
+    private List<SettlementType> settlementTypes = null;
 
 
+    /**
+     * Default nation type constructor.
+     *
+     * @param id The nation type identifier.
+     * @param specification The containing <code>Specification</code>.
+     */
     public NationType(String id, Specification specification) {
         super(id, specification);
+
         setModifierIndex(Modifier.NATION_PRODUCTION_INDEX);
     }
 
     /**
-     * Get the <code>TypeOfSettlement</code> value.
+     * Get the settlement types.
      *
-     * @return an <code>SettlementType</code> value
+     * @return A list of <code>SettlementType</code>s.
      */
     public final List<SettlementType> getSettlementTypes() {
-        return settlementTypes;
+        return (settlementTypes == null) ? new ArrayList<SettlementType>()
+            : settlementTypes;
     }
 
     /**
-     * Return the <code>SettlementType</code> of the nation type's
-     * capital.
+     * Gets the settlement type for the national capital.
      *
-     * @return a <code>SettlementType</code> value
+     * @return The capital <code>SettlementType</code>.
      */
     public SettlementType getCapitalType() {
         return getSettlementType(true);
     }
 
+    /**
+     * Gets the settlement type for a settlement of this nation.
+     *
+     * @param isCapital If true, get the capital type.
+     * @return The settlement type.
+     */
     public SettlementType getSettlementType(boolean isCapital) {
-
-        for (SettlementType settlementType : settlementTypes) {
+        for (SettlementType settlementType : getSettlementTypes()) {
             if (settlementType.isCapital() == isCapital) {
                 return settlementType;
             }
         }
         // @compat 0.9.x
         // TODO: remove compatibility code and throw exception instead
-        String id = "model.settlement." + getId().substring(getId().lastIndexOf(".") + 1)
+        String id = "model.settlement."
+            + getId().substring(getId().lastIndexOf(".") + 1)
             + (isCapital ? ".capital" : "");
         SettlementType type = new SettlementType(id, getSpecification());
         if (isCapital) {
@@ -97,13 +111,18 @@ public abstract class NationType extends FreeColGameObjectType {
             type.setPlunder(new RandomRange(50, 2, 6, 1000));
             type.setGifts(new RandomRange(50, 2, 6, 100));
         }
-        return type;
         // end compatibility code
+        return type;
     }
 
+    /**
+     * Get a settlement type by id.
+     *
+     * @param id The id to check.
+     * @return The settlement type.
+     */
     public SettlementType getSettlementType(String id) {
-
-        for (SettlementType settlementType : settlementTypes) {
+        for (SettlementType settlementType : getSettlementTypes()) {
             if (id.equals(settlementType.getId())) {
                 return settlementType;
             }
@@ -112,154 +131,143 @@ public abstract class NationType extends FreeColGameObjectType {
     }
 
     /**
-     * Get the <code>NumberOfSettlements</code> value.
+     * Get the national number of settlements.
      *
-     * @return a <code>SettlementNumber</code> value
+     * @return The <code>SettlementNumber</code>.
      */
     public final SettlementNumber getNumberOfSettlements() {
         return numberOfSettlements;
     }
 
     /**
-     * Set the <code>NumberOfSettlements</code> value.
+     * Get the national aggression.
      *
-     * @param newNumberOfSettlements The new NumberOfSettlements value.
-     */
-    public final void setNumberOfSettlements(final SettlementNumber newNumberOfSettlements) {
-        this.numberOfSettlements = newNumberOfSettlements;
-    }
-
-    /**
-     * Get the <code>Aggression</code> value.
-     *
-     * @return an <code>AggressionLevel</code> value
+     * @return The national <code>AggressionLevel</code>.
      */
     public final AggressionLevel getAggression() {
         return aggression;
     }
 
     /**
-     * Set the <code>Aggression</code> value.
-     *
-     * @param newAggression The new Aggression value.
-     */
-    public final void setAggression(final AggressionLevel newAggression) {
-        this.aggression = newAggression;
-    }
-
-    /**
      * Whether this is a EuropeanNation, i.e. a player or a REF.
      *
+     * @return True if this is an European nation.
      */
     public abstract boolean isEuropean();
 
     /**
      * Whether this is a IndianNation.
      *
+     * @return True if this is a native nation.
      */
     public abstract boolean isIndian();
 
     /**
      * Whether this is a EuropeanREFNation.
      *
+     * @return True if this is a REF nation.
      */
     public abstract boolean isREF();
 
+
+    // Serialization
+
+    private static final String AGGRESSION_TAG = "aggression";
+    private static final String NUMBER_OF_SETTLEMENTS_TAG = "number-of-settlements";
+    private static final String SETTLEMENT_TAG = "settlement";
+
     /**
-     * Reads the attributes of this object from an XML stream.
-     *
-     * @param in The XML input stream.
-     * @throws XMLStreamException if a problem was encountered
-     *     during parsing.
+     * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        super.writeAttributes(out);
+
+        writeAttribute(out, NUMBER_OF_SETTLEMENTS_TAG, numberOfSettlements);
+
+        writeAttribute(out, AGGRESSION_TAG, aggression);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
+        super.writeChildren(out);
+
+        for (SettlementType settlementType : getSettlementTypes()) {
+            settlementType.toXML(out, SETTLEMENT_TAG);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
 
-        String extendString = in.getAttributeValue(null, EXTENDS_TAG);
-        NationType parent = (extendString == null) ? this :
-            getSpecification().getType(extendString, NationType.class);
-        String valueString = in.getAttributeValue(null,
-            "number-of-settlements");
-        if (valueString == null) {
-            numberOfSettlements = parent.numberOfSettlements;
-        } else {
-            numberOfSettlements = Enum.valueOf(SettlementNumber.class,
-                valueString.toUpperCase(Locale.US));
+        final Specification spec = getSpecification();
+        NationType parent = spec.getType(in, EXTENDS_TAG,
+                                         NationType.class, this);
+
+        numberOfSettlements = getAttribute(in, NUMBER_OF_SETTLEMENTS_TAG,
+            SettlementNumber.class, parent.numberOfSettlements);
+
+        aggression = getAttribute(in, AGGRESSION_TAG,
+                                  AggressionLevel.class, parent.aggression);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        if (readShouldClearContainers(in)) {
+            // Clear containers
+            settlementTypes = null;
         }
 
-        valueString = in.getAttributeValue(null, "aggression");
-        if (valueString == null) {
-            aggression = parent.aggression;
-        } else {
-            aggression = Enum.valueOf(AggressionLevel.class,
-                valueString.toUpperCase(Locale.US));
-        }
+        final Specification spec = getSpecification();
+        NationType parent = spec.getType(in, EXTENDS_TAG,
+                                         NationType.class, this);
+
+        super.readChildren(in);
 
         if (parent != this) {
-            getSettlementTypes().addAll(parent.getSettlementTypes());
+            if (parent.settlementTypes != null) {
+                if (settlementTypes == null) {
+                    settlementTypes = new ArrayList<SettlementType>();
+                }
+                settlementTypes.addAll(parent.settlementTypes);
+            }
+
             addFeatures(parent);
             if (parent.isAbstractType()) {
                 getFeatureContainer().replaceSource(parent, this);
             }
         }
-
     }
 
     /**
-     * Reads a child object.
-     *
-     * @param in The XML stream to read.
-     * @exception XMLStreamException if an error occurs
+     * {@inheritDoc}
      */
     @Override
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        String childName = in.getLocalName();
-        if ("settlement".equals(childName)) {
-            String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-            SettlementType settlementType
-                = new SettlementType(id, getSpecification());
+        final Specification spec = getSpecification();
+        final String tag = in.getLocalName();
+
+        if (SETTLEMENT_TAG.equals(tag)) {
+            String id = getAttribute(in, ID_ATTRIBUTE_TAG, (String)null);
+            SettlementType settlementType = new SettlementType(id, spec);
             settlementType.readFromXML(in);
+            if (settlementTypes == null) {
+                settlementTypes = new ArrayList<SettlementType>();
+            }
             settlementTypes.add(settlementType);
+
         } else {
             super.readChild(in);
         }
     }
-
-    /**
-     * Write the attributes of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to
-     *     the stream.
-     */
-    @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
-        super.writeAttributes(out);
-
-        out.writeAttribute("number-of-settlements",
-            numberOfSettlements.toString().toLowerCase(Locale.US));
-        out.writeAttribute("aggression",
-            aggression.toString().toLowerCase(Locale.US));
-    }
-
-    /**
-     * Write the children of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to
-     *     the stream.
-     */
-    @Override
-    protected void writeChildren(XMLStreamWriter out)
-        throws XMLStreamException {
-        super.writeChildren(out);
-
-        for (SettlementType settlementType : settlementTypes) {
-            settlementType.toXML(out, "settlement");
-        }
-    }
-
 }

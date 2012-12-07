@@ -48,72 +48,74 @@ public class EuropeanNationType extends NationType {
     /**
      * Stores the starting units of this Nation.
      */
-    private List<AbstractUnit> startingUnits;
+    private List<AbstractUnit> startingUnits = null;
 
     /**
      * Stores the starting units of this Nation at various
      * difficulties.
      */
-    private Map<String, Map<String, AbstractUnit>> startingUnitMap =
-        new HashMap<String, Map<String, AbstractUnit>>();
+    private Map<String, Map<String, AbstractUnit>> startingUnitMap
+        = new HashMap<String, Map<String, AbstractUnit>>();
+
+    /**
+     * Always using expert starting units.
+     */
+    private final boolean expert = true;
 
 
-
+    /**
+     * Create a new European nation type.
+     *
+     * @param id The nation type identifier.
+     * @param specification The containing <code>Specification</code>.
+     */
     public EuropeanNationType(String id, Specification specification) {
         super(id, specification);
     }
 
     /**
-     * Get the <code>REF</code> value.
+     * Is this a REF nation type?
      *
-     * @return a <code>boolean</code> value
+     * @return True if this is a REF nation type.
      */
     public final boolean isREF() {
         return ref;
     }
 
     /**
-     * Set the <code>REF</code> value.
+     * Is this a European nation type?
      *
-     * @param newREF The new REF value.
-     */
-    public final void setREF(final boolean newREF) {
-        this.ref = newREF;
-    }
-
-    /**
-     * Returns true.
-     *
-     * @return a <code>boolean</code> value
+     * @return True.
      */
     public boolean isEuropean() {
         return true;
     }
 
     /**
-     * Returns false.
+     * Is this a native nation type?
      *
-     * @return a <code>boolean</code> value
+     * @return False.
      */
     public boolean isIndian() {
         return false;
     }
 
     /**
-     * Returns a list of this Nation's starting units.
+     * Gets the starting units for this nation type.
      *
-     * @return a list of this Nation's starting units.
+     * @return A list of <code>AbstractUnit</code>s to start with.
      */
     public List<AbstractUnit> getStartingUnits() {
-        return startingUnits;
+        return (startingUnits == null) ? new ArrayList<AbstractUnit>()
+            : startingUnits;
     }
 
     /**
-     * Returns a list of this Nation's starting units at the given
+     * Gets a list of this Nation's starting units at the given
      * difficulty.
      *
-     * @param key the value of the expert-starting-units field
-     * @return a list of this Nation's starting units.
+     * @param key The value of the expert-starting-units field.
+     * @return A list of <code>AbstractUnit</code>s to start with.
      */
     public List<AbstractUnit> getStartingUnits(String key) {
         Map<String, AbstractUnit> result = new HashMap<String, AbstractUnit>();
@@ -135,134 +137,151 @@ public class EuropeanNationType extends NationType {
      */
     @Override
     public void applyDifficultyLevel(OptionGroup difficulty) {
-        String experts = Boolean.toString(((BooleanOption) difficulty.getOption("model.option.expertStartingUnits"))
-                                          .getValue());
-        startingUnits = getStartingUnits(experts);
+        boolean ex = difficulty.getBoolean("model.option.expertStartingUnits");
+        startingUnits = getStartingUnits(String.valueOf(ex));
     }
 
 
+    // Serialization
+
+    private static final String EXPERT_STARTING_UNITS_TAG = "expert-starting-units";
+    private static final String REF_TAG = "ref";
+    private static final String ROLE_TAG = "role";
+    private static final String TYPE_TAG = "type";
+    private static final String UNIT_TAG = "unit";
+
     /**
-     * Makes an XML-representation of this object.
-     *
-     * @param out The output stream.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
+     * {@inheritDoc}
      */
-    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+    @Override
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         super.toXML(out, getXMLElementTagName());
     }
 
     /**
-     * Write the attributes of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to
-     *     the stream.
+     * {@inheritDoc}
      */
     @Override
-    public void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
-        out.writeAttribute("ref", Boolean.toString(ref));
+        writeAttribute(out, REF_TAG, ref);
     }
 
     /**
-     * Write the children of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to
-     *     the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
         super.writeChildren(out);
 
         if (startingUnitMap != null && !startingUnitMap.isEmpty()) {
+            Map<String, AbstractUnit> map;
             // default map
-            for (Map.Entry<String, AbstractUnit> entry
-                     : startingUnitMap.get(null).entrySet()) {
-                writeUnit(out, entry.getKey(), entry.getValue(), false);
+            if ((map = startingUnitMap.get(null)) != null) {
+                for (Map.Entry<String, AbstractUnit> entry : map.entrySet()) {
+                    writeUnit(out, entry.getKey(), entry.getValue(), false);
+                }
             }
             // expert map
-            for (Map.Entry<String, AbstractUnit> entry
-                     : startingUnitMap.get("true").entrySet()) {
-                writeUnit(out, entry.getKey(), entry.getValue(), true);
+            if ((map = startingUnitMap.get(Boolean.TRUE.toString())) != null) {
+                for (Map.Entry<String, AbstractUnit> entry : map.entrySet()) {
+                    writeUnit(out, entry.getKey(), entry.getValue(), true);
+                }
             }
         }
     }
 
     private void writeUnit(XMLStreamWriter out, String id,
-        AbstractUnit unit, boolean expert)
+                           AbstractUnit unit, boolean expert)
         throws XMLStreamException {
-        out.writeStartElement("unit");
-        out.writeAttribute(ID_ATTRIBUTE_TAG, id);
-        out.writeAttribute("type", unit.getId());
-        out.writeAttribute("role",
-            unit.getRole().toString().toLowerCase(Locale.US));
-        //out.writeAttribute("number", String.valueOf(unit.getNumber()));
-        if (expert) {
-            out.writeAttribute("expert-starting-units", "true");
-        }
+        out.writeStartElement(UNIT_TAG);
+
+        writeAttribute(out, ID_ATTRIBUTE_TAG, id);
+
+        writeAttribute(out, TYPE_TAG, unit);
+
+        writeAttribute(out, ROLE_TAG, unit.getRole());
+
+        //writeAttribute(out, "number", unit.getNumber());
+
+        if (expert) writeAttribute(out, EXPERT_STARTING_UNITS_TAG, expert);
+
         out.writeEndElement();
     }
 
     /**
-     * Reads the attributes of this object from an XML stream.
-     *
-     * @param in The XML input stream.
-     * @throws XMLStreamException if a problem was encountered
-     *     during parsing.
+     * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
 
-        String extendString = in.getAttributeValue(null, EXTENDS_TAG);
-        EuropeanNationType parent = (extendString == null) ? this :
-            (EuropeanNationType) getSpecification().getNationType(extendString);
-        ref = getAttribute(in, "ref", parent.ref);
+        final Specification spec = getSpecification();
+        EuropeanNationType parent = spec.getType(in, EXTENDS_TAG,
+                                                 EuropeanNationType.class, this);
+        
+        ref = getAttribute(in, REF_TAG, parent.ref);
+    }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        if (readShouldClearContainers(in)) {
+            // Clear containers.
+            startingUnitMap.clear();
+        }
+
+        final Specification spec = getSpecification();
+        EuropeanNationType parent = spec.getType(in, EXTENDS_TAG,
+                                                 EuropeanNationType.class, this);
         if (parent != this) {
-            for (Map.Entry<String,Map<String, AbstractUnit>> entry
+            for (Map.Entry<String, Map<String, AbstractUnit>> entry
                      : parent.startingUnitMap.entrySet()) {
                 startingUnitMap.put(entry.getKey(),
                     new HashMap<String, AbstractUnit>(entry.getValue()));
             }
         }
-    }
 
+        super.readChildren(in);
+    }
+    
     /**
-     * Reads a child object.
-     *
-     * @param in The XML stream to read.
-     * @exception XMLStreamException if an error occurs
+     * {@inheritDoc}
      */
     @Override
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        String childName = in.getLocalName();
-        if ("unit".equals(childName)) {
-            String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-            String type = in.getAttributeValue(null, "type");
-            Role role = Enum.valueOf(Role.class, getAttribute(in, "role", "default").toUpperCase(Locale.US));
-            String useExperts = in.getAttributeValue(null, "expert-starting-units");
+        final String tag = in.getLocalName();
+
+        if (UNIT_TAG.equals(tag)) {
+            String id = getAttribute(in, ID_ATTRIBUTE_TAG, (String)null);
+
+            String type = getAttribute(in, TYPE_TAG, (String)null);
+
+            Role role = getAttribute(in, ROLE_TAG, Role.class, Role.DEFAULT);
+            
+            boolean ex = getAttribute(in, EXPERT_STARTING_UNITS_TAG, false);
+            String exTag = (ex) ? Boolean.TRUE.toString() : null;
+
             AbstractUnit unit = new AbstractUnit(type, role, 1);
-            Map<String, AbstractUnit> units = startingUnitMap.get(useExperts);
+            Map<String, AbstractUnit> units = startingUnitMap.get(exTag);
             if (units == null) {
                 units = new HashMap<String, AbstractUnit>();
-                startingUnitMap.put(useExperts, units);
+                startingUnitMap.put(exTag, units);
             }
             units.put(id, unit);
             in.nextTag();
+            System.err.println("READ " + this.getId() + " " + id + " " + units.size());
+
         } else {
             super.readChild(in);
         }
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "european-nation-type".
      */
