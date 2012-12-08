@@ -31,7 +31,7 @@ import net.sf.freecol.common.model.Specification;
 
 /**
  * The super class of all options. GUI components making use of this
- * class can refer to its name and shortDescription properties. The
+ * class can refer to its name and shortDescription properties.  The
  * complete keys of these properties consist of the id of the option
  * group (if any), followed by a "."  unless the option group is null,
  * followed by the id of the option object, followed by a ".",
@@ -42,11 +42,13 @@ abstract public class AbstractOption<T> extends FreeColObject
 
     private static Logger logger = Logger.getLogger(AbstractOption.class.getName());
 
+    /** The option group prefix. */
     private String optionGroup = "";
 
-    // Determine if the option has been defined
-    // When defined an option won't change when a default value is read from an
-    // XML file.
+    /**
+     * Determine if the option has been defined.  When defined an
+     * option won't change when a default value is read from an XML file.
+     */
     protected boolean isDefined = false;
 
 
@@ -63,9 +65,9 @@ abstract public class AbstractOption<T> extends FreeColObject
     /**
      * Creates a new <code>AbstractOption</code>.
      *
-     * @param specification The specification this Option refers
-     *     to. This may be null, since only some options need access
-     *     to the specification.
+     * @param specification The <code>Specification</code> this
+     *     <code>Option</code> refers to.  This may be null, since only
+     *     some options need access to the specification.
      */
     public AbstractOption(Specification specification) {
         this(null, specification);
@@ -74,11 +76,11 @@ abstract public class AbstractOption<T> extends FreeColObject
     /**
      * Creates a new <code>AbstractOption</code>.
      *
-     * @param id The identifier for this option. This is used when the
+     * @param id The identifier for this option.  This is used when the
      *     object should be found in an {@link OptionGroup}.
-     * @param specification The specification this Option refers
-     *     to. This may be null, since only some options need access
-     *     to the specification.
+     * @param specification The <code>Specification</code> this
+     *     <code>Option</code> refers to.  This may be null, since only
+     *     some options need access to the specification.
      */
     public AbstractOption(String id, Specification specification) {
         setId(id);
@@ -87,6 +89,11 @@ abstract public class AbstractOption<T> extends FreeColObject
 
     public abstract AbstractOption<T> clone() throws CloneNotSupportedException;
 
+    /**
+     * Sets the values from another option.
+     *
+     * @param source The other <code>AbstractOption</code>.
+     */
     protected void setValues(AbstractOption<T> source) {
         setId(source.getId());
         setSpecification(source.getSpecification());
@@ -96,7 +103,7 @@ abstract public class AbstractOption<T> extends FreeColObject
     }
 
     /**
-     * Returns the string prefix that identifies the group of this
+     * Gets the string prefix that identifies the group of this
      * <code>Option</code>.
      *
      * @return The string prefix provided by the OptionGroup.
@@ -106,10 +113,9 @@ abstract public class AbstractOption<T> extends FreeColObject
     }
 
     /**
-     * Set the option group
+     * Set the option group prefix.
      *
-     * @param group <code>OptionGroup</code> to set
-     *
+     * @param group The prefix to set.
      */
     public void setGroup(String group) {
         if (group == null) {
@@ -120,130 +126,156 @@ abstract public class AbstractOption<T> extends FreeColObject
     }
 
     /**
-     * Returns the value of this Option.
+     * Gets the value of this Option.
      *
-     * @return the value of this Option
+     * @return The value of this Option
      */
     public abstract T getValue();
 
     /**
      * Sets the value of this Option.
      *
-     * @param value the value of this Option
+     * @param value The new value of this Option.
      */
     public abstract void setValue(T value);
 
     /**
      * Sets the value of this Option from the given string
-     * representation. Both parameters must not be null at the same
-     * time. This method does nothing. Override it if the Option has a
-     * suitable string representation.
+     * representation.  Both parameters must not be null at the same
+     * time.  This method does nothing.  Override it if the Option has
+     * a suitable string representation.
      *
-     * @param valueString the string representation of the value of
-     * this Option
-     * @param defaultValueString the string representation of the
-     * default value of this Option
+     * @param valueString The string representation of the value of
+     *     this Option.
+     * @param defaultValueString The string representation of the
+     *     default value of this Option
      */
     protected void setValue(String valueString, String defaultValueString) {
         logger.warning("Unsupported method: setValue.");
     }
 
     /**
-     * Returns whether <code>null</code> is an acceptable value for
-     * this Option. This method always returns <code>false</code>.
+     * Is null an acceptable value for this Option?
      * Override it where necessary.
      *
-     * @return false
+     * @return False.
      */
     public boolean isNullValueOK() {
         return false;
     }
 
     /**
-     * Generate the choices to provide to the UI. This method does
-     * nothing. Override it if the Option needs to determine its
-     * choices dynamically.
+     * Generate the choices to provide to the UI.
+     * Override if the Option needs to determine its choices dynamically.
      */
     public void generateChoices() {
         // do nothing
     }
 
+
+    // Serialization
+
+    private static final String ACTION_TAG = "action";
+    private static final String DEFAULT_VALUE_TAG = "defaultValue";
+
     /**
-     * Initialize this object from an XML-representation of this object.
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
+     * {@inheritDoc}
      */
+    @Override
     public void readFromXML(XMLStreamReader in) throws XMLStreamException {
         readAttributes(in);
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            readChild(in);
-        }
+
+        super.readChildren(in);
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         setId(getAttribute(in, ID_ATTRIBUTE_TAG, getId()));
-        final String defaultValue = in.getAttributeValue(null, "defaultValue");
-        final String value = in.getAttributeValue(null, VALUE_TAG);
+        
+        String defaultValue = getAttribute(in, DEFAULT_VALUE_TAG, (String)null);
+
+        String value = getAttribute(in, VALUE_TAG, (String)null);
 
         if (!isNullValueOK() && defaultValue == null && value == null) {
             throw new XMLStreamException("invalid option " + getId()
-                                         + ": no value nor default value found.");
+                + ": no value nor default value found.");
         }
 
         setValue(value, defaultValue);
     }
 
+    /**
+     * General option reader routine.
+     *
+     * @param in The <code>XMLStreamReader</code> to read from.
+     * @return An option.
+     */
     protected AbstractOption readOption(XMLStreamReader in) throws XMLStreamException {
-        String optionType = in.getLocalName();
+        final Specification spec = getSpecification();
+        final String tag = in.getLocalName();
         AbstractOption option = null;
-        if (OptionGroup.getXMLElementTagName().equals(optionType)) {
-            option = new OptionGroup(getSpecification());
-        } else if (IntegerOption.getXMLElementTagName().equals(optionType)) {
-            option = new IntegerOption(getSpecification());
-        } else if (BooleanOption.getXMLElementTagName().equals(optionType)) {
-            option = new BooleanOption(getSpecification());
-        } else if (RangeOption.getXMLElementTagName().equals(optionType)) {
-            option = new RangeOption(getSpecification());
-        } else if (SelectOption.getXMLElementTagName().equals(optionType)) {
-            option = new SelectOption(getSpecification());
-        } else if (LanguageOption.getXMLElementTagName().equals(optionType)) {
-            option = new LanguageOption(getSpecification());
-        } else if (FileOption.getXMLElementTagName().equals(optionType)) {
-            option = new FileOption(getSpecification());
-        } else if (PercentageOption.getXMLElementTagName().equals(optionType)) {
-            option = new PercentageOption(getSpecification());
-        } else if (AudioMixerOption.getXMLElementTagName().equals(optionType)) {
-            option = new AudioMixerOption(getSpecification());
-        } else if (StringOption.getXMLElementTagName().equals(optionType)) {
-            option = new StringOption(getSpecification());
-        } else if (UnitTypeOption.getXMLElementTagName().equals(optionType)) {
-            option = new UnitTypeOption(getSpecification());
-        } else if (AbstractUnitOption.getXMLElementTagName().equals(optionType)) {
-            option = new AbstractUnitOption(getSpecification());
-        } else if (ModOption.getXMLElementTagName().equals(optionType)) {
-            option = new ModOption(getSpecification());
-        } else if (UnitListOption.getXMLElementTagName().equals(optionType)) {
-            option = new UnitListOption(getSpecification());
-        } else if (ModListOption.getXMLElementTagName().equals(optionType)) {
-            option = new ModListOption(getSpecification());
-        } else if ("action".equals(optionType)) {
-            logger.finest("Skipping action " + in.getAttributeValue(null, "id"));
+
+        if (ACTION_TAG.equals(tag)) {
             // TODO: load FreeColActions from client options?
+            logger.finest("Skipping action "
+                + getAttribute(in, ID_ATTRIBUTE_TAG, ""));
             in.nextTag();
-            return null;
+
+        } else if (AbstractUnitOption.getXMLElementTagName().equals(tag)) {
+            option = new AbstractUnitOption(spec);
+
+        } else if (AudioMixerOption.getXMLElementTagName().equals(tag)) {
+            option = new AudioMixerOption(spec);
+
+        } else if (BooleanOption.getXMLElementTagName().equals(tag)) {
+            option = new BooleanOption(spec);
+
+        } else if (FileOption.getXMLElementTagName().equals(tag)) {
+            option = new FileOption(spec);
+
+        } else if (IntegerOption.getXMLElementTagName().equals(tag)) {
+            option = new IntegerOption(spec);
+
+        } else if (LanguageOption.getXMLElementTagName().equals(tag)) {
+            option = new LanguageOption(spec);
+
+        } else if (ModListOption.getXMLElementTagName().equals(tag)) {
+            option = new ModListOption(spec);
+
+        } else if (ModOption.getXMLElementTagName().equals(tag)) {
+            option = new ModOption(spec);
+
+        } else if (OptionGroup.getXMLElementTagName().equals(tag)) {
+            option = new OptionGroup(spec);
+
+        } else if (PercentageOption.getXMLElementTagName().equals(tag)) {
+            option = new PercentageOption(spec);
+
+        } else if (RangeOption.getXMLElementTagName().equals(tag)) {
+            option = new RangeOption(spec);
+
+        } else if (SelectOption.getXMLElementTagName().equals(tag)) {
+            option = new SelectOption(spec);
+
+        } else if (StringOption.getXMLElementTagName().equals(tag)) {
+            option = new StringOption(spec);
+
+        } else if (UnitListOption.getXMLElementTagName().equals(tag)) {
+            option = new UnitListOption(spec);
+
+        } else if (UnitTypeOption.getXMLElementTagName().equals(tag)) {
+            option = new UnitTypeOption(spec);
+
         } else {
-            logger.finest("Parsing of option type '" + optionType + "' is not implemented yet");
+            logger.finest("Parsing of option type '" + tag
+                + "' is not implemented yet");
             in.nextTag();
-            return null;
         }
-        option.readFromXML(in);
+
+        if (option != null) option.readFromXML(in);
         return option;
     }
-
-
-
 }

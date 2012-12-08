@@ -420,8 +420,7 @@ public final class Specification {
                     // extensions to not have to re-specify all the
                     // attributes when just changing the children.
                     if (object.getId() != null
-                        && FreeColObject.hasAttribute(xsr,
-                            FreeColGameObjectType.PRESERVE_TAG)) {
+                        && xsr.getAttributeValue(null, FreeColGameObjectType.PRESERVE_TAG) != null) {
                         object.readChildren(xsr);
                     } else {
                         object.readFromXML(xsr);

@@ -959,14 +959,22 @@ public final class FreeColServer {
             logger.info("Found savegame version " + savegameVersion);
 
             if (server != null) {
-                server.setSinglePlayer(FreeColObject.getAttribute(xsr,
-                        "singleplayer", true));
-                server.setPublicServer(FreeColObject.getAttribute(xsr,
-                        "publicServer", false));
-                String randomState = xsr.getAttributeValue(null, "randomState");
-                server.setServerRandom(Utils.restoreRandomState(randomState));
-                FreeColDebugger.setDebugModes(xsr.getAttributeValue(null, "debug"));
+                String str = xsr.getAttributeValue(null, "singleplayer");
+                server.setSinglePlayer((str == null) ? true
+                    : Boolean.parseBoolean(str));
+
+                str = xsr.getAttributeValue(null, "publicServer");
+                server.setPublicServer((str == null) ? false
+                    : Boolean.parseBoolean(str));
+
+                str = xsr.getAttributeValue(null, "randomState");
+                server.setServerRandom(Utils.restoreRandomState(str));
+
+                str = xsr.getAttributeValue(null, "debug");
+                FreeColDebugger.setDebugModes(str);
+
                 server.setOwner(xsr.getAttributeValue(null, "owner"));
+
                 active = xsr.getAttributeValue(null, "activeUnit");
             }
 
