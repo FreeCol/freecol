@@ -273,7 +273,6 @@ public class EuropeanNationType extends NationType {
             }
             units.put(id, unit);
             in.nextTag();
-            System.err.println("READ " + this.getId() + " " + id + " " + units.size());
 
         } else {
             super.readChild(in);
