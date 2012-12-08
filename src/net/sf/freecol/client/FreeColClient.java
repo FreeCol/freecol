@@ -175,7 +175,7 @@ public final class FreeColClient {
 
         mapEditor = false;
 
-        gui.displaySpashScreen(splashFilename);
+        gui.displaySplashScreen(splashFilename);
 
         // Determine the window size.
         gui.setWindowed(size != null);

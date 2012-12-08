@@ -278,7 +278,11 @@ public class GUI {
         canvas.repaint(0, 0, canvas.getWidth(), canvas.getHeight());
     }
 
-    public void displaySpashScreen(final String splashFilename) {
+    public void displayColonyTile(Graphics2D g, Tile tile, Colony colony) {
+        mapViewer.displayColonyTile(g, tile, colony);
+    }
+
+    public void displaySplashScreen(final String splashFilename) {
         splash = null;
         if (splashFilename != null) {
             try {

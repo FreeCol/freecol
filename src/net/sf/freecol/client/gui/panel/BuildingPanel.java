@@ -79,16 +79,19 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
         this.gui = gui;
         this.building = building;
 
-        addPropertyChangeListeners();
 
         setToolTipText(" ");
         setLayout(new MigLayout("", "[32][32][32]", "[32][44]"));
         initialize();
     }
 
-
     public void initialize() {
+        cleanup();
+        addPropertyChangeListeners();
+        update();
+    }
 
+    public void update() {
         removeAll();
         unitLabels.clear();
 
@@ -138,6 +141,10 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
         repaint();
     }
 
+    public void cleanup() {
+        removePropertyChangeListeners();
+    }
+
     /**
      * Paints this component.
      *
@@ -171,7 +178,7 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
     }
 
     public void updateProductionLabel() {
-        initialize();
+        update();
     }
 
     public List<UnitLabel> getUnitLabels() {
@@ -196,7 +203,7 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
         logger.finest(building.getId() + " change " + property
                       + ": " + event.getOldValue()
                       + " -> " + event.getNewValue());
-        initialize();
+        update();
     }
 
 
