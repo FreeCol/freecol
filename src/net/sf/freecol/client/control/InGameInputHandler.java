@@ -335,18 +335,21 @@ public final class InGameInputHandler extends InputHandler {
     }
 
     /**
-     * Handles an "animateMove"-message. This only performs animation,
-     * if required. It does not actually change unit positions, which
-     * happens in an "update".
+     * Handles an "animateMove"-message.  This only performs
+     * animation, if required.  It does not actually change unit
+     * positions, which happens in an "update".
      *
-     * @param element An element (root element in a DOM-parsed XML tree) that
-     *            holds attributes for the old and new tiles and an element for
-     *            the unit that is moving (which are used solely to operate the
-     *            animation).
+     * @param element An element (root element in a DOM-parsed XML
+     *     tree) that holds attributes for the old and new tiles and
+     *     an element for the unit that is moving (which are used
+     *     solely to operate the animation).
+     * @return Null.
      */
     private Element animateMove(Element element) {
         FreeColClient client = getFreeColClient();
-        Game game = getGame();
+        if (client.isHeadless()) return null;
+
+        final Game game = getGame();
         String unitId = element.getAttribute("unit");
         Unit unit;
         if (unitId == null
@@ -357,46 +360,51 @@ public final class InGameInputHandler extends InputHandler {
                 + " missing unit:" + unitId);
         }
 
-        if (!client.isHeadless()
-            && gui.getAnimationSpeed(unit) > 0) {
-            String oldTileId = element.getAttribute("oldTile");
-            String newTileId = element.getAttribute("newTile");
-            Tile oldTile, newTile;
-            if (oldTileId == null
-                || (oldTile = game.getFreeColGameObject(oldTileId, Tile.class)) == null) {
-                throw new IllegalStateException("Animation"
-                    + " for: " + client.getMyPlayer().getId()
-                    + " missing oldTile: " + oldTileId);
-            }
-            if (newTileId == null
-                || (newTile = game.getFreeColGameObject(newTileId, Tile.class)) == null) {
-                throw new IllegalStateException("Animation"
-                    + " for: " + client.getMyPlayer().getId()
-                    + " missing newTile: " + newTileId);
-            }
+        Player player = client.getMyPlayer();
+        String oldTileId = element.getAttribute("oldTile");
+        String newTileId = element.getAttribute("newTile");
+        Tile oldTile, newTile;
+        if (oldTileId == null
+            || (oldTile = game.getFreeColGameObject(oldTileId, Tile.class)) == null) {
+            throw new IllegalStateException("Animation for: " + player.getId()
+                + " missing oldTile: " + oldTileId);
+        }
+        if (newTileId == null
+            || (newTile = game.getFreeColGameObject(newTileId, Tile.class)) == null) {
+            throw new IllegalStateException("Animation for: " + player.getId()
+                + " missing newTile: " + newTileId);
+        }
 
-            // All is well, queue the animation.g
+        if (gui.getAnimationSpeed(unit) > 0) {
+            // All is well, queue the animation.
             // Use lastAnimatedUnit as a filter to avoid excessive refocussing.
             try {
                 new UnitMoveAnimationCanvasSwingTask(unit, oldTile, newTile,
-                                                     unit != lastAnimatedUnit)
-                    .invokeSpecial();
-                lastAnimatedUnit = unit;
+                    unit != lastAnimatedUnit).invokeSpecial();
             } catch (Exception e) {
                 logger.log(Level.WARNING, "UnitMoveAnimation", e);
             }
+        } else {
+            // Not animating, but if the centering option is enabled at least
+            // refocus so we can see the move happen.
+            if (!gui.onScreen(oldTile) && client.getClientOptions()
+                .getBoolean(ClientOptions.ALWAYS_CENTER)) {
+                gui.setFocus(oldTile);
+            }
         }
+        lastAnimatedUnit = unit;
         return null;
     }
 
     /**
-     * Handles an "animateAttack"-message. This only performs animation, if
-     * required. It does not actually perform any attacks.
+     * Handles an "animateAttack"-message.  This only performs animation, if
+     * required.  It does not actually perform any attacks.
      *
-     * @param element An element (root element in a DOM-parsed XML tree) that
-     *            holds attributes for the old and new tiles and an element for
-     *            the unit that is moving (which are used solely to operate the
-     *            animation).
+     * @param element An element (root element in a DOM-parsed XML
+     *     tree) that holds attributes for the old and new tiles and
+     *     an element for the unit that is moving (which are used
+     *     solely to operate the animation).
+     * @return Null.
      */
     private Element animateAttack(Element element) {
         FreeColClient client = getFreeColClient();
@@ -448,7 +456,6 @@ public final class InGameInputHandler extends InputHandler {
 
     private void takeTurn(Player player, boolean newTurn) {
         final FreeColClient fcc = getFreeColClient();
-
         fcc.getInGameController().setCurrentPlayer(player);
 
         if (newTurn) {
