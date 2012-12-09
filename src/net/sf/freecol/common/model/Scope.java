@@ -32,7 +32,6 @@ import javax.xml.stream.XMLStreamWriter;
  */
 public class Scope extends FreeColObject implements Cloneable {
 
-
     /**
      * The ID of a <code>FreeColGameObjectType</code>, or <code>Option</code>.
      */
@@ -87,137 +86,136 @@ public class Scope extends FreeColObject implements Cloneable {
     }
 
     /**
-     * Get the <code>MatchesNull</code> value.
+     * Does this scope match null?
      *
-     * @return a <code>boolean</code> value
+     * @return True if this scope matches null.
      */
     public boolean isMatchesNull() {
         return matchesNull;
     }
 
     /**
-     * Set the <code>MatchesNull</code> value.
+     * Set the null match value.
      *
-     * @param newMatchesNull The new MatchesNull value.
+     * @param newMatchesNull The new null match value.
      */
     public void setMatchesNull(final boolean newMatchesNull) {
         this.matchesNull = newMatchesNull;
     }
 
     /**
-     * Get the <code>MatchNegated</code> value.
+     * Is the match negated for this scope?
      *
-     * @return a <code>boolean</code> value
+     * @return True if this match is negated.
      */
     public boolean isMatchNegated() {
         return matchNegated;
     }
 
     /**
-     * Set the <code>MatchNegated</code> value.
+     * Set the match negated value.
      *
-     * @param newMatchNegated The new MatchNegated value.
+     * @param newMatchNegated The new match negated value.
      */
     public void setMatchNegated(final boolean newMatchNegated) {
         this.matchNegated = newMatchNegated;
     }
 
     /**
-     * Get the <code>Type</code> value.
+     * Gets the type of scope.
      *
-     * @return a <code>String</code> value
+     * @return The scope type.
      */
     public String getType() {
         return type;
     }
 
     /**
-     * Set the <code>Type</code> value.
+     * Set the scope type.
      *
-     * @param newType The new Type value.
+     * @param newType The new scope type.
      */
     public void setType(final String newType) {
         this.type = newType;
     }
 
     /**
-     * Get the <code>AbilityID</code> value.
+     * Gets the ability id.
      *
-     * @return a <code>String</code> value
+     * @return The ability id.
      */
     public String getAbilityID() {
         return abilityID;
     }
 
     /**
-     * Set the <code>AbilityID</code> value.
+     * Sets the ability id.
      *
-     * @param newAbilityID The new AbilityID value.
+     * @param newAbilityID The new ability id.
      */
     public void setAbilityID(final String newAbilityID) {
         this.abilityID = newAbilityID;
     }
 
     /**
-     * Get the <code>AbilityValue</code> value.
+     * Gets the ability value.
      *
-     * @return a <code>boolean</code> value
+     * @return The ability value.
      */
-    public boolean isAbilityValue() {
+    public boolean getAbilityValue() {
         return abilityValue;
     }
 
     /**
-     * Set the <code>AbilityValue</code> value.
+     * Sets the ability value.
      *
-     * @param newAbilityValue The new AbilityValue value.
+     * @param newAbilityValue The new ability value.
      */
     public void setAbilityValue(final boolean newAbilityValue) {
         this.abilityValue = newAbilityValue;
     }
 
     /**
-     * Get the <code>MethodName</code> value.
+     * Gets the method name.
      *
-     * @return a <code>String</code> value
+     * @return The method name.
      */
     public String getMethodName() {
         return methodName;
     }
 
     /**
-     * Set the <code>MethodName</code> value.
+     * Sets the method name.
      *
-     * @param newMethodName The new MethodName value.
+     * @param newMethodName The new method name.
      */
     public void setMethodName(final String newMethodName) {
         this.methodName = newMethodName;
     }
 
     /**
-     * Get the <code>MethodValue</code> value.
+     * Gets the method value.
      *
-     * @return an <code>String</code> value
+     * @return The method value.
      */
     public String getMethodValue() {
         return methodValue;
     }
 
     /**
-     * Set the <code>MethodValue</code> value.
+     * Sets the method value.
      *
-     * @param newMethodValue The new MethodValue value.
+     * @param newMethodValue The new method value.
      */
     public void setMethodValue(final String newMethodValue) {
         this.methodValue = newMethodValue;
     }
 
-
     /**
-     * Describe <code>appliesTo</code> method here.
+     * Does this scope apply to a given object?
      *
-     * @param object a <code>FreeColGameObjectType</code> value
-     * @return a <code>boolean</code> value
+     * @param object The <code>FreeColGameObjectType</code> to test.
+     * @return True if the scope is applicable.
      */
     public boolean appliesTo(FreeColObject object) {
         if (object == null) {
@@ -265,6 +263,11 @@ public class Scope extends FreeColObject implements Cloneable {
         return !matchNegated;
     }
 
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public int hashCode() {
         int hash = 7;
         hash += 31 * hash + (type == null ? 0 : type.hashCode());
@@ -277,6 +280,10 @@ public class Scope extends FreeColObject implements Cloneable {
         return hash;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean equals(Object o) {
         if (o == this) {
             return true;
@@ -302,7 +309,7 @@ public class Scope extends FreeColObject implements Cloneable {
             } else if (!abilityID.equals(otherScope.getAbilityID())) {
                 return false;
             }
-            if (abilityValue != otherScope.isAbilityValue()) {
+            if (abilityValue != otherScope.getAbilityValue()) {
                 return false;
             }
             if (methodName == null) {
@@ -325,65 +332,74 @@ public class Scope extends FreeColObject implements Cloneable {
         }
     }
 
+
+    // Serialization
+
+    private static final String ABILITY_ID_TAG = "ability-id";
+    private static final String ABILITY_VALUE_TAG = "ability-value";
+    private static final String MATCH_NEGATED_TAG = "matchNegated";
+    private static final String MATCHES_NULL_TAG = "matchesNull";
+    private static final String METHOD_NAME_TAG = "method-name";
+    private static final String METHOD_VALUE_TAG = "method-value";
+    private static final String TYPE_TAG = "type";
+
     /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * {@inheritDoc}
      */
+    @Override
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
+
         writeAttributes(out);
+
         out.writeEndElement();
     }
 
     /**
-     * Write the attributes of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *     to the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
-        out.writeAttribute("matchNegated", Boolean.toString(matchNegated));
-        out.writeAttribute("matchesNull", Boolean.toString(matchesNull));
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        writeAttribute(out, MATCH_NEGATED_TAG, matchNegated);
+
+        writeAttribute(out, MATCHES_NULL_TAG, matchesNull);
+
         if (type != null) {
-            out.writeAttribute("type", type);
+            writeAttribute(out, TYPE_TAG, type);
         }
+
         if (abilityID != null) {
-            out.writeAttribute("ability-id", abilityID);
-            out.writeAttribute("ability-value", Boolean.toString(abilityValue));
+            writeAttribute(out, ABILITY_ID_TAG, abilityID);
+            writeAttribute(out, ABILITY_VALUE_TAG, abilityValue);
         }
+
         if (methodName != null) {
-            out.writeAttribute("method-name", methodName);
-            // method value may be null in the Operand sub-class
+            writeAttribute(out, METHOD_NAME_TAG, methodName);
             if (methodValue != null) {
-                out.writeAttribute("method-value", methodValue);
+                // methodValue may be null in the Operand sub-class
+                writeAttribute(out, METHOD_VALUE_TAG, methodValue);
             }
         }
     }
 
     /**
-     * Reads the attributes of this object from an XML stream.
-     *
-     * @param in The XML input stream.
-     * @throws XMLStreamException if a problem was encountered
-     *     during parsing.
+     * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
-        matchNegated = getAttribute(in, "matchNegated", false);
-        matchesNull = getAttribute(in, "matchesNull", true);
-        type = in.getAttributeValue(null, "type");
-        abilityID = in.getAttributeValue(null, "ability-id");
-        abilityValue = getAttribute(in, "ability-value", true);
-        methodName = in.getAttributeValue(null, "method-name");
-        methodValue = in.getAttributeValue(null, "method-value");
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        matchNegated = getAttribute(in, MATCH_NEGATED_TAG, false);
+
+        matchesNull = getAttribute(in, MATCHES_NULL_TAG, true);
+
+        type = getAttribute(in, TYPE_TAG, (String)null);
+
+        abilityID = getAttribute(in, ABILITY_ID_TAG, (String)null);
+
+        abilityValue = getAttribute(in, ABILITY_VALUE_TAG, true);
+
+        methodName = getAttribute(in, METHOD_NAME_TAG, (String)null);
+
+        methodValue = getAttribute(in, METHOD_VALUE_TAG, (String)null);
     }
 
     /**

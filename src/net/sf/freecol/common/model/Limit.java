@@ -41,25 +41,38 @@ public final class Limit extends FreeColGameObjectType {
     }
 
     /**
-     * Describe operator here.
+     * The operator to apply when evaluating the limit expression.
      */
     private Operator operator;
 
     /**
-     * Describe leftHandSide here.
+     * The left hand side term of the limit expression.
      */
     private Operand leftHandSide;
 
     /**
-     * Describe rightHandSide here.
+     * The right hand side term of the limit expression.
      */
     private Operand rightHandSide;
 
 
+    /**
+     * Create a new limit.
+     *
+     * @param specification The containing <code>Specification</code>.
+     */
     public Limit(Specification specification) {
         super(specification);
     }
 
+    /**
+     * Create a new limit.
+     *
+     * @param id The identifier for this <code>FreeColObject</code>.
+     * @param lhs The left hand side <code>Operand</code>.
+     * @param op The <code>Operator</code> to apply.
+     * @param rhs The right hand side <code>Operand</code>.
+     */
     public Limit(String id, Operand lhs, Operator op, Operand rhs) {
         setId(id);
         leftHandSide = lhs;
@@ -70,7 +83,7 @@ public final class Limit extends FreeColGameObjectType {
     /**
      * Get the <code>Operator</code> value.
      *
-     * @return an <code>Operator</code> value
+     * @return The <code>Operator</code> of this limit.
      */
     public Operator getOperator() {
         return operator;
@@ -79,89 +92,97 @@ public final class Limit extends FreeColGameObjectType {
     /**
      * Set the <code>Operator</code> value.
      *
-     * @param newOperator The new Operator value.
+     * @param newOperator The new <code>Operator</code> value.
      */
     public void setOperator(final Operator newOperator) {
         this.operator = newOperator;
     }
 
     /**
-     * Get the <code>LeftHandSide</code> value.
+     * Get the left hand side <code>Operand</code>.
      *
-     * @return an <code>Operand</code> value
+     * @return The left hand side <code>Operand</code>.
      */
     public Operand getLeftHandSide() {
         return leftHandSide;
     }
 
     /**
-     * Set the <code>LeftHandSide</code> value.
+     * Set the left hand side <code>Operand</code>.
      *
-     * @param newLeftHandSide The new LeftHandSide value.
+     * @param newLeftHandSide The new left hand side <code>Operand</code>.
      */
     public void setLeftHandSide(final Operand newLeftHandSide) {
         this.leftHandSide = newLeftHandSide;
     }
 
     /**
-     * Get the <code>RightHandSide</code> value.
+     * Get the right hand side <code>Operand</code>.
      *
-     * @return an <code>Operand</code> value
+     * @return The right hand side <code>Operand</code>.
      */
     public Operand getRightHandSide() {
         return rightHandSide;
     }
 
     /**
-     * Set the <code>RightHandSide</code> value.
+     * Set the right hand side <code>Operand</code>.
      *
-     * @param newRightHandSide The new RightHandSide value.
+     * @param newRightHandSide The new right hand side <code>Operand</code>.
      */
     public void setRightHandSide(final Operand newRightHandSide) {
         this.rightHandSide = newRightHandSide;
     }
 
+    /**
+     * Does this limit apply to an object?
+     *
+     * @param object The object to test.
+     * @return True if the limit is applicable.
+     */
     public boolean appliesTo(FreeColObject object) {
         return leftHandSide.appliesTo(object);
     }
 
     /**
-     * Describe <code>evaluate</code> method here.
+     * Evaluate this limit within a game.
      *
-     * @param game a <code>Game</code> value
-     * @return a <code>boolean</code> value
+     * @param game The <code>Game</code> to use.
+     * @return The result of the evaluation.
      */
     public boolean evaluate(Game game) {
         Integer lhs = null;
-        switch(leftHandSide.getScopeLevel()) {
+        switch (leftHandSide.getScopeLevel()) {
         case GAME:
             lhs = leftHandSide.getValue(game);
             break;
         default:
             lhs = leftHandSide.getValue();
+            break;
         }
 
         Integer rhs = null;
-        switch(rightHandSide.getScopeLevel()) {
+        switch (rightHandSide.getScopeLevel()) {
         case GAME:
             rhs = rightHandSide.getValue(game);
             break;
         default:
             rhs = rightHandSide.getValue();
+            break;
         }
 
         return evaluate(lhs, rhs);
     }
 
     /**
-     * Describe <code>evaluate</code> method here.
+     * Evaluate this limit with respect to a player.
      *
-     * @param player a <code>Player</code> value
-     * @return a <code>boolean</code> value
+     * @param player The <code>Player</code> to use.
+     * @return The result of the evaluation.
      */
     public boolean evaluate(Player player) {
         Integer lhs = null;
-        switch(leftHandSide.getScopeLevel()) {
+        switch (leftHandSide.getScopeLevel()) {
         case PLAYER:
             lhs = leftHandSide.getValue(player);
             break;
@@ -170,10 +191,11 @@ public final class Limit extends FreeColGameObjectType {
             break;
         default:
             lhs = leftHandSide.getValue();
+            break;
         }
 
         Integer rhs = null;
-        switch(rightHandSide.getScopeLevel()) {
+        switch (rightHandSide.getScopeLevel()) {
         case PLAYER:
             rhs = rightHandSide.getValue(player);
             break;
@@ -182,21 +204,22 @@ public final class Limit extends FreeColGameObjectType {
             break;
         default:
             rhs = rightHandSide.getValue();
+            break;
         }
 
         return evaluate(lhs, rhs);
     }
 
     /**
-     * Describe <code>evaluate</code> method here.
+     * Evaluate this limit with respect to a player.
      *
-     * @param settlement a <code>Settlement</code> value
-     * @return a <code>boolean</code> value
+     * @param settlement The <code>Settlement</code> to use.
+     * @return The result of the evaluation.
      */
     public boolean evaluate(Settlement settlement) {
         final Specification spec = getSpecification();
         Integer lhs = null;
-        switch(leftHandSide.getScopeLevel()) {
+        switch (leftHandSide.getScopeLevel()) {
         case SETTLEMENT:
             lhs = leftHandSide.getValue(settlement);
             lhs += spec.getInteger("model.option.settlementLimitModifier");
@@ -209,10 +232,11 @@ public final class Limit extends FreeColGameObjectType {
             break;
         default:
             lhs = leftHandSide.getValue();
+            break;
         }
 
         Integer rhs = null;
-        switch(rightHandSide.getScopeLevel()) {
+        switch (rightHandSide.getScopeLevel()) {
         case SETTLEMENT:
             rhs = rightHandSide.getValue(settlement);
             break;
@@ -224,23 +248,30 @@ public final class Limit extends FreeColGameObjectType {
             break;
         default:
             rhs = rightHandSide.getValue();
+            break;
         }
 
         return evaluate(lhs, rhs);
     }
 
     /**
-     * Returns true if at least one of the Operands has the given
-     * OperandType.
+     * Check if at least one of the Operands has a given OperandType.
      *
-     * @param type an <code>OperandType</code> value
-     * @return a <code>boolean</code> value
+     * @param type The <code>OperandType</code> to check for.
+     * @return True if the type is present.
      */
     public boolean hasOperandType(OperandType type) {
         return leftHandSide.getOperandType() == type
             || rightHandSide.getOperandType() == type;
     }
 
+    /**
+     * Evaluate two integers using the limit operator.
+     *
+     * @param lhs The left hand side <code>Integer</code>.
+     * @param rhs The right hand side <code>Integer</code>.
+     * @return The result of the evaluation.
+     */
     private boolean evaluate(Integer lhs, Integer rhs) {
         if (lhs == null || rhs == null) {
             return true;
@@ -256,92 +287,85 @@ public final class Limit extends FreeColGameObjectType {
     }
 
 
+    // Serialization
+
+    private static final String LEFT_HAND_SIDE_TAG = "leftHandSide";
+    private static final String OPERATOR_TAG = "operator";
+    private static final String RIGHT_HAND_SIDE_TAG = "rightHandSide";
+
     /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * {@inheritDoc}
      */
+    @Override
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         super.toXML(out, getXMLElementTagName());
     }
 
     /**
-     * Write the attributes of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to
-     *     the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
-        out.writeAttribute("operator", operator.toString());
+        // Force operator to be an upper case string (do not use the
+        // writeAttribute(... Enum) routine which downcases).
+        writeAttribute(out, OPERATOR_TAG, operator.toString());
     }
 
     /**
-     * Write the children of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to
-     *     the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
         super.writeChildren(out);
 
-        leftHandSide.toXML(out, "leftHandSide");
-        rightHandSide.toXML(out, "rightHandSide");
+        leftHandSide.toXML(out, LEFT_HAND_SIDE_TAG);
+        rightHandSide.toXML(out, RIGHT_HAND_SIDE_TAG);
     }
 
     /**
-     * Reads the attributes of this object from an XML stream.
-     *
-     * @param in The XML input stream.
-     * @exception XMLStreamException if a problem was encountered
-     *     during parsing.
+     * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
 
-        operator = Enum.valueOf(Operator.class,
-            in.getAttributeValue(null, "operator"));
+        operator = getAttribute(in, OPERATOR_TAG,
+                                Operator.class, (Operator)null);
     }
 
     /**
-     * Reads a child object.
-     *
-     * @param in The XML stream to read.
-     * @exception XMLStreamException if an error occurs
+     * {@inheritDoc}
      */
     @Override
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        String childName = in.getLocalName();
-        if ("leftHandSide".equals(childName)) {
+        final String tag = in.getLocalName();
+
+        if (LEFT_HAND_SIDE_TAG.equals(tag)) {
             leftHandSide = new Operand();
             leftHandSide.readFromXML(in);
-        } else if ("rightHandSide".equals(childName)) {
+
+        } else if (RIGHT_HAND_SIDE_TAG.equals(tag)) {
             rightHandSide = new Operand();
             rightHandSide.readFromXML(in);
+
         } else {
-            logger.warning("Unsupported child element: " + childName);
+            super.readChild(in);
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String toString() {
         return leftHandSide.toString() + " " + operator.toString() + " "
             + rightHandSide.toString();
     }
 
     /**
-     * Returns the XML tag name for this element.
+     * Gets the XML tag name for this element.
      *
      * @return "limit".
      */

@@ -57,17 +57,17 @@ public class Operand extends Scope {
     }
 
     /**
-     * Describe operandType here.
+     * The type of object the operand really represents.
      */
     private OperandType operandType = OperandType.NONE;
 
     /**
-     * Describe scopeLevel here.
+     * How broadly to apply the operand.
      */
     private ScopeLevel scopeLevel = ScopeLevel.NONE;
 
     /**
-     * A fixed rather than a dynamic Integer value.
+     * The operand amount.
      */
     private Integer value = null;
 
@@ -83,7 +83,7 @@ public class Operand extends Scope {
     /**
      * Creates a new <code>Operand</code> instance.
      *
-     * @param value an <code>int</code> value
+     * @param value The initial operand value.
      */
     public Operand(int value) {
         this.value = value;
@@ -92,8 +92,8 @@ public class Operand extends Scope {
     /**
      * Creates a new <code>Operand</code> instance.
      *
-     * @param operandType an <code>OperandType</code> value
-     * @param scopeLevel a <code>ScopeLevel</code> value
+     * @param operandType The <code>OperandType</code> to use.
+     * @param scopeLevel The <code>ScopeLevel</code> to use.
      */
     public Operand(OperandType operandType, ScopeLevel scopeLevel) {
         this.operandType = operandType;
@@ -101,65 +101,64 @@ public class Operand extends Scope {
     }
 
     /**
-     * Get the <code>OperandType</code> value.
+     * Gets the operand type.
      *
-     * @return an <code>OperandType</code> value
+     * @return The <code>OperandType</code>.
      */
     public final OperandType getOperandType() {
         return operandType;
     }
 
     /**
-     * Set the <code>OperandType</code> value.
+     * Set the operand type.
      *
-     * @param newOperandType The new OperandType value.
+     * @param newOperandType The new <code>OperandType</code>.
      */
     public final void setOperandType(final OperandType newOperandType) {
         this.operandType = newOperandType;
     }
 
     /**
-     * Get the <code>ScopeLevel</code> value.
+     * Gets the scope level.
      *
-     * @return a <code>ScopeLevel</code> value
+     * @return The scope level.
      */
     public final ScopeLevel getScopeLevel() {
         return scopeLevel;
     }
 
     /**
-     * Set the <code>ScopeLevel</code> value.
+     * Sets the scope level.
      *
-     * @param newScopeLevel The new ScopeLevel value.
+     * @param newScopeLevel The new <code>ScopeLevel</code>.
      */
     public final void setScopeLevel(final ScopeLevel newScopeLevel) {
         this.scopeLevel = newScopeLevel;
     }
 
     /**
-     * Get the <code>Value</code> value.
+     * Gets the operand value.
      *
-     * @return an <code>Integer</code> value
+     * @return The operand value.
      */
     public final Integer getValue() {
         return value;
     }
 
     /**
-     * Set the <code>Value</code> value.
+     * Sets the operand value.
      *
-     * @param newValue The new Value value.
+     * @param newValue The new value.
      */
     public final void setValue(final Integer newValue) {
         this.value = newValue;
     }
 
     /**
-     * Returns an Integer value if this Operand is applicable to the
-     * given Game, and <code>null</code> otherwise.
+     * Gets the operand value if it is applicable to the given Game.
      *
-     * @param game a <code>Game</code> value
-     * @return an <code>Integer</code> value
+     * @param game The <code>Game</code> to check.
+     * @return The operand value or null if inapplicable.
      */
     public Integer getValue(Game game) {
         if (value == null) {
@@ -173,9 +172,14 @@ public class Operand extends Scope {
         }
     }
 
-
+    /**
+     * Calculate the operand value within a given game.
+     *
+     * @param game The <code>Game</code> to check.
+     * @return The operand value.
+     */
     private Integer calculateGameValue(Game game) {
-        switch(operandType) {
+        switch (operandType) {
         case NONE:
             if (getMethodName() != null) {
                 try {
@@ -220,11 +224,10 @@ public class Operand extends Scope {
     }
 
     /**
-     * Returns an Integer value if this Operand is applicable to the
-     * given Player, and <code>null</code> otherwise.
+     * Gets the operand value if it is applicable to the given Player.
      *
-     * @param player a <code>Player</code> value
-     * @return an <code>Integer</code> value
+     * @param player The <code>Player</code> to check.
+     * @return The operand value, or null if inapplicable.
      */
     public Integer getValue(Player player) {
         if (value == null) {
@@ -273,12 +276,10 @@ public class Operand extends Scope {
     }
 
     /**
-     * Returns an Integer value if this Operand is applicable to the
-     * given Settlement, and <code>null</code> otherwise. Currently,
-     * this only works for Colonies.
+     * Gets the operand value if it is applicable to the given Settlement.
      *
-     * @param settlement a <code>Settlement</code> value
-     * @return an <code>Integer</code> value
+     * @param settlement The <code>Settlement</code> to check.
+     * @return The operand value, or null if inapplicable.
      */
     public Integer getValue(Settlement settlement) {
         if (value == null) {
@@ -320,9 +321,11 @@ public class Operand extends Scope {
     }
 
     /**
-     * Describe <code>count</code> method here.
+     * Count the number of objects in a list that this operand is
+     * applicable to.
      *
-     * @return an <code>int</code> value
+     * @param objects The list of objects to check.
+     * @return The number of applicable objects.
      */
     private int count(List<FreeColObject> objects) {
         int result = 0;
@@ -335,51 +338,46 @@ public class Operand extends Scope {
     }
 
 
+    // Serialization
+
+    private static final String OPERAND_TYPE_TAG = "operandType";
+    private static final String SCOPE_LEVEL_TAG = "scopeLevel";
+    private static final String VALUE_TAG = "value";
+
     /**
-     * Write the attributes of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to
-     *     the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
-        out.writeAttribute("operandType", operandType.toString());
-        out.writeAttribute("scopeLevel", scopeLevel.toString());
+        writeAttribute(out, OPERAND_TYPE_TAG, operandType.toString());
+        writeAttribute(out, SCOPE_LEVEL_TAG, scopeLevel.toString());
         if (value != null) {
-            out.writeAttribute(VALUE_TAG, value.toString());
+            writeAttribute(out, VALUE_TAG, value);
         }
     }
 
     /**
-     * Reads the attributes of this object from an XML stream.
-     *
-     * @param in The XML input stream.
-     * @throws XMLStreamException if a problem was encountered
-     *     during parsing.
+     * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
 
-        String attribute = in.getAttributeValue(null, "operandType");
-        if (attribute != null) {
-            operandType = Enum.valueOf(OperandType.class, attribute);
-        }
-        attribute = in.getAttributeValue(null, "scopeLevel");
-        if (attribute != null) {
-            scopeLevel = Enum.valueOf(ScopeLevel.class, attribute);
-        }
-        attribute = in.getAttributeValue(null, VALUE_TAG);
-        if (attribute != null) {
-            value = new Integer(attribute);
-        }
+        operandType = getAttribute(in, OPERAND_TYPE_TAG,
+                                   OperandType.class, OperandType.NONE);
+
+        scopeLevel = getAttribute(in, SCOPE_LEVEL_TAG,
+                                  ScopeLevel.class, ScopeLevel.NONE);
+
+        int val = getAttribute(in, VALUE_TAG, INFINITY);
+        if (val != INFINITY) value = new Integer(val);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         if (value == null) {
@@ -388,4 +386,6 @@ public class Operand extends Scope {
             return Integer.toString(value);
         }
     }
+
+    // getXMLElementTagName apparently not needed, uses parents.
 }
