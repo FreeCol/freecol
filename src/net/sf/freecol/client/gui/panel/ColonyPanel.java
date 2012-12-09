@@ -391,6 +391,10 @@ public final class ColonyPanel extends PortPanel
         outsideColonyPanel.update();
     }
 
+    public void updateBuildingsPanel() {
+        buildingsPanel.update();
+    }
+
     public void updateTilePanel() {
         tilePanel.update();
     }
@@ -410,6 +414,23 @@ public final class ColonyPanel extends PortPanel
         }
 
         netProductionPanel.revalidate();
+    }
+
+    /**
+     * Update all the production-related panels.
+     *
+     * This has to be very broad as a change at one work location can
+     * have a secondary effect on another, and especially if the
+     * population hits a bonus boundary.  A simple example is that
+     * adding extra lumber production may improve the production of the
+     * lumber mill.  These changes can then flow on to production and
+     * construction displays.
+     */
+    private void updateProduction() {
+        updateTilePanel();
+        updateBuildingsPanel();
+        updateProductionPanel();
+        updateConstructionPanel();
     }
 
     private void sortBuildings(List<Building> buildings) {
@@ -450,9 +471,8 @@ public final class ColonyPanel extends PortPanel
                     break;
                 case SETGOODS:
                     DebugUtils.setColonyGoods(getFreeColClient(), colony);
-                    updateConstructionPanel();
-                    updateProductionPanel();
                     updateWarehousePanel();
+                    updateProduction();
                     break;
                 default:
                     logger.warning("Invalid action");
@@ -846,22 +866,18 @@ public final class ColonyPanel extends PortPanel
                     .add("%oldType%", oldType.getNameKey())
                     .add("%newType%", newType.getNameKey()));
             updateTilePanel();
-        // ColonyTiles and Buildings how have their own propertyChangeListeners
-        //} else if (ColonyTile.UNIT_CHANGE.toString().equals(property)) {
-        //    // Note: ColonyTile.UNIT_CHANGE.equals(Building.UNIT_CHANGE)
-        //    updateTilePanel();
-        //    updateProductionPanel();
         } else if (property.startsWith("model.goods.")) {
             // Changes to warehouse goods count may affect building production
             // which requires a view update.
-            updateProductionPanel();
             updateWarehousePanel();
-            buildingsPanel.update();
-            updateConstructionPanel();
+            updateProduction();
         } else if (Tile.UNIT_CHANGE.equals(property)) {
             updateOutsideColonyPanel();
             updateInPortPanel();
         } else {
+            // ColonyTiles and Buildings now have their own
+            // propertyChangeListeners so {ColonyTile,Building}.UNIT_CHANGE
+            // events should not arrive here.
             logger.warning("Unknown property change event: "
                            + event.getPropertyName());
         }
@@ -1256,6 +1272,11 @@ public final class ColonyPanel extends PortPanel
          * Update this buildings panel.
          */
         public void update() {
+            for (Component component : getComponents()) {
+                if (component instanceof ASingleBuildingPanel) {
+                    ((ASingleBuildingPanel)component).update();
+                }
+            }
             repaint();
         }
 
@@ -1310,7 +1331,6 @@ public final class ColonyPanel extends PortPanel
                         unitLabel.addMouseListener(pressListener);
                     }
                 }
-                colonyPanel.updateProductionPanel();
             }
 
             // Do not need an overriding cleanup, BuildingPanel.cleanup is good.
@@ -1376,6 +1396,13 @@ public final class ColonyPanel extends PortPanel
 
                 getController().work(unit, building);
                 return true;
+            }
+
+            @Override
+            public void propertyChange(PropertyChangeEvent event) {
+                super.propertyChange(event);
+                
+                colonyPanel.updateProduction();
             }
 
             public boolean accepts(Unit unit) {
@@ -1451,6 +1478,11 @@ public final class ColonyPanel extends PortPanel
          * Update this tile panel.
          */
         public void update() {
+            for (Component component : getComponents()) {
+                if (component instanceof ASingleTilePanel) {
+                    ((ASingleTilePanel)component).update();
+                }
+            }
             repaint();
         }
 
@@ -1563,8 +1595,6 @@ public final class ColonyPanel extends PortPanel
                     setTransferHandler(defaultTransferHandler);
                     addMouseListener(releaseListener);
                 }
-
-                colonyPanel.updateProductionPanel();
             }
 
             /**
@@ -1765,7 +1795,7 @@ public final class ColonyPanel extends PortPanel
                 logger.finest(colonyTile.getId() + " change " + property
                               + ": " + event.getOldValue()
                               + " -> " + event.getNewValue());
-                update();
+                colonyPanel.updateProduction();
             }
 
             public boolean accepts(Unit unit) {
