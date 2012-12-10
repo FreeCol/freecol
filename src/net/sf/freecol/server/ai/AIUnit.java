@@ -403,6 +403,8 @@ public class AIUnit extends AIObject implements Transportable {
                                                               ag.getAmount());
                     if (!player.checkGold(cost)) {
                         if (cheat) {
+                            logger.finest("CHEAT: added " + cost
+                                + " gold to equip " + unit + " for " + r);
                             player.modifyGold(cost);
                         } else {
                             continue eq;

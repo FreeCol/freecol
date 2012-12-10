@@ -1072,7 +1072,7 @@ public class EuropeanAIPlayer extends AIPlayer {
 
         for (GoodsType goodsType : spec.getGoodsTypeList()) {
             if (market.getArrears(goodsType) > 0
-                && Utils.randomInt(logger, "Lift Boycott Cheat", air, 100) 
+                && Utils.randomInt(logger, "Lift Boycott?", air, 100) 
                 < liftBoycottCheatPercent) {
                 market.setArrears(goodsType, 0);
                 // Just remove one goods party modifier (we can not
@@ -1097,18 +1097,19 @@ public class EuropeanAIPlayer extends AIPlayer {
         
         if (!europe.isEmpty()
             && scoutsNeeded() > 0
-            && Utils.randomInt(logger, "Equip Scout Cheat", air, 100)
+            && Utils.randomInt(logger, "Equip Scout?", air, 100)
             < equipScoutCheatPercent) {
             for (Unit u : europe.getUnitList()) {
                 if (u.getRole() == Unit.Role.DEFAULT
                     && u.isPerson()
                     && getAIUnit(u).equipForRole(Unit.Role.SCOUT, true)) {
+                    logger.finest("CHEAT: equipped scout " + u);
                     break;
                 }
             }
         }
 
-        if (Utils.randomInt(logger, "Land Unit Cheat", air, 100)
+        if (Utils.randomInt(logger, "Recruit Land Unit?", air, 100)
             < landUnitCheatPercent) {
             WorkerWish bestWish = null;
             int bestValue = Integer.MIN_VALUE;
@@ -1150,9 +1151,10 @@ public class EuropeanAIPlayer extends AIPlayer {
                 }
                 AIUnit aiUnit = (unitType == null) ? recruitAIUnitInEurope(-1)
                     : trainAIUnitInEurope(unitType);
-                logger.finest(Utils.lastPart(getPlayer().getNationID(), ".")
-                    + " cheat " + ((unitType == null) ? "recruit"
-                        : "train " + unitType.toString())
+                logger.finest("CHEAT: "
+                    + Utils.lastPart(getPlayer().getNationID(), ".")
+                    + ((unitType == null) ? " recruit"
+                        : " train " + unitType.toString())
                     + " " + ((aiUnit == null) ? "failed" : "succeeded"));
                 if (aiUnit != null) {
                     if (bestWish != null) {
@@ -1175,7 +1177,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             : -1;
         List<RandomChoice<UnitType>> rc 
             = new ArrayList<RandomChoice<UnitType>>();
-        if (Utils.randomInt(logger, "Offensive Naval Unit Cheat", air, 100)
+        if (Utils.randomInt(logger, "Build Offensive Naval Unit?", air, 100)
             < nNaval) {
             rc.clear();
             List<UnitType> navalUnits = new ArrayList<UnitType>();
@@ -1195,7 +1197,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         // Only cheat carriers if they have work to do.
         int nCarrier = (nNavalCarrier > 0) ? transportNavalUnitCheatPercent
             : -1;
-        if (Utils.randomInt(logger, "Transport Naval Unit Cheat", air, 100)
+        if (Utils.randomInt(logger, "Build Transport Naval Unit?", air, 100)
             < nCarrier) {
             rc.clear();
             List<UnitType> navalUnits = new ArrayList<UnitType>();
@@ -1230,8 +1232,8 @@ public class EuropeanAIPlayer extends AIPlayer {
         int cost = europe.getUnitPrice(unitToPurchase);
         if (cost > 0 && !player.checkGold(cost)) player.modifyGold(cost);
         AIUnit aiUnit = trainAIUnitInEurope(unitToPurchase);
-        logger.finest(Utils.lastPart(player.getNationID(), ".")
-            + " cheat build " + unitToPurchase
+        logger.finest("CHEAT: " + Utils.lastPart(player.getNationID(), ".")
+            + " build " + unitToPurchase
             + ((aiUnit == null) ? " failed" : " succeeded"));
     }
 

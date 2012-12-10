@@ -2548,7 +2548,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 if (settlement != null) {
                     for (AbstractGoods goods : equip.getRequiredGoods()) {
                         settlement.addGoods(goods);
-                        logger.finest("CHEAT teleporting " + goods.toString()
+                        logger.finest("CHEAT: teleporting " + goods.toString()
                                       + " back to " + settlement.getName());
                     }
                     cs.add(See.only(winnerPlayer), settlement);
