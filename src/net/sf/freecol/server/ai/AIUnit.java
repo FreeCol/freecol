@@ -385,8 +385,10 @@ public class AIUnit extends AIObject implements Transportable {
         final Player player = unit.getOwner();
         Location loc = unit.getLocation();
         Europe europe = (unit.isInEurope()) ? player.getEurope() : null;
-        Settlement settlement = loc.getSettlement();
-        if (settlement == null && europe == null) return false;
+        Settlement settlement;
+        if (loc == null
+            || ((settlement = loc.getSettlement()) == null
+                && europe == null)) return false;
 
         eq: for (EquipmentType e : r.getRoleEquipment(spec)) {
             if (!unit.canBeEquippedWith(e)) {

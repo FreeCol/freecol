@@ -352,9 +352,11 @@ public class PioneeringMission extends Mission {
         String reason = invalidReason(aiUnit);
         if (reason != null) return reason;
         final Unit unit = aiUnit.getUnit();
-        if (!hasTools(aiUnit)) aiUnit.equipForRole(Unit.Role.PIONEER, false);
-        return (hasTools(aiUnit)
-            || unit.hasAbility(Ability.EXPERT_PIONEER)) ? null
+        if (!hasTools(aiUnit)
+            && !aiUnit.equipForRole(Unit.Role.PIONEER, false))
+            return "unit-could-not-equip";
+        return (hasTools(aiUnit) || unit.hasAbility(Ability.EXPERT_PIONEER))
+            ? null
             : "unit-missing-tools";
     }
 
