@@ -159,7 +159,8 @@ public class EuropeanAIPlayer extends AIPlayer {
         = new Comparator<AIUnit>() {
             private int score(AIUnit a) {
                 Unit unit = a.getUnit();
-                if (!unit.isColonist()) {
+                if (unit == null || unit.getLocation() == null
+                    || !unit.isColonist()) {
                     return -1000;
                 } else if (unit.hasAbility("model.ability.scoutIndianSettlement")) {
                     return 900 + ((unit.getTile() != null) ? 100 : 0);
