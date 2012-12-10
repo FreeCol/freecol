@@ -228,7 +228,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                     if ((turns = unit.getTurnsToReach(s)) == INFINITY) 
                         continue;
                 } else {
-                    PathNode path = unit.search(europe,
+                    PathNode path = unit.search(unit.getLocation(),
                         GoalDeciders.getAdjacentLocationGoalDecider(s),
                         null, INFINITY, null);
                     if (path == null) continue;
