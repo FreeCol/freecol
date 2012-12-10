@@ -95,7 +95,7 @@ public class GetNationSummaryMessage extends DOMMessage {
         if (player == null) {
             return DOMMessage.clientError("Not a player: " + playerId);
         } else if (player.isIndian() && !serverPlayer.hasContacted(player)) {
-            return DOMMessage.clientError("Not contacted: " + playerId);
+            return null;
         }
 
         // Proceed to get the summary.

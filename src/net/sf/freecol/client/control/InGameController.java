@@ -2840,11 +2840,13 @@ public final class InGameController implements NetworkConstants {
         Tile unitTile = unit.getTile();
         Tile tile = unitTile.getNeighbourOrNull(direction);
         IndianSettlement settlement = tile.getIndianSettlement();
+        Player player = unit.getOwner();
         clearGotoOrders(unit);
 
         // Offer the choices.
         NationSummary ns = getNationSummary(settlement.getOwner());
-        String number = (ns == null) ? "many" : ns.getNumberOfSettlements();
+        String number = (ns == null) ? Messages.message("many")
+            : ns.getNumberOfSettlements();
         switch (gui.showScoutIndianSettlementDialog(settlement, number)) {
         case CANCEL:
             return true;
@@ -2853,7 +2855,6 @@ public final class InGameController implements NetworkConstants {
             askServer().attack(unit, direction);
             return false;
         case INDIAN_SETTLEMENT_SPEAK:
-            Player player = unit.getOwner();
             final int oldGold = player.getGold();
             String result = askServer().scoutSpeak(unit, direction);
             if (result == null) {
