@@ -1118,7 +1118,7 @@ public final class Canvas extends JDesktopPane {
         if (freeColClient.getGame() == null) {
             errorMessage("europe.noGame");
         } else {
-            europePanel.initialize(freeColClient.getMyPlayer().getEurope(), freeColClient.getGame());
+            europePanel.initialize(freeColClient.getMyPlayer().getEurope());
             showSubPanel(europePanel, true);
         }
     }

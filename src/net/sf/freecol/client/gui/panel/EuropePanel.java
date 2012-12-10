@@ -28,6 +28,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseListener;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -94,11 +95,12 @@ public final class EuropePanel extends PortPanel {
 
     private final TransactionLog log;
 
+    private final JButton exitButton, trainButton, purchaseButton,
+                          recruitButton, unloadButton, sailButton;
+
+    private final JLabel header = getDefaultHeader("");
+
     private Europe europe;
-
-    private JButton exitButton;
-
-    private JLabel header = getDefaultHeader("");
 
 
     /**
@@ -113,19 +115,18 @@ public final class EuropePanel extends PortPanel {
 
         setFocusCycleRoot(true);
 
-        // Use ESCAPE for closing the ColonyPanel:
         exitButton = new EuropeButton(Messages.message("close"),
-                                      KeyEvent.VK_ESCAPE, EuropeAction.EXIT.toString(), this);
-        EuropeButton trainButton = new EuropeButton(Messages.message("train"),
-                                                    KeyEvent.VK_T, EuropeAction.TRAIN.toString(), this);
-        EuropeButton purchaseButton = new EuropeButton(Messages.message("purchase"),
-                                                       KeyEvent.VK_P, EuropeAction.PURCHASE.toString(), this);
-        EuropeButton recruitButton = new EuropeButton(Messages.message("recruit"),
-                                                      KeyEvent.VK_R, EuropeAction.RECRUIT.toString(), this);
-        EuropeButton unloadButton = new EuropeButton(Messages.message("unload"),
-                                                     KeyEvent.VK_U, EuropeAction.UNLOAD.toString(), this);
-        EuropeButton sailButton = new EuropeButton(Messages.message("sail"),
-                                                   KeyEvent.VK_S, EuropeAction.SAIL.toString(), this);
+            KeyEvent.VK_ESCAPE, EuropeAction.EXIT.toString(), this);
+        trainButton = new EuropeButton(Messages.message("train"),
+            KeyEvent.VK_T, EuropeAction.TRAIN.toString(), this);
+        purchaseButton = new EuropeButton(Messages.message("purchase"),
+            KeyEvent.VK_P, EuropeAction.PURCHASE.toString(), this);
+        recruitButton = new EuropeButton(Messages.message("recruit"),
+            KeyEvent.VK_R, EuropeAction.RECRUIT.toString(), this);
+        unloadButton = new EuropeButton(Messages.message("unload"),
+            KeyEvent.VK_U, EuropeAction.UNLOAD.toString(), this);
+        sailButton = new EuropeButton(Messages.message("sail"),
+            KeyEvent.VK_S, EuropeAction.SAIL.toString(), this);
 
         toAmericaPanel = new DestinationPanel();
         toEuropePanel = new DestinationPanel();
@@ -141,7 +142,8 @@ public final class EuropePanel extends PortPanel {
         StyleConstants.setBold(attributes, true);
         log.setParagraphAttributes(attributes, true);
 
-        defaultTransferHandler = new DefaultTransferHandler(freeColClient, getGUI(), this);
+        defaultTransferHandler
+            = new DefaultTransferHandler(freeColClient, getGUI(), this);
         toAmericaPanel.setTransferHandler(defaultTransferHandler);
         toEuropePanel.setTransferHandler(defaultTransferHandler);
         inPortPanel.setTransferHandler(defaultTransferHandler);
@@ -164,32 +166,51 @@ public final class EuropePanel extends PortPanel {
         cargoPanel.setLayout(new GridLayout(1, 0));
         docksPanel.setLayout(new GridLayout(0, 5));
 
-        JScrollPane toAmericaScroll = new JScrollPane(toAmericaPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        JScrollPane toAmericaScroll = new JScrollPane(toAmericaPanel,
+            ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
+            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         toAmericaScroll.getVerticalScrollBar().setUnitIncrement(16);
-        JScrollPane toEuropeScroll = new JScrollPane(toEuropePanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        JScrollPane toEuropeScroll = new JScrollPane(toEuropePanel,
+            ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
+            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         toEuropeScroll.getVerticalScrollBar().setUnitIncrement(16);
-        JScrollPane inPortScroll = new JScrollPane(inPortPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        JScrollPane inPortScroll = new JScrollPane(inPortPanel,
+            ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
+            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         inPortScroll.getVerticalScrollBar().setUnitIncrement(16);
-        JScrollPane cargoScroll = new JScrollPane(cargoPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        JScrollPane cargoScroll = new JScrollPane(cargoPanel,
+            ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
+            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         cargoScroll.getVerticalScrollBar().setUnitIncrement(16);
-        JScrollPane docksScroll = new JScrollPane(docksPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        JScrollPane docksScroll = new JScrollPane(docksPanel,
+            ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         docksScroll.getVerticalScrollBar().setUnitIncrement(16);
-        JScrollPane marketScroll = new JScrollPane(marketPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        JScrollPane logScroll = new JScrollPane(log, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        JScrollPane marketScroll = new JScrollPane(marketPanel,
+            ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
+            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        JScrollPane logScroll = new JScrollPane(log,
+            ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         logScroll.getVerticalScrollBar().setUnitIncrement(16);
 
-        toAmericaPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages
-                .message("goingToAmerica")));
-        toEuropePanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages
-                .message("goingToEurope")));
-        docksPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages
-                .message("docks")));
-        inPortPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages
-                .message("inPort")));
+        toAmericaPanel.setBorder(BorderFactory
+            .createTitledBorder(BorderFactory.createEmptyBorder(),
+                                Messages.message("goingToAmerica")));
+        toEuropePanel.setBorder(BorderFactory
+            .createTitledBorder(BorderFactory.createEmptyBorder(),
+                                Messages.message("goingToEurope")));
+        docksPanel.setBorder(BorderFactory
+            .createTitledBorder(BorderFactory.createEmptyBorder(),
+                                Messages.message("docks")));
+        inPortPanel.setBorder(BorderFactory
+            .createTitledBorder(BorderFactory.createEmptyBorder(),
+                                Messages.message("inPort")));
         marketPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        log.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(),
-                                                       Messages.message("sales")));
+        log.setBorder(BorderFactory
+            .createTitledBorder(BorderFactory.createEmptyBorder(),
+                                Messages.message("sales")));
 
         toAmericaScroll.getViewport().setOpaque(false);
         toAmericaPanel.setOpaque(false);
@@ -233,7 +254,40 @@ public final class EuropePanel extends PortPanel {
         // of this fake mouse listener.
         addMouseListener(new MouseAdapter() {});
 
-        restoreSavedSize(1000, canvas.getHeight() > 750 ? 700 : 600);
+        restoreSavedSize(1000, (canvas.getHeight() > 750) ? 700 : 600);
+    }
+
+    /**
+     * Initialize this EuropePanel.
+     *
+     * @param europe The <code>Europe</code> this panel should display.
+     */
+    public void initialize(Europe europe) {
+        this.europe = europe;
+        header.setText(Messages.message(europe.getNameKey()));
+
+        // Initialize the subpanels.
+        toAmericaPanel.initialize(europe.getGame().getMap());
+        toEuropePanel.initialize(europe);
+        // Initialize cargoPanel *before* inPortPanel calls setSelectedUnit().
+        cargoPanel.initialize();
+        inPortPanel.initialize();
+        marketPanel.initialize();
+        docksPanel.initialize();
+        log.initialize();
+    }
+
+    /**
+     * Cleans up this EuropePanel.
+     */
+    public void cleanup() {
+        log.cleanup();
+        docksPanel.cleanup();
+        marketPanel.cleanup();
+        inPortPanel.cleanup();
+        cargoPanel.cleanup();
+        toEuropePanel.cleanup();
+        toAmericaPanel.cleanup();
     }
 
     /**
@@ -273,43 +327,13 @@ public final class EuropePanel extends PortPanel {
         inPortPanel.repaint();
     }
 
+    /**
+     * Get the units in Europe.
+     *
+     * @return A list of units in Europe.
+     */
     public List<Unit> getUnitList() {
         return europe.getUnitList();
-    }
-
-    /**
-     * Initialize this EuropePanel.
-     *
-     * @param europe The <code>Europe</code> this panel should display.
-     * @param game The <code>Game</code> the <code>Europe</code> is in.
-     */
-    public void initialize(Europe europe, Game game) {
-        this.europe = europe;
-        header.setText(Messages.message(europe.getNameKey()));
-
-        // Initialize the subpanels.
-        toAmericaPanel.initialize(getGame().getMap());
-        toEuropePanel.initialize(getMyPlayer().getEurope());
-        // Initialize cargoPanel before inPortPanel calls setSelectedUnit().
-        cargoPanel.initialize();
-        inPortPanel.initialize();
-        marketPanel.initialize();
-        docksPanel.initialize();
-        log.initialize();
-
-    }
-
-    /**
-     * Cleans up this EuropePanel.
-     */
-    public void cleanup() {
-        log.cleanup();
-        docksPanel.cleanup();
-        marketPanel.cleanup();
-        inPortPanel.cleanup();
-        cargoPanel.cleanup();
-        toEuropePanel.cleanup();
-        toAmericaPanel.cleanup();
     }
 
     /**
@@ -387,7 +411,6 @@ public final class EuropePanel extends PortPanel {
             logger.warning("Invalid action command: " + command);
         }
     }
-
 
     /**
      * A panel that holds UnitsLabels that represent Units that are going to
@@ -512,9 +535,7 @@ public final class EuropePanel extends PortPanel {
         public boolean accepts(Goods goods) {
             return false;
         }
-
     }
-
 
     /**
      * A panel that holds UnitLabels that represent naval units that are
@@ -529,7 +550,6 @@ public final class EuropePanel extends PortPanel {
         @Override
         protected void addPropertyChangeListeners() {
             europe.addPropertyChangeListener(this);
-            System.out.println("added property listener " + europe);
         }
 
         @Override
@@ -581,7 +601,6 @@ public final class EuropePanel extends PortPanel {
         public boolean accepts(Goods goods) {
             return false;
         }
-
     }
 
     /**
@@ -681,9 +700,12 @@ public final class EuropePanel extends PortPanel {
     /**
      * To log transactions made in Europe
      */
-    public class TransactionLog extends JTextPane
+    public final class TransactionLog extends JTextPane
         implements TransactionListener {
 
+        /**
+         * Creates a transaction log.
+         */
         public TransactionLog() {
             setEditable(false);
         }
@@ -705,48 +727,49 @@ public final class EuropePanel extends PortPanel {
 
         public void logPurchase(GoodsType goodsType, int amount, int price) {
             int total = amount * price;
-            String text = Messages.message(StringTemplate.template("transaction.purchase")
-                                           .add("%goods%", goodsType.getNameKey())
-                                           .addAmount("%amount%", amount)
-                                           .addAmount("%gold%", price))
-                + "\n" + Messages.message(StringTemplate.template("transaction.price")
-                                          .addAmount("%gold%", total));
-            add(text);
+            StringTemplate t1 = StringTemplate.template("transaction.purchase")
+                .add("%goods%", goodsType.getNameKey())
+                .addAmount("%amount%", amount)
+                .addAmount("%gold%", price);
+            StringTemplate t2 = StringTemplate.template("transaction.price")
+                .addAmount("%gold%", total);
+            add(Messages.message(t1) + "\n" + Messages.message(t2));
         }
 
-        public void logSale(GoodsType goodsType, int amount, int price, int tax) {
+        public void logSale(GoodsType goodsType, int amount,
+                            int price, int tax) {
             int totalBeforeTax = amount * price;
             int totalTax = totalBeforeTax * tax / 100;
             int totalAfterTax = totalBeforeTax - totalTax;
 
-            String text = Messages.message(StringTemplate.template("transaction.sale")
-                                           .add("%goods%", goodsType.getNameKey())
-                                           .addAmount("%amount%", amount)
-                                           .addAmount("%gold%", price))
-            + "\n" + Messages.message(StringTemplate.template("transaction.price")
-                                      .addAmount("%gold%", totalBeforeTax))
-            + "\n" + Messages.message(StringTemplate.template("transaction.tax")
-                                      .addAmount("%tax%", tax)
-                                      .addAmount("%gold%", totalTax))
-            + "\n" + Messages.message(StringTemplate.template("transaction.net")
-                                      .addAmount("%gold%", totalAfterTax));
-            add(text);
+            StringTemplate t1 = StringTemplate.template("transaction.sale")
+
+                .add("%goods%", goodsType.getNameKey())
+                .addAmount("%amount%", amount)
+                .addAmount("%gold%", price);
+            StringTemplate t2 = StringTemplate.template("transaction.price")
+                .addAmount("%gold%", totalBeforeTax);
+            StringTemplate t3 = StringTemplate.template("transaction.tax")
+                .addAmount("%tax%", tax)
+                .addAmount("%gold%", totalTax);
+            StringTemplate t4 = StringTemplate.template("transaction.net")
+                .addAmount("%gold%", totalAfterTax);
+            add(Messages.message(t1) + "\n" + Messages.message(t2)
+                + "\n" + Messages.message(t3) + "\n" + Messages.message(t4));
         }
 
         private void add(String text) {
             StyledDocument doc = getStyledDocument();
             try {
-                if (doc.getLength() > 0) {
-                    text = "\n\n" + text;
-                }
+                if (doc.getLength() > 0) text = "\n\n" + text;
                 doc.insertString(doc.getLength(), text, null);
-            } catch(Exception e) {
-                logger.warning("Failed to update transaction log: " + e.toString());
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Transaction log update failure", e);
             }
         }
     }
 
-    public class EuropeButton extends JButton {
+    public final class EuropeButton extends JButton {
 
         public EuropeButton(String text, int keyEvent, String command,
                             ActionListener listener) {
@@ -759,7 +782,9 @@ public final class EuropePanel extends PortPanel {
                               "pressed");
             closeInputMap.put(KeyStroke.getKeyStroke(keyEvent, 0, true),
                               "released");
-            SwingUtilities.replaceUIInputMap(this, JComponent.WHEN_IN_FOCUSED_WINDOW, closeInputMap);
+            SwingUtilities.replaceUIInputMap(this,
+                                             JComponent.WHEN_IN_FOCUSED_WINDOW,
+                                             closeInputMap);
             enterPressesWhenFocused(this);
         }
     }
