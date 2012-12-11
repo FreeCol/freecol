@@ -42,6 +42,7 @@ import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.Region.RegionType;
 import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Element;
 
@@ -589,6 +590,17 @@ public class Player extends FreeColGameObject implements Nameable {
                 }
             }
         }
+    }
+
+    /**
+     * Standardized log of an instance of cheating by this player.
+     *
+     * @param what A description of the cheating.
+     */
+    public void logCheat(String what) {
+        logger.finest("CHEAT: " + getGame().getTurn().getNumber()
+            + " " + Utils.lastPart(getNationID(), ".")
+            + " " + what);
     }
 
     /**

@@ -1086,6 +1086,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                     for (Modifier m : c.getModifiers()) {
                         if ("model.modifier.colonyGoodsParty".equals(m.getSource())) {
                             c.removeModifier(m);
+                            player.logCheat("lift-boycott at " + c.getName());
                             break findOne;
                         }
                     }
@@ -1104,7 +1105,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 if (u.getRole() == Unit.Role.DEFAULT
                     && u.isPerson()
                     && getAIUnit(u).equipForRole(Unit.Role.SCOUT, true)) {
-                    logger.finest("CHEAT: equipped scout " + u);
+                    player.logCheat("equipped scout " + u);
                     break;
                 }
             }
@@ -1152,11 +1153,6 @@ public class EuropeanAIPlayer extends AIPlayer {
                 }
                 AIUnit aiUnit = (unitType == null) ? recruitAIUnitInEurope(-1)
                     : trainAIUnitInEurope(unitType);
-                logger.finest("CHEAT: "
-                    + Utils.lastPart(getPlayer().getNationID(), ".")
-                    + ((unitType == null) ? " recruit"
-                        : " train " + unitType.toString())
-                    + " " + ((aiUnit == null) ? "failed" : "succeeded"));
                 if (aiUnit != null) {
                     if (bestWish != null) {
                         aiUnit.setMission(consumeWorkerWish(aiUnit, bestWish));
@@ -1164,6 +1160,9 @@ public class EuropeanAIPlayer extends AIPlayer {
                         Mission m = getSimpleMission(aiUnit);
                         if (m != null) aiUnit.setMission(m);
                     }
+                    player.logCheat((unitType == null)
+                        ? " recruit " + aiUnit.getUnit().getType().toString()
+                        : " train " + unitType.toString());
                 }
             }
         }
@@ -1233,9 +1232,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         int cost = europe.getUnitPrice(unitToPurchase);
         if (cost > 0 && !player.checkGold(cost)) player.modifyGold(cost);
         AIUnit aiUnit = trainAIUnitInEurope(unitToPurchase);
-        logger.finest("CHEAT: " + Utils.lastPart(player.getNationID(), ".")
-            + " build " + unitToPurchase
-            + ((aiUnit == null) ? " failed" : " succeeded"));
+        if (aiUnit != null) player.logCheat("build " + unitToPurchase);
     }
 
     /**

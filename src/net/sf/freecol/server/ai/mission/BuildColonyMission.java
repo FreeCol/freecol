@@ -416,9 +416,9 @@ public class BuildColonyMission extends Mission {
                 if (price > 0 && !player.checkGold(price)) {
                     if (Utils.randomInt(logger, "Land gold?",
                             getAIRandom(), 4) == 0) {
-                        logger.finest("CHEAT: added " + price
-                            + " gold to buy " + tile);
                         player.modifyGold(price);
+                        player.logCheat("minted " + price
+                            + " gold to buy " + tile);
                     }
                 }
                 if (price >= 0) {
