@@ -26,7 +26,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;

@@ -19,7 +19,6 @@
 
 package net.sf.freecol.server.ai.mission;
 
-import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -28,8 +27,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.EquipmentType;
-import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;

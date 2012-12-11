@@ -26,12 +26,10 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
-import javax.swing.JSeparator;
 import javax.swing.border.Border;
 
 import net.miginfocom.swing.MigLayout;

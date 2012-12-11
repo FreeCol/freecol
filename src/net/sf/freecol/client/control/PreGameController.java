@@ -21,7 +21,6 @@
 package net.sf.freecol.client.control;
 
 
-import java.awt.Color;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
@@ -38,8 +37,6 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
-import net.sf.freecol.common.resources.ResourceManager;
-import net.sf.freecol.common.resources.ResourceMapping;
 
 
 

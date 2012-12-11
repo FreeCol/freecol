@@ -19,8 +19,6 @@
 
 package net.sf.freecol.client.control;
 
-import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,7 +68,6 @@ import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MonarchActionMessage;
 import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
-import net.sf.freecol.server.FreeColServer;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
