@@ -100,15 +100,15 @@ public class SchoolTest extends FreeColTestCase {
     }
 
     public void testUpgrades() {
-        assertEquals(Unit.getUnitTypeTeaching(masterCarpenterType,
-                                              freeColonistType),
-                     masterCarpenterType);
-        assertEquals(Unit.getUnitTypeTeaching(masterCarpenterType,
-                                              indenturedServantType),
-                     freeColonistType);
-        assertEquals(Unit.getUnitTypeTeaching(masterCarpenterType,
-                                              pettyCriminalType),
-                     indenturedServantType);
+        assertEquals("Colonist should upgrade to carpenter",
+            masterCarpenterType,
+            Unit.getUnitTypeTeaching(masterCarpenterType, freeColonistType));
+        assertEquals("Servant should upgrade to colonist",
+            freeColonistType,
+            Unit.getUnitTypeTeaching(masterCarpenterType, indenturedServantType));
+        assertEquals("Criminal should upgrade to servant",
+            indenturedServantType,
+            Unit.getUnitTypeTeaching(masterCarpenterType, pettyCriminalType));
     }
 
     public void testEducationOption() {

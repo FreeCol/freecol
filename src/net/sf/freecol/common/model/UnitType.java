@@ -22,7 +22,6 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -100,7 +99,7 @@ public final class UnitType extends BuildableType
     /**
      * The expert production of this UnitType.
      */
-    private GoodsType expertProduction;
+    private GoodsType expertProduction = null;
 
     /**
      * How much a Unit of this type contributes to the Player's score.
@@ -121,77 +120,77 @@ public final class UnitType extends BuildableType
     /**
      * The skill this UnitType teaches, mostly its own.
      */
-    private UnitType skillTaught;
+    private UnitType skillTaught = null;
 
     /**
-     * Describe defaultEquipment here.
+     * The default equipment for a unit of this type.
      */
-    private EquipmentType defaultEquipment;
-
-    /**
-     * The goods consumed per turn when in a settlement.
-     */
-    private TypeCountMap<GoodsType> consumption = new TypeCountMap<GoodsType>();
+    private EquipmentType defaultEquipment = null;
 
     /**
      * The possible type changes for this unit type.
      */
-    private List<UnitTypeChange> typeChanges = new ArrayList<UnitTypeChange>();
+    private List<UnitTypeChange> typeChanges = null;
+
+    /**
+     * The goods consumed per turn when in a settlement.
+     */
+    private TypeCountMap<GoodsType> consumption = null;
 
 
     /**
      * Creates a new <code>UnitType</code> instance.
      *
+     * @param id The unit type id.
+     * @param specification The <code>Specification</code> in which to create
+     *     this unit type.
      */
     public UnitType(String id, Specification specification) {
         super(id, specification);
+
         setModifierIndex(Modifier.EXPERT_PRODUCTION_INDEX);
     }
 
+    /**
+     * Get a key for the working as this unit type message.
+     *
+     * @return A message key.
+     */
     public final String getWorkingAsKey() {
         return getId() + ".workingAs";
     }
 
     /**
-     * Returns <code>true</code> if Units of this type can carry other Units.
+     * Can this unit type carry units?
      *
-     * @return a <code>boolean</code> value
+     * @return True if units can be carried.
      */
     public boolean canCarryUnits() {
         return hasAbility(Ability.CARRY_UNITS);
     }
 
     /**
-     * Returns <code>true</code> if Units of this type can carry Goods.
+     * Can this unit type carry goods?
      *
-     * @return a <code>boolean</code> value
+     * @return True if goods can be carried.
      */
     public boolean canCarryGoods() {
         return hasAbility(Ability.CARRY_GOODS);
     }
 
     /**
-     * Get the <code>ScoreValue</code> value.
+     * Gets the score for acquiring a unit of this type.
      *
-     * @return an <code>int</code> value
+     * @return The score for this unit type.
      */
     public int getScoreValue() {
         return scoreValue;
     }
 
     /**
-     * Set the <code>ScoreValue</code> value.
+     * Get the offence value.
      *
-     * @param newScoreValue The new ScoreValue value.
-     */
-    public void setScoreValue(final int newScoreValue) {
-        this.scoreValue = newScoreValue;
-    }
-
-    /**
-     * Get the <code>Offence</code> value.
-     *
-     * @return an <code>int</code> value
+     * @return The offence value.
      */
     public int getOffence() {
         return offence;
@@ -207,30 +206,12 @@ public final class UnitType extends BuildableType
     }
 
     /**
-     * Set the <code>Offence</code> value.
+     * Get the defence value.
      *
-     * @param newOffence The new Offence value.
-     */
-    public void setOffence(final int newOffence) {
-        this.offence = newOffence;
-    }
-
-    /**
-     * Get the <code>Defence</code> value.
-     *
-     * @return an <code>int</code> value
+     * @return The defence value.
      */
     public int getDefence() {
         return defence;
-    }
-
-    /**
-     * Set the <code>Defence</code> value.
-     *
-     * @param newDefence The new Defence value.
-     */
-    public void setDefence(final int newDefence) {
-        this.defence = newDefence;
     }
 
     /**
@@ -243,57 +224,40 @@ public final class UnitType extends BuildableType
     }
 
     /**
-     * Get the <code>LineOfSight</code> value.
+     * Get the `line of sight' distance (in tiles).
      *
-     * @return an <code>int</code> value
+     * @return The line of sight distance.
      */
     public int getLineOfSight() {
         return lineOfSight;
     }
 
     /**
-     * Set the <code>LineOfSight</code> value.
+     * Get the space this unit type has to carry cargo.
      *
-     * @param newLineOfSight The new Defence value.
-     */
-    public void setLineOfSight(final int newLineOfSight) {
-        this.lineOfSight = newLineOfSight;
-    }
-
-    /**
-     * Get the <code>Space</code> value.
-     *
-     * @return an <code>int</code> value
+     * @return The cargo capacity of this unit type.
      */
     public int getSpace() {
         return space;
     }
 
     /**
-     * Set the <code>Space</code> value.
+     * Set the space this unit type has to carry cargo.
+     * Required by the test suite.
      *
-     * @param newSpace The new Space value.
+     * @param newSpace The new cargo capacity.
      */
     public void setSpace(final int newSpace) {
         this.space = newSpace;
     }
 
     /**
-     * Get the <code>HitPoints</code> value.
+     * Get the unit type hit points.
      *
-     * @return an <code>int</code> value
+     * @return The hit points.
      */
     public int getHitPoints() {
         return hitPoints;
-    }
-
-    /**
-     * Set the <code>HitPoints</code> value.
-     *
-     * @param newHitPoints The new HitPoints value.
-     */
-    public void setHitPoints(final int newHitPoints) {
-        this.hitPoints = newHitPoints;
     }
 
     /**
@@ -306,171 +270,123 @@ public final class UnitType extends BuildableType
     }
 
     /**
-     * Set the <code>SpaceTaken</code> value.
+     * Set the number of cargo slots a unit of this type takes on a carrier.
+     * Required by the test suite.
      *
-     * @param newSpaceTaken The new SpaceTaken value.
+     * @param newSpaceTaken The new number of cargo slots.
      */
     public void setSpaceTaken(final int newSpaceTaken) {
         this.spaceTaken = newSpaceTaken;
     }
 
     /**
-     * If this UnitType is recruitable in Europe
+     * Is this UnitType recruitable in Europe?
      *
-     * @return an <code>boolean</code> value
+     * @return True if European-recruitable.
      */
     public boolean isRecruitable() {
         return recruitProbability > 0;
     }
 
     /**
-     * Get the <code>RecruitProbability</code> value.
+     * Get the relative probability of recruiting this unit in Europe.
      *
-     * @return an <code>int</code> value
+     * @return A relative probability.
      */
     public int getRecruitProbability() {
         return recruitProbability;
     }
 
     /**
-     * Set the <code>RecruitProbability</code> value.
+     * Get the skill level associated with this unit type.
      *
-     * @param newRecruitProbability The new RecruitProbability value.
-     */
-    public void setRecruitProbability(final int newRecruitProbability) {
-        this.recruitProbability = newRecruitProbability;
-    }
-
-    /**
-     * Get the <code>Skill</code> value.
-     *
-     * @return an <code>int</code> value
+     * @return The skill level.
      */
     public int getSkill() {
         return skill;
     }
 
     /**
-     * Set the <code>Skill</code> value.
+     * Set the skill level associated with this unit type.
+     * Required by the test suite.
      *
-     * @param newSkill The new Skill value.
+     * @param newSkill The new skill level.
      */
     public void setSkill(final int newSkill) {
         this.skill = newSkill;
     }
 
     /**
-     * Get the <code>Price</code> value.
+     * Get the base price of this unit type.
+     * For the actual price of the unit, use
+     * {@link Europe#getUnitPrice(UnitType)}
      *
-     * @return an <code>int</code> value
-     *
-     * This returns the base price of the <code>UnitType</code>
-     *
-     * For the actual price of the unit, use {@link Europe#getUnitPrice(UnitType)}
+     * @return The base price.
      */
     public int getPrice() {
         return price;
     }
 
     /**
-     * Set the <code>Price</code> value.
+     * Get the base movement of this unit type.
      *
-     * @param newPrice The new Price value.
-     */
-    public void setPrice(final int newPrice) {
-        this.price = newPrice;
-    }
-
-    /**
-     * Get the <code>Movement</code> value.
-     *
-     * @return an <code>int</code> value
+     * @return The base movement.
      */
     public int getMovement() {
         return movement;
     }
 
     /**
-     * Set the <code>Movement</code> value.
+     * Get the maximum experience required a unit of this type may achieve.
      *
-     * @param newMovement The new Movement value.
-     */
-    public void setMovement(final int newMovement) {
-        this.movement = newMovement;
-    }
-
-    /**
-     * Get the <code>MaximumExperience</code> value.
-     *
-     * @return an <code>int</code> value
+     * @return The maximum experience.
      */
     public final int getMaximumExperience() {
         return maximumExperience;
     }
 
     /**
-     * Set the <code>MaximumExperience</code> value.
+     * Get the maximum attrition for this unit type (greater attrition than
+     * this destroys the unit).
      *
-     * @param newMaximumExperience The new MaximumExperience value.
-     */
-    public final void setMaximumExperience(final int newMaximumExperience) {
-        this.maximumExperience = newMaximumExperience;
-    }
-
-    /**
-     * Get the <code>MaximumAttrition</code> value.
-     *
-     * @return an <code>int</code> value
+     * @return The maximum attrition.
      */
     public int getMaximumAttrition() {
         return maximumAttrition;
     }
 
     /**
-     * Set the <code>MaximumAttrition</code> value.
+     * Get the type of goods this unit type has expert ability to produce.
      *
-     * @param newMaximumAttrition The new MaximumAttrition value.
-     */
-    public void setMaximumAttrition(final int newMaximumAttrition) {
-        this.maximumAttrition = newMaximumAttrition;
-    }
-
-    /**
-     * Get the <code>ExpertProduction</code> value.
-     *
-     * @return a <code>GoodsType</code> value
+     * @return The expert production <code>GoodsType</code>.
      */
     public GoodsType getExpertProduction() {
         return expertProduction;
     }
 
     /**
-     * Set the <code>ExpertProduction</code> value.
+     * Get the skill taught by this unit type.
      *
-     * @param newExpertProduction The new ExpertProduction value.
+     * @return The skill taught by this unit type.
      */
-    public void setExpertProduction(final GoodsType newExpertProduction) {
-        this.expertProduction = newExpertProduction;
+    public UnitType getSkillTaught() {
+        return skillTaught;
     }
 
     /**
-     * Get the <code>DefaultEquipment</code> value.
+     * Gets the default equipment type this unit type is equipped with.
      *
-     * @return an <code>EquipmentType</code> value
+     * @return The default <code>EquipmentType</code>.
      */
     public EquipmentType getDefaultEquipmentType() {
         return defaultEquipment;
     }
 
     /**
-     * Set the <code>DefaultEquipment</code> value.
+     * Gets the default equipment to equip a unit of this type with.
      *
-     * @param newDefaultEquipment The new DefaultEquipment value.
+     * @return The default equipment.
      */
-    public void setDefaultEquipmentType(final EquipmentType newDefaultEquipment) {
-        this.defaultEquipment = newDefaultEquipment;
-    }
-
     public EquipmentType[] getDefaultEquipment() {
         if (hasAbility(Ability.CAN_BE_EQUIPPED) && defaultEquipment != null) {
             int count = defaultEquipment.getMaximumCount();
@@ -484,34 +400,32 @@ public final class UnitType extends BuildableType
         }
     }
 
+    /**
+     * Gets the list of all type changes associated with this unit type.
+     *
+     * @return The list of type changes.
+     */
     public List<UnitTypeChange> getTypeChanges() {
-        return typeChanges;
+        return (typeChanges == null) ? new ArrayList<UnitTypeChange>()
+            : typeChanges;
     }
 
     /**
-     * Get the <code>SkillTaught</code> value.
+     * Sets the list of all type changes associated with this unit type.
+     * Public for the test suite.
      *
-     * @return an <code>UnitType</code> value
+     * @param typeChanges The new list of type changes.
      */
-    public UnitType getSkillTaught() {
-        return skillTaught;
+    public void setTypeChanges(List<UnitTypeChange> typeChanges) {
+        this.typeChanges = typeChanges;
     }
 
     /**
-     * Set the <code>SkillTaught</code> value.
+     * Gets a unit type resulting from a given change type and player.
      *
-     * @param newSkillTaught The new SkillTaught value.
-     */
-    public void setSkillTaught(final UnitType newSkillTaught) {
-        this.skillTaught = newSkillTaught;
-    }
-
-    /**
-     * Describe <code>getUnitTypeChange</code> method here.
-     *
-     * @param changeType an <code>UnitTypeChange.Type</code> value
-     * @param player a <code>Player</code> value
-     * @return an <code>UnitType</code> value
+     * @param changeType A <code>ChangeType</code> to match.
+     * @param player A <code>Player</code> to check.
+     * @return Any changed <code>UnitType</code> found, or null if none.
      */
     public UnitType getTargetType(ChangeType changeType, Player player) {
         UnitTypeChange change = getUnitTypeChange(changeType, player);
@@ -519,14 +433,15 @@ public final class UnitType extends BuildableType
     }
 
     /**
-     * Describe <code>getUnitTypeChange</code> method here.
+     * Gets any suitable unit type changes applicable to a given change type
+     * and player.
      *
-     * @param changeType an <code>UnitTypeChange.Type</code> value
-     * @param player a <code>Player</code> value
-     * @return an <code>UnitType</code> value
+     * @param changeType The <code>ChangeType</code> to match.
+     * @param player The <code>Player</code> to check.
+     * @return Any <code>UnitTypeChange</code> found, or null if none.
      */
     public UnitTypeChange getUnitTypeChange(ChangeType changeType, Player player) {
-        for (UnitTypeChange change : typeChanges) {
+        for (UnitTypeChange change : getTypeChanges()) {
             if (change.asResultOf(changeType) && change.appliesTo(player)) {
                 UnitType result = change.getNewUnitType();
                 if (result.isAvailableTo(player)) {
@@ -537,17 +452,14 @@ public final class UnitType extends BuildableType
         return null;
     }
 
-
     /**
-     * Returns the <code>UnitTypeChange</code> associated with the
-     * given <code>UnitType</code>, or <code>null</code> if there is
-     * none.
+     * Gets the type change required to become another given unit type.
      *
-     * @param newType the target UnitType
-     * @return the type change
+     * @param newType The target <code>UnitType</code>.
+     * @return The type change, or null if impossible.
      */
     public UnitTypeChange getUnitTypeChange(UnitType newType) {
-        for (UnitTypeChange change : typeChanges) {
+        for (UnitTypeChange change : getTypeChanges()) {
             if (change.getNewUnitType() == newType) {
                 return change;
             }
@@ -556,19 +468,20 @@ public final class UnitType extends BuildableType
     }
 
     /**
-     * Return true if this UnitType can be upgraded to the given
-     * UnitType by the given means of education. If the given UnitType
-     * is null, return true if the UnitType can be upgraded to any
-     * other UnitType by the given means of education.
+     * Can this type of unit be upgraded to another given type by a given
+     * educational change type?
      *
-     * @param newType The UnitType to learn (may be null in the case
-     *     of attempting to move to a native settlement when the skill
-     *     taught there is still unknown).
-     * @param changeType an <code>ChangeType</code> value
-     * @return <code>true</code> if can learn the given UnitType
+     * If the target type is null, return true if the UnitType can be
+     * upgraded to any other type by the given means of education.
+     *
+     * @param newType The <code>UnitType</code> to learn (may be null
+     *     in the case of attempting to move to a native settlement
+     *     when the skill taught there is still unknown).
+     * @param changeType The educational <code>ChangeType</code>.
+     * @return True if this unit type can learn.
      */
     public boolean canBeUpgraded(UnitType newType, ChangeType changeType) {
-        for (UnitTypeChange change : typeChanges) {
+        for (UnitTypeChange change : getTypeChanges()) {
             if ((newType == null || newType == change.getNewUnitType())
                 && change.getProbability(changeType) > 0) {
                 return true;
@@ -578,14 +491,13 @@ public final class UnitType extends BuildableType
     }
 
     /**
-     * Get a list of UnitType which can learn in a lost city rumour
+     * Gets the unit types which can be learned from a lost city rumour.
      *
-     * @return <code>UnitType</code> with a skill equal or less than given
-     * maximum
+     * @return A list of unit types.
      */
     public List<UnitType> getUnitTypesLearntInLostCity() {
         List<UnitType> unitTypes = new ArrayList<UnitType>();
-        for (UnitTypeChange change : typeChanges) {
+        for (UnitTypeChange change : getTypeChanges()) {
             if (change.asResultOf(ChangeType.LOST_CITY)) {
                 unitTypes.add(change.getNewUnitType());
             }
@@ -594,14 +506,15 @@ public final class UnitType extends BuildableType
     }
 
     /**
-     * Get a UnitType to learn with a level skill less or equal than given level
+     * Get a UnitType to learn with a level skill less or equal than
+     * given level.
      *
-     * @param maximumSkill the maximum level skill which we are searching for
-     * @return <code>UnitType</code> with a skill equal or less than given
-     * maximum
+     * @param maximumSkill The maximum level skill which we are searching for.
+     * @return A <code>UnitType</code> with a skill equal or less than given
+     *     maximum.
      */
     public UnitType getEducationUnit(int maximumSkill) {
-        for (UnitTypeChange change : typeChanges) {
+        for (UnitTypeChange change : getTypeChanges()) {
             if (change.canBeTaught()) {
                 UnitType unitType = change.getNewUnitType();
                 if (unitType.hasSkill() && unitType.getSkill() <= maximumSkill) {
@@ -613,12 +526,14 @@ public final class UnitType extends BuildableType
     }
 
     /**
-     * Get the <code>EducationTurns</code> value.
+     * Get the number of turns to educate this unit type to become
+     * another type.
      *
-     * @return a <code>int</code> value
+     * @param unitType The <code>UnitType</code> to teach.
+     * @return The number of turns, or UNDEFINED if impossible.
      */
     public int getEducationTurns(UnitType unitType) {
-        for (UnitTypeChange change : typeChanges) {
+        for (UnitTypeChange change : getTypeChanges()) {
             if (change.asResultOf(UnitTypeChange.ChangeType.EDUCATION)) {
                 if (unitType == change.getNewUnitType()) {
                     return change.getTurnsToLearn();
@@ -638,7 +553,7 @@ public final class UnitType extends BuildableType
     }
 
     /**
-     * Can this unit type move to the High Seas.
+     * Can this unit type move to the High Seas?
      *
      * ATM this is synonymous with being a naval unit, but we should use
      * this routine instead of isNaval() in case this changes.
@@ -650,32 +565,31 @@ public final class UnitType extends BuildableType
     }
 
     /**
-     * Returns true if this UnitType has a skill.
+     * Does this UnitType have a skill?
      *
-     * @return a <code>boolean</code> value
+     * @return True if this unit type has a skill.
      */
     public boolean hasSkill() {
         return skill != UNDEFINED;
     }
 
-
     /**
-     * Returns true if this UnitType has a price.
+     * Does this UnitType have a price?
      *
-     * @return a <code>boolean</code> value
+     * @return True if the unit type has a price.
      */
     public boolean hasPrice() {
         return price != UNDEFINED;
     }
 
     /**
-     * Returns the number of units of the given GoodsType this
-     * UnitType consumes per turn (when in a settlement).
+     * Gets the number of units of the given GoodsType this UnitType
+     * consumes per turn (when in a settlement).
      *
-     * @return units consumed
+     * @return The amount of goods consumed per turn.
      */
     public int getConsumptionOf(GoodsType goodsType) {
-        return consumption.getCount(goodsType);
+        return (consumption == null) ? 0 : consumption.getCount(goodsType);
     }
 
     // Interface Comparable
@@ -690,24 +604,27 @@ public final class UnitType extends BuildableType
     // Interface Consumer
 
     /**
-     * Returns a list of GoodsTypes this Consumer consumes.
+     * Gets a list of goods this Consumer consumes.
      *
-     * @return a <code>List</code> value
+     * @return The goods consumed by this unit type.
      */
     public List<AbstractGoods> getConsumedGoods() {
         List<AbstractGoods> result = new ArrayList<AbstractGoods>();
-        for (GoodsType goodsType : consumption.keySet()) {
-            result.add(new AbstractGoods(goodsType, consumption.getCount(goodsType)));
+        if (consumption != null) {
+            for (GoodsType goodsType : consumption.keySet()) {
+                result.add(new AbstractGoods(goodsType,
+                        consumption.getCount(goodsType)));
+            }
         }
         return result;
     }
 
     /**
-     * The priority of this Consumer. The higher the priority, the
-     * earlier will the Consumer be allowed to consume the goods it
-     * requires.
+     * Gets the priority of this Consumer.  The higher the priority,
+     * the earlier will the Consumer be allowed to consume the goods
+     * it requires.
      *
-     * @return an <code>int</code> value
+     * @return The priority of this unit type.
      */
     public int getPriority() {
         // TODO: make this configurable
@@ -726,208 +643,276 @@ public final class UnitType extends BuildableType
 
     // Serialization
 
+    private static final String CONSUMES_TAG = "consumes";
+    private static final String DEFAULT_EQUIPMENT_TAG = "default-equipment";
+
+    private static final String DEFENCE_TAG = "defence";
+    private static final String EXPERT_PRODUCTION_TAG = "expert-production";
+    private static final String HIT_POINTS_TAG = "hitPoints";
+    private static final String LINE_OF_SIGHT_TAG = "lineOfSight";
+    private static final String MOVEMENT_TAG = "movement";
+    private static final String MAXIMUM_EXPERIENCE_TAG = "maximumExperience";
+    private static final String MAXIMUM_ATTRITION_TAG = "maximumAttrition";
+    private static final String OFFENCE_TAG = "offence";
+    private static final String PRICE_TAG = "price";
+    private static final String RECRUIT_PROBABILITY_TAG = "recruitProbability";
+    private static final String SCORE_VALUE_TAG = "scoreValue";
+    private static final String SKILL_TAG = "skill";
+    private static final String SKILL_TAUGHT_TAG = "skillTaught";
+    private static final String SPACE_TAG = "space";
+    private static final String SPACE_TAKEN_TAG = "spaceTaken";
+
+    private static final String DOWNGRADE_TAG = "downgrade";
+    private static final String UNIT_TAG = "unit";
+    private static final String UPGRADE_TAG = "upgrade";
+
     /**
-     * Makes an XML-representation of this object.
-     *
-     * @param out The output stream.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
+     * {@inheritDoc}
      */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         super.toXML(out, getXMLElementTagName());
     }
 
     /**
-     * Write the attributes of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to
-     *     the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
-        out.writeAttribute("offence", Integer.toString(offence));
-        out.writeAttribute("defence", Integer.toString(defence));
-        out.writeAttribute("movement", Integer.toString(movement));
-        out.writeAttribute("lineOfSight", Integer.toString(lineOfSight));
-        out.writeAttribute("scoreValue", Integer.toString(scoreValue));
-        out.writeAttribute("space", Integer.toString(space));
-        out.writeAttribute("spaceTaken", Integer.toString(spaceTaken));
-        out.writeAttribute("hitPoints", Integer.toString(hitPoints));
-        out.writeAttribute("maximumExperience",
-            Integer.toString(maximumExperience));
+        writeAttribute(out, OFFENCE_TAG, offence);
+
+        writeAttribute(out, DEFENCE_TAG, defence);
+
+        writeAttribute(out, MOVEMENT_TAG, movement);
+
+        writeAttribute(out, LINE_OF_SIGHT_TAG, lineOfSight);
+
+        writeAttribute(out, SCORE_VALUE_TAG, scoreValue);
+
+        writeAttribute(out, SPACE_TAG, space);
+
+        writeAttribute(out, SPACE_TAKEN_TAG, spaceTaken);
+
+        writeAttribute(out, HIT_POINTS_TAG, hitPoints);
+
+        writeAttribute(out, MAXIMUM_EXPERIENCE_TAG, maximumExperience);
+
         if (maximumAttrition < INFINITY) {
-            out.writeAttribute("maximumAttrition",
-                Integer.toString(maximumAttrition));
+            writeAttribute(out, MAXIMUM_ATTRITION_TAG, maximumAttrition);
         }
-        out.writeAttribute("recruitProbability",
-            Integer.toString(recruitProbability));
-        if (skill != UNDEFINED) {
-            out.writeAttribute("skill", Integer.toString(skill));
+
+        writeAttribute(out, RECRUIT_PROBABILITY_TAG, recruitProbability);
+
+        if (hasSkill()) {
+            writeAttribute(out, SKILL_TAG, skill);
         }
-        if (price != UNDEFINED) {
-            out.writeAttribute("price", Integer.toString(price));
+
+        if (hasPrice()) {
+            writeAttribute(out, PRICE_TAG, price);
         }
-        out.writeAttribute("skillTaught", skillTaught.getId());
+
+        writeAttribute(out, SKILL_TAUGHT_TAG, skillTaught);
+
         if (expertProduction != null) {
-            out.writeAttribute("expert-production", expertProduction.getId());
+            writeAttribute(out, EXPERT_PRODUCTION_TAG, expertProduction);
         }
     }
 
     /**
-     * Write the children of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to
-     *     the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
         super.writeChildren(out);
 
-        for (UnitTypeChange change : typeChanges) {
-            change.toXMLImpl(out);
-        }
         if (defaultEquipment != null) {
-            out.writeStartElement("default-equipment");
-            out.writeAttribute(ID_ATTRIBUTE_TAG, defaultEquipment.getId());
+            out.writeStartElement(DEFAULT_EQUIPMENT_TAG);
+
+            writeAttribute(out, ID_ATTRIBUTE_TAG, defaultEquipment);
+
             out.writeEndElement();
         }
-        if (!consumption.isEmpty()) {
+
+        if (typeChanges != null) {
+            for (UnitTypeChange change : typeChanges) {
+                change.toXMLImpl(out);
+            }
+        }
+
+        if (consumption != null) {
             for (GoodsType goodsType : consumption.keySet()) {
-                out.writeStartElement("consumes");
-                out.writeAttribute(ID_ATTRIBUTE_TAG, goodsType.getId());
-                out.writeAttribute(VALUE_TAG, Integer.toString(consumption.getCount(goodsType)));
+                out.writeStartElement(CONSUMES_TAG);
+
+                writeAttribute(out, ID_ATTRIBUTE_TAG, goodsType);
+
+                writeAttribute(out, VALUE_TAG, consumption.getCount(goodsType));
+
                 out.writeEndElement();
             }
         }
     }
 
     /**
-     * Reads the attributes of this object from an XML stream.
-     *
-     * @param in The XML input stream.
-     * @throws XMLStreamException if a problem was encountered
-     *     during parsing.
+     * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
 
-        String extendString = in.getAttributeValue(null, "extends");
-        UnitType parent = (extendString == null) ? this :
-            getSpecification().getUnitType(extendString);
-        offence = getAttribute(in, "offence", parent.offence);
-        defence = getAttribute(in, "defence", parent.defence);
-        movement = getAttribute(in, "movement", parent.movement);
-        lineOfSight = getAttribute(in, "lineOfSight", parent.lineOfSight);
-        scoreValue = getAttribute(in, "scoreValue", parent.scoreValue);
-        space = getAttribute(in, "space", parent.space);
-        hitPoints = getAttribute(in, "hitPoints", parent.hitPoints);
-        spaceTaken = getAttribute(in, "spaceTaken", parent.spaceTaken);
-        maximumExperience = getAttribute(in, "maximumExperience",
-            parent.maximumExperience);
-        maximumAttrition = getAttribute(in, "maximumAttrition",
-            parent.maximumAttrition);
-        String skillString = in.getAttributeValue(null, "skillTaught");
-        skillTaught = (skillString == null) ? this
-            : getSpecification().getUnitType(skillString);
+        final Specification spec = getSpecification();
 
-        recruitProbability = getAttribute(in, "recruitProbability",
-            parent.recruitProbability);
-        skill = getAttribute(in, "skill", parent.skill);
+        UnitType parent = spec.getType(in, EXTENDS_TAG, UnitType.class, this);
 
-        price = getAttribute(in, "price", parent.price);
+        offence = getAttribute(in, OFFENCE_TAG, parent.offence);
 
-        expertProduction = getSpecification().getType(in, "expert-production",
-            GoodsType.class, parent.expertProduction);
+        defence = getAttribute(in, DEFENCE_TAG, parent.defence);
 
-        if (parent != this) {
-            if (!hasAttribute(in, "population-required")) {
-                setRequiredPopulation(getAttribute(in, "population-required",
-                        parent.getRequiredPopulation()));
-            }
-            typeChanges.addAll(parent.typeChanges);
-            defaultEquipment = parent.defaultEquipment;
-            consumption.putAll(parent.consumption);
-            addFeatures(parent);
-            if (parent.isAbstractType()) {
-                getFeatureContainer().replaceSource(parent, this);
+        movement = getAttribute(in, MOVEMENT_TAG, parent.movement);
+
+        lineOfSight = getAttribute(in, LINE_OF_SIGHT_TAG, parent.lineOfSight);
+
+        scoreValue = getAttribute(in, SCORE_VALUE_TAG, parent.scoreValue);
+
+        space = getAttribute(in, SPACE_TAG, parent.space);
+
+        hitPoints = getAttribute(in, HIT_POINTS_TAG, parent.hitPoints);
+
+        spaceTaken = getAttribute(in, SPACE_TAKEN_TAG, parent.spaceTaken);
+
+        maximumExperience = getAttribute(in, MAXIMUM_EXPERIENCE_TAG,
+                                         parent.maximumExperience);
+
+        maximumAttrition = getAttribute(in, MAXIMUM_ATTRITION_TAG,
+                                        parent.maximumAttrition);
+
+        skillTaught = spec.getType(in, SKILL_TAUGHT_TAG,
+                                   UnitType.class, this);
+
+        recruitProbability = getAttribute(in, RECRUIT_PROBABILITY_TAG,
+                                          parent.recruitProbability);
+
+        skill = getAttribute(in, SKILL_TAG, parent.skill);
+
+        price = getAttribute(in, PRICE_TAG, parent.price);
+
+        expertProduction = spec.getType(in, EXPERT_PRODUCTION_TAG,
+                                        GoodsType.class, parent.expertProduction);
+
+        if (parent != this) { // Handle "extends" for super-type fields
+            if (!hasAttribute(in, REQUIRED_POPULATION_TAG)) {
+                setRequiredPopulation(parent.getRequiredPopulation());
             }
         }
     }
 
     /**
-     * Reads a child object.
-     *
-     * @param in The XML stream to read.
-     * @exception XMLStreamException if an error occurs
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        if (readShouldClearContainers(in)) {
+            consumption = null;
+            defaultEquipment = null;
+            typeChanges = null;
+        }
+
+        final Specification spec = getSpecification();
+        UnitType parent = spec.getType(in, EXTENDS_TAG, UnitType.class, this);
+        if (parent != this) {
+            defaultEquipment = parent.defaultEquipment;
+
+            if (parent.typeChanges != null) {
+                if (typeChanges == null) {
+                    typeChanges = new ArrayList<UnitTypeChange>();
+                }
+                typeChanges.addAll(parent.typeChanges);
+            }
+
+            if (parent.consumption != null) {
+                if (consumption == null) {
+                    consumption = new TypeCountMap<GoodsType>();
+                }
+                consumption.putAll(parent.consumption);
+            }
+
+            addFeatures(parent);
+            if (parent.isAbstractType()) {
+                getFeatureContainer().replaceSource(parent, this);
+            }
+        }
+
+        super.readChildren(in);
+    }
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        String nodeName = in.getLocalName();
-        Specification spec = getSpecification();
-        if ("downgrade".equals(nodeName)
-            || "upgrade".equals(nodeName)) {
-            if (getAttribute(in, "delete", false)) {
-                String unitId = in.getAttributeValue(null, "unit");
-                Iterator<UnitTypeChange> iterator = typeChanges.iterator();
-                while (iterator.hasNext()) {
-                    if (unitId.equals(iterator.next()
-                            .getNewUnitType().getId())) {
-                        iterator.remove();
-                        break;
+        final Specification spec = getSpecification();
+        final String tag = in.getLocalName();
+
+        if (CONSUMES_TAG.equals(tag)) {
+            GoodsType type = spec.getType(in, ID_ATTRIBUTE_TAG,
+                                          GoodsType.class, (GoodsType)null);
+            int amount = getAttribute(in, VALUE_TAG, UNDEFINED);
+            if (type != null && amount != UNDEFINED) {
+                if (consumption == null) {
+                    consumption = new TypeCountMap<GoodsType>();
+                }
+                consumption.incrementCount(type, amount);
+            }
+            in.nextTag(); // close this element
+
+        } else if (DEFAULT_EQUIPMENT_TAG.equals(tag)) {
+            defaultEquipment = spec.getType(in, ID_ATTRIBUTE_TAG,
+                EquipmentType.class, (EquipmentType)null);
+            in.nextTag(); // close this element
+
+        } else if (DOWNGRADE_TAG.equals(tag) || UPGRADE_TAG.equals(tag)) {
+            if (getAttribute(in, DELETE_TAG, false)) {
+                if (typeChanges != null) {
+                    String unitId = getAttribute(in, UNIT_TAG, (String)null);
+                    Iterator<UnitTypeChange> it = typeChanges.iterator();
+                    while (it.hasNext()) {
+                        if (unitId.equals(it.next().getNewUnitType().getId())) {
+                            it.remove();
+                            break;
+                        }
                     }
                 }
                 in.nextTag();
+
             } else {
                 UnitTypeChange change = new UnitTypeChange(in, spec);
-                if ("downgrade".equals(nodeName)
+                if (DOWNGRADE_TAG.equals(tag)
                     && change.getChangeTypes().isEmpty()) {
                     // add default downgrade type
                     change.getChangeTypes().put(ChangeType.CLEAR_SKILL, 100);
                 }
+                if (typeChanges == null) {
+                    typeChanges = new ArrayList<UnitTypeChange>();
+                }
                 typeChanges.add(change);
             }
-        } else if ("default-equipment".equals(nodeName)) {
-            String equipmentString
-                = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-            if (equipmentString != null) {
-                defaultEquipment = spec.getEquipmentType(equipmentString);
-            }
-            in.nextTag(); // close this element
-        } else if ("consumes".equals(nodeName)) {
-            String typeString = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-            String valueString = in.getAttributeValue(null, VALUE_TAG);
-            if (typeString != null && valueString != null) {
-                try {
-                    GoodsType type = spec.getGoodsType(typeString);
-                    int amount = Integer.parseInt(valueString);
-                    consumption.incrementCount(type, amount);
-                } catch(Exception e) {
-                    logger.warning("Failed to parse integer " + valueString);
-                }
-            }
-            in.nextTag(); // close this element
+
         } else {
             super.readChild(in);
         }
     }
 
     /**
-     * Debug print helper.
+     * {@inheritDoc}
      */
+    @Override
     public String toString() {
         return getId();
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "unit-type".
      */

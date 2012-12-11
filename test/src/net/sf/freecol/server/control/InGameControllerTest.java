@@ -2085,7 +2085,9 @@ public class InGameControllerTest extends FreeColTestCase {
         UnitTypeChange change = new UnitTypeChange();
         change.setNewUnitType(farmerType);
         change.getChangeTypes().put(enterColony, 100);
-        gardenerType.getTypeChanges().add(change);
+        List<UnitTypeChange> ch = gardenerType.getTypeChanges();
+        ch.add(change);
+        gardenerType.setTypeChanges(ch);
 
         assertTrue(gardenerType.canBeUpgraded(farmerType, enterColony));
         assertTrue(change.appliesTo(dutch));

@@ -32,11 +32,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 public class UnitTypeChange extends FreeColObject {
 
-    /**
-     * Describe newUnitType here.
-     */
-    private UnitType newUnitType;
-
     public static enum ChangeType {
         EDUCATION,
         NATIVES,
@@ -52,9 +47,8 @@ public class UnitTypeChange extends FreeColObject {
         UNDEAD
     }
 
-    public static final Map<ChangeType, String> tags =
-        new EnumMap<ChangeType, String>(ChangeType.class);
-
+    public static final Map<ChangeType, String> tags
+        = new EnumMap<ChangeType, String>(ChangeType.class);
     static {
         tags.put(ChangeType.EDUCATION, "learnInSchool");
         tags.put(ChangeType.NATIVES, "learnFromNatives");
@@ -70,20 +64,32 @@ public class UnitTypeChange extends FreeColObject {
         tags.put(ChangeType.UNDEAD, "undead");
     }
 
+    /**
+     * The new unit type to change to.
+     */
+    private UnitType newUnitType = null;
+
+    /**
+     * The number of turns the changes takes, if applicable.
+     */
     protected int turnsToLearn = 0;
 
-    protected Map<ChangeType, Integer> changeTypes =
-        new EnumMap<ChangeType, Integer>(ChangeType.class);
+    /**
+     * A map of change type to probability.
+     */
+    protected Map<ChangeType, Integer> changeTypes
+        = new EnumMap<ChangeType, Integer>(ChangeType.class);
 
     /**
      * A list of Scopes limiting the applicability of this Feature.
      */
-    private List<Scope> scopes = new ArrayList<Scope>();
+    private List<Scope> scopes = null;
 
 
-    public UnitTypeChange() {
-        // empty constructor
-    }
+    /**
+     * Empty constructor.
+     */
+    public UnitTypeChange() {}
 
     /**
      * Creates a new <code>UnitTypeChange</code> instance.
@@ -100,31 +106,69 @@ public class UnitTypeChange extends FreeColObject {
     }
 
     /**
-     * Returns the probability of a change taking place (defaults to
-     * zero). At the moment, this probability only applies to the
+     * Gets the unit type to change to.
+     *
+     * @return The new <code>UnitType</code>.
+     */
+    public final UnitType getNewUnitType() {
+        return newUnitType;
+    }
+
+    /**
+     * Sets the new unit type to change to.
+     * Public for the test suite.
+     *
+     * @param newUnitType The new <code>UnitType</code>.
+     */
+    public final void setNewUnitType(final UnitType newUnitType) {
+        this.newUnitType = newUnitType;
+    }
+
+    /**
+     * Gets the turns to learn the skill.
+     *
+     * @return The turns to learn.
+     */
+    public final int getTurnsToLearn() {
+        return turnsToLearn;
+    }
+
+    /**
+     * Sets the turns to learn.
+     *
+     * @param newTurnsToLearn The new turns to learn.
+     */
+    public final void setTurnsToLearn(final int newTurnsToLearn) {
+        this.turnsToLearn = newTurnsToLearn;
+    }
+
+    /**
+     * Gets the change type probability map.
+     *
+     * @return The change type map.
+     */
+    public Map<ChangeType, Integer> getChangeTypes() {
+        return changeTypes;
+    }
+
+    /**
+     * Gets the probability of a change taking place.
+     * At the moment, this probability only applies to the
      * ChangeTypes EXPERIENCE and PROMOTION.
      *
-     * @param type a <code>ChangeType</code> value
-     * @return an <code>int</code> value
+     * @param type The <code>ChangeType</code> to check.
+     * @return The probability, defaulting to zero.
      */
     public final int getProbability(ChangeType type) {
         Integer result = changeTypes.get(type);
         return (result == null) ? 0 : result;
     }
 
-    public List<Scope> getScopes() {
-        return scopes;
-    }
-
-    public Map<ChangeType, Integer> getChangeTypes() {
-        return changeTypes;
-    }
-
     /**
-     * Describe <code>asResultOf</code> method here.
+     * Is this unit change type possible as a specific change type.
      *
-     * @param type a <code>ChangeType</code> value
-     * @return a <code>boolean</code> value
+     * @param type The <code>ChangeType</code> to check.
+     * @return True if the change type can occur.
      */
     public boolean asResultOf(ChangeType type) {
         return changeTypes.containsKey(type)
@@ -132,116 +176,102 @@ public class UnitTypeChange extends FreeColObject {
     }
 
     /**
-     * Describe <code>appliesTo</code> method here.
+     * Can this unit type change occur as a result of education?
      *
-     * @param player a <code>Player</code> value
-     * @return a <code>boolean</code> value
+     * @return True if this is a valid educational change.
      */
-    public boolean appliesTo(Player player) {
-        if (scopes.isEmpty()) {
-            return true;
-        } else {
-            for (Scope scope : scopes) {
-                if (scope.appliesTo(player)) {
-                    return true;
-                }
-            }
-            return false;
-        }
-    }
-
-    /**
-     * Get the <code>TurnsToLearn</code> value.
-     *
-     * @return an <code>int</code> value
-     */
-    public final int getTurnsToLearn() {
-        return turnsToLearn;
-    }
-
-    /**
-     * Set the <code>TurnsToLearn</code> value.
-     *
-     * @param newTurnsToLearn The new TurnsToLearn value.
-     */
-    public final void setTurnsToLearn(final int newTurnsToLearn) {
-        this.turnsToLearn = newTurnsToLearn;
-    }
-
     public boolean canBeTaught() {
         return asResultOf(ChangeType.EDUCATION) && turnsToLearn > 0;
     }
 
     /**
-     * Get the <code>NewUnitType</code> value.
+     * Gets the scopes associated with this type change.
      *
-     * @return an <code>UnitType</code> value
+     * @return The list of scopes.
      */
-    public final UnitType getNewUnitType() {
-        return newUnitType;
+    public List<Scope> getScopes() {
+        return (scopes == null) ? new ArrayList<Scope>() : scopes;
     }
 
     /**
-     * Set the <code>NewUnitType</code> value.
+     * Sets the scopes associated with this type change.
+     * Public for the test suite.
      *
-     * @param newNewUnitType The new NewUnitType value.
+     * @param scopes The new list of <code>Scope</code>s.
      */
-    public final void setNewUnitType(final UnitType newNewUnitType) {
-        this.newUnitType = newNewUnitType;
+    public void setScopes(List<Scope> scopes) {
+        this.scopes = scopes;
     }
 
     /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
+     * Does this change type apply to a given player?
      *
-     * @param out The target stream.
-     * @exception XMLStreamException if there are any problems writing
-     *      to the stream.
+     * @param player The <code>Player</code> to test.
+     * @return True if this change is applicable.
      */
+    public boolean appliesTo(Player player) {
+        if (scopes == null || scopes.isEmpty()) return true;
+        for (Scope scope : scopes) {
+            if (scope.appliesTo(player)) return true;
+        }
+        return false;
+    }
+
+
+    // Serialization
+
+    private static final String TURNS_TO_LEARN_TAG = "turnsToLearn";
+    private static final String UNIT_TAG = "unit";
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
+
         if (newUnitType != null) {
-            out.writeAttribute("unit", newUnitType.getId());
+            writeAttribute(out, UNIT_TAG, newUnitType);
         }
+
         if (turnsToLearn != UNDEFINED) {
-            out.writeAttribute("turnsToLearn", Integer.toString(turnsToLearn));
+            writeAttribute(out, TURNS_TO_LEARN_TAG, turnsToLearn);
         }
+
         for (Map.Entry<ChangeType, Integer> entry : changeTypes.entrySet()) {
-            out.writeAttribute(tags.get(entry.getKey()),
-                entry.getValue().toString());
+            writeAttribute(out, tags.get(entry.getKey()),
+                           entry.getValue().toString());
         }
+
         out.writeEndElement();
     }
 
     /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The XML input stream.
-     * @throws XMLStreamException if a problem was encountered
-     *     during parsing.
+     * {@inheritDoc}
      */
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
-        String newTypeId = in.getAttributeValue(null, "unit");
-        if (newTypeId == null) {
-            newUnitType = null;
-        } else {
-            newUnitType = getSpecification().getType(newTypeId, UnitType.class);
-            turnsToLearn = getAttribute(in, "turnsToLearn", UNDEFINED);
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        final Specification spec = getSpecification();
+
+        if (hasAttribute(in, UNIT_TAG)) {
+            newUnitType = spec.getType(in, UNIT_TAG,
+                                       UnitType.class, (UnitType)null);
+
+            turnsToLearn = getAttribute(in, TURNS_TO_LEARN_TAG, UNDEFINED);
             if (turnsToLearn > 0) {
                 changeTypes.put(ChangeType.EDUCATION, 100);
             }
+
             // @compat 0.9.x
             for (ChangeType type : ChangeType.values()) {
-                String value = in.getAttributeValue(null, tags.get(type));
+                String value = getAttribute(in, tags.get(type), (String)null);
                 if (value != null) {
-                    if(value.equalsIgnoreCase("false")) {
+                    if (value.equalsIgnoreCase("false")) {
                         changeTypes.put(type, 0);
                     } else if (value.equalsIgnoreCase("true")) {
                         changeTypes.put(type, 100);
                     } else {
                         changeTypes.put(type, Math.max(0,
-                                Math.min(100, new Integer(value))));
+                                        Math.min(100, new Integer(value))));
                     }
                 }
             }
@@ -250,29 +280,60 @@ public class UnitTypeChange extends FreeColObject {
     }
 
     /**
-     * Reads the children of this object from an XML stream.
-     *
-     * @param in The XML input stream.
-     * @throws XMLStreamException if a problem was encountered
-     *     during parsing.
+     * {@inheritDoc}
      */
     @Override
     protected void readChildren(XMLStreamReader in) throws XMLStreamException {
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            String nodeName = in.getLocalName();
-            if ("scope".equals(nodeName)) {
-                scopes.add(new Scope(in));
+        scopes = null;
+
+        super.readChildren(in);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+        final String tag = in.getLocalName();
+
+        if (Scope.getXMLElementTagName().equals(tag)) {
+            Scope scope = new Scope(in);
+            if (scope != null) {
+                if (scopes == null) scopes = new ArrayList<Scope>();
+                scopes.add(scope);
             }
+
+        } else {
+            super.readChild(in);
         }
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        sb.append(newUnitType.toString());
+        sb.append(" ");
+        sb.append(Integer.toString(turnsToLearn));
+        for (Map.Entry<ChangeType, Integer> entry : changeTypes.entrySet()) {
+            sb.append(" ");
+            sb.append(tags.get(entry.getKey()));
+            sb.append("/");
+            sb.append(entry.getValue().toString());
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+
+    /**
+     * Gets the tag name of the root element representing this object.
      *
      * @return "upgrade".
      */
     public static final String getXMLElementTagName() {
         return "upgrade";
     }
-
 }
