@@ -1259,25 +1259,28 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 } else if (Effect.LOSS_OF_GOODS.equals(effect.getId())) {
                     Goods goods = Utils.getRandomMember(logger, "select goods",
                                                         colony.getLootableGoodsList(), random);
-                    goods.setAmount(Math.min(goods.getAmount() / 2, 50));
-                    colony.removeGoods(goods);
-                    messages.add(new ModelMessage(ModelMessage.MessageType.DEFAULT,
-                                                  effect.getId(), this)
-                                 .addName("%goods%", goods));
+                    if (goods != null) {
+                        goods.setAmount(Math.min(goods.getAmount() / 2, 50));
+                        colony.removeGoods(goods);
+                        messages.add(new ModelMessage(ModelMessage.MessageType.DEFAULT,
+                                                      effect.getId(), this)
+                                     .addAmount("%amount%", goods.getAmount())
+                                     .add("%goods%", goods.getType().getNameKey()));
+                    }
                 } else if (Effect.LOSS_OF_UNIT.equals(effect.getId())) {
                     Unit unit = getUnitForEffect(colony, effect, random);
                     if (unit != null) {
                         if (colony.getUnitCount() == 1) {
-                            csDisposeSettlement(colony, cs);
                             messages.add(new ModelMessage(ModelMessage.MessageType.DEFAULT,
                                                           "model.disaster.effect.colonyDestroyed", this)
                                          .addName("%colony%", colony));
+                            csDisposeSettlement(colony, cs);
                         } else {
-                            cs.addDispose(See.perhaps().always(this),
-                                          unit.getLocation(), unit);
                             messages.add(new ModelMessage(ModelMessage.MessageType.DEFAULT,
                                                           effect.getId(), this)
                                          .add("%unit%", unit.getType().getNameKey()));
+                            cs.addDispose(See.perhaps().always(this),
+                                          unit.getLocation(), unit);
                         }
                     }
                 } else if (Effect.DAMAGED_UNIT.equals(effect.getId())) {
@@ -1285,16 +1288,15 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     if (unit != null && unit.isNaval()) {
                         Location repairLocation = unit.getRepairLocation();
                         if (repairLocation == null) {
-                            csSinkShip(unit, null, cs);
                             messages.add(new ModelMessage(ModelMessage.MessageType.DEFAULT,
                                                           "model.disaster.effect.lossOfUnit", this)
                                          .add("%unit%", unit.getType().getNameKey()));
-
+                            csSinkShip(unit, null, cs);
                         } else {
-                            csDamageShip(unit, repairLocation, cs);
                             messages.add(new ModelMessage(ModelMessage.MessageType.DEFAULT,
                                                           effect.getId(), this)
                                          .addName("%unit%", unit));
+                            csDamageShip(unit, repairLocation, cs);
                         }
                     }
                 } else {
@@ -1365,7 +1367,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             java.util.Map<IndianSettlement,
                 java.util.Map<Player, Tension.Level>> oldLevels
                 = new HashMap<IndianSettlement,
-                java.util.Map<Player, Tension.Level>>();
+                    java.util.Map<Player, Tension.Level>>();
             for (IndianSettlement settlement : allSettlements) {
                 java.util.Map<Player, Tension.Level> oldLevel
                     = new HashMap<Player, Tension.Level>();
@@ -1449,6 +1451,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
             }
 
             // Now collect the settlements that changed.
+            // Update those that changed, and add messages for selected
+            // worsening relation transitions.
             for (IndianSettlement settlement : allSettlements) {
                 java.util.Map<Player, Tension.Level> oldLevel
                     = oldLevels.get(settlement);
@@ -1457,10 +1461,23 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     Tension newTension = settlement.getAlarm(enemy);
                     Tension.Level newLevel = (newTension == null) ? null
                         : newTension.getLevel();
-                    if (entry.getValue() != newLevel) {
-                        cs.add(See.only(null).perhaps((ServerPlayer)enemy),
-                               settlement);
-                    }
+                    if (entry.getValue() == newLevel) continue;
+                    cs.add(See.only(null).perhaps((ServerPlayer)enemy),
+                        settlement);
+                    // No messages about improving tension
+                    if (newLevel == null
+                        || (entry.getValue() != null 
+                            && entry.getValue().getLimit()
+                            > newLevel.getLimit())) continue;
+                    String key = "indianSettlement.alarmIncrease."
+                        + settlement.getAlarm(enemy).getKey();
+                    if (!Messages.containsKey(key)) continue;
+                    cs.addMessage(See.only((ServerPlayer)enemy),
+                        new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                         key, settlement)
+                            .addStringTemplate("%nation%", getNationName())
+                            .addStringTemplate("%enemy%", enemy.getNationName())
+                            .addName("%settlement%", settlement.getName()));
                 }
             }
 
@@ -1616,8 +1633,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     if (!p.isDead() && p.isIndian() && p.hasContacted(this)) {
                         p.setTension(this, new Tension(Tension.TENSION_MIN));
                         for (IndianSettlement is : p.getIndianSettlements()) {
-                            is.setAlarm(this, new Tension(Tension.TENSION_MIN));
-                            cs.add(See.only(this), is);
+                            if (is.hasContacted(this)) {
+                                is.setAlarm(this,
+                                            new Tension(Tension.TENSION_MIN));
+                                cs.add(See.only(this), is);
+                            }
                         }
                         csChangeStance(Stance.PEACE, p, true, cs);
                     }
