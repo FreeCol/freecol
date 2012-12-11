@@ -212,7 +212,7 @@ public final class FreeColClient {
             System.err.println("Failed to load resource mapping from rule set 'classic'.");
             System.exit(1);
         }
-        actionManager.initializeActions(inGameController);
+        actionManager.initializeActions(inGameController, connectController);
 
         // Load the client options, which handle reloading the
         // resources specified in the active mods.

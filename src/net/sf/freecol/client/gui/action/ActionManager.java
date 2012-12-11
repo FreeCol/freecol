@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
@@ -62,7 +63,7 @@ public class ActionManager extends OptionGroup {
      * add it in this method.  Localization and a possible accelerator
      * need to be added to the strings file.
      */
-    public void initializeActions(InGameController inGameController) {
+    public void initializeActions(InGameController inGameController, ConnectController connectController) {
         // keep this list alphabetized.
 
         add(new AboutAction(freeColClient, gui));
@@ -76,7 +77,7 @@ public class ActionManager extends OptionGroup {
         for (PanelType panelType : PanelType.values()) {
             add(new ColopediaAction(freeColClient, gui, panelType));
         }
-        add(new DebugAction(freeColClient, inGameController, gui));
+        add(new DebugAction(freeColClient, inGameController, connectController, gui));
         add(new DeclareIndependenceAction(freeColClient, inGameController, gui));
         add(new DetermineHighSeasAction(freeColClient, gui));
         add(new DisbandUnitAction(freeColClient, inGameController, gui));
@@ -104,13 +105,13 @@ public class ActionManager extends OptionGroup {
             add(new MoveAction(freeColClient, inGameController, gui, d, true));
         }
         add(new NewAction(freeColClient, gui));
-        add(new ContinueAction(freeColClient, inGameController, gui));
+        add(new ContinueAction(freeColClient, inGameController, connectController, gui));
         add(new NewEmptyMapAction(freeColClient, gui));
         add(new OpenAction(freeColClient, inGameController, gui));
         add(new PreferencesAction(freeColClient, gui));
         add(new SaveAndQuitAction(freeColClient, inGameController, gui));
         add(new QuitAction(freeColClient, gui));
-        add(new ReconnectAction(freeColClient, gui));
+        add(new ReconnectAction(freeColClient, connectController, gui));
         add(new RenameAction(freeColClient, inGameController, gui));
         add(new ReportCargoAction(freeColClient, gui));
         add(new ReportContinentalCongressAction(freeColClient, gui));
@@ -135,7 +136,7 @@ public class ActionManager extends OptionGroup {
         add(new SentryAction(freeColClient, inGameController, gui));
         add(new ShowDifficultyAction(freeColClient, gui));
         add(new ShowGameOptionsAction(freeColClient, gui));
-        add(new ShowMainAction(freeColClient, gui));
+        add(new ShowMainAction(freeColClient, connectController, gui));
         add(new ShowMapGeneratorOptionsAction(freeColClient, gui));
         add(new SkipUnitAction(freeColClient, inGameController, gui));
         add(new TilePopupAction(freeColClient, gui));

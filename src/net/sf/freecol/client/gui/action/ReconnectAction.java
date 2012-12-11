@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.client.gui.GUI;
 
 /**
@@ -31,15 +32,18 @@ import net.sf.freecol.client.gui.GUI;
 public class ReconnectAction extends FreeColAction {
 
     public static final String id = "reconnectAction";
+    private final ConnectController connectController;
 
     /**
      * Creates a new <code>DeclareIndependenceAction</code>.
      *
      * @param freeColClient The main controller object for the client.
+     * @param connectController 
      * @param gui 
      */
-    ReconnectAction(FreeColClient freeColClient, GUI gui) {
+    ReconnectAction(FreeColClient freeColClient, ConnectController connectController, GUI gui) {
         super(freeColClient, gui, id);
+        this.connectController = connectController;
     }
 
     /**
@@ -48,6 +52,6 @@ public class ReconnectAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        freeColClient.getConnectController().reconnect();
+        connectController.reconnect();
     }
 }

@@ -148,7 +148,7 @@ public class GUI {
      * with the default MapViewer.
      */
     private MapViewer colonyTileGUI;
-
+ 
     private ImageLibrary imageLibrary;
 
     private SoundPlayer soundPlayer;

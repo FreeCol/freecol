@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.client.gui.GUI;
 
 /**
@@ -33,16 +34,19 @@ import net.sf.freecol.client.gui.GUI;
 public class ShowMainAction extends FreeColAction {
 
     public static final String id = "showMainAction";
+    private final ConnectController connectController;
 
 
     /**
      * Creates this action.
      *
      * @param freeColClient The main controller object for the client.
+     * @param connectController 
      * @param gui 
      */
-    ShowMainAction(FreeColClient freeColClient, GUI gui) {
+    ShowMainAction(FreeColClient freeColClient, ConnectController connectController, GUI gui) {
         super(freeColClient, gui, id);
+        this.connectController = connectController;
     }
 
     /**
@@ -55,7 +59,7 @@ public class ShowMainAction extends FreeColAction {
                                                               "stopCurrentGame.no")) {
             return;
         }
-        getFreeColClient().getConnectController().quitGame(true);
+        connectController.quitGame(true);
         gui.removeInGameComponents();
         getFreeColClient().setMapEditor(false);
         getFreeColClient().setGame(null);
