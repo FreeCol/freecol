@@ -42,10 +42,10 @@ public class EquipmentType extends BuildableType {
 
     /**
      * Determines which type of Equipment will be lost first if the
-     * Unit carrying it is defeated. Horses should be lost before
+     * Unit carrying it is defeated.  Horses should be lost before
      * Muskets, for example.
      */
-    private int combatLossPriority;
+    private int combatLossPriority = -1;
 
     /**
      * What this equipment type becomes if it is captured by Indians
@@ -57,84 +57,54 @@ public class EquipmentType extends BuildableType {
     /**
      * The default Role of the Unit carrying this type of Equipment.
      */
-    private Role role;
+    private Role role = Role.DEFAULT;
 
     /**
-     * Describe militaryEquipment here.
+     * Is this military equipment?
      */
-    private boolean militaryEquipment;
+    private boolean militaryEquipment = false;
 
     /**
-     * A List containing the IDs of equipment types compatible with this one.
+     * A list containing the ids of equipment types compatible with this one.
      */
-    private List<String> compatibleEquipment = new ArrayList<String>();
+    private List<String> compatibleEquipment = null;
 
 
+    /**
+     * Simple constructor.
+     *
+     * @param id The object identifier.
+     * @param specification The containing <code>Specification</code>.
+     */
     public EquipmentType(String id, Specification specification) {
         super(id, specification);
     }
 
     /**
-     * Get the <code>MaximumCount</code> value.
+     * Get the maximum combinable amount of this equipment type.
      *
-     * @return an <code>int</code> value
+     * @return The maximum combinable count.
      */
     public final int getMaximumCount() {
         return maximumCount;
     }
 
     /**
-     * Set the <code>MaximumCount</code> value.
+     * Get the combat loss priority.
      *
-     * @param newMaximumCount The new MaximumCount value.
-     */
-    public final void setMaximumCount(final int newMaximumCount) {
-        this.maximumCount = newMaximumCount;
-    }
-
-    /**
-     * Get the <code>Role</code> value.
-     *
-     * @return a <code>Role</code> value
-     */
-    public final Role getRole() {
-        return role;
-    }
-
-    /**
-     * Set the <code>Role</code> value.
-     *
-     * @param newRole The new Role value.
-     */
-    public final void setRole(final Role newRole) {
-        this.role = newRole;
-    }
-
-    /**
-     * Get the <code>CombatLossPriority</code> value.
-     *
-     * @return an <code>int</code> value
+     * @return The combat loss priority.
      */
     public final int getCombatLossPriority() {
         return combatLossPriority;
     }
 
     /**
-     * Set the <code>CombatLossPriority</code> value.
+     * Can this equipment type be captured in combat?
      *
-     * @param newCombatLossPriority The new CombatLossPriority value.
-     */
-    public final void setCombatLossPriority(final int newCombatLossPriority) {
-        this.combatLossPriority = newCombatLossPriority;
-    }
-
-    /**
-     * Returns true if this EquipmentType can be captured in combat.
-     *
-     * @return a <code>boolean</code> value
+     * @return True if this equipment can be captured.
      */
     public boolean canBeCaptured() {
-        return (combatLossPriority > 0);
+        return combatLossPriority > 0;
     }
 
     /**
@@ -142,9 +112,8 @@ public class EquipmentType extends BuildableType {
      * Europeans and Indians use different <code>EquipmentType</code>s
      * for the same underlying goods.
      *
-     * @param byIndians is the capture by the Indians?
-     *
-     * @return an <code>EquipmentType</code> value
+     * @param byIndians Is the capture by the Indians?
+     * @return The captured <code>EquipmentType</code>.
      */
     public EquipmentType getCaptureEquipment(boolean byIndians) {
         return (captureEquipmentId != null
@@ -154,21 +123,43 @@ public class EquipmentType extends BuildableType {
     }
 
     /**
-     * Returns true if this type of equipment is compatible with the
-     * given type of equipment.
+     * Is this type of equipment compatible with the given type of equipment?
      *
-     * @param otherType an <code>EquipmentType</code> value
-     * @return a <code>boolean</code> value
+     * @param otherType The other <code>EquipmentType</code>.
+     * @return True if the equipment is compatible.
      */
     public boolean isCompatibleWith(EquipmentType otherType) {
         if (this.getId().equals(otherType.getId())) {
             // model.equipment.tools for example
             return true;
         }
-        return compatibleEquipment.contains(otherType.getId()) &&
-            otherType.compatibleEquipment.contains(getId());
+        return compatibleEquipment != null
+            && compatibleEquipment.contains(otherType.getId())
+            && otherType.compatibleEquipment.contains(getId());
     }
 
+    /**
+     * Get the role for this equipment type.
+     *
+     * @return The equipment related role.
+     */
+    public final Role getRole() {
+        return role;
+    }
+
+    /**
+     * Is this military equiment?
+     * (True if it grants an offensive or defensive bonus)
+     *
+     * @return True if this is military equipment.
+     */
+    public final boolean isMilitaryEquipment() {
+        return militaryEquipment;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -181,6 +172,9 @@ public class EquipmentType extends BuildableType {
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -203,114 +197,97 @@ public class EquipmentType extends BuildableType {
         return true;
     }
 
-    /**
-     * Returns true if Equipment of this type grants an offence bonus
-     * or a defence bonus.
-     *
-     * @return a <code>boolean</code> value
-     */
-    public final boolean isMilitaryEquipment() {
-        return militaryEquipment;
-    }
+
+    // Serialization
+
+    private static final String BY_INDIANS_TAG = "by-indians";
+    private static final String CAPTURE_EQUIPMENT_TAG = "capture-equipment";
+    private static final String COMBAT_LOSS_PRIORITY_TAG = "combat-loss-priority";
+    private static final String COMPATIBLE_EQUIPMENT_TAG = "compatible-equipment";
+    private static final String MAXIMUM_COUNT_TAG = "maximum-count";
+    private static final String REQUIRED_LOCATION_ABILITY_TAG = "required-location-ability";
+    private static final String ROLE_TAG = "role";
 
     /**
-     * Set the <code>MilitaryEquipment</code> value.
-     *
-     * @param newMilitaryEquipment The new MilitaryEquipment value.
+     * {@inheritDoc}
      */
-    public final void setMilitaryEquipment(final boolean newMilitaryEquipment) {
-        this.militaryEquipment = newMilitaryEquipment;
-    }
-
-
-    /**
-     * Makes an XML-representation of this object.
-     *
-     * @param out The output stream.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
-     */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         super.toXML(out, getXMLElementTagName());
     }
 
     /**
-     * Write the attributes of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to
-     *     the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
-        out.writeAttribute("maximum-count", Integer.toString(maximumCount));
-        out.writeAttribute("combat-loss-priority",
-            Integer.toString(combatLossPriority));
-        out.writeAttribute("role", role.toString().toLowerCase(Locale.US));
+        writeAttribute(out, MAXIMUM_COUNT_TAG, maximumCount);
+
+        writeAttribute(out, COMBAT_LOSS_PRIORITY_TAG, combatLossPriority);
+        
+        writeAttribute(out, ROLE_TAG, role);
     }
 
     /**
-     * Write the children of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to
-     *     the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
         super.writeChildren(out);
 
-        for (String compatible : compatibleEquipment) {
-            out.writeStartElement("compatible-equipment");
-            out.writeAttribute(ID_ATTRIBUTE_TAG, compatible);
+        if (captureEquipmentId != null) {
+            out.writeStartElement(CAPTURE_EQUIPMENT_TAG);
+
+            writeAttribute(out, ID_ATTRIBUTE_TAG, captureEquipmentId);
+
+            writeAttribute(out, BY_INDIANS_TAG, captureEquipmentByIndians);
+
             out.writeEndElement();
         }
 
-        if (captureEquipmentId != null) {
-            out.writeStartElement("capture-equipment");
-            out.writeAttribute(ID_ATTRIBUTE_TAG, captureEquipmentId);
-            out.writeAttribute("by-indians",
-                Boolean.toString(captureEquipmentByIndians));
-            out.writeEndElement();
+        if (compatibleEquipment != null) {
+            for (String compatible : compatibleEquipment) {
+                out.writeStartElement(COMPATIBLE_EQUIPMENT_TAG);
+                
+                writeAttribute(out, ID_ATTRIBUTE_TAG, compatible);
+                
+                out.writeEndElement();
+            }
         }
     }
 
     /**
-     * Reads the attributes of this object from an XML stream.
-     *
-     * @param in The XML input stream.
-     * @throws XMLStreamException if a problem was encountered
-     *     during parsing.
+     * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
 
-        maximumCount = getAttribute(in, "maximum-count", 1);
-        combatLossPriority = getAttribute(in, "combat-loss-priority", -1);
-        String roleString = getAttribute(in, "role", "default");
-        role = Enum.valueOf(Role.class, roleString.toUpperCase(Locale.US));
+        maximumCount = getAttribute(in, MAXIMUM_COUNT_TAG, 1);
+
+        combatLossPriority = getAttribute(in, COMBAT_LOSS_PRIORITY_TAG, -1);
+
+        role = getAttribute(in, ROLE_TAG, Role.class, Role.DEFAULT);
     }
 
     /**
-     * Reads the children of this object from an XML stream.
-     *
-     * @param in The XML input stream.
-     * @throws XMLStreamException if a problem was encountered
-     *     during parsing.
+     * {@inheritDoc}
      */
     @Override
     protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        if (readShouldClearContainers(in)) {
+            captureEquipmentId = null;
+            captureEquipmentByIndians = false;
+            compatibleEquipment = null;
+        }
+
         super.readChildren(in);
 
         for (Modifier modifier : getModifiers()) {
-            if (modifier.getId().equals(Modifier.OFFENCE) ||
-                modifier.getId().equals(Modifier.DEFENCE)) {
+            if (modifier.getId().equals(Modifier.OFFENCE)
+                || modifier.getId().equals(Modifier.DEFENCE)) {
                 militaryEquipment = true;
                 for (AbstractGoods goods : getRequiredGoods()) {
                     goods.getType().setMilitaryGoods(true);
@@ -321,38 +298,46 @@ public class EquipmentType extends BuildableType {
     }
 
     /**
-     * Reads a child object.
-     *
-     * @param in The XML stream to read.
-     * @exception XMLStreamException if an error occurs
+     * {@inheritDoc}
      */
     @Override
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        String nodeName = in.getLocalName();
-        if ("required-location-ability".equals(nodeName)) {
-            // @compat 0.10.0
-            String abilityId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
+        final Specification spec = getSpecification();
+        final String tag = in.getLocalName();
+
+        if (CAPTURE_EQUIPMENT_TAG.equals(tag)) {
+            captureEquipmentId = getAttribute(in, ID_ATTRIBUTE_TAG, (String)null);
+            captureEquipmentByIndians = getAttribute(in, BY_INDIANS_TAG, false);
+
+            in.nextTag();
+
+        } else if (COMPATIBLE_EQUIPMENT_TAG.equals(tag)) {
+            String equipmentId = getAttribute(in, ID_ATTRIBUTE_TAG, (String)null);
+            if (equipmentId != null) {
+                if (compatibleEquipment == null) {
+                    compatibleEquipment = new ArrayList<String>();
+                }
+                compatibleEquipment.add(equipmentId);
+            }
+            in.nextTag(); // close this element
+
+        // @compat 0.10.0
+        } else if (REQUIRED_LOCATION_ABILITY_TAG.equals(tag)) {
+            String abilityId = getAttribute(in, ID_ATTRIBUTE_TAG, (String)null);
             Map<String, Boolean> required = getRequiredAbilities();
             required.put(abilityId, getAttribute(in, VALUE_TAG, true));
             setRequiredAbilities(required);
-            getSpecification().addAbility(abilityId);
+            spec.addAbility(abilityId);
             in.nextTag(); // close this element
-            // end compatibility code
-        } else if ("compatible-equipment".equals(nodeName)) {
-            String equipmentId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-            compatibleEquipment.add(equipmentId);
-            in.nextTag(); // close this element
-        } else if ("capture-equipment".equals(nodeName)) {
-            captureEquipmentId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-            captureEquipmentByIndians = getAttribute(in, "by-indians", false);
-            in.nextTag();
+        // end compatibility code
+
         } else {
             super.readChild(in);
         }
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "equipment-type".
      */
