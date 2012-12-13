@@ -27,6 +27,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+
 public class Role extends BuildableType {
 
     /**
@@ -38,7 +39,7 @@ public class Role extends BuildableType {
 
     /**
      * The maximum multiple of required goods this Role may
-     * carry. Defaults to <code>1</code>.
+     * carry.  Defaults to <code>1</code>.
      */
     private int maximumCount = 1;
 
@@ -46,7 +47,7 @@ public class Role extends BuildableType {
      * The expert unit for this Role, e.g. a hardy pioneer is an
      * expert for the pioneer role.
      */
-    private UnitType expertUnit;
+    private UnitType expertUnit = null;
 
     /**
      * Sorts roles by defensive power, descendingly.
@@ -95,79 +96,114 @@ public class Role extends BuildableType {
     }
 
     /**
-     * Get the <code>Downgrade</code> value.
+     * Get the downgraded role from this one.
      *
-     * @return a <code>Role</code> value
+     * @return The downgraded role.
      */
     public final Role getDowngrade() {
         return downgrade;
     }
 
     /**
-     * Set the <code>Downgrade</code> value.
+     * Sets the downgraded role.
      *
-     * @param newDowngrade The new Downgrade value.
+     * @param newDowngrade The new downgraded role.
      */
     public final void setDowngrade(final Role newDowngrade) {
         this.downgrade = newDowngrade;
     }
 
     /**
-     * Get the <code>MaximumCount</code> value.
+     * Gets the maximum goods count for the role.
      *
-     * @return an <code>int</code> value
+     * @return The maximum goods count.
      */
     public final int getMaximumCount() {
         return maximumCount;
     }
 
     /**
-     * Set the <code>MaximumCount</code> value.
+     * Sets the maximum goods count for this role.
      *
-     * @param newMaximumCount The new MaximumCount value.
+     * @param newMaximumCount The new maximum goods count.
      */
     public final void setMaximumCount(final int newMaximumCount) {
         this.maximumCount = newMaximumCount;
     }
 
     /**
-     * Get the <code>ExpertUnit</code> value.
+     * Gets the expert profession for this role.
      *
-     * @return an <code>UnitType</code> value
+     * @return The expert type.
      */
     public final UnitType getExpertUnit() {
         return expertUnit;
     }
 
     /**
-     * Set the <code>ExpertUnit</code> value.
+     * Sets the expert profession for this role.
      *
-     * @param newExpertUnit The new ExpertUnit value.
+     * @param newExpertUnit The new expert type.
      */
     public final void setExpertUnit(final UnitType newExpertUnit) {
         this.expertUnit = newExpertUnit;
     }
 
+    /**
+     * Get the offense value for this role.
+     *
+     * @return The offense value.
+     */
     private float getOffence() {
-        return getFeatureContainer().applyModifier(1, "model.modifier.offence", null, null);
+        return getFeatureContainer()
+            .applyModifier(1, "model.modifier.offence", null, null);
     }
 
+    /**
+     * Is this an offensive role?
+     *
+     * @return True if this is an offensive role.
+     */
     public boolean isOffensive() {
         return getOffence() > 1;
     }
 
+    /**
+     * Get the defence value for this role.
+     *
+     * @return The defence value.
+     */
     private float getDefence() {
-        return getFeatureContainer().applyModifier(1, "model.modifier.defence", null, null);
+        return getFeatureContainer()
+            .applyModifier(1, "model.modifier.defence", null, null);
     }
 
+    /**
+     * Is this an defensive role?
+     *
+     * @return True if this is an defensive role.
+     */
     public boolean isDefensive() {
         return getDefence() > 1;
     }
 
+    /**
+     * Is this role compatible with another?
+     *
+     * @param other The other <code>Role</code> to compare with.
+     * @return True if the other role is compatible.
+     */
     public boolean isCompatibleWith(Role other) {
         return isCompatibleWith(this, other);
     }
 
+    /**
+     * Are two roles compatible.
+     *
+     * @param role1 A <code>Role</code> to compare.
+     * @param role2 The other <code>Role</code> to compare.
+     * @return True if the roles are compatible.
+     */
     public static boolean isCompatibleWith(Role role1, Role role2) {
         if (role1 == null) {
             return role2 == null;
@@ -179,6 +215,7 @@ public class Role extends BuildableType {
                 || role2.getDowngrade() == role1;
         }
     }
+
 
     public List<AbstractGoods> getDowngradeGoods() {
         List<AbstractGoods> result = new ArrayList<AbstractGoods>();
@@ -194,52 +231,53 @@ public class Role extends BuildableType {
         return result;
     }
 
-    /**
-     * Reads the attributes of this object from an XML stream.
-     *
-     * @param in The XML input stream.
-     * @throws XMLStreamException if a problem was encountered
-     *     during parsing.
-     */
-    @Override
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
-        super.readAttributes(in);
 
-        downgrade = getSpecification().getType(in, "downgrade", Role.class, null);
-        expertUnit = getSpecification().getType(in, "expertUnit", UnitType.class, null);
-        maximumCount = getAttribute(in, "maximumCount", 1);
-    }
+    // Serialization
 
+    private static final String DOWNGRADE_TAG = "downgrade";
+    private static final String EXPERT_UNIT_TAG = "expertUnit";
+    private static final String MAXIMUM_COUNT_TAG = "maximumCount";
 
     /**
-     * Write the attributes of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to
-     *     the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
         if (downgrade != null) {
-            out.writeAttribute("downgrade", downgrade.getId());
+            writeAttribute(out, DOWNGRADE_TAG, downgrade);
         }
 
         if (expertUnit != null) {
-            out.writeAttribute("expertUnit", expertUnit.getId());
+            writeAttribute(out, EXPERT_UNIT_TAG, expertUnit);
         }
 
         if (maximumCount > 1) {
-            out.writeAttribute("maximumCount", Integer.toString(maximumCount));
+            writeAttribute(out, MAXIMUM_COUNT_TAG, maximumCount);
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        final Specification spec = getSpecification();
+
+        super.readAttributes(in);
+
+        downgrade = spec.getType(in, DOWNGRADE_TAG,
+                                 Role.class, (Role)null);
+
+        expertUnit = spec.getType(in, EXPERT_UNIT_TAG,
+                                  UnitType.class, (UnitType)null);
+
+        maximumCount = getAttribute(in, MAXIMUM_COUNT_TAG, 1);
+    }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "role"
      */
