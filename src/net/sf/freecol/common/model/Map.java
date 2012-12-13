@@ -1086,14 +1086,16 @@ public class Map extends FreeColGameObject implements Location {
             if (offMapUnit == null
                 || !offMapUnit.getType().canMoveToHighSeas()) return null;
 
+            // This is suboptimal.  We do not know where to enter from
+            // Europe, so start with the standard entry location, then
+            // if we find a path, try to optimize it.  This will lose
+            // if the initial search fails due to a turn limit.
+            // TODO: something better.
             path = searchMap(unit, (Tile)offMapUnit.getEntryLocation(),
                              goalDecider, costDecider, maxTurns, carrier, null);
             if (path != null) {
-                path.addTurns(offMapUnit.getSailTurns());
-                path.previous = new PathNode(realStart,
-                                             offMapUnit.getMovesLeft(), 0,
-                                             carrier != null, null, path);
-                path = path.previous;
+                path = findPath(unit, realStart, path.getLastNode().getTile(),
+                                carrier, costDecider);
             }
         } else {
             path = searchMap(unit, realStart.getTile(), goalDecider,
