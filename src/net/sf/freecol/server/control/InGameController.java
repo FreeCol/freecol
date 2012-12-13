@@ -1879,8 +1879,10 @@ public final class InGameController extends Controller {
             cs.add(See.only(serverPlayer), carrier);
         }
         if (oldLocation instanceof Tile) {
-            cs.addMove(See.only(serverPlayer), unit, (Tile)oldLocation,
-                       carrier.getTile());
+            if (carrier.getTile() != (Tile)oldLocation) {
+                cs.addMove(See.only(serverPlayer), unit, (Tile)oldLocation,
+                           carrier.getTile());
+            }
             cs.addDisappear(serverPlayer, (Tile)oldLocation, unit);
         }
 

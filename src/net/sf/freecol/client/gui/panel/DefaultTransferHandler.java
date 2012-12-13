@@ -203,7 +203,6 @@ public final class DefaultTransferHandler extends TransferHandler {
             }
 
             if (data instanceof UnitLabel) {
-
                 // Check if the unit can be dragged to comp.
 
                 Unit unit = ((UnitLabel)data).getUnit();

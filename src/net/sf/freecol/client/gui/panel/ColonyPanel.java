@@ -497,8 +497,8 @@ public final class ColonyPanel extends PortPanel
             for (Unit u : unit.getUnitList()) {
                 getController().leaveShip(u);
             }
-            cargoPanel.initialize();
-            outsideColonyPanel.initialize();
+            cargoPanel.update();
+            outsideColonyPanel.update();
         }
         unloadButton.setEnabled(false);
         fillButton.setEnabled(false);
@@ -890,6 +890,11 @@ public final class ColonyPanel extends PortPanel
      */
     public final class ColonyCargoPanel extends CargoPanel {
 
+        /**
+         * Create this colony cargo panel.
+         *
+         * @param freeColClient The containing <code>FreeColClient</code>.
+         */
         public ColonyCargoPanel(FreeColClient freeColClient) {
             super(freeColClient, freeColClient.getGUI(), true);
 
