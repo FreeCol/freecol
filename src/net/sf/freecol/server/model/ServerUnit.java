@@ -170,6 +170,25 @@ public class ServerUnit extends Unit implements ServerModelObject {
         boolean tileDirty = false;
         boolean unitDirty = false;
 
+        // Attrition.  Do it first as the unit might die.
+        if (loc instanceof Tile && ((Tile) loc).getSettlement() == null) {
+            int attrition = getAttrition() + 1;
+            setAttrition(attrition);
+            if (attrition > getType().getMaximumAttrition()) {
+                cs.addMessage(See.only(owner),
+                    new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
+                        "model.unit.attrition", this)
+                    .addStringTemplate("%unit%", getLabel())
+                    .addStringTemplate("%location%",
+                                       loc.getLocationNameFor(owner)));
+                cs.addDispose(See.perhaps().always(owner), loc, this);
+                cs.add(See.perhaps(), (Tile)loc);
+                return;
+            }
+        } else {
+            setAttrition(0);
+        }
+
         // Check for experience-promotion.
         GoodsType produce;
         UnitType learn;
@@ -197,21 +216,6 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     + " to " + getType());
                 unitDirty = true;
             }
-        }
-
-        // Attrition
-        if (loc instanceof Tile && ((Tile) loc).getSettlement() == null) {
-            int attrition = getAttrition() + 1;
-            setAttrition(attrition);
-            if (attrition > getType().getMaximumAttrition()) {
-                cs.addMessage(See.only(owner),
-                    new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
-                        "model.unit.attrition", this)
-                    .addStringTemplate("%unit%", getLabel()));
-                cs.addDispose(See.perhaps().always(owner), loc, this);
-            }
-        } else {
-            setAttrition(0);
         }
 
         // Update moves left.
