@@ -1321,7 +1321,8 @@ public class Colony extends Settlement implements Nameable {
         getOwner().incrementLiberty(amount);
         List<GoodsType> libertyTypeList = getSpecification()
             .getLibertyGoodsTypeList();
-        if (getMembers() <= getUnitCount() + 1
+        final int uc = getUnitCount();
+        if (calculateRebels(uc, sonsOfLiberty) <= uc + 1
             && amount > 0
             && !libertyTypeList.isEmpty()) {
             addGoods(libertyTypeList.get(0), amount);
@@ -1359,26 +1360,25 @@ public class Colony extends Settlement implements Nameable {
      * the liberty value and colonists.
      */
     public void updateSoL() {
-        int units = getUnitCount();
+        int uc = getUnitCount();
         oldSonsOfLiberty = sonsOfLiberty;
         oldTories = tories;
-        sonsOfLiberty = calculateMembership(units);
-        tories = units - getMembers();
+        sonsOfLiberty = calculateSoL(uc, liberty);
+        tories = uc - calculateRebels(uc, sonsOfLiberty);
     }
 
     /**
-     * Returns the SoL membership of the colony based on the liberty
-     * value and the number of colonists given.
+     * Calculate the SoL membership percentage of the colony based on the
+     * number of colonists and liberty.
      *
-     * @param units an <code>int</code> value
-     * @return an <code>int</code> value
+     * @param uc The proposed number of units in the colony.
+     * @param liberty The amount of liberty.
+     * @return The percentage of SoLs.
      */
-    public int calculateMembership(int units) {
-        if (units <= 0) {
-            return 0;
-        }
-        // Update "addSol(int)" and "getMembers()" if this formula gets changed:
-        int membership = (liberty * 100) / (LIBERTY_PER_REBEL * units);
+    private static int calculateSoL(int uc, int liberty) {
+        if (uc <= 0) return 0;
+
+        int membership = (liberty * 100) / (LIBERTY_PER_REBEL * uc);
         if (membership < 0) {
             membership = 0;
         } else if (membership > 100) {
@@ -1388,15 +1388,17 @@ public class Colony extends Settlement implements Nameable {
     }
 
     /**
-     * Return the number of sons of liberty
+     * Calculate the number of rebels given a SoL percentage and unit count.
+     *
+     * @param uc The number of units in the colony.
+     * @param solPercent The percentage of SoLs.
      */
-    public int getMembers() {
-        float result = (sonsOfLiberty * getUnitCount()) / 100f;
-        return (int)Math.floor(result);
+    public static int calculateRebels(int uc, int solPercent) {
+        return (int)Math.floor(0.01 * solPercent * uc);
     }
 
     /**
-     * Returns the Tory membership of the colony.
+     * Gets the Tory membership percentage of the colony.
      *
      * @return The current Tory membership of the colony.
      */
@@ -1949,9 +1951,8 @@ public class Colony extends Settlement implements Nameable {
         final int goodGovernment
             = spec.getInteger("model.option.goodGovernmentLimit");
 
-
-        int rebelPercent = calculateMembership(unitCount);
-        int rebelCount = Math.round(0.01f * rebelPercent * unitCount);
+        int rebelPercent = calculateSoL(unitCount, liberty);
+        int rebelCount = calculateRebels(unitCount, rebelPercent);
         int loyalistCount = unitCount - rebelCount;
 
         int result = 0;

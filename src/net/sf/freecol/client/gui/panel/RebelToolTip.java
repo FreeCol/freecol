@@ -30,6 +30,7 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 
 
@@ -46,68 +47,88 @@ public class RebelToolTip extends JToolTip {
      * @param colony The <code>Colony</code> for which to display information.
      */
     public RebelToolTip(FreeColClient freeColClient, GUI gui, Colony colony) {
+        final Specification spec = colony.getSpecification();
+        final int population = colony.getUnitCount();
+        final int solPercent = colony.getSoL();
+        final int rebels = Colony.calculateRebels(population, solPercent);
+        StringTemplate t;
 
         setLayout(new MigLayout("fillx, wrap 3", "[][right][right]", ""));
 
-        int members = colony.getMembers();
-        int rebels = colony.getSoL();
+        t = StringTemplate.template("colonyPanel.rebelLabel")
+                          .addName("%number%", "");
+        add(new JLabel(Messages.message(t)));
 
-        add(new JLabel(Messages.message(StringTemplate.template("colonyPanel.rebelLabel")
-                                        .addName("%number%", ""))));
-        add(new JLabel(Integer.toString(members)));
-        add(new JLabel(Integer.toString(rebels) + "%"));
-        add(new JLabel(Messages.message(StringTemplate.template("colonyPanel.royalistLabel")
-                                        .addName("%number%", ""))));
-        add(new JLabel(Integer.toString(colony.getUnitCount() - members)));
-        add(new JLabel(Integer.toString(colony.getTory()) + "%"));
+        add(new JLabel(Integer.toString(rebels)));
+
+        add(new JLabel(solPercent + "%"));
+
+        t = StringTemplate.template("colonyPanel.royalistLabel")
+                          .addName("%number%", "");
+        add(new JLabel(Messages.message(t)));
+
+        add(new JLabel(Integer.toString(population - rebels)));
+
+        add(new JLabel(colony.getTory() + "%"));
 
         int libertyProduction = 0;
-        for (GoodsType goodsType : colony.getSpecification().getLibertyGoodsTypeList()) {
+        for (GoodsType goodsType : spec.getLibertyGoodsTypeList()) {
             add(new JLabel(Messages.message(goodsType.getNameKey())));
             int production = colony.getNetProductionOf(goodsType);
             libertyProduction += production;
-            add(new ProductionLabel(freeColClient, gui, goodsType, production), "span 2");
+            add(new ProductionLabel(freeColClient, gui, goodsType, production),
+                "span 2");
         }
-        int liberty = colony.getLiberty();
-        int modulo = liberty % Colony.LIBERTY_PER_REBEL;
-        FreeColProgressBar progress = new FreeColProgressBar(gui, null, 0, Colony.LIBERTY_PER_REBEL,
-                                                             modulo, libertyProduction);
-        progress.setPreferredSize(new Dimension((int) getPreferredSize().getWidth() - 32, 20));
+
+        final int liberty = colony.getLiberty();
+        final int modulo = liberty % Colony.LIBERTY_PER_REBEL;
+        final int width = (int)getPreferredSize().getWidth() - 32;
+        FreeColProgressBar progress = new FreeColProgressBar(gui, null, 0, 
+            Colony.LIBERTY_PER_REBEL, modulo, libertyProduction);
+        progress.setPreferredSize(new Dimension(width, 20));
         add(progress, "span 3");
 
-        float turns100 = 0;
-        float turns50 = 0;
-        float turnsNext = 0;
-
+        double turns100 = -1.0;
+        double turns50 = -1.0;
+        double turnsNext = -1.0;
         if (libertyProduction > 0) {
-            int requiredLiberty = Colony.LIBERTY_PER_REBEL * colony.getUnitCount();
+            int requiredLiberty = Colony.LIBERTY_PER_REBEL
+                * colony.getUnitCount();
 
             if (liberty < requiredLiberty) {
-                turns100 = (requiredLiberty - liberty) / (float)libertyProduction;
+                turns100 = (requiredLiberty - liberty)
+                    / (double)libertyProduction;
             }
 
             requiredLiberty = requiredLiberty / 2;
             if (liberty < requiredLiberty) {
-                turns50 = (requiredLiberty - liberty) / (float)libertyProduction;
+                turns50 = (requiredLiberty - liberty)
+                    / (double)libertyProduction;
             }
 
-            if (members < colony.getUnitCount()) {
-                requiredLiberty  = Colony.LIBERTY_PER_REBEL * (members + 1);
+            if (rebels < population) {
+                requiredLiberty = Colony.LIBERTY_PER_REBEL * (rebels + 1);
                 if (liberty < requiredLiberty) {
-                    turnsNext = (requiredLiberty - liberty) / (float)libertyProduction;
+                    turnsNext = (requiredLiberty - liberty)
+                        / (double)libertyProduction;
                 }
             }
         }
 
-        String na = Messages.message("notApplicable.short");
+        final String na = Messages.message("notApplicable.short");
         add(new JLabel(Messages.message("report.nextMember")));
-        add(new JLabel(turnsNext == 0 ? na : Integer.toString((int) Math.ceil(turnsNext))), "skip");
-        add(new JLabel(Messages.message("report.50percent")));
-        add(new JLabel(turns50 == 0 ? na : Integer.toString((int) Math.ceil(turns50))), "skip");
-        add(new JLabel(Messages.message("report.100percent")));
-        add(new JLabel(turns100 == 0 ? na : Integer.toString((int) Math.ceil(turns100))), "skip");
+        add(new JLabel((turnsNext < 0) ? na
+                : Integer.toString((int)Math.ceil(turnsNext))), "skip");
 
-        int grow = colony.getPreferredSizeChange();
+        add(new JLabel(Messages.message("report.50percent")));
+        add(new JLabel((turns50 < 0) ? na
+                : Integer.toString((int)Math.ceil(turns50))), "skip");
+
+        add(new JLabel(Messages.message("report.100percent")));
+        add(new JLabel((turns100 < 0) ? na
+                : Integer.toString((int)Math.ceil(turns100))), "skip");
+
+        final int grow = colony.getPreferredSizeChange();
         if (grow > 0) {
             add(new JLabel(Messages.message("report.changeMore")));
             add(new JLabel(Integer.toString(grow)), "skip");

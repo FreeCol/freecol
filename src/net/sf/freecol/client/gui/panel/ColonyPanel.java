@@ -84,6 +84,7 @@ import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.ModelMessage;
+import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.NoClaimReason;
 import net.sf.freecol.common.model.ProductionInfo;
@@ -903,8 +904,12 @@ public final class ColonyPanel extends PortPanel
         }
     }
 
+    /**
+     * The panel to display the population breakdown for this colony.
+     */
     public final class PopulationPanel extends JPanel {
 
+        // Predefine all the required labels.
         private final JLabel rebelShield = new JLabel();
         private final JLabel rebelLabel = new JLabel();
         private final JLabel bonusLabel = new JLabel();
@@ -915,6 +920,9 @@ public final class ColonyPanel extends PortPanel
         private final JLabel royalistMemberLabel = new JLabel();
 
 
+        /**
+         * Create a new population panel.
+         */
         public PopulationPanel() {
             setOpaque(false);
             setToolTipText(" ");
@@ -930,29 +938,46 @@ public final class ColonyPanel extends PortPanel
             add(royalistShield, "bottom");
         }
 
+        /**
+         * Update this population panel.
+         */
         public void update() {
-            Colony colony = getColony();
-            int population = colony.getUnitCount();
-            int members = colony.getMembers();
-            int rebels = colony.getSoL();
-            int grow = colony.getPreferredSizeChange();
-            String rebelNumber = Messages.message(StringTemplate.template("colonyPanel.rebelLabel")
-                .addAmount("%number%", members));
-            String royalistNumber = Messages.message(StringTemplate.template("colonyPanel.royalistLabel")
-                .addAmount("%number%", population - members));
-            popLabel.setText(Messages.message(StringTemplate.template("colonyPanel.populationLabel")
-                    .addAmount("%number%", population)));
-            rebelLabel.setText(rebelNumber);
-            rebelMemberLabel.setText(Integer.toString(rebels) + "%");
-            bonusLabel.setText(Messages.message(StringTemplate.template("colonyPanel.bonusLabel")
-                    .addAmount("%number%", colony.getProductionBonus())
-                    .add("%extra%", (grow == 0) ? ""
-                        : "(" + Integer.toString(grow) + ")")));
-            royalistLabel.setText(royalistNumber);
-            royalistMemberLabel.setText(Integer.toString(colony.getTory()) + "%");
-            rebelShield.setIcon(new ImageIcon(getLibrary().getCoatOfArmsImage(colony.getOwner().getNation(), 0.5)));
-            royalistShield.setIcon(new ImageIcon(getLibrary().getCoatOfArmsImage(colony.getOwner().getNation()
-                                                                                 .getRefNation(), 0.5)));
+            final int uc = colony.getUnitCount();
+            final int solPercent = colony.getSoL();
+            final int rebels = Colony.calculateRebels(uc, solPercent);
+            StringTemplate t;
+
+            t = StringTemplate.template("colonyPanel.rebelLabel")
+                              .addAmount("%number%", rebels);
+            rebelLabel.setText(Messages.message(t));
+
+            t = StringTemplate.template("colonyPanel.royalistLabel")
+                              .addAmount("%number%", uc - rebels);
+            royalistLabel.setText(Messages.message(t));
+
+            t = StringTemplate.template("colonyPanel.populationLabel")
+                              .addAmount("%number%", uc);
+            popLabel.setText(Messages.message(t));
+
+            rebelMemberLabel.setText(solPercent + "%");
+
+            final int grow = colony.getPreferredSizeChange();
+            final int bonus = colony.getProductionBonus();
+            t = StringTemplate.template("colonyPanel.bonusLabel")
+                              .addAmount("%number%", bonus)
+                              .add("%extra%",
+                                  ((grow == 0) ? "" : "(" + grow + ")"));
+            bonusLabel.setText(Messages.message(t));
+
+            royalistMemberLabel.setText(colony.getTory() + "%");
+
+            final Nation nation = colony.getOwner().getNation();
+            rebelShield.setIcon(new ImageIcon(getLibrary()
+                    .getCoatOfArmsImage(nation, 0.5)));
+
+            royalistShield.setIcon(new ImageIcon(getLibrary()
+                    .getCoatOfArmsImage(nation.getRefNation(), 0.5)));
+
             revalidate();
             repaint();
         }
@@ -965,7 +990,7 @@ public final class ColonyPanel extends PortPanel
         public String getUIClassID() {
             return "PopulationPanelUI";
         }
-    };
+    }
 
     /**
      * A panel that holds UnitLabels that represent Units that are standing in
