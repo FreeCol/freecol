@@ -1177,6 +1177,7 @@ public final class ColonyPanel extends PortPanel
                     add(goodsLabel, false);
                 }
             }
+            colonyPanel.updateProduction();
             revalidate();
             repaint();
         }
