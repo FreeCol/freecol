@@ -271,7 +271,7 @@ public final class ReportColonyPanel extends ReportPanel
         // Define the layout, with a column for each goods type.
         String cols = "[l][c][c][c]";
         for (int i = 0; i < goodsTypes.size(); i++) cols += "[c]";
-        cols += "[c][l][l][c][l]";
+        cols += "[c][c][l][l][l]";
         reportPanel.setLayout(new MigLayout("fillx, insets 0, gap 0 0",
                 cols, ""));
 
@@ -405,6 +405,27 @@ public final class ReportColonyPanel extends ReportPanel
             b.setFont(b.getFont().deriveFont(Font.BOLD));
         }
         reportPanel.add(b, "newline");
+
+        // Field: The number of colonists that can be added to a
+        // colony without damaging the production bonus, unless
+        // the colony is inefficient in which case add the number
+        // of colonists to remove to fix the inefficiency.
+        // Colour: Blue if efficient/Red if inefficient.
+        if (grow < 0) {
+            b = colourButton(cac, Integer.toString(-grow), null, cAlarm,
+                stpl("report.colony.shrinking.description")
+                    .addName("%colony%", colony.getName())
+                    .addAmount("%amount%", -grow));
+            reportPanel.add(b);
+        } else if (grow > 0) {
+            b = colourButton(cac, Integer.toString(grow), null, cGood,
+                stpl("report.colony.growing.description")
+                    .addName("%colony%", colony.getName())
+                    .addAmount("%amount%", grow));
+            reportPanel.add(b);
+        } else {
+            reportPanel.add(new JLabel(""));
+        }
 
         // Field: The number of potential colony tiles that need
         // exploring.
@@ -712,27 +733,6 @@ public final class ReportColonyPanel extends ReportPanel
             reportPanel.add(new JLabel(""));
         }
 
-        // Field: The number of colonists that can be added to a
-        // colony without damaging the production bonus, unless
-        // the colony is inefficient in which case add the number
-        // of colonists to remove to fix the inefficiency.
-        // Colour: Blue if efficient/Red if inefficient.
-        if (grow < 0) {
-            b = colourButton(cac, Integer.toString(-grow), null, cAlarm,
-                stpl("report.colony.shrinking.description")
-                    .addName("%colony%", colony.getName())
-                    .addAmount("%amount%", -grow));
-            reportPanel.add(b);
-        } else if (grow > 0) {
-            b = colourButton(cac, Integer.toString(grow), null, cGood,
-                stpl("report.colony.growing.description")
-                    .addName("%colony%", colony.getName())
-                    .addAmount("%amount%", grow));
-            reportPanel.add(b);
-        } else {
-            reportPanel.add(new JLabel(""));
-        }
-
         // Field: The units the colony could make good use of.
         if (!want.isEmpty()) {
             // TODO: explain food limitations better
@@ -756,6 +756,8 @@ public final class ReportColonyPanel extends ReportPanel
         reportPanel.add(newLabel("report.colony.name.header", null, null,
                                  stpl("report.colony.name.description")),
             "newline");
+        reportPanel.add(newLabel("report.colony.grow.header", null, null,
+                                 stpl("report.colony.grow.description")));
         reportPanel.add(newLabel("report.colony.explore.header", null, null,
                                  stpl("report.colony.explore.description")));
         reportPanel.add(newLabel("report.colony.plow.header", null, null,
@@ -781,8 +783,6 @@ public final class ReportColonyPanel extends ReportPanel
                                  stpl("report.colony.making.description")));
         reportPanel.add(newLabel("report.colony.improve.header", null, null,
                                  stpl("report.colony.improve.description")));
-        reportPanel.add(newLabel("report.colony.grow.header", null, null,
-                                 stpl("report.colony.grow.description")));
         reportPanel.add(newLabel("report.colony.wanted.header", null, null,
                                  stpl("report.colony.wanted.description")));
 
