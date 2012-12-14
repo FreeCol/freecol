@@ -100,7 +100,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
     private final DefaultListModel stopListModel = new DefaultListModel();
 
     @SuppressWarnings("unchecked") // FIXME in Java7
-        private final JList stopList = new JList(stopListModel);
+    private final JList stopList = new JList(stopListModel);
 
     private final JScrollPane tradeRouteView = new JScrollPane(stopList);
 
@@ -228,6 +228,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
         Player player = getMyPlayer();
 
         // combo box for selecting destination
+        destinationSelector.setRenderer(new DestinationCellRenderer());
         destinationSelector.addItem(Messages.message(StringTemplate.template("report.allColonies")
                                                      .addName("%number%", "")));
         if (player.getEurope() != null) {
@@ -552,7 +553,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
         }
 
         @SuppressWarnings("unchecked") // FIXME in Java7
-            public boolean importData(JComponent target, Transferable data) {
+        public boolean importData(JComponent target, Transferable data) {
             if (canImport(target, data.getTransferDataFlavors())) {
                 try {
                     List stops = (List) data.getTransferData(STOP_FLAVOR);
@@ -656,6 +657,28 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
                 panel.add(new JLabel(new ImageIcon(getLibrary().getGoodsImage(cargo, 0.5))));
             }
             return panel;
+        }
+    }
+
+    private class DestinationCellRenderer extends JLabel
+        implements ListCellRenderer {
+
+        public DestinationCellRenderer() {
+            setOpaque(true);
+        }
+
+        public Component getListCellRendererComponent(JList list, Object value,
+                                                      int index,
+                                                      boolean isSelected,
+                                                      boolean cellHasFocus) {
+            setText((value instanceof Location)
+                ? Messages.message(((Location)value).getLocationName())
+                : value.toString());
+            setForeground((isSelected) ? list.getSelectionForeground()
+                : list.getForeground());
+            setBackground((isSelected) ? list.getSelectionBackground()
+                : list.getBackground());
+            return this;
         }
     }
 }
