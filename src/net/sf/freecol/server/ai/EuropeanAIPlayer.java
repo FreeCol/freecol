@@ -198,8 +198,9 @@ public class EuropeanAIPlayer extends AIPlayer {
     private static final Comparator<AIUnit> pioneerComparator
         = new Comparator<AIUnit>() {
             private int score(AIUnit a) {
-                Unit unit = a.getUnit();
-                if (!unit.isColonist()) {
+                Unit unit;
+                if (a == null || (unit = a.getUnit()) == null
+                    || !unit.isColonist()) {
                     return -1000;
                 } else if (unit.hasAbility("model.ability.improveTerrain")) {
                     return 900 + ((unit.getTile() != null) ? 100 : 0);
