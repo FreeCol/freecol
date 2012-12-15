@@ -132,8 +132,10 @@ public class EuropeanAIPlayer extends AIPlayer {
     private static final Comparator<AIUnit> builderComparator
         = new Comparator<AIUnit>() {
             private int score(AIUnit a) {
-                Unit unit = a.getUnit();
-                if (BuildColonyMission.invalidReason(a) != null) return -1000;
+                Unit unit;
+                if (a == null || (unit = a.getUnit()) == null
+                    || BuildColonyMission.invalidReason(a) != null) 
+                    return -1000;
                 int base = (!unit.getEquipment().isEmpty()) ? 0
                     : (unit.getSkillLevel() > 0) ? 100
                     : 500 + 100 * unit.getSkillLevel();
@@ -158,8 +160,9 @@ public class EuropeanAIPlayer extends AIPlayer {
     private static final Comparator<AIUnit> scoutComparator
         = new Comparator<AIUnit>() {
             private int score(AIUnit a) {
-                Unit unit = a.getUnit();
-                if (unit == null || unit.getLocation() == null
+                Unit unit;
+                if (a == null || (unit = a.getUnit()) == null
+                    || unit.getLocation() == null
                     || !unit.isColonist()) {
                     return -1000;
                 } else if (unit.hasAbility("model.ability.scoutIndianSettlement")) {

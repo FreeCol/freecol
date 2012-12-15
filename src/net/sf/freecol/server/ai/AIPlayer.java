@@ -216,8 +216,16 @@ public abstract class AIPlayer extends AIObject {
     private void createAIUnits() {
         clearAIUnits();
         for (Unit u : getPlayer().getUnits()) {
+            if (u.isDisposed()) {
+                logger.warning("createAIUnits ignoring: " + u.getId());
+                continue;
+            }
             AIUnit a = getAIUnit(u);
             if (a != null) {
+                if (a.getUnit() != u) {
+                    throw new IllegalStateException("createAIUnits fail: " + u
+                                                    + "/" + a);
+                }
                 aiUnits.add(a);
             } else {
                 logger.warning("Could not find the AIUnit for: "
