@@ -2466,6 +2466,14 @@ public final class InGameController implements NetworkConstants {
             clearDestination = false;
             unit.setState(UnitState.SKIPPED);
             break;
+        case MOVE_NO_TILE:
+            if (interactive || clearDestination) {
+                gui.playSound("sound.event.illegalMove");
+                gui.showInformationMessage(unit,
+                    StringTemplate.template("move.noTile")
+                    .addStringTemplate("%unit%", Messages.getLabel(unit)));
+            }
+            break;
         default:
             if (interactive || clearDestination) {
                 gui.playSound("sound.event.illegalMove");

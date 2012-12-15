@@ -225,6 +225,7 @@ public class Unit extends GoodsLocation
         MOVE_NO_ATTACK_MARINE("Attempt to attack from on board ship"),
         MOVE_NO_EUROPE("Attempt to move to Europe by incapable unit"),
         MOVE_NO_REPAIR("Attempt to move a unit that is under repair"),
+        MOVE_NO_TILE("Attempt to move when not on a tile"),
         MOVE_ILLEGAL("Unspecified illegal move");
 
         /**
@@ -1559,13 +1560,10 @@ public class Unit extends GoodsLocation
      */
     public MoveType getMoveType(Direction direction) {
         Tile tile = getTile();
-        if (tile == null) {
-            throw new IllegalStateException("getTile() == null, location is "
-                                            + location);
-        }
-
+        if (tile == null) return MoveType.MOVE_NO_TILE;
         Tile target = tile.getNeighbourOrNull(direction);
-        return (target == null) ? MoveType.MOVE_ILLEGAL : getMoveType(target);
+        if (target == null) return MoveType.MOVE_ILLEGAL;
+        return getMoveType(target);
     }
 
     /**
@@ -1576,7 +1574,9 @@ public class Unit extends GoodsLocation
      * @return The move type.
      */
     public MoveType getMoveType(Tile target) {
-        return getMoveType(getTile(), target, getMovesLeft());
+        Tile tile = getTile();
+        if (tile == null) return MoveType.MOVE_NO_TILE;
+        return getMoveType(tile, target, getMovesLeft());
     }
 
     /**
@@ -1635,9 +1635,7 @@ public class Unit extends GoodsLocation
      */
     public MoveType getSimpleMoveType(Tile target) {
         Tile tile = getTile();
-        if (tile == null) {
-            throw new IllegalStateException("Null tile");
-        }
+        if (tile == null) return MoveType.MOVE_NO_TILE;
         return getSimpleMoveType(tile, target);
     }
 
@@ -1650,10 +1648,7 @@ public class Unit extends GoodsLocation
      */
     public MoveType getSimpleMoveType(Direction direction) {
         Tile tile = getTile();
-        if (tile == null) {
-            throw new IllegalStateException("Null tile");
-        }
-
+        if (tile == null) return MoveType.MOVE_NO_TILE;
         Tile target = tile.getNeighbourOrNull(direction);
         return getSimpleMoveType(tile, target);
     }
@@ -1708,9 +1703,7 @@ public class Unit extends GoodsLocation
      * @return The move type.
      */
     private MoveType getLandMoveType(Tile from, Tile target) {
-        if (target == null) {
-            return MoveType.MOVE_ILLEGAL;
-        }
+        if (target == null) return MoveType.MOVE_ILLEGAL;
 
         Player owner = getOwner();
         Unit defender = target.getFirstUnit();
