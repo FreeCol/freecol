@@ -39,6 +39,7 @@ import javax.swing.JPanel;
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.action.EndTurnAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.MapTransform;
@@ -52,10 +53,19 @@ import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.resources.ResourceManager;
 
+
 /**
- * This is the panel that shows more details about the currently selected unit
- * and the tile it stands on. It also shows the amount of gold the player has
- * left and stuff like that.
+ * A collection of useful panels.
+ *
+ * - InfoPanel: shows more details about the currently, selected unit,
+ *   the tile it stands on, the amount of gold the player has left, etc.
+ *
+ * - TileInfoPanel: shows the details of a tile.
+ *
+ * - UnitInfoPanel: shows the current active unit (lower right corner).
+ *
+ * - EndTurnPanel: panel to use instead of the above when there is no
+ *   active units left.
  */
 public final class InfoPanel extends FreeColPanel {
 
@@ -335,10 +345,13 @@ public final class InfoPanel extends FreeColPanel {
      */
     public class UnitInfoPanel extends JPanel {
 
+        /** The unit to display. */
         private Unit unit;
 
+        /**
+         * Create a new unit information panel.
+         */
         public UnitInfoPanel() {
-
             super(new MigLayout("wrap 6, fill, gap 0 0", "", ""));
 
             setSize(226, 100);
@@ -346,17 +359,20 @@ public final class InfoPanel extends FreeColPanel {
         }
 
         /**
-         * Updates this <code>InfoPanel</code>.
+         * Updates this unit information panel.
          *
-         * @param unit The displayed unit (or null if none)
+         * @param unit The displayed <code>Unit</code> (may be null).
          */
         public void update(Unit unit) {
             this.unit = unit;
-
             removeAll();
+
+            final ImageLibrary lib = getLibrary();
             if (unit != null) {
-                add(new JLabel(getLibrary().getUnitImageIcon(unit)), "spany, gapafter 5px");
+                add(new JLabel(lib.getUnitImageIcon(unit)),
+                    "spany, gapafter 5px");
                 String name = Messages.message(Messages.getLabel(unit));
+
                 // TODO: this is too brittle!
                 int index = name.indexOf(" (");
                 if (index < 0) {
@@ -365,38 +381,51 @@ public final class InfoPanel extends FreeColPanel {
                     add(new JLabel(name.substring(0, index)), "span");
                     add(new JLabel(name.substring(index + 1)), "span");
                 }
-                add(new JLabel(Messages.message("moves") + " " + unit.getMovesAsString()), "span");
 
-                // Handle the special cases. TODO: make this more generic
+                String text = (unit.isInEurope())
+                    ? Messages.message(unit.getOwner().getEurope().getNameKey())
+                    : Messages.message("moves") +" "+ unit.getMovesAsString();
+                add(new JLabel(text), "span");
+
+                // Handle the special cases.
+                // TODO: make this more generic
+                ImageIcon icon;
+                JLabel label;
                 if (unit.canCarryTreasure()) {
-                    add(new JLabel(unit.getTreasureAmount() + " " + Messages.message("gold")), "span");
+                    text = unit.getTreasureAmount() + " "
+                        + Messages.message("gold");
+                    add(new JLabel(text), "span");
                 } else if (unit.isCarrier()) {
                     for (Goods goods : unit.getGoodsList()) {
-                        JLabel goodsLabel = new JLabel(getLibrary().getScaledGoodsImageIcon(goods.getType(), 0.66f));
-                        goodsLabel.setToolTipText(Messages.message(StringTemplate.template("model.goods.goodsAmount")
-                                                                   .addAmount("%amount%", goods.getAmount())
-                                                                   .add("%goods%", goods.getNameKey())));
-                        add(goodsLabel);
+                        icon = lib.getScaledGoodsImageIcon(goods.getType(), 0.66f);
+                        label = new JLabel(icon);
+                        text = Messages.message(StringTemplate.template("model.goods.goodsAmount")
+                            .addAmount("%amount%", goods.getAmount())
+                            .add("%goods%", goods.getNameKey()));
+                        label.setToolTipText(text);
+                        add(label);
                     }
                     for (Unit carriedUnit : unit.getUnitList()) {
-                        ImageIcon unitIcon = getLibrary().getUnitImageIcon(carriedUnit, 0.5);
-                        JLabel unitLabel = new JLabel(unitIcon);
-                        unitLabel.setToolTipText(Messages.message(carriedUnit.getLabel()));
-                        add(unitLabel);
+                        icon = lib.getUnitImageIcon(carriedUnit, 0.5);
+                        label = new JLabel(icon);
+                        text = Messages.message(carriedUnit.getLabel());
+                        label.setToolTipText(text);
+                        add(label);
                     }
                 } else {
-                    for (EquipmentType equipment : unit.getEquipment().keySet()) {
-                        for (AbstractGoods ag : equipment.getRequiredGoods()) {
-                            int amount = ag.getAmount() * unit.getEquipment().getCount(equipment);
-                            JLabel equipmentLabel =
-                                new JLabel(Integer.toString(amount),
-                                           getLibrary().getScaledGoodsImageIcon(ag.getType(), 0.66f),
-                                           JLabel.CENTER);
-                            equipmentLabel
-                                .setToolTipText(Messages.message(StringTemplate.template("model.goods.goodsAmount")
-                                                                 .addAmount("%amount%", amount)
-                                                                 .add("%goods%", ag.getNameKey())));
-                            add(equipmentLabel);
+                    for (EquipmentType et : unit.getEquipment().keySet()) {
+                        for (AbstractGoods ag : et.getRequiredGoods()) {
+                            int amount = ag.getAmount()
+                                * unit.getEquipment().getCount(et);
+                            icon = lib.getScaledGoodsImageIcon(ag.getType(), 0.66f);
+
+                            label = new JLabel(Integer.toString(amount),
+                                               icon, JLabel.CENTER);
+                            text = Messages.message(StringTemplate.template("model.goods.goodsAmount")
+                                .addAmount("%amount%", amount)
+                                .add("%goods%", ag.getNameKey()));
+                            label.setToolTipText(text);
+                            add(label);
                         }
                     }
                 }
@@ -415,7 +444,6 @@ public final class InfoPanel extends FreeColPanel {
         public Unit getUnit() {
             return unit;
         }
-
     }
 
     /**
@@ -444,7 +472,6 @@ public final class InfoPanel extends FreeColPanel {
                     .getFreeColAction(EndTurnAction.id)));
             setOpaque(false);
             setSize(getPreferredSize());
-
         }
     }
 }

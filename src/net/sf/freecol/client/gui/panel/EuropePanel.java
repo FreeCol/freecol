@@ -557,9 +557,12 @@ public final class EuropePanel extends PortPanel {
         }
 
         public boolean accepts(Unit unit) {
-            return unit.isNaval()
-                && (unit.getState() == Unit.UnitState.ACTIVE
-                    || unit.getState() == Unit.UnitState.SENTRY);
+            if (!unit.isNaval()) return false;
+            switch (unit.getState()) {
+            case ACTIVE: case SENTRY: case SKIPPED:
+                return true;
+            }
+            return false;
         }
     }
 
