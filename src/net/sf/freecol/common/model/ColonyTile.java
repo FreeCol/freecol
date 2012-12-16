@@ -361,8 +361,6 @@ public class ColonyTile extends WorkLocation implements Ownable {
 
         return (isColonyCenterTile())
             ? NoAddReason.COLONY_CENTER
-            : (tile.getOccupyingUnit() != null)
-            ? NoAddReason.OCCUPIED_BY_ENEMY
             : (!getColony().hasAbility(Ability.PRODUCE_IN_WATER)
                 && !tile.isLand())
             ? NoAddReason.MISSING_ABILITY
@@ -379,6 +377,8 @@ public class ColonyTile extends WorkLocation implements Ownable {
             ? ((tile.getSettlement().getOwner() == getOwner())
                 ? NoAddReason.ANOTHER_COLONY
                 : NoAddReason.OWNED_BY_ENEMY)
+            : (claim == NoClaimReason.OCCUPIED)
+            ? NoAddReason.OCCUPIED_BY_ENEMY
             : (claim == NoClaimReason.WORKED)
             ? NoAddReason.ANOTHER_COLONY
             : (claim == NoClaimReason.EUROPEANS)

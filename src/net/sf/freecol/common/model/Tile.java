@@ -1619,12 +1619,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             owner = getOwningSettlement().getOwner();
         }
         if (owner != null && unit != null && unit.getOwner() != owner
-            && owner.getStance(unit.getOwner()) != Stance.ALLIANCE) {
-            for(Unit enemyUnit : getUnitList()) {
-                if (enemyUnit.isOffensiveUnit()
-                    && enemyUnit.getState() == Unit.UnitState.FORTIFIED) {
-                    return enemyUnit;
-                }
+            && unit.getOwner().atWarWith(owner)) {
+            for (Unit enemyUnit : getUnitList()) {
+                if (enemyUnit.isOffensiveUnit()) return enemyUnit;
             }
         }
         return null;

@@ -855,7 +855,7 @@ public final class ColonyPanel extends PortPanel
         } else if (ColonyChangeEvent.BONUS_CHANGE.toString().equals(property)) {
             ModelMessage msg = colony.checkForGovMgtChangeMessage();
             if (msg != null) {
-                getGUI().showInformationMessage(msg);
+                getGUI().showInformationMessage(colony, msg);
             }
             populationPanel.update();
         } else if (ColonyChangeEvent.UNIT_TYPE_CHANGE.toString().equals(property)) {
@@ -1420,7 +1420,7 @@ public final class ColonyPanel extends PortPanel
                 Building building = getBuilding();
                 NoAddReason reason = building.getNoAddReason(unit);
                 if (reason != NoAddReason.NONE) {
-                    getGUI().errorMessage("noAddReason."
+                    getGUI().showInformationMessage(building, "noAddReason."
                         + reason.toString().toLowerCase(Locale.US));
                     return false;
                 }
@@ -1734,7 +1734,7 @@ public final class ColonyPanel extends PortPanel
                         }
                         break;
                     default: // Otherwise, can not use land
-                        getGUI().errorMessage("noClaimReason."
+                        getGUI().showInformationMessage(tile, "noClaimReason."
                             + claim.toString().toLowerCase(Locale.US));
                         return false;
                     }
@@ -1747,7 +1747,7 @@ public final class ColonyPanel extends PortPanel
                 // Claim sorted, but complain about other failure.
                 NoAddReason reason = colonyTile.getNoAddReason(unit);
                 if (reason != NoAddReason.NONE) {
-                    getGUI().errorMessage("noAddReason."
+                    getGUI().showInformationMessage(colonyTile, "noAddReason."
                         + reason.toString().toLowerCase(Locale.US));
                     return false;
                 }
@@ -1802,7 +1802,7 @@ public final class ColonyPanel extends PortPanel
                             .addStringTemplate("%unit%", Messages.getLabel(unit))
                             .add("%goods%", workType.getNameKey())
                             .addStringTemplate("%tile%", best.getLabel());
-                        getGUI().showInformationMessage(template);
+                        getGUI().showInformationMessage(best, template);
                     }
                 }
                 return true;

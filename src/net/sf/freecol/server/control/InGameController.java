@@ -3648,10 +3648,14 @@ public final class InGameController extends Controller {
             ServerColony colony = (tile.getOwningSettlement() instanceof Colony)
                 ? (ServerColony) tile.getOwningSettlement()
                 : null;
-            if (colony != null
-                && colony.getOwner() != unit.getOwner()
-                && colony.isTileInUse(tile)) {
-                colony.csEvictUser(unit, cs);
+            Player owner = (colony == null) ? null : colony.getOwner();
+            if (owner != null
+                && owner != unit.getOwner()
+                && serverPlayer.getStance(owner) != Stance.ALLIANCE
+                && serverPlayer.getStance(owner) != Stance.PEACE) {
+                if (colony.isTileInUse(tile)) {
+                    colony.csEvictUser(unit, cs);
+                }
             }
         }
 

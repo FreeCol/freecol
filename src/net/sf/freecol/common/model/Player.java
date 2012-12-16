@@ -1215,6 +1215,7 @@ public class Player extends FreeColGameObject implements Nameable {
         TERRAIN,         // Not on settleable terrain
         RUMOUR,          // Europeans can not claim tiles with LCR
         WATER,           // Natives do not claim water
+        OCCUPIED,        // Hostile unit present.
         SETTLEMENT,      // Settlement present
         WORKED,          // One of our settlements is working this tile
         EUROPEANS,       // Owned by Europeans and not for sale
@@ -1240,13 +1241,19 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The reason why/not the tile can be owned by this player.
      */
     private NoClaimReason canOwnTileReason(Tile tile) {
+        for (Unit u : tile.getUnitList()) {
+            Player owner = u.getOwner();
+            if (owner == this || !owner.atWarWith(this)) break; // Not hostile
+            // If the unit is military, the tile is held against us.
+            if (u.isOffensiveUnit()) return NoClaimReason.OCCUPIED;
+        }
         return (isEuropean())
             ? ((tile.hasLostCityRumour())
-               ? NoClaimReason.RUMOUR
-               : NoClaimReason.NONE)
+                ? NoClaimReason.RUMOUR
+                : NoClaimReason.NONE)
             : ((tile.isLand())
-               ? NoClaimReason.NONE
-               : NoClaimReason.WATER);
+                ? NoClaimReason.NONE
+                : NoClaimReason.WATER);
     }
 
     /**
