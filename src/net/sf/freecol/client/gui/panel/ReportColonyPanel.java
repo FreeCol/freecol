@@ -678,7 +678,6 @@ public final class ReportColonyPanel extends ReportPanel
                     stpl("report.colony.making.noconstruction.description")
                         .addName("%colony%", colony.getName()));
             } else if (turns >= 0) {
-                turns++;
                 name += " " + Integer.toString(turns);
                 b = colourButton(qac, name, null, cGood,
                     stpl("report.colony.making.constructing.description")
