@@ -1017,7 +1017,7 @@ public class Map extends FreeColGameObject implements Location {
             path.previous = new PathNode(realStart, unit.getMovesLeft(),
                                          0, carrier != null, null, path);
             path = path.previous;
-            if (unit.getLocation() != carrier) {
+            if (carrier != null && unit.getLocation() != carrier) {
                 path.previous = new PathNode(realStart, unit.getMovesLeft(),
                                              0, false, null, path);
                 path = path.previous;
