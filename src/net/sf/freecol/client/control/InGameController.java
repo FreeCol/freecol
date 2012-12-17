@@ -2687,15 +2687,28 @@ public final class InGameController implements NetworkConstants {
         // between coastal and high sea.  Otherwise just move.
         Tile oldTile = unit.getTile();
         Tile newTile = oldTile.getNeighbourOrNull(direction);
-        if ((newTile == null
-             || (!oldTile.isDirectlyHighSeasConnected()
-                 && newTile.isDirectlyHighSeasConnected()))
-            && gui.showConfirmDialog(oldTile,
-                StringTemplate.template("highseas.text")
-                    .addAmount("%number%", unit.getSailTurns()),
-                "highseas.yes", "highseas.no")) {
-            moveTo(unit, unit.getOwner().getEurope());
-            return false;
+        if (newTile == null
+            || (!oldTile.isDirectlyHighSeasConnected()
+                && newTile.isDirectlyHighSeasConnected())) {
+            if (unit.getTradeRoute() != null) {
+                Stop stop = unit.getStop();
+                if (stop != null && TradeRoute.isStopValid(unit, stop)
+                    && stop.getLocation() instanceof Europe) {
+                    moveTo(unit, stop.getLocation());
+                    return false;
+                }
+            } else if (unit.getDestination() instanceof Europe) {
+                moveTo(unit, unit.getDestination());
+                return false;
+            } else {
+                if (gui.showConfirmDialog(oldTile,
+                        StringTemplate.template("highseas.text")
+                                      .addAmount("%number%", unit.getSailTurns()),
+                        "highseas.yes", "highseas.no")) {
+                    moveTo(unit, unit.getOwner().getEurope());
+                    return false;
+                }
+            }
         }
         return moveMove(unit, direction);
     }
