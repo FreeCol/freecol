@@ -1460,7 +1460,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     Tension newTension = settlement.getAlarm(enemy);
                     Tension.Level newLevel = (newTension == null) ? null
                         : newTension.getLevel();
-                    if (entry.getValue() == newLevel) continue;
+                    if (entry.getValue() == null
+                        || entry.getValue() == newLevel
+                        || !settlement.hasContacted(enemy)
+                        || !enemy.hasExplored(settlement.getTile()))
+                        continue;
                     cs.add(See.only(null).perhaps((ServerPlayer)enemy),
                         settlement);
                     // No messages about improving tension
@@ -3667,8 +3671,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 .addStringTemplate("%nation%", other.getNationName()));
 
             // Extra special meeting on first landing!
-            if (other.isIndian()
-                && !isNewLandNamed()
+            if (other.isIndian() && !isNewLandNamed()
                 && tile != null && tile.getOwner() == other) {
                 welcomer = other;
             }

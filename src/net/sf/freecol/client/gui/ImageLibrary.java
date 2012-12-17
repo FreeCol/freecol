@@ -32,6 +32,7 @@ import java.awt.Transparency;
 import java.awt.font.TextLayout;
 import java.awt.image.BufferedImage;
 import java.util.Map.Entry;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -582,48 +583,53 @@ public final class ImageLibrary {
         if (display == null) {
             return new ImageIcon();
         } else if (display instanceof GoodsType) {
-            GoodsType goodsType = (GoodsType) display;
+            GoodsType goodsType = (GoodsType)display;
             try {
                 image = this.getGoodsImage(goodsType);
             } catch (Exception e) {
-                logger.warning("could not find image for goods " + goodsType);
+                logger.log(Level.WARNING, "could not find image for goods "
+                    + goodsType, e);
             }
         } else if (display instanceof Unit) {
-            Unit unit = (Unit) display;
+            Unit unit = (Unit)display;
             try {
                 image = this.getUnitImageIcon(unit).getImage();
             } catch (Exception e) {
-                logger.warning("could not find image for unit " + unit.toString());
+                logger.log(Level.WARNING, "could not find image for unit "
+                    + unit, e);
             }
         } else if (display instanceof UnitType) {
-            UnitType unitType = (UnitType) display;
+            UnitType unitType = (UnitType)display;
             try {
                 image = this.getUnitImageIcon(unitType).getImage();
             } catch (Exception e) {
-                logger.warning("could not find image for unit " + unitType);
+                logger.log(Level.WARNING, "could not find image for unit "
+                    + unitType, e);
             }
         } else if (display instanceof Settlement) {
-            Settlement settlement = (Settlement) display;
+            Settlement settlement = (Settlement)display;
             try {
                 image = this.getSettlementImage(settlement);
             } catch (Exception e) {
-                logger.warning("could not find image for settlement " + settlement);
+                logger.log(Level.WARNING, "could not find image for settlement "
+                    + settlement.getId(), e);
             }
         } else if (display instanceof LostCityRumour) {
             try {
                 image = this.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR);
             } catch (Exception e) {
-                logger.warning("could not find image for lost city rumour");
+                logger.log(Level.WARNING, "could not find image for LCR", e);
             }
         } else if (display instanceof Player) {
-            image = this.getCoatOfArmsImage(((Player) display).getNation());
+            image = this.getCoatOfArmsImage(((Player)display).getNation());
         }
         if (image != null && small) {
-            return new ImageIcon(image.getScaledInstance((image.getWidth(null) / 3) * 2,
-                                                         (image.getHeight(null) / 3) *2,
+            int width = (image.getWidth(null) / 3) * 2;
+            int height = (image.getHeight(null) / 3) * 2;
+            return new ImageIcon(image.getScaledInstance(width, height,
                                                          Image.SCALE_SMOOTH));
         } else {
-            return (image != null) ? new ImageIcon(image) : null;
+            return (image == null) ? null : new ImageIcon(image);
         }
     }
 

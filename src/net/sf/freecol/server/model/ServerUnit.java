@@ -900,16 +900,18 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     || (unit != null
                         && (is = unit.getIndianSettlement()) != null)
                     || (unit != null
-                        && (is = getIndianSettlement()) != null
                         && (contactPlayer = (ServerPlayer)unit.getOwner())
-                        .isEuropean())) {
-                    if (is.setContacted(contactPlayer)) {
+                            .isEuropean()
+                        && (is = getIndianSettlement()) != null)) {
+                    if (contactPlayer.hasExplored(is.getTile())
+                        && is.setContacted(contactPlayer)) {
                         cs.add(See.only(contactPlayer), is);
                         // First European contact with native settlement.
                         StringTemplate nation = is.getOwner().getNationName();
                         cs.addMessage(See.only(contactPlayer),
                             new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                "model.unit.nativeSettlementContact", this, is)
+                                             "model.unit.nativeSettlementContact",
+                                             this, is)
                                 .addStringTemplate("%nation%", nation)
                                 .addName("%settlement%", is.getName()));
                     }                   
