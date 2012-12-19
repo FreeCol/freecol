@@ -2166,7 +2166,16 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Gets a new going_to unit.
+     * Checks if a new active unit can be made active.
+     *
+     * @return <i>true</i> if this is the case and <i>false</i> otherwise.
+     */
+    public boolean hasNextActiveUnit() {
+        return nextActiveUnitIterator.hasNext();
+    }
+
+    /**
+     * Gets a new going-to unit.
      *
      * @return A <code>Unit</code> that can be made active.
      */
@@ -2175,12 +2184,13 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Checks if a new active unit can be made active.
+     * Sets a new going-to unit.
      *
-     * @return <i>true</i> if this is the case and <i>false</i> otherwise.
+     * @param unit A <code>Unit</code> to make the next one to be active.
+     * @return True if the operation succeeded.
      */
-    public boolean hasNextActiveUnit() {
-        return nextActiveUnitIterator.hasNext();
+    public boolean setNextGoingToUnit(Unit unit) {
+        return nextGoingToUnitIterator.setNext(unit);
     }
 
     /**

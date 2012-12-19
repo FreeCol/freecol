@@ -339,6 +339,11 @@ public final class InGameController implements NetworkConstants {
             moveMode = MODE_EXECUTE_GOTO_ORDERS;
         }
 
+        // The active unit might also be a going-to unit.  Make sure it
+        // gets processed first.  setNextGoingToUnit will fail harmlessly
+        // if it is not a going-to unit so this is safe.
+        if (active != null) player.setNextGoingToUnit(active);
+
         // Process all units.
         Unit stillActive = null;
         while (player.hasNextGoingToUnit()) {
