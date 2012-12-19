@@ -617,6 +617,48 @@ public class DebugUtils {
     }
 
     /**
+     * Debug action to dump a players units/iterators to stderr.
+     *
+     * Called from the debug menu.
+     *
+     * @param freeColClient The <code>FreeColClient</code> in effect.
+     */
+    public static void displayUnits(final FreeColClient freeColClient) {
+        final Player player = freeColClient.getMyPlayer();
+        List<Unit> all = player.getUnits();
+        StringBuilder sb = new StringBuilder("\nActive units:\n");
+
+        Unit u, first = player.getNextActiveUnit();
+        if (first != null) {
+            sb.append(first.toString()); sb.append("\n");
+            all.remove(first);
+            while (player.hasNextActiveUnit()
+                && (u = player.getNextActiveUnit()) != first) {
+                sb.append(u.toString()); sb.append("\n");
+                all.remove(u);
+            }
+        }
+        sb.append("Going-to units:\n");
+        first = player.getNextGoingToUnit();
+        if (first != null) {
+            sb.append(first.toString()); sb.append("\n");
+            all.remove(first);
+            while (player.hasNextGoingToUnit()
+                && (u = player.getNextGoingToUnit()) != first) {
+                sb.append(u.toString()); sb.append("\n");
+                all.remove(u);
+            }
+        }
+        sb.append("Remaining units:\n");
+        while (!all.isEmpty()) {
+            u = all.remove(0);
+            sb.append(u.toString()); sb.append("\n");
+        }
+
+        freeColClient.getGUI().showInformationMessage(sb.toString());
+    }
+
+    /**
      * Debug action to dump a tile to stderr.
      *
      * Called from tile popup menu.

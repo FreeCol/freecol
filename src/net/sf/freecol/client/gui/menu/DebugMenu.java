@@ -295,6 +295,18 @@ public class DebugMenu extends JMenu {
             });
         rng.setEnabled(hasServer);
 
+        // Unit display
+        final JMenuItem du = new JMenuItem(
+            Messages.message("menuBar.debug.displayUnits"));
+        du.setOpaque(false);
+        this.add(du);
+        du.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    DebugUtils.displayUnits(freeColClient);
+                }
+            });
+        du.setEnabled(true);
+
         this.addSeparator();
 
         final JMenu panelMenu
