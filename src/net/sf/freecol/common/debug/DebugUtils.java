@@ -630,29 +630,34 @@ public class DebugUtils {
 
         Unit u, first = player.getNextActiveUnit();
         if (first != null) {
-            sb.append(first.toString()); sb.append("\n");
+            sb.append(first.toString() + "\nat "
+                + ((FreeColGameObject)first.getLocation()) + "\n");
             all.remove(first);
             while (player.hasNextActiveUnit()
                 && (u = player.getNextActiveUnit()) != first) {
-                sb.append(u.toString()); sb.append("\n");
+                sb.append(u.toString() + "\nat "
+                    + ((FreeColGameObject)u.getLocation()) + "\n");
                 all.remove(u);
             }
         }
         sb.append("Going-to units:\n");
         first = player.getNextGoingToUnit();
         if (first != null) {
-            sb.append(first.toString()); sb.append("\n");
             all.remove(first);
+            sb.append(first.toString() + "\nat "
+                + ((FreeColGameObject)first.getLocation()) + "\n");
             while (player.hasNextGoingToUnit()
                 && (u = player.getNextGoingToUnit()) != first) {
-                sb.append(u.toString()); sb.append("\n");
+                sb.append(u.toString() + "\nat "
+                    + ((FreeColGameObject)u.getLocation()) + "\n");
                 all.remove(u);
             }
         }
         sb.append("Remaining units:\n");
         while (!all.isEmpty()) {
             u = all.remove(0);
-            sb.append(u.toString()); sb.append("\n");
+            sb.append(u.toString() + "\nat "
+                + ((FreeColGameObject)u.getLocation()) + "\n");
         }
 
         freeColClient.getGUI().showInformationMessage(sb.toString());
