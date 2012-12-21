@@ -2464,6 +2464,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // Inform former owner of loss of owned tiles, and process possible
         // increase in line of sight.  Leave other exploration etc to csMove.
         for (Tile t : colony.getOwnedTiles()) {
+            if (t == tile) continue;
             cs.add(See.perhaps().always(colonyPlayer), t);
         }
         if (colony.getLineOfSight() > attacker.getLineOfSight()) {
@@ -2475,11 +2476,12 @@ public class ServerPlayer extends Player implements ServerModelObject {
             }
         }
 
-        // Inform the former owner of loss of units.  Only the potentially
-        // active units on the tile need be considered.  Carried and colony
-        // workers will just become inaccessible.
+        // Inform the former owner of loss of units.
         for (Unit u : tile.getUnitList()) {
-            cs.addDisappear(colonyPlayer, tile, u);
+            cs.addDispose(See.only(colonyPlayer), null, u);
+        }
+        for (Unit u : colony.getUnitList()) {
+            cs.addDispose(See.only(colonyPlayer), null, u);
         }
 
         cs.addAttribute(See.only(attackerPlayer), "sound",
