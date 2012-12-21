@@ -856,6 +856,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 && Utils.randomInt(logger, "Claim tribal land", random,
                     d + 1) == 0) {
                 newTile.setOwner(serverPlayer);
+                newTile.changeOwningSettlement(settlement);
             }
 
             // Check for first landing
