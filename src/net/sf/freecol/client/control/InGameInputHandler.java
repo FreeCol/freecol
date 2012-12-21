@@ -453,18 +453,6 @@ public final class InGameInputHandler extends InputHandler {
 
     private void takeTurn(Player player, boolean newTurn) {
         final FreeColClient fcc = getFreeColClient();
-        fcc.getInGameController().setCurrentPlayer(player);
-
-        if (newTurn) {
-            List<Settlement> settlements = player.getSettlements();
-            Tile defTile = ((settlements.size() > 0)
-                ? settlements.get(0).getTile()
-                : player.getEntryLocation().getTile()).getSafeTile(null, null);
-            player.resetIterators();
-            fcc.getInGameController().nextActiveUnit(defTile);
-        }
-
-        fcc.updateActions();
     }
 
     /**
@@ -479,24 +467,25 @@ public final class InGameInputHandler extends InputHandler {
         final Player player = fcc.getMyPlayer();
         final Player newPlayer = getGame()
             .getFreeColGameObject(element.getAttribute("player"), Player.class);
-        final boolean newTurn = player.equals(newPlayer);
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)
             && fcc.currentPlayerIsMyPlayer()) closeMenus();
         FreeColDebugger.finishDebugRun(fcc, false);
-
-        if (SwingUtilities.isEventDispatchThread()) {
-            takeTurn(newPlayer, newTurn);
-        } else {
+        
+        fcc.getInGameController().setCurrentPlayer(player);
+        if (player == newPlayer) { // Prepare client for our player turn.
             try {
-                SwingUtilities.invokeAndWait(new Runnable() {
-                        public void run() {
-                            takeTurn(newPlayer, newTurn);
-                        }
-                    });
-            } catch (InterruptedException e) {
-                // Ignore
-            } catch (InvocationTargetException e) {
-                // Ignore
+                List<Settlement> settlements = player.getSettlements();
+                Tile defTile = ((settlements.size() > 0)
+                    ? settlements.get(0).getTile()
+                    : player.getEntryLocation().getTile()).getSafeTile(null, null);
+                player.resetIterators();
+                fcc.getInGameController().nextActiveUnit(defTile);
+                fcc.updateActions();
+            } catch (Exception e) {
+                // We end up here if there is a crash in things like the
+                // turn report.  These were hard to track down because we
+                // used to fail silently.  We now complain louder.
+                logger.log(Level.WARNING, "Client new turn failure for " + player, e);
             }
         }
 
