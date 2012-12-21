@@ -1602,8 +1602,9 @@ public final class InGameController extends Controller {
         container.saveState();
         serverPlayer.buy(container, type, amount, random);
         serverPlayer.csFlushMarket(type, cs);
+        unit.setMovesLeft(0);
         cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
-        cs.add(See.only(serverPlayer), container);
+        cs.add(See.only(serverPlayer), unit);
         // Action occurs in Europe, nothing is visible to other players.
         return cs.build(serverPlayer);
     }
@@ -1627,8 +1628,9 @@ public final class InGameController extends Controller {
         container.saveState();
         serverPlayer.sell(container, type, amount, random);
         serverPlayer.csFlushMarket(type, cs);
+        unit.setMovesLeft(0);
         cs.addPartial(See.only(serverPlayer), serverPlayer, "gold");
-        cs.add(See.only(serverPlayer), container);
+        cs.add(See.only(serverPlayer), unit);
         // Action occurs in Europe, nothing is visible to other players.
         return cs.build(serverPlayer);
     }

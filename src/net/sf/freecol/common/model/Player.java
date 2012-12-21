@@ -3346,13 +3346,20 @@ public class Player extends FreeColGameObject implements Nameable {
 
         private final Player player;
 
+        /**
+         * Creates a new active predicate.
+         *
+         * @param player The owning <code>Player</code>.
+         */
         public ActivePredicate(Player player) {
             this.player = player;
         }
 
         /**
-         * Returns true if the unit is active, going nowhere, on a tile,
-         * and thus available to be moved by the player.
+         * Is the unit active and going nowhere, and thus available to
+         * be moved by the player?
+         *
+         * @return True if the unit can be moved.
          */
         public boolean obtains(Unit unit) {
             return unit.couldMove();
@@ -3366,22 +3373,31 @@ public class Player extends FreeColGameObject implements Nameable {
 
         private final Player player;
 
+        /**
+         * Creates a new going-to predicate.
+         *
+         * @param player The owning <code>Player</code>.
+         */
         public GoingToPredicate(Player player) {
             this.player = player;
         }
 
         /**
-         * Returns true if the unit has order to go somewhere.
+         * Does this unit have orders to go somewhere?
+         *
+         * @return True if the unit has orders to go somewhere.
          */
         public boolean obtains(Unit unit) {
             return !unit.isDisposed()
                 && unit.getOwner() == player
-                && unit.getMovesLeft() > 0
                 && unit.getState() != Unit.UnitState.SKIPPED
+                && unit.getMovesLeft() > 0
                 && (unit.getDestination() != null
                     || unit.getTradeRoute() != null)
-                && !(unit.getLocation() instanceof WorkLocation)
-                && unit.getTile() != null;
+                && !unit.isUnderRepair()
+                && !unit.isAtSea()
+                && !unit.isOnCarrier()
+                && !(unit.getLocation() instanceof WorkLocation);
         }
     }
 

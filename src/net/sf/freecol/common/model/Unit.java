@@ -3198,7 +3198,10 @@ public class Unit extends GoodsLocation
      */
     public Location resolveDestination() {
         if (!isAtSea()) throw new IllegalArgumentException("Not at sea.");
-        Location dst = getDestination();
+        Stop stop = getStop();
+        Location dst = (stop != null && TradeRoute.isStopValid(this, stop))
+            ? stop.getLocation()
+            : getDestination();
         Tile best;
         return (dst == null) ? getFullEntryLocation()
             : (dst instanceof Europe) ? dst

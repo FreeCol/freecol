@@ -412,7 +412,7 @@ public final class InGameController implements NetworkConstants {
             .getBoolean(ClientOptions.SHOW_GOODS_MOVEMENT);
         final List<Stop> stops = tr.getStops();
         Stop stop;
-        boolean result = false;
+        boolean result = false, more = true;
         int tries = stops.size();
 
         for (;;) {
@@ -503,9 +503,11 @@ public final class InGameController implements NetworkConstants {
                 continue; // Stop was updated, loop.
             }
 
-            // Not at stop, give up if no moves left.
+            // Not at stop, give up if no moves left or the path was
+            // exhausted on a previous round.
             if (unit.getMovesLeft() <= 0
-                || unit.getState() == UnitState.SKIPPED) {
+                || unit.getState() == UnitState.SKIPPED
+                || !more) {
                 break;
             }
 
@@ -523,9 +525,9 @@ public final class InGameController implements NetworkConstants {
                 break;
             }
 
-            // Try to follow the path.
-            // Ignore the result, check for unload before returning.
-            followPath(unit, path);
+            // Try to follow the path.  Mark if the path is complete
+            // but loop so as to check for unload before returning.
+            more = followPath(unit, path);
         }
 
         for (ModelMessage m : messages) player.addModelMessage(m);
@@ -850,22 +852,28 @@ public final class InGameController implements NetworkConstants {
                 if (unit.getTile() != null
                     && unit.getTile().isDirectlyHighSeasConnected()) {
                     moveTo(unit, path.getLocation());
-                    return false;
                 } else {
                     logger.warning("Can not move to Europe from "
                         + unit.getLocation()
                         + " on path: " + path.fullPathToString());
                 }
-            } else {
-                if (path.getDirection() != null) {
+                return false;
+            } else if (path.getLocation() instanceof Tile) {
+                if (path.getDirection() == null) {
+                    if (unit.isInEurope()) {
+                        moveTo(unit, unit.getGame().getMap());
+                    } else {
+                        logger.warning("Null direction on path: "
+                            + path.fullPathToString());
+                    }
+                    return false;
+                } else {
                     if (!moveDirection(unit, path.getDirection(), false)) {
                         return false;
                     }
-                } else {
-                    logger.warning("Can not move to tile from "
-                        + unit.getLocation()
-                        + " on path: " + path.fullPathToString());
                 }
+            } else {
+                logger.warning("Bad path: " + path.fullPathToString());
             }
         }
         return true;

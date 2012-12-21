@@ -167,7 +167,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         ServerPlayer owner = (ServerPlayer) getOwner();
         Specification spec = getSpecification();
         Location loc = getLocation();
-        boolean tileDirty = false;
+        boolean locDirty = false;
         boolean unitDirty = false;
 
         // Attrition.  Do it first as the unit might die.
@@ -258,15 +258,15 @@ public class ServerUnit extends Unit implements ServerModelObject {
             }
         }
 
-        if (getWorkLeft() == 0) tileDirty |= csCompleteWork(random, cs);
+        if (getWorkLeft() == 0) locDirty |= csCompleteWork(random, cs);
 
         if (getState() == UnitState.SKIPPED) {
             setState(UnitState.ACTIVE);
             unitDirty = true;
         }
 
-        if (tileDirty) {
-            cs.add(See.perhaps(), getTile());
+        if (locDirty) {
+            cs.add(See.perhaps(), (FreeColGameObject)getLocation());
         } else if (unitDirty) {
             cs.add(See.perhaps(), this);
         } else {
@@ -279,7 +279,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
      *
      * @param random A pseudo-random number source.
      * @param cs A <code>ChangeSet</code> to update.
-     * @return True if the tile under the unit needs an update.
+     * @return True if the unit location needs an update.
      */
     private boolean csCompleteWork(Random random, ChangeSet cs) {
         setWorkLeft(-1);
@@ -292,9 +292,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
             Location result = resolveDestination();
             if (result == europe) {
                 logger.info(this + " arrives in Europe");
-                if (getTradeRoute() != null) {
-                    setMovesLeft(0);
-                } else {
+                if (getTradeRoute() == null) {
                     setDestination(null);
                     cs.addMessage(See.only(owner),
                         new ModelMessage(ModelMessage.MessageType.DEFAULT,
@@ -304,7 +302,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 }
                 setState(UnitState.ACTIVE);
                 setLocation(europe);
-                cs.add(See.only(owner), europe, owner.getHighSeas());
+                cs.add(See.only(owner), owner.getHighSeas());
+                return true;
             } else if (result instanceof Tile) {
                 Tile tile = ((Tile)result).getSafeTile(owner, random);
                 logger.info(this + " arrives in America at " + tile
