@@ -892,6 +892,7 @@ public class DebugUtils {
                                            final IndianSettlement is) {
         final FreeColServer server = freeColClient.getFreeColServer();
         final Game sGame = server.getGame();
+        final AIMain aiMain = server.getAIMain();
         final Specification sSpec = sGame.getSpecification();
         final IndianSettlement sis = sGame.getFreeColGameObject(is.getId(),
             IndianSettlement.class);
@@ -904,10 +905,9 @@ public class DebugUtils {
             sb.append(Messages.message(p.getNationName())
                 + " " + ((tension == null) ? "(none)"
                     : Integer.toString(tension.getValue()))
-                + " " + ((mostHated == null) ? "(peaceful)"
-                    : "(hate " + Messages.message(mostHated.getNationID()) + ")")
+                + ((mostHated == p) ? " (most hated)" : "")
                 + " " + Messages.message(sis.getShortAlarmLevelMessageId(p))
-                + " " + ((sis.hasScouted(p)) ? "(spoke to chief)" : "")
+                + " " + sis.getContactLevel(p)
                 + "\n");
         }
 
@@ -942,16 +942,32 @@ public class DebugUtils {
                 + "\n");
         }
 
-        sb.append("\nOwned Units\n");
+        sb.append("\nUnits present\n");
+        for (Unit u : sis.getUnitList()) {
+            Mission m = aiMain.getAIUnit(u).getMission();
+            sb.append(u + " at " + ((FreeColGameObject)u.getLocation()));
+            if (m != null) {
+                sb.append(" " + Utils.lastPart(m.getClass().getName(), "."));
+            }
+            sb.append("\n");
+        }            
+        sb.append("\nUnits owned\n");
         for (Unit u : sis.getOwnedUnits()) {
-            sb.append(u);
-            sb.append("\n  at " + u.getTile() + "\n");
+            Mission m = aiMain.getAIUnit(u).getMission();
+            sb.append(u + " at " + ((FreeColGameObject)u.getLocation()));
+            if (m != null) {
+                sb.append(" " + Utils.lastPart(m.getClass().getName(), "."));
+            }
+            sb.append("\n");
         }
 
         sb.append("\nTiles\n");
         for (Tile t : sis.getOwnedTiles()) {
             sb.append(t + "\n");
         }
+
+        sb.append("\nConvert Progress = " + sis.getConvertProgress());
+        sb.append("\nLast Tribute = " + sis.getLastTribute());
 
         freeColClient.getGUI().showInformationMessage(sb.toString());
     }
