@@ -203,6 +203,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             private int score(AIUnit a) {
                 Unit unit;
                 if (a == null || (unit = a.getUnit()) == null
+                    || unit.getLocation() == null
                     || !unit.isColonist()) {
                     return -1000;
                 } else if (unit.hasAbility("model.ability.improveTerrain")) {
