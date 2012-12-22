@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- XSD for specification version 0.73
+<!-- XSD for specification version 0.74
      CHANGELOG:
      0.26: add capture-equipment
      0.27: add limits
@@ -49,6 +49,7 @@
      0.71: exportData is a FreeColObject, should use id attribute, not ID
      0.72: allow preserveAttributes attribute to aid spec fragment authors
      0.73: generalize preserveAttributes to preserve
+     0.74: add convertThreshold to settlement
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 
@@ -696,6 +697,7 @@
       <xs:attribute name="minimumGrowth" type="xs:integer"/>
       <xs:attribute name="maximumGrowth" type="xs:integer"/>
       <xs:attribute name="tradeBonus" type="xs:integer"/>
+      <xs:attribute name="convertThreshold" type="xs:integer"/>
     </xs:complexType>
   </xs:element>
 

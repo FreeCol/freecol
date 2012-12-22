@@ -92,6 +92,11 @@ public class SettlementType extends FreeColGameObjectType {
      */
     private int tradeBonus = 1;
 
+    /**
+     * The threshold at which a new convert occurs.
+     */
+    private int convertThreshold = 100;
+
 
     /**
      * Creates a new <code>SettlementType</code> instance.
@@ -324,6 +329,16 @@ public class SettlementType extends FreeColGameObjectType {
 
 
     /**
+     * Gets the convert threshold for this settlement.
+     *
+     * @return The convert threshold.
+     */
+    public int getConvertThreshold() {
+        return convertThreshold;
+    }
+
+
+    /**
      * This method writes an XML-representation of this object to
      * the given stream.
      *
@@ -360,6 +375,7 @@ public class SettlementType extends FreeColGameObjectType {
         out.writeAttribute("minimumGrowth", Integer.toString(minimumGrowth));
         out.writeAttribute("maximumGrowth", Integer.toString(maximumGrowth));
         out.writeAttribute("tradeBonus", Integer.toString(tradeBonus));
+        out.writeAttribute("convertThreshold", Integer.toString(convertThreshold));
     }
 
     /**
@@ -405,6 +421,7 @@ public class SettlementType extends FreeColGameObjectType {
         minimumGrowth = getAttribute(in, "minimumGrowth", minimumGrowth);
         maximumGrowth = getAttribute(in, "maximumGrowth", maximumGrowth);
         tradeBonus = getAttribute(in, "tradeBonus", tradeBonus);
+        convertThreshold = getAttribute(in, "convertThreshold", convertThreshold);
     }
 
     /**
