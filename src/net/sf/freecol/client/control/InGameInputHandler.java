@@ -471,7 +471,7 @@ public final class InGameInputHandler extends InputHandler {
             && fcc.currentPlayerIsMyPlayer()) closeMenus();
         FreeColDebugger.finishDebugRun(fcc, false);
         
-        fcc.getInGameController().setCurrentPlayer(player);
+        fcc.getInGameController().setCurrentPlayer(newPlayer);
         if (player == newPlayer) { // Prepare client for our player turn.
             try {
                 List<Settlement> settlements = player.getSettlements();
@@ -480,7 +480,6 @@ public final class InGameInputHandler extends InputHandler {
                     : player.getEntryLocation().getTile()).getSafeTile(null, null);
                 player.resetIterators();
                 fcc.getInGameController().nextActiveUnit(defTile);
-                fcc.updateActions();
             } catch (Exception e) {
                 // We end up here if there is a crash in things like the
                 // turn report.  These were hard to track down because we
@@ -488,6 +487,7 @@ public final class InGameInputHandler extends InputHandler {
                 logger.log(Level.WARNING, "Client new turn failure for " + player, e);
             }
         }
+        fcc.updateActions();
 
         new RefreshCanvasSwingTask(true).invokeLater();
         return null;
