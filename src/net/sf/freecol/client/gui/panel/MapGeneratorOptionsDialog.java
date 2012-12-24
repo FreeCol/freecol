@@ -36,11 +36,13 @@ import javax.swing.JScrollPane;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.BooleanOptionUI;
 import net.sf.freecol.client.gui.option.FileOptionUI;
 import net.sf.freecol.client.gui.option.OptionGroupUI;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColSavegameFile;
+import net.sf.freecol.common.option.FileOption;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
 
@@ -91,7 +93,7 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog implements Ac
                         }
                     })) {
                     String mapName = file.getName().substring(0, file.getName().lastIndexOf('.'));
-                    JButton mapButton = new JButton(mapName);
+                    JButton mapButton = new JButton(Messages.message("freecol.map." + mapName));
                     try {
                         FreeColSavegameFile savegame = new FreeColSavegameFile(file);
                         Image thumbnail = ImageIO.read(savegame.getInputStream(FreeColSavegameFile.THUMBNAIL_FILE));
@@ -145,14 +147,12 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog implements Ac
     }
 
     private void setFile(File file) {
-        OptionGroupUI ui = getOptionUI();
-        ui.reset();
-        FileOptionUI fou = (FileOptionUI) ui.getOptionUI(MapGeneratorOptions.IMPORT_FILE);
-        fou.setValue(file);
+        OptionGroup group = getGroup();
+        ((FileOption) group.getOption(MapGeneratorOptions.IMPORT_FILE)).setValue(file);
 
-        ((BooleanOptionUI) ui.getOptionUI(MapGeneratorOptions.IMPORT_RUMOURS)).setValue(false);
-        ((BooleanOptionUI) ui.getOptionUI(MapGeneratorOptions.IMPORT_TERRAIN)).setValue(true);
-        ((BooleanOptionUI) ui.getOptionUI(MapGeneratorOptions.IMPORT_BONUSES)).setValue(false);
+        group.setBoolean(MapGeneratorOptions.IMPORT_RUMOURS, false);
+        group.setBoolean(MapGeneratorOptions.IMPORT_TERRAIN, true);
+        group.setBoolean(MapGeneratorOptions.IMPORT_BONUSES, false);
     }
 
     /**

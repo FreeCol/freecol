@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.option;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.Color;
 import java.io.File;
 
 import javax.swing.JButton;
@@ -57,6 +58,8 @@ public final class FileOptionUI extends OptionUI<FileOption>  {
 
         File file = option.getValue();
         fileField = new JTextField((file == null) ? null : file.getAbsolutePath(), 10);
+        fileField.setToolTipText((file == null) ? null : file.getAbsolutePath());
+        fileField.setDisabledTextColor(Color.BLACK);
         panel.add(fileField);
 
         JButton browse = new JButton(Messages.message("file.browse"));
@@ -75,6 +78,7 @@ public final class FileOptionUI extends OptionUI<FileOption>  {
                    }
 
                    fileField.setText(file.getAbsolutePath());
+                   fileField.setToolTipText(file.getAbsolutePath());
                }
             });
         }
@@ -116,10 +120,13 @@ public final class FileOptionUI extends OptionUI<FileOption>  {
      * Sets the value of this UI's component.
      */
     public void setValue(File f) {
+        getOption().setValue(f);
         if (f == null) {
             fileField.setText("");
+            fileField.setToolTipText("");
         } else {
             fileField.setText(f.getAbsolutePath());
+            fileField.setToolTipText(f.getAbsolutePath());
         }
     }
 
@@ -147,6 +154,7 @@ public final class FileOptionUI extends OptionUI<FileOption>  {
     public void reset() {
         File file = getOption().getValue();
         fileField.setText((file == null) ? null : file.getAbsolutePath());
+        fileField.setToolTipText((file == null) ? null : file.getAbsolutePath());
     }
 
 }
