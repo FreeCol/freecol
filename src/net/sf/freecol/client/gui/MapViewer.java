@@ -1288,7 +1288,7 @@ public final class MapViewer {
     * If a unit is active and is located on the selected tile,
     * then nothing (except perhaps a map reposition) will happen.
     *
-    * @param newTileToSelect The <code>Tile</code>, the tile to be selected
+    * @param newTile The <code>Tile</code>, the tile to be selected
     * @param clearGoToOrders Use <code>true</code> to clear goto orders
     *                        of the unit which is activated
     * @return True if the focus was set.
@@ -1296,27 +1296,25 @@ public final class MapViewer {
     * @see #setActiveUnit
     * @see #setFocus(Tile)
     */
-    public boolean setSelectedTile(Tile newTileToSelect, boolean clearGoToOrders) {
+    public boolean setSelectedTile(Tile newTile, boolean clearGoToOrders) {
         Tile oldTile = this.selectedTile;
         boolean ret = false;
-
-        selectedTile = newTileToSelect;
+        selectedTile = newTile;
 
         if (getView() == GUI.MOVE_UNITS_MODE) {
-            if (noActiveUnitIsAt(selectedTile)) {
-                if (selectedTile != null && selectedTile.getSettlement() != null) {
-                    Settlement s = selectedTile.getSettlement();
-                    gui.getCanvas().showSettlement(s);
-                    return ret;
+            if (noActiveUnitIsAt(newTile)) {
+                if (newTile != null && newTile.getSettlement() != null) {
+                    gui.getCanvas().showSettlement(newTile.getSettlement());
+                    return false;
                 }
 
                 // else, just select a unit on the selected tile
-                Unit unitInFront = getUnitInFront(selectedTile);
+                Unit unitInFront = getUnitInFront(newTile);
                 if (unitInFront != null) {
                     ret = setActiveUnit(unitInFront);
                     updateGotoPathForActiveUnit();
                 } else {
-                    setFocus(selectedTile);
+                    setFocus(newTile);
                     ret = true;
                 }
             } else {
@@ -1334,17 +1332,17 @@ public final class MapViewer {
         gui.updateMapControls();
 
         // Check for refocus
-        if (!onScreen(selectedTile) || freeColClient.getClientOptions()
-            .getBoolean(ClientOptions.ALWAYS_CENTER)) {
-            setFocus(selectedTile);
+        if (!onScreen(newTile)
+            || freeColClient.getClientOptions().getBoolean(ClientOptions.ALWAYS_CENTER)) {
+            setFocus(newTile);
             ret = true;
         } else {
             if (oldTile != null) {
                 gui.refreshTile(oldTile);
             }
 
-            if (selectedTile != null) {
-                gui.refreshTile(selectedTile);
+            if (newTile != null) {
+                gui.refreshTile(newTile);
             }
         }
         return ret;
@@ -2834,10 +2832,8 @@ public final class MapViewer {
     }
 
 
-    private boolean noActiveUnitIsAt(Tile selectedTile) {
-        return activeUnit == null ||
-            (activeUnit.getTile() != null &&
-             !activeUnit.getTile().equals(selectedTile));
+    private boolean noActiveUnitIsAt(Tile tile) {
+        return activeUnit == null || activeUnit.getTile() != tile;
     }
 
 
