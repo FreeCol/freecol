@@ -140,7 +140,7 @@ public class NationTypeTest extends FreeColTestCase {
 
     }
 
-    public void testBuildingAdvantage() {
+    public void testAdvantagesThatOnlyApplyToPersons() {
         Game game = getGame();
         game.setMap(getTestMap(true));
 
@@ -157,6 +157,21 @@ public class NationTypeTest extends FreeColTestCase {
             assertTrue("Hammer production bonus should apply to all persons",
                        modifiers.get(0).appliesTo(unit.getType()));
         }
+
+        colony.getOwner().setNationType(spec().getNationType("model.nationType.furTrapping"));
+
+        modifiers = new ArrayList<Modifier>(colony.getOwner().getModifierSet("model.goods.coats"));
+        assertEquals(1, modifiers.size());
+
+        BuildingType traderHouse = spec().getBuildingType("model.building.furTraderHouse");
+        assertFalse("Coat production bonus should not apply to buildings",
+                    modifiers.get(0).appliesTo(traderHouse));
+        for (Unit unit : colony.getUnitList()) {
+            assertTrue("Coat production bonus should apply to all persons",
+                       modifiers.get(0).appliesTo(unit.getType()));
+        }
+
+
     }
 
 

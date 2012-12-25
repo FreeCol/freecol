@@ -51,7 +51,9 @@
     </european-nation-type>
     <european-nation-type id="model.nationType.furTrapping" extends="model.nationType.default">
       <modifier id="model.goods.furs" type="additive" value="2"/>
-      <modifier id="model.goods.coats" type="additive" value="2"/>
+      <modifier id="model.goods.coats" type="additive" value="2">
+        <scope ability-id="model.ability.person" />
+      </modifier>
       <unit id="pioneer" type="model.unit.expertFurTrapper" role="pioneer"/>
       <unit id="soldier" type="model.unit.masterFurTrader" role="soldier"/>
     </european-nation-type>
