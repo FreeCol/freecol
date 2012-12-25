@@ -2705,10 +2705,10 @@ public class Player extends FreeColGameObject implements Nameable {
         final float MOD_GOOD_PRODUCTION        = 1.1f;
 
         //applied per occurrence (own colony only one-time), range-dependent.
-        final float[] MOD_OWN_COLONY     = {0.0f, 0.0f, 0.5f, 1.25f, 1.1f};
-        final float[] MOD_ENEMY_COLONY   = {0.0f, 0.0f, 0.6f, 0.7f,  0.8f};
-        final float[] MOD_NEUTRAL_COLONY = {0.0f, 0.0f, 0.9f, 0.95f, 1.0f};
-        final float[] MOD_ENEMY_UNIT     = {0.0f, 0.5f, 0.6f, 0.7f,  0.8f};
+        final float[] MOD_OWN_COLONY     = {0.0f, 0.0f, 0.5f, 1.50f, 1.25f};
+        final float[] MOD_ENEMY_COLONY   = {0.0f, 0.0f, 0.4f, 0.5f,  0.7f};
+        final float[] MOD_NEUTRAL_COLONY = {0.0f, 0.0f, 0.7f, 0.8f,  1.0f};
+        final float[] MOD_ENEMY_UNIT     = {0.0f, 0.5f, 0.6f, 0.75f, 0.9f};
 
         final int LONG_PATH_TILES = 16;
         final int PRIMARY_GOODS_VALUE = 30;
