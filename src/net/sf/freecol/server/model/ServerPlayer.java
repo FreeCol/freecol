@@ -2417,6 +2417,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
         ServerPlayer colonyPlayer = (ServerPlayer) colony.getOwner();
         StringTemplate colonyNation = colonyPlayer.getNationName();
         Tile tile = colony.getTile();
+        List<Unit> units = new ArrayList<Unit>();
+        units.addAll(colony.getUnitList());
+        units.addAll(tile.getUnitList());
         int plunder = colony.getPlunder(attacker, random);
 
         // Handle history and messages before colony handover
@@ -2477,12 +2480,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
 
         // Inform the former owner of loss of units.
-        for (Unit u : tile.getUnitList()) {
-            cs.addDispose(See.only(colonyPlayer), null, u);
-        }
-        for (Unit u : colony.getUnitList()) {
-            cs.addDispose(See.only(colonyPlayer), null, u);
-        }
+        cs.addRemoves(See.only(colonyPlayer), null, units);
 
         cs.addAttribute(See.only(attackerPlayer), "sound",
                         "sound.event.captureColony");

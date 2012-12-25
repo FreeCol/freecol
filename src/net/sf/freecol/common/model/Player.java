@@ -1461,6 +1461,8 @@ public class Player extends FreeColGameObject implements Nameable {
     public void removeUnit(final Unit oldUnit) {
         if (oldUnit != null) {
             units.remove(oldUnit.getId());
+            nextActiveUnitIterator.remove(oldUnit);
+            nextGoingToUnitIterator.remove(oldUnit);
         }
     }
 
@@ -3575,6 +3577,16 @@ public class Player extends FreeColGameObject implements Nameable {
          */
         public void remove() {
             throw new UnsupportedOperationException();
+        }
+
+        /**
+         * Removes a specific unit from this unit iterator.
+         *
+         * @param u The <code>Unit</code> to remove.
+         * @return True if the unit was removed.
+         */
+        public boolean remove(Unit u) {
+            return units.remove(u);
         }
     }
 

@@ -577,12 +577,11 @@ public class ChangeSet {
         @Override
         public List<Change> consequences(ServerPlayer serverPlayer) {
             if (seeOld(serverPlayer) && !seeNew(serverPlayer)) {
+                List<Unit> units = new ArrayList<Unit>();
+                units.add(unit);
                 List<Change> changes = new ArrayList<Change>();
-                List<FreeColGameObject> objects
-                    = new ArrayList<FreeColGameObject>();
-                objects.add(unit);
                 changes.add(new RemoveChange(See.only(serverPlayer),
-                        unit.getLocation(), objects));
+                                             unit.getLocation(), units));
                 return changes;
             }
             return Collections.emptyList();
@@ -776,7 +775,7 @@ public class ChangeSet {
     private static class RemoveChange extends Change {
         private Tile tile;
         private FreeColGameObject fcgo;
-        private List<FreeColGameObject> contents;
+        private List<? extends FreeColGameObject> contents;
 
         /**
          * Build a new RemoveChange for an object that is disposed.
@@ -786,7 +785,7 @@ public class ChangeSet {
          * @param objects The <code>FreeColGameObject</code>s to remove.
          */
         public RemoveChange(See see, Location loc,
-                            List<FreeColGameObject> objects) {
+                            List<? extends FreeColGameObject> objects) {
             super(see);
             this.tile = (loc instanceof Tile) ? (Tile) loc : null;
             this.fcgo = objects.remove(objects.size() - 1);
@@ -1274,9 +1273,8 @@ public class ChangeSet {
                                   FreeColGameObject fcgo) {
         List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
         objects.add(fcgo);
+        changes.add(new RemoveChange(See.perhaps().except(owner), tile, objects));
         changes.add(new ObjectChange(See.perhaps().except(owner), tile));
-        changes.add(new RemoveChange(See.perhaps().except(owner), tile,
-                                     objects));
         return this;
     }
 
@@ -1440,6 +1438,24 @@ public class ChangeSet {
         LastSale sale = new LastSale(settlement, type, game.getTurn(), price);
         changes.add(new OwnedChange(See.only(serverPlayer), sale));
         serverPlayer.saveSale(sale);
+        return this;
+    }
+
+    /**
+     * Helper function to add removals for several objects to a ChangeSet.
+     *
+     * @param see The visibility of this change.
+     * @param loc The <code>Location</code> where the object was.
+     * @param objects A list of <code>FreeColGameObject</code>s to remove.
+     * @return The updated <code>ChangeSet</code>.
+     */
+    public ChangeSet addRemoves(See see, Location loc,
+                                List<? extends FreeColGameObject> objects) {
+        List<FreeColGameObject> fcgos = new ArrayList<FreeColGameObject>();
+        for (FreeColGameObject fcgo : objects) {
+            fcgos.clear(); fcgos.add(fcgo);
+            changes.add(new RemoveChange(see, loc, fcgos));
+        }
         return this;
     }
 
