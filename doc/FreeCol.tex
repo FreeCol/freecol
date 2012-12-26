@@ -5,6 +5,7 @@
 \newcommand{\Father}[1]{\index{#1}\index{Founding Fathers!#1}\hypertarget{#1}{\textbf{#1}}}
 \newcommand{\FFather}[2]{\index{#2}\index{Founding Fathers!#2}\hypertarget{#1}{\textbf{#2}}}
 \newcommand{\Report}[1]{\index{#1}\index{Reports!#1}\hypertarget{#1}{\textbf{#1}}}
+\newcommand{\Option}[1]{\index{#1}\index{Options!#1}\hypertarget{#1}{\textbf{#1}}}
 \newcommand{\Concept}[1]{\index{#1}\hypertarget{#1}{\textbf{#1}}}
 \newcommand{\Wikipedia}[1]{\href{http://en.wikipedia.org/wiki/#1}%
 {\includegraphics[scale=0.6]{images/wikipedia.png}}}
@@ -547,38 +548,163 @@ The game options allow you to select several parameters that
 influence game play, such as non-standard rules and victory
 conditions.
 
-The map tab allows you to select whether to use the \textit{Fog of
-  War}, whether to hide enemy units in settlements and carriers, and
-whether to award exploration points for regions discovered by the
-players. By default, exploration points are only awarded for the
-discovery of the Pacific Ocean. You can also change the number of
-turns required to sail between Europe and the New World. By default,
-the journey takes three turns.
+\hypertarget{map options}{\subsubsection{Map Options}}
 
-The colony tab allows you to enable custom houses to
-\hypertarget{ignore boycotts}{ignore boycotts}\index{ignoring
-  boycotts}. This means that custom houses will be able to export
-boycotted goods. This does not apply to carriers, however, and does
-not prevent further boycotts by the Crown. This feature of the
-original game is considered a bug by the FreeCol team and is therefore
-disabled by default in the FreeCol rule set.
+\begin{itemize}
 
-You can also allow experts to ``have connections'', which means that
-experts working in factory-level buildings will be able to produce a
-small amount of goods even if the necessary raw materials are not
-generally available. This alleged feature of the original game is also
-disabled by default. You also have the choice to save production
-overflow, which means that new buildings, for example, will not use up
-all available hammers, but only the exact number required. The
-remaining hammers will remain available for the next building
-project. Finally, you may enable or disable manual student
-selection. The original game always selected a random student from
-those available.
+\item The option \Option{Turns to Sail} allows you to change the
+  number of turns required to sail between Europe and the New
+  World. By default, the journey takes three turns.
 
-The victory conditions tab allows you to choose among three possible
-victory conditions. The game will be won by the first player to
-achieve independence, the player to eliminate all other European
-players, or the player to eliminate all other human players.
+\item The \Option{Settlement Limit Modifier} allows you to relax the
+  settlement limit, which currently applies only to the number of
+  \hyperlink{Wagon Train}{Wagon Trains} that your colonies can
+  support.
+
+\item The checkbox \Option{Fog of War} allows you to toggle whether
+  the areas of the map your units can not currently see are marked.
+
+\item The checkbox \Option{Exploration Points} allows you to award
+  exploration points for regions discovered by the players. By
+  default, exploration points are only awarded for the discovery of
+  the Pacific Ocean.
+
+\item The checkbox \Option{Amphibious Moves} enables offensive units
+  to attack colonies from a ship. This is necessary in order to
+  prevent the construction of unassaillable strongholds on small
+  islands.
+
+\item The checkbox \Option{Empty Trade Units} enables empty carriers
+  to trade with foreign settlements, in other words to buy foreign
+  goods without selling goods first.
+
+\item The checkbox \Option{Chief Contact} toggles whether all
+  interactions with a settlement, such as sending a unit to learn a
+  skill, automatically contact its chief.
+
+\item The checkbox \Option{Enhanced Missionaries} grants missionaries
+  various abilities, making them more valuable than in the original
+  game.
+
+\item The \Option{Gift Probability} influences the amount of gifts
+  your colonies will receive from the natives.
+
+\item The \Option{Demand Probability} influences the number of demands
+  your colonies will receive from the natives.
+
+\item The checkbox \Option{Continue Recruiting Founding Fathers}
+  allows you to elect \hyperlink{Founding Fathers}{Founding Fathers}
+  after independence has been granted.
+
+\item The checkbox \Option{Teleport REF} enables the \hyperlink{Royal
+  Expeditionary Force}{Royal Expeditionary Force} to arrive directly
+  at its destination, as in the original game. If this option is
+  disabled, the REF must sail to its destination and can be attacked
+  {\it en route}.
+
+\item The option \Option{Starting Positions} allows you to determine
+  whether the various European nations will start at positions similar
+  to those of the original game, at positions closer to their
+  historical landfalls, or at random locations.
+
+\end{itemize}
+
+\hypertarget{colony options}{\subsubsection{Colony Options}}
+
+\begin{itemize}
+
+\item The checkbox \Option{Custom House Ignores Boycott} enables
+  \hyperlink{Custom House}{Custom Houses} to \hypertarget{ignore
+    boycotts}{ignore boycotts}\index{ignoring boycotts} and export
+  boycotted goods regardless. This does not apply to carriers,
+  however, and does not prevent further boycotts by the Crown. This
+  feature of the original game is considered a bug by the FreeCol team
+  and is therefore disabled by default in the FreeCol rule set.
+
+\item The checkbox \Option{Experts Have Connections} enables experts
+  working in factory-level buildings to produce a small amount of
+  goods even if the necessary raw materials are not generally
+  available. This alleged feature of the original game is also
+  disabled by default.
+
+\item The checkbox \Option{Save Production Overflow}, toggles whether
+  the construction of new units or buildings uses up all available
+  hammers, or only the exact number required. In the latter case, the
+  remaining hammers will remain available for the next building
+  project.
+
+\item The checkbox \Option{Allow Student Selection} enables (and
+  obliges) you to explicitly assign students to teachers. The original
+  game always selects a random student from those available.
+
+\item The checkbox \Option{Buildings Require Upkeep} toggles whether
+  you have to pay for the upkeep of all buildings not present in a
+  newly established colony. If you fail to pay the upkeep, you will
+  suffer a production penalty. This feature was apparently considered
+  for the original game, but was removed during play-testing.
+
+\item The option \Option{Natural Disasters} influences the probability
+  of natural disasters devastating your colonies. If this option is
+  set to zero, no natural disasters will occur.
+
+\end{itemize}
+
+
+\hypertarget{victory conditions}{\subsubsection{Victory Conditions}}
+
+Victory conditions allow you to choose how a European player may win
+the game:
+
+\begin{itemize}
+
+\item \Option{First Player to Gain Independence}
+
+\item \Option{All Other European Players Defeated}
+
+\item \Option{All Other Human Players Defeated}
+
+\end{itemize}
+
+Please note that if you start a single-player game and select the
+defeat of all other human players as a victory condition, your game
+will end immediately, since the victory condition already applies.
+
+
+\hypertarget{year options}{\subsubsection{Year Options}}
+
+\begin{itemize}
+
+\item The \Option{Starting Year} determines the year in which the game
+  starts (defaults to 1492).
+
+\item The \Option{Season Year} determines the first year with two
+  turns or seasons per year (defaults to 1600).
+
+\item The \Option{Mandatory Colony Year} determines the first year in
+  which it becomes mandatory for European players to own at least one
+  colony in order to avoid defeat (defaults to 1600).
+
+\item The \Option{Last Game Year} determines the year in which the
+  game ends (defaults to 1850).
+
+\item The \Option{Last Colonial Game Year} determines the year by
+  which European players must have declared independence in order to
+  avoid defeat (defaults to 1800).
+
+\end{itemize}
+
+
+\hypertarget{initial prices}{\subsubsection{Initial Prices}}
+
+The initial price options determine the minimum and maximum initial
+prices for all goods traded in Europe, as well as the difference
+between the buy and sell prices. Unless the initial prices for a type
+of goods are set to the same value, the initial price will be
+randomized at the beginning of the game. The price spread, however,
+remains constant.
+
+You can also set the price of hammers when paying for the completion
+of buildings and buildable units.
 
 
 \hypertarget{client options}{\section{Client Options}}
@@ -3011,9 +3137,10 @@ all your coastal colonies you have lost.
 At the declaration, colonies with strong support for the Sons of
 Liberty sometimes promote veteran soldiers at work there to
 \hyperlink{Colonial Regular}{Colonial Regular} in preparation for the
-coming war.  In the future, the European enemies of your Monarch may
-support your effort if you generate a sufficient number of Liberty
-Bells after the War of Independence has begun.
+coming war. The European enemies of your Monarch may support your
+effort by dispatching an \Concept{Intervention Force}, provided that
+you generate a sufficient number of Liberty Bells after the War of
+Independence has begun.
 
 If you continue to play after successfully defeating the
 \hyperlink{Royal Expeditionary Force}{Royal Expeditionary Force}, your
