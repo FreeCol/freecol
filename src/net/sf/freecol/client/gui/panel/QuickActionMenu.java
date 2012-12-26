@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
@@ -195,7 +196,7 @@ public final class QuickActionMenu extends JPopupMenu {
             });
         return ret;
     }
-        
+
     private JMenuItem makeProductionItem(GoodsType type, WorkLocation wl,
                                          int amount, UnitLabel unitLabel,
                                          boolean claim) {
@@ -216,7 +217,6 @@ public final class QuickActionMenu extends JPopupMenu {
     }
 
     private boolean addWorkItems(final UnitLabel unitLabel) {
-        final int currentItems = this.getComponentCount();
         final Unit unit = unitLabel.getUnit();
         final UnitType unitType = unit.getType();
         final GoodsType expertGoods = unitType.getExpertProduction();
@@ -283,14 +283,17 @@ public final class QuickActionMenu extends JPopupMenu {
                 }
             }
         }
+        JMenu container = new JMenu(Messages.message("model.unit.changeWork"));
+        this.add(container);
+
         List<JMenuItem> owned = descendingList(items);
         if (expertOwned != null) owned.add(0, expertOwned);
-        for (JMenuItem j : owned) this.add(j);
+        for (JMenuItem j : owned) container.add(j);
         List<JMenuItem> unowned = descendingList(extras);
         if (expertUnowned != null) unowned.add(0, expertUnowned);
         if (!unowned.isEmpty()) {
-            if (!owned.isEmpty()) this.addSeparator();
-            for (JMenuItem j : unowned) this.add(j);
+            if (!owned.isEmpty()) container.addSeparator();
+            for (JMenuItem j : unowned) container.add(j);
         }
         if (current != null) {
             JMenuItem ji = new JMenuItem(Messages.message("showProductivity"));
@@ -301,7 +304,7 @@ public final class QuickActionMenu extends JPopupMenu {
                 });
             this.add(ji);
         }
-        return this.getComponentCount() != currentItems;
+        return !(owned.isEmpty() && unowned.isEmpty() && current == null);
     }
 
     private boolean addEducationItems(final UnitLabel unitLabel) {
