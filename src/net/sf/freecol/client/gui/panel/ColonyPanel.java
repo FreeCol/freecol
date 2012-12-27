@@ -26,6 +26,7 @@ import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -1535,9 +1536,12 @@ public final class ColonyPanel extends PortPanel
             g.fillRect(0, 0, getWidth(), getHeight());
 
             if (colony == null) return;
-            TileType tileType = colony.getTile().getType();
-            int tileWidth = getLibrary().getTerrainImageWidth(tileType) / 2;
-            int tileHeight = getLibrary().getTerrainImageHeight(tileType) / 2;
+            final Tile tile = colony.getTile();
+            final TileType tileType = tile.getType();
+            final ImageLibrary lib = getLibrary();
+            final Image image = lib.getTerrainImage(tileType, tile.getX(), tile.getY());
+            int tileWidth = image.getWidth(null) / 2;
+            int tileHeight = image.getHeight(null) / 2;
             for (int x = 0; x < 3; x++) {
                 for (int y = 0; y < 3; y++) {
                     if (tiles[x][y] == null) continue;
@@ -1577,10 +1581,13 @@ public final class ColonyPanel extends PortPanel
 
                 setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
                 setOpaque(false);
-                TileType tileType = colonyTile.getTile().getType();
+                final Tile tile = colonyTile.getTile();
+                final TileType tileType = tile.getType();
+                final Image image = getLibrary()
+                    .getTerrainImage(tileType, tile.getX(), tile.getY());
                 // Size and position:
-                int width = getLibrary().getTerrainImageWidth(tileType);
-                int height = getLibrary().getTerrainImageHeight(tileType);
+                final int width = image.getWidth(null);
+                final int height = image.getHeight(null);
                 setSize(width, height);
                 setLocation(((2 - x) + y) * width / 2, (x + y) * height / 2);
             }

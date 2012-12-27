@@ -23,6 +23,7 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.util.logging.Logger;
 
@@ -38,6 +39,7 @@ import javax.swing.SwingUtilities;
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.StringTemplate;
@@ -87,13 +89,15 @@ public final class TilePanel extends FreeColPanel {
         String name = Messages.message(tile.getLabel()) + " (" + tile.getX() + ", " + tile.getY() + ")";
         add(new JLabel(name));
 
-        int width = getLibrary().getTerrainImageWidth(tileType);
-        int height = getLibrary().getCompoundTerrainImageHeight(tileType);
-        int baseHeight = getLibrary().getTerrainImageHeight(tileType);
+        final ImageLibrary lib = getLibrary();
+        final Image terrain = lib.getTerrainImage(tileType, tile.getX(), tile.getY());
+        final int width = terrain.getWidth(null);
+        final int baseHeight = terrain.getHeight(null);
+        int height = lib.getCompoundTerrainImageHeight(tileType);
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = (Graphics2D) image.getGraphics();
+        Graphics2D g = (Graphics2D)image.getGraphics();
         g.translate(0, height - baseHeight);
-        gui.getMapViewer().displayColonyTile(g, tile, null);
+        gui.displayColonyTile(g, tile, null);
         add(new JLabel(new ImageIcon(image)));
 
         if (tile.getRegion() != null) {

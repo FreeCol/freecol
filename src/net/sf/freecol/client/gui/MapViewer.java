@@ -834,24 +834,27 @@ public final class MapViewer {
             }
         }
 
-        displayBaseTile(g, tile, false);
+        displayBaseTile(g, lib, tile, false);
         displayTileOverlays(g, tile, false, false);
+
         if (tileCannotBeWorked) {
-            g.drawImage(lib.getMiscImage(ImageLibrary.TILE_TAKEN), 0, 0, null);
+            g.drawImage(lib.getMiscImage(ImageLibrary.TILE_TAKEN),
+                        0, 0, null);
         }
 
         if (price > 0 && tile.getSettlement() == null) {
-            // tile is owned by an IndianSettlement
             Image image = lib.getMiscImage(ImageLibrary.TILE_OWNED_BY_INDIANS);
             centerImage(g, image);
         }
 
         if (unit != null) {
             ImageIcon image = lib.getUnitImageIcon(unit, 0.5);
-            g.drawImage(image.getImage(), tileWidth/4 - image.getIconWidth() / 2,
+            g.drawImage(image.getImage(),
+                        tileWidth/4 - image.getIconWidth() / 2,
                         halfHeight - image.getIconHeight() / 2, null);
             // Draw an occupation and nation indicator.
-            String text = Messages.message(unit.getOccupationKey(freeColClient.getMyPlayer().owns(unit)));
+            boolean owner = freeColClient.getMyPlayer().owns(unit);
+            String text = Messages.message(unit.getOccupationKey(owner));
             g.drawImage(lib.getOccupationIndicatorChip(unit, text),
                         (int)(STATE_OFFSET_X * lib.getScalingFactor()),
                         0, null);
@@ -869,7 +872,7 @@ public final class MapViewer {
      * @param tile The Tile to draw.
      */
     public void displayTerrain(Graphics2D g, Tile tile) {
-        displayBaseTile(g, tile, true);
+        displayBaseTile(g, lib, tile, true);
         displayTileItems(g, tile);
     }
 
@@ -1435,7 +1438,7 @@ public final class MapViewer {
             if (newScale >= 1f) {
                 setImageLibrary(gui.getImageLibrary());
             } else {
-                setImageLibrary(gui.getImageLibrary().getScaledImageLibrary(newScale));
+                setImageLibrary(new ImageLibrary(newScale));
             }
         } catch (Exception ex) {
             logger.warning("Failed to retrieve scaled image library.");
@@ -1643,26 +1646,32 @@ public final class MapViewer {
     /**
      * Displays the given Tile onto the given Graphics2D object at the
      * location specified by the coordinates. Only base terrain will be drawn.
+     *
      * @param g The Graphics2D object on which to draw the Tile.
+     * @param library The <code>ImageLibrary</code> to use. 
      * @param tile The Tile to draw.
      * @param drawUnexploredBorders If true; draws border between explored and
      *        unexplored terrain.
      */
-    private void displayBaseTile(Graphics2D g, Tile tile, boolean drawUnexploredBorders) {
+    private void displayBaseTile(Graphics2D g, ImageLibrary library, Tile tile,
+                                 boolean drawUnexploredBorders) {
         if (tile != null) {
             int x = tile.getX();
             int y = tile.getY();
             // ATTENTION: we assume that all base tiles have the same size
-            g.drawImage(lib.getTerrainImage(tile.getType(), x, y), 0, 0, null);
+            g.drawImage(library.getTerrainImage(tile.getType(), x, y),
+                        0, 0, null);
             if (tile.isExplored()) {
                 if (!tile.isLand() && tile.getStyle() > 0) {
                     int edgeStyle = tile.getStyle() >> 4;
                     if (edgeStyle > 0) {
-                        g.drawImage(lib.getBeachEdgeImage(edgeStyle, x, y), 0, 0, null);
+                        g.drawImage(library.getBeachEdgeImage(edgeStyle, x, y),
+                                    0, 0, null);
                     }
                     int cornerStyle = tile.getStyle() & 15;
                     if (cornerStyle > 0) {
-                        g.drawImage(lib.getBeachCornerImage(cornerStyle, x, y), 0, 0, null);
+                        g.drawImage(library.getBeachCornerImage(cornerStyle, x, y),
+                                    0, 0, null);
                     }
                 }
 
@@ -1685,22 +1694,21 @@ public final class MapViewer {
                         } else if (!tile.isLand() && borderingTile.isLand() && borderingTile.isExplored()) {
                             // If there is a Coast image (eg. beach) defined, use it, otherwise skip
                             // Draw the grass from the neighboring tile, spilling over on the side of this tile
-                            g.drawImage(lib.getBorderImage(borderingTile.getType(), direction,
-                                                           x, y), 0, 0, null);
+                            g.drawImage(library.getBorderImage(borderingTile.getType(), direction, x, y),
+                                        0, 0, null);
                             TileImprovement river = borderingTile.getRiver();
                             if (river != null && river.isConnectedTo(direction.getReverseDirection())) {
-                                g.drawImage(lib.getRiverMouthImage(direction, borderingTile.getRiver()
-                                                                   .getMagnitude(), x,
-                                                                   y), 0, 0, null);
+                                g.drawImage(library.getRiverMouthImage(direction, borderingTile.getRiver().getMagnitude(), x, y),
+                                            0, 0, null);
                             }
                         } else if (borderingTile.isExplored()) {
-                            if (lib.getTerrainImage(tile.getType(), 0, 0)
-                                .equals(lib.getTerrainImage(borderingTile.getType(), 0, 0))) {
+                            if (library.getTerrainImage(tile.getType(), 0, 0)
+                                .equals(library.getTerrainImage(borderingTile.getType(), 0, 0))) {
                                 // Do not draw limit between tile that share same graphics (ocean & great river)
                                 continue;
                             } else if (borderingTile.getType().getIndex() < tile.getType().getIndex()) {
                                 // Draw land terrain with bordering land type, or ocean/high seas limit
-                                g.drawImage(lib.getBorderImage(borderingTile.getType(), direction,
+                                g.drawImage(library.getBorderImage(borderingTile.getType(), direction,
                                                                x, y), 0, 0, null);
                             }
                         }
@@ -1873,7 +1881,7 @@ public final class MapViewer {
             // Column per column; start at the left side to display the tiles.
             for (int column = firstColumn; column <= lastColumn; column++) {
                 Tile tile = map.getTile(column, row);
-                displayBaseTile(g, tile, true);
+                displayBaseTile(g, lib, tile, true);
                 g.translate(tileWidth, 0);
             }
             g.setTransform(rowTransform);
@@ -3088,9 +3096,10 @@ public final class MapViewer {
         this.lib = lib;
         cursorImage = lib.getMiscImage(ImageLibrary.UNIT_SELECT);
         // ATTENTION: we assume that all base tiles have the same size
-        tileHeight = lib.getTerrainImageHeight(null);
+        Image unexplored = lib.getTerrainImage(null, 0, 0);
+        tileHeight = unexplored.getHeight(null);
         halfHeight = tileHeight/2;
-        tileWidth = lib.getTerrainImageWidth(null);
+        tileWidth = unexplored.getWidth(null);
         halfWidth = tileWidth/2;
 
         int dx = tileWidth/16;

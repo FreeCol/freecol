@@ -278,8 +278,10 @@ public final class InfoPanel extends FreeColPanel {
             removeAll();
 
             if (tile != null) {
-                int width = getLibrary().getTerrainImageWidth(tile.getType());
-                int height = getLibrary().getTerrainImageHeight(tile.getType());
+                final Image terrain = getLibrary().getTerrainImage(tile.getType(),
+                    tile.getX(), tile.getY());
+                int width = terrain.getWidth(null);
+                int height = terrain.getHeight(null);
                 int compoundHeight = getLibrary().getCompoundTerrainImageHeight(tile.getType());
                 BufferedImage image = new BufferedImage(width, compoundHeight, BufferedImage.TYPE_INT_ARGB);
                 Graphics2D g = image.createGraphics();

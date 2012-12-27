@@ -471,7 +471,8 @@ public final class ImageLibrary {
      * @return The height of the terrain-image at the given index.
      */
     public int getCompoundTerrainImageHeight(TileType type) {
-        int height = getTerrainImageHeight(type);
+        Image terrain = getTerrainImage(type, 0, 0);
+        int height = terrain.getHeight(null);
         if (type != null) {
             Image overlayImage = getOverlayImage(type, 0, 0);
             if (overlayImage != null) {
@@ -987,26 +988,6 @@ public final class ImageLibrary {
         String key = (type == null) ? "model.tile.unexplored" : type.getId();
         return ResourceManager.getImage(key + ".center"
             + (isEven(x, y) ? "0" : "1") + ".image", scale);
-    }
-
-    /**
-     * Returns the height of the terrain-image for a terrain type.
-     *
-     * @param type The type of the terrain-image.
-     * @return The height of the terrain-image at the given index.
-     */
-    public int getTerrainImageHeight(TileType type) {
-        return getTerrainImage(type, 0, 0).getHeight(null);
-    }
-
-    /**
-     * Returns the width of the terrain-image for a terrain type.
-     *
-     * @param type The type of the terrain-image.
-     * @return The width of the terrain-image at the given index.
-     */
-    public int getTerrainImageWidth(TileType type) {
-        return getTerrainImage(type, 0, 0).getWidth(null);
     }
 
     /**

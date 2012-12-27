@@ -144,7 +144,7 @@ public class GUI {
 
     /**
      * This is the MapViewer instance used to paint the colony tiles in the
-     * ColonyPanel and other panels. It should not be scaled along
+     * ColonyPanel and other panels.  It should not be scaled along
      * with the default MapViewer.
      */
     private MapViewer colonyTileGUI;
@@ -279,7 +279,7 @@ public class GUI {
     }
 
     public void displayColonyTile(Graphics2D g, Tile tile, Colony colony) {
-        mapViewer.displayColonyTile(g, tile, colony);
+        colonyTileGUI.displayColonyTile(g, tile, colony);
     }
 
     public void displaySplashScreen(final String splashFilename) {

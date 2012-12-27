@@ -48,6 +48,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
@@ -199,8 +200,10 @@ public final class UnitLabel extends JLabel
             this.isSmall = true;
         } else {
             if (unit.getLocation() instanceof ColonyTile) {
-                TileType tileType = ((ColonyTile) unit.getLocation()).getTile().getType();
-                setSize(new Dimension(gui.getImageLibrary().getTerrainImageWidth(tileType) / 2,
+                final Tile tile = ((ColonyTile) unit.getLocation()).getTile();
+                final TileType tileType = tile.getType();
+                final Image image = gui.getImageLibrary().getTerrainImage(tileType, tile.getX(), tile.getY());
+                setSize(new Dimension(image.getWidth(null) / 2,
                                       imageIcon.getIconHeight()));
             } else {
                 setPreferredSize(null);
