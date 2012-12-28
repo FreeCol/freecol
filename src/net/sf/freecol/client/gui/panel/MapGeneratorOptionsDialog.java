@@ -153,6 +153,7 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog implements Ac
         group.setBoolean(MapGeneratorOptions.IMPORT_RUMOURS, false);
         group.setBoolean(MapGeneratorOptions.IMPORT_TERRAIN, true);
         group.setBoolean(MapGeneratorOptions.IMPORT_BONUSES, false);
+        getOptionUI().reset();
     }
 
     /**
