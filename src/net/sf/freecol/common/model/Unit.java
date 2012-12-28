@@ -2811,7 +2811,9 @@ public class Unit extends GoodsLocation
      */
     public boolean isInMission() {
         return hasAbility("model.ability.missionary")
-            && getLocation() instanceof IndianSettlement;
+            && (getLocation() instanceof IndianSettlement
+                // TODO: remove this when PET missionary serialization is fixed
+                || getLocation() == null);
     }
 
     public String getMovesAsString() {
