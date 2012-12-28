@@ -371,7 +371,7 @@ public class OggVorbisDecoderFactory {
         /**
          * Create a new player.
          *
-         * @param inputStream The stream to read from.
+         * @param os The <code>OggStream</code> to read from.
          */
         public OggVorbisAudioInputStream(OggStream os) throws IOException {
             super(os, os.getFormat(), AudioSystem.NOT_SPECIFIED);

@@ -256,7 +256,7 @@ public final class ImageLibrary {
      * The background is either the native owner's, or that of the
      * most hated nation if any.
      *
-     * @param settlement The <code>IndianSettlement</code> to check.
+     * @param is The <code>IndianSettlement</code> to check.
      * @param player The <code>Player</code> viewing the settlement.
      * @param text The text for the chip.
      * @return An alarm chip, or null if none suitable.
@@ -538,7 +538,7 @@ public final class ImageLibrary {
     /**
      * Gets the owner chip for the settlement.
      *
-     * @param settlement The <code>IndianSettlement</code> to check.
+     * @param is The <code>IndianSettlement</code> to check.
      * @param text The text for the chip.
      * @return A chip.
      */

@@ -2666,7 +2666,7 @@ public final class InGameController implements NetworkConstants {
      *
      * @param unit The <code>Unit</code> that is exploring.
      * @param direction The direction of a rumour.
-     * @param True if the unit can move further.
+     * @return True if the unit can move further.
      */
     private boolean moveExplore(Unit unit, Direction direction) {
         Tile tile = unit.getTile().getNeighbourOrNull(direction);

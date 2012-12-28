@@ -1134,8 +1134,6 @@ public final class ColonyPanel extends PortPanel
 
         /**
          * Creates a WarehousePanel.
-         *
-         * @param colonyPanel The panel that holds this WarehousePanel.
          */
         public WarehousePanel() {
             this.colonyPanel = ColonyPanel.this;

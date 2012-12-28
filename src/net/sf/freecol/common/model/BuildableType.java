@@ -141,7 +141,7 @@ public abstract class BuildableType extends FreeColGameObjectType {
      * Get the amount required of a given <code>GoodsType</code> to build
      * an instance of this buildable.
      *
-     * @param The <code>GoodsType</code> to check.
+     * @param type The <code>GoodsType</code> to check.
      * @return The amount of goods required.
      */
     public int getRequiredAmountOf(GoodsType type) {

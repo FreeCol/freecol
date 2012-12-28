@@ -966,7 +966,7 @@ public class Map extends FreeColGameObject implements Location {
      * @return A path starting at the start location and ending at the
      *     end location, or null if none found.
      * @throws IllegalArgumentException For many reasons, see
-     *     {@link findRealStart}.
+     *     {@link #findRealStart}.
      */
     public PathNode findPath(final Unit unit,
                              final Location start, final Location end,
@@ -1281,7 +1281,7 @@ public class Map extends FreeColGameObject implements Location {
      * Does this path include a non-carrier move within the last turn?
      *
      * @param p The <code>PathNode</code> to check.
-     * @param turn Paths with fewer turns than this are previous turns.
+     * @param turns Paths with fewer turns than this are previous turns.
      * @return True if there was a non-carrier move in the last turn.
      */
     private static boolean embarkedThisTurn(PathNode p, int turns) {

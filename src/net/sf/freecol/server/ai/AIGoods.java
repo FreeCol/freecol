@@ -336,7 +336,6 @@ public class AIGoods extends AIObject implements Transportable {
     /**
      * Goods leaves a ship.
      *
-     * @param type The <code>GoodsType</code> to unload.
      * @param amount The amount of goods to unload.
      * @return True if the unload succeeds.
      */

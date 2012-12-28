@@ -67,8 +67,6 @@ public class ServerIndianSettlement extends IndianSettlement
      * @param isCapital True if settlement is tribe's capital
      * @param learnableSkill The skill that can be learned by
      *     Europeans at this settlement.
-     * @param spokenTo Indicates if any European scout has asked to
-     *     speak with the chief.
      * @param missionary The missionary in this settlement (or null).
      * @exception IllegalArgumentException if an invalid tribe or kind is given
      */
