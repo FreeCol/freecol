@@ -30,12 +30,16 @@ public class Animations {
      * @param gui The <code>GUI</code> to display on.
      * @param attacker The <code>Unit</code> that is attacking.
      * @param defender The <code>Unit</code> that is defending.
+     * @param attackerTile The <code>Tile</code> the attack comes from.
+     * @param defenderTile The <code>Tile</code> the attack goes to.
      * @param success Did the attack succeed?
      */
     public static void unitAttack(GUI gui,
-                                  Unit attacker, Unit defender, 
+                                  Unit attacker, Unit defender,
+                                  Tile attackerTile, Tile defenderTile,
                                   boolean success) {
-        new UnitAttackAnimation(gui, attacker, defender, success)
+        new UnitAttackAnimation(gui, attacker, defender,
+                                attackerTile, defenderTile, success)
             .animate();
     }
 

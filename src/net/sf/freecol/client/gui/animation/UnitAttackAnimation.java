@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.animation;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
 import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -34,6 +35,8 @@ final class UnitAttackAnimation {
 
     private final Unit attacker;
     private final Unit defender;
+    private final Tile attackerTile;
+    private final Tile defenderTile;
     private final boolean success;
     private GUI gui;
 
@@ -44,13 +47,18 @@ final class UnitAttackAnimation {
      * @param gui The <code>GUI</code> to display on.
      * @param attacker The <code>Unit</code> that is attacking.
      * @param defender The <code>Unit</code> that is defending.
+     * @param attackerTile The <code>Tile</code> the attack comes from.
+     * @param defenderTile The <code>Tile</code> the attack goes to.
      * @param success Does the attack succeed?
      */
-    public UnitAttackAnimation(GUI gui,
-                               Unit attacker, Unit defender, boolean success) {
+    public UnitAttackAnimation(GUI gui, Unit attacker, Unit defender,
+                               Tile attackerTile, Tile defenderTile,
+                               boolean success) {
         this.gui = gui;
         this.attacker = attacker;
         this.defender = defender;
+        this.attackerTile = attackerTile;
+        this.defenderTile = defenderTile;
         this.success = success;
     }
 
@@ -88,13 +96,13 @@ final class UnitAttackAnimation {
      * Do the animation.
      */
     public void animate() {
-        Direction direction = attacker.getTile()
-            .getDirection(defender.getTile());
+        Direction direction = attackerTile.getDirection(defenderTile);
         SimpleZippedAnimation sza;
 
         if (gui.getAnimationSpeed(attacker) > 0) {
             if ((sza = getAnimation(attacker, direction)) != null) {
-                new UnitImageAnimation(gui, attacker, sza).animate();
+                new UnitImageAnimation(gui, attacker, attackerTile, sza)
+                    .animate();
             }
         }
 
@@ -102,7 +110,8 @@ final class UnitAttackAnimation {
             && gui.getAnimationSpeed(defender) > 0) {
             direction = direction.getReverseDirection();
             if ((sza = getAnimation(defender, direction)) != null) {
-                new UnitImageAnimation(gui, defender, sza).animate();
+                new UnitImageAnimation(gui, defender, defenderTile, sza)
+                    .animate();
             }
         }
     }

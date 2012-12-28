@@ -406,46 +406,72 @@ public final class InGameInputHandler extends InputHandler {
     private Element animateAttack(Element element) {
         FreeColClient client = getFreeColClient();
         if (client.isHeadless()) return null;
-        Game game = getGame();
+        final Game game = getGame();
+        String str;
+        Unit attacker, defender;
+        Tile attackerTile, defenderTile;
 
-        String attackerId = element.getAttribute("attacker");
-        Unit attacker = game.getFreeColGameObject(attackerId, Unit.class);
-        if (attacker == null
-            && (attacker = selectUnitFromElement(game, element,
-                                                 attackerId)) == null) {
-            logger.warning("Attack animation"
-                           + " for: " + client.getMyPlayer().getId()
-                           + " incorrectly omitted attacker: " + attackerId);
+        if ((str = element.getAttribute("attacker")) == null) {
+            logger.warning("animateAttack null attacker");
             return null;
+        } else {
+            if ((attacker = game.getFreeColGameObject(str, Unit.class)) == null
+                && (attacker = selectUnitFromElement(game, element, str)) == null) {
+                logger.warning("Attack animation"
+                    + " for: " + client.getMyPlayer().getId()
+                    + " incorrectly omitted attacker: " + str);
+                return null;
+            }
         }
 
-        String defenderId = element.getAttribute("defender");
-        Unit defender = game.getFreeColGameObject(defenderId, Unit.class);
-        if (defender == null
-            && (defender = selectUnitFromElement(game, element,
-                                                 defenderId)) == null) {
-            logger.warning("Attack animation"
-                           + " for: " + client.getMyPlayer().getId()
-                           + " incorrectly omitted defender: " + defenderId);
+        if ((str = element.getAttribute("defender")) == null) {
+            logger.warning("animateAttack null defender");
             return null;
+        } else {
+            if ((defender = game.getFreeColGameObject(str, Unit.class)) == null
+                && (defender = selectUnitFromElement(game, element, str)) == null) {
+                logger.warning("Attack animation"
+                    + " for: " + client.getMyPlayer().getId()
+                    + " incorrectly omitted defender: " + str);
+                return null;
+            }
+        }
+
+        if ((str = element.getAttribute("attackerTile")) == null) {
+            logger.warning("animateAttack null attackerTile");
+            return null;
+        } else {
+            attackerTile = game.getFreeColGameObject(str, Tile.class);
+            if (attackerTile == null) {
+                logger.warning("Attack animation"
+                    + " for: " + client.getMyPlayer().getId()
+                    + " can not find attacker tile: " + str);
+                return null;
+            }
+        }
+
+        if ((str = element.getAttribute("defenderTile")) == null) {
+            logger.warning("animateAttack null defenderTile");
+            return null;
+        } else {
+            defenderTile = game.getFreeColGameObject(str, Tile.class);
+            if (defenderTile == null) {
+                logger.warning("Attack animation"
+                    + " for: " + client.getMyPlayer().getId()
+                    + " can not find defender tile: " + str);
+                return null;
+            }
         }
 
         boolean success = Boolean.parseBoolean(element.getAttribute("success"));
-        if (attacker == null || defender == null) {
-            throw new IllegalStateException("animateAttack"
-                    + ((attacker == null) ? ": null attacker" : "")
-                    + ((defender == null) ? ": null defender" : ""));
-        }
-
         // All is well, queue the animation.
         // Use lastAnimatedUnit as a filter to avoid excessive refocussing.
         try {
-            new UnitAttackAnimationCanvasSwingTask(attacker, defender, success,
-                                                   attacker != lastAnimatedUnit)
-                .invokeSpecial();
-        } catch (Exception exception) {
-            logger.warning("UnitAttackAnimationCanvasSwingTask raised "
-                           + exception.toString());
+            new UnitAttackAnimationCanvasSwingTask(attacker, defender,
+                attackerTile, defenderTile, success,
+                attacker != lastAnimatedUnit).invokeSpecial();
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Attack animation fail", e);
         }
         lastAnimatedUnit = attacker;
         return null;
@@ -1587,51 +1613,45 @@ public final class InGameInputHandler extends InputHandler {
      */
     class UnitAttackAnimationCanvasSwingTask extends NoResultCanvasSwingTask {
 
-        private final Unit unit;
-
+        private final Unit attacker;
         private final Unit defender;
-
+        private final Tile attackerTile;
+        private final Tile defenderTile;
         private final boolean success;
 
         private boolean focus;
 
 
         /**
-         * Constructor - Play the unit attack animation, always focusing on the
-         * source tile.
-         *
-         * @param unit The <code>Unit</code> that is attacking.
-         * @param defender The <code>Unit</code> that is defending.
-         * @param success Did the attack succeed?
-         */
-        public UnitAttackAnimationCanvasSwingTask(Unit unit, Unit defender,
-                                                  boolean success) {
-            this(unit, defender, success, true);
-        }
-
-        /**
          * Constructor - Play the unit attack animation, optionally focusing on
          * the source tile.
          *
-         * @param unit The <code>Unit</code> that is attacking.
+         * @param attacker The <code>Unit</code> that is attacking.
          * @param defender The <code>Unit</code> that is defending.
+         * @param attackerTile The <code>Tile</code> the attack comes from.
+         * @param defenderTile The <code>Tile</code> the attack goes to.
          * @param success Did the attack succeed?
          * @param focus Focus on the source tile before the animation.
          */
-        public UnitAttackAnimationCanvasSwingTask(Unit unit, Unit defender,
-                                                  boolean success, boolean focus) {
-            this.unit = unit;
+        public UnitAttackAnimationCanvasSwingTask(Unit attacker, Unit defender,
+            Tile attackerTile, Tile defenderTile, boolean success,
+            boolean focus) {
+            this.attacker = attacker;
             this.defender = defender;
+            this.attackerTile = attackerTile;
+            this.defenderTile = defenderTile;
             this.success = success;
             this.focus = focus;
         }
 
         protected void doNoResultWork() {
-            if (focus || !gui.onScreen(unit.getTile())) {
-                gui.setFocusImmediately(unit.getTile());
+            if (focus || !gui.onScreen(attackerTile)
+                || !gui.onScreen(defenderTile)) {
+                gui.setFocusImmediately(attackerTile);
             }
 
-            gui.animateUnitAttack(unit, defender, success);
+            gui.animateUnitAttack(attacker, defender,
+                                  attackerTile, defenderTile, success);
             gui.refresh();
         }
     }

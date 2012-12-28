@@ -32,6 +32,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.AbstractUnit;
@@ -1930,13 +1931,31 @@ public class ServerPlayer extends Player implements ServerModelObject {
         case WIN:
             vis = See.perhaps().always(defenderPlayer);
             if (isAttack) {
-                cs.addAttack(vis, attackerUnit, defenderUnit, true);
+                if (attackerTile == null || defenderTile == null
+                    || attackerTile == defenderTile
+                    || !attackerTile.isAdjacent(defenderTile)) {
+                    logger.warning("Bogus attack from " + attackerTile
+                        + " to " + defenderTile
+                        + "\n" + FreeColDebugger.stackTraceToString());
+                } else {
+                    cs.addAttack(vis, attackerUnit, defenderUnit,
+                                 attackerTile, defenderTile, true);
+                }
             }
             break;
         case LOSE:
             vis = See.perhaps().always(this);
             if (isAttack) {
-                cs.addAttack(vis, attackerUnit, defenderUnit, false);
+                if (attackerTile == null || defenderTile == null
+                    || attackerTile == defenderTile
+                    || !attackerTile.isAdjacent(defenderTile)) {
+                    logger.warning("Bogus attack from " + attackerTile
+                        + " to " + defenderTile
+                        + "\n" + FreeColDebugger.stackTraceToString());
+                } else {
+                    cs.addAttack(vis, attackerUnit, defenderUnit,
+                                 attackerTile, defenderTile, false);
+                }
             }
             break;
         default:

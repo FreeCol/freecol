@@ -300,21 +300,32 @@ public class ChangeSet {
     private static class AttackChange extends Change {
         private Unit attacker;
         private Unit defender;
+        private Tile attackerTile;
+        private Tile defenderTile;
         private boolean success;
 
         /**
          * Build a new AttackChange.
          *
+         * Note that we must record attacker and defender tiles
+         * now, because a successful attacker can move, and an unsuccessful
+         * participant can die.
+         *
          * @param see The visibility of this change.
          * @param attacker The <code>Unit</code> that is attacking.
          * @param defender The <code>Unit</code> that is defending.
+         * @param attackerTile The <code>Tile</code> the attack comes from.
+         * @param defenderTile The <code>Tile</code> the attack goes to.
          * @param success Did the attack succeed.
          */
         public AttackChange(See see, Unit attacker, Unit defender,
+                            Tile attackerTile, Tile defenderTile,
                             boolean success) {
             super(see);
             this.attacker = attacker;
             this.defender = defender;
+            this.attackerTile = attackerTile;
+            this.defenderTile = defenderTile;
             this.success = success;
         }
 
@@ -339,10 +350,8 @@ public class ChangeSet {
         public boolean isPerhapsNotifiable(ServerPlayer serverPlayer) {
             return serverPlayer == attacker.getOwner()
                 || serverPlayer == defender.getOwner()
-                || (attacker.getTile() != null
-                    && serverPlayer.canSee(attacker.getTile())
-                    && defender.getTile() != null
-                    && serverPlayer.canSee(defender.getTile()));
+                || (serverPlayer.canSee(attackerTile)
+                    && serverPlayer.canSee(defenderTile));
         }
 
         /**
@@ -357,6 +366,8 @@ public class ChangeSet {
             Element element = doc.createElement("animateAttack");
             element.setAttribute("attacker", attacker.getId());
             element.setAttribute("defender", defender.getId());
+            element.setAttribute("attackerTile", attackerTile.getId());
+            element.setAttribute("defenderTile", defenderTile.getId());
             element.setAttribute("success", Boolean.toString(success));
             if (!attacker.isVisibleTo(serverPlayer)) {
                 element.appendChild(attacker.toXMLElement(serverPlayer, doc,
@@ -380,8 +391,10 @@ public class ChangeSet {
         public String toString() {
             return "[" + getClass().getName() + " " + see.toString()
                 + " #" + getPriority()
-                + " " + attacker.getId() + " " + success
-                + " " + defender.getId() + "]";
+                + " " + attacker.getId() + "@" + attackerTile.getId()
+                + " " + success
+                + " " + defender.getId() + "@" + defenderTile.getId()
+                + "]";
         }
     }
 
@@ -1210,14 +1223,18 @@ public class ChangeSet {
      * Helper function to add an attack to a ChangeSet.
      *
      * @param see The visibility of this change.
-     * @param unit The <code>Unit</code> that is attacking.
+     * @param attacker The <code>Unit</code> that is attacking.
      * @param defender The <code>Unit</code> that is defending.
+     * @param attackerTile The <code>Tile</code> the attack comes from.
+     * @param defenderTile The <code>Tile</code> the attack goes to.
      * @param success Did the attack succeed?
      * @return The updated <code>ChangeSet</code>.
      */
-    public ChangeSet addAttack(See see, Unit unit, Unit defender,
+    public ChangeSet addAttack(See see, Unit attacker, Unit defender,
+                               Tile attackerTile, Tile defenderTile,
                                boolean success) {
-        changes.add(new AttackChange(see, unit, defender, success));
+        changes.add(new AttackChange(see, attacker, defender,
+                                     attackerTile, defenderTile, success));
         return this;
     }
 
