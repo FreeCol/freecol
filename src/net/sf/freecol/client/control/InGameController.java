@@ -2245,6 +2245,7 @@ public final class InGameController implements NetworkConstants {
     public void moveActiveUnit(Direction direction) {
         Unit unit = gui.getActiveUnit();
         if (unit != null && requireOurTurn()) {
+            unit.setState(UnitState.ACTIVE);
             clearGotoOrders(unit);
             move(unit, direction);
         } // else: nothing: There is no active unit that can be moved.

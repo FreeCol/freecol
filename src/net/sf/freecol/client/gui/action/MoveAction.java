@@ -53,13 +53,16 @@ public class MoveAction extends MapboardAction {
      * Creates a new <code>MoveAction</code>.
      *
      * @param freeColClient The main controller object for the client.
-     * @param direction a <code>Direction</code> value
+     * @param igc The current <code>InGameController</code> to handle the move.
+     * @param gui The current <code>GUI</code>.
+     * @param direction The <code>Direction</code> to move in.
      * @param secondary a <code>boolean</code> value
      */
-    MoveAction(FreeColClient freeColClient, InGameController inGameController, GUI gui, Direction direction, boolean secondary) {
+    public MoveAction(FreeColClient freeColClient, InGameController igc,
+                      GUI gui, Direction direction, boolean secondary) {
         super(freeColClient, gui, id + direction + ".secondary");
         this.direction = direction;
-        this.inGameController = inGameController;
+        this.inGameController = igc;
     }
 
     /**
@@ -68,7 +71,7 @@ public class MoveAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) { 
-        switch(gui.getCurrentViewMode()) {
+        switch (gui.getCurrentViewMode()) {
         case GUI.MOVE_UNITS_MODE:
             inGameController.moveActiveUnit(direction);
             break;
