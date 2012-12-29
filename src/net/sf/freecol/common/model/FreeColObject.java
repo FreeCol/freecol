@@ -1033,6 +1033,8 @@ public abstract class FreeColObject {
         }
     }
 
+    // Feature container handling.
+
     /**
      * Gets the feature container for this object, if any.
      * None is provided here, but select subclasses will override.
@@ -1179,9 +1181,9 @@ public abstract class FreeColObject {
      * @param key The key to check.
      * @return True if the key is present.
      */
-    public boolean containsModifierKey(String key) {
-        return FeatureContainer.containsModifierKey(getFeatureContainer(),
-                                                    key);
+    public final boolean containsModifierKey(String key) {
+        Set<Modifier> set = getModifierSet(key);
+        return (set == null) ? false : set.contains(key);
     }
 
     /**
@@ -1189,7 +1191,7 @@ public abstract class FreeColObject {
      *
      * @return A set of modifiers.
      */
-    public Set<Modifier> getModifiers() {
+    public final Set<Modifier> getModifiers() {
         return FeatureContainer.getModifiers(getFeatureContainer());
     }
 
@@ -1218,7 +1220,8 @@ public abstract class FreeColObject {
 
     /**
      * Gets the set of modifiers with the given Id from this object.
-     * Subclasses with complex modifier handling should override this
+     *
+     * Subclasses with complex modifier handling may override this
      * routine.
      *
      * @param id The id of the modifier to test.
@@ -1270,8 +1273,8 @@ public abstract class FreeColObject {
      */
     public final float applyModifier(float number, String id,
                                      FreeColGameObjectType fcgot, Turn turn) {
-        return FeatureContainer.applyModifier(getFeatureContainer(),
-                                              number, id, fcgot, turn);
+        return FeatureContainer.applyModifierSet(number, turn,
+                                                 getModifierSet(id, fcgot, turn));
     }
 
     /**

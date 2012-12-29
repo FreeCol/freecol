@@ -39,7 +39,7 @@ import java.util.logging.Logger;
  *
  * - FreeColObject itself implements a null version.
  */
-public class FeatureContainer {
+public final class FeatureContainer {
 
     private static final Logger logger = Logger.getLogger(FeatureContainer.class.getName());
 
@@ -375,7 +375,11 @@ public class FeatureContainer {
      */
     public static boolean addModifier(FeatureContainer fc,
                                       Modifier modifier) {
-        if (fc == null || modifier == null) return false;
+        if (fc == null) {
+            logger.warning("addModifier to <null-feature-container>: "
+                + modifier);
+            return false;
+        } else if (modifier == null) return false;
         fc.requireModifiers();
         Set<Modifier> modifierSet = fc.modifiers.get(modifier.getId());
         if (modifierSet == null) {
@@ -394,7 +398,11 @@ public class FeatureContainer {
      */
     public static Modifier removeModifier(FeatureContainer fc,
                                           Modifier modifier) {
-        if (fc == null || fc.modifiers == null || modifier == null) return null;
+        if (fc == null) {
+            logger.warning("removeModifier from <null-feature-container>: "
+                + modifier);
+            return null;
+        } else if (fc.modifiers == null || modifier == null) return null;
         Set<Modifier> modifierSet = fc.modifiers.get(modifier.getId());
         return (modifierSet == null || !modifierSet.remove(modifier)) ? null
             : modifier;
@@ -407,7 +415,10 @@ public class FeatureContainer {
      * @param id The Id of the modifiers to remove.
      */
     public static void removeModifiers(FeatureContainer fc, String id) {
-        if (fc != null && fc.modifiers != null) fc.modifiers.remove(id);
+        if (fc == null) {
+            logger.warning("removeModifiers from <null-feature-container>: "
+                + id);
+        } else if (fc.modifiers != null) fc.modifiers.remove(id);
     }
 
 
@@ -519,16 +530,14 @@ public class FeatureContainer {
         if (abilities != null) {
             result.append("[abilities");
             for (Ability ability : getAbilities(this)) {
-                result.append(" ");
-                result.append(ability.toString());
+                result.append(" ").append(ability.toString());
             }
             result.append("]");
         }
         if (modifiers != null) {
             result.append("[modifiers");
             for (Modifier modifier : getModifiers(this)) {
-                result.append(" ");
-                result.append(modifier.toString());
+                result.append(" ").append(modifier.toString());
             }
             result.append("]");
         }
