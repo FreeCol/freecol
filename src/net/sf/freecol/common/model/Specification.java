@@ -235,7 +235,6 @@ public final class Specification {
     }
 
     public void clean() {
-
         logger.finest("Cleaning up specification.");
 
         Iterator<FreeColGameObjectType> typeIterator = allTypes.values().iterator();
@@ -292,10 +291,10 @@ public final class Specification {
             if (goodsType.isNewWorldGoodsType()) {
                 newWorldGoodsTypeList.add(goodsType);
             }
-            if (goodsType.isLibertyGoodsType()) {
+            if (goodsType.isLibertyType()) {
                 libertyGoodsTypeList.add(goodsType);
             }
-            if (goodsType.isImmigrationGoodsType()) {
+            if (goodsType.isImmigrationType()) {
                 immigrationGoodsTypeList.add(goodsType);
             }
             if (goodsType.isRawBuildingMaterial() && !goodsType.isFoodType()) {

@@ -129,24 +129,6 @@ public final class GoodsType extends FreeColGameObjectType {
         return getId() + ".workingAs";
     }
 
-    /**
-     * Get the <code>ImmigrationType</code> value.
-     *
-     * @return a <code>boolean</code> value
-     */
-    public boolean isImmigrationType() {
-        return !getModifierSet("model.modifier.immigration").isEmpty();
-    }
-
-    /**
-     * Get the <code>LibertyType</code> value.
-     *
-     * @return a <code>boolean</code> value
-     */
-    public boolean isLibertyType() {
-        return !getModifierSet("model.modifier.liberty").isEmpty();
-    }
-
     public boolean isStorable() {
         return storable;
     }
@@ -161,6 +143,24 @@ public final class GoodsType extends FreeColGameObjectType {
         } else {
             return storedAs;
         }
+    }
+
+    /**
+     * Does this type of goods produce liberty?
+     *
+     * True if this goods type produces liberty.
+     */
+    public boolean isLibertyType() {
+        return containsModifierKey("model.modifier.liberty");
+    }
+
+    /**
+     * Does this type of goods produce immigration?
+     *
+     * True if this goods type produces immigration.
+     */
+    public boolean isImmigrationType() {
+        return containsModifierKey("model.modifier.immigration");
     }
 
     public int getInitialAmount() {
@@ -286,24 +286,6 @@ public final class GoodsType extends FreeColGameObjectType {
      */
     public boolean isTradeGoods() {
         return tradeGoods;
-    }
-
-    /**
-     * Whether this type of goods produces liberty points.
-     *
-     * @return a <code>boolean</code> value
-     */
-    public boolean isLibertyGoodsType() {
-        return containsModifierKey("model.modifier.liberty");
-    }
-
-    /**
-     * Whether this type of goods causes immigration.
-     *
-     * @return a <code>boolean</code> value
-     */
-    public boolean isImmigrationGoodsType() {
-        return containsModifierKey("model.modifier.immigration");
     }
 
     /**

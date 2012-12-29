@@ -125,7 +125,8 @@ public class Game extends FreeColGameObject {
     /**
      * The Specification this game uses.
      */
-    private Specification specification;
+    private Specification specification = null;
+
 
     /**
      * This constructor is used by the Server to create a new Game

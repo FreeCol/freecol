@@ -1183,7 +1183,7 @@ public abstract class FreeColObject {
      */
     public final boolean containsModifierKey(String key) {
         Set<Modifier> set = getModifierSet(key);
-        return (set == null) ? false : set.contains(key);
+        return (set == null) ? false : !set.isEmpty();
     }
 
     /**

@@ -199,18 +199,6 @@ public final class FeatureContainer {
 
 
     /**
-     * Checks if this container contains a given modifier key.
-     *
-     * @param fc The <code>FeatureContainer</code> to get abilities from.
-     * @param key The key to check.
-     * @return True if the key is present.
-     */
-    public static boolean containsModifierKey(FeatureContainer fc, String key) {
-        return (fc == null || fc.modifiers == null) ? false
-            : fc.modifiers.containsKey(key);
-    }
-
-    /**
      * Gets a copy of the modifiers in a container.
      *
      * @param fc The <code>FeatureContainer</code> to get modifiers from.

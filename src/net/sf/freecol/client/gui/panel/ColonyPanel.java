@@ -971,8 +971,8 @@ public final class ColonyPanel extends PortPanel
             final int bonus = colony.getProductionBonus();
             t = StringTemplate.template("colonyPanel.bonusLabel")
                               .addAmount("%number%", bonus)
-                              .add("%extra%",
-                                  ((grow == 0) ? "" : "(" + grow + ")"));
+                              .add("%extra%", ((grow == 0) ? ""
+                                      : "(" + grow + ")"));
             bonusLabel.setText(Messages.message(t));
 
             royalistMemberLabel.setText(colony.getTory() + "%");
