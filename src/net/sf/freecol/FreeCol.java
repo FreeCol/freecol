@@ -83,7 +83,7 @@ public final class FreeCol {
     public static final String CLIENT_THREAD = "FreeColClient:";
     public static final String SERVER_THREAD = "FreeColServer:";
     public static final String METASERVER_THREAD = "FreeColMetaServer:";
-    private static final String FREECOL_VERSION = "0.10.0-trunk";
+    private static final String FREECOL_VERSION = "0.10.x-trunk";
     private static String FREECOL_REVISION;
 
     private static final String MIN_JDK_VERSION = "1.5";
