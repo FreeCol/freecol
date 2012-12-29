@@ -1727,10 +1727,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         if (askServer().changeState(unit, state)) {
-            if (!gui.isShowingSubPanel()
-                && (unit.getMovesLeft() == 0
-                    || unit.getState() == UnitState.SENTRY
-                    || unit.getState() == UnitState.SKIPPED)) {
+            if (unit == gui.getActiveUnit() && !unit.couldMove()) {
                 nextActiveUnit();
             } else {
                 gui.refresh();
