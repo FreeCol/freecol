@@ -363,16 +363,16 @@ public final class InGameController implements NetworkConstants {
             Unit unit = player.getNextGoingToUnit();
             gui.setActiveUnit(unit);
 
+            // Move the unit as much as possible
+            if (moveToDestination(unit)) stillActive = unit;
+            nextModelMessage();
+
             // Give the player a chance to deal with any problems
             // shown in a popup before pressing on with more moves.
             if (gui.isShowingSubPanel()) {
                 gui.requestFocusForSubPanel();
-                return false;
+                break;
             }
-
-            // Move the unit as much as possible
-            if (moveToDestination(unit)) stillActive = unit;
-            nextModelMessage();
         }
         gui.setActiveUnit((stillActive != null) ? stillActive : active);
         return stillActive == null;
@@ -541,6 +541,7 @@ public final class InGameController implements NetworkConstants {
             // Try to follow the path.  Mark if the path is complete
             // but loop so as to check for unload before returning.
             more = followPath(unit, path);
+            if (!more) unit.setState(UnitState.SKIPPED);
         }
 
         for (ModelMessage m : messages) player.addModelMessage(m);
