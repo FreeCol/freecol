@@ -1910,7 +1910,7 @@ public class Map extends FreeColGameObject implements Location {
      */
     public static boolean[][] floodFill(boolean[][] boolmap, Position p,
                                         int limit) {
-        Queue<Position>q = new LinkedList<Position>();
+        Queue<Position> q = new LinkedList<Position>();
         boolean[][] visited = new boolean[boolmap.length][boolmap[0].length];
         visited[p.getX()][p.getY()] = true;
         limit--;

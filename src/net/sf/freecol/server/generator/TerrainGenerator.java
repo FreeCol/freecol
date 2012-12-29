@@ -1331,14 +1331,14 @@ public class TerrainGenerator {
         // Create the water map, and find any tiles that are water but
         // not part of any region (such as the oceans).  These are
         // lake tiles.
-        List<Position> lakes = new ArrayList<Position>();
-        boolean[][] watermap = new boolean[map.getWidth()][map.getHeight()];
+        List<Tile> lakes = new ArrayList<Tile>();
         for (int y = 0; y < map.getHeight(); y++) {
             for (int x = 0; x < map.getWidth(); x++) {
-                watermap[x][y] = map.isValid(x, y)
-                    && !map.getTile(x,y).isLand();
-                if (watermap[x][y] && map.getTile(x, y).getRegion() == null) {
-                    lakes.add(new Position(x, y));
+                Tile tile;
+                if (map.isValid(x, y)
+                    && !(tile = map.getTile(x, y)).isLand()
+                    && map.getTile(x, y).getRegion() == null) {
+                    lakes.add(tile);
                     logger.info("Adding lake at " + x + "," + y);
                 }
             }
@@ -1347,9 +1347,8 @@ public class TerrainGenerator {
         // Make lake regions from unassigned lake tiles.
         int lakeCount = 0;
         while (!lakes.isEmpty()) {
-            Position p = lakes.remove(0);
-            Tile t = map.getTile(p);
-            if (t.getRegion() != null) continue;
+            Tile tile = lakes.get(0);
+            if (tile.getRegion() != null) continue;
 
             String id;
             while (game.getFreeColGameObject(id = "model.region.inlandLake"
@@ -1360,20 +1359,15 @@ public class TerrainGenerator {
             map.putRegion(lakeRegion);
             // Pretend lakes are discovered with the surrounding terrain?
             lakeRegion.setPrediscovered(false);
-
-            boolean[][] found = Map.floodFill(watermap, p);
-            for (int y = 0; y < map.getHeight(); y++) {
-                for (int x = 0; x < map.getWidth(); x++) {
-                    if (found[x][y]) {
-                        Tile tt = map.getTile(x, y);
-                        if (tt.getRegion() == null) {
-                            tt.setType(lakeType);
-                            tt.setRegion(lakeRegion);
-                        } else {
-                            logger.warning("Bogus lake filled from " + p
-                                + " at " + x + "," + y);
-                        }
-                    }
+            List<Tile> todo = new ArrayList<Tile>();
+            todo.add(tile);
+            while (!todo.isEmpty()) {
+                Tile t = todo.remove(0);
+                if (lakes.contains(t)) {
+                    t.setRegion(lakeRegion);
+                    t.setType(lakeType);
+                    lakes.remove(t);
+                    todo.addAll(t.getSurroundingTiles(1, 1));
                 }
             }
         }
