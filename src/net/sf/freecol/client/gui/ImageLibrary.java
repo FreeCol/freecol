@@ -1081,26 +1081,24 @@ public final class ImageLibrary {
         }
         
         // try to get an image matching the key
-        final String key = unitType.getId()
+        String key = unitType.getId()
             + (role == Role.DEFAULT ? "" : "." + role.getId())
             + (nativeEthnicity ? ".native" : "")
             + ".image";
-        Image image = null;
-        if (grayscale) {
-            image = ResourceManager.getGrayscaleImage(key, scale);
-        } else {
-            image = ResourceManager.getImage(key, scale);
+        if (!ResourceManager.hasResource(key) && nativeEthnicity) {
+            key = unitType.getId()
+                + (role == Role.DEFAULT ? "" : "." + role.getId())
+                + ".image";
         }
-        
+        Image image = (grayscale)
+            ? ResourceManager.getGrayscaleImage(key, scale)
+            : ResourceManager.getImage(key, scale);
         if (image == null) {
-            // log and attempt fallback
-            logger.finest("No image found for image for " + key);
-            if (nativeEthnicity == true) {
-                // try non-native variant
-                return getUnitImageIcon(unitType, role, false, grayscale, scale);
-            
-            // FIXME: these require the game specification, which ImageLibrary doesn't yet have access to
-/*          } else if (role != Role.DEFAULT && !unitType.getId().equals("model.unit.freeColonist")) {
+            // FIXME: these require the game specification, which
+            // ImageLibrary doesn't yet have access to
+
+            /*
+            if (role != Role.DEFAULT && !unitType.getId().equals("model.unit.freeColonist")) {
                 // try a free colonist with the same role
                 unitType = getGame().getSpecification().getUnitType("model.unit.freeColonist");
                 return getUnitImageIcon(unitType, role, false, grayscale, scale);
@@ -1108,9 +1106,7 @@ public final class ImageLibrary {
                 // give up, draw a standard unit icon
                 unitType = getGame().getSpecification().getUnitType("model.unit.freeColonist");
                 return getUnitImageIcon(unitType, Role.DEFAULT, false, grayscale, scale);
-*/          }
-            
-            logger.warning("Failed to retrieve image for " + key);
+            }*/
             return null;
         }
         return new ImageIcon(image);
