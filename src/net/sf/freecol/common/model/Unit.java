@@ -1993,9 +1993,8 @@ public class Unit extends GoodsLocation
     public Location getRepairLocation() {
         final Player player = getOwner();
         final Tile tile = getTile();
-        Location bestLocation = player.getEurope();
-        int bestTurns = (bestLocation == null) ? INFINITY
-            : getTurnsToReach(bestLocation);
+        Location bestLocation = null;
+        int bestTurns = INFINITY;
         for (Colony colony : player.getColonies()) {
             int turns;
             if (colony != null && colony != tile.getColony()
@@ -2009,6 +2008,7 @@ public class Unit extends GoodsLocation
                 bestLocation = colony;
             }
         }
+        if (bestLocation == null) bestLocation = player.getEurope();
         return bestLocation;
     }
 
