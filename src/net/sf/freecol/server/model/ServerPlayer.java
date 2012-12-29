@@ -1491,24 +1491,50 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 .getUnitTypesWithAbility("model.ability.convert");
             StringTemplate nation = getNationName();
             for (IndianSettlement settlement : allSettlements) {
-                if (!settlement.checkForNewMissionaryConvert()) continue;
                 Unit missionary = settlement.getMissionary();
-                ServerPlayer other = (ServerPlayer) missionary.getOwner();
-                Settlement colony = settlement.getTile()
-                    .getNearestSettlement(other, MAX_CONVERT_DISTANCE);
-                if (colony != null && converts.size() > 0) {
-                    Unit brave = settlement.getUnitList().get(0);
+                if (missionary == null) continue;
+
+                ServerPlayer other = (ServerPlayer)missionary.getOwner();
+                float convert = missionary.applyModifier(0f,
+                    "model.modifier.conversionSkill");
+                // The convert rate increases by a percentage of the
+                // current alarm.
+                int alarm = Math.min(settlement.getAlarm(other).getValue(),
+                                     Tension.TENSION_MAX);
+                convert += missionary.applyModifier(alarm,
+                    "model.modifier.conversionAlarmRate") - alarm;
+                convert += settlement.getConvertProgress();
+                Settlement colony = null;
+                if (convert < (float)settlement.getType().getConvertThreshold()
+                    || (settlement.getUnitCount()
+                        + settlement.getTile().getUnitCount()) <= 2
+                    || (colony = settlement.getTile().getNearestSettlement(other, MAX_CONVERT_DISTANCE)) == null
+                    || converts.isEmpty()) {
+                    settlement.setConvertProgress((int)Math.floor(convert));
+                } else {
+                    logger.fine("Convert at " + settlement.getName()
+                        + " for " + colony.getName());
+                    settlement.setConvertProgress(0);
+                    // TODO: fix native AI to put the units just
+                    // hanging around (as distinct to those with
+                    // DefendSettlement missions) into the settlement
+                    // so we can ignore the tile-residents.
+                    Tile tile = settlement.getTile();
+                    Unit brave = Utils.getRandomMember(logger, "Choose convert",
+                        ((!tile.isEmpty()) ? tile.getUnitList()
+                            : settlement.getUnitList()),
+                        random);
                     brave.clearEquipment();
                     brave.setOwner(other);
                     brave.setIndianSettlement(null);
                     brave.setNationality(other.getNationID());
                     brave.setType(Utils.getRandomMember(logger,
-                                  "Choose brave", converts, random));
+                                  "Choose convert type", converts, random));
                     brave.setLocation(colony.getTile());
                     cs.add(See.perhaps(), colony.getTile(), settlement);
                     cs.addMessage(See.only(other),
                         new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
-                            "model.colony.newConvert", brave)
+                                         "model.colony.newConvert", brave)
                             .addStringTemplate("%nation%", nation)
                             .addName("%colony%", colony.getName()));
                 }

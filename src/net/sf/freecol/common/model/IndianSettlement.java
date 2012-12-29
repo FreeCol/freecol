@@ -1092,33 +1092,6 @@ public class IndianSettlement extends Settlement {
             : Utils.getRandomMember(logger, "Gift type", goodsList, random);
     }
 
-    /**
-     * Is a new convert available at this settlement?
-     *
-     * @return True if a new convert is available.
-     */
-    public boolean checkForNewMissionaryConvert() {
-        /* Increase convert progress and generate convert if needed. */
-        if (missionary != null && getGame().getViewOwner() == null) {
-            int increment = 8;
-
-            // Update increment if missionary is an expert.
-            if (missionary.hasAbility("model.ability.expertMissionary")) {
-                increment = 13;
-            }
-
-            // Increase increment if alarm level is high.
-            increment += 2 * getAlarm(missionary.getOwner()).getValue() / 100;
-            convertProgress += increment;
-
-            if (convertProgress >= 100 && getUnitCount() > 2) {
-                convertProgress = 0;
-                return true;
-            }
-        }
-        return false;
-    }
-
 
     // Interface location
 

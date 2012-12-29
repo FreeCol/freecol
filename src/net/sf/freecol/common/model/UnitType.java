@@ -844,6 +844,23 @@ public final class UnitType extends BuildableType
         }
 
         super.readChildren(in);
+
+        // @compat 0.10.6
+        if (hasAbility("model.ability.person")) {
+            if (!containsModifierKey("model.modifier.conversionSkill")) {
+                addModifier(new Modifier("model.modifier.conversionSkill", 8.0f,
+                        Modifier.Type.ADDITIVE));
+                if (hasAbility("model.ability.expertMissionary")) {
+                    addModifier(new Modifier("model.modifier.conversionSkill", 5.0f,
+                            Modifier.Type.ADDITIVE));
+                }
+            }
+            if (!containsModifierKey("model.modifier.conversionAlarmRate")) {
+                addModifier(new Modifier("model.modifier.conversionAlarmRate", 2.0f,
+                        Modifier.Type.PERCENTAGE));
+            }
+        }
+        // end compatibility code
     }
 
     /**
