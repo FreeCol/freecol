@@ -259,12 +259,13 @@
             <fileset dir="${basedir}" includes="FreeCol.jar"/>
             <fileset dir="${freecol.packaging.dir}/common" includes="COPYING"/>
             <fileset dir="${freecol.packaging.dir}/common" includes="README"/>
-            <fileset dir="${freecol.packaging.dir}/common" includes="freecol.sh"/>
             <fileset dir="${freecol.packaging.dir}/common" includes="freecol.cmd"/>
             <fileset dir="${freecol.packaging.dir}/common" includes="freecol.xpm"/>
             <fileset dir="${basedir}" includes="data/**" excludes="**/.svn/**"/>
             <fileset dir="${basedir}" includes="jars/**" excludes="**/.svn/**"/>
         </copy>
+        <copy file="${freecol.packaging.dir}/common/freecol.sh"
+              tofile="${freecol.release.dir}/base/${freecol.name}/freecol"/>
     </target>
 
     <target name="prepareSourceFiles" depends="initDist">
