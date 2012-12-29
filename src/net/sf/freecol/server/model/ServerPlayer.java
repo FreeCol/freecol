@@ -695,6 +695,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         if (map != null) {
             for (Unit unit : getUnits()) {
                 Tile tile = unit.getTile();
+                if (tile == null) continue;
                 setExplored(tile);
 
                 int radius = (unit.getColony() != null)
