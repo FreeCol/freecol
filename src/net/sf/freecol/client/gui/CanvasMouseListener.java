@@ -166,28 +166,13 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
      */
     public void mouseReleased(MouseEvent e) {
         try {
-            if (mapViewer.getGotoPath() != null) {
-                // A mouse drag has ended (see CanvasMouseMotionListener).
-
+            if (mapViewer.getGotoPath() != null) { // A mouse drag has ended.
                 PathNode temp = mapViewer.getGotoPath();
-
                 mapViewer.stopGoto();
 
-                // Move the unit:
-                Unit unit = mapViewer.getActiveUnit();
-                InGameController ctlr = freeColClient
-                    .getInGameController();
-                ctlr.setDestination(unit, temp.getLastNode().getTile());
-                if (freeColClient.currentPlayerIsMyPlayer()) {
-                    ctlr.moveToDestination(unit);
-                    boolean canStayActive = unit.getState() == UnitState.ACTIVE
-                    						&& unit.getDestination() == null
-                    						&& unit.getMovesLeft() > 0;
-                    if(canStayActive){
-                    	return;
-                    }
-                    ctlr.nextActiveUnit();
-                }
+                freeColClient.getInGameController()
+                    .goToTile(mapViewer.getActiveUnit(),
+                              temp.getLastNode().getTile());
 
             } else if (mapViewer.isGotoStarted()) {
                 mapViewer.stopGoto();

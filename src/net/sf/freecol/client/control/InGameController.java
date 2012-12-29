@@ -320,6 +320,19 @@ public final class InGameController implements NetworkConstants {
         return player.getNationName();
     }
 
+    /**
+     * Updates the GUI after a unit moves.
+     *
+     * TODO: check if this is necessary for all actions?
+     */
+    private void updateAfterMove() {
+        SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    freeColClient.updateActions();
+                    gui.updateMenuBar();
+                }
+            });
+    }
 
     // Utilities to handle the transitions between the active unit,
     // execute-orders and end-turn controller states.
@@ -2122,8 +2135,11 @@ public final class InGameController implements NetworkConstants {
      */
     public void goToTile(Unit unit, Tile tile) {
         if (!requireOurTurn()) return;
+
         if (!setDestination(unit, tile)) return;
+
         if (!moveToDestination(unit)) nextActiveUnit();
+        updateAfterMove();
     }
 
     /**
@@ -2262,14 +2278,7 @@ public final class InGameController implements NetworkConstants {
         if (!requireOurTurn()) return;
 
         if (!moveDirection(unit, direction, true)) nextActiveUnit();
-
-        // TODO: check if this is necessary for all actions?
-        SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    freeColClient.updateActions();
-                    gui.updateMenuBar();
-                }
-            });
+        updateAfterMove();
     }
     
     /**
