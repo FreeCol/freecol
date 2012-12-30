@@ -1532,34 +1532,34 @@ public final class Canvas extends JDesktopPane {
     }
 
     public void showReportCargoPanel() {
-        showSubPanel(new ReportCargoPanel(freeColClient, gui), false);
+        showSubPanel(new ReportCargoPanel(freeColClient, gui), true);
 
     }
 
     public void showReportColonyPanel() {
-        showSubPanel(new ReportColonyPanel(freeColClient, gui), false);
+        showSubPanel(new ReportColonyPanel(freeColClient, gui), true);
 
     }
 
     public void showReportContinentalCongressPanel() {
-        showSubPanel(new ReportContinentalCongressPanel(freeColClient, gui), false);
+        showSubPanel(new ReportContinentalCongressPanel(freeColClient, gui), true);
     }
 
     public void showReportEducationPanel() {
-        showSubPanel(new ReportEducationPanel(freeColClient, gui), false);
+        showSubPanel(new ReportEducationPanel(freeColClient, gui), true);
 
     }
 
     public void showReportExplorationPanel() {
-        showSubPanel(new ReportExplorationPanel(freeColClient, gui), false);
+        showSubPanel(new ReportExplorationPanel(freeColClient, gui), true);
     }
 
     public void showReportForeignAffairPanel() {
-        showSubPanel(new ReportForeignAffairPanel(freeColClient, gui), false);
+        showSubPanel(new ReportForeignAffairPanel(freeColClient, gui), true);
     }
 
     public void showReportHistoryPanel() {
-        showSubPanel(new ReportHistoryPanel(freeColClient, gui), false);
+        showSubPanel(new ReportHistoryPanel(freeColClient, gui), true);
     }
 
     public void showReportIndianPanel() {
@@ -1571,40 +1571,40 @@ public final class Canvas extends JDesktopPane {
 
         ReportLabourDetailPanel details = new ReportLabourDetailPanel(freeColClient, gui, unitType, data, unitCount, colonies);
         details.initialize();
-        showSubPanel(details, false);
+        showSubPanel(details, true);
     }
 
     public void showReportLabourPanel() {
-        showSubPanel(new ReportLabourPanel(freeColClient, gui), false);
+        showSubPanel(new ReportLabourPanel(freeColClient, gui), true);
 
     }
 
     public void showReportMilitaryPanel() {
-        showSubPanel(new ReportMilitaryPanel(freeColClient, gui), false);
+        showSubPanel(new ReportMilitaryPanel(freeColClient, gui), true);
     }
 
     public void showReportNavalPanel() {
-        showSubPanel(new ReportNavalPanel(freeColClient, gui), false);
+        showSubPanel(new ReportNavalPanel(freeColClient, gui), true);
 
     }
 
     public void showReportProductionPanel() {
-        showSubPanel(new ReportProductionPanel(freeColClient, gui), false);
+        showSubPanel(new ReportProductionPanel(freeColClient, gui), true);
 
     }
 
 
     public void showReportReligiousPanel() {
-        showSubPanel(new ReportReligiousPanel(freeColClient, gui), false);
+        showSubPanel(new ReportReligiousPanel(freeColClient, gui), true);
 
     }
 
     public void showReportRequirementsPanel() {
-        showSubPanel(new ReportRequirementsPanel(freeColClient, gui), false);
+        showSubPanel(new ReportRequirementsPanel(freeColClient, gui), true);
     }
 
     public void showReportTradePanel() {
-        showSubPanel(new ReportTradePanel(freeColClient, gui), false);
+        showSubPanel(new ReportTradePanel(freeColClient, gui), true);
 
     }
 
@@ -1615,7 +1615,7 @@ public final class Canvas extends JDesktopPane {
      * @param messages The <code>ModelMessage</code>s to show.
      */
     public void showReportTurnPanel(ModelMessage... messages) {
-        showSubPanel(new ReportTurnPanel(freeColClient, gui, messages), false);
+        showSubPanel(new ReportTurnPanel(freeColClient, gui, messages), true);
     }
 
     public String showRiverStyleDialog() {
