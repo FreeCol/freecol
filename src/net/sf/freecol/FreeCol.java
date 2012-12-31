@@ -154,6 +154,7 @@ public final class FreeCol {
         Locale locale = getLocale();
         Locale.setDefault(locale);
         Messages.setMessageBundle(locale);
+        Messages.setModMessageBundle(locale);
 
         if (javaCheck && !checkJavaVersion()) {
             System.err.println("Java version " + MIN_JDK_VERSION +

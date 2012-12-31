@@ -25,11 +25,13 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.UIManager;
@@ -48,32 +50,32 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.option.Option;
 
 /**
- * <p>Represents a collection of messages in a particular locale.</p>
+ * Represents a collection of messages in a particular locale.
  *
- * <p>The individual messages are read from property files in the
+ * The individual messages are read from property files in the
  * <code>data/strings</code> directory. The property files are called
  * "FreeColMessages[_LANGUAGE[_COUNTRY[_VARIANT]]].properties", where
  * LANGUAGE should be an ISO 639-2 or ISO 639-3 language code, COUNTRY
  * should be an ISO 3166-2 country code, and VARIANT is an arbitrary
  * string. The encoding of the property files is UTF-8. Since the Java
  * Properties class is unable to handle UTF-8 directly, this class
- * uses its own implementation.</p>
+ * uses its own implementation.
  *
- * <p>The individual messages may include variables, which must be
+ * Te individual messages may include variables, which must be
  * delimited by percent characters (e.g. "%nation%"), and will be
  * replaced when the message is formatted. Furthermore, the messages
  * may include choice formats consisting of a tag followed by a colon
  * (":"), a selector and one or several choices separated from the
  * selector and each other by pipe characters ("|"). The entire choice
  * format must be enclosed in double brackets ("{{" and "}}",
- * respectively).</p>
+ * respectively).
  *
- * <p>Each choice must consist of a key and a value separated by an
+ * Each choice must consist of a key and a value separated by an
  * equals character ("="), unless it is a variable, in which case the
  * variable must resolve to another choice format. The selector may
  * also be a variable. If the selector is omitted, then one of the
  * choices should use the key "default". Choice formats may be
- * nested.</p>
+ * nested.
  *
  * <pre>
  *   key1=%colony% tuottaa tuotetta {{tag:acc|%goods%}}.
@@ -81,9 +83,8 @@ import net.sf.freecol.common.option.Option;
  *   key3={{tag:|acc=viljaa|default={{plural:%amount%|one=ruoka|other=ruokaa|default=Ruoka}}}}
  * </pre>
  *
- * <p>This class is NOT thread-safe. (CO: I cannot find any place that
- * really has a problem)</p>
- *
+ * This class is NOT thread-safe. (CO: I cannot find any place that
+ * really has a problem)
  */
 public class Messages {
 
@@ -97,9 +98,12 @@ public class Messages {
         ".description", ".shortDescription", ".name"
     };
 
-
-    private static Map<String, String> messageBundle =
-        new HashMap<String, String>();
+    /**
+     * The mapping from language-independent key to localized message
+     * for the established locale.
+     */
+    private static final Map<String, String> messageBundle
+        = new HashMap<String, String>();
 
     /**
      * A map with Selector values and the tag keys used in choice
@@ -135,82 +139,126 @@ public class Messages {
     }
 
     /**
-     * Set the resource bundle for the given locale
+     * Set the message bundle for the given locale
      *
-     * @param locale
+     * Error messages have to go to System.err as this routine is called
+     * before logging is enabled.
+     *
+     * @param locale The <code>Locale</code> to set resources for.
      */
     public static void setMessageBundle(Locale locale) {
-        if (locale == null) {
-            throw new NullPointerException("Parameter locale must not be null");
-        } else {
-            if (!Locale.getDefault().equals(locale)) {
-                Locale.setDefault(locale);
+        messageBundle.clear(); // Reset the message bundle.
+
+        if (!Locale.getDefault().equals(locale)) {
+            Locale.setDefault(locale);
+        }
+
+        File i18nDirectory = FreeColDirectories.getI18nDirectory();
+        if (i18nDirectory == null) return;
+
+        if (!NumberRules.isInitialized()) {
+            // attempt to read grammatical rules
+            File cldr = new File(i18nDirectory, "plurals.xml");
+            if (cldr.exists()) {
+                try {
+                    FileInputStream in = new FileInputStream(cldr);
+                    NumberRules.load(in);
+                    in.close();
+                } catch (Exception e) {
+                    System.err.println("Failed to read CLDR rules: "
+                        + e.getMessage());
+                }
+            } else {
+                System.err.println("Could not find CLDR rules: "
+                    + cldr.getPath());
             }
-            setMessageBundle(locale.getLanguage(), locale.getCountry(), locale.getVariant());
+        }
+
+        setGrammaticalNumber(NumberRules.getNumberForLanguage(locale.getLanguage()));
+
+        List<String> filenames = FreeColModFile.getFileNames(FILE_PREFIX,
+            FILE_SUFFIX,
+            locale.getLanguage(), locale.getCountry(), locale.getVariant());
+        for (String name : filenames) {
+            File file = new File(i18nDirectory, name);
+            if (!file.exists()) continue; // Expected
+            try {
+                loadMessages(new FileInputStream(file));
+            } catch (Exception e) {
+                System.err.println("Failed to load messages from " + name
+                    + ": " + e.getMessage());
+            }
         }
     }
 
     /**
-     * Set the resource bundle to the given locale
+     * Loads messages from a resource file into the current message bundle.
      *
-     * @param language The language for this locale.
-     * @param country The language for this locale.
-     * @param variant The variant for this locale.
+     * Public for the test suite.
+     *
+     * @param is The <code>InputStream</code> to read from.
+     * @throws IOException
      */
-    private static void setMessageBundle(String language, String country, String variant) {
-
-        messageBundle = new HashMap<String, String>();
-        List<String> filenames = FreeColModFile.getFileNames(FILE_PREFIX, FILE_SUFFIX, language, country, variant);
-
-        if (!NumberRules.isInitialized()) {
-            // attempt to read grammatical rules
-            File stringDirectory = FreeColDirectories.getI18nDirectory();
-            if (stringDirectory.exists()) {
-                File cldr = new File(stringDirectory, "plurals.xml");
-                if (cldr.exists()) {
-                    try {
-                        FileInputStream in = new FileInputStream(cldr);
-                        NumberRules.load(in);
-                        in.close();
-                    } catch(Exception e) {
-                        logger.warning("Failed to read CLDR rules: "
-                                       + e.toString());
-                    }
-                } else {
-                    logger.warning("Could not find CLDR rules: "
-                                   + cldr.getPath());
-                }
-            } else {
-                logger.warning("Could not find string directory: "
-                               + stringDirectory.getPath());
-            }
+    public static void loadMessages(InputStream is) throws IOException {
+        InputStreamReader inputReader;
+        try {
+            inputReader = new InputStreamReader(is, "UTF-8");
+        } catch (UnsupportedEncodingException uee) {
+            return; // We have big problems if UTF-8 is not supported.
         }
-
-        setGrammaticalNumber(NumberRules.getNumberForLanguage(language));
-
-        for (String fileName : filenames) {
-            File resourceFile = new File(FreeColDirectories.getI18nDirectory(), fileName);
-            loadResources(resourceFile);
-            logger.finest("Loaded message bundle " + fileName + " from messages.");
-        }
-
-        List<FreeColModFile> allMods = new ArrayList<FreeColModFile>();
-        allMods.addAll(Mods.getAllMods());
-        allMods.addAll(Mods.getRuleSets());
-        for (FreeColModFile fcmf : allMods) {
-            for (String fileName : filenames) {
-                try {
-                    InputStream is = fcmf.getInputStream(fileName);
-                    loadResources(is);
-                    logger.finest("Loaded message bundle " + fileName + " from "
-                                  + fcmf.getId() + ".");
-                } catch (IOException e) {
-                    logger.fine("No message bundle " + fileName + " in "
-                                + fcmf.getId() + ".");
+        BufferedReader in = new BufferedReader(inputReader);
+        
+        String line = null;
+        while((line = in.readLine()) != null) {
+            line = line.trim();
+            int index = line.indexOf('#');
+            if (index == 0) continue;
+            index = line.indexOf('=');
+            if (index > 0) {
+                String key = line.substring(0, index).trim();
+                String value = line.substring(index + 1).trim()
+                    .replace("\\n", "\n").replace("\\t", "\t");
+                messageBundle.put(key, value);
+                if (key.startsWith("FileChooser.")) {
+                    UIManager.put(key, value);
                 }
             }
         }
     }
+
+    /**
+     * Load localized messages for mods.
+     *
+     * We can not initially load resources from mods because not all
+     * mods can be loaded until the user mod directory is initialized,
+     * which depends on the command line processing, which in turn
+     * requires at least the basic localized message resources to be
+     * loaded.  So this routine is called separately when the mods are
+     * finally loaded.
+     *
+     * @param locale The <code>Locale</code> to load resources for.
+     */
+    public static void setModMessageBundle(Locale locale) {
+        List<FreeColModFile> allMods = new ArrayList<FreeColModFile>();
+        allMods.addAll(Mods.getAllMods());
+        allMods.addAll(Mods.getRuleSets());
+
+        List<String> filenames = FreeColModFile.getFileNames(FILE_PREFIX,
+            FILE_SUFFIX,
+            locale.getLanguage(), locale.getCountry(), locale.getVariant());
+
+        for (FreeColModFile fcmf : allMods) {
+            for (String name : filenames) {
+                try {
+                    loadMessages(fcmf.getInputStream(name));
+                } catch (IOException e) {
+                    logger.log(Level.WARNING, "Failed to load mod messages from"
+                        + fcmf.getId() + "/" + name, e);
+                }
+            }
+        }
+    }
+
 
     /**
      * Returns the text mapping for a particular ID in the default locale message bundle.
@@ -223,9 +271,6 @@ public class Messages {
         // Check that all the values are correct.
         if (messageId == null) {
             throw new NullPointerException("Message ID must not be null!");
-        }
-        if (messageBundle == null) {
-            setMessageBundle(Locale.getDefault());
         }
 
         // return key as value if there is no mapping found
@@ -503,10 +548,7 @@ public class Messages {
      * @return a <code>boolean</code> value
      */
     public static boolean containsKey(String key) {
-        if (messageBundle == null) {
-            setMessageBundle(Locale.getDefault());
-        }
-        return (messageBundle.get(key) != null);
+        return messageBundle.get(key) != null;
     }
 
 
@@ -765,58 +807,6 @@ public class Messages {
         // Collect the rest
         collectNames(prefix, names);
         return names;
-    }
-
-    /**
-     * Loads a new resource file into the current message bundle.
-     *
-     * @param resourceFile
-     */
-    public static void loadResources(File resourceFile) {
-
-        if ((resourceFile != null) && resourceFile.exists()
-            && resourceFile.isFile() && resourceFile.canRead()) {
-            try {
-                loadResources(new FileInputStream(resourceFile));
-            } catch (Exception e) {
-                logger.warning("Unable to load resource file " + resourceFile.getPath());
-            }
-        }
-    }
-
-
-
-    /**
-     * Loads a new resource file into the current message bundle.
-     *
-     * @param is an <code>InputStream</code> value
-     */
-    public static void loadResources(InputStream is) {
-        try {
-            InputStreamReader inputReader = new InputStreamReader(is, "UTF-8");
-            BufferedReader in = new BufferedReader(inputReader);
-
-            String line = null;
-            while((line = in.readLine()) != null) {
-                line = line.trim();
-                int index = line.indexOf('#');
-                if (index == 0) {
-                    continue;
-                }
-                index = line.indexOf('=');
-                if (index > 0) {
-                    String key = line.substring(0, index).trim();
-                    String value = line.substring(index + 1).trim()
-                        .replace("\\n", "\n").replace("\\t", "\t");
-                    messageBundle.put(key, value);
-                    if (key.startsWith("FileChooser.")) {
-                        UIManager.put(key, value);
-                    }
-                }
-            }
-        } catch (Exception e) {
-            logger.warning("Unable to load resources from input stream.");
-        }
     }
 
     /**

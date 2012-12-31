@@ -20,6 +20,7 @@
 package net.sf.freecol.client.gui.i18n;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.Locale;
 
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -142,7 +143,9 @@ public class MessagesTest extends FreeColTestCase {
         // removed
         String mapping = "some.key={{}}abc   {{xyz}}def{{123|567}}\n";
         ByteArrayInputStream stream = new ByteArrayInputStream(mapping.getBytes());
-        Messages.loadResources(stream);
+        try {
+            Messages.loadMessages(stream);
+        } catch (IOException ioe) { fail(); }
         assertEquals("abc   def", Messages.message("some.key"));
     }
 
@@ -154,7 +157,9 @@ public class MessagesTest extends FreeColTestCase {
         String mapping = "some.key=abc{{plural:%number%|zero=zero|one=one|two=two"
             + "|few=few|many=many|other=other}}|xyz";
         ByteArrayInputStream stream = new ByteArrayInputStream(mapping.getBytes());
-        Messages.loadResources(stream);
+        try {
+            Messages.loadMessages(stream);
+        } catch (IOException ioe) { fail(); }
 
         // default Number is Other
         Messages.setGrammaticalNumber(NumberRules.OTHER_NUMBER_RULE);
@@ -209,7 +214,9 @@ public class MessagesTest extends FreeColTestCase {
             + "unit.key={{plural:%number%|one=piece of artillery|other=pieces of artillery|"
             + "default=artillery}}";
         ByteArrayInputStream stream = new ByteArrayInputStream(mapping.getBytes());
-        Messages.loadResources(stream);
+        try {
+            Messages.loadMessages(stream);
+        } catch (IOException ioe) { fail(); }
 
         assertEquals("artillery", Messages.message("unit.key"));
 
@@ -241,7 +248,9 @@ public class MessagesTest extends FreeColTestCase {
             + "greeting2=The {{otherRandomTag:people|%nation%}} are happy to see you.\n";
 
         ByteArrayInputStream stream = new ByteArrayInputStream(mapping.getBytes());
-        Messages.loadResources(stream);
+        try {
+            Messages.loadMessages(stream);
+        } catch (IOException ioe) { fail(); }
 
         assertEquals("French people", Messages.message("key.france"));
 
@@ -268,7 +277,9 @@ public class MessagesTest extends FreeColTestCase {
             + "key3={{tag:|acc=viljaa|default={{plural:%amount%|one=ruoka|other=ruokaa|default=Ruoka}}}}\n";
 
         ByteArrayInputStream stream = new ByteArrayInputStream(mapping.getBytes());
-        Messages.loadResources(stream);
+        try {
+            Messages.loadMessages(stream);
+        } catch (IOException ioe) { fail(); }
 
         StringTemplate t = StringTemplate.template("key1")
             .addName("%colony%", "someColony")
@@ -287,7 +298,9 @@ public class MessagesTest extends FreeColTestCase {
             + "|AUTUMN 1612-AUTUMN 1667=nathan|default=fred}}";
 
         ByteArrayInputStream stream = new ByteArrayInputStream(mapping.getBytes());
-        Messages.loadResources(stream);
+        try {
+            Messages.loadMessages(stream);
+        } catch (IOException ioe) { fail(); }
 
         StringTemplate t = StringTemplate.template("monarch")
             .addName("%turn%", Turn.toString(1));

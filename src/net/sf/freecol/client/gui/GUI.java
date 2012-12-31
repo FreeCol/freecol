@@ -1051,6 +1051,7 @@ public class GUI {
                         } else {
                             Locale l = ((Language) e.getNewValue()).getLocale();
                             Messages.setMessageBundle(l);
+                            Messages.setModMessageBundle(l);
                             showInformationMessage(StringTemplate.template("newLanguageSelected")
                                 .addName("%language%", l.getDisplayName()));
                         }
