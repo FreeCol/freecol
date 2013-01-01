@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -37,11 +38,7 @@ public class Mods {
 
     private static final Logger logger = Logger.getLogger(Mods.class.getName());
 
-    private static final Map<String, FreeColModFile> allMods =
-        new HashMap<String, FreeColModFile>();
-
-    public static final FileFilter MOD_FILTER =
-        new FileFilter() {
+    private static final FileFilter MOD_FILTER = new FileFilter() {
             public boolean accept(File f) {
                 final String name = f.getName();
                 if (name.startsWith(".")) {
@@ -60,57 +57,49 @@ public class Mods {
             }
         };
 
-    static {
-        getDirectoryMods(FreeColDirectories.getUserModsDirectory());
-        getDirectoryMods(FreeColDirectories.getStandardModsDirectory());
-    }
+    /** A cache of all the mods. */
+    private static final Map<String, FreeColModFile> allMods
+        = new HashMap<String, FreeColModFile>();
 
-
-    /**
-     * Gets a mod file from a file (possibly a directory).
-     *
-     * @param file The <code>File</code> to test.
-     * @return A <code>FreeColModFile</code> if the file contains a mod,
-     *     or null if it did not.
-     */
-    public static FreeColModFile getModFile(File file) {
-        try {
-            /* The constructor will throw on IO problems, and if there
-             * is no valid mod.xml.  That is all we require ATM to
-             * consider this a valid mod.
-             */
-            return new FreeColModFile(file);
-        } catch (IOException e) {
-            return null;
-        }
-    }
-
-    /**
-     * Returns the <code>FreeColModFile</code> with the given ID.
-     *
-     * @param id a <code>String</code> value
-     * @return a <code>FreeColModFile</code> value
-     */
-    public static FreeColModFile getModFile(String id) {
-        return allMods.get(id);
-    }
 
     /**
      * Loads all valid mods from a specified directory.
      *
      * @param directory The directory to load from.
      */
-    private static void getDirectoryMods(File directory) {
+    private static void loadModDirectory(File directory) {
         if (directory != null && directory.isDirectory()) {
             for (File f : directory.listFiles(MOD_FILTER)) {
-                FreeColModFile fcmf = getModFile(f);
-                if (fcmf != null) {
-                    allMods.put(fcmf.getId(), fcmf);
-                } else {
-                    logger.warning("Failed to load mod from: " + f.getName());
+                try {
+                    FreeColModFile fcmf = new FreeColModFile(f);
+                    if (fcmf != null) allMods.put(fcmf.getId(), fcmf);
+                } catch (IOException e) {
+                    logger.log(Level.WARNING, "Bad mod in " + f.getName(), e);
                 }
             }
         }
+    }
+
+    /**
+     * Require all mods to be loaded.  This must be delayed until
+     * the mods directories are defined.
+     *
+     * User mods are loaded after standard mods to allow user override.
+     */
+    public static void loadMods() {
+        loadModDirectory(FreeColDirectories.getStandardModsDirectory());
+        loadModDirectory(FreeColDirectories.getUserModsDirectory());
+    }
+
+    /**
+     * Gets the mod with the given ID.
+     *
+     * @param id The id of the mod to search for.
+     * @return The <code>FreeColModFile</code> for the mod, or null if
+     *     not found.
+     */
+    public static FreeColModFile getModFile(String id) {
+        return allMods.get(id);
     }
 
     /**
@@ -124,9 +113,9 @@ public class Mods {
     }
 
     /**
-     * Gets all available rules.
+     * Gets all available rulesets.
      *
-     * @return A list of <code>FreeColModFile</code>s contain mods.
+     * @return A list of <code>FreeColModFile</code>s containing rulesets.
      */
     public static List<FreeColTcFile> getRuleSets() {
         List<FreeColTcFile> result = new ArrayList<FreeColTcFile>();
@@ -137,8 +126,9 @@ public class Mods {
                 if (modDescription.exists()) {
                     try {
                         result.add(new FreeColTcFile(dir));
-                    } catch(IOException e) {
-                        logger.warning("Failed to create rule set " + dir);
+                    } catch (IOException e) {
+                        logger.log(Level.WARNING, "Failed to create rule set "
+                            + dir, e);
                     }
                 }
             }

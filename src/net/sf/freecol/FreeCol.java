@@ -47,6 +47,7 @@ import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
+import net.sf.freecol.common.io.Mods;
 import net.sf.freecol.common.logging.DefaultHandler;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
@@ -150,6 +151,7 @@ public final class FreeCol {
 
         FreeColDirectories.createAndSetDirectories();
         initLogging();
+        Mods.loadMods();
 
         Locale locale = getLocale();
         Locale.setDefault(locale);

@@ -27,30 +27,32 @@ import net.sf.freecol.util.test.FreeColTestCase;
 public class ModTest extends FreeColTestCase {
 
     public void testGetAllMods() {
-        // check that there are some mods
+        // There should not be any mods present until they are loaded.
+        assertTrue(Mods.getAllMods().isEmpty());
+        // Load them and check that there are some mods
+        Mods.loadMods();
         assertFalse(Mods.getAllMods().isEmpty());
-        // check that all mod files can be loaded
+        // Check that all mod files can be loaded
         for (FreeColModFile mod : Mods.getAllMods()) {
-            assertNotNull("Id of mod " + mod + " should not be null", mod.getId());
+            assertNotNull("Id of mod " + mod + " should not be null",
+                          mod.getId());
             assertEquals(mod, Mods.getModFile(mod.getId()));
         }
 
     }
 
     public void testGetRuleSets() {
-        // check that all rule sets can be loaded
+        // Check that all rule sets can be loaded
         Set<String> ids = new HashSet<String>();
         for (FreeColModFile mod : Mods.getRuleSets()) {
-            assertNotNull("Id of mod " + mod + " should not be null", mod.getId());
+            assertNotNull("Id of mod " + mod + " should not be null", 
+                          mod.getId());
             ids.add(mod.getId());
         }
 
         assertTrue(ids.contains("freecol"));
         assertTrue(ids.contains("classic"));
-        // testing has no mod descriptor
+        // Testing has no mod descriptor
         assertFalse(ids.contains("testing"));
-
     }
-
-
 }
