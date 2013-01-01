@@ -1358,7 +1358,8 @@
       <ability id="model.ability.bombardShips" value="true"/>
     </building-type>
     <building-type id="model.building.fortress" extends="model.building.fort"
-                   upgradesFrom="model.building.fort" upkeep="15">
+                   upgradesFrom="model.building.fort" upkeep="15"
+                   required-population="8">
       <required-goods id="model.goods.hammers" value="320"/>
       <required-goods id="model.goods.tools" value="200"/>
       <modifier id="model.modifier.defence" delete="true" />
