@@ -230,8 +230,7 @@ public final class FreeColClient {
 
         // Swing system and look-and-feel initialization.
         try {
-            FreeColLookAndFeel fclaf
-                = new FreeColLookAndFeel(FreeColDirectories.getDataDirectory());
+            FreeColLookAndFeel fclaf = new FreeColLookAndFeel();
             FreeColLookAndFeel.install(fclaf, font);
         } catch (FreeColException e) {
             logger.log(Level.SEVERE, "Unable to install FreeCol look-and-feel.",

@@ -50,10 +50,9 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
     /**
      * Initiates a new FreeCol look and feel.
      *
-     * @param dataDirectory The home of the FreeCol data files.
      * @exception FreeColException If the ui directory could not be found.
      */
-    public FreeColLookAndFeel(File dataDirectory) throws FreeColException {
+    public FreeColLookAndFeel() throws FreeColException {
         super();
 
         setCurrentTheme(new DefaultMetalTheme() {
@@ -85,10 +84,6 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
                     return new ColorUIResource(ResourceManager.getColor("lookAndFeel.disabledMenu.color"));
                 }
             });
-
-        if (!dataDirectory.isDirectory()) {
-           throw new FreeColException("Data directory is not a directory.");
-        }
     }
 
     /**
