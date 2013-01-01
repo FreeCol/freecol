@@ -251,10 +251,7 @@ public class Messages {
             for (String name : filenames) {
                 try {
                     loadMessages(fcmf.getInputStream(name));
-                } catch (IOException e) {
-                    logger.log(Level.WARNING, "Failed to load mod messages from"
-                        + fcmf.getId() + "/" + name, e);
-                }
+                } catch (IOException e) {} // Failures expected
             }
         }
     }
