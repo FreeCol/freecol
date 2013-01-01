@@ -74,7 +74,7 @@ public class FreeColModFile extends FreeColDataFile {
      * @exception IOException if an error occurs
      */
     public Specification getSpecification() throws IOException {
-        InputStream si = getInputStream(SPECIFICATION_FILE);
+        InputStream si = getSpecificationInputStream();
         Specification specification = new Specification(si);
         si.close();
         return specification;

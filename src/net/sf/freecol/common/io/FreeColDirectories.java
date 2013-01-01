@@ -195,11 +195,6 @@ public class FreeColDirectories {
         return savegameFile;
     }
 
-    public static InputStream getSpecificationInputStream() throws IOException {
-        final FreeColTcFile tcData = new FreeColTcFile(getTc());
-        return tcData.getSpecificationInputStream();
-    }
-
     /**
      * Gets the mods directory.
      *
