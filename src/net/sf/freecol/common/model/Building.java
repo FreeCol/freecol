@@ -154,19 +154,12 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     }
 
     /**
-     * Gets the set of modifiers with the given Id from this Building.
-     * Delegate to the type.
-     *
-     * @param id The id of the modifier to test.
-     * @param fcgot An optional <code>FreeColGameObjectType</code> the
-     *     modifier applies to.
-     * @param turn An optional applicable <code>Turn</code>.
-     * @return A set of modifiers.
+     * {@inheritDoc}
      */
     @Override
     public Set<Modifier> getModifierSet(String id, FreeColGameObjectType fcgot,
                                         Turn turn) {
-        return getType().getModifierSet(id);
+        return getType().getModifierSet(id, fcgot, turn);
     }
 
     /**
