@@ -2314,54 +2314,54 @@
           <integerOption id="model.option.taxAdjustment" value="3"/>
           <integerOption id="model.option.mercenaryPrice" value="70"/>
           <integerOption id="model.option.maximumTax" value="70"/>
-        <integerOption id="model.option.monarchSupport" value="1"/>
-        <integerOption id="model.option.treasureTransportFee" value="65"/>
-        <integerOption id="model.option.interventionBells" value="6500" />
-        <integerOption id="model.option.interventionTurns" value="53" />
-        <unitListOption id="model.option.refSize">
-          <unitOption id="model.option.refSize.soldiers">
-            <unitType value="model.unit.kingsRegular" />
-            <role value="SOLDIER" />
-            <number value="39" />
-          </unitOption>
-          <unitOption id="model.option.refSize.dragoons">
-            <unitType value="model.unit.kingsRegular" />
-            <role value="DRAGOON" />
-            <number value="20" />
-          </unitOption>
-          <unitOption id="model.option.refSize.artillery">
-            <unitType value="model.unit.artillery" />
-            <role value="DEFAULT" />
-            <number value="20" />
-          </unitOption>
-          <unitOption id="model.option.refSize.menOfWar">
-            <unitType value="model.unit.manOWar" />
-            <role value="DEFAULT" />
-            <number value="11" />
-          </unitOption>
-        </unitListOption>
-        <unitListOption id="model.option.interventionForce">
-          <unitOption id="model.option.interventionForce.regulars">
-            <unitType value="model.unit.colonialRegular" />
-            <role value="SOLDIER" />
-            <number value="2" />
-          </unitOption>
-          <unitOption id="model.option.interventionForce.dragoons">
-            <unitType value="model.unit.colonialRegular" />
-            <role value="DRAGOON" />
-            <number value="1" />
-          </unitOption>
-          <unitOption id="model.option.interventionForce.artillery">
-            <unitType value="model.unit.artillery" />
-            <role value="DEFAULT" />
-            <number value="2" />
-          </unitOption>
-          <unitOption id="model.option.interventionForce.menOfWar">
-            <unitType value="model.unit.manOWar" />
-            <role value="DEFAULT" />
-            <number value="2" />
-          </unitOption>
-        </unitListOption>
+          <integerOption id="model.option.monarchSupport" value="1"/>
+          <integerOption id="model.option.treasureTransportFee" value="65"/>
+          <integerOption id="model.option.interventionBells" value="6500" />
+          <integerOption id="model.option.interventionTurns" value="53" />
+          <unitListOption id="model.option.refSize">
+            <unitOption id="model.option.refSize.soldiers">
+              <unitType value="model.unit.kingsRegular" />
+              <role value="SOLDIER" />
+              <number value="39" />
+            </unitOption>
+            <unitOption id="model.option.refSize.dragoons">
+              <unitType value="model.unit.kingsRegular" />
+              <role value="DRAGOON" />
+              <number value="20" />
+            </unitOption>
+            <unitOption id="model.option.refSize.artillery">
+              <unitType value="model.unit.artillery" />
+              <role value="DEFAULT" />
+              <number value="20" />
+            </unitOption>
+            <unitOption id="model.option.refSize.menOfWar">
+              <unitType value="model.unit.manOWar" />
+              <role value="DEFAULT" />
+              <number value="11" />
+            </unitOption>
+          </unitListOption>
+          <unitListOption id="model.option.interventionForce">
+            <unitOption id="model.option.interventionForce.regulars">
+              <unitType value="model.unit.colonialRegular" />
+              <role value="SOLDIER" />
+              <number value="2" />
+            </unitOption>
+            <unitOption id="model.option.interventionForce.dragoons">
+              <unitType value="model.unit.colonialRegular" />
+              <role value="DRAGOON" />
+              <number value="1" />
+            </unitOption>
+            <unitOption id="model.option.interventionForce.artillery">
+              <unitType value="model.unit.artillery" />
+              <role value="DEFAULT" />
+              <number value="2" />
+            </unitOption>
+            <unitOption id="model.option.interventionForce.menOfWar">
+              <unitType value="model.unit.manOWar" />
+              <role value="DEFAULT" />
+              <number value="2" />
+            </unitOption>
+          </unitListOption>
           <unitListOption id="model.option.mercenaryForce">
             <unitOption id="model.option.mercenaryForce.regulars">
               <unitType value="model.unit.veteranSoldier" />
@@ -2416,7 +2416,7 @@
           <booleanOption id="model.option.expertStartingUnits" value="false" />
         </optionGroup>
         <optionGroup id="model.difficulty.natives">
-          <integerOption id="model.option.foundingFatherFactor" value="56"/>
+          <integerOption id="model.option.landPriceFactor" value="80"/>
           <integerOption id="model.option.nativeConvertProbability" value="10"/>
           <integerOption id="model.option.burnProbability" value="10"/>
           <integerOption id="model.option.nativeDemands" value="4"/>
@@ -2515,7 +2515,7 @@
         </optionGroup>
         <optionGroup id="model.difficulty.other">
           <integerOption id="model.option.startingMoney" value="0"/>
-          <integerOption id="model.option.landPriceFactor" value="80"/>
+          <integerOption id="model.option.foundingFatherFactor" value="56"/>
           <integerOption id="model.option.arrearsFactor" value="700"/>
           <integerOption id="model.option.unitsThatUseNoBells" value="2"/>
           <stringOption  id="model.option.tileProduction" value="veryLow" />
