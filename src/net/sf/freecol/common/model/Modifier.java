@@ -19,8 +19,6 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.Locale;
-
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -496,9 +494,15 @@ public class Modifier extends Feature implements Comparable<Modifier> {
      */
     @Override
     public String toString() {
-        return getId()
-            + ((getSource() == null) ? " " : " (" + getSource().getId() + ") ")
-            + type + " " + value;
+        StringBuilder sb = new StringBuilder("[Modifier ");
+        sb.append(getId());
+        if (getSource() != null) sb.append(" (" + getSource().getId() + ")");
+        sb.append(" ").append(type).append(" ").append(value);
+        for (Scope s : getScopes()) {
+            sb.append(" ").append(s.toString());
+        }
+        sb.append("]");
+        return sb.toString();
     }
 
     /**

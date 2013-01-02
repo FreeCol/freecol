@@ -403,6 +403,18 @@ public class Scope extends FreeColObject implements Cloneable {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public String toString() {
+        return "[Scope " + type
+            + ((abilityID == null) ? "" : abilityID + "=" + abilityValue)
+            + ((methodName == null) ? "" : methodName + "=" + methodValue)
+            + ((matchesNull) ? " matches-null" : "")
+            + ((matchNegated) ? " match-negated" : "")
+            + "]";
+    }
+
+    /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "scope".
