@@ -120,6 +120,8 @@ public class TileTest extends FreeColTestCase {
 
     private static final UnitType colonistType
         = spec().getUnitType("model.unit.freeColonist");
+    private static final UnitType expertFarmerType
+        = spec().getUnitType("model.unit.expertFarmer");
 
 
     private class Work {
@@ -298,26 +300,43 @@ public class TileTest extends FreeColTestCase {
         Game game = getStandardGame();
 
         Tile tile1 = new Tile(game, mountains, 0, 0);
-        assertEquals(0, tile1.potential(food, null));
-        assertEquals(0, tile1.getMaximumPotential(food, null));
-        assertEquals(1, tile1.potential(silver, null));
-        assertEquals(2, tile1.getMaximumPotential(silver, null));
+        assertEquals("Mountain/food", 0,
+                     tile1.potential(food, null));
+        assertEquals("Mountain/food max", 0,
+                     tile1.getMaximumPotential(food, null));
+        assertEquals("Mountain/silver", 1,
+                     tile1.potential(silver, null));
+        assertEquals("Mountain/silver max", 2,
+                     tile1.getMaximumPotential(silver, null));
         tile1.addResource(new Resource(game, tile1, silverResource));
-        assertEquals(0, tile1.potential(food, null));
-        assertEquals(3, tile1.potential(silver, null));
-        assertEquals(4, tile1.getMaximumPotential(silver, null));
+        assertEquals("Mountain+Resource/food", 0,
+                     tile1.potential(food, null));
+        assertEquals("Mountain+Resource/silver", 3,
+                     tile1.potential(silver, null));
+        assertEquals("Mountain+Resource/silver max", 4,
+                     tile1.getMaximumPotential(silver, null));
 
+        // grain-max should equal grain-potential + 1 (ploughing improvement)
         Tile tile2 = new Tile(game, plains, 0, 1);
-        assertEquals(5, tile2.potential(grain, null));
-        assertEquals(6, tile2.getMaximumPotential(grain, null));
+        assertEquals("Plains/grain", 5,
+                     tile2.potential(grain, null));
+        assertEquals("Plains/grain max", 6,
+                     tile2.getMaximumPotential(grain, null));
         tile2.addResource(new Resource(game, tile2, grainResource));
-        // potential assumes expert
-        assertEquals(9, tile2.potential(grain, null));
-        assertEquals(10, tile2.getMaximumPotential(grain, null));
+        assertEquals("Plains+Resource/grain", 7,
+                     tile2.potential(grain, null));
+        assertEquals("Plains+Resource/grain max", 8,
+                     tile2.getMaximumPotential(grain, null));
+        assertEquals("Plains+Resource/grain/expertFarmer", 9,
+                     tile2.potential(grain, expertFarmerType));
+        assertEquals("Plains+Resource/grain/expertFarmer max", 10,
+                     tile2.getMaximumPotential(grain, expertFarmerType));
 
         Tile tile3 = new Tile(game, plainsForest, 1, 1);
-        assertEquals(3, tile3.potential(grain, null));
-        assertEquals(6, tile3.getMaximumPotential(grain, null));
+        assertEquals("Forest/grain", 3,
+                     tile3.potential(grain, null));
+        assertEquals("Forest/grain max", 6,
+                     tile3.getMaximumPotential(grain, null));
     }
 
     public void testCanHaveImprovement() {

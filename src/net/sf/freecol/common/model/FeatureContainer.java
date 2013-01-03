@@ -246,12 +246,8 @@ public final class FeatureContainer {
         Set<Modifier> result = new HashSet<Modifier>();
         Set<Modifier> modifierSet;
         if (modifiers != null && (modifierSet = modifiers.get(id)) != null) {
-            if (fcgot == null) {
-                result.addAll(modifierSet);
-            } else {
-                for (Modifier modifier : modifierSet) {
-                    if (modifier.appliesTo(fcgot, turn)) result.add(modifier);
-                }
+            for (Modifier modifier : modifierSet) {
+                if (modifier.appliesTo(fcgot, turn)) result.add(modifier);
             }
         }
         return result;

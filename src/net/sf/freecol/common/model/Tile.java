@@ -1258,37 +1258,36 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         // improvements and get the bonuses of all related ones.  If
         // there are options to change tiletype using an improvement,
         // consider that too.
-
+        final Specification spec = getSpecification();
         List<TileType> tileTypes = new ArrayList<TileType>();
-        tileTypes.add(getType());
+        tileTypes.add(type);
 
         // Add to the list the various possible tile type changes
-        for (TileImprovementType impType : getSpecification().getTileImprovementTypeList()) {
-            if (impType.getChange(getType()) != null) {
+        for (TileImprovementType impType : spec.getTileImprovementTypeList()) {
+            if (impType.getChange(type) != null) {
                 // There is an option to change TileType
-                tileTypes.add(impType.getChange(getType()));
+                tileTypes.add(impType.getChange(type));
             }
         }
 
         int maxProduction = 0;
-
         for (TileType tileType : tileTypes) {
             float potential = tileType.getProductionOf(goodsType, unitType);
-            if (tileType == getType() && hasResource()) {
+            if (tileType == type && hasResource()) {
                 for (TileItem item : tileItemContainer.getTileItems()) {
                     if (item instanceof Resource) {
-                        potential = ((Resource) item).getBonus(goodsType, unitType, (int) potential);
+                        potential = ((Resource)item).getBonus(goodsType, unitType, (int) potential);
                     }
                 }
             }
-            for (TileImprovementType impType : getSpecification().getTileImprovementTypeList()) {
-                if (impType.isNatural() || !impType.isTileTypeAllowed(tileType)) {
-                    continue;
-                } else if (impType.getBonus(goodsType) > 0) {
+            for (TileImprovementType impType : spec.getTileImprovementTypeList()) {
+                if (impType.isNatural()
+                    || !impType.isTileTypeAllowed(tileType)) continue;
+                if (impType.getBonus(goodsType) > 0) {
                     potential = impType.getProductionModifier(goodsType).applyTo(potential);
                 }
             }
-            maxProduction = Math.max((int) potential, maxProduction);
+            maxProduction = Math.max((int)potential, maxProduction);
         }
         return maxProduction;
     }
