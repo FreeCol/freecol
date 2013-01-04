@@ -409,8 +409,8 @@ public class Scope extends FreeColObject implements Cloneable {
         return "[Scope " + type
             + ((abilityID == null) ? "" : abilityID + "=" + abilityValue)
             + ((methodName == null) ? "" : methodName + "=" + methodValue)
-            + ((matchesNull) ? " matches-null" : "")
-            + ((matchNegated) ? " match-negated" : "")
+            + ((matchesNull) ? " matchesNull" : "")
+            + ((matchNegated) ? " matchNegated" : "")
             + "]";
     }
 

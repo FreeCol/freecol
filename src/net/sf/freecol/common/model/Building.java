@@ -286,24 +286,26 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     }
 
     /**
-     * Gets the maximum productivity of a unit working in this work location,
-     * considering *only* the contribution of the unit, exclusive of
-     * that of the work location.
+     * Gets the maximum productivity of a unit working in this work
+     * location, considering *only* the contribution of the unit,
+     * exclusive of that of the work location.
      *
      * Used below, only public for the test suite.
      * 
      * @param unit The <code>Unit</code> to check.
      * @return The maximum return from this unit.
      */
-    public int getUnitConsumption(Unit unit) {
+    public int getUnitProduction(Unit unit) {
         if (getGoodsOutputType() == null || unit == null) return 0;
 
-        int productivity = getType().getBasicProduction();
-        if (productivity > 0) {
-            productivity += getColony().getProductionBonus();
-            productivity = (int)unit.getType()
-                .applyModifier(Math.max(1, productivity),
-                    getGoodsOutputType().getId());
+        int productivity = 0;
+        if (getType().getBasicProduction() > 0) {
+            final GoodsType goodsType = getGoodsOutputType();
+            final UnitType unitType = unit.getType();
+            final Turn turn = getGame().getTurn();
+
+            productivity = (int)FeatureContainer.applyModifiers(0f, turn,
+                getProductionModifiers(goodsType, unitType));
         }
         return Math.max(0, productivity);
     }
@@ -364,7 +366,7 @@ public class Building extends WorkLocation implements Named, Comparable<Building
                 }
             } else {
                 for (Unit u : getUnitList()) {
-                    maximumInput += getUnitConsumption(u);
+                    maximumInput += getUnitProduction(u);
                 }
                 maximumInput = Math.max(0, maximumInput);
             }
@@ -578,23 +580,21 @@ public class Building extends WorkLocation implements Named, Comparable<Building
             final String id = goodsType.getId();
             final Turn turn = getGame().getTurn();
             final Player owner = getOwner();
-            // This is fragile.  The colony contains all the buildings,
-            // including this one, so as long as buildings produce
-            // distinct goods, this works.
-            mods.addAll(getColony().getModifierSet(id, type, turn));
             if (unitType != null) {
+                // If a unit is present add unit specific bones and
+                // unspecific owner bonuses (which includes things
+                // like the Building national advantage).
+                mods.addAll(getModifierSet(id, unitType, turn));
                 mods.add(getColony().getProductionModifier(goodsType));
                 mods.add(type.getProductionModifier());
-                mods.addAll(unitType.getModifierSet(id, type, turn));
-                // If a unit is present add unspecific owner bonuses
-                // (which includes things like the Building national
-                // advantage).
+                mods.addAll(unitType.getModifierSet(id, goodsType, turn));
                 if (owner != null) {
-                    mods.addAll(owner.getModifierSet(id, null, turn));
+                    mods.addAll(owner.getModifierSet(id, unitType, turn));
                 }
             } else {
-                // If a unit is not present add only the owner bonuses
+                // If a unit is not present add only the bonuses
                 // specific to the building (such as the Paine bells bonus).
+                mods.addAll(getColony().getModifierSet(id, type, turn));
                 if (owner != null) {
                     mods.addAll(owner.getModifierSet(id, type, turn));
                 }

@@ -167,7 +167,11 @@ public class FreeColTestCase extends TestCase {
     public static Game getStandardGame(String specName) {
         Specification specification = getSpecification(specName);
         game = new ServerGame(specification);
-        game.setNationOptions(new NationOptions(specification, Advantages.SELECTABLE));
+        NationOptions nationOptions = new NationOptions(specification, Advantages.SELECTABLE);
+        for (Nation nation : specification.getEuropeanNations()) {
+            nationOptions.setNationState(nation, NationOptions.NationState.AVAILABLE);
+        }
+        game.setNationOptions(nationOptions);
 
         specification.applyDifficultyLevel("model.difficulty.medium");
         for (Nation n : specification.getNations()) {

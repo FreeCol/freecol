@@ -40,6 +40,8 @@ public class BuildingTest extends FreeColTestCase {
         = spec().getBuildingType("model.building.armory");
     private static final BuildingType blacksmithType
         = spec().getBuildingType("model.building.blacksmithHouse");
+    private static final BuildingType carpenterHouseType
+        = spec().getBuildingType("model.building.carpenterHouse");
     private static final BuildingType chapelType
         = spec().getBuildingType("model.building.chapel");
     private static final BuildingType countryType
@@ -77,8 +79,12 @@ public class BuildingTest extends FreeColTestCase {
         = spec().getPrimaryFoodType();
     private static final GoodsType grainType
         = spec().getGoodsType("model.goods.grain");
+    private static final GoodsType hammersType
+        = spec().getGoodsType("model.goods.hammers");
     private static final GoodsType horsesType
         = spec().getGoodsType("model.goods.horses");
+    private static final GoodsType lumberType
+        = spec().getGoodsType("model.goods.lumber");
     private static final GoodsType musketsType
         = spec().getGoodsType("model.goods.muskets");
     private static final GoodsType toolsType
@@ -541,63 +547,86 @@ public class BuildingTest extends FreeColTestCase {
         GoodsType bellsType = spec().getGoodsType("model.goods.bells");
 
         Set<Modifier> modifiers = colony.getModifierSet("model.goods.bells");
-        assertEquals(1, modifiers.size());
+        assertEquals("Initial modifier size", 1,
+                     modifiers.size());
         Modifier bellsModifier = modifiers.iterator().next();
-        assertEquals(Modifier.Type.ADDITIVE, bellsModifier.getType());
-        assertEquals(1.0f, bellsModifier.getValue());
+        assertEquals("Initial modifier type", Modifier.Type.ADDITIVE,
+                     bellsModifier.getType());
+        assertEquals("Initial modifier value", 1.0f,
+                     bellsModifier.getValue());
 
-        assertEquals("Wrong initial bell production",
-            (int) bellsModifier.getValue(),
-            building.getTotalProductionOf(bellsType));
+        assertEquals("Initial bell production", (int)bellsModifier.getValue(),
+                     building.getTotalProductionOf(bellsType));
 
         building.add(colonist);
+        colony.invalidateCache();
         // 3 from the colonist
-        assertEquals(3, building.getUnitConsumption(colonist));
-        // 3 from the colonist + 1
-        assertEquals("Wrong bell production", 4,
-            building.getTotalProductionOf(bellsType));
+        assertEquals("Production(Colonist)", 3,
+                     building.getUnitProduction(colonist));
+        // 3(colonist) + 1(autoproduced)
+        assertEquals("Total production(Colonist)", 4,
+                     building.getTotalProductionOf(bellsType));
 
-        FoundingFather jefferson = spec().getFoundingFather("model.foundingFather.thomasJefferson");
+        // Add Jefferson.
+        FoundingFather jefferson = spec()
+            .getFoundingFather("model.foundingFather.thomasJefferson");
         modifiers = jefferson.getModifierSet("model.goods.bells");
-        assertEquals(1, modifiers.size());
+        assertEquals("Jefferson modifier size", 1, modifiers.size());
         bellsModifier = modifiers.iterator().next();
         owner.addFather(jefferson);
-        assertTrue(colony.getOwner().getModifierSet("model.goods.bells")
-                   .contains(bellsModifier));
-        // The colony does not contain the bellsModifier, only the player...
-        assertFalse(colony.getModifierSet("model.goods.bells")
-            .contains(bellsModifier));
-        // ...but the Building.getModifierSet() routine does pull in the
-        // player modifiers.
-        assertTrue(building.getProductionModifiers(bellsType, freeColonistType)
-            .contains(bellsModifier));
 
-        assertEquals(3, building.getUnitConsumption(colonist));
-        // 3 from the colonist + 50% + 1 = 5.5
-        assertEquals("Wrong bell production with Jefferson", 5,
-            building.getTotalProductionOf(bellsType));
+        // Jefferson is a property of the player...
+        assertTrue("Jefferson modifier present in player", 
+            colony.getOwner().getModifierSet("model.goods.bells")
+                             .contains(bellsModifier));
+        // ...not the colony,
+        assertFalse("Jefferson modifier not present in colony",
+            colony.getModifierSet("model.goods.bells")
+                  .contains(bellsModifier));
+        // ...but the building modifiers do have it.
+        assertFalse("Jefferson modifier present in building modifiers",
+            building.getModifierSet("model.goods.bells")
+                    .contains(bellsModifier));
 
+        // 3(colonist)
+        assertEquals("Production(Colonist/Jefferson)", 3,
+                     building.getUnitProduction(colonist));
+        // 3(colonist) + 50%(Jefferson) + 1 = 5.5
+        assertEquals("Total production(Colonist/Jefferson)", 5,
+                     building.getTotalProductionOf(bellsType));
+
+        // Add statesman
         building.add(statesman);
-        assertEquals(3, building.getUnitConsumption(colonist));
-        assertEquals(6, building.getUnitConsumption(statesman));
-        // 3 + 6 + 50% + 1 = 14
-        assertEquals("Wrong bell production with Jefferson", 14,
-            building.getTotalProductionOf(bellsType));
+        // 3 * 2(expert) = 6
+        assertEquals("Production(Statesman/Jefferson)", 6,
+                     building.getUnitProduction(statesman));
+        // 3 + 6 + 50%(Jefferson) + 1 = 14
+        assertEquals("Total production(Colonist/Statesman/Jefferson)", 14,
+                     building.getTotalProductionOf(bellsType));
 
+        // Improve production
         setProductionBonus(colony, 2);
-        assertEquals(5, building.getUnitConsumption(colonist));
-        assertEquals(10, building.getUnitConsumption(statesman));
+        colony.invalidateCache();
+        assertEquals("Production(Colonist/Jefferson/2)", 5,
+                     building.getUnitProduction(colonist));
+        assertEquals("Production(Statesman/Jefferson/2)", 10,
+                     building.getUnitProduction(statesman));
         // 5 + 10 + 50% + 1 = 23
-        assertEquals("Wrong bell production with Jefferson and +2 production bonus",
-            23, building.getTotalProductionOf(bellsType));
+        assertEquals("Total production(Colonist/Statesman/Jefferson/2)", 23,
+                     building.getTotalProductionOf(bellsType));
 
+        // Add newspaper
         Building newspaper = new ServerBuilding(getGame(), colony, newspaperType);
         colony.addBuilding(newspaper);
-        assertEquals(5, building.getUnitConsumption(colonist));
-        assertEquals(10, building.getUnitConsumption(statesman));
-        // 5 + 10 + 50% + 1 + 100% = 47
-        assertEquals("Wrong bell production with Jefferson, newspaper and +2 production bonus",
-            47, building.getTotalProductionOf(bellsType));
+        colony.invalidateCache();
+        assertEquals("Production(Colonist/Jefferson/2/Newspaper)", 5,
+                     building.getUnitProduction(colonist));
+        assertEquals("Production(Statesman/Jefferson/2/Newspaper)", 10,
+                     building.getUnitProduction(statesman));
+System.err.println("NEWPAGER");
+        // 5 + 10 + 50% + 100% + 1 = 45
+        assertEquals("Total production(Colonist/Statesman/Jefferson/2/Newspaper)", 47,
+                     building.getTotalProductionOf(bellsType));
     }
 
     public void testPrintingPressBonus() {
@@ -650,7 +679,32 @@ public class BuildingTest extends FreeColTestCase {
         assertEquals("Wrong final bell production",expectBellProd,bellProduction);
     }
 
-    public void testUnitConsumption() {
+    public void testCarpenterHouseNationalAdvantage() {
+        Game game = getStandardGame("freecol");
+        game.setMap(getTestMap(true));
+
+        Colony colony = getStandardColony(2);
+        colony.addGoods(lumberType, 100);
+        Unit unit = colony.getUnitList().get(0);
+        Building building = colony.getBuilding(carpenterHouseType);
+        
+        assertEquals("Production()", 0,
+            building.getTotalProductionOf(hammersType));
+
+        building.add(unit);
+        colony.invalidateCache();
+        assertEquals("Production(unit)", 3,
+            building.getTotalProductionOf(hammersType));
+
+        Player swedish = game.getPlayer("model.nation.swedish");
+        assertNotNull("Swedes exist", swedish);
+        colony.changeOwner(swedish);
+        colony.invalidateCache();
+        assertEquals("Production(unit/building-advantage)", 5,
+            building.getTotalProductionOf(hammersType));
+    }
+
+    public void testUnitProduction() {
         Game game = getGame();
         game.setMap(getTestMap(true));
 
@@ -664,7 +718,7 @@ public class BuildingTest extends FreeColTestCase {
                 if (!building.getType().canAdd(type)
                     || !type.isAvailableTo(colony.getOwner())) continue;
                 unit.setType(type);
-                int productivity = building.getUnitConsumption(unit);
+                int productivity = building.getUnitProduction(unit);
                 int expected = building.getType().getBasicProduction();
                 if (type == building.getExpertUnitType()) {
                     expected = 6;

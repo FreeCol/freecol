@@ -1188,7 +1188,9 @@
   <building-types>
     <building-type id="model.building.townHall" basicProduction="3"
                    produces="model.goods.bells">
-      <modifier id="model.goods.bells" type="additive" value="1"/>
+      <modifier id="model.goods.bells" type="additive" value="1">
+        <scope ability-id="model.ability.person" matchNegated="true"/>
+      </modifier>      
     </building-type>
     <building-type id="model.building.carpenterHouse" basicProduction="3"
                    consumes="model.goods.lumber" produces="model.goods.hammers">
@@ -1221,7 +1223,9 @@
       <required-goods id="model.goods.hammers" value="240"/>
       <required-goods id="model.goods.tools" value="100"/>
       <required-ability id="model.ability.buildFactory"/>
-      <modifier id="model.goods.tools" type="percentage" value="50"/>
+      <modifier id="model.goods.tools" type="percentage" value="50">
+        <scope ability-id="model.ability.person" matchNegated="true"/>
+      </modifier>
       <ability id="model.ability.expertsUseConnections" value="true"/>
     </building-type>
     <building-type id="model.building.tobacconistHouse" basicProduction="3"
@@ -1237,7 +1241,9 @@
       <required-goods id="model.goods.hammers" value="160"/>
       <required-goods id="model.goods.tools" value="100"/>
       <required-ability id="model.ability.buildFactory"/>
-      <modifier id="model.goods.cigars" type="percentage" value="50"/>
+      <modifier id="model.goods.cigars" type="percentage" value="50">
+        <scope ability-id="model.ability.person" matchNegated="true"/>
+      </modifier>
       <ability id="model.ability.expertsUseConnections" value="true"/>
     </building-type>
     <building-type id="model.building.weaverHouse" basicProduction="3"
@@ -1253,7 +1259,9 @@
       <required-goods id="model.goods.hammers" value="160"/>
       <required-goods id="model.goods.tools" value="100"/>
       <required-ability id="model.ability.buildFactory"/>
-      <modifier id="model.goods.cloth" type="percentage" value="50"/>
+      <modifier id="model.goods.cloth" type="percentage" value="50">
+        <scope ability-id="model.ability.person" matchNegated="true"/>
+      </modifier>
       <ability id="model.ability.expertsUseConnections" value="true"/>
     </building-type>
     <building-type id="model.building.distillerHouse" basicProduction="3"
@@ -1269,7 +1277,9 @@
       <required-goods id="model.goods.hammers" value="160"/>
       <required-goods id="model.goods.tools" value="100"/>
       <required-ability id="model.ability.buildFactory"/>
-      <modifier id="model.goods.rum" type="percentage" value="50"/>
+      <modifier id="model.goods.rum" type="percentage" value="50">
+        <scope ability-id="model.ability.person" matchNegated="true"/>
+      </modifier>
       <ability id="model.ability.expertsUseConnections" value="true"/>
     </building-type>
     <building-type id="model.building.furTraderHouse" basicProduction="3"
@@ -1285,7 +1295,9 @@
       <required-goods id="model.goods.hammers" value="160"/>
       <required-goods id="model.goods.tools" value="100"/>
       <required-ability id="model.ability.buildFactory"/>
-      <modifier id="model.goods.coats" type="percentage" value="50"/>
+      <modifier id="model.goods.coats" type="percentage" value="50">
+        <scope ability-id="model.ability.person" matchNegated="true"/>
+      </modifier>
       <ability id="model.ability.expertsUseConnections" value="true"/>
     </building-type>
     <building-type id="model.building.schoolhouse" workplaces="1" minSkill="1" maxSkill="1"
@@ -1323,17 +1335,23 @@
       <required-goods id="model.goods.hammers" value="240"/>
       <required-goods id="model.goods.tools" value="100"/>
       <required-ability id="model.ability.buildFactory"/>
-      <modifier id="model.goods.muskets" type="percentage" value="50"/>
+      <modifier id="model.goods.muskets" type="percentage" value="50">
+        <scope ability-id="model.ability.person" matchNegated="true"/>
+      </modifier>
       <ability id="model.ability.expertsUseConnections" value="true"/>
     </building-type>
     <building-type id="model.building.chapel" workplaces="0" produces="model.goods.crosses">
-      <modifier id="model.goods.crosses" type="additive" value="1"/>
+      <modifier id="model.goods.crosses" type="additive" value="1">
+        <scope ability-id="model.ability.person" matchNegated="true"/>
+      </modifier>      
     </building-type>
     <building-type id="model.building.church" extends="model.building.chapel"
                    basicProduction="3" upgradesFrom="model.building.chapel"
                    workplaces="3" required-population="3" upkeep="5">
       <required-goods id="model.goods.hammers" value="64"/>
-      <modifier id="model.goods.crosses" type="additive" value="1"/>
+      <modifier id="model.goods.crosses" type="additive" value="1">
+        <scope ability-id="model.ability.person" matchNegated="true"/>
+      </modifier>      
       <ability id="model.ability.dressMissionary" value="true"/>
     </building-type>
     <building-type id="model.building.cathedral" extends="model.building.church"
@@ -1341,7 +1359,9 @@
                    required-population="8" upkeep="15">
       <required-goods id="model.goods.hammers" value="176"/>
       <required-goods id="model.goods.tools" value="100"/>
-      <modifier id="model.goods.crosses" type="additive" value="1"/>
+      <modifier id="model.goods.crosses" type="additive" value="1">
+        <scope ability-id="model.ability.person" matchNegated="true"/>
+      </modifier>      
     </building-type>
     <building-type id="model.building.stockade" workplaces="0" required-population="3">
       <required-goods id="model.goods.hammers" value="64"/>
@@ -1420,14 +1440,18 @@
     <building-type id="model.building.printingPress" workplaces="0" upkeep="5">
       <required-goods id="model.goods.hammers" value="52"/>
       <required-goods id="model.goods.tools" value="20"/>
-      <modifier id="model.goods.bells" type="percentage" value="50"/>
+      <modifier id="model.goods.bells" type="percentage" value="50">
+        <scope ability-id="model.ability.person" matchNegated="true"/>
+      </modifier>
     </building-type>
     <building-type id="model.building.newspaper" extends="model.building.printingPress"
                    upgradesFrom="model.building.printingPress" required-population="4" upkeep="10">
       <required-goods id="model.goods.hammers" value="120"/>
       <required-goods id="model.goods.tools" value="50"/>
       <modifier id="model.goods.bells" delete="true" />
-      <modifier id="model.goods.bells" type="percentage" value="100"/>
+      <modifier id="model.goods.bells" type="percentage" value="100">
+        <scope ability-id="model.ability.person" matchNegated="true"/>
+      </modifier>
     </building-type>
     <building-type id="model.building.customHouse" workplaces="0" upkeep="15">
       <required-goods id="model.goods.hammers" value="160"/>
@@ -1491,7 +1515,9 @@
     </founding-father>
     <founding-father id="model.foundingFather.henryHudson" type="exploration"
                      weight1="10" weight2="1" weight3="1">
-      <modifier id="model.goods.furs" type="percentage" value="100"/>
+      <modifier id="model.goods.furs" type="percentage" value="100">
+        <scope ability-id="model.ability.person" matchNegated="true"/>
+      </modifier>
     </founding-father>
     <founding-father id="model.foundingFather.laSalle" type="exploration"
                      weight1="7" weight2="5" weight3="3">
@@ -1530,7 +1556,9 @@
     </founding-father>
     <founding-father id="model.foundingFather.thomasJefferson" type="political"
                      weight1="4" weight2="5" weight3="6">
-      <modifier id="model.goods.bells" type="percentage" value="50"/>
+      <modifier id="model.goods.bells" type="percentage" value="50">
+        <scope ability-id="model.ability.person" matchNegated="true"/>
+      </modifier>
     </founding-father>
     <founding-father id="model.foundingFather.pocahontas" type="political"
                      weight1="7" weight2="5" weight3="3">
@@ -1542,7 +1570,9 @@
       <ability id="model.ability.addTaxToBells" value="true"/>
       <!-- The value of the modifier is intentionally zero.
            It will be set to the current tax. -->
-      <modifier id="model.goods.bells" type="percentage" value="0"/>
+      <modifier id="model.goods.bells" type="percentage" value="0">
+        <scope ability-id="model.ability.person" matchNegated="true"/>
+      </modifier>
     </founding-father>
     <founding-father id="model.foundingFather.simonBolivar" type="political"
                      weight1="0" weight2="4" weight3="6">
@@ -1564,7 +1594,9 @@
     </founding-father>
     <founding-father id="model.foundingFather.williamPenn" type="religious"
                      weight1="8" weight2="5" weight3="2">
-      <modifier id="model.goods.crosses" type="percentage" value="50"/>
+      <modifier id="model.goods.crosses" type="percentage" value="50">
+        <scope ability-id="model.ability.person" matchNegated="true"/>
+      </modifier>
     </founding-father>
     <founding-father id="model.foundingFather.fatherJeanDeBrebeuf" type="religious"
                      weight1="6" weight2="6" weight3="1">
