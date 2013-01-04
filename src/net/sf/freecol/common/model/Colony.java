@@ -2293,7 +2293,7 @@ public class Colony extends Settlement implements Nameable {
      * Invalidates the production cache.
      */
     public void invalidateCache() {
-        logger.finest("invalidating production cache");
+        //logger.finest("invalidating production cache");
         productionCache.invalidate();
     }
 
@@ -2778,7 +2778,7 @@ public class Colony extends Settlement implements Nameable {
             // buildings).
             Turn turn = getGame().getTurn();
             for (Modifier modifier : getModifiers()) {
-                if (!modifier.isOutOfDate(turn)) {
+                if (modifier.hasIncrement() && !modifier.isOutOfDate(turn)) {
                     modifier.toXML(out);
                 }
             }
@@ -2845,7 +2845,13 @@ public class Colony extends Settlement implements Nameable {
                 data.readFromXML(in);
                 exportData.put(data.getId(), data);
             } else if (Modifier.getXMLElementTagName().equals(in.getLocalName())) {
-                addModifier(new Modifier(in, getSpecification()));
+                Modifier m = new Modifier(in, getSpecification());
+                if (m.hasIncrement()) {
+                    addModifier(m);
+                } else {
+                    logger.warning("Ignoring non-timed colony modifier: "
+                        + m.toString());
+                }
             } else if ("buildQueue".equals(in.getLocalName())) {
                 // TODO: remove support for old format, move serialization to BuildQueue
                 int size = getAttribute(in, ARRAY_SIZE, 0);
