@@ -21,6 +21,9 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Font;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JToolTip;
@@ -29,16 +32,22 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Building;
+import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.resources.ResourceManager;
 
+
 /**
- * This panel represents a single building in a Colony.
+ * A tooltip for a single building in a Colony.
  */
 public class BuildingToolTip extends JToolTip {
 
@@ -47,7 +56,6 @@ public class BuildingToolTip extends JToolTip {
     static {
         arrow.setFont(ResourceManager.getFont("SimpleFont", Font.BOLD, 24f));
     }
-
 
 
     /**
@@ -59,8 +67,10 @@ public class BuildingToolTip extends JToolTip {
      */
     public BuildingToolTip(FreeColClient freeColClient, Building building,
                            GUI gui) {
-
-        int workplaces = building.getUnitCapacity();
+        final Game game = building.getGame();
+        final int workplaces = building.getUnitCapacity();
+        final GoodsType output = building.getGoodsOutputType();
+        final Colony colony = building.getColony();
 
         String columns = "[align center]";
         for (int index = 0; index < workplaces; index++) {
@@ -71,7 +81,8 @@ public class BuildingToolTip extends JToolTip {
                                          columns, "[][][align bottom]");
         setLayout(layout);
 
-        JLabel buildingName = new JLabel(Messages.message(building.getNameKey()));
+        JLabel buildingName
+            = new JLabel(Messages.message(building.getNameKey()));
         buildingName.setFont(ResourceManager.getFont("SimpleFont", Font.BOLD, 16f));
         add(buildingName, "span");
 
@@ -107,15 +118,23 @@ public class BuildingToolTip extends JToolTip {
 
         for (Unit unit : building.getUnitList()) {
             UnitLabel unitLabel = new UnitLabel(freeColClient, unit, gui, false);
-            if (building.canTeach() && unit.getStudent() != null) {
-                JLabel progress = new JLabel(unit.getTurnsOfTraining() + "/" +
-                                             unit.getNeededTurnsOfTraining());
-                UnitLabel studentLabel = new UnitLabel(freeColClient, unit.getStudent(), gui, true);
-                studentLabel.setIgnoreLocation(true);
+            int production = building.getUnitProduction(unit);
+            if (production > 0) {
+                add(unitLabel);
+                JLabel pLabel = new ProductionLabel(freeColClient, gui, output,
+                                                    production);
+                add(pLabel, "split 2");
+                add(new JLabel());
+            } else if (building.canTeach() && unit.getStudent() != null) {
+                JLabel progress = new JLabel(unit.getTurnsOfTraining() + "/"
+                                           + unit.getNeededTurnsOfTraining());
+                UnitLabel sLabel = new UnitLabel(freeColClient, 
+                                                 unit.getStudent(), gui, true);
+                sLabel.setIgnoreLocation(true);
                 add(unitLabel);
                 add(progress, "split 2, flowy");
-                add(studentLabel);
-            } else  {
+                add(sLabel);
+            } else {
                 add(unitLabel, "span 2");
             }
         }
@@ -125,7 +144,6 @@ public class BuildingToolTip extends JToolTip {
             add(new JLabel(new ImageIcon(ResourceManager.getImage("placeholder.image"))), "span 2");
         }
 
-        GoodsType output = building.getGoodsOutputType();
         int breedingNumber = (output == null) ? GoodsType.INFINITY
             : output.getBreedingNumber();
         if (breedingNumber < GoodsType.INFINITY
@@ -136,10 +154,25 @@ public class BuildingToolTip extends JToolTip {
             add(new JLabel(Messages.message(t)));
         }
 
+        if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
+            List<Modifier> modifiers = new ArrayList<Modifier>();
+            modifiers.addAll(building.getProductionModifiers(output, null));
+            Collections.sort(modifiers);
+            for (Modifier m : modifiers) {
+                JLabel[] mLabels = FreeColPanel.getModifierLabels(m, null,
+                                                                  game.getTurn());
+                for (int i = 0; i < mLabels.length; i++) {
+                    if (mLabels[i] != null) {
+                        if (i == 0) {
+                            add(mLabels[i],"newline");
+                        } else {
+                            add(mLabels[i]);
+                        }
+                    }
+                }
+            }
+        }
+
         setPreferredSize(layout.preferredLayoutSize(this));
-
     }
-
 }
-
-

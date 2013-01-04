@@ -45,7 +45,6 @@ import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Modifier;
-import net.sf.freecol.common.model.Scope;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Turn;
@@ -62,15 +61,17 @@ public class WorkProductionPanel extends FreeColPanel {
         .createCompoundBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.BLACK),
                               BorderFactory.createEmptyBorder(2, 2, 2, 2));
 
+
     public WorkProductionPanel(FreeColClient freeColClient, GUI gui, Unit unit) {
         super(freeColClient, gui);
 
         setLayout(new MigLayout("wrap 3, insets 10 10 10 10", "[]30:push[right][]", ""));
 
-        Colony colony = unit.getColony();
-        UnitType unitType = unit.getType();
+        final Colony colony = unit.getColony();
+        final UnitType unitType = unit.getType();
 
         List<Modifier> modifiers = new ArrayList<Modifier>();
+        List<Modifier> moreModifiers = new ArrayList<Modifier>();
         if (unit.getLocation() instanceof ColonyTile) {
             ColonyTile colonyTile = (ColonyTile) unit.getLocation();
             GoodsType goodsType = unit.getWorkType();
@@ -98,7 +99,8 @@ public class WorkProductionPanel extends FreeColPanel {
             GoodsType goodsType = building.getGoodsOutputType();
             modifiers.addAll(building.getProductionModifiers(goodsType,
                                                              unitType));
-
+            moreModifiers.addAll(building.getProductionModifiers(goodsType,
+                                                                 null));
             add(localizedLabel(building.getNameKey()),
                                "span, align center, wrap 30");
             add(new JLabel(ResourceManager.getImageIcon(building.getType()
@@ -110,7 +112,13 @@ public class WorkProductionPanel extends FreeColPanel {
         Collections.sort(modifiers);
         float result = 0.0f;
         for (Modifier modifier : modifiers) {
-            result = addModifier(modifier, unitType, result);
+            JLabel[] mLabels = getModifierLabels(modifier, unitType, turn);
+            for (int i = 0; i < mLabels.length; i++) {
+                if (mLabels[i] != null) {
+                    if (i == 0) add(mLabels[i],"newline"); else add(mLabels[i]);
+                }
+            }
+            result = modifier.applyTo(result, turn);
         }
 
         if (result < 0.0f) {
@@ -129,42 +137,22 @@ public class WorkProductionPanel extends FreeColPanel {
         finalResult.setBorder(border);
         add(finalResult, "wrap 30");
 
-        add(okButton, "span, tag ok");
-
-        setSize(getPreferredSize());
-    }
-
-
-    private float addModifier(Modifier modifier, UnitType unitType, float result) {
-        FreeColObject source = modifier.getSource();
-        String sourceName;
-        if (source == null) {
-            sourceName = "???";
-        } else {
-            sourceName = Messages.getName(source);
-            if (unitType != null && modifier.hasScope()) {
-                for (Scope scope : modifier.getScopes()) {
-                    if (scope.appliesTo(unitType)) {
-                        sourceName += " (" + Messages.message(unitType.getNameKey()) + ")";
+        Collections.sort(moreModifiers);
+        for (Modifier modifier : moreModifiers) {
+            JLabel[] mLabels = getModifierLabels(modifier, null, turn);
+            for (int i = 0; i < mLabels.length; i++) {
+                if (mLabels[i] != null) {
+                    if (i == 0) {
+                        add(mLabels[i], "newline");
+                    } else {
+                        add(mLabels[i]);
                     }
                 }
             }
         }
-        float value = modifier.getValue(turn);
-        if (value == 0) {
-            return result;
-        }
-        String[] bonus = getModifierStrings(value, modifier.getType());
-        add(new JLabel(sourceName), "newline");
-        add(new JLabel(bonus[0] + bonus[1]));
-        if (bonus[2] != null) {
-            add(new JLabel(bonus[2]));
-        }
-        return modifier.applyTo(result, turn);
+        
+        add(okButton, "span, tag ok");
+
+        setSize(getPreferredSize());
     }
-
-
-
 }
-
-
