@@ -407,8 +407,8 @@ public class Scope extends FreeColObject implements Cloneable {
      */
     public String toString() {
         return "[Scope " + type
-            + ((abilityID == null) ? "" : abilityID + "=" + abilityValue)
-            + ((methodName == null) ? "" : methodName + "=" + methodValue)
+            + ((abilityID == null) ? "" : " " + abilityID + "=" + abilityValue)
+            + ((methodName == null) ? "" : " " + methodName + "=" + methodValue)
             + ((matchesNull) ? " matchesNull" : "")
             + ((matchNegated) ? " matchNegated" : "")
             + "]";
