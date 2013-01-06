@@ -1031,8 +1031,14 @@ public class Map extends FreeColGameObject implements Location {
                 
             // Search forwards to the high seas.
             path = searchMap(unit, (Tile)realStart,
-                             GoalDeciders.getLocationGoalDecider(realEnd),
+                             GoalDeciders.getHighSeasGoalDecider(),
                              costDecider, INFINITY, carrier, null);
+            if (path != null) {
+                PathNode last = path.getLastNode();
+                last.next = new PathNode(realEnd, unit.getInitialMovesLeft(),
+                    last.getTurns() + offMapUnit.getSailTurns(),
+                    last.isOnCarrier(), last, null);
+            }
 
         } else if (realStart instanceof Tile && realEnd instanceof Tile) {
             // 3: Tile->Tile
