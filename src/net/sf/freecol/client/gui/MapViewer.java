@@ -2361,6 +2361,14 @@ public final class MapViewer {
             // Forest
             if (tile.isForested()) {
                 Image forestImage = lib.getForestImage(tile.getType(), tile.getRiverStyle());
+                // @compat 0.10.6
+                // Workaround for BR#3599586.  America_large used to contain
+                // tiles with an isolated river (old river style="0"!).
+                // There will never be an image for these, so just drop the
+                // river style.  The map is now fixed, this is just for the
+                // the saved games.
+                if (forestImage == null) forestImage = lib.getForestImage(tile.getType(), null);
+                // @end compatibility code
                 g.drawImage(forestImage, 0, (tileHeight - forestImage.getHeight(null)), null);
             }
 
