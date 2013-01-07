@@ -437,8 +437,8 @@ public class Colony extends Settlement implements Nameable {
                 // stockade, BR#3522055.
                 source = getBuilding((BuildingType)source).getType();
             }
-            message += Messages.message(StringTemplate.template("colonyPanel.minimumColonySize")
-                .addName("%object%", source)) + "\n";
+            return Messages.message(StringTemplate.template("colonyPanel.minimumColonySize")
+                .addName("%object%", source));
         }
         return message;
     }
