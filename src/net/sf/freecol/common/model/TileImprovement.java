@@ -254,12 +254,10 @@ public class TileImprovement extends TileItem implements Named {
             } else {
                 Direction direction = targetTile.getMap().getDirection(targetTile, fromTile);
                 // TODO: fix this properly, roads are getting bogus styles
-                Tile other;
                 boolean connected = (isRiver())
                     ? style != null && style.isConnectedTo(direction)
                     : (isRoad())
-                    ? ((other = tile.getNeighbourOrNull(direction)) != null
-                        && other.hasRoad())
+                    ? fromTile.hasRoad() && targetTile.hasRoad()
                     : false;
                 if (connected) return type.getMoveCost(moveCost);
             }
