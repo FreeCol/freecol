@@ -50,6 +50,7 @@ import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
@@ -109,39 +110,26 @@ public final class QuickActionMenu extends JPopupMenu {
             }
         }
 
-        if (tempUnit.getLocation().getTile() != null &&
-            tempUnit.getLocation().getTile().getColony() != null) {
-            if (addWorkItems(unitLabel)) {
-                this.addSeparator();
-            }
-            if (addEducationItems(unitLabel)) {
-                this.addSeparator();
-            }
-            if (tempUnit.getLocation() instanceof WorkLocation) {
-                if (tempUnit.getColony().canReducePopulation()) {
+        if (tempUnit.getLocation().getTile() != null) {
+            Colony colony = tempUnit.getLocation().getTile().getColony();
+            if (colony != null) {
+                if (addWorkItems(unitLabel)) {
+                    this.addSeparator();
+                }
+                if (addEducationItems(unitLabel)) {
+                    this.addSeparator();
+                }
+                if (tempUnit.getLocation() instanceof WorkLocation
+                    && colony.canReducePopulation()) {
                     JMenuItem menuItem = new JMenuItem(Messages.message("leaveTown"));
                     menuItem.setActionCommand(UnitAction.LEAVE_TOWN.toString());
                     menuItem.addActionListener(unitLabel);
                     this.add(menuItem);
-                }
-                if(!tempUnit.isCarrier()){
-                    if(tempUnit.getColony() != null){
-                        for (Unit unit : tempUnit.getColony().getTile().getUnitList()) {
-                            if (unit.isCarrier() && unit.canCarryUnits()
-                                && unit.canAdd(tempUnit)
-                                && !(unit.getUnitList().contains(tempUnit))) {
-                                final Unit funit = unit;
-                                JMenuItem menuItem = new JMenuItem(Messages.message("Board " + Messages.message(unit.getLabel())));
-                                menuItem.addActionListener(new ActionListener() {
-                                    public void actionPerformed(ActionEvent e){
-                                        if (freeColClient.getInGameController().putOutsideColony(tempUnit)) {
-                                            freeColClient.getInGameController().boardShip(tempUnit, funit);
-                                        }
-                                    }
-                                });
-                                this.add(menuItem);
-                            }
-                        }
+                    addBoardItems(unitLabel, colony.getTile());
+                    this.addSeparator();
+                } else {
+                    if (addBoardItems(unitLabel, colony.getTile())) {
+                        this.addSeparator();
                     }
                 }
             } else {
@@ -149,8 +137,11 @@ public final class QuickActionMenu extends JPopupMenu {
                     this.addSeparator();
                 }
             }
-        } else if (tempUnit.getLocation() instanceof Europe) {
+        } else if (tempUnit.isInEurope()) {
             if (addCommandItems(unitLabel)) {
+                this.addSeparator();
+            }
+            if (addBoardItems(unitLabel, tempUnit.getOwner().getEurope())) {
                 this.addSeparator();
             }
         }
@@ -160,6 +151,35 @@ public final class QuickActionMenu extends JPopupMenu {
             }
         }
     }
+
+    private boolean addBoardItems(final UnitLabel unitLabel, Location loc) {
+        final Unit tempUnit = unitLabel.getUnit();
+
+        if (tempUnit.isCarrier()) return false;
+        boolean added = false;
+        for (Unit unit : loc.getUnitList()) {
+            if (unit.isCarrier() && unit.canCarryUnits()
+                && unit.canAdd(tempUnit)
+                && tempUnit.getLocation() != unit) {
+                final Unit funit = unit;
+                final InGameController igc = freeColClient.getInGameController();
+                StringTemplate template = StringTemplate.template("board")
+                    .addStringTemplate("%unit%", unit.getLabel());
+                JMenuItem menuItem = new JMenuItem(Messages.message(template));
+                menuItem.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            //if (igc.putOutsideColony(tempUnit)) {
+                                igc.boardShip(tempUnit, funit);
+                                //}
+                        }
+                    });
+                this.add(menuItem);
+                added = true;
+            }
+        }
+        return added;
+    }
+        
     private boolean addCarrierItems(final UnitLabel unitLabel) {
         final Unit tempUnit = unitLabel.getUnit();
 
@@ -437,23 +457,6 @@ public final class QuickActionMenu extends JPopupMenu {
                     }
                 });
             this.add(menuItem);
-        }
-        if(tempUnit.getColony() != null){
-            if(!tempUnit.isCarrier()){
-                for (Unit unit : tempUnit.getColony().getTile().getUnitList()){
-                    if (unit.isCarrier() && unit.canCarryUnits()) {
-                        if (tempUnit.isOnCarrier()) {
-                            menuItem = new JMenuItem(Messages.message("leaveTown"));
-                            menuItem.addActionListener(new ActionListener() {
-                                public void actionPerformed(ActionEvent e){
-                                    freeColClient.getInGameController().putOutsideColony(tempUnit);
-                                }
-                            });
-                        }
-                        this.add(menuItem);
-                    }
-                }
-            }
         }
         return true;
     }

@@ -1421,8 +1421,8 @@ public final class InGameController implements NetworkConstants {
             logger.warning("Trying to load onto a non-existent carrier.");
             return false;
         }
-        if (unit.isNaval()) {
-            logger.warning("Trying to load a ship onto another carrier.");
+        if (unit.isCarrier()) {
+            logger.warning("Trying to load a carrier onto another carrier.");
             return false;
         }
         if (unit.isInEurope() != carrier.isInEurope()
