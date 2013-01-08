@@ -39,8 +39,6 @@ public class FreeColDirectories {
 
     public static final String DEFAULT_TC = "freecol";
 
-    private static String dataFolder = "data";
-
     private static File clientOptionsFile = null;
 
     private static final String HIGH_SCORE_FILE = "HighScores.xml";
@@ -49,48 +47,49 @@ public class FreeColDirectories {
 
     private static final String STRINGS_DIRECTORY = "strings";
 
+    private static final String LOG_FILE_NAME = "FreeCol.log";
+
+    private static final String BASE_DIRECTORY = "base";
+    private static final String DATA_DIRECTORY = "data";
+    private static final String I18N_DIRECTORY = "strings";
     /**
-     * Creates a freecol dir for the current user.
+     * The directory where the standard freecol data is installed.
+     * Can be overridden at the command line.
      *
-     * The directory is created within the current user's
-     * home directory. This directory will be called "freecol"
-     * and underneath that directory a "save" directory will
-     * be created.
-     *
-     * For MacOS X the Library/FreeCol is used
-     * (which is the standard path for application related files).
-     *
-     * For os.name beginning with "Windows" JFileChooser() is used to
-     * find the path to "My Documents" (or localized equivalent)
+     * TODO: defaults lamely to ./data.  Do something better in the
+     * installer.
      */
-    public static void createAndSetDirectories() {
-        // TODO: The location of the save directory should be determined by the installer.;
-    
-        String freeColDirectoryName = "/".equals(System.getProperty("file.separator")) ?
-                ".freecol" : "freecol";
-    
-        File userHome = FileSystemView.getFileSystemView().getDefaultDirectory();
-    
-        // Checks for OS specific paths, however if the old {home}/.freecol exists
-        // that overrides OS-specifics for backwards compatibility.
-        // TODO: remove compatibility code
-        if (System.getProperty("os.name").equals("Mac OS X")) {
-            // We are running on a Mac and should use {home}/Library/FreeCol
-            if (!new File(userHome, freeColDirectoryName).isDirectory()) {
-                userHome = new File(userHome, "Library");
-                freeColDirectoryName = "FreeCol";
-            }
-        } else if (System.getProperty("os.name").startsWith("Windows")) {
-            // We are running on Windows and should use "My Documents" (or localized equivalent)
-            if (!new File(userHome, freeColDirectoryName).isDirectory()) {
-                freeColDirectoryName = "FreeCol";
-            }
-        }
-    
+    private static File dataDirectory = new File(DATA_DIRECTORY);
+
+    /**
+     * The path to the log file.
+     * Can be overridden at the command line.
+     */
+    private static String logFilePath = null;
+
+    private static final String SEPARATOR = System.getProperty("file.separator");
+
+    /**
+     * Checks/creates the freecol directory structure for the current
+     * user.
+     *
+     * The main user directory is in the current user's home
+     * directory.  It used to be called ".freecol" (UNIXes) or
+     * "freecol", but now we also use Library/FreeCol under MacOSX and
+     * some JFileChooser trickery with Windows.
+     *
+     * Note: the freecol data directory is set independently.
+     *
+     * TODO: The default location of the main user and data
+     * directories should be determined by the installer.
+     *
+     * @return True if the directory structure is intact.
+     */
+    public static boolean createAndSetDirectories() {
         if (FreeColDirectories.mainUserDirectory == null) {
-            FreeColDirectories.setMainUserDirectory(new File(userHome, freeColDirectoryName));
+            if (setMainUserDirectory(null) != null) return false;
         }
-        if (!FreeColDirectories.insistDirectory(FreeColDirectories.mainUserDirectory)) return;
+
         if (FreeColDirectories.saveDirectory == null) {
             FreeColDirectories.saveDirectory = new File(FreeColDirectories.getMainUserDirectory(), "save");
         }
@@ -109,6 +108,11 @@ public class FreeColDirectories {
             FreeColDirectories.clientOptionsFile = (FreeColDirectories.tcUserDirectory == null) ? null
                 : new File(FreeColDirectories.tcUserDirectory, "options.xml");
         }
+
+        if (logFilePath == null) {
+            logFilePath = mainUserDirectory + SEPARATOR + LOG_FILE_NAME;
+        }
+        return true;
     }
 
     /**
@@ -138,11 +142,7 @@ public class FreeColDirectories {
      * @return The directory where the data files are located.
      */
     public static File getDataDirectory() {
-        if (FreeColDirectories.dataFolder.equals("")) {
-            return new File("data");
-        } else {
-            return new File(FreeColDirectories.dataFolder);
-        }
+        return dataDirectory;
     }
 
     public static File getHighScoreFile() {
@@ -158,6 +158,24 @@ public class FreeColDirectories {
         return new File(getDataDirectory(), FreeColDirectories.STRINGS_DIRECTORY);
     }
 
+    /**
+     * Gets the log file path.
+     *
+     * @return The log file path.
+     */
+    public static String getLogFilePath() {
+        return logFilePath;
+    }
+
+    /**
+     * Sets the log file path.
+     *
+     * @param path The new log file path.
+     */
+    public static void setLogFilePath(String path) {
+        logFilePath = path;
+    }
+ 
     public static File getMainUserDirectory() {
         return mainUserDirectory;
     }
@@ -234,17 +252,109 @@ public class FreeColDirectories {
         return file.mkdir();
     }
 
-    public static void setClientOptionsFile(File file) {
-        FreeColDirectories.clientOptionsFile = file;
+    /**
+     * Sets the client options file.
+     *
+     * @param path The new client options file.
+     * @return True if the file was set successfully.
+     */
+    public static boolean setClientOptionsFile(String path) {
+        File file = new File(path);
+        if (file.exists() && file.isFile() && file.canRead()) {
+            clientOptionsFile = file;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Sets the data directory.
+     *
+     * Insist that the base resources and i18n subdirectories are present.
+     *
+     * @param dir The new value for the data directory, or null to
+     *     apply the default.
+     * @return A (non-i18n) error message on failure, null on success.
+     */
+    public static String setDataDirectory(String path) {
+        if (path == null) path = DATA_DIRECTORY;
+        File dir = new File(path);
+        if (!dir.isDirectory()) return "Not a directory: " + path;
+        if (!dir.canRead()) return "Can not read directory: " + path;
+        dataDirectory = dir;
+        if (getBaseDirectory() == null) {
+            return "Can not find base resources directory: " + path
+                + SEPARATOR + BASE_DIRECTORY;
+        }
+        if (getI18nDirectory() == null) {
+            return "Can not find I18n resources directory: " + path
+                + SEPARATOR + I18N_DIRECTORY;
+        }
+        return null;
+    }
+
+    /**
+     * Sets the main user directory, creating it if necessary.
+     * If pre-existing, it must be a directory, readable and writable.
+     *
+     * @param path The path to the new main user directory, or null to apply
+     *     the default.
+     * @return Null on success, an error message key on failure.
+     */
+    public static String setMainUserDirectory(String path) {
+        String ret = null;
+        File dir = (path == null) ? getDefaultMainUserDirectory()
+            : new File(path);
+        if (!dir.exists()) {
+            ret = "cli.error.home.notExists";
+            try {
+                if (dir.mkdir()) {
+                    mainUserDirectory = dir;
+                    ret = null;
+                }
+            } catch (Exception e) {}
+        } else if (!dir.isDirectory()) {
+            ret = "cli.error.home.notExists";
+        } else if (!dir.canRead()) {
+            ret = "cli.error.home.noRead";
+        } else if (!dir.canWrite()) {
+            ret = "cli.error.home.noWrite";
+        } else {
+            mainUserDirectory = dir;
+        }
+        return ret;
+    }
+
+    /**
+     * Gets the default main user directory under their home.
+     *
+     * @return The default main user directory.
+     */
+    public static File getDefaultMainUserDirectory() {
+        String freeColDirectoryName = "/".equals(SEPARATOR) ? ".freecol"
+            : "freecol";
+        File userHome = FileSystemView.getFileSystemView()
+            .getDefaultDirectory();
+        if (userHome == null) return null;
+
+        // Checks for OS specific paths, however if the old
+        // {home}/.freecol exists that overrides OS-specifics for
+        // backwards compatibility.  TODO: remove compatibility code
+        if (System.getProperty("os.name").equals("Mac OS X")) {
+            // We are running on a Mac and should use {home}/Library/FreeCol
+            if (!new File(userHome, freeColDirectoryName).isDirectory()) {
+                userHome = new File(userHome, "Library");
+                freeColDirectoryName = "FreeCol";
+            }
+        } else if (System.getProperty("os.name").startsWith("Windows")) {
+            // We are running on Windows and should use "My Documents"
+            // (or localized equivalent)
+            if (!new File(userHome, freeColDirectoryName).isDirectory()) {
+                freeColDirectoryName = "FreeCol";
+            }
+        }
         
-    }
-
-    public static void setDataFolder(String dataFolder) {
-        FreeColDirectories.dataFolder = dataFolder;
-    }
-
-    public static void setMainUserDirectory(File mainUserDirectory) {
-        FreeColDirectories.mainUserDirectory = mainUserDirectory;
+        return new File(userHome, freeColDirectoryName);
     }
 
     /**
@@ -259,21 +369,25 @@ public class FreeColDirectories {
         FreeColDirectories.savegameFile = savegameFile;
     }
 
-    public static void setSaveGameFile(String name) {
-        setSavegameFile(new File(name));
-        if (!getSavegameFile().exists() || !getSavegameFile().isFile()) {
-            setSavegameFile(new File(getSaveDirectory(), name));
-            if (!getSavegameFile().exists() || !getSavegameFile().isFile()) {
-                System.out.println("Could not find savegame file: " + name);
-                System.exit(1);
-            }
-        } else {
-            setSaveDirectory(getSavegameFile().getParentFile());
+    /**
+     * Sets the save game file.
+     *
+     * @param path The path to the new save game file.
+     * @return True if the setting succeeds.
+     */
+    public static boolean setSavegameFile(String path) {
+        File file = new File(path);
+        if (!file.exists() || !file.isFile() || !file.canRead()) {
+            file = new File(getSaveDirectory(), path);
+            if (!file.exists() || !file.isFile()
+                || !file.canRead()) return false;
         }
+        setSavegameFile(file);
+        setSaveDirectory(file.getParentFile());
+        return true;
     }
 
     public static void setTc(String tc) {
         FreeColDirectories.tc = tc;
     }
-
 }

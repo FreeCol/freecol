@@ -49,6 +49,8 @@ import net.sf.freecol.common.option.SelectOption;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.events.XMLEvent;
+
 
 
 /**
@@ -614,7 +616,48 @@ public class ClientOptions extends OptionGroup {
         }
     }
 
-
+    /**
+     * Extracts the value of the LANGUAGE option from the client options file.
+     *
+     * @return The language option value, or null if none or IO error.
+     */
+    public static String getLanguageOption() {
+        File options = FreeColDirectories.getClientOptionsFile();
+        if (options.canRead()) {
+            XMLStreamReader in = null;
+            try {
+                in = XMLInputFactory.newInstance()
+                    .createXMLStreamReader(new FileInputStream(options),
+                                           "UTF-8");
+                in.nextTag();
+                /**
+                 * The following code was contributed by armcode to fix
+                 * bug #[ 2045521 ] "Exception in Freecol.log on starting
+                 * game". I was never able to reproduce the bug, but the
+                 * patch did no harm either.
+                 */
+                for (int eventid = in.getEventType();
+                     eventid != XMLEvent.END_DOCUMENT;
+                     eventid = in.getEventType()) {
+                    //TODO: Is checking for XMLEvent.ATTRIBUTE needed?
+                    if (eventid == XMLEvent.START_ELEMENT
+                        && LANGUAGE.equals(in.getAttributeValue(null, "id"))) {
+                        return in.getAttributeValue(null, "value");
+                    }
+                    in.nextTag();
+                }
+                // We don't have a language option in our file, it is
+                // either not there or the file is corrupt
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Failure getting language.", e);
+            } finally {
+                try {
+                    if (in != null) in.close();
+                } catch (Exception e) {}
+            }
+        }
+        return null;
+    }
 
     /**
      * Return the client's preferred tile text type.

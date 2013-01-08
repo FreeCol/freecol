@@ -35,6 +35,8 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.io.FreeColDirectories;
+
 
 /**
  * This is the panel that pops up when an error needs to be reported.
@@ -77,7 +79,7 @@ public final class ErrorPanel extends FreeColDialog<Boolean> {
     public ErrorPanel(FreeColClient freeColClient, GUI gui) {
         super(freeColClient, gui);
 
-        File logFile = new File(FreeCol.getLogFile());
+        File logFile = new File(FreeColDirectories.getLogFilePath());
         byte[] buffer = new byte[(int) logFile.length()];
         BufferedInputStream logFileStream = null;
         String message = null;

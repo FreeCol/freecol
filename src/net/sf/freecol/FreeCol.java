@@ -34,10 +34,6 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.events.XMLEvent;
-
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -64,6 +60,9 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamReader;
+
 /**
  * This class is responsible for handling the command-line arguments
  * and starting either the stand-alone server or the client-GUI.
@@ -81,25 +80,25 @@ public final class FreeCol {
     public static final int     DEFAULT_TIMEOUT = 60; // 1 minute
     public static final int     TIMEOUT_MIN = 10; // 10s
 
+    private static final int MIN_MEMORY = 128; // Mbytes
+    private static final String MIN_JDK_VERSION = "1.5";
+    private static final String DEFAULT_SPLASH_FILE = "splash.jpg";
+
     public static final String CLIENT_THREAD = "FreeColClient:";
     public static final String SERVER_THREAD = "FreeColServer:";
     public static final String METASERVER_THREAD = "FreeColMetaServer:";
+
     private static final String FREECOL_VERSION = "0.10.x-trunk";
     private static String FREECOL_REVISION;
 
-    private static final String MIN_JDK_VERSION = "1.5";
-
-    private static final String DEFAULT_SPLASH_FILE = "splash.jpg";
-
-    private static boolean  sound = true,
-                            javaCheck = true,
-                            memoryCheck = true,
-                            consoleLogging = false,
-                            introVideo = true;
-    private static String logFile = null;
-
-    private static boolean standAloneServer = false;
-    private static boolean publicServer = true;
+    private static boolean checkIntegrity = false,
+                           sound = true,
+                           javaCheck = true,
+                           memoryCheck = true,
+                           consoleLogging = false,
+                           introVideo = true,
+                           standAloneServer = false,
+                           publicServer = true;
 
     private static String fontName = null;
 
@@ -108,27 +107,14 @@ public final class FreeCol {
 
     private static Level logLevel = Level.INFO;
 
-    private static boolean checkIntegrity = false;
-
-    private static final Options options = new Options();
-
     private static String splashFilename = DEFAULT_SPLASH_FILE;
+
     private static Dimension windowSize;
 
     private static int freeColTimeout = -1;
 
 
-    private FreeCol() {
-        // Hide constructor
-    }
-
-    private static String readVersion(Class c) throws IOException {
-        String resourceName = "/" + c.getName().toString().replace('.', '/')
-            + ".class";
-        URL url = c.getResource(resourceName);
-        Manifest mf = ((JarURLConnection)url.openConnection()).getManifest();
-        return mf.getMainAttributes().getValue("Package-Version");
-    }
+    private FreeCol() {} // Hide constructor
 
     /**
      * The entrypoint.
@@ -146,185 +132,145 @@ public final class FreeCol {
             System.err.println("Unable to load Manifest: " + e.getMessage());
         }
 
-        // parse command line arguments
+        // We can not even emit localized error messages until we find
+        // the data directory, which might have been specified on the
+        // command line.
+        String dataDirectoryArg = null;
+        for (int i = 0; i < args.length - 1; i++) {
+            if ("--freecol-data".equals(args[i])) {
+                dataDirectoryArg = args[++i];
+                break;
+            }
+        }
+        String err = FreeColDirectories.setDataDirectory(dataDirectoryArg);
+        if (err != null) fatal(err); // This must not fail.
+
+        // Now we have the data directory, establish the base locale.
+        // Beware, the locale may change!
+        String localeArg = null;
+        for (int i = 0; i < args.length - 1; i++) {
+            if ("--default-locale".equals(args[i])) {
+                localeArg = args[++i];
+                break;
+            }
+        }
+        Locale locale;
+        if (localeArg == null) {
+            locale = Locale.getDefault();
+        } else {
+            // Strip encoding if present
+            int index = localeArg.indexOf('.');
+            if (index > 0) localeArg = localeArg.substring(0, index);
+
+            locale = LanguageOption.getLocale(localeArg);
+        }
+
+        // Locale established, now load some messages.
+        Messages.setMessageBundle(locale);
+
+        // Now we can emit error messages, parse the other command
+        // line arguments.
         handleArgs(args);
 
-        FreeColDirectories.createAndSetDirectories();
-        initLogging();
-        Mods.loadMods();
+        // Do the potentially fatal system checks as early as possible.
+        String version = System.getProperty("java.version");
+        if (javaCheck && version.compareTo(MIN_JDK_VERSION) < 0) {
+            fatal(Messages.message(StringTemplate.template("main.javaVersion")
+                    .addName("%version%", version)
+                    .addName("%minVersion%", MIN_JDK_VERSION)));
+        }
+        long memory = Runtime.getRuntime().maxMemory();
+        if (memoryCheck && memory < MIN_MEMORY * 1000000) {
+            fatal(Messages.message(StringTemplate.template("main.memory")
+                    .addAmount("%memory%", memory)
+                    .addAmount("%minMemory%", MIN_MEMORY)));
+        }
 
-        Locale locale = getLocale();
-        Locale.setDefault(locale);
-        Messages.setMessageBundle(locale);
+        // Having parsed the command line args, we know where the main
+        // user directory should be, so we can set up the rest of the
+        // file/directory structure.
+        FreeColDirectories.createAndSetDirectories();
+
+        // Now we have the log file path, start logging.
+        initializeLogging();
+
+        // Now we can find the client options, allow the options
+        // setting to override the locale.  We have users whose
+        // machines default to Finnish but play FreeCol in English.
+        String clientLanguage = ClientOptions.getLanguageOption();
+        if (clientLanguage != null) {
+            locale = LanguageOption.getLocale(clientLanguage);
+            if (!Locale.getDefault().equals(locale)) {
+                Messages.setMessageBundle(locale);
+            }
+        }
+
+        // Now we have the user mods directory and the locale is now
+        // stable, load the mods and their messages.
+        Mods.loadMods();
         Messages.setModMessageBundle(locale);
 
-        if (javaCheck && !checkJavaVersion()) {
-            System.err.println("Java version " + MIN_JDK_VERSION +
-                               " or better is recommended in order to run FreeCol." +
-                               " Use --no-java-check to skip this check.");
-            System.exit(1);
-        }
+        // Report on where we are.
+        File autosave = FreeColDirectories.getAutosaveDirectory();
+        File clientOptionsFile = FreeColDirectories.getClientOptionsFile();
+        File userMods = FreeColDirectories.getUserModsDirectory();
+        logger.info("Initialization:"
+            + "\n  java:     " + version
+            + "\n  memory:   " + memory
+            + "\n  locale:   " + locale.toString()
+            + "\n  data:     " + FreeColDirectories.getDataDirectory().getPath()
+            + "\n  userMain: " + FreeColDirectories.getMainUserDirectory().getPath()
+            + "\n  autosave: " + ((autosave == null) ? "NONE"
+                                   : autosave.getPath())
+            + "\n  logFile:  " + FreeColDirectories.getLogFilePath()
+            + "\n  options:  " + ((clientOptionsFile == null) ? "NONE"
+                                   : clientOptionsFile.getPath())
+            + "\n  save:     " + FreeColDirectories.getSaveDirectory().getPath()
+            + "\n  userMods: " + ((userMods == null) ? "NONE"
+                                   : userMods.getPath())
+            );
 
-        int  minMemory = 128;  // million bytes
-        if (memoryCheck && Runtime.getRuntime().maxMemory() < minMemory * 1000000) {
-            System.out.println("You need to assign more memory to the JVM. Restart FreeCol with:");
-            System.out.println("java -Xmx" + minMemory + "M -jar FreeCol.jar");
-            System.exit(1);
-        }
-
+        // Ready to specialize into client or server.
         if (standAloneServer) {
             startServer();
         } else {
-            FreeColClient freeColClient = new FreeColClient(FreeColDirectories.getSavegameFile(), windowSize, sound, splashFilename, introVideo, fontName);
+            new FreeColClient(FreeColDirectories.getSavegameFile(), windowSize,
+                              sound, splashFilename, introVideo, fontName);
         }
     }
 
     /**
-     * Initialize loggers.
-     */
-    private static void initLogging() {
-        final Logger baseLogger = Logger.getLogger("");
-        final Handler[] handlers = baseLogger.getHandlers();
-        for (int i = 0; i < handlers.length; i++) {
-            baseLogger.removeHandler(handlers[i]);
-        }
-        if (logFile == null) {
-            logFile = FreeColDirectories.getMainUserDirectory().getPath() + File.separator
-                + "FreeCol.log";
-        }
-        try {
-            baseLogger.addHandler(new DefaultHandler(consoleLogging, logFile));
-            Logger freecolLogger = Logger.getLogger("net.sf.freecol");
-            freecolLogger.setLevel(logLevel);
-        } catch (FreeColException e) {
-            e.printStackTrace();
-        }
-        Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
-                public void uncaughtException(Thread thread, Throwable e) {
-                    baseLogger.log(Level.WARNING, "Uncaught exception from thread: " + thread, e);
-                }
-            });
-    }
-
-    /**
-     * Determines the <code>Locale</code> to be used.
-     * @return Currently this method returns the locale set by
-     *      the ClientOptions (read directly from "options.xml").
-     *      This behavior will probably be changed.
-     */
-    public static Locale getLocale() {
-        XMLInputFactory xif = XMLInputFactory.newInstance();
-        XMLStreamReader in = null;
-        File options = FreeColDirectories.getClientOptionsFile();
-        if (options.canRead()) {
-            try {
-                in = xif.createXMLStreamReader(new FileInputStream(options), "UTF-8");
-                in.nextTag();
-                /**
-                 * The following code was contributed by armcode to fix
-                 * bug #[ 2045521 ] "Exception in Freecol.log on starting
-                 * game". I was never able to reproduce the bug, but the
-                 * patch did no harm either.
-                 */
-                for(int eventid = in.getEventType();eventid != XMLEvent.END_DOCUMENT; eventid = in.getEventType()) {
-
-                    //TODO: Is checking for XMLEvent.ATTRIBUTE needed?
-                    if (eventid == XMLEvent.START_ELEMENT) {
-                        if (ClientOptions.LANGUAGE.equals(in.getAttributeValue(null, "id"))) {
-                            return LanguageOption.getLocale(in.getAttributeValue(null, "value"));
-                        }
-                    }
-                    in.nextTag();
-                }
-                //We don't have a language option in our file, it is either not there or the file is corrupt
-                logger.log(Level.WARNING, "Language setting not found in client options file.  Using default.");
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Exception while loading options.", e);
-            } finally {
-                try {
-                    if (in != null) {
-                        in.close();
-                    }
-                } catch (Exception e) {
-                    logger.log(Level.WARNING, "Exception while closing stream.", e);
-                }
-            }
-        }
-        return Locale.getDefault();
-    }
-
-    /**
-     * Returns the default server network port.
-     * @return The port number.
-     */
-    public static int getDefaultPort() {
-        return DEFAULT_PORT;
-    }
-
-    /**
-     * Set up the save file and directory
-     * @param name the name of the save file to use
-     */
-    private static void setSavegame(String name) {
-        if(name == null){
-            System.out.println("No savegame given with --load-savegame parameter");
-            System.exit(1);
-        }
-
-        FreeColDirectories.setSaveGameFile(name);
-    }
-
-    /**
-     * Ensure that the Java version is good enough. JDK 1.4 or better is
-     * required.
+     * Extract the package version from the class.
      *
-     * @return true if Java version is at least 1.5.0.
+     * @param c The <code>Class</code> to extract from.
+     * @return A value of the package version attribute.
      */
-    private static boolean checkJavaVersion() {
-        // Must use string comparison because some JVM's provide
-        // versions like "1.4.1"
-        String version = System.getProperty("java.version");
-        boolean success = (version.compareTo(MIN_JDK_VERSION) >= 0);
-        return success;
+    private static String readVersion(Class c) throws IOException {
+        String resourceName = "/" + c.getName().toString().replace('.', '/')
+            + ".class";
+        URL url = c.getResource(resourceName);
+        Manifest mf = ((JarURLConnection)url.openConnection()).getManifest();
+        return mf.getMainAttributes().getValue("Package-Version");
     }
 
-
+    /**
+     * Exit printing fatal error message.
+     *
+     * @param err The error message to print.
+     */
+    private static void fatal(String err) {
+        System.err.println(err);
+        System.exit(1);
+    }
 
     /**
-     * Checks the command-line arguments and takes appropriate actions
-     * for each of them.
+     * Processes the command-line arguments and takes appropriate
+     * actions for each of them.
      *
      * @param args The command-line arguments.
      */
     private static void handleArgs(String[] args) {
-        // create the command line parser
-        CommandLineParser parser = new PosixParser();
-
-        /**
-         * Ugly hack: try to determine language first, so that usage,
-         * etc. will be localized.
-         */
-        String localeArg = null;
-        String locationArg = null;
-        for (int index = 0; index < args.length - 1; index++) {
-            if ("--default-locale".equals(args[index])) {
-                localeArg = args[++index];
-            } else if ("--freecol-data".equals(args[index])) {
-                locationArg = args[++index];
-            }
-        }
-        if (locationArg != null) {
-            FreeColDirectories.setDataFolder(locationArg);
-        }
-        if (localeArg == null) {
-            Messages.setMessageBundle(Locale.getDefault());
-        } else {
-            Locale locale = LanguageOption.getLocale(localeArg);
-            Locale.setDefault(locale);
-            Messages.setMessageBundle(locale);
-        }
-
-        // create the Options
+        Options options = new Options();
         options.addOption(OptionBuilder.withLongOpt("freecol-data")
                           .withDescription(Messages.message("cli.freecol-data"))
                           .withArgName(Messages.message("cli.arg.directory"))
@@ -442,100 +388,51 @@ public final class FreeCol {
                           .hasArg()
                           .create());
 
+        CommandLineParser parser = new PosixParser();
+        boolean usageError = false;
         try {
-            // parse the command line arguments
             CommandLine line = parser.parse(options, args);
-            if (line.hasOption("default-locale")) {
-                // slightly ugly: strip encoding from LC_MESSAGES
-                String languageID = line.getOptionValue("default-locale");
-                int index = languageID.indexOf('.');
-                if (index > 0) {
-                    languageID = languageID.substring(0, index);
-                }
-                Locale newLocale = LanguageOption.getLocale(languageID);
-                Locale.setDefault(newLocale);
-                Messages.setMessageBundle(newLocale);
-            }
-            if (line.hasOption("splash")) {
-                final String str = line.getOptionValue("splash");
-                if (str != null) {
-                    splashFilename = str;
-                }
-            }
-            if (line.hasOption("freecol-data")) {
-                FreeColDirectories.setDataFolder(line.getOptionValue("freecol-data"));
-            }
-            if (line.hasOption("tc")) {
-                FreeColDirectories.setTc(line.getOptionValue("tc"));
-            }
-            if (line.hasOption("home-directory")) {
-                String arg = line.getOptionValue("home-directory");
-                FreeColDirectories.setMainUserDirectory(new File(arg));
-                String errMsg = null;
-                if(!FreeColDirectories.getMainUserDirectory().exists()){
-                    errMsg = "cli.error.home.notExists";
-                }
-                if(!FreeColDirectories.getMainUserDirectory().canRead()){
-                    errMsg = "cli.error.home.noRead";
-                }
-                if(!FreeColDirectories.getMainUserDirectory().canWrite()){
-                    errMsg = "cli.error.home.noWrite";
-                }
-                if(errMsg != null){
-                    System.out.println(Messages.message(StringTemplate.template(errMsg)
-                                                        .addName("%string%", arg)));
-                    System.exit(1);
-                }
-            }
-            if (line.hasOption("log-console")) {
-                consoleLogging = true;
-            }
-            if (line.hasOption("log-file")) {
-                logFile = line.getOptionValue("log-file");
-            }
-            if (line.hasOption("log-level")) {
-                String logLevelString = line.getOptionValue("log-level").toUpperCase();
-                try {
-                    logLevel = Level.parse(logLevelString);
-                } catch (IllegalArgumentException e) {
-                    printUsage();
-                    System.exit(1);
-                }
-            }
-            if (line.hasOption("no-java-check")) {
-                javaCheck = false;
-            }
-            if (line.hasOption("windowed")) {
-                String dimensions = line.getOptionValue("windowed");
-                if (dimensions == null) {
-                    windowSize = new Dimension(-1, -1);
-                } else {
-                    String[] xy = dimensions.split("[^0-9]");
-                    if (xy.length == 2) {
-                        windowSize = new Dimension(Integer.parseInt(xy[0]), Integer.parseInt(xy[1]));
-                    } else {
-                        printUsage();
-                        System.exit(1);
-                    }
-                }
-            }
-            if (line.hasOption("no-sound")) {
-                sound = false;
-            }
-            if (line.hasOption("no-intro")) {
-                introVideo = false;
-            }
-            if (line.hasOption("no-memory-check")) {
-                memoryCheck = false;
-            }
             if (line.hasOption("help") || line.hasOption("usage")) {
-                printUsage();
-                System.exit(0);
+                printUsage(options, 0);
             }
             if (line.hasOption("version")) {
                 System.out.println("FreeCol " + getVersion());
-                System.exit(0); 
+                System.exit(0);
             }
+
+            if (line.hasOption("default-locale")) {
+                ; // Do nothing, already handled above.
+            }
+            if (line.hasOption("freecol-data")) {
+                ; // Do nothing, already handled above.
+            }
+    
+            if (line.hasOption("check-savegame")) {
+                String arg = line.getOptionValue("check-savegame");
+                if (!FreeColDirectories.setSavegameFile(arg)) {
+                    fatal(Messages.message(StringTemplate.template("cli.err.save")
+                            .addName("%string%", arg)));
+                }
+                checkIntegrity = true;
+                standAloneServer = true;
+            }
+            if (line.hasOption("load-savegame")) {
+                String arg = line.getOptionValue("load-savegame");
+                if (!FreeColDirectories.setSavegameFile(arg)) {
+                    fatal(Messages.message(StringTemplate.template("cli.err.save")
+                            .addName("%string%", arg)));
+                }
+            }
+
+            if (line.hasOption("clientOptions")) {
+                String fileName = line.getOptionValue("clientOptions");
+                if (!FreeColDirectories.setClientOptionsFile(fileName)) {
+                    String err = Messages.message(StringTemplate.template("cli.error.clientOptions")
+                        .addName("%string%", fileName));
+                    System.err.println(err); // not fatal
+                }
+            }                    
+
             if (line.hasOption("debug")) {
                 // If the optional argument is supplied use limited mode.
                 String arg = line.getOptionValue("debug");
@@ -551,6 +448,49 @@ public final class FreeCol {
                 FreeColDebugger.enableDebugMode(FreeColDebugger.DebugMode.MENUS);
                 FreeColDebugger.configureDebugRun(line.getOptionValue("debug-run"));
             }
+
+            if (line.hasOption("home-directory")) {
+                String arg = line.getOptionValue("home-directory");
+                String errMsg = FreeColDirectories.setMainUserDirectory(arg);
+                if (errMsg != null) {
+                    fatal(Messages.message(StringTemplate.template(errMsg)
+                            .addName("%string%", arg)));
+                }
+            }
+
+            if (line.hasOption("font")) {
+                fontName = line.getOptionValue("font");
+            }
+
+            if (line.hasOption("log-console")) {
+                consoleLogging = true;
+            }
+            if (line.hasOption("log-file")) {
+                FreeColDirectories.setLogFilePath(line.getOptionValue("log-file"));
+            }
+            if (line.hasOption("log-level")) {
+                String logLevelString = line.getOptionValue("log-level")
+                    .toUpperCase();
+                logLevel = Level.parse(logLevelString);
+            }
+
+            if (line.hasOption("no-sound")) {
+                sound = false;
+            }
+            if (line.hasOption("no-intro")) {
+                introVideo = false;
+            }
+            if (line.hasOption("no-memory-check")) {
+                memoryCheck = false;
+            }
+            if (line.hasOption("no-java-check")) {
+                javaCheck = false;
+            }
+
+            if (line.hasOption("private")) {
+                publicServer = false;
+            }
+
             if (line.hasOption("server")) {
                 standAloneServer = true;
                 String arg = line.getOptionValue("server");
@@ -558,73 +498,109 @@ public final class FreeCol {
                     try {
                         serverPort = Integer.parseInt(arg);
                     } catch (NumberFormatException nfe) {
-                        System.out.println(Messages.message(StringTemplate.template("cli.error.port")
-                                                            .addName("%string%", arg)));
-                        System.exit(1);
+                        fatal(Messages.message(StringTemplate.template("cli.error.port")
+                                .addName("%string%", arg)));
                     }
                 }
-            }
-            if (line.hasOption("private")) {
-                publicServer = false;
-            }
-            if (line.hasOption("check-savegame")) {
-                setSavegame(line.getOptionValue("load-savegame"));
-                checkIntegrity = true;
-                standAloneServer = true;
-            }
-            if (line.hasOption("load-savegame")) {
-                setSavegame(line.getOptionValue("load-savegame"));
             }
             if (line.hasOption("server-name")) {
                 serverName = line.getOptionValue("server-name");
             }
-            if (line.hasOption("font")) {
-                fontName = line.getOptionValue("font");
-            }
+
             if (line.hasOption("seed")) {
                 String seedStr = line.getOptionValue("seed");
-                try {
-                    FreeColSeed.initialize(Long.parseLong(seedStr));
-                } catch (NumberFormatException e) {
-                    System.err.println("Ignoring bad seed: " + seedStr);
-                }
+                FreeColSeed.initialize(Long.parseLong(seedStr));
             }
+
+            if (line.hasOption("splash")) {
+                splashFilename = line.getOptionValue("splash");
+            }
+
+            if (line.hasOption("tc")) {
+                FreeColDirectories.setTc(line.getOptionValue("tc"));
+            }
+
             if (line.hasOption("timeout")) {
                 String timeoutStr = line.getOptionValue("timeout");
-                int result;
-                try {
-                    result = Integer.parseInt(timeoutStr);
-                } catch (NumberFormatException nfe) {
-                    result = -1;
-                }
+                int result = Integer.parseInt(timeoutStr);
                 if (result < TIMEOUT_MIN) {
-                    System.err.println("Ignoring bad timeout: " + timeoutStr);
+                    String err = Messages.message(StringTemplate.template("cli.error.timeout")
+                        .addName("%string%", timeoutStr)
+                        .addName("%minimum%", Integer.toString(TIMEOUT_MIN)));
+                    System.err.println(err); // Not fatal
                 } else {
                     freeColTimeout = result;
                 }
             }
-            if (line.hasOption("clientOptions")) {
-                String fileName = line.getOptionValue("clientOptions");
-                File file = new File(fileName);
-                if (file.exists() && file.isFile() && file.canRead()) {
-                    FreeColDirectories.setClientOptionsFile(file);
+
+            if (line.hasOption("windowed")) {
+                String dimensions = line.getOptionValue("windowed");
+                if (dimensions == null) {
+                    windowSize = new Dimension(-1, -1);
                 } else {
-                    String err = Messages.message(StringTemplate
-                        .template("cli.error.clientOptions")
-                        .addName("%string%", fileName));
-                    System.err.println(err);
+                    String[] xy = dimensions.split("[^0-9]");
+                    if (xy.length == 2) {
+                        windowSize = new Dimension(Integer.parseInt(xy[0]),
+                                                   Integer.parseInt(xy[1]));
+                    } else {
+                        usageError = true;
+                    }
                 }
-            }                    
+            }
+
         } catch (ParseException e) {
             System.err.println("\n" + e.getMessage() + "\n");
-            printUsage();
-            System.exit(1);
+            usageError = true;
         }
+        if (usageError) printUsage(options, 1);
     }
 
-    private static void printUsage() {
+    /**
+     * Prints the usage message and exits.
+     *
+     * @param options The command line <code>Options</code>.
+     * @param status The status to exit with.
+     */
+    private static void printUsage(Options options, int status) {
         HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp("java -Xmx 128M -jar freecol.jar [OPTIONS]", options);
+        formatter.printHelp("java -Xmx 256M -jar freecol.jar [OPTIONS]",
+                            options);
+        System.exit(status);
+    }
+
+    /**
+     * Initialize logging.
+     */
+    private static void initializeLogging() {
+        final Logger baseLogger = Logger.getLogger("");
+        final Handler[] handlers = baseLogger.getHandlers();
+        for (int i = 0; i < handlers.length; i++) {
+            baseLogger.removeHandler(handlers[i]);
+        }
+        String logFile = FreeColDirectories.getLogFilePath();
+        try {
+            baseLogger.addHandler(new DefaultHandler(consoleLogging, logFile));
+            Logger freecolLogger = Logger.getLogger("net.sf.freecol");
+            freecolLogger.setLevel(logLevel);
+        } catch (FreeColException e) {
+            System.err.println("Logging initialization failure: "
+                + e.getMessage());
+            e.printStackTrace();
+        }
+        Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
+                public void uncaughtException(Thread thread, Throwable e) {
+                    baseLogger.log(Level.WARNING, "Uncaught exception from thread: " + thread, e);
+                }
+            });
+    }
+
+    /**
+     * Gets the default server network port.
+     *
+     * @return The port number.
+     */
+    public static int getDefaultPort() {
+        return DEFAULT_PORT;
     }
 
     /**
@@ -644,16 +620,6 @@ public final class FreeCol {
      */
     public static String getRevision() {
         return FREECOL_REVISION;
-    }
-
-
-    /**
-     * Returns the name of the log file.
-     *
-     * @return a <code>String</code> value
-     */
-    public static String getLogFile() {
-        return logFile;
     }
 
     /**
