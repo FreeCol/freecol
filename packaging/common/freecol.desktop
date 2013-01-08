@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=FreeCol
+GenericName=Strategy Game
+Comment=A free Colonization clone
+TryExec=/usr/bin/freecol
+Exec=freecol
+Icon=/usr/share/pixmaps/freecol.xpm
+Categories=Game;StrategyGame;
