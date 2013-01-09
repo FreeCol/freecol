@@ -637,62 +637,63 @@ public final class FreeCol {
             : DEFAULT_TIMEOUT;
     }
 
+
+    /**
+     * Start the server.
+     */
     private static void startServer() {
         logger.info("Starting stand-alone server.");
-        try {
-            final FreeColServer freeColServer;
-            if (FreeColDirectories.getSavegameFile() != null) {
-                XMLStream xs = null;
-                try {
-                    // Get suggestions for "singlePlayer" and "public
-                    // game" settings from the file:
-                    final FreeColSavegameFile fis = new FreeColSavegameFile(FreeColDirectories.getSavegameFile());
-                    xs = FreeColServer.createXMLStreamReader(fis);
-                    final XMLStreamReader in = xs.getXMLStreamReader();
-                    in.nextTag();
-                    xs.close();
+        final FreeColServer freeColServer;
+        if (FreeColDirectories.getSavegameFile() != null) {
+            XMLStream xs = null;
+            try {
+                // Get suggestions for "singlePlayer" and "public
+                // game" settings from the file:
+                final FreeColSavegameFile fis = new FreeColSavegameFile(FreeColDirectories.getSavegameFile());
+                xs = FreeColServer.createXMLStreamReader(fis);
+                final XMLStreamReader in = xs.getXMLStreamReader();
+                in.nextTag();
+                xs.close();
 
-                    freeColServer = new FreeColServer(fis, serverPort,
-                                                      serverName);
-                    if (checkIntegrity) {
-                        boolean integrityOK = freeColServer.getIntegrity();
-                        System.out.println(Messages.message((integrityOK)
-                                ? "cli.check-savegame.success"
-                                : "cli.check-savegame.failure"));
-                        System.exit((integrityOK) ? 0 : 1);
-                    }
-                } catch (Exception e) {
-                    if (checkIntegrity) {
-                        System.out.println(Messages.message("cli.check-savegame.failure"));
-                    }
-                    System.out.println("Could not load savegame.");
-                    System.exit(1);
-                    return;
-                } finally {
-                    xs.close();
+                freeColServer = new FreeColServer(fis, serverPort, serverName);
+                if (checkIntegrity) {
+                    boolean integrityOK = freeColServer.getIntegrity();
+                    System.out.println(Messages.message((integrityOK)
+                            ? "cli.check-savegame.success"
+                            : "cli.check-savegame.failure"));
+                    System.exit((integrityOK) ? 0 : 1);
                 }
-            } else {
-                try {
-                    FreeColTcFile tcData = new FreeColTcFile(FreeColDirectories.getTC());
-                    Specification specification = tcData.getSpecification();
-                    freeColServer = new FreeColServer(specification,
-                        publicServer, false, serverPort, serverName);
-                } catch (NoRouteToServerException e) {
-                    System.out.println(Messages.message("server.noRouteToServer"));
-                    System.exit(1);
-                    return;
+            } catch (Exception e) {
+                if (checkIntegrity) {
+                    System.err.println(Messages.message("cli.check-savegame.failure"));
                 }
+                fatal(Messages.message("server.load")
+                    + ": " + e.getMessage());
+                return;
+            } finally {
+                xs.close();
             }
-
-            Runtime runtime = Runtime.getRuntime();
-            runtime.addShutdownHook(new Thread() {
-                    public void run() {
-                        freeColServer.getController().shutdown();
-                    }
-                });
-        } catch (IOException e) {
-            System.err.println("Error while loading server: " + e);
-            System.exit(1);
+        } else {
+            try {
+                FreeColTcFile tcData
+                    = new FreeColTcFile(FreeColDirectories.getTC());
+                freeColServer = new FreeColServer(tcData.getSpecification(),
+                    publicServer, false, serverPort, serverName);
+            } catch (NoRouteToServerException nrtse) {
+                fatal(Messages.message("server.noRouteToServer"));
+                return;
+            } catch (IOException ioe) {
+                fatal(Messages.message("server.initialize")
+                    + ": " + ioe.getMessage());
+                return;
+            }
         }
+
+        Runtime runtime = Runtime.getRuntime();
+        runtime.addShutdownHook(new Thread() {
+                public void run() {
+                    freeColServer.getController().shutdown();
+                }
+            });
     }
 }
