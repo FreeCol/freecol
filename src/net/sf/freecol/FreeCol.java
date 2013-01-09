@@ -517,7 +517,7 @@ public final class FreeCol {
             }
 
             if (line.hasOption("tc")) {
-                FreeColDirectories.setTc(line.getOptionValue("tc"));
+                FreeColDirectories.setTC(line.getOptionValue("tc"));
             }
 
             if (line.hasOption("timeout")) {
@@ -673,7 +673,7 @@ public final class FreeCol {
                 }
             } else {
                 try {
-                    FreeColTcFile tcData = new FreeColTcFile(FreeColDirectories.getTc());
+                    FreeColTcFile tcData = new FreeColTcFile(FreeColDirectories.getTC());
                     Specification specification = tcData.getSpecification();
                     freeColServer = new FreeColServer(specification,
                         publicServer, false, serverPort, serverName);

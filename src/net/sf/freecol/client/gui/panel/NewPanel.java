@@ -24,6 +24,7 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.ButtonGroup;
@@ -54,7 +55,7 @@ import net.sf.freecol.common.option.OptionGroup;
 
 /**
  * This dialog allows the user to start a single player or multiplayer
- * game, to join a running game and to fetch a list of games from the
+ * game, to join a running game, and to fetch a list of games from the
  * meta-server.
  */
 public final class NewPanel extends FreeColPanel implements ActionListener {
@@ -142,21 +143,23 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
      *     the new game.
      */
     @SuppressWarnings("unchecked") // FIXME in Java7
-    public NewPanel(FreeColClient freeColClient, GUI gui, Specification specification) {
+    public NewPanel(FreeColClient freeColClient, GUI gui,
+                    Specification specification) {
         super(freeColClient, gui);
         this.specification = specification;
         this.connectController = getFreeColClient().getConnectController();
 
+        String selectTC = (specification != null) ? specification.getId()
+            : FreeColDirectories.DEFAULT_TC;
         for (FreeColTcFile tc : Mods.getRuleSets()) {
             specificationBox.addItem(tc);
-            if ((specification == null && FreeColDirectories.DEFAULT_TC.equals(tc.getId()))
-                || (specification != null && specification.getId().equals(tc.getId()))) {
+            if (selectTC.equals(tc.getId())) {
                 specificationBox.setSelectedItem(tc);
             }
         }
         setRenderers();
 
-        JButton cancel = new JButton( Messages.message("cancel") );
+        JButton cancel = new JButton(Messages.message("cancel"));
         JLabel nameLabel = localizedLabel("name");
 
         setCancelComponent(cancel);
@@ -228,6 +231,16 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
 
 
     /**
+     * Gets the currently selected TC from the specificationBox.
+     *
+     * @return The TC.
+     */
+    private FreeColTcFile getTC() {
+        Object o = specificationBox.getSelectedItem();
+        return (o == null) ? null : (FreeColTcFile)o;
+    }     
+
+    /**
      * Get the <code>Specification</code> value.
      *
      * @return a <code>Specification</code> value
@@ -235,12 +248,14 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
     @Override
     public Specification getSpecification() {
         if (specification == null) {
-            try {
-                String tc = ((FreeColModFile) specificationBox.getSelectedItem()).getId();
-                FreeColTcFile tcData = new FreeColTcFile(tc);
-                specification = tcData.getSpecification();
-            } catch(Exception e) {
-                logger.warning(e.toString());
+            FreeColTcFile tcFile = getTC();
+            if (tcFile != null) {
+                try {
+                    specification = tcFile.getSpecification();
+                } catch (Exception e) {
+                    logger.log(Level.WARNING, "Spec read failed in "
+                        + tcFile.getId(), e);
+                }
             }
         }
         return specification;
@@ -264,7 +279,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
     private void enableComponents() {
         NewPanelAction action = Enum.valueOf(NewPanelAction.class,
                                              group.getSelection().getActionCommand());
-        switch(action) {
+        switch (action) {
         case SINGLE:
             enableComponents(joinComponents, false);
             enableComponents(serverComponents, false);
@@ -301,6 +316,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         try {
             switch (Enum.valueOf(NewPanelAction.class, command)) {
             case OK:
+                FreeColDirectories.setTC(getTC().getId());
                 NewPanelAction action = Enum.valueOf(NewPanelAction.class,
                                                      group.getSelection().getActionCommand());
                 switch(action) {
