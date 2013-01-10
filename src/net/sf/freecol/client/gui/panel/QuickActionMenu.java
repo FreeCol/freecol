@@ -128,6 +128,9 @@ public final class QuickActionMenu extends JPopupMenu {
                     addBoardItems(unitLabel, colony.getTile());
                     this.addSeparator();
                 } else {
+                    if (addCommandItems(unitLabel)) {
+                        this.addSeparator();
+                    }
                     if (addBoardItems(unitLabel, colony.getTile())) {
                         this.addSeparator();
                     }
@@ -303,9 +306,8 @@ public final class QuickActionMenu extends JPopupMenu {
                 }
             }
         }
-        JMenu container = new JMenu(Messages.message("model.unit.changeWork"));
-        this.add(container);
 
+        JMenu container = new JMenu(Messages.message("model.unit.changeWork"));
         List<JMenuItem> owned = descendingList(items);
         if (expertOwned != null) owned.add(0, expertOwned);
         for (JMenuItem j : owned) container.add(j);
@@ -315,6 +317,8 @@ public final class QuickActionMenu extends JPopupMenu {
             if (!owned.isEmpty()) container.addSeparator();
             for (JMenuItem j : unowned) container.add(j);
         }
+        if (container.getItemCount() > 0) this.add(container);
+
         if (current != null) {
             JMenuItem ji = new JMenuItem(Messages.message("showProductivity"));
             ji.addActionListener(new ActionListener() {
