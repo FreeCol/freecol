@@ -647,15 +647,14 @@ public final class FreeCol {
         if (FreeColDirectories.getSavegameFile() != null) {
             XMLStream xs = null;
             try {
-                // Get suggestions for "singlePlayer" and "public
-                // game" settings from the file:
                 final FreeColSavegameFile fis = new FreeColSavegameFile(FreeColDirectories.getSavegameFile());
-                xs = FreeColServer.createXMLStreamReader(fis);
+                xs = fis.getXMLStream();
                 final XMLStreamReader in = xs.getXMLStreamReader();
                 in.nextTag();
                 xs.close();
 
-                freeColServer = new FreeColServer(fis, serverPort, serverName);
+                freeColServer = new FreeColServer(fis, (Specification)null,
+                                                  serverPort, serverName);
                 if (checkIntegrity) {
                     boolean integrityOK = freeColServer.getIntegrity();
                     System.out.println(Messages.message((integrityOK)
@@ -671,26 +670,27 @@ public final class FreeCol {
                     + ": " + e.getMessage());
                 return;
             } finally {
-                xs.close();
+                if (xs != null) xs.close();
             }
         } else {
             try {
                 FreeColTcFile tcData
                     = new FreeColTcFile(FreeColDirectories.getTC());
-                freeColServer = new FreeColServer(tcData.getSpecification(),
-                    publicServer, false, serverPort, serverName);
+                // TODO: command line advantages setting?
+                freeColServer = new FreeColServer(publicServer, false, null,
+                                                  tcData.getSpecification(),
+                                                  serverPort, serverName);
             } catch (NoRouteToServerException nrtse) {
                 fatal(Messages.message("server.noRouteToServer"));
                 return;
-            } catch (IOException ioe) {
+            } catch (Exception e) {
                 fatal(Messages.message("server.initialize")
-                    + ": " + ioe.getMessage());
+                    + ": " + e.getMessage());
                 return;
             }
         }
 
-        Runtime runtime = Runtime.getRuntime();
-        runtime.addShutdownHook(new Thread() {
+        Runtime.getRuntime().addShutdownHook(new Thread() {
                 public void run() {
                     freeColServer.getController().shutdown();
                 }

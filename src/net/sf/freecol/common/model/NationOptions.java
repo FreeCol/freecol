@@ -66,10 +66,12 @@ public class NationOptions extends FreeColObject {
      * Creates a new <code>NationOptions</code> instance.
      *
      * @param specification a <code>Specification</code> value
-     * @param advantages an <code>Advantages</code> value
+     * @param advantages An optional <code>Advantages</code> setting for the
+     *     nations.
      */
     public NationOptions(Specification specification, Advantages advantages) {
         this.specification = specification;
+        if (advantages == null) advantages = Advantages.SELECTABLE;
         setNationalAdvantages(advantages);
         if (specification != null) {
             int counter = 0;

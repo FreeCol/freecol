@@ -24,6 +24,9 @@ import java.io.IOException;
 import java.io.BufferedInputStream;
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.util.XMLStream;
+
+
 /**
  * Represents a FreeCol savegame.
  */
@@ -77,6 +80,17 @@ public class FreeColSavegameFile extends FreeColDataFile {
      */
     public BufferedInputStream getSavegameInputStream() throws IOException {
         return getInputStream(SAVEGAME_FILE);
+    }
+
+    /**
+     * Creates a <code>XMLStream</code> for reading this saved game.
+     *
+     * @return The <code>XMLStreamr</code>.
+     * @exception IOException if thrown while loading the game or if a
+     *     <code>XMLStreamException</code> have been thrown by the parser.
+     */
+    public XMLStream getXMLStream() throws IOException {
+        return new XMLStream(getSavegameInputStream());
     }
 
     /**

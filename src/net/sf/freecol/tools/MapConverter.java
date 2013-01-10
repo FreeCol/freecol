@@ -55,8 +55,9 @@ public class MapConverter {
                     } catch (FileNotFoundException e) {
                         System.out.println("No thumbnail present.");
                     }
-                    FreeColServer server = new FreeColServer(savegame, FreeCol.DEFAULT_PORT,
-                                                             "mapTransformer", specification);
+                    FreeColServer server
+                        = new FreeColServer(savegame, specification,
+                                            FreeCol.DEFAULT_PORT, "mapTransformer");
                     System.out.println("Started server.");
                     server.saveGame(out, server.getOwner(), null, thumbnail);
                     System.out.println("Saved updated savegame.");

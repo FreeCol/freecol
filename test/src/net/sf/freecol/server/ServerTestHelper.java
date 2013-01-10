@@ -80,7 +80,8 @@ public final class ServerTestHelper {
         stopServer(server);
         try {
             // TODO: fixme! Pass tc
-            server = new FreeColServer(FreeColTestCase.spec(), publicServer, singlePlayer, port, name);
+            server = new FreeColServer(publicServer, singlePlayer, null,
+                                       FreeColTestCase.spec(),  port, name);
         } catch (NoRouteToServerException e) {
             fail(e.getMessage());
         } catch (IOException e) {
@@ -98,7 +99,8 @@ public final class ServerTestHelper {
     public static FreeColServer startServer(File file, boolean publicServer, boolean singlePlayer, int port, String name) {
         stopServer(server);
         try {
-            server = new FreeColServer(new FreeColSavegameFile(file), port, name);
+            server = new FreeColServer(new FreeColSavegameFile(file), 
+                                       null, port, name);
         } catch (NoRouteToServerException e) {
             fail(e.getMessage());
         } catch (FreeColException e) {

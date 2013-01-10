@@ -141,13 +141,38 @@ public final class FreeColServer {
     public static final int MINIMUM_SAVEGAME_VERSION = 7;
 
     /**
-     * The specification to use when loading old format games where
-     * a spec may not be readily available.
+     * The ruleset to use when loading old format games where a spec
+     * may not be readily available.
      */
-    public static final String defaultSpec = "freecol";
+    public static final String DEFAULT_SPEC = "freecol";
 
-    /** Constant for storing the state of the game. */
+    /** A comparator for high scores. */       
+    public static final Comparator<HighScore> highScoreComparator
+        = new Comparator<HighScore>() {
+        public int compare(HighScore score1, HighScore score2) {
+            return score2.getScore() - score1.getScore();
+        }
+    };
+
+    /** Games are either starting, ending or being played. */
     public static enum GameState {STARTING_GAME, IN_GAME, ENDING_GAME}
+
+
+    // Instantiation-time parameters.
+
+    /** Is this a single player game? */
+    private boolean singlePlayer;
+
+    /** Should this game be listed on the meta-server? */
+    private boolean publicServer = false;
+
+    /** The port the server is available at. */
+    private int port;
+
+    /** The name of this server. */
+    private String name;
+
+
 
     /** Stores the current state of the game. */
     private GameState gameState = GameState.STARTING_GAME;
@@ -172,18 +197,8 @@ public final class FreeColServer {
 
     private MapGenerator mapGenerator;
 
-    private boolean singlePlayer;
-
     // The username of the player owning this server.
     private String owner;
-
-    private boolean publicServer = false;
-
-    /** The port the server is available at. */
-    private int port;
-
-    /** The name of this server. */
-    private String name;
 
     /** The private provider for random numbers. */
     private Random random = null;
@@ -194,21 +209,168 @@ public final class FreeColServer {
     /** An active unit specified in a saved game. */
     private Unit activeUnit = null;
 
-    /**
-     * The high scores on this server.
-     */
+    /** The high scores on this server.  */
     private List<HighScore> highScores = null;
 
-    public static final Comparator<HighScore> highScoreComparator
-        = new Comparator<HighScore>() {
-        public int compare(HighScore score1, HighScore score2) {
-            return score2.getScore() - score1.getScore();
+
+    /**
+     * Starts a new server, with a new game.
+     *
+     * @param publicServer If true, add to the meta-server.
+     * @param singlePlayer True if this is a single player game.
+     * @param advantages An optional <code>Advantages</code> setting.
+     * @param specification The <code>Specification</code> to use in this game.
+     * @param port The TCP port to use for the public socket.
+     * @param name An optional name for the server.
+     * @exception IOException If the public socket cannot be created.
+     * @exception NoRouteToServerException If there is a problem with the
+     *     meta-server.
+     */
+    public FreeColServer(boolean publicServer, boolean singlePlayer,
+                         Advantages advantages,
+                         Specification specification, int port, String name)
+        throws IOException, NoRouteToServerException {
+        this.publicServer = publicServer;
+        this.singlePlayer = singlePlayer;
+        this.port = port;
+        this.name = name;
+
+        server = serverStart(port); // Throws IOException
+
+        userConnectionHandler = new UserConnectionHandler(this);
+        preGameController = new PreGameController(this);
+        preGameInputHandler = new PreGameInputHandler(this);
+        inGameInputHandler = new InGameInputHandler(this);
+
+        random = new Random(FreeColSeed.getFreeColSeed());
+        inGameController = new InGameController(this, random);
+        mapGenerator = new SimpleMapGenerator(random, specification);
+
+        game = new ServerGame(specification);
+        game.setNationOptions(new NationOptions(specification, advantages));
+        // @compat 0.9.x, 0.10.x
+        fixGameOptions();
+        // end compatibility code
+
+        if (publicServer) {
+            updateMetaServer(true); // Throws NoRouteToServerException
         }
-    };
+    }
+
+    /**
+     * Starts a new networked server, initializing from a saved game.
+     *
+     * The specification is usually null, which means it will be
+     * initialized by extracting it from the saved game.  However
+     * MapConverter does call this with an overriding specification.
+     *
+     * @param savegame The file where the game data is located.
+     * @param specification An optional <code>Specification</code> to use.
+     * @param port The TCP port to use for the public socket.
+     * @param name An optional name for the server.
+     * @exception IOException If the public socket cannot be created.
+     * @exception FreeColException If the savegame could not be loaded.
+     * @exception NoRouteToServerException If there is a problem with the
+     *     meta-server.
+     */
+    public FreeColServer(final FreeColSavegameFile savegame, 
+                         Specification specification, int port, String name)
+        throws IOException, FreeColException, NoRouteToServerException {
+        // publicServer will be read from the saved game
+        // singlePlayer will be read from the saved game
+        this.port = port;
+        this.name = name;
+
+        server = serverStart(port); // Throws IOException
+
+        userConnectionHandler = new UserConnectionHandler(this);
+        preGameController = new PreGameController(this);
+        preGameInputHandler = new PreGameInputHandler(this);
+        inGameInputHandler = new InGameInputHandler(this);
+
+        try {
+            game = loadGame(savegame, specification, server);
+            // nationOptions will be read from the saved game
+            TransactionSession.clearAll();
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to load game", e);
+            FreeColException fe = new FreeColException("couldNotLoadGame");
+            fe.initCause(e);
+            throw fe;
+        }
+
+        if (random == null) {
+            // Should have been read from the saved game, but lets be sure.
+            this.random = new Random(FreeColSeed.getFreeColSeed());
+        }
+        inGameController = new InGameController(this, random);
+        mapGenerator = new SimpleMapGenerator(random, getSpecification());
+
+        if (publicServer) {
+            updateMetaServer(true); // Throws NoRouteToServerException
+        }
+    }
+
+    /**
+     * Is the user playing in single player mode?
+     *
+     * @return True if this is a single player game.
+     */
+    public boolean isSinglePlayer() {
+        return this.singlePlayer;
+    }
+
+    /**
+     * Sets the single/multiplayer state of the game.
+     *
+     * @param singlePlayer The new single/multiplayer status.
+     */
+    public void setSinglePlayer(boolean singlePlayer) {
+        this.singlePlayer = singlePlayer;
+    }
+
+    /**
+     * Sets the public server state.
+     *
+     * @param publicServer The new public server state.
+     */
+    public void setPublicServer(boolean publicServer) {
+        this.publicServer = publicServer;
+    }
+
+    /**
+     * Gets the port this server was started on.
+     *
+     * @return The port.
+     */
+    public int getPort() {
+        return this.port;
+    }
+
+    /**
+     * Gets the name of this server.
+     *
+     * @return The name.
+     */
+    public String getName() {
+        return this.name;
+    }
+
+    /**
+     * Sets the name of this server.
+     *
+     * @param name The new name.
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
 
     /**
      * Start a Server at port.
+     *
      * If the port is specified, just try once.
+     *
      * If the port is unspecified (negative), try multiple times.
      *
      * @param firstPort The port to start trying to connect at.
@@ -250,169 +412,6 @@ public final class FreeColServer {
         return server;
     }
 
-    /**
-     * Starts a new server in a specified mode and with a specified port.
-     *
-     * @param publicServer This value should be set to <code>true</code> in
-     *            order to appear on the meta server's listing.
-     *
-     * @param singlePlayer Sets the game as single player (if <i>true</i>) or
-     *            multiplayer (if <i>false</i>).
-     *
-     * @param port The TCP port to use for the public socket. That is the port
-     *            the clients will connect to.
-     *
-     * @param name The name of the server, or <code>null</code> if the default
-     *            name should be used.
-     *
-     * @throws IOException if the public socket cannot be created (the exception
-     *             will be logged by this class).
-     *
-     */
-    public FreeColServer(Specification specification, boolean publicServer,
-                         boolean singlePlayer, int port, String name)
-        throws IOException, NoRouteToServerException {
-        this(specification, publicServer, singlePlayer, port, name,
-             Advantages.SELECTABLE);
-    }
-
-    public FreeColServer(Specification specification, boolean publicServer,
-                         boolean singlePlayer, int port, String name,
-                         Advantages advantages)
-        throws IOException, NoRouteToServerException {
-
-        this.publicServer = publicServer;
-        this.singlePlayer = singlePlayer;
-        this.port = port;
-        this.name = name;
-        this.random = new Random(FreeColSeed.getFreeColSeed());
-
-        userConnectionHandler = new UserConnectionHandler(this);
-        preGameController = new PreGameController(this);
-        preGameInputHandler = new PreGameInputHandler(this);
-        inGameInputHandler = new InGameInputHandler(this);
-        inGameController = new InGameController(this, random);
-
-        game = new ServerGame(specification);
-        game.setNationOptions(new NationOptions(specification, advantages));
-        // @compat 0.9.x, 0.10.x
-        fixGameOptions();
-        // end compatibility code
-
-        mapGenerator = new SimpleMapGenerator(random, specification);
-
-        server = serverStart(port);
-
-        updateMetaServer(true);
-        startMetaServerUpdateThread();
-    }
-
-    /**
-     * Starts a new server in a specified mode and with a specified port and
-     * loads the game from the given file.
-     *
-     * @param savegame The file where the game data is located.
-     *
-     * @param port The TCP port to use for the public socket. That is the port
-     *            the clients will connect to.
-     *
-     * @param name The name of the server, or <code>null</code> if the default
-     *            name should be used.
-     *
-     * @exception IOException if the public socket cannot be created (the exception
-     *             will be logged by this class).
-     *
-     * @exception FreeColException if the savegame could not be loaded.
-     * @exception NoRouteToServerException if an error occurs
-     */
-    public FreeColServer(final FreeColSavegameFile savegame, int port, String name)
-        throws IOException, FreeColException, NoRouteToServerException {
-        this(savegame, port, name, null);
-    }
-
-    /**
-     * Starts a new server in a specified mode and with a specified port and
-     * loads the game from the given file.
-     *
-     * @param savegame The file where the game data is located.
-     *
-     * @param port The TCP port to use for the public socket. That is the port
-     *            the clients will connect to.
-     *
-     * @param name The name of the server, or <code>null</code> if the default
-     *            name should be used.
-     *
-     * @param specification a <code>Specification</code> value
-     * @exception IOException if the public socket cannot be created (the exception
-     *             will be logged by this class).
-     *
-     * @exception FreeColException if the savegame could not be loaded.
-     * @exception NoRouteToServerException if an error occurs
-     */
-    public FreeColServer(final FreeColSavegameFile savegame, int port,
-                         String name, Specification specification)
-        throws IOException, FreeColException, NoRouteToServerException {
-        this.port = port;
-        this.name = name;
-        //this.nationOptions = nationOptions;
-        mapGenerator = null;
-        userConnectionHandler = new UserConnectionHandler(this);
-        preGameController = new PreGameController(this);
-        preGameInputHandler = new PreGameInputHandler(this);
-        inGameInputHandler = new InGameInputHandler(this);
-
-        server = serverStart(port);
-
-        try {
-            this.game = loadGame(savegame, specification);
-        } catch (FreeColException e) {
-            server.shutdown();
-            throw e;
-        } catch (Exception e) {
-            server.shutdown();
-            FreeColException fe = new FreeColException("couldNotLoadGame");
-            fe.initCause(e);
-            throw fe;
-        }
-        if (random == null) {
-            this.random = new Random(FreeColSeed.getFreeColSeed());
-        }
-        inGameController = new InGameController(this, random);
-        mapGenerator = new SimpleMapGenerator(random, getSpecification());
-
-        updateMetaServer(true);
-        startMetaServerUpdateThread();
-        TransactionSession.clearAll();
-    }
-
-    /**
-     * Gets the port this server was started on.
-     *
-     * @return The port.
-     */
-    public int getPort() {
-        return this.port;
-    }
-
-    /**
-     * Sets the mode of the game: single/multiplayer.
-     *
-     * @param singlePlayer Sets the game as single player (if <i>true</i>) or
-     *            multiplayer (if <i>false</i>).
-     */
-    public void setSinglePlayer(boolean singlePlayer) {
-        this.singlePlayer = singlePlayer;
-    }
-
-    /**
-     * Checks if the user is playing in single player mode.
-     *
-     * @return <i>true</i> if the user is playing in single player mode,
-     *         <i>false</i> otherwise.
-     */
-    public boolean isSinglePlayer() {
-        return singlePlayer;
-    }
 
     /**
      * Gets the specification from the game run by this server.
@@ -589,32 +588,6 @@ public final class FreeColServer {
     }
 
     /**
-     * Sends information about this server to the meta-server. The information
-     * is only sent if <code>public == true</code>.
-     */
-    public void updateMetaServer() throws NoRouteToServerException {
-        updateMetaServer(false);
-    }
-
-    /**
-     * Returns the name of this server.
-     *
-     * @return The name.
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Sets the name of this server.
-     *
-     * @param name The name.
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
      * Gets the owner of the <code>Game</code>.
      *
      * @return The owner of the game.
@@ -650,46 +623,27 @@ public final class FreeColServer {
         activeUnit = unit;
     }
 
+
     /**
-     * Sets the public server.
+     * Sends information about this server to the meta-server.
      *
-     * @param publicServer The new public server flag.
+     * Publically visible version, that is called in game.
      */
-    public void setPublicServer(boolean publicServer) {
-        this.publicServer = publicServer;
+    public void updateMetaServer() throws NoRouteToServerException {
+        if (publicServer) updateMetaServer(false);
     }
 
     /**
-     * Starts the metaserver update thread if <code>publicServer == true</code>.
+     * Sends information about this server to the meta-server.
      *
-     * This update is really a "Hi! I am still here!"-message, since an
-     * additional update should be sent when a new player is added to/removed
-     * from this server etc.
-     */
-    public void startMetaServerUpdateThread() {
-        if (!publicServer) {
-            return;
-        }
-        Timer t = new Timer(true);
-        t.scheduleAtFixedRate(new TimerTask() {
-                public void run() {
-                    try {
-                        updateMetaServer();
-                    } catch (NoRouteToServerException e) {}
-                }
-            }, META_SERVER_UPDATE_INTERVAL, META_SERVER_UPDATE_INTERVAL);
-    }
-
-    /**
-     * Sends information about this server to the meta-server. The information
-     * is only sent if <code>public == true</code>.
+     * This is the master routine with private `firstTime' access
+     * when called from the constructors.
      *
-     * @param firstTime Should be set to <i>true></i> when calling this method
-     *      for the first time.
+     * @param firstTime Must be true when called for the first time.
      * @throws NoRouteToServerException if the meta-server cannot connect to
-     *      this server.
+     *     this server.
      */
-    public void updateMetaServer(boolean firstTime)
+    private void updateMetaServer(boolean firstTime)
         throws NoRouteToServerException {
         if (!publicServer) return;
 
@@ -727,6 +681,21 @@ public final class FreeColServer {
             return;
         } finally {
             mc.close();
+        }
+        if (firstTime) {
+            // Starts the metaserver update thread.
+            //
+            // This update is really a "Hi! I am still here!"-message,
+            // since an additional update should be sent when a new
+            // player is added to/removed from this server etc.
+            Timer t = new Timer(true);
+            t.scheduleAtFixedRate(new TimerTask() {
+                    public void run() {
+                        try {
+                            updateMetaServer();
+                        } catch (NoRouteToServerException e) {}
+                    }
+                }, META_SERVER_UPDATE_INTERVAL, META_SERVER_UPDATE_INTERVAL);
         }
     }
 
@@ -899,44 +868,30 @@ public final class FreeColServer {
     }
 
     /**
-     * Creates a <code>XMLStream</code> for reading the given file.
-     * Compression is automatically detected.
-     *
-     * @param fis The file to be read.
-     * @return The <code>XMLStreamr</code>.
-     * @exception IOException if thrown while loading the game or if a
-     *                <code>XMLStreamException</code> have been thrown by the
-     *                parser.
-     */
-    public static XMLStream createXMLStreamReader(FreeColSavegameFile fis)
-        throws IOException {
-        return new XMLStream(fis.getSavegameInputStream());
-    }
-
-    /**
      * Loads a game.
      *
      * @param fis The file where the game data is located.
      * @return The username of the player saving the game.
-     * @throws IOException If a problem was encountered while trying to open,
-     *             read or close the file.
-     * @exception IOException if thrown while loading the game or if a
-     *                <code>XMLStreamException</code> have been thrown by the
-     *                parser.
+     * @exception IOException If a problem was encountered while trying to open,
+     *     read or close the file.
      * @exception FreeColException if the savegame contains incompatible data.
      */
     public ServerGame loadGame(final FreeColSavegameFile fis)
         throws IOException, FreeColException {
-        return loadGame(fis, null);
+        return loadGame(fis, null, getServer());
     }
 
     /**
      * Reads just the game part from a save game.
+     *
+     * When the specification is not supplied, the one found in the saved
+     * game will be used.
+     *
      * This routine exists apart from loadGame so that the map generator
      * can load the predefined maps.
      *
      * @param fis The stream to read from.
-     * @param specification The <code>Specification</code> to use in the game.
+     * @param specification An optional <code>Specification</code> to use.
      * @param server Use this (optional) server to load into.
      * @return The game found in the stream.
      * @exception FreeColException if the format is incompatible.
@@ -947,12 +902,12 @@ public final class FreeColServer {
                                       FreeColServer server)
         throws IOException, FreeColException {
         final int savegameVersion = getSavegameVersion(fis);
-        ArrayList<String> serverStrings = null;
+        List<String> serverStrings = null;
         XMLStream xs = null;
         ServerGame game = null;
         try {
             String active = null;
-            xs = createXMLStreamReader(fis);
+            xs = fis.getXMLStream();
             final XMLStreamReader xsr = xs.getXMLStreamReader();
             xsr.nextTag();
 
@@ -985,7 +940,7 @@ public final class FreeColServer {
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                         serverStrings.add(xsr.getLocalName());
                         serverStrings.add(xsr.getAttributeValue(null,
-                                FreeColObject.ID_ATTRIBUTE));
+                                          FreeColObject.ID_ATTRIBUTE));
                         xsr.nextTag();
                     }
                     // @compat 0.9.x
@@ -997,16 +952,16 @@ public final class FreeColServer {
                 } else if (Game.getXMLElementTagName().equals(tag)) {
                     // @compat 0.9.x
                     if (savegameVersion < 9 && specification == null) {
-                        specification = new FreeColTcFile(defaultSpec)
+                        specification = new FreeColTcFile(DEFAULT_SPEC)
                             .getSpecification();
                         logger.info("Reading old format game"
                             + " (version: " + savegameVersion
-                            + "), using " + defaultSpec + " specification.");
+                            + "), using " + DEFAULT_SPEC + " specification.");
                     }
                     // @end compatibility code
                     // Read the game
                     game = new ServerGame(null, xsr, serverStrings,
-                        specification);
+                                          specification);
                     game.setCurrentPlayer(null);
                     if (server != null) server.setGame(game);
                     // @compat 0.9.x
@@ -1044,12 +999,13 @@ public final class FreeColServer {
      *
      * @param fis The file where the game data is located.
      * @param specification a <code>Specification</code> value
+     * @param server The server to connect the AI players to.
      * @return The new game.
      * @exception FreeColException if the savegame contains incompatible data.
      * @exception IOException if there is problem reading a stream.
      */
-    public ServerGame loadGame(final FreeColSavegameFile fis,
-                               Specification specification)
+    private ServerGame loadGame(final FreeColSavegameFile fis,
+                                Specification specification, Server server)
         throws FreeColException, IOException {
 
         ServerGame game = readGame(fis, specification, this);
@@ -1115,10 +1071,12 @@ public final class FreeColServer {
         // ensure that option groups can not be edited
         game.getMapGeneratorOptions().setEditable(false);
         try {
+            specification = getSpecification();
             specification.getOptionGroup("gameOptions").setEditable(false);
             specification.getOptionGroup("difficultyLevels").setEditable(false);
-        } catch(Exception e) {
-            logger.warning("Failed to make option groups read-only");
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Failed to set option groups read-only.",
+                e);
         }
 
         // AI initialization.
@@ -1145,7 +1103,7 @@ public final class FreeColServer {
                         new AIInGameInputHandler(this, serverPlayer, aiMain));
                 aiConnection.setOutgoingMessageHandler(theConnection);
                 theConnection.setOutgoingMessageHandler(aiConnection);
-                getServer().addDummyConnection(theConnection);
+                server.addDummyConnection(theConnection);
                 serverPlayer.setConnection(theConnection);
                 serverPlayer.setConnected(true);
             }
@@ -1165,7 +1123,7 @@ public final class FreeColServer {
         throws FreeColException {
         XMLStream xs = null;
         try {
-            xs = createXMLStreamReader(fis);
+            xs = fis.getXMLStream();
             final XMLStreamReader xsr = xs.getXMLStreamReader();
             xsr.nextTag();
 
@@ -1333,7 +1291,7 @@ public final class FreeColServer {
         // @compat 0.10.x
         XMLStream xs = null;
         try {
-            xs = createXMLStreamReader(fis);
+            xs = fis.getXMLStream();
             final XMLStreamReader xsr = xs.getXMLStreamReader();
             xsr.nextTag();
             final String owner = xsr.getAttributeValue(null, "owner");

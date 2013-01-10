@@ -131,8 +131,8 @@ public final class ConnectController {
 
         FreeColServer freeColServer;
         try {
-            freeColServer = new FreeColServer(specification, publicServer,
-                                              false, port, null, advantages);
+            freeColServer = new FreeColServer(publicServer, false, advantages,
+                                              specification, port, null);
         } catch (NoRouteToServerException e) {
             gui.errorMessage("server.noRouteToServer");
             logger.log(Level.WARNING, "No route to server.", e);
@@ -199,8 +199,8 @@ public final class ConnectController {
 
         FreeColServer freeColServer;
         try {
-            freeColServer = new FreeColServer(specification, false,
-                                              true, -1, null, advantages);
+            freeColServer = new FreeColServer(false, true, advantages,
+                                              specification, -1, null);
         } catch (NoRouteToServerException e) {
             gui.errorMessage("server.noRouteToServer");
             logger.log(Level.WARNING, "No route to server (single player!).",
@@ -383,7 +383,7 @@ public final class ConnectController {
             // Get suggestions for "singlePlayer" and "publicServer"
             // settings from the file
             final FreeColSavegameFile fis = new FreeColSavegameFile(theFile);
-            xs = new XMLStream(fis.getSavegameInputStream());
+            xs = fis.getXMLStream();
             final XMLStreamReader in = xs.getXMLStreamReader();
             in.nextTag();
             String str = in.getAttributeValue(null, "singleplayer");
@@ -393,6 +393,7 @@ public final class ConnectController {
             final boolean defaultPublicServer = str != null
                 && Boolean.valueOf(str).booleanValue();
             xs.close();
+            xs = null;
 
             // Reload the client options saved with this game.
             try {
@@ -455,7 +456,8 @@ public final class ConnectController {
                 try {
                     final FreeColSavegameFile saveGame
                         = new FreeColSavegameFile(theFile);
-                    freeColServer = new FreeColServer(saveGame, port, name);
+                    freeColServer = new FreeColServer(saveGame,
+                        (Specification)null, port, name);
                     freeColClient.setFreeColServer(freeColServer);
                     final String userName = freeColServer.getOwner();
                     final int port = freeColServer.getPort();

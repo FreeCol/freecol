@@ -95,7 +95,9 @@ public final class MapEditorController {
             // TODO: fixme! Difficulty level must also be known in advance
             specification.applyDifficultyLevel("model.difficulty.medium");
             freeColClient.setMapEditor(true);
-            final FreeColServer freeColServer = new FreeColServer(specification, false, false, 0, null);
+            final FreeColServer freeColServer
+                = new FreeColServer(false, false, null,
+                                    specification, 0, null);
             freeColClient.setFreeColServer(freeColServer);
             freeColClient.setGame(freeColServer.getGame());
             freeColClient.setMyPlayer(null);
@@ -264,7 +266,8 @@ public final class MapEditorController {
             public void run() {
                 FreeColServer freeColServer = null;
                 try {
-                    freeColServer = new FreeColServer(new FreeColSavegameFile(theFile), 0, "MapEditor");
+                    freeColServer = new FreeColServer(new FreeColSavegameFile(theFile),
+                        (Specification)null, 0, "MapEditor");
                     freeColClient.setFreeColServer(freeColServer);
                     freeColClient.setGame(freeColServer.getGame());
                     SwingUtilities.invokeLater( new Runnable() {
