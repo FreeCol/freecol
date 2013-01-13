@@ -85,61 +85,114 @@ public final class Specification {
 
     private static final Logger logger = Logger.getLogger(Specification.class.getName());
 
-    private final Map<String, FreeColGameObjectType> allTypes = new HashMap<String, FreeColGameObjectType>();
+    /** A map from specification element to a reader for that element. */
+    private final Map<String, ChildReader> readerMap
+        = new HashMap<String, ChildReader>();
 
-    private final Map<String, AbstractOption> allOptions = new HashMap<String, AbstractOption>();
+    /* Containers filled from readers in the readerMap. */
 
-    private final Map<String, OptionGroup> allOptionGroups = new HashMap<String, OptionGroup>();
+    // readerMap("building-types")
+    private final List<BuildingType> buildingTypeList
+        = new ArrayList<BuildingType>();
+    // readerMap("disasters")
+    private final List<Disaster> disasters
+        = new ArrayList<Disaster>();
+    // readerMap("equipment-types")
+    private final List<EquipmentType> equipmentTypes
+        = new ArrayList<EquipmentType>();
+    // readerMap("european-nation-types")
+    private final List<EuropeanNationType> europeanNationTypes
+        = new ArrayList<EuropeanNationType>();
+    // readerMap("events")
+    private final List<Event> events
+        = new ArrayList<Event>();
+    // readerMap("founding-fathers")
+    private final List<FoundingFather> foundingFathers
+        = new ArrayList<FoundingFather>();
+    // readerMap("goods-types")
+    private final List<GoodsType> goodsTypeList
+        = new ArrayList<GoodsType>();
+    // readerMap("indian-nation-types")
+    private final List<IndianNationType> indianNationTypes
+        = new ArrayList<IndianNationType>();
+    // readerMap("nations")
+    private final List<Nation> nations
+        = new ArrayList<Nation>();
+    // readerMap("resource-types")
+    private final List<ResourceType> resourceTypeList
+        = new ArrayList<ResourceType>();
+    // readerMap("roles")
+    private final List<Role> roles
+        = new ArrayList<Role>();
+    // readerMap("tile-types")
+    private final List<TileType> tileTypeList
+        = new ArrayList<TileType>();
+    // readerMap("tileimprovement-types")
+    private final List<TileImprovementType> tileImprovementTypeList
+        = new ArrayList<TileImprovementType>();
+    // readerMap("unit-types")
+    private final List<UnitType> unitTypeList
+        = new ArrayList<UnitType>();
 
-    private final Map<GoodsType, UnitType> experts = new HashMap<GoodsType, UnitType>();
+    // readerMap("modifiers")
+    private final Map<String, List<Modifier>> allModifiers
+        = new HashMap<String, List<Modifier>>();
+    private final List<Modifier> specialModifiers
+        = new ArrayList<Modifier>();
 
-    private final Map<String, List<Ability>> allAbilities = new HashMap<String, List<Ability>>();
+    // readerMap("options")
+    private final Map<String, AbstractOption> allOptions
+        = new HashMap<String, AbstractOption>();
+    private final Map<String, OptionGroup> allOptionGroups
+        = new HashMap<String, OptionGroup>();
 
-    private final Map<String, List<Modifier>> allModifiers = new HashMap<String, List<Modifier>>();
+    /* Containers derived from readerMap containers */
 
-    private final List<BuildingType> buildingTypeList = new ArrayList<BuildingType>();
+    // Derived from readerMap container: goodsTypeList
+    private final List<GoodsType> farmedGoodsTypeList
+        = new ArrayList<GoodsType>();
+    private final List<GoodsType> foodGoodsTypeList
+        = new ArrayList<GoodsType>();
+    private final List<GoodsType> newWorldGoodsTypeList
+        = new ArrayList<GoodsType>();
+    private final List<GoodsType> libertyGoodsTypeList
+        = new ArrayList<GoodsType>();
+    private final List<GoodsType> immigrationGoodsTypeList
+        = new ArrayList<GoodsType>();
+    private final List<GoodsType> rawBuildingGoodsTypeList
+        = new ArrayList<GoodsType>();
+    private int storableTypes = 0;
 
-    private final List<GoodsType> goodsTypeList = new ArrayList<GoodsType>();
-    private final List<GoodsType> farmedGoodsTypeList = new ArrayList<GoodsType>();
-    private final List<GoodsType> foodGoodsTypeList = new ArrayList<GoodsType>();
-    private final List<GoodsType> newWorldGoodsTypeList = new ArrayList<GoodsType>();
-    private final List<GoodsType> libertyGoodsTypeList = new ArrayList<GoodsType>();
-    private final List<GoodsType> immigrationGoodsTypeList = new ArrayList<GoodsType>();
-
-    private final List<GoodsType> rawBuildingGoodsTypeList = new ArrayList<GoodsType>();
-
-    private final List<ResourceType> resourceTypeList = new ArrayList<ResourceType>();
-
-    private final List<TileType> tileTypeList = new ArrayList<TileType>();
-
-    private final List<TileImprovementType> tileImprovementTypeList = new ArrayList<TileImprovementType>();
-
-    private final List<UnitType> unitTypeList = new ArrayList<UnitType>();
-    private final List<UnitType> unitTypesTrainedInEurope = new ArrayList<UnitType>();
-    private final List<UnitType> unitTypesPurchasedInEurope = new ArrayList<UnitType>();
-
-    private final List<FoundingFather> foundingFathers = new ArrayList<FoundingFather>();
-
-    private final List<Nation> nations = new ArrayList<Nation>();
+    // Derived from readerMap container: nations
     private final List<Nation> europeanNations = new ArrayList<Nation>();
     private final List<Nation> REFNations = new ArrayList<Nation>();
     private final List<Nation> indianNations = new ArrayList<Nation>();
+    // Derived from readerMap containers: indianNationTypes europeanNationTypes
+    private final List<NationType> nationTypes
+        = new ArrayList<NationType>();
+    // Derived from readerMap container: europeanNationTypes
+    private final List<EuropeanNationType> REFNationTypes
+        = new ArrayList<EuropeanNationType>();
 
-    private final List<NationType> nationTypes = new ArrayList<NationType>();
-    private final List<EuropeanNationType> europeanNationTypes = new ArrayList<EuropeanNationType>();
-    private final List<EuropeanNationType> REFNationTypes = new ArrayList<EuropeanNationType>();
-    private final List<IndianNationType> indianNationTypes = new ArrayList<IndianNationType>();
+    // Derived from readerMap container: unitTypeList
+    private final Map<GoodsType, UnitType> experts
+        = new HashMap<GoodsType, UnitType>();
+    private final List<UnitType> unitTypesTrainedInEurope
+        = new ArrayList<UnitType>();
+    private final List<UnitType> unitTypesPurchasedInEurope
+        = new ArrayList<UnitType>();
+    private UnitType fastestLandUnitType = null;
+    private UnitType fastestNavalUnitType = null;
 
-    private final List<EquipmentType> equipmentTypes = new ArrayList<EquipmentType>();
-    private final List<Role> roles = new ArrayList<Role>();
 
-    private final List<Event> events = new ArrayList<Event>();
-    private final List<Disaster> disasters = new ArrayList<Disaster>();
-    private final List<Modifier> specialModifiers = new ArrayList<Modifier>();
+    /* Other containers. */
 
-    private final Map<String, ChildReader> readerMap = new HashMap<String, ChildReader>();
+    private final Map<String, FreeColGameObjectType> allTypes
+        = new HashMap<String, FreeColGameObjectType>();
 
-    private int storableTypes = 0;
+    private final Map<String, List<Ability>> allAbilities
+        = new HashMap<String, List<Ability>>();
+
 
     private boolean initialized = false;
 
@@ -147,8 +200,6 @@ public final class Specification {
 
     private String difficultyLevel;
 
-    private UnitType cachedFastestLandUnitType = null;
-    private UnitType cachedFastestNavalUnitType = null;
 
 
     /**
@@ -183,36 +234,37 @@ public final class Specification {
             allTypes.put(source.getId(), source);
         }
 
-        readerMap.put("nations",
-                      new TypeReader<Nation>(Nation.class, nations));
         readerMap.put("building-types",
                       new TypeReader<BuildingType>(BuildingType.class, buildingTypeList));
-        readerMap.put("european-nation-types",
-                      new TypeReader<EuropeanNationType>(EuropeanNationType.class, europeanNationTypes));
-        readerMap.put("roles",
-                      new TypeReader<Role>(Role.class, roles));
+        readerMap.put("disasters",
+                      new TypeReader<Disaster>(Disaster.class, disasters));
         readerMap.put("equipment-types",
                       new TypeReader<EquipmentType>(EquipmentType.class, equipmentTypes));
-        readerMap.put("events", new TypeReader<Event>(Event.class, events));
-        readerMap.put("disasters", new TypeReader<Disaster>(Disaster.class, disasters));
+        readerMap.put("european-nation-types",
+                      new TypeReader<EuropeanNationType>(EuropeanNationType.class, europeanNationTypes));
+        readerMap.put("events",
+                      new TypeReader<Event>(Event.class, events));
         readerMap.put("founding-fathers",
                       new TypeReader<FoundingFather>(FoundingFather.class, foundingFathers));
         readerMap.put("goods-types",
                       new TypeReader<GoodsType>(GoodsType.class, goodsTypeList));
         readerMap.put("indian-nation-types",
                       new TypeReader<IndianNationType>(IndianNationType.class, indianNationTypes));
+        readerMap.put("nations",
+                      new TypeReader<Nation>(Nation.class, nations));
         readerMap.put("resource-types",
                       new TypeReader<ResourceType>(ResourceType.class, resourceTypeList));
+        readerMap.put("roles",
+                      new TypeReader<Role>(Role.class, roles));
         readerMap.put("tile-types",
                       new TypeReader<TileType>(TileType.class, tileTypeList));
         readerMap.put("tileimprovement-types",
                       new TypeReader<TileImprovementType>(TileImprovementType.class, tileImprovementTypeList));
         readerMap.put("unit-types",
                       new TypeReader<UnitType>(UnitType.class, unitTypeList));
+
         readerMap.put("modifiers", new ModifierReader());
         readerMap.put("options", new OptionReader());
-
-
     }
 
     private void load(InputStream in) {
@@ -237,7 +289,8 @@ public final class Specification {
     public void clean() {
         logger.finest("Cleaning up specification.");
 
-        Iterator<FreeColGameObjectType> typeIterator = allTypes.values().iterator();
+        Iterator<FreeColGameObjectType> typeIterator
+            = allTypes.values().iterator();
         while (typeIterator.hasNext()) {
             FreeColGameObjectType type = typeIterator.next();
             if (type.isAbstractType()) {
@@ -245,42 +298,13 @@ public final class Specification {
             }
         }
 
-        for (Nation nation : nations) {
-            if (nation.getType().isEuropean()) {
-                if (nation.getType().isREF()) {
-                    REFNations.add(nation);
-                } else {
-                    europeanNations.add(nation);
-                }
-            } else {
-                indianNations.add(nation);
-            }
-        }
-
-        nationTypes.addAll(indianNationTypes);
-        nationTypes.addAll(europeanNationTypes);
-        Iterator<EuropeanNationType> iterator = europeanNationTypes.iterator();
-        while (iterator.hasNext()) {
-            EuropeanNationType nationType = iterator.next();
-            if (nationType.isREF()) {
-                REFNationTypes.add(nationType);
-                iterator.remove();
-            }
-        }
-
-        for (UnitType unitType : unitTypeList) {
-            if (unitType.getExpertProduction() != null) {
-                experts.put(unitType.getExpertProduction(), unitType);
-            }
-            if (unitType.hasPrice()) {
-                if (unitType.getSkill() > 0) {
-                    unitTypesTrainedInEurope.add(unitType);
-                } else if (!unitType.hasSkill()) {
-                    unitTypesPurchasedInEurope.add(unitType);
-                }
-            }
-        }
-
+        farmedGoodsTypeList.clear();
+        foodGoodsTypeList.clear();
+        newWorldGoodsTypeList.clear();
+        libertyGoodsTypeList.clear();
+        immigrationGoodsTypeList.clear();
+        rawBuildingGoodsTypeList.clear();
+        storableTypes = 0;
         for (GoodsType goodsType : goodsTypeList) {
             if (goodsType.isFarmed()) {
                 farmedGoodsTypeList.add(goodsType);
@@ -304,6 +328,62 @@ public final class Specification {
                 storableTypes++;
             }
         }
+
+        REFNations.clear();
+        europeanNations.clear();
+        indianNations.clear();
+        for (Nation nation : nations) {
+            if (nation.getType().isEuropean()) {
+                if (nation.getType().isREF()) {
+                    REFNations.add(nation);
+                } else {
+                    europeanNations.add(nation);
+                }
+            } else {
+                indianNations.add(nation);
+            }
+        }
+
+        nationTypes.clear();
+        nationTypes.addAll(indianNationTypes);
+        nationTypes.addAll(europeanNationTypes);
+        Iterator<EuropeanNationType> iterator = europeanNationTypes.iterator();
+        while (iterator.hasNext()) {
+            EuropeanNationType nationType = iterator.next();
+            if (nationType.isREF()) {
+                REFNationTypes.add(nationType);
+                iterator.remove();
+            }
+        }
+
+        experts.clear();
+        unitTypesTrainedInEurope.clear();
+        unitTypesPurchasedInEurope.clear();
+        int bestLandValue = -1, bestNavalValue = -1;
+        for (UnitType unitType : unitTypeList) {
+            if (unitType.getExpertProduction() != null) {
+                experts.put(unitType.getExpertProduction(), unitType);
+            }
+            if (unitType.hasPrice()) {
+                if (unitType.getSkill() > 0) {
+                    unitTypesTrainedInEurope.add(unitType);
+                } else if (!unitType.hasSkill()) {
+                    unitTypesPurchasedInEurope.add(unitType);
+                }
+            }
+            if (unitType.isNaval()) {
+                if (bestNavalValue < unitType.getMovement()) {
+                    bestNavalValue = unitType.getMovement();
+                    fastestNavalUnitType = unitType;
+                }
+            } else {
+                if (bestLandValue < unitType.getMovement()) {
+                    bestLandValue = unitType.getMovement();
+                    fastestLandUnitType = unitType;
+                }
+            }
+        }
+
 
         // now that specification is complete, dynamically generate
         // option choices
@@ -1074,16 +1154,7 @@ public final class Specification {
      * @return The fastest land unit type.
      */
     public UnitType getFastestLandUnitType() {
-        if (cachedFastestLandUnitType == null) {
-            int bestValue = -1;
-            for (UnitType t : unitTypeList) {
-                if (!t.isNaval() && t.getMovement() > bestValue) {
-                    bestValue = t.getMovement();
-                    cachedFastestLandUnitType = t;
-                }
-            }
-        }
-        return cachedFastestLandUnitType;
+        return fastestLandUnitType;
     }
 
     /**
@@ -1092,16 +1163,7 @@ public final class Specification {
      * @return The fastest naval unit type.
      */
     public UnitType getFastestNavalUnitType() {
-        if (cachedFastestNavalUnitType == null) {
-            int bestValue = -1;
-            for (UnitType t : unitTypeList) {
-                if (t.isNaval() && t.getMovement() > bestValue) {
-                    bestValue = t.getMovement();
-                    cachedFastestNavalUnitType = t;
-                }
-            }
-        }
-        return cachedFastestNavalUnitType;
+        return fastestNavalUnitType;
     }
 
     // -- Founding Fathers --
