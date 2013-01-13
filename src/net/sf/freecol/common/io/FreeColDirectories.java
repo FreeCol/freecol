@@ -153,17 +153,17 @@ public class FreeColDirectories {
             if (setMainUserDirectory(null) != null) return false;
         }
 
-        autosaveDirectory = new File(getSaveDirectory(), AUTOSAVE_DIRECTORY);
-        if (!insistDirectory(autosaveDirectory)) autosaveDirectory = null;
-    
         if (logFilePath == null) {
-            logFilePath = mainUserDirectory + SEPARATOR + LOG_FILE;
+            logFilePath = getMainUserDirectory() + SEPARATOR + LOG_FILE;
         }
 
         if (saveDirectory == null) {
             saveDirectory = new File(getMainUserDirectory(), SAVE_DIRECTORY);
             if (!insistDirectory(saveDirectory)) return false;
         }
+    
+        autosaveDirectory = new File(getSaveDirectory(), AUTOSAVE_DIRECTORY);
+        if (!insistDirectory(autosaveDirectory)) autosaveDirectory = null;
     
         userModsDirectory = new File(getMainUserDirectory(), MODS_DIRECTORY);
         if (!insistDirectory(userModsDirectory)) userModsDirectory = null;
