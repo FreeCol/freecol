@@ -63,6 +63,12 @@ public class FreeColDebugger {
      */
     private static String debugRunSave = null;
 
+    
+    /**
+     * Stores the standard fog of war setting when revealing all the map
+     * Allows restore to previous state when re-enabling normal vision
+     */
+    private static boolean normalGamefogOfWar = false;
 
     /**
      * Is a debug mode enabled in this game?
@@ -279,4 +285,12 @@ public class FreeColDebugger {
         sb.deleteCharAt(sb.length()-1);
         return sb.toString();
     }
+
+	public static boolean getNormalGameFogOfWar() {
+		return normalGamefogOfWar;
+	}
+
+	public static void setNormalGameFogOfWar(boolean normalGamefogOfWar) {
+		FreeColDebugger.normalGamefogOfWar = normalGamefogOfWar;
+	}
 }

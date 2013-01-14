@@ -1359,8 +1359,17 @@ public final class FreeColServer {
         for (Player player : getGame().getLiveEuropeanPlayers()) {
             ((ServerPlayer)player).exploreMap(reveal);
         }
-        getSpecification().getBooleanOption(GameOptions.FOG_OF_WAR)
-            .setValue(reveal);
+     
+        // Removes fog of war when revealing the whole map
+        // Restores previous setting when hiding it back again
+        BooleanOption fogOfWarSetting = game.getSpecification().getBooleanOption(GameOptions.FOG_OF_WAR);
+        if(reveal){
+        	FreeColDebugger.setNormalGameFogOfWar(fogOfWarSetting.getValue());
+        	fogOfWarSetting.setValue(false); 
+        }
+        else{
+        	fogOfWarSetting.setValue(FreeColDebugger.getNormalGameFogOfWar());
+        }
 
         for (Player player : getGame().getLiveEuropeanPlayers()) {
             try {

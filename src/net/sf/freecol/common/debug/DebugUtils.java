@@ -75,6 +75,7 @@ import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIColony;
@@ -724,8 +725,17 @@ public class DebugUtils {
         final Game game = freeColClient.getGame();
 
         server.exploreMapForAllPlayers(reveal);
-        game.getSpecification().getBooleanOption(GameOptions.FOG_OF_WAR)
-            .setValue(reveal);
+        
+        // Removes fog of war when revealing the whole map
+        // Restores previous setting when hiding it back again
+        BooleanOption fogOfWarSetting = game.getSpecification().getBooleanOption(GameOptions.FOG_OF_WAR);
+        if(reveal){
+        	FreeColDebugger.setNormalGameFogOfWar(fogOfWarSetting.getValue());
+        	fogOfWarSetting.setValue(false); 
+        }
+        else{
+        	fogOfWarSetting.setValue(FreeColDebugger.getNormalGameFogOfWar());
+        }
     }
 
     /**
