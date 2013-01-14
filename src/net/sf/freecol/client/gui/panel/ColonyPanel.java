@@ -1597,6 +1597,7 @@ public final class ColonyPanel extends PortPanel
                 cleanup();
 
                 addPropertyChangeListeners();
+                addMouseListener(pressListener);
                 update();
             }
 
@@ -1622,7 +1623,9 @@ public final class ColonyPanel extends PortPanel
                     ProductionInfo info = colony.getProductionInfo(colonyTile);
                     if (info != null) {
                         for (AbstractGoods ag : info.getProduction()) {
-                            add(new ProductionLabel(getFreeColClient(), getGUI(), ag));
+                        	ProductionLabel productionLabel = new ProductionLabel(getFreeColClient(), getGUI(), ag);
+                            productionLabel.addMouseListener(pressListener);
+                            add(productionLabel);
                         }
                     }
                 }
@@ -1840,6 +1843,10 @@ public final class ColonyPanel extends PortPanel
 
             public boolean accepts(Goods goods) {
                 return false;
+            }
+
+            public ColonyTile getColonyTile() {
+                return colonyTile;
             }
         }
     }

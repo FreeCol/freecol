@@ -40,6 +40,7 @@ import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.ColonyPanel.TilePanel.ASingleTilePanel;
 import net.sf.freecol.client.gui.panel.UnitLabel.UnitAction;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -53,6 +54,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.Unit.UnitState;
@@ -113,7 +115,10 @@ public final class QuickActionMenu extends JPopupMenu {
         if (tempUnit.getLocation().getTile() != null) {
             Colony colony = tempUnit.getLocation().getTile().getColony();
             if (colony != null) {
-                if (addWorkItems(unitLabel)) {
+            	if (addTileItem(unitLabel)) {
+                    this.addSeparator();
+                }
+            	if (addWorkItems(unitLabel)) {
                     this.addSeparator();
                 }
                 if (addEducationItems(unitLabel)) {
@@ -600,6 +605,38 @@ public final class QuickActionMenu extends JPopupMenu {
         }
         return separatorNeeded;
     }
+
+    /**
+     * Creates a menu for a tile.
+     */
+    public void createTileMenu(final ASingleTilePanel singleTilePanel) {
+        if (singleTilePanel.getColonyTile() != null && singleTilePanel.getColonyTile().getColony() != null) {
+            addTileItem(singleTilePanel.getColonyTile().getWorkTile());
+        }
+    }
+
+    private boolean addTileItem(final UnitLabel unitLabel) {
+        final Unit unit = unitLabel.getUnit();
+        if (unit.getWorkTile() != null) {
+            final Tile tile = unit.getWorkTile().getWorkTile();
+            addTileItem(tile);
+           return true;
+        }
+        return false;
+    }
+
+    private void addTileItem(final Tile tile) {
+        if (tile != null) {
+            JMenuItem menuItem = new JMenuItem(Messages.message(tile.getNameKey()));
+            menuItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    gui.showTilePanel(tile);
+                }
+            });
+            add(menuItem);
+        }
+    }
+
     /**
      * Creates a menu for a good.
      */

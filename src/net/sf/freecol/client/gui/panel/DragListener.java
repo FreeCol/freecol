@@ -30,6 +30,7 @@ import javax.swing.TransferHandler;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.panel.ColonyPanel.TilePanel.ASingleTilePanel;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Unit;
 
@@ -90,6 +91,11 @@ public final class DragListener extends MouseAdapter {
                         ((EuropePanel) parentPanel).revalidate();
                         ((EuropePanel) parentPanel).refresh();
                     }
+                } else if (comp instanceof ASingleTilePanel
+                        || (comp.getParent() != null && comp.getParent() instanceof ASingleTilePanel)) {
+                    menu = new QuickActionMenu(freeColClient, gui, parentPanel);
+                    // Also check the parent to show the popup in the center of the colony panel tile
+                    menu.createTileMenu((ASingleTilePanel)(comp instanceof ASingleTilePanel ? comp : comp.getParent()));
                 }
                 if (menu != null) {
                     int elements = menu.getSubElements().length;
