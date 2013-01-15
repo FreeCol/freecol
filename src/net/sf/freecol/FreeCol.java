@@ -366,6 +366,8 @@ public final class FreeCol {
                           .create());
         options.addOption(OptionBuilder.withLongOpt("check-savegame")
                           .withDescription(Messages.message("cli.check-savegame"))
+                          .withArgName(Messages.message("cli.arg.file"))
+                          .hasArg()
                           .create());
         options.addOption(OptionBuilder.withLongOpt("font")
                           .withDescription(Messages.message("cli.font"))
