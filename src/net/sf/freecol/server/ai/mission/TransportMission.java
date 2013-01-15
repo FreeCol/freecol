@@ -378,6 +378,11 @@ public class TransportMission extends Mission {
             Locatable l = transportable.getTransportLocatable();
             if (l == null) return "null locatable: " + transportable.toString();
 
+            if (l instanceof FreeColGameObject
+                && ((FreeColGameObject)l).isDisposed()) {
+                return "locatable disposed";
+            }
+            
             Location tLoc = l.getLocation();
             if (tLoc instanceof Unit && (Unit)tLoc != carrier) {
                 return "carrier usurped"; // On another carrier!

@@ -137,7 +137,7 @@ public class AIUnit extends AIObject implements Transportable {
 
         this.unit = unit;
         mission = null;
-        uninitialized = getUnit() == null;
+        uninitialized = unit == null;
     }
 
     /**
@@ -175,7 +175,8 @@ public class AIUnit extends AIObject implements Transportable {
      * Disposes this object and any attached mission.
      */
     public void dispose() {
-        getAIOwner().removeAIUnit(this);
+        AIPlayer aiOwner = getAIOwner();
+        if (aiOwner != null) aiOwner.removeAIUnit(this);
         abortMission("AIUnit-disposed");
         setTransport(null, "disposing");
         super.dispose();
@@ -188,7 +189,7 @@ public class AIUnit extends AIObject implements Transportable {
      */
     public String getId() {
         if (unit == null) {
-            logger.warning("Uninitialized AI unit");
+            logger.warning("Uninitialized AI unit: " + super.getId());
             return null;
         }
         return unit.getId();
@@ -218,7 +219,8 @@ public class AIUnit extends AIObject implements Transportable {
      * @return The owning AIPlayer.
      */
     public AIPlayer getAIOwner() {
-        return getAIMain().getAIPlayer(unit.getOwner());
+        return (unit == null) ? null
+            : getAIMain().getAIPlayer(unit.getOwner());
     }
 
     /**
