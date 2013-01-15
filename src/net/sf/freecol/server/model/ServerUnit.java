@@ -720,30 +720,29 @@ public class ServerUnit extends Unit implements ServerModelObject {
                          "lostCityRumour.fountainOfYouthWithoutEurope",
                          serverPlayer, this));
             } else {
-                if (serverPlayer.hasAbility("model.ability.selectRecruit")
-                    && !serverPlayer.isAI()) { // TODO: let the AI select
+                if (!serverPlayer.isAI()) { // TODO: let the AI select
                     // Remember, and ask player to select
                     serverPlayer.setRemainingEmigrants(dx);
                     cs.addTrivial(See.only(serverPlayer), "fountainOfYouth",
-                        ChangeSet.ChangePriority.CHANGE_LATE,
-                        "migrants", Integer.toString(dx));
+                                  ChangeSet.ChangePriority.CHANGE_LATE,
+                                  "migrants", Integer.toString(dx));
                 } else {
                     List<RandomChoice<UnitType>> recruitables
                         = serverPlayer.generateRecruitablesList();
                     for (int k = 0; k < dx; k++) {
-                        UnitType type = RandomChoice
-                            .getWeightedRandom(logger,
-                                "Choose FoY", random, recruitables);
+                        UnitType type = RandomChoice.getWeightedRandom(logger,
+                            "Choose FoY", random, recruitables);
                         new ServerUnit(game, europe, serverPlayer, type);
                     }
                     cs.add(See.only(serverPlayer), europe);
                 }
                 cs.addMessage(See.only(serverPlayer),
                      new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                         "lostCityRumour.fountainOfYouth", serverPlayer, this));
+                         "lostCityRumour.fountainOfYouth",
+                         serverPlayer, this));
+                cs.addAttribute(See.only(serverPlayer),
+                                "sound", "sound.event.fountainOfYouth");
             }
-            cs.addAttribute(See.only(serverPlayer),
-                "sound", "sound.event.fountainOfYouth");
             break;
         case NO_SUCH_RUMOUR: case MOUNDS:
         default:

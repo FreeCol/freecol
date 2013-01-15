@@ -77,7 +77,8 @@ public final class EmigrationPanel extends FreeColDialog<Integer> {
     public void initialize(Europe europe, boolean fountainOfYouth) {
 
         if (fountainOfYouth) {
-            question.insert(Messages.message("lostCityRumour.FountainOfYouth") + "\n\n", 0);
+            question.insert(Messages.message("lostCityRumour.fountainOfYouth")
+                            + "\n\n", 0);
         }
 
         setLayout(new MigLayout("wrap 1", "[fill]", ""));
