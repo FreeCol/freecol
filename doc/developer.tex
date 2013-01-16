@@ -335,7 +335,9 @@ are the work of the devil!
 \begin{itemize}
 
 \item Make sure that all relevant changes have been committed to the
-  branch you are about to release.
+  branch you are about to release.  If you plan to upload the JavaDoc
+  (see below) make sure that \verb+ant javadoc+ is not finding errors
+  before branching.
 
 \item Merge translations from trunk if the release is not made from
   trunk, with \verb+ant merge-translations+. Skip this step if the
@@ -437,31 +439,14 @@ The following items can be omitted for unstable releases:
 
 \begin{itemize}
 
-\item Go to the page ``Tracker > Admin > Bugs > Add/Update Groups''
-  and rename the bug tracking group for the current development branch
-  to match the release, e.g. change ``Fixed (trunk)'' to ``Fixed
-  (FreeCol 0.10.2)'' if you have just released 0.10.2 from
-  trunk. Then, create a new group with the old name you have just
-  changed, e.g. ``Fixed (trunk)''.
+\item Go to the page ``Tickets > Admin > Bugs'' and create a new
+  milestone called ``Fixed\_\emph{release}''
+  (e.g. ``Fixed\_0.10.2'').  Do a mass edit (the pencil icon in the
+  top right of the bug tracker list) and move all bugs from the
+  ``Fixed\_trunk'' milestone to the new milestone.
 
-\item Go to the page "Tracker > Admin > Bugs > Update preferences" and
-  edit the text under the heading ``Free form text for the "browse
-  artifacts" page''. Add a new link for the current release matching
-  the examples for older releases. Remove links to ancient releases if
-  the list is getting too long.
-
-\item Go to the page ``Tracker > Admin > Feature Requests > Add/Update
-  Groups'' and rename the feature request group for the current
-  development branch to match the release, e.g. change ``Added
-  (trunk)'' to ``Added (FreeCol 0.10.2)'' if you have just released
-  0.10.2 from trunk. Then, create a new group with the old name you
-  have just changed, e.g. ``Added (trunk)''.
-
-\item Go to the page "Tracker > Admin > Feature Requests > Update
-  preferences" and edit the text under the heading ``Free form text
-  for the "browse artifacts" page''. Add a new link for the current
-  release matching the examples for older releases. Remove links to
-  ancient releases if the list is getting too long.
+\item Do the corresponding action in other ticket categories that
+  have distinct release milestones.
 
 \item Regenerate the documentation (with \verb+ant manual+) and
   JavaDoc (with \verb+ant javadoc+) and update JavaDoc and User
@@ -495,9 +480,6 @@ to be installed.
 The following items should be omitted for unstable releases:
 
 \begin{itemize}
-
-\item Update the links to "Added (x.y.z-branch)" and "Fixed
-  (x.y.z-branch)" on the roadmap (and release status etc).
 
 \item Post a news item on the FreeCol project news page on sourceforge
 (at \verb+https://sourceforge.net/news/?group_id=43225+).
