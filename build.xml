@@ -9,7 +9,7 @@
         the metaserver, distribution packages, running tests
         and creating documentation.
     </description>
-    <property name="java.target.version" value="1.5"/>
+    <property name="java.target.version" value="1.6"/>
     <property name="freecol.name" value="freecol"/>
     <property environment="env"/>
     <property name="freecol.data.dir" value="${basedir}/data"/>
@@ -317,7 +317,7 @@
                         <authors>
                             <author name="The FreeCol Team" email="developers@freecol.org" />
                         </authors>
-                        <javaversion>1.5</javaversion>
+                        <javaversion>1.6</javaversion>
                     </info>
                     <guiprefs width="640" height="480" resizable="no">
                         <laf name="looks">

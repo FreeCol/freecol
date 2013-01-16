@@ -81,7 +81,7 @@ public final class FreeCol {
     public static final int     TIMEOUT_MIN = 10; // 10s
 
     private static final int    MIN_MEMORY = 128; // Mbytes
-    private static final String MIN_JDK_VERSION = "1.5";
+    private static final String MIN_JDK_VERSION = "1.6";
     private static final String DEFAULT_SPLASH_FILE = "splash.jpg";
 
     public static final String CLIENT_THREAD = "FreeColClient:";
