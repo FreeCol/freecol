@@ -54,10 +54,10 @@ public final class SpecificationTest extends FreeColTestCase {
      * Test for some typical abilities.
      */
     public void testUnitAbilities() {
-    	Specification spec = spec();
+        Specification spec = spec();
 
         UnitType colonist = spec.getUnitType("model.unit.freeColonist");
-        assertTrue(colonist.hasAbility("model.ability.foundColony"));
+        assertTrue(colonist.hasAbility(Ability.FOUND_COLONY));
         assertFalse(colonist.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT));
         assertTrue(colonist.isRecruitable());
         assertFalse(colonist.hasAbility(Ability.NAVAL_UNIT));
@@ -66,7 +66,7 @@ public final class SpecificationTest extends FreeColTestCase {
         assertFalse(colonist.hasAbility(Ability.CAPTURE_GOODS));
 
         UnitType wagon = spec.getUnitType("model.unit.wagonTrain");
-        assertFalse(wagon.hasAbility("model.ability.foundColony"));
+        assertFalse(wagon.hasAbility(Ability.FOUND_COLONY));
         assertFalse(wagon.isRecruitable());
         assertFalse(wagon.hasAbility(Ability.NAVAL_UNIT));
         assertTrue(wagon.hasAbility(Ability.CARRY_GOODS));
@@ -74,7 +74,7 @@ public final class SpecificationTest extends FreeColTestCase {
         assertFalse(wagon.hasAbility(Ability.CAPTURE_GOODS));
 
         UnitType brave = spec.getUnitType("model.unit.brave");
-        //assertFalse(brave.hasAbility("model.ability.foundColony"));
+        //assertFalse(brave.hasAbility(Ability.FOUND_COLONY));
         assertTrue(brave.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT));
         assertFalse(brave.isRecruitable());
         assertFalse(brave.hasAbility(Ability.NAVAL_UNIT));
@@ -83,7 +83,7 @@ public final class SpecificationTest extends FreeColTestCase {
         assertFalse(brave.hasAbility(Ability.CAPTURE_GOODS));
 
         UnitType caravel = spec.getUnitType("model.unit.caravel");
-        assertFalse(caravel.hasAbility("model.ability.foundColony"));
+        assertFalse(caravel.hasAbility(Ability.FOUND_COLONY));
         assertFalse(caravel.isRecruitable());
         assertTrue(caravel.hasAbility(Ability.NAVAL_UNIT));
         assertTrue(caravel.hasAbility(Ability.CARRY_GOODS));
@@ -91,17 +91,15 @@ public final class SpecificationTest extends FreeColTestCase {
         assertFalse(caravel.hasAbility(Ability.CAPTURE_GOODS));
 
         UnitType privateer = spec.getUnitType("model.unit.privateer");
-        assertFalse(privateer.hasAbility("model.ability.foundColony"));
+        assertFalse(privateer.hasAbility(Ability.FOUND_COLONY));
         assertFalse(privateer.isRecruitable());
         assertTrue(privateer.hasAbility(Ability.NAVAL_UNIT));
         assertTrue(privateer.hasAbility(Ability.CARRY_GOODS));
         assertTrue(privateer.hasAbility(Ability.CARRY_UNITS));
         assertTrue(privateer.hasAbility(Ability.CAPTURE_GOODS));
-
     }
 
     public void testFoundingFathers() {
-
         Specification spec = spec();
 
         FoundingFather smith = spec.getFoundingFather("model.foundingFather.adamSmith");
@@ -122,26 +120,25 @@ public final class SpecificationTest extends FreeColTestCase {
     }
 
     public void testModifiers() {
+        Specification spec = spec();
 
-    	Specification spec = spec();
+        // Percentage Modifier
+        BuildingType ironWorks = spec.getBuildingType("model.building.ironWorks");
+        Modifier modifier = ironWorks.getModifierSet("model.goods.tools").iterator().next();
+        assertEquals(Modifier.Type.PERCENTAGE, modifier.getType());
+        assertEquals(50f, modifier.getValue());
 
-    	// Percentage Modifier
-    	BuildingType ironWorks = spec.getBuildingType("model.building.ironWorks");
-    	Modifier modifier = ironWorks.getModifierSet("model.goods.tools").iterator().next();
-    	assertEquals(Modifier.Type.PERCENTAGE, modifier.getType());
-    	assertEquals(50f, modifier.getValue());
+        // Additive Modifier
+        BuildingType depot = spec.getBuildingType("model.building.depot");
+        modifier = depot.getModifierSet("model.modifier.warehouseStorage").iterator().next();
+        assertEquals(Modifier.Type.ADDITIVE, modifier.getType());
+        assertEquals(100f, modifier.getValue());
 
-    	// Additive Modifier
-    	BuildingType depot = spec.getBuildingType("model.building.depot");
-    	modifier = depot.getModifierSet("model.modifier.warehouseStorage").iterator().next();
-    	assertEquals(Modifier.Type.ADDITIVE, modifier.getType());
-    	assertEquals(100f, modifier.getValue());
-
-    	// Multiplicative Modifier
-    	UnitType blackSmith = spec.getUnitType("model.unit.masterBlacksmith");
-    	modifier = blackSmith.getModifierSet("model.goods.tools").iterator().next();
-    	assertEquals(Modifier.Type.MULTIPLICATIVE, modifier.getType());
-    	assertEquals(2f, modifier.getValue());
+        // Multiplicative Modifier
+        UnitType blackSmith = spec.getUnitType("model.unit.masterBlacksmith");
+        modifier = blackSmith.getModifierSet("model.goods.tools").iterator().next();
+        assertEquals(Modifier.Type.MULTIPLICATIVE, modifier.getType());
+        assertEquals(2f, modifier.getValue());
     }
 
     public void testNations() {
@@ -169,8 +166,8 @@ public final class SpecificationTest extends FreeColTestCase {
     }
 
     public void testReqAbilitiesForEquipmentTypes() {
-    	String equipmentTypeStr;
-    	Map<String,Boolean> abilitiesReq, expectAbilities;
+        String equipmentTypeStr;
+        Map<String,Boolean> abilitiesReq, expectAbilities;
         Specification spec = spec();
 
         Map<String,Map<String,Boolean>> eqTypesAbilities = new Hashtable<String,Map<String,Boolean>>();

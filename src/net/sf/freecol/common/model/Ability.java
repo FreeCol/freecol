@@ -160,9 +160,14 @@ public final class Ability extends Feature {
     public static final String EXPORT = "model.ability.export";
 
     /**
-     * The ability to found a colony.
+     * The ability of a unit to found a colony.
      */
     public static final String FOUND_COLONY = "model.ability.foundColony";
+
+    /**
+     * The ability of a player to found colonies.
+     */
+    public static final String FOUNDS_COLONIES = "model.ability.foundsColonies";
 
     /**
      * The ability of ships to move across water tiles.

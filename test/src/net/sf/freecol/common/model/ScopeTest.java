@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.model;
 
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
 
@@ -104,7 +105,7 @@ public class ScopeTest extends FreeColTestCase {
         assertFalse(testScope.appliesTo(frigate));
 
         testScope.setMethodValue("2");
-        testScope.setAbilityID("model.ability.foundColony");
+        testScope.setAbilityID(Ability.FOUND_COLONY);
         assertFalse(testScope.appliesTo(frigate));
     }
 
@@ -150,7 +151,7 @@ public class ScopeTest extends FreeColTestCase {
         assertFalse(testScope2.equals(testScope1));
 
         testScope1.setType("model.unit.frigate");
-        testScope1.setAbilityID("model.ability.foundColony");
+        testScope1.setAbilityID(Ability.FOUND_COLONY);
 
         assertFalse(testScope1.equals(testScope2));
         assertFalse(testScope2.equals(testScope1));
@@ -212,7 +213,7 @@ public class ScopeTest extends FreeColTestCase {
         Unit unit = new ServerUnit(game, unitTile, dutch, colonistType);
 
         Scope scope = new Scope();
-        scope.setAbilityID("model.ability.foundColony");
+        scope.setAbilityID(Ability.FOUND_COLONY);
         assertTrue(scope.appliesTo(unit));
         scope.setType("model.unit.freeColonist");
         assertTrue(scope.appliesTo(unit));

@@ -636,8 +636,8 @@ public class Unit extends GoodsLocation
      *         otherwise.
      */
     public boolean isColonist() {
-        return unitType.hasAbility("model.ability.foundColony")
-            && owner.isEuropean();
+        return unitType.hasAbility(Ability.FOUND_COLONY)
+            && owner.hasAbility(Ability.FOUNDS_COLONIES);
     }
 
     /**
@@ -2478,9 +2478,9 @@ public class Unit extends GoodsLocation
     public boolean isPerson() {
         return hasAbility("model.ability.person")
             // @compat 0.10.0
-            || hasAbility(Ability.BORN_IN_COLONY)
-            || hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
-            || hasAbility("model.ability.foundColony")
+            || unitType.hasAbility(Ability.BORN_IN_COLONY)
+            || unitType.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
+            || unitType.hasAbility(Ability.FOUND_COLONY)
             // Nick also had:
             //     && (!hasAbility("model.ability.carryGoods")
             //         && !hasAbility("model.ability.carryUnits")

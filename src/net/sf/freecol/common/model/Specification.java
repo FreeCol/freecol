@@ -1569,6 +1569,15 @@ public final class Specification {
         }
         // end compatibility code
 
+        // @compat 0.10.7
+        for (EuropeanNationType ent : europeanNationTypes) {
+            if (ent.hasAbility(Ability.FOUND_COLONY)) {
+                ent.removeAbilities(Ability.FOUND_COLONY);
+                ent.addAbility(new Ability(Ability.FOUNDS_COLONIES, ent, true));
+            }
+        }
+        // end compatibility code
+
         initialized = true;
     }
 

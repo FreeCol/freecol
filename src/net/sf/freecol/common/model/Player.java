@@ -38,6 +38,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.Region.RegionType;
@@ -1811,7 +1812,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *         independence.
      */
     public boolean canBuildColonies() {
-        return nationType.hasAbility("model.ability.foundColony");
+        return nationType.hasAbility(Ability.FOUNDS_COLONIES);
     }
 
     /**

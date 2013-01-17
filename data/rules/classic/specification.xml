@@ -1621,7 +1621,7 @@
       <unit id="soldier" type="model.unit.freeColonist" role="soldier"/>
       <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" expert-starting-units="true"/>
       <unit id="ship" type="model.unit.caravel"/>
-      <ability id="model.ability.foundColony" value="true"/>
+      <ability id="model.ability.foundsColonies" value="true"/>
       <ability id="model.ability.electFoundingFather"/>
       <ability id="model.ability.canRecruitUnit" />
       <settlement id="model.settlement.colony" capital="false" claimableRadius="1"
@@ -1667,7 +1667,7 @@
   <indian-nation-types>
     <indian-nation-type id="default" abstract="true">
       <ability id="model.ability.ambushBonus" value="true"/>
-      <ability id="model.ability.foundColony" value="false"/>
+      <ability id="model.ability.foundsColonies" value="false"/>
       <ability id="model.ability.automaticEquipment" value="true">
         <scope type="model.equipment.indian.muskets"/>
         <scope type="model.equipment.indian.horses"/>

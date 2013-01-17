@@ -388,8 +388,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
         UnitType unitType = null;
         int price = europe.getRecruitPrice();
-        for (UnitType type : spec
-                 .getUnitTypesWithAbility("model.ability.foundColony")) {
+        for (UnitType type : spec.getUnitTypesWithAbility(Ability.FOUND_COLONY)) {
             int p = europe.getUnitPrice(type);
             if (p != UNDEFINED && p < price) price = p;
         }
