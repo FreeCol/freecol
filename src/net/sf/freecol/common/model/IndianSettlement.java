@@ -284,6 +284,15 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
+     * Does this settlement have a missionary?
+     *
+     * @return True if there is a missionary at this settlement.
+     */
+    public boolean hasMissionary() {
+        return missionary != null;
+    }
+
+    /**
      * Gets the missionary from this settlement.
      *
      * @return The missionary at this settlement, or null if there is none.
@@ -1137,7 +1146,7 @@ public class IndianSettlement extends Settlement {
     public String getImageKey() {
         return getOwner().getNationID()
             + (isCapital() ? ".capital" : ".settlement")
-            + ((getMissionary() == null) ? "" : ".mission")
+            + ((hasMissionary()) ? "" : ".mission")
             + ".image";
     }
 

@@ -352,6 +352,15 @@ public class PlayerExploredTile extends FreeColGameObject {
                            + " loading PlayerExploredTile");
             in.nextTag();
         }
+
+        // Workaround for BR#2508, problem possibly dates as late as 0.10.5.
+        if (tile.getIndianSettlement() == null && missionary != null) {
+            logger.warning("Dropping ghost missionary " + missionary.getId()
+                + " from " + this.getId());
+            Player p = missionary.getOwner();
+            if (p != null) p.removeUnit(missionary);
+            missionary = null;
+        }           
     }
 
     /**

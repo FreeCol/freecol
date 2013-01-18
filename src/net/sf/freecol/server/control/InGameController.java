@@ -2282,11 +2282,9 @@ public final class InGameController extends Controller {
         ChangeSet cs = new ChangeSet();
         csVisit(serverPlayer, settlement, false, cs);
 
-        Unit missionary = settlement.getMissionary();
-        if (missionary != null) {
-            ServerPlayer enemy = (ServerPlayer) missionary.getOwner();
-            enemy.csKillMissionary(settlement,
-                                   "indianSettlement.mission.denounced", cs);
+        if (settlement.hasMissionary()) {
+            ((ServerIndianSettlement)settlement)
+                .csKillMissionary("indianSettlement.mission.denounced", cs);
         }
 
         // Result depends on tension wrt this settlement.

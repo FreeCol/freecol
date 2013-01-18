@@ -453,38 +453,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     /**
-     * Kills this players missionary in a settlement.
-     *
-     * @param settlement The <code>IndianSettlement</code> to kill the
-     *     missionary from.
-     * @param messageId An optional messageId to send.
-     * @param cs A <code>ChangeSet</code> to update.
-     */
-    public void csKillMissionary(IndianSettlement settlement, String messageId,
-                                 ChangeSet cs) {
-        Unit missionary = settlement.getMissionary();
-        settlement.changeMissionary(null);
-
-        // Inform the enemy of loss of mission
-        cs.add(See.only(this), settlement);
-        cs.addDispose(See.perhaps().always(this),
-            settlement.getTile(), missionary);
-        if ("indianSettlement.mission.denounced".equals(messageId)) {
-            cs.addMessage(See.only(this),
-                new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                 messageId, settlement)
-                    .addStringTemplate("%settlement%", 
-                        settlement.getLocationNameFor(this)));
-        } else if ("indianSettlement.mission.destroyed".equals(messageId)) {
-            cs.addMessage(See.only(this),
-                new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
-                                 messageId, settlement)
-                    .addStringTemplate("%settlement%", 
-                        settlement.getLocationNameFor(this)));
-        }
-    }
-
-    /**
      * Kill off a player and clear out its remains.
      *
      * @param cs A <code>ChangeSet</code> to update.
@@ -499,10 +467,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
             if (other == this) continue;
             if (isEuropean() && other.isIndian()) {
                 for (IndianSettlement s : other.getIndianSettlements()) {
-                    Unit unit = s.getMissionary();
-                    if (unit != null
-                        && ((ServerPlayer) unit.getOwner()) == this) {
-                        csKillMissionary(s, null, cs);
+                    if (s.getMissionary(this) != null) {
+                        ((ServerIndianSettlement)s).csKillMissionary(null, cs);
                     }
                     s.removeAlarm(this);
                 }
@@ -1418,7 +1384,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     }
                 }
                 // Missionary helps reducing alarm a bit
-                if (settlement.getMissionary() != null) {
+                if (settlement.hasMissionary()) {
                     Unit mission = settlement.getMissionary();
                     int missionAlarm = ALARM_MISSIONARY_PRESENT;
                     if (mission.hasAbility(Ability.EXPERT_MISSIONARY)) {
@@ -2426,7 +2392,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // Burn down the missions
         for (IndianSettlement s : nativePlayer.getIndianSettlements()) {
             if (s.getMissionary(attackerPlayer) != null) {
-                csKillMissionary(s, null, cs);
+                ((ServerIndianSettlement)s).csKillMissionary(null, cs);
             }
         }
     }
@@ -2968,11 +2934,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         // Get rid of the any missionary first.
         if (settlement instanceof IndianSettlement) {
-            Unit missionary = ((IndianSettlement)settlement).getMissionary();
-            if (missionary != null) {
-                ((ServerPlayer)missionary.getOwner())
-                    .csKillMissionary((IndianSettlement)settlement,
-                        "indianSettlement.mission.destroyed", cs);
+            if (((IndianSettlement)settlement).hasMissionary()) {
+                ((ServerIndianSettlement)settlement)
+                    .csKillMissionary("indianSettlement.mission.destroyed", cs);
             }
         }
             

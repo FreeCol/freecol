@@ -29,6 +29,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
@@ -204,6 +205,36 @@ public class ServerIndianSettlement extends IndianSettlement
             + " modified by " + Integer.toString(addToAlarm)
             + " now = " + Integer.toString(getAlarm(player).getValue()));
         return modified;
+    }
+
+    /**
+     * Kills the missionary at this settlement.
+     *
+     * @param messageId An optional messageId to send.
+     * @param cs A <code>ChangeSet</code> to update.
+     */
+    public void csKillMissionary(String messageId, ChangeSet cs) {
+        Unit missionary = getMissionary();
+        if (missionary == null) return;
+        ServerPlayer missionaryOwner = (ServerPlayer)missionary.getOwner();
+        changeMissionary(null);
+
+        // Inform the enemy of loss of mission
+        cs.add(See.perhaps().always(missionaryOwner), getTile());
+        cs.addDispose(See.only(missionaryOwner), null, missionary);
+        if ("indianSettlement.mission.denounced".equals(messageId)) {
+            cs.addMessage(See.only(missionaryOwner),
+                new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                 messageId, this)
+                    .addStringTemplate("%settlement%", 
+                        getLocationNameFor(missionaryOwner)));
+        } else if ("indianSettlement.mission.destroyed".equals(messageId)) {
+            cs.addMessage(See.only(missionaryOwner),
+                new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
+                                 messageId, this)
+                    .addStringTemplate("%settlement%", 
+                        getLocationNameFor(missionaryOwner)));
+        }
     }
 
     /**

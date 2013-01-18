@@ -2045,11 +2045,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         // Fix bug where missionary locations get cleared.
         // TODO: Remove this when PETs have been revised to not store
         // the actual unit.
-        Unit missionary = null;
-        if (settlement instanceof IndianSettlement
-            && (missionary = ((IndianSettlement)settlement).getMissionary())
-            != null) {
-            missionary.setLocationNoUpdate(settlement);
+        if (settlement instanceof IndianSettlement) {
+            Unit missionary = ((IndianSettlement)settlement).getMissionary(); 
+            if (missionary != null) missionary.setLocationNoUpdate(settlement);
         }
     }
 
