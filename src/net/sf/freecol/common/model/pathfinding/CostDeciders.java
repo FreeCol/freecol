@@ -22,8 +22,8 @@ package net.sf.freecol.common.model.pathfinding;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 
 
@@ -176,9 +176,10 @@ public final class CostDeciders {
      * @return A suitable <code>CostDecider</code>.
      */
     public static CostDecider defaultCostDeciderFor(final Unit unit) {
-        return (unit == null || !unit.isOffensiveUnit())
-            ? avoidSettlementsAndBlockingUnits()
-            : avoidSettlements();
+        return (unit != null && unit.isOffensiveUnit()
+            && unit.getRole() != Unit.Role.SCOUT)
+            ? avoidSettlements()
+            : avoidSettlementsAndBlockingUnits();
     }
 
     /**
