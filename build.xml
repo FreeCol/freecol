@@ -27,19 +27,9 @@
     <property name="miglayout.jar" value="jars/miglayout-4.0-swing.jar"/>
     <property name="cli.jar" value="jars/commons-cli-1.1.jar"/>
     <property name="cortado.jar" value="jars/cortado-0.6.0.jar"/>
-<!--
-    <property name="stax.jar" value="jars/stax2-api-3.0.3.jar"/>
-    <property name="woodstox.jar" value="jars/woodstox-core-lgpl-4.0.9.jar"/>
--->
-    <property name="stax.jar" value="jars/jsr173_1.0_api.jar"/>
-    <property name="woodstox.jar" value="jars/wstx-lgpl-4.0pr1.jar"/>
 
 
     <path id="libraries.classpath">
-        <!-- StAX xml parser -->
-        <pathelement location="${basedir}/${stax.jar}" />
-        <!-- Woodstox XML processor -->
-        <pathelement location="${basedir}/${woodstox.jar}"/>
         <!-- MigLayout manager -->
         <pathelement location="${basedir}/${miglayout.jar}"/>
         <!-- Command line processor -->
@@ -157,13 +147,13 @@
       </exec>
       <property prefix="svn" file="build/svn.properties"/>
     </target>
-            
+
     <target name="manifest" depends="svnproperties,gitproperties"
             description="Creates the Manifest file.">
       <manifest file="${basedir}/src/MANIFEST.MF">
         <attribute name="Created-By" value="FreeCol Team"/>
         <attribute name="Main-Class" value="net.sf.freecol.FreeCol"/>
-        <attribute name="Class-Path" value="${stax.jar} ${woodstox.jar} jars/jogg-0.0.7.jar jars/jorbis-0.0.15.jar ${miglayout.jar} ${cli.jar} ${cortado.jar}"/>
+        <attribute name="Class-Path" value="jars/jogg-0.0.7.jar jars/jorbis-0.0.15.jar ${miglayout.jar} ${cli.jar} ${cortado.jar}"/>
         <attribute name="Product-Name" value="FreeCol"/>
         <attribute name="Package-Title" value="FreeCol"/>
         <attribute name="Package-Version" value="${svn.Revision}"/>

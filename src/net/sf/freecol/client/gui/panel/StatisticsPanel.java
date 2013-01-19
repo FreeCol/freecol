@@ -58,7 +58,7 @@ public final class StatisticsPanel extends FreeColPanel
 
         private static final int NAME_COLUMN = 0, VALUE_COLUMN = 1;
         private final String[] columnNames = { "Name", "Value" };
-        
+
         private Object data[][] = null;
 
         /**
@@ -87,7 +87,7 @@ public final class StatisticsPanel extends FreeColPanel
 
         /**
          * Returns the amount of columns in this statesTable.
-         * 
+         *
          * @return The amount of columns in this statesTable.
          */
         public int getColumnCount() {
@@ -96,7 +96,7 @@ public final class StatisticsPanel extends FreeColPanel
 
         /**
          * Returns the name of the specified column.
-         * 
+         *
          * @return The name of the specified column.
          */
         public String getColumnName(int column) {
@@ -105,7 +105,7 @@ public final class StatisticsPanel extends FreeColPanel
 
         /**
          * Returns the amount of rows in this statesTable.
-         * 
+         *
          * @return The amount of rows in this statesTable.
          */
         public int getRowCount() {
@@ -114,7 +114,7 @@ public final class StatisticsPanel extends FreeColPanel
 
         /**
          * Returns the value at the requested location.
-         * 
+         *
          * @param row The requested row.
          * @param column The requested column.
          * @return The value at the requested location.
@@ -134,7 +134,7 @@ public final class StatisticsPanel extends FreeColPanel
 
         /**
          * Returns 'true' if the specified cell is editable, 'false' otherwise.
-         * 
+         *
          * @param row The specified row.
          * @param column The specified column.
          * @return 'true' if the specified cell is editable, 'false' otherwise.
@@ -142,7 +142,7 @@ public final class StatisticsPanel extends FreeColPanel
         public boolean isCellEditable(int row, int column) {
             return false;
         }
-        
+
         /**
          * Returns the Class of the objects in the given column.
          */
@@ -150,7 +150,7 @@ public final class StatisticsPanel extends FreeColPanel
             return String.class;
         }
     }
-    
+
 
     /**
      * Creates the statistics panel.
@@ -160,7 +160,7 @@ public final class StatisticsPanel extends FreeColPanel
      */
     public StatisticsPanel(FreeColClient freeColClient, GUI gui) {
         super(freeColClient, gui, new BorderLayout());
-        
+
         // Retrieve the client and server data
         Map<String, String> serverStatistics
             = getController().getServerStatistics();
@@ -171,7 +171,7 @@ public final class StatisticsPanel extends FreeColPanel
         JPanel header = new JPanel();
         this.add(header, BorderLayout.NORTH);
         header.add(new JLabel("Statistics"),JPanel.CENTER_ALIGNMENT);
-        
+
         // Actual stats panel
         JPanel statsPanel = new JPanel(new GridLayout(1,2));
         JScrollPane scrollPane = new JScrollPane(statsPanel,
@@ -220,7 +220,7 @@ public final class StatisticsPanel extends FreeColPanel
         }
         return panel;
     }
-    
+
     private JPanel createStatsTable(String title, Map<String, String> data) {
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
@@ -230,7 +230,7 @@ public final class StatisticsPanel extends FreeColPanel
         JTable table = new JTable(model);
         table.setAutoCreateColumnsFromModel(true);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        //table.setAutoCreateRowSorter(true); // Java 1.6 only
+        table.setAutoCreateRowSorter(true);
         JScrollPane scrollPane = new JScrollPane(table);
         table.addNotify();
         scrollPane.getViewport().setOpaque(false);
