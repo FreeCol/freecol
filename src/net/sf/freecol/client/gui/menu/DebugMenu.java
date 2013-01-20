@@ -410,7 +410,7 @@ public class DebugMenu extends JMenu {
                     gui.refresh();
                 }
             });
-        dami.setEnabled(gui.getMapViewer().debugShowMission);
+        dami.setEnabled(gui.getMapViewer().debugShowMissionInfo);
 
         this.addSeparator();
 

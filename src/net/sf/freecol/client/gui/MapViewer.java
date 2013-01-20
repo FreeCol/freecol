@@ -56,6 +56,7 @@ import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
+import javax.swing.JToolTip;
 import javax.swing.UIManager;
 
 import net.sf.freecol.FreeCol;
@@ -2471,15 +2472,20 @@ public final class MapViewer {
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)
             && player != null
             && !player.owns(unit)
+            && unit.getOwner().isAI()
             && freeColClient.getFreeColServer() != null
             && (au = freeColClient.getFreeColServer().getAIMain()
                 .getAIUnit(unit)) != null) {
-            g.setColor(Color.WHITE);
-            String wrap = (unit.getOwner().isAI()) ? "" : "(";
-            String text = wrap + ((au.getMission() == null) ? "No mission"
-                : Utils.lastPart(au.getMission().getClass().toString(), "."))
-                + wrap;
-            g.drawString(text, 0, 0);
+            if (debugShowMission) {
+                g.setColor(Color.WHITE);
+                g.drawString((!au.hasMission()) ? "No mission"
+                    : Utils.lastPart(au.getMission().getClass().toString(), "."),
+                    0, 0);
+            }
+            if (debugShowMissionInfo && au.hasMission()) {
+                g.setColor(Color.WHITE);
+                g.drawString(au.getMission().toString(), 0, 25);
+            }
         }
     }
 
