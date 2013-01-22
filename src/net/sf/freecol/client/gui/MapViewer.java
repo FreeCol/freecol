@@ -2440,7 +2440,8 @@ public final class MapViewer {
             g.drawImage(image, p.x, p.y, null);
 
             // Draw an occupation and nation indicator.
-            String text = Messages.message(unit.getOccupationKey(player != null && player.owns(unit)));
+            boolean owned = player != null && player.owns(unit);
+            String text = Messages.message(unit.getOccupationKey(owned));
             g.drawImage(lib.getOccupationIndicatorChip(unit, text),
                         (int)(STATE_OFFSET_X * lib.getScalingFactor()), 0,
                         null);
@@ -2448,23 +2449,26 @@ public final class MapViewer {
             // Draw one small line for each additional unit (like in civ3).
             int unitsOnTile = 0;
             if (unit.getTile() != null) {
-                // When a unit is moving from tile to tile, it is removed from the source tile
-                // So the unit stack indicator cannot be drawn during the movement
-                // see UnitMoveAnimation.animate() for details
+                // When a unit is moving from tile to tile, it is
+                // removed from the source tile.  So the unit stack
+                // indicator cannot be drawn during the movement see
+                // UnitMoveAnimation.animate() for details
                 unitsOnTile = unit.getTile().getTotalUnitCount();
             }
             if (unitsOnTile > 1) {
                 g.setColor(Color.WHITE);
                 int unitLinesY = OTHER_UNITS_OFFSET_Y;
-                int x1 = (int) ((STATE_OFFSET_X + OTHER_UNITS_OFFSET_X) * lib.getScalingFactor());
-                int x2 = (int) ((STATE_OFFSET_X + OTHER_UNITS_OFFSET_X + OTHER_UNITS_WIDTH) * lib.getScalingFactor());
-                for (int i = 0; (i < unitsOnTile) && (i < MAX_OTHER_UNITS); i++) {
+                int x1 = (int)((STATE_OFFSET_X + OTHER_UNITS_OFFSET_X)
+                    * lib.getScalingFactor());
+                int x2 = (int)((STATE_OFFSET_X + OTHER_UNITS_OFFSET_X
+                        + OTHER_UNITS_WIDTH) * lib.getScalingFactor());
+                for (int i = 0; i < unitsOnTile && i < MAX_OTHER_UNITS; i++) {
                     g.drawLine(x1, unitLinesY, x2, unitLinesY);
                     unitLinesY += 2;
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.log(Level.WARNING, "displayUnit " + unit.toString(), e);
         }
 
         // FOR DEBUGGING
@@ -2784,11 +2788,15 @@ public final class MapViewer {
         final int width = halfWidth + unitImg.getWidth(null)/2;
         final int height = unitImg.getHeight(null);
 
-        BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage img = new BufferedImage(width, height,
+                                              BufferedImage.TYPE_INT_ARGB);
         Graphics g = img.getGraphics();
 
         final int unitX = (width - unitImg.getWidth(null)) / 2;
         g.drawImage(unitImg, unitX, 0, null);
+
+        String text = Messages.message(unit.getOccupationKey(true));
+        g.drawImage(lib.getOccupationIndicatorChip(unit, text), 0, 0, null);
 
         final JLabel label = new JLabel(new ImageIcon(img));
         label.setSize(width, height);
