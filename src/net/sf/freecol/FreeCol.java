@@ -134,9 +134,9 @@ public final class FreeCol {
 
         // We can not even emit localized error messages until we find
         // the data directory, which might have been specified on the
-        // command line.
+        // command line.  Take care to use the *last* instance.
         String dataDirectoryArg = null;
-        for (int i = 0; i < args.length - 1; i++) {
+        for (int i = args.length - 2; i >= 0; i--) {
             if ("--freecol-data".equals(args[i])) {
                 dataDirectoryArg = args[++i];
                 break;
@@ -148,7 +148,7 @@ public final class FreeCol {
         // Now we have the data directory, establish the base locale.
         // Beware, the locale may change!
         String localeArg = null;
-        for (int i = 0; i < args.length - 1; i++) {
+        for (int i = args.length - 2; i >= 0; i--) {
             if ("--default-locale".equals(args[i])) {
                 localeArg = args[++i];
                 break;
