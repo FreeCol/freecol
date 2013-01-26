@@ -1098,6 +1098,7 @@ public final class InGameController implements NetworkConstants {
     public boolean saveGame() {
         Player player = freeColClient.getMyPlayer();
         Game game = freeColClient.getGame();
+        if (game == null) return false; // Keyboard handling can race init
         String gid = Integer.toHexString(game.getUUID().hashCode());
         String fileName = /* player.getName() + "_" */ gid + "_"
             + Messages.message(player.getNationName()) + "_"
