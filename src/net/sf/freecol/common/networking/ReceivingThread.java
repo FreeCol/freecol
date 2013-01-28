@@ -320,7 +320,7 @@ final class ReceivingThread extends Thread {
      */
     private void listen() throws IOException, SAXException,
                                  XMLStreamException {
-        final int LOOK_AHEAD = 500;
+        final int LOOK_AHEAD = 4096;
         BufferedInputStream bis = new BufferedInputStream(in, LOOK_AHEAD);
         in.enable();
         bis.mark(LOOK_AHEAD);
@@ -371,22 +371,28 @@ final class ReceivingThread extends Thread {
                     timesFailed = 0;
                 } catch (XMLStreamException e) {
                     timesFailed++;
-                    if (shouldRun && timesFailed > MAXIMUM_RETRIES) {
-                        disconnect("XML failure: " + e.getMessage());
+                    logger.log(Level.WARNING, "XML fail", e);
+                    if (shouldRun() && timesFailed > MAXIMUM_RETRIES) {
+                        disconnect("Too many failures (XML)");
                     }
                 } catch (SAXException e) {
                     timesFailed++;
-                    if (shouldRun && timesFailed > MAXIMUM_RETRIES) {
-                        disconnect("SAX failure: " + e.getMessage());
+                    logger.log(Level.WARNING, "SAX fail", e);
+                    if (shouldRun() && timesFailed > MAXIMUM_RETRIES) {
+                        disconnect("Too many failures (SAX)");
                     }
                 } catch (IOException e) {
-                    if (shouldRun) {
-                        disconnect("IO failure: " + e.getMessage());
+                    logger.log(Level.WARNING, "IO fail", e);
+                    if (shouldRun()) {
+                        disconnect("Unexpected IO failure");
                     }
                 }
             }
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Unexpected exception.", e);
         } finally {
             askToStop();
         }
+        logger.info("Receiving thread " + getName() + " finished.");
     }
 }
