@@ -78,42 +78,8 @@ final class ReceivingThread extends Thread {
          * @param in The input stream in which this object should get the data
          *            from.
          */
-        FreeColNetworkInputStream(InputStream in) {
+        public FreeColNetworkInputStream(InputStream in) {
             this.in = in;
-        }
-
-        /**
-         * Fills the buffer with data.
-         * 
-         * @return <i>true</i> if the buffer has been filled with data, and
-         *         <i>false</i> if an error occured.
-         * @exception IOException if thrown by the underlying stream.
-         */
-        private boolean fill() throws IOException {
-            int r;
-            if (bStart < bEnd || empty && bStart == bEnd) {
-                if (empty) {
-                    bStart = 0;
-                    bEnd = 0;
-                }
-                r = in.read(buffer, bEnd, BUFFER_SIZE - bEnd);
-            } else if (bStart == bEnd) {
-                throw new IllegalStateException();
-            } else {
-                r = in.read(buffer, bEnd, bStart - bEnd);
-            }
-
-            if (r <= 0) {
-                logger.fine("Could not read data from stream.");
-                return false;
-            }
-
-            empty = false;
-            bEnd += r;
-            if (bEnd == BUFFER_SIZE) {
-                bEnd = 0;
-            }
-            return true;
         }
 
         /**
@@ -126,92 +92,91 @@ final class ReceivingThread extends Thread {
         }
 
         /**
+         * Fills the buffer with data.
+         * 
+         * @return True if a non-zero amount of data was read into the buffer.
+         * @exception IOException is thrown by the underlying read.
+         * @exception IllegalStateException if the buffer is not empty.
+         */
+        private boolean fill() throws IOException {
+            if (!empty) throw new IllegalStateException("Not empty.");
+
+            int r;
+            if (bStart < bEnd) {
+                r = in.read(buffer, bEnd, BUFFER_SIZE - bEnd);
+            } else if (bStart == bEnd) {
+                bStart = bEnd = 0; // Might as well resync.
+                r = in.read(buffer, bEnd, BUFFER_SIZE - bEnd);
+            } else {
+                r = in.read(buffer, bEnd, bStart - bEnd);
+            }
+            if (r <= 0) return false;
+
+            empty = false;
+            bEnd += r;
+            if (bEnd >= BUFFER_SIZE) bEnd = 0;
+            return true;
+        }
+
+        /**
          * Reads a single byte.
          * 
+         * @return The byte read, or -1 on error or "end" of stream.
          * @see #read(byte[], int, int)
+         * @exception IOException is thrown by the underlying read.
          */
         public int read() throws IOException {
             if (wait) return -1;
 
-            if (empty) {
-                if (!fill()) {
-                    wait = true;
-                    return -1;
-                }
-            }
-
-            if (buffer[bStart] == END_OF_STREAM) {
-                bStart++;
-                if (bStart == BUFFER_SIZE) {
-                    bStart = 0;
-                }
-                if (bStart == bEnd) {
-                    empty = true;
-                }
+            if (empty && !fill()) {
                 wait = true;
                 return -1;
-            } else {
-                bStart++;
-                if (bStart == bEnd || bEnd == 0 && bStart == BUFFER_SIZE) {
-                    empty = true;
-                }
-                if (bStart == BUFFER_SIZE) {
-                    bStart = 0;
-                    return buffer[BUFFER_SIZE - 1];
-                } else {
-                    return buffer[bStart - 1];
-                }
             }
+
+            int ret = buffer[bStart];
+            bStart++;
+            if (bStart >= BUFFER_SIZE) bStart = 0;
+            if (bStart == bEnd) empty = true;
+
+            if (ret == END_OF_STREAM) {
+                wait = true;
+                ret = -1;
+            }
+            return ret;
         }
 
         /**
          * Reads from the buffer and returns the data.
          * 
-         * @param b The place where the data will be put.
-         * @param off The offset to use when writing the data to
-         *      <code>b</code>.
-         * @param len Number of bytes to read.
-         * @return The actual number of bytes read and <code>-1</code> if the
-         *         message has ended, that is; if the token
-         *         {@link #END_OF_STREAM} is encountered.
+         * @param b The buffer to put the data in.
+         * @param off The offset to use when writing the data.
+         * @param len The maximum number of bytes to read.
+         * @return The actual number of bytes read, or -1 if the 
+         *     message has ended ({@link #END_OF_STREAM} was encountered).
          */
         public int read(byte[] b, int off, int len) throws IOException {
             if (wait) return -1;
 
-            if (empty) {
-                if (!fill()) {
+            int n = 0;
+            for (; n < len; n++) {
+                if (empty && !fill()) {
                     wait = true;
-                    return -1;
-                }
-            }
-
-            int r = 0;
-            for (; r < len; r++) {
-                if (buffer[bStart] == END_OF_STREAM) {
-                    bStart++;
-                    if (bStart == BUFFER_SIZE) {
-                        bStart = 0;
-                    }
-                    if (bStart == bEnd) {
-                        empty = true;
-                    }
-                    wait = true;
-                    return r;
+                    break;
                 }
 
-                b[r + off] = buffer[bStart];
+                byte value = buffer[bStart];
                 bStart++;
-                if (bStart == bEnd || bEnd == 0 && bStart == BUFFER_SIZE) {
-                    empty = true;
-                    if (!fill()) {
-                        wait = true;
-                        return r + 1;
-                    }
-                }
                 if (bStart == BUFFER_SIZE) bStart = 0;
+                if (bStart == bEnd) empty = true;
+
+                if (value == END_OF_STREAM) {
+                    wait = true;
+                    break;
+                }
+                b[n + off] = value;
             }
 
-            return len;
+            return (n <= 0 && wait) ? -1 : n;
         }
     }
 
@@ -320,11 +285,12 @@ final class ReceivingThread extends Thread {
      */
     private void listen() throws IOException, SAXException,
                                  XMLStreamException {
+        if (!shouldRun()) return;
+        in.enable();
+
         final int LOOK_AHEAD = 4096;
         BufferedInputStream bis = new BufferedInputStream(in, LOOK_AHEAD);
-        in.enable();
         bis.mark(LOOK_AHEAD);
-        if (!shouldRun()) return;
 
         XMLInputFactory xif = XMLInputFactory.newInstance();
         XMLStreamReader xmlIn = xif.createXMLStreamReader(bis);
@@ -370,22 +336,21 @@ final class ReceivingThread extends Thread {
                     listen();
                     timesFailed = 0;
                 } catch (XMLStreamException e) {
-                    timesFailed++;
+                    if (!shouldRun()) break;
                     logger.log(Level.WARNING, "XML fail", e);
-                    if (shouldRun() && timesFailed > MAXIMUM_RETRIES) {
+                    if (++timesFailed > MAXIMUM_RETRIES) {
                         disconnect("Too many failures (XML)");
                     }
                 } catch (SAXException e) {
-                    timesFailed++;
+                    if (!shouldRun()) break;
                     logger.log(Level.WARNING, "SAX fail", e);
-                    if (shouldRun() && timesFailed > MAXIMUM_RETRIES) {
+                    if (++timesFailed > MAXIMUM_RETRIES) {
                         disconnect("Too many failures (SAX)");
                     }
                 } catch (IOException e) {
+                    if (!shouldRun()) break;
                     logger.log(Level.WARNING, "IO fail", e);
-                    if (shouldRun()) {
-                        disconnect("Unexpected IO failure");
-                    }
+                    disconnect("Unexpected IO failure");
                 }
             }
         } catch (Exception e) {
