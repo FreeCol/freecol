@@ -207,6 +207,19 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         }
     }
 
+    /**
+     * Fix any tile integrity problems.
+     *
+     * @return True if there were no problems.
+     */
+    public boolean fixIntegrity() {
+        boolean result = true;
+        for (TileImprovement ti : getTileImprovements()) {
+            result &= ti.fixIntegrity();
+        }
+        return result;
+    }
+        
     // ------------------------------------------------------------ static methods
     /**
      * Creates a temporary copy of this tile for planning purposes.
@@ -1177,6 +1190,64 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         return this;
     }
 
+
+    /**
+     * Adds a river to this tile.
+     *
+     * @param magnitude The magnitude of the river to be created
+     * @param style The river style.
+     * @return The new river added, or the existing river TileImprovement.
+     */
+    public TileImprovement addRiver(int magnitude, String style) {
+        if (magnitude == TileImprovement.NO_RIVER) return null;
+        TileImprovementType riverType = getSpecification()
+            .getTileImprovementType("model.improvement.river");
+        TileImprovement river = new TileImprovement(getGame(), this, riverType);
+        river.setTurnsToComplete(0);
+        river.setMagnitude(magnitude);
+        river.setStyle(TileImprovementStyle.getInstance(style));
+        if (!add(river)) return null;
+        river.updateConnections();
+        return river;
+    }
+
+    /**
+     * Removes a river from this tile.
+     *
+     * @return The removed river.
+     */
+    public TileImprovement removeRiver() {
+        TileImprovement river = getRiver();
+        return (river == null || !remove(river)) ? null : river;
+    }
+
+    /**
+     * Adds a road to this tile.  It is not necessarily complete.
+     *
+     * @return The new road added, or the existing one.
+     */
+    public TileImprovement addRoad() {
+        TileImprovementType roadType = getSpecification()
+            .getTileImprovementType("model.improvement.road");
+        TileImprovement road = new TileImprovement(getGame(), this, roadType);
+        road.setMagnitude(1);
+        if (!add(road)) return null;
+        road.setStyle(road.getRoadStyleFromMap());
+        road.updateConnections();
+        return road;
+    }
+
+    /**
+     * Removes a road from this tile.
+     *
+     * @return The removed road.
+     */
+    public TileImprovement removeRoad() {
+        TileImprovement road = getRoad();
+        return (road == null || !remove(road)) ? null : road;
+    }
+
+
     /**
      * Adds a <code>Locatable</code> to this Location.
      *
@@ -1206,7 +1277,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public boolean remove(Locatable locatable) {
         if (locatable instanceof TileItem) {
             Player old = getOwner();
-            tileItemContainer.addTileItem((TileItem) locatable);
+            tileItemContainer.removeTileItem((TileItem) locatable);
             updatePlayerExploredTiles(old);
             return true;
         } else {

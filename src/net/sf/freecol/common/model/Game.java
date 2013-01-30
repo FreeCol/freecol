@@ -812,52 +812,38 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Checks the integrity of this <code>Game</code
-     * by checking if there are any
-     * {@link FreeColGameObject#isUninitialized() uninitialized objects}.
+     * Checks the integrity of this <code>Game</code>.
+     * 
+     * - Detects {@link FreeColGameObject#isUninitialized() uninitialized}
+     *   <code>FreeColGameObject</code>s.
+     * - Detects and fixes map inconsistencies
+     * - Detects and fixes player inconsistencies
      *
-     * Detected problems gets written to the log.
-     *
-     * @return <code>true</code> if the <code>Game</code> has
-     *      been loaded properly.
+     * @return True if there were no problems found.
      */
     public boolean checkIntegrity() {
-    	List<String> brokenObjects = new ArrayList<String>();
         boolean ok = true;
         Iterator<FreeColGameObject> iterator = getFreeColGameObjectIterator();
         while (iterator.hasNext()) {
             FreeColGameObject fgo = iterator.next();
             if (fgo.isUninitialized()) {
-            	brokenObjects.add(fgo.getId());
-                logger.warning("Uninitialized object: " + fgo.getId() + " (" + fgo.getClass() + ")");
+                logger.warning("Uninitialized object: " + fgo.getId()
+                    + " (" + fgo.getClass() + ")");
                 ok = false;
             }
+        }
+        Map map = getMap();
+        if (map != null) ok &= map.fixIntegrity();
+        for (Player player : getPlayers()) {
+            ok &= player.fixIntegrity();
         }
         if (ok) {
             logger.info("Game integrity ok.");
         } else {
             logger.warning("Game integrity test failed.");
-            fixIntegrity(brokenObjects);
         }
         return ok;
     }
-
-    /**
-     * Try to fix integrity problems
-     */
-    private boolean fixIntegrity(List<String> list){
-    	// try to update Units who may have missing info
-    	for(Player player : this.getPlayers()){
-    		for(Unit unit : player.getUnits()){
-    			if(unit.getOwner() == null){
-    				logger.warning("Fixing " + unit.getId() + ": owner missing");
-    				unit.setOwner(player);
-    			}
-    		}
-    	}
-    	return false;
-    }
-
 
     /**
      * Gets the <code>MapGeneratorOptions</code> that is associated with this

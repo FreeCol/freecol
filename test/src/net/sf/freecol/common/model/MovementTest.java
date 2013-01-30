@@ -25,19 +25,34 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 public class MovementTest extends FreeColTestCase {
 
+    private static final TileType hills
+        = spec().getTileType("model.tile.hills");
+    private static final TileType ocean
+        = spec().getTileType("model.tile.ocean");
+    private static final TileType plains
+        = spec().getTileType("model.tile.plains");
 
-    TileType plains = spec().getTileType("model.tile.plains");
-    TileType hills = spec().getTileType("model.tile.hills");
-    TileType ocean = spec().getTileType("model.tile.ocean");
+    private static final UnitType braveType
+        = spec().getUnitType("model.unit.brave");
+    private static final UnitType colonistType
+        = spec().getUnitType("model.unit.freeColonist");
+    private static final UnitType galleonType
+        = spec().getUnitType("model.unit.galleon");
 
-    UnitType galleonType = spec().getUnitType("model.unit.galleon");
-    UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
-    UnitType braveType = spec().getUnitType("model.unit.brave");
+    private static final EquipmentType horses
+        = spec().getEquipmentType("model.equipment.horses");
+    private static final EquipmentType indianHorses
+        = spec().getEquipmentType("model.equipment.indian.horses");
+    private static final EquipmentType indianMuskets
+        = spec().getEquipmentType("model.equipment.indian.muskets");
+    private static final EquipmentType muskets
+        = spec().getEquipmentType("model.equipment.muskets");
+    
+    private static final TileImprovementType riverType
+        = spec().getTileImprovementType("model.improvement.river");
+    private static final TileImprovementType roadType
+        = spec().getTileImprovementType("model.improvement.road");
 
-    EquipmentType horses = spec().getEquipmentType("model.equipment.horses");
-    EquipmentType muskets = spec().getEquipmentType("model.equipment.muskets");
-    EquipmentType indianHorses = spec().getEquipmentType("model.equipment.indian.horses");
-    EquipmentType indianMuskets = spec().getEquipmentType("model.equipment.indian.muskets");
 
     public void testMoveFromPlainsToPlains() throws Exception {
 
@@ -61,8 +76,7 @@ public class MovementTest extends FreeColTestCase {
         assertTrue("No improvements", tile2.getTileImprovements().isEmpty());
         TileImprovement ti = new TileImprovement(game, tile2, spec().getTileImprovementType("model.improvement.plow"));
         ti.setTurnsToComplete(0);
-        tile2.setTileItemContainer(new TileItemContainer(game, tile2));
-        tile2.getTileItemContainer().addTileItem(ti);
+        tile2.add(ti);
         assertTrue("Plowed", tile2.getCompletedTileImprovements().size() == 1);
         assertEquals(moveCost, colonist.getMoveCost(tile2));
         assertEquals(Math.min(moveCost, colonistType.getMovement()),
@@ -101,30 +115,29 @@ public class MovementTest extends FreeColTestCase {
         tile1.setExploredBy(dutch, true);
         tile2.setExploredBy(dutch, true);
 
-        TileImprovementType roadType = spec().getTileImprovementType("model.improvement.road");
-        TileImprovement road1 = new TileImprovement(game, tile1, roadType);
+        TileImprovement road1 = tile1.addRoad();
         assertTrue(road1.isRoad());
         assertFalse(road1.isComplete());
         road1.setTurnsToComplete(0);
         assertTrue(road1.isComplete());
-        tile1.setTileItemContainer(new TileItemContainer(game, tile1));
-        tile1.getTileItemContainer().addTileItem(road1);
-        assertTrue(tile1.hasRoad());
+        road1.updateRoadConnections(true);
+        assertEquals(road1, tile1.getRoad());
 
-        TileImprovement road2 = new TileImprovement(game, tile2, roadType);
+        TileImprovement road2 = tile2.addRoad();
         road2.setTurnsToComplete(0);
-        tile2.setTileItemContainer(new TileItemContainer(game, tile2));
-        tile2.getTileItemContainer().addTileItem(road2);
+        road2.updateRoadConnections(true);
         assertTrue(road2.isComplete());
-        assertTrue(tile2.hasRoad());
+        assertEquals(road2, tile2.getRoad());
+        
+        assertTrue(road1.isConnectedTo(tile1.getDirection(tile2)));
+        assertTrue(road2.isConnectedTo(tile2.getDirection(tile1)));
+System.err.println("TMARoad " + tile1.getDirection(tile2));
 
         Unit colonist = new ServerUnit(game, tile1, dutch, colonistType);
-
         int moveCost = 1;
         assertEquals(moveCost, colonist.getMoveCost(tile2));
         assertEquals(Math.min(moveCost, colonistType.getMovement()),
                      colonist.getMoveCost(tile2));
-
     }
 
     public void testMoveAlongRiver() throws Exception {
@@ -137,28 +150,32 @@ public class MovementTest extends FreeColTestCase {
         Tile tile2 = tile1.getAdjacentTile(Map.Direction.NE);
         tile1.setExploredBy(dutch, true);
         tile2.setExploredBy(dutch, true);
+        assertEquals(Map.Direction.NE, map.getDirection(tile1, tile2));
+        assertEquals(Map.Direction.SW, map.getDirection(tile2, tile1));
 
-        TileImprovementType riverType = spec().getTileImprovementType("model.improvement.river");
-        TileImprovement river1 = new TileImprovement(game, tile1, riverType);
+        TileImprovement river1 = tile1.addRiver(1, "0101");
         assertTrue(river1.isRiver());
         assertTrue(river1.isComplete());
-        tile1.setTileItemContainer(new TileItemContainer(game, tile1));
-        tile1.getTileItemContainer().addTileItem(river1);
         assertTrue(tile1.hasRiver());
 
-        TileImprovement river2 = new TileImprovement(game, tile2, riverType);
-        river2.setTurnsToComplete(0);
-        tile2.setTileItemContainer(new TileItemContainer(game, tile2));
-        tile2.getTileItemContainer().addTileItem(river2);
+        TileImprovement river2 = tile2.addRiver(1, "0101");
+        assertTrue(river2.isRiver());
         assertTrue(river2.isComplete());
         assertTrue(tile2.hasRiver());
 
+        assertFalse(river1.isConnectedTo(Map.Direction.NE));
+        assertTrue (river1.isConnectedTo(Map.Direction.SE));
+        assertFalse(river1.isConnectedTo(Map.Direction.SW));
+        assertTrue (river1.isConnectedTo(Map.Direction.NW));
+        assertFalse(river2.isConnectedTo(Map.Direction.NE));
+        assertTrue (river2.isConnectedTo(Map.Direction.SE));
+        assertFalse(river2.isConnectedTo(Map.Direction.SW));
+        assertTrue (river2.isConnectedTo(Map.Direction.NW));
+
         Unit colonist = new ServerUnit(game, tile1, dutch, colonistType);
+System.err.println("TMAR");
 
-        // rivers run parallel, no cost reduction
-        river1.setStyle(TileImprovementStyle.getInstance("0101"));
-        river2.setStyle(TileImprovementStyle.getInstance("0101"));
-
+        // rivers start parallel, no cost reduction
         int moveCost = 3;
         assertEquals(moveCost, colonist.getMoveCost(tile2));
         assertEquals(Math.min(moveCost, colonistType.getMovement()),
@@ -166,17 +183,23 @@ public class MovementTest extends FreeColTestCase {
 
         // rivers are connected, cost reduction applies
         river1.setStyle(TileImprovementStyle.getInstance("1000"));
-        assertEquals(Map.Direction.NE, map.getDirection(tile1, tile2));
-        assertTrue(tile1.getRiver().getStyle().isConnectedTo(Map.Direction.NE));
         river2.setStyle(TileImprovementStyle.getInstance("0010"));
-        assertEquals(Map.Direction.SW, map.getDirection(tile2, tile1));
-        assertTrue(tile2.getRiver().getStyle().isConnectedTo(Map.Direction.SW));
+        river1.updateConnections();
+        river2.updateConnections();
+
+        assertTrue (river1.isConnectedTo(Map.Direction.NE));
+        assertFalse(river1.isConnectedTo(Map.Direction.SE));
+        assertFalse(river1.isConnectedTo(Map.Direction.SW));
+        assertFalse(river1.isConnectedTo(Map.Direction.NW));
+        assertFalse(river2.isConnectedTo(Map.Direction.NE));
+        assertFalse(river2.isConnectedTo(Map.Direction.SE));
+        assertTrue (river2.isConnectedTo(Map.Direction.SW));
+        assertFalse(river2.isConnectedTo(Map.Direction.NW));
 
         moveCost = 1;
         assertEquals(moveCost, colonist.getMoveCost(tile2));
         assertEquals(Math.min(moveCost, colonistType.getMovement()),
                      colonist.getMoveCost(tile2));
-
     }
 
     public void testScoutColony() {

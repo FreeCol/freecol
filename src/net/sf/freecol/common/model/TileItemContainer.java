@@ -349,7 +349,8 @@ public class TileItemContainer extends FreeColGameObject {
         for (TileItem item : tileItems) {
             if (item instanceof TileImprovement
                 && ((TileImprovement) item).isComplete()) {
-                moveCost = Math.min(moveCost, ((TileImprovement) item).getMoveCost(fromTile, targetTile, moveCost));
+                moveCost = Math.min(moveCost,
+                    ((TileImprovement)item).getMoveCost(targetTile.getDirection(fromTile), moveCost));
             }
         }
         return moveCost;
@@ -504,43 +505,6 @@ public class TileItemContainer extends FreeColGameObject {
     }
 
     // ------------------------------------------------------------ manipulation methods
-
-    /**
-     * Creates a river <code>TileImprovement</code> and adds to this Tile/Container.
-     * Checking for overwrite is done by {@link #addTileItem}.
-     * @param magnitude The Magnitude of the river to be created
-     * @param style an <code>int</code> value
-     * @return The new river added, or the existing river TileImprovement
-     */
-    public TileImprovement addRiver(int magnitude, TileImprovementStyle style) {
-        if (magnitude == TileImprovement.NO_RIVER) {
-            return null;
-        }
-        TileImprovement river = new TileImprovement(getGame(), tile, getSpecification()
-                                                    .getTileImprovementType("model.improvement.river"));
-        river = (TileImprovement) addTileItem(river);
-        river.setMagnitude(magnitude);
-        river.setStyle(style);
-        invalidateCache();
-        return river;
-    }
-
-    /**
-     * Removes the river <code>TileImprovement</code> from this Tile/Container.
-     */
-    // Change neighbours' River Style with {@link #adjustNeighbourRiverStyle}.
-    public TileImprovement removeRiver() {
-        Iterator<TileItem> iterator = tileItems.iterator();
-        while (iterator.hasNext()) {
-            TileItem item = iterator.next();
-            if (item instanceof TileImprovement && ((TileImprovement) item).isRiver()) {
-                iterator.remove();
-                invalidateCache();
-                return (TileImprovement) item;
-            }
-        }
-        return null;
-    }
 
 
     /**

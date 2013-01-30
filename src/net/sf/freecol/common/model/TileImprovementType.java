@@ -58,8 +58,7 @@ public final class TileImprovementType extends FreeColGameObjectType {
     private List<RandomChoice<Disaster>> disasters
         = new ArrayList<RandomChoice<Disaster>>();
 
-    private int movementCost;
-    private float movementCostFactor;
+    private int movementCost = -1;
 
     /**
      * The layer a TileItem belongs to. Items with higher zIndex
@@ -276,28 +275,20 @@ public final class TileImprovementType extends FreeColGameObjectType {
     }
 
     /**
-     * Performs reduction of the movement-cost.
-     * @param moveCost Original movement cost
-     * @return The movement cost after any change
+     * Possibly reduces the cost of moving due to this tile
+     * improvement type.
+     *
+     * Only applies if movementCost is positive (see spec).  Do not
+     * return zero from a movement costing routine or units get free
+     * moves!
+     *
+     * @param originalCost The original movement cost.
+     * @return The movement cost after any change.
      */
-    public int getMoveCost(int moveCost) {
-        int cost = moveCost;
-        if (movementCostFactor >= 0) {
-            float cost2 = cost * movementCostFactor;
-            cost = (int)cost2;
-            if (cost < cost2) {
-                cost++;
-            }
-        }
-        if (movementCost > 0) {
-            // Only >0 values are meaningful (see spec).
-            // Do not return zero from a movement costing routine or
-            // units get free moves!
-            if (movementCost < cost) {
-                cost = movementCost;
-            }
-        }
-        return cost;
+    public int getMoveCost(int originalCost) {
+        return (movementCost > 0 && movementCost < originalCost)
+            ? movementCost
+            : originalCost;
     }
 
     /**
@@ -444,7 +435,6 @@ public final class TileImprovementType extends FreeColGameObjectType {
         natural = getAttribute(in, "natural", false);
         addWorkTurns = getAttribute(in, "add-work-turns", 0);
         movementCost = getAttribute(in, "movement-cost", 0);
-        movementCostFactor = -1;
         magnitude = getAttribute(in, "magnitude", 1);
 
         requiredImprovementType = getSpecification().getType(in,

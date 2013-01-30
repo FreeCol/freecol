@@ -142,10 +142,11 @@ public class LostCityRumour extends TileItem {
         this.name = newName;
     }
 
+
+    // Interface TileItem
+
     /**
-     * Get the <code>ZIndex</code> value.
-     *
-     * @return an <code>int</code> value
+     * {@inheritDoc}
      */
     public final int getZIndex() {
         return RUMOUR_ZINDEX;

@@ -117,15 +117,6 @@ public class Resource extends TileItem {
     }
 
     /**
-     * Get the <code>ZIndex</code> value.
-     *
-     * @return an <code>int</code> value
-     */
-    public final int getZIndex() {
-        return RESOURCE_ZINDEX;
-    }
-
-    /**
      * Returns the best GoodsType
      */
     public GoodsType getBestGoodsType() {
@@ -179,18 +170,27 @@ public class Resource extends TileItem {
         return quantity;
     }
 
+    /* TODO: what was this for? Named resources, such as Lost Crazy Russian Gold Mine?
+    public void setName(String newName) {
+        // do nothing
+    }
+    */
+
+    // Interface TileItem
+
+    /**
+     * {@inheritDoc}
+     */
+    public final int getZIndex() {
+        return RESOURCE_ZINDEX;
+    }
+
     /**
      * {@inheritDoc}
      */
     public boolean isTileTypeAllowed(TileType tileType) {
         return tileType.canHaveResourceType(getType());
     }
-
-    /* TODO: what was this for? Named resources, such as Lost Crazy Russian Gold Mine?
-    public void setName(String newName) {
-        // do nothing
-    }
-    */
 
 
     /**

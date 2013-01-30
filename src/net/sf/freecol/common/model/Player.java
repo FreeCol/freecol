@@ -1468,6 +1468,24 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Try to fix integrity problems with units that have no owner.
+     *
+     * @return True if there were no problems, false if problems were found
+     *     and corrected.
+     */
+    public boolean fixIntegrity() {
+        boolean result = true;
+        for (Unit unit : getUnits()) {
+            if (unit.getOwner() == null) {
+                logger.warning("Fixing " + unit.getId() + ": owner missing");
+                unit.setOwner(this);
+                result = false;
+            }
+        }
+        return result;
+    }
+
+    /**
      * Gets the price to this player for a proposed unit.
      *
      * @param au The proposed <code>AbstractUnit</code>.

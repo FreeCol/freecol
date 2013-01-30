@@ -24,48 +24,50 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 public class TileItemContainerTest extends FreeColTestCase {
 
+    private static final TileImprovementType riverImprov
+        = spec().getTileImprovementType("model.improvement.river");
+    private static final TileImprovementType roadImprov
+        = spec().getTileImprovementType("model.improvement.road");
+    private static final ResourceType oreRsc = spec().getResourceType("model.resource.ore");
+
+
     private TileItemContainer getSample(Game game, Tile t, 
-    				boolean addImprovements, 
-    				boolean addResources,
-    				boolean addRumours){
-    	final TileImprovementType riverImprov =
-            spec().getTileImprovementType("model.improvement.river");
-    	final TileImprovementType roadImprov =
-            spec().getTileImprovementType("model.improvement.road");
-    	final ResourceType oreRsc = spec().getResourceType("model.resource.ore"); 
+                                        boolean addImprovements, 
+                                        boolean addResources,
+                                        boolean addRumours) {
+        if (addImprovements) {
+            t.addRiver(1, "0101");
+            TileImprovement road = t.addRoad();
+            road.setTurnsToComplete(0);
+        }
     	
-    	TileItemContainer cont = new TileItemContainer(game,t);
+        if (addResources) {
+            t.addResource(new Resource(game, t, oreRsc));
+        }
     	
-    	if(addImprovements){
-    		TileImprovement river = new TileImprovement(game, t, riverImprov);
-    		TileImprovement road = new TileImprovement(game, t, roadImprov);
-    		cont.addTileItem(river);
-    		cont.addTileItem(road);
-    	}
+        if (addRumours) {
+            t.add(new LostCityRumour(game, t, RumourType.FOUNTAIN_OF_YOUTH, "fountain"));
+        }
     	
-    	if(addResources){
-    		Resource ore = new Resource(game,t,oreRsc);
-    		cont.addTileItem(ore);
-    	}
-    	
-    	if(addRumours){
-    		LostCityRumour rumour = new LostCityRumour(game, t, RumourType.FOUNTAIN_OF_YOUTH, "fountain"); 
-    		cont.addTileItem(rumour);
-    	}
-    	t.setTileItemContainer(cont);
-    	
-    	return cont;
+        if (t.getTileItemContainer() == null) {
+            t.setTileItemContainer(new TileItemContainer(game, t));
+        }
+        return t.getTileItemContainer();
     }
 
 
     public void testCopyFromWithEveryThing() {
-    	final TileType desert = spec().getTileType("model.tile.desert");
-    	final TileType plains = spec().getTileType("model.tile.plains");
+        final TileType desert = spec().getTileType("model.tile.desert");
+        final TileType plains = spec().getTileType("model.tile.plains");
     	
         Game game = getStandardGame();
+        Map map = getTestMap();
+        game.setMap(map);
 
-    	Tile tOriginal = new Tile(game,plains,8,8);
-    	Tile tCopy = new Tile(game,desert,8,9);
+        Tile tOriginal = map.getTile(8, 8);
+        tOriginal.setType(plains);
+        Tile tCopy = map.getTile(8, 9);
+        tCopy.setType(desert);
         TileItemContainer original = getSample(game,tOriginal,true,true,true);
         TileItemContainer copy = getSample(game,tCopy,false,false,false);
         

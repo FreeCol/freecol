@@ -88,12 +88,10 @@ public class ServerColony extends Colony implements ServerModelObject {
         established = game.getTurn();
         tile.setOwner(owner);
         if (!tile.hasRoad()) {
-            TileImprovement road
-                = new TileImprovement(game, tile,
-                    spec.getTileImprovementType("model.improvement.road"));
+            TileImprovement road = tile.addRoad();
             road.setTurnsToComplete(0);
             road.setVirtual(true);
-            tile.add(road);
+            road.updateRoadConnections(true);
         }
 
         ColonyTile colonyTile = new ServerColonyTile(game, this, tile);

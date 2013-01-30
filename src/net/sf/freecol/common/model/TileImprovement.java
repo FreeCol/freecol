@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.EnumMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -35,14 +37,6 @@ public class TileImprovement extends TileItem implements Named {
 
     private static Logger logger = Logger.getLogger(TileImprovement.class.getName());
 
-    private TileImprovementType type;
-    private int turnsToComplete;
-
-    /**
-     * Default is type.getMagnitude(), but this will override.
-     */
-    private int magnitude;
-
     /**
      * River magnitudes
      */
@@ -51,13 +45,19 @@ public class TileImprovement extends TileItem implements Named {
     public static final int LARGE_RIVER = 2;
     public static final int FJORD_RIVER = 3;
 
+    /** The type of this improvement. */
+    private TileImprovementType type;
+
+    /** Turns remaining until the improvement is complete, if any. */
+    private int turnsToComplete;
 
     /**
-     * To store the style of multi-image TileImprovements (eg. rivers)
-     * Rivers have 4 directions {NE=1, SE=3, SW=9, NW=27}, and 3 levels (see above)
-     * @see Map
-     * @see net.sf.freecol.server.generator.River
+     * The improvement magnitude.  Default is type.getMagnitude(), but
+     * this will override.
      */
+    private int magnitude;
+
+    /** Image and overlay style information for the improvement. */
     private TileImprovementStyle style;
 
     /**
@@ -67,7 +67,9 @@ public class TileImprovement extends TileItem implements Named {
      */
     private boolean virtual;
 
-    // ------------------------------------------------------------ constructor
+    /** Cached bitmap of connections by direction, derived from style. */       
+    private long connected = 0L;
+
 
     /**
      * Creates a standard <code>TileImprovement</code>-instance.
@@ -88,6 +90,7 @@ public class TileImprovement extends TileItem implements Named {
             this.turnsToComplete = tile.getType().getBasicWorkTurns() + type.getAddWorkTurns();
         }
         this.magnitude = type.getMagnitude();
+        this.connected = 0L;
     }
 
     public TileImprovement(Game game, XMLStreamReader in) throws XMLStreamException {
@@ -96,188 +99,104 @@ public class TileImprovement extends TileItem implements Named {
     }
 
     /**
-     * Initiates a new <code>TileImprovement</code> with the given ID. The object
-     * should later be initialized by calling either
+     * Instantiates a new <code>TileImprovement</code> with the given
+     * ID. The object should later be initialized by calling either
      * {@link #readFromXML(XMLStreamReader)} or
      * {@link #readFromXMLElement(Element)}.
      *
-     * @param game The <code>Game</code> in which this object belong.
+     * @param game The <code>Game</code> in which this object belongs.
      * @param id The unique identifier for this object.
      */
     public TileImprovement(Game game, String id) {
         super(game, id);
     }
 
-    // ------------------------------------------------------------ retrieval methods
-
+    /**
+     * Gets the type of this tile improvement.
+     *
+     * @return The type of this improvement.
+     */
     public TileImprovementType getType() {
         return type;
     }
 
-    public int getMagnitude() {
-        return magnitude;
-    }
-
-    public void setMagnitude(int magnitude) {
-        this.magnitude = magnitude;
-    }
-
     /**
-     * Get the <code>Virtual</code> value.
+     * Gets a key for message routines.
      *
-     * @return a <code>boolean</code> value
+     * @return The name key.
      */
-    public final boolean isVirtual() {
-        return virtual;
-    }
-
-    /**
-     * Set the <code>Virtual</code> value.
-     *
-     * @param newVirtual The new Virtual value.
-     */
-    public final void setVirtual(final boolean newVirtual) {
-        this.virtual = newVirtual;
+    public String getNameKey() {
+        return type.getNameKey();
     }
 
     /**
      * Is this <code>TileImprovement</code> a road?
-     * @return a <code>boolean</code> value
+     * TODO: deprecate?
+     *
+     * @return True if this is a road improvement.
      */
     public boolean isRoad() {
-        return getType().getId().equals("model.improvement.road");
+        return "model.improvement.road".equals(type.getId());
     }
 
     /**
      * Is this <code>TileImprovement</code> a river?
-     * @return a <code>boolean</code> value
+     * TODO: deprecate?
+     *
+     * @return True if this is a river improvement.
      */
     public boolean isRiver() {
-        return getType().getId().equals("model.improvement.river");
-    }
-
-    public String getNameKey() {
-        return getType().getNameKey();
+        return "model.improvement.river".equals(type.getId());
     }
 
     /**
-     * Returns a textual representation of this object.
-     * @return A <code>String</code> of either:
-     * <ol>
-     * <li>NAME (#TURNS turns left) (eg. Road (2 turns left) ) if it is under construction
-     * <li>NAME (eg. Road) if it is complete
-     * </ol>
-     */
-    public String toString() {
-        if (turnsToComplete > 0) {
-            return getType().getId() + " (" + Integer.toString(turnsToComplete) + " turns left)";
-        } else {
-            return getType().getId();
-        }
-    }
-
-    /**
-     * @return the current turns to completion.
+     * How many turns remain until this improvement is complete?
+     *
+     * @return The current turns to completion.
      */
     public int getTurnsToComplete() {
         return turnsToComplete;
     }
 
     /**
-     * Update the turns required to complete the improvement.
+     * Is this improvement complete?
      *
-     * @param turns an <code>int</code> value
+     * @return True if complete.
+     */
+    public boolean isComplete() {
+        return turnsToComplete <= 0;
+    }
+
+    /**
+     * Sets the turns required to complete the improvement.
+     *
+     * @param turns The new turns to completion.
      */
     public void setTurnsToComplete(int turns) {
         turnsToComplete = turns;
     }
 
     /**
-     * Get the <code>ZIndex</code> value.
+     * Gets the magnitude of this improvement.
      *
-     * @return an <code>int</code> value
+     * @return The magnitude of this immprovement.
      */
-    public final int getZIndex() {
-        return type.getZIndex();
-    }
-
-    public boolean isComplete() {
-        return turnsToComplete <= 0;
-    }
-
-    public EquipmentType getExpendedEquipmentType() {
-        return type.getExpendedEquipmentType();
-    }
-
-    public int getExpendedAmount() {
-        return type.getExpendedAmount();
+    public int getMagnitude() {
+        return magnitude;
     }
 
     /**
-     * Returns the bonus (if any).
-     * @param goodsType a <code>GoodsType</code> value
-     * @return an <code>int</code> value
-     */
-    public int getBonus(GoodsType goodsType) {
-        if (!isComplete()) {
-            return 0;
-        }
-        return type.getBonus(goodsType);
-    }
-
-    /**
-     * Returns the bonus Modifier (if any).
-     * @param goodsType a <code>GoodsType</code> value
-     * @return a <code>Modifier</code> value
-     */
-    public Modifier getProductionModifier(GoodsType goodsType) {
-        if (!isComplete()) {
-            return null;
-        }
-        return type.getProductionModifier(goodsType);
-    }
-
-    /**
-     * Calculates the movement cost on the basis of connected tile
-     * improvements.
+     * Sets the magnitude of this improvement.
      *
-     * @param fromTile a <code>Tile</code> value
-     * @param targetTile a <code>Tile</code> value
-     * @param moveCost Original movement cost
-     * @return The movement cost after any change
+     * @param magnitude The new magnitude.
      */
-    public int getMoveCost(Tile fromTile, Tile targetTile, int moveCost) {
-        if (isComplete()) {
-            if (style == null) {
-                // implicitly connected to all neighbouring tiles
-                return type.getMoveCost(moveCost);
-            } else {
-                Direction direction = targetTile.getMap().getDirection(targetTile, fromTile);
-                // TODO: fix this properly, roads are getting bogus styles
-                boolean connected = (isRiver())
-                    ? style != null && style.isConnectedTo(direction)
-                    : (isRoad())
-                    ? fromTile.hasRoad() && targetTile.hasRoad()
-                    : false;
-                if (connected) return type.getMoveCost(moveCost);
-            }
-        }
-        return moveCost;
+    public void setMagnitude(int magnitude) {
+        this.magnitude = magnitude;
     }
 
     /**
-     * Returns any change of TileType
-     * @return The new TileType.
-     */
-    public TileType getChange(TileType tileType) {
-        if (!isComplete()) {
-            return null;
-        }
-        return type.getChange(tileType);
-    }
-
-    /**
-     * Returns the Style of this Improvement - used for Rivers
+     * Gets the style of this improvement.
+     *
      * @return The style
      */
     public TileImprovementStyle getStyle() {
@@ -285,35 +204,237 @@ public class TileImprovement extends TileItem implements Named {
     }
 
     /**
-     * Sets the Style of this Improvement - used for Rivers
-     * @param style The style
+     * Sets the style of this improvement.
+     *
+     * @param style The new style.
      */
     public void setStyle(TileImprovementStyle style) {
         this.style = style;
     }
 
     /**
-     * Returns <code>true</code> if this TileImprovement is connected
-     * to a similar TileImprovement on the given tile.
+     * Is this a virtual improvement?
      *
-     * @param direction a <code>Direction</code> value
-     * @return a <code>boolean</code> value
+     * @return True if this is a virtual improvement.
      */
-    public boolean isConnectedTo(Direction direction) {
-        return style == null ? false : style.isConnectedTo(direction);
+    public final boolean isVirtual() {
+        return virtual;
     }
 
     /**
-     * Checks if a given worker can work at this Improvement
+     * Set the virtual status of this improvement.
+     * Used for the roads in a colony center tile.
+     *
+     * @param virtual The new virtual value.
+     */
+    public final void setVirtual(final boolean virtual) {
+        this.virtual = virtual;
+    }
+
+    /**
+     * Is this TileImprovement connected to a similar TileImprovement
+     * on a neighbouring tile?
+     *
+     * @param direction The <code>Direction</code> to check.
+     * @return True if this improvement is connected.
+     */
+    public boolean isConnectedTo(Direction direction) {
+        return (connected & (1 << direction.ordinal())) != 0;
+    }
+
+    /**
+     * Sets the connection status in a given direction.
+     *
+     * @param direction The <code>Direction</code> to set.
+     * @param value The new status for the connection.
+     */
+    public void setConnected(Direction direction, boolean value) {
+        boolean now = isConnectedTo(direction);
+        if (now != value) {
+            if (value) {
+                connected |= 1 << direction.ordinal();
+            } else {
+                connected &= ~(1 << direction.ordinal());
+            }
+        }
+        style = TileImprovementStyle.getInstance(encodeConnections());
+    }
+
+    /**
+     * Encode a style string suitable for TileImprovementStyle.getInstance.
+     */
+    private String encodeConnections() {
+        String s = new String();
+        for (Direction d : Direction.values()) {
+            s = s.concat((isConnectedTo(d)) ? Integer.toString(magnitude) :"0");
+        }
+        return s;
+    }
+
+    /**
+     * Gets a map of connection-direction to magnitude.
+     *
+     * @return A map of the connections.
+     */
+    public Map<Direction, Integer> getConnections() {
+        Map<Direction, Integer> result
+            = new EnumMap<Direction, Integer>(Direction.class);
+        for (Direction d : Direction.values()) {
+            if (isConnectedTo(d)) result.put(d, magnitude);
+        }
+        return result;
+    }
+
+    /**
+     * Gets the production bonus this improvement provides for a given type
+     * of goods.
+     *
+     * @param goodsType The <code>GoodsType</code> to test.
+     * @return A production bonus, or zero if none applicable.
+     */
+    public int getBonus(GoodsType goodsType) {
+        return (isComplete()) ? type.getBonus(goodsType) : 0;
+    }
+
+    /**
+     * Gets a Modifier for the production bonus this improvement provides
+     * for a given type of goods.
+     *
+     * @param goodsType The <code>GoodsType</code> to test.
+     * @return A production <code>Modifier</code>, or null if none applicable.
+     */
+    public Modifier getProductionModifier(GoodsType goodsType) {
+        return (isComplete()) ? type.getProductionModifier(goodsType) : null;
+    }
+
+
+    /**
+     * Calculates the movement cost on the basis of connected tile
+     * improvements.
+     *
+     * @param direction The <code>Direction</code> to move.
+     * @param moveCost The original movement cost.
+     * @return The movement cost with this improvement.
+     */
+    public int getMoveCost(Direction direction, int moveCost) {
+        return (isComplete() && isConnectedTo(direction))
+            ? type.getMoveCost(moveCost)
+            : moveCost;
+    }
+
+    /**
+     * What type of tile does this improvement change a given type to?
+     *
+     * @param tileType The original <code>TileType</code>.
+     * @return The <code>TileType</code> that results from completing this
+     *     improvement, or null if nothing changes.
+     */
+    public TileType getChange(TileType tileType) {
+        return (isComplete()) ? type.getChange(tileType) : null;
+    }
+
+    /**
+     * Can a unit build this improvement?
+     *
+     * @param unit A <code>Unit</code> to do the building.
+     * @return True if the supplied unit can build this improvement.
      */
     public boolean isWorkerAllowed(Unit unit) {
-        if (unit == null) {
-            return false;
+        return (unit == null || isComplete()) ? false
+            : type.isWorkerAllowed(unit);
+    }
+
+
+    /**
+     * Fixes any tile improvement style discontinuities.
+     *
+     * We check only if this improvement is not connected to a neighbour
+     * that *is* connected to this one, and connect this one.
+     *
+     * TODO: drop this one day when we never have style discontinuities.
+     * This alas is not the case in 0.10.x.
+     *
+     * @return True if the style was coherent, false if a problem was
+     *     found and corrected.
+     */
+    public boolean fixIntegrity() {
+        final Tile tile = getTile();
+        boolean result = true;
+        for (Tile t : tile.getSurroundingTiles(1)) {
+            Direction dForward = tile.getDirection(t);
+            Direction dReverse = dForward.getReverseDirection();
+            for (TileImprovement ti : t.getTileImprovements()) {
+                if (getType() == ti.getType()
+                    && !isConnectedTo(dForward)
+                    && ti.isConnectedTo(dReverse)) {
+                    setConnected(dForward, true);
+                    result = false;
+                    logger.warning("Connecting improvement " + this
+                        + " at " + tile + " to " + t);
+                }
+            }
         }
-        if (isComplete()) {
-            return false;
+        return result;
+    }
+
+    /**
+     * Updates the connections from the current style.
+     *
+     * Public for the test suite.
+     */
+    public void updateConnections() {
+        connected = 0L;
+        if (style != null) {
+            Direction[] directions = (isRoad()) ? Direction.values()
+                : Direction.longSides;
+            String mask = style.getMask();
+            for (int i = 0; i < directions.length; i++) {
+                if (mask.charAt(i) != '0') {
+                    connected |= 1L << directions[i].ordinal();
+                }
+            }
         }
-        return type.isWorkerAllowed(unit);
+    }
+
+    /**
+     * Work out what the road style at this tile should be by checking
+     * neighbouring tiles for roads.
+     *
+     * @return A suitable TileImprovementStyle.
+     */
+    public TileImprovementStyle getRoadStyleFromMap() {
+        if (!isRoad()) return null;
+        final Tile tile = getTile();
+        String s = new String();
+        for (Direction d : Direction.values()) {
+            Tile t = tile.getNeighbourOrNull(d);
+            s = s.concat((t != null && t.hasRoad()) ? "1" : "0");
+        }
+        return TileImprovementStyle.getInstance(s);
+    }
+        
+    /**
+     * Updates the connections from/to this road improvement.
+     *
+     * @param connect If true, add connections, otherwise remove them.
+     */
+    public void updateRoadConnections(boolean connect) {
+        if (!isRoad() || !isComplete()) return;
+        final Tile tile = getTile();
+        for (Tile t : tile.getSurroundingTiles(1)) {
+            if (t.hasRoad()) {
+                t.getRoad().setConnected(t.getDirection(tile), connect);
+            }
+        }
+    }
+
+    // Interface TileItem
+
+    /**
+     * {@inheritDoc}
+     */
+    public final int getZIndex() {
+        return type.getZIndex();
     }
 
     /**
@@ -396,16 +517,44 @@ public class TileImprovement extends TileItem implements Named {
 
         magnitude = Integer.parseInt(in.getAttributeValue(null, "magnitude"));
 
-        style = TileImprovementStyle.getInstance(in.getAttributeValue(null, "style"));
+        str = in.getAttributeValue(null, "style");
+        if (str == null) {
+            style = null;
+        // @compat 0.10.5
+        } else if (str.length() < 4) {
+            String old = TileImprovementStyle.decodeOldStyle(str, isRoad());
+            if (old == null) {
+                logger.warning("Ignoring bogus old TileImprovementStyle: "
+                    + str);
+            } else {
+                style = TileImprovementStyle.getInstance(old);
+            }
+        // end compatibility code
+        } else {
+            style = TileImprovementStyle.getInstance(str);
+            if (style == null) {
+                logger.warning("Ignoring bogus TileImprovementStyle: " + str);
+            }
+        }
+        updateConnections();
 
         virtual = getAttribute(in, "virtual", false);
+    }
 
+    /**
+     * Gets a textual representation of this object.
+     *
+     * @return The id and turns to complete if any.
+     */
+    public String toString() {
+        return getType().getId() + ((turnsToComplete <= 0) ? ""
+            : " (" + Integer.toString(turnsToComplete) + " turns left)");
     }
 
     /**
      * Gets the tag name of the root element representing this object.
      *
-     * @return "tileImprovement".
+     * @return "tileimprovement".
      */
     public static String getXMLElementTagName() {
         return "tileimprovement";

@@ -274,13 +274,8 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                 tile.getSpecification().getTileImprovementType("model.improvement.river");
 
             if (tile.getType().canHaveImprovement(riverType)) {
-                TileItemContainer tic = tile.getTileItemContainer();
-                if (tic == null) {
-                    tic = new TileItemContainer(tile.getGame(), tile);
-                    tile.setTileItemContainer(tic);
-                }
                 int oldMagnitude = TileImprovement.NO_RIVER;
-                TileImprovement river = tic.getRiver();
+                TileImprovement river = tile.getRiver();
                 if (river == null) {
                     river = new TileImprovement(tile.getGame(), tile, riverType);
                     river.setStyle(TileImprovementStyle.getInstance("0000"));
@@ -289,8 +284,8 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                 }
 
                 if (magnitude != oldMagnitude) {
-                    tic.addRiver(magnitude, river.getStyle());
-                    RiverSection mysection = new RiverSection(river.getStyle().getConnections());
+                    tile.addRiver(magnitude, river.getStyle().getString());
+                    RiverSection mysection = new RiverSection(river.getConnections());
                     // for each neighboring tile
                     for (Direction direction : Direction.longSides) {
                         Tile t = tile.getNeighbourOrNull(direction);
@@ -308,7 +303,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                             // update the other tile river branch
                             Direction otherDirection = direction.getReverseDirection();
                             RiverSection oppositesection =
-                                new RiverSection(otherRiver.getStyle().getConnections());
+                                new RiverSection(otherRiver.getConnections());
                             oppositesection.setBranch(otherDirection, tile.getRiver().getMagnitude());
                             otherRiver.setStyle(TileImprovementStyle.getInstance(oppositesection.encodeStyle()));
                             // update the current tile river branch

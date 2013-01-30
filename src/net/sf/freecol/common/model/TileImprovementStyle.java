@@ -19,7 +19,6 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,125 +45,135 @@ import net.sf.freecol.common.model.Map.Direction;
  */
 public class TileImprovementStyle {
 
-    private String style;
+    /** Cache all TileImprovementStyles. */
+    private static final Map<String, TileImprovementStyle> cache
+        = new HashMap<String, TileImprovementStyle>();
 
-    private String mask;
+    /** A key for the tile improvement style. */
+    private final String style;
 
-    private Map<Direction, Integer> connections =
-        new EnumMap<Direction, Integer>(Direction.class);
-
-    private static final Map<String, TileImprovementStyle> cache =
-        new HashMap<String, TileImprovementStyle>();
+    /** A key for the forest overlay, derived from the above. */
+    private final String mask;
 
 
-    private TileImprovementStyle(String input) {
+    /**
+     * Private constructor, only called in getInstance() below.
+     *
+     * @param style The (decoded) style.
+     */
+    private TileImprovementStyle(String style) {
+        this.style = style;
 
-        Direction[] directions = (input.length() < 8)
-            ? Direction.longSides : Direction.values();
+        String s = new String();
+        for (int i = 0; i < style.length(); i++) {
+            char c = style.charAt(i);
+            if (Character.digit(c, Character.MAX_RADIX) < 0) break;
+            s = s.concat((c == '0') ? "0" : "1");
+        }
+        this.mask = s;
+    }
 
-        // @compat 0.10.5
-        if (input.length() < 4) {
-            // must be an old style
-            style = new String();
+    // @compat 0.10.5
+    /**
+     * Decode the old base-3 encoded style format.
+     *
+     * @param input An old style string.
+     * @param allDirections If true extend the string to contain a value for
+     *     all directions, if not, extend the string only for the long sides.
+     * @return The style in the new format.
+     */
+    public static String decodeOldStyle(String input, boolean allDirections) {
+        Direction[] directions = (allDirections) ? Direction.values()
+            : Direction.longSides;
+
+        String style = new String();
+        try {
             int value = Integer.parseInt(input);
             for (int index = 0; index < 4; index++) {
                 int magnitude = value % 3;
-                style = style.concat(Integer.toString(magnitude, Character.MAX_RADIX));
-                connections.put(directions[index], magnitude);
+                style = style.concat(Integer.toString(magnitude,
+                        Character.MAX_RADIX));
                 value /= 3;
             }
-            // end @compat
-        } else {
-            style = input;
-            char[] chars = new char[directions.length];
-            for (int index = 0; index < directions.length; index++) {
-                int magnitude = Integer.parseInt(style.substring(index, index + 1),
-                                                 Character.MAX_RADIX);
-                connections.put(directions[index], magnitude);
-            }
+        } catch (NumberFormatException nfe) {
+            return null;
         }
-        this.mask = new String();
-        for (Direction direction : directions) {
-            mask = mask.concat((getConnection(direction) == 0) ? "0" : "1");
+        while (style.length() < directions.length) {
+            style = style.concat("0");
         }
+        return style;
     }
-
+    // @end compatibility code
 
     /**
-     * Return the instance identified by the given string.
+     * Gets the style corresponding to the given string.
      *
-     * @param key a <code>String</code> value
-     * @return a <code>TileImprovementStyle</code> value
+     * @param key The key to look up.
+     * @return The corresponding <code>TileImprovementStyle</code>.
      */
     public static TileImprovementStyle getInstance(String key) {
-        if (key == null || "".equals(key)) {
-            return null;
-        } else {
-            TileImprovementStyle result = cache.get(key);
-            if (result == null) {
-                result = new TileImprovementStyle(key);
-                cache.put(key, result);
-                if (result.getString() != key) {
-                    cache.put(result.getString(), result);
-                }
+        if (key == null || "".equals(key)) return null;
+
+        TileImprovementStyle result = cache.get(key);
+        if (result == null) {
+            result = new TileImprovementStyle(key);
+            cache.put(key, result);
+            if (result.getString() != key) {
+                cache.put(result.getString(), result);
             }
-            return result;
         }
+        return result;
     }
 
+    /**
+     * Gets a new style derived from a base version but with an added
+     * connection in a given direction.
+     *
+     * @param direction The new direction to connect to.
+     * @param base The base style (may be null).
+     * @param magnitude The magnitude of the new connection.
+     * @param allDirections The style must include all directions.
+     * @return A new style.
+     */
+    public static TileImprovementStyle getConnectedStyle(Direction direction,
+        TileImprovementStyle base, int magnitude, boolean allDirections) {
+        String style = (base == null) ? decodeOldStyle("0", allDirections)
+            : base.getString();
+        int index = direction.ordinal();
+        if (style.length() < Direction.NUMBER_OF_DIRECTIONS) index /= 2;
+
+        String result = ((index == 0) ? "" : style.substring(0, index-1))
+            + Integer.toString(magnitude)
+            + ((index+1 == style.length()) ? "" : style.substring(index+1));
+        return getInstance(result);
+    }
+      
 
     /**
-     * Return a string suitable for looking up an appropriate tile
+     * Gets the key suitable for looking up an appropriate tile
      * improvement image.
      *
-     * @return a <code>String</code> value
+     * @return The tile improvement lookup key.
      */
     public String getString() {
         return style;
     }
 
-    public String toString() {
-        return style;
-    }
-
     /**
-     * Return a string suitable for looking up an appropriate overlay
+     * Gets the key suitable for looking up an appropriate overlay
      * (forest) image.
      *
-     * @return a <code>String</code> value
+     * @return The overlay lookup key.
      */
     public String getMask() {
         return mask;
     }
 
-    public Map<Direction, Integer> getConnections() {
-        return new EnumMap<Direction, Integer>(connections);
-    }
-
+        
     /**
-     * Return the magnitude of the TileImprovement in the given
-     * direction.
-     *
-     * @param direction a <code>Direction</code> value
-     * @return an <code>int</code> value
+     * {@inheritDoc}
      */
-    public int getConnection(Direction direction) {
-        if (connections.containsKey(direction)) {
-            return connections.get(direction);
-        } else {
-            return 0;
-        }
+    public String toString() {
+        return style;
     }
-
-    /**
-     * Return <code>true</code> if the tile improvement is connected
-     * to a similar improvement on the given tile.
-     *
-     * @param direction a <code>Direction</code> value
-     * @return a <code>boolean</code> value
-     */
-    public boolean isConnectedTo(Direction direction) {
-        return getConnection(direction) > 0;
-    }
-
 }

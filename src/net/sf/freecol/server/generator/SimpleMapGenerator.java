@@ -997,15 +997,9 @@ public class SimpleMapGenerator implements MapGenerator {
                     ct.setType(t);
                     TileImprovementType plowType = map.getSpecification()
                         .getTileImprovementType("model.improvement.plow");
-                    TileImprovementType roadType = map.getSpecification()
-                        .getTileImprovementType("model.improvement.road");
-                    TileImprovement road = new TileImprovement(game, ct, roadType);
-                    road.setTurnsToComplete(0);
                     TileImprovement plow = new TileImprovement(game, ct, plowType);
                     plow.setTurnsToComplete(0);
-                    ct.setTileItemContainer(new TileItemContainer(game, ct));
-                    ct.getTileItemContainer().addTileItem(road);
-                    ct.getTileItemContainer().addTileItem(plow);
+                    ct.add(plow);
                     break;
                 }
             }

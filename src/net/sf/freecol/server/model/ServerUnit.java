@@ -237,6 +237,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 if (ti.isComplete()) {
                     setState(UnitState.ACTIVE);
                     setWorkLeft(-1);
+                    if (ti.isRoad()) ti.updateRoadConnections(true);
                 } else {
                     // Otherwise do work
                     int amount = (getType().hasAbility(Ability.EXPERT_PIONEER))
@@ -407,8 +408,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
         }
 
         // Expend equipment
-        EquipmentType type = ti.getExpendedEquipmentType();
-        changeEquipment(type, -ti.getExpendedAmount());
+        EquipmentType type = ti.getType().getExpendedEquipmentType();
+        changeEquipment(type, -ti.getType().getExpendedAmount());
         for (Unit unit : tile.getUnitList()) {
             if (unit.getWorkImprovement() != null
                 && unit.getWorkImprovement().getType() == ti.getType()

@@ -126,11 +126,5 @@ public class PioneeringMissionTest extends FreeColTestCase {
         Tile target = tip.getTarget();
         assertNotNull("Plan should have a target", target);
         aiUnit.setMission(mission);
-
-        // Simulate improvement tile getting road other than by unit
-        target.setTileItemContainer(new TileItemContainer(game, target));
-        TileImprovement imp = new TileImprovement(game, target, tip.getType());
-        imp.setTurnsToComplete(0);
-        target.getTileItemContainer().addTileItem(imp);
     }
 }

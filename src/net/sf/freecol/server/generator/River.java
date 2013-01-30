@@ -451,14 +451,12 @@ public class River {
                     logger.fine("Added fjord (magnitude: " + section.getSize() +
                                 ") to tile at " + section.getPosition());
                 } else if (section.getSize() > TileImprovement.NO_RIVER) {
-                    TileItemContainer container = tile.getTileItemContainer();
-                    if (container == null) {
-                        container = new TileItemContainer(tile.getGame(), tile);
-                        tile.setTileItemContainer(container);
-                    }
-                    container.addRiver(section.getSize(), TileImprovementStyle.getInstance(section.encodeStyle()));
-                    logger.fine("Added river (magnitude: " + section.getSize() +
-                                ") to tile at " + section.getPosition());
+                    String style = section.encodeStyle();
+                    tile.addRiver(section.getSize(), style);
+                    logger.fine("Added river"
+                        + "(magnitude: " + section.getSize()
+                        + " style: " + style
+                        + ") at " + section.getPosition());
                 }
                 region.addTile(tile);
                 oldSection = section;

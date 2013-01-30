@@ -30,15 +30,6 @@ public class TileImprovementTest extends FreeColTestCase {
         TileImprovementStyle style = TileImprovementStyle.getInstance("0102");
         assertEquals("0102", style.getString());
         assertEquals("0101", style.getMask());
-        assertFalse(style.isConnectedTo(Direction.N));
-        assertFalse(style.isConnectedTo(Direction.NE));
-        assertFalse(style.isConnectedTo(Direction.E));
-        assertTrue(style.isConnectedTo(Direction.SE));
-        assertFalse(style.isConnectedTo(Direction.S));
-        assertFalse(style.isConnectedTo(Direction.SW));
-        assertFalse(style.isConnectedTo(Direction.W));
-        assertTrue(style.isConnectedTo(Direction.NW));
-
     }
 
     public void testRiverWithExtras() {
@@ -47,15 +38,6 @@ public class TileImprovementTest extends FreeColTestCase {
         TileImprovementStyle style = TileImprovementStyle.getInstance("7170_&?");
         assertEquals("7170_&?", style.getString());
         assertEquals("1110", style.getMask());
-        assertFalse(style.isConnectedTo(Direction.N));
-        assertTrue(style.isConnectedTo(Direction.NE));
-        assertFalse(style.isConnectedTo(Direction.E));
-        assertTrue(style.isConnectedTo(Direction.SE));
-        assertFalse(style.isConnectedTo(Direction.S));
-        assertTrue(style.isConnectedTo(Direction.SW));
-        assertFalse(style.isConnectedTo(Direction.W));
-        assertFalse(style.isConnectedTo(Direction.NW));
-
     }
 
     public void testAllFrills() {
@@ -64,67 +46,55 @@ public class TileImprovementTest extends FreeColTestCase {
         TileImprovementStyle style = TileImprovementStyle.getInstance("7170110X_&?");
         assertEquals("7170110X_&?", style.getString());
         assertEquals("11101101", style.getMask());
-        assertTrue(style.isConnectedTo(Direction.N));
-        assertTrue(style.isConnectedTo(Direction.NE));
-        assertTrue(style.isConnectedTo(Direction.E));
-        assertFalse(style.isConnectedTo(Direction.SE));
-        assertTrue(style.isConnectedTo(Direction.S));
-        assertTrue(style.isConnectedTo(Direction.SW));
-        assertFalse(style.isConnectedTo(Direction.W));
-        assertTrue(style.isConnectedTo(Direction.NW));
-
     }
 
 
     public void testOldStyle() {
         TileImprovementStyle style;
 
-        style = TileImprovementStyle.getInstance("0");
+        style = TileImprovementStyle.getInstance(TileImprovementStyle.decodeOldStyle("0", false));
         assertEquals("0000", style.getString());
-        style = TileImprovementStyle.getInstance("1");
+        style = TileImprovementStyle.getInstance(TileImprovementStyle.decodeOldStyle("1", false));
         assertEquals("1000", style.getString());
-        style = TileImprovementStyle.getInstance("3");
+        style = TileImprovementStyle.getInstance(TileImprovementStyle.decodeOldStyle("3", false));
         assertEquals("0100", style.getString());
-        style = TileImprovementStyle.getInstance("9");
+        style = TileImprovementStyle.getInstance(TileImprovementStyle.decodeOldStyle("9", false));
         assertEquals("0010", style.getString());
-        style = TileImprovementStyle.getInstance("27");
+        style = TileImprovementStyle.getInstance(TileImprovementStyle.decodeOldStyle("27", false));
         assertEquals("0001", style.getString());
-        style = TileImprovementStyle.getInstance("54");
+        style = TileImprovementStyle.getInstance(TileImprovementStyle.decodeOldStyle("54", false));
         assertEquals("0002", style.getString());
-        style = TileImprovementStyle.getInstance("67");
+        style = TileImprovementStyle.getInstance(TileImprovementStyle.decodeOldStyle("67", false));
         assertEquals("1112", style.getString());
-        style = TileImprovementStyle.getInstance("80");
+        style = TileImprovementStyle.getInstance(TileImprovementStyle.decodeOldStyle("80", false));
         assertEquals("2222", style.getString());
-
     }
 
     public void testEquality() {
-
         TileImprovementStyle style1, style2;
-        style1 = TileImprovementStyle.getInstance("0");
+        style1 = TileImprovementStyle.getInstance(TileImprovementStyle.decodeOldStyle("0", false));
         style2 = TileImprovementStyle.getInstance("0000");
         assertTrue(style1 == style2);
-        style1 = TileImprovementStyle.getInstance("1");
+        style1 = TileImprovementStyle.getInstance(TileImprovementStyle.decodeOldStyle("1", false));
         style2 = TileImprovementStyle.getInstance("1000");
         assertTrue(style1 == style2);
-        style1 = TileImprovementStyle.getInstance("3");
+        style1 = TileImprovementStyle.getInstance(TileImprovementStyle.decodeOldStyle("3", false));
         style2 = TileImprovementStyle.getInstance("0100");
         assertTrue(style1 == style2);
-        style1 = TileImprovementStyle.getInstance("9");
+        style1 = TileImprovementStyle.getInstance(TileImprovementStyle.decodeOldStyle("9", false));
         style2 = TileImprovementStyle.getInstance("0010");
         assertTrue(style1 == style2);
-        style1 = TileImprovementStyle.getInstance("27");
+        style1 = TileImprovementStyle.getInstance(TileImprovementStyle.decodeOldStyle("27", false));
         style2 = TileImprovementStyle.getInstance("0001");
         assertTrue(style1 == style2);
-        style1 = TileImprovementStyle.getInstance("54");
+        style1 = TileImprovementStyle.getInstance(TileImprovementStyle.decodeOldStyle("54", false));
         style2 = TileImprovementStyle.getInstance("0002");
         assertTrue(style1 == style2);
-        style1 = TileImprovementStyle.getInstance("67");
+        style1 = TileImprovementStyle.getInstance(TileImprovementStyle.decodeOldStyle("67", false));
         style2 = TileImprovementStyle.getInstance("1112");
         assertTrue(style1 == style2);
-        style1 = TileImprovementStyle.getInstance("80");
+        style1 = TileImprovementStyle.getInstance(TileImprovementStyle.decodeOldStyle("80", false));
         style2 = TileImprovementStyle.getInstance("2222");
-
+        assertTrue(style1 == style2);
     }
-
 }

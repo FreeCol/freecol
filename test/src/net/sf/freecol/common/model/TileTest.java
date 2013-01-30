@@ -243,8 +243,7 @@ public class TileTest extends FreeColTestCase {
         assertEquals(cotton, secondaryProduction.getType());
         assertEquals(2, secondaryProduction.getAmount());
 
-        TileImprovement ti = new TileImprovement(game, tile,
-            spec().getTileImprovementType("model.improvement.plow"));
+        TileImprovement ti = new TileImprovement(game, tile, plow);
         ti.setTurnsToComplete(0);
         tile.add(ti);
         colony.invalidateCache();
@@ -270,10 +269,9 @@ public class TileTest extends FreeColTestCase {
         assertEquals(furs, secondaryProduction.getType());
         assertEquals(3, secondaryProduction.getAmount());
 
-        ti = new TileImprovement(game, tile, 
-            spec().getTileImprovementType("model.improvement.road"));
+        ti = tile.addRoad();
         ti.setTurnsToComplete(0);
-        tile.add(ti);
+        ti.updateRoadConnections(true);
         colony.invalidateCache();
 
         production = center.getProduction();
@@ -386,23 +384,19 @@ public class TileTest extends FreeColTestCase {
         Tile tile1 = map.getTile(5, 8);
         Tile tile2 = map.getTile(4, 8);
 
-        TileImprovement road1 = new TileImprovement(game, tile1, road);
-        TileImprovement river1 = new TileImprovement(game, tile1, river);
+        TileImprovement road1 = tile1.addRoad();
+        assertFalse(road1.isComplete());
         road1.setTurnsToComplete(0);
         assertTrue(road1.isComplete());
-        tile1.setTileItemContainer(new TileItemContainer(game, tile1));
-        tile1.getTileItemContainer().addTileItem(road1);
-        tile1.getTileItemContainer().addTileItem(river1);
         assertTrue(tile1.hasRoad());
+        TileImprovement river1 = tile1.addRiver(1, "0101");
+        assertTrue(river1.isComplete());
         assertTrue(tile1.hasRiver());
 
-        TileImprovement road2 = new TileImprovement(game, tile2, road);
-        TileImprovement river2 = new TileImprovement(game, tile2, river);
+        TileImprovement road2 = tile2.addRoad();
         road2.setTurnsToComplete(0);
         assertTrue(road2.isComplete());
-        tile2.setTileItemContainer(new TileItemContainer(game, tile2));
-        tile2.getTileItemContainer().addTileItem(road2);
-        tile2.getTileItemContainer().addTileItem(river2);
+        TileImprovement river2 = tile2.addRiver(1, "0101");
         assertTrue(tile2.hasRoad());
         assertTrue(tile2.hasRiver());
 
@@ -429,23 +423,17 @@ public class TileTest extends FreeColTestCase {
         Tile tile1 = colonyTile1.getWorkTile();
         Tile tile2 = colonyTile2.getWorkTile();
 
-        TileImprovement road1 = new TileImprovement(game, tile1, road);
-        TileImprovement river1 = new TileImprovement(game, tile1, river);
+        TileImprovement road1 = tile1.addRoad();
         road1.setTurnsToComplete(0);
         assertTrue(road1.isComplete());
-        tile1.setTileItemContainer(new TileItemContainer(game, tile1));
-        tile1.getTileItemContainer().addTileItem(road1);
-        tile1.getTileItemContainer().addTileItem(river1);
+        TileImprovement river1 = tile1.addRiver(1, "0101");
         assertTrue(tile1.hasRoad());
         assertTrue(tile1.hasRiver());
 
-        TileImprovement road2 = new TileImprovement(game, tile2, road);
-        TileImprovement river2 = new TileImprovement(game, tile2, river);
+        TileImprovement road2 = tile2.addRoad();
         road2.setTurnsToComplete(0);
         assertTrue(road2.isComplete());
-        tile2.setTileItemContainer(new TileItemContainer(game, tile2));
-        tile2.getTileItemContainer().addTileItem(road2);
-        tile2.getTileItemContainer().addTileItem(river2);
+        TileImprovement river2 = tile2.addRiver(1, "0101");
         assertTrue(tile2.hasRoad());
         assertTrue(tile2.hasRiver());
 

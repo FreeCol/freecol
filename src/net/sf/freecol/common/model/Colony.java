@@ -2222,7 +2222,7 @@ public class Colony extends Settlement implements Nameable {
         }
         TileImprovement road = getTile().getRoad();
         if (road != null && road.isVirtual()) {
-            getTile().getTileItemContainer().removeTileItem(road);
+            getTile().removeRoad();
         }
         objects.addAll(super.disposeList());
         return objects;

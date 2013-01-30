@@ -120,6 +120,7 @@ public abstract class TileItem extends FreeColGameObject implements Locatable {
         return 0;
     }
 
+
     /**
      * Get the <code>ZIndex</code> value.
      *
