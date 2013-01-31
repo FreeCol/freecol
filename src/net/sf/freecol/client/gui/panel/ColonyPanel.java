@@ -1425,7 +1425,12 @@ public final class ColonyPanel extends PortPanel
                 }
 
                 getController().work(unit, building);
-                return true;
+                // check to see if the unit actually starts working at the building
+                // some units like a teacher may not have actually started working there
+				if(unit.getWorkBuilding() == building){
+                	return true;
+                }
+                return false;
             }
 
             @Override
