@@ -25,10 +25,12 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.HeadlessException;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
+import java.awt.Insets;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -120,7 +122,10 @@ public class GUI {
     /**
      * The space not being used in windowed mode.
      */
-    private static final int DEFAULT_WINDOW_SPACE = 50;
+    private static final int DEFAULT_SCREEN_INSET_WIDTH  = 0;
+    private static final int DEFAULT_SCREEN_INSET_HEIGHT = 32;
+    private static final int DEFAULT_WINDOW_INSET_WIDTH  = 6;
+    private static final int DEFAULT_WINDOW_INSET_HEIGHT = 30;
 
 
 
@@ -148,7 +153,7 @@ public class GUI {
      * with the default MapViewer.
      */
     private MapViewer colonyTileGUI;
- 
+
     private ImageLibrary imageLibrary;
 
     private SoundPlayer soundPlayer;
@@ -247,19 +252,52 @@ public class GUI {
         return canvas.containsInGameComponents();
     }
 
+    /**
+     * Estimate size of client area for a window of maximum size.
+     */
     public Dimension determineWindowSize() {
-        Rectangle bounds = GraphicsEnvironment.getLocalGraphicsEnvironment()
-            .getMaximumWindowBounds();
-        Dimension size = new Dimension(bounds.width - DEFAULT_WINDOW_SPACE,
-                                       bounds.height - DEFAULT_WINDOW_SPACE);
+        final GraphicsEnvironment lge
+            = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        final GraphicsDevice gd;
+        try {
+            gd = lge.getDefaultScreenDevice();
+        } catch (HeadlessException e) {
+            return null;
+        }
+
+        // Get max size of window including border.
+        Rectangle bounds = lge.getMaximumWindowBounds();
+
+        // Do we trust getMaximumWindowBounds?
+        // Check the insets for evidence the taskbar has been missed.
+        Insets insets = Toolkit.getDefaultToolkit()
+            .getScreenInsets(gd.getDefaultConfiguration());
+        if (insets != null && insets.top <= 0 && insets.bottom <= 0) {
+            bounds.height -= DEFAULT_SCREEN_INSET_HEIGHT;
+        }
+        if (insets != null && insets.left <= 0 && insets.right <= 0) {
+            bounds.width -= DEFAULT_SCREEN_INSET_WIDTH;
+        }
+
+        // TODO: find better way to get size of window title and
+        // border.  The information is only available from getInsets
+        // when a window is already displayable.
+        Dimension size
+            = new Dimension(bounds.width - DEFAULT_WINDOW_INSET_WIDTH,
+                            bounds.height - DEFAULT_WINDOW_INSET_HEIGHT);
+        logger.info("Screen = " + Toolkit.getDefaultToolkit().getScreenSize()
+            + "\nBounds = " + gd.getDefaultConfiguration().getBounds()
+            + "\nMaxBounds = " + lge.getMaximumWindowBounds()
+            + "\nInsets = " + insets
+            + "\n => " + size);
         return size;
     }
 
-    public void displayChat(String senderNme, String message, boolean privateChat) {
+
+    public void displayChat(String senderNme, String message,
+                            boolean privateChat) {
         canvas.displayChat(senderNme, message, privateChat);
-
     }
-
 
     /**
      * Tells the map controls that a chat message was received.
@@ -503,7 +541,7 @@ public class GUI {
 
     public void setActiveUnit(Unit unitToActivate) {
         mapViewer.setActiveUnit(unitToActivate);
-        if (unitToActivate != null 
+        if (unitToActivate != null
             && !freeColClient.getMyPlayer().owns(unitToActivate)) {
             canvas.repaint(0, 0, canvas.getWidth(), canvas.getHeight());
         }

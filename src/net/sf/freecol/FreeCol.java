@@ -537,17 +537,16 @@ public final class FreeCol {
 
             if (line.hasOption("windowed")) {
                 String dimensions = line.getOptionValue("windowed");
-                if (dimensions == null) {
-                    windowSize = new Dimension(-1, -1);
-                } else {
-                    String[] xy = dimensions.split("[^0-9]");
-                    if (xy.length == 2) {
+                String[] xy;
+                if (dimensions != null
+                    && (xy = dimensions.split("[^0-9]")) != null
+                    && xy.length == 2) {
+                    try {
                         windowSize = new Dimension(Integer.parseInt(xy[0]),
                                                    Integer.parseInt(xy[1]));
-                    } else {
-                        usageError = true;
-                    }
+                    } catch (NumberFormatException nfe) {}
                 }
+                if (windowSize == null) windowSize = new Dimension(-1, -1);
             }
 
         } catch (ParseException e) {

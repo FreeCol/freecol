@@ -178,10 +178,10 @@ public final class FreeColClient {
         gui.displaySplashScreen(splashFilename);
 
         // Determine the window size.
-        gui.setWindowed(size != null);
-        final Dimension windowSize = (size == null) ? null
+        final Dimension windowSize = (headless || size == null) ? null
             : (size.width <= 0 || size.height <= 0) ? gui.determineWindowSize()
             : size;
+        gui.setWindowed(size != null);
         logger.info("Window size is " + windowSize);
 
         // Control
