@@ -2190,7 +2190,7 @@
       <optionGroup id="model.difficulty.medium" editable="false">
         <optionGroup id="model.difficulty.immigration">
           <integerOption id="model.option.crossesIncrement" value="10"/>
-          <integerOption id="model.option.recruitPriceIncrease" value="40"/>
+          <integerOption id="model.option.recruitPriceIncrease" value="30"/>
           <integerOption id="model.option.lowerCapIncrease" value="0"/>
           <integerOption id="model.option.priceIncrease.artillery" value="100"/>
           <booleanOption id="model.option.priceIncreasePerType" value="true"/>
