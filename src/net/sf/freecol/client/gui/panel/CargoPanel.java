@@ -120,7 +120,8 @@ public class CargoPanel extends FreeColPanel
      * Initialize this CargoPanel.
      */
     public void initialize() {
-        setCarrier(null);
+        carrier = null;
+        addPropertyChangeListeners();
     }
 
     /**

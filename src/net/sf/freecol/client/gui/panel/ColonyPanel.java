@@ -128,38 +128,54 @@ public final class ColonyPanel extends PortPanel
         COLONY_UNITS = 6,
         SETGOODS = 7;
 
-    private final JPanel netProductionPanel = new JPanel();
-    private final PopulationPanel populationPanel = new PopulationPanel();
+    /** The <code>Colony</code> this panel is displaying. */
+    private Colony colony;
 
+    // Inherits PortPanel.pressListener and PortPanel.defaultTransferHandler
+    private final MouseListener releaseListener = new DropListener();
+
+    private final ImageLibrary imageLibrary = getLibrary();
+
+
+    // Subparts
+    // Inherits protected PortPanel.cargoPanel and PortPanel.inPortPanel
     private final JComboBox nameBox;
+
+    private final JPanel netProductionPanel = new JPanel();
+
+    private final PopulationPanel populationPanel;
 
     private final OutsideColonyPanel outsideColonyPanel;
 
     private final WarehousePanel warehousePanel;
 
-    private final TilePanel tilePanel;
+    private final TilesPanel tilesPanel;
 
     private final BuildingsPanel buildingsPanel;
 
     private final ConstructionPanel constructionPanel;
+    
 
-    private final MouseListener releaseListener;
+    // Buttons
+    private final JButton unloadButton
+        = new JButton(Messages.message("unload"));
 
-    private Colony colony;
+    private final JButton fillButton
+        = new JButton(Messages.message("fill"));
 
-    private JButton unloadButton = new JButton(Messages.message("unload"));
+    private final JButton warehouseButton
+        = new JButton(Messages.message("warehouseDialog.name"));
 
-    private JButton fillButton = new JButton(Messages.message("fill"));
+    private final JButton buildQueueButton
+        = new JButton(Messages.message("colonyPanel.buildQueue"));
 
-    private JButton warehouseButton = new JButton(Messages.message("warehouseDialog.name"));
+    private final JButton colonyUnitsButton
+        = new JButton(Messages.message("colonyPanel.colonyUnits"));
 
-    private JButton buildQueueButton = new JButton(Messages.message("colonyPanel.buildQueue"));
-
-    private JButton colonyUnitsButton = new JButton(Messages.message("colonyPanel.colonyUnits"));
-
-    private JButton setGoodsButton
+    private final JButton setGoodsButton
         = (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS))
-        ? new JButton("Set Goods") : null;
+            ? new JButton("Set Goods")
+            : null;
 
 
     /**
@@ -217,15 +233,16 @@ public final class ColonyPanel extends PortPanel
 
         warehousePanel = new WarehousePanel();
 
-        tilePanel = new TilePanel(freeColClient);
+        tilesPanel = new TilesPanel(freeColClient);
 
         buildingsPanel = new BuildingsPanel();
+
+        populationPanel = new PopulationPanel();
 
         cargoPanel = new ColonyCargoPanel(freeColClient);
 
         defaultTransferHandler = new DefaultTransferHandler(freeColClient, gui, this);
         pressListener = new DragListener(freeColClient, gui, this);
-        releaseListener = new DropListener();
 
         JScrollPane outsideColonyScroll = new JScrollPane(outsideColonyPanel,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
@@ -239,7 +256,7 @@ public final class ColonyPanel extends PortPanel
         JScrollPane warehouseScroll = new JScrollPane(warehousePanel,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        JScrollPane tilesScroll = new JScrollPane(tilePanel,
+        JScrollPane tilesScroll = new JScrollPane(tilesPanel,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         JScrollPane buildingsScroll = new JScrollPane(buildingsPanel,
@@ -342,7 +359,11 @@ public final class ColonyPanel extends PortPanel
     }
 
     /**
-     * Gets the <code>Colony</code>-pointer in use.
+     * Gets the <code>Colony</code> in use.
+     *
+     * Try to use this at the top of all the routines that need the colony,
+     * to get a stable value.  There have been nasty races when the colony
+     * changes out from underneath us, and more may be lurking.
      *
      * @return The <code>Colony</code>.
      */
@@ -369,12 +390,12 @@ public final class ColonyPanel extends PortPanel
     }
 
     /**
-     * Gets the <code>TilePanel</code>-object in use.
+     * Gets the <code>TilesPanel</code>-object in use.
      *
-     * @return The <code>TilePanel</code>.
+     * @return The <code>TilesPanel</code>.
      */
-    public final TilePanel getTilePanel() {
-        return tilePanel;
+    public final TilesPanel getTilesPanel() {
+        return tilesPanel;
     }
 
     public void updateConstructionPanel() {
@@ -383,6 +404,10 @@ public final class ColonyPanel extends PortPanel
 
     public void updateInPortPanel() {
         inPortPanel.update();
+    }
+
+    public void updatePopulationPanel() {
+        populationPanel.update();
     }
 
     public void updateWarehousePanel() {
@@ -397,11 +422,12 @@ public final class ColonyPanel extends PortPanel
         buildingsPanel.update();
     }
 
-    public void updateTilePanel() {
-        tilePanel.update();
+    public void updateTilesPanel() {
+        tilesPanel.update();
     }
 
     public void updateProductionPanel() {
+        final Colony colony = getColony();
         final Specification spec = colony.getSpecification();
         // TODO: find out why the cache needs to be explicitly invalidated
         colony.invalidateCache();
@@ -429,14 +455,10 @@ public final class ColonyPanel extends PortPanel
      * construction displays.
      */
     private void updateProduction() {
-        updateTilePanel();
+        updateTilesPanel();
         updateBuildingsPanel();
         updateProductionPanel();
         updateConstructionPanel();
-    }
-
-    private void sortBuildings(List<Building> buildings) {
-        Collections.sort(buildings);
     }
 
     /**
@@ -446,7 +468,7 @@ public final class ColonyPanel extends PortPanel
      * @param event The incoming action event
      */
     public void actionPerformed(ActionEvent event) {
-        Colony colony = getColony();
+        final Colony colony = getColony();
         String command = event.getActionCommand();
         if (OK.equals(command)) {
             closeColonyPanel();
@@ -499,7 +521,7 @@ public final class ColonyPanel extends PortPanel
                 getController().leaveShip(u);
             }
             cargoPanel.update();
-            outsideColonyPanel.update();
+            updateOutsideColonyPanel();
         }
         unloadButton.setEnabled(false);
         fillButton.setEnabled(false);
@@ -509,13 +531,14 @@ public final class ColonyPanel extends PortPanel
      * Fill goods from the carrier currently selected to capacity.
      */
     private void fill() {
+        final Colony colony = getColony();
         Unit unit = getSelectedUnit();
         if (unit != null && unit.isCarrier()) {
             for (Goods goods : unit.getGoodsContainer().getGoods()) {
                 int space = GoodsContainer.CARGO_SIZE - goods.getAmount();
-                int count = getColony().getGoodsCount(goods.getType());
+                int count = colony.getGoodsCount(goods.getType());
                 if (space > 0 && count > 0) {
-                    Goods newGoods = new Goods(goods.getGame(), getColony(),
+                    Goods newGoods = new Goods(goods.getGame(), colony,
                                                goods.getType(),
                                                Math.min(space, count));
                     getController().loadCargo(newGoods, unit);
@@ -529,6 +552,7 @@ public final class ColonyPanel extends PortPanel
      * carrier with some cargo.
      */
     private void updateCarrierButtons() {
+        final Colony colony = getColony();
         unloadButton.setEnabled(false);
         fillButton.setEnabled(false);
         if (isEditable() && selectedUnitLabel != null) {
@@ -536,7 +560,7 @@ public final class ColonyPanel extends PortPanel
             if (unit != null && unit.isCarrier() && unit.hasCargo()) {
                 unloadButton.setEnabled(true);
                 for (Goods goods : unit.getGoodsList()) {
-                    if (getColony().getGoodsCount(goods.getType()) > 0) {
+                    if (colony.getGoodsCount(goods.getType()) > 0) {
                         fillButton.setEnabled(true);
                         break;
                     }
@@ -588,7 +612,7 @@ public final class ColonyPanel extends PortPanel
      * @return A list of units on the colony tile.
      */
     public List<Unit> getUnitList() {
-        return colony.getTile().getUnitList();
+        return getColony().getTile().getUnitList();
     }
 
     /**
@@ -641,34 +665,35 @@ public final class ColonyPanel extends PortPanel
         inPortPanel.initialize();
         warehousePanel.initialize();
         buildingsPanel.initialize();
-        tilePanel.initialize();
+        tilesPanel.initialize();
         outsideColonyPanel.initialize();
 
         updateProductionPanel();
-        populationPanel.update();
+        updatePopulationPanel();
 
         constructionPanel.setColony(colony);
-        inPortPanel.setName(colony.getName() + " - port");
+        inPortPanel.setName(colony.getName() + " " + Messages.message("port"));
     }
 
     /**
      * Closes the <code>ColonyPanel</code>.
      */
     public void closeColonyPanel() {
-        if (getColony().getUnitCount() == 0) {
+        final Colony colony = getColony();
+        if (colony.getUnitCount() == 0) {
             if (getGUI().showConfirmDialog("abandonColony.text",
                                          "abandonColony.yes",
                                          "abandonColony.no")) {
                 getGUI().removeFromCanvas(this);
-                getController().abandonColony(getColony());
+                getController().abandonColony(colony);
             }
         } else {
-            BuildableType buildable = getColony().getCurrentlyBuilding();
+            BuildableType buildable = colony.getCurrentlyBuilding();
             if (buildable != null
-                && buildable.getRequiredPopulation() > getColony().getUnitCount()
+                && buildable.getRequiredPopulation() > colony.getUnitCount()
                 && !getGUI().showConfirmDialog(null,
                     StringTemplate.template("colonyPanel.reducePopulation")
-                        .addName("%colony%", getColony().getName())
+                        .addName("%colony%", colony.getName())
                         .addAmount("%number%", buildable.getRequiredPopulation())
                         .add("%buildable%", buildable.getNameKey()),
                     "ok", "cancel")) {
@@ -683,7 +708,7 @@ public final class ColonyPanel extends PortPanel
             }
             buildingsPanel.cleanup();
             warehousePanel.cleanup();
-            tilePanel.cleanup();
+            tilesPanel.cleanup();
             constructionPanel.removePropertyChangeListeners();
             cargoPanel.setCarrier(null);
             outsideColonyPanel.cleanup();
@@ -706,10 +731,11 @@ public final class ColonyPanel extends PortPanel
      * from the Colony Panel allowing keyboard access to said units.
      */
     private void generateColonyUnitsMenu() {
+        final Colony colony = getColony();
         JPopupMenu colonyUnitsMenu = new JPopupMenu("Colony Units");
-        ImageLibrary imageLibrary = super.getLibrary();
         ImageIcon unitIcon = null;
-        final QuickActionMenu unitMenu = new QuickActionMenu(getFreeColClient(), getGUI(), this);
+        final QuickActionMenu unitMenu
+            = new QuickActionMenu(getFreeColClient(), getGUI(), this);
         Tile colonyTile = colony.getTile();
         int unitNumber = 0;
         JMenuItem subMenu = null;
@@ -722,8 +748,9 @@ public final class ColonyPanel extends PortPanel
                 unitIcon = imageLibrary.getUnitImageIcon(unit, 0.5);
                 String nominative = Messages.message(StringTemplate.template(
                     goodsType.getNameKey()).addAmount("%amount%", producing));
-                String menuTitle = new String(Messages.message(unit.getLabel()) + " " +
-                    Messages.message("producing.name") + " " + producing + " " + nominative);
+                String menuTitle = new String(Messages.message(unit.getLabel())
+                    + " " + Messages.message("producing.name")
+                    + " " + producing + " " + nominative);
                 subMenu = new JMenuItem(menuTitle, unitIcon);
   	            subMenu.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
@@ -737,12 +764,14 @@ public final class ColonyPanel extends PortPanel
                 Building workingInBuilding = unit.getWorkLocation();
                 if(workingInBuilding != null){
                     GoodsType goodsType = unit.getWorkType();
-                    int producing = workingInBuilding.getProductionOf(unit, workingInBuilding.getGoodsOutputType());
+                    int producing = workingInBuilding.getProductionOf(unit,
+                        workingInBuilding.getGoodsOutputType());
                     unitIcon = imageLibrary.getUnitImageIcon(unit, 0.5);
-                    String nominative = Messages.message(StringTemplate.template(
-                        goodsType.getNameKey()).addAmount("%amount%", producing));
-                    String menuTitle = new String(Messages.message(unit.getLabel()) + " " +
-                        Messages.message("producing.name") + " " + producing + " " + nominative);
+                    String nominative = Messages.message(StringTemplate.template(goodsType.getNameKey())
+                        .addAmount("%amount%", producing));
+                    String menuTitle = new String(Messages.message(unit.getLabel())
+                        + " " + Messages.message("producing.name")
+                        + " " + producing + " " + nominative);
                     subMenu = new JMenuItem(menuTitle, unitIcon);
                     subMenu.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
@@ -812,10 +841,12 @@ public final class ColonyPanel extends PortPanel
         }
         colonyUnitsMenu.show(getGUI().getCanvas(), 0, 0);
     }
+
     /**
      * Add property change listeners needed by this ColonyPanel.
      */
     private void addPropertyChangeListeners() {
+        final Colony colony = getColony();
         if (colony != null) {
             colony.addPropertyChangeListener(this);
             colony.getGoodsContainer().addPropertyChangeListener(this);
@@ -827,6 +858,7 @@ public final class ColonyPanel extends PortPanel
      * Remove the property change listeners of ColonyPanel.
      */
     private void removePropertyChangeListeners() {
+        final Colony colony = getColony();
         if (colony != null) {
             colony.removePropertyChangeListener(this);
             colony.getGoodsContainer().removePropertyChangeListener(this);
@@ -840,6 +872,7 @@ public final class ColonyPanel extends PortPanel
      * @param event The <code>PropertyChangeEvent</code> to handle.
      */
     public void propertyChange(PropertyChangeEvent event) {
+        final Colony colony = getColony();
         if (!isShowing() || colony == null) return;
         String property = event.getPropertyName();
         logger.finest(colony.getName() + " change " + property
@@ -851,14 +884,14 @@ public final class ColonyPanel extends PortPanel
         } else if (Unit.CARGO_CHANGE.equals(property)) {
             updateInPortPanel();
         } else if (ColonyChangeEvent.POPULATION_CHANGE.toString().equals(property)) {
-            populationPanel.update();
+            updatePopulationPanel();
             updateProductionPanel(); // food production changes
         } else if (ColonyChangeEvent.BONUS_CHANGE.toString().equals(property)) {
             ModelMessage msg = colony.checkForGovMgtChangeMessage();
             if (msg != null) {
                 getGUI().showInformationMessage(colony, msg);
             }
-            populationPanel.update();
+            updatePopulationPanel();
         } else if (ColonyChangeEvent.UNIT_TYPE_CHANGE.toString().equals(property)) {
             FreeColGameObject object = (FreeColGameObject) event.getSource();
             UnitType oldType = (UnitType) event.getOldValue();
@@ -867,7 +900,7 @@ public final class ColonyPanel extends PortPanel
                 StringTemplate.template("model.colony.unitChange")
                     .add("%oldType%", oldType.getNameKey())
                     .add("%newType%", newType.getNameKey()));
-            updateTilePanel();
+            updateTilesPanel();
         } else if (property.startsWith("model.goods.")) {
             // Changes to warehouse goods count may affect building production
             // which requires a view update.
@@ -907,6 +940,7 @@ public final class ColonyPanel extends PortPanel
             super.update();
             // May have un/loaded cargo, "Unload" could have changed validity
             updateCarrierButtons();
+            updatePopulationPanel();
         }
     }
 
@@ -948,6 +982,7 @@ public final class ColonyPanel extends PortPanel
          * Update this population panel.
          */
         public void update() {
+            final Colony colony = getColony();
             final int uc = colony.getUnitCount();
             final int solPercent = colony.getSoL();
             final int rebels = Colony.calculateRebels(uc, solPercent);
@@ -1005,11 +1040,14 @@ public final class ColonyPanel extends PortPanel
     public final class OutsideColonyPanel extends UnitPanel
         implements DropTarget {
 
+        /**
+         * Create this OutsideColonyPanel.
+         */
         public OutsideColonyPanel() {
             super(ColonyPanel.this, null, ColonyPanel.this.isEditable());
             setLayout(new MigLayout("wrap 4, fill, insets 0"));
             setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(),
-                                                       Messages.message("outsideColony")));
+                    Messages.message("outsideColony")));
         }
 
         /**
@@ -1017,7 +1055,9 @@ public final class ColonyPanel extends PortPanel
          */
         @Override
         public void initialize() {
+            final Colony colony = getColony();
             cleanup();
+
             super.initialize();
             if (colony != null) setName(colony.getName() + " - port");
         }
@@ -1068,6 +1108,7 @@ public final class ColonyPanel extends PortPanel
 
         @Override
         protected void addPropertyChangeListeners() {
+            final Colony colony = getColony();
             if (colony != null) {
                 colony.getTile().addPropertyChangeListener(Tile.UNIT_CHANGE,
                                                            this);
@@ -1076,15 +1117,11 @@ public final class ColonyPanel extends PortPanel
 
         @Override
         protected void removePropertyChangeListeners() {
+            final Colony colony = getColony();
             if (colony != null) {
                 colony.getTile().removePropertyChangeListener(Tile.UNIT_CHANGE,
                                                               this);
             }
-        }
-
-        @Override
-        public String getUIClassID() {
-            return "OutsideColonyPanelUI";
         }
 
         public boolean accepts(Unit unit) {
@@ -1094,6 +1131,11 @@ public final class ColonyPanel extends PortPanel
         public boolean accepts(Goods goods) {
             return false;
         }
+
+        @Override
+        public String getUIClassID() {
+            return "OutsideColonyPanelUI";
+        }
     }
 
     /**
@@ -1102,14 +1144,22 @@ public final class ColonyPanel extends PortPanel
      */
     public final class ColonyInPortPanel extends InPortPanel {
 
+        /**
+         * Creates this ColonyInPortPanel.
+         */
         public ColonyInPortPanel() {
             super(ColonyPanel.this, null, ColonyPanel.this.isEditable());
+
             setLayout(new MigLayout("wrap 3, fill, insets 0"));
             setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(),
-                                                       Messages.message("inPort")));
+                    Messages.message("inPort")));
         }
 
+        /**
+         * Initialize this ColonyInPortPanel.
+         */
         public void initialize() {
+            final Colony colony = getColony();
             if (colony != null) {
                 setName(colony.getName() + " - port");
                 super.initialize();
@@ -1153,6 +1203,7 @@ public final class ColonyPanel extends PortPanel
          * Update this WarehousePanel.
          */
         private void update() {
+            final Colony colony = getColony();
             removeAll();
             if (colony == null) return;
 
@@ -1215,22 +1266,29 @@ public final class ColonyPanel extends PortPanel
             return add(comp);
         }
 
+        /**
+         * Add the property change listeners to this panel.
+         */
         private void addPropertyChangeListeners() {
-            Colony colony = getColony();
+            final Colony colony = getColony();
             if (colony != null) {
                 colony.getGoodsContainer().addPropertyChangeListener(this);
             }
         }
 
+        /**
+         * Remove the property change listeners from this panel.
+         */
         private void removePropertyChangeListeners() {
-            Colony colony = getColony();
+            final Colony colony = getColony();
             if (colony != null) {
                 colony.getGoodsContainer().removePropertyChangeListener(this);
             }
         }
 
         public void propertyChange(PropertyChangeEvent event) {
-            logger.finest(getColony().getName() + "-warehouse change "
+            final Colony colony = getColony();
+            logger.finest(colony.getName() + "-warehouse change "
                           + event.getPropertyName()
                           + ": " + event.getOldValue()
                           + " -> " + event.getNewValue());
@@ -1260,6 +1318,12 @@ public final class ColonyPanel extends PortPanel
         /** The parent colony panel. */
         private final ColonyPanel colonyPanel;
 
+        private MouseAdapter mouseAdapter = new MouseAdapter() {
+                public void mousePressed(MouseEvent e) {
+                    getGUI().showBuildQueuePanel(getColony());
+                }
+            };
+
 
         /**
          * Creates this BuildingsPanel.
@@ -1273,25 +1337,16 @@ public final class ColonyPanel extends PortPanel
          * Initializes the game data in this buildings panel.
          */
         public void initialize() {
-            cleanup();
+            final Colony colony = getColony();
             if (colony == null) return;
-
-            MouseAdapter mouseAdapter = new MouseAdapter() {
-                    public void mousePressed(MouseEvent e) {
-                        getGUI().showBuildQueuePanel(getColony());
-                    }
-                };
+            cleanup();
 
             List<Building> buildings = colony.getBuildings();
-            sortBuildings(buildings);
+            Collections.sort(buildings);
             for (Building building : buildings) {
                 ASingleBuildingPanel aSBP = new ASingleBuildingPanel(building);
-                if (colonyPanel.isEditable()) {
-                    aSBP.addMouseListener(releaseListener);
-                    aSBP.setTransferHandler(defaultTransferHandler);
-                }
+                aSBP.initialize();
                 aSBP.setOpaque(false);
-                aSBP.addMouseListener(mouseAdapter);
                 add(aSBP);
             }
 
@@ -1327,7 +1382,6 @@ public final class ColonyPanel extends PortPanel
             return "BuildingsPanelUI";
         }
 
-
         /**
          * This panel is a single line (one building) in the
          * <code>BuildingsPanel</code>.
@@ -1346,9 +1400,12 @@ public final class ColonyPanel extends PortPanel
 
             @Override
             public void initialize() {
-                super.initialize();
-
-                update();
+                if (colonyPanel.isEditable()) {
+                    addMouseListener(releaseListener);
+                    setTransferHandler(defaultTransferHandler);
+                    addMouseListener(mouseAdapter);
+                    addPropertyChangeListeners();
+                }
             }
 
             @Override
@@ -1453,7 +1510,7 @@ public final class ColonyPanel extends PortPanel
     /**
      * A panel that displays the tiles in the immediate area around the colony.
      */
-    public final class TilePanel extends FreeColPanel {
+    public final class TilesPanel extends FreeColPanel {
 
         /** The parent colony panel. */
         private final ColonyPanel colonyPanel;
@@ -1463,11 +1520,11 @@ public final class ColonyPanel extends PortPanel
 
 
         /**
-         * Creates a TilePanel.
+         * Creates a TilesPanel.
          *
          * @param freeColClient The container <code>FreeColClient</code>.
          */
-        public TilePanel(FreeColClient freeColClient) {
+        public TilesPanel(FreeColClient freeColClient) {
             super(freeColClient, freeColClient.getGUI());
 
             this.colonyPanel = ColonyPanel.this;
@@ -1480,8 +1537,9 @@ public final class ColonyPanel extends PortPanel
          * Initialize the game data in this Tile panel.
          */
         public void initialize() {
-            cleanup();
+            final Colony colony = getColony();
             if (colony == null) return;
+            cleanup();
 
             Tile tile = colony.getTile();
             tiles[0][0] = tile.getNeighbourOrNull(Direction.N);
@@ -1499,10 +1557,11 @@ public final class ColonyPanel extends PortPanel
                 for (int y = 0; y < 3; y++) {
                     if (tiles[x][y] == null) continue;
                     ColonyTile colonyTile = colony.getColonyTile(tiles[x][y]);
-                    ASingleTilePanel p = new ASingleTilePanel(colonyTile, x, y);
-                    p.initialize();
-                    add(p, new Integer(layer));
-                    layer++;
+                    ASingleTilePanel aSTP = new ASingleTilePanel(colonyTile,
+                                                                 x, y);
+                    aSTP.initialize();
+                    aSTP.setOpaque(false);
+                    add(aSTP, new Integer(layer++));
                 }
             }
 
@@ -1510,7 +1569,7 @@ public final class ColonyPanel extends PortPanel
         }
 
         /**
-         * Update this tile panel.
+         * Update this tiles panel.
          */
         public void update() {
             for (Component component : getComponents()) {
@@ -1522,7 +1581,7 @@ public final class ColonyPanel extends PortPanel
         }
 
         /**
-         * Clean up this tile panel.
+         * Clean up this tiles panel.
          */
         public void cleanup() {
             for (Component component : getComponents()) {
@@ -1535,14 +1594,15 @@ public final class ColonyPanel extends PortPanel
 
         @Override
         public void paintComponent(Graphics g) {
+            final Colony colony = getColony();
             g.setColor(Color.black);
             g.fillRect(0, 0, getWidth(), getHeight());
-
             if (colony == null) return;
+
             final Tile tile = colony.getTile();
             final TileType tileType = tile.getType();
-            final ImageLibrary lib = getLibrary();
-            final Image image = lib.getTerrainImage(tileType, tile.getX(), tile.getY());
+            final Image image = imageLibrary.getTerrainImage(tileType,
+                tile.getX(), tile.getY());
             int tileWidth = image.getWidth(null) / 2;
             int tileHeight = image.getHeight(null) / 2;
             for (int x = 0; x < 3; x++) {
@@ -1586,8 +1646,8 @@ public final class ColonyPanel extends PortPanel
                 setOpaque(false);
                 final Tile tile = colonyTile.getTile();
                 final TileType tileType = tile.getType();
-                final Image image = getLibrary()
-                    .getTerrainImage(tileType, tile.getX(), tile.getY());
+                final Image image = imageLibrary.getTerrainImage(tileType,
+                    tile.getX(), tile.getY());
                 // Size and position:
                 final int width = image.getWidth(null);
                 final int height = image.getHeight(null);
@@ -1596,14 +1656,24 @@ public final class ColonyPanel extends PortPanel
             }
 
             /**
+             * Gets the colony tile this panel is handling.
+             *
+             * @return The colony tile.
+             */
+            public ColonyTile getColonyTile() {
+                return colonyTile;
+            }
+
+            /**
              * Initialize this single tile panel.
              */
             public void initialize() {
-                cleanup();
-
-                addPropertyChangeListeners();
-                addMouseListener(pressListener);
-                update();
+                if (colonyPanel.isEditable()) {
+                    addMouseListener(releaseListener);
+                    setTransferHandler(defaultTransferHandler);
+                    addMouseListener(pressListener);
+                    addPropertyChangeListeners();
+                }
             }
 
             /**
@@ -1628,16 +1698,13 @@ public final class ColonyPanel extends PortPanel
                     ProductionInfo info = colony.getProductionInfo(colonyTile);
                     if (info != null) {
                         for (AbstractGoods ag : info.getProduction()) {
-                        	ProductionLabel productionLabel = new ProductionLabel(getFreeColClient(), getGUI(), ag);
+                            ProductionLabel productionLabel
+                                = new ProductionLabel(getFreeColClient(),
+                                                      getGUI(), ag);
                             productionLabel.addMouseListener(pressListener);
                             add(productionLabel);
                         }
                     }
-                }
-
-                if (colonyPanel.isEditable()) {
-                    setTransferHandler(defaultTransferHandler);
-                    addMouseListener(releaseListener);
                 }
             }
 
@@ -1724,8 +1791,8 @@ public final class ColonyPanel extends PortPanel
              * @return True if the unit succeeds.
              */
             private boolean tryWork(Unit unit) {
+                final Colony colony = getColony();
                 Tile tile = colonyTile.getWorkTile();
-                Colony colony = getColony();
                 Player player = unit.getOwner();
 
                 if (tile.getOwningSettlement() != colony) {
@@ -1848,10 +1915,6 @@ public final class ColonyPanel extends PortPanel
 
             public boolean accepts(Goods goods) {
                 return false;
-            }
-
-            public ColonyTile getColonyTile() {
-                return colonyTile;
             }
         }
     }
