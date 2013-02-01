@@ -487,8 +487,10 @@ public class CombatTest extends FreeColTestCase {
         Tile tile1 = map.getTile(5, 8);
         Tile tile2 = map.getTile(4, 8);
 
-        Unit colonial = new ServerUnit(game, tile1, french, colonialRegularType, muskets, horses);
-        Unit regular = new ServerUnit(game, tile1, french, kingsRegularType, muskets, horses);
+        Unit colonial = new ServerUnit(game, tile1, french, colonialRegularType,
+                                       muskets, horses);
+        Unit regular = new ServerUnit(game, tile2, refPlayer, kingsRegularType,
+                                      muskets, horses);
 
         // (regular + muskets + horses) * attack bonus
         float offence = (4 + 2 + 1) * 1.5f;
@@ -497,10 +499,10 @@ public class CombatTest extends FreeColTestCase {
         float defence = 3 + 1 + 1 + 1;
         assertEquals(defence, combatModel.getDefencePower(regular, colonial));
 
-        List<CombatResult> result = combatModel.generateAttackResult(random, regular, colonial);
+        List<CombatResult> result
+            = combatModel.generateAttackResult(random, regular, colonial);
         assertEquals(CombatResult.LOSE, result.get(0));
         assertEquals(CombatResult.LOSE_EQUIP, result.get(1));
-
         refPlayer.csCombat(regular, colonial, result, random, new ChangeSet());
 
         // (regular + muskets) * attack bonus
@@ -510,10 +512,11 @@ public class CombatTest extends FreeColTestCase {
         // slaughter King's Regular
         result = combatModel.generateAttackResult(random, colonial, regular);
         assertEquals(CombatResult.WIN, result.get(0));
-        assertEquals("King's Regular should be slaughtered upon losing all equipment.",
+        assertEquals("Regular should be slaughtered upon losing all equipment.",
                      CombatResult.SLAUGHTER_UNIT, result.get(1));
 
-        regular = new ServerUnit(game, tile1, french, kingsRegularType, muskets, horses);
+        regular = new ServerUnit(game, tile1, french, kingsRegularType,
+                                 muskets, horses);
 
         result = combatModel.generateAttackResult(random, regular, colonial);
         assertEquals(CombatResult.WIN, result.get(0));
@@ -532,8 +535,5 @@ public class CombatTest extends FreeColTestCase {
         assertEquals(CombatResult.WIN, result.get(0));
         assertEquals(CombatResult.CAPTURE_UNIT, result.get(1));
         refPlayer.csCombat(regular, colonial, result, random, new ChangeSet());
-
     }
-
-
 }
