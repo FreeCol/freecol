@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -84,6 +85,32 @@ public class ServerIndianSettlement extends IndianSettlement
 
         convertProgress = 0;
         updateWantedGoods();
+    }
+
+    public ServerIndianSettlement(Game game, Player owner, Tile tile, IndianSettlement template) {
+        super(game, owner, template.getName(), tile);
+
+        setLearnableSkill(template.getLearnableSkill());
+        setCapital(template.isCapital());
+        // TODO: the template settlement might have additional owned
+        // units
+        for (Unit unit: template.getUnitList()) {
+            Unit newUnit = new ServerUnit(game, this, unit);
+            add(newUnit);
+            addOwnedUnit(newUnit);
+        }
+        Unit missionary = template.getMissionary();
+        if (missionary != null) {
+            setMissionary(new ServerUnit(game, this, missionary));
+        }
+        setConvertProgress(template.getConvertProgress());
+        setLastTribute(template.getLastTribute());
+        setGoodsContainer(new GoodsContainer(game, this));
+        for (Goods goods : template.getCompactGoods()) {
+            GoodsType type = getSpecification().getGoodsType(goods.getType().getId());
+            addGoods(type, goods.getAmount());
+        }
+        wantedGoods = template.getWantedGoods();
     }
 
 

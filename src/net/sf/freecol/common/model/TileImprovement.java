@@ -67,7 +67,7 @@ public class TileImprovement extends TileItem implements Named {
      */
     private boolean virtual;
 
-    /** Cached bitmap of connections by direction, derived from style. */       
+    /** Cached bitmap of connections by direction, derived from style. */
     private long connected = 0L;
 
 
@@ -96,6 +96,14 @@ public class TileImprovement extends TileItem implements Named {
     public TileImprovement(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
         readFromXML(in);
+    }
+
+    public TileImprovement(Game game, Tile tile, TileImprovement template) {
+        super(game, tile);
+        this.type = getSpecification().getTileImprovementType(template.getId());
+        this.magnitude = template.magnitude;
+        this.style = template.style;
+        this.turnsToComplete = template.turnsToComplete;
     }
 
     /**
@@ -412,7 +420,7 @@ public class TileImprovement extends TileItem implements Named {
         }
         return TileImprovementStyle.getInstance(s);
     }
-        
+
     /**
      * Updates the connections from/to this road improvement.
      *

@@ -106,6 +106,37 @@ public class ServerUnit extends Unit implements ServerModelObject {
         this(game, location, owner, type, type.getDefaultEquipment());
     }
 
+    public ServerUnit(Game game, Location location, Unit template) {
+        super(game);
+        setLocation(location);
+        setType(getSpecification().getUnitType(template.getType().getId()));
+        setOwner(((ServerGame) game).getPlayer(template.getOwner().getNationID()));
+        setNationality(template.getNationality());
+        setEthnicity(template.getEthnicity());
+        visibleGoodsCount = -1;
+
+        if (getType().canCarryGoods()) {
+            setGoodsContainer(new GoodsContainer(game, this));
+        }
+
+        workLeft = template.getWorkLeft();
+        workType = getSpecification().getGoodsType(template.getWorkType().getId());
+
+        this.movesLeft = template.getMovesLeft();
+        hitpoints = template.getType().getHitPoints();
+
+        for (EquipmentType equipmentType : template.getEquipment().keySet()) {
+            EquipmentType myType = getSpecification().getEquipmentType(equipmentType.getId());
+            equipment.incrementCount(myType, template.getEquipment().getCount(equipmentType));
+        }
+        setRole();
+        setStateUnchecked(template.getState());
+
+        owner.setUnit(this);
+        owner.invalidateCanSeeTiles();
+        owner.modifyScore(unitType.getScoreValue());
+    }
+
     /**
      * Creates a new ServerUnit.
      *

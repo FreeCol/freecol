@@ -34,6 +34,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.PlayerExploredTile;
+import net.sf.freecol.common.model.Map.Layer;
 
 
 /**
@@ -103,6 +104,28 @@ public class TileItemContainer extends FreeColGameObject {
 
         this.tile = tile;
         readFromXML(in);
+    }
+
+    public TileItemContainer(Game game, Tile tile, TileItemContainer template, Layer layer) {
+        this(game, tile);
+        for (TileItem item : template.getTileItems()) {
+            if (item instanceof Resource
+                && layer.compareTo(Layer.RESOURCES) >= 0) {
+                Resource resource = (Resource) item;
+                addTileItem(new Resource(game, tile, getSpecification().getResourceType(resource.getId()),
+                                         resource.getQuantity()));
+            } else if (item instanceof LostCityRumour
+                       && layer.compareTo(Layer.NATIVES) >= 0) {
+                LostCityRumour rumour = (LostCityRumour) item;
+                addTileItem(new LostCityRumour(game, tile, rumour.getType(), rumour.getName()));
+            } else if (item instanceof TileImprovement) {
+                TileImprovement improvement = (TileImprovement) item;
+                if (layer.compareTo(Layer.RIVERS) >= 0
+                    || improvement.getType().isNatural()) {
+                    addTileItem(new TileImprovement(game, tile, improvement));
+                }
+            }
+        }
     }
 
     // ------------------------------------------------------------ checking/retrieval functions
