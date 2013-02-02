@@ -2,6 +2,7 @@
 *.project
 *.settings
 semantic.cache*
+*~
 nbproject
 FreeCol.log
 FreeCol.jar
