@@ -114,7 +114,7 @@ public class BuildingToolTip extends JToolTip {
             }
         }
 
-        add(new JLabel(new ImageIcon(ResourceManager.getImage(building.getType().getId() + ".image"))));
+        add(new JLabel(new ImageIcon(gui.getImageLibrary().getBuildingImage(building))));
 
         for (Unit unit : building.getUnitList()) {
             UnitLabel unitLabel = new UnitLabel(freeColClient, unit, gui, false);

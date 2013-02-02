@@ -40,6 +40,8 @@ import javax.swing.JComponent;
 
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Ability;
+import net.sf.freecol.common.model.Building;
+import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.GoodsType;
@@ -536,6 +538,32 @@ public final class ImageLibrary {
     }
 
     /**
+     * Returns the goods-image for a goods type.
+     *
+     * @param goodsType The type of the goods-image to return.
+     * @return The goods-image at the given index.
+     */
+    public ImageIcon getGoodsImageIcon(GoodsType goodsType) {
+        return ResourceManager.getImageIcon(goodsType.getId() + ".image");
+    }
+
+    public Image getBuildingImage(Building building) {
+        return getBuildingImage(building.getType(), building.getOwner(), scalingFactor);
+    }
+
+    public Image getBuildingImage(Building building, double scale) {
+        return getBuildingImage(building.getType(), building.getOwner(), scale);
+    }
+
+    public Image getBuildingImage(BuildingType buildingType, Player player, double scale) {
+        String key = buildingType.getId() + "." + player.getNationNameKey() + ".image";
+        if (!ResourceManager.hasResource(key)) {
+            key = buildingType.getId() + ".image";
+        }
+        return ResourceManager.getImage(key, scale);
+    }
+
+    /**
      * Gets the owner chip for the settlement.
      *
      * @param is The <code>IndianSettlement</code> to check.
@@ -553,16 +581,6 @@ public final class ImageLibrary {
             ResourceManager.addGameMapping(key, new ImageResource(img));
         }
         return img;
-    }
-
-    /**
-     * Returns the goods-image for a goods type.
-     *
-     * @param goodsType The type of the goods-image to return.
-     * @return The goods-image at the given index.
-     */
-    public ImageIcon getGoodsImageIcon(GoodsType goodsType) {
-        return ResourceManager.getImageIcon(goodsType.getId() + ".image");
     }
 
     public Image getImage(FreeColGameObjectType type) {

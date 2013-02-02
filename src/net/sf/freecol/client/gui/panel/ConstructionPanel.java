@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.Image;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
@@ -35,12 +36,14 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
+import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.resources.ResourceManager;
 
 /**
- * This panel represents a single building in a Colony.
+ * This panel shows the progress of constructing a building or
+ * unit in a colony.
  */
 public class ConstructionPanel extends JPanel implements PropertyChangeListener {
 
@@ -120,8 +123,12 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
         } else {
             int turnsToComplete = colony.getTurnsToComplete(buildable);
             String turnsStr = Messages.getTurnsText(turnsToComplete);
-            add(new JLabel(new ImageIcon(ResourceManager.getImage(buildable.getId() + ".image", 0.75))),
-                "spany");
+            // TODO: distinguish national unit types
+            Image image = (buildable instanceof BuildingType)
+                ? gui.getImageLibrary()
+                    .getBuildingImage((BuildingType) buildable, colony.getOwner(), 0.75)
+                : gui.getImageLibrary().getImage(buildable, 0.75);
+            add(new JLabel(new ImageIcon(image)), "spany");
             add(new JLabel(Messages.message(StringTemplate.template("colonyPanel.currentlyBuilding")
                                             .addName("%buildable%", buildable))));
 

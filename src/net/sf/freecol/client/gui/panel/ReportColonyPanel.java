@@ -244,8 +244,8 @@ public final class ReportColonyPanel extends ReportPanel
                 }
 
                 JLabel buildingLabel =
-                    new JLabel(new ImageIcon(ResourceManager.getImage(building.getType().getId()
-                                                                      + ".image", 0.66)));
+                    new JLabel(new ImageIcon(getGUI().getImageLibrary().
+                                             getBuildingImage(building, 0.66)));
                 buildingLabel.setToolTipText(Messages.message(building.getNameKey()));
                 buildingsPanel.add(buildingLabel);
             }

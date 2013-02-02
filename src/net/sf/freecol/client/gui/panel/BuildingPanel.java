@@ -152,7 +152,7 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
      */
     @Override
     public void paintComponent(Graphics g) {
-        BufferedImage bgImage = fadeImage(ResourceManager.getImage(building.getType().getId() + ".image"), 0.6f, 192.0f);
+        BufferedImage bgImage = fadeImage(gui.getImageLibrary().getBuildingImage(building), 0.6f, 192.0f);
         g.drawImage(bgImage, 0, 0, this);
     }
 
