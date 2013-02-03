@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -29,7 +30,7 @@ import javax.xml.stream.XMLStreamWriter;
 /**
  * This class describes a possible production type of a tile or building.
  */
-public class ProductionType {
+public class ProductionType extends FreeColObject {
 
     /**
      * Whether this production type applies only to colony center tiles.
@@ -92,7 +93,7 @@ public class ProductionType {
      *
      * @param in a <code>XMLStreamReader</code> value
      */
-    public ProductionType(XMLStreamReader in) {
+    public ProductionType(XMLStreamReader in) throws XMLStreamException {
         readFromXML(in);
     }
 
@@ -178,7 +179,7 @@ public class ProductionType {
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
      */
-    protected void toXML(XMLStreamWriter out) throws XMLStreamException {
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement("production");
         if (colonyCenterTile) {
             out.writeAttribute("colonyCenterTile", "true");
