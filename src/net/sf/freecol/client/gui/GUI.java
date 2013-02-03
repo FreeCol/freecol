@@ -1150,14 +1150,24 @@ public class GUI {
      * to abandon its participation in education (if any).
      *
      * @param unit The <code>Unit</code> to check.
-     * @param checkStudent Should we check for student movements.
+     * @param leavingColony True if the unit is leaving the colony.
      * @return True if the unit should proceed to move.
      */
-    public boolean confirmAbandonEducation(Unit unit, boolean checkStudent) {
-        StringTemplate message = unit.getAbandonEducationMessage(checkStudent);
-        return message == null
-            || showConfirmDialog(unit.getTile(), message,
-                "abandonEducation.yes", "abandonEducation.no");
+    public boolean confirmAbandonEducation(Unit unit, boolean leavingColony) {
+        StringTemplate message = unit.getAbandonEducationMessage(leavingColony);
+        // when leaving the colony, we need to check both for students and teachers leaving
+        if(leavingColony){
+        	return message == null
+        			|| showConfirmDialog(unit.getTile(), message,
+        					"abandonEducation.yes", "abandonEducation.no");
+        }
+        // the teacher is staying in the colony, just stopping teaching
+        // students moving inside the colony have no effect on learning
+        else{
+        	return message == null
+        			|| showConfirmDialog(unit.getTile(), message,
+        					"abandonTeaching.yes", "abandonTeaching.no");
+        }
     }
 
     public void updateGameOptions() {

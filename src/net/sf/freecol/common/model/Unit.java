@@ -1024,22 +1024,32 @@ public class Unit extends GoodsLocation
      * @param checkStudent Should we check for student movements.
      * @return A message to display, or null if education is not an issue.
      */
-    public StringTemplate getAbandonEducationMessage(boolean checkStudent) {
+    public StringTemplate getAbandonEducationMessage(boolean leavingColony) {
         if (!(getLocation() instanceof WorkLocation)) return null;
         boolean teacher = getStudent() != null;
-        boolean student = checkStudent && getTeacher() != null;
+        // if leaving the colony, the student loses learning spot, so check with player 
+        boolean student = leavingColony && getTeacher() != null;
         if (!teacher && !student) return null;
 
         Building school = (Building)((teacher) ? getLocation()
             : getTeacher().getLocation());
-        String action = (teacher)
-            ? Messages.message("abandonEducation.action.teaching")
-            : Messages.message("abandonEducation.action.studying");
-        return StringTemplate.template("abandonEducation.text")
+ 
+        if(leavingColony){
+        	String action = (teacher)
+        	            ? Messages.message("abandonEducation.action.teaching")
+        	            : Messages.message("abandonEducation.action.studying");
+        	return StringTemplate.template("abandonEducation.text")
                 .addStringTemplate("%unit%", Messages.getLabel(this))
                 .addName("%colony%", getColony().getName())
                 .add("%building%", school.getNameKey())
                 .addName("%action%", action);
+        }
+        if(teacher){
+        	return StringTemplate.template("abandonTeaching.text")
+                    .addStringTemplate("%unit%", Messages.getLabel(this))
+                    .add("%building%", school.getNameKey());
+        }
+        return null;
     }
 
     /**
