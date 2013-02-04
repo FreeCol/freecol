@@ -758,9 +758,10 @@
               classpath="build/" />
     </target>
 
-    <!-- Creates '.desktop' file. -->
+    <!-- Creates 'freecol.desktop' file. -->
     <target name="desktop-entry" depends="build"
-            description="Creates '.desktop' file.">
+            description="Creates 'freecol.desktop' file.">
+        <mkdir dir="${freecol.release.dir}"/>
         <java classname="net.sf.freecol.tools.DesktopEntry"
               classpath="build/" />
     </target>

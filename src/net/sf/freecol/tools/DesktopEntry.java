@@ -37,10 +37,12 @@ public class DesktopEntry {
     private static final String COMMENT =
         "freecol.desktopEntry.Comment";
 
-
+    /**
+     * Command line arguments are just ignored.
+     */
     public static void main(String[] args) throws Exception {
 
-        FileWriter  result = new FileWriter(".desktop");
+        FileWriter  result = new FileWriter(new File("dist", "freecol.desktop"));
         result.append("[Desktop Entry]\n");
         result.append("Version=1.0\n");
         result.append("Type=Application\n");
@@ -67,7 +69,8 @@ public class DesktopEntry {
                     .replace('-', '@');
             }
 
-            boolean found = false;
+            boolean foundGenericName = false;
+            boolean foundComment = false;
             File sourceFile = new File(SOURCE_DIRECTORY, name);
             FileReader fileReader = new FileReader(sourceFile);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
@@ -78,8 +81,10 @@ public class DesktopEntry {
                     String key = line.substring(0, index).trim();
                     if (GENERIC_NAME.equals(key)) {
                         result.append("GenericName");
+                        foundGenericName = true;
                     } else if (COMMENT.equals(key)) {
                         result.append("Comment");
+                        foundComment = true;
                     } else {
                         line = bufferedReader.readLine();
                         continue;
@@ -90,10 +95,8 @@ public class DesktopEntry {
                     result.append("=");
                     result.append(line.substring(index + 1).trim());
                     result.append("\n");
-                    if (found) {
+                    if (foundGenericName && foundComment) {
                         break;
-                    } else {
-                        found = true;
                     }
                 }
                 line = bufferedReader.readLine();
