@@ -1044,7 +1044,8 @@ public class DebugUtils {
         final AIMain aiMain = server.getAIMain();
         final AIPlayer ap = aiMain.getAIPlayer(player);
 
-        ap.setDebuggingConnection(freeColClient.getClient().getConnection());
+        ap.setDebuggingConnection(freeColClient.askServer().getClient()
+                                                           .getConnection());
         ap.startWorking();
         freeColClient.getConnectController().reconnect();
     }

@@ -150,7 +150,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         this.connectController = getFreeColClient().getConnectController();
 
         String selectTC = (specification != null) ? specification.getId()
-            : FreeColDirectories.DEFAULT_TC;
+            : FreeColDirectories.getTC();
         for (FreeColTcFile tc : Mods.getRuleSets()) {
             specificationBox.addItem(tc);
             if (selectTC.equals(tc.getId())) {

@@ -333,8 +333,8 @@ public final class ConnectController {
      */
     public void reconnect() {
         final String userName = freeColClient.getMyPlayer().getName();
-        final String host = freeColClient.getClient().getHost();
-        final int port = freeColClient.getClient().getPort();
+        final String host = freeColClient.askServer().getClient().getHost();
+        final int port = freeColClient.askServer().getClient().getPort();
 
         gui.removeInGameComponents();
         logout(true);

@@ -58,8 +58,6 @@ public class FreeColDirectories {
     private static final String SAVE_DIRECTORY = "save";
 
     private static final String SEPARATOR = System.getProperty("file.separator");
-    // Used by NewPanel.
-    public static final String DEFAULT_TC = "freecol";
 
     /**
      * The directory containing automatically created save games.  At
@@ -127,7 +125,7 @@ public class FreeColDirectories {
      *
      * Can be overridden at the command line, or specified on the NewPanel.
      */
-    private static String tc = DEFAULT_TC;
+    private static String tc = "freecol";
 
 
     /**

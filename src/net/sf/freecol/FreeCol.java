@@ -648,7 +648,8 @@ public final class FreeCol {
         if (FreeColDirectories.getSavegameFile() != null) {
             XMLStream xs = null;
             try {
-                final FreeColSavegameFile fis = new FreeColSavegameFile(FreeColDirectories.getSavegameFile());
+                final FreeColSavegameFile fis
+                    = new FreeColSavegameFile(FreeColDirectories.getSavegameFile());
                 xs = fis.getXMLStream();
                 final XMLStreamReader in = xs.getXMLStreamReader();
                 in.nextTag();
@@ -658,7 +659,7 @@ public final class FreeCol {
                                                   serverPort, serverName);
                 if (checkIntegrity) {
                     boolean integrityOK = freeColServer.getIntegrity();
-                    System.out.println(Messages.message((integrityOK)
+                    System.err.println(Messages.message((integrityOK)
                             ? "cli.check-savegame.success"
                             : "cli.check-savegame.failure"));
                     System.exit((integrityOK) ? 0 : 1);
@@ -674,9 +675,15 @@ public final class FreeCol {
                 if (xs != null) xs.close();
             }
         } else {
+            FreeColTcFile tcData = null;
+            String tc = FreeColDirectories.getTC();
             try {
-                FreeColTcFile tcData
-                    = new FreeColTcFile(FreeColDirectories.getTC());
+                tcData = new FreeColTcFile(tc);
+            } catch (IOException ioe) {
+                fatal(Messages.message(StringTemplate.template("server.badTC")
+                                                     .addName("%tc%", tc)));
+            }
+            try {
                 // TODO: command line advantages setting?
                 freeColServer = new FreeColServer(publicServer, false, null,
                                                   tcData.getSpecification(),

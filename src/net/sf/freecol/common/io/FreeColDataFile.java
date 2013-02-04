@@ -74,8 +74,9 @@ public class FreeColDataFile {
      * Opens the given file for reading.
      *
      * @param file The file to be read.
+     * @exception IOException if the file does not exist.
      */
-    public FreeColDataFile(File file) {
+    public FreeColDataFile(File file) throws IOException {
         if (!file.exists()) {
             for (String ending : getFileEndings()) {
                 final File tempFile = new File(file.getAbsolutePath() + ending);
@@ -85,6 +86,7 @@ public class FreeColDataFile {
                 }
             }
         }
+        if (!file.exists()) throw new IOException("File does not exist");
 
         this.file = file;
 

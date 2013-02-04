@@ -43,12 +43,11 @@ public class FreeColModFile extends FreeColDataFile {
     private String parent;
 
 
-
     /**
      * Make a FreeColModFile from a File.
      *
      * @param file The <code>File</code> containing a FreeCol mod.
-     * @throws IOException if thrown while opening the file.
+     * @exception IOException if thrown while opening the file.
      */
     public FreeColModFile(final File file) throws IOException {
         super(file);
@@ -60,17 +59,16 @@ public class FreeColModFile extends FreeColDataFile {
      *
      * @return An <code>InputStream</code> to the file
      *      "specification.xml" within this data file.
-     * @throws IOException if thrown while opening the
-     *      input stream.
+     * @exception IOException if thrown while opening the input stream.
      */
     public InputStream getSpecificationInputStream() throws IOException {
         return getInputStream(SPECIFICATION_FILE);
     }
 
     /**
-     * Returns the Specification of this Mod.
+     * Gets the Specification of this Mod.
      *
-     * @return a <code>Specification</code> value
+     * @return The <code>Specification</code> in this mod.
      * @exception IOException if an error occurs
      */
     public Specification getSpecification() throws IOException {
@@ -83,7 +81,7 @@ public class FreeColModFile extends FreeColDataFile {
     /**
      * Reads a file object representing this mod.
      *
-     * @throws IOException if thrown while reading the "mod.xml" file.
+     * @exception IOException if thrown while reading the "mod.xml" file.
      */
     protected void readModDescriptor() throws IOException {
         XMLInputFactory xif = XMLInputFactory.newInstance();
@@ -99,9 +97,7 @@ public class FreeColModFile extends FreeColDataFile {
             throw e2;
         } finally {
             try {
-                if (in != null) {
-                    in.close();
-                }
+                if (in != null) in.close();
             } catch (Exception e) {}
         }
     }
@@ -109,10 +105,9 @@ public class FreeColModFile extends FreeColDataFile {
     /**
      * Gets the input stream to the mod meta file.
      *
-     * @return An <code>InputStream</code> to the file
-     *      "mod.xml" within this data file.
-     * @throws IOException if thrown while opening the
-     *      input stream.
+     * @return An <code>InputStream</code> to the file "mod.xml"
+     *     within this data file.
+     * @exception IOException if thrown while opening the input stream.
      */
     private InputStream getModDescriptorInputStream() throws IOException {
         return getInputStream(MOD_DESCRIPTOR_FILE);
@@ -120,6 +115,7 @@ public class FreeColModFile extends FreeColDataFile {
 
     /**
      * File endings that are supported for this type of data file.
+     *
      * @return An array of: ".fmd" and ".zip".
      */
     @Override
@@ -138,10 +134,10 @@ public class FreeColModFile extends FreeColDataFile {
 
     /**
      * Gets the parent of the mod.
-     * @return a <code>String</code> value
+     *
+     * @return The mod parent name.
      */
     public String getParent() {
         return parent;
     }
-
 }

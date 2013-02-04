@@ -50,7 +50,12 @@ public class SoundTest extends FreeColTestCase {
             fail("Could not construct sound player: " + e.getMessage());
         }
         File baseDirectory = FreeColDirectories.getBaseDirectory();
-        FreeColDataFile baseData = new FreeColDataFile(baseDirectory);
+        FreeColDataFile baseData = null;
+        try {
+            baseData = new FreeColDataFile(baseDirectory);
+        } catch (Exception e) {
+            fail("Could not load base data: " + e.getMessage());
+        }
         ResourceManager.setBaseMapping(baseData.getResourceMapping());
     }
 
