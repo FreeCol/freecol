@@ -82,11 +82,11 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     }
 
     /**
-     * Initiates a new <code>Building</code> with the given ID. The object
-     * should later be initialized by calling either
+     * Initiates a new <code>Building</code> with the given ID.  The
+     * object should later be initialized by calling
      * {@link #readFromXML(XMLStreamReader)}.
      *
-     * @param game The <code>Game</code> in which this object belong.
+     * @param game The <code>Game</code> in which this object belongs.
      * @param id The unique identifier for this object.
      */
     public Building(Game game, String id) {
@@ -112,10 +112,10 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     }
 
     /**
-     * Changes the type of the Building. The type of a building may
+     * Changes the type of the Building.  The type of a building may
      * change when it is upgraded or damaged.
      *
-     * @param newBuildingType
+     * @param newBuildingType The new <code>BuildingType</code>.
      * @see #upgrade
      * @see #damage
      */
@@ -151,32 +151,6 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     }
 
     /**
-     * Is an ability present in this Building? The method actually
-     * returns whether the type of the building has the required
-     * ability, since Buildings have no abilities independent of their
-     * type.
-     *
-     * @param id The id of the ability to test.
-     * @param type A <code>FreeColGameObjectType</code> (ignored)
-     * @param turn An <code>Turn</code> (ignored)
-     * @return True if the ability is present.
-     */
-    @Override
-    public boolean hasAbility(String id, FreeColGameObjectType type,
-                              Turn turn) {
-        return getType().hasAbility(id);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Set<Modifier> getModifierSet(String id, FreeColGameObjectType fcgot,
-                                        Turn turn) {
-        return getType().getModifierSet(id, fcgot, turn);
-    }
-
-    /**
      * {@inheritDoc}
      */
     public String getNameKey() {
@@ -184,43 +158,40 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     }
 
     /**
-     * Returns the level of this building.
+     * Gets the level of this building.
+     * Delegates to type.
      *
-     * @return an <code>int</code> value
+     * @return The building level.
      */
     public int getLevel() {
         return getType().getLevel();
     }
 
     /**
-     * Gets the name of the improved building of the same type. An improved
-     * building is a building of a higher level.
+     * Gets the name of the improved building of the same type.
+     * An improved building is a building of a higher level.
      *
      * @return The name of the improved building or <code>null</code> if the
-     *         improvement does not exist.
+     *     improvement does not exist.
      */
     public String getNextNameKey() {
         final BuildingType next = getType().getUpgradesTo();
-        return next == null ? null : next.getNameKey();
+        return (next == null) ? null : next.getNameKey();
     }
 
     /**
-     * Checks if this building can have a higher level.
+     * Does this building have a higher level?
      *
-     * @return If this <code>Building</code> can have a higher level, that
-     *         {@link FoundingFather Adam Smith} is present for manufactoring
-     *         factory level buildings and that the <code>Colony</code>
-     *         containing this <code>Building</code> has a sufficiently high
-     *         population.
+     * @return True if this <code>Building</code> can have a higher level.
      */
     public boolean canBuildNext() {
         return getColony().canBuild(getType().getUpgradesTo());
     }
 
     /**
-     * Returns whether this building can be damaged
+     * Can this building can be damaged?
      *
-     * @return <code>true</code> if can be damaged
+     * @return True if this building can be damaged.
      * @see #damage
      */
     public boolean canBeDamaged() {
@@ -229,12 +200,11 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     }
 
     /**
-     * Reduces this building to previous level (is set to UpgradesFrom
-     * attribute in BuildingType) or is destroyed if it's the first level
+     * Downgrade this building.
      *
-     * @return True if the building was damaged.
+     * @return True if the building was downgraded.
      */
-    public boolean damage() {
+    public boolean downgrade() {
         if (canBeDamaged()) {
             setType(getType().getUpgradesFrom());
             getColony().invalidateCache();
@@ -244,8 +214,7 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     }
 
     /**
-     * Upgrades this building to next level (is set to UpgradesTo
-     * attribute in BuildingType)
+     * Upgrade this building to next level.
      *
      * @return True if the upgrade succeeds.
      */
@@ -259,9 +228,9 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     }
 
     /**
-     * Returns the unit type being an expert in this <code>Building</code>.
+     * Gets the unit type that is the expert for this <code>Building</code>.
      *
-     * @return The UnitType.
+     * @return The expert <code>UnitType</code>.
      */
     public UnitType getExpertUnitType() {
         return getSpecification().getExpertForProducing(getGoodsOutputType());
@@ -287,11 +256,10 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     }
 
     /**
-     * Returns the type of goods this <code>Building</code> produces,
-     * or <code>null</code> if the Building does not produce any
-     * goods.
+     * Gets the type of goods this <code>Building</code> produces.
      *
-     * @return The type of goods this <code>Building</code> produces
+     * @return The type of goods this <code>Building</code> produces, or
+     *     null if none.
      */
     public GoodsType getGoodsOutputType() {
         AbstractGoods output = getOutput();
@@ -299,11 +267,11 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     }
 
     /**
-     * Returns the type of goods this building needs for input, or
-     * <code>null</code> if the Building does not consume any goods.
+     * Gets the type of goods this building needs for input.
+     * in order to produce it's {@link #getGoodsOutputType output}.
      *
-     * @return The type of goods this <code>Building</code> requires as input
-     *         in order to produce it's {@link #getGoodsOutputType output}.
+     * @return The type of goods this <code>Building</code> requires as input,
+     *     or null if none.
      */
     public GoodsType getGoodsInputType() {
         List<AbstractGoods> inputs = getInputs();
@@ -654,7 +622,7 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     // Interface Consumer
 
     /**
-     * Returns true if this Consumer consumes the given GoodsType.
+     * Can this Consumer consume the given GoodsType?
      *
      * @param goodsType a <code>GoodsType</code> value
      * @return a <code>boolean</code> value
@@ -664,9 +632,7 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     }
 
     /**
-     * Returns a list of GoodsTypes this Consumer consumes.
-     *
-     * @return a <code>List</code> value
+     * {@inheritDoc}
      */
     public List<AbstractGoods> getConsumedGoods() {
         List<AbstractGoods> result = new ArrayList<AbstractGoods>();
@@ -678,101 +644,104 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     }
 
     /**
-     * The priority of this Consumer. The higher the priority, the
-     * earlier will the Consumer be allowed to consume the goods it
-     * requires.
-     *
-     * @return an <code>int</code> value
+     * {@inheritDoc}
      */
     public int getPriority() {
         return getType().getPriority();
     }
 
-    // Serialization
+    /**
+     * Is an ability present in this Building?
+     *
+     * The method actually returns whether the type of the building
+     * has the required ability, since Buildings have no abilities
+     * independent of their type.
+     *
+     * @param id The id of the ability to test.
+     * @param type A <code>FreeColGameObjectType</code> (ignored).
+     * @param turn A <code>Turn</code> (ignored).
+     * @return True if the ability is present.
+     */
+    @Override
+    public boolean hasAbility(String id, FreeColGameObjectType type,
+                              Turn turn) {
+        return getType().hasAbility(id);
+    }
 
     /**
-     * This method writes an XML-representation of this object to the given
-     * stream.
+     * Gets the set of modifiers with the given Id from this Building.
+     * Delegate to the type.
      *
-     * <br>
-     * <br>
-     *
-     * Only attributes visible to the given <code>Player</code> will be added
-     * to that representation if <code>showAll</code> is set to
-     * <code>false</code>.
-     *
-     * @param out The target stream.
-     * @param player The <code>Player</code> this XML-representation should be
-     *            made for, or <code>null</code> if
-     *            <code>showAll == true</code>.
-     * @param showAll Only attributes visible to <code>player</code> will be
-     *            added to the representation if <code>showAll</code> is set
-     *            to <i>false</i>.
-     * @param toSavedGame If <code>true</code> then information that is only
-     *            needed when saving a game is added.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
+     * @param id The id of the modifier to retrieve.
+     * @param fcgot A <code>FreeColGameObjectType</code> (ignored).
+     * @param turn A <code>Turn</code> (ignored).
+     * @return A set of modifiers.
+     */
+    @Override
+    public Set<Modifier> getModifierSet(String id, FreeColGameObjectType fcgot,
+                                        Turn turn) {
+        return getType().getModifierSet(id, fcgot, turn);
+    }
+
+
+    // Serialization
+
+    private static final String BUILDING_TYPE_TAG = "buildingType";
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     protected void toXMLImpl(XMLStreamWriter out, Player player,
-                             boolean showAll, boolean toSavedGame)
-            throws XMLStreamException {
-        // Start
+                             boolean showAll, boolean toSavedGame) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
 
-        // Attributes
-        super.writeAttributes(out);
-        out.writeAttribute("buildingType", buildingType.getId());
-
-        // Children
+        writeAttributes(out);
         super.writeChildren(out, player, showAll, toSavedGame);
 
-        // End
         out.writeEndElement();
     }
 
     /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered during parsing.
+     * {@inheritDoc}
      */
     @Override
-    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        super.writeAttributes(out);
+
+        writeAttribute(out, BUILDING_TYPE_TAG, buildingType);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
 
-        buildingType = getSpecification().getBuildingType(in.getAttributeValue(null, "buildingType"));
+        final Specification spec = getSpecification();
+        buildingType = spec.getType(in, BUILDING_TYPE_TAG,
+                                    BuildingType.class, (BuildingType)null);
     }
 
     /**
-     * Partial writer, so that "remove" messages can be brief.
-     *
-     * @param out The target stream.
-     * @param fields The fields to write.
-     * @throws XMLStreamException If there are problems writing the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void toXMLPartialImpl(XMLStreamWriter out, String[] fields)
-        throws XMLStreamException {
-        toXMLPartialByClass(out, getClass(), fields);
+    protected void toXMLPartialImpl(XMLStreamWriter out, String[] fields) throws XMLStreamException {
+        toXMLPartialByClass(out, Building.class, fields);
     }
 
     /**
-     * Partial reader, so that "remove" messages can be brief.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException If there are problems reading the stream.
+     * {@inheritDoc}
      */
     @Override
-    public void readFromXMLPartialImpl(XMLStreamReader in)
-        throws XMLStreamException {
-        readFromXMLPartialByClass(in, getClass());
+    public void readFromXMLPartialImpl(XMLStreamReader in) throws XMLStreamException {
+        readFromXMLPartialByClass(in, Building.class);
     }
 
     /**
-     * String converter for debugging.
-     *
-     * @return The name of the building.
+     * {@inheritDoc}
      */
     @Override
     public String toString() {

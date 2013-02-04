@@ -407,22 +407,26 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
 
     // Serialization
 
+    private static final String COLONY_TAG = "colony";
+
     /**
      * {@inheritDoc}
      */
-    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    @Override
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        super.writeAttributes(out);
 
-        colony = getFreeColGameObject(in, "colony", Colony.class);
+        writeAttribute(out, COLONY_TAG, colony);
     }
 
     /**
      * {@inheritDoc}
      */
-    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    @Override
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
 
-        out.writeAttribute("colony", colony.getId());
+        colony = getAttribute(in, COLONY_TAG, Colony.class, (Colony)null);
     }
 
     /**

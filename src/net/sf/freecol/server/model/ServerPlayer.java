@@ -3337,7 +3337,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             colony.removeBuilding(building);
             cs.addDispose(See.only((ServerPlayer) colony.getOwner()), colony, building);
         } else if (building.canBeDamaged()) {
-            building.damage();
+            building.downgrade();
         }
         if (isAI()) {
             colony.firePropertyChange(Colony.REARRANGE_WORKERS, true, false);

@@ -63,11 +63,9 @@ public class ColonyTile extends WorkLocation implements Ownable {
 
 
     /**
-     * Constructor for ServerColonyTile.
+     * Constructor for ServerColonyTile, deliberately empty.
      */
-    protected ColonyTile() {
-        // empty constructor
-    }
+    protected ColonyTile() {}
 
     /**
      * Constructor for ServerColonyTile.
@@ -99,9 +97,8 @@ public class ColonyTile extends WorkLocation implements Ownable {
     }
 
     /**
-     * Initiates a new <code>ColonyTile</code>
-     * with the given ID. The object should later be
-     * initialized by calling either
+     * Initiates a new <code>ColonyTile</code> with the given ID.  The
+     * object should later be initialized by calling either
      * {@link #readFromXML(XMLStreamReader)}.
      *
      * @param game The <code>Game</code> in which this object belong.
@@ -112,7 +109,7 @@ public class ColonyTile extends WorkLocation implements Ownable {
     }
 
     /**
-     * Returns a description of the tile, with the name of the tile
+     * Gets a description of the tile, with the name of the tile
      * and any improvements made to it (road/plow).
      *
      * @return The description label for this tile
@@ -122,7 +119,7 @@ public class ColonyTile extends WorkLocation implements Ownable {
     }
 
     /**
-     * Checks if this is the tile where the <code>Colony</code> is located.
+     * Is this the tile where the <code>Colony</code> is located?
      *
      * @return True if this is the colony center tile.
      */
@@ -131,10 +128,10 @@ public class ColonyTile extends WorkLocation implements Ownable {
     }
 
     /**
-     * Gets the work tile.
+     * Gets the work tile, that is the actual tile being worked.
      *
-     * @return The tile in which this <code>ColonyTile</code> represents a
-     *         <code>WorkLocation</code> for.
+     * @return The <code>Tile</code> in which this
+     *     <code>ColonyTile</code> represents a <code>WorkLocation</code> for.
      */
     public Tile getWorkTile() {
         return workTile;
@@ -157,8 +154,9 @@ public class ColonyTile extends WorkLocation implements Ownable {
     }
 
     /**
-     * Returns the unit who is occupying the tile
-     * @return the unit who is occupying the tile
+     * Gets a unit who is occupying the tile.
+     *
+     * @return A <code>Unit</code> who is occupying the work tile, if any.
      * @see #isOccupied()
      */
     public Unit getOccupyingUnit() {
@@ -166,63 +164,58 @@ public class ColonyTile extends WorkLocation implements Ownable {
     }
 
     /**
-     * Checks whether there is a fortified enemy unit in the tile.
-     * Units can't produce in occupied tiles
-     * @return <code>true</code> if an fortified enemy unit is in the tile
+     * Is there a fortified enemy unit on the work tile?
+     * Production can not occur on occupied tiles.
+     *
+     * @return True if an fortified enemy unit is in the tile.
      */
     public boolean isOccupied() {
         return workTile.isOccupied();
     }
 
     /**
-     * Returns the primary production of a colony center tile. In the
+     * Gets the primary production of a colony center tile.  In the
      * standard rule sets, this is always some kind of food and all
      * tile improvements contribute to the production.
      *
-     * @return an <code>AbstractGoods</code> value
+     * @return The primary production, as an <code>AbstractGoods</code>.
      */
     private AbstractGoods getPrimaryProduction() {
-        if (workTile.getType().getPrimaryGoods() == null) {
-            return null;
-        } else {
-            AbstractGoods primaryProduction
-                = new AbstractGoods(workTile.getType().getPrimaryGoods());
-            int potential = primaryProduction.getAmount();
-            if (workTile.getTileItemContainer() != null) {
-                potential = workTile.getTileItemContainer()
-                    .getTotalBonusPotential(primaryProduction.getType(), null,
-                                            potential, false);
-            }
-            primaryProduction.setAmount(potential
-                + Math.max(0, getColony().getProductionBonus()));
-            return primaryProduction;
+        if (workTile.getType().getPrimaryGoods() == null) return null;
+        AbstractGoods primaryProduction
+            = new AbstractGoods(workTile.getType().getPrimaryGoods());
+        int potential = primaryProduction.getAmount();
+        if (workTile.getTileItemContainer() != null) {
+            potential = workTile.getTileItemContainer()
+                .getTotalBonusPotential(primaryProduction.getType(), null,
+                                        potential, false);
         }
+        primaryProduction.setAmount(potential
+            + Math.max(0, getColony().getProductionBonus()));
+        return primaryProduction;
     }
 
     /**
-     * Returns the secondary production of a colony center tile. Only
+     * Gets the secondary production of a colony center tile.  Only
      * natural tile improvements, such as rivers, contribute to the
-     * production. Artificial tile improvements, such as plowing, are
+     * production.  Artificial tile improvements, such as plowing, are
      * ignored.
      *
-     * @return an <code>int</code> value
+     * @return The secondary production, as an <code>AbstractGoods</code>.
      */
     private AbstractGoods getSecondaryProduction() {
-        if (workTile.getType().getSecondaryGoods() == null) {
-            return null;
-        } else {
-            AbstractGoods secondaryProduction
-                = new AbstractGoods(workTile.getType().getSecondaryGoods());
-            int potential = secondaryProduction.getAmount();
-            if (workTile.getTileItemContainer() != null) {
-                potential = workTile.getTileItemContainer()
-                    .getTotalBonusPotential(secondaryProduction.getType(), null,
-                                            potential, true);
-            }
-            secondaryProduction.setAmount(potential
-                + Math.max(0, getColony().getProductionBonus()));
-            return secondaryProduction;
+        if (workTile.getType().getSecondaryGoods() == null) return null;
+        AbstractGoods secondaryProduction
+            = new AbstractGoods(workTile.getType().getSecondaryGoods());
+        int potential = secondaryProduction.getAmount();
+        if (workTile.getTileItemContainer() != null) {
+            potential = workTile.getTileItemContainer()
+                .getTotalBonusPotential(secondaryProduction.getType(), null,
+                                        potential, true);
         }
+        secondaryProduction.setAmount(potential
+            + Math.max(0, getColony().getProductionBonus()));
+        return secondaryProduction;
     }
 
     /**
@@ -262,14 +255,11 @@ public class ColonyTile extends WorkLocation implements Ownable {
      */
     public StringTemplate getLocationName() {
         String name = getColony().getName();
-        if (isColonyCenterTile()) {
-            return StringTemplate.name(name);
-        } else {
-            return StringTemplate.template("nearLocation")
+        return (isColonyCenterTile()) ? StringTemplate.name(name)
+            : StringTemplate.template("nearLocation")
                 .add("%direction%", "direction."
-                    + getTile().getDirection(workTile).toString())
+                     + getTile().getDirection(workTile).toString())
                 .addName("%location%", name);
-        }
     }
 
     // Omit getLocationNameFor
@@ -504,89 +494,63 @@ public class ColonyTile extends WorkLocation implements Ownable {
 
     // Serialization
 
+    private static final String WORK_TILE_TAG = "workTile";
+
     /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *
-     * <br><br>
-     *
-     * Only attributes visible to the given <code>Player</code> will
-     * be added to that representation if <code>showAll</code> is
-     * set to <code>false</code>.
-     *
-     * @param out The target stream.
-     * @param player The <code>Player</code> this XML-representation
-     *      should be made for, or <code>null</code> if
-     *      <code>showAll == true</code>.
-     * @param showAll Only attributes visible to <code>player</code>
-     *      will be added to the representation if <code>showAll</code>
-     *      is set to <i>false</i>.
-     * @param toSavedGame If <code>true</code> then information that
-     *      is only needed when saving a game is added.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * {@inheritDoc}
      */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out, Player player,
                              boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
-        // Start
         out.writeStartElement(getXMLElementTagName());
 
-        // Attributes
-        super.writeAttributes(out);
-        out.writeAttribute("workTile", workTile.getId());
-
-        // Children
+        writeAttributes(out);
         super.writeChildren(out, player, showAll, toSavedGame);
 
-        // End
         out.writeEndElement();
     }
 
     /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
+     * {@inheritDoc}
      */
-    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    @Override
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        super.writeAttributes(out);
+
+        writeAttribute(out, WORK_TILE_TAG, workTile);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
-        workTile = getFreeColGameObject(in, "workTile", Tile.class);
+
+        workTile = getAttribute(in, WORK_TILE_TAG, Tile.class, (Tile)null);
     }
 
     /**
-     * Partial writer, so that "remove" messages can be brief.
-     *
-     * @param out The target stream.
-     * @param fields The fields to write.
-     * @throws XMLStreamException If there are problems writing the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void toXMLPartialImpl(XMLStreamWriter out, String[] fields)
-        throws XMLStreamException {
-        toXMLPartialByClass(out, getClass(), fields);
+    protected void toXMLPartialImpl(XMLStreamWriter out, String[] fields) throws XMLStreamException {
+        toXMLPartialByClass(out, ColonyTile.class, fields);
     }
 
     /**
-     * Partial reader, so that "remove" messages can be brief.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException If there are problems reading the stream.
+     * {@inheritDoc}
      */
     @Override
-    public void readFromXMLPartialImpl(XMLStreamReader in)
-        throws XMLStreamException {
-        readFromXMLPartialByClass(in, getClass());
+    public void readFromXMLPartialImpl(XMLStreamReader in) throws XMLStreamException {
+        readFromXMLPartialByClass(in, ColonyTile.class);
     }
 
     /**
-     * Will return the position of the tile and the name of the colony in
-     * addition to the FreeColObject.toString().
-     *
-     * @return A representation of a colony-tile that can be used for
-     *     debugging.
+     * {@inheritDoc}
      */
+    @Override
     public String toString() {
         return "ColonyTile" + getWorkTile().getPosition().toString()
             + "/" + getColony().getName();
@@ -594,6 +558,7 @@ public class ColonyTile extends WorkLocation implements Ownable {
 
     /**
      * Gets the tag name of the root element representing this object.
+     *
      * @return "colonyTile".
      */
     public static String getXMLElementTagName() {
