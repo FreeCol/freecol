@@ -64,6 +64,7 @@ import org.apache.commons.cli.PosixParser;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
+
 /**
  * This class is responsible for handling the command-line arguments
  * and starting either the stand-alone server or the client-GUI.
@@ -106,6 +107,8 @@ public final class FreeCol {
 
     private static String fontName = null;
 
+    private static String name = null;
+
     private static int serverPort = -1;
     private static String serverName = null;
 
@@ -119,7 +122,6 @@ public final class FreeCol {
     private static String tc = null;
 
     private static int freeColTimeout = -1;
-
 
 
     private FreeCol() {} // Hide constructor
@@ -402,6 +404,11 @@ public final class FreeCol {
                           .withArgName(Messages.message("cli.arg.advantages"))
                           .hasArg()
                           .create());
+        options.addOption(OptionBuilder.withLongOpt("name")
+                          .withDescription(Messages.message("cli.name"))
+                          .withArgName(Messages.message("cli.arg.name"))
+                          .hasArg()
+                          .create());
 
         CommandLineParser parser = new PosixParser();
         boolean usageError = false;
@@ -503,6 +510,10 @@ public final class FreeCol {
                 String logLevelString = line.getOptionValue("log-level")
                     .toUpperCase();
                 logLevel = Level.parse(logLevelString);
+            }
+
+            if (line.hasOption("name")) {
+                setName(line.getOptionValue("name"));
             }
 
             if (line.hasOption("no-sound")) {
@@ -622,6 +633,27 @@ public final class FreeCol {
                     baseLogger.log(Level.WARNING, "Uncaught exception from thread: " + thread, e);
                 }
             });
+    }
+
+    /**
+     * Gets the user name.
+     *
+     * @return The user name, defaults to the user.name property, then to
+     *     the "defaultPlayerName" message value.
+     */
+    public static String getName() {
+        return (name != null) ? name
+            : System.getProperty("user.name",
+                                 Messages.message("defaultPlayerName"));
+    }
+
+    /**
+     * Sets the user name.
+     *
+     * @param name The new user name.
+     */
+    public static void setName(String name) {
+        FreeCol.name = name;
     }
 
     /**

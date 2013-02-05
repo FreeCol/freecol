@@ -1128,8 +1128,7 @@ public final class InGameController implements NetworkConstants {
         gui.showStatusPanel(Messages.message("status.savingGame"));
         try {
             server.setActiveUnit(gui.getActiveUnit());
-            server.saveGame(file, freeColClient.getMyPlayer().getName(),
-                freeColClient.getClientOptions());
+            server.saveGame(file, freeColClient.getClientOptions());
             gui.closeStatusPanel();
             result = true;
         } catch (IOException e) {

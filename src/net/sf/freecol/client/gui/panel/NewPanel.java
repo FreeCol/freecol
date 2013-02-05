@@ -78,9 +78,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
     private final JLabel rulesLabel = localizedLabel("rules");
 
     private final JCheckBox publicServer = new JCheckBox(Messages.message("publicServer"));
-    private final JTextField name = new JTextField(System.getProperty("user.name",
-                                                                      Messages.message("defaultPlayerName")), 20);
-
+    private final JTextField name = new JTextField(FreeCol.getName(), 20);
     private final JTextField server = new JTextField("127.0.0.1");
     private final JTextField port1 = new JTextField(Integer.toString(FreeCol.getDefaultPort()));
     private final JTextField port2 = new JTextField(Integer.toString(FreeCol.getDefaultPort()));
@@ -332,6 +330,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         try {
             switch (Enum.valueOf(NewPanelAction.class, command)) {
             case OK:
+                FreeCol.setName(name.getText());
                 FreeCol.setTC(getTC().getId());
                 FreeCol.setAdvantages(getAdvantages());
                 NewPanelAction action = Enum.valueOf(NewPanelAction.class,
@@ -342,14 +341,14 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                         .showDifficultyDialog(getSpecification());
                     if (level != null) {
                         getSpecification().applyDifficultyLevel(level);
-                        connectController.startSinglePlayerGame(getSpecification(), name.getText());
+                        connectController.startSinglePlayerGame(getSpecification());
                     }
                     break;
                 case JOIN:
                     try {
                         int port = Integer.valueOf(port1.getText()).intValue();
                         // tell Canvas to launch client
-                        connectController.joinMultiplayerGame(name.getText(), server.getText(), port);
+                        connectController.joinMultiplayerGame(server.getText(), port);
                     } catch (NumberFormatException e) {
                         port1Label.setForeground(Color.red);
                     }
@@ -361,7 +360,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                             .showDifficultyDialog(getSpecification());
                         getSpecification().applyDifficultyLevel(level);
                         connectController.startMultiplayerGame(getSpecification(), publicServer.isSelected(),
-                                                               name.getText(), port, level);
+                                                               port, level);
                     } catch (NumberFormatException e) {
                         port2Label.setForeground(Color.red);
                     }
@@ -369,7 +368,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                 case META_SERVER:
                     List<ServerInfo> serverList = connectController.getServerList();
                     if (serverList != null) {
-                        getGUI().showServerListPanel(name.getText(), serverList);
+                        getGUI().showServerListPanel(serverList);
                     }
                 }
                 break;

@@ -1808,17 +1808,14 @@ public final class Canvas extends JDesktopPane {
     /**
      * Displays the <code>ServerListPanel</code>.
      *
-     * @param username The username that should be used when connecting to one
-     *            of the servers on the list.
      * @param serverList The list containing the servers retrieved from the
      *            metaserver.
      * @see ServerListPanel
      */
-    public void showServerListPanel(String username,
-                                    List<ServerInfo> serverList) {
+    public void showServerListPanel(List<ServerInfo> serverList) {
         closeMenus();
 
-        serverListPanel.initialize(username, serverList);
+        serverListPanel.initialize(serverList);
         showSubPanel(serverListPanel, true);
     }
 

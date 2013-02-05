@@ -134,7 +134,7 @@ public final class ServerTestHelper {
         // save the game as a file
         File file = new File(TEST_FILE);
         try {
-            serv.saveGame(file, "user", null);
+            serv.saveGame(file, null);
         } catch (IOException e) {
             e.printStackTrace();
             fail(e.toString());

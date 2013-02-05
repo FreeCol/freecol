@@ -58,8 +58,6 @@ public final class ServerListPanel extends FreeColPanel implements ActionListene
 
     private final ServerListTableModel tableModel;
 
-    private String username;
-
     private JButton connect;
 
     
@@ -131,13 +129,10 @@ public final class ServerListPanel extends FreeColPanel implements ActionListene
     /**
      * Initializes the data that is displayed in this panel.
      * 
-     * @param username The username to be used when connecting to a server.
      * @param servers A list of <code>ServerInfo</code>-objects to be
      *            displayed.
      */
-    public void initialize(String username, List<ServerInfo> servers) {
-        this.username = username;
-
+    public void initialize(List<ServerInfo> servers) {
         // TODO: This should be added as a filtering rule:
         // Remove servers with an incorrect version from the list:
         Iterator<ServerInfo> it = servers.iterator();
@@ -188,7 +183,7 @@ public final class ServerListPanel extends FreeColPanel implements ActionListene
             switch (Integer.valueOf(command).intValue()) {
             case CONNECT:
                 ServerInfo si = tableModel.getItem(table.getSelectedRow());
-                connectController.joinMultiplayerGame(username, si.getAddress(), si.getPort());
+                connectController.joinMultiplayerGame(si.getAddress(), si.getPort());
                 break;
             case CANCEL:
                 getGUI().removeFromCanvas(this);

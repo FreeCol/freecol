@@ -28,7 +28,6 @@ import net.sf.freecol.server.FreeColServer;
 public class ClientTestHelper {
 
     public static final int port = 3541;
-    public static final String username = "test";
 
     public static FreeColClient startClient(FreeColServer freeColServer) {
         // This is not ideal, but headless mode allows cutting off
@@ -40,7 +39,7 @@ public class ClientTestHelper {
         ConnectController connectController = client.getConnectController();
         client.setFreeColServer(freeColServer);
         client.setSinglePlayer(true);
-        boolean connected = connectController.login(username, "127.0.0.1",
+        boolean connected = connectController.login("127.0.0.1",
                                                     freeColServer.getPort());
         assertTrue(connected);
         client.getPreGameController().setReady(true);

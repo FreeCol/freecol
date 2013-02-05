@@ -344,9 +344,45 @@ FreeCol also provides several application-specific command line
 options:
 
 \begin{itemize}
+\item\verb$--usage$ Display the help screen.
+\item\verb$--version$ Display the version number.
+\item\verb$--default-locale LOCALE$ Specify a locale.
 \item\verb$--freecol-data DIR$ Specify the directory that contains
 FreeCol's data files. In general, you will only need to use this if
 you have installed a modified copy of FreeCol's data files.
+\item\verb$--load-savegame SAVEGAME_FILE$ Load the given
+savegame. This is particularly useful in combination with the client
+option \hyperlink{show savegame settings}{show savegame settings}.
+\item\verb$--no-intro$ Skip the introductory video.
+\item\verb$--no-sound$ Run FreeCol without sound. Note that the game
+does not yet contain any music, so the only sounds you will hear will
+be special effects.
+\item\verb$--advantages ADVANTAGES$ Set the European nation advantages
+  type, which must be one of \texttt{Selected} (each nation may choose
+  an advantage), \texttt{Fixed} (the standard advantage types are
+  fixed) or \texttt{None} (Europeans do not have national advantages).
+  The names of the advantage types will be translated to the specified
+  locale, but if you specify the ADVANTAGES wrongly an error message is
+  printed which lists the available choices.
+\item\verb$--clientOptions FILE$ Override the client options file
+  (normally \texttt{options.xml} in the freecol directory).
+\item\verb$--font FONTSPEC$ Override the default font with a Java
+font specifier (e.g. Arial-BOLD-12).
+\item\verb$--home-directory DIRECTORY$ Use the given directory instead
+  of your default home directory to load and save games, options and
+  log files. You can use this in order to run the game from a USB
+  stick\index{USB stick}, for example. Please note that specifying a
+  save game file on the command line will override the save game
+  directory.
+\item\verb$--name NAME$ Specify a player name.
+\item\verb$--server PORT$ Start a stand-alone server on the specified
+port. If you don't know what that means, you will not need the option.
+\item\verb$--server-help$ Display a help screen for the more advanced
+server options.
+\item\verb$--timeout TIMEOUT$ Specifies the number of seconds the
+  server should wait for a player to answer a question (e.g. demands
+  from natives).  This is `infinite' by default in single player mode,
+  and 60 seconds in multiplayer.
 \item\verb$--windowed[[=]WIDTHxHEIGHT]$ Run FreeCol in windowed mode
   instead of full screen mode and set the window width and height. You
   will need this if your window manager or Java Virtual Machine do not
@@ -355,40 +391,6 @@ you have installed a modified copy of FreeCol's data files.
   screen, but probably set the window height slightly lower than the
   height of your screen, in order to leave space for the menu bar,
   dock etc.
-\item\verb$--load-savegame SAVEGAME_FILE$ Load the given
-savegame. This is particularly useful in combination with the client
-option \hyperlink{show savegame settings}{show savegame settings}.
-\item\verb$--no-intro$ Skip the introductory video.
-\item\verb$--no-sound$ Run FreeCol without sound. Note that the game
-does not yet contain any music, so the only sounds you will hear will
-be special effects.
-\item\verb$--usage$ Display the help screen.
-\item\verb$--version$ Display the version number.
-\item\verb$--server PORT$ Start a stand-alone server on the specified
-port. If you don't know what that means, you will not need the option.
-\item\verb$--server-help$ Display a help screen for the more advanced
-server options.
-\item\verb$--advantages ADVANTAGES$ Set the European nation advantages
-  type, which must be one of \texttt{Selected} (each nation may choose
-  an advantage), \texttt{Fixed} (the standard advantage types are
-  fixed) or \texttt{None} (Europeans do not have national advantages).
-  The names of the advantage types will be translated to the specified
-  locale, but if you specify the ADVANTAGES wrongly an error message is
-  printed which lists the available choices.
-\item\verb$--font[[=]FONTSPEC]$ Override the default font with a Java
-font specifier (e.g. Arial-BOLD-12).
-\item\verb$--home-directory DIRECTORY$ Use the given directory instead
-  of your default home directory to load and save games, options and
-  log files. You can use this in order to run the game from a USB
-  stick\index{USB stick}, for example. Please note that specifying a
-  save game file on the command line will override the save game
-  directory.
-\item\verb$--clientOptions FILE$ Override the client options file
-  (normally \texttt{options.xml} in the freecol directory).
-\item\verb$--timeout TIMEOUT$ Specifies the number of seconds the
-  server should wait for a player to answer a question (e.g. demands
-  from natives).  This is `infinite' by default in single player mode,
-  and 60 seconds in multiplayer.
 \end{itemize}
 
 There are several other options that you will probably only be
@@ -1620,9 +1622,9 @@ identify the font. For this reason, you must obey the usual quoting
 rules. In particular, you must use the string {\tt \%20} instead of a
 space character in the font name.
 
-You can also use a font that is not known to the JVM. Just copy it to
-the fonts directory mentioned above and add it to the configuration
-file by adding a line like this:
+If you are using Java 1.6 or higher, you can also use fonts that are
+not known to the JVM. You can copy it to the fonts directory mentioned
+above and add it to the configuration file by adding a line like this:
 
 \begin{quote}
 {\tt MyFavouriteFont=resources/fonts/Chancery.ttf}

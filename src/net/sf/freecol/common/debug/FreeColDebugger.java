@@ -230,7 +230,6 @@ public class FreeColDebugger {
             if (fcs != null) {
                 try {
                     fcs.saveGame(new File(".", getDebugRunSave()),
-                                 freeColClient.getMyPlayer().getName(),
                                  freeColClient.getClientOptions());
                 } catch (IOException e) {}
             }

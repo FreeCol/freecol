@@ -196,9 +196,6 @@ public final class FreeColServer {
 
     private MapGenerator mapGenerator;
 
-    // The username of the player owning this server.
-    private String owner;
-
     /** The private provider for random numbers. */
     private Random random = null;
 
@@ -585,24 +582,6 @@ public final class FreeColServer {
     }
 
     /**
-     * Gets the owner of the <code>Game</code>.
-     *
-     * @return The owner of the game.
-     */
-    public String getOwner() {
-        return owner;
-    }
-
-    /**
-     * Sets the owner of the game.
-     *
-     * @param owner The new owner of the game.
-     */
-    public void setOwner(String owner) {
-        this.owner = owner;
-    }
-
-    /**
      * Gets the active unit specified in a saved game, if any.
      *
      * @return The active unit.
@@ -766,26 +745,22 @@ public final class FreeColServer {
      * Saves a game.
      *
      * @param file The file where the data will be written.
-     * @param username The username of the player saving the game.
      * @throws IOException If a problem was encountered while trying to open,
      *             write or close the file.
      */
-    public void saveGame(File file, String username, OptionGroup options)
-        throws IOException {
-        saveGame(file, username, options, null);
+    public void saveGame(File file, OptionGroup options) throws IOException {
+        saveGame(file, options, null);
     }
 
     /**
      * Saves a game.
      *
      * @param file The file where the data will be written.
-     * @param username The username of the player saving the game.
      * @param image an <code>Image</code> value
      * @throws IOException If a problem was encountered while trying
      *     to open, write or close the file.
      */
-    public void saveGame(File file, String username, OptionGroup options,
-                         BufferedImage image)
+    public void saveGame(File file, OptionGroup options, BufferedImage image)
         throws IOException {
         final ServerGame game = getGame();
         XMLOutputFactory xof = XMLOutputFactory.newInstance();
@@ -822,7 +797,6 @@ public final class FreeColServer {
             xsw.writeStartElement("savedGame");
 
             // Add the attributes:
-            xsw.writeAttribute("owner", username);
             xsw.writeAttribute("publicServer", Boolean.toString(publicServer));
             xsw.writeAttribute("singleplayer", Boolean.toString(singlePlayer));
             xsw.writeAttribute("version", Integer.toString(SAVEGAME_VERSION));
@@ -868,9 +842,9 @@ public final class FreeColServer {
      * Loads a game.
      *
      * @param fis The file where the game data is located.
-     * @return The username of the player saving the game.
-     * @exception IOException If a problem was encountered while trying to open,
-     *     read or close the file.
+     * @return The game found in the stream.
+     * @exception IOException If a problem was encountered while trying
+     *     to open, read or close the file.
      * @exception FreeColException if the savegame contains incompatible data.
      */
     public ServerGame loadGame(final FreeColSavegameFile fis)
@@ -924,8 +898,6 @@ public final class FreeColServer {
 
                 str = xsr.getAttributeValue(null, "debug");
                 FreeColDebugger.setDebugModes(str);
-
-                server.setOwner(xsr.getAttributeValue(null, "owner"));
 
                 active = xsr.getAttributeValue(null, "activeUnit");
             }

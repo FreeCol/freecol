@@ -112,13 +112,11 @@ public final class ConnectController {
      *
      * @param specification The <code>Specification</code> for the game.
      * @param publicServer Whether to make the server public.
-     * @param userName The name to use when logging in.
      * @param port The port in which the server should listen for new clients.
      * @param level An <code>OptionGroup</code> containing difficulty options.
      */
     public void startMultiplayerGame(Specification specification,
-                                     boolean publicServer,
-                                     String userName, int port,
+                                     boolean publicServer, int port,
                                      OptionGroup level) {
         freeColClient.setMapEditor(false);
 
@@ -128,8 +126,7 @@ public final class ConnectController {
 
         FreeColServer freeColServer;
         try {
-            freeColServer = new FreeColServer(publicServer, false,
-                                              specification, port, null);
+            freeColServer = new FreeColServer(publicServer, false, specification, port, null);
         } catch (NoRouteToServerException e) {
             gui.errorMessage("server.noRouteToServer");
             logger.log(Level.WARNING, "No route to server.", e);
@@ -141,7 +138,7 @@ public final class ConnectController {
         }
 
         freeColClient.setFreeColServer(freeColServer);
-        joinMultiplayerGame(userName, "localhost", port);
+        joinMultiplayerGame("localhost", port);
     }
 
     /**
@@ -181,10 +178,8 @@ public final class ConnectController {
      * TODO: connect client/server directly (not using network-classes)
      *
      * @param specification The <code>Specification</code> for the game.
-     * @param userName The name to use when logging in.
      */
-    public void startSinglePlayerGame(Specification specification,
-                                      String userName) {
+    public void startSinglePlayerGame(Specification specification) {
         freeColClient.setMapEditor(false);
 
         if (freeColClient.isLoggedIn()) logout(true);
@@ -195,8 +190,7 @@ public final class ConnectController {
 
         FreeColServer freeColServer;
         try {
-            freeColServer = new FreeColServer(false, true, specification,
-                                              -1, null);
+            freeColServer = new FreeColServer(false, true, specification, -1, null);
         } catch (NoRouteToServerException e) {
             gui.errorMessage("server.noRouteToServer");
             logger.log(Level.WARNING, "No route to server (single player!).",
@@ -214,7 +208,7 @@ public final class ConnectController {
         }
         freeColClient.setFreeColServer(freeColServer);
         freeColClient.setSinglePlayer(true);
-        if (login(userName, "127.0.0.1", freeColServer.getPort())) {
+        if (login("127.0.0.1", freeColServer.getPort())) {
             freeColClient.getPreGameController().setReady(true);
             gui.showStartGamePanel(freeColClient.getGame(),
                                    freeColClient.getMyPlayer(), true);
@@ -224,11 +218,10 @@ public final class ConnectController {
     /**
      * Starts a new multiplayer game by connecting to the server.
      *
-     * @param userName The name to use when logging in.
      * @param host The name of the machine running the server.
      * @param port The port to use when connecting to the host.
      */
-    public void joinMultiplayerGame(String userName, String host, int port) {
+    public void joinMultiplayerGame(String host, int port) {
         freeColClient.setMapEditor(false);
 
         if (freeColClient.isLoggedIn()) logout(true);
@@ -239,29 +232,28 @@ public final class ConnectController {
                 "connectController.choicePlayer", "cancel",
                 vacantPlayers);
             if (choice == null) return;
-            userName = choice;
+            FreeCol.setName(choice);
         }
 
         freeColClient.setSinglePlayer(false);
-        if (login(userName, host, port) && !freeColClient.isInGame()) {
+        if (login(host, port)
+            && !freeColClient.isInGame()) {
             gui.showStartGamePanel(freeColClient.getGame(),
                                    freeColClient.getMyPlayer(), false);
         }
     }
-
  
 
     /**
      * Starts the client and connects to <i>host:port</i>.
      *
-     * @param userName The name to use when logging in. This should be
-     *            a unique identifier.
      * @param host The name of the machine running the
      *            <code>FreeColServer</code>.
      * @param port The port to use when connecting to the host.
      * @return True if the login succeeds.
      */
-    public boolean login(String userName, String host, int port) {
+    public boolean login(String host, int port) {
+        String userName = FreeCol.getName();
         freeColClient.setMapEditor(false);
  
         freeColClient.askServer().disconnect();
@@ -328,13 +320,12 @@ public final class ConnectController {
      * Reconnects to the server.
      */
     public void reconnect() {
-        final String userName = freeColClient.getMyPlayer().getName();
         final String host = freeColClient.askServer().getClient().getHost();
         final int port = freeColClient.askServer().getClient().getPort();
 
         gui.removeInGameComponents();
         logout(true);
-        login(userName, host, port);
+        login(host, port);
         freeColClient.getInGameController().nextModelMessage();
     }
 
@@ -455,14 +446,13 @@ public final class ConnectController {
                     freeColServer = new FreeColServer(saveGame,
                         (Specification)null, port, name);
                     freeColClient.setFreeColServer(freeColServer);
-                    final String userName = freeColServer.getOwner();
                     final int port = freeColServer.getPort();
                     freeColClient.setSinglePlayer(singlePlayer);
                     freeColClient.getInGameController().setGameConnected();
                     SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 ResourceManager.setScenarioMapping(saveGame.getResourceMapping());
-                                login(userName, "127.0.0.1", port);
+                                login("127.0.0.1", port);
                                 gui.closeStatusPanel();
                             }
                         });

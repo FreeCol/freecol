@@ -679,13 +679,13 @@ public abstract class ServerAPI {
     /**
      * Server query-response for logging in a player.
      *
-     * @param username The user name.
+     * @param userName The user name.
      * @param version The client version.
      * @return A <code>LoginMessage</code> on success, or null on error.
      */
-    public LoginMessage login(String username, String version) {
+    public LoginMessage login(String userName, String version) {
         Element reply = askExpecting(new TrivialMessage("login",
-                                                        "userName", username,
+                                                        "userName", userName,
                                                         "version", version),
                                      "login", null);
         return (reply == null) ? null : new LoginMessage(null, reply);

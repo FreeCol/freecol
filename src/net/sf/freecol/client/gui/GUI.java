@@ -926,8 +926,8 @@ public class GUI {
         return canvas.showSellDialog(unit, settlement, goods, gold);
     }
 
-    public void showServerListPanel(String username, List<ServerInfo> serverList) {
-        canvas.showServerListPanel(username, serverList);
+    public void showServerListPanel(List<ServerInfo> serverList) {
+        canvas.showServerListPanel(serverList);
 
     }
 
