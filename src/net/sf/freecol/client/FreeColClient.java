@@ -139,13 +139,16 @@ public final class FreeColClient {
      * @param splashFilename The name of the splash image.
      * @param showOpeningVideo Display the opening video.
      * @param fontName An optional override of the main font.
+     * @param spec If non-null, a <code>Specification</code> to use to start
+     *     a new game immediately.
      */
     public FreeColClient(final File savedGame,
                          final Dimension size,
                          final boolean sound,
                          final String splashFilename,
                          final boolean showOpeningVideo,
-                         final String fontName) {
+                         final String fontName,
+                         final Specification spec) {
         gui = new GUI(this);
         serverAPI = new UserServerAPI(gui);
 
@@ -233,15 +236,14 @@ public final class FreeColClient {
         }
 
         // Once resources are in place, get preloading started.
-        if (!headless)
-            ResourceManager.preload(windowSize);
+        if (!headless) ResourceManager.preload(windowSize);
 
         // Start the GUI.
         gui.hideSplashScreen();
         SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     gui.startGUI(windowSize, sound, showOpeningVideo,
-                                 savedGame != null);
+                                 savedGame == null && spec == null, spec);
                 }
             });
 
@@ -672,9 +674,7 @@ public final class FreeColClient {
      */
     public void askToQuit() {
         if (gui.showConfirmDialog("quitDialog.areYouSure.text",
-                                  "ok", "cancel")) {
-            quit();
-        }
+                                  "ok", "cancel")) quit();
     }
 
     /**

@@ -114,8 +114,6 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
 
     private final ButtonGroup group = new ButtonGroup();
 
-    private final ConnectController connectController;
-
     /**
      * The specification to use for the new game.
      */
@@ -145,7 +143,6 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                     Specification specification) {
         super(freeColClient, gui);
         this.specification = specification;
-        this.connectController = getFreeColClient().getConnectController();
 
         String selectTC = (specification != null) ? specification.getId()
             : FreeCol.getTC();
@@ -221,16 +218,6 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
 
         setSize(getPreferredSize());
         
-    }
-
-    /**
-     * Moved these here out of the constructor to allow
-     * warning suppression to work.
-     */
-    @SuppressWarnings("unchecked") // FIXME in Java7
-    private void setRenderers() {
-        specificationBox.setRenderer(new FreeColModFileRenderer());
-        nationalAdvantages.setRenderer(new AdvantageRenderer());
     }
 
 
@@ -319,14 +306,46 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         }
     }
 
+
     /**
-    * This function analyses an event and calls the right methods to take
-    * care of the user's requests.
-    * @param event The incoming ActionEvent.
-    */
+     * Moved these here out of the constructor to allow
+     * warning suppression to work.
+     */
+    @SuppressWarnings("unchecked") // FIXME in Java7
+    private void setRenderers() {
+        specificationBox.setRenderer(new FreeColModFileRenderer());
+        nationalAdvantages.setRenderer(new AdvantageRenderer());
+    }
+
+    private class AdvantageRenderer extends FreeColComboBoxRenderer {
+        @Override
+        public void setLabelValues(JLabel label, Object value) {
+            label.setText(Messages.message(((Advantages)value).getKey()));
+        }
+    }
+
+    private class FreeColModFileRenderer extends FreeColComboBoxRenderer {
+        @Override
+        public void setLabelValues(JLabel label, Object value) {
+            FreeColModFile mod = (FreeColModFile) value;
+            label.setText(Messages.message("mod." + mod.getId() + ".name"));
+        }
+    }
+
+
+    /**
+     * This function analyses an event and calls the right methods to take
+     * care of the user's requests.
+     *
+     * @param event The incoming <code>ActionEvent</code>.
+     */
     @Override
     public void actionPerformed(ActionEvent event) {
+        final Specification spec = getSpecification();
+        final ConnectController connectController
+            = getFreeColClient().getConnectController();
         String command = event.getActionCommand();
+        OptionGroup level;
         try {
             switch (Enum.valueOf(NewPanelAction.class, command)) {
             case OK:
@@ -334,14 +353,13 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                 FreeCol.setTC(getTC().getId());
                 FreeCol.setAdvantages(getAdvantages());
                 NewPanelAction action = Enum.valueOf(NewPanelAction.class,
-                                                     group.getSelection().getActionCommand());
-                switch(action) {
+                    group.getSelection().getActionCommand());
+                switch (action) {
                 case SINGLE:
-                    OptionGroup level = getGUI()
-                        .showDifficultyDialog(getSpecification());
+                    level = getGUI().showDifficultyDialog(spec);
                     if (level != null) {
-                        getSpecification().applyDifficultyLevel(level);
-                        connectController.startSinglePlayerGame(getSpecification());
+                        spec.applyDifficultyLevel(level);
+                        connectController.startSinglePlayerGame(spec);
                     }
                     break;
                 case JOIN:
@@ -356,19 +374,20 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                 case START:
                     try {
                         int port = Integer.valueOf(port2.getText()).intValue();
-                        level = getGUI()
-                            .showDifficultyDialog(getSpecification());
-                        getSpecification().applyDifficultyLevel(level);
-                        connectController.startMultiplayerGame(getSpecification(), publicServer.isSelected(),
-                                                               port, level);
+                        level = getGUI().showDifficultyDialog(spec);
+                        if (level != null) {
+                            spec.applyDifficultyLevel(level);
+                            connectController.startMultiplayerGame(spec,
+                                publicServer.isSelected(), port, level);
+                        }
                     } catch (NumberFormatException e) {
                         port2Label.setForeground(Color.red);
                     }
                     break;
                 case META_SERVER:
-                    List<ServerInfo> serverList = connectController.getServerList();
-                    if (serverList != null) {
-                        getGUI().showServerListPanel(serverList);
+                    List<ServerInfo> servers = connectController.getServerList();
+                    if (servers != null) {
+                        getGUI().showServerListPanel(servers);
                     }
                 }
                 break;
@@ -386,24 +405,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                 logger.warning("Invalid Action command: " + command);
             }
         } catch (Exception e) {
-            logger.warning(e.toString());
-            e.printStackTrace();
-        }
-    }
-
-
-    private class AdvantageRenderer extends FreeColComboBoxRenderer {
-        @Override
-        public void setLabelValues(JLabel label, Object value) {
-            label.setText(Messages.message(((Advantages)value).getKey()));
-        }
-    }
-
-    private class FreeColModFileRenderer extends FreeColComboBoxRenderer {
-        @Override
-        public void setLabelValues(JLabel label, Object value) {
-            FreeColModFile mod = (FreeColModFile) value;
-            label.setText(Messages.message("mod." + mod.getId() + ".name"));
+            logger.log(Level.WARNING, "Unexpected NewPanel fail", e);
         }
     }
 }

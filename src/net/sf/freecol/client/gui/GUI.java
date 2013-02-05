@@ -35,6 +35,7 @@ import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -989,11 +990,19 @@ public class GUI {
 
     /**
      * Starts the GUI by creating and displaying the GUI-objects.
+     *
+     * @param innerWindowSize The desired size of the GUI window.
+     * @param sound Enable sound if true.
+     * @param showOpeningVideo Show the opening video.
+     * @param showMain Show the main panel.
+     * @param spec If non-null, a <code>Specification</code> to use to start
+     *     a new game at once.
      */
     public void startGUI(Dimension innerWindowSize,
                          final boolean sound,
                          final boolean showOpeningVideo,
-                         final boolean loadGame) {
+                         final boolean showMain,
+                         final Specification spec) {
         final ClientOptions opts = freeColClient.getClientOptions();
         // Prepare the sound system.
         if (sound) {
@@ -1097,19 +1106,20 @@ public class GUI {
                 });
         }
 
-        // run opening video or main panel
-        if (showOpeningVideo && !loadGame) {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    canvas.showOpeningVideoPanel();
-                }
-            });
-        } else {
-            if (!loadGame) {
-                showMainPanel();
+        // Start a game or show the main panel and run opening video.
+        if (spec != null) {
+            freeColClient.getConnectController().startSinglePlayerGame(spec);
+        } else if (showMain) {
+            if (showOpeningVideo) {
+                SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            canvas.showOpeningVideoPanel();
+                        }
+                    });
             }
-            playSound("sound.intro.general");
+            showMainPanel();
         }
+        playSound("sound.intro.general");
         mapViewer.startCursorBlinking();
     }
 

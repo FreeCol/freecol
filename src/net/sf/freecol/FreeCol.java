@@ -50,6 +50,7 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.option.LanguageOption;
+import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.util.XMLStream;
 import net.sf.freecol.server.FreeColServer;
 
@@ -122,6 +123,8 @@ public final class FreeCol {
     private static String tc = null;
 
     private static int freeColTimeout = -1;
+
+    private static boolean debugStart = false;
 
 
     private FreeCol() {} // Hide constructor
@@ -244,8 +247,7 @@ public final class FreeCol {
         if (standAloneServer) {
             startServer();
         } else {
-            new FreeColClient(FreeColDirectories.getSavegameFile(), windowSize,
-                              sound, splashFilename, introVideo, fontName);
+            startClient();
         }
     }
 
@@ -409,6 +411,9 @@ public final class FreeCol {
                           .withArgName(Messages.message("cli.arg.name"))
                           .hasArg()
                           .create());
+        options.addOption(OptionBuilder.withLongOpt("debug-start")
+                          .withDescription(Messages.message("cli.debug-start"))
+                          .create());
 
         CommandLineParser parser = new PosixParser();
         boolean usageError = false;
@@ -485,6 +490,10 @@ public final class FreeCol {
             if (line.hasOption("debug-run")) {
                 FreeColDebugger.enableDebugMode(FreeColDebugger.DebugMode.MENUS);
                 FreeColDebugger.configureDebugRun(line.getOptionValue("debug-run"));
+            }
+            if (line.hasOption("debug-start")) {
+                debugStart = true;
+                FreeColDebugger.enableDebugMode(FreeColDebugger.DebugMode.MENUS);
             }
 
             if (line.hasOption("home-directory")) {
@@ -720,6 +729,15 @@ public final class FreeCol {
     }
 
     /**
+     * Gets the FreeColTcFile for the current TC.
+     *
+     * @return The <code>FreeColTcFile</code>.
+     */
+    public static FreeColTcFile getTCFile() throws IOException {
+        return new FreeColTcFile(getTC());
+    }
+
+    /**
      * Gets the default advantages type.
      *
      * @return Usually Advantages.SELECTABLE, but can be overridden at the
@@ -741,6 +759,27 @@ public final class FreeCol {
         FreeCol.advantages = advantages;
     }
 
+
+    /**
+     * Start a client.
+     */
+    private static void startClient() {
+        Specification spec = null;
+        if (debugStart) {
+            try {
+                spec = FreeCol.getTCFile().getSpecification();
+            } catch (Exception e) {
+                spec = null;
+            }
+        }
+        if (spec != null) {
+            // TODO: add option for difficulty level
+            OptionGroup og = spec.getOptionGroup("model.difficulty.medium");
+            if (og != null) spec.applyDifficultyLevel(og);
+        }
+        new FreeColClient(FreeColDirectories.getSavegameFile(), windowSize,
+                          sound, splashFilename, introVideo, fontName, spec);
+    }
 
     /**
      * Start the server.
@@ -778,11 +817,13 @@ public final class FreeCol {
                 if (xs != null) xs.close();
             }
         } else {
-            FreeColTcFile tcData = null;
-            String tc = FreeCol.getTC();
+            FreeColTcFile tcData;
             try {
-                tcData = new FreeColTcFile(tc);
+                tcData = FreeCol.getTCFile();
             } catch (IOException ioe) {
+                tcData = null;
+            }
+            if (tcData == null) {
                 fatal(Messages.message(StringTemplate.template("server.badTC")
                                                      .addName("%tc%", tc)));
             }
