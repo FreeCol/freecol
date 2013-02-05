@@ -48,7 +48,6 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions;
-import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Region;
@@ -167,7 +166,7 @@ public class FreeColTestCase extends TestCase {
     public static Game getStandardGame(String specName) {
         Specification specification = getSpecification(specName);
         game = new ServerGame(specification);
-        NationOptions nationOptions = new NationOptions(specification, Advantages.SELECTABLE);
+        NationOptions nationOptions = new NationOptions(specification);
         for (Nation nation : specification.getEuropeanNations()) {
             nationOptions.setNationState(nation, NationOptions.NationState.AVAILABLE);
         }

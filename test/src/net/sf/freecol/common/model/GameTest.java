@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.List;
 
 import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -35,21 +34,19 @@ public class GameTest extends FreeColTestCase {
     public void testGame() throws FreeColException {
 
         Game game = new ServerGame(spec());
-        game.setNationOptions(new NationOptions(spec(), Advantages.SELECTABLE));
+        game.setNationOptions(new NationOptions(spec()));
         game.setMap(getTestMap());
 
         game.addPlayer(new ServerPlayer(game, "TestPlayer", false,
                                         spec().getNation("model.nation.dutch"),
                                         null, null));
-
         // map tiles are null
-        //game.newTurn();
-
+        // game.newTurn();
     }
 
     public void testAddPlayer() {
         Game game = new ServerGame(spec());
-        NationOptions defaultOptions = new NationOptions(spec(), Advantages.SELECTABLE);
+        NationOptions defaultOptions = new NationOptions(spec());
         game.setNationOptions(defaultOptions);
 
         List<Player> players = new ArrayList<Player>();

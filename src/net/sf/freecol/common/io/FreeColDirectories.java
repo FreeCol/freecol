@@ -24,6 +24,8 @@ import java.io.InputStream;
 
 import javax.swing.filechooser.FileSystemView;
 
+import net.sf.freecol.FreeCol;
+
 
 /**
  * Simple container for the freecol file and directory structure model.
@@ -119,13 +121,6 @@ public class FreeColDirectories {
      * Can be modified in game.
      */
     private static File savegameFile = null;
-
-    /**
-     * The TotalConversion / ruleset in play.
-     *
-     * Can be overridden at the command line, or specified on the NewPanel.
-     */
-    private static String tc = "freecol";
 
 
     /**
@@ -249,7 +244,7 @@ public class FreeColDirectories {
      *
      * Insist that the base resources and i18n subdirectories are present.
      *
-     * @param dir The new value for the data directory, or null to
+     * @param path The path to the new data directory, or null to
      *     apply the default.
      * @return A (non-i18n) error message on failure, null on success.
      */
@@ -413,7 +408,7 @@ public class FreeColDirectories {
      * @return The directory to save user options in.
      */
     public static File getOptionsDirectory() {
-        return new File(getMainUserDirectory(), getTC());
+        return new File(getMainUserDirectory(), FreeCol.getTC());
     }
 
     /**
@@ -455,7 +450,7 @@ public class FreeColDirectories {
     /**
      * Gets the save game file.
      *
-     * @param The save game file.
+     * @return The save game file.
      */
     public static File getSavegameFile() {
         return savegameFile;
@@ -485,21 +480,5 @@ public class FreeColDirectories {
         setSavegameFile(file);
         setSaveDirectory(file.getParentFile());
         return true;
-    }
-
-    /**
-     * Gets the current Total-Conversion.
-     */
-    public static String getTC() {
-        return tc;
-    }
-
-    /**
-     * Sets the Total-Conversion.
-     *
-     * @param tc The name of the new total conversion.
-     */
-    public static void setTC(String tc) {
-        FreeColDirectories.tc = tc;
     }
 }

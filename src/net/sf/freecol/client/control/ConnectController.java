@@ -45,7 +45,6 @@ import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
@@ -115,13 +114,11 @@ public final class ConnectController {
      * @param publicServer Whether to make the server public.
      * @param userName The name to use when logging in.
      * @param port The port in which the server should listen for new clients.
-     * @param advantages The national <code>Advantages</code>.
      * @param level An <code>OptionGroup</code> containing difficulty options.
      */
     public void startMultiplayerGame(Specification specification,
                                      boolean publicServer,
                                      String userName, int port,
-                                     Advantages advantages,
                                      OptionGroup level) {
         freeColClient.setMapEditor(false);
 
@@ -131,7 +128,7 @@ public final class ConnectController {
 
         FreeColServer freeColServer;
         try {
-            freeColServer = new FreeColServer(publicServer, false, advantages,
+            freeColServer = new FreeColServer(publicServer, false,
                                               specification, port, null);
         } catch (NoRouteToServerException e) {
             gui.errorMessage("server.noRouteToServer");
@@ -185,10 +182,9 @@ public final class ConnectController {
      *
      * @param specification The <code>Specification</code> for the game.
      * @param userName The name to use when logging in.
-     * @param advantages The national <code>Advantages</code>.
      */
     public void startSinglePlayerGame(Specification specification,
-                                      String userName, Advantages advantages) {
+                                      String userName) {
         freeColClient.setMapEditor(false);
 
         if (freeColClient.isLoggedIn()) logout(true);
@@ -199,8 +195,8 @@ public final class ConnectController {
 
         FreeColServer freeColServer;
         try {
-            freeColServer = new FreeColServer(false, true, advantages,
-                                              specification, -1, null);
+            freeColServer = new FreeColServer(false, true, specification,
+                                              -1, null);
         } catch (NoRouteToServerException e) {
             gui.errorMessage("server.noRouteToServer");
             logger.log(Level.WARNING, "No route to server (single player!).",
