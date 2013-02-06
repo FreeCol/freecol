@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2012   The FreeCol Team
+ *  Copyright (C) 2002-2013   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -30,7 +30,7 @@ import java.io.FilenameFilter;
 public class DesktopEntry {
 
     private static final File SOURCE_DIRECTORY =
-        new File("data/strings");
+        new File("data", "strings");
 
     private static final String GENERIC_NAME =
         "freecol.desktopEntry.GenericName";
@@ -38,11 +38,11 @@ public class DesktopEntry {
         "freecol.desktopEntry.Comment";
 
     /**
-     * Command line arguments are just ignored.
+     * Pass the desktop entry file to create as first argument.
      */
     public static void main(String[] args) throws Exception {
 
-        FileWriter  result = new FileWriter(new File("dist", "freecol.desktop"));
+        FileWriter  result = new FileWriter(new File(args[0]));
         result.append("[Desktop Entry]\n");
         result.append("Version=1.0\n");
         result.append("Type=Application\n");

@@ -242,8 +242,8 @@
     </target>
 
     <target name="askReleaseVersion" unless="freecol.version">
-        <input message="Please specify the release version (default: svn-${DSTAMP}): "
-               addproperty="freecol.version" defaultvalue="svn-${DSTAMP}" />
+        <input message="Please specify the release version (default: git-${DSTAMP}): "
+               addproperty="freecol.version" defaultvalue="git-${DSTAMP}" />
     </target>
 
     <target name="prepareManual" depends="initDist,print-manual">
@@ -253,7 +253,7 @@
         </copy>
     </target>
 
-    <target name="prepareBaseFiles" depends="initDist">
+    <target name="prepareBaseFiles" depends="initDist,desktop-entry">
         <antcall target="clean"/>
         <antcall target="package"/>
         <mkdir dir="${freecol.release.dir}/base/${freecol.name}"/>
@@ -660,7 +660,7 @@
       </schemavalidate>
     </target>
 
-    <target name="print-manual"
+    <target name="print-manual" unless="manual.is.up.to.date"
             description="Creates the printable user guide.">
         <delete file="doc/FreeCol.ind" />
         <exec executable="pdflatex" dir="doc" >
@@ -672,6 +672,7 @@
         <exec executable="pdflatex" dir="doc" >
             <arg file="doc/FreeCol.tex"/>
         </exec>
+        <property name="manual.is.up.to.date" value="true" />
     </target>
 
     <target name="online-manual"
@@ -717,7 +718,7 @@
             <isset property="localeKey" />
         </condition>
         <java classname="net.sf.freecol.tools.TranslationReport" classpath="build/" >
-            <arg value="src/net/sf/freecol/client/gui/i18n/" />
+            <arg value="data/strings" />
             <arg value="${localeKey}" />
         </java>
     </target>
@@ -725,17 +726,19 @@
     <!-- Merges new translations from trunk. You can specify a
         particular language by setting the localeKey property
         ("-DlocaleKey=fi", for example), or all translations. -->
+    <!-- Now that translations are hosted at translatewiki, we no longer need this.
     <target name="merge-translations" depends="build"
             description="Merges translations from trunk.">
         <condition property="localeKey" else="">
             <isset property="localeKey" />
         </condition>
         <java classname="net.sf.freecol.tools.MergeTranslations" classpath="build/" >
-            <arg value="../../trunk/src/net/sf/freecol/client/gui/i18n/" />
-            <arg value="src/net/sf/freecol/client/gui/i18n/" />
+            <arg value="../../trunk/data/strings" />
+            <arg value="data/strings" />
             <arg value="${localeKey}" />
         </java>
     </target>
+    -->
 
     <!-- Validates a savegame files specified as property file
         ("-Dsavegame=whatever.fsg", for example).  If file is a directory,
@@ -761,9 +764,11 @@
     <!-- Creates 'freecol.desktop' file. -->
     <target name="desktop-entry" depends="build"
             description="Creates 'freecol.desktop' file.">
-        <mkdir dir="${freecol.release.dir}"/>
+        <mkdir dir="${freecol.release.dir}/base/freecol"/>
         <java classname="net.sf.freecol.tools.DesktopEntry"
-              classpath="build/" />
+              classpath="build/">
+          <arg value="${freecol.release.dir}/base/freecol/freecol.desktop" />
+        </java>
     </target>
 
     <target name="pmd">
