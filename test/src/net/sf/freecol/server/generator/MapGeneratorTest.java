@@ -31,7 +31,6 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions;
-import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Tile;
@@ -49,7 +48,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         ((FileOption) spec().getOption(MapGeneratorOptions.IMPORT_FILE)).setValue(null);
 
         Game g = new ServerGame(spec());
-        g.setNationOptions(new NationOptions(spec(), Advantages.SELECTABLE));
+        g.setNationOptions(new NationOptions(spec()));
 
         // A new game does not have a map yet
         assertEquals(null, g.getMap());
@@ -76,7 +75,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         ((FileOption) spec().getOption(MapGeneratorOptions.IMPORT_FILE)).setValue(null);
 
         Game g = new ServerGame(spec());
-        g.setNationOptions(new NationOptions(spec(), Advantages.SELECTABLE));
+        g.setNationOptions(new NationOptions(spec()));
 
         // A new game does not have a map yet
         assertEquals(null, g.getMap());
@@ -107,7 +106,7 @@ public class MapGeneratorTest extends FreeColTestCase {
 
         Game g = new ServerGame(spec());
 
-        g.setNationOptions(new NationOptions(spec(), Advantages.SELECTABLE));
+        g.setNationOptions(new NationOptions(spec()));
         // A new game does not have a map yet
         assertEquals(null, g.getMap());
 
@@ -171,7 +170,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         ((FileOption) spec().getOption(MapGeneratorOptions.IMPORT_FILE)).setValue(null);
 
         Game g = new ServerGame(spec());
-        g.setNationOptions(new NationOptions(spec(), Advantages.SELECTABLE));
+        g.setNationOptions(new NationOptions(spec()));
 
         MapGenerator gen = new SimpleMapGenerator(new Random(1), spec());
 

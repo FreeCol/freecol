@@ -45,6 +45,7 @@ import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.io.Mods;
 import net.sf.freecol.common.logging.DefaultHandler;
+import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.networking.NoRouteToServerException;
@@ -100,6 +101,9 @@ public final class FreeCol {
                            standAloneServer = false,
                            publicServer = true;
 
+    /** The type of advantages, defaults to Advantages.SELECTABLE. */
+    private static Advantages advantages = null;
+
     private static String fontName = null;
 
     private static int serverPort = -1;
@@ -111,7 +115,11 @@ public final class FreeCol {
 
     private static Dimension windowSize;
 
+    /** The TotalConversion / ruleset in play, defaults to "freecol". */
+    private static String tc = null;
+
     private static int freeColTimeout = -1;
+
 
 
     private FreeCol() {} // Hide constructor
@@ -389,6 +397,11 @@ public final class FreeCol {
                           .withArgName(Messages.message("cli.arg.clientOptions"))
                           .hasArg()
                           .create());
+        options.addOption(OptionBuilder.withLongOpt("advantages")
+                          .withDescription(Messages.message("cli.advantages"))
+                          .withArgName(Messages.message("cli.arg.advantages"))
+                          .hasArg()
+                          .create());
 
         CommandLineParser parser = new PosixParser();
         boolean usageError = false;
@@ -408,7 +421,23 @@ public final class FreeCol {
             if (line.hasOption("freecol-data")) {
                 ; // Do nothing, already handled above.
             }
-    
+
+            if (line.hasOption("advantages")) {
+                String arg = line.getOptionValue("advantages");
+                String err = "[";
+                advantages = null;
+                for (Advantages a : Advantages.values()) {
+                    String msg = Messages.message(a.getKey());
+                    if (msg.equals(arg)) {
+                        advantages = a;
+                        break;
+                    }
+                }
+                if (advantages == null) {
+                    System.err.println(Messages.message("cli.error.advantages"));
+                }
+            }
+
             if (line.hasOption("check-savegame")) {
                 String arg = line.getOptionValue("check-savegame");
                 if (!FreeColDirectories.setSavegameFile(arg)) {
@@ -519,7 +548,7 @@ public final class FreeCol {
             }
 
             if (line.hasOption("tc")) {
-                FreeColDirectories.setTC(line.getOptionValue("tc"));
+                setTC(line.getOptionValue("tc"));
             }
 
             if (line.hasOption("timeout")) {
@@ -638,6 +667,48 @@ public final class FreeCol {
             : DEFAULT_TIMEOUT;
     }
 
+    /**
+     * Gets the current Total-Conversion.
+     *
+     * @return Usually "freecol", but can be overridden at the command line.
+     */
+    public static String getTC() {
+        return (tc == null) ? "freecol" : tc;
+    }
+
+    /**
+     * Sets the Total-Conversion.
+     *
+     * Called from NewPanel when a selection is made.
+     *
+     * @param tc The name of the new total conversion.
+     */
+    public static void setTC(String tc) {
+        FreeCol.tc = tc;
+    }
+
+    /**
+     * Gets the default advantages type.
+     *
+     * @return Usually Advantages.SELECTABLE, but can be overridden at the
+     *     command line.
+     */
+    public static Advantages getAdvantages() {
+        return (advantages == null) ? Advantages.SELECTABLE
+            : advantages;
+    }
+
+    /**
+     * Sets the advantages type.
+     *
+     * Called from NewPanel when a selection is made.
+     *
+     * @param advantages The new advantages type.
+     */
+    public static void setAdvantages(Advantages advantages) {
+        FreeCol.advantages = advantages;
+    }
+
 
     /**
      * Start the server.
@@ -676,7 +747,7 @@ public final class FreeCol {
             }
         } else {
             FreeColTcFile tcData = null;
-            String tc = FreeColDirectories.getTC();
+            String tc = FreeCol.getTC();
             try {
                 tcData = new FreeColTcFile(tc);
             } catch (IOException ioe) {
@@ -685,7 +756,7 @@ public final class FreeCol {
             }
             try {
                 // TODO: command line advantages setting?
-                freeColServer = new FreeColServer(publicServer, false, null,
+                freeColServer = new FreeColServer(publicServer, false,
                                                   tcData.getSpecification(),
                                                   serverPort, serverName);
             } catch (NoRouteToServerException nrtse) {

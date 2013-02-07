@@ -68,7 +68,6 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions;
-import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
@@ -218,7 +217,6 @@ public final class FreeColServer {
      *
      * @param publicServer If true, add to the meta-server.
      * @param singlePlayer True if this is a single player game.
-     * @param advantages An optional <code>Advantages</code> setting.
      * @param specification The <code>Specification</code> to use in this game.
      * @param port The TCP port to use for the public socket.
      * @param name An optional name for the server.
@@ -227,7 +225,6 @@ public final class FreeColServer {
      *     meta-server.
      */
     public FreeColServer(boolean publicServer, boolean singlePlayer,
-                         Advantages advantages,
                          Specification specification, int port, String name)
         throws IOException, NoRouteToServerException {
         this.publicServer = publicServer;
@@ -247,7 +244,7 @@ public final class FreeColServer {
         mapGenerator = new SimpleMapGenerator(random, specification);
 
         game = new ServerGame(specification);
-        game.setNationOptions(new NationOptions(specification, advantages));
+        game.setNationOptions(new NationOptions(specification));
         // @compat 0.9.x, 0.10.x
         fixGameOptions();
         // end compatibility code

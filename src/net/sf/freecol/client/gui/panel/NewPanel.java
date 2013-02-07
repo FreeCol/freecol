@@ -89,14 +89,14 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
     private final JRadioButton start = new JRadioButton(Messages.message("startMultiplayerGame"), false);
     private final JRadioButton meta = new JRadioButton( Messages.message("getServerList")
                                                         + " (" + FreeCol.META_SERVER_ADDRESS + ")", false);
-    private final Advantages[] choices = new Advantages[] {
+    private final Advantages[] advChoices = new Advantages[] {
         Advantages.SELECTABLE,
         Advantages.FIXED,
         Advantages.NONE
     };
 
     @SuppressWarnings("unchecked") // FIXME in Java7
-    private final JComboBox nationalAdvantages = new JComboBox(choices);
+    private final JComboBox nationalAdvantages = new JComboBox(advChoices);
 
     @SuppressWarnings("unchecked") // FIXME in Java7
     private final JComboBox specificationBox = new JComboBox();
@@ -150,7 +150,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         this.connectController = getFreeColClient().getConnectController();
 
         String selectTC = (specification != null) ? specification.getId()
-            : FreeColDirectories.getTC();
+            : FreeCol.getTC();
         for (FreeColTcFile tc : Mods.getRuleSets()) {
             specificationBox.addItem(tc);
             if (selectTC.equals(tc.getId())) {
@@ -179,6 +179,12 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         add(start, "newline, span 3");
         add(advantageLabel);
         add(nationalAdvantages, "growx");
+        Advantages selectAdvantage = FreeCol.getAdvantages();
+        for (Advantages a : advChoices) {
+            if (selectAdvantage == a) {
+                nationalAdvantages.setSelectedItem(a);
+            }
+        }
 
         add(port2Label, "newline, skip");
         add(port2, "width 60:");
@@ -239,6 +245,16 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         Object o = specificationBox.getSelectedItem();
         return (o == null) ? null : (FreeColTcFile)o;
     }     
+
+    /**
+     * Gets the currently selected Advantages type from the nationalAdvantages
+     * box.
+     *
+     * @return The selected advantages type.
+     */
+    private Advantages getAdvantages() {
+        return (Advantages)nationalAdvantages.getSelectedItem();
+    }
 
     /**
      * Get the <code>Specification</code> value.
@@ -316,18 +332,17 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         try {
             switch (Enum.valueOf(NewPanelAction.class, command)) {
             case OK:
-                FreeColDirectories.setTC(getTC().getId());
+                FreeCol.setTC(getTC().getId());
+                FreeCol.setAdvantages(getAdvantages());
                 NewPanelAction action = Enum.valueOf(NewPanelAction.class,
                                                      group.getSelection().getActionCommand());
                 switch(action) {
                 case SINGLE:
                     OptionGroup level = getGUI()
                         .showDifficultyDialog(getSpecification());
-                    Advantages advantages;
                     if (level != null) {
                         getSpecification().applyDifficultyLevel(level);
-                        advantages = (Advantages) nationalAdvantages.getSelectedItem();
-                        connectController.startSinglePlayerGame(getSpecification(), name.getText(), advantages);
+                        connectController.startSinglePlayerGame(getSpecification(), name.getText());
                     }
                     break;
                 case JOIN:
@@ -345,9 +360,8 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                         level = getGUI()
                             .showDifficultyDialog(getSpecification());
                         getSpecification().applyDifficultyLevel(level);
-                        advantages = (Advantages) nationalAdvantages.getSelectedItem();
                         connectController.startMultiplayerGame(getSpecification(), publicServer.isSelected(),
-                                                               name.getText(), port, advantages, level);
+                                                               name.getText(), port, level);
                     } catch (NumberFormatException e) {
                         port2Label.setForeground(Color.red);
                     }
@@ -382,7 +396,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
     private class AdvantageRenderer extends FreeColComboBoxRenderer {
         @Override
         public void setLabelValues(JLabel label, Object value) {
-            label.setText(Messages.message("playerOptions." + value.toString()));
+            label.setText(Messages.message(((Advantages)value).getKey()));
         }
     }
 

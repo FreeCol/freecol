@@ -96,8 +96,7 @@ public final class MapEditorController {
             specification.applyDifficultyLevel("model.difficulty.medium");
             freeColClient.setMapEditor(true);
             final FreeColServer freeColServer
-                = new FreeColServer(false, false, null,
-                                    specification, 0, null);
+                = new FreeColServer(false, false, specification, 0, null);
             freeColClient.setFreeColServer(freeColServer);
             freeColClient.setGame(freeColServer.getGame());
             freeColClient.setMyPlayer(null);

@@ -34,7 +34,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.IntegerOption;
@@ -1103,7 +1102,7 @@ public class Game extends FreeColGameObject {
                 gameOptions.readFromXML(in);
             } else if (tagName.equals(NationOptions.getXMLElementTagName())) {
                 if (nationOptions == null) {
-                    nationOptions = new NationOptions(specification, Advantages.SELECTABLE);
+                    nationOptions = new NationOptions(specification);
                 }
                 nationOptions.readFromXML(in);
             } else if (tagName.equals(Player.getXMLElementTagName())) {

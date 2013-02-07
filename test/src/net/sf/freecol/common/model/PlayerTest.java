@@ -170,7 +170,7 @@ public class PlayerTest extends FreeColTestCase {
         // available
         Specification specification = getSpecification("freecol");
         Game game = new ServerGame(specification);
-        NationOptions nationOptions = new NationOptions(specification, NationOptions.Advantages.SELECTABLE);
+        NationOptions nationOptions = new NationOptions(specification);
         for (Nation nation : specification.getEuropeanNations()) {
             nationOptions.setNationState(nation, NationOptions.NationState.AVAILABLE);
         }

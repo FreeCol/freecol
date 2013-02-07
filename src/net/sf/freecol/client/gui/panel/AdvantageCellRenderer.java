@@ -33,49 +33,52 @@ import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.NationOptions.Advantages;
 
+
 /**
-* A table cell renderer that should be used to display the chosen nation in a table.
-* It is being used in the players table (StartGamePanel).
-*/
+ * A table cell renderer that should be used to display the chosen
+ * nation in a table.  It is being used in the players table
+ * (StartGamePanel).
+ */
 public final class AdvantageCellRenderer implements TableCellRenderer {
 
+    /** The national advantages type. */
     private Advantages advantages;
 
+ 
     /**
-    * The default constructor.
-    *
-    * @param advantages <code>Advantages</code> ??
-    */
+     * The default constructor.
+     *
+     * @param advantages The type of national <code>Advantages</code>.
+     */
     public AdvantageCellRenderer(Advantages advantages) {
         this.advantages = advantages;
     }
 
     /**
-    * Returns the component used to render the cell's value.
-    * @param table The table whose cell needs to be rendered.
-    * @param value The value of the cell being rendered.
-    * @param hasFocus Indicates whether or not the cell in question has focus.
-    * @param row The row index of the cell that is being rendered.
-    * @param column The column index of the cell that is being rendered.
-    * @return The component used to render the cell's value.
-    */
+     * Gets the component used to render the cell's value.
+     *
+     * @param table The table whose cell needs to be rendered.
+     * @param value The value of the cell being rendered.
+     * @param hasFocus Indicates whether or not the cell in question has focus.
+     * @param row The row index of the cell that is being rendered.
+     * @param column The column index of the cell that is being rendered.
+     * @return The component used to render the cell's value.
+     */
     public Component getTableCellRendererComponent(JTable table, Object value,
-            boolean isSelected, boolean hasFocus, int row, int column) {
-
-        Player player = (Player) table.getValueAt(row, PlayersTable.PLAYER_COLUMN);
-        NationType nationType = ((Nation) table.getValueAt(row, PlayersTable.NATION_COLUMN)).getType();
-
+                                                   boolean isSelected,
+                                                   boolean hasFocus,
+                                                   int row, int column) {
+        Player player = (Player)table.getValueAt(row, PlayersTable.PLAYER_COLUMN);
+        NationType nationType = ((Nation)table.getValueAt(row, PlayersTable.NATION_COLUMN)).getType();
         JLabel label;
-        switch(advantages) {
+        switch (advantages) {
+        case SELECTABLE:
+            return new JLabel(Messages.message((player == null)
+                    ? nationType.getNameKey()
+                    : player.getNationType().getNameKey()));
         case FIXED:
             label = new JLabel(Messages.message(nationType.getNameKey()));
             break;
-        case SELECTABLE:
-            if (player == null) {
-                return new JLabel(Messages.message(nationType.getNameKey()));
-            } else {
-                return new JLabel(Messages.message(player.getNationType().getNameKey()));
-            }
         case NONE:
         default:
             label = new JLabel(Messages.message("model.nationType.none.name"));
@@ -87,7 +90,6 @@ public final class AdvantageCellRenderer implements TableCellRenderer {
             label.setForeground(table.getForeground());
         }
         label.setBackground(table.getBackground());
-
         return label;
     }
 }

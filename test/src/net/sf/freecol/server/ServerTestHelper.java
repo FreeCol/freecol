@@ -80,7 +80,7 @@ public final class ServerTestHelper {
         stopServer(server);
         try {
             // TODO: fixme! Pass tc
-            server = new FreeColServer(publicServer, singlePlayer, null,
+            server = new FreeColServer(publicServer, singlePlayer,
                                        FreeColTestCase.spec(),  port, name);
         } catch (NoRouteToServerException e) {
             fail(e.getMessage());

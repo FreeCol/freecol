@@ -28,6 +28,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.FreeCol;
+
 
 public class NationOptions extends FreeColObject {
 
@@ -37,10 +39,17 @@ public class NationOptions extends FreeColObject {
     public static final int DEFAULT_NO_OF_EUROPEANS = 4;
 
     /**
-     * National advantages for European players only. The natives will
-     * always have national advantages.
+     * Type of national advantages for European players.
      */
-    public static enum Advantages { NONE, FIXED, SELECTABLE };
+    public static enum Advantages {
+        NONE,
+        FIXED,
+        SELECTABLE;
+
+        public String getKey() {
+            return "playerOptions." + this.toString();
+        }
+    };
 
     /**
      * Nations may be available to all players, to AI players only, or
@@ -49,7 +58,7 @@ public class NationOptions extends FreeColObject {
     public static enum NationState { AVAILABLE, AI_ONLY, NOT_AVAILABLE }
 
     /**
-     * Describe nationalAdvantages here.
+     * The type of European national advantages.
      */
     private Advantages nationalAdvantages;
 
@@ -66,13 +75,10 @@ public class NationOptions extends FreeColObject {
      * Creates a new <code>NationOptions</code> instance.
      *
      * @param specification a <code>Specification</code> value
-     * @param advantages An optional <code>Advantages</code> setting for the
-     *     nations.
      */
-    public NationOptions(Specification specification, Advantages advantages) {
+    public NationOptions(Specification specification) {
         this.specification = specification;
-        if (advantages == null) advantages = Advantages.SELECTABLE;
-        setNationalAdvantages(advantages);
+        setNationalAdvantages(FreeCol.getAdvantages());
         if (specification != null) {
             int counter = 0;
             Map<Nation, NationState> defaultNations = new HashMap<Nation, NationState>();
