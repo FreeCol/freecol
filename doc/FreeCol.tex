@@ -239,20 +239,25 @@ everything works as planned, you will only need to double click the
 icon in order to start the game. If this is not the case, then please
 read the following paragraphs.
 
+FreeCol comes with a multi-lingual desktop entry file, which is not
+installed by default, however. If you run FreeCol on Linux, you can
+copy the file ``freecol.desktop'' from the base install directory to
+the appropriate folder (e.g. ``/usr/share/applications'' or
+``~/.local/share/applications/'').
+
+
 \hypertarget{System Requirements}{\section{System Requirements}}
 
 FreeCol is written in Java. In order to run, it requires a Java
 Virtual Machine. In theory, FreeCol should run on any platform on
-which a Java Virtual Machine compatible with Sun Java 5 or higher is
+which a Java Virtual Machine compatible with Sun Java 6 or higher is
 available. In practice, however, things are less clear cut.
 
-FreeCol is known to work with \href{http://java.sun.com/}{Sun's Java 5
-  and 6}. FreeCol also works with OpenJDK, although some minor
-problems and graphics glitches may remain. FreeCol is known to run on
-recent versions of Windows, Linux, and Mac OS X. If you are using
-Linux, using Java 6 is recommended, as its font rendering is much
-better. If you are using FreeCol on a different platform, we would
-like to hear about it.
+FreeCol is known to work with \href{http://java.sun.com/}{Oracle Java
+  6}. FreeCol also works with OpenJDK, although some minor problems
+and graphics glitches may remain. FreeCol is known to run on recent
+versions of Windows, Linux, and Mac OS X. If you are using FreeCol on
+a different platform, we would like to hear about it.
 
 FreeCol requires at least 256 MB memory, although some systems slow
 down badly and require 512MB.  FreeCol works best with a screen
@@ -262,16 +267,20 @@ some panels will look a bit cramped. You can play the game with an
 even smaller screen, but we do not support that, and some things might
 not work.
 
-\hypertarget{FreeCol on OSX}{\subsection{FreeCol on OSX}}
+%% This should no longer be relevant, now that we are using 1.6:
 
-Some users report that they can not start FreeCol on their 64-bit
-Intel Macs. It seems that these Macs use a 32-bit version of Java 1.5
-by default. In order to solve this problem, you can either edit the
-file "Info.plist" within the application package to select 1.6+, or
-you can change the default Java version under
-"/Applications/Utilities/Java/Java Preferences".  Just drag "1.5
-64-bit" or "1.6 64-bit" to the top of the list and FreeCol should run
-without any changes in "Info.plist".
+%% \hypertarget{FreeCol on OSX}{\subsection{FreeCol on OSX}}
+
+%% Some users report that they can not start FreeCol on their 64-bit
+%% Intel Macs. It seems that these Macs use a 32-bit version of Java 1.5
+%% by default. In order to solve this problem, you can either edit the
+%% file "Info.plist" within the application package to select 1.6+, or
+%% you can change the default Java version under
+%% "/Applications/Utilities/Java/Java Preferences".  Just drag "1.5
+%% 64-bit" or "1.6 64-bit" to the top of the list and FreeCol should run
+%% without any changes in "Info.plist".
+
+\hypertarget{FreeCol on Windows}{\subsection{FreeCol on Windows}}
 
 FreeCol uses context menus in several places. On most platforms,
 context menus are opened with a click of the right mouse button. If
@@ -339,13 +348,13 @@ options:
 FreeCol's data files. In general, you will only need to use this if
 you have installed a modified copy of FreeCol's data files.
 \item\verb$--windowed[[=]WIDTHxHEIGHT]$ Run FreeCol in windowed mode
-instead of full screen mode and set the window width and height. You
-will need this if your window manager or Java Virtual Machine do not
-(correctly) support FreeCol's full screen mode. If you use Linux and
-Java 5, for example, you should set the window width to the width of
-your screen, but probably set the window height slightly lower than
-the height of your screen, in order to leave space for the menu bar,
-dock etc.
+  instead of full screen mode and set the window width and height. You
+  will need this if your window manager or Java Virtual Machine do not
+  (correctly) support FreeCol's full screen mode. If you use Linux,
+  for example, you should set the window width to the width of your
+  screen, but probably set the window height slightly lower than the
+  height of your screen, in order to leave space for the menu bar,
+  dock etc.
 \item\verb$--load-savegame SAVEGAME_FILE$ Load the given
 savegame. This is particularly useful in combination with the client
 option \hyperlink{show savegame settings}{show savegame settings}.
@@ -1604,9 +1613,9 @@ identify the font. For this reason, you must obey the usual quoting
 rules. In particular, you must use the string {\tt \%20} instead of a
 space character in the font name.
 
-If you are using Java 1.6 or higher, you can also use fonts that are
-not known to the JVM. You can copy it to the fonts directory mentioned
-above and add it to the configuration file by adding a line like this:
+You can also use a font that is not known to the JVM. Just copy it to
+the fonts directory mentioned above and add it to the configuration
+file by adding a line like this:
 
 \begin{quote}
 {\tt MyFavouriteFont=resources/fonts/Chancery.ttf}
