@@ -405,6 +405,25 @@ public class TileImprovement extends TileItem implements Named {
     }
 
     /**
+     * Work out what the river style at this tile should be by checking
+     * its connectivity.
+     *
+     * @return A suitable TileImprovementStyle.
+     */
+    public TileImprovementStyle getRiverStyleFromMap() {
+        if (!isRiver()) return null;
+        final Tile tile = getTile();
+        final Region region = tile.getRegion();
+        String s = new String();
+        for (Direction d : Direction.longSides) {
+            Tile t = tile.getNeighbourOrNull(d);
+            s = s.concat((t != null && t.hasRiver()
+                    && t.getRegion() == region) ? "1" : "0");
+        }
+        return TileImprovementStyle.getInstance(s);
+    }
+
+    /**
      * Work out what the road style at this tile should be by checking
      * neighbouring tiles for roads.
      *
@@ -542,6 +561,25 @@ public class TileImprovement extends TileItem implements Named {
             style = TileImprovementStyle.getInstance(str);
             if (style == null) {
                 logger.warning("Ignoring bogus TileImprovementStyle: " + str);
+            } else {
+                int slen = style.toString().length();
+                if (isRiver()) {
+                    if (slen != Direction.longSides.length) {
+                        TileImprovementStyle old = style;
+                        style = getRiverStyleFromMap();
+                        logger.warning("At " + tile
+                            + " bad river style (" + old.toString()
+                            + ") replaced with " + style.toString());
+                    }
+                } else if (isRoad()) {
+                    if (slen != Direction.values().length) {
+                        TileImprovementStyle old = style;
+                        style = getRoadStyleFromMap();
+                        logger.warning("At " + tile
+                            + " bad road style (" + old.toString()
+                            + ") replaced with " + style.toString());
+                    }
+                }
             }
         }
         updateConnections();
