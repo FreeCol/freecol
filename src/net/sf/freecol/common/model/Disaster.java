@@ -26,6 +26,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.common.util.RandomChoice;
 
+
 /**
  * This class describes disasters that can happen to a Colony, such as
  * flooding, disease or Indian raids.
@@ -41,7 +42,7 @@ public class Disaster extends FreeColGameObjectType {
     public static enum Effects { ONE, SEVERAL, ALL };
 
     /**
-     * Whether this disaster is natural. Defaults to
+     * Whether this disaster is natural.  Defaults to
      * <code>false</code>.
      */
     private boolean natural = false;
@@ -53,36 +54,33 @@ public class Disaster extends FreeColGameObjectType {
     private Effects numberOfEffects = Effects.ONE;
 
     /**
-     * Describe effects here.
+     * The effects of this disaster.
      */
-    private List<RandomChoice<Effect>> effects;
+    private List<RandomChoice<Effect>> effects = null;
 
 
 
+    /**
+     * Create a new disaster.
+     *
+     * @param id The object identifier.
+     * @param specification The enclosing <code>Specification</code>.
+     */
     public Disaster(String id, Specification specification) {
         super(id, specification);
     }
 
     /**
-     * Get the <code>Natural</code> value.
+     * Is this a natural disaster?
      *
-     * @return a <code>boolean</code> value
+     * @return True if this is a natural disaster.
      */
     public final boolean isNatural() {
         return natural;
     }
 
     /**
-     * Set the <code>Natural</code> value.
-     *
-     * @param newNatural The new Natural value.
-     */
-    public final void setNatural(final boolean newNatural) {
-        this.natural = newNatural;
-    }
-
-    /**
-     * Get the <code>NumberOfEffects</code> value.
+     * Get the number of effects.
      *
      * @return an <code>Effects</code> value
      */
@@ -91,101 +89,47 @@ public class Disaster extends FreeColGameObjectType {
     }
 
     /**
-     * Set the <code>NumberOfEffects</code> value.
+     * Get the random choice list of effects.
      *
-     * @param newNumberOfEffects The new NumberOfEffects value.
-     */
-    public final void setNumberOfEffects(final Effects newNumberOfEffects) {
-        this.numberOfEffects = newNumberOfEffects;
-    }
-
-    /**
-     * Get the <code>Effects</code> value.
-     *
-     * @return a <code>List<RandomChoice<Effect>></code> value
+     * @return A list of <code>RandomChoice\<Effect\></code>s.
      */
     public final List<RandomChoice<Effect>> getEffects() {
         return effects;
     }
 
-    /**
-     * Set the <code>Effects</code> value.
-     *
-     * @param newEffects The new Effects value.
-     */
-    public final void setEffects(final List<RandomChoice<Effect>> newEffects) {
-        this.effects = newEffects;
-    }
 
+    // Serialization
 
-    @Override
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
-        super.readAttributes(in);
-        String extendString = in.getAttributeValue(null, EXTENDS_TAG);
-        Disaster parent = (extendString == null) ? this :
-            getSpecification().getDisaster(extendString);
-
-        natural = getAttribute(in, "natural", parent.natural);
-        String effectString = in.getAttributeValue(null, "effects");
-        numberOfEffects = (effectString == null)
-            ? parent.numberOfEffects
-            : Effects.valueOf(effectString);
-
-        effects = new ArrayList<RandomChoice<Effect>>();
-        if (parent != this) {
-            for (RandomChoice<Effect> choice : parent.effects) {
-                Effect effect = new Effect(choice.getObject());
-                effect.getFeatureContainer().replaceSource(parent, this);
-                effects.add(new RandomChoice<Effect>(effect, effect.getProbability()));
-            }
-        }
-
-    }
-
-    @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        String nodeName = in.getLocalName();
-        if ("effect".equals(nodeName)) {
-            Effect effect = new Effect(in, getSpecification());
-            effect.getFeatureContainer().replaceSource(null, this);
-            effects.add(new RandomChoice<Effect>(effect, effect.getProbability()));
-        } else {
-            super.readChild(in);
-        }
-    }
+    private static final String EFFECT_TAG = "effect";
+    private static final String EFFECTS_TAG = "effects";
+    private static final String NATURAL_TAG = "natural";
 
 
     /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * {@inheritDoc}
      */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         super.toXML(out, getXMLElementTagName());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
-        out.writeAttribute("natural", Boolean.toString(natural));
-        out.writeAttribute("effects", numberOfEffects.toString());
+
+        writeAttribute(out, NATURAL_TAG, natural);
+
+        writeAttribute(out, EFFECTS_TAG, numberOfEffects.toString());
     }
 
     /**
-     * Write the children of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *     to the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
         super.writeChildren(out);
 
         for (RandomChoice<Effect> choice : effects) {
@@ -194,14 +138,75 @@ public class Disaster extends FreeColGameObjectType {
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
-     *
-     * @return "disaster".
+     * {@inheritDoc}
      */
-    public static String getXMLElementTagName() {
-        return "disaster";
+    @Override
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        final Specification spec = getSpecification();
+
+        super.readAttributes(in);
+
+        Disaster parent = spec.getType(in, EXTENDS_TAG, Disaster.class, this);
+
+        natural = getAttribute(in, NATURAL_TAG, parent.natural);
+
+        String str = getAttribute(in, EFFECTS_TAG, (String)null);
+        numberOfEffects = (str == null) ? parent.numberOfEffects
+            : Effects.valueOf(str);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        if (readShouldClearContainers(in)) {
+            effects = null;
+        }
+
+        final Specification spec = getSpecification();
+
+        Disaster parent = spec.getType(in, EXTENDS_TAG, Disaster.class, this);
+
+        if (parent != this && !parent.effects.isEmpty()) {
+            if (effects == null) {
+                effects = new ArrayList<RandomChoice<Effect>>();
+            }
+            for (RandomChoice<Effect> choice : parent.effects) {
+                Effect effect = new Effect(choice.getObject());
+                effect.getFeatureContainer().replaceSource(parent, this);
+                effects.add(new RandomChoice<Effect>(effect, effect.getProbability()));
+            }
+        }
+
+        super.readChildren(in);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+        final Specification spec = getSpecification();
+        final String tag = in.getLocalName();
+
+        if (EFFECT_TAG.equals(tag)) {
+            if (effects == null) {
+                effects = new ArrayList<RandomChoice<Effect>>();
+            }
+            Effect effect = new Effect(in, spec);
+            effect.getFeatureContainer().replaceSource(null, this);
+            effects.add(new RandomChoice<Effect>(effect, effect.getProbability()));
+
+        } else {
+            super.readChild(in);
+        }
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
     public String toString() {
         String result = getId();
         for (RandomChoice<Effect> choice : effects) {
@@ -210,6 +215,12 @@ public class Disaster extends FreeColGameObjectType {
         return result;
     }
 
+    /**
+     * Gets the tag name of the root element representing this object.
+     *
+     * @return "disaster".
+     */
+    public static String getXMLElementTagName() {
+        return "disaster";
+    }
 }
-
-
