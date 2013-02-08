@@ -322,6 +322,21 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                 if (sale != null) {
                     sales.add(Messages.message(goodsType.getNameKey())
                               + " " + sale);
+                    continue;
+                }
+                if (loc instanceof IndianSettlement) {
+                    IndianSettlement indianSettlement = (IndianSettlement) loc;
+                    GoodsType[] wanted = indianSettlement.getWantedGoods();
+                    if (wanted.length > 0 && goodsType == wanted[0]) {
+                        sales.add(Messages.message(goodsType.getNameKey())
+                            + "***");
+                    } else if (wanted.length > 1 && goodsType == wanted[1]) {
+                        sales.add(Messages.message(goodsType.getNameKey())
+                            + "**");
+                    } else if (wanted.length > 2 && goodsType == wanted[2]) {
+                        sales.add(Messages.message(goodsType.getNameKey())
+                            + "*");
+                    }
                 }
             }
             if (!sales.isEmpty()) {
