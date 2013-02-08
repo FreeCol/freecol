@@ -13,7 +13,7 @@
               commandLine="--splash"
               workingDirectory="$INSTALL_PATH"
               categories="Application;Game;StrategyGame"
-              description="FreeCol"
+              description="A turn-based strategy game based on 'Sid Meier's Colonization'."
               iconFile="$INSTALL_PATH/freecol.xpm"
               iconIndex="0"
               initialState="normal"
