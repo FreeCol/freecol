@@ -67,6 +67,7 @@ import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
@@ -156,12 +157,20 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
 
         MouseListener mouseListener = new MouseAdapter() {
                 public void mouseClicked(MouseEvent e) {
-                    if (e.getClickCount() == 2) {
-                        Destination d = (Destination) destinationList.getSelectedValue();
-                        if (d != null) {
-                            setResponse((Location) d.location);
-                        }
+                    Destination d;
+                    switch (e.getClickCount()) {
+                    case 2:
+                        d = (Destination)destinationList.getSelectedValue();
+                        if (d != null) setResponse((Location)d.location);
                         getGUI().removeFromCanvas(SelectDestinationDialog.this);
+                        break;
+                    case 1:
+                        d = (Destination)destinationList.getSelectedValue();
+                        Location loc = (d == null) ? null
+                            : (Location)d.location;
+                        Tile tile = (loc == null) ? null : loc.getTile();
+                        if (tile != null) getGUI().setFocusImmediately(tile);
+                        break;
                     }
                 }
             };
