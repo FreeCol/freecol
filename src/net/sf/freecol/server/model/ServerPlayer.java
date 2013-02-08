@@ -42,6 +42,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
 import net.sf.freecol.common.model.Disaster;
+import net.sf.freecol.common.model.Disaster.Effects;
 import net.sf.freecol.common.model.Effect;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;

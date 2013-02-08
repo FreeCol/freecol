@@ -20,10 +20,13 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
 import net.sf.freecol.common.util.RandomChoice;
 
 
@@ -39,23 +42,16 @@ public class Disaster extends FreeColGameObjectType {
      */
     public static final String BANKRUPTCY = "model.disaster.bankruptcy";
 
+    /** Whether to apply one, many or all applicable disasters. */
     public static enum Effects { ONE, SEVERAL, ALL };
 
-    /**
-     * Whether this disaster is natural.  Defaults to
-     * <code>false</code>.
-     */
+    /** Whether this disaster is natural.  Defaults to false. */
     private boolean natural = false;
 
-    /**
-     * The number of effects of this disaster. Defaults to
-     * <code>ONE</code>.
-     */
+    /** The number of effects of this disaster. Defaults to <code>ONE</code>. */
     private Effects numberOfEffects = Effects.ONE;
 
-    /**
-     * The effects of this disaster.
-     */
+    /** The effects of this disaster. */
     private List<RandomChoice<Effect>> effects = null;
 
 
@@ -70,6 +66,7 @@ public class Disaster extends FreeColGameObjectType {
         super(id, specification);
     }
 
+
     /**
      * Is this a natural disaster?
      *
@@ -82,7 +79,7 @@ public class Disaster extends FreeColGameObjectType {
     /**
      * Get the number of effects.
      *
-     * @return an <code>Effects</code> value
+     * @return The <code>Effects</code> to apply.
      */
     public final Effects getNumberOfEffects() {
         return numberOfEffects;
@@ -91,9 +88,10 @@ public class Disaster extends FreeColGameObjectType {
     /**
      * Get the random choice list of effects.
      *
-     * @return A list of <code>RandomChoice\<Effect\></code>s.
+     * @return A list of random <code>Effect</code> choices.
      */
     public final List<RandomChoice<Effect>> getEffects() {
+        if (effects == null) return Collections.emptyList();
         return effects;
     }
 
@@ -132,7 +130,7 @@ public class Disaster extends FreeColGameObjectType {
     protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
         super.writeChildren(out);
 
-        for (RandomChoice<Effect> choice : effects) {
+        for (RandomChoice<Effect> choice : getEffects()) {
             choice.getObject().toXMLImpl(out);
         }
     }
@@ -168,14 +166,15 @@ public class Disaster extends FreeColGameObjectType {
 
         Disaster parent = spec.getType(in, EXTENDS_TAG, Disaster.class, this);
 
-        if (parent != this && !parent.effects.isEmpty()) {
+        if (parent != this && !parent.getEffects().isEmpty()) {
             if (effects == null) {
                 effects = new ArrayList<RandomChoice<Effect>>();
             }
-            for (RandomChoice<Effect> choice : parent.effects) {
+            for (RandomChoice<Effect> choice : parent.getEffects()) {
                 Effect effect = new Effect(choice.getObject());
                 effect.getFeatureContainer().replaceSource(parent, this);
-                effects.add(new RandomChoice<Effect>(effect, effect.getProbability()));
+                effects.add(new RandomChoice<Effect>(effect,
+                                                     effect.getProbability()));
             }
         }
 
@@ -191,12 +190,15 @@ public class Disaster extends FreeColGameObjectType {
         final String tag = in.getLocalName();
 
         if (EFFECT_TAG.equals(tag)) {
-            if (effects == null) {
-                effects = new ArrayList<RandomChoice<Effect>>();
-            }
             Effect effect = new Effect(in, spec);
-            effect.getFeatureContainer().replaceSource(null, this);
-            effects.add(new RandomChoice<Effect>(effect, effect.getProbability()));
+            if (effect != null) {
+                effect.getFeatureContainer().replaceSource(null, this);
+                if (effects == null) {
+                    effects = new ArrayList<RandomChoice<Effect>>();
+                }
+                effects.add(new RandomChoice<Effect>(effect,
+                                                     effect.getProbability()));
+            }
 
         } else {
             super.readChild(in);
@@ -207,9 +209,10 @@ public class Disaster extends FreeColGameObjectType {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String toString() {
         String result = getId();
-        for (RandomChoice<Effect> choice : effects) {
+        for (RandomChoice<Effect> choice : getEffects()) {
             result += " " + choice.getObject();
         }
         return result;
