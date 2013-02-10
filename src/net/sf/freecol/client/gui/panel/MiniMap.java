@@ -242,7 +242,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
 
         if (map.getHeight() <= ySize) {
             firstRow = 0;
-            adjustY = ((ySize - map.getHeight()) * tileSize)/8;
+            adjustY = ((ySize - map.getHeight()) * tileSize)/MIN_TILE_SIZE;
             height = map.getHeight() * (tileSize/4);
         } else {
             adjustY = 0;
@@ -368,8 +368,17 @@ public final class MiniMap extends JPanel implements MouseInputListener {
 
 
     private void focus(int x, int y) {
-        int tileX = ((x - adjustX) / tileSize) + firstColumn;
-        int tileY = ((y - adjustY) / tileSize * 4) + firstRow;
+        int tileX, tileY;
+
+        // When focusing out on the minimap, the last available focus out takes a larger jump than previous ones.
+        // This if statement adjusts for the last larger jump in focus out.
+        if (adjustX > 0 && adjustY > 0) {
+            tileX = ((x - adjustX) / tileSize) + firstColumn + adjustX / MIN_TILE_SIZE;
+            tileY = ((y - adjustY) / tileSize * MIN_TILE_SIZE) + firstRow + adjustY;
+        } else {
+            tileX = ((x - adjustX) / tileSize) + firstColumn;
+            tileY = ((y - adjustY) / tileSize * 4) + firstRow ;
+        }
 
         gui.setFocus(freeColClient.getGame().getMap().getTile(tileX,tileY));
     }
