@@ -162,10 +162,14 @@
 
     <target name="manifest" depends="git-revision,svnproperties"
             description="Creates the Manifest file.">
+      <manifestclasspath property="jar.classpath"
+                         jarfile="Freecol.jar">
+        <classpath refid="libraries.classpath" />
+      </manifestclasspath>
       <manifest file="${basedir}/src/MANIFEST.MF">
         <attribute name="Created-By" value="FreeCol Team"/>
         <attribute name="Main-Class" value="net.sf.freecol.FreeCol"/>
-        <attribute name="Class-Path" value="jars/jogg-0.0.7.jar jars/jorbis-0.0.15.jar ${miglayout.jar} ${cli.jar} ${cortado.jar}"/>
+        <attribute name="Class-Path" value="${jar.classpath}"/>
         <attribute name="Product-Name" value="FreeCol"/>
         <attribute name="Package-Title" value="FreeCol"/>
         <attribute name="Package-Version" value="${FreeCol.Revision}"/>
@@ -503,11 +507,12 @@
     <!-- Cleans the directories by removing auto-generated files. -->
     <target name="clean" depends="init" description="Cleans the directories by removing auto-generated files.">
         <delete quiet="true" includeEmptyDirs="true">
-            <fileset dir="${freecol.build.dir}" includes="net/**" />
-            <fileset dir="${freecol.build.dir}" includes="timestamp.inf" />
-        	<fileset dir="${freecol.build.dir}" includes="report/**" />
-        	<fileset dir="${freecol.build.dir}" includes="TEST-net.sf.freecol.*" />
-            <fileset dir="${freecol.build.dir}" includes="dependencies.txt" />
+          <fileset dir="${freecol.build.dir}" includes="net/**" />
+          <fileset dir="${freecol.build.dir}" includes="timestamp.inf" />
+          <fileset dir="${freecol.build.dir}" includes="report/**" />
+          <fileset dir="${freecol.build.dir}" includes="TEST-net.sf.freecol.*" />
+          <fileset dir="${freecol.build.dir}" includes="dependencies.txt" />
+          <fileset dir="${freecol.doc.dir}" excludes="*.tex images/*" />
         </delete>
     	<delete quiet="true" file="${freecol.jar.file}"/>
     	<delete quiet="true" file="TESTS-TestSuites.xml"/>
@@ -660,7 +665,7 @@
       </schemavalidate>
     </target>
 
-    <target name="print-manual" unless="manual.is.up.to.date"
+    <target name="print-manual" unless="print.manual.is.up.to.date"
             description="Creates the printable user guide.">
         <delete file="doc/FreeCol.ind" />
         <exec executable="pdflatex" dir="doc" >
@@ -672,10 +677,10 @@
         <exec executable="pdflatex" dir="doc" >
             <arg file="doc/FreeCol.tex"/>
         </exec>
-        <property name="manual.is.up.to.date" value="true" />
+        <property name="print.manual.is.up.to.date" value="true" />
     </target>
 
-    <target name="online-manual"
+    <target name="online-manual" unless="online.manual.is.up.to.date"
             description="Creates the online user guide.">
         <delete file="doc/FreeCol.ind" />
         <exec executable="htlatex" dir="doc" >
@@ -690,6 +695,7 @@
         <exec executable="htlatex" dir="doc" >
             <arg file="doc/FreeCol.tex"/>
         </exec>
+        <property name="online.manual.is.up.to.date" value="true" />
     </target>
 
     <target name="manual" depends="print-manual,online-manual"
