@@ -8,7 +8,4 @@ FreeCol.log
 FreeCol.jar
 src/MANIFEST.MF
 test/data
-build/TEST-net.sf.freecol.AllTests.txt
-build/dependencies.txt
-build/net/
-build/svn.properties
+build/

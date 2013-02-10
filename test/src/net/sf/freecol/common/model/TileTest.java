@@ -287,11 +287,12 @@ public class TileTest extends FreeColTestCase {
     public void testPotential() {
         Game game = getStandardGame();
         Tile tile = new Tile(game, mountains, 0, 0);
-        assertEquals(0,tile.potential(food, null));
-        assertEquals(1,tile.potential(silver, null));
+        assertEquals(0, tile.potential(food, null));
+        assertEquals(1, tile.getType().getProductionOf(silver, null));
+        assertEquals(1, tile.potential(silver, null));
         tile.addResource(new Resource(game, tile, silverResource));
-        assertEquals(0,tile.potential(food, null));
-        assertEquals(3,tile.potential(silver, null));
+        assertEquals(0, tile.potential(food, null));
+        assertEquals(3, tile.potential(silver, null));
     }
 
     public void testMaximumPotential() {

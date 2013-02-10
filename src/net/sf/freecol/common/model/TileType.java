@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -67,38 +68,21 @@ public final class TileType extends FreeColGameObjectType {
     private boolean connected;
 
     /**
-     * The primary goods produced by this tile type. In the original
-     * game, this is always food or null (in the case of the arctic).
-     */
-    private AbstractGoods primaryGoods = null;
-
-    /**
-     * The secondary goods produced by this tile type. In the original
-     * game, this is never food, but may be null (in the case of the
-     * arctic).
-     */
-    private AbstractGoods secondaryGoods = null;
-
-    /**
      * The disasters that may strike this type of tile.
      */
     private List<RandomChoice<Disaster>> disasters
         = new ArrayList<RandomChoice<Disaster>>();
 
     /**
-     * A list of AbstractGoods produced by this TileType when it is
-     * not the colony center tile.
+     * The possible production types of this tile type. This includes
+     * the production types available if a tile of this type is a
+     * colony center tile.
      */
-    private List<AbstractGoods> production = new ArrayList<AbstractGoods>();
+    private final List<ProductionType> productionTypes
+        = new ArrayList<ProductionType>();
 
-    private Map<String, AbstractGoods> primaryGoodsMap =
-        new HashMap<String, AbstractGoods>();
-
-    private Map<String, AbstractGoods> secondaryGoodsMap =
-        new HashMap<String, AbstractGoods>();
-
-    private Map<String, Map<GoodsType, AbstractGoods>> productionMap =
-        new HashMap<String, Map<GoodsType, AbstractGoods>>();
+    // TODO: make this hack go away!
+    private String productionLevel = null;
 
 
     // ------------------------------------------------------------ constructor
@@ -224,26 +208,46 @@ public final class TileType extends FreeColGameObjectType {
     }
 
     /**
+     * Returns the production types available for the given combination
+     * of colony center tile and production level. If the production
+     * level is null, all production levels will be returned.
+     *
+     * @param center whether the tile is a colony center tile
+     * @param level the production level
+     * @return a <code>List<ProductionType></code> value
+     */
+    public List<ProductionType> getProductionTypes(boolean center, String level) {
+        List<ProductionType> result = new ArrayList<ProductionType>();
+        for (ProductionType productionType : productionTypes) {
+            if (productionType.isColonyCenterTile() == center
+                && productionType.appliesTo(level)) {
+                result.add(productionType);
+            }
+        }
+        return result;
+    }
+
+    public List<ProductionType> getProductionTypes() {
+        return productionTypes;
+    }
+
+    /**
      * Get the <code>PrimaryGoods</code> value.
      *
      * @return an <code>AbstractGoods</code> value
      */
     public AbstractGoods getPrimaryGoods() {
-        return primaryGoods;
-    }
-
-    /**
-     * Get the <code>PrimaryGoods</code> value at the tileProduction level
-     * with the ID given.
-     *
-     * @return an <code>AbstractGoods</code> value
-     */
-    public AbstractGoods getPrimaryGoods(String tileProduction) {
-        AbstractGoods result = primaryGoodsMap.get(tileProduction);
-        if (result == null) {
-            result = primaryGoodsMap.get(null);
+        List<ProductionType> production = getProductionTypes(true, productionLevel);
+        if (production == null || production.isEmpty()) {
+            return null;
+        } else {
+            List<AbstractGoods> outputs = production.get(0).getOutputs();
+            if (outputs == null || outputs.isEmpty()) {
+                return null;
+            } else {
+                return outputs.get(0);
+            }
         }
-        return result;
     }
 
     /**
@@ -254,16 +258,8 @@ public final class TileType extends FreeColGameObjectType {
      * @return a <code>boolean</code> value
      */
     public boolean isPrimaryGoodsType(GoodsType type) {
+        AbstractGoods primaryGoods = getPrimaryGoods();
         return (primaryGoods != null && primaryGoods.getType() == type);
-    }
-
-    /**
-     * Set the <code>PrimaryGoods</code> value.
-     *
-     * @param newPrimaryGoods The new PrimaryGoods value.
-     */
-    public void setPrimaryGoods(final AbstractGoods newPrimaryGoods) {
-        this.primaryGoods = newPrimaryGoods;
     }
 
     /**
@@ -272,30 +268,17 @@ public final class TileType extends FreeColGameObjectType {
      * @return an <code>AbstractGoods</code> value
      */
     public AbstractGoods getSecondaryGoods() {
-        return secondaryGoods;
-    }
-
-    /**
-     * Get the <code>SecondaryGoods</code> value at the tileProduction level
-     * with the ID given.
-     *
-     * @return an <code>AbstractGoods</code> value
-     */
-    public AbstractGoods getSecondaryGoods(String tileProduction) {
-        AbstractGoods result = secondaryGoodsMap.get(tileProduction);
-        if (result == null) {
-            result = secondaryGoodsMap.get(null);
+        List<ProductionType> production = getProductionTypes(true, productionLevel);
+        if (production == null || production.isEmpty()) {
+            return null;
+        } else {
+            List<AbstractGoods> outputs = production.get(0).getOutputs();
+            if (outputs == null || outputs.size() < 2) {
+                return null;
+            } else {
+                return outputs.get(1);
+            }
         }
-        return result;
-    }
-
-    /**
-     * Set the <code>SecondaryGoods</code> value.
-     *
-     * @param newSecondaryGoods The new SecondaryGoods value.
-     */
-    public void setSecondaryGoods(final AbstractGoods newSecondaryGoods) {
-        this.secondaryGoods = newSecondaryGoods;
     }
 
     /**
@@ -306,8 +289,10 @@ public final class TileType extends FreeColGameObjectType {
      * @return a <code>boolean</code> value
      */
     public boolean isSecondaryGoodsType(GoodsType type) {
+        AbstractGoods secondaryGoods = getSecondaryGoods();
         return (secondaryGoods != null && secondaryGoods.getType() == type);
     }
+
 
     /**
      * Returns a list of all types of AbstractGoods produced by this
@@ -316,28 +301,16 @@ public final class TileType extends FreeColGameObjectType {
      * @return a <code>List<AbstractGoods></code> value
      */
     public List<AbstractGoods> getProduction() {
+        List<AbstractGoods> production = new ArrayList<AbstractGoods>();
+        for (ProductionType productionType : getProductionTypes(false, productionLevel)) {
+            List<AbstractGoods> outputs = productionType.getOutputs();
+            if (!(outputs == null || outputs.isEmpty())) {
+                production.addAll(outputs);
+            }
+        }
         return production;
     }
 
-    /**
-     * Returns a list of all types of AbstractGoods produced by this
-     * TileType when it is not the colony center tile.
-     *
-     * @param tileProduction
-     * @return a <code>List<AbstractGoods></code> value
-     */
-    public List<AbstractGoods> getProduction(String tileProduction) {
-        Map<GoodsType, AbstractGoods> result = new HashMap<GoodsType, AbstractGoods>();
-        Map<GoodsType, AbstractGoods> defaultMap = productionMap.get(null);
-        Map<GoodsType, AbstractGoods> difficultyMap = productionMap.get(tileProduction);
-        if (defaultMap != null) {
-            result.putAll(defaultMap);
-        }
-        if (difficultyMap != null) {
-            result.putAll(difficultyMap);
-        }
-        return new ArrayList<AbstractGoods>(result.values());
-    }
 
     public List<RandomChoice<ResourceType>> getWeightedResources() {
         return resourceType;
@@ -400,25 +373,28 @@ public final class TileType extends FreeColGameObjectType {
      */
     @Override
     public void applyDifficultyLevel(OptionGroup difficultyLevel) {
-        String tileProduction = ((StringOption) difficultyLevel.getOption("model.option.tileProduction"))
+        productionLevel = ((StringOption) difficultyLevel.getOption("model.option.tileProduction"))
             .getValue();
-        primaryGoods = getPrimaryGoods(tileProduction);
-        secondaryGoods = getSecondaryGoods(tileProduction);
-        production = getProduction(tileProduction);
         // remove old modifiers
         for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
             removeModifiers(goodsType.getId());
         }
         // add new modifiers
-        for (AbstractGoods goods : production) {
-            addModifier(new Modifier(goods.getType().getId(), this,
-                                     goods.getAmount(),
-                                     Modifier.Type.ADDITIVE));
+        for (ProductionType productionType : productionTypes) {
+            if (productionType.appliesTo(productionLevel)) {
+                List<AbstractGoods> outputs = productionType.getOutputs();
+                if (!(outputs == null || outputs.isEmpty())) {
+                    for (AbstractGoods goods : outputs) {
+                        addModifier(new Modifier(goods.getType().getId(), this,
+                                                 goods.getAmount(),
+                                                 Modifier.Type.ADDITIVE));
+                    }
+                }
+            }
         }
     }
 
-
-    /**
+   /**
      * Makes an XML-representation of this object.
      *
      * @param out The output stream.
@@ -448,6 +424,7 @@ public final class TileType extends FreeColGameObjectType {
         out.writeAttribute("is-elevation", Boolean.toString(elevation));
         out.writeAttribute("is-connected", Boolean.toString(connected));
         out.writeAttribute("can-settle", Boolean.toString(canSettle));
+        out.writeAttribute("productionLevel", productionLevel);
     }
 
     /**
@@ -471,44 +448,8 @@ public final class TileType extends FreeColGameObjectType {
         out.writeAttribute("altitudeMax", Integer.toString(altitude[1]));
         out.writeEndElement();
 
-        for (Map.Entry<String, AbstractGoods> entry
-                 : primaryGoodsMap.entrySet()) {
-            out.writeStartElement("primary-production");
-            out.writeAttribute("goods-type",
-                entry.getValue().getType().getId());
-            out.writeAttribute(VALUE_TAG,
-                Integer.toString(entry.getValue().getAmount()));
-            if (entry.getKey() != null) {
-                out.writeAttribute("tile-production", entry.getKey());
-            }
-            out.writeEndElement();
-        }
-
-        for (Map.Entry<String, AbstractGoods> entry
-                 : secondaryGoodsMap.entrySet()) {
-            out.writeStartElement("secondary-production");
-            out.writeAttribute("goods-type",
-                entry.getValue().getType().getId());
-            out.writeAttribute(VALUE_TAG,
-                Integer.toString(entry.getValue().getAmount()));
-            if (entry.getKey() != null) {
-                out.writeAttribute("tile-production", entry.getKey());
-            }
-            out.writeEndElement();
-        }
-
-        for (Map.Entry<String, Map<GoodsType, AbstractGoods>> entry
-                 : productionMap.entrySet()) {
-            for (AbstractGoods goods : entry.getValue().values()) {
-                out.writeStartElement("production");
-                out.writeAttribute("goods-type", goods.getType().getId());
-                out.writeAttribute(VALUE_TAG,
-                    Integer.toString(goods.getAmount()));
-                if (entry.getKey() != null) {
-                    out.writeAttribute("tile-production", entry.getKey());
-                }
-                out.writeEndElement();
-            }
+        for (ProductionType productionType : productionTypes) {
+            productionType.toXML(out);
         }
 
         for (RandomChoice<ResourceType> choice : resourceType) {
@@ -549,6 +490,7 @@ public final class TileType extends FreeColGameObjectType {
         elevation = getAttribute(in, "is-elevation", false);
         canSettle = getAttribute(in, "can-settle", !water);
         connected = getAttribute(in, "is-connected", false);
+        productionLevel = in.getAttributeValue(null, "productionLevel");
     }
 
     /**
@@ -569,25 +511,36 @@ public final class TileType extends FreeColGameObjectType {
             altitude[1] = getAttribute(in, "altitudeMax", 0);
             in.nextTag(); // close this element
         } else if ("production".equals(childName)
+                   && in.getAttributeValue(null, "goods-type") == null) {
+            // new production style
+            ProductionType productionType = new ProductionType(getSpecification());
+            productionType.readFromXML(in);
+            productionTypes.add(productionType);
+        } else if ("production".equals(childName)
                    || "primary-production".equals(childName)
                    || "secondary-production".equals(childName)) {
+            // @compat 0.10.6
             GoodsType type = getSpecification().getGoodsType(in.getAttributeValue(null, "goods-type"));
             int amount = Integer.parseInt(in.getAttributeValue(null, VALUE_TAG));
             AbstractGoods goods = new AbstractGoods(type, amount);
             String tileProduction = in.getAttributeValue(null, "tile-production");
+            // CAUTION: this only works if the primary production is
+            // defined before the secondary production
             if ("primary-production".equals(childName)) {
-                primaryGoodsMap.put(tileProduction, goods);
+                productionTypes.add(new ProductionType(goods, true, tileProduction));
             } else if ("secondary-production".equals(childName)) {
-                secondaryGoodsMap.put(tileProduction, goods);
-            } else {
-                Map<GoodsType, AbstractGoods> oldValue = productionMap.get(tileProduction);
-                if (oldValue == null) {
-                    oldValue = new HashMap<GoodsType, AbstractGoods>();
-                    productionMap.put(tileProduction, oldValue);
+                for (ProductionType productionType : productionTypes) {
+                    if (productionType.isColonyCenterTile()
+                        && (tileProduction == null
+                            || tileProduction.equals(productionType.getProductionLevel()))) {
+                        productionType.getOutputs().add(goods);
+                    }
                 }
-                oldValue.put(type, goods);
+            } else {
+                productionTypes.add(new ProductionType(goods, false, tileProduction));
             }
             in.nextTag(); // close this element
+            // end compat
         } else if ("resource".equals(childName)) {
             ResourceType type = getSpecification().getResourceType(in.getAttributeValue(null, "type"));
             int probability = getAttribute(in, "probability", 100);

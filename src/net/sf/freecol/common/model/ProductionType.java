@@ -52,6 +52,11 @@ public class ProductionType extends FreeColObject {
      */
     private List<AbstractGoods> inputs;
 
+
+    public ProductionType(Specification specification) {
+        setSpecification(specification);
+    }
+
     /**
      * Creates a new production type that consumes no raw materials
      * and produces the given output.
@@ -86,6 +91,25 @@ public class ProductionType extends FreeColObject {
         outputs.add(output);
         colonyCenterTile = center;
         productionLevel = level;
+    }
+
+    /**
+     * Convenience constructor for a new <code>ProductionType</code>
+     * instance with a single input and output.
+     *
+     * @param input a <code>GoodsType</code> value
+     * @param output a <code>GoodsType</code> value
+     * @param amount an <code>int</code> value
+     */
+    public ProductionType(GoodsType input, GoodsType output, int amount) {
+        if (input != null) {
+            inputs = new ArrayList<AbstractGoods>();
+            inputs.add(new AbstractGoods(input, amount));
+        }
+        if (output != null) {
+            outputs = new ArrayList<AbstractGoods>();
+            outputs.add(new AbstractGoods(output, amount));
+        }
     }
 
     /**
@@ -171,6 +195,12 @@ public class ProductionType extends FreeColObject {
         this.productionLevel = newProductionLevel;
     }
 
+    public boolean appliesTo(String level) {
+        return (level == null
+                || productionLevel == null
+                || level.equals(productionLevel));
+    }
+
 
     /**
      * Makes an XML-representation of this object.
@@ -187,36 +217,78 @@ public class ProductionType extends FreeColObject {
         if (productionLevel != null) {
             out.writeAttribute("productionLevel", productionLevel);
         }
-        for (AbstractGoods input : inputs) {
-            input.toXML(out, "input");
+        if (inputs != null) {
+            for (AbstractGoods input : inputs) {
+                out.writeStartElement("input");
+                out.writeAttribute("goods-type", input.getType().getId());
+                out.writeAttribute("value", Integer.toString(input.getAmount()));
+                out.writeEndElement();
+            }
         }
-        for (AbstractGoods output : outputs) {
-            output.toXML(out, "output");
+        if (outputs != null) {
+            for (AbstractGoods output : outputs) {
+                out.writeStartElement("output");
+                out.writeAttribute("goods-type", output.getType().getId());
+                out.writeAttribute("value", Integer.toString(output.getAmount()));
+                out.writeEndElement();
+            }
         }
         out.writeEndElement();
     }
 
-    /**
-     * Initializes this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
-     */
-    public void readFromXML(XMLStreamReader in) throws XMLStreamException {
+    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
         colonyCenterTile = "true".equalsIgnoreCase(in.getAttributeValue(null, "colonyCenterTile"));
         productionLevel = in.getAttributeValue(null, "productionLevel");
+    }
 
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            String childName = in.getLocalName();
-            GoodsType type = getSpecification().getGoodsType(in.getAttributeValue(null, "goods-type"));
-            int amount = Integer.parseInt(in.getAttributeValue(null, "value"));
-            if ("input".equals(childName)) {
-                inputs.add(new AbstractGoods(type, amount));
-            } else if ("output".equals(childName)) {
-                outputs.add(new AbstractGoods(type, amount));
+    public void readChild(XMLStreamReader in) throws XMLStreamException {
+        String childName = in.getLocalName();
+        GoodsType type = getSpecification().getGoodsType(in.getAttributeValue(null, "goods-type"));
+        int amount = Integer.parseInt(in.getAttributeValue(null, "value"));
+        if ("input".equals(childName)) {
+            if (inputs == null) {
+                inputs = new ArrayList<AbstractGoods>(1);
             }
+            inputs.add(new AbstractGoods(type, amount));
+            in.nextTag();
+        } else if ("output".equals(childName)) {
+            if (outputs == null) {
+                outputs = new ArrayList<AbstractGoods>(1);
+            }
+            outputs.add(new AbstractGoods(type, amount));
+            in.nextTag();
+        } else {
+            super.readChild(in);
         }
+    }
+
+
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+        result.append("[production: " + productionLevel);
+        if (colonyCenterTile) {
+            result.append(", colony center tile");
+        }
+        if (!(inputs == null || inputs.isEmpty())) {
+            result.append(" [inputs: ");
+            for (AbstractGoods input : inputs) {
+                result.append(input);
+                result.append(", ");
+            }
+            int length = result.length();
+            result.replace(length - 2, length, "]");
+        }
+        if (!(outputs == null || outputs.isEmpty())) {
+            result.append(" [outputs: ");
+            for (AbstractGoods output : outputs) {
+                result.append(output);
+                result.append(", ");
+            }
+            int length = result.length();
+            result.replace(length - 2, length, "]");
+        }
+        result.append("]");
+        return result.toString();
     }
 
 }

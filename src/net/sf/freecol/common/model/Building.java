@@ -291,7 +291,7 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      * exclusive of that of the work location.
      *
      * Used below, only public for the test suite.
-     * 
+     *
      * @param unit The <code>Unit</code> to check.
      * @return The maximum return from this unit.
      */
@@ -563,7 +563,7 @@ public class Building extends WorkLocation implements Named, Comparable<Building
         if (getGoodsOutputType() == goodsType
             && getType().getBasicProduction() > 0) {
             production = (int)FeatureContainer.applyModifiers(0f,
-                getGame().getTurn(), 
+                getGame().getTurn(),
                 getProductionModifiers(goodsType, unitType));
         }
         return Math.max(0, production);

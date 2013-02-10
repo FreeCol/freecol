@@ -130,7 +130,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         } catch (FreeColException e) {
             fail();
         }
-		
+
         // Check that the map is created at all
         assertNotNull(g.getMap());
 
@@ -164,7 +164,7 @@ public class MapGeneratorTest extends FreeColTestCase {
 
     /**
      * Make sure that each tribe has exactly one capital
-     * 
+     *
      */
     public void testIndianCapital() {
         ((FileOption) spec().getOption(MapGeneratorOptions.IMPORT_FILE)).setValue(null);
@@ -206,11 +206,11 @@ public class MapGeneratorTest extends FreeColTestCase {
                 if (s.isCapital())
                     capitals++;
             }
-            if (settlements > 0) 
+            if (settlements > 0)
                 assertEquals(1, capitals);
         }
     }
-    
+
     public void testImportMap() {
         /**
          * Make sure we can import all distributed maps.
@@ -277,5 +277,5 @@ public class MapGeneratorTest extends FreeColTestCase {
         assertFalse(northAtlantic.isPacific());
         assertFalse(northAtlantic.isDiscoverable());
         assertNull(northAtlantic.getDiscoverableRegion());
-    }        
+    }
 }

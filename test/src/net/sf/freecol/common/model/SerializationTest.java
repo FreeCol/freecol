@@ -62,19 +62,28 @@ public class SerializationTest extends FreeColTestCase {
 
 
     private void validateMap(String name) throws Exception {
-        try{
+        try {
             Validator mapValidator = buildValidator("schema/data/data-savedGame.xsd");
 
             FreeColSavegameFile mapFile = new FreeColSavegameFile(new File(name));
 
             mapValidator.validate(new StreamSource(mapFile.getSavegameInputStream()));
-        }
-        catch(SAXParseException e){
+        } catch(SAXParseException e) {
             String errMsg = e.getMessage()
                 + " at line=" + e.getLineNumber()
                 + " column=" + e.getColumnNumber();
             fail(errMsg);
         }
+    }
+
+    private void logParseFailure(SAXParseException e, String serialized) {
+        int col = e.getColumnNumber();
+        String errMsg = e.getMessage()
+            + "\nAt line=" + e.getLineNumber()
+            + ", column=" + col + ":\n"
+            + serialized.substring(Math.max(0, col - 100),
+                                   Math.min(col + 100, serialized.length()));
+        fail(errMsg);
     }
 
     public void testValidation() throws Exception {
@@ -86,13 +95,18 @@ public class SerializationTest extends FreeColTestCase {
         ServerTestHelper.newTurn();
         ServerTestHelper.newTurn();
 
+        String serialized = null;
         try {
             Validator validator = buildValidator("schema/data/data-game.xsd");
-            validator.validate(buildSource(game, player, true, true));
+            serialized = serialize(game, player, true, true);
+            validator.validate(new StreamSource(new StringReader(serialized)));
         } catch(SAXParseException e){
+            int col = e.getColumnNumber();
             String errMsg = e.getMessage()
-                + " at line=" + e.getLineNumber()
-                + " column=" + e.getColumnNumber();
+                + "\nAt line=" + e.getLineNumber()
+                + ", column=" + col + ":\n"
+                + serialized.substring(Math.max(0, col - 100),
+                                       Math.min(col + 100, serialized.length()));
             fail(errMsg);
         }
 

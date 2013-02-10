@@ -230,7 +230,7 @@ public abstract class BuildableType extends FreeColGameObjectType {
 
         for (AbstractGoods goods : getRequiredGoods()) {
             out.writeStartElement(REQUIRED_GOODS_TAG);
-            
+
             writeAttribute(out, ID_ATTRIBUTE_TAG, goods.getType());
 
             writeAttribute(out, VALUE_TAG, goods.getAmount());
@@ -264,10 +264,10 @@ public abstract class BuildableType extends FreeColGameObjectType {
             requiredGoods = null;
             limits = null;
         }
-        
+
         super.readChildren(in);
     }
-        
+
     /**
      * {@inheritDoc}
      */

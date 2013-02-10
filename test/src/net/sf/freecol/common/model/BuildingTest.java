@@ -745,6 +745,7 @@ System.err.println("NEWPAGER");
 
         Colony colony = getStandardColony(8);
         List<Unit> units = colony.getUnitList();
+        assertEquals(8, units.size());
         // make sure there are enough goods to get started
         //colony.addGoods(spec().getGoodsType("model.goods.food"), 100);
         colony.addGoods(spec().getGoodsType("model.goods.ore"), 100);
@@ -780,9 +781,9 @@ System.err.println("NEWPAGER");
         smithy.upgrade();
         armory.upgrade();
 
-        assertEquals(6, smithy.getType().getBasicProduction());
+        assertEquals(9, smithy.getType().getBasicProduction());
         assertEquals(18, smithy.getTotalProductionOf(toolsType));
-        assertEquals(6, armory.getType().getBasicProduction());
+        assertEquals(9, armory.getType().getBasicProduction());
         //assertEquals("According to bug report #3430371, the arsenal does not enjoy "
         //            + "the usual factory level production bonus of 50%",
         //    12, armory.getTotalProductionOf(musketsType));

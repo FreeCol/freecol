@@ -106,8 +106,10 @@
           </xs:complexType>
         </xs:element>
         <xs:element ref="production"/>
-        <xs:element ref="primary-production"/>
-        <xs:element ref="secondary-production"/>
+        <!-- @compat 0.10.x -->
+        <xs:element name="primary-production"/>
+        <xs:element name="secondary-production"/>
+        <!-- end @compat -->
         <xs:element ref="ability"/>
         <xs:element name="disaster">
           <xs:complexType>
@@ -124,6 +126,7 @@
       <xs:attribute name="can-settle" type="xs:boolean"/>
       <xs:attribute name="is-connected" type="xs:boolean"/>
       <xs:attribute name="is-elevation" type="xs:boolean"/>
+      <xs:attribute name="productionLevel" type="xs:string"/>
     </xs:complexType>
   </xs:element>
 
@@ -146,25 +149,12 @@
 
   <xs:element name="production">
     <xs:complexType>
-      <xs:attribute name="goods-type" use="required" type="GoodsTypeId"/>
-      <xs:attribute name="value" use="required" type="xs:nonNegativeInteger"/>
-      <xs:attribute name="tile-production" type="xs:string"/>
-    </xs:complexType>
-  </xs:element>
-
-  <xs:element name="primary-production">
-    <xs:complexType>
-      <xs:attribute name="goods-type" use="required" type="GoodsTypeId"/>
-      <xs:attribute name="value" use="required" type="xs:nonNegativeInteger"/>
-      <xs:attribute name="tile-production" type="xs:string"/>
-    </xs:complexType>
-  </xs:element>
-
-  <xs:element name="secondary-production">
-    <xs:complexType>
-      <xs:attribute name="goods-type" use="required" type="GoodsTypeId"/>
-      <xs:attribute name="value" use="required" type="xs:nonNegativeInteger"/>
-      <xs:attribute name="tile-production" type="xs:string"/>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="input" type="AbstractGoodsType"/>
+        <xs:element name="output" type="AbstractGoodsType"/>
+      </xs:choice>
+      <xs:attribute name="colonyCenterTile" type="xs:boolean"/>
+      <xs:attribute name="productionLevel" type="xs:string"/>
     </xs:complexType>
   </xs:element>
 
@@ -288,7 +278,7 @@
   <xs:element name="change">
     <xs:complexType>
       <xs:sequence minOccurs="0">
-        <xs:element ref="production" />
+        <xs:element name="production" type="AbstractGoodsType" />
       </xs:sequence>
       <xs:attribute name="from" use="required" type="TileTypeId"/>
       <xs:attribute name="to" use="required" type="TileTypeId"/>
@@ -364,14 +354,12 @@
         <xs:element ref="ability"/>
         <xs:element ref="modifier"/>
         <xs:element ref="limit"/>
+        <xs:element ref="production"/>
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:ID"/>
       <xs:attribute name="abstract" use="optional" type="xs:boolean" />
       <xs:attribute name="extends" use="optional" type="xs:string" />
       <xs:attribute name="workplaces" use="optional" type="xs:nonNegativeInteger"/>
-      <xs:attribute name="basicProduction" type="xs:nonNegativeInteger"/>
-      <xs:attribute name="produces" type="GoodsTypeId"/>
-      <xs:attribute name="consumes" type="GoodsTypeId"/>
       <xs:attribute name="required-population" type="xs:nonNegativeInteger"/>
       <xs:attribute name="priority" type="xs:nonNegativeInteger"/>
       <xs:attribute name="minSkill" type="xs:int"/>
@@ -1001,6 +989,11 @@
     <xs:attribute name="minimum" type="xs:int"/>
     <xs:attribute name="maximum" type="xs:int"/>
     <xs:attribute name="factor" type="xs:int"/>
+  </xs:complexType>
+
+  <xs:complexType name="AbstractGoodsType">
+    <xs:attribute name="goods-type" use="required" type="GoodsTypeId"/>
+    <xs:attribute name="value" use="required" type="xs:nonNegativeInteger"/>
   </xs:complexType>
 
   <!-- Game Object Types -->

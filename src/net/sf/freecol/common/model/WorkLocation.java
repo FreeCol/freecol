@@ -45,6 +45,11 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
      */
     private Colony colony;
 
+    /**
+     * The production type of this WorkLocation.
+     */
+    private ProductionType productionType;
+
 
     /**
      * Constructor for ServerWorkLocation.
@@ -85,6 +90,24 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
      */
     public WorkLocation(Game game, String id) {
         super(game, id);
+    }
+
+    /**
+     * Get the <code>ProductionType</code> value.
+     *
+     * @return a <code>ProductionType</code> value
+     */
+    public final ProductionType getProductionType() {
+        return productionType;
+    }
+
+    /**
+     * Set the <code>ProductionType</code> value.
+     *
+     * @param newProductionType The new ProductionType value.
+     */
+    public final void setProductionType(final ProductionType newProductionType) {
+        this.productionType = newProductionType;
     }
 
     /**
@@ -393,4 +416,26 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
 
         out.writeAttribute("colony", colony.getId());
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void readChild(XMLStreamReader in) throws XMLStreamException {
+        if ("production".equals(in.getLocalName())) {
+            productionType = new ProductionType(in);
+        } else {
+            super.readChild(in);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void writeChildren(XMLStreamWriter out) throws XMLStreamException {
+        super.writeChildren(out);
+        if (productionType != null) {
+            productionType.toXML(out);
+        }
+    }
+
 }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- XSD for specification version 0.74
+<!-- XSD for specification version 0.75
      CHANGELOG:
      0.26: add capture-equipment
      0.27: add limits
@@ -50,6 +50,7 @@
      0.72: allow preserveAttributes attribute to aid spec fragment authors
      0.73: generalize preserveAttributes to preserve
      0.74: add convertThreshold to settlement
+     0.75: add generalized production element
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 
@@ -157,8 +158,6 @@
         <xs:element ref="skirmish"/>
         <xs:element ref="resource"/>
         <xs:element ref="production"/>
-        <xs:element ref="primary-production"/>
-        <xs:element ref="secondary-production"/>
         <xs:element ref="ability"/>
         <xs:element name="disaster">
           <xs:complexType>
@@ -176,6 +175,7 @@
       <xs:attribute name="is-elevation" type="xs:boolean"/>
       <xs:attribute name="can-settle" type="xs:boolean"/>
       <xs:attribute name="is-connected" type="xs:boolean"/>
+      <xs:attribute name="productionLevel" type="xs:string"/>
     </xs:complexType>
   </xs:element>
 
@@ -205,25 +205,12 @@
 
   <xs:element name="production">
     <xs:complexType>
-      <xs:attribute name="goods-type" use="required" type="GoodsTypeId"/>
-      <xs:attribute name="value" use="required" type="xs:nonNegativeInteger"/>
-      <xs:attribute name="tile-production" type="xs:string"/>
-    </xs:complexType>
-  </xs:element>
-
-  <xs:element name="primary-production">
-    <xs:complexType>
-      <xs:attribute name="goods-type" use="required" type="GoodsTypeId"/>
-      <xs:attribute name="value" use="required" type="xs:nonNegativeInteger"/>
-      <xs:attribute name="tile-production" type="xs:string"/>
-    </xs:complexType>
-  </xs:element>
-
-  <xs:element name="secondary-production">
-    <xs:complexType>
-      <xs:attribute name="goods-type" use="required" type="GoodsTypeId"/>
-      <xs:attribute name="value" use="required" type="xs:nonNegativeInteger"/>
-      <xs:attribute name="tile-production" type="xs:string"/>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="input" type="AbstractGoodsType"/>
+        <xs:element name="output" type="AbstractGoodsType"/>
+      </xs:choice>
+      <xs:attribute name="colonyCenterTile" type="xs:boolean"/>
+      <xs:attribute name="productionLevel" type="xs:string"/>
     </xs:complexType>
   </xs:element>
 
@@ -350,7 +337,7 @@
   <xs:element name="change">
     <xs:complexType>
       <xs:sequence>
-        <xs:element ref="production" />
+        <xs:element name="production" type="AbstractGoodsType"/>
       </xs:sequence>
       <xs:attribute name="from" use="required" type="TileTypeId"/>
       <xs:attribute name="to" use="required" type="TileTypeId"/>
@@ -427,15 +414,13 @@
         <xs:element ref="ability"/>
         <xs:element ref="modifier"/>
         <xs:element ref="limit"/>
+        <xs:element ref="production"/>
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:ID"/>
       <xs:attribute name="preserve" use="optional" type="xs:boolean"/>
       <xs:attribute name="abstract" use="optional" type="xs:boolean" />
       <xs:attribute name="extends" use="optional" type="xs:string" />
       <xs:attribute name="workplaces" use="optional" type="xs:nonNegativeInteger"/>
-      <xs:attribute name="basicProduction" type="xs:nonNegativeInteger"/>
-      <xs:attribute name="produces" type="GoodsTypeId"/>
-      <xs:attribute name="consumes" type="GoodsTypeId"/>
       <xs:attribute name="required-population" type="xs:nonNegativeInteger"/>
       <xs:attribute name="priority" type="xs:nonNegativeInteger"/>
       <xs:attribute name="minSkill" type="xs:int"/>
@@ -1174,6 +1159,11 @@
     <xs:attribute name="minimum" type="xs:int"/>
     <xs:attribute name="maximum" type="xs:int"/>
     <xs:attribute name="factor" type="xs:int"/>
+  </xs:complexType>
+
+  <xs:complexType name="AbstractGoodsType">
+    <xs:attribute name="goods-type" use="required" type="GoodsTypeId"/>
+    <xs:attribute name="value" use="required" type="xs:nonNegativeInteger"/>
   </xs:complexType>
 
   <!-- Game Object Types -->

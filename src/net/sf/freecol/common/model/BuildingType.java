@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -36,18 +38,20 @@ public final class BuildingType extends BuildableType
 
     private int level = 1;
     private int workPlaces = 3;
-    private int basicProduction = 3;
     private int minSkill = UNDEFINED;
     private int maxSkill = INFINITY;
     private int upkeep = 0;
     private int priority = Consumer.BUILDING_PRIORITY;
 
-    private GoodsType consumes = null;
-    private GoodsType produces = null;
     private Modifier productionModifier = null;
     private BuildingType upgradesFrom = null;
     private BuildingType upgradesTo = null;
 
+    /**
+     * The possible production types of this building type.
+     */
+    private final List<ProductionType> productionTypes
+        = new ArrayList<ProductionType>();
 
     /**
      * Creates a new <code>BuildingType</code> instance.
@@ -88,7 +92,16 @@ public final class BuildingType extends BuildableType
      * @return The base production of this building type.
      */
     public int getBasicProduction() {
-        return basicProduction;
+        if (productionTypes == null || productionTypes.isEmpty()) {
+            return 0;
+        } else {
+            List<AbstractGoods> outputs = productionTypes.get(0).getOutputs();
+            if (outputs == null || outputs.isEmpty()) {
+                return 0;
+            } else {
+                return outputs.get(0).getAmount();
+            }
+        }
     }
 
     /**
@@ -185,12 +198,48 @@ public final class BuildingType extends BuildableType
     }
 
     /**
+     * Get the <code>ProductionTypes</code> value.
+     *
+     * @return a <code>List<ProductionType></code> value
+     */
+    public List<ProductionType> getProductionTypes() {
+        return productionTypes;
+    }
+
+    /**
+     * Return the production types available for the given production
+     * level. If the production level is null, all production levels
+     * will be returned.
+     *
+     * @param level the production level
+     * @return a <code>List<ProductionType></code> value
+     */
+    public List<ProductionType> getProductionTypes(String level) {
+        List<ProductionType> result = new ArrayList<ProductionType>();
+        for (ProductionType productionType : productionTypes) {
+            if (level == null || level.equals(productionType.getProductionLevel())) {
+                result.add(productionType);
+            }
+        }
+        return result;
+    }
+
+    /**
      * Get the type of goods consumed by this BuildingType.
      *
      * @return The consumed <code>GoodsType</code>.
      */
     public GoodsType getConsumedGoodsType() {
-        return consumes;
+        if (productionTypes == null || productionTypes.isEmpty()) {
+            return null;
+        } else {
+            List<AbstractGoods> inputs = productionTypes.get(0).getInputs();
+            if (inputs == null || inputs.isEmpty()) {
+                return null;
+            } else {
+                return inputs.get(0).getType();
+            }
+        }
     }
 
     /**
@@ -199,7 +248,16 @@ public final class BuildingType extends BuildableType
      * @return The produced <code>GoodsType</code>.
      */
     public GoodsType getProducedGoodsType() {
-        return produces;
+        if (productionTypes == null || productionTypes.isEmpty()) {
+            return null;
+        } else {
+            List<AbstractGoods> outputs = productionTypes.get(0).getOutputs();
+            if (outputs == null || outputs.isEmpty()) {
+                return null;
+            } else {
+                return outputs.get(0).getType();
+            }
+        }
     }
 
     /**
@@ -210,6 +268,7 @@ public final class BuildingType extends BuildableType
      */
     @Override
     public final int getModifierIndex(Modifier modifier) {
+        GoodsType produces = getProducedGoodsType();
         if (produces != null && produces.getId().equals(modifier.getId())) {
             return Modifier.AUTO_PRODUCTION_INDEX;
         } else {
@@ -266,8 +325,6 @@ public final class BuildingType extends BuildableType
 
         writeAttribute(out, WORKPLACES_TAG, workPlaces);
 
-        writeAttribute(out, BASIC_PRODUCTION_TAG, basicProduction);
-
         if (minSkill != UNDEFINED) {
             writeAttribute(out, MIN_SKILL_TAG, minSkill);
         }
@@ -284,13 +341,6 @@ public final class BuildingType extends BuildableType
             writeAttribute(out, PRIORITY_TAG, priority);
         }
 
-        if (consumes != null) {
-            writeAttribute(out, CONSUMES_TAG, consumes);
-        }
-
-        if (produces != null) {
-            writeAttribute(out, PRODUCES_TAG, produces);
-        }
     }
 
     /**
@@ -302,7 +352,7 @@ public final class BuildingType extends BuildableType
 
         super.readAttributes(in);
 
-        BuildingType parent = spec.getType(in, EXTENDS_TAG, 
+        BuildingType parent = spec.getType(in, EXTENDS_TAG,
                                            BuildingType.class, this);
 
         upgradesFrom = spec.getType(in, UPGRADES_FROM_TAG,
@@ -316,9 +366,6 @@ public final class BuildingType extends BuildableType
 
         workPlaces = getAttribute(in, WORKPLACES_TAG, parent.workPlaces);
 
-        basicProduction = getAttribute(in, BASIC_PRODUCTION_TAG,
-                                       parent.basicProduction);
-
         minSkill = getAttribute(in, MIN_SKILL_TAG, parent.minSkill);
 
         maxSkill = getAttribute(in, MAX_SKILL_TAG, parent.maxSkill);
@@ -327,16 +374,21 @@ public final class BuildingType extends BuildableType
 
         priority = getAttribute(in, PRIORITY_TAG, parent.priority);
 
-        consumes = spec.getType(in, CONSUMES_TAG, GoodsType.class,
-                                parent.consumes);
-
-        produces = spec.getType(in, PRODUCES_TAG, GoodsType.class,
-                                parent.produces);
-        if (produces != null && basicProduction > 0) {
-            productionModifier = new Modifier(produces.getId(), this,
-                                              basicProduction,
-                                              Modifier.Type.ADDITIVE);
+        // @compat 0.10.6
+        int basicProduction = getAttribute(in, BASIC_PRODUCTION_TAG, -1);
+        if (basicProduction > 0) {
+            GoodsType consumes = spec.getType(in, CONSUMES_TAG, GoodsType.class,
+                                              parent.getConsumedGoodsType());
+            GoodsType produces = spec.getType(in, PRODUCES_TAG, GoodsType.class,
+                                              parent.getProducedGoodsType());
+            productionTypes.add(new ProductionType(consumes, produces, basicProduction));
+            if (produces != null) {
+                productionModifier = new Modifier(produces.getId(), this,
+                                                  basicProduction,
+                                                  Modifier.Type.ADDITIVE);
+            }
         }
+        // end @compat
 
         if (parent != this) { // Handle "extends" for super-type fields
             if (!hasAttribute(in, REQUIRED_POPULATION_TAG)) {
@@ -349,6 +401,41 @@ public final class BuildingType extends BuildableType
             }
         }
     }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+        final Specification spec = getSpecification();
+        if ("production".equals(in.getLocalName())) {
+            ProductionType productionType = new ProductionType(getSpecification());
+            productionType.readFromXML(in);
+            productionTypes.add(productionType);
+            if (!(productionType.getOutputs() == null
+                  || productionType.getOutputs().isEmpty())) {
+                AbstractGoods output = productionType.getOutputs().get(0);
+                productionModifier = new Modifier(output.getType().getId(), this,
+                                                  output.getAmount(),
+                                                  Modifier.Type.ADDITIVE);
+            }
+        } else {
+            super.readChild(in);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
+        super.writeChildren(out);
+        for (ProductionType productionType : productionTypes) {
+            productionType.toXMLImpl(out);
+        }
+    }
+
 
     // @compat 0.9.x
     /**
