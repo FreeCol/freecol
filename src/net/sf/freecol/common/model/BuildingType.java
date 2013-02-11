@@ -43,7 +43,6 @@ public final class BuildingType extends BuildableType
     private int upkeep = 0;
     private int priority = Consumer.BUILDING_PRIORITY;
 
-    private Modifier productionModifier = null;
     private BuildingType upgradesFrom = null;
     private BuildingType upgradesTo = null;
 
@@ -83,25 +82,6 @@ public final class BuildingType extends BuildableType
      */
     public int getWorkPlaces() {
         return workPlaces;
-    }
-
-    /**
-     * Get the production of a single Unit in this BuildingType before
-     * any modifiers are applied.
-     *
-     * @return The base production of this building type.
-     */
-    public int getBasicProduction() {
-        if (productionTypes == null || productionTypes.isEmpty()) {
-            return 0;
-        } else {
-            List<AbstractGoods> outputs = productionTypes.get(0).getOutputs();
-            if (outputs == null || outputs.isEmpty()) {
-                return 0;
-            } else {
-                return outputs.get(0).getAmount();
-            }
-        }
     }
 
     /**
@@ -146,15 +126,6 @@ public final class BuildingType extends BuildableType
      */
     public FreeColGameObjectType getType() {
         return this;
-    }
-
-    /**
-     * Gets the base production modifier for this building type.
-     *
-     * @return The base modifier if any.
-     */
-    public Modifier getProductionModifier() {
-        return productionModifier;
     }
 
     /**
@@ -382,11 +353,6 @@ public final class BuildingType extends BuildableType
             GoodsType produces = spec.getType(in, PRODUCES_TAG, GoodsType.class,
                                               parent.getProducedGoodsType());
             productionTypes.add(new ProductionType(consumes, produces, basicProduction));
-            if (produces != null) {
-                productionModifier = new Modifier(produces.getId(), this,
-                                                  basicProduction,
-                                                  Modifier.Type.ADDITIVE);
-            }
         }
         // end @compat
 
@@ -413,13 +379,6 @@ public final class BuildingType extends BuildableType
             ProductionType productionType = new ProductionType(getSpecification());
             productionType.readFromXML(in);
             productionTypes.add(productionType);
-            if (!(productionType.getOutputs() == null
-                  || productionType.getOutputs().isEmpty())) {
-                AbstractGoods output = productionType.getOutputs().get(0);
-                productionModifier = new Modifier(output.getType().getId(), this,
-                                                  output.getAmount(),
-                                                  Modifier.Type.ADDITIVE);
-            }
         } else {
             super.readChild(in);
         }

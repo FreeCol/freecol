@@ -110,6 +110,14 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
         this.productionType = newProductionType;
     }
 
+    public List<AbstractGoods> getOutputs() {
+        return (productionType == null) ? null : productionType.getOutputs();
+    }
+
+    public List<AbstractGoods> getInputs() {
+        return (productionType == null) ? null : productionType.getInputs();
+    }
+
     /**
      * Set the <code>Colony</code> value.
      *

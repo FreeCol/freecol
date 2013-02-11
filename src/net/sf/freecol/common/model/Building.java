@@ -64,6 +64,8 @@ public class Building extends WorkLocation implements Named, Comparable<Building
         super(game);
         setColony(colony);
         this.buildingType = type;
+        // set production type to default value
+        setDefaultProductionType(type);
     }
 
     /**
@@ -100,6 +102,15 @@ public class Building extends WorkLocation implements Named, Comparable<Building
         return buildingType;
     }
 
+    private void setDefaultProductionType(BuildingType type) {
+        List<ProductionType> production = type.getProductionTypes();
+        if (production == null || production.isEmpty()) {
+            setProductionType(null);
+        } else {
+            setProductionType(production.get(0));
+        }
+    }
+
     /**
      * Changes the type of the Building. The type of a building may
      * change when it is upgraded or damaged.
@@ -115,6 +126,9 @@ public class Building extends WorkLocation implements Named, Comparable<Building
 
         if (newBuildingType != null) {
             buildingType = newBuildingType;
+
+            // change default production type
+            setDefaultProductionType(newBuildingType);
 
             // add new features and abilities from new type
             colony.addFeatures(buildingType);
@@ -263,6 +277,15 @@ public class Building extends WorkLocation implements Named, Comparable<Building
         return canBeWorked() && getType().canAdd(unitType);
     }
 
+    AbstractGoods getOutput() {
+        List<AbstractGoods> outputs = getOutputs();
+        if (outputs == null || outputs.isEmpty()) {
+            return null;
+        } else {
+            return outputs.get(0);
+        }
+    }
+
     /**
      * Returns the type of goods this <code>Building</code> produces,
      * or <code>null</code> if the Building does not produce any
@@ -271,7 +294,8 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      * @return The type of goods this <code>Building</code> produces
      */
     public GoodsType getGoodsOutputType() {
-        return getType().getProducedGoodsType();
+        AbstractGoods output = getOutput();
+        return output == null ? null : output.getType();
     }
 
     /**
@@ -282,7 +306,12 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      *         in order to produce it's {@link #getGoodsOutputType output}.
      */
     public GoodsType getGoodsInputType() {
-        return getType().getConsumedGoodsType();
+        List<AbstractGoods> inputs = getInputs();
+        if (inputs == null || inputs.isEmpty()) {
+            return null;
+        } else {
+            return inputs.get(0).getType();
+        }
     }
 
     /**
@@ -296,18 +325,22 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      * @return The maximum return from this unit.
      */
     public int getUnitProduction(Unit unit) {
-        if (getGoodsOutputType() == null || unit == null) return 0;
+        AbstractGoods output = getOutput();
+        if (output == null || unit == null) {
+            return 0;
+        } else {
+            int productivity = output.getAmount();
+            if (productivity > 0) {
+                final GoodsType goodsType = output.getType();
+                final UnitType unitType = unit.getType();
+                final Turn turn = getGame().getTurn();
 
-        int productivity = 0;
-        if (getType().getBasicProduction() > 0) {
-            final GoodsType goodsType = getGoodsOutputType();
-            final UnitType unitType = unit.getType();
-            final Turn turn = getGame().getTurn();
-
-            productivity = (int)FeatureContainer.applyModifiers(0f, turn,
-                getProductionModifiers(goodsType, unitType));
+                productivity = (int) FeatureContainer
+                    .applyModifiers(productivity, turn,
+                                    getProductionModifiers(goodsType, unitType));
+            }
+            return Math.max(0, productivity);
         }
-        return Math.max(0, productivity);
     }
 
     /**
@@ -559,14 +592,16 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      * {@inheritDoc}
      */
     public int getPotentialProduction(GoodsType goodsType, UnitType unitType) {
-        int production = 0;
-        if (getGoodsOutputType() == goodsType
-            && getType().getBasicProduction() > 0) {
-            production = (int)FeatureContainer.applyModifiers(0f,
-                getGame().getTurn(),
-                getProductionModifiers(goodsType, unitType));
+        AbstractGoods output = getOutput();
+        if (output == null || output.getType() != goodsType) {
+            return 0;
+        } else {
+            int production = (int) FeatureContainer
+                .applyModifiers(output.getAmount(),
+                                getGame().getTurn(),
+                                getProductionModifiers(goodsType, unitType));
+            return Math.max(0, production);
         }
-        return Math.max(0, production);
     }
 
     /**
@@ -581,12 +616,12 @@ public class Building extends WorkLocation implements Named, Comparable<Building
             final Turn turn = getGame().getTurn();
             final Player owner = getOwner();
             if (unitType != null) {
-                // If a unit is present add unit specific bones and
+                // If a unit is present add unit specific bonuses and
                 // unspecific owner bonuses (which includes things
                 // like the Building national advantage).
                 mods.addAll(getModifierSet(id, unitType, turn));
                 mods.add(getColony().getProductionModifier(goodsType));
-                mods.add(type.getProductionModifier());
+                //mods.add(type.getProductionModifier());
                 mods.addAll(unitType.getModifierSet(id, goodsType, turn));
                 if (owner != null) {
                     mods.addAll(owner.getModifierSet(id, unitType, turn));

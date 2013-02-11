@@ -39,6 +39,7 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Feature;
@@ -164,6 +165,10 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
 
     protected JButton getGoodsButton(final GoodsType goodsType, int amount) {
         return getGoodsButton(goodsType, Integer.toString(amount));
+    }
+
+    protected JButton getGoodsButton(final AbstractGoods goods) {
+        return getGoodsButton(goods.getType(), goods.getAmount());
     }
 
     protected JButton getGoodsButton(final GoodsType goodsType, String text) {

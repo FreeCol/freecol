@@ -718,23 +718,26 @@ System.err.println("NEWPAGER");
                 if (!building.getType().canAdd(type)
                     || !type.isAvailableTo(colony.getOwner())) continue;
                 unit.setType(type);
-                int productivity = building.getUnitProduction(unit);
-                int expected = building.getType().getBasicProduction();
-                if (type == building.getExpertUnitType()) {
-                    expected = 6;
-                } else if (type == indenturedServantType) {
-                    expected = 2;
-                } else if (type == indianConvertType) {
-                    expected = 1;
-                } else if (type == pettyCriminalType) {
-                    expected = 1;
+                AbstractGoods output = building.getOutput();
+                if (output != null) {
+                    int productivity = building.getUnitProduction(unit);
+                    int expected = output.getAmount();
+                    if (type == building.getExpertUnitType()) {
+                        expected = 6;
+                    } else if (type == indenturedServantType) {
+                        expected = 2;
+                    } else if (type == indianConvertType) {
+                        expected = 1;
+                    } else if (type == pettyCriminalType) {
+                        expected = 1;
+                    }
+                    if (expected != output.getAmount()) {
+                        assertFalse("ModifierSet should not be empty!",
+                                    type.getModifierSet(outputType.getId()).isEmpty());
+                    }
+                    assertEquals("Wrong productivity for " + type, expected,
+                                 productivity);
                 }
-                if (expected != building.getType().getBasicProduction()) {
-                    assertFalse("ModifierSet should not be empty!",
-                        type.getModifierSet(outputType.getId()).isEmpty());
-                }
-                assertEquals("Wrong productivity for " + type, expected,
-                    productivity);
             }
         }
     }
@@ -762,17 +765,13 @@ System.err.println("NEWPAGER");
         armory.add(units.get(2));
         armory.add(units.get(3));
 
-        assertEquals(3, smithy.getType().getBasicProduction());
         assertEquals(6, smithy.getTotalProductionOf(toolsType));
-        assertEquals(3, armory.getType().getBasicProduction());
         assertEquals(6, armory.getTotalProductionOf(musketsType));
 
         smithy.upgrade();
         armory.upgrade();
 
-        assertEquals(6, smithy.getType().getBasicProduction());
         assertEquals(12, smithy.getTotalProductionOf(toolsType));
-        assertEquals(6, armory.getType().getBasicProduction());
         assertEquals(12, armory.getTotalProductionOf(musketsType));
 
         // make sure we can build factory level buildings
@@ -781,9 +780,7 @@ System.err.println("NEWPAGER");
         smithy.upgrade();
         armory.upgrade();
 
-        assertEquals(9, smithy.getType().getBasicProduction());
         assertEquals(18, smithy.getTotalProductionOf(toolsType));
-        assertEquals(9, armory.getType().getBasicProduction());
         //assertEquals("According to bug report #3430371, the arsenal does not enjoy "
         //            + "the usual factory level production bonus of 50%",
         //    12, armory.getTotalProductionOf(musketsType));

@@ -49,6 +49,7 @@ import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Modifier;
+import net.sf.freecol.common.model.ProductionType;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -169,7 +170,7 @@ public class BuildingDetailPanel extends ColopediaGameObjectTypePanel<BuildingTy
         if (!buildingType.needsGoodsToBuild()) {
             panel.add(localizedLabel("colopedia.buildings.autoBuilt"), "span");
         } else {
-            List<AbstractGoods> required = buildingType.getRequiredGoods(); 
+            List<AbstractGoods> required = buildingType.getRequiredGoods();
             AbstractGoods goodsRequired = required.get(0);
             if (required.size() > 1) {
                 panel.add(getGoodsButton(goodsRequired.getType(), goodsRequired.getAmount()),
@@ -200,23 +201,24 @@ public class BuildingDetailPanel extends ColopediaGameObjectTypePanel<BuildingTy
             }
         } else {
 
-            GoodsType inputType = buildingType.getConsumedGoodsType();
-            GoodsType outputType = buildingType.getProducedGoodsType();
+            List<ProductionType> productionTypes = buildingType.getProductionTypes();
 
-            if (outputType != null) {
-                panel.add(localizedLabel("colopedia.buildings.production"), "newline");
-                if (inputType != null) {
-                    panel.add(getGoodsButton(inputType), "span, split 3");
-                    JLabel arrow = new JLabel("\u2192");
-                    arrow.setFont(arrowFont);
-                    panel.add(arrow);
+            if (!(productionTypes == null || productionTypes.isEmpty())) {
+                for (ProductionType productionType : productionTypes) {
+                    panel.add(localizedLabel("colopedia.buildings.production"), "newline");
+                    List<AbstractGoods> inputs = productionType.getInputs();
+                    List<AbstractGoods> outputs = productionType.getOutputs();
+                    // for the moment, we assume only a single input and output type
+                    if (!(inputs == null || inputs.isEmpty())) {
+                        panel.add(getGoodsButton(inputs.get(0)), "span, split 3");
+                        JLabel arrow = new JLabel("\u2192");
+                        arrow.setFont(arrowFont);
+                        panel.add(arrow);
+                    }
+                    panel.add(getGoodsButton(outputs.get(0)));
                 }
-                panel.add(getGoodsButton(outputType));
             }
         }
-
-        panel.add(localizedLabel("colopedia.buildings.basicProduction"), "newline");
-        panel.add(new JLabel(Integer.toString(buildingType.getBasicProduction())), "span");
 
         int workplaces = buildingType.getWorkPlaces();
         panel.add(localizedLabel("colopedia.buildings.workplaces"), "newline");

@@ -444,8 +444,8 @@ public class ColonyProductionTest extends FreeColTestCase {
 
         assertEquals("Zero potential production of cotton in town hall", 0,
             townHall.getPotentialProduction(cottonType, colonistType));
-        assertEquals("Basic potential production of bells in town hall", 
-            (int)FeatureContainer.applyModifiers(0f, game.getTurn(), 
+        assertEquals("Basic potential production of bells in town hall",
+            (int) FeatureContainer.applyModifiers(townHall.getOutput().getAmount(), game.getTurn(),
                 townHall.getProductionModifiers(bellsType, colonistType)),
             townHall.getPotentialProduction(bellsType, colonistType));
 
