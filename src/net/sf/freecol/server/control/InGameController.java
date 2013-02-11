@@ -491,8 +491,7 @@ public final class InGameController extends Controller {
         DOMMessage reply;
         try {
             boolean single = getFreeColServer().isSinglePlayer();
-            reply = future.get(FreeCol.getFreeColTimeout(single),
-                               TimeUnit.SECONDS);
+            reply = future.get(FreeCol.getTimeout(single), TimeUnit.SECONDS);
         } catch (TimeoutException te) {
             sendElement(serverPlayer,
                 new ChangeSet().addTrivial(See.only(serverPlayer),

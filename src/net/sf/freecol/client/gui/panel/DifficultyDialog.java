@@ -32,6 +32,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -55,7 +56,6 @@ public final class DifficultyDialog extends OptionsDialog implements TreeSelecti
 
     private JButton edit = new JButton(Messages.message("edit"));
 
-    private String DEFAULT_LEVEL = "model.difficulty.medium";
     private String CUSTOM_LEVEL = "model.difficulty.custom";
 
     private OptionGroup selected;
@@ -103,7 +103,9 @@ public final class DifficultyDialog extends OptionsDialog implements TreeSelecti
         boolean customized = loadCustomOptions();
 
         OptionGroup group = specification.getOptionGroup("difficultyLevels");
-        selected = specification.getDifficultyLevel(customized ? CUSTOM_LEVEL : DEFAULT_LEVEL);
+        selected = (customized)
+            ? specification.getDifficultyLevel(CUSTOM_LEVEL)
+            : FreeCol.getDifficulty(specification);
         if (selected == null) {
             // this really should not happen
             selected = specification.getDifficultyLevels().get(0);
@@ -149,6 +151,7 @@ public final class DifficultyDialog extends OptionsDialog implements TreeSelecti
             getOptionUI().updateOption();
             getGUI().removeFromCanvas(this);
             setResponse(selected);
+            FreeCol.setDifficulty(selected);
         } else if (EDIT.equals(command)) {
             OptionGroup custom = specification.getOptionGroup(CUSTOM_LEVEL);
             custom.setValue(selected);
@@ -205,5 +208,4 @@ public final class DifficultyDialog extends OptionsDialog implements TreeSelecti
     public String getDefaultFileName() {
         return "custom.xml";
     }
-
 }

@@ -1236,7 +1236,7 @@ public abstract class ServerAPI {
         throws ConnectException, IOException {
         int tries;
             if (port < 0) {
-                port = FreeCol.getDefaultPort();
+                port = FreeCol.getServerPort();
                 tries = 10;
             } else {
                 tries = 1;

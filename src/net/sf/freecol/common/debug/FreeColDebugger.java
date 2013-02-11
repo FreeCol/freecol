@@ -126,8 +126,11 @@ public class FreeColDebugger {
      *
      * @param optionValue The command line option.
      */
-    public static void setDebugModes(String optionValue) {
-        if (optionValue == null) return;
+    public static boolean setDebugModes(String optionValue) {
+        if (optionValue == null || "".equals(optionValue)) {
+            enableDebugMode(DebugMode.MENUS);
+            return true;
+        }
         // @compat 0.10.x
         try {
             int i = Integer.parseInt(optionValue);
@@ -140,9 +143,9 @@ public class FreeColDebugger {
                 // Fall through
             case 1:
                 enableDebugMode(DebugMode.MENUS);
-                return;
+                return true;
             default:
-                break;
+                return false;
             }
         } catch (NumberFormatException nfe) {}
         // @end compatibility code
@@ -154,8 +157,10 @@ public class FreeColDebugger {
                 enableDebugMode(mode);
             } catch (Exception e) {
                 logger.warning("Unrecognized debug mode: " + optionValue);
+                return false;
             }
         }
+        return true;
     }
 
     /**

@@ -374,7 +374,7 @@ public final class FreeColServer {
     private Server serverStart(int firstPort) throws IOException {
         int port, tries;
         if (firstPort < 0) {
-            port = FreeCol.getDefaultPort();
+            port = FreeCol.getServerPort();
             tries = 10;
         } else {
             port = firstPort;

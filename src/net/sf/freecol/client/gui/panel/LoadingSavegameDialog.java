@@ -98,7 +98,7 @@ public final class LoadingSavegameDialog extends FreeColDialog<Boolean> implemen
         JPanel p2 = new JPanel(new FlowLayout(FlowLayout.LEFT));
         p2.add(new JLabel(Messages.message("LoadingSavegame.port"), JLabel.LEFT));
         panel.add(p2);
-        portField = new JSpinner(new SpinnerNumberModel(FreeCol.getDefaultPort(), 1, 65536, 1));
+        portField = new JSpinner(new SpinnerNumberModel(FreeCol.getServerPort(), 1, 65536, 1));
         panel.add(portField);
 
         ButtonGroup bg = new ButtonGroup();

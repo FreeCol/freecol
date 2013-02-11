@@ -1,21 +1,33 @@
+/**
+ *  Copyright (C) 2002-2012   The FreeCol Team
+ *
+ *  This file is part of FreeCol.
+ *
+ *  FreeCol is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  FreeCol is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package net.sf.freecol.common;
 
 import java.security.SecureRandom;
 import java.util.logging.Logger;
 
-public class FreeColSeed {
 
+public class FreeColSeed {
 
     private static final Logger logger = Logger.getLogger(FreeColSeed.class.getName());
 
-    
-    public static final String COPYRIGHT = "Copyright (C) 2003-2012 The FreeCol Team";
-
-    public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
-
-    public static final String REVISION = "$Revision$";
-
-    private static long freeColSeed;
+    private static long freeColSeed = 0L;
     
 
     /**
@@ -32,17 +44,21 @@ public class FreeColSeed {
     }
 
     /**
+     * Sets the seed for the PRNG.
+     *
+     * @param arg A string defining the seed.
+     */
+    public static void setFreeColSeed(String arg) {
+        try {
+            FreeColSeed.freeColSeed = Long.parseLong(arg);
+        } catch (NumberFormatException nfe) {}
+    }
+
+    /**
      * Increments the seed for the PRNG.
      */
     public static void incrementFreeColSeed() {
         freeColSeed = getFreeColSeed() + 1;
         logger.info("Reseeded with: " + freeColSeed);
     }
-
-    public static void initialize(long initianValue) {
-        FreeColSeed.freeColSeed = initianValue;
-        
-    }
-
-
 }

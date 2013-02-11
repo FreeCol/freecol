@@ -27,6 +27,8 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import java.net.URL;
 import java.net.JarURLConnection;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
@@ -50,6 +52,7 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.option.LanguageOption;
+import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.util.XMLStream;
 import net.sf.freecol.server.FreeColServer;
@@ -77,54 +80,74 @@ public final class FreeCol {
 
     private static final Logger logger = Logger.getLogger(FreeCol.class.getName());
 
+    public static final String  CLIENT_THREAD = "FreeColClient:";
+    public static final String  SERVER_THREAD = "FreeColServer:";
+    public static final String  METASERVER_THREAD = "FreeColMetaServer:";
+
     public static final String  META_SERVER_ADDRESS = "meta.freecol.org";
     public static final int     META_SERVER_PORT = 3540;
-    public static final int     DEFAULT_PORT = 3541;
-    public static final int     DEFAULT_TIMEOUT = 60; // 1 minute
-    public static final int     TIMEOUT_MIN = 10; // 10s
-
-    private static final int    MIN_MEMORY = 128; // Mbytes
-    private static final String MIN_JDK_VERSION = "1.6";
-    private static final String DEFAULT_SPLASH_FILE = "splash.jpg";
-
-    public static final String CLIENT_THREAD = "FreeColClient:";
-    public static final String SERVER_THREAD = "FreeColServer:";
-    public static final String METASERVER_THREAD = "FreeColMetaServer:";
 
     private static final String FREECOL_VERSION = "0.10.x-trunk";
-    private static String FREECOL_REVISION;
+    private static String       FREECOL_REVISION;
+
+    // Cli defaults.
+
+    private static final Advantages ADVANTAGES_DEFAULT = Advantages.SELECTABLE;
+    private static final String DIFFICULTY_DEFAULT = "model.difficulty.medium";
+    private static final Level  LOGLEVEL_DEFAULT = Level.INFO;
+    private static final String JAVA_VERSION_MIN = "1.6";
+    private static final int    MEMORY_MIN = 128; // Mbytes
+    private static final int    PORT_DEFAULT = 3541;
+    private static final String SPLASH_FILE_DEFAULT = "splash.jpg";
+    private static final String TC_DEFAULT = "freecol";
+    public static final int     TIMEOUT_DEFAULT = 60; // 1 minute
+    public static final int     TIMEOUT_MIN = 10; // 10s
+
+
+    // Cli values.  Often set to null so the default can be applied in
+    // the accessor function.
 
     private static boolean checkIntegrity = false,
-                           sound = true,
+                           consoleLogging = false,
+                           debugStart = false,
+                           introVideo = true,
                            javaCheck = true,
                            memoryCheck = true,
-                           consoleLogging = false,
-                           introVideo = true,
-                           standAloneServer = false,
-                           publicServer = true;
+                           publicServer = true,
+                           sound = true,
+                           standAloneServer = false;
 
-    /** The type of advantages, defaults to Advantages.SELECTABLE. */
+    /** The type of advantages. */
     private static Advantages advantages = null;
 
+    /** The difficulty level id. */
+    private static String difficulty = null;
+
+    /** A font override. */
     private static String fontName = null;
 
+    /** The level of logging in this game. */
+    private static Level logLevel = LOGLEVEL_DEFAULT;
+
+    /** The client player name. */
     private static String name = null;
 
+    /** How to name and configure the server. */
     private static int serverPort = -1;
     private static String serverName = null;
 
-    private static Level logLevel = Level.INFO;
-
-    private static String splashFilename = DEFAULT_SPLASH_FILE;
-
-    private static Dimension windowSize;
+    /** Where the splash file lives. */
+    private static String splashFilename = SPLASH_FILE_DEFAULT;
 
     /** The TotalConversion / ruleset in play, defaults to "freecol". */
     private static String tc = null;
 
-    private static int freeColTimeout = -1;
+    /** The time out (seconds) for otherwise blocking commands. */
+    private static int timeout = -1;
 
-    private static boolean debugStart = false;
+    /** The size of window to create, defaults to null for full screen. */
+    private static Dimension windowSize = null;
+
 
 
     private FreeCol() {} // Hide constructor
@@ -187,16 +210,16 @@ public final class FreeCol {
 
         // Do the potentially fatal system checks as early as possible.
         String version = System.getProperty("java.version");
-        if (javaCheck && version.compareTo(MIN_JDK_VERSION) < 0) {
+        if (javaCheck && version.compareTo(JAVA_VERSION_MIN) < 0) {
             fatal(Messages.message(StringTemplate.template("main.javaVersion")
                     .addName("%version%", version)
-                    .addName("%minVersion%", MIN_JDK_VERSION)));
+                    .addName("%minVersion%", JAVA_VERSION_MIN)));
         }
         long memory = Runtime.getRuntime().maxMemory();
-        if (memoryCheck && memory < MIN_MEMORY * 1000000) {
+        if (memoryCheck && memory < MEMORY_MIN * 1000000) {
             fatal(Messages.message(StringTemplate.template("main.memory")
                     .addAmount("%memory%", memory)
-                    .addAmount("%minMemory%", MIN_MEMORY)));
+                    .addAmount("%minMemory%", MEMORY_MIN)));
         }
 
         // Having parsed the command line args, we know where the main
@@ -205,7 +228,26 @@ public final class FreeCol {
         FreeColDirectories.createAndSetDirectories();
 
         // Now we have the log file path, start logging.
-        initializeLogging();
+        final Logger baseLogger = Logger.getLogger("");
+        final Handler[] handlers = baseLogger.getHandlers();
+        for (int i = 0; i < handlers.length; i++) {
+            baseLogger.removeHandler(handlers[i]);
+        }
+        String logFile = FreeColDirectories.getLogFilePath();
+        try {
+            baseLogger.addHandler(new DefaultHandler(consoleLogging, logFile));
+            Logger freecolLogger = Logger.getLogger("net.sf.freecol");
+            freecolLogger.setLevel(logLevel);
+        } catch (FreeColException e) {
+            System.err.println("Logging initialization failure: "
+                + e.getMessage());
+            e.printStackTrace();
+        }
+        Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
+                public void uncaughtException(Thread thread, Throwable e) {
+                    baseLogger.log(Level.WARNING, "Uncaught exception from thread: " + thread, e);
+                }
+            });
 
         // Now we can find the client options, allow the options
         // setting to override the locale.  We have users whose
@@ -271,7 +313,9 @@ public final class FreeCol {
      * @param err The error message to print.
      */
     private static void fatal(String err) {
-        System.err.println(err);
+        System.err.println((err == null || "".equals(err))
+            ? "Bogus null fatal error message"
+            : err);
         System.exit(1);
     }
 
@@ -283,20 +327,77 @@ public final class FreeCol {
      */
     private static void handleArgs(String[] args) {
         Options options = new Options();
+
+        // Help options.
+        options.addOption(OptionBuilder.withLongOpt("usage")
+                          .withDescription(Messages.message("cli.help"))
+                          .create());
+        options.addOption(OptionBuilder.withLongOpt("help")
+                          .withDescription(Messages.message("cli.help"))
+                          .create());
+
+        // Special options handled early.
         options.addOption(OptionBuilder.withLongOpt("freecol-data")
                           .withDescription(Messages.message("cli.freecol-data"))
                           .withArgName(Messages.message("cli.arg.directory"))
                           .hasArg()
                           .create());
-        options.addOption(OptionBuilder.withLongOpt("tc")
-                          .withDescription(Messages.message("cli.tc"))
-                          .withArgName(Messages.message("cli.arg.name"))
+        options.addOption(OptionBuilder.withLongOpt("default-locale")
+                          .withDescription(Messages.message("cli.default-locale"))
+                          .withArgName(Messages.message("cli.arg.locale"))
+                          .hasArg()
+                          .create());
+
+        // Ordinary options, handled here.
+        options.addOption(OptionBuilder.withLongOpt("advantages")
+                          .withDescription(Messages.message(StringTemplate.template("cli.advantages")
+                                  .addName("%advantages%", getValidAdvantages())))
+                          .withArgName(Messages.message("cli.arg.advantages"))
+                          .hasArg()
+                          .create());
+        options.addOption(OptionBuilder.withLongOpt("check-savegame")
+                          .withDescription(Messages.message("cli.check-savegame"))
+                          .withArgName(Messages.message("cli.arg.file"))
+                          .hasArg()
+                          .create());
+        options.addOption(OptionBuilder.withLongOpt("clientOptions")
+                          .withDescription(Messages.message("cli.clientOptions"))
+                          .withArgName(Messages.message("cli.arg.clientOptions"))
+                          .hasArg()
+                          .create());
+        options.addOption(OptionBuilder.withLongOpt("debug")
+                          .withDescription(Messages.message(StringTemplate.template("cli.debug")
+                                  .addName("%modes%", FreeColDebugger.getDebugModes())))
+                          .withArgName(Messages.message("cli.arg.debug"))
+                          .hasOptionalArg()
+                          .create());
+        options.addOption(OptionBuilder.withLongOpt("debug-run")
+                          .withDescription(Messages.message("cli.debug-run"))
+                          .withArgName(Messages.message("cli.arg.debugRun"))
+                          .hasOptionalArg()
+                          .create());
+        options.addOption(OptionBuilder.withLongOpt("debug-start")
+                          .withDescription(Messages.message("cli.debug-start"))
+                          .create());
+        options.addOption(OptionBuilder.withLongOpt("difficulty")
+                          .withDescription(Messages.message("cli.difficulty"))
+                          .withArgName(Messages.message("cli.arg.difficulty"))
+                          .hasArg()
+                          .create());
+        options.addOption(OptionBuilder.withLongOpt("font")
+                          .withDescription(Messages.message("cli.font"))
+                          .withArgName(Messages.message("cli.arg.font"))
                           .hasArg()
                           .create());
         options.addOption(OptionBuilder.withLongOpt("home-directory")
                           .withDescription(Messages.message("cli.home-directory"))
                           .withArgName(Messages.message("cli.arg.directory"))
                           .withType(new File("dummy"))
+                          .hasArg()
+                          .create());
+        options.addOption(OptionBuilder.withLongOpt("load-savegame")
+                          .withDescription(Messages.message("cli.load-savegame"))
+                          .withArgName(Messages.message("cli.arg.file"))
                           .hasArg()
                           .create());
         options.addOption(OptionBuilder.withLongOpt("log-console")
@@ -312,59 +413,35 @@ public final class FreeCol {
                           .withArgName(Messages.message("cli.arg.loglevel"))
                           .hasArg()
                           .create());
-        options.addOption(OptionBuilder.withLongOpt("no-java-check")
-                          .withDescription(Messages.message("cli.no-java-check"))
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("windowed")
-                          .withDescription(Messages.message("cli.windowed"))
-                          .withArgName(Messages.message("cli.arg.dimensions"))
-                          .hasOptionalArg()
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("default-locale")
-                          .withDescription(Messages.message("cli.default-locale"))
-                          .withArgName(Messages.message("cli.arg.locale"))
+        options.addOption(OptionBuilder.withLongOpt("name")
+                          .withDescription(Messages.message("cli.name"))
+                          .withArgName(Messages.message("cli.arg.name"))
                           .hasArg()
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("no-memory-check")
-                          .withDescription(Messages.message("cli.no-memory-check"))
                           .create());
         options.addOption(OptionBuilder.withLongOpt("no-intro")
                           .withDescription(Messages.message("cli.no-intro"))
                           .create());
+        options.addOption(OptionBuilder.withLongOpt("no-java-check")
+                          .withDescription(Messages.message("cli.no-java-check"))
+                          .create());
+        options.addOption(OptionBuilder.withLongOpt("no-memory-check")
+                          .withDescription(Messages.message("cli.no-memory-check"))
+                          .create());
         options.addOption(OptionBuilder.withLongOpt("no-sound")
                           .withDescription(Messages.message("cli.no-sound"))
                           .create());
-        options.addOption(OptionBuilder.withLongOpt("usage")
-                          .withDescription(Messages.message("cli.help"))
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("help")
-                          .withDescription(Messages.message("cli.help"))
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("version")
-                          .withDescription(Messages.message("cli.version"))
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("debug")
-                          .withDescription(Messages.message("cli.debug"))
-                          .withArgName(Messages.message("cli.arg.debuglevel"))
-                          .hasOptionalArg()
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("debug-run")
-                          .withDescription(Messages.message("cli.debug-run"))
-                          .withArgName(Messages.message("cli.arg.debugRun"))
-                          .hasOptionalArg()
-                          .create());
         options.addOption(OptionBuilder.withLongOpt("private")
                           .withDescription(Messages.message("cli.private"))
+                          .create());
+        options.addOption(OptionBuilder.withLongOpt("seed")
+                          .withDescription(Messages.message("cli.seed"))
+                          .withArgName(Messages.message("cli.arg.seed"))
+                          .hasArg()
                           .create());
         options.addOption(OptionBuilder.withLongOpt("server")
                           .withDescription(Messages.message("cli.server"))
                           .withArgName(Messages.message("cli.arg.port"))
                           .hasOptionalArg()
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("load-savegame")
-                          .withDescription(Messages.message("cli.load-savegame"))
-                          .withArgName(Messages.message("cli.arg.file"))
-                          .hasArg()
                           .create());
         options.addOption(OptionBuilder.withLongOpt("server-name")
                           .withDescription(Messages.message("cli.server-name"))
@@ -376,19 +453,9 @@ public final class FreeCol {
                           .withArgName(Messages.message("cli.arg.file"))
                           .hasOptionalArg()
                           .create());
-        options.addOption(OptionBuilder.withLongOpt("check-savegame")
-                          .withDescription(Messages.message("cli.check-savegame"))
-                          .withArgName(Messages.message("cli.arg.file"))
-                          .hasArg()
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("font")
-                          .withDescription(Messages.message("cli.font"))
-                          .withArgName(Messages.message("cli.arg.font"))
-                          .hasArg()
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("seed")
-                          .withDescription(Messages.message("cli.seed"))
-                          .withArgName(Messages.message("cli.arg.seed"))
+        options.addOption(OptionBuilder.withLongOpt("tc")
+                          .withDescription(Messages.message("cli.tc"))
+                          .withArgName(Messages.message("cli.arg.name"))
                           .hasArg()
                           .create());
         options.addOption(OptionBuilder.withLongOpt("timeout")
@@ -396,23 +463,13 @@ public final class FreeCol {
                           .withArgName(Messages.message("cli.arg.timeout"))
                           .hasArg()
                           .create());
-        options.addOption(OptionBuilder.withLongOpt("clientOptions")
-                          .withDescription(Messages.message("cli.clientOptions"))
-                          .withArgName(Messages.message("cli.arg.clientOptions"))
-                          .hasArg()
+        options.addOption(OptionBuilder.withLongOpt("version")
+                          .withDescription(Messages.message("cli.version"))
                           .create());
-        options.addOption(OptionBuilder.withLongOpt("advantages")
-                          .withDescription(Messages.message("cli.advantages"))
-                          .withArgName(Messages.message("cli.arg.advantages"))
-                          .hasArg()
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("name")
-                          .withDescription(Messages.message("cli.name"))
-                          .withArgName(Messages.message("cli.arg.name"))
-                          .hasArg()
-                          .create());
-        options.addOption(OptionBuilder.withLongOpt("debug-start")
-                          .withDescription(Messages.message("cli.debug-start"))
+        options.addOption(OptionBuilder.withLongOpt("windowed")
+                          .withDescription(Messages.message("cli.windowed"))
+                          .withArgName(Messages.message("cli.arg.dimensions"))
+                          .hasOptionalArg()
                           .create());
 
         CommandLineParser parser = new PosixParser();
@@ -422,31 +479,18 @@ public final class FreeCol {
             if (line.hasOption("help") || line.hasOption("usage")) {
                 printUsage(options, 0);
             }
-            if (line.hasOption("version")) {
-                System.out.println("FreeCol " + getVersion());
-                System.exit(0);
-            }
 
             if (line.hasOption("default-locale")) {
-                ; // Do nothing, already handled above.
+                ; // Do nothing, already handled in main().
             }
             if (line.hasOption("freecol-data")) {
-                ; // Do nothing, already handled above.
+                ; // Do nothing, already handled in main().
             }
 
             if (line.hasOption("advantages")) {
-                String arg = line.getOptionValue("advantages");
-                String err = "[";
-                advantages = null;
-                for (Advantages a : Advantages.values()) {
-                    String msg = Messages.message(a.getKey());
-                    if (msg.equals(arg)) {
-                        advantages = a;
-                        break;
-                    }
-                }
-                if (advantages == null) {
-                    System.err.println(Messages.message("cli.error.advantages"));
+                if (!setAdvantages(line.getOptionValue("advantages"))) {
+                    System.err.println(Messages.message(StringTemplate.template("cli.error.advantages")
+                            .addName("%advantages%", getValidAdvantages())));
                 }
             }
 
@@ -459,30 +503,22 @@ public final class FreeCol {
                 checkIntegrity = true;
                 standAloneServer = true;
             }
-            if (line.hasOption("load-savegame")) {
-                String arg = line.getOptionValue("load-savegame");
-                if (!FreeColDirectories.setSavegameFile(arg)) {
-                    fatal(Messages.message(StringTemplate.template("cli.err.save")
-                            .addName("%string%", arg)));
-                }
-            }
 
             if (line.hasOption("clientOptions")) {
                 String fileName = line.getOptionValue("clientOptions");
                 if (!FreeColDirectories.setClientOptionsFile(fileName)) {
-                    String err = Messages.message(StringTemplate.template("cli.error.clientOptions")
-                        .addName("%string%", fileName));
-                    System.err.println(err); // not fatal
+                    // Not fatal.
+                    System.err.println(Messages.message(StringTemplate.template("cli.error.clientOptions")
+                            .addName("%string%", fileName)));
                 }
             }                    
 
             if (line.hasOption("debug")) {
                 // If the optional argument is supplied use limited mode.
-                String arg = line.getOptionValue("debug");
-                if (arg == null || "".equals(arg)) {
-                    FreeColDebugger.enableDebugMode(FreeColDebugger.DebugMode.MENUS);
-                } else {                
-                    FreeColDebugger.setDebugModes(arg);
+                if (!FreeColDebugger.setDebugModes(line.getOptionValue("debug"))) {
+                    // Not fatal.
+                    System.err.println(Messages.message(StringTemplate.template("cli.error.debug")
+                            .addName("%modes", FreeColDebugger.getDebugModes())));
                 }
                 // user set log level has precedence
                 if (!line.hasOption("log-level")) logLevel = Level.FINEST;
@@ -494,6 +530,26 @@ public final class FreeCol {
             if (line.hasOption("debug-start")) {
                 debugStart = true;
                 FreeColDebugger.enableDebugMode(FreeColDebugger.DebugMode.MENUS);
+            }
+
+            if (line.hasOption("difficulty")) {
+                String arg = line.getOptionValue("difficulty");
+                difficulty = null;
+                String err = "";
+                for (String d : new String[] { "veryEasy", "easy", "medium",
+                                               "hard", "veryHard" }) {
+                    String key = "model.difficulty." + d;
+                    String value = Messages.message(key + ".name");
+                    if (value.equals(arg)) {
+                        setDifficulty(key);
+                        break;
+                    }
+                    err += "," + value;
+                }
+                if (difficulty == null) {
+                    fatal(Messages.message(StringTemplate.template("cli.error.difficulties")
+                            .addName("%difficulties%", err.substring(1))));
+                }
             }
 
             if (line.hasOption("home-directory")) {
@@ -509,6 +565,14 @@ public final class FreeCol {
                 fontName = line.getOptionValue("font");
             }
 
+            if (line.hasOption("load-savegame")) {
+                String arg = line.getOptionValue("load-savegame");
+                if (!FreeColDirectories.setSavegameFile(arg)) {
+                    fatal(Messages.message(StringTemplate.template("cli.err.save")
+                            .addName("%string%", arg)));
+                }
+            }
+
             if (line.hasOption("log-console")) {
                 consoleLogging = true;
             }
@@ -516,26 +580,24 @@ public final class FreeCol {
                 FreeColDirectories.setLogFilePath(line.getOptionValue("log-file"));
             }
             if (line.hasOption("log-level")) {
-                String logLevelString = line.getOptionValue("log-level")
-                    .toUpperCase();
-                logLevel = Level.parse(logLevelString);
+                setLogLevel(line.getOptionValue("log-level"));
             }
 
             if (line.hasOption("name")) {
                 setName(line.getOptionValue("name"));
             }
 
-            if (line.hasOption("no-sound")) {
-                sound = false;
-            }
             if (line.hasOption("no-intro")) {
                 introVideo = false;
+            }
+            if (line.hasOption("no-java-check")) {
+                javaCheck = false;
             }
             if (line.hasOption("no-memory-check")) {
                 memoryCheck = false;
             }
-            if (line.hasOption("no-java-check")) {
-                javaCheck = false;
+            if (line.hasOption("no-sound")) {
+                sound = false;
             }
 
             if (line.hasOption("private")) {
@@ -543,24 +605,19 @@ public final class FreeCol {
             }
 
             if (line.hasOption("server")) {
-                standAloneServer = true;
                 String arg = line.getOptionValue("server");
-                if (arg != null) {
-                    try {
-                        serverPort = Integer.parseInt(arg);
-                    } catch (NumberFormatException nfe) {
-                        fatal(Messages.message(StringTemplate.template("cli.error.port")
-                                .addName("%string%", arg)));
-                    }
+                if (!setServerPort(arg)) {
+                    fatal(Messages.message(StringTemplate.template("cli.error.serverPort")
+                            .addName("%string%", arg)));
                 }
+                standAloneServer = true;
             }
             if (line.hasOption("server-name")) {
                 serverName = line.getOptionValue("server-name");
             }
 
             if (line.hasOption("seed")) {
-                String seedStr = line.getOptionValue("seed");
-                FreeColSeed.initialize(Long.parseLong(seedStr));
+                FreeColSeed.setFreeColSeed(line.getOptionValue("seed"));
             }
 
             if (line.hasOption("splash")) {
@@ -572,30 +629,22 @@ public final class FreeCol {
             }
 
             if (line.hasOption("timeout")) {
-                String timeoutStr = line.getOptionValue("timeout");
-                int result = Integer.parseInt(timeoutStr);
-                if (result < TIMEOUT_MIN) {
-                    String err = Messages.message(StringTemplate.template("cli.error.timeout")
-                        .addName("%string%", timeoutStr)
-                        .addName("%minimum%", Integer.toString(TIMEOUT_MIN)));
-                    System.err.println(err); // Not fatal
-                } else {
-                    freeColTimeout = result;
+                String arg = line.getOptionValue("timeout");
+                if (!setTimeout(arg)) { // Not fatal
+                    System.err.println(Messages.message(StringTemplate.template("cli.error.timeout")
+                            .addName("%string%", arg)
+                            .addName("%minimum%", Integer.toString(TIMEOUT_MIN))));
                 }
             }
 
+            if (line.hasOption("version")) {
+                System.out.println("FreeCol " + getVersion());
+                System.exit(0);
+            }
+
             if (line.hasOption("windowed")) {
-                String dimensions = line.getOptionValue("windowed");
-                String[] xy;
-                if (dimensions != null
-                    && (xy = dimensions.split("[^0-9]")) != null
-                    && xy.length == 2) {
-                    try {
-                        windowSize = new Dimension(Integer.parseInt(xy[0]),
-                                                   Integer.parseInt(xy[1]));
-                    } catch (NumberFormatException nfe) {}
-                }
-                if (windowSize == null) windowSize = new Dimension(-1, -1);
+                String arg = line.getOptionValue("windowed");
+                setWindowSize(arg); // Does not fail
             }
 
         } catch (ParseException e) {
@@ -618,30 +667,112 @@ public final class FreeCol {
         System.exit(status);
     }
 
+
+    // Accessors, mutators and support for the cli variables.
+
     /**
-     * Initialize logging.
+     * Gets the default advantages type.
+     *
+     * @return Usually Advantages.SELECTABLE, but can be overridden at the
+     *     command line.
      */
-    private static void initializeLogging() {
-        final Logger baseLogger = Logger.getLogger("");
-        final Handler[] handlers = baseLogger.getHandlers();
-        for (int i = 0; i < handlers.length; i++) {
-            baseLogger.removeHandler(handlers[i]);
+    public static Advantages getAdvantages() {
+        return (advantages == null) ? ADVANTAGES_DEFAULT
+            : advantages;
+    }
+
+    /**
+     * Sets the advantages type.
+     *
+     * Called from NewPanel when a selection is made.
+     *
+     * @param advantages The name of the new advantages type.
+     * @return True of the advantages type was set.
+     */
+    private static boolean setAdvantages(String advantages) {
+        for (Advantages a : Advantages.values()) {
+            String msg = Messages.message(a.getKey());
+            if (msg.equals(advantages)) {
+                setAdvantages(a);
+                return true;
+            }
         }
-        String logFile = FreeColDirectories.getLogFilePath();
-        try {
-            baseLogger.addHandler(new DefaultHandler(consoleLogging, logFile));
-            Logger freecolLogger = Logger.getLogger("net.sf.freecol");
-            freecolLogger.setLevel(logLevel);
-        } catch (FreeColException e) {
-            System.err.println("Logging initialization failure: "
-                + e.getMessage());
-            e.printStackTrace();
+        return false;
+    }
+
+    /**
+     * Sets the advantages type.
+     *
+     * @param advantages The new <code>Advantages</code> type.
+     */
+    public static void setAdvantages(Advantages advantages) {
+        FreeCol.advantages = advantages;
+    }
+
+    /**
+     * Gets a comma separated list of i18n advantage type names.
+     *
+     * @return A list of advantage types.
+     */
+    private static String getValidAdvantages() {
+        String ret = "";
+        for (Advantages a : Advantages.values()) {
+            ret += "," + Messages.message(a.getKey());
         }
-        Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
-                public void uncaughtException(Thread thread, Throwable e) {
-                    baseLogger.log(Level.WARNING, "Uncaught exception from thread: " + thread, e);
-                }
-            });
+        return ret.substring(1);
+    }
+
+    /**
+     * Gets the difficulty level.
+     *
+     * @return The name of a difficulty level.
+     */
+    public static String getDifficulty() {
+        return (difficulty == null) ? DIFFICULTY_DEFAULT : difficulty;
+    }
+
+    /**
+     * Gets a difficulty level option group from a specification.
+     *
+     * @param spec The <code>Specification</code> to search.
+     * @return A difficulty level, or null if none found.
+     */
+    public static OptionGroup getDifficulty(Specification spec) {
+        String diff = getDifficulty();
+        OptionGroup difficulties = (OptionGroup)spec.getOptionGroup("difficultyLevels");
+        for (Option o : difficulties.getOptions()) {
+            if (o instanceof OptionGroup && o.getId().equals(diff)) {
+                return (OptionGroup)o;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Sets the difficulty level.
+     *
+     * @param difficulty The new difficulty level.
+     */
+    public static void setDifficulty(OptionGroup difficulty) {
+        setDifficulty(difficulty.getId());
+    }
+
+    /**
+     * Sets the difficulty level.
+     *
+     * @param difficulty The new difficulty.
+     */
+    public static void setDifficulty(String difficulty) {
+        FreeCol.difficulty = difficulty;
+    }
+
+    /**
+     * Sets the log level.
+     *
+     * @param arg The log level to set.
+     */
+    private static void setLogLevel(String arg) {
+        logLevel = Level.parse(arg.toUpperCase());
     }
 
     /**
@@ -666,25 +797,6 @@ public final class FreeCol {
     }
 
     /**
-     * Gets the default server network port.
-     *
-     * @return The port number.
-     */
-    public static int getDefaultPort() {
-        return DEFAULT_PORT;
-    }
-
-    /**
-     * Gets the current version of game.
-     *
-     * @return The current version of the game using the format "x.y.z",
-     *         where "x" is major, "y" is minor and "z" is revision.
-     */
-    public static String getVersion() {
-        return FREECOL_VERSION;
-    }
-
-    /**
      * Gets the current revision of game.
      *
      * @return The current version and SVN Revision of the game.
@@ -694,27 +806,37 @@ public final class FreeCol {
     }
 
     /**
-     * Gets the timeout.
-     * Use the command line specified one if any, otherwise default
-     * to `infinite' in single player and the DEFAULT_TIMEOUT for
-     * multiplayer.
+     * Gets the server network port.
      *
-     * @param singlePlayer True if this is a single player game.
-     * @return A suitable timeout value.
+     * @return The port number.
      */
-    public static int getFreeColTimeout(boolean singlePlayer) {
-        return (freeColTimeout >= TIMEOUT_MIN) ? freeColTimeout
-            : (singlePlayer) ? Integer.MAX_VALUE
-            : DEFAULT_TIMEOUT;
+    public static int getServerPort() {
+        return (serverPort < 0) ? PORT_DEFAULT : serverPort;
+    }
+
+    /**
+     * Sets the server port.
+     *
+     * @param arg The server port number.
+     * @return True if the port was set.
+     */
+    public static boolean setServerPort(String arg) {
+        if (arg == null) return false;
+        try {
+            serverPort = Integer.parseInt(arg);
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+        return true;
     }
 
     /**
      * Gets the current Total-Conversion.
      *
-     * @return Usually "freecol", but can be overridden at the command line.
+     * @return Usually TC_DEFAULT, but can be overridden at the command line.
      */
     public static String getTC() {
-        return (tc == null) ? "freecol" : tc;
+        return (tc == null) ? TC_DEFAULT : tc;
     }
 
     /**
@@ -733,32 +855,78 @@ public final class FreeCol {
      *
      * @return The <code>FreeColTcFile</code>.
      */
-    public static FreeColTcFile getTCFile() throws IOException {
-        return new FreeColTcFile(getTC());
+    public static FreeColTcFile getTCFile() {
+        try {
+            return new FreeColTcFile(getTC());
+        } catch (IOException ioe) {}
+        return null;
     }
 
     /**
-     * Gets the default advantages type.
+     * Gets the timeout.
+     * Use the command line specified one if any, otherwise default
+     * to `infinite' in single player and the TIMEOUT_DEFAULT for
+     * multiplayer.
      *
-     * @return Usually Advantages.SELECTABLE, but can be overridden at the
-     *     command line.
+     * @param singlePlayer True if this is a single player game.
+     * @return A suitable timeout value.
      */
-    public static Advantages getAdvantages() {
-        return (advantages == null) ? Advantages.SELECTABLE
-            : advantages;
+    public static int getTimeout(boolean singlePlayer) {
+        return (timeout >= TIMEOUT_MIN) ? timeout
+            : (singlePlayer) ? Integer.MAX_VALUE
+            : TIMEOUT_DEFAULT;
     }
 
     /**
-     * Sets the advantages type.
+     * Sets the timeout.
      *
-     * Called from NewPanel when a selection is made.
-     *
-     * @param advantages The new advantages type.
+     * @param timeout A string containing the new timeout.
+     * @return True if the timeout was set.
      */
-    public static void setAdvantages(Advantages advantages) {
-        FreeCol.advantages = advantages;
+    public static boolean setTimeout(String timeout) {
+        try {
+            int result = Integer.parseInt(timeout);
+            if (result >= TIMEOUT_MIN) {
+                FreeCol.timeout = result;
+                return true;
+            }
+        } catch (NumberFormatException nfe) {}
+        return false;
     }
 
+    /**
+     * Gets the current version of game.
+     *
+     * @return The current version of the game using the format "x.y.z",
+     *         where "x" is major, "y" is minor and "z" is revision.
+     */
+    public static String getVersion() {
+        return FREECOL_VERSION;
+    }
+
+    /**
+     * Sets the window size.
+     *
+     * Does not fail because any empty or invalid value is interpreted as
+     * `windowed but use as much screen as possible'.
+     *
+     * @param arg The window size specification.
+     */
+    public static void setWindowSize(String arg) {
+        String[] xy;
+        if (arg != null
+            && (xy = arg.split("[^0-9]")) != null
+            && xy.length == 2) {
+            try {
+                windowSize = new Dimension(Integer.parseInt(xy[0]),
+                                           Integer.parseInt(xy[1]));
+            } catch (NumberFormatException nfe) {}
+        }
+        if (windowSize == null) windowSize = new Dimension(-1, -1);
+    }
+
+
+    // The major final actions.
 
     /**
      * Start a client.
@@ -767,14 +935,12 @@ public final class FreeCol {
         Specification spec = null;
         if (debugStart) {
             try {
-                spec = FreeCol.getTCFile().getSpecification();
-            } catch (Exception e) {
-                spec = null;
-            }
+                FreeColTcFile tcf = getTCFile();
+                if (tcf != null) spec = tcf.getSpecification();
+            } catch (IOException ioe) {}
         }
         if (spec != null) {
-            // TODO: add option for difficulty level
-            OptionGroup og = spec.getOptionGroup("model.difficulty.medium");
+            OptionGroup og = getDifficulty(spec);
             if (og != null) spec.applyDifficultyLevel(og);
         }
         new FreeColClient(FreeColDirectories.getSavegameFile(), windowSize,
@@ -795,7 +961,6 @@ public final class FreeCol {
                 xs = fis.getXMLStream();
                 final XMLStreamReader in = xs.getXMLStreamReader();
                 in.nextTag();
-                xs.close();
 
                 freeColServer = new FreeColServer(fis, (Specification)null,
                                                   serverPort, serverName);
@@ -817,20 +982,15 @@ public final class FreeCol {
                 if (xs != null) xs.close();
             }
         } else {
-            FreeColTcFile tcData;
-            try {
-                tcData = FreeCol.getTCFile();
-            } catch (IOException ioe) {
-                tcData = null;
-            }
-            if (tcData == null) {
+            FreeColTcFile tcf = FreeCol.getTCFile();
+            if (tcf == null) {
                 fatal(Messages.message(StringTemplate.template("server.badTC")
                                                      .addName("%tc%", tc)));
             }
             try {
                 // TODO: command line advantages setting?
                 freeColServer = new FreeColServer(publicServer, false,
-                                                  tcData.getSpecification(),
+                                                  tcf.getSpecification(),
                                                   serverPort, serverName);
             } catch (NoRouteToServerException nrtse) {
                 fatal(Messages.message("server.noRouteToServer"));

@@ -184,7 +184,7 @@ public final class ConnectController {
 
         if (freeColClient.isLoggedIn()) logout(true);
 
-        if (!unblockServer(FreeCol.getDefaultPort())) return;
+        if (!unblockServer(FreeCol.getServerPort())) return;
 
         loadModFragments(specification);
 
