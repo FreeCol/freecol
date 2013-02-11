@@ -165,6 +165,7 @@ public class GUI {
 
     private JWindow splash;
 
+
     public GUI(FreeColClient freeColClient) {
         this.freeColClient = freeColClient;
         this.imageLibrary = new ImageLibrary();
@@ -254,17 +255,53 @@ public class GUI {
     }
 
     /**
-     * Estimate size of client area for a window of maximum size.
+     * Get the default screen device.
+     *
+     * @return The default screen device, or null if none available
+     *     (as in headless mode).
      */
-    public Dimension determineWindowSize() {
+    private static GraphicsDevice getDefaultScreenDevice() {
         final GraphicsEnvironment lge
             = GraphicsEnvironment.getLocalGraphicsEnvironment();
         final GraphicsDevice gd;
         try {
-            gd = lge.getDefaultScreenDevice();
-        } catch (HeadlessException e) {
-            return null;
-        }
+            return lge.getDefaultScreenDevice();
+        } catch (HeadlessException he) {}
+        return null;
+    }
+
+    /**
+     * Determine whether full screen mode can be used.
+     *
+     * @return True if full screen is available.
+     */
+    public static boolean checkFullScreen() {
+        GraphicsDevice gd = getDefaultScreenDevice();
+        return gd != null && gd.isFullScreenSupported();
+    }
+
+    /**
+     * Estimate size of client area when using the full screen.
+     *
+     * @return A suitable window size.
+     */
+    public static Dimension determineFullScreenSize() {
+        GraphicsDevice gd = getDefaultScreenDevice();
+        Rectangle bounds = gd.getDefaultConfiguration().getBounds();
+        return new Dimension(bounds.width - bounds.x,
+                             bounds.height - bounds.y);
+    }
+
+    /**
+     * Estimate size of client area for a window of maximum size.
+     *
+     * @return A suitable window size.
+     */
+    public static Dimension determineWindowSize() {
+        final GraphicsEnvironment lge
+            = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        final GraphicsDevice gd = getDefaultScreenDevice();
+        if (gd == null) return null;
 
         // Get max size of window including border.
         Rectangle bounds = lge.getMaximumWindowBounds();
@@ -1004,6 +1041,7 @@ public class GUI {
                          final boolean showMain,
                          final Specification spec) {
         final ClientOptions opts = freeColClient.getClientOptions();
+
         // Prepare the sound system.
         if (sound) {
             final AudioMixerOption amo
@@ -1023,28 +1061,10 @@ public class GUI {
             this.soundPlayer = null;
         }
 
-        if (GraphicsEnvironment.isHeadless()) {
+        gd = getDefaultScreenDevice();
+        if (gd == null) {
             logger.info("It seems that the GraphicsEnvironment is headless!");
-        }
-        this.gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-        if (!isWindowed()) {
-            if (!gd.isFullScreenSupported()) {
-                String fullscreenNotSupported =
-                   "\nIt seems that full screen mode is not fully supported for this" +
-                   "\nGraphicsDevice. Please try the \"--windowed\" option if you\nexperience" +
-                   "any graphical problems while running FreeCol.";
-                logger.info(fullscreenNotSupported);
-                System.out.println(fullscreenNotSupported);
-                /*
-                 * We might want this behavior later: logger.warning("It seems
-                 * that full screen mode is not supported for this
-                 * GraphicsDevice! Using windowed mode instead."); windowed =
-                 * true; setWindowed(true); frame = new
-                 * WindowedFrame(size);
-                 */
-            }
-            Rectangle bounds = gd.getDefaultConfiguration().getBounds();
-            innerWindowSize = new Dimension(bounds.width - bounds.x, bounds.height - bounds.y);
+            return;
         }
 
         // Work around a Java 2D bug that seems to be X11 specific.

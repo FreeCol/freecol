@@ -143,12 +143,20 @@ public final class FreeColClient {
      *     a new game immediately.
      */
     public FreeColClient(final File savedGame,
-                         final Dimension size,
+                         Dimension size,
                          final boolean sound,
                          final String splashFilename,
                          final boolean showOpeningVideo,
                          final String fontName,
                          final Specification spec) {
+        // Headless mode is enabled for the test suite, where it now
+        // works again.
+        // TODO: It would be nice to have it useful for running full
+        // automated debug games without GUI, but that is untested and
+        // probably still borked.  Fix.
+        headless = "true".equals(System.getProperty("java.awt.headless",
+                                                    "false"));
+
         gui = new GUI(this);
         serverAPI = new UserServerAPI(gui);
 
@@ -169,23 +177,21 @@ public final class FreeColClient {
                 + ((ioeMessage == null) ? "" : "\n" + ioeMessage));
         }
 
-        // headless mode is enable for the test suite, where it now
-        // works again.
-        // TODO: It would be nice to have it useful for running full
-        // automated debug games without GUI, but that is untested and
-        // probably still borked.  Fix.
-        headless = "true".equals(System.getProperty("java.awt.headless",
-                                                    "false"));
-
         mapEditor = false;
 
         gui.displaySplashScreen(splashFilename);
 
         // Determine the window size.
-        final Dimension windowSize = (headless || size == null) ? null
-            : (size.width <= 0 || size.height <= 0) ? gui.determineWindowSize()
-            : size;
+        if (size == null && !GUI.checkFullScreen()) {
+            logger.warning("Full screen not supported.");
+            System.err.println(Messages.message("client.fullScreen"));
+            size = new Dimension(-1, -1);
+        }
         gui.setWindowed(size != null);
+        final Dimension windowSize = (headless) ? null
+            : (size == null) ? GUI.determineFullScreenSize()
+            : (size.width <= 0 || size.height <= 0) ? GUI.determineWindowSize()
+            : size;
         logger.info("Window size is " + windowSize);
 
         // Control
