@@ -5,11 +5,11 @@
 # Usage:
 #   fclogscore.sh <freecol-log-file>...
 #
-STATS=stats.awk # Where is the stats awk script?
+STATS=${STATS:-stats.awk} # Where is the stats awk script?
 
 statit () {
     statitMEAN=0 ; statitSD=0
-    eval `$STATS | sed -e 's/^n=[^ ]* *mean=\([^ ]*\) *sd=\(.*\)$/statitMEAN="\1";statitSD="\2"/' -`
+    eval `$STATS | sed -n -e 's/^n=[^ ]* *mean=\([^ ]*\) *sd=\(.*\)$/statitMEAN="\1";statitSD="\2"/p' -`
     printf "%7.3f" "$statitMEAN"
 }
 

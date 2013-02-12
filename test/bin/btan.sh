@@ -23,7 +23,7 @@ blockit () {
 
 statit () {
     statitMEAN=0 ; statitSD=0
-    eval `$STATS | sed -e 's/^n=[^ ]* *mean=\([^ ]*\) *sd=\(.*\)$/statitMEAN="\1";statitSD="\2"/' -`
+    eval `$STATS | sed -n -e 's/^n=[^ ]* *mean=\([^ ]*\) *sd=\(.*\)$/statitMEAN="\1";statitSD="\2"/p' -`
     printf "%7.3f ~ %7.3f" "$statitMEAN" "$statitSD"
 }
 
