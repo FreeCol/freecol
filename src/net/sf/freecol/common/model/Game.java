@@ -1151,14 +1151,10 @@ public class Game extends FreeColGameObject {
                 mapGeneratorOptions = new OptionGroup(specification);
                 mapGeneratorOptions.readFromXML(in);
             } else if (Specification.getXMLElementTagName().equals(tagName)) {
-                Specification spec = new Specification();
-                spec.readFromXML(in);
-                if (specification == null) {
-                    specification = spec;
-                    specification.clean("load in Game");
-                } else {
-                    logger.warning("Ignoring specification in saved game.");
-                }
+                logger.info(((specification == null) ? "Loading" : "Reloading")
+                    + " specification.");
+                specification = new Specification(in);
+
             } else {
                 logger.warning("Unknown tag: " + tagName + " loading game");
                 in.nextTag();
