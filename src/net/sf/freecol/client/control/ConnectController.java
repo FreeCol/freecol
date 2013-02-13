@@ -178,8 +178,10 @@ public final class ConnectController {
      * TODO: connect client/server directly (not using network-classes)
      *
      * @param specification The <code>Specification</code> for the game.
+     * @param skip Skip the start game panel.
      */
-    public void startSinglePlayerGame(Specification specification) {
+    public void startSinglePlayerGame(Specification specification,
+                                      boolean skip) {
         freeColClient.setMapEditor(false);
 
         if (freeColClient.isLoggedIn()) logout(true);
@@ -210,8 +212,12 @@ public final class ConnectController {
         freeColClient.setSinglePlayer(true);
         if (login("127.0.0.1", freeColServer.getPort())) {
             freeColClient.getPreGameController().setReady(true);
-            gui.showStartGamePanel(freeColClient.getGame(),
-                                   freeColClient.getMyPlayer(), true);
+            if (skip) {
+                freeColClient.getPreGameController().requestLaunch();
+            } else {
+                gui.showStartGamePanel(freeColClient.getGame(),
+                                       freeColClient.getMyPlayer(), true);
+            }                
         }
     }
 

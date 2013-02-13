@@ -1032,14 +1032,11 @@ public class GUI {
      * @param sound Enable sound if true.
      * @param showOpeningVideo Show the opening video.
      * @param showMain Show the main panel.
-     * @param spec If non-null, a <code>Specification</code> to use to start
-     *     a new game at once.
      */
     public void startGUI(Dimension innerWindowSize,
                          final boolean sound,
                          final boolean showOpeningVideo,
-                         final boolean showMain,
-                         final Specification spec) {
+                         final boolean showMain) {
         final ClientOptions opts = freeColClient.getClientOptions();
 
         // Prepare the sound system.
@@ -1126,10 +1123,8 @@ public class GUI {
                 });
         }
 
-        // Start a game or show the main panel and run opening video.
-        if (spec != null) {
-            freeColClient.getConnectController().startSinglePlayerGame(spec);
-        } else if (showMain) {
+        // Show the main panel and run opening video.
+        if (showMain) {
             if (showOpeningVideo) {
                 SwingUtilities.invokeLater(new Runnable() {
                         public void run() {

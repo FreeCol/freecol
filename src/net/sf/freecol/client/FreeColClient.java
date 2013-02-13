@@ -249,15 +249,21 @@ public final class FreeColClient {
         SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     gui.startGUI(windowSize, sound, showOpeningVideo,
-                                 savedGame == null && spec == null, spec);
+                                 savedGame == null && spec == null);
                 }
             });
 
-        // Load the optional saved game.
+        // Load the optional saved game, or start a new game with the spec.
         if (savedGame != null) {
             SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         connectController.loadGame(savedGame);
+                    }
+                });
+        } else if (spec != null) {
+            SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        connectController.startSinglePlayerGame(spec, true);
                     }
                 });
         }

@@ -359,7 +359,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                     level = getGUI().showDifficultyDialog(spec);
                     if (level != null) {
                         spec.applyDifficultyLevel(level);
-                        connectController.startSinglePlayerGame(spec);
+                        connectController.startSinglePlayerGame(spec, false);
                     }
                     break;
                 case JOIN:

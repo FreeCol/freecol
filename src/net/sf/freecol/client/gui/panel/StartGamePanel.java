@@ -164,7 +164,6 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         mapGeneratorOptions.addActionListener(this);
 
         setEnabled(true);
-
     }
 
     @Override
@@ -327,6 +326,8 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
      * they've made.
      */
     public void refreshPlayersTable() {
-        table.update();
+        if (table != null) {
+            table.update();
+        }
     }
 }
