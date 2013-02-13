@@ -1332,6 +1332,7 @@ public class TerrainGenerator {
         // not part of any region (such as the oceans).  These are
         // lake tiles.
         List<Tile> lakes = new ArrayList<Tile>();
+        StringBuilder sb = new StringBuilder("Lakes at:");
         for (int y = 0; y < map.getHeight(); y++) {
             for (int x = 0; x < map.getWidth(); x++) {
                 Tile tile;
@@ -1339,10 +1340,12 @@ public class TerrainGenerator {
                     && !(tile = map.getTile(x, y)).isLand()
                     && map.getTile(x, y).getRegion() == null) {
                     lakes.add(tile);
-                    logger.info("Adding lake at " + x + "," + y);
+                    sb.append(" ").append(Integer.toString(x))
+                        .append(",").append(Integer.toString(y));
                 }
             }
         }
+        logger.fine(sb.toString());
 
         // Make lake regions from unassigned lake tiles.
         int lakeCount = 0;
