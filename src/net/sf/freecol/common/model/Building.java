@@ -358,13 +358,16 @@ public class Building extends WorkLocation implements Named, Comparable<Building
         ProductionInfo result = new ProductionInfo();
         GoodsType outputType = getGoodsOutputType();
         GoodsType inputType = getGoodsInputType();
-        if (outputType != null && outputType != output.getType()) {
-            throw new IllegalArgumentException("Wrong output type: " + output.getType()
-                                               + " should have been: " + outputType);
+        int amountPresent = (output == null) ? 0 : output.getAmount();
+
+        if (outputType != null && output != null
+            && outputType != output.getType()) {
+            throw new IllegalArgumentException("Wrong output type: "
+                + output.getType() + " should have been: " + outputType);
         }
         int capacity = getColony().getWarehouseCapacity();
         if (getType().hasAbility(Ability.AVOID_EXCESS_PRODUCTION)
-            && output.getAmount() >= capacity) {
+            && amountPresent >= capacity) {
             // warehouse is already full: produce nothing
             return result;
         }
@@ -431,7 +434,7 @@ public class Building extends WorkLocation implements Named, Comparable<Building
                                                             productionModifiers);
             if (prod > 0) {
                 if (getType().hasAbility(Ability.AVOID_EXCESS_PRODUCTION)) {
-                    int total = output.getAmount() + prod;
+                    int total = amountPresent + prod;
                     while (total > capacity) {
                         if (actualInput <= 0) {
                             // produce nothing
@@ -441,7 +444,7 @@ public class Building extends WorkLocation implements Named, Comparable<Building
                         }
                         prod = (int)FeatureContainer.applyModifiers(actualInput,
                             turn, productionModifiers);
-                        total = output.getAmount() + prod;
+                        total = amountPresent + prod;
                         // in this case, maximum production does not
                         // exceed actual production
                         maximumInput = actualInput;
