@@ -8,7 +8,6 @@ FSGUNPACK=${FSGUNPACK:-fsgunpack.sh}
 STATS=${STATS:-stats.awk}
 #
 tmp=`mktemp -d fsgscore.XXXXXX`
-#
 finish () {
     rm -rf "$tmp"
 }

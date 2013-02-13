@@ -7,7 +7,7 @@
 #
 if test "x$1" = "x" ; then name=Unknown ; else name="$1" ; fi
 name=`date +%Y%m%d`-"$name"
-STATS=stats # Where is the stats awk script?
+STATS=${STATS:-stats.awk} # Where is the stats awk script?
 blockitstate=y
 
 

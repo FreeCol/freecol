@@ -21,7 +21,7 @@ while test "x$1" != "x" ; do
     (cd "$n" ;\
         unzip "$n.fsg" 1> /dev/null ;\
         rm -f "$n.fsg" ;\
-        for s in *.xml ; do xml_pp -i "$s" ; done) || exit $?
+        for s in *.xml ; do xml_pp -i "$s" 2> /dev/null ; done) || exit $?
     shift
 done
 exit 0
