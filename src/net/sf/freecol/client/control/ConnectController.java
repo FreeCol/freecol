@@ -379,7 +379,9 @@ public final class ConnectController {
             xs = fis.getXMLStream();
             final XMLStreamReader in = xs.getXMLStreamReader();
             in.nextTag();
-            String str = in.getAttributeValue(null, "singleplayer");
+            String str = in.getAttributeValue(null, "owner");
+            if (str != null) FreeCol.setName(str);
+            str = in.getAttributeValue(null, "singleplayer");
             final boolean defaultSinglePlayer = str != null
                 && Boolean.valueOf(str).booleanValue();
             str = in.getAttributeValue(null, "publicServer");
