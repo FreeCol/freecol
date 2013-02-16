@@ -21,9 +21,9 @@ package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
 
-
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
+
 
 /**
  * An action for starting a new game.
@@ -39,7 +39,7 @@ public class NewAction extends FreeColAction {
      * @param freeColClient The main controller object for the client.
      * @param gui 
      */
-    NewAction(FreeColClient freeColClient, GUI gui) {
+    public NewAction(FreeColClient freeColClient, GUI gui) {
         super(freeColClient, gui, id);
     }
 

@@ -346,6 +346,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
             = getFreeColClient().getConnectController();
         String command = event.getActionCommand();
         OptionGroup level;
+        int port;
         try {
             switch (Enum.valueOf(NewPanelAction.class, command)) {
             case OK:
@@ -357,33 +358,36 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                 switch (action) {
                 case SINGLE:
                     level = getGUI().showDifficultyDialog(spec);
-                    if (level != null) {
-                        spec.applyDifficultyLevel(level);
-                        connectController.startSinglePlayerGame(spec, false);
-                    }
-                    break;
+                    if (level == null) break;
+                    spec.applyDifficultyLevel(level);
+                    // Launch!
+                    connectController.startSinglePlayerGame(spec, false);
+                    return;
                 case JOIN:
                     try {
-                        int port = Integer.valueOf(port1.getText()).intValue();
-                        // tell Canvas to launch client
-                        connectController.joinMultiplayerGame(server.getText(), port);
+                        port = Integer.valueOf(port1.getText()).intValue();
                     } catch (NumberFormatException e) {
                         port1Label.setForeground(Color.red);
+                        break;
                     }
-                    break;
+                    // Launch!
+                    connectController.joinMultiplayerGame(server.getText(),
+                                                          port);
+                    return;
                 case START:
                     try {
-                        int port = Integer.valueOf(port2.getText()).intValue();
-                        level = getGUI().showDifficultyDialog(spec);
-                        if (level != null) {
-                            spec.applyDifficultyLevel(level);
-                            connectController.startMultiplayerGame(spec,
-                                publicServer.isSelected(), port, level);
-                        }
+                        port = Integer.valueOf(port2.getText()).intValue();
                     } catch (NumberFormatException e) {
                         port2Label.setForeground(Color.red);
+                        break;
                     }
-                    break;
+                    level = getGUI().showDifficultyDialog(spec);
+                    if (level == null) break;
+                    spec.applyDifficultyLevel(level);
+                    // Launch!
+                    connectController.startMultiplayerGame(spec,
+                        publicServer.isSelected(), port);
+                    return;
                 case META_SERVER:
                     List<ServerInfo> servers = connectController.getServerList();
                     if (servers != null) {

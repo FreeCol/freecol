@@ -73,7 +73,7 @@ public final class ConnectController {
 
     private final FreeColClient freeColClient;
 
-    private GUI gui;
+    private final GUI gui;
 
 
     /**
@@ -81,12 +81,11 @@ public final class ConnectController {
      *
      * @param freeColClient The main client controller.
      */
-    public ConnectController(FreeColClient freeColClient, GUI gui) {
+    public ConnectController(FreeColClient freeColClient) {
         this.freeColClient = freeColClient;
-        this.gui = gui;
+        this.gui = freeColClient.getGUI();
     }
 
-    
     /**
      * Shut down an existing server on a given port.
      *
@@ -113,11 +112,9 @@ public final class ConnectController {
      * @param specification The <code>Specification</code> for the game.
      * @param publicServer Whether to make the server public.
      * @param port The port in which the server should listen for new clients.
-     * @param level An <code>OptionGroup</code> containing difficulty options.
      */
     public void startMultiplayerGame(Specification specification,
-                                     boolean publicServer, int port,
-                                     OptionGroup level) {
+                                     boolean publicServer, int port) {
         freeColClient.setMapEditor(false);
 
         if (freeColClient.isLoggedIn()) logout(true);
@@ -126,7 +123,8 @@ public final class ConnectController {
 
         FreeColServer freeColServer;
         try {
-            freeColServer = new FreeColServer(publicServer, false, specification, port, null);
+            freeColServer = new FreeColServer(publicServer, false,
+                                              specification, port, null);
         } catch (NoRouteToServerException e) {
             gui.errorMessage("server.noRouteToServer");
             logger.log(Level.WARNING, "No route to server.", e);
@@ -142,6 +140,34 @@ public final class ConnectController {
     }
 
     /**
+     * Starts a new multiplayer game by connecting to the server.
+     *
+     * @param host The name of the machine running the server.
+     * @param port The port to use when connecting to the host.
+     */
+    public void joinMultiplayerGame(String host, int port) {
+        freeColClient.setMapEditor(false);
+
+        if (freeColClient.isLoggedIn()) logout(true);
+
+        List<String> vacantPlayers = getVacantPlayers(host, port);
+        if (vacantPlayers != null) {
+            String choice = gui.showSimpleChoiceDialog(null,
+                "connectController.choicePlayer", "cancel",
+                vacantPlayers);
+            if (choice == null) return;
+            FreeCol.setName(choice);
+        }
+
+        freeColClient.setSinglePlayer(false);
+        if (login(host, port)
+            && !freeColClient.isInGame()) {
+            gui.showStartGamePanel(freeColClient.getGame(),
+                                   freeColClient.getMyPlayer(), false);
+        }
+    }
+
+    /**
      * Load current mod fragments into the specification.
      *
      * @param specification The <code>Specification</code> to load into.
@@ -149,7 +175,7 @@ public final class ConnectController {
     private void loadModFragments(Specification specification) {
         boolean loadedMod = false;
         for (FreeColModFile f : freeColClient.getClientOptions()
-                 .getActiveMods()) {
+                                             .getActiveMods()) {
             InputStream sis = null;
             try {
                 sis = f.getSpecificationInputStream();
@@ -204,13 +230,13 @@ public final class ConnectController {
             return;
         }
 
-        if (freeColClient.getClientOptions()
-            .getBoolean(ClientOptions.AUTOSAVE_DELETE)) {
-            FreeColServer.removeAutosaves(Messages.message("clientOptions.savegames.autosave.fileprefix"));
-        }
         freeColClient.setFreeColServer(freeColServer);
         freeColClient.setSinglePlayer(true);
         if (login("127.0.0.1", freeColServer.getPort())) {
+            if (freeColClient.getClientOptions()
+                             .getBoolean(ClientOptions.AUTOSAVE_DELETE)) {
+                FreeColServer.removeAutosaves(Messages.message("clientOptions.savegames.autosave.fileprefix"));
+            }
             freeColClient.getPreGameController().setReady(true);
             if (skip) {
                 freeColClient.getPreGameController().requestLaunch();
@@ -221,34 +247,6 @@ public final class ConnectController {
         }
     }
 
-    /**
-     * Starts a new multiplayer game by connecting to the server.
-     *
-     * @param host The name of the machine running the server.
-     * @param port The port to use when connecting to the host.
-     */
-    public void joinMultiplayerGame(String host, int port) {
-        freeColClient.setMapEditor(false);
-
-        if (freeColClient.isLoggedIn()) logout(true);
-
-        List<String> vacantPlayers = getVacantPlayers(host, port);
-        if (vacantPlayers != null) {
-            String choice = gui.showSimpleChoiceDialog(null,
-                "connectController.choicePlayer", "cancel",
-                vacantPlayers);
-            if (choice == null) return;
-            FreeCol.setName(choice);
-        }
-
-        freeColClient.setSinglePlayer(false);
-        if (login(host, port)
-            && !freeColClient.isInGame()) {
-            gui.showStartGamePanel(freeColClient.getGame(),
-                                   freeColClient.getMyPlayer(), false);
-        }
-    }
- 
 
     /**
      * Starts the client and connects to <i>host:port</i>.
@@ -265,17 +263,15 @@ public final class ConnectController {
         freeColClient.askServer().disconnect();
 
         try {
-
             freeColClient.askServer().connect(FreeCol.CLIENT_THREAD + userName,
                     host, port, freeColClient.getPreGameInputHandler());
-            
         } catch (Exception e) {
             gui.errorMessage("server.couldNotConnect", e.getMessage());
             return false;
         }
 
         LoginMessage msg = freeColClient.askServer()
-            .login(userName, FreeCol.getVersion());
+                                        .login(userName, FreeCol.getVersion());
         Game game;
         if (msg == null || (game = msg.getGame()) == null) return false;
 

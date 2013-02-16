@@ -42,8 +42,9 @@ import net.sf.freecol.client.gui.action.PreferencesAction;
 import net.sf.freecol.client.gui.action.QuitAction;
 import net.sf.freecol.common.resources.ResourceManager;
 
+
 /**
- * A panel filled with 'main' items.
+ * The initial panel where the user chooses from the main modes of operation.
  */
 public final class MainPanel extends FreeColPanel {
 
@@ -61,8 +62,6 @@ public final class MainPanel extends FreeColPanel {
         boolean canContinue = getFreeColClient().getInGameController()
             .getLastSaveGameFile() != null;
 
-
-        
         ActionManager am = getFreeColClient().getActionManager();
         JButton newButton = new JButton(am.getFreeColAction(NewAction.id));
         JButton openButton = new JButton(am.getFreeColAction(OpenAction.id));
@@ -71,7 +70,9 @@ public final class MainPanel extends FreeColPanel {
         JButton quitButton = new JButton(am.getFreeColAction(QuitAction.id));
 
         setCancelComponent(quitButton);
-        okButton.setAction(am.getFreeColAction( canContinue ? ContinueAction.id : NewAction.id));
+        okButton.setAction(am.getFreeColAction((canContinue)
+                ? ContinueAction.id
+                : NewAction.id));
 
         enterPressesWhenFocused(okButton);
         enterPressesWhenFocused(newButton);
@@ -84,19 +85,17 @@ public final class MainPanel extends FreeColPanel {
 
         if (tempImage != null) {
             JLabel logoLabel = new JLabel(new ImageIcon(tempImage));
-            logoLabel.setBorder(new CompoundBorder(new EmptyBorder(2,2,0,2), new BevelBorder(BevelBorder.LOWERED)));
+            logoLabel.setBorder(new CompoundBorder(new EmptyBorder(2,2,0,2),
+                    new BevelBorder(BevelBorder.LOWERED)));
             add(logoLabel);
         }
 
         add(okButton, "newline 20, width 70%");
-        if (canContinue) {
-           add(newButton, "width 70%");
-        }
+        if (canContinue) add(newButton, "width 70%");
         add(openButton, "width 70%");
         add(mapEditorButton, "width 70%");
         add(optionsButton, "width 70%");
         add(quitButton, "width 70%");
-
 
         setSize(getPreferredSize());
     }

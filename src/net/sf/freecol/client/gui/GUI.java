@@ -853,6 +853,10 @@ public class GUI {
         canvas.showNewPanel(specification);
     }
 
+    public void showOpeningVideoPanel() {
+        canvas.showOpeningVideoPanel();
+    }
+
     public boolean showPreCombatDialog(FreeColGameObject attacker,
             FreeColGameObject defender,
             Tile tile) {
@@ -1030,13 +1034,8 @@ public class GUI {
      *
      * @param innerWindowSize The desired size of the GUI window.
      * @param sound Enable sound if true.
-     * @param showOpeningVideo Show the opening video.
-     * @param showMain Show the main panel.
      */
-    public void startGUI(Dimension innerWindowSize,
-                         final boolean sound,
-                         final boolean showOpeningVideo,
-                         final boolean showMain) {
+    public void startGUI(Dimension innerWindowSize, boolean sound) {
         final ClientOptions opts = freeColClient.getClientOptions();
 
         // Prepare the sound system.
@@ -1122,19 +1121,6 @@ public class GUI {
                     }
                 });
         }
-
-        // Show the main panel and run opening video.
-        if (showMain) {
-            if (showOpeningVideo) {
-                SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            canvas.showOpeningVideoPanel();
-                        }
-                    });
-            }
-            showMainPanel();
-        }
-        playSound("sound.intro.general");
         mapViewer.startCursorBlinking();
     }
 

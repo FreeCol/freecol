@@ -194,8 +194,8 @@ public final class FreeColClient {
             : size;
         logger.info("Window size is " + windowSize);
 
-        // Control
-        connectController = new ConnectController(this, gui);
+        // Control.  Controllers expect GUI to be available.
+        connectController = new ConnectController(this);
         preGameController = new PreGameController(this, gui);
         preGameInputHandler = new PreGameInputHandler(this, gui);
         inGameController = new InGameController(this, gui);
@@ -246,14 +246,18 @@ public final class FreeColClient {
 
         // Start the GUI.
         gui.hideSplashScreen();
-        SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    gui.startGUI(windowSize, sound, showOpeningVideo,
-                                 savedGame == null && spec == null);
-                }
-            });
+        gui.startGUI(windowSize, sound);
 
-        // Load the optional saved game, or start a new game with the spec.
+        // Now the GUI is going, either:
+        //   - load the saved game if one was supplied
+        //   - use the debug shortcut to immediately start a new game with
+        //     supplied specification
+        //   - display the opening video (which goes on to display the
+        //     main panel when it completes)
+        //   - display the main panel and let the user choose what to
+        //     do (which will often be to progress through the
+        //     NewPanel to a call to the connect controller to start a game)
+        if (!showOpeningVideo) gui.playSound("sound.intro.general");
         if (savedGame != null) {
             SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
@@ -264,6 +268,18 @@ public final class FreeColClient {
             SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         connectController.startSinglePlayerGame(spec, true);
+                    }
+                });
+        } else if (showOpeningVideo) {
+            SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        gui.showOpeningVideoPanel();
+                    }
+                });
+        } else {
+            SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        gui.showMainPanel();
                     }
                 });
         }
@@ -638,8 +654,12 @@ public final class FreeColClient {
     // Fundamental game start/stop/continue actions
 
     /**
-     * Displays a quit dialog and, if desired, logs out of the current
-     * game and shows the new game panel.
+     * If currently in a game, displays a quit dialog and if desired,
+     * logs out of the current game.
+     *
+     * When the game is clear, show the new game panel.
+     *
+     * Called from the New action, often from the button on the MainPanel.
      */
     public void newGame() {
         Specification specification = null;
