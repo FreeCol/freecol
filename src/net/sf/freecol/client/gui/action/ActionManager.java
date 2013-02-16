@@ -105,7 +105,7 @@ public class ActionManager extends OptionGroup {
             add(new MoveAction(freeColClient, inGameController, gui, d, true));
         }
         add(new NewAction(freeColClient, gui));
-        add(new ContinueAction(freeColClient, inGameController, connectController, gui));
+        add(new ContinueAction(freeColClient));
         add(new NewEmptyMapAction(freeColClient, gui));
         add(new OpenAction(freeColClient, inGameController, gui));
         add(new PreferencesAction(freeColClient, gui));

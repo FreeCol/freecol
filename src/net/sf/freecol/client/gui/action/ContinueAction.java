@@ -29,14 +29,13 @@ import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 
+
 /**
- *  Action to load and start the most recent save game of the client.
+ * Action to load and start the most recent save game of the client.
  */
 public class ContinueAction extends FreeColAction {
 
     public static final String id = "continueAction";
-    private final InGameController inGameController;
-    private ConnectController connectController;
 
 
     /**
@@ -45,10 +44,8 @@ public class ContinueAction extends FreeColAction {
      * @param freeColClient The main controller object for the client.
      * @param gui 
      */
-    ContinueAction(FreeColClient freeColClient, InGameController inGameController, ConnectController connectController, GUI gui) {
-        super(freeColClient, gui, id);
-        this.inGameController = inGameController;
-        this.connectController = connectController;
+    public ContinueAction(FreeColClient freeColClient) {
+        super(freeColClient, freeColClient.getGUI(), id);
         
         // interim solution to be replaced! redirect to identical NAME text
         putValue(NAME, Messages.message("victory.continue"));
@@ -62,9 +59,11 @@ public class ContinueAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-       File lastSave = inGameController.getLastSaveGameFile();
-       if (lastSave != null) {
-           connectController.loadGame(lastSave);
-       }
+        final FreeColClient freeColClient = getFreeColClient();
+        File lastSave = freeColClient.getInGameController()
+            .getLastSaveGameFile();
+        if (lastSave != null) {
+            freeColClient.getConnectController().startSavedGame(lastSave);
+        }
     }
 }

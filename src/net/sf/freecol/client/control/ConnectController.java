@@ -107,6 +107,64 @@ public final class ConnectController {
     }
 
     /**
+     * Load current mod fragments into the specification.
+     *
+     * @param specification The <code>Specification</code> to load into.
+     */
+    private void loadModFragments(Specification specification) {
+        boolean loadedMod = false;
+        for (FreeColModFile f : freeColClient.getClientOptions()
+                                             .getActiveMods()) {
+            InputStream sis = null;
+            try {
+                sis = f.getSpecificationInputStream();
+            } catch (IOException ioe) {
+                logger.log(Level.WARNING, "IO error in mod fragment "
+                    + f.getId(), ioe);
+            }
+            if (sis != null) {
+                try {
+                    specification.loadFragment(sis);
+                    loadedMod = true;
+                    logger.info("Loaded mod fragment " + f.getId());
+                } catch (RuntimeException rte) {
+                    logger.log(Level.WARNING, "Parse error in mod fragment "
+                        + f.getId(), rte);
+                }
+            }
+        }
+        if (loadedMod) { // Update actions in case new ones loaded.
+            freeColClient.updateActions();
+        }
+    }
+
+    //
+    // There are several ways to start a game.
+    // - multi-player
+    // - single player
+    // - restore from saved game
+    //
+    // They all ultimately have to establish a connection to the server,
+    // and get the game from there, which is done in {@link #login()}.
+    //
+    // When restoring from saved we are mostly done at this point and
+    // the game will begin.  Otherwise we may still need to select a
+    // nation and change game or map options, which is done in the
+    // {@link StartGamePanel}.  The start game panel can then send a
+    // requestLaunch message which will tell the server to generate
+    // the game and map with the required parameters.  The updated
+    // game is sent to all clients with an "updateGame" message.
+    //
+    // The server then tells the clients that the game is starting
+    // with a "startGame" message.  Except for saved games where it
+    // cheats and sets a "startGame" flag in the login response that
+    // short circuits this.  TODO: which is awkward, tidy?
+    //
+    // "startGame" ends up in PreGameController.startGame, where the
+    // inGame state is finally set to true, and the game begins.
+    //
+
+    /**
      * Starts a multiplayer server and connects to it.
      *
      * @param specification The <code>Specification</code> for the game.
@@ -168,38 +226,6 @@ public final class ConnectController {
     }
 
     /**
-     * Load current mod fragments into the specification.
-     *
-     * @param specification The <code>Specification</code> to load into.
-     */
-    private void loadModFragments(Specification specification) {
-        boolean loadedMod = false;
-        for (FreeColModFile f : freeColClient.getClientOptions()
-                                             .getActiveMods()) {
-            InputStream sis = null;
-            try {
-                sis = f.getSpecificationInputStream();
-            } catch (IOException ioe) {
-                logger.log(Level.WARNING, "IO error in mod fragment "
-                    + f.getId(), ioe);
-            }
-            if (sis != null) {
-                try {
-                    specification.loadFragment(sis);
-                    loadedMod = true;
-                    logger.info("Loaded mod fragment " + f.getId());
-                } catch (RuntimeException rte) {
-                    logger.log(Level.WARNING, "Parse error in mod fragment "
-                        + f.getId(), rte);
-                }
-            }
-        }
-        if (loadedMod) { // Update actions in case new ones loaded.
-            freeColClient.updateActions();
-        }
-    }
-
-    /**
      * Starts a new single player game by connecting to the server.
      * TODO: connect client/server directly (not using network-classes)
      *
@@ -247,108 +273,12 @@ public final class ConnectController {
         }
     }
 
-
     /**
-     * Starts the client and connects to <i>host:port</i>.
+     * Loads and starts a game from the given file.
      *
-     * @param host The name of the machine running the
-     *            <code>FreeColServer</code>.
-     * @param port The port to use when connecting to the host.
-     * @return True if the login succeeds.
+     * @param file The saved game.
      */
-    public boolean login(String host, int port) {
-        String userName = FreeCol.getName();
-        freeColClient.setMapEditor(false);
- 
-        freeColClient.askServer().disconnect();
-
-        try {
-            freeColClient.askServer().connect(FreeCol.CLIENT_THREAD + userName,
-                    host, port, freeColClient.getPreGameInputHandler());
-        } catch (Exception e) {
-            gui.errorMessage("server.couldNotConnect", e.getMessage());
-            return false;
-        }
-
-        LoginMessage msg = freeColClient.askServer()
-                                        .login(userName, FreeCol.getVersion());
-        Game game;
-        if (msg == null || (game = msg.getGame()) == null) return false;
-
-        // This completes the client's view of the spec with options
-        // obtained from the server difficulty.  It should not be
-        // required in the client, to be removed later, when newTurn()
-        // only runs in the server
-        freeColClient.setGame(game);
-        Player player = game.getPlayerByName(userName);
-        if (player == null) {
-            logger.warning("New game does not contain player: " + userName);
-            return false;
-        }
-        freeColClient.setMyPlayer(player);
-        freeColClient.addSpecificationActions(game.getSpecification());
-        logger.info("FreeColClient logged in as " + userName
-                    + "/" + player.getId());
-
-        // Reconnect
-        if (msg.getStartGame()) {
-            Tile entryTile = (player.getEntryLocation() == null) ? null
-                : player.getEntryLocation().getTile();
-            freeColClient.setSinglePlayer(msg.isSinglePlayer());
-            freeColClient.getPreGameController().startGame();
-
-            if (msg.isCurrentPlayer()) {
-                freeColClient.getInGameController()
-                    .setCurrentPlayer(player);
-                Unit activeUnit = msg.getActiveUnit();
-                if (activeUnit != null) {
-                    activeUnit.getOwner().resetIterators();
-                    activeUnit.getOwner().setNextActiveUnit(activeUnit);
-                    gui.setActiveUnit(activeUnit);
-                } else {
-                    gui.setSelectedTile(entryTile, false);
-                }
-            } else {
-                gui.setSelectedTile(entryTile, false);
-            }
-        }
-
-        // All done.
-        freeColClient.setLoggedIn(true);
-        return true;
-    }
-
-    /**
-     * Reconnects to the server.
-     */
-    public void reconnect() {
-        final String host = freeColClient.askServer().getClient().getHost();
-        final int port = freeColClient.askServer().getClient().getPort();
-
-        gui.removeInGameComponents();
-        logout(true);
-        login(host, port);
-        freeColClient.getInGameController().nextModelMessage();
-    }
-
-    /**
-     * Opens a dialog where the user should specify the filename
-     * and loads the game.
-     */
-    public void loadGame() {
-        File file = gui.showLoadDialog(FreeColDirectories.getSaveDirectory());
-        if (file != null) {
-            //FreeCol.setSaveDirectory(file.getParentFile());
-            loadGame(file);
-        }
-    }
-
-    /**
-     * Loads a game from the given file.
-     *
-     * @param file The <code>File</code>.
-     */
-    public void loadGame(File file) {
+    public void startSavedGame(File file) {
         final File theFile = file;
 
         freeColClient.setMapEditor(false);
@@ -444,6 +374,7 @@ public final class ConnectController {
         Runnable loadGameJob = new Runnable() {
             public void run() {
                 FreeColServer freeColServer = null;
+                String err = null;
                 try {
                     final FreeColSavegameFile saveGame
                         = new FreeColSavegameFile(theFile);
@@ -460,47 +391,115 @@ public final class ConnectController {
                                 gui.closeStatusPanel();
                             }
                         });
+                    return; // Success!
                 } catch (NoRouteToServerException e) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                gui.closeMainPanel();
-                                gui.showMainPanel();
-                            }
-                        });
-                    SwingUtilities.invokeLater(new ErrorJob("server.noRouteToServer"));
+                    err = "server.noRouteToServer";
                     logger.log(Level.WARNING, "No route to server.", e);
                 } catch (FileNotFoundException e) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                gui.closeMainPanel();
-                                gui.showMainPanel();
-                            }
-                        });
-                    SwingUtilities.invokeLater(new ErrorJob("fileNotFound"));
+                    err = "fileNotFound";
                     logger.log(Level.WARNING, "Can not find file.", e);
                 } catch (IOException e) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                gui.closeMainPanel();
-                                gui.showMainPanel();
-                            }
-                        });
-                    SwingUtilities.invokeLater(new ErrorJob("server.couldNotStart"));
+                    err = "server.couldNotStart";
                     logger.log(Level.WARNING, "Error starting game.", e);
                 } catch (FreeColException e) {
+                    err = e.getMessage();
+                    logger.log(Level.WARNING, "FreeCol error.", e);
+                }
+                if (err != null) {
                     SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 gui.closeMainPanel();
                                 gui.showMainPanel();
                             }
                         });
-                    SwingUtilities.invokeLater(new ErrorJob(e.getMessage()));
-                    logger.log(Level.WARNING, "FreeCol error starting game.",
-                        e);
+                    SwingUtilities.invokeLater(new ErrorJob(err));
                 }
             }
         };
-        freeColClient.worker.schedule(loadGameJob);
+        freeColClient.setWork(loadGameJob);
+    }
+
+    /**
+     * Starts the client and connects to <i>host:port</i>.
+     *
+     * @param host The name of the machine running the
+     *            <code>FreeColServer</code>.
+     * @param port The port to use when connecting to the host.
+     * @return True if the login succeeds.
+     */
+    public boolean login(String host, int port) {
+        String userName = FreeCol.getName();
+        freeColClient.setMapEditor(false);
+ 
+        freeColClient.askServer().disconnect();
+
+        try {
+            freeColClient.askServer().connect(FreeCol.CLIENT_THREAD + userName,
+                    host, port, freeColClient.getPreGameInputHandler());
+        } catch (Exception e) {
+            gui.errorMessage("server.couldNotConnect", e.getMessage());
+            return false;
+        }
+
+        LoginMessage msg = freeColClient.askServer()
+                                        .login(userName, FreeCol.getVersion());
+        Game game;
+        if (msg == null || (game = msg.getGame()) == null) return false;
+
+        // This completes the client's view of the spec with options
+        // obtained from the server difficulty.  It should not be
+        // required in the client, to be removed later, when newTurn()
+        // only runs in the server
+        freeColClient.setGame(game);
+        Player player = game.getPlayerByName(userName);
+        if (player == null) {
+            logger.warning("New game does not contain player: " + userName);
+            return false;
+        }
+        freeColClient.setMyPlayer(player);
+        freeColClient.addSpecificationActions(game.getSpecification());
+        logger.info("FreeColClient logged in as " + userName
+                    + "/" + player.getId());
+
+        // Reconnect
+        if (msg.getStartGame()) {
+            Tile entryTile = (player.getEntryLocation() == null) ? null
+                : player.getEntryLocation().getTile();
+            freeColClient.setSinglePlayer(msg.isSinglePlayer());
+            freeColClient.getPreGameController().startGame();
+
+            if (msg.isCurrentPlayer()) {
+                freeColClient.getInGameController()
+                    .setCurrentPlayer(player);
+                Unit activeUnit = msg.getActiveUnit();
+                if (activeUnit != null) {
+                    activeUnit.getOwner().resetIterators();
+                    activeUnit.getOwner().setNextActiveUnit(activeUnit);
+                    gui.setActiveUnit(activeUnit);
+                } else {
+                    gui.setSelectedTile(entryTile, false);
+                }
+            } else {
+                gui.setSelectedTile(entryTile, false);
+            }
+        }
+
+        // All done.
+        freeColClient.setLoggedIn(true);
+        return true;
+    }
+
+    /**
+     * Reconnects to the server.
+     */
+    public void reconnect() {
+        final String host = freeColClient.askServer().getClient().getHost();
+        final int port = freeColClient.askServer().getClient().getPort();
+
+        gui.removeInGameComponents();
+        logout(true);
+        login(host, port);
+        freeColClient.getInGameController().nextModelMessage();
     }
 
     /**
@@ -513,7 +512,6 @@ public final class ConnectController {
     public void logout(boolean notifyServer) {
         if (notifyServer) {
             freeColClient.askServer().logout();
-
         }
         freeColClient.askServer().disconnect();
 
@@ -559,6 +557,7 @@ public final class ConnectController {
     public void quitGame(boolean stopServer) {
         quitGame(stopServer, true);
     }
+
 
     /**
      * Returns a list of vacant players on a given server.

@@ -103,6 +103,7 @@ public final class FreeColClient {
     /** The client options specific to this player. */
     private ClientOptions clientOptions;
 
+    /** A worker to perform game loading. */
     public final Worker worker;
 
     /**
@@ -261,7 +262,7 @@ public final class FreeColClient {
         if (savedGame != null) {
             SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        connectController.loadGame(savedGame);
+                        connectController.startSavedGame(savedGame);
                     }
                 });
         } else if (spec != null) {
@@ -650,7 +651,15 @@ public final class FreeColClient {
             && game.getCurrentPlayer().equals(player);
     }
 
-
+    /**
+     * Give the worker some work.
+     *
+     * @param runnable The <code>Runnable</code> to do.
+     */
+    public void setWork(Runnable runnable) {
+        worker.schedule(runnable);
+    }
+    
     // Fundamental game start/stop/continue actions
 
     /**

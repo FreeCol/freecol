@@ -92,10 +92,10 @@ public final class PreGameInputHandler extends InputHandler {
         });
         register("requestLaunch", new NetworkRequestHandler() {
             public Element handle(Connection connection, Element element) {
-            	Element reply = requestLaunch(connection, element);
-            	if (reply != null) {
+                Element reply = requestLaunch(connection, element);
+                if (reply != null) {
                     launching = false;
-            	}
+                }
                 return reply;
             }
         });
