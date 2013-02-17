@@ -449,35 +449,36 @@ public class DebugUtils {
         final GUI gui = freeColClient.getGUI();
 
         boolean problemDetected = false;
+        StringBuilder sb = new StringBuilder("Desynchronization detected\n\n");
         for (Tile t : sMap.getAllTiles()) {
             if (sPlayer.canSee(t)) {
                 for (Unit u : t.getUnitList()) {
                     if (!u.isVisibleTo(sPlayer)) continue;
                     if (game.getFreeColGameObject(u.getId(), Unit.class) == null) {
-                        System.out.println("Desynchronization detected: Unit missing on client-side");
-                        System.out.println(Messages.message(Messages.getLabel(u))
+                        sb.append("Unit missing on client-side.\n");
+                        sb.append("  Server: ");
+                        sb.append(Messages.message(Messages.getLabel(u))
                             + "(" + u.getId() + "). Position: "
-                            + u.getTile().getPosition());
+                            + u.getTile().getPosition() + ".\n");
                         try {
-                            System.out.println("Possible unit on client-side: "
+                            sb.append("  Client: "
                                 + map.getTile(u.getTile().getPosition())
-                                .getFirstUnit().getId());
+                                .getFirstUnit().getId() + "\n");
                         } catch (NullPointerException npe) {}
-                        System.out.println();
                         problemDetected = true;
                     } else {
-                        Unit cUnit = game.getFreeColGameObject(u.getId(), Unit.class);
+                        Unit cUnit = game.getFreeColGameObject(u.getId(),
+                                                               Unit.class);
                         if (cUnit.getTile() != null
                             && !cUnit.getTile().getId().equals(u.getTile().getId())) {
-                            System.out.println("Deynchronization detected: Unit located on different tiles");
-                            System.out.println("Server: " + Messages.message(Messages.getLabel(u))
+                            sb.append("Unit located on different tiles.\n");
+                            sb.append("  Server: " + Messages.message(Messages.getLabel(u))
                                 + "(" + u.getId() + "). Position: "
-                                + u.getTile().getPosition());
-                            System.out.println("Client: "
+                                + u.getTile().getPosition() + "\n");
+                            sb.append("  Client: "
                                 + Messages.message(Messages.getLabel(cUnit))
                                 + "(" + cUnit.getId() + "). Position: "
-                                + cUnit.getTile().getPosition());
-                            System.out.println();
+                                + cUnit.getTile().getPosition() + "\n");
                             problemDetected = true;
                         }
                     }
@@ -485,9 +486,22 @@ public class DebugUtils {
             }
         }
 
-        gui.showInformationMessage((problemDetected)
-            ? "menuBar.debug.compareMaps.problem"
-            : "menuBar.debug.compareMaps.checkComplete");
+        for (GoodsType sg : sGame.getSpecification().getGoodsTypeList()) {
+            int sPrice = sPlayer.getMarket().getBidPrice(sg, 1);
+            GoodsType cg = game.getSpecification().getGoodsType(sg.getId());
+            int cPrice = player.getMarket().getBidPrice(cg, 1);
+            if (sPrice != cPrice) {
+                sb.append("Goods prices for " + sg + " differ.\n");
+                sb.append("  Server: " + sPrice + "\n");
+                sb.append("  Client: " + cPrice + "\n");
+                problemDetected = true;
+            }
+        }
+
+        if (problemDetected) {
+            freeColClient.getGUI().showInformationMessage(sb.toString());
+            System.err.println(sb.toString());
+        }
     }
 
     /**
