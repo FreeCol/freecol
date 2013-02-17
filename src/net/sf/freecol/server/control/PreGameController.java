@@ -76,86 +76,27 @@ public final class PreGameController extends Controller {
     /**
      * Updates and starts the new game.
      *
-     * This method performs these tasks in the given order:
+     * Called in response to a requestLaunch message arriving at the 
+     * PreGameInputHandler.
      *
      * <ol>
-     *   <li>Generates the map.
+     *   <li>Creates the game.
      *   <li>Sends updated game information to the clients.
      *   <li>Changes the game state to {@link net.sf.freecol.server.FreeColServer.GameState#IN_GAME}.
      *   <li>Sends the "startGame"-message to the clients.
      * </ol>
      */
     public void startGame() throws FreeColException {
-        FreeColServer freeColServer = getFreeColServer();
-
-        Game game = freeColServer.getGame();
-        Specification spec = game.getSpecification();
-        // Apply the difficulty level
-
-        MapGenerator mapGenerator = freeColServer.getMapGenerator();
-        AIMain aiMain = new AIMain(freeColServer);
-        freeColServer.setAIMain(aiMain);
-        game.setFreeColGameObjectListener(aiMain);
-
-        // Add AI players
-        game.setUnknownEnemy(new ServerPlayer(game, Player.UNKNOWN_ENEMY,
-                                              false, null, null, null));
-        Set<Entry<Nation, NationState>> entries
-            = new HashSet<Entry<Nation, NationState>>(game.getNationOptions()
-                .getNations().entrySet());
-        for (Entry<Nation, NationState> entry : entries) {
-            if (entry.getValue() != NationState.NOT_AVAILABLE
-                && game.getPlayer(entry.getKey().getId()) == null) {
-                freeColServer.addAIPlayer(entry.getKey());
-            }
-        }
-        Collections.sort(game.getPlayers(), Player.playerComparator);
-
-        // Save the old GameOptions as possibly set by clients..
-        // TODO: This might not be the best way to do it, the
-        // createMap should not really use the entire loadGame method.
-        OptionGroup gameOptions = spec.getOptionGroup("gameOptions");
-        Element oldGameOptions = gameOptions.toXMLElement(DOMMessage.createMessage("oldGameOptions").getOwnerDocument());
-
-        // Make the map.
-        mapGenerator.createMap(game);
-
-        // Restore the GameOptions that may have been overwritten by
-        // loadGame in createMap
-        gameOptions.readFromXMLElement(oldGameOptions);
-
-        // Initial stances and randomizations for all players.
-        Random random = getFreeColServer().getServerRandom();
-        for (Player player : game.getPlayers()) {
-            ((ServerPlayer)player).randomizeGame(random);
-            if (player.isIndian()) {
-                // Indian players know about each other, but European colonial
-                // players do not.
-                final int alarm = (Tension.Level.HAPPY.getLimit()
-                    + Tension.Level.CONTENT.getLimit()) / 2;
-                for (Player other : game.getPlayers()) {
-                    if (other != player && other.isIndian()) {
-                        player.setStance(other, Stance.PEACE);
-                        for (IndianSettlement is : player.getIndianSettlements()) {
-                            is.setAlarm(other, new Tension(alarm));
-                        }
-                    }
-                }
-            }
-        }
-
-        // ensure that option groups can not be edited
-        game.getMapGeneratorOptions().setEditable(false);
-        gameOptions.setEditable(false);
-        spec.getOptionGroup("difficultyLevels").setEditable(false);
+        final FreeColServer freeColServer = getFreeColServer();
+        Game game = freeColServer.buildGame();
 
         // Inform the clients.
         for (Player player : game.getPlayers()) {
             if (!player.isAI()) {
-                Connection conn = ((ServerPlayer) player).getConnection();
+                Connection conn = ((ServerPlayer)player).getConnection();
                 Element update = DOMMessage.createMessage("updateGame");
                 update.appendChild(game.toXMLElement(player,
-                        update.getOwnerDocument(), false, false));
+                                   update.getOwnerDocument(), false, false));
                 try {
                     conn.askDumping(update);
                 } catch (IOException e) {
@@ -169,7 +110,6 @@ public final class PreGameController extends Controller {
         try {
             freeColServer.updateMetaServer();
         } catch (NoRouteToServerException e) {}
-
 
         freeColServer.getServer()
             .sendToAll(DOMMessage.createMessage("startGame"));

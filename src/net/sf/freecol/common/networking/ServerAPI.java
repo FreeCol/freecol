@@ -1209,16 +1209,13 @@ public abstract class ServerAPI {
 
 
     public void logout() {
-        
-        client
-            .sendAndWait(DOMMessage.createMessage("logout",
-                    "reason", "User has quit the client."));        
+        client.sendAndWait(DOMMessage.createMessage("logout",
+                "reason", "User has quit the client."));        
     }
 
 
     public void disconnect() {
-        if (client != null) 
-            client.disconnect();        
+        if (client != null) client.disconnect();        
     }
 
 

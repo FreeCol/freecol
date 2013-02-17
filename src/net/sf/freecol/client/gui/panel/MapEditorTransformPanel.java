@@ -58,7 +58,6 @@ import net.sf.freecol.common.model.TileItemContainer;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.generator.RiverSection;
 import net.sf.freecol.server.model.ServerIndianSettlement;
 import net.sf.freecol.server.model.ServerUnit;
@@ -82,13 +81,12 @@ public final class MapEditorTransformPanel extends FreeColPanel {
 
     private final JPanel listPanel;
     private JToggleButton settlementButton;
-
     private ButtonGroup group;
 
     /**
-     * Describe nativePlayer here.
+     * A native player to use for native settlement type and skill.
      */
-    private static Player nativePlayer;
+    private static Player nativePlayer = null;
 
 
     /**
@@ -100,17 +98,16 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     public MapEditorTransformPanel(FreeColClient freeColClient, GUI gui) {
         super(freeColClient, gui, new BorderLayout());
 
-        // assume we have only native players for the moment
+        // Make sure the native players are present.
         if (getGame().getPlayers().isEmpty()) {
-            FreeColServer server = getFreeColClient().getFreeColServer();
-            if (server.getAIMain() == null) {
-                server.setAIMain(new AIMain(server));
-            }
-            for (Nation nation : getSpecification().getIndianNations()) {
-                server.addAIPlayer(nation);
+            getFreeColClient().getFreeColServer().initializeAI(false);
+        }
+        for (Player p : getGame().getPlayers()) {
+            if (p.isIndian()) {
+                nativePlayer = p;
+                break;
             }
         }
-        nativePlayer = getGame().getPlayers().get(0);
         listPanel = new JPanel(new GridLayout(2, 0));
 
         group = new ButtonGroup();
@@ -148,10 +145,12 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         listPanel.add(buildButton(getLibrary().getMiscImage(ImageLibrary.LOST_CITY_RUMOUR, 0.66),
                                   Messages.message("model.message.LOST_CITY_RUMOUR"),
                                   new LostCityRumourTransform()));
-        SettlementType settlementType = nativePlayer.getNationType().getCapitalType();
-        settlementButton = buildButton(getLibrary().getSettlementImage(settlementType, 0.5),
-                                       Messages.message("Settlement"), new SettlementTransform());
-        listPanel.add(settlementButton);
+        if (nativePlayer != null) {
+            SettlementType settlementType = nativePlayer.getNationType().getCapitalType();
+            settlementButton = buildButton(getLibrary().getSettlementImage(settlementType, 0.5),
+                                           Messages.message("Settlement"), new SettlementTransform());
+            listPanel.add(settlementButton);
+        }
     }
 
     /**
@@ -376,7 +375,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         public void transform(Tile t) {
             if (t.isLand()) {
                 Settlement settlement = t.getSettlement();
-                if (settlement == null) {
+                if (settlement == null && nativePlayer != null) {
                     logger.info("Adding settlement to tile " + t);
                     UnitType skill = ((IndianNationType) nativePlayer.getNationType()).getSkills().get(0)
                         .getObject();
