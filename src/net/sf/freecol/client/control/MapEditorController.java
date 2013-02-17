@@ -83,17 +83,17 @@ public final class MapEditorController {
 
     /**
      * Enters map editor modus.
+     *
+     * TODO: The TC and difficulty level can now be set at the command line,
+     * but we should do better.
      */
     public void startMapEditor() {
-
-        // TODO: fixme! Specification must be known in advance
-        final String tc = "freecol";
+        final String tc = FreeCol.getTC();
 
         try {
             FreeColTcFile tcData = new FreeColTcFile(tc);
             Specification specification = tcData.getSpecification();
-            // TODO: fixme! Difficulty level must also be known in advance
-            specification.applyDifficultyLevel("model.difficulty.medium");
+            specification.applyDifficultyLevel(FreeCol.getDifficulty());
             freeColClient.setMapEditor(true);
             final FreeColServer freeColServer
                 = new FreeColServer(false, false, specification, 0, null);
@@ -166,7 +166,7 @@ public final class MapEditorController {
 
         try {
             if (game.getSpecification().getDifficultyLevel() == null) {
-                game.getSpecification().applyDifficultyLevel("model.difficulty.medium");
+                game.getSpecification().applyDifficultyLevel(FreeCol.getDifficulty());
             }
             mapGenerator.createMap(game);
             gui.setFocus(game.getMap().getTile(1,1));
