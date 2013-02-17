@@ -140,33 +140,6 @@ public final class Market extends FreeColGameObject implements Ownable {
     // ------------------------------------------------------------ API methods
 
     /**
-     * Makes a slight randomization to all the new world and luxury goods
-     * types.  Used at the start of game by the PreGameController.
-     *
-     * @param random A pseudo-random number source.
-     */
-    public void randomizeInitialPrice(Random random) {
-        Specification spec = getGame().getSpecification();
-        for (GoodsType type : spec.getGoodsTypeList()) {
-            String prefix = "model.option." + type.getSuffix("model.goods.");
-            // these options are not available for all goods types
-            if (spec.hasOption(prefix + ".minimumPrice")
-                && spec.hasOption(prefix + ".maximumPrice")) {
-                int min = spec.getInteger(prefix + ".minimumPrice");
-                int max = spec.getInteger(prefix + ".maximumPrice");
-                int value = min;
-                if (max > min) {
-                    value += Utils.randomInt(null, null, random, max - min);
-                } else if (max < min) {
-                    // user error
-                    value = max + Utils.randomInt(null, null, random, min - max);
-                }
-                setInitialPrice(type, value);
-            }
-        }
-    }
-
-    /**
      * Return the market data for a type of goods.  This one is public
      * so the server can send individual MarketData updates.
      *
@@ -532,6 +505,19 @@ public final class Market extends FreeColGameObject implements Ownable {
         owner = getFreeColGameObject(in, "owner", Player.class);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        marketData.clear();
+
+        super.readChildren(in);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
         if (in.getLocalName().equals(MarketData.getXMLElementTagName())) {
@@ -548,7 +534,21 @@ public final class Market extends FreeColGameObject implements Ownable {
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * {@inheritDoc}
+     */
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[");
+        sb.append(getXMLElementTagName());
+        sb.append(" owner=").append(owner.getId());
+        for (MarketData md : marketData.values()) {
+            sb.append(" ").append(md.toString());
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+
+    /**
+     * Gets the tag name of the root element representing this object.
      *
      * @return "market".
      */

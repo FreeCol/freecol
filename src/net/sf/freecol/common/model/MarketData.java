@@ -471,6 +471,27 @@ public class MarketData extends FreeColGameObject {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[");
+        sb.append(getXMLElementTagName());
+        sb.append(" ").append(goodsType.getId());
+        sb.append(" costToBuy=").append(costToBuy);
+        sb.append(" paidForSale=").append(paidForSale);
+        sb.append(" amountInMarket=").append(amountInMarket);
+        sb.append(" initialPrice=").append(initialPrice);
+        sb.append(" arrears=").append(arrears);
+        sb.append(" sales=").append(sales);
+        sb.append(" incomeBeforeTaxes=").append(incomeBeforeTaxes);
+        sb.append(" incomeAfterTaxes=").append(incomeAfterTaxes);
+        sb.append(" oldPrice=").append(oldPrice);
+        sb.append(" traded=").append(traded);
+        sb.append("]");
+        return sb.toString();
+    }
+
+    /**
      * Returns the tag name of the root element representing this object.
      *
      * @return "marketData"

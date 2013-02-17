@@ -256,12 +256,40 @@ public class ServerPlayer extends Player implements ServerModelObject {
      *
      * @param random A pseudo-random number source.
      */
-    public void startGame(Random random) {
+    public void randomizeGame(Random random) {
         Specification spec = getGame().getSpecification();
         if (isEuropean() && !isREF()) {
             modifyGold(spec.getInteger(GameOptions.STARTING_MONEY));
             ((ServerEurope) getEurope()).initializeMigration(random);
-            getMarket().randomizeInitialPrice(random);
+            Market market = getMarket();
+            StringBuilder sb = new StringBuilder();
+            boolean changed = false;
+            for (GoodsType type : spec.getGoodsTypeList()) {
+                String prefix = "model.option."
+                    + type.getSuffix("model.goods.");
+                // these options are not available for all goods types
+                if (spec.hasOption(prefix + ".minimumPrice")
+                    && spec.hasOption(prefix + ".maximumPrice")) {
+                    int min = spec.getInteger(prefix + ".minimumPrice");
+                    int max = spec.getInteger(prefix + ".maximumPrice");
+                    if (max < min) { // User error
+                        int bad = min;
+                        min = max;
+                        max = bad;
+                    } else if (max == min) continue;
+                    int add = Utils.randomInt(null, null, random, max - min);
+                    if (add > 0) {
+                        market.setInitialPrice(type, min + add);
+                        market.flushPriceChange(type);
+                        sb.append(", " + type.getId() + " -> " + min + add);
+                        changed = true;
+                    }
+                }
+            }
+            if (changed) {
+                logger.finest("randomizeGame(" + getId() + ") initial prices: "
+                    + sb.toString().substring(2));
+            }
         }
     }
 
