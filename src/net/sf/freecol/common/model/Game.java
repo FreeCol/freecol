@@ -1154,9 +1154,8 @@ public class Game extends FreeColGameObject {
                 Specification spec = new Specification();
                 spec.readFromXML(in);
                 if (specification == null) {
-                    logger.info("Loaded specification from saved game.");
                     specification = spec;
-                    specification.clean();
+                    specification.clean("load in Game");
                 } else {
                     logger.warning("Ignoring specification in saved game.");
                 }
