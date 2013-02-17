@@ -103,9 +103,8 @@ public final class DifficultyDialog extends OptionsDialog implements TreeSelecti
         boolean customized = loadCustomOptions();
 
         OptionGroup group = specification.getOptionGroup("difficultyLevels");
-        selected = (customized)
-            ? specification.getDifficultyLevel(CUSTOM_LEVEL)
-            : FreeCol.getDifficulty(specification);
+        selected = specification.getDifficultyLevel((customized) ? CUSTOM_LEVEL
+            : FreeCol.getDifficulty());
         if (selected == null) {
             // this really should not happen
             selected = specification.getDifficultyLevels().get(0);

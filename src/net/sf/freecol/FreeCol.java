@@ -732,23 +732,6 @@ public final class FreeCol {
     }
 
     /**
-     * Gets a difficulty level option group from a specification.
-     *
-     * @param spec The <code>Specification</code> to search.
-     * @return A difficulty level, or null if none found.
-     */
-    public static OptionGroup getDifficulty(Specification spec) {
-        String diff = getDifficulty();
-        OptionGroup difficulties = (OptionGroup)spec.getOptionGroup("difficultyLevels");
-        for (Option o : difficulties.getOptions()) {
-            if (o instanceof OptionGroup && o.getId().equals(diff)) {
-                return (OptionGroup)o;
-            }
-        }
-        return null;
-    }
-
-    /**
      * Sets the difficulty level.
      *
      * @param difficulty The new difficulty level.
@@ -936,12 +919,11 @@ public final class FreeCol {
         if (debugStart) {
             try {
                 FreeColTcFile tcf = getTCFile();
-                if (tcf != null) spec = tcf.getSpecification();
+                if (tcf != null) {
+                    spec = tcf.getSpecification();
+                    spec.applyDifficultyLevel(FreeCol.getDifficulty());
+                }
             } catch (IOException ioe) {}
-        }
-        if (spec != null) {
-            OptionGroup og = getDifficulty(spec);
-            if (og != null) spec.applyDifficultyLevel(og);
         }
         new FreeColClient(FreeColDirectories.getSavegameFile(), windowSize,
                           sound, splashFilename, introVideo, fontName, spec);
