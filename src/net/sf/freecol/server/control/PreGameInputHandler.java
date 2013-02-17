@@ -117,7 +117,7 @@ public final class PreGameInputHandler extends InputHandler {
         OptionGroup gameOptions = spec.getOptionGroup("gameOptions");
         Element child = (Element)element.getChildNodes().item(0);
         gameOptions.readFromXMLElement(child);
-        spec.clean();
+        spec.clean("update game options (server)");
 
         Element up = DOMMessage.createMessage("updateGameOptions");
         up.appendChild(gameOptions.toXMLElement(up.getOwnerDocument()));
@@ -300,7 +300,7 @@ public final class PreGameInputHandler extends InputHandler {
             ((PreGameController)freeColServer.getController()).startGame();
         } catch (FreeColException e) {
             return DOMMessage.createError("server.errorStartingGame",
-                "An error occurred while starting the game!");
+                                          e.getMessage());
         }
 
         return null;

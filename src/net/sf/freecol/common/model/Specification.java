@@ -212,7 +212,7 @@ public final class Specification {
         this();
         initialized = false;
         load(in);
-        clean();
+        clean("load from InputStream");
         initialized = true;
     }
 
@@ -286,8 +286,18 @@ public final class Specification {
         initialized = true;
     }
 
-    public void clean() {
-        logger.finest("Cleaning up specification.");
+    /**
+     * Clean up the specification.
+     *
+     * Builds all the cached containers and secondary variables.  This
+     * *must* clear any containers before building as it may be called
+     * multiple times in response to various specification updates.
+     *
+     * @param why A short statement of why the specification needed to
+     *     be cleaned.
+     */
+    public void clean(String why) {
+        logger.finest("Cleaning up specification following " + why + ".");
 
         Iterator<FreeColGameObjectType> typeIterator
             = allTypes.values().iterator();
@@ -406,7 +416,7 @@ public final class Specification {
             logger.log(Level.WARNING, "Failed to set year options", e);
         }
 
-        logger.info("Specification clean complete"
+        logger.info("Specification clean following " + why + " complete"
                     + ", starting year=" + Turn.getStartingYear()
                     + ", season year=" + Turn.getSeasonYear()
                     + ", " + allTypes.size() + " FreeColGameObjectTypes"

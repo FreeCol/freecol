@@ -148,7 +148,7 @@ public final class PreGameController {
     public void sendGameOptions() {
         Specification spec = freeColClient.getGame().getSpecification();
         OptionGroup gameOptions = spec.getOptionGroup("gameOptions");
-        spec.clean();
+        spec.clean("update game options (client initiated)");
 
         freeColClient.askServer().updateGameOptions(gameOptions);
 

@@ -328,7 +328,7 @@ public final class PreGameInputHandler extends InputHandler {
         Specification spec = game.getSpecification();
         OptionGroup gameOptions = spec.getOptionGroup("gameOptions");
         gameOptions.readFromXMLElement(mgoElement);
-        spec.clean();
+        spec.clean("update game options (server initiated)");
 
         gui.updateGameOptions();
 
