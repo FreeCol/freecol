@@ -579,7 +579,7 @@ public final class ConnectController {
         List<String> items = new ArrayList<String>();
         Element element = DOMMessage.createMessage("getVacantPlayers");
         try {
-            Element reply = mc.ask(element);
+            Element reply = mc.askDumping(element);
             if (reply == null) {
                 logger.warning("The server did not return a list.");
                 return null;
@@ -620,7 +620,7 @@ public final class ConnectController {
         }
 
         try {
-            Element reply = mc.ask(DOMMessage.createMessage("getServerList"));
+            Element reply = mc.askDumping(DOMMessage.createMessage("getServerList"));
             if (reply == null) {
                 gui.errorMessage("metaServer.communicationError");
                 logger.warning("The meta-server did not return a list.");
