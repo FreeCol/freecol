@@ -406,7 +406,7 @@ public final class Specification {
             logger.log(Level.WARNING, "Failed to set year options", e);
         }
 
-        logger.info("Specification clean following " + why + " complete"
+        logger.info("Specification clean complete"
                     + ", starting year=" + Turn.getStartingYear()
                     + ", season year=" + Turn.getSeasonYear()
                     + ", " + allTypes.size() + " FreeColGameObjectTypes"
