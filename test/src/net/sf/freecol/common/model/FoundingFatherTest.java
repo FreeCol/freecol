@@ -19,10 +19,13 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.util.test.FreeColTestCase;
+
 
 /**
  * Test cases that apply to all Founding Fathers, or to the
@@ -30,14 +33,14 @@ import net.sf.freecol.util.test.FreeColTestCase;
  */
 public class FoundingFatherTest extends FreeColTestCase {
 
-    private static GoodsType musketsType
+    private static final GoodsType musketsType
         = spec().getGoodsType("model.goods.muskets");
 
-    private static UnitType servantType
+    private static final UnitType servantType
         = spec().getUnitType("model.unit.indenturedServant");
-    private static UnitType colonistType
+    private static final UnitType colonistType
         = spec().getUnitType("model.unit.freeColonist");
-    private static UnitType statesmanType
+    private static final UnitType statesmanType
         = spec().getUnitType("model.unit.elderStatesman");
 
 
@@ -86,8 +89,8 @@ public class FoundingFatherTest extends FreeColTestCase {
 
     public void testAddAllFathers() {
         // check that all fathers can be added
-    	Game game = getGame();
-    	game.setMap(getTestMap(true));
+        Game game = getGame();
+        game.setMap(getTestMap(true));
 
         Colony colony = getStandardColony(4);
         Player player = colony.getOwner();
@@ -98,14 +101,13 @@ public class FoundingFatherTest extends FreeColTestCase {
     }
 
     public void testBellsRequired() {
-
         int[] expectedValues = new int[] {
             40, 201, 442, 763, 1164, 1645 , 2206, 2847, 3568, 4369,
             5250, 6211, 7252, 8373, 9574, 10855, 12216, 13657, 15178,
             16779, 18460, 20221, 22062, 23983, 25984
         };
 
-    	Game game = getGame();
+        Game game = getGame();
         Player dutch = game.getPlayer("model.nation.dutch");
 
         //assertEquals(2, getGame().getGameOptions().getInteger(GameOptions.DIFFICULTY));
@@ -122,10 +124,11 @@ public class FoundingFatherTest extends FreeColTestCase {
 
     public void testAvailableTo() {
         // this feature is not used at the moment
-    	Game game = getGame();
+        Game game = getGame();
         for (FoundingFather father : spec().getFoundingFathers()) {
             for (Player player : game.getPlayers()) {
-                assertEquals(player.getNationID(), player.isEuropean(), father.isAvailableTo(player));
+                assertEquals(player.getNationID(), player.isEuropean(), 
+                             father.isAvailableTo(player));
             }
         }
 
@@ -138,21 +141,20 @@ public class FoundingFatherTest extends FreeColTestCase {
         dutchScope.setMethodName("getNationID");
         dutchScope.setMethodValue("model.nation.dutch");
         assertTrue(dutchScope.appliesTo(dutch));
-        newFather.getScopes().add(dutchScope);
 
         Scope frenchScope = new Scope();
         frenchScope.setMethodName("getNationType");
         frenchScope.setMethodValue("model.nationType.cooperation");
         assertTrue(frenchScope.appliesTo(french));
-        newFather.getScopes().add(frenchScope);
 
+        List<Scope> scopes = new ArrayList<Scope>();
+        scopes.add(dutchScope);
+        scopes.add(frenchScope);
+        newFather.setScopes(scopes);
         for (Player player : game.getPlayers()) {
-            assertEquals(player.getNationID(), (player == french || player == dutch),
+            assertEquals(player.getNationID(),
+                         (player == french || player == dutch),
                          newFather.isAvailableTo(player));
         }
-
-
     }
-
-
 }

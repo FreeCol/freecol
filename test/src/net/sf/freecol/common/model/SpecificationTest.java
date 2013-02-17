@@ -112,9 +112,9 @@ public final class SpecificationTest extends FreeColTestCase {
         assertTrue(smith.getWeight(1) <= 10);
         assertTrue(smith.getWeight(2) <= 10);
         assertTrue(smith.getWeight(3) <= 10);
-        // weight 3 is the default
-        assertTrue(smith.getWeight(3) == smith.getWeight(0));
-        assertTrue(smith.getWeight(3) == smith.getWeight(34));
+
+        assertTrue(smith.getWeight(0) == 0);
+        assertTrue(smith.getWeight(34) == 0);
         // check for ability
         assertTrue(smith.hasAbility("model.ability.buildFactory"));
     }

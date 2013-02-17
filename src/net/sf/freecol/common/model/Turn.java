@@ -54,6 +54,12 @@ public class Turn {
         1492, 1600, 1700
     };
 
+    /**
+     * The number of ages.
+     * Used by FoundingFather for age-dependent weights.
+     */
+    public static final int NUMBER_OF_AGES = ages.length;
+
 
     /**
      * Creates a new <code>Turn</code> instance.
