@@ -402,39 +402,58 @@ public final class Specification {
             if (seasonYear < startingYear) seasonYear = startingYear;
             Turn.setStartingYear(startingYear);
             Turn.setSeasonYear(seasonYear);
-            logger.info("Initialized turn"
-                + ", starting year=" + Integer.toString(Turn.getStartingYear())
-                + ", season year=" + Integer.toString(Turn.getSeasonYear()));
         } catch (Exception e) {
             logger.log(Level.WARNING, "Failed to set year options", e);
         }
 
-        // generate dynamic game options
+        logger.info("Specification clean following " + why + " complete"
+                    + ", starting year=" + Turn.getStartingYear()
+                    + ", season year=" + Turn.getSeasonYear()
+                    + ", " + allTypes.size() + " FreeColGameObjectTypes"
+                    + ", " + allOptions.size() + " Options"
+                    + ", " + allAbilities.size() + " Abilities"
+                    + ", " + allModifiers.size() + " Modifiers read.");
+    }
+
+    /**
+     * Generate the dynamic options.
+     *
+     * Only call this in the server.  If clients call it the European
+     * prices can be desynchronized.
+     */
+    public void generateDynamicOptions() {
+        logger.finest("Generating dynamic options.");
         OptionGroup prices = new OptionGroup("gameOptions.prices", this);
         for (GoodsType goodsType : goodsTypeList) {
             String name = goodsType.getSuffix("model.goods.");
+            String base = "model.option." + name + ".";
             if (goodsType.getInitialSellPrice() > 0) {
-                int diff = (goodsType.isNewWorldGoodsType() || goodsType.isNewWorldLuxuryType()) ? 3 : 0;
-                IntegerOption minimum = new IntegerOption("model.option." + name + ".minimumPrice", this);
+                int diff = (goodsType.isNewWorldGoodsType()
+                    || goodsType.isNewWorldLuxuryType()) ? 3 : 0;
+                IntegerOption minimum
+                    = new IntegerOption(base + "minimumPrice", this);
                 minimum.setValue(goodsType.getInitialSellPrice());
                 minimum.setMinimumValue(1);
                 minimum.setMaximumValue(100);
                 prices.add(minimum);
                 addAbstractOption(minimum);
-                IntegerOption maximum = new IntegerOption("model.option." + name + ".maximumPrice", this);
+                IntegerOption maximum
+                    = new IntegerOption(base + "maximumPrice", this);
                 maximum.setValue(goodsType.getInitialSellPrice() + diff);
                 maximum.setMinimumValue(1);
                 maximum.setMaximumValue(100);
                 prices.add(maximum);
                 addAbstractOption(maximum);
-                IntegerOption spread = new IntegerOption("model.option." + name + ".spread", this);
+                IntegerOption spread
+                    = new IntegerOption(base + "spread", this);
                 spread.setValue(goodsType.getPriceDifference());
                 spread.setMinimumValue(1);
                 spread.setMaximumValue(100);
                 prices.add(spread);
                 addAbstractOption(spread);
             } else if (goodsType.getPrice() < FreeColGameObjectType.INFINITY) {
-                IntegerOption price = new IntegerOption("model.option." + name + ".price", this);
+                IntegerOption price
+                    = new IntegerOption(base + "price", this);
                 price.setValue(goodsType.getPrice());
                 price.setMinimumValue(1);
                 price.setMaximumValue(100);
@@ -443,14 +462,8 @@ public final class Specification {
             }
         }
         getOptionGroup("gameOptions").add(prices);
-        allOptionGroups.put(id, prices);
-
-        logger.info("Specification initialization complete. "
-                    + allTypes.size() + " FreeColGameObjectTypes,\n"
-                    + allOptions.size() + " Options, "
-                    + allAbilities.size() + " Abilities, "
-                    + allModifiers.size() + " Modifiers read.");
     }
+
 
     private interface ChildReader {
         public void readChildren(XMLStreamReader xsr) throws XMLStreamException;
@@ -520,7 +533,7 @@ public final class Specification {
             while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 String optionType = xsr.getLocalName();
                 String recursiveString = xsr.getAttributeValue(null, "recursive");
-                boolean recursive = "false".equals(recursiveString) ? false : true;
+                boolean recursive = !"false".equals(recursiveString);
                 if (OptionGroup.getXMLElementTagName().equals(optionType)) {
                     String id = xsr.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG);
                     OptionGroup group = allOptionGroups.get(id);

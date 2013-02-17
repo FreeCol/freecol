@@ -1339,6 +1339,7 @@ public final class FreeColServer {
         gameOptions.readFromXMLElement(oldGameOptions);
 
         // Initial stances and randomizations for all players.
+        spec.generateDynamicOptions();
         Random random = getServerRandom();
         for (Player player : game.getPlayers()) {
             ((ServerPlayer)player).randomizeGame(random);
