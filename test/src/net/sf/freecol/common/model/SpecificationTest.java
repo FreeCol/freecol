@@ -20,24 +20,26 @@
 package net.sf.freecol.common.model;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.FileInputStream;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.util.test.FreeColTestCase;
+
 
 public final class SpecificationTest extends FreeColTestCase {
 
     /**
      * Make sure that a specification object can be created without an exception
      * being thrown.
-     *
      */
     public void testLoad() {
-
         Specification spec = null;
         try {
             spec = new FreeColTcFile("freecol").getSpecification();
@@ -45,9 +47,7 @@ public final class SpecificationTest extends FreeColTestCase {
             e.printStackTrace();
             fail();
         }
-
-    	assertNotNull(spec);
-
+        assertNotNull(spec);
     }
 
     /**
@@ -281,18 +281,17 @@ public final class SpecificationTest extends FreeColTestCase {
         }
     }
 
-    public void testLoadFragment() {
+    public void testLoadMods() {
         try {
             Specification specification = new Specification(new FreeColTcFile("freecol").getSpecificationInputStream());
             int numberOfUnitTypes = specification.numberOfUnitTypes();
-            specification.loadFragment(new FileInputStream("data/mods/example/specification.xml"));
+            List<FreeColModFile> mods = new ArrayList<FreeColModFile>();
+            mods.add(new FreeColModFile(new File("data/mods/example")));
+            specification.loadMods(mods);
             UnitType milkmaid = specification.getUnitType("model.unit.milkmaid");
             assertEquals(numberOfUnitTypes + 1, specification.numberOfUnitTypes());
         } catch(Exception e) {
             fail(e.getMessage());
         }
-
     }
-
-
 }

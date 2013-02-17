@@ -38,6 +38,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.option.AbstractOption;
@@ -203,19 +204,8 @@ public final class Specification {
 
 
     /**
-     * Creates a new Specification object by loading it from the
-     * given <code>InputStream</code>.
-     *
-     * @param in an <code>InputStream</code> value
+     * Creates a new Specification object.
      */
-    public Specification(InputStream in) {
-        this();
-        initialized = false;
-        load(in);
-        clean("load from InputStream");
-        initialized = true;
-    }
-
     public Specification() {
         logger.fine("Initializing Specification");
         for (FreeColGameObjectType source : new FreeColGameObjectType[] {
@@ -267,11 +257,22 @@ public final class Specification {
         readerMap.put("options", new OptionReader());
     }
 
-    private void load(InputStream in) {
+    /**
+     * Creates a new Specification object by loading it from the
+     * given <code>XMLStreamReader</code>.
+     *
+     * @param xsr The <code>XMLStreamReader</code> to read from.
+     */
+    public Specification(XMLStreamReader xsr) {
+        this();
+        initialized = false;
+        load(xsr);
+        clean("load from XMLStream");
+        initialized = true;
+    }
 
+    private void load(XMLStreamReader xsr) {
         try {
-            XMLStreamReader xsr = XMLInputFactory.newInstance().createXMLStreamReader(in);
-            xsr.nextTag();
             readFromXML(xsr);
         } catch (Exception e) {
             logger.log(Level.WARNING, "Load exception", e);
@@ -280,10 +281,60 @@ public final class Specification {
         }
     }
 
-    public void loadFragment(InputStream in) {
+    /**
+     * Creates a new Specification object by loading it from the
+     * given <code>InputStream</code>.
+     *
+     * @param in The <code>InputStream</code> to read from.
+     */
+    public Specification(InputStream in) {
+        this();
         initialized = false;
         load(in);
+        clean("load from InputStream");
         initialized = true;
+    }
+
+    private void load(InputStream in) {
+        try {
+            XMLStreamReader xsr
+                = XMLInputFactory.newInstance().createXMLStreamReader(in);
+            xsr.nextTag();
+            load(xsr);
+        } catch (XMLStreamException xse) {
+            logger.log(Level.WARNING, "Load stream exception", xse);
+            throw new RuntimeException("Error parsing specification: "
+                + xse.getMessage());
+        }
+    }
+
+    /**
+     * Load mods into this specification.
+     *
+     * @param mods A list of <code>FreeColModFile</code>s to load.
+     * @return True if any mod was loaded.
+     */
+    public boolean loadMods(List<FreeColModFile> mods) {
+        initialized = false;
+        boolean loadedMod = false;
+        for (FreeColModFile mod : mods) {
+            InputStream sis = null;
+            try {
+                sis = mod.getSpecificationInputStream();
+                load(sis);
+                loadedMod = true;
+                logger.info("Loaded mod " + mod.getId());
+            } catch (IOException ioe) {
+                logger.log(Level.WARNING, "Read error in mod " + mod.getId(),
+                    ioe);
+            } catch (RuntimeException rte) {
+                logger.log(Level.WARNING, "Parse error in mod " + mod.getId(),
+                    rte);
+            }
+        }
+        if (loadedMod) clean("mod loading");
+        initialized = true;
+        return loadedMod;
     }
 
     /**

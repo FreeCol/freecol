@@ -106,38 +106,6 @@ public final class ConnectController {
         return true;
     }
 
-    /**
-     * Load current mod fragments into the specification.
-     *
-     * @param specification The <code>Specification</code> to load into.
-     */
-    private void loadModFragments(Specification specification) {
-        boolean loadedMod = false;
-        for (FreeColModFile f : freeColClient.getClientOptions()
-                                             .getActiveMods()) {
-            InputStream sis = null;
-            try {
-                sis = f.getSpecificationInputStream();
-            } catch (IOException ioe) {
-                logger.log(Level.WARNING, "IO error in mod fragment "
-                    + f.getId(), ioe);
-            }
-            if (sis != null) {
-                try {
-                    specification.loadFragment(sis);
-                    loadedMod = true;
-                    logger.info("Loaded mod fragment " + f.getId());
-                } catch (RuntimeException rte) {
-                    logger.log(Level.WARNING, "Parse error in mod fragment "
-                        + f.getId(), rte);
-                }
-            }
-        }
-        if (loadedMod) { // Update actions in case new ones loaded.
-            freeColClient.updateActions();
-        }
-    }
-
     //
     // There are several ways to start a game.
     // - multi-player
@@ -240,11 +208,18 @@ public final class ConnectController {
 
         if (!unblockServer(FreeCol.getServerPort())) return;
 
-        loadModFragments(specification);
+        // Load the player mods into the specification that is about to be
+        // used to initialize the server.
+        //
+        // ATM we only allow mods in single player games.
+        // TODO: allow in stand alone server starts?
+        specification.loadMods(freeColClient.getClientOptions()
+                                            .getActiveMods());
 
         FreeColServer freeColServer;
         try {
-            freeColServer = new FreeColServer(false, true, specification, -1, null);
+            freeColServer = new FreeColServer(false, true, specification,
+                                              -1, null);
         } catch (NoRouteToServerException e) {
             gui.errorMessage("server.noRouteToServer");
             logger.log(Level.WARNING, "No route to server (single player!).",
@@ -458,6 +433,7 @@ public final class ConnectController {
         }
         freeColClient.setMyPlayer(player);
         freeColClient.addSpecificationActions(game.getSpecification());
+        freeColClient.updateActions();
         logger.info("FreeColClient logged in as " + userName
                     + "/" + player.getId());
 
