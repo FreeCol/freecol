@@ -1247,6 +1247,12 @@ public final class Specification {
     }
 
     // -- DifficultyLevels --
+
+    /**
+     * Gets the difficulty levels in this specification.
+     *
+     * @return A list of difficulty levels in this specification.
+     */
     public List<OptionGroup> getDifficultyLevels() {
         List<OptionGroup> result = new ArrayList<OptionGroup>();
         for (Option option : allOptionGroups.get("difficultyLevels").getOptions()) {
@@ -1258,62 +1264,42 @@ public final class Specification {
     }
 
     /**
-     * Return the current difficulty level.
+     * Gets the current difficulty level.
      *
-     * @return the current difficulty level
+     * @return The current difficulty level.
      */
     public OptionGroup getDifficultyLevel() {
         return allOptionGroups.get(difficultyLevel);
     }
 
     /**
-     * Describe <code>getDifficultyLevel</code> method here.
+     * Gets a difficulty level by id.
      *
-     * @param id a <code>String</code> value
-     * @return a <code>DifficultyLevel</code> value
+     * @param id The id to look for.
+     * @return The corresponding difficulty level, if any.
      */
     public OptionGroup getDifficultyLevel(String id) {
         return allOptionGroups.get(id);
     }
 
     /**
-     * Describe <code>getDifficultyLevel</code> method here.
-     *
-     * @param level an <code>int</code> value
-     * @return a <code>DifficultyLevel</code> value
-     */
-    public OptionGroup getDifficultyLevel(int level) {
-        return getDifficultyLevels().get(level);
-    }
-
-    /**
-     * Applies the difficulty level identified by the given integer to
-     * the current specification.
-     *
-     * @param difficultyLevel index of difficulty level to apply
-     */
-    public void applyDifficultyLevel(int difficultyLevel) {
-        applyDifficultyLevel(getDifficultyLevel(difficultyLevel));
-    }
-
-    /**
      * Applies the difficulty level identified by the given String to
      * the current specification.
      *
-     * @param difficultyLevel id of difficulty level to apply
+     * @param difficultyLevel The id of a difficulty level to apply
      */
     public void applyDifficultyLevel(String difficultyLevel) {
         applyDifficultyLevel(getDifficultyLevel(difficultyLevel));
     }
 
-
     /**
      * Applies the given difficulty level to the current
      * specification.
      *
-     * @param level difficulty level to apply
+     * @param level The difficulty level <code>OptionGroup</code> to apply.
      */
     public void applyDifficultyLevel(OptionGroup level) {
+        if (level == null) return;
         logger.fine("Applying difficulty level " + level.getId());
         addOptionGroup(level, true);
 

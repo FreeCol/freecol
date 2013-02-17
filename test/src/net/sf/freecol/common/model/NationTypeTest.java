@@ -22,6 +22,7 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 
@@ -90,9 +91,9 @@ public class NationTypeTest extends FreeColTestCase {
     }
 
     public void testStartingUnits() {
-
-        for (int difficulty = 0; difficulty < 5; difficulty++) {
-            spec().applyDifficultyLevel(difficulty);
+        int difficulty = 0;
+        for (OptionGroup og : spec().getDifficultyLevels()) {
+            spec().applyDifficultyLevel(og);
             for (EuropeanNationType type : spec().getEuropeanNationTypes()) {
                 List<AbstractUnit> startingUnits = type.getStartingUnits();
                 assertEquals("Wrong number of starting units: " + type.toString(),
@@ -134,10 +135,8 @@ public class NationTypeTest extends FreeColTestCase {
                     }
                 }
             }
-
+            difficulty++;
         }
-
-
     }
 
     public void testAdvantagesThatOnlyApplyToPersons() {
