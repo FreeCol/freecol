@@ -66,6 +66,8 @@ public class FreeColGameObjectType extends FreeColObject {
      * is nothing but the order in which the objects of the respective
      * class were defined.  It is guaranteed to remain stable only for
      * a particular revision of a particular specification.
+     *
+     * Do not serialize.
      */
     private int index = -1;
 
@@ -239,7 +241,10 @@ public class FreeColGameObjectType extends FreeColObject {
 
     // Serialization
 
+    // FreeColGameObjectTypes use the ID_ATTRIBUTE_TAG for their ids.
+    // We do not serialize index, so no INDEX_TAG.
     private static final String ABSTRACT_TAG = "abstract";
+
 
     /**
      * {@inheritDoc}
@@ -260,10 +265,17 @@ public class FreeColGameObjectType extends FreeColObject {
         super.toXML(out, tag);
     }
 
-    // We do not need a writeAttributes to write the abstractType
-    // attribute, as once the spec is read, all cases of
-    // abstractType==true are removed.
+    /**
+     * {@inheritDoc}
+     */
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        writeAttribute(out, ID_ATTRIBUTE_TAG, getId());
 
+        // We do not need to write the abstractType attribute, as once
+        // the spec is read, all cases of abstractType==true are
+        // removed.
+    }
+    
     /**
      * {@inheritDoc}
      */
@@ -286,7 +298,12 @@ public class FreeColGameObjectType extends FreeColObject {
      */
     @Override
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+        String newId = getAttribute(in, ID_ATTRIBUTE_TAG, (String)null);
+        if (newId == null) {
+            throw new XMLStreamException("Null " + ID_ATTRIBUTE_TAG);
+        } else {
+            setId(newId);
+        }
 
         abstractType = getAttribute(in, ABSTRACT_TAG, false);
     }
