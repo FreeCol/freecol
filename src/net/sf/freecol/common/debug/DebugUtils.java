@@ -300,6 +300,7 @@ public class DebugUtils {
     public static void addSkipChangeListener(final FreeColClient freeColClient,
                                              JMenu menu, final JMenuItem item) {
         final FreeColServer server = freeColClient.getFreeColServer();
+        if (server == null) return;
 
         menu.addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent e) {
