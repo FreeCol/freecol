@@ -417,6 +417,21 @@ public final class Market extends FreeColGameObject implements Ownable {
     }
 
     /**
+     * Update the price for a type of goods, bypassing the price change
+     * clamping.
+     *
+     * Used to reset the prices when the initial price is randomized.  Do
+     * not use during the game, the price change clamping mechanism should
+     * remain in effect.
+     *
+     * @param goodsType The <code>GoodsType</code> to update.
+     */
+    public void update(GoodsType goodsType) {
+        MarketData data = requireMarketData(goodsType);
+        if (data != null) data.update();
+    }
+
+    /**
      * Adds a transaction listener for notification of any transaction
      *
      * @param listener The <code>TransactionListener</code> to add.
