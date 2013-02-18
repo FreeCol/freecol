@@ -20,7 +20,9 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -46,15 +48,12 @@ public class Effect extends FreeColGameObjectType {
     public static final String LOSS_OF_TILE_PRODUCTION = "model.disaster.effect.lossOfTileProduction";
     public static final String LOSS_OF_BUILDING_PRODUCTION = "model.disaster.effect.lossOfBuildingProduction";
 
-    /**
-     * The probability of this effect.
-     */
+    /** The probability of this effect. */
     private int probability;
 
-    /**
-     * Scopes that might limit this Effect to certain types of objects.
-     */
-    private List<Scope> scopes;
+    /** Scopes that might limit this Effect to certain types of objects. */
+    private List<Scope> scopes = null;
+
 
 
     protected Effect() {
@@ -73,6 +72,11 @@ public class Effect extends FreeColGameObjectType {
         readFromXML(in);
     }
 
+    /**
+     * Create a new effect from an existing one.
+     *
+     * @param template The <code>Effect</code> to copy from.
+     */
     public Effect(Effect template) {
         setSpecification(template.getSpecification());
         setId(template.getId());
@@ -81,141 +85,131 @@ public class Effect extends FreeColGameObjectType {
         addFeatures(template);
     }
 
+
     /**
-     * Get the <code>Probability</code> value.
+     * Get the probability of this effect.
      *
-     * @return an <code>int</code> value
+     * @return The probability.
      */
     public final int getProbability() {
         return probability;
     }
 
     /**
-     * Set the <code>Probability</code> value.
+     * Get the scopes applicable to this effect.
      *
-     * @param newProbability The new Probability value.
-     */
-    public final void setProbability(final int newProbability) {
-        this.probability = newProbability;
-    }
-
-    /**
-     * Get the <code>Scopes</code> value.
-     *
-     * @return a <code>List<Scope></code> value
+     * @return A list of <code>Scope</code>s.
      */
     public final List<Scope> getScopes() {
+        if (scopes == null) return Collections.emptyList();
         return scopes;
     }
 
-    /**
-     * Set the <code>Scopes</code> value.
-     *
-     * @param newScopes The new Scopes value.
-     */
-    public final void setScopes(final List<Scope> newScopes) {
-        this.scopes = newScopes;
-    }
 
     /**
-     * Returns true if the <code>appliesTo</code> method of at least
-     * one <code>Scope</code> object returns true.
+     * Does at least one of this effect's scopes apply to an object.
      *
-     * @param objectType a <code>FreeColGameObjectType</code> value
-     * @return a <code>boolean</code> value
+     * @param objectType The <code>FreeColGameObjectType</code> to check.
+     * @return True if this effect applies.
      */
     public boolean appliesTo(final FreeColGameObjectType objectType) {
-        if (scopes.isEmpty()) {
-            return true;
-        } else {
-            for (Scope scope : scopes) {
-                if (scope.appliesTo(objectType)) {
-                    return true;
-                }
-            }
-            return false;
+        if (scopes == null || scopes.isEmpty()) return true;
+        for (Scope scope : scopes) {
+            if (scope.appliesTo(objectType)) return true;
         }
+        return false;
     }
 
 
+    // Serialization
+
+    private static final String PROBABILITY_TAG = "probability";
+
+
+    /**
+     * {@inheritDoc}
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        super.toXML(out, getXMLElementTagName());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        super.writeAttributes(out);
+
+        writeAttribute(out, PROBABILITY_TAG, probability);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
+        super.writeChildren(out);
+
+        for (Scope scope : getScopes()) scope.toXMLImpl(out);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
-        probability = getAttribute(in, "probability", 0);
+
+        probability = getAttribute(in, PROBABILITY_TAG, 0);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    protected void readChild(XMLStreamReader in)
-        throws XMLStreamException {
-        String childName = in.getLocalName();
-        if (Scope.getXMLElementTagName().equals(childName)) {
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        if (readShouldClearContainers(in)) {
+            scopes = null;
+        }
+
+        super.readChildren(in);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+        final String tag = in.getLocalName();
+
+        if (Scope.getXMLElementTagName().equals(tag)) {
             Scope scope = new Scope(in);
-            if (scopes == null) {
-                scopes = new ArrayList<Scope>();
+            if (scope != null) {
+                if (scopes == null) scopes = new ArrayList<Scope>();
+                scopes.add(scope);
             }
-            scopes.add(scope);
+
         } else {
             super.readChild(in);
         }
     }
 
     /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * {@inheritDoc}
      */
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXML(out, getXMLElementTagName());
-    }
-
-    @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
-        super.writeAttributes(out);
-        out.writeAttribute("probability", Integer.toString(probability));
+    public String toString() {
+        String result = "[" + getId() + "probability=" + probability + "%";
+        for (Scope scope : getScopes()) result += " " + scope;
+        result += "]";
+        return result;
     }
 
     /**
-     * Write the children of this object to a stream.
+     * Gets the XML tag name for this element.
      *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *     to the stream.
-     */
-    @Override
-    protected void writeChildren(XMLStreamWriter out)
-        throws XMLStreamException {
-        super.writeChildren(out);
-
-        if (getScopes() != null) {
-            for (Scope scope : getScopes()) {
-                scope.toXMLImpl(out);
-            }
-        }
-    }
-
-
-    /**
-     * Returns the XML tag name for this element.
-     *
-     * @return a <code>String</code> value
+     * @return "effect".
      */
     public static String getXMLElementTagName() {
         return "effect";
     }
-
-    public String toString() {
-        String result = getId() + " [probability: " + probability + "%]";
-        if (getScopes() != null) {
-            for (Scope scope : getScopes()) {
-                result += " " + scope;
-            }
-        }
-        return result;
-    }
-
 }
