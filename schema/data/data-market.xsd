@@ -28,24 +28,24 @@
   <xs:element name="market">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
-	<xs:element name="marketData">
-	  <xs:complexType>
-      <xs:attribute name="ID" type="MarketDataId" use="required" />
-	    <xs:attribute name="goods-type" type="GoodsTypeId" use="required" />
-	    <xs:attribute name="amount" type="xs:string" use="required" />
-	    <xs:attribute name="initialPrice" type="xs:int" use="optional"
-			  default="-1" />
-	    <xs:attribute name="arrears" type="xs:int" use="required" />
-	    <xs:attribute name="sales" type="xs:int" use="required" />
-	    <xs:attribute name="incomeBeforeTaxes" type="xs:int"
-			  use="required" />
-	    <xs:attribute name="incomeAfterTaxes" type="xs:int"
-			  use="required" />
-	    <xs:attribute name="traded" type="xs:boolean" use="optional" />
-	  </xs:complexType>
-	</xs:element>
+	      <xs:element name="marketData">
+	        <xs:complexType>
+            <xs:attribute name="ID" type="MarketDataId" use="required" />
+	          <xs:attribute name="goods-type" type="GoodsTypeId" use="required" />
+	          <xs:attribute name="amount" type="xs:string" use="required" />
+	          <xs:attribute name="initialPrice" type="xs:int" use="optional"
+			                    default="-1" />
+	          <xs:attribute name="arrears" type="xs:int" use="required" />
+	          <xs:attribute name="sales" type="xs:int" use="required" />
+	          <xs:attribute name="incomeBeforeTaxes" type="xs:int"
+			                    use="required" />
+	          <xs:attribute name="incomeAfterTaxes" type="xs:int"
+			                    use="required" />
+	          <xs:attribute name="traded" type="xs:boolean" use="optional" />
+	        </xs:complexType>
+	      </xs:element>
       </xs:choice>
-
+      
       <xs:attribute name="ID" type="MarketId" use="required" />
       <xs:attribute name="owner" type="PlayerId" use="required" />
 

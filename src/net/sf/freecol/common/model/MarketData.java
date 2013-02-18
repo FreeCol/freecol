@@ -98,6 +98,7 @@ public class MarketData extends FreeColGameObject {
      */
     private boolean traded;
 
+
     /**
      * Creates a new <code>MarketData</code> instance.
      *
@@ -146,69 +147,6 @@ public class MarketData extends FreeColGameObject {
         super(game, id);
     }
 
-    /**
-     * Adjust the prices.  Sets the costToBuy and paidForSale fields
-     * from the amount in the market, initial price and goods-type
-     * specific information.
-     */
-    public void price() {
-        if (!goodsType.isStorable()) return;
-        int diff = goodsType.getPriceDifference();
-        float amountPrice = initialPrice * (goodsType.getInitialAmount()
-            / (float) amountInMarket);
-        int newSalePrice = Math.round(amountPrice);
-        int newPrice = newSalePrice + diff;
-
-        // Work-around to limit prices of new world goods
-        // and related manufactured goods.
-        if ((goodsType.isNewWorldGoodsType()
-             || (goodsType.getRawMaterial() != null
-                 && goodsType.getRawMaterial().isNewWorldGoodsType()))
-            && newSalePrice > initialPrice + 2) {
-            newSalePrice = initialPrice + 2;
-            newPrice = newSalePrice + diff;
-        }
-
-        // Another hack to prevent price changing too fast in one hit.
-        // Push the amount in market back as well to keep this stable.
-        //
-        // Prices that change by more than the buy/sell difference
-        // allow big traders to exploit the market and extract free
-        // money... not sure I want to be fighting economic reality
-        // but game balance demands it here.
-        if (costToBuy > 0) {
-            if (newPrice > costToBuy + diff) {
-                amountPrice -= newPrice - (costToBuy + diff);
-                amountInMarket = Math.round(goodsType.getInitialAmount()
-                    * (initialPrice / amountPrice));
-                logger.info("Clamped price rise for " + getId()
-                    + " from " + newPrice
-                    + " to " + (costToBuy + diff));
-                newPrice = costToBuy + diff;
-            } else if (newPrice < costToBuy - diff) {
-                amountPrice += (costToBuy - diff) - newPrice;
-                amountInMarket = Math.round(goodsType.getInitialAmount()
-                    * (initialPrice / amountPrice));
-                logger.info("Clamped price fall for " + getId()
-                    + " from " + newPrice
-                    + " to " + (costToBuy - diff));
-                newPrice = costToBuy - diff;
-            }
-            newSalePrice = newPrice - diff;
-        }
-
-        // Clamp extremes.
-        if (newPrice > MAXIMUM_PRICE) {
-            newPrice = MAXIMUM_PRICE;
-            newSalePrice = newPrice - diff;
-        } else if (newSalePrice < MINIMUM_PRICE) {
-            newSalePrice = MINIMUM_PRICE;
-            newPrice = newSalePrice + diff;
-        }
-
-        costToBuy = newPrice;
-        paidForSale = newSalePrice;
-    }
 
     /**
      * Get the type of goods of this <code>MarketData</code>.
@@ -401,72 +339,165 @@ public class MarketData extends FreeColGameObject {
 
 
     /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
+     * Adjust the prices.
      *
-     * Only attributes visible to the given <code>Player</code> will
-     * be added to that representation if <code>showAll</code> is
-     * set to <code>false</code>.
-     *
-     * @param out The target stream.
-     * @param player The <code>Player</code> this XML-representation
-     *      should be made for, or <code>null</code> if
-     *      <code>showAll == true</code>.
-     * @param showAll Only attributes visible to <code>player</code>
-     *      will be added to the representation if <code>showAll</code>
-     *      is set to <i>false</i>.
-     * @param toSavedGame If <code>true</code> then information that
-     *      is only needed when saving a game is added.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * Sets the costToBuy and paidForSale fields from the amount in
+     * the market, initial price and goods-type specific information.
+     * Ensures that prices change incrementally with a clamping
+     * mechanism.
      */
+    public void price() {
+        if (!goodsType.isStorable()) return;
+        int diff = goodsType.getPriceDifference();
+        float amountPrice = initialPrice * (goodsType.getInitialAmount()
+            / (float) amountInMarket);
+        int newSalePrice = Math.round(amountPrice);
+        int newPrice = newSalePrice + diff;
+
+        // Work-around to limit prices of new world goods
+        // and related manufactured goods.
+        if ((goodsType.isNewWorldGoodsType()
+             || (goodsType.getRawMaterial() != null
+                 && goodsType.getRawMaterial().isNewWorldGoodsType()))
+            && newSalePrice > initialPrice + 2) {
+            newSalePrice = initialPrice + 2;
+            newPrice = newSalePrice + diff;
+        }
+
+        // Another hack to prevent price changing too fast in one hit.
+        // Push the amount in market back as well to keep this stable.
+        //
+        // Prices that change by more than the buy/sell difference
+        // allow big traders to exploit the market and extract free
+        // money... not sure I want to be fighting economic reality
+        // but game balance demands it here.
+        if (costToBuy > 0) {
+            if (newPrice > costToBuy + diff) {
+                amountPrice -= newPrice - (costToBuy + diff);
+                amountInMarket = Math.round(goodsType.getInitialAmount()
+                    * (initialPrice / amountPrice));
+                logger.info("Clamped price rise for " + getId()
+                    + " from " + newPrice
+                    + " to " + (costToBuy + diff));
+                newPrice = costToBuy + diff;
+            } else if (newPrice < costToBuy - diff) {
+                amountPrice += (costToBuy - diff) - newPrice;
+                amountInMarket = Math.round(goodsType.getInitialAmount()
+                    * (initialPrice / amountPrice));
+                logger.info("Clamped price fall for " + getId()
+                    + " from " + newPrice
+                    + " to " + (costToBuy - diff));
+                newPrice = costToBuy - diff;
+            }
+            newSalePrice = newPrice - diff;
+        }
+
+        // Clamp extremes.
+        if (newPrice > MAXIMUM_PRICE) {
+            newPrice = MAXIMUM_PRICE;
+            newSalePrice = newPrice - diff;
+        } else if (newSalePrice < MINIMUM_PRICE) {
+            newSalePrice = MINIMUM_PRICE;
+            newPrice = newSalePrice + diff;
+        }
+
+        costToBuy = newPrice;
+        paidForSale = newSalePrice;
+    }
+
+    /**
+     * Update the pricing of this datum, ignoring the price change clamp.
+     */
+    public void update() {
+        costToBuy = -1; // Disable price change clamping
+        price();
+    }
+
+
+    // Serialization
+
+    private static final String AMOUNT_TAG = "amount";
+    private static final String ARREARS_TAG = "arrears";
+    private static final String GOODS_TYPE_TAG = "goods-type";
+    private static final String INCOME_AFTER_TAXES_TAG = "incomeAfterTaxes";
+    private static final String INCOME_BEFORE_TAXES_TAG = "incomeBeforeTaxes";
+    private static final String INITIAL_PRICE_TAG = "initialPrice";
+    private static final String SALES_TAG = "sales";
+    private static final String TRADED_TAG = "traded";
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out, Player player,
                              boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
-        // Start element:
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute(ID_ATTRIBUTE, getId());
-        out.writeAttribute("goods-type", goodsType.getId());
-        out.writeAttribute("amount", Integer.toString(amountInMarket));
-        out.writeAttribute("initialPrice", Integer.toString(initialPrice));
-        out.writeAttribute("arrears", Integer.toString(arrears));
-        out.writeAttribute("sales", Integer.toString(sales));
-        out.writeAttribute("incomeBeforeTaxes",
-            Integer.toString(incomeBeforeTaxes));
-        out.writeAttribute("incomeAfterTaxes",
-            Integer.toString(incomeAfterTaxes));
-        out.writeAttribute("traded", Boolean.toString(traded));
+        writeAttributes(out);
+
         out.writeEndElement();
     }
 
     /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
+     * {@inheritDoc}
      */
-    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        String goodsTypeStr = in.getAttributeValue(null, "goods-type");
-        if (goodsTypeStr == null) { // @compat 0.9.x
-            goodsTypeStr = in.getAttributeValue(null, ID_ATTRIBUTE);
+    @Override
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        writeAttribute(out, ID_ATTRIBUTE, getId());
+
+        writeAttribute(out, GOODS_TYPE_TAG, goodsType);
+
+        writeAttribute(out, AMOUNT_TAG, amountInMarket);
+
+        writeAttribute(out, INITIAL_PRICE_TAG, initialPrice);
+
+        writeAttribute(out, ARREARS_TAG, arrears);
+
+        writeAttribute(out, SALES_TAG, sales);
+
+        writeAttribute(out, INCOME_AFTER_TAXES_TAG, incomeAfterTaxes);
+
+        writeAttribute(out, INCOME_BEFORE_TAXES_TAG, incomeBeforeTaxes);
+
+        writeAttribute(out, TRADED_TAG, traded);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        final Specification spec = getSpecification();
+
+        super.readAttributes(in);
+
+        goodsType = spec.getType(in, GOODS_TYPE_TAG, GoodsType.class,
+                                 (GoodsType)null);
+        // @compat 0.9.x
+        if (goodsType == null) {
             setDefaultId(getGame());
-            // end compatibility code
-        } else {
-            setId(in.getAttributeValue(null, ID_ATTRIBUTE));
+            goodsType = spec.getType(in, ID_ATTRIBUTE, GoodsType.class,
+                                     (GoodsType)null);
         }
-        if (goodsTypeStr == null) {
-            throw new XMLStreamException("Missing goods-type");
-        }
-        goodsType = getSpecification().getGoodsType(goodsTypeStr);
-        amountInMarket = getAttribute(in, "amount", 0);
-        initialPrice = getAttribute(in, "initialPrice", -1);
-        arrears = getAttribute(in, "arrears", 0);
-        sales = getAttribute(in, "sales", 0);
-        incomeBeforeTaxes = getAttribute(in, "incomeBeforeTaxes", 0);
-        incomeAfterTaxes = getAttribute(in, "incomeAfterTaxes", 0);
-        traded = getAttribute(in, "traded", sales != 0);
-        costToBuy = -1; // Disable price change clamping
-        price();
+        // end compatibility code
+
+        amountInMarket = getAttribute(in, AMOUNT_TAG, 0);
+
+        initialPrice = getAttribute(in, INITIAL_PRICE_TAG, -1);
+
+        arrears = getAttribute(in, ARREARS_TAG, 0);
+
+        sales = getAttribute(in, SALES_TAG, 0);
+
+        incomeBeforeTaxes = getAttribute(in, INCOME_BEFORE_TAXES_TAG, 0);
+
+        incomeAfterTaxes = getAttribute(in, INCOME_AFTER_TAXES_TAG, 0);
+
+        traded = getAttribute(in, TRADED_TAG, sales != 0);
+
+        update();
         oldPrice = costToBuy;
     }
 
@@ -475,7 +506,7 @@ public class MarketData extends FreeColGameObject {
      */
     public String toString() {
         StringBuilder sb = new StringBuilder("[");
-        sb.append(getXMLElementTagName());
+        sb.append(getId());
         sb.append(" ").append(goodsType.getId());
         sb.append(" costToBuy=").append(costToBuy);
         sb.append(" paidForSale=").append(paidForSale);
@@ -492,7 +523,7 @@ public class MarketData extends FreeColGameObject {
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "marketData"
      */

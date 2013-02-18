@@ -888,13 +888,12 @@ public abstract class FreeColObject {
     protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
         String newId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-        // @compat 0.9.x
+        // @compat 0.9.x, 0.10.x (MarketData)
         if (newId == null) {
-            setId(in.getAttributeValue(null, ID_ATTRIBUTE));
-        // end compatibility code
-        } else {
-            setId(newId);
+            newId = in.getAttributeValue(null, ID_ATTRIBUTE);
         }
+        // end compatibility code
+        setId(newId);
     }
 
     /**

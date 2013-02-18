@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -41,6 +43,8 @@ import org.w3c.dom.Element;
  */
 public final class Market extends FreeColGameObject implements Ownable {
 
+    private static Logger logger = Logger.getLogger(Market.class.getName());
+
     /**
      * European markets are bottomless.  Goods present never decrease
      * below this threshold.
@@ -56,11 +60,14 @@ public final class Market extends FreeColGameObject implements Ownable {
         CUSTOM_HOUSE,
     }
 
+    /** The contents of the market, keyed by goods type. */
     private final Map<GoodsType, MarketData> marketData
         = new HashMap<GoodsType, MarketData>();
 
+    /** The owning player. */
     private Player owner;
 
+    /** Watching listeners.  Do not serialize. */
     private ArrayList<TransactionListener> transactionListeners
         = new ArrayList<TransactionListener>();
 
@@ -70,6 +77,7 @@ public final class Market extends FreeColGameObject implements Ownable {
      */
     public Market(Game game, Player player) {
         super(game);
+
         this.owner = player;
 
         /*
@@ -79,7 +87,7 @@ public final class Market extends FreeColGameObject implements Ownable {
          */
         for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
             if (goodsType.isStorable()) {
-                marketData.put(goodsType, new MarketData(game, goodsType));
+                putMarketData(goodsType, new MarketData(game, goodsType));
             }
         }
     }
@@ -95,6 +103,7 @@ public final class Market extends FreeColGameObject implements Ownable {
      */
     public Market(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
+
         readFromXML(in);
     }
 
@@ -140,32 +149,15 @@ public final class Market extends FreeColGameObject implements Ownable {
     // ------------------------------------------------------------ API methods
 
     /**
-     * Return the market data for a type of goods.  This one is public
-     * so the server can send individual MarketData updates.
+     * Gets the market data for a type of goods.
      *
-     * @param goodsType a <code>GoodsType</code> value
-     * @return a <code>MarketData</code> value
+     * Public so the server can send individual MarketData updates.
+     *
+     * @param goodsType The <code>GoodsType</code> to look for.
+     * @return The corresponding <code>MarketData</code>, or null if none.
      */
     public MarketData getMarketData(GoodsType goodsType) {
         return marketData.get(goodsType);
-    }
-
-    /**
-     * Gets the owner of this <code>Market</code>.
-     *
-     * @return The owner of this <code>Market</code>.
-     */
-    public Player getOwner() {
-        return owner;
-    }
-
-    /**
-     * Sets the owner of this <code>Market</code>.
-     *
-     * @param owner The <code>Player</code> to own this <code>Market</code>.
-     */
-    public void setOwner(Player owner) {
-        this.owner = owner;
     }
 
     /**
@@ -427,7 +419,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     /**
      * Adds a transaction listener for notification of any transaction
      *
-     * @param listener the listener
+     * @param listener The <code>TransactionListener</code> to add.
      */
     public void addTransactionListener(TransactionListener listener) {
         transactionListeners.add(listener);
@@ -436,73 +428,95 @@ public final class Market extends FreeColGameObject implements Ownable {
     /**
      * Removes a transaction listener
      *
-     * @param listener the listener
+     * @param listener The <code>TransactionListener</code> to remove.
      */
     public void removeTransactionListener(TransactionListener listener) {
         transactionListeners.remove(listener);
     }
 
     /**
-     * Returns an array of all the TransactionListener added to this Market.
+     * Gets the listeners added to this market.
      *
-     * @return all of the TransactionListener added or an empty array if no
-     * listeners have been added
+     * @return An array of all the <code>TransactionListener</code>s
+     *     added, or an empty array if none found.
      */
     public TransactionListener[] getTransactionListener() {
         return transactionListeners.toArray(new TransactionListener[0]);
     }
 
+    // Interface Ownable
 
     /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
+     * Gets the owner of this <code>Market</code>.
      *
-     * Only attributes visible to the given <code>Player</code> will
-     * be added to that representation if <code>showAll</code> is
-     * set to <code>false</code>.
-     *
-     * @param out The target stream.
-     * @param player The <code>Player</code> this XML-representation
-     *      should be made for, or <code>null</code> if
-     *      <code>showAll == true</code>.
-     * @param showAll Only attributes visible to <code>player</code>
-     *      will be added to the representation if <code>showAll</code>
-     *      is set to <i>false</i>.
-     * @param toSavedGame If <code>true</code> then information that
-     *      is only needed when saving a game is added.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * @return The owner of this <code>Market</code>.
      */
+    public Player getOwner() {
+        return owner;
+    }
+
+    /**
+     * Sets the owner of this <code>Market</code>.
+     *
+     * @param owner The <code>Player</code> to own this <code>Market</code>.
+     */
+    public void setOwner(Player owner) {
+        this.owner = owner;
+    }
+
+
+    // Serialization
+
+    private static final String OWNER_TAG = "owner";
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out, Player player,
                              boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
-        // Start element:
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute(ID_ATTRIBUTE, getId());
-        out.writeAttribute("owner", owner.getId());
-
+        writeAttributes(out);
         if (player == owner || showAll || toSavedGame) {
-            for (MarketData data : marketData.values()) {
-                data.toXML(out, player, showAll, toSavedGame);
-            }
+            writeChildren(out);
         }
 
         out.writeEndElement();
     }
 
     /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException on problems with the stream.
-     * TODO: Get rid of the price() when the server sends all
-     * price changes.
+     * {@inheritDoc}
+    */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        writeAttribute(out, ID_ATTRIBUTE, getId());
+
+        writeAttribute(out, OWNER_TAG, owner.getId());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
+        super.writeChildren(out);
+
+        for (MarketData data : marketData.values()) {
+            data.toXML(out);
+        }
+    }
+    
+    /**
+     * {@inheritDoc}
      */
     @Override
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
-        owner = getFreeColGameObject(in, "owner", Player.class);
+
+        owner = getAttribute(in, OWNER_TAG, Player.class, (Player)null);
     }
 
     /**
@@ -520,16 +534,16 @@ public final class Market extends FreeColGameObject implements Ownable {
      */
     @Override
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        if (in.getLocalName().equals(MarketData.getXMLElementTagName())) {
-            String id = in.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE);
-            Game game = getGame();
-            MarketData data = game.getFreeColGameObject(id, MarketData.class);
-            if (data == null) {
-                data = new MarketData(game, in);
-            } else {
-                data.readFromXML(in);
+        final String tag = in.getLocalName();
+
+        if (MarketData.getXMLElementTagName().equals(tag)) {
+            MarketData data = updateFreeColGameObject(in, MarketData.class);
+            if (data != null) {
+                putMarketData(data.getGoodsType(), data);
             }
-            putMarketData(data.getGoodsType(), data);
+
+        } else {
+            super.readChild(in);
         }
     }
 
@@ -538,7 +552,7 @@ public final class Market extends FreeColGameObject implements Ownable {
      */
     public String toString() {
         StringBuilder sb = new StringBuilder("[");
-        sb.append(getXMLElementTagName());
+        sb.append(getId());
         sb.append(" owner=").append(owner.getId());
         for (MarketData md : marketData.values()) {
             sb.append(" ").append(md.toString());
