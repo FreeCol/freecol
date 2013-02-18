@@ -1613,12 +1613,15 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
         // Otherwise abandon this rearrangement, disposing of the
         // scratch colony and returning null.
         report += "Final population = " + scratch.getWorkLocationUnitCount();
+        if (scratch.getWorkLocationUnitCount() <= 0) {
+            // Move units out of scope for dispose.
+            for (Unit u : tile.getUnitList()) u.setLocation(null);
+            scratch.disposeScratchColony();
+            report += "\nassignWorkers at " + colony.getName() + " failed.";
+            scratch = null;
+        }
         logger.finest(report);
-        if (scratch.getWorkLocationUnitCount() > 0) return scratch;
-
-        scratch.disposeScratchColony();
-        logger.warning("assignWorkers at " + colony.getName() + " failed.");
-        return null;
+        return scratch;
     }
 
 
