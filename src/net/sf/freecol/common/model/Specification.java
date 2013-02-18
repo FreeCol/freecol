@@ -445,15 +445,14 @@ public final class Specification {
             }
         }
 
-
-        // now that specification is complete, dynamically generate
-        // option choices
-        for (AbstractOption option : allOptions.values()) {
-            option.generateChoices();
-        }
-
+        // Set difficulty level before options processing.
         if (difficultyLevel != null) {
             applyDifficultyLevel(difficultyLevel);
+        }
+
+        // Initialize UI containers.
+        for (AbstractOption option : allOptions.values()) {
+            option.generateChoices();
         }
 
         // Initialize the Turn class using GameOptions.
@@ -1426,12 +1425,10 @@ public final class Specification {
     }
 
 
+    // Serialization
+
     /**
-     * Makes an XML-representation of this object.
-     *
-     * @param out The output stream.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
+     * {@inheritDoc}
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         // Start element:
@@ -1474,15 +1471,16 @@ public final class Specification {
 
     }
 
-    private <T extends FreeColObject> void writeSection(XMLStreamWriter out, String section, Collection<T> items)
-        throws XMLStreamException {
+    private <T extends FreeColObject> void writeSection(XMLStreamWriter out,
+        String section, Collection<T> items) throws XMLStreamException {
         out.writeStartElement(section);
-        for (T item : items) {
-            item.toXMLImpl(out);
-        }
+        for (T item : items) item.toXMLImpl(out);
         out.writeEndElement();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void readFromXML(XMLStreamReader xsr) throws XMLStreamException {
         String newId = xsr.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG);
         if (difficultyLevel == null) {
@@ -1524,9 +1522,6 @@ public final class Specification {
             } else {
                 reader.readChildren(xsr);
             }
-        }
-        if (difficultyLevel != null) {
-            applyDifficultyLevel(difficultyLevel);
         }
 
         // @compat 0.9.x
@@ -1641,6 +1636,11 @@ public final class Specification {
         initialized = true;
     }
 
+    /**
+     * Gets the tag name of the root element representing this object.
+     *
+     * @return "freecol-specification".
+     */
     public static String getXMLElementTagName() {
         return "freecol-specification";
     }
