@@ -731,6 +731,7 @@ XSD schema for validation. -->
     <role id="model.role.scout" expertUnit="model.unit.seasonedScout">
       <required-ability id="model.ability.canBeEquipped" />
       <required-goods id="model.goods.horses" value="50" />
+      <ability id="model.ability.captureUnits"/>
       <ability id="model.ability.speakWithChief"/>
       <ability id="model.ability.demandTribute"/>
       <ability id="model.ability.spyOnColony"/>
