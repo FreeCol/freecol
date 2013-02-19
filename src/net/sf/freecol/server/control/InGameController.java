@@ -1011,7 +1011,7 @@ public final class InGameController extends Controller {
             }
             template = StringTemplate.template("model.monarch.action."
                 + action.toString())
-                .addStringTemplate("%goods%", goods.getType().getLabel(true))
+                .addStringTemplate("%goods%", goods.getType().getLabel())
                 .addAmount("%amount%", taxRaise);
             if (action == MonarchAction.RAISE_TAX_WAR) {
                 template = template.add("%nation%", getNonPlayerNation());

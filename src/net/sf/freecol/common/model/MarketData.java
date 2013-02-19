@@ -357,8 +357,8 @@ public class MarketData extends FreeColGameObject {
         // Work-around to limit prices of new world goods
         // and related manufactured goods.
         if ((goodsType.isNewWorldGoodsType()
-             || (goodsType.getRawMaterial() != null
-                 && goodsType.getRawMaterial().isNewWorldGoodsType()))
+             || (goodsType.getInputType() != null
+                 && goodsType.getInputType().isNewWorldGoodsType()))
             && newSalePrice > initialPrice + 2) {
             newSalePrice = initialPrice + 2;
             newPrice = newSalePrice + diff;

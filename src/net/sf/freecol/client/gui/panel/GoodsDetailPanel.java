@@ -119,7 +119,7 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
         } else {
             panel.add(localizedLabel("colopedia.goods.madeFrom"), "newline 20");
             if (type.isRefined()) {
-                panel.add(getGoodsButton(type.getRawMaterial()), "span");
+                panel.add(getGoodsButton(type.getInputType()), "span");
             } else {
                 panel.add(localizedLabel("nothing"), "span");
             }
@@ -127,7 +127,7 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
 
         panel.add(localizedLabel("colopedia.goods.makes"), "newline 20");
         if (type.isRawMaterial()) {
-            panel.add(getGoodsButton(type.getProducedMaterial()), "span");
+            panel.add(getGoodsButton(type.getOutputType()), "span");
         } else if (type.getStoredAs() != type) {
             panel.add(getGoodsButton(type.getStoredAs()), "span");
         } else {

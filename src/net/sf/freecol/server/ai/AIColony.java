@@ -1218,7 +1218,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             GoodsType requiredType = type;
             while (requiredType != null) {
                 if (requiredType.isStorable()) break;
-                requiredType = requiredType.getRawMaterial();
+                requiredType = requiredType.getInputType();
             }
             if (requiredType == null) continue;
             int amount = Math.min(colony.getWarehouseCapacity(),
@@ -1252,8 +1252,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             }
         } else {
             if (!colony.getBuildingsForProducing(goodsType).isEmpty()) {
-                return (goodsType.getRawMaterial() == null) ? true
-                    : colonyCouldProduce(goodsType.getRawMaterial());
+                return (goodsType.getInputType() == null) ? true
+                    : colonyCouldProduce(goodsType.getInputType());
             }
         }
         return false;

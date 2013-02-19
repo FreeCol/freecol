@@ -93,7 +93,7 @@ public class ServerIndianSettlementTest extends FreeColTestCase {
         camp.addGoods(horsesType, initialHorses);
 
         // verify that there is food production for the horses
-        assertEquals("Horses need food", foodType, horsesType.getRawMaterial());
+        assertEquals("Horses need food", foodType, horsesType.getInputType());
         int foodProduced = camp.getTotalProductionOf(grainType);
         int foodConsumed = camp.getFoodConsumption();
         int foodAvail = foodProduced - foodConsumed;

@@ -34,13 +34,42 @@ import org.w3c.dom.Element;
 
 public class GoodsTest extends FreeColTestCase {
 
-    public static GoodsType cottonType = spec().getGoodsType("model.goods.cotton");
+    private static final GoodsType bellsType
+        = spec().getGoodsType("model.goods.bells");
+    private static final GoodsType clothType
+        = spec().getGoodsType("model.goods.cloth");
+    private static final GoodsType cottonType
+        = spec().getGoodsType("model.goods.cotton");
+    private static final GoodsType crossesType
+        = spec().getGoodsType("model.goods.crosses");
+    private static final GoodsType fishType
+        = spec().getGoodsType("model.goods.fish");
+    private static final GoodsType foodType
+        = spec().getPrimaryFoodType();
+    private static final GoodsType hammersType
+        = spec().getGoodsType("model.goods.hammers");
+    private static final GoodsType horsesType
+        = spec().getGoodsType("model.goods.horses");
+    private static final GoodsType lumberType
+        = spec().getGoodsType("model.goods.lumber");
+    private static final GoodsType musketsType
+        = spec().getGoodsType("model.goods.muskets");
+    private static final GoodsType oreType
+        = spec().getGoodsType("model.goods.ore");
+    private static final GoodsType toolsType
+        = spec().getGoodsType("model.goods.tools");
+    private static final GoodsType tradeGoodsType
+        = spec().getGoodsType("model.goods.tradeGoods");
 
-    public static TileType plainsType = spec().getTileType("model.tile.plains");
+    private static final TileType plainsType
+        = spec().getTileType("model.tile.plains");
 
-    public static UnitType privateerType = spec().getUnitType("model.unit.privateer");
-    public static UnitType wagonTrainType = spec().getUnitType("model.unit.wagonTrain");
-    public static UnitType veteranSoldierType = spec().getUnitType("model.unit.veteranSoldier");
+    private static final UnitType privateerType
+        = spec().getUnitType("model.unit.privateer");
+    private static final UnitType veteranSoldierType
+        = spec().getUnitType("model.unit.veteranSoldier");
+    private static final UnitType wagonTrainType
+        = spec().getUnitType("model.unit.wagonTrain");
 
 
     public void testGoodsGameLocationIntInt() {
@@ -104,99 +133,67 @@ public class GoodsTest extends FreeColTestCase {
 
     }
 
-    public void testGetRawMaterial() {
-    	GoodsType cotton = spec().getGoodsType("model.goods.cotton");
-    	GoodsType cloth = spec().getGoodsType("model.goods.cloth");
-
-        assertEquals(null, cotton.getRawMaterial());
-        assertEquals(cotton, cloth.getRawMaterial());
+    public void testGetInputType() {
+        assertEquals(null, cottonType.getInputType());
+        assertEquals(cottonType, clothType.getInputType());
     }
 
-    public void testGetManufactoredGoods() {
-    	GoodsType cotton = spec().getGoodsType("model.goods.cotton");
-    	GoodsType cloth = spec().getGoodsType("model.goods.cloth");
-
-        assertEquals(null, cloth.getProducedMaterial());
-        assertEquals(cloth, cotton.getProducedMaterial());
+    public void testGetOutputType() {
+        assertEquals(null, clothType.getOutputType());
+        assertEquals(clothType, cottonType.getOutputType());
     }
 
     public void testIsFarmedGoods() {
-    	GoodsType bells = spec().getGoodsType("model.goods.bells");
-    	GoodsType cloth = spec().getGoodsType("model.goods.cloth");
-    	GoodsType cotton = spec().getGoodsType("model.goods.cotton");
-
-        assertFalse(bells.isFarmed());
-        assertTrue(cotton.isFarmed());
-        assertFalse(cloth.isFarmed());
+        assertFalse(bellsType.isFarmed());
+        assertTrue(cottonType.isFarmed());
+        assertFalse(clothType.isFarmed());
     }
 
     public void testMilitaryGoods() {
-        GoodsType bells = spec().getGoodsType("model.goods.bells");
-        GoodsType crosses = spec().getGoodsType("model.goods.crosses");
-        GoodsType cloth = spec().getGoodsType("model.goods.cloth");
-        GoodsType cotton = spec().getGoodsType("model.goods.cotton");
-        GoodsType muskets = spec().getGoodsType("model.goods.muskets");
-        GoodsType horses = spec().getGoodsType("model.goods.horses");
-
-        assertFalse(bells.isMilitaryGoods());
-        assertFalse(crosses.isMilitaryGoods());
-        assertFalse(cloth.isMilitaryGoods());
-        assertFalse(cotton.isMilitaryGoods());
-        assertTrue(horses.isMilitaryGoods());
-        assertTrue(muskets.isMilitaryGoods());
+        assertFalse(bellsType.isMilitaryGoods());
+        assertFalse(crossesType.isMilitaryGoods());
+        assertFalse(clothType.isMilitaryGoods());
+        assertFalse(cottonType.isMilitaryGoods());
+        assertTrue(horsesType.isMilitaryGoods());
+        assertTrue(musketsType.isMilitaryGoods());
     }
 
     public void testBuildingMaterials() {
-        GoodsType bells = spec().getGoodsType("model.goods.bells");
-        GoodsType crosses = spec().getGoodsType("model.goods.crosses");
-        GoodsType cloth = spec().getGoodsType("model.goods.cloth");
-        GoodsType cotton = spec().getGoodsType("model.goods.cotton");
-        GoodsType muskets = spec().getGoodsType("model.goods.muskets");
-        GoodsType horses = spec().getGoodsType("model.goods.horses");
-        GoodsType hammers = spec().getGoodsType("model.goods.hammers");
-        GoodsType tools = spec().getGoodsType("model.goods.tools");
-        GoodsType fish = spec().getGoodsType("model.goods.fish");
-        GoodsType food = spec().getPrimaryFoodType();
-        GoodsType ore = spec().getGoodsType("model.goods.ore");
-        GoodsType lumber = spec().getGoodsType("model.goods.lumber");
-
         // for EquipmentType horses
-        assertTrue(horses.isBuildingMaterial());
+        assertTrue(horsesType.isBuildingMaterial());
         // for EquipmentType muskets
-        assertTrue(muskets.isBuildingMaterial());
+        assertTrue(musketsType.isBuildingMaterial());
         // for buildings and units
-        assertTrue(hammers.isBuildingMaterial());
-        assertTrue(tools.isBuildingMaterial());
+        assertTrue(hammersType.isBuildingMaterial());
+        assertTrue(toolsType.isBuildingMaterial());
 
         // other goods not involved in construction, or not directly involved
-        assertFalse(bells.isBuildingMaterial());
-        assertFalse(crosses.isBuildingMaterial());
-        assertFalse(cloth.isBuildingMaterial());
-        assertFalse(cotton.isBuildingMaterial());
-        assertFalse(fish.isBuildingMaterial());
-        //assertFalse(food.isBuildingMaterial());
-        assertFalse(ore.isBuildingMaterial());
-        assertFalse(lumber.isBuildingMaterial());
+        assertFalse(bellsType.isBuildingMaterial());
+        assertFalse(crossesType.isBuildingMaterial());
+        assertFalse(clothType.isBuildingMaterial());
+        assertFalse(cottonType.isBuildingMaterial());
+        assertFalse(fishType.isBuildingMaterial());
+        //assertFalse(foodType.isBuildingMaterial());
+        assertFalse(oreType.isBuildingMaterial());
+        assertFalse(lumberType.isBuildingMaterial());
 
         // checking raw materials
-        assertTrue(ore.isRawBuildingMaterial());
-        assertTrue(lumber.isRawBuildingMaterial());
-        assertFalse(tools.isRawBuildingMaterial());
-        assertTrue(food.isRawBuildingMaterial());
-        assertFalse(fish.isRawBuildingMaterial());
-        assertFalse(horses.isRawBuildingMaterial());
-        assertFalse(muskets.isRawBuildingMaterial());
-        assertFalse(hammers.isRawBuildingMaterial());
-        assertFalse(bells.isRawBuildingMaterial());
-        assertFalse(crosses.isRawBuildingMaterial());
-        assertFalse(cloth.isRawBuildingMaterial());
-        assertFalse(cotton.isRawBuildingMaterial());
+        assertTrue(oreType.isRawBuildingMaterial());
+        assertTrue(lumberType.isRawBuildingMaterial());
+        assertFalse(toolsType.isRawBuildingMaterial());
+        assertTrue(foodType.isRawBuildingMaterial());
+        assertFalse(fishType.isRawBuildingMaterial());
+        assertFalse(horsesType.isRawBuildingMaterial());
+        assertFalse(musketsType.isRawBuildingMaterial());
+        assertFalse(hammersType.isRawBuildingMaterial());
+        assertFalse(bellsType.isRawBuildingMaterial());
+        assertFalse(crossesType.isRawBuildingMaterial());
+        assertFalse(clothType.isRawBuildingMaterial());
+        assertFalse(cottonType.isRawBuildingMaterial());
     }
 
     public void testTradeGoods() {
-        GoodsType tradeGoods = spec().getGoodsType("model.goods.tradeGoods");
-
-        assertTrue(tradeGoods.isTradeGoods());
+        assertTrue(tradeGoodsType.isTradeGoods());
     }
 
     public void testGetTakeSpace() {
@@ -228,7 +225,7 @@ public class GoodsTest extends FreeColTestCase {
     }
 
     public Player dutch(){
-    	return getGame().getPlayer("model.nation.dutch");
+        return getGame().getPlayer("model.nation.dutch");
     }
 
     public void testAdjustAmount() {
@@ -273,21 +270,13 @@ public class GoodsTest extends FreeColTestCase {
     }
 
     public void testProductionChain() {
-        GoodsType hammers = spec().getGoodsType("model.goods.hammers");
-        GoodsType lumber = spec().getGoodsType("model.goods.lumber");
-        GoodsType muskets = spec().getGoodsType("model.goods.muskets");
-        GoodsType tools = spec().getGoodsType("model.goods.tools");
-        GoodsType ore = spec().getGoodsType("model.goods.ore");
+        List<GoodsType> chain = hammersType.getProductionChain();
+        assertEquals(lumberType, chain.get(0));
+        assertEquals(hammersType, chain.get(1));
 
-        List<GoodsType> chain = hammers.getProductionChain();
-        assertEquals(lumber, chain.get(0));
-        assertEquals(hammers, chain.get(1));
-
-        chain = muskets.getProductionChain();
-        assertEquals(ore, chain.get(0));
-        assertEquals(tools, chain.get(1));
-        assertEquals(muskets, chain.get(2));
-
+        chain = musketsType.getProductionChain();
+        assertEquals(oreType, chain.get(0));
+        assertEquals(toolsType, chain.get(1));
+        assertEquals(musketsType, chain.get(2));
     }
-
 }

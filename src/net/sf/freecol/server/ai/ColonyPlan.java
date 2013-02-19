@@ -372,7 +372,7 @@ public class ColonyPlan {
                 if (amount <= colony.getGoodsCount(type)) break; // Shortcut
                 required.add(0, new AbstractGoods(type,
                         amount - colony.getGoodsCount(type)));
-                type = type.getRawMaterial();
+                type = type.getInputType();
             }
         }
         return required;
@@ -419,7 +419,7 @@ public class ColonyPlan {
             WorkLocationPlan wlp = plans.get(i);
             GoodsType g = wlp.getGoodsType();
             if ((rawBuildingGoodsTypes.contains(g)
-                    && !required.contains(g.getProducedMaterial()))
+                    && !required.contains(g.getOutputType()))
                 || (buildingGoodsTypes.contains(g)
                     && !required.contains(g))) {
                 workPlans.remove(i - offset);
@@ -432,11 +432,11 @@ public class ColonyPlan {
                 logger.finest("At " + colony.getName()
                     + " suppress production of " + g);
             } else if (g.isRefined()
-                && (rawBuildingGoodsTypes.contains(g.getRawMaterial())
-                    || buildingGoodsTypes.contains(g.getRawMaterial()))) {
+                && (rawBuildingGoodsTypes.contains(g.getInputType())
+                    || buildingGoodsTypes.contains(g.getInputType()))) {
                 int n = 0, idx = produce.indexOf(g);
-                for (GoodsType type = g.getRawMaterial(); type != null;
-                     type = type.getRawMaterial()) {
+                for (GoodsType type = g.getInputType(); type != null;
+                     type = type.getInputType()) {
                     if ((wls = suppressed.get(type)) == null) break;
                     if (colony.getGoodsCount(type)
                         >= GoodsContainer.CARGO_SIZE/2) break;
@@ -522,12 +522,12 @@ public class ColonyPlan {
             } else if (g.isRawBuildingMaterial()) {
                 rawBuildingGoodsTypes.add(g);
             } else if (g.isBuildingMaterial()
-                && g.getRawMaterial().isRawBuildingMaterial()) {
+                && g.getInputType().isRawBuildingMaterial()) {
                 buildingGoodsTypes.add(g);
             } else if (g.isNewWorldGoodsType()) {
                 rawLuxuryGoodsTypes.add(g);
             } else if (g.isRefined()
-                && g.getRawMaterial().isNewWorldGoodsType()) {
+                && g.getInputType().isNewWorldGoodsType()) {
                 luxuryGoodsTypes.add(g);
             } else if (g.isFarmed()) {
                 otherRawGoodsTypes.add(g);
@@ -573,11 +573,11 @@ public class ColonyPlan {
                 // the material, or if it is the raw material for a
                 // refined goods type, the average of the raw and
                 // refined goods prices.
-                if (g.getProducedMaterial() == null) {
+                if (g.getOutputType() == null) {
                     value *= market.getSalePrice(g, 1);
-                } else if (production.containsKey(g.getProducedMaterial())) {
+                } else if (production.containsKey(g.getOutputType())) {
                     value *= (market.getSalePrice(g, 1)
-                        + market.getSalePrice(g.getProducedMaterial(), 1)) / 2;
+                        + market.getSalePrice(g.getOutputType(), 1)) / 2;
                 }
             }
             if (!nationType.getModifierSet(g.getId()).isEmpty()) {
@@ -585,10 +585,10 @@ public class ColonyPlan {
             }
             if (value > secondaryValue && secondaryRawMaterial != null) {
                 production.remove(secondaryRawMaterial);
-                production.remove(secondaryRawMaterial.getProducedMaterial());
+                production.remove(secondaryRawMaterial.getOutputType());
                 if (rawLuxuryGoodsTypes.contains(secondaryRawMaterial)) {
                     rawLuxuryGoodsTypes.remove(secondaryRawMaterial);
-                    luxuryGoodsTypes.remove(secondaryRawMaterial.getProducedMaterial());
+                    luxuryGoodsTypes.remove(secondaryRawMaterial.getOutputType());
                 } else if (rawMaterials.contains(otherRawGoodsTypes)) {
                     rawMaterials.remove(otherRawGoodsTypes);
                 }
@@ -605,13 +605,13 @@ public class ColonyPlan {
         }
         if (primaryRawMaterial != null) {
             produce.add(primaryRawMaterial);
-            if (primaryRawMaterial.getProducedMaterial() != null) {
-                produce.add(primaryRawMaterial.getProducedMaterial());
+            if (primaryRawMaterial.getOutputType() != null) {
+                produce.add(primaryRawMaterial.getOutputType());
             }
             if (secondaryRawMaterial != null) {
                 produce.add(secondaryRawMaterial);
-                if (secondaryRawMaterial.getProducedMaterial() != null) {
-                    produce.add(secondaryRawMaterial.getProducedMaterial());
+                if (secondaryRawMaterial.getOutputType() != null) {
+                    produce.add(secondaryRawMaterial.getOutputType());
                 }
             }
         }
@@ -721,7 +721,7 @@ public class ColonyPlan {
                 1.0/*FIXME: Brewster?*/);
         } else if (produce.contains(goodsType)) {
             if ("trade".equals(advantage)) factor = 1.2;
-            double f = 0.1 * colony.getTotalProductionOf(goodsType.getRawMaterial());
+            double f = 0.1 * colony.getTotalProductionOf(goodsType.getInputType());
             ret = prioritize(type, PRODUCTION_WEIGHT,
                 f/*FIXME: improvement?*/);
         }
@@ -889,7 +889,7 @@ public class ColonyPlan {
                 if (need > 0) {
                     // Penalize building with type that can not be
                     // made locally.
-                    double f = (produce.contains(g.getRawMaterial())) ? 1.0
+                    double f = (produce.contains(g.getInputType())) ? 1.0
                         : 5.0;
                     difficulty += need * f;
                 }                    
@@ -999,7 +999,7 @@ public class ColonyPlan {
         Collections.sort(rawBuildingGoodsTypes, productionComparator);
         for (GoodsType g : buildingGoodsTypes) {
             if (production.containsKey(g)) {
-                GoodsType raw = g.getRawMaterial();
+                GoodsType raw = g.getInputType();
                 if (colony.getGoodsCount(raw) >= GoodsContainer.CARGO_SIZE/2
                     || production.containsKey(raw)) {
                     toAdd.add(g);
@@ -1008,14 +1008,14 @@ public class ColonyPlan {
         }
         Collections.sort(toAdd, new Comparator<GoodsType>() {
                 public int compare(GoodsType g1, GoodsType g2) {
-                    int i1 = rawBuildingGoodsTypes.indexOf(g1.getRawMaterial());
-                    int i2 = rawBuildingGoodsTypes.indexOf(g2.getRawMaterial());
+                    int i1 = rawBuildingGoodsTypes.indexOf(g1.getInputType());
+                    int i2 = rawBuildingGoodsTypes.indexOf(g2.getInputType());
                     return i1 - i2;
                 }
             });
         for (int i = toAdd.size()-1; i >= 0; i--) {
             GoodsType make = toAdd.get(i);
-            GoodsType raw = make.getRawMaterial();
+            GoodsType raw = make.getInputType();
             if (production.containsKey(raw)) {
                 if (colony.getGoodsCount(raw) >= GoodsContainer.CARGO_SIZE/2) {
                     produce.add(raw); // Add at the end, enough in stock
@@ -1450,7 +1450,7 @@ public class ColonyPlan {
                 // raw material.  Do not reduce raw materials below
                 // what is needed for a building--- e.g. prevent
                 // musket production from hogging the tools.
-                GoodsType raw = goodsType.getRawMaterial();
+                GoodsType raw = goodsType.getInputType();
                 int rawNeeded = 0;
                 for (AbstractGoods ag : buildGoods) {
                     if (raw == ag.getType()) rawNeeded += ag.getAmount();

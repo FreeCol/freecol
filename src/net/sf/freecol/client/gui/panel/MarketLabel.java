@@ -109,7 +109,7 @@ public final class MarketLabel extends AbstractGoodsLabel implements Draggable {
         if (player == null || player.canTrade(getType())) {
             setEnabled(true);
         } else {
-            toolTipText = Messages.message(getType().getLabel(false));
+            toolTipText = Messages.message(getType().getLabel());
             setEnabled(false);
         }
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {

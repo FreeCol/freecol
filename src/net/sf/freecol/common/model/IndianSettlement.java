@@ -784,7 +784,7 @@ public class IndianSettlement extends Settlement {
         int current = getGoodsCount(type);
 
         // Increase effective stock if its raw material is produced here.
-        GoodsType rawType = type.getRawMaterial();
+        GoodsType rawType = type.getInputType();
         if (rawType != null) {
             int rawProduction = getMaximumProduction(rawType);
             int add = (rawProduction < 5) ? 10 * rawProduction
@@ -1066,7 +1066,7 @@ public class IndianSettlement extends Settlement {
         for (GoodsType g : getSpecification().getGoodsTypeList()) {
             GoodsType produced;
             if (g.isRawMaterial()
-                && (produced = g.getProducedMaterial()) != null
+                && (produced = g.getOutputType()) != null
                 && produced.isStorable()
                 && getGoodsCount(g) > getWantedGoodsAmount(g)
                 && (diff = getWantedGoodsAmount(produced)

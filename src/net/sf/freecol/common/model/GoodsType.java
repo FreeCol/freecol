@@ -29,14 +29,19 @@ import javax.xml.stream.XMLStreamWriter;
 
 public final class GoodsType extends FreeColGameObjectType {
 
+    /** Is this a farmed goods type. */
     private boolean isFarmed;
+
+    /** Is this a food type. */
     private boolean isFood;
+
+    /** Does this goods type ignore warehouse limits. */
     private boolean ignoreLimit;
+
+    /** Is this goods type native to the New World. */
     private boolean newWorldGoods;
 
-    /**
-     * Whether this type of goods is required for building.
-     */
+    /** Whether this type of goods is required for building. */
     private boolean buildingMaterial;
 
     /**
@@ -45,27 +50,28 @@ public final class GoodsType extends FreeColGameObjectType {
      */
     private boolean militaryGoods;
 
-    /**
-     * Whether these are trade goods that can only be obtained in
-     * Europe.
-     */
+    /** Whether these are trade goods that can only be obtained in Europe. */
     private boolean tradeGoods;
 
-    /**
-     * Whether this type of goods can be stored in a warehouse.
-     */
+    /** Whether this type of goods can be stored in a warehouse. */
     private boolean storable;
 
-    private GoodsType madeFrom;
-    private GoodsType makes;
+    /** What this goods type is stored as. */
     private GoodsType storedAs;
 
+    /** What this goods type is made from. */
+    private GoodsType madeFrom;
+
+    /** What this goods type can make. */
+    private GoodsType makes;
+
+    /** The initial amount of this goods type in a market. */
     private int initialAmount;
 
-    /**
-     * The initial <em>minimum</em> sales price for this type of goods.
-     */
+    /** The initial <em>minimum</em> sales price for this type of goods. */
     private int initialPrice;
+
+    /** The initial market price difference for this type of goods. */
     private int priceDiff;
 
     /**
@@ -75,80 +81,118 @@ public final class GoodsType extends FreeColGameObjectType {
     private int breedingNumber = INFINITY;
 
     /**
-     * The price of this type of goods. This is only used for goods
+     * The price of this type of goods.  This is only used for goods
      * that can not be traded in the market, such as hammers.
      */
     private int price = INFINITY;
 
 
-    // ----------------------------------------------------------- constructors
-
+    /**
+     * Create a new goods type.
+     *
+     * @param id The object id.
+     * @param specification The enclosing <code>Specification</code>.
+     */
     public GoodsType(String id, Specification specification) {
         super(id, specification);
     }
 
-    // ----------------------------------------------------------- retriveal methods
 
-    public StringTemplate getLabel(boolean sellable) {
-        return StringTemplate.key(getNameKey());
-    }
-
-    public boolean isRawMaterial() {
-        return makes != null;
-    }
-
-    public boolean isRefined() {
-        return madeFrom != null;
-    }
-
-    public GoodsType getRawMaterial() {
-        return madeFrom;
-    }
-
-    public GoodsType getProducedMaterial() {
-        return makes;
-    }
-
+    /**
+     * Is this a farmed goods type?
+     *
+     * @return True if this is a farmed goods type.
+     */
     public boolean isFarmed() {
         return isFarmed;
     }
 
+    /**
+     * Is this an edible goods type?
+     *
+     * @return True if this is a food type.
+     */
+    public boolean isFoodType() {
+        return isFood;
+    }
+
+    /**
+     * Do warehouse storage limits not apply to this goods type?
+     *
+     * @return True if unlimited amounts of this goods type can be stored.
+     */
     public boolean limitIgnored() {
         return ignoreLimit;
     }
 
+    /**
+     * Is this a goods type native to the New World?
+     *
+     * @return True if this goods type is native to the New World.
+     */
     public boolean isNewWorldGoodsType() {
         return newWorldGoods;
     }
 
+    /**
+     * Is this goods type made from a New World goods type?
+     *
+     * @return True if this goods type is made from New World goods.
+     */
     public boolean isNewWorldLuxuryType() {
-        return (madeFrom != null && madeFrom.isNewWorldGoodsType());
+        return madeFrom != null && madeFrom.isNewWorldGoodsType();
     }
 
-    public final String getWorkingAsKey() {
-        return getId() + ".workingAs";
+    /**
+     * Is this type of goods is required for building a BuildableType?
+     *
+     * @return True if this is a simple building material.
+     * @see BuildableType
+     */
+    public boolean isBuildingMaterial() {
+        return buildingMaterial;
     }
 
-    public boolean isStorable() {
-        return storable;
+    /**
+     * Set the building material state.
+     *
+     * @param newBuildingMaterial The new building material state.
+     */
+    public void setBuildingMaterial(final boolean newBuildingMaterial) {
+        this.buildingMaterial = newBuildingMaterial;
     }
 
-    public boolean isStoredAs() {
-        return storedAs!=null;
+    /**
+     * Is this goods type a military goods type?
+     *
+     * @return True if this is a military goods type.
+     */
+    public boolean isMilitaryGoods() {
+        return militaryGoods;
     }
 
-    public GoodsType getStoredAs() {
-        if (storedAs==null) {
-            return this;
-        } else {
-            return storedAs;
-        }
+    /**
+     * Set the military goods state.
+     *
+     * @param newMilitaryGoods The new military goods state.
+     */
+    public void setMilitaryGoods(final boolean newMilitaryGoods) {
+        this.militaryGoods = newMilitaryGoods;
+    }
+
+    /**
+     * Is this a trade goods type?
+     *
+     * @return True if this goods type is trade goods.
+     */
+    public boolean isTradeGoods() {
+        return tradeGoods;
     }
 
     /**
      * Does this type of goods produce liberty?
      *
-     * True if this goods type produces liberty.
+     * @return True if this goods type produces liberty.
      */
     public boolean isLibertyType() {
         return containsModifierKey("model.modifier.liberty");
@@ -157,77 +201,186 @@ public final class GoodsType extends FreeColGameObjectType {
     /**
      * Does this type of goods produce immigration?
      *
-     * True if this goods type produces immigration.
+     * @return True if this goods type produces immigration.
      */
     public boolean isImmigrationType() {
         return containsModifierKey("model.modifier.immigration");
     }
 
+    /**
+     * Is this goods type storable?
+     *
+     * @return True if this goods type is storable.
+     */
+    public boolean isStorable() {
+        return storable;
+    }
+
+    /**
+     * Is this type of goods stored as something else?
+     *
+     * @return True if this type of goods is stored as another type.
+     */
+    public boolean isStoredAs() {
+        return storedAs != null;
+    }
+
+    /**
+     * What type of goods is this goods type stored as?
+     *
+     * @return The <code>GoodsType</code> this is stored as, usually itself.
+     */
+    public GoodsType getStoredAs() {
+        return (storedAs == null) ? this : storedAs;
+    }
+
+    /**
+     * Can this goods type be made into somthing?
+     *
+     * @return True if this <code>GoodsType</code> can be made into something.
+     */
+    public boolean isRawMaterial() {
+        return makes != null;
+    }
+
+    /**
+     * Is this goods type made from somthing?
+     *
+     * @return True if this <code>GoodsType</code> is made from something.
+     */
+    public boolean isRefined() {
+        return madeFrom != null;
+    }
+
+    /**
+     * What is this goods made into?
+     *
+     * @return The <code>GoodsType</code> this is made into, if anything.
+     */
+    public GoodsType getOutputType() {
+        return makes;
+    }
+
+    /**
+     * What is this goods type made from?
+     *
+     * @return The <code>GoodsType</code> this is made from, if anything.
+     */
+    public GoodsType getInputType() {
+        return madeFrom;
+    }
+
+    /**
+     * Get the default initial amount of this goods type in a market.
+     *
+     * @return The default initial amount.
+     */
     public int getInitialAmount() {
         return initialAmount;
     }
 
     /**
-     * Returns the initial <em>minimum</em> sales price for this type
-     * of goods. The actual initial sales price in a particular Market
-     * may be higher. This method is only used for initializing
+     * Get the initial <em>minimum</em> sales price for this type
+     * of goods.  The actual initial sales price in a particular
+     * Market may be higher.  This method is only used for initializing
      * Markets.
      *
-     * @return an <code>int</code> value
+     * @return The initial sell price.
      * @see Market
      */
     int getInitialSellPrice() {
         return initialPrice;
     }
 
+    /**
+     * The default initial purchase price for this goods type.
+     *
+     * @return The default initial purchase price.
+     */
     int getInitialBuyPrice() {
         return initialPrice + priceDiff;
     }
 
+    /**
+     * The default initial price difference (between purchase and sale price)
+     * for this type of goods.
+     *
+     * @return The default initial price difference.
+     */
     int getPriceDifference() {
         return priceDiff;
     }
 
-    // TODO: give this some meaning
-    // Originally intended for when there are no static variables
-    public boolean isFoodType() {
-        return isFood;
-    }
-
-    public GoodsType outputType() {
-        return makes;
-    }
-
-    public GoodsType inputType() {
-        return madeFrom;
-    }
-
     /**
-     * Returns true if this type of goods is required for building a
-     * BuildableType.
+     * Get the breeding number for this goods type.
      *
-     * @return a <code>boolean</code> value
-     * @see BuildableType
+     * @return The breeding number.
      */
-    public boolean isBuildingMaterial() {
-        return buildingMaterial;
+    public int getBreedingNumber() {
+        return breedingNumber;
     }
 
     /**
-     * Set the <code>BuildingMaterial</code> value.
+     * Set the breeding number.
      *
-     * @param newBuildingMaterial The new BuildingMaterial value.
+     * @param newBreedingNumber The new breeding number.
      */
-    public void setBuildingMaterial(final boolean newBuildingMaterial) {
-        this.buildingMaterial = newBuildingMaterial;
+    public void setBreedingNumber(final int newBreedingNumber) {
+        this.breedingNumber = newBreedingNumber;
     }
 
     /**
-     * Returns the production chain of the goods type, beginning with
-     * a raw material that can not be produced from any other. The
-     * last element of the production chain is the goods type itself.
+     * Is this type of goods breedable?
      *
-     * @return  the production chain of the goods type
+     * @return True if this <code>GoodsType</code> is breedable.
+     */
+    public boolean isBreedable() {
+        return breedingNumber != INFINITY;
+    }
+
+    /**
+     * Get the price of a non-tradeable goods type.
+     *
+     * @return The price.
+     */
+    public int getPrice() {
+        return price;
+    }
+
+    /**
+     * Set the price value.
+     *
+     * @param newPrice The new price value.
+     */
+    public void setPrice(final int newPrice) {
+        this.price = newPrice;
+    }
+
+
+    /**
+     * Gets the i18n-ed name for this goods type.
+     *
+     * @return The name of this <code>GoodsType</code>.
+     */
+    public StringTemplate getLabel() {
+        return StringTemplate.key(getNameKey());
+    }
+
+    /**
+     * Gets the "workingAs" key for the profession that makes this goods type.
+     *
+     * @return The "workingAs" message key.
+     */
+    public final String getWorkingAsKey() {
+        return getId() + ".workingAs";
+    }
+
+    /**
+     * Gets the production chain of the goods type, beginning with a
+     * raw material that can not be produced from any other.  The last
+     * element of the production chain is the goods type itself.
+     *
+     * @return The production chain of this <code>GoodsType</code> as a list.
      */
     public List<GoodsType> getProductionChain() {
         List<GoodsType> result = new ArrayList<GoodsType>();
@@ -240,222 +393,162 @@ public final class GoodsType extends FreeColGameObjectType {
     }
 
     /**
-     * Returns true if this type of goods is required for producing a
-     * type of goods required for building a BuildableType.
+     * Is this type of goods required somewhere in the chain for
+     * producing a BuildableType, and is not itself buildable.
      *
-     * @return a <code>boolean</code> value
+     * @return True if a raw building type.
      * @see BuildableType
      */
     public boolean isRawBuildingMaterial() {
-        if (this.madeFrom!=null) {
-            return false;
-        }
+        if (this.madeFrom != null) return false;
+
         GoodsType refinedType = makes;
         while (refinedType != null) {
-            if (refinedType.isBuildingMaterial()) {
-                return true;
-            } else {
-                refinedType = refinedType.makes;
-            }
+            if (refinedType.isBuildingMaterial()) return true;
+            refinedType = refinedType.makes;
         }
         return false;
     }
 
-    /**
-     * Get the <code>MilitaryGoods</code> value.
-     *
-     * @return a <code>boolean</code> value
-     */
-    public boolean isMilitaryGoods() {
-        return militaryGoods;
-    }
 
-    /**
-     * Set the <code>MilitaryGoods</code> value.
-     *
-     * @param newMilitaryGoods The new MilitaryGoods value.
-     */
-    public void setMilitaryGoods(final boolean newMilitaryGoods) {
-        this.militaryGoods = newMilitaryGoods;
-    }
+    // Serialization
 
-    /**
-     * Get the <code>TradeGoods</code> value.
-     *
-     * @return a <code>boolean</code> value
-     */
-    public boolean isTradeGoods() {
-        return tradeGoods;
-    }
-
-    /**
-     * Get the <code>BreedingNumber</code> value.
-     *
-     * @return an <code>int</code> value
-     */
-    public int getBreedingNumber() {
-        return breedingNumber;
-    }
-
-    /**
-     * Set the <code>BreedingNumber</code> value.
-     *
-     * @param newBreedingNumber The new BreedingNumber value.
-     */
-    public void setBreedingNumber(final int newBreedingNumber) {
-        this.breedingNumber = newBreedingNumber;
-    }
-
-    /**
-     * Returns <code>true</code> if this type of Goods is
-     * breedable. This should only be true for animals, such as
-     * horses.
-     *
-     * @return a <code>boolean</code> value
-     */
-    public boolean isBreedable() {
-        return breedingNumber != INFINITY;
-    }
-
-    /**
-     * Get the <code>Price</code> value.
-     *
-     * @return an <code>int</code> value
-     */
-    public int getPrice() {
-        return price;
-    }
-
-    /**
-     * Set the <code>Price</code> value.
-     *
-     * @param newPrice The new Price value.
-     */
-    public void setPrice(final int newPrice) {
-        this.price = newPrice;
-    }
+    private static final String BREEDING_NUMBER_TAG = "breeding-number";
+    private static final String IGNORE_LIMIT_TAG = "ignore-limit";
+    private static final String INITIAL_AMOUNT_TAG = "initial-amount";
+    private static final String INITIAL_PRICE_TAG = "initial-price";
+    private static final String IS_FARMED_TAG = "is-farmed";
+    private static final String IS_FOOD_TAG = "is-food";
+    private static final String MADE_FROM_TAG = "made-from";
+    private static final String MARKET_TAG = "market";
+    private static final String NEW_WORLD_GOODS_TAG = "new-world-goods";
+    private static final String PRICE_TAG = "price";
+    private static final String PRICE_DIFFERENCE_TAG = "price-difference";
+    private static final String STORABLE_TAG = "storable";
+    private static final String STORED_AS_TAG = "stored-as";
+    private static final String TRADE_GOODS_TAG = "trade-goods";
 
 
     /**
-     * Makes an XML-representation of this object.
-     *
-     * @param out The output stream.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
+     * {@inheritDoc}
      */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         super.toXML(out, getXMLElementTagName());
     }
 
     /**
-     * Write the attributes of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to
-     *     the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
-        out.writeAttribute("is-farmed", Boolean.toString(isFarmed));
-        out.writeAttribute("is-food", Boolean.toString(isFood));
-        out.writeAttribute("ignore-limit", Boolean.toString(ignoreLimit));
-        out.writeAttribute("new-world-goods", Boolean.toString(newWorldGoods));
-        out.writeAttribute("trade-goods", Boolean.toString(tradeGoods));
-        out.writeAttribute("storable", Boolean.toString(storable));
+        writeAttribute(out, IS_FARMED_TAG, isFarmed);
+
+        writeAttribute(out, IS_FOOD_TAG, isFood);
+
+        writeAttribute(out, IGNORE_LIMIT_TAG, ignoreLimit);
+
+        writeAttribute(out, NEW_WORLD_GOODS_TAG, newWorldGoods);
+
+        writeAttribute(out, TRADE_GOODS_TAG, tradeGoods);
+
+        writeAttribute(out, STORABLE_TAG, storable);
+
         if (breedingNumber != INFINITY) {
-            out.writeAttribute("breeding-number", Integer.toString(breedingNumber));
+            writeAttribute(out, BREEDING_NUMBER_TAG, breedingNumber);
         }
+
         if (price != INFINITY) {
-            out.writeAttribute("price", Integer.toString(price));
+            writeAttribute(out, PRICE_TAG, price);
         }
+
         if (madeFrom != null) {
-            out.writeAttribute("made-from", madeFrom.getId());
+            writeAttribute(out, MADE_FROM_TAG, madeFrom);
         }
+
         if (storedAs != null) {
-            out.writeAttribute("stored-as", storedAs.getId());
+            writeAttribute(out, STORED_AS_TAG, storedAs);
         }
     }
 
     /**
-     * Write the children of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to
-     *     the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
         super.writeChildren(out);
 
         if (initialAmount > 0) {
-            out.writeStartElement("market");
-            out.writeAttribute("initial-amount",
-                Integer.toString(initialAmount));
-            out.writeAttribute("initial-price",
-                Integer.toString(initialPrice));
-            out.writeAttribute("price-difference",
-                Integer.toString(priceDiff));
+            out.writeStartElement(MARKET_TAG);
+
+            writeAttribute(out, INITIAL_AMOUNT_TAG, initialAmount);
+
+            writeAttribute(out, INITIAL_PRICE_TAG, initialPrice);
+
+            writeAttribute(out, PRICE_DIFFERENCE_TAG, priceDiff);
+
             out.writeEndElement();
         }
     }
 
     /**
-     * Reads the attributes of this object from an XML stream.
-     *
-     * @param in The XML input stream.
-     * @throws XMLStreamException if a problem was encountered
-     *     during parsing.
+     * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        final Specification spec = getSpecification();
+
         super.readAttributes(in);
 
-        isFarmed = getAttribute(in, "is-farmed", false);
-        isFood = getAttribute(in, "is-food", false);
-        ignoreLimit = getAttribute(in, "ignore-limit", false);
-        newWorldGoods = getAttribute(in, "new-world-goods", false);
-        tradeGoods = getAttribute(in, "trade-goods", false);
-        breedingNumber = getAttribute(in, "breeding-number", INFINITY);
-        price = getAttribute(in, "price", INFINITY);
+        isFarmed = getAttribute(in, IS_FARMED_TAG, false);
 
-        madeFrom = getSpecification().getType(in, "made-from",
-            GoodsType.class, null);
-        if (madeFrom != null) {
-            madeFrom.makes = this;
-        }
+        isFood = getAttribute(in, IS_FOOD_TAG, false);
 
-        storable = getAttribute(in, "storable", true);
-        storedAs = getSpecification().getType(in, "stored-as",
-            GoodsType.class, null);
+        ignoreLimit = getAttribute(in, IGNORE_LIMIT_TAG, false);
+
+        newWorldGoods = getAttribute(in, NEW_WORLD_GOODS_TAG, false);
+
+        tradeGoods = getAttribute(in, TRADE_GOODS_TAG, false);
+
+        breedingNumber = getAttribute(in, BREEDING_NUMBER_TAG, INFINITY);
+
+        price = getAttribute(in, PRICE_TAG, INFINITY);
+
+        madeFrom = spec.getType(in, MADE_FROM_TAG, GoodsType.class,
+                                (GoodsType)null);
+        if (madeFrom != null) madeFrom.makes = this;
+
+        storable = getAttribute(in, STORABLE_TAG, true);
+
+        storedAs = spec.getType(in, STORED_AS_TAG, GoodsType.class,
+                                (GoodsType)null);
     }
 
     /**
-     * Reads a child object.
-     *
-     * @param in The XML stream to read.
-     * @exception XMLStreamException if an error occurs
+     * {@inheritDoc}
      */
     @Override
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        String childName = in.getLocalName();
-        if ("market".equals(childName)) {
-            initialAmount = Integer.parseInt(in.getAttributeValue(null,
-                    "initial-amount"));
-            initialPrice = getAttribute(in, "initial-price", 1);
-            priceDiff = getAttribute(in, "price-difference", 1);
+        final String tag = in.getLocalName();
+
+        if (MARKET_TAG.equals(tag)) {
+            initialAmount = getAttribute(in, INITIAL_AMOUNT_TAG, 0);
+
+            initialPrice = getAttribute(in, INITIAL_PRICE_TAG, 1);
+
+            priceDiff = getAttribute(in, PRICE_DIFFERENCE_TAG, 1);
+
             in.nextTag(); // close this element
+
         } else {
             super.readChild(in);
         }
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "goods-type".
      */

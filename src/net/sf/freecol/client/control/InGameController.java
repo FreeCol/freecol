@@ -1544,7 +1544,7 @@ public final class InGameController implements NetworkConstants {
                 goodsMap.put(goodsType, new Integer(potential));
             } else if (goodsType.isBuildingMaterial()) {
                 while (goodsType.isRefined()) {
-                    goodsType = goodsType.getRawMaterial();
+                    goodsType = goodsType.getInputType();
                 }
                 int potential = 0;
                 if (tile.getType().isSecondaryGoodsType(goodsType)) {
