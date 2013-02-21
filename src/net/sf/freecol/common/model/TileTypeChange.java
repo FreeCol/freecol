@@ -27,14 +27,10 @@ import javax.xml.stream.XMLStreamWriter;
 
 public class TileTypeChange {
 
-    /**
-     * The original tile type.
-     */
+    /** The original tile type. */
     private TileType from;
 
-    /**
-     * The destination tile type.
-     */
+    /** The destination tile type. */
     private TileType to;
 
     /**
@@ -43,59 +39,68 @@ public class TileTypeChange {
      */
     private AbstractGoods production;
 
+
     /**
-     * Get the <code>From</code> value.
+     * Gets the original tile type.
      *
-     * @return a <code>TileType</code> value
+     * @return The original tile type.
      */
     public final TileType getFrom() {
         return from;
     }
 
     /**
-     * Set the <code>From</code> value.
+     * Set the original tile type.
      *
-     * @param newFrom The new From value.
+     * @param from The new original tile type.
      */
-    public final void setFrom(final TileType newFrom) {
-        this.from = newFrom;
+    public final void setFrom(final TileType from) {
+        this.from = from;
     }
 
     /**
-     * Get the <code>To</code> value.
+     * Gets the destination tile type.
      *
-     * @return a <code>TileType</code> value
+     * @return The destination tile type.
      */
     public final TileType getTo() {
         return to;
     }
 
     /**
-     * Set the <code>To</code> value.
+     * Set the destination tile type.
      *
-     * @param newTo The new To value.
+     * @param to The new destination tile type.
      */
-    public final void setTo(final TileType newTo) {
-        this.to = newTo;
+    public final void setTo(final TileType to) {
+        this.to = to;
     }
 
     /**
-     * Get the <code>Production</code> value.
+     * Gets the production consequent to the type change.
      *
-     * @return an <code>AbstractGoods</code> value
+     * @return The consequent production.
      */
     public final AbstractGoods getProduction() {
         return production;
     }
 
     /**
-     * Set the <code>Production</code> value.
+     * Set the production consequent to the type change.
      *
-     * @param newProduction The new Production value.
+     * @param production The new consequent production.
      */
-    public final void setProduction(final AbstractGoods newProduction) {
-        this.production = newProduction;
+    public final void setProduction(final AbstractGoods production) {
+        this.production = production;
     }
+
+
+    // Serialization
+    private static final String FROM_TAG = "from";
+    private static final String GOODS_TYPE_TAG = "goods-type";
+    private static final String PRODUCTION_TAG = "production";
+    private static final String TO_TAG = "to";
+    private static final String VALUE_TAG = "value";
 
 
     /**
@@ -107,15 +112,21 @@ public class TileTypeChange {
      */
     public void toXML(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
-        out.writeAttribute("from", from.getId());
-        out.writeAttribute("to", to.getId());
+
+        out.writeAttribute(FROM_TAG, from.getId());
+
+        out.writeAttribute(TO_TAG, to.getId());
 
         if (production != null) {
-            out.writeStartElement("production");
-            out.writeAttribute("goods-type", production.getType().getId());
-            out.writeAttribute("value", Integer.toString(production.getAmount()));
+            out.writeStartElement(PRODUCTION_TAG);
+
+            out.writeAttribute(GOODS_TYPE_TAG, production.getType().getId());
+
+            out.writeAttribute(VALUE_TAG, Integer.toString(production.getAmount()));
+
             out.writeEndElement();
         }
+
         out.writeEndElement();
     }
 
@@ -123,28 +134,43 @@ public class TileTypeChange {
      * Reads this object from an XML stream.
      *
      * @param in The XML input stream.
-     * @param specification a <code>Specification</code> value
+     * @param spec The <code>Specification</code> to use.
      * @throws XMLStreamException if a problem was encountered
      *     during parsing.
      */
-    public void readFromXML(XMLStreamReader in, Specification specification)
-        throws XMLStreamException {
-        from = specification.getTileType(in.getAttributeValue(null, "from"));
-        to = specification.getTileType(in.getAttributeValue(null, "to"));
+    public void readFromXML(XMLStreamReader in,
+                            Specification spec) throws XMLStreamException {
+
+        from = spec.getType(in, FROM_TAG, TileType.class, (TileType)null);
+
+        to = spec.getType(in, TO_TAG, TileType.class, (TileType)null);
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            String childName = in.getLocalName();
-            if ("production".equals(childName)) {
-                GoodsType type = specification.getGoodsType(in.getAttributeValue(null, "goods-type"));
-                int amount = Integer.parseInt(in.getAttributeValue(null, "value"));
+            final String tag = in.getLocalName();
+
+            if (PRODUCTION_TAG.equals(tag)) {
+                GoodsType type = spec.getType(in, GOODS_TYPE_TAG,
+                                              GoodsType.class, (GoodsType)null);
+
+                String str = in.getAttributeValue(null, VALUE_TAG);
+                int amount = 0;
+                try {
+                    amount = Integer.parseInt(str);
+                } catch (NumberFormatException e) {}
+
                 production = new AbstractGoods(type, amount);
-                in.nextTag();
+
+                in.nextTag(); // close tag
+
+            } else {
+                throw new XMLStreamException("Unexpected TileTypeChange tag: "
+                    + tag);
             }
         }
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "change".
      */
