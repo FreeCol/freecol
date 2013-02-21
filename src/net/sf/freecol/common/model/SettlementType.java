@@ -29,19 +29,13 @@ import javax.xml.stream.XMLStreamWriter;
 
 public class SettlementType extends FreeColGameObjectType {
 
-    /**
-     * Whether this SettlementType is a capital.
-     */
+    /** Whether this SettlementType is a capital. */
     private boolean capital = false;
 
-    /**
-     * How many tiles this SettlementType can see.
-     */
+    /** How many tiles this SettlementType can see. */
     private int visibleRadius = 2;
 
-    /**
-     * How many tiles this SettlementType can claim.
-     */
+    /** How many tiles this SettlementType can claim. */
     private int claimableRadius = 1;
 
     /**
@@ -50,40 +44,19 @@ public class SettlementType extends FreeColGameObjectType {
      */
     private int extraClaimableRadius = 2;
 
-    /**
-     * How far units from this SettlementType may roam.
-     */
+    /** How far units from this SettlementType may roam. */
     private int wanderingRadius = 4;
 
-    /**
-     * The plunder this SettlementType generates when destroyed.
-     */
-    private List<RandomRange> plunder = new ArrayList<RandomRange>();
-
-    /**
-     * The gifts this SettlementType generates when visited by a
-     * scout.
-     */
-    private List<RandomRange> gifts = new ArrayList<RandomRange>();
-
-    /**
-     * The minimum number of units for this SettlementType.
-     */
+    /** The minimum number of units for this SettlementType. */
     private int minimumSize = 3;
 
-    /**
-     * The maximum number of units for this SettlementType.
-     */
+    /** The maximum number of units for this SettlementType. */
     private int maximumSize = 10;
 
-    /**
-     * The minimum number of tiles to grow this SettlementType.
-     */
+    /** The minimum number of tiles to grow this SettlementType. */
     private int minimumGrowth = 1;
 
-    /**
-     * The maximum number of tiles to grown this SettlementType.
-     */
+    /** The maximum number of tiles to grown this SettlementType. */
     private int maximumGrowth = 10;
 
     /**
@@ -92,105 +65,75 @@ public class SettlementType extends FreeColGameObjectType {
      */
     private int tradeBonus = 1;
 
-    /**
-     * The threshold at which a new convert occurs.
-     */
+    /** The threshold at which a new convert occurs. */
     private int convertThreshold = 100;
 
+    /** The plunder this SettlementType generates when destroyed. */
+    private List<RandomRange> plunder = null;
+
+    /** The gifts this SettlementType generates when visited by a scout. */
+    private List<RandomRange> gifts = null;
+
+
 
     /**
-     * Creates a new <code>SettlementType</code> instance.
+     * Creates a new settlement type.
      *
-     * @param id a <code>String</code> value
-     * @param specification a <code>Specification</code> value
+     * @param id The object id.
+     * @param specification The enclosing <code>Specification</code>.
      */
     public SettlementType(String id, Specification specification) {
         super(id, specification);
     }
 
+
     /**
-     * Get the <code>Capital</code> value.
+     * Is this a capital settlement type?
      *
-     * @return a <code>boolean</code> value
+     * @return True if this is a capital.
      */
     public final boolean isCapital() {
         return capital;
     }
 
     /**
-     * Set the <code>Capital</code> value.
+     * Get the minimum size of this settlement type.
      *
-     * @param newCapital The new Capital value.
-     */
-    public final void setCapital(final boolean newCapital) {
-        this.capital = newCapital;
-    }
-
-    /**
-     * Get the <code>MinimumSize</code> value.
-     *
-     * @return an <code>int</code> value
+     * @return The minimum settlement size.
      */
     public final int getMinimumSize() {
         return minimumSize;
     }
 
     /**
-     * Set the <code>MinimumSize</code> value.
+     * Get the maximum size of this settlement type.
      *
-     * @param newMinimumSize The new MinimumSize value.
-     */
-    public final void setMinimumSize(final int newMinimumSize) {
-        this.minimumSize = newMinimumSize;
-    }
-
-    /**
-     * Get the <code>MaximumSize</code> value.
-     *
-     * @return an <code>int</code> value
+     * @return The maximum settlement size.
      */
     public final int getMaximumSize() {
         return maximumSize;
     }
 
     /**
-     * Set the <code>MaximumSize</code> value.
+     * Get the visible radius of this settlement type.
      *
-     * @param newMaximumSize The new MaximumSize value.
-     */
-    public final void setMaximumSize(final int newMaximumSize) {
-        this.maximumSize = newMaximumSize;
-    }
-
-    /**
-     * Get the <code>VisibleRadius</code> value.
-     *
-     * @return an <code>int</code> value
+     * @return The visible radius.
      */
     public final int getVisibleRadius() {
         return visibleRadius;
     }
 
     /**
-     * Set the <code>VisibleRadius</code> value.
+     * Get the claimable radius of this settlement type.
      *
-     * @param newVisibleRadius The new VisibleRadius value.
-     */
-    public final void setVisibleRadius(final int newVisibleRadius) {
-        this.visibleRadius = newVisibleRadius;
-    }
-
-    /**
-     * Get the <code>ClaimableRadius</code> value.
-     *
-     * @return an <code>int</code> value
+     * @return The claimable radius.
      */
     public final int getClaimableRadius() {
         return claimableRadius;
     }
 
     /**
-     * Get the <code>extraClaimableRadius</code> value.
+     * Get the extra claimable radius.
      *
      * @return The extra claimable radius.
      */
@@ -199,30 +142,12 @@ public class SettlementType extends FreeColGameObjectType {
     }
 
     /**
-     * Set the <code>ClaimableRadius</code> value.
+     * Get the wandering radius for this settlement type.
      *
-     * @param newClaimableRadius The new ClaimableRadius value.
-     */
-    public final void setClaimableRadius(final int newClaimableRadius) {
-        this.claimableRadius = newClaimableRadius;
-    }
-
-    /**
-     * Get the <code>WanderingRadius</code> value.
-     *
-     * @return an <code>int</code> value
+     * @return The wandering radius.
      */
     public final int getWanderingRadius() {
         return wanderingRadius;
-    }
-
-    /**
-     * Set the <code>WanderingRadius</code> value.
-     *
-     * @param newWanderingRadius The new WanderingRadius value.
-     */
-    public final void setWanderingRadius(final int newWanderingRadius) {
-        this.wanderingRadius = newWanderingRadius;
     }
 
     /**
@@ -255,66 +180,50 @@ public class SettlementType extends FreeColGameObjectType {
     }
 
     /**
+     * Gets the convert threshold for this settlement.
+     *
+     * @return The convert threshold.
+     */
+    public int getConvertThreshold() {
+        return convertThreshold;
+    }
+
+    /**
      * Gets the plunder range available for the supplied unit.
      *
      * @param unit The <code>Unit</code> to check.
-     * @return The plunder range.
+     * @return The plunder range, or null if none applicable.
      */
     public final RandomRange getPlunderRange(Unit unit) {
+        if (plunder == null) return null;
+
         for (RandomRange range : plunder) {
             List<Scope> scopes = range.getScopes();
-            if (scopes.isEmpty()) {
-                return range;
-            } else {
-                for (Scope scope : scopes) {
-                    if (scope.appliesTo(unit)) {
-                        return range;
-                    }
-                }
+            if (scopes.isEmpty()) return range;
+            for (Scope scope : scopes) {
+                if (scope.appliesTo(unit)) return range;
             }
         }
         return null;
     }
 
     /**
-     * Set the <code>Plunder</code> value.
+     * Get the range of gifts available to a unit.
      *
-     * @param newPlunder The new Plunder value.
-     */
-    public final void setPlunder(final RandomRange newPlunder) {
-        plunder.add(newPlunder);
-    }
-
-
-    /**
-     * Get the <code>Gifts</code> value.
-     *
-     * @param unit an <code>Unit</code> value
-     * @return a <code>RandomRange</code> value
+     * @param unit The <code>Unit</code> to check.
+     * @return A range of gifts, or null if none applicable.
      */
     public final RandomRange getGifts(Unit unit) {
+        if (gifts == null) return null;
+
         for (RandomRange range : gifts) {
             List<Scope> scopes = range.getScopes();
-            if (scopes.isEmpty()) {
-                return range;
-            } else {
-                for (Scope scope : scopes) {
-                    if (scope.appliesTo(unit)) {
-                        return range;
-                    }
-                }
+            if (scopes.isEmpty()) return range;
+            for (Scope scope : scopes) {
+                if (scope.appliesTo(unit)) return range;
             }
         }
         return null;
-    }
-
-    /**
-     * Set the <code>Gifts</code> value.
-     *
-     * @param newGifts The new Gifts value.
-     */
-    public final void setGifts(final RandomRange newGifts) {
-        gifts.add(newGifts);
     }
 
 
@@ -327,126 +236,182 @@ public class SettlementType extends FreeColGameObjectType {
         return GoodsContainer.CARGO_SIZE * getClaimableRadius();
     }
 
-
+    // @compat 0.9.x
     /**
-     * Gets the convert threshold for this settlement.
+     * Set the capital value.
      *
-     * @return The convert threshold.
+     * @param newCapital The new capital value.
      */
-    public int getConvertThreshold() {
-        return convertThreshold;
+    public final void setCapital(final boolean newCapital) {
+        this.capital = newCapital;
     }
 
+    /**
+     * Set the <code>Plunder</code> value.
+     *
+     * @param newPlunder The new Plunder value.
+     */
+    public final void setPlunder(final RandomRange newPlunder) {
+        if (plunder == null) plunder = new ArrayList<RandomRange>();
+        plunder.add(newPlunder);
+    }
 
     /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
+     * Set the <code>Gifts</code> value.
      *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * @param newGifts The new Gifts value.
      */
+    public final void setGifts(final RandomRange newGifts) {
+        if (gifts == null) gifts = new ArrayList<RandomRange>();
+        gifts.add(newGifts);
+    }
+    // end @compat
+
+
+    // Serialization
+
+    private static final String CAPITAL_TAG = "capital";
+    private static final String CLAIMABLE_RADIUS_TAG = "claimableRadius";
+    private static final String CONVERT_THRESHOLD_TAG = "convertThreshold";
+    private static final String EXTRA_CLAIMABLE_RADIUS_TAG = "extraClaimableRadius";
+    private static final String GIFTS_TAG = "gifts";
+    private static final String MAXIMUM_GROWTH_TAG = "maximumGrowth";
+    private static final String MAXIMUM_SIZE_TAG = "maximumSize";
+    private static final String MINIMUM_GROWTH_TAG = "minimumGrowth";
+    private static final String MINIMUM_SIZE_TAG = "minimumSize";
+    private static final String PLUNDER_TAG = "plunder";
+    private static final String TRADE_BONUS_TAG = "tradeBonus";
+    private static final String VISIBLE_RADIUS_TAG = "visibleRadius";
+    private static final String WANDERING_RADIUS_TAG = "wanderingRadius";
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         super.toXMLImpl(out, getXMLElementTagName());
     }
 
     /**
-     * Write the attributes of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to
-     *     the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
-        out.writeAttribute("capital", Boolean.toString(capital));
-        out.writeAttribute("minimumSize", Integer.toString(minimumSize));
-        out.writeAttribute("maximumSize", Integer.toString(maximumSize));
-        out.writeAttribute("visibleRadius", Integer.toString(visibleRadius));
-        out.writeAttribute("claimableRadius",
-            Integer.toString(claimableRadius));
-        out.writeAttribute("extraClaimableRadius",
-            Integer.toString(extraClaimableRadius));
-        out.writeAttribute("wanderingRadius",
-            Integer.toString(wanderingRadius));
-        out.writeAttribute("minimumGrowth", Integer.toString(minimumGrowth));
-        out.writeAttribute("maximumGrowth", Integer.toString(maximumGrowth));
-        out.writeAttribute("tradeBonus", Integer.toString(tradeBonus));
-        out.writeAttribute("convertThreshold", Integer.toString(convertThreshold));
+        writeAttribute(out, CAPITAL_TAG, capital);
+
+        writeAttribute(out, MINIMUM_SIZE_TAG, minimumSize);
+
+        writeAttribute(out, MAXIMUM_SIZE_TAG, maximumSize);
+
+        writeAttribute(out, VISIBLE_RADIUS_TAG, visibleRadius);
+
+        writeAttribute(out, CLAIMABLE_RADIUS_TAG, claimableRadius);
+
+        writeAttribute(out, EXTRA_CLAIMABLE_RADIUS_TAG, extraClaimableRadius);
+
+        writeAttribute(out, WANDERING_RADIUS_TAG, wanderingRadius);
+
+        writeAttribute(out, MINIMUM_GROWTH_TAG, minimumGrowth);
+
+        writeAttribute(out, MAXIMUM_GROWTH_TAG, maximumGrowth);
+
+        writeAttribute(out, TRADE_BONUS_TAG, tradeBonus);
+
+        writeAttribute(out, CONVERT_THRESHOLD_TAG, convertThreshold);
     }
 
     /**
-     * Write the children of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to
-     *     the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
         super.writeChildren(out);
 
-        for (RandomRange range : plunder) {
-            range.toXML(out, "plunder");
+        if (plunder != null) {
+            for (RandomRange range : plunder) range.toXML(out, PLUNDER_TAG);
         }
-        for (RandomRange range : gifts) {
-            range.toXML(out, "gifts");
+
+        if (gifts != null) {
+            for (RandomRange range : gifts) range.toXML(out, GIFTS_TAG);
         }
     }
 
     /**
-     * Reads the attributes of this object from an XML stream.
-     *
-     * @param in The XML input stream.
-     * @throws XMLStreamException if a problem was encountered
-     *     during parsing.
+     * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
 
-        capital = getAttribute(in, "capital", capital);
-        minimumSize = getAttribute(in, "minimumSize", minimumSize);
-        maximumSize = getAttribute(in, "maximumSize", maximumSize);
-        visibleRadius = getAttribute(in, "visibleRadius", visibleRadius);
-        claimableRadius = getAttribute(in, "claimableRadius", claimableRadius);
-        extraClaimableRadius = getAttribute(in, "extraClaimableRadius",
-            extraClaimableRadius);
-        wanderingRadius = getAttribute(in, "wanderingRadius", wanderingRadius);
-        minimumGrowth = getAttribute(in, "minimumGrowth", minimumGrowth);
-        maximumGrowth = getAttribute(in, "maximumGrowth", maximumGrowth);
-        tradeBonus = getAttribute(in, "tradeBonus", tradeBonus);
-        convertThreshold = getAttribute(in, "convertThreshold", convertThreshold);
+        capital = getAttribute(in, CAPITAL_TAG, capital);
+
+        minimumSize = getAttribute(in, MINIMUM_SIZE_TAG, minimumSize);
+
+        maximumSize = getAttribute(in, MAXIMUM_SIZE_TAG, maximumSize);
+
+        visibleRadius = getAttribute(in, VISIBLE_RADIUS_TAG, visibleRadius);
+
+        claimableRadius = getAttribute(in, CLAIMABLE_RADIUS_TAG,
+                                       claimableRadius);
+
+        extraClaimableRadius = getAttribute(in, EXTRA_CLAIMABLE_RADIUS_TAG,
+                                            extraClaimableRadius);
+
+        wanderingRadius = getAttribute(in, WANDERING_RADIUS_TAG,
+                                       wanderingRadius);
+
+        minimumGrowth = getAttribute(in, MINIMUM_GROWTH_TAG, minimumGrowth);
+
+        maximumGrowth = getAttribute(in, MAXIMUM_GROWTH_TAG, maximumGrowth);
+
+        tradeBonus = getAttribute(in, TRADE_BONUS_TAG, tradeBonus);
+
+        convertThreshold = getAttribute(in, CONVERT_THRESHOLD_TAG,
+                                        convertThreshold);
     }
 
     /**
-     * Reads a child object.
-     *
-     * @param in The XML stream to read.
-     * @exception XMLStreamException if an error occurs
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        if (readShouldClearContainers(in)) {
+            plunder = null;
+            gifts = null;
+        }
+
+        super.readChildren(in);
+    }
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        if ("plunder".equals(in.getLocalName())) {
+        final String tag = in.getLocalName();
+
+        if (GIFTS_TAG.equals(tag)) {
             RandomRange range = new RandomRange();
             range.readFromXML(in);
-            plunder.add(range);
-        } else if ("gifts".equals(in.getLocalName())) {
-            RandomRange range = new RandomRange();
-            range.readFromXML(in);
+            if (gifts == null) gifts = new ArrayList<RandomRange>();
             gifts.add(range);
+
+        } else if (PLUNDER_TAG.equals(tag)) {
+            RandomRange range = new RandomRange();
+            range.readFromXML(in);
+            if (plunder == null) plunder = new ArrayList<RandomRange>();
+            plunder.add(range);
+
         } else {
             super.readChild(in);
         }
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "settlementType".
      */
