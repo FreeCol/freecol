@@ -140,6 +140,7 @@ public class UnitWas implements Comparable<UnitWas> {
      * @return True if the reversion was complete.
      */
     public static boolean revertAll(List<UnitWas> was) {
+        for (UnitWas uw : was) uw.getUnit().setLocation(null);
         Collections.sort(was);
         List<UnitWas> retry = new ArrayList<UnitWas>();
         while (!was.isEmpty()) {
