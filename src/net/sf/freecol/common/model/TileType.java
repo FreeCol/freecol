@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -37,6 +38,8 @@ import net.sf.freecol.common.util.RandomChoice;
 
 public final class TileType extends FreeColGameObjectType {
 
+    public static enum RangeType { HUMIDITY, TEMPERATURE, ALTITUDE };
+
     /**
      * Use these tile types only for "land maps", i.e. maps that only
      * distinguish water and land.
@@ -44,49 +47,58 @@ public final class TileType extends FreeColGameObjectType {
     public static final TileType WATER = new TileType("WATER", true);
     public static final TileType LAND  = new TileType("LAND", false);
 
+    /** Is this a forested tile? */
     private boolean forest;
+
+    /** Is this a water tile? */
     private boolean water;
+
+    /** Can this tile be settled? */
     private boolean canSettle;
-    private boolean elevation;
 
-    private int basicMoveCost;
-    private int basicWorkTurns;
-
-    public static enum RangeType { HUMIDITY, TEMPERATURE, ALTITUDE }
-
-    private int[] humidity = new int[2];
-    private int[] temperature = new int[2];
-    private int[] altitude = new int[2];
-
-    private List<RandomChoice<ResourceType>> resourceType =
-        new ArrayList<RandomChoice<ResourceType>>();
-
-
-    /**
-     * Whether this TileType is connected to Europe.
-     */
+    /** Whether this TileType is connected to Europe. */
     private boolean connected;
 
-    /**
-     * The disasters that may strike this type of tile.
-     */
-    private List<RandomChoice<Disaster>> disasters
-        = new ArrayList<RandomChoice<Disaster>>();
+    /** Is this elevated terrain? */
+    private boolean elevation;
+
+    /** The base movement cost for this tile type. */
+    private int basicMoveCost;
+
+    /** The base work turns for this tile type. */
+    private int basicWorkTurns;
+
+    /** The humidity range for this tile type. */
+    private int[] humidity = new int[2];
+    /** The temperature range for this tile type. */
+    private int[] temperature = new int[2];
+    /** The altitude range for this tile type. */
+    private int[] altitude = new int[2];
+
+    /** The resource types that are valid for this tile type. */
+    private List<RandomChoice<ResourceType>> resourceTypes = null;
+
+    /** The disasters that may strike this type of tile. */
+    private List<RandomChoice<Disaster>> disasters = null;
 
     /**
-     * The possible production types of this tile type. This includes
+     * The possible production types of this tile type.  This includes
      * the production types available if a tile of this type is a
      * colony center tile.
      */
-    private final List<ProductionType> productionTypes
-        = new ArrayList<ProductionType>();
+    private List<ProductionType> productionTypes = null;
 
     // TODO: make this hack go away!
     private String productionLevel = null;
 
 
-    // ------------------------------------------------------------ constructor
 
+    /**
+     * Create a new tile type.
+     *
+     * @param id The object identifier.
+     * @param specification The enclosing <code>Specification</code>.
+     */
     public TileType(String id, Specification specification) {
         super(id, specification);
     }
@@ -96,29 +108,32 @@ public final class TileType extends FreeColGameObjectType {
         this.water = water;
     }
 
-    // ------------------------------------------------------------ retrieval methods
 
     /**
-     * Returns the index of this FreeColGameObjectType. The index
-     * imposes a total ordering consistent with equals on each class
-     * extending FreeColGameObjectType, but this ordering is nothing
-     * but the order in which the objects of the respective class were
-     * defined. It is guaranteed to remain stable only for a
-     * particular revision of a particular specification.
+     * Is this tile type forested?
      *
-     * @return an <code>int</code> value
+     * @return True if this is a forested tile type.
      */
-    @Override
-    public int getIndex() {
-        return super.getIndex();
-    }
-
     public boolean isForested() {
         return forest;
     }
 
+    /**
+     * Is this a water tile type?
+     *
+     * @return True if this is a water tile type.
+     */
     public boolean isWater() {
         return water;
+    }
+
+    /**
+     * Can this tile type be settled?
+     *
+     * @return True if this is a settleable tile type.
+     */
+    public boolean canSettle() {
+        return canSettle;
     }
 
     /**
@@ -141,196 +156,59 @@ public final class TileType extends FreeColGameObjectType {
     }
 
     /**
-     * Is this tile an elevation.
+     * Is this an elevated tile type?
      *
-     * @return <tt>true</tt> if and only if the tile is an elevation, <tt>false</tt> otherwise.
+     * @return True if this is an elevated tile type.
      */
     public boolean isElevation() {
-    	return elevation;
-    }
-
-    public boolean canSettle() {
-        return canSettle;
+        return elevation;
     }
 
     /**
-     * Returns true if this TileType supports the given TileImprovementType.
+     * Gets the basic movement cost through this tile type.
      *
-     * @param improvement a <code>TileImprovementType</code> value
-     * @return a <code>boolean</code> value
+     * @return The basic movement cost.
      */
-    public boolean canHaveImprovement(TileImprovementType improvement) {
-        return (improvement != null && improvement.isTileTypeAllowed(this));
-    }
-
     public int getBasicMoveCost() {
         return basicMoveCost;
     }
 
+    /**
+     * Gets the basic work turns to build an improvement on this tile type.
+     *
+     * @return The basic work turns.
+     */
     public int getBasicWorkTurns() {
         return basicWorkTurns;
     }
 
-    public Set<Modifier> getDefenceBonus() {
-        return getModifierSet(Modifier.DEFENCE);
-    }
-
     /**
-     * Returns the amount of goods of given GoodsType this TileType
-     * can produce. This method applies the production bonus to
-     * <code>0f</code>. Thus, it will always return <code>0</code>
-     * unless an additive modifier is present. This is intentional.
+     * Gets the production types applicable to this tile type.
      *
-     * @param goodsType a <code>GoodsType</code> value
-     * @param unitType an <code>UnitType</code> value
-     * @return an <code>int</code> value
-     * @see #getProductionBonus(GoodsType)
+     * @return A list of <code>ProductionType</code>s.
      */
-    public int getProductionOf(GoodsType goodsType, UnitType unitType) {
-        return (int)applyModifier(0f, goodsType.getId(), unitType);
-        /*
-        Set<Modifier> result = featureContainer.getModifierSet(goodsType.getId(), unitType);
-        if (unitType != null && !result.isEmpty()) {
-            result.addAll(unitType.getFeatureContainer().getModifierSet(goodsType.getId()));
-        }
-        return (int) featureContainer.applyModifierSet(0f, null, result);
-        */
-    }
-
-    /**
-     * Returns the production bonus for the given GoodsType.
-     *
-     * @param goodsType a <code>GoodsType</code> value
-     * @return a <code>Modifier</code> value
-     */
-    public Set<Modifier> getProductionBonus(GoodsType goodsType) {
-        return getModifierSet(goodsType.getId());
-    }
-
-    /**
-     * Returns the production types available for the given combination
-     * of colony center tile and production level. If the production
-     * level is null, all production levels will be returned.
-     *
-     * @param center whether the tile is a colony center tile
-     * @param level the production level
-     * @return a <code>List<ProductionType></code> value
-     */
-    public List<ProductionType> getProductionTypes(boolean center, String level) {
-        List<ProductionType> result = new ArrayList<ProductionType>();
-        for (ProductionType productionType : productionTypes) {
-            if (productionType.isColonyCenterTile() == center
-                && productionType.appliesTo(level)) {
-                result.add(productionType);
-            }
-        }
-        return result;
-    }
-
     public List<ProductionType> getProductionTypes() {
+        if (productionTypes == null) return Collections.emptyList();
         return productionTypes;
     }
 
     /**
-     * Get the <code>PrimaryGoods</code> value.
+     * Gets the resources that can be placed on this tile type.
      *
-     * @return an <code>AbstractGoods</code> value
+     * @return A weighted list of resource types.
      */
-    public AbstractGoods getPrimaryGoods() {
-        List<ProductionType> production = getProductionTypes(true, productionLevel);
-        if (production == null || production.isEmpty()) {
-            return null;
-        } else {
-            List<AbstractGoods> outputs = production.get(0).getOutputs();
-            if (outputs == null || outputs.isEmpty()) {
-                return null;
-            } else {
-                return outputs.get(0);
-            }
-        }
-    }
-
-    /**
-     * Returns true if the given <code>GoodsType</code> is the primary
-     * goods type of this TileType.
-     *
-     * @param type a <code>GoodsType</code> value
-     * @return a <code>boolean</code> value
-     */
-    public boolean isPrimaryGoodsType(GoodsType type) {
-        AbstractGoods primaryGoods = getPrimaryGoods();
-        return (primaryGoods != null && primaryGoods.getType() == type);
-    }
-
-    /**
-     * Get the <code>SecondaryGoods</code> value.
-     *
-     * @return an <code>AbstractGoods</code> value
-     */
-    public AbstractGoods getSecondaryGoods() {
-        List<ProductionType> production = getProductionTypes(true, productionLevel);
-        if (production == null || production.isEmpty()) {
-            return null;
-        } else {
-            List<AbstractGoods> outputs = production.get(0).getOutputs();
-            if (outputs == null || outputs.size() < 2) {
-                return null;
-            } else {
-                return outputs.get(1);
-            }
-        }
-    }
-
-    /**
-     * Returns true if the given <code>GoodsType</code> is the secondary
-     * goods type of this TileType.
-     *
-     * @param type a <code>GoodsType</code> value
-     * @return a <code>boolean</code> value
-     */
-    public boolean isSecondaryGoodsType(GoodsType type) {
-        AbstractGoods secondaryGoods = getSecondaryGoods();
-        return (secondaryGoods != null && secondaryGoods.getType() == type);
-    }
-
-
-    /**
-     * Returns a list of all types of AbstractGoods produced by this
-     * TileType when it is not the colony center tile.
-     *
-     * @return a <code>List<AbstractGoods></code> value
-     */
-    public List<AbstractGoods> getProduction() {
-        List<AbstractGoods> production = new ArrayList<AbstractGoods>();
-        for (ProductionType productionType : getProductionTypes(false, productionLevel)) {
-            List<AbstractGoods> outputs = productionType.getOutputs();
-            if (!(outputs == null || outputs.isEmpty())) {
-                production.addAll(outputs);
-            }
-        }
-        return production;
-    }
-
-
     public List<RandomChoice<ResourceType>> getWeightedResources() {
-        return resourceType;
-    }
-
-    public List<ResourceType> getResourceTypeList() {
-        List<ResourceType> result = new ArrayList<ResourceType>();
-        for (RandomChoice<ResourceType> resource : resourceType) {
-            result.add(resource.getObject());
-        }
-        return result;
+        if (resourceTypes == null) return Collections.emptyList();
+        return resourceTypes;
     }
 
     /**
-     * Return a weighted list of natural disasters than can strike
-     * this tile type.
+     * Gets the natural disasters than can strike this tile type.
      *
      * @return a <code>List<RandomChoice<Disaster>></code> value
      */
     public List<RandomChoice<Disaster>> getDisasters() {
+        if (disasters == null) return Collections.emptyList();
         return disasters;
     }
 
@@ -339,197 +217,432 @@ public final class TileType extends FreeColGameObjectType {
      *
      * @param newDisasters The new Disasters value.
      */
-    public void setDisasters(final List<RandomChoice<Disaster>> newDisasters) {
+    public void setXDisasters(final List<RandomChoice<Disaster>> newDisasters) {
         this.disasters = newDisasters;
     }
 
+
     /**
-     * Can this <code>TileType</code> contain a specified <code>ResourceType</code>?
+     * Gets the resource types that can be found on this tile type.
      *
-     * @param resourceType a <code>ResourceType</code> to test
-     * @return Whether this <code>TileType</code> contains the specified <code>ResourceType</code>
+     * @return A list of <code>ResourceType</code>s.
      */
-    public boolean canHaveResourceType(ResourceType resourceType) {
-        return getResourceTypeList().contains(resourceType);
+    public List<ResourceType> getResourceTypes() {
+        List<ResourceType> result = new ArrayList<ResourceType>();
+        if (resourceTypes != null) { 
+            for (RandomChoice<ResourceType> resource : resourceTypes) {
+                result.add(resource.getObject());
+            }
+        }
+        return result;
     }
 
+    /**
+     * Can this tile type contain a specified resource type?
+     *
+     * @param resourceType The <code>ResourceType</code> to test.
+     * @return True if the <code>ResourceType</code> is compatible.
+     */
+    public boolean canHaveResourceType(ResourceType resourceType) {
+        return getResourceTypes().contains(resourceType);
+    }
+
+    /**
+     * Gets the amount of goods of given goods type this tile type can
+     * produce.
+     *
+     * This method applies the production bonus to
+     * <code>0f</code>.  Thus, it will always return <code>0</code>
+     * unless an additive modifier is present.  This is intentional.
+     *
+     * @param goodsType The <code>GoodsType</code> to produce.
+     * @param unitType A <code>UnitType</code> that is to do the work.
+     * @return The amount of goods production.
+     * @see #getProductionBonus(GoodsType)
+     */
+    public int getProductionOf(GoodsType goodsType, UnitType unitType) {
+        return (int)applyModifier(0f, goodsType.getId(), unitType);
+    }
+
+    /**
+     * Gets the production bonuses for the given goods type.
+     *
+     * @param goodsType The <code>GoodsType</code> to check.
+     * @return A set of applicable production modifiers.
+     */
+    public Set<Modifier> getProductionBonus(GoodsType goodsType) {
+        return getModifierSet(goodsType.getId());
+    }
+
+    /**
+     * Gets the production types available for the given combination
+     * of colony center tile and production level.  If the production
+     * level is null, all production levels will be returned.
+     *
+     * @param center Whether the tile is a colony center tile.
+     * @param level The production level.
+     * @return A list of <code>ProductionType</code>s.
+     */
+    public List<ProductionType> getProductionTypes(boolean center, String level) {
+        List<ProductionType> result = new ArrayList<ProductionType>();
+        if (productionTypes != null) {
+            for (ProductionType productionType : productionTypes) {
+                if (productionType.isColonyCenterTile() == center
+                    && productionType.appliesTo(level)) {
+                    result.add(productionType);
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Gets the primary goods of this tile type.
+     *
+     * @return The primary goods, as an <code>AbstractGoods</code>.
+     */
+    public AbstractGoods getPrimaryGoods() {
+        List<ProductionType> production = getProductionTypes(true, productionLevel);
+        if (production == null || production.isEmpty()) return null;
+        List<AbstractGoods> outputs = production.get(0).getOutputs();
+        return (outputs == null || outputs.isEmpty()) ? null
+            : outputs.get(0);
+    }
+
+    /**
+     * Is a goods type the primary goods type of this tile type?
+     *
+     * @param type The <code>GoodsType</code> to check.
+     * @return True if the goods type is the primary goods type.
+     */
+    public boolean isPrimaryGoodsType(GoodsType type) {
+        AbstractGoods primaryGoods = getPrimaryGoods();
+        return primaryGoods != null && primaryGoods.getType() == type;
+    }
+
+    /**
+     * Gets the secondary goods of this tile type.
+     *
+     * @return The secondary goods, as an <code>AbstractGoods</code>.
+     */
+    public AbstractGoods getSecondaryGoods() {
+        List<ProductionType> production = getProductionTypes(true, productionLevel);
+        if (production == null || production.isEmpty()) return null;
+        List<AbstractGoods> outputs = production.get(0).getOutputs();
+        return (outputs == null || outputs.size() < 2) ? null
+            : outputs.get(1);
+    }
+
+    /**
+     * Is a goods type the secondary goods type of this tile type?
+     *
+     * @param type The <code>GoodsType</code> to check.
+     * @return True if the goods type is the primary goods type.
+     */
+    public boolean isSecondaryGoodsType(GoodsType type) {
+        AbstractGoods secondaryGoods = getSecondaryGoods();
+        return secondaryGoods != null && secondaryGoods.getType() == type;
+    }
+
+    /**
+     * Gets a list of the AbstractGoods produced by this tile type
+     * when it is not the colony center tile.
+     *
+     * @return A list of produced <code>AbstractGoods</code>.
+     */
+    public List<AbstractGoods> getProduction() {
+        List<AbstractGoods> production = new ArrayList<AbstractGoods>();
+        for (ProductionType productionType : getProductionTypes(false, productionLevel)) {
+            List<AbstractGoods> outputs = productionType.getOutputs();
+            if (outputs != null && !outputs.isEmpty()) {
+                production.addAll(outputs);
+            }
+        }
+        return production;
+    }
+
+    /**
+     * Gets the defence bonuses applicable to this tile type.
+     *
+     * @return A set of defensive modifiers.
+     */
+    public Set<Modifier> getDefenceBonus() {
+        return getModifierSet(Modifier.DEFENCE);
+    }
+
+    /**
+     * Can this tile type support the a given TileImprovementType.
+     *
+     * @param improvement The <code>TileImprovementType</code> to check.
+     * @return True if the improvement is compatible.
+     */
+    public boolean canHaveImprovement(TileImprovementType improvement) {
+        return improvement != null && improvement.isTileTypeAllowed(this);
+    }
+
+    /**
+     * Is this tile type suitable for a given range type.
+     *
+     * @param rangeType The <code>RangeType</code> to test.
+     * @param A value that must be within the range boundaries.
+     * @return True if the tile type meets the range limits.
+     */
     public boolean withinRange(RangeType rangeType, int value) {
         switch (rangeType) {
         case HUMIDITY:
-            return (humidity[0] <= value && value <= humidity[1]);
+            return humidity[0] <= value && value <= humidity[1];
         case TEMPERATURE:
-            return (temperature[0] <= value && value <= temperature[1]);
+            return temperature[0] <= value && value <= temperature[1];
         case ALTITUDE:
-            return (altitude[0] <= value && value <= altitude[1]);
+            return altitude[0] <= value && value <= altitude[1];
         default:
-            return false;
+            break;
         }
+        return false;
     }
 
     /**
-     * Applies the difficulty level to this TileType.
+     * Apply a difficulty level to this tile type.
      *
      * @param difficultyLevel difficulty level to apply
      */
     @Override
     public void applyDifficultyLevel(OptionGroup difficultyLevel) {
+        final Specification spec = getSpecification();
+
         productionLevel = ((StringOption) difficultyLevel.getOption("model.option.tileProduction"))
             .getValue();
         // remove old modifiers
-        for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
+        for (GoodsType goodsType : spec.getGoodsTypeList()) {
             removeModifiers(goodsType.getId());
         }
         // add new modifiers
-        for (ProductionType productionType : productionTypes) {
+        for (ProductionType productionType : getProductionTypes()) {
             if (productionType.appliesTo(productionLevel)) {
                 List<AbstractGoods> outputs = productionType.getOutputs();
-                if (!(outputs == null || outputs.isEmpty())) {
-                    for (AbstractGoods goods : outputs) {
-                        addModifier(new Modifier(goods.getType().getId(), this,
-                                                 goods.getAmount(),
-                                                 Modifier.Type.ADDITIVE));
-                    }
+                if (outputs == null) continue;
+                for (AbstractGoods goods : outputs) {
+                    addModifier(new Modifier(goods.getType().getId(), this,
+                                             goods.getAmount(),
+                                             Modifier.Type.ADDITIVE));
                 }
             }
         }
     }
 
-   /**
-     * Makes an XML-representation of this object.
+    /**
+     * {@inheritDoc}
      *
-     * @param out The output stream.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
+     * Kludge to make this public so that MapViewer can see it.
      */
+    @Override
+    public int getIndex() {
+        return super.getIndex();
+    }
+
+
+
+    // Serialization
+    private static final String ALTITUDE_MIN_TAG = "altitudeMin";
+    private static final String ALTITUDE_MAX_TAG = "altitudeMax";
+    private static final String BASIC_MOVE_COST_TAG = "basic-move-cost";
+    private static final String BASIC_WORK_TURNS_TAG = "basic-work-turns";
+    private static final String CAN_SETTLE_TAG = "can-settle";
+    private static final String DISASTER_TAG = "disaster";
+    private static final String GEN_TAG = "gen";
+    private static final String GOODS_TYPE_TAG = "goods-type";
+    private static final String HUMIDITY_MIN_TAG = "humidityMin";
+    private static final String HUMIDITY_MAX_TAG = "humidityMax";
+    private static final String IS_CONNECTED_TAG = "is-connected";
+    private static final String IS_ELEVATION_TAG = "is-elevation";
+    private static final String IS_FOREST_TAG = "is-forest";
+    private static final String IS_WATER_TAG = "is-water";
+    private static final String PRIMARY_PRODUCTION_TAG = "primary-production";
+    private static final String PROBABILITY_TAG = "probability";
+    private static final String PRODUCTION_TAG = "production";
+    private static final String PRODUCTION_LEVEL_TAG = "productionLevel";
+    private static final String RESOURCE_TAG = "resource";
+    private static final String SECONDARY_PRODUCTION_TAG = "secondary-production";
+    private static final String TEMPERATURE_MIN_TAG = "temperatureMin";
+    private static final String TEMPERATURE_MAX_TAG = "temperatureMax";
+    private static final String TILE_PRODUCTION_TAG = "tile-production";
+    private static final String TYPE_TAG = "type";
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         super.toXML(out, getXMLElementTagName());
     }
 
     /**
-     * Write the attributes of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to
-     *     the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
-        out.writeAttribute("basic-move-cost", Integer.toString(basicMoveCost));
-        out.writeAttribute("basic-work-turns", Integer.toString(basicWorkTurns));
-        out.writeAttribute("is-forest", Boolean.toString(forest));
-        out.writeAttribute("is-water", Boolean.toString(water));
-        out.writeAttribute("is-elevation", Boolean.toString(elevation));
-        out.writeAttribute("is-connected", Boolean.toString(connected));
-        out.writeAttribute("can-settle", Boolean.toString(canSettle));
-        out.writeAttribute("productionLevel", productionLevel);
+        writeAttribute(out, BASIC_MOVE_COST_TAG, basicMoveCost);
+
+        writeAttribute(out, BASIC_WORK_TURNS_TAG, basicWorkTurns);
+
+        writeAttribute(out, IS_FOREST_TAG, forest);
+
+        writeAttribute(out, IS_WATER_TAG, water);
+
+        writeAttribute(out, IS_ELEVATION_TAG, elevation);
+
+        writeAttribute(out, IS_CONNECTED_TAG, connected);
+
+        writeAttribute(out, CAN_SETTLE_TAG, canSettle);
+
+        writeAttribute(out, PRODUCTION_LEVEL_TAG, productionLevel);
     }
 
     /**
-     * Write the children of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to
-     *     the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
         super.writeChildren(out);
 
-        out.writeStartElement("gen");
-        out.writeAttribute("humidityMin", Integer.toString(humidity[0]));
-        out.writeAttribute("humidityMax", Integer.toString(humidity[1]));
-        out.writeAttribute("temperatureMin", Integer.toString(temperature[0]));
-        out.writeAttribute("temperatureMax", Integer.toString(temperature[1]));
-        out.writeAttribute("altitudeMin", Integer.toString(altitude[0]));
-        out.writeAttribute("altitudeMax", Integer.toString(altitude[1]));
+        out.writeStartElement(GEN_TAG);
+
+        writeAttribute(out, HUMIDITY_MIN_TAG, humidity[0]);
+
+        writeAttribute(out, HUMIDITY_MAX_TAG, humidity[1]);
+
+        writeAttribute(out, TEMPERATURE_MIN_TAG, temperature[0]);
+
+        writeAttribute(out, TEMPERATURE_MAX_TAG, temperature[1]);
+
+        writeAttribute(out, ALTITUDE_MIN_TAG, altitude[0]);
+
+        writeAttribute(out, ALTITUDE_MAX_TAG, altitude[1]);
+
         out.writeEndElement();
 
-        for (ProductionType productionType : productionTypes) {
+        for (ProductionType productionType : getProductionTypes()) {
             productionType.toXML(out);
         }
 
-        for (RandomChoice<ResourceType> choice : resourceType) {
-            out.writeStartElement("resource");
-            out.writeAttribute("type", choice.getObject().getId());
-            out.writeAttribute("probability",
-                Integer.toString(choice.getProbability()));
+        for (RandomChoice<ResourceType> choice : getWeightedResources()) {
+            out.writeStartElement(RESOURCE_TAG);
+
+            writeAttribute(out, TYPE_TAG, choice.getObject());
+
+            writeAttribute(out, PROBABILITY_TAG, choice.getProbability());
+
             out.writeEndElement();
         }
 
-        for (RandomChoice<Disaster> choice : disasters) {
-            out.writeStartElement("disaster");
-            out.writeAttribute("id", choice.getObject().getId());
-            out.writeAttribute("probability",
-                Integer.toString(choice.getProbability()));
+        for (RandomChoice<Disaster> choice : getDisasters()) {
+            out.writeStartElement(DISASTER_TAG);
+
+            writeAttribute(out, ID_ATTRIBUTE_TAG, choice.getObject());
+
+            writeAttribute(out, PROBABILITY_TAG, choice.getProbability());
+
             out.writeEndElement();
         }
     }
 
     /**
-     * Reads the attributes of this object from an XML stream.
-     *
-     * @param in The XML input stream.
-     * @throws XMLStreamException if a problem was encountered
-     *     during parsing.
+     * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
 
-        basicMoveCost = Integer.parseInt(in.getAttributeValue(null,
-                "basic-move-cost"));
-        basicWorkTurns = Integer.parseInt(in.getAttributeValue(null,
-                "basic-work-turns"));
-        forest = getAttribute(in, "is-forest", false);
-        water = getAttribute(in, "is-water", false);
-        elevation = getAttribute(in, "is-elevation", false);
-        canSettle = getAttribute(in, "can-settle", !water);
-        connected = getAttribute(in, "is-connected", false);
-        productionLevel = in.getAttributeValue(null, "productionLevel");
+        basicMoveCost = getAttribute(in, BASIC_MOVE_COST_TAG, 1);
+
+        basicWorkTurns = getAttribute(in, BASIC_WORK_TURNS_TAG, 1);
+
+        forest = getAttribute(in, IS_FOREST_TAG, false);
+
+        water = getAttribute(in, IS_WATER_TAG, false);
+
+        elevation = getAttribute(in, IS_ELEVATION_TAG, false);
+
+        canSettle = getAttribute(in, CAN_SETTLE_TAG, !water);
+
+        connected = getAttribute(in, IS_CONNECTED_TAG, false);
+
+        productionLevel = getAttribute(in, PRODUCTION_LEVEL_TAG, (String)null);
     }
 
     /**
-     * Reads a child object.
-     *
-     * @param in The XML stream to read.
-     * @exception XMLStreamException if an error occurs
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        if (readShouldClearContainers(in)) {
+            disasters = null;
+            resourceTypes = null;
+            productionTypes = null;
+        }
+
+        super.readChildren(in);
+    }
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        String childName = in.getLocalName();
-        if ("gen".equals(childName)) {
-            humidity[0] = getAttribute(in, "humidityMin", 0);
-            humidity[1] = getAttribute(in, "humidityMax", 100);
-            temperature[0] = getAttribute(in, "temperatureMin", -20);
-            temperature[1] = getAttribute(in, "temperatureMax", 40);
-            altitude[0] = getAttribute(in, "altitudeMin", 0);
-            altitude[1] = getAttribute(in, "altitudeMax", 0);
+        final Specification spec = getSpecification();
+        final String tag = in.getLocalName();
+
+        if (DISASTER_TAG.equals(tag)) {
+            Disaster disaster = spec.getType(in, ID_ATTRIBUTE_TAG,
+                                             Disaster.class, (Disaster)null);
+            int probability = getAttribute(in, PROBABILITY_TAG, 100);
+            if (disasters == null) {
+                disasters = new ArrayList<RandomChoice<Disaster>>();
+            }
+            disasters.add(new RandomChoice<Disaster>(disaster, probability));
             in.nextTag(); // close this element
-        } else if ("production".equals(childName)
-                   && in.getAttributeValue(null, "goods-type") == null) {
+
+        } else if (GEN_TAG.equals(tag)) {
+            humidity[0] = getAttribute(in, HUMIDITY_MIN_TAG, 0);
+            humidity[1] = getAttribute(in, HUMIDITY_MAX_TAG, 100);
+            temperature[0] = getAttribute(in, TEMPERATURE_MIN_TAG, -20);
+            temperature[1] = getAttribute(in, TEMPERATURE_MAX_TAG, 40);
+            altitude[0] = getAttribute(in, ALTITUDE_MIN_TAG, 0);
+            altitude[1] = getAttribute(in, ALTITUDE_MAX_TAG, 0);
+            in.nextTag(); // close this element
+
+        } else if (PRODUCTION_TAG.equals(tag)
+            && getAttribute(in, GOODS_TYPE_TAG, (String)null) == null) {
             // new production style
-            ProductionType productionType = new ProductionType(getSpecification());
+            ProductionType productionType = new ProductionType(spec);
             productionType.readFromXML(in);
+            if (productionTypes == null) {
+                productionTypes = new ArrayList<ProductionType>();
+            }
             productionTypes.add(productionType);
-        } else if ("production".equals(childName)
-                   || "primary-production".equals(childName)
-                   || "secondary-production".equals(childName)) {
+
+        } else if (PRODUCTION_TAG.equals(tag)
+            || PRIMARY_PRODUCTION_TAG.equals(tag)
+            || SECONDARY_PRODUCTION_TAG.equals(tag)) {
             // @compat 0.10.6
-            GoodsType type = getSpecification().getGoodsType(in.getAttributeValue(null, "goods-type"));
-            int amount = Integer.parseInt(in.getAttributeValue(null, VALUE_TAG));
+            GoodsType type = spec.getType(in, GOODS_TYPE_TAG,
+                                          GoodsType.class, (GoodsType)null);
+            int amount = getAttribute(in, VALUE_TAG, 0);
             AbstractGoods goods = new AbstractGoods(type, amount);
-            String tileProduction = in.getAttributeValue(null, "tile-production");
+            String tileProduction = getAttribute(in, TILE_PRODUCTION_TAG,
+                                                 (String)null);
             // CAUTION: this only works if the primary production is
             // defined before the secondary production
-            if ("primary-production".equals(childName)) {
+            if (productionTypes == null) {
+                productionTypes = new ArrayList<ProductionType>();
+            }
+            if (PRIMARY_PRODUCTION_TAG.equals(tag)) {
                 productionTypes.add(new ProductionType(goods, true, tileProduction));
-            } else if ("secondary-production".equals(childName)) {
-                for (ProductionType productionType : productionTypes) {
+            } else if (SECONDARY_PRODUCTION_TAG.equals(tag)) {
+                for (ProductionType productionType : getProductionTypes()) {
                     if (productionType.isColonyCenterTile()
                         && (tileProduction == null
                             || tileProduction.equals(productionType.getProductionLevel()))) {
@@ -537,27 +650,29 @@ public final class TileType extends FreeColGameObjectType {
                     }
                 }
             } else {
-                productionTypes.add(new ProductionType(goods, false, tileProduction));
+                productionTypes.add(new ProductionType(goods, false,
+                                                       tileProduction));
             }
             in.nextTag(); // close this element
-            // end compat
-        } else if ("resource".equals(childName)) {
-            ResourceType type = getSpecification().getResourceType(in.getAttributeValue(null, "type"));
-            int probability = getAttribute(in, "probability", 100);
-            resourceType.add(new RandomChoice<ResourceType>(type, probability));
+            // end @compat
+
+        } else if (RESOURCE_TAG.equals(tag)) {
+            ResourceType type = spec.getType(in, TYPE_TAG, ResourceType.class,
+                                             (ResourceType)null);
+            int probability = getAttribute(in, PROBABILITY_TAG, 100);
+            if (resourceTypes == null) {
+                resourceTypes = new ArrayList<RandomChoice<ResourceType>>();
+            }
+            resourceTypes.add(new RandomChoice<ResourceType>(type, probability));
             in.nextTag(); // close this element
-        } else if ("disaster".equals(childName)) {
-            Disaster disaster = getSpecification().getDisaster(in.getAttributeValue(null, "id"));
-            int probability = getAttribute(in, "probability", 100);
-            disasters.add(new RandomChoice<Disaster>(disaster, probability));
-            in.nextTag(); // close this element
+
         } else {
             super.readChild(in);
         }
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "tile-type".
      */

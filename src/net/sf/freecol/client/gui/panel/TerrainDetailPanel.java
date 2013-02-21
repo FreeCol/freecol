@@ -101,7 +101,7 @@ public class TerrainDetailPanel extends ColopediaGameObjectTypePanel<TileType> {
         Image terrainImage = getLibrary().getCompoundTerrainImage(tileType, 1);
         panel.add(new JLabel(new ImageIcon(terrainImage)), "spany 3");
 
-        List<ResourceType> resourceList = tileType.getResourceTypeList();
+        List<ResourceType> resourceList = tileType.getResourceTypes();
         if (resourceList.size() > 0) {
             panel.add(localizedLabel("colopedia.terrain.resource"));
             if (resourceList.size() > 1) {

@@ -137,6 +137,12 @@ public class FreeColGameObjectType extends FreeColObject {
     /**
      * Gets the index of this FreeColGameObjectType.
      *
+     * The index imposes a total ordering consistent with equals on
+     * each class extending FreeColGameObjectType, but this ordering
+     * is nothing but the order in which the objects of the respective
+     * class were defined.  It is guaranteed to remain stable only for
+     * a particular revision of a particular specification.
+     *
      * @return The game object index.
      */
     protected int getIndex() {
