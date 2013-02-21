@@ -40,57 +40,81 @@ public class Nation extends FreeColGameObjectType {
         "german", "austrian", "prussian", "turkish"
     };
 
-    /**
-     * Describe type here.
-     */
+    /** The nation type, European, native, etc. */
     private NationType type;
 
-    /**
-     * Describe selectable here.
-     */
+    /** Can this nation be selected? */
     private boolean selectable;
 
-    /**
-     * Describe refNation here.
-     */
+    /** The REF nation to oppose this nation. */
     private Nation refNation;
 
-    /**
-     * Describe preferredLatitude here.
-     */
+    /** The preferred starting latitude for this nation. */
     private int preferredLatitude = 0;
 
-    /**
-     * Describe startsOnEastCoast here.
-     */
+    /** Whether this nation starts on the East coast by default. */
     private boolean startsOnEastCoast = true;
 
 
+    /**
+     * Create a new nation.
+     *
+     * @param id The object id.
+     * @param specification The enclosing <code>Specification</code>.
+     */
     public Nation(String id, Specification specification) {
         super(id, specification);
     }
 
 
     /**
-     * Get the <code>Type</code> value.
+     * Get the nation type.
      *
-     * @return a <code>NationType</code> value
+     * @return The nation type.
      */
     public final NationType getType() {
         return type;
     }
 
     /**
-     * Set the <code>Type</code> value.
+     * Is this nation selectable?
      *
-     * @param newType The new Type value.
+     * @return True if the nation is selectable.
      */
-    public final void setType(final NationType newType) {
-        this.type = newType;
+    public final boolean isSelectable() {
+        return selectable;
     }
 
     /**
-     * Get the <code>RulerName</code> value.
+     * Get the REF nation to oppose this nation.
+     *
+     * @return The REF <code>Nation</code>, or null if not applicable.
+     */
+    public final Nation getREFNation() {
+        return refNation;
+    }
+
+    /**
+     * Get the preferred latitude of this nation.
+     *
+     * @return The preferred latitude.
+     */
+    public final int getPreferredLatitude() {
+        return preferredLatitude;
+    }
+
+    /**
+     * Does this nation start on the east coast by default?
+     *
+     * @return True if the nation starts on the east coast.
+     */
+    public final boolean startsOnEastCoast() {
+        return startsOnEastCoast;
+    }
+
+
+    /**
+     * Get a message key for the ruler of this nation.
      *
      * @return a <code>String</code> value
      */
@@ -98,135 +122,65 @@ public class Nation extends FreeColGameObjectType {
         return getId() + ".ruler";
     }
 
-    /**
-     * Get the <code>Selectable</code> value.
-     *
-     * @return a <code>boolean</code> value
-     */
-    public final boolean isSelectable() {
-        return selectable;
-    }
+
+    // Serialization
+
+    private static final String NATION_TYPE_TAG = "nation-type";
+    private static final String PREFERRED_LATITUDE_TAG = "preferredLatitude";
+    private static final String REF_TAG = "ref";
+    private static final String SELECTABLE_TAG = "selectable";
+    private static final String STARTS_ON_EAST_COAST_TAG = "startsOnEastCoast";
+
 
     /**
-     * Get the <code>RefNation</code> value.
-     *
-     * @return a <code>Nation</code> value
+     * {@inheritDoc}
      */
-    public final Nation getRefNation() {
-        return refNation;
-    }
-
-    /**
-     * Set the <code>RefNation</code> value.
-     *
-     * @param newRefNation The new RefNation value.
-     */
-    public final void setRefNation(final Nation newRefNation) {
-        this.refNation = newRefNation;
-    }
-
-    /**
-     * Set the <code>Selectable</code> value.
-     *
-     * @param newSelectable The new Selectable value.
-     */
-    public final void setSelectable(final boolean newSelectable) {
-        this.selectable = newSelectable;
-    }
-
-    /**
-     * Get the <code>PreferredLatitude</code> value.
-     *
-     * @return an <code>int</code> value
-     */
-    public final int getPreferredLatitude() {
-        return preferredLatitude;
-    }
-
-    /**
-     * Set the <code>PreferredLatitude</code> value.
-     *
-     * @param newPreferredLatitude The new PreferredLatitude value.
-     */
-    public final void setPreferredLatitude(final int newPreferredLatitude) {
-        this.preferredLatitude = newPreferredLatitude;
-    }
-
-    /**
-     * Get the <code>StartsOnEastCoast</code> value.
-     *
-     * @return a <code>boolean</code> value
-     */
-    public final boolean startsOnEastCoast() {
-        return startsOnEastCoast;
-    }
-
-    /**
-     * Set the <code>StartsOnEastCoast</code> value.
-     *
-     * @param newStartsOnEastCoast The new StartsOnEastCoast value.
-     */
-    public final void setStartsOnEastCoast(final boolean newStartsOnEastCoast) {
-        this.startsOnEastCoast = newStartsOnEastCoast;
-    }
-
-    /**
-     * Makes an XML-representation of this object.
-     *
-     * @param out The output stream.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
-     */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         super.toXML(out, getXMLElementTagName());
     }
 
     /**
-     * Write the attributes of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to
-     *     the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
-        out.writeAttribute("nation-type", type.getId());
-        out.writeAttribute("selectable", Boolean.toString(selectable));
-        out.writeAttribute("preferredLatitude", Integer.toString(preferredLatitude));
-        out.writeAttribute("startsOnEastCoast", Boolean.toString(startsOnEastCoast));
-        if (refNation != null) {
-            out.writeAttribute("ref", refNation.getId());
-        }
+        writeAttribute(out, NATION_TYPE_TAG, type);
+
+        writeAttribute(out, SELECTABLE_TAG, selectable);
+
+        writeAttribute(out, PREFERRED_LATITUDE_TAG, preferredLatitude);
+
+        writeAttribute(out, STARTS_ON_EAST_COAST_TAG, startsOnEastCoast);
+
+        if (refNation != null) writeAttribute(out, REF_TAG, refNation);
     }
 
     /**
-     * Reads the attributes of this object from an XML stream.
-     *
-     * @param in The XML input stream.
-     * @exception XMLStreamException if a problem was encountered
-     *     during parsing.
+     * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        final Specification spec = getSpecification();
+
         super.readAttributes(in);
 
-        type = getSpecification().getNationType(in.getAttributeValue(null,
-                "nation-type"));
-        selectable = getAttribute(in, "selectable", false);
-        preferredLatitude = getAttribute(in, "preferredLatitude", 0);
-        startsOnEastCoast = getAttribute(in, "startsOnEastCoast", true);
-        String refId = getAttribute(in, "ref", (String)null);
-        if (refId != null) {
-            refNation = getSpecification().getNation(refId);
-        }
+        type = spec.getType(in, NATION_TYPE_TAG,
+                            NationType.class, (NationType)null);
+
+        selectable = getAttribute(in, SELECTABLE_TAG, false);
+
+        preferredLatitude = getAttribute(in, PREFERRED_LATITUDE_TAG, 0);
+
+        startsOnEastCoast = getAttribute(in, STARTS_ON_EAST_COAST_TAG, true);
+
+        refNation = spec.getType(in, REF_TAG, Nation.class, (Nation)null);
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "nation".
      */

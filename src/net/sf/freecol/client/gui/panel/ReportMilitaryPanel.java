@@ -77,7 +77,7 @@ public final class ReportMilitaryPanel extends ReportUnitPanel {
     }
 
     protected void addREFUnits() {
-        reportPanel.add(new JLabel(Messages.message(player.getNation().getRefNation().getId() + ".name")),
+        reportPanel.add(new JLabel(Messages.message(player.getNation().getREFNation().getId() + ".name")),
                         "span, split 2");
         reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "growx");
 

@@ -329,7 +329,7 @@ public final class InGameController extends Controller {
      * @return The REF player.
      */
     public ServerPlayer createREFPlayer(ServerPlayer serverPlayer) {
-        Nation refNation = serverPlayer.getNation().getRefNation();
+        Nation refNation = serverPlayer.getNation().getREFNation();
         Monarch monarch = serverPlayer.getMonarch();
         ServerPlayer refPlayer = getFreeColServer().addAIPlayer(refNation);
         refPlayer.setEntryLocation(null); // Trigger initial placement routine

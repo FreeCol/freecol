@@ -1017,7 +1017,7 @@ public final class ColonyPanel extends PortPanel
                     .getCoatOfArmsImage(nation, 0.5)));
 
             royalistShield.setIcon(new ImageIcon(getLibrary()
-                    .getCoatOfArmsImage(nation.getRefNation(), 0.5)));
+                    .getCoatOfArmsImage(nation.getREFNation(), 0.5)));
 
             revalidate();
             repaint();

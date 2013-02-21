@@ -1553,7 +1553,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *         royal expeditionary force.
      */
     public Player getREFPlayer() {
-        Nation ref = getNation().getRefNation();
+        Nation ref = getNation().getREFNation();
         return (ref == null) ? null : getGame().getPlayer(ref.getId());
     }
 
