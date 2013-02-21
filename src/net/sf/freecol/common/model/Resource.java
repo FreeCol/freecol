@@ -124,20 +124,20 @@ public class Resource extends TileItem {
     }
 
     /**
-     * Returns the bonus (checking available stock) for next turn.
-     * @param goodsType The GoodsType to check
-     * @param unitType an <code>UnitType</code> value
-     * @param potential Potential of Tile + Improvements
-     * @return an <code>int</code> value
+     * Gets the production (checking available stock) for next turn applying
+     * the bonuses from this resource.
+     *
+     * @param goodsType The <code>GoodsType</code> to produce.
+     * @param unitType The <code>UnitType</code> that is to work.
+     * @param potential The base potential production.
+     * @return The production with resource bonuses.
      */
     public int getBonus(GoodsType goodsType, UnitType unitType, int potential) {
-        Set<Modifier> productionBonus = type.getProductionModifier(goodsType, unitType);
-        int bonusAmount = (int) FeatureContainer.applyModifierSet(potential, null, productionBonus) - potential;
-        if (quantity > -1 && bonusAmount > quantity) {
-            return potential + quantity;
-        } else {
-            return potential + bonusAmount;
-        }
+        Set<Modifier> bonus = type.getModifierSet(goodsType.getId(), unitType);
+        int amount = (int)FeatureContainer.applyModifierSet(potential, null,
+                                                            bonus) - potential;
+        return potential
+            + ((quantity > -1 && amount > quantity) ? quantity : amount);
     }
 
     /**

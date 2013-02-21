@@ -347,7 +347,7 @@ public class TileItemContainer extends FreeColGameObject {
         for (TileItem item : tileItems) {
             if (item instanceof Resource) {
                 result.addAll(((Resource) item).getType()
-                    .getProductionModifier(goodsType, unitType));
+                    .getModifierSet(goodsType.getId(), unitType));
             } else if (item instanceof TileImprovement) {
                 Modifier modifier = ((TileImprovement) item)
                     .getProductionModifier(goodsType);

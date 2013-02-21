@@ -28,35 +28,52 @@ import javax.xml.stream.XMLStreamWriter;
 
 public final class ResourceType extends FreeColGameObjectType {
 
-    private int minValue;
-    private int maxValue;
+    /** Maximum and minimum values for this resource type. */
+    private int maxValue, minValue;
 
-    // ------------------------------------------------------------ constructors
 
+    /**
+     * Creates a new resource type.
+     *
+     * @param id The object id.
+     * @param specification The enclosing <code>Specification</code>.
+     */
     public ResourceType(String id, Specification specification) {
         super(id, specification);
     }
 
-    // ------------------------------------------------------------ retrieval methods
 
-    public int getMinValue() {
-        return minValue;
-    }
-
+    /**
+     * Gets the maximum value for this resource.
+     *
+     * @return The maximum value.
+     */
     public int getMaxValue() {
         return maxValue;
     }
 
-    public Set<Modifier> getProductionModifier(GoodsType goodsType, UnitType unitType) {
-        return getModifierSet(goodsType.getId(), unitType);
+    /**
+     * Gets the minimum value for this resource.
+     *
+     * @return The minimum value.
+     */
+    public int getMinValue() {
+        return minValue;
     }
 
+
+    /**
+     * Get the best goods type to make with this resource type.
+     *
+     * @return The best <code>GoodsType</code>.
+     */
     public GoodsType getBestGoodsType() {
+        final Specification spec = getSpecification();
         GoodsType bestType = null;
         float bestValue = 0f;
         for (Modifier modifier : getModifiers()) {
-            GoodsType goodsType = getSpecification().getGoodsType(modifier.getId());
-            float value = getSpecification().getInitialPrice(goodsType) * modifier.applyTo(100);
+            GoodsType goodsType = spec.getGoodsType(modifier.getId());
+            float value = spec.getInitialPrice(goodsType) * modifier.applyTo(100);
             if (bestType == null || value > bestValue) {
                 bestType = goodsType;
                 bestValue = value;
@@ -66,59 +83,46 @@ public final class ResourceType extends FreeColGameObjectType {
     }
 
 
+    // Serialization
+
+    private static final String MAXIMUM_VALUE_TAG = "maximum-value";
+    private static final String MINIMUM_VALUE_TAG = "minimum-value";
+
+
     /**
-     * Makes an XML-representation of this object.
-     *
-     * @param out The output stream.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
+     * {@inheritDoc}
      */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         super.toXML(out, getXMLElementTagName());
     }
 
     /**
-     * Write the attributes of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to
-     *     the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
         if (maxValue > -1) {
-            out.writeAttribute("maximum-value", Integer.toString(maxValue));
-            out.writeAttribute("minimum-value", Integer.toString(minValue));
+            writeAttribute(out, MAXIMUM_VALUE_TAG, maxValue);
+            writeAttribute(out, MINIMUM_VALUE_TAG, minValue);
         }
     }
 
     /**
-     * Reads the attributes of this object from an XML stream.
-     *
-     * @param in The XML input stream.
-     * @throws XMLStreamException if a problem was encountered
-     *     during parsing.
+     * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
 
-        if (hasAttribute(in, "maximum-value")) {
-            maxValue = Integer.parseInt(in.getAttributeValue(null,
-                    "maximum-value"));
-            minValue = getAttribute(in, "minimum-value", 0);
-        } else {
-            maxValue = -1;
-            minValue = -1;
-        }
+        maxValue = getAttribute(in, MAXIMUM_VALUE_TAG, -1);
+        minValue = getAttribute(in, MINIMUM_VALUE_TAG, -1);
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "resource-type".
      */
