@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -32,32 +33,36 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.util.RandomChoice;
 
+
 public final class TileImprovementType extends FreeColGameObjectType {
 
+    /** Is this improvement natural or man-made? */
     private boolean natural;
+
+    /** The magnitude of the improvement. */
     private int magnitude;
+
+    /** The number of turns to build this improvement. */
     private int addWorkTurns;
 
+    /** Any improvement that is required before this one. */
     private TileImprovementType requiredImprovementType;
 
-    private Set<String> allowedWorkers = new HashSet<String>();
+    /** Equipment expended in making this improvement. */
     private EquipmentType expendedEquipmentType;
+
+    /** The amount of the equipment expended in making this improvement. */
     private int expendedAmount;
 
     // @compat 0.10.4
-    private GoodsType deliverGoodsType;
+    /** The type of goods delivered by making this improvement. */
+    private GoodsType deliverGoodsType = null;
+
+    /** The amount of goods delivered by making this improvement. */
     private int deliverAmount;
     // end @compat
 
-    private Map<TileType, TileTypeChange> tileTypeChanges
-        = new HashMap<TileType, TileTypeChange>();
-
-    /**
-     * The disasters that may strike this type of tile improvement.
-     */
-    private List<RandomChoice<Disaster>> disasters
-        = new ArrayList<RandomChoice<Disaster>>();
-
+    /** The change to the movement cost due to this tile improvement. */
     private int movementCost = -1;
 
     /**
@@ -74,87 +79,142 @@ public final class TileImprovementType extends FreeColGameObjectType {
      */
     private int exposeResourcePercent;
 
+    /** The workers that can make this improvement. */
+    private Set<String> allowedWorkers = null;
+
+    /** The changes this improvement makes to a particular tile type. */
+    private Map<TileType, TileTypeChange> tileTypeChanges = null;
+
+    /** The disasters that may strike this type of tile improvement. */
+    private List<RandomChoice<Disaster>> disasters = null;
+
     /**
-     * The scopes define which TileTypes support this improvement. An
-     * eligible TileType must match all scopes.
+     * The scopes define which TileTypes support this improvement.
+     * An eligible TileType must match all scopes.
      */
-    private List<Scope> scopes = new ArrayList<Scope>();
+    private List<Scope> scopes = null;
 
-    // ------------------------------------------------------------ constructors
 
+    /**
+     * Create a new tile improvement type.
+     *
+     * @param id The object id.
+     * @param specification The enclosing <code>Specification</code>.
+     */
     public TileImprovementType(String id, Specification specification) {
         super(id, specification);
+
         setModifierIndex(Modifier.IMPROVEMENT_PRODUCTION_INDEX);
     }
 
-    // ------------------------------------------------------------ retrieval methods
 
+    /**
+     * Is this tile improvement type natural?
+     *
+     * @return True if this is a natural tile improvement type.
+     */
     public boolean isNatural() {
         return natural;
     }
 
+    /**
+     * Get the magnitude of this tile improvement type.
+     *
+     * @return The magnitude.
+     */
     public int getMagnitude() {
         return magnitude;
     }
 
+    /**
+     * Get the number of turns to build this tile improvement type.
+     *
+     * @return The number of build turns.
+     */
     public int getAddWorkTurns() {
         return addWorkTurns;
     }
 
     /**
-     * Get the <code>ZIndex</code> value.
+     * Gets the required improvement type.
      *
-     * @return an <code>int</code> value
+     * @return The required improvement type if any.
+     */
+    public TileImprovementType getRequiredImprovementType() {
+        return requiredImprovementType;
+    }
+
+    /**
+     * Gets the expended equipment type to build this improvement type.
+     *
+     * @return The expended equipment, if any.
+     */
+    public EquipmentType getExpendedEquipmentType() {
+        return expendedEquipmentType;
+    }
+
+    /**
+     * Gets the amount of equipment expended in building this improvement type.
+     *
+     * @return The expended equipment amount, if any.
+     */
+    public int getExpendedAmount() {
+        return expendedAmount;
+    }
+
+    /**
+     * Gets the percent chance that this tile improvement can expose a
+     * resource on the tile. This only applies to TileImprovementTypes
+     * that change the underlying tile type (e.g. clearing forests).
+     *
+     * @return The exposure chance.
+     */
+    public int getExposeResourcePercent() {
+        return exposeResourcePercent;
+    }
+
+    /**
+     * Get the scopes applicable to this improvement.
+     *
+     * @return A list of <code>Scope</code>s.
+     */
+    public List<Scope> getScopes() {
+        if (scopes == null) return Collections.emptyList();
+        return scopes;
+    }
+
+    /**
+     * Get a weighted list of natural disasters than can strike this
+     * tile improvement type.
+     *
+     * @return A random choice list of <code>Disaster</code>s.
+     */
+    public List<RandomChoice<Disaster>> getDisasters() {
+        if (disasters == null) return Collections.emptyList();
+        return disasters;
+    }
+
+    /**
+     * Get the layer.
+     *
+     * @return The layer.
      */
     public int getZIndex() {
         return zIndex;
     }
 
     /**
-     * Set the <code>ZIndex</code> value.
+     * Set the layer.
      *
-     * @param newZIndex The new ZIndex value.
+     * @param newZIndex The new layer.
      */
     public void setZIndex(final int newZIndex) {
         this.zIndex = newZIndex;
     }
 
-    public TileImprovementType getRequiredImprovementType() {
-        return requiredImprovementType;
-    }
-
-    public EquipmentType getExpendedEquipmentType() {
-        return expendedEquipmentType;
-    }
-
-    public int getExpendedAmount() {
-        return expendedAmount;
-    }
 
     /**
-     * Returns the goods produced by applying this TileImprovementType
-     * to a Tile with the given TileType.
-     *
-     * @param from a <code>TileType</code> value
-     * @return an <code>AbstractGoods</code> value
-     */
-    public AbstractGoods getProduction(TileType from) {
-        TileTypeChange change = tileTypeChanges.get(from);
-        return change == null ? null : change.getProduction();
-    }
-
-
-    /**
-     * Get the <code>Scopes</code> value.
-     *
-     * @return a <code>List<Scope></code> value
-     */
-    public List<Scope> getScopes() {
-        return scopes;
-    }
-
-    /**
-     * Return an ID of an appropriate action.
+     * Gets an identifier for the action of building this improvement.
      *
      * @return a <code>String</code> value
      */
@@ -163,52 +223,59 @@ public final class TileImprovementType extends FreeColGameObjectType {
         return getId().substring(index);
     }
 
-
+    /**
+     * Is a particular unit type allowed to build this improvement?
+     *
+     * @param unitType The <code>UnitType</code> to check.
+     * @return True if the <code>UnitType</code> can build this improvement.
+     */
     public boolean isWorkerTypeAllowed(UnitType unitType) {
-        return allowedWorkers.isEmpty() || allowedWorkers.contains(unitType.getId());
+        return allowedWorkers == null || allowedWorkers.isEmpty()
+            || allowedWorkers.contains(unitType.getId());
     }
 
     /**
-     * Check if a given <code>Unit</code> can perform this TileImprovement.
-     * @return true if Worker UnitType is allowed and expended Goods are available
+     * Is a particular unit allowed to build this improvement?
+     *
+     * Checks both the unit type and the available equipment.
+     *
+     * @param unit The <code>Unit</code> to check.
+     * @return True if the <code>Unit</code> can build this improvement.
      */
     public boolean isWorkerAllowed(Unit unit) {
-        if (!isWorkerTypeAllowed(unit.getType())) {
-            return false;
-        }
-        return (unit.getEquipment().getCount(expendedEquipmentType) >= expendedAmount);
+        return isWorkerTypeAllowed(unit.getType())
+            && (unit.getEquipment().getCount(expendedEquipmentType)
+                >= expendedAmount);
     }
 
     /**
-     * This will check if in principle this type of improvement can be used on
-     * this kind of tile, disregarding the current state of an actual tile.
+     * This will check if in principle this type of improvement can be
+     * used on this kind of tile, disregarding the current state of an
+     * actual tile.
      *
      * If you want to find out if an improvement is allowed for a tile, call
      * {@link #isTileAllowed(Tile)}.
      *
-     * @param tileType The type of terrain
-     * @return true if improvement is possible
+     * @param tileType The <code>TileType</code> to check.
+     * @return True if improvement is possible.
      */
     public boolean isTileTypeAllowed(TileType tileType) {
-        for (Scope scope : scopes) {
-            if (!scope.appliesTo(tileType)) {
-                return false;
-            }
+        for (Scope scope : getScopes()) {
+            if (!scope.appliesTo(tileType)) return false;
         }
         return true;
     }
 
     /**
-     * Check if a given <code>Tile</code> is valid for this TileImprovement.
+     * Check if a given tile is valid for this tile improvement.
      *
-     * @return true if Tile TileType is valid and required Improvement (if any)
-     *         is present.
+     * @param tile The <code>Tile</code> to check.
+     * @return True if the tile can be improved with this improvement.
      */
     public boolean isTileAllowed(Tile tile) {
-        if (!isTileTypeAllowed(tile.getType())) {
-            return false;
-        }
-        if (requiredImprovementType != null && tile.findTileImprovementType(requiredImprovementType) == null) {
+        if (!isTileTypeAllowed(tile.getType())) return false;
+        if (requiredImprovementType != null
+            && tile.findTileImprovementType(requiredImprovementType) == null) {
             return false;
         }
         TileImprovement ti = tile.findTileImprovementType(this);
@@ -238,45 +305,57 @@ public final class TileImprovementType extends FreeColGameObjectType {
     }
 
     /**
-     * Returns true if this TileImprovementType changes the underlying
-     * tile type.
+     * Does this tile improvement change the underlying tile type.
      *
-     * @return a <code>boolean</code> value
+     * @return True if this tile improvement changes the tile type.
      */
     public boolean isChangeType() {
-        return !tileTypeChanges.isEmpty();
+        return tileTypeChanges != null && !tileTypeChanges.isEmpty();
     }
 
     /**
-     * Returns the destination type of a tile type change (or null).
+     * Gets the goods produced by applying this TileImprovementType
+     * to a Tile with the given TileType.
      *
-     * @param tileType a <code>TileType</code> value
-     * @return a <code>TileType</code> value
+     * @param from The original <code>TileType</code>.
+     * @return The <code>AbstractGoods</code> produced.
+     */
+    public AbstractGoods getProduction(TileType from) {
+        if (tileTypeChanges == null) return null;
+        TileTypeChange change = tileTypeChanges.get(from);
+        return (change == null) ? null : change.getProduction();
+    }
+
+    /**
+     * Gets the destination type of a tile type change (or null).
+     *
+     * @param tileType The <code>TileType</code> that is to change.
+     * @return The resulting <code>TileType</code>.
      */
     public TileType getChange(TileType tileType) {
+        if (tileTypeChanges == null) return null;
         TileTypeChange change = tileTypeChanges.get(tileType);
-        return change == null ? null : change.getTo();
+        return (change == null) ? null : change.getTo();
     }
 
     /**
-     * Returns true if this TileImprovementType can change a tile type
-     * to the given tile type.
+     * Can this tile improvement type change a tile type to the given
+     * tile type.
      *
-     * @param tileType a <code>TileType</code> value
-     * @return a <code>boolean</code> value
+     * @param tileType The required <code>TileType</code>.
+     * @return True if the required <code>TileType</code> can be changed to.
      */
     public boolean changeContainsTarget(TileType tileType) {
+        if (tileTypeChanges == null) return false;
         for (TileTypeChange change : tileTypeChanges.values()) {
-            if (change.getTo() == tileType) {
-                return true;
-            }
+            if (change.getTo() == tileType) return true;
         }
         return false;
     }
 
     /**
-     * Possibly reduces the cost of moving due to this tile
-     * improvement type.
+     * Possibly reduce the cost of moving due to this tile improvement
+     * type.
      *
      * Only applies if movementCost is positive (see spec).  Do not
      * return zero from a movement costing routine or units get free
@@ -289,17 +368,6 @@ public final class TileImprovementType extends FreeColGameObjectType {
         return (movementCost > 0 && movementCost < originalCost)
             ? movementCost
             : originalCost;
-    }
-
-    /**
-     * Gets the percent chance that this tile improvement can expose a
-     * resource on the tile. This only applies to TileImprovementTypes
-     * that change the underlying tile type (e.g. clearing forests).
-     *
-     * @return The exposure chance.
-     */
-    public int getExposeResourcePercent() {
-        return exposeResourcePercent;
     }
 
     /**
@@ -329,170 +397,219 @@ public final class TileImprovementType extends FreeColGameObjectType {
         return value;
     }
 
-    /**
-     * Return a weighted list of natural disasters than can strike
-     * this tile improvement type.
-     *
-     * @return a <code>List<RandomChoice<Disaster>></code> value
-     */
-    public List<RandomChoice<Disaster>> getDisasters() {
-        return disasters;
-    }
+
+    // Serialization
+    private static final String ADD_WORK_TURNS_TAG = "add-work-turns";
+    private static final String CHANGE_TAG = "change";
+    private static final String DELIVER_AMOUNT_TAG = "deliver-amount";
+    private static final String DELIVER_GOODS_TYPE_TAG = "deliver-goods-type";
+    private static final String DISASTER_TAG = "disaster";
+    private static final String EXPENDED_AMOUNT_TAG = "expended-amount";
+    private static final String EXPENDED_EQUIPMENT_TYPE_TAG = "expended-equipment-type";
+    private static final String EXPOSE_RESOURCE_PERCENT_TAG = "exposeResourcePercent";
+    private static final String FROM_TAG = "from";
+    private static final String MAGNITUDE_TAG = "magnitude";
+    private static final String MOVEMENT_COST_TAG = "movement-cost";
+    private static final String NATURAL_TAG = "natural";
+    private static final String PROBABILITY_TAG = "probability";
+    private static final String REQUIRED_IMPROVEMENT_TAG = "required-improvement";
+    private static final String TO_TAG = "to";
+    private static final String WORKER_TAG = "worker";
+    private static final String ZINDEX_TAG = "zIndex";
+
 
     /**
-     * Makes an XML-representation of this object.
-     *
-     * @param out The output stream.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
+     * {@inheritDoc}
      */
+    @Override
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         super.toXML(out, getXMLElementTagName());
     }
 
     /**
-     * Write the attributes of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to
-     *     the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
-        out.writeAttribute("natural", Boolean.toString(natural));
-        out.writeAttribute("add-work-turns", Integer.toString(addWorkTurns));
-        out.writeAttribute("movement-cost", Integer.toString(movementCost));
-        out.writeAttribute("magnitude", Integer.toString(magnitude));
-        out.writeAttribute("zIndex", Integer.toString(zIndex));
-        out.writeAttribute("exposeResourcePercent",
-                           Integer.toString(exposeResourcePercent));
+        writeAttribute(out, NATURAL_TAG, natural);
+
+        writeAttribute(out, MAGNITUDE_TAG, magnitude);
+
+        writeAttribute(out, ADD_WORK_TURNS_TAG, addWorkTurns);
+
         if (requiredImprovementType != null) {
-            out.writeAttribute("required-improvement",
-                requiredImprovementType.getId());
+            writeAttribute(out, REQUIRED_IMPROVEMENT_TAG,
+                           requiredImprovementType);
         }
+
         if (expendedEquipmentType != null) {
-            out.writeAttribute("expended-equipment-type",
-                expendedEquipmentType.getId());
-            out.writeAttribute("expended-amount",
-                Integer.toString(expendedAmount));
+            writeAttribute(out, EXPENDED_EQUIPMENT_TYPE_TAG, 
+                           expendedEquipmentType);
+
+            writeAttribute(out, EXPENDED_AMOUNT_TAG, expendedAmount);
         }
+
+        writeAttribute(out, MOVEMENT_COST_TAG, movementCost);
+
+        writeAttribute(out, ZINDEX_TAG, zIndex);
+
+        writeAttribute(out, EXPOSE_RESOURCE_PERCENT_TAG, exposeResourcePercent);
     }
 
     /**
-     * Write the children of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to
-     *     the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
         super.writeChildren(out);
 
-        if (scopes != null) {
-            for (Scope scope : scopes) {
-                scope.toXMLImpl(out);
-            }
-        }
+        for (Scope scope : getScopes()) scope.toXMLImpl(out);
+
         if (allowedWorkers != null) {
             for (String id : allowedWorkers) {
-                out.writeStartElement("worker");
-                out.writeAttribute(ID_ATTRIBUTE_TAG, id);
+                out.writeStartElement(WORKER_TAG);
+
+                writeAttribute(out, ID_ATTRIBUTE_TAG, id);
+
                 out.writeEndElement();
             }
         }
+
         if (tileTypeChanges != null) {
             for (TileTypeChange change : tileTypeChanges.values()) {
                 change.toXML(out);
             }
         }
 
-        for (RandomChoice<Disaster> choice : disasters) {
-            out.writeStartElement("disaster");
-            out.writeAttribute("id", choice.getObject().getId());
-            out.writeAttribute("probability",
-                Integer.toString(choice.getProbability()));
+        for (RandomChoice<Disaster> choice : getDisasters()) {
+            out.writeStartElement(DISASTER_TAG);
+
+            writeAttribute(out, ID_ATTRIBUTE_TAG, choice.getObject().getId());
+
+            writeAttribute(out, PROBABILITY_TAG, choice.getProbability());
+
             out.writeEndElement();
         }
     }
 
     /**
-     * Reads the attributes of this object from an XML stream.
-     *
-     * @param in The XML input stream.
-     * @throws XMLStreamException if a problem was encountered
-     *     during parsing.
+     * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        final Specification spec = getSpecification();
+
         super.readAttributes(in);
 
-        natural = getAttribute(in, "natural", false);
-        addWorkTurns = getAttribute(in, "add-work-turns", 0);
-        movementCost = getAttribute(in, "movement-cost", 0);
-        magnitude = getAttribute(in, "magnitude", 1);
+        natural = getAttribute(in, NATURAL_TAG, false);
 
-        requiredImprovementType = getSpecification().getType(in,
-            "required-improvement", TileImprovementType.class, null);
+        magnitude = getAttribute(in, MAGNITUDE_TAG, 1);
 
-        zIndex = getAttribute(in, "zIndex", 0);
-        exposeResourcePercent = getAttribute(in, "exposeResourcePercent", 0);
+        addWorkTurns = getAttribute(in, ADD_WORK_TURNS_TAG, 0);
 
-        expendedEquipmentType = getSpecification().getType(in,
-            "expended-equipment-type", EquipmentType.class, null);
-        expendedAmount = getAttribute(in, "expended-amount", 0);
+        requiredImprovementType = spec.getType(in, REQUIRED_IMPROVEMENT_TAG,
+            TileImprovementType.class, (TileImprovementType)null);
+
+        expendedEquipmentType = spec.getType(in, EXPENDED_EQUIPMENT_TYPE_TAG,
+            EquipmentType.class, (EquipmentType)null);
+
+        expendedAmount = getAttribute(in, EXPENDED_AMOUNT_TAG, 0);
 
         // @compat 0.10.4
-        deliverGoodsType = getSpecification().getType(in,
-            "deliver-goods-type", GoodsType.class, null);
-        deliverAmount = getAttribute(in, "deliver-amount", 0);
+        deliverGoodsType = spec.getType(in, DELIVER_GOODS_TYPE_TAG,
+            GoodsType.class, (GoodsType)null);
+
+        deliverAmount = getAttribute(in, DELIVER_AMOUNT_TAG, 0);
         // end @compat
+
+        movementCost = getAttribute(in, MOVEMENT_COST_TAG, 0);
+
+        zIndex = getAttribute(in, ZINDEX_TAG, 0);
+
+        exposeResourcePercent = getAttribute(in, EXPOSE_RESOURCE_PERCENT_TAG, 0);
     }
 
     /**
-     * Reads a child object.
-     *
-     * @param in The XML stream to read.
-     * @exception XMLStreamException if an error occurs
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        if (readShouldClearContainers(in)) {
+            scopes = null;
+            allowedWorkers = null;
+            tileTypeChanges = null;
+            disasters = null;
+        }
+
+        super.readChildren(in);
+    }
+    
+    /**
+     * {@inheritDoc}
      */
     @Override
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        String childName = in.getLocalName();
-        if ("scope".equals(childName)) {
-            scopes.add(new Scope(in));
-        } else if ("worker".equals(childName)) {
-            allowedWorkers.add(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
-            in.nextTag(); // close this element
-        } else if ("change".equals(childName)) {
+        final Specification spec = getSpecification();
+        final String tag = in.getLocalName();
+
+        if (CHANGE_TAG.equals(tag)) {
             TileTypeChange change = new TileTypeChange();
             if (deliverGoodsType == null) {
-                change.readFromXML(in, getSpecification());
+                change.readFromXML(in, spec);
             } else {
                 // @compat 0.10.4
-                change.setFrom(getSpecification().getTileType(in.getAttributeValue(null, "from")));
-                change.setTo(getSpecification().getTileType(in.getAttributeValue(null, "to")));
-                change.setProduction(new AbstractGoods(deliverGoodsType, deliverAmount));
-                // end @compat
+                TileType from = spec.getType(in, FROM_TAG,
+                                             TileType.class, (TileType)null);
+                TileType to = spec.getType(in, TO_TAG,
+                                           TileType.class, (TileType)null);
+                change.setFrom(from);
+                change.setTo(to);
+                change.setProduction(new AbstractGoods(deliverGoodsType,
+                                                       deliverAmount));
                 in.nextTag(); // close this element
+                // end @compat
+            }
+            if (tileTypeChanges == null) {
+                tileTypeChanges = new HashMap<TileType, TileTypeChange>();
             }
             tileTypeChanges.put(change.getFrom(), change);
-        } else if ("disaster".equals(childName)) {
-            Disaster disaster = getSpecification().getDisaster(in.getAttributeValue(null, "id"));
-            int probability = getAttribute(in, "probability", 100);
+
+        } else if (DISASTER_TAG.equals(tag)) {
+            Disaster disaster = spec.getType(in, ID_ATTRIBUTE_TAG,
+                                             Disaster.class, (Disaster)null);
+            int probability = getAttribute(in, PROBABILITY_TAG, 100);
+            if (disasters == null) {
+                disasters = new ArrayList<RandomChoice<Disaster>>();
+            }
             disasters.add(new RandomChoice<Disaster>(disaster, probability));
             in.nextTag(); // close this element
+
+        } else if (WORKER_TAG.equals(tag)) {
+            String id = getAttribute(in, ID_ATTRIBUTE_TAG, (String)null);
+            if (id != null) {
+                if (allowedWorkers == null) {
+                    allowedWorkers = new HashSet<String>();
+                }
+                allowedWorkers.add(id);
+            }
+            in.nextTag(); // close this element
+
+        } else if (Scope.getXMLElementTagName().equals(tag)) {
+            Scope scope = new Scope(in);
+            if (scope != null) {
+                if (scopes == null) scopes = new ArrayList<Scope>();
+                scopes.add(scope);
+            }
+
         } else {
             super.readChild(in);
         }
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "tileimprovement-type".
      */
