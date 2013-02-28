@@ -767,6 +767,13 @@
               classpath="build/" />
     </target>
 
+    <!-- Creates HTML documentation from specification. -->
+    <target name="generate-documentation" depends="build"
+            description="Creates HTML documentation from specification.">
+        <java classname="net.sf.freecol.tools.GenerateDocumentation"
+              classpath="build/" />
+    </target>
+
     <!-- Creates 'freecol.desktop' file. -->
     <target name="desktop-entry" depends="build"
             description="Creates 'freecol.desktop' file.">
