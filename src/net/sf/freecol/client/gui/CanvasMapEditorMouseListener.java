@@ -151,7 +151,8 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
                         canvas.showEditSettlementDialog(tile.getIndianSettlement());
                     }
                 } else {
-                    gui.setSelectedTile(null, true);
+                    gui.setSelectedTile(null,
+                        tile.getX() >= 0 && tile.getY() >= 0);
                 }
             } else if (e.getButton() == MouseEvent.BUTTON1) {
                 startPoint = e.getPoint();
@@ -170,34 +171,30 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
      * @param e The MouseEvent that holds all the information.
      */
     public void mouseReleased(MouseEvent e) {
-        if (getMap() == null) {
-            return;
-        }
+        if (getMap() == null) return;
         JComponent component = (JComponent)e.getSource();
 
-        MapEditorController controller = freeColClient
-            .getMapEditorController();
+        MapEditorController controller = freeColClient.getMapEditorController();
         boolean isTransformActive = controller.getMapTransform() != null;
 
-        if(startPoint == null){
-        	startPoint = e.getPoint();
-        }
-        if(oldPoint == null){
-        	oldPoint = e.getPoint();
-        }
+        if (startPoint == null) startPoint = e.getPoint();
+        if (oldPoint == null)	oldPoint = e.getPoint();
         drawBox(component, startPoint, oldPoint);
         if (gui.getFocus() != null) {
             Tile start = mapViewer.convertToMapTile(startPoint.x, startPoint.y);
             Tile end = start;
-            //Optimization, only check if the points are different
-            if(startPoint.x != oldPoint.x || startPoint.y != oldPoint.y){
-            	end = mapViewer.convertToMapTile(oldPoint.x, oldPoint.y);
+            // Optimization, only check if the points are different
+            if (startPoint.x != oldPoint.x || startPoint.y != oldPoint.y) {
+                end = mapViewer.convertToMapTile(oldPoint.x, oldPoint.y);
             }
 
-            // no option selected, just center map
-            if(!isTransformActive){
-            	gui.setFocus(end);
-            	return;
+            // edit 2 more conditions in if statement.  we need to
+            // check for coordinator of X and Y if (x,y) outside of
+            // map then dont focus to that else setfocus to that
+            // position no option selected, just center map
+            if (!isTransformActive && end.getX() >= 0 && end.getY() >= 0) {
+                gui.setFocus(end);
+                return;
             }
 
             // find the area to transform
