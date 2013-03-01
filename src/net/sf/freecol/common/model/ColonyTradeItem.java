@@ -26,29 +26,23 @@ import javax.xml.stream.XMLStreamWriter;
 
 public class ColonyTradeItem extends TradeItem {
 
-    /**
-     * The ID of the colony to change hands.
-     */
+    /** The id of the colony to change hands. */
     private String colonyId;
 
-    /**
-     * The colony to change hands.
-     */
+    /** The colony to change hands. */
     private Colony colony;
 
-    /**
-     * The colony name, when the colony is unknown to the offer recipient.
-     */
+    /** The colony name, when the colony is unknown to the offer recipient. */
     private String colonyName;
 
 
     /**
      * Creates a new <code>ColonyTradeItem</code> instance.
      *
-     * @param game a <code>Game</code> value
-     * @param source a <code>Player</code> value
-     * @param destination a <code>Player</code> value
-     * @param colony a <code>Colony</code> value
+     * @param game The <code>Game</code> the trade occurs in.
+     * @param source The source <code>Player</code>.
+     * @param destination The destination <code>Player</code>.
+     * @param colony The <code>Colony</code> to trade.
      */
     public ColonyTradeItem(Game game, Player source, Player destination,
                            Colony colony) {
@@ -61,33 +55,13 @@ public class ColonyTradeItem extends TradeItem {
     /**
      * Creates a new <code>ColonyTradeItem</code> instance.
      *
-     * @param game a <code>Game</code> value
-     * @param in a <code>XMLStreamReader</code> value
+     * @param game The <code>Game</code> the trade occurs in.
+     * @param in The <code>XMLStreamReader</code> to read from.
      */
     public ColonyTradeItem(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
+
         readFromXML(in);
-    }
-
-    /**
-     * Returns whether this TradeItem is valid.
-     *
-     * @return a <code>boolean</code> value
-     */
-    public boolean isValid() {
-        return (colony.getOwner() == getSource() &&
-                getDestination().isEuropean());
-    }
-
-    /**
-     * Returns whether this TradeItem must be unique. This is true for
-     * the StanceTradeItem and the GoldTradeItem, and false for all
-     * others.
-     *
-     * @return a <code>boolean</code> value
-     */
-    public boolean isUnique() {
-        return false;
     }
 
     /**
@@ -100,11 +74,25 @@ public class ColonyTradeItem extends TradeItem {
         return colonyName;
     }
 
+    // Interface TradeItem
 
     /**
-     * Get the colony to trade.
-     *
-     * @return The colony to trade.
+     * {@inheritDoc}
+     */
+    public boolean isValid() {
+        return (colony.getOwner() == getSource() &&
+                getDestination().isEuropean());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isUnique() {
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     public Colony getColony() {
@@ -112,9 +100,7 @@ public class ColonyTradeItem extends TradeItem {
     }
 
     /**
-     * Set the colony to trade.
-     *
-     * @param colony The new <code>Colony</code> to trade.
+     * {@inheritDoc}
      */
     @Override
     public void setColony(Colony colony) {
@@ -122,51 +108,43 @@ public class ColonyTradeItem extends TradeItem {
     }
 
 
+    // Serialization
+
+    private static final String COLONY_TAG = "colony";
+    private static final String COLONY_NAME_TAG = "colonyName";
+
     /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * {@inheritDoc}
      */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         super.toXML(out, getXMLElementTagName());
     }
 
     /**
-     * Write the attributes of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *     to the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
-        out.writeAttribute("colony", colonyId);
-        out.writeAttribute("colonyName", colonyName);
+        writeAttribute(out, COLONY_TAG, colonyId);
+
+        writeAttribute(out, COLONY_NAME_TAG, colonyName);
     }
 
     /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
+     * {@inheritDoc}
      */
-    public void readFromXML(XMLStreamReader in)
-        throws XMLStreamException {
-        super.readFromXML(in);
+    @Override
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
 
-        colonyName = in.getAttributeValue(null, "colonyName");
+        Colony colony = getAttribute(in, COLONY_TAG, getGame(),
+                                     Colony.class, (Colony)null);
+        colonyId = (colony == null) ? null : colony.getId();
 
-        colonyId = in.getAttributeValue(null, "colony");
-        colony = game.getFreeColGameObject(colonyId, Colony.class);
-
-        in.nextTag();
+        colonyName = getAttribute(in, COLONY_NAME_TAG, (String)null);
     }
 
     /**

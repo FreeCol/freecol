@@ -49,35 +49,28 @@ public class DiplomaticTrade extends FreeColObject {
     }
 
 
-    /**
-     * The individual items the trade consists of.
-     */
-    private List<TradeItem> items;
-
+    /** The game in play. */
     private final Game game;
 
-    /**
-     * The player who proposed agreement.
-     */
+    /** The player who proposed agreement. */
     private Player sender;
 
-    /**
-     * The player who is to accept this agreement.
-     */
+    /** The player who is to accept this agreement. */
     private Player recipient;
 
-    /**
-     * The status of this agreement.
-     */
+    /** The status of this agreement. */
     private TradeStatus status;
+
+    /** The individual items the trade consists of. */
+    private final List<TradeItem> items = new ArrayList<TradeItem>();
 
 
     /**
      * Creates a new <code>DiplomaticTrade</code> instance.
      *
-     * @param game a <code>Game</code> value
-     * @param sender a <code>Player</code> value
-     * @param recipient a <code>Player</code> value
+     * @param game The current <code>Game</code>.
+     * @param sender The sending <code>Player</code>.
+     * @param recipient The recipient <code>Player</code>.
      */
     public DiplomaticTrade(Game game, Player sender, Player recipient) {
         this(game, sender, recipient, new ArrayList<TradeItem>());
@@ -97,8 +90,9 @@ public class DiplomaticTrade extends FreeColObject {
         this.game = game;
         this.sender = sender;
         this.recipient = recipient;
-        this.items = items;
         this.status = TradeStatus.PROPOSE_TRADE;
+        this.items.clear();
+        this.items.addAll(items);
     }
 
     /**
@@ -109,6 +103,7 @@ public class DiplomaticTrade extends FreeColObject {
      */
     public DiplomaticTrade(Game game, Element element) {
         this.game = game;
+
         readFromXMLElement(element);
     }
 
@@ -167,7 +162,6 @@ public class DiplomaticTrade extends FreeColObject {
         this.recipient = newRecipient;
     }
 
-
     /**
      * Add to the DiplomaticTrade.
      *
@@ -212,13 +206,12 @@ public class DiplomaticTrade extends FreeColObject {
         }
     }
 
-
     /**
      * Get a list of all items to trade.
      *
      * @return A list of all the TradeItems.
      */
-    public List<TradeItem> getTradeItems() {
+    public final List<TradeItem> getTradeItems() {
         return items;
     }
 
@@ -230,7 +223,6 @@ public class DiplomaticTrade extends FreeColObject {
     public Iterator<TradeItem> iterator() {
         return items.iterator();
     }
-
 
     /**
      * Get the items offered by a particular player.
@@ -291,88 +283,101 @@ public class DiplomaticTrade extends FreeColObject {
     }
 
 
+    // Serialization
+
+    private static final String RECIPIENT_TAG = "recipient";
+    private static final String SENDER_TAG = "sender";
+    private static final String STATUS_TAG = "status";
+
     /**
-     * This method writes an XML-representation of this object to the given
-     * stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to
-     *     the stream.
+     * {@inheritDoc}
      */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         super.toXML(out, getXMLElementTagName());
     }
 
     /**
-     * Write the attributes of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *     to the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
-        out.writeAttribute("sender", sender.getId());
-        out.writeAttribute("recipient", recipient.getId());
-        out.writeAttribute("status", status.toString());
+        writeAttribute(out, SENDER_TAG, sender);
+
+        writeAttribute(out, RECIPIENT_TAG, recipient);
+
+        out.writeAttribute(STATUS_TAG, status.toString());
     }
 
     /**
-     * Write the children of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *     to the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
         super.writeChildren(out);
 
         for (TradeItem item : items) item.toXML(out);
     }
 
     /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered during parsing.
+     * {@inheritDoc}
      */
-    public void readFromXML(XMLStreamReader in)
-        throws XMLStreamException {
-        String senderString = in.getAttributeValue(null, "sender");
-        sender = game.getFreeColGameObject(senderString, Player.class);
+    @Override
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
 
-        String recipientString = in.getAttributeValue(null, "recipient");
-        recipient = game.getFreeColGameObject(recipientString, Player.class);
+        sender = getAttribute(in, SENDER_TAG, game,
+                              Player.class, (Player)null);
 
-        status = Enum.valueOf(TradeStatus.class,
-                              in.getAttributeValue(null, "status"));
+        recipient = getAttribute(in, RECIPIENT_TAG, game,
+                                 Player.class, (Player)null);
 
-        items = new ArrayList<TradeItem>();
-        TradeItem item;
-        while (in.hasNext()) {
-            if (in.next() != XMLStreamConstants.START_ELEMENT) continue;
-            if (in.getLocalName().equals(StanceTradeItem.getXMLElementTagName())) {
-                item = new StanceTradeItem(game, in);
-            } else if (in.getLocalName().equals(GoodsTradeItem.getXMLElementTagName())) {
-                item = new GoodsTradeItem(game, in);
-            } else if (in.getLocalName().equals(GoldTradeItem.getXMLElementTagName())) {
-                item = new GoldTradeItem(game, in);
-            } else if (in.getLocalName().equals(ColonyTradeItem.getXMLElementTagName())) {
-                item = new ColonyTradeItem(game, in);
-            } else if (in.getLocalName().equals(UnitTradeItem.getXMLElementTagName())) {
-                item = new UnitTradeItem(game, in);
-            } else {
-                logger.warning("Unknown TradeItem: " + in.getLocalName());
-                continue;
-            }
-            items.add(item);
+        status = getAttribute(in, STATUS_TAG, TradeStatus.class,
+                              TradeStatus.REJECT_TRADE);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        // Clear containers
+        items.clear();
+
+        super.readChildren(in);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+        final String tag = in.getLocalName();
+        TradeItem item = null;
+
+        if (ColonyTradeItem.getXMLElementTagName().equals(tag)) {
+            item = new ColonyTradeItem(game, in);
+
+        } else if (GoldTradeItem.getXMLElementTagName().equals(tag)) {
+            item = new GoldTradeItem(game, in);
+
+        } else if (GoodsTradeItem.getXMLElementTagName().equals(tag)) {
+            item = new GoodsTradeItem(game, in);
+
+        } else if (StanceTradeItem.getXMLElementTagName().equals(tag)) {
+            item = new StanceTradeItem(game, in);
+
+        } else if (UnitTradeItem.getXMLElementTagName().equals(tag)) {
+            item = new UnitTradeItem(game, in);
+
+        } else {
+            super.readChild(in);
+            return;
         }
 
+        if (item != null) items.add(item);
     }
 
     /**

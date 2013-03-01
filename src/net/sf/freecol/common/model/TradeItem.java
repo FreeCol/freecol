@@ -31,28 +31,23 @@ import net.sf.freecol.common.model.Player.Stance;
  */
 public abstract class TradeItem extends FreeColObject {
 
-    /**
-     * The game this TradeItem belongs to.
-     */
+    /** The game this TradeItem belongs to. */
     protected Game game;
 
-    /**
-     *  The player who is to provide this item.
-     */
+    /** The player who is to provide this item. */
     private Player source;
 
-    /**
-     * The player who is to receive this item.
-     */
+    /** The player who is to receive this item. */
     private Player destination;
+
 
     /**
      * Creates a new <code>TradeItem</code> instance.
      *
-     * @param game a <code>Game</code> value
-     * @param id a <code>String</code> value
-     * @param source a <code>Player</code> value
-     * @param destination a <code>Player</code> value
+     * @param game The <code>Game</code> the trade occurs in.
+     * @param id An id for this item.
+     * @param source The source <code>Player</code>.
+     * @param destination The destination <code>Player</code>.
      */
     public TradeItem(Game game, String id, Player source, Player destination) {
         this.game = game;
@@ -64,69 +59,80 @@ public abstract class TradeItem extends FreeColObject {
     /**
      * Creates a new <code>TradeItem</code> instance.
      *
-     * @param game a <code>Game</code> value
-     * @param in a <code>XMLStreamReader</code> value
+     * @param game The <code>Game</code> the trade occurs in.
+     * @param in The <code>XMLStreamReader</code> to read from.
      */
     public TradeItem(Game game, XMLStreamReader in) throws XMLStreamException {
         this.game = game;
     }
 
     /**
-     * Get the <code>Source</code> value.
+     * Gets the game.  The subclasses need this.
      *
-     * @return a <code>Player</code> value
+     * @return The game.
+     */
+    protected final Game getGame() {
+        return game;
+    }
+
+    /**
+     * Get the source player.
+     *
+     * @return The source <code>Player</code>.
      */
     public final Player getSource() {
         return source;
     }
 
     /**
-     * Set the <code>Source</code> value.
+     * Set the source player.
      *
-     * @param newSource The new Source value.
+     * @param newSource The new source <code>Player</code>.
      */
     public final void setSource(final Player newSource) {
         this.source = newSource;
     }
 
     /**
-     * Get the <code>Destination</code> value.
+     * Get the destination player.
      *
-     * @return a <code>Player</code> value
+     * @return The destination <code>Player</code>.
      */
     public final Player getDestination() {
         return destination;
     }
 
     /**
-     * Set the <code>Destination</code> value.
+     * Set the destination player.
      *
-     * @param newDestination The new Destination value.
+     * @param newDestination The new destination <code>Player</code>.
      */
     public final void setDestination(final Player newDestination) {
         this.destination = newDestination;
     }
 
+    // The following routines must be supplied/overridden by the subclasses.
+
     /**
-     * Returns whether this TradeItem is valid.
+     * Is this trade item valid?
      *
-     * @return a <code>boolean</code> value
+     * @return True if the item is valid.
      */
     public abstract boolean isValid();
 
     /**
-     * Returns whether this TradeItem must be unique. This is true for
-     * the StanceTradeItem and the GoldTradeItem, and false for all
-     * others.
+     * Is this trade item unique?
+     * This is true for the StanceTradeItem and the GoldTradeItem,
+     * and false for all others.
      *
-     * @return a <code>boolean</code> value
+     * @return True if the item is unique.
      */
     public abstract boolean isUnique();
 
     /**
      * Get the colony to trade.
      *
-     * @return The colony to trade.
+     * @return The <code>Colony</code> to trade.
      */
     public Colony getColony() { return null; }
 
@@ -140,7 +146,7 @@ public abstract class TradeItem extends FreeColObject {
     /**
      * Get the goods to trade.
      *
-     * @return The goods to trade.
+     * @return The <code>Goods</code> to trade.
      */
     public Goods getGoods() { return null; }
 
@@ -161,14 +167,14 @@ public abstract class TradeItem extends FreeColObject {
     /**
      * Set the gold to trade.
      *
-     * @param gold The new gold value.
+     * @param gold The new gold to trade.
      */
     public void setGold(int gold) {}
 
     /**
      * Get the stance to trade.
      *
-     * @return The stance to trade.
+     * @return The <code>Stance</code> to trade.
      */
     public Stance getStance() { return null; }
 
@@ -182,7 +188,7 @@ public abstract class TradeItem extends FreeColObject {
     /**
      * Get the unit to trade.
      *
-     * @return The unit to trade.
+     * @return The <code>Unit</code> to trade.
      */
     public Unit getUnit() { return null; }
 
@@ -194,37 +200,34 @@ public abstract class TradeItem extends FreeColObject {
     public void setUnit(Unit unit) {}
 
 
+    // Serialization
+
+    private static final String DESTINATION_TAG = "destination";
+    private static final String SOURCE_TAG = "source";
+
     /**
-     * Write the attributes of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *     to the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
-        out.writeAttribute("source", this.source.getId());
-        out.writeAttribute("destination", this.destination.getId());
+        writeAttribute(out, SOURCE_TAG, source);
+
+        writeAttribute(out, DESTINATION_TAG, destination);
     }
 
     /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
+     * {@inheritDoc}
      */
-    public void readFromXML(XMLStreamReader in)
-        throws XMLStreamException {
-        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
+    @Override
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
 
-        String src = in.getAttributeValue(null, "source");
-        this.source = game.getFreeColGameObject(src, Player.class);
+        source = getAttribute(in, SOURCE_TAG, game,
+                              Player.class, (Player)null);
 
-        String dst = in.getAttributeValue(null, "destination");
-        this.destination = game.getFreeColGameObject(dst, Player.class);
+        destination = getAttribute(in, DESTINATION_TAG, game,
+                                   Player.class, (Player)null);
     }
 }

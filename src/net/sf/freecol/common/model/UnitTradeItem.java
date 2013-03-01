@@ -26,40 +26,41 @@ import javax.xml.stream.XMLStreamWriter;
 
 public class UnitTradeItem extends TradeItem {
     
-    /**
-     * The unit to change hands.
-     */
+    /** The unit to change hands. */
     private Unit unit;
 
         
     /**
      * Creates a new <code>UnitTradeItem</code> instance.
      *
-     * @param game a <code>Game</code> value
-     * @param source a <code>Player</code> value
-     * @param destination a <code>Player</code> value
-     * @param unit an <code>Unit</code> value
+     * @param game The <code>Game</code> the trade occurs in.
+     * @param source The source <code>Player</code>.
+     * @param destination The destination <code>Player</code>.
+     * @param unit The <code>Unit</code> to trade.
      */
-    public UnitTradeItem(Game game, Player source, Player destination, Unit unit) {
+    public UnitTradeItem(Game game, Player source, Player destination,
+                         Unit unit) {
         super(game, "tradeItem.unit", source, destination);
+
         this.unit = unit;
     }
 
     /**
      * Creates a new <code>UnitTradeItem</code> instance.
      *
-     * @param game a <code>Game</code> value
-     * @param in a <code>XMLStreamReader</code> value
+     * @param game The <code>Game</code> the trade occurs in.
+     * @param in The <code>XMLStreamReader</code> to read from.
      */
     public UnitTradeItem(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
+
         readFromXML(in);
     }
 
+    // Interface TradeItem
+
     /**
-     * Returns whether this TradeItem is valid.
-     *
-     * @return a <code>boolean</code> value
+     * {@inheritDoc}
      */
     public boolean isValid() {
         return unit.getOwner() == getSource()
@@ -67,20 +68,14 @@ public class UnitTradeItem extends TradeItem {
     }
 
     /**
-     * Returns whether this TradeItem must be unique. This is true for
-     * the StanceTradeItem and the GoldTradeItem, and false for all
-     * others.
-     *
-     * @return a <code>boolean</code> value
+     * {@inheritDoc}
      */
     public boolean isUnique() {
         return false;
     }
     
     /**
-     * Get the unit to trade.
-     *
-     * @return The unit to trade.
+     * {@inheritDoc}
      */
     @Override
     public Unit getUnit() {
@@ -88,9 +83,7 @@ public class UnitTradeItem extends TradeItem {
     }
 
     /**
-     * Set the unit to trade.
-     *
-     * @param unit The new <code>Unit</code> to trade.
+     * {@inheritDoc}
      */
     @Override
     public void setUnit(Unit unit) {
@@ -98,48 +91,36 @@ public class UnitTradeItem extends TradeItem {
     }
 
 
+    // Serialization
+
+    private static final String UNIT_TAG = "unit";
+
     /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     * 
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * {@inheritDoc}
      */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         super.toXML(out, getXMLElementTagName());
     }
 
     /**
-     * Write the attributes of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *     to the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
-        out.writeAttribute("unit", this.unit.getId());
+        writeAttribute(out, UNIT_TAG, unit);
     }
     
     /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
+     * {@inheritDoc}
      */
-    public void readFromXML(XMLStreamReader in)
-        throws XMLStreamException {
-        super.readFromXML(in);
+    @Override
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
 
-        String unitId = in.getAttributeValue(null, "unit");
-        this.unit = game.getFreeColGameObject(unitId, Unit.class);
-
-        in.nextTag();
+        unit = getAttribute(in, UNIT_TAG, getGame(), Unit.class, (Unit)null);
     }
 
     /**

@@ -26,21 +26,20 @@ import javax.xml.stream.XMLStreamWriter;
 
 public class GoldTradeItem extends TradeItem {
     
-    /**
-     * The amount of gold to change hands.
-     */
+    /** The amount of gold to change hands. */
     private int gold;
 
         
     /**
      * Creates a new <code>GoldTradeItem</code> instance.
      *
-     * @param game a <code>Game</code> value
-     * @param source a <code>Player</code> value
-     * @param destination a <code>Player</code> value
-     * @param gold an <code>int</code> value
+     * @param game The <code>Game</code> the trade occurs in.
+     * @param source The source <code>Player</code>.
+     * @param destination The destination <code>Player</code>.
+     * @param gold The amount of gold.
      */
-    public GoldTradeItem(Game game, Player source, Player destination, int gold) {
+    public GoldTradeItem(Game game, Player source, Player destination,
+                         int gold) {
         super(game, "tradeItem.gold", source, destination);
         this.gold = gold;
     }
@@ -48,38 +47,33 @@ public class GoldTradeItem extends TradeItem {
     /**
      * Creates a new <code>GoldTradeItem</code> instance.
      *
-     * @param game a <code>Game</code> value
-     * @param in a <code>XMLStreamReader</code> value
+     * @param game The <code>Game</code> the trade occurs in.
+     * @param in The <code>XMLStreamReader</code> to read from.
      */
     public GoldTradeItem(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
+
         readFromXML(in);
     }
 
+    // Interface TradeItem
+
     /**
-     * Returns whether this TradeItem is valid.
-     *
-     * @return a <code>boolean</code> value
+     * {@inheritDoc}
      */
     public boolean isValid() {
         return gold >= 0 && getSource().checkGold(gold);
     }
 
     /**
-     * Returns whether this TradeItem must be unique. This is true for
-     * the StanceTradeItem and the GoldTradeItem, and false for all
-     * others.
-     *
-     * @return a <code>boolean</code> value
+     * {@inheritDoc}
      */
     public boolean isUnique() {
         return true;
     }
 
     /**
-     * Get the gold to trade.
-     *
-     * @return The gold to trade.
+     * {@inheritDoc}
      */
     @Override
     public int getGold() {
@@ -87,9 +81,7 @@ public class GoldTradeItem extends TradeItem {
     }
 
     /**
-     * Set the gold to trade.
-     *
-     * @param gold The new gold value.
+     * {@inheritDoc}
      */
     @Override
     public void setGold(int gold) {
@@ -97,44 +89,35 @@ public class GoldTradeItem extends TradeItem {
     }
 
 
+    // Serialization
+
+    private static final String GOLD_TAG = "gold";
+
     /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     * 
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * {@inheritDoc}
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         super.toXML(out, getXMLElementTagName());
     }
 
     /**
-     * Write the attributes of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *     to the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
-        out.writeAttribute("gold", Integer.toString(this.gold));
+        writeAttribute(out, GOLD_TAG, gold);
     }
     
     /**
-     * Initialize this object from an XML-representation of this object.
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
+     * {@inheritDoc}
      */
-    public void readFromXML(XMLStreamReader in)
-        throws XMLStreamException {
-        super.readFromXML(in);
-        this.gold = Integer.parseInt(in.getAttributeValue(null, "gold"));
-        in.nextTag();
+    @Override
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
+
+        gold = getAttribute(in, GOLD_TAG, UNDEFINED);
     }
 
     /**

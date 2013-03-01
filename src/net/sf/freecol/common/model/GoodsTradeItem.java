@@ -28,29 +28,26 @@ import javax.xml.stream.XMLStreamWriter;
 
 public class GoodsTradeItem extends TradeItem {
     
-    /**
-     * The goods to change hands.
-     */
+    /** The goods to change hands. */
     private Goods goods;
 
-    /**
-     * The settlement where the trade is to take place.
-     */
+    /** The settlement where the trade is to take place. */
     private Settlement settlement;
         
 
     /**
      * Creates a new <code>GoodsTradeItem</code> instance.
      *
-     * @param game a <code>Game</code> value
-     * @param source a <code>Player</code> value
-     * @param destination a <code>Player</code> value
-     * @param goods a <code>Goods</code> value
-     * @param settlement a <code>Settlement</code> value
+     * @param game The <code>Game</code> the trade occurs in.
+     * @param source The source <code>Player</code>.
+     * @param destination The destination <code>Player</code>.
+     * @param goods The <code>Goods</code> to trade.
+     * @param settlement The <code>Settlement</code> to trade at.
      */
     public GoodsTradeItem(Game game, Player source, Player destination,
                           Goods goods, Settlement settlement) {
         super(game, "tradeItem.goods", source, destination);
+
         this.goods = goods;
         this.settlement = settlement;
     }
@@ -58,18 +55,19 @@ public class GoodsTradeItem extends TradeItem {
     /**
      * Creates a new <code>GoodsTradeItem</code> instance.
      *
-     * @param game a <code>Game</code> value
-     * @param in a <code>XMLStreamReader</code> value
+     * @param game The <code>Game</code> the trade occurs in.
+     * @param in The <code>XMLStreamReader</code> to read from.
      */
     public GoodsTradeItem(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
+
         readFromXML(in);
     }
 
     /**
      * Get the <code>Settlement</code> value.
      *
-     * @return a <code>Settlement</code> value
+     * @return The <code>Settlement</code>.
      */
     public final Settlement getSettlement() {
         return settlement;
@@ -78,48 +76,35 @@ public class GoodsTradeItem extends TradeItem {
     /**
      * Set the <code>Settlement</code> value.
      *
-     * @param newSettlement The new Settlement value.
+     * @param newSettlement The new <code>Settlement</code> value.
      */
     public final void setSettlement(final Settlement newSettlement) {
         this.settlement = newSettlement;
     }
 
+    // Interface TradeItem
+
     /**
-     * Returns whether this TradeItem is valid.
-     *
-     * @return a <code>boolean</code> value
+     * {@inheritDoc}
      */
     public boolean isValid() {
-        if (!(goods.getLocation() instanceof Unit)) {
-            return false;
-        }
-        Unit unit = (Unit) goods.getLocation();
-        if (unit.getOwner() != getSource()) {
-            return false;
-        }
-        if (settlement != null && settlement.getOwner() == getDestination()) {
-            return true;
-        } else {
-            return false;
-        }
+        if (!(goods.getLocation() instanceof Unit)) return false;
 
+        Unit unit = (Unit) goods.getLocation();
+        if (unit.getOwner() != getSource()) return false;
+
+        return settlement != null && settlement.getOwner() == getDestination();
     }
     
     /**
-     * Returns whether this TradeItem must be unique. This is true for
-     * the StanceTradeItem and the GoldTradeItem, and false for all
-     * others.
-     *
-     * @return a <code>boolean</code> value
+     * {@inheritDoc}
      */
     public boolean isUnique() {
         return false;
     }
 
     /**
-     * Get the goods to trade.
-     *
-     * @return The goods to trade.
+     * {@inheritDoc}
      */
     @Override
     public Goods getGoods() {
@@ -127,9 +112,7 @@ public class GoodsTradeItem extends TradeItem {
     }
 
     /**
-     * Set the goods to trade.
-     *
-     * @param goods The new <code>Goods</code> to trade.
+     * {@inheritDoc}
      */
     @Override
     public void setGoods(Goods goods) {
@@ -137,66 +120,73 @@ public class GoodsTradeItem extends TradeItem {
     }
 
 
+    // Serialization
+
+    private static final String SETTLEMENT_TAG = "settlement";
+
     /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * {@inheritDoc}
      */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         super.toXML(out, getXMLElementTagName());
     }
 
     /**
-     * Write the attributes of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *     to the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
-        out.writeAttribute("settlement", settlement.getId());
+        writeAttribute(out, SETTLEMENT_TAG, settlement);
     }
 
     /**
-     * Write the children of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *     to the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
         super.writeChildren(out);
 
         goods.toXML(out);
     }
 
     /**
-     * Initialize this object from an XML-representation of this object.
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
+     * {@inheritDoc}
      */
-    public void readFromXML(XMLStreamReader in)
-        throws XMLStreamException {
-        super.readFromXML(in);
+    @Override
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
 
-        String settlementId = in.getAttributeValue(null, "settlement");
-        this.settlement = game.getFreeColGameObject(settlementId,
-                                                    Settlement.class);
+        settlement = getAttribute(in, SETTLEMENT_TAG, getGame(),
+                                  Settlement.class, (Settlement)null);
+    }
 
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if (in.getLocalName().equals(Goods.getXMLElementTagName())) {
-                this.goods = new Goods(game, in);
-            }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        // Clear containers
+        goods = null;
+
+        super.readChildren(in);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+        final Game game = settlement.getGame();
+        final String tag = in.getLocalName();
+
+        if (Goods.getXMLElementTagName().equals(tag)) {
+            goods = new Goods(game, in);
+
+        } else {
+            super.readChild(in);
         }
     }
 

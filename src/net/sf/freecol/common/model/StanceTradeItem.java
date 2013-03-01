@@ -28,61 +28,55 @@ import net.sf.freecol.common.model.Player.Stance;
 
 public class StanceTradeItem extends TradeItem {
     
-    /**
-     * The stance between source and destination.
-     */
+    /** The stance between source and destination. */
     private Stance stance;
 
         
     /**
      * Creates a new <code>StanceTradeItem</code> instance.
      *
-     * @param game a <code>Game</code> value
-     * @param source a <code>Player</code> value
-     * @param destination a <code>Player</code> value
-     * @param stance an <code>Stance</code> value
+     * @param game The <code>Game</code> the trade occurs in.
+     * @param source The source <code>Player</code>.
+     * @param destination The destination <code>Player</code>.
+     * @param stance The <code>Stance</code> to trade.
      */
     public StanceTradeItem(Game game, Player source, Player destination,
                            Stance stance) {
         super(game, "tradeItem.stance", source, destination);
+
         this.stance = stance;
     }
 
     /**
      * Creates a new <code>StanceTradeItem</code> instance.
      *
-     * @param game a <code>Game</code> value
-     * @param in a <code>XMLStreamReader</code> value
+     * @param game The <code>Game</code> the trade occurs in.
+     * @param in A <code>XMLStreamReader</code> to read from.
      */
     public StanceTradeItem(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
+
         readFromXML(in);
     }
 
+    // Interface TradeItem
+
     /**
-     * Returns whether this TradeItem is valid.
-     *
-     * @return a <code>boolean</code> value
+     * {@inheritDoc}
      */
     public boolean isValid() {
         return stance != null;
     }
 
     /**
-     * Returns whether this TradeItem must be unique. This is true for
-     * the StanceTradeItem and the GoldTradeItem, and false for all
-     * others.
-     *
-     * @return a <code>boolean</code> value
+     * {@inheritDoc}
      */
     public boolean isUnique() {
         return true;
     }
 
     /**
-     * Get the stance to trade.
-     *
-     * @return The stance to trade.
+     * {@inheritDoc}
      */
     @Override
     public Stance getStance() {
@@ -90,9 +84,7 @@ public class StanceTradeItem extends TradeItem {
     }
 
     /**
-     * Set the stance to trade.
-     *
-     * @param stance The new <code>Stance</code> to trade.
+     * {@inheritDoc}
      */
     @Override
     public void setStance(Stance stance) {
@@ -100,48 +92,36 @@ public class StanceTradeItem extends TradeItem {
     }
 
 
+    // Serialization
+
+    private static final String STANCE_TAG = "stance";
+
     /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     * 
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * {@inheritDoc}
      */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         super.toXML(out, getXMLElementTagName());
     }
 
     /**
-     * Write the attributes of this object to a stream.
-     * To be overridden by any object that uses
-     * the toXML(XMLStreamWriter, String) call.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *     to the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
-        out.writeAttribute("stance", this.stance.toString());
+        writeAttribute(out, STANCE_TAG, stance);
     }
     
     /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
+     * {@inheritDoc}
      */
-    public void readFromXML(XMLStreamReader in)
-        throws XMLStreamException {
-        super.readFromXML(in);
-        this.stance = Enum.valueOf(Stance.class,
-            in.getAttributeValue(null, "stance"));
-        in.nextTag();
+    @Override
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
+
+        stance = getAttribute(in, STANCE_TAG, Stance.class, (Stance)null);
     }
 
     /**
