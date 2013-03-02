@@ -1,3 +1,7 @@
+h1, .name {
+    text-align: center;
+}
+
 table {
     border-collapse: collapse;
 }
@@ -9,4 +13,24 @@ td, th {
 
 th {
     background-color: #D8BFD8;
+}
+
+span.veryHigh {
+    background-color: green;
+    display: block;
+}
+
+span.high {
+    background-color: #90EE90;
+    display: block;
+}
+
+span.low {
+    background-color: light-grey;
+    display: block;
+}
+
+span.veryLow {
+    background-color: grey;
+    display: block;
 }

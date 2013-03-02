@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import javax.xml.transform.stream.StreamResult;
@@ -62,9 +63,12 @@ public class GenerateDocumentation {
 
 
     public static void main(String[] args) throws Exception {
+        if (args.length > 0) {
+            Arrays.sort(args);
+        }
         readResources();
         //generateTMX();
-        generateDocumentation();
+        generateDocumentation(args);
     }
 
     private static void readResources() {
@@ -159,7 +163,7 @@ public class GenerateDocumentation {
         }
     }
 
-    public static void generateDocumentation() {
+    public static void generateDocumentation(String[] languages) {
         for (String name : sourceFiles) {
 
             String languageCode = name.substring(15, name.length() - 11);
@@ -171,22 +175,25 @@ public class GenerateDocumentation {
                 // don't know what to do
                 continue;
             }
-            System.out.println("Generating localized documentation for language code "
-                               + languageCode);
+            if (languages.length == 0
+                || Arrays.binarySearch(languages, languageCode) >= 0) {
+                System.out.println("Generating localized documentation for language code "
+                                   + languageCode);
 
-            Messages.setMessageBundle(LanguageOption.getLocale(languageCode));
-            try {
-                TransformerFactory factory = TransformerFactory.newInstance();
-                Source xsl = new StreamSource(new File("doc", "specification.xsl"));
-                Transformer stylesheet = factory.newTransformer(xsl);
+                Messages.setMessageBundle(LanguageOption.getLocale(languageCode));
+                try {
+                    TransformerFactory factory = TransformerFactory.newInstance();
+                    Source xsl = new StreamSource(new File("doc", "specification.xsl"));
+                    Transformer stylesheet = factory.newTransformer(xsl);
 
-                Source request  = new StreamSource(new File(RULE_DIRECTORY, "specification.xml"));
-                Result response = new StreamResult(new File(DESTINATION_DIRECTORY, "specification_"
-                                                            + languageCode + ".html"));
-                stylesheet.transform(request, response);
-            }
-            catch (TransformerException e) {
-                e.printStackTrace();
+                    Source request  = new StreamSource(new File(RULE_DIRECTORY, "specification.xml"));
+                    Result response = new StreamResult(new File(DESTINATION_DIRECTORY, "specification_"
+                                                                + languageCode + ".html"));
+                    stylesheet.transform(request, response);
+                }
+                catch (TransformerException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
