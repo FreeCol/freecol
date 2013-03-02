@@ -27,6 +27,16 @@ import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.util.HashMap;
 import java.util.Map;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.option.LanguageOption;
+import net.sf.freecol.client.gui.i18n.Messages;
 
 
 public class GenerateDocumentation {
@@ -39,21 +49,29 @@ public class GenerateDocumentation {
     private static final File DESTINATION_DIRECTORY =
         new File("doc");
 
+    private static Map<String, String> resources =
+        new HashMap<String, String>();
+
+    private static String[] sourceFiles = STRING_DIRECTORY.list(new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return name.matches("FreeColMessages.*\\.properties");
+            }
+        });
+
+
+
+
     public static void main(String[] args) throws Exception {
-        generateResources();
-        generateTMX();
+        readResources();
+        //generateTMX();
+        generateDocumentation();
     }
 
-    private static void generateResources() {
+    private static void readResources() {
 
         System.out.println("Processing source file: resources.properties");
         try {
             File sourceFile = new File(RULE_DIRECTORY, "resources.properties");
-            File destinationFile = new File(DESTINATION_DIRECTORY, "resources.xml");
-            FileWriter out = new FileWriter(destinationFile);
-            out.write("<?xml version =\"1.0\" encoding=\"UTF-8\"?>\n");
-            //out.write("<!DOCTYPE properties SYSTEM \"http://java.sun.com/dtd/properties.dtd\">\n");
-            out.write("<properties>\n");
             FileReader fileReader = new FileReader(sourceFile);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             String line = bufferedReader.readLine();
@@ -62,13 +80,10 @@ public class GenerateDocumentation {
                 if (index >= 0) {
                     String key = line.substring(0, index).trim();
                     String value = line.substring(index + 1).trim();
-                    out.write("  <entry key=\"" + key + "\">" + value + "</entry>\n");
+                    resources.put(key, value);
                 }
                 line = bufferedReader.readLine();
             }
-            out.write("</properties>\n");
-            out.flush();
-            out.close();
         } catch(Exception e) {
             e.printStackTrace();
         }
@@ -76,12 +91,6 @@ public class GenerateDocumentation {
 
 
     private static void generateTMX() {
-
-        String[] sourceFiles = STRING_DIRECTORY.list(new FilenameFilter() {
-                public boolean accept(File dir, String name) {
-                    return name.matches("FreeColMessages.*\\.properties");
-                }
-            });
 
         Map<String, Map<String, String>> translations
             = new HashMap<String, Map<String, String>>();
@@ -149,5 +158,53 @@ public class GenerateDocumentation {
             e.printStackTrace();
         }
     }
+
+    public static void generateDocumentation() {
+        for (String name : sourceFiles) {
+
+            String languageCode = name.substring(15, name.length() - 11);
+            if (languageCode.isEmpty()) {
+                languageCode = "en";
+            } else if ('_' == languageCode.charAt(0)) {
+                languageCode = languageCode.substring(1);
+            } else {
+                // don't know what to do
+                continue;
+            }
+            System.out.println("Generating localized documentation for language code "
+                               + languageCode);
+
+            Messages.setMessageBundle(LanguageOption.getLocale(languageCode));
+            try {
+                TransformerFactory factory = TransformerFactory.newInstance();
+                Source xsl = new StreamSource(new File("doc", "specification.xsl"));
+                Transformer stylesheet = factory.newTransformer(xsl);
+
+                Source request  = new StreamSource(new File(RULE_DIRECTORY, "specification.xml"));
+                Result response = new StreamResult(new File(DESTINATION_DIRECTORY, "specification_"
+                                                            + languageCode + ".html"));
+                stylesheet.transform(request, response);
+            }
+            catch (TransformerException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static String getResource(String key) {
+        return resources.get(key);
+    }
+
+    public static String localize(String template) {
+        return Messages.message(template);
+    }
+
+    public static String localize(String template, String key, String number) {
+        double num = Double.parseDouble(number);
+        StringTemplate stringTemplate = StringTemplate.template(template)
+            .addAmount(key, num);
+        return Messages.message(stringTemplate);
+    }
+
 }
 
