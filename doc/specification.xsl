@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:freecol="xalan://net.sf.freecol.tools.GenerateDocumentation"
     extension-element-prefixes="freecol">
 
@@ -12,6 +12,7 @@
       <body>
         <xsl:apply-templates select="//goods-types"/>
         <xsl:apply-templates select="//tile-types"/>
+        <xsl:apply-templates select="//unit-types"/>
         <xsl:apply-templates select="//building-types"/>
         <xsl:apply-templates select="//founding-fathers"/>
       </body>
@@ -75,6 +76,72 @@
         <xsl:value-of select="freecol:localize(concat(@id, '.description'))"/>
       </td>
     </tr>
+  </xsl:template>
+
+  <xsl:template match="unit-types">
+    <h1><xsl:value-of select="freecol:localize('colopediaAction.UNITS.name')"/></h1>
+    <table>
+      <tr>
+        <th><xsl:value-of select="freecol:localize('name')"/></th>
+        <th><xsl:value-of select="freecol:localize('colopedia.unit.movement')"/></th>
+        <th><xsl:value-of select="freecol:localize('colopedia.unit.price')"/></th>
+        <th><xsl:value-of select="freecol:localize('abilities')"/></th>
+        <th><xsl:value-of select="freecol:localize('colopedia.unit.requirements')"/></th>
+        <th><xsl:value-of select="freecol:localize('colopedia.description')"/></th>
+      </tr>
+      <xsl:apply-templates/>
+    </table>
+  </xsl:template>
+
+  <xsl:template match="unit-type">
+    <xsl:if test="not(@abstract)">
+      <tr>
+        <xsl:call-template name="name">
+          <xsl:with-param name="id"><xsl:value-of select="@id"/></xsl:with-param>
+        </xsl:call-template>
+        <td>
+          <xsl:choose>
+            <xsl:when test="@movement">
+              <xsl:value-of select="@movement"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>3</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </td>
+        <td>
+          <xsl:value-of select="@price"/>
+        </td>
+        <td class="left">
+          <xsl:choose>
+            <xsl:when test="ability">
+              <ul>
+                <xsl:apply-templates select="ability"/>
+              </ul>
+            </xsl:when>
+          </xsl:choose>
+          <xsl:choose>
+            <xsl:when test="modifier">
+              <ul>
+                <xsl:apply-templates select="modifier"/>
+              </ul>
+            </xsl:when>
+          </xsl:choose>
+        </td>
+        <td class="left">
+          <xsl:choose>
+            <xsl:when test="required-ability">
+              <ul>
+                <xsl:apply-templates select="required-ability"/>
+              </ul>
+            </xsl:when>
+          </xsl:choose>
+        </td>
+        <td class="left">
+          <xsl:value-of select="freecol:localize(concat(@id, '.description'))"/>
+        </td>
+      </tr>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match="tile-types">
@@ -249,15 +316,16 @@
     </a><br/>
   </xsl:template>
 
-  <xsl:template match="ability">
+  <xsl:template match="ability|required-ability">
     <li>
-      <xsl:value-of select="freecol:localize(concat(@id, '.name'))"/><xsl:text>: </xsl:text>
       <xsl:choose>
-        <xsl:when test="@value='true'">
-          <xsl:value-of select="freecol:localize('yes')"/>
+        <xsl:when test="@value='false'">
+          <strike>
+            <xsl:value-of select="freecol:localize(concat(@id, '.name'))"/>
+          </strike>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:value-of select="freecol:localize('no')"/>
+          <xsl:value-of select="freecol:localize(concat(@id, '.name'))"/>
         </xsl:otherwise>
       </xsl:choose>
       <xsl:choose>
@@ -278,10 +346,10 @@
         <xsl:when test="starts-with($id, 'model.goods.')">
           <a href="#{$id}">
             <xsl:value-of select="freecol:localize(concat($id, '.name'))"/>
-          </a><xsl:text>: </xsl:text>
+          </a><xsl:text>:</xsl:text>&#160;
         </xsl:when>
         <xsl:otherwise>
-          <xsl:value-of select="freecol:localize(concat($id, '.name'))"/><xsl:text>: </xsl:text>
+          <xsl:value-of select="freecol:localize(concat($id, '.name'))"/><xsl:text>:</xsl:text>&#160;
         </xsl:otherwise>
       </xsl:choose>
       <xsl:choose>
@@ -297,7 +365,7 @@
       </xsl:choose>
       <xsl:choose>
         <xsl:when test="scope">
-          <br /><xsl:value-of select="freecol:localize('model.scope.name')"/>
+          <br /><xsl:value-of select="freecol:localize('model.scope.name')"/><xsl:text>:</xsl:text>
           <ul>
             <xsl:apply-templates select="scope"/>
           </ul>
@@ -309,25 +377,30 @@
   <xsl:template match="scope">
     <li>
       <xsl:choose>
-        <xsl:when test="@type">
-          <xsl:variable name="id" select="@type"/>
-          <a href="#{$id}">
-            <xsl:value-of select="freecol:localize(concat(@type, '.name'))"/>
-          </a><xsl:text>: </xsl:text>
-        </xsl:when>
-        <xsl:when test="@ability-id">
-          <xsl:value-of select="freecol:localize(concat(@ability-id, '.name'))"/><xsl:text>: </xsl:text>
-        </xsl:when>
-      </xsl:choose>
-      <xsl:choose>
-        <xsl:when test="@match-negated">
-          <xsl:value-of select="freecol:localize('no')"/>
+        <xsl:when test="@match-negated or @ability-value='false'">
+          <strike>
+            <xsl:call-template name="scope-body"/>
+          </strike>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:value-of select="freecol:localize('yes')"/>
+          <xsl:call-template name="scope-body"/>
         </xsl:otherwise>
       </xsl:choose>
     </li>
+  </xsl:template>
+
+  <xsl:template name="scope-body">
+    <xsl:choose>
+      <xsl:when test="@type">
+        <xsl:variable name="id" select="@type"/>
+        <a href="#{$id}">
+          <xsl:value-of select="freecol:localize(concat(@type, '.name'))"/>
+        </a>
+      </xsl:when>
+      <xsl:when test="@ability-id">
+        <xsl:value-of select="freecol:localize(concat(@ability-id, '.name'))"/>
+      </xsl:when>
+    </xsl:choose>
   </xsl:template>
 
 </xsl:stylesheet>
