@@ -13,6 +13,7 @@
         <xsl:apply-templates select="//goods-types"/>
         <xsl:apply-templates select="//tile-types"/>
         <xsl:apply-templates select="//building-types"/>
+        <xsl:apply-templates select="//founding-fathers"/>
       </body>
     </html>
   </xsl:template>
@@ -163,6 +164,51 @@
   </xsl:template>
 
 
+  <xsl:template match="founding-fathers">
+    <h1><xsl:value-of select="freecol:localize('colopediaAction.FATHERS.name')"/></h1>
+    <table>
+      <tr>
+        <th><xsl:value-of select="freecol:localize('name')"/></th>
+        <th><xsl:value-of select="freecol:localize('colopedia.birthAndDeath')"/></th>
+        <th><xsl:value-of select="freecol:localize('colopedia.effects')"/></th>
+        <th><xsl:value-of select="freecol:localize('colopedia.description')"/></th>
+      </tr>
+      <xsl:apply-templates />
+    </table>
+  </xsl:template>
+
+  <xsl:template match="founding-father">
+    <tr>
+      <xsl:call-template name="name">
+        <xsl:with-param name="id"><xsl:value-of select="@id"/></xsl:with-param>
+      </xsl:call-template>
+      <td>
+        <xsl:value-of select="freecol:localize(concat(@id, '.birthAndDeath'))"/>
+      </td>
+      <td class="left">
+        <xsl:value-of select="freecol:localize(concat(@id, '.description'))"/>
+        <xsl:choose>
+          <xsl:when test="ability">
+            <ul>
+              <xsl:apply-templates select="ability"/>
+            </ul>
+          </xsl:when>
+        </xsl:choose>
+        <xsl:choose>
+          <xsl:when test="modifier">
+            <ul>
+              <xsl:apply-templates select="modifier"/>
+            </ul>
+          </xsl:when>
+        </xsl:choose>
+      </td>
+      <td class="left">
+        <xsl:value-of select="freecol:localize(concat(@id, '.text'))"/>
+      </td>
+    </tr>
+  </xsl:template>
+
+
   <xsl:template match="production">
     <xsl:choose>
       <xsl:when test="@productionLevel">
@@ -203,5 +249,85 @@
     </a><br/>
   </xsl:template>
 
+  <xsl:template match="ability">
+    <li>
+      <xsl:value-of select="freecol:localize(concat(@id, '.name'))"/><xsl:text>: </xsl:text>
+      <xsl:choose>
+        <xsl:when test="@value='true'">
+          <xsl:value-of select="freecol:localize('yes')"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="freecol:localize('no')"/>
+        </xsl:otherwise>
+      </xsl:choose>
+      <xsl:choose>
+        <xsl:when test="scope">
+          <br /><xsl:value-of select="freecol:localize('model.scope.name')"/>
+          <ul>
+            <xsl:apply-templates select="scope"/>
+          </ul>
+        </xsl:when>
+      </xsl:choose>
+    </li>
+  </xsl:template>
+
+  <xsl:template match="modifier">
+    <xsl:variable name="id" select="@id"/>
+    <li>
+      <xsl:choose>
+        <xsl:when test="starts-with($id, 'model.goods.')">
+          <a href="#{$id}">
+            <xsl:value-of select="freecol:localize(concat($id, '.name'))"/>
+          </a><xsl:text>: </xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="freecol:localize(concat($id, '.name'))"/><xsl:text>: </xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+      <xsl:choose>
+        <xsl:when test="@type='percentage'">
+          <xsl:value-of select="@value"/><xsl-text>%</xsl-text>
+        </xsl:when>
+        <xsl:when test="@type='multiplicative'">
+          &#215;<xsl:value-of select="@value"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="@value"/>
+        </xsl:otherwise>
+      </xsl:choose>
+      <xsl:choose>
+        <xsl:when test="scope">
+          <br /><xsl:value-of select="freecol:localize('model.scope.name')"/>
+          <ul>
+            <xsl:apply-templates select="scope"/>
+          </ul>
+        </xsl:when>
+      </xsl:choose>
+    </li>
+  </xsl:template>
+
+  <xsl:template match="scope">
+    <li>
+      <xsl:choose>
+        <xsl:when test="@type">
+          <xsl:variable name="id" select="@type"/>
+          <a href="#{$id}">
+            <xsl:value-of select="freecol:localize(concat(@type, '.name'))"/>
+          </a><xsl:text>: </xsl:text>
+        </xsl:when>
+        <xsl:when test="@ability-id">
+          <xsl:value-of select="freecol:localize(concat(@ability-id, '.name'))"/><xsl:text>: </xsl:text>
+        </xsl:when>
+      </xsl:choose>
+      <xsl:choose>
+        <xsl:when test="@match-negated">
+          <xsl:value-of select="freecol:localize('no')"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="freecol:localize('yes')"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </li>
+  </xsl:template>
 
 </xsl:stylesheet>
