@@ -2,11 +2,6 @@
 <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:freecol="xalan://net.sf.freecol.tools.GenerateDocumentation"
     extension-element-prefixes="freecol">
-<!--
-  <xsl:variable name="resources" select="document('resources.xml')"/>
-  <xsl:variable name="translations" select="document('freecol.tmx')"/>
-  <xsl:variable name="lang">en</xsl:variable>
--->
 
   <xsl:template match="/">
     <html>
@@ -15,10 +10,70 @@
         <link href="specification.css" rel="stylesheet" type="text/css"/>
       </head>
       <body>
+        <xsl:apply-templates select="//goods-types"/>
         <xsl:apply-templates select="//tile-types"/>
         <xsl:apply-templates select="//building-types"/>
       </body>
     </html>
+  </xsl:template>
+
+
+  <xsl:template name="name">
+    <xsl:param name="id"></xsl:param>
+    <xsl:param name="key">.image</xsl:param>
+    <xsl:variable name="src" select="freecol:getResource(concat($id, $key))"/>
+    <td class="name">
+      <a id="{$id}">
+        <img src="../data/rules/classic/{$src}"/><br />
+        <xsl:value-of select="freecol:localize(concat($id, '.name'))"/>
+      </a>
+    </td>
+  </xsl:template>
+
+
+  <xsl:template match="goods-types">
+    <h1><xsl:value-of select="freecol:localize('colopediaAction.TERRAIN.name')"/></h1>
+    <table>
+      <tr>
+        <th><xsl:value-of select="freecol:localize('name')"/></th>
+        <th><xsl:value-of select="freecol:localize('colopedia.goods.initialPrice')"/></th>
+        <th><xsl:value-of select="freecol:localize('colopedia.goods.madeFrom')"/></th>
+        <th><xsl:value-of select="freecol:localize('colopedia.description')"/></th>
+      </tr>
+      <xsl:apply-templates />
+    </table>
+  </xsl:template>
+
+  <xsl:template match="goods-type">
+    <tr>
+      <xsl:call-template name="name">
+        <xsl:with-param name="id"><xsl:value-of select="@id"/></xsl:with-param>
+      </xsl:call-template>
+      <td>
+        <xsl:choose>
+          <xsl:when test="market">
+            <xsl:value-of select="market/@initial-price"/>
+            <xsl:text> / </xsl:text>
+            <xsl:value-of select="market/@initial-price + market/@price-difference"/>
+          </xsl:when>
+        </xsl:choose>
+      </td>
+      <td>
+        <xsl:choose>
+          <xsl:when test="@made-from">
+            <xsl:variable name="id" select="@made-from"/>
+            <xsl:variable name="src" select="freecol:getResource(concat(@made-from, '.image'))"/>
+            <img src="../data/rules/classic/{$src}"/><br />
+            <a href="#{$id}">
+              <xsl:value-of select="freecol:localize(concat(@made-from, '.name'))"/>
+            </a>
+          </xsl:when>
+        </xsl:choose>
+      </td>
+      <td class="left">
+        <xsl:value-of select="freecol:localize(concat(@id, '.description'))"/>
+      </td>
+    </tr>
   </xsl:template>
 
   <xsl:template match="tile-types">
@@ -30,6 +85,7 @@
         <th><xsl:value-of select="freecol:localize('colopedia.terrain.workTurns')"/></th>
         <th><xsl:value-of select="freecol:localize('colopedia.terrain.colonyCenterTile')"/></th>
         <th><xsl:value-of select="freecol:localize('colopedia.terrain.production')"/></th>
+        <th><xsl:value-of select="freecol:localize('colopedia.description')"/></th>
       </tr>
       <xsl:apply-templates />
     </table>
@@ -37,15 +93,27 @@
 
   <xsl:template match="tile-type">
     <tr>
-      <td class="name">
-        <xsl:variable name="src" select="freecol:getResource(concat(@id, '.center0.image'))"/>
-        <img src="../data/rules/classic/{$src}"/><br />
-        <xsl:value-of select="freecol:localize(concat(@id, '.name'))"/>
-      </td>
+      <xsl:choose>
+        <xsl:when test="freecol:getResource(concat(@id, '.forest'))">
+          <xsl:call-template name="name">
+            <xsl:with-param name="id"><xsl:value-of select="@id"/></xsl:with-param>
+            <xsl:with-param name="key">.forest</xsl:with-param>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="name">
+            <xsl:with-param name="id"><xsl:value-of select="@id"/></xsl:with-param>
+            <xsl:with-param name="key">.center0.image</xsl:with-param>
+          </xsl:call-template>
+        </xsl:otherwise>
+      </xsl:choose>
       <td><xsl:value-of select="@basic-move-cost"/></td>
       <td><xsl:value-of select="@basic-work-turns"/></td>
-      <td><xsl:apply-templates select="production[@colonyCenterTile='true']"/></td>
-      <td><xsl:apply-templates select="production[not(@colonyCenterTile='true')]"/></td>
+      <td class="left"><xsl:apply-templates select="production[@colonyCenterTile='true']"/></td>
+      <td class="left"><xsl:apply-templates select="production[not(@colonyCenterTile='true')]"/></td>
+      <td class="left">
+        <xsl:value-of select="freecol:localize(concat(@id, '.description'))"/>
+      </td>
     </tr>
   </xsl:template>
 
@@ -57,6 +125,7 @@
         <th><xsl:value-of select="freecol:localize('colopedia.buildings.workplaces')"/></th>
         <th><xsl:value-of select="freecol:localize('colopedia.buildings.production')"/></th>
         <th><xsl:value-of select="freecol:localize('colopedia.buildings.requires')"/></th>
+        <th><xsl:value-of select="freecol:localize('colopedia.description')"/></th>
       </tr>
       <xsl:apply-templates />
     </table>
@@ -64,11 +133,9 @@
 
   <xsl:template match="building-type">
     <tr>
-      <td class="name">
-        <xsl:variable name="src" select="freecol:getResource(concat(@id, '.image'))"/>
-        <img src="../data/rules/classic/{$src}"/><br />
-        <xsl:value-of select="freecol:localize(concat(@id, '.name'))"/>
-      </td>
+      <xsl:call-template name="name">
+        <xsl:with-param name="id"><xsl:value-of select="@id"/></xsl:with-param>
+      </xsl:call-template>
       <td>
         <xsl:value-of select="@workplaces"/>
         <!-- TODO: consider inheritance
@@ -79,8 +146,18 @@
         -->
       </td>
       <td><xsl:apply-templates select="production"/></td>
-      <td>
-        <xsl:apply-templates select="required-goods"/>
+      <td class="left">
+        <xsl:choose>
+          <xsl:when test="required-goods">
+            <xsl:apply-templates select="required-goods"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="freecol:localize('colopedia.buildings.autoBuilt')"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </td>
+      <td class="left">
+        <xsl:value-of select="freecol:localize(concat(@id, '.description'))"/>
       </td>
     </tr>
   </xsl:template>
@@ -106,21 +183,24 @@
   </xsl:template>
 
   <xsl:template match="input">
-    <xsl:value-of select="@value"/><xsl:text> </xsl:text>
+    <xsl:variable name="id" select="@goods-type"/>
+    <xsl:value-of select="@value"/>&#160;<a href="#{$id}">
     <xsl:value-of select="freecol:localize(concat(@goods-type, '.name'), '%amount%', string(@value))"/>
-    <xsl:text> &#8594; </xsl:text>
+    </a><br /><xsl:text> &#8595; </xsl:text><br />
   </xsl:template>
 
   <xsl:template match="output">
-    <xsl:value-of select="@value"/><xsl:text> </xsl:text>
+    <xsl:variable name="id" select="@goods-type"/>
+    <xsl:value-of select="@value"/>&#160;<a href="#{$id}">
     <xsl:value-of select="freecol:localize(concat(@goods-type, '.name'), '%amount%', string(@value))"/>
-    <br/>
+    </a><br/>
   </xsl:template>
 
   <xsl:template match="required-goods">
-    <xsl:value-of select="@value"/><xsl:text> </xsl:text>
+    <xsl:variable name="id" select="@id"/>
+    <xsl:value-of select="@value"/>&#160;<a href="#{$id}">
     <xsl:value-of select="freecol:localize(concat(@id, '.name'), '%amount%', string(@value))"/>
-    <br/>
+    </a><br/>
   </xsl:template>
 
 

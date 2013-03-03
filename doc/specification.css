@@ -9,10 +9,15 @@ table {
 td, th {
     border: 2px solid #D8BFD8;
     padding: 5px;
+    text-align: center;
 }
 
 th {
     background-color: #D8BFD8;
+}
+
+.left {
+    text-align: left;
 }
 
 span.veryHigh {
