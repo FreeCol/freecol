@@ -72,6 +72,8 @@ import org.w3c.dom.NodeList;
  */
 public abstract class ServerAPI {
 
+    private static final Logger logger = Logger.getLogger(ServerAPI.class.getName());
+
     /** Temporary trivial message wrapper. */
     private class TrivialMessage extends DOMMessage {
 
@@ -87,9 +89,6 @@ public abstract class ServerAPI {
             return DOMMessage.createMessage(tag, attributes);
         }
     }
-
-
-    private static final Logger logger = Logger.getLogger(ServerAPI.class.getName());
 
 
     private Client client;
@@ -551,13 +550,9 @@ public abstract class ServerAPI {
         List<HighScore> result = new ArrayList<HighScore>();
         NodeList childElements = reply.getChildNodes();
         for (int i = 0; i < childElements.getLength(); i++) {
-            try {
-                HighScore score = new HighScore((Element)childElements.item(i));
-                result.add(score);
-            } catch (XMLStreamException e) {
-                logger.warning("Unable to read score element: "
-                               + e.getMessage());
-            }
+            HighScore hs = new HighScore();
+            hs.readFromXMLElement((Element)childElements.item(i));
+            result.add(hs);
         }
         return result;
     }

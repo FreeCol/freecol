@@ -1599,7 +1599,9 @@ public final class FreeColServer {
             xsr.nextTag();
             while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 if (xsr.getLocalName().equals("highScore")) {
-                    highScores.add(new HighScore(xsr));
+                    HighScore hs = new HighScore();
+                    hs.readFromXML(xsr);
+                    highScores.add(hs);
                 }
             }
             xsr.close();

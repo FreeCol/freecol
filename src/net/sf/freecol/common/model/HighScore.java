@@ -21,6 +21,8 @@ package net.sf.freecol.common.model;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -31,11 +33,13 @@ import org.w3c.dom.Element;
 
 public class HighScore extends FreeColObject {
 
+    private static final Logger logger = Logger.getLogger(HighScore.class.getName());
+
     /**
      * On retirement, an object will be named in honour of the
-     * player. The nature of the object depends on the player's score.
+     * player.  The nature of the object depends on the player's score.
      */
-    public static enum Level {
+    public static enum ScoreLevel {
         CONTINENT(40000),
         COUNTRY(35000),
         STATE(30000),
@@ -59,7 +63,8 @@ public class HighScore extends FreeColObject {
 
         private int minimumScore;
 
-        Level(int minimumScore) {
+
+        ScoreLevel(int minimumScore) {
             this.minimumScore = minimumScore;
         }
 
@@ -68,80 +73,67 @@ public class HighScore extends FreeColObject {
         }
     }
 
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ");
+    /** The format to use for dates.  Almost ISO8601. */
+    private static final SimpleDateFormat dateFormat
+        = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ");
 
-    /**
-     * The turn in which independence was granted.
-     */
+    /** The turn in which independence was granted. */
     private int independenceTurn = -1;
 
-    /**
-     * The name of the human player.
-     */
+    /** The name of the human player. */
     private String playerName;
 
-    /**
-     * Describe nationID here.
-     */
+    /** The nation that retired. */
     private String nationID;
 
-    /**
-     * Describe nationTypeID here.
-     */
+    /** The nation type that retired. */
     private String nationTypeID;
 
-    /**
-     * Describe score here.
-     */
+    /** The high score. */
     private int score;
 
-    /**
-     * Describe level here.
-     */
-    private Level level;
+    /** The ScoreLevel/title for this score. */
+    private ScoreLevel level;
 
-    /**
-     * The name given to the new independent nation.
-     */
+    /** The name given to the new independent nation. */
     private String nationName;
 
-    /**
-     * The difficulty level of this game.
-     */
+    /** The difficulty level of this game. */
     private String difficulty;
 
-    /**
-     * The final number of units.
-     */
+    /** The final number of units. */
     private int units;
 
-    /**
-     * The final number of colonies.
-     */
+    /** The final number of colonies. */
     private int colonies;
 
-    /**
-     * Describe newLandName here.
-     */
+    /** The name for the New World. */
     private String newLandName;
 
-    /**
-     * Describe date here.
-     */
+    /** The date for this score. */
     private Date date;
     
-    /**
-     * Retirement Game year
-     * 
-     */
+    /** The turn when the player retired. */
     private int retirementTurn;
 
+
+    /**
+     * Empty constructor for I/O.
+     */
+    public HighScore() {}
+
+    /**
+     * Create a new high score record.
+     *
+     * @param player The <code>Player</code> the score is for.
+     * @param theDate The <code>Data</code> the score is created.
+     */
     public HighScore(Player player, Date theDate) {
         Game game = player.getGame();
         date = theDate;
         retirementTurn = game.getTurn().getNumber();
         score = player.getScore();
-        for (Level someLevel : Level.values()) {
+        for (ScoreLevel someLevel : ScoreLevel.values()) {
             if (score >= someLevel.getMinimumScore()) {
                 level = someLevel;
                 break;
@@ -163,73 +155,38 @@ public class HighScore extends FreeColObject {
         newLandName = player.getNewLandName();
     }
 
-    public HighScore(XMLStreamReader in) throws XMLStreamException {
-        readFromXML(in);
-    }
-
-    public HighScore(Element element) throws XMLStreamException {
-        readFromXMLElement(element);
-    }
-
 
     /**
-     * Get the <code>IndependenceTurn</code> value.
+     * Get the turn independence occurs.
      *
-     * @return an <code>int</code> value
+     * @return The independence turn.
      */
     public final int getIndependenceTurn() {
         return independenceTurn;
     }
 
     /**
-     * Set the <code>IndependenceTurn</code> value.
+     * Get the turn the player retired.
      *
-     * @param newIndependenceTurn The new IndependenceTurn value.
-     */
-    public final void setIndependenceTurn(final int newIndependenceTurn) {
-        this.independenceTurn = newIndependenceTurn;
-    }
-    
-    /**
-     * Get the <code>RetirementTurn</code> value.
-     *
-     * @return an <code>int</code> value
+     * @return The retirement turn.
      */
     public final int getRetirementTurn() {
         return retirementTurn;
     }
 
     /**
-     * Set the <code>RetirementTurn</code> value.
+     * Get the player name.
      *
-     * @param newRetirementTurn The new RetirementTurn value.
-     */
-    public final void setRetirementTurn(final int newRetirementTurn) {
-        this.retirementTurn = newRetirementTurn;
-    }
-
-    /**
-     * Get the <code>PlayerName</code> value.
-     *
-     * @return a <code>String</code> value
+     * @return The player name.
      */
     public final String getPlayerName() {
         return playerName;
     }
 
     /**
-     * Set the <code>PlayerName</code> value.
+     * Get the nation id.
      *
-     * @param newPlayerName The new PlayerName value.
-     */
-    public final void setPlayerName(final String newPlayerName) {
-        this.playerName = newPlayerName;
-    }
-
-    /**
-     * Get the <code>NationID</code> value.
-     *
-     * @return a <code>String</code> value
+     * @return The nation id.
      */
     public final String getNationID() {
         return nationID;
@@ -239,261 +196,206 @@ public class HighScore extends FreeColObject {
      * Set the <code>NationID</code> value.
      *
      * @param newNationID The new NationID value.
-     */
     public final void setNationID(final String newNationID) {
         this.nationID = newNationID;
     }
+     */
 
     /**
-     * Get the <code>NationTypeID</code> value.
+     * Get the nation type id.
      *
-     * @return a <code>String</code> value
+     * @return The nation type id.
      */
     public final String getNationTypeID() {
         return nationTypeID;
     }
 
     /**
-     * Set the <code>NationTypeID</code> value.
+     * Get the final score.
      *
-     * @param newNationTypeID The new NationTypeID value.
-     */
-    public final void setNationTypeID(final String newNationTypeID) {
-        this.nationTypeID = newNationTypeID;
-    }
-
-    /**
-     * Get the <code>Score</code> value.
-     *
-     * @return an <code>int</code> value
+     * @return The score.
      */
     public final int getScore() {
         return score;
     }
 
     /**
-     * Set the <code>Score</code> value.
+     * Get the <code>ScoreLevel</code> corresponding to the score.
      *
-     * @param newScore The new Score value.
+     * @return The score level.
      */
-    public final void setScore(final int newScore) {
-        this.score = newScore;
-    }
-
-    /**
-     * Get the <code>Level</code> value.
-     *
-     * @return a <code>Level</code> value
-     */
-    public final Level getLevel() {
+    public final ScoreLevel getLevel() {
         return level;
     }
 
     /**
-     * Set the <code>Level</code> value.
+     * Get the original nation localized name key.
      *
-     * @param newLevel The new Level value.
-     */
-    public final void setLevel(final Level newLevel) {
-        this.level = newLevel;
-    }
-
-    /**
-     * Get the <code>Nation's</code> localized name.
-     *
-     * @return a <code>String</code> value
+     * @return The old name key.
      */
     public final String getOldNationNameKey() {
         return nationID + ".name";
     }
 
     /**
-     * Get the <code>NationName</code> value.
+     * Get the independent nation name.
      *
-     * @return a <code>String</code> value
+     * @return The independent nation name.
      */
     public final String getNationName() {
         return nationName;
     }
 
     /**
-     * Set the <code>NationName</code> value.
+     * Get the name given to the New World.
      *
-     * @param newNationName The new NationName value.
-     */
-    public final void setNationName(final String newNationName) {
-        this.nationName = newNationName;
-    }
-
-    /**
-     * Get the <code>NewLandName</code> value.
-     *
-     * @return a <code>String</code> value
+     * @return The new land name.
      */
     public final String getNewLandName() {
         return newLandName;
     }
 
     /**
-     * Set the <code>NewLandName</code> value.
+     * Get the game difficulty key.
      *
-     * @param newNewLandName The new NewLandName value.
-     */
-    public final void setNewLandName(final String newNewLandName) {
-        this.newLandName = newNewLandName;
-    }
-
-    /**
-     * Get the <code>Difficulty</code> value.
-     *
-     * @return a <code>String</code> value
+     * @return The game difficulty key.
      */
     public final String getDifficulty() {
         return difficulty;
     }
 
     /**
-     * Set the <code>Difficulty</code> value.
+     * Get number of units.
      *
-     * @param newDifficulty The new Difficulty value.
-     */
-    public final void setDifficulty(final String newDifficulty) {
-        this.difficulty = newDifficulty;
-    }
-
-    /**
-     * Get the <code>Units</code> value.
-     *
-     * @return an <code>int</code> value
+     * @return The number of units.
      */
     public final int getUnits() {
         return units;
     }
 
     /**
-     * Set the <code>Units</code> value.
+     * Get the number of colonies.
      *
-     * @param newUnits The new Units value.
-     */
-    public final void setUnits(final int newUnits) {
-        this.units = newUnits;
-    }
-
-    /**
-     * Get the <code>Colonies</code> value.
-     *
-     * @return an <code>int</code> value
+     * @return The number of colonies.
      */
     public final int getColonies() {
         return colonies;
     }
 
     /**
-     * Set the <code>Colonies</code> value.
+     * Get the <code>Date</code> the score was achieved.
      *
-     * @param newColonies The new Colonies value.
-     */
-    public final void setColonies(final int newColonies) {
-        this.colonies = newColonies;
-    }
-
-    /**
-     * Get the <code>Date</code> value.
-     *
-     * @return a <code>Date</code> value
+     * @return The score <code>Date</code>.
      */
     public final Date getDate() {
         return date;
     }
 
-    /**
-     * Set the <code>Date</code> value.
-     *
-     * @param newDate The new Date value.
-     */
-    public final void setDate(final Date newDate) {
-        this.date = newDate;
-    }
+
+    // Serialization
+    private static final String COLONIES_TAG = "colonies";
+    private static final String DATE_TAG = "date";
+    private static final String DIFFICULTY_TAG = "difficulty";
+    private static final String INDEPENDENCE_TURN_TAG = "independenceTurn";
+    private static final String LEVEL_TAG = "level";
+    private static final String NATION_ID_TAG = "nationID";
+    private static final String NATION_NAME_TAG = "nationName";
+    private static final String NATION_TYPE_ID_TAG = "nationTypeID";
+    private static final String NEW_LAND_NAME_TAG = "newLandName";
+    private static final String PLAYER_NAME_TAG = "playerName";
+    private static final String RETIREMENT_TURN_TAG = "retirementTurn";
+    private static final String SCORE_TAG = "score";
+    private static final String UNITS_TAG = "units";
 
 
     /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     * 
-     * @param out The target stream.
-     * @exception XMLStreamException if there are any problems writing
-     *      to the stream.
+     * {@inheritDoc}
      */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         super.toXML(out, getXMLElementTagName());
     }
 
     /**
-     * Write the attributes of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *     to the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
-        out.writeAttribute("date", dateFormat.format(date));
-        out.writeAttribute("retirementTurn", Integer.toString(retirementTurn));
-        out.writeAttribute("independenceTurn", Integer.toString(independenceTurn));
-        out.writeAttribute("playerName", playerName);
-        out.writeAttribute("nationID", nationID);
-        out.writeAttribute("nationTypeID", nationTypeID);
-        out.writeAttribute("score", Integer.toString(score));
-        out.writeAttribute("level", level.toString());
+        writeAttribute(out, DATE_TAG, dateFormat.format(date));
+
+        writeAttribute(out, RETIREMENT_TURN_TAG, retirementTurn);
+
+        writeAttribute(out, INDEPENDENCE_TURN_TAG, independenceTurn);
+
+        writeAttribute(out, PLAYER_NAME_TAG, playerName);
+
+        writeAttribute(out, NATION_ID_TAG, nationID);
+
+        writeAttribute(out, NATION_TYPE_ID_TAG, nationTypeID);
+
+        writeAttribute(out, SCORE_TAG, score);
+
+        writeAttribute(out, LEVEL_TAG, level.toString());
+
         if (nationName != null) {
-            out.writeAttribute("nationName", nationName);
+            writeAttribute(out, NATION_NAME_TAG, nationName);
         }
+
         if (newLandName != null) {
-            out.writeAttribute("newLandName", newLandName);
+            writeAttribute(out, NEW_LAND_NAME_TAG, newLandName);
         }
-        out.writeAttribute("difficulty", difficulty);
-        out.writeAttribute("units", Integer.toString(units));
-        out.writeAttribute("colonies", Integer.toString(colonies));
+
+        writeAttribute(out, DIFFICULTY_TAG, difficulty);
+
+        writeAttribute(out, UNITS_TAG, units);
+
+        writeAttribute(out, COLONIES_TAG, colonies);
     }
 
     /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
+     * {@inheritDoc}
      */
-    public void readFromXML(XMLStreamReader in)
-        throws XMLStreamException {
-
+    @Override
+    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        String str = getAttribute(in, DATE_TAG, "2008-01-01 00:00:00+0000");
         try {
-            date = dateFormat.parse(getAttribute(in, "date",
-                                                 "2008-01-01 00:00:00+0000"));
+            date = dateFormat.parse(str);
         } catch (Exception e) {
-            logger.warning(e.toString());
+            logger.log(Level.WARNING, "Bad date: " + str, e);
             date = new Date();
         }
-        retirementTurn = getAttribute(in, "retirementTurn", 0);
-        independenceTurn = getAttribute(in, "independenceTurn", 0);
-        playerName = getAttribute(in, "playerName", "");
-        nationID = getAttribute(in, "nationID", "model.nation.dutch");
-        nationTypeID = getAttribute(in, "nationTypeID",
-                                    "model.nationType.trade");
-        score = getAttribute(in, "score", 0);
-        level = Enum.valueOf(Level.class,
-                             getAttribute(in, "level", "PARASITIC_WORM"));
-        nationName = getAttribute(in, "nationName", "Freedonia");
-        newLandName = getAttribute(in, "newLandName", "New World");
-        difficulty = getAttribute(in, "difficulty", "model.difficulty.medium");
-        units = getAttribute(in, "units", 0);
-        colonies = getAttribute(in, "colonies", 0);
 
-        in.nextTag();
+        retirementTurn = getAttribute(in, RETIREMENT_TURN_TAG, 0);
+
+        independenceTurn = getAttribute(in, INDEPENDENCE_TURN_TAG, 0);
+
+        playerName = getAttribute(in, PLAYER_NAME_TAG, "anonymous");
+
+        nationID = getAttribute(in, NATION_ID_TAG, "model.nation.dutch");
+
+        nationTypeID = getAttribute(in, NATION_TYPE_ID_TAG,
+                                    "model.nationType.trade");
+
+        score = getAttribute(in, SCORE_TAG, 0);
+
+        level = getAttribute(in, LEVEL_TAG, ScoreLevel.class,
+                             ScoreLevel.PARASITIC_WORM);
+
+        nationName = getAttribute(in, NATION_NAME_TAG, "Freedonia");
+
+        newLandName = getAttribute(in, NEW_LAND_NAME_TAG, "New World");
+        
+        difficulty = getAttribute(in, DIFFICULTY_TAG, "model.difficulty.medium");
+
+        units = getAttribute(in, UNITS_TAG, 0);
+
+        colonies = getAttribute(in, COLONIES_TAG, 0);
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "highScore".
      */
