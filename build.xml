@@ -507,17 +507,18 @@
     <!-- Cleans the directories by removing auto-generated files. -->
     <target name="clean" depends="init" description="Cleans the directories by removing auto-generated files.">
         <delete quiet="true" includeEmptyDirs="true">
-          <fileset dir="${freecol.build.dir}" includes="net/**" />
-          <fileset dir="${freecol.build.dir}" includes="timestamp.inf" />
-          <fileset dir="${freecol.build.dir}" includes="report/**" />
-          <fileset dir="${freecol.build.dir}" includes="TEST-net.sf.freecol.*" />
-          <fileset dir="${freecol.build.dir}" includes="dependencies.txt" />
-          <fileset dir="${freecol.doc.dir}" excludes="*.tex images/*" />
+            <fileset dir="${freecol.build.dir}" includes="net/**" />
+            <fileset dir="${freecol.build.dir}" includes="timestamp.inf" />
+            <fileset dir="${freecol.build.dir}" includes="report/**" />
+            <fileset dir="${freecol.build.dir}" includes="TEST-net.sf.freecol.*" />
+            <fileset dir="${freecol.build.dir}" includes="dependencies.txt" />
+            <fileset dir="${freecol.doc.dir}" excludes="*.tex images/*" />
         </delete>
-    	<delete quiet="true" file="${freecol.jar.file}"/>
-    	<delete quiet="true" file="TESTS-TestSuites.xml"/>
+    	  <delete quiet="true" file="${freecol.jar.file}"/>
+    	  <delete quiet="true" file="TESTS-TestSuites.xml"/>
         <delete quiet="true" dir="${freecol.javadoc.dir}"/>
-    	<delete quiet="true" file="Freecol.log"/>
+    	  <delete quiet="true" file="Freecol.log"/>
+        <delete quiet="true" file="${basedir}/test/data/specification.xml"/>
     </target>
 
     <target name="distclean" depends="init,clean" description="Cleans the directories and removes the distribution directory.">
