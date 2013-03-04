@@ -2824,7 +2824,6 @@ public class Colony extends Settlement implements Nameable {
     }
 
     public void readChildren(XMLStreamReader in) throws XMLStreamException {
-        int oldUnitCount = getUnitCount();
         // Clear containers
         colonyTiles.clear();
         buildingMap.clear();
@@ -2894,11 +2893,6 @@ public class Colony extends Settlement implements Nameable {
             }
         }
         // end compatibility code
-
-        // Hack to kick AI colonies when the population changes.
-        if (owner.isAI() && getUnitCount() != oldUnitCount) {
-            firePropertyChange(REARRANGE_WORKERS, true, false);
-        }
     }
 
     /**
