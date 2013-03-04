@@ -30,16 +30,12 @@ import javax.xml.stream.XMLStreamWriter;
  * to represent things such as the amount of Lumber necessary to build
  * something, or the amount of cargo to load at a certain Location.
  */
-public class AbstractGoods extends FreeColObject {
+public class AbstractGoods extends FreeColObject implements Named {
 
-    /**
-     * The type of goods.
-     */
+    /** The type of goods. */
     private GoodsType type;
 
-    /**
-     * The amount of goods.
-     */
+    /** The amount of goods. */
     private int amount;
 
 
@@ -71,14 +67,6 @@ public class AbstractGoods extends FreeColObject {
         this.amount = other.amount;
     }
 
-    /**
-     * Gets a key for message routines.
-     *
-     * @return The name key.
-     */
-    public String getNameKey() {
-        return getType().getNameKey();
-    }
 
     /**
      * Get the goods type.
@@ -116,21 +104,39 @@ public class AbstractGoods extends FreeColObject {
         this.amount = newAmount;
     }
 
+
+    // Object overrides
+
     /**
-     * Compare this AbstractGoods to another.
-     *
-     * @param other The <code>AbstractGoods</code> to compare to.
-     * @return True if the goods are equal.
+     * {@inheritDoc}
      */
-    public boolean equals(AbstractGoods other) {
-        return type == other.type && amount == other.amount;
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof AbstractGoods) {
+            AbstractGoods ag = (AbstractGoods)other;
+            return type == ag.type && amount == ag.amount;
+        }
+        return false;
+    }
+
+
+    // Interface Named
+
+    /**
+     * Gets a key for message routines.
+     *
+     * @return The name key.
+     */
+    public String getNameKey() {
+        return getType().getNameKey();
     }
 
 
     // Serialization
 
-    private static final String TYPE_TAG = "type";
     private static final String AMOUNT_TAG = "amount";
+    private static final String TYPE_TAG = "type";
+
 
     /**
      * {@inheritDoc}
@@ -149,7 +155,7 @@ public class AbstractGoods extends FreeColObject {
 
         writeAttribute(out, TYPE_TAG, type);
 
-        out.writeAttribute(AMOUNT_TAG, Integer.toString(amount));
+        writeAttribute(out, AMOUNT_TAG, amount);
     }
 
     /**
@@ -157,10 +163,12 @@ public class AbstractGoods extends FreeColObject {
      */
     @Override
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        final Specification spec = getSpecification();
+
         super.readAttributes(in);
 
-        final Specification spec = getSpecification();
         type = spec.getType(in, TYPE_TAG, GoodsType.class, (GoodsType)null);
+        if (type == null) throw new XMLStreamException("Null goods type.");
 
         amount = getAttribute(in, AMOUNT_TAG, 0);
     }
@@ -170,7 +178,28 @@ public class AbstractGoods extends FreeColObject {
      */
     @Override
     public String toString() {
-        return Integer.toString(amount) + " " + type.getId();
+        return toString(this);
+    }
+
+    /**
+     * Simple string version of some goods.
+     *
+     * @param ag The <code>AbstractGoods</code> to make a string from.
+     * @return A string version of the goods.
+     */     
+    public static String toString(AbstractGoods ag) {
+        return toString(ag.getType(), ag.getAmount());
+    }
+
+    /**
+     * Simple string version of the component parts of some goods.
+     *
+     * @param goodsType The <code>GoodsType</code> to use.
+     * @param amount The amount of goods.
+     * @return A string version of the goods.
+     */     
+    public static String toString(GoodsType goodsType, int amount) {
+        return Integer.toString(amount) + " " + goodsType.getId();
     }
 
     /**

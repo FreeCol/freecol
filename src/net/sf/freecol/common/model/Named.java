@@ -25,10 +25,10 @@ package net.sf.freecol.common.model;
  */
 public interface Named {
 
-
     /**
-    * Gets the name of this <code>Named</code>.
-    * @return The name of the <code>Named</code>.
-    */
+     * Gets the name of this named object.
+     *
+     * @return The name of the <code>Named</code>.
+     */
     public String getNameKey();
 }

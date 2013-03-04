@@ -97,11 +97,10 @@ public abstract class FreeColObject {
      */
     private String id;
 
-    /**
-     * The <code>specification</code> this object uses. May be null.
-     */
+    /** The <code>Specification</code> this object uses, which may be null. */
     private Specification specification;
 
+    /** An optional property change container, allocated on demand. */
     private PropertyChangeSupport pcs = null;
 
 

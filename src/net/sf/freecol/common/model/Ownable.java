@@ -27,13 +27,10 @@ package net.sf.freecol.common.model;
  */
 public interface Ownable {
 
-
-
     /**
      * Gets the owner of this <code>Ownable</code>.
      *
-     * @return The <code>Player</code> controlling this
-     *         {@link Ownable}.
+     * @return The <code>Player</code> controlling this <code>Ownable</code>.
      */
     public Player getOwner();
 
@@ -41,7 +38,7 @@ public interface Ownable {
      * Sets the owner of this <code>Ownable</code>.
      *
      * @param p The <code>Player</code> that should take ownership
-     *      of this {@link Ownable}.
+     *     of this <code>Ownable</code>.
      * @exception UnsupportedOperationException if not implemented.
      */
     public void setOwner(Player p);

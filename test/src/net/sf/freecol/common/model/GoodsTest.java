@@ -251,8 +251,8 @@ public class GoodsTest extends FreeColTestCase {
     }
 
     public void testSerialize() {
-    	Game game = getGame();
-    	game.setMap(getTestMap(plainsType,true));
+        Game game = getGame();
+        game.setMap(getTestMap(plainsType,true));
 
         Colony colony = getStandardColony();
         Goods goods1 = new Goods(game, colony, cottonType, 75);

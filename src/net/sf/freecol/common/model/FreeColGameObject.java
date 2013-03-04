@@ -155,21 +155,6 @@ abstract public class FreeColGameObject extends FreeColObject {
         return game;
     }
 
-
-    /**
-     * Describe <code>getSpecification</code> method here.
-     *
-     * @return a <code>Specification</code> value
-     */
-    @Override
-    public Specification getSpecification() {
-        if (game == null) {
-            return null;
-        } else {
-            return game.getSpecification();
-        }
-    }
-
     /**
      * Sets the game object this <code>FreeColGameObject</code> belongs to.
      * @param game The <code>game</code>.
@@ -178,6 +163,16 @@ abstract public class FreeColGameObject extends FreeColObject {
         this.game = game;
     }
 
+
+    /**
+     * Get the specification for this game object.
+     *
+     * @return The <code>Specification</code>.
+     */
+    @Override
+    public Specification getSpecification() {
+        return (game == null) ? null : game.getSpecification();
+    }
 
     /**
      * Low level base dispose.
