@@ -1,0 +1,8 @@
+# This directory is here because SerializationTest needs somewhere harmless
+# to write its files to.
+#
+# This file is here because git does not allow you to commit an empty directory.
+#
+# Ignore everything except this file
+*
+!.gitignore
