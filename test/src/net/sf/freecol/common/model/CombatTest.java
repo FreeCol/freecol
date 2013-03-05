@@ -515,7 +515,7 @@ public class CombatTest extends FreeColTestCase {
         assertEquals("Regular should be slaughtered upon losing all equipment.",
                      CombatResult.SLAUGHTER_UNIT, result.get(1));
 
-        regular = new ServerUnit(game, tile1, french, kingsRegularType,
+        regular = new ServerUnit(game, tile2, french, kingsRegularType,
                                  muskets, horses);
 
         result = combatModel.generateAttackResult(random, regular, colonial);
