@@ -512,7 +512,8 @@
             <fileset dir="${freecol.build.dir}" includes="report/**" />
             <fileset dir="${freecol.build.dir}" includes="TEST-net.sf.freecol.*" />
             <fileset dir="${freecol.build.dir}" includes="dependencies.txt" />
-            <fileset dir="${freecol.doc.dir}" excludes="*.tex images/*" />
+            <fileset dir="${freecol.doc.dir}"
+                     excludes="*.tex images/* specification.*" />
         </delete>
     	  <delete quiet="true" file="${freecol.jar.file}"/>
     	  <delete quiet="true" file="TESTS-TestSuites.xml"/>
