@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
+import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
@@ -277,18 +278,21 @@ public final class MapEditorController {
                             gui.refresh();
                         }
                     } );
-                } catch (NoRouteToServerException e) {
-                    reloadMainPanel();
-                    SwingUtilities.invokeLater( new ErrorJob("server.noRouteToServer") );
-                } catch (FileNotFoundException e) {
-                    reloadMainPanel();
-                    SwingUtilities.invokeLater( new ErrorJob("fileNotFound") );
-                } catch (IOException e) {
-                    reloadMainPanel();
-                    SwingUtilities.invokeLater( new ErrorJob("server.couldNotStart") );
                 } catch (FreeColException e) {
                     reloadMainPanel();
-                    SwingUtilities.invokeLater( new ErrorJob(e.getMessage()) );
+                    SwingUtilities.invokeLater(new ErrorJob(e.getMessage()));
+                } catch (FileNotFoundException e) {
+                    reloadMainPanel();
+                    SwingUtilities.invokeLater(new ErrorJob("fileNotFound"));
+                } catch (IOException e) {
+                    reloadMainPanel();
+                    SwingUtilities.invokeLater(new ErrorJob("server.couldNotStart"));
+                } catch (NoRouteToServerException e) {
+                    reloadMainPanel();
+                    SwingUtilities.invokeLater(new ErrorJob("server.noRouteToServer"));
+                } catch (XMLStreamException e) {
+                    reloadMainPanel();
+                    SwingUtilities.invokeLater(new ErrorJob("server.streamError"));
                 }
             }
         };

@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamException;
+
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.FreeColDebugger;
@@ -138,6 +140,8 @@ public class SimpleMapGenerator implements MapGenerator {
                 g = FreeColServer.readGame(new FreeColSavegameFile(importFile),
                     game.getSpecification(), null);
             } catch (IOException ioe) {
+                g = null;
+            } catch (XMLStreamException xse) {
                 g = null;
             }
             importGame = g;

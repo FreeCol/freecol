@@ -269,14 +269,15 @@ public final class FreeColServer {
      * @param specification An optional <code>Specification</code> to use.
      * @param port The TCP port to use for the public socket.
      * @param name An optional name for the server.
-     * @exception IOException If the public socket cannot be created.
+     * @exception IOException If save game can not be found.
      * @exception FreeColException If the savegame could not be loaded.
      * @exception NoRouteToServerException If there is a problem with the
      *     meta-server.
      */
     public FreeColServer(final FreeColSavegameFile savegame, 
                          Specification specification, int port, String name)
-        throws IOException, FreeColException, NoRouteToServerException {
+        throws FreeColException, IOException, NoRouteToServerException,
+               XMLStreamException {
         // publicServer will be read from the saved game
         // singlePlayer will be read from the saved game
         this.port = port;
@@ -289,17 +290,9 @@ public final class FreeColServer {
         preGameInputHandler = new PreGameInputHandler(this);
         inGameInputHandler = new InGameInputHandler(this);
 
-        try {
-            game = loadGame(savegame, specification, server);
-            // nationOptions will be read from the saved game
-            TransactionSession.clearAll();
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "Failed to load game", e);
-            FreeColException fe = new FreeColException("couldNotLoadGame");
-            fe.initCause(e);
-            throw fe;
-        }
-
+        game = loadGame(savegame, specification, server);
+        // NationOptions will be read from the saved game.
+        TransactionSession.clearAll();
         if (random == null) {
             // Should have been read from the saved game, but lets be sure.
             this.random = new Random(FreeColSeed.getFreeColSeed());
@@ -850,12 +843,12 @@ public final class FreeColServer {
      *
      * @param fis The file where the game data is located.
      * @return The game found in the stream.
-     * @exception IOException If a problem was encountered while trying
-     *     to open, read or close the file.
      * @exception FreeColException if the savegame contains incompatible data.
+     * @exception IOException if the stream can not be created.
+     * @exception XMLStreamException if there is a problem reading the stream.
      */
     public ServerGame loadGame(final FreeColSavegameFile fis)
-        throws IOException, FreeColException {
+        throws IOException, FreeColException, XMLStreamException {
         return loadGame(fis, null, getServer());
     }
 
@@ -873,13 +866,19 @@ public final class FreeColServer {
      * @param server Use this (optional) server to load into.
      * @return The game found in the stream.
      * @exception FreeColException if the format is incompatible.
-     * @exception IOException if there is a problem reading the stream.
+     * @exception IOException if the stream can not be created.
+     * @exception XMLStreamException if there is a problem reading the stream.
      */
     public static ServerGame readGame(final FreeColSavegameFile fis,
                                       Specification specification,
                                       FreeColServer server)
-        throws IOException, FreeColException {
+        throws IOException, FreeColException, XMLStreamException {
         final int savegameVersion = getSavegameVersion(fis);
+        if (savegameVersion < MINIMUM_SAVEGAME_VERSION) {
+            throw new FreeColException("incompatibleVersions");
+        }
+        logger.info("Found savegame version " + savegameVersion);
+
         List<String> serverStrings = null;
         XMLStream xs = null;
         ServerGame game = null;
@@ -888,8 +887,6 @@ public final class FreeColServer {
             xs = fis.getXMLStream();
             final XMLStreamReader xsr = xs.getXMLStreamReader();
             xsr.nextTag();
-
-            logger.info("Found savegame version " + savegameVersion);
 
             if (server != null) {
                 String str = xsr.getAttributeValue(null, "singleplayer");
@@ -910,7 +907,7 @@ public final class FreeColServer {
             }
 
             while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                String tag = xsr.getLocalName();
+                final String tag = xsr.getLocalName();
                 if ("serverObjects".equals(tag)) {
                     serverStrings = new ArrayList<String>();
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
@@ -962,8 +959,6 @@ public final class FreeColServer {
                 Unit u = game.getFreeColGameObject(active, Unit.class);
                 server.setActiveUnit(u);
             }
-        } catch (Exception e) {
-            throw new IOException("Exception: " + e.getMessage());
         } finally {
             if (xs != null) xs.close();
         }
@@ -978,11 +973,12 @@ public final class FreeColServer {
      * @param server The server to connect the AI players to.
      * @return The new game.
      * @exception FreeColException if the savegame contains incompatible data.
-     * @exception IOException if there is problem reading a stream.
+     * @exception IOException if the stream can not be created.
+     * @exception XMLStreamException if there a problem reading the stream.
      */
     private ServerGame loadGame(final FreeColSavegameFile fis,
                                 Specification specification, Server server)
-        throws FreeColException, IOException {
+        throws FreeColException, IOException, XMLStreamException {
 
         ServerGame game = readGame(fis, specification, this);
         gameState = GameState.IN_GAME;
@@ -1093,32 +1089,22 @@ public final class FreeColServer {
      *
      * @param fis The saved game.
      * @return The saved game version.
-     * @exception FreeColException if the version is incompatible.
      */
-    private static int getSavegameVersion(final FreeColSavegameFile fis)
-        throws FreeColException {
+    private static int getSavegameVersion(final FreeColSavegameFile fis) {
+        int v = -1;
         XMLStream xs = null;
         try {
             xs = fis.getXMLStream();
             final XMLStreamReader xsr = xs.getXMLStreamReader();
             xsr.nextTag();
 
-            final String version = xsr.getAttributeValue(null, "version");
-            int savegameVersion = 0;
-            try {
-                savegameVersion = Integer.parseInt(version);
-            } catch (Exception e) {
-                throw new FreeColException("incompatibleVersions");
-            }
-            if (savegameVersion < MINIMUM_SAVEGAME_VERSION) {
-                throw new FreeColException("incompatibleVersions");
-            }
-            return savegameVersion;
+            v = Integer.parseInt(xsr.getAttributeValue(null, "version"));
         } catch (Exception e) {
-            throw new FreeColException(e.toString());
+            ; // Just fail
         } finally {
             if (xs != null) xs.close();
         }
+        return v;
     }
 
     private void fixGameOptions() {

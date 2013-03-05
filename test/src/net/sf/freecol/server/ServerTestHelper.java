@@ -101,11 +101,7 @@ public final class ServerTestHelper {
         try {
             server = new FreeColServer(new FreeColSavegameFile(file), 
                                        null, port, name);
-        } catch (NoRouteToServerException e) {
-            fail(e.getMessage());
-        } catch (FreeColException e) {
-            fail(e.getMessage());
-        } catch (IOException e) {
+        } catch (Exception e) {
             fail(e.getMessage());
         }
         assertNotNull(server);

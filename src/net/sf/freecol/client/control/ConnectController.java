@@ -367,18 +367,21 @@ public final class ConnectController {
                             }
                         });
                     return; // Success!
-                } catch (NoRouteToServerException e) {
-                    err = "server.noRouteToServer";
-                    logger.log(Level.WARNING, "No route to server.", e);
                 } catch (FileNotFoundException e) {
                     err = "fileNotFound";
                     logger.log(Level.WARNING, "Can not find file.", e);
-                } catch (IOException e) {
-                    err = "server.couldNotStart";
-                    logger.log(Level.WARNING, "Error starting game.", e);
                 } catch (FreeColException e) {
                     err = e.getMessage();
                     logger.log(Level.WARNING, "FreeCol error.", e);
+                } catch (IOException e) {
+                    err = "server.couldNotStart";
+                    logger.log(Level.WARNING, "Error starting game.", e);
+                } catch (NoRouteToServerException e) {
+                    err = "server.noRouteToServer";
+                    logger.log(Level.WARNING, "No route to server.", e);
+                } catch (XMLStreamException e) {
+                    err = "server.streamError";
+                    logger.log(Level.WARNING, "Stream error.", e);
                 }
                 if (err != null) {
                     SwingUtilities.invokeLater(new Runnable() {
