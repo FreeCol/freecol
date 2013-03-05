@@ -104,7 +104,7 @@ public class AIColonyTest extends FreeColTestCase {
     // Add buildings until the next buildable requires tools
     private BuildableType getToolsBuilder(AIColony aiColony) {
         Colony colony = aiColony.getColony();
-        for (BuildableType b : aiColony.getColonyPlan().getBuildableTypes()) {
+        for (BuildableType b : aiColony.getPlannedBuildableTypes()) {
             if (colony.canBuild(b)
                 && b.getRequiredAmountOf(toolsType) > 0) return b;
             if (b instanceof BuildingType) {

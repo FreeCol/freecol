@@ -518,30 +518,9 @@ public class DebugUtils {
         final FreeColServer server = freeColClient.getFreeColServer();
         final AIMain aiMain = server.getAIMain();
         final AIColony aiColony = aiMain.getAIColony(colony);
-
-        StringBuilder sb = new StringBuilder();
-        if (aiColony == null) {
-            sb.append(colony.getName() + "is not an AI colony.");
-        } else {
-            sb.append(aiColony.getColonyPlan().toString());
-            sb.append("\n\nTILE IMPROVEMENTS:\n");
-            for (TileImprovementPlan tip : aiColony.getTileImprovementPlans()) {
-                sb.append(tip.toString());
-                sb.append("\n");
-            }
-            sb.append("\n\nWISHES:\n");
-            for (Wish w : aiColony.getWishes()) {
-                sb.append(w.toString());
-                sb.append("\n");
-            }
-            sb.append("\n\nEXPORT GOODS:\n");
-            for (AIGoods aig : aiColony.getAIGoods()) {
-                sb.append(aig.toString());
-                sb.append("\n");
-            }
-        }
-
-        freeColClient.getGUI().showInformationMessage(sb.toString());
+        freeColClient.getGUI().showInformationMessage((aiColony == null)
+            ? colony.getName() + "is not an AI colony."
+            : aiColony.planToString());
     }
 
     /**
