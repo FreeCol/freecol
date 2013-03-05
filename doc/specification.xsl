@@ -205,13 +205,9 @@
         <xsl:with-param name="id"><xsl:value-of select="@id"/></xsl:with-param>
       </xsl:call-template>
       <td>
-        <xsl:value-of select="@workplaces"/>
-        <!-- TODO: consider inheritance
-        <xsl:choose>
-          <xsl:when test="@workplaces"><xsl:value-of select="@workplaces"/></xsl:when>
-          <xsl:otherwise>3</xsl:otherwise>
-        </xsl:choose>
-        -->
+        <xsl:call-template name="workplaces">
+          <xsl:with-param name="building" select="."/>
+        </xsl:call-template>
       </td>
       <td><xsl:apply-templates select="production"/></td>
       <td class="left">
@@ -400,6 +396,23 @@
       <xsl:when test="@ability-id">
         <xsl:value-of select="freecol:localize(concat(@ability-id, '.name'))"/>
       </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+
+
+  <xsl:template name="workplaces">
+    <xsl:param name="building"/>
+    <xsl:choose>
+      <xsl:when test="$building/@workplaces">
+        <xsl:value-of select="$building/@workplaces"/>
+      </xsl:when>
+      <xsl:when test="$building/@extends">
+        <xsl:variable name="parent" select="$building/@extends"/>
+        <xsl:call-template name="workplaces">
+          <xsl:with-param name="building" select="//building-type[@id=$parent]"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>3</xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
