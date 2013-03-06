@@ -171,6 +171,10 @@ public class GenerateDocumentation {
                 languageCode = "en";
             } else if ('_' == languageCode.charAt(0)) {
                 languageCode = languageCode.substring(1);
+                if ("qqq".equals(languageCode)) {
+                    System.out.println("Skipping language code 'qqq'");
+                    continue;
+                }
             } else {
                 // don't know what to do
                 continue;
