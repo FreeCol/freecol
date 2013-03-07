@@ -16,8 +16,17 @@ th {
     background-color: #D8BFD8;
 }
 
+caption {
+    padding-bottom: 5px;
+    text-align: justify;
+}
+
 .left {
     text-align: left;
+}
+
+.abstract {
+    background-color: grey;
 }
 
 span.veryHigh {
@@ -31,7 +40,7 @@ span.high {
 }
 
 span.low {
-    background-color: light-grey;
+    background-color: lightgrey;
     display: block;
 }
 

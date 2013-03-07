@@ -61,7 +61,7 @@
   </xsl:template>
 
   <xsl:template match="goods-types">
-    <h1><xsl:value-of select="freecol:localize('colopediaAction.TERRAIN.name')"/></h1>
+    <h1><xsl:value-of select="freecol:localize('colopediaAction.GOODS.name')"/></h1>
     <table>
       <tr>
         <th><xsl:value-of select="freecol:localize('name')"/></th>
@@ -127,76 +127,80 @@
   </xsl:template>
 
   <xsl:template match="unit-type">
-    <xsl:if test="not(@abstract)">
-      <tr>
-        <xsl:call-template name="name">
-          <xsl:with-param name="id"><xsl:value-of select="@id"/></xsl:with-param>
-        </xsl:call-template>
-        <td>
-          <xsl:choose>
-            <xsl:when test="@movement">
-              <xsl:value-of select="number(@movement) div 3"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:text>1</xsl:text>
-            </xsl:otherwise>
-          </xsl:choose>
-          <xsl:text> / </xsl:text>
-          <xsl:choose>
-            <xsl:when test="@offence">
-              <xsl:value-of select="@offence"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:text>0</xsl:text>
-            </xsl:otherwise>
-          </xsl:choose>
-          <xsl:text> / </xsl:text>
-          <xsl:choose>
-            <xsl:when test="@defence">
-              <xsl:value-of select="@defence"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:text>1</xsl:text>
-            </xsl:otherwise>
-          </xsl:choose>
-        </td>
-        <td>
-          <xsl:value-of select="@price"/>
-        </td>
-        <td class="left">
-          <xsl:choose>
-            <xsl:when test="ability">
-              <ul>
-                <xsl:apply-templates select="ability"/>
-              </ul>
-            </xsl:when>
-          </xsl:choose>
-          <xsl:choose>
-            <xsl:when test="modifier">
-              <ul>
-                <xsl:apply-templates select="modifier"/>
-              </ul>
-            </xsl:when>
-          </xsl:choose>
-        </td>
-        <td class="left">
-          <xsl:choose>
-            <xsl:when test="required-ability">
-              <ul>
-                <xsl:apply-templates select="required-ability"/>
-              </ul>
-            </xsl:when>
-          </xsl:choose>
-          <xsl:if test="required-goods">
-            <br />
+    <tr>
+      <xsl:choose>
+        <xsl:when test="@abstract">
+          <xsl:attribute name="class">abstract</xsl:attribute>
+          <xsl:variable name="id" select="@id"/>
+          <td class="name">
+            <a id="{$id}">
+              <xsl:value-of select="freecol:localize(concat($id, '.name'))"/>
+            </a>
+          </td>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="name">
+            <xsl:with-param name="id"><xsl:value-of select="@id"/></xsl:with-param>
+          </xsl:call-template>
+        </xsl:otherwise>
+      </xsl:choose>
+      <td>
+        <xsl:choose>
+          <xsl:when test="@movement">
+            <xsl:value-of select="number(@movement) div 3"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>1</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:text> / </xsl:text>
+        <xsl:choose>
+          <xsl:when test="@offence">
+            <xsl:value-of select="@offence"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>0</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:text> / </xsl:text>
+        <xsl:choose>
+          <xsl:when test="@defence">
+            <xsl:value-of select="@defence"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>1</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </td>
+      <td>
+        <xsl:value-of select="@price"/>
+      </td>
+      <td class="left">
+        <xsl:if test="@extends or ability or modifier">
+          <ul>
+            <xsl:if test="@extends">
+              <xsl:variable name="id" select="@extends"/>
+              <li>
+                <a href="#{$id}"><xsl:value-of select="freecol:localize(concat(@extends, '.name'))"/></a>
+              </li>
+            </xsl:if>
+            <xsl:apply-templates select="ability"/>
+            <xsl:apply-templates select="modifier"/>
+          </ul>
+        </xsl:if>
+      </td>
+      <td class="left">
+        <xsl:if test="required-ability or required-goods">
+          <ul>
+            <xsl:apply-templates select="required-ability"/>
             <xsl:apply-templates select="required-goods"/>
-          </xsl:if>
-        </td>
-        <td class="left">
-          <xsl:value-of select="freecol:localize(concat(@id, '.description'))"/>
-        </td>
-      </tr>
-    </xsl:if>
+          </ul>
+        </xsl:if>
+      </td>
+      <td class="left">
+        <xsl:value-of select="freecol:localize(concat(@id, '.description'))"/>
+      </td>
+    </tr>
   </xsl:template>
 
   <xsl:template match="tile-types">
@@ -277,7 +281,9 @@
       <td class="left">
         <xsl:choose>
           <xsl:when test="required-goods">
-            <xsl:apply-templates select="required-goods"/>
+            <ul>
+              <xsl:apply-templates select="required-goods"/>
+            </ul>
           </xsl:when>
           <xsl:otherwise>
             <xsl:value-of select="freecol:localize('colopedia.buildings.autoBuilt')"/>
@@ -373,10 +379,12 @@
   </xsl:template>
 
   <xsl:template match="required-goods">
-    <xsl:variable name="id" select="@id"/>
-    <xsl:value-of select="@value"/>&#160;<a href="#{$id}">
-    <xsl:value-of select="freecol:localize(concat(@id, '.name'), '%amount%', string(@value))"/>
-    </a><br/>
+    <li class="goods">
+      <xsl:variable name="id" select="@id"/>
+      <xsl:value-of select="@value"/>&#160;<a href="#{$id}">
+      <xsl:value-of select="freecol:localize(concat(@id, '.name'), '%amount%', string(@value))"/>
+      </a>
+    </li>
   </xsl:template>
 
   <xsl:template match="ability|required-ability">
