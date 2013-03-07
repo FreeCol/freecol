@@ -29,22 +29,18 @@ caption {
     background-color: grey;
 }
 
-span.veryHigh {
+div.veryHigh {
     background-color: green;
-    display: block;
 }
 
-span.high {
+div.high {
     background-color: #90EE90;
-    display: block;
 }
 
-span.low {
+div.low {
     background-color: lightgrey;
-    display: block;
 }
 
-span.veryLow {
+div.veryLow {
     background-color: grey;
-    display: block;
 }

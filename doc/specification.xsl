@@ -52,7 +52,9 @@
         <xsl:with-param name="id"><xsl:value-of select="@id"/></xsl:with-param>
       </xsl:call-template>
       <td class="left">
-        <xsl:apply-templates />
+        <ul>
+          <xsl:apply-templates />
+        </ul>
       </td>
       <td class="left">
         <xsl:value-of select="freecol:localize(concat(@id, '.description'))"/>
@@ -280,8 +282,9 @@
       <td><xsl:apply-templates select="production"/></td>
       <td class="left">
         <xsl:choose>
-          <xsl:when test="required-goods">
+          <xsl:when test="required-goods or required-ability">
             <ul>
+              <xsl:apply-templates select="required-ability"/>
               <xsl:apply-templates select="required-goods"/>
             </ul>
           </xsl:when>
@@ -323,20 +326,13 @@
       </td>
       <td class="left">
         <xsl:value-of select="freecol:localize(concat(@id, '.description'))"/>
-        <xsl:choose>
-          <xsl:when test="ability">
-            <ul>
-              <xsl:apply-templates select="ability"/>
-            </ul>
-          </xsl:when>
-        </xsl:choose>
-        <xsl:choose>
-          <xsl:when test="modifier">
-            <ul>
-              <xsl:apply-templates select="modifier"/>
-            </ul>
-          </xsl:when>
-        </xsl:choose>
+        <xsl:if test="ability or modifier or event">
+          <ul>
+            <xsl:apply-templates select="event"/>
+            <xsl:apply-templates select="ability"/>
+            <xsl:apply-templates select="modifier"/>
+          </ul>
+        </xsl:if>
       </td>
       <td class="left">
         <xsl:value-of select="freecol:localize(concat(@id, '.text'))"/>
@@ -349,16 +345,16 @@
     <xsl:choose>
       <xsl:when test="@productionLevel">
         <xsl:variable name="productionLevel" select="@productionLevel"/>
-        <span class="{$productionLevel}">
+        <div class="{$productionLevel}">
           <xsl:apply-templates select="input"/>
           <xsl:apply-templates select="output"/>
-        </span>
+        </div>
       </xsl:when>
       <xsl:otherwise>
-        <span>
+        <div>
           <xsl:apply-templates select="input"/>
           <xsl:apply-templates select="output"/>
-        </span>
+        </div>
       </xsl:otherwise>
     </xsl:choose>
 
@@ -384,6 +380,23 @@
       <xsl:value-of select="@value"/>&#160;<a href="#{$id}">
       <xsl:value-of select="freecol:localize(concat(@id, '.name'), '%amount%', string(@value))"/>
       </a>
+    </li>
+  </xsl:template>
+
+  <xsl:template match="event">
+    <li>
+      <xsl:value-of select="freecol:localize(concat(@id, '.name'))"/>
+      <xsl:if test="@value">
+        <xsl:text>: </xsl:text>
+        <xsl:choose>
+          <xsl:when test="number(@value) = @value">
+            <xsl:value-of select="@value"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="freecol:localize(concat(@value, '.name'))"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:if>
     </li>
   </xsl:template>
 
