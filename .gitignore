@@ -8,3 +8,4 @@ FreeCol.log
 FreeCol.jar
 src/MANIFEST.MF
 build/
+doc/specification_*.html

@@ -308,7 +308,9 @@
       </caption>
       <tr>
         <th><xsl:value-of select="freecol:localize('name')"/></th>
+        <th><xsl:value-of select="freecol:localize('model.foundingFather.type')"/></th>
         <th><xsl:value-of select="freecol:localize('colopedia.birthAndDeath')"/></th>
+        <th><xsl:value-of select="freecol:localize('colopedia.probability')"/></th>
         <th><xsl:value-of select="freecol:localize('colopedia.effects')"/></th>
         <th><xsl:value-of select="freecol:localize('colopedia.description')"/></th>
       </tr>
@@ -322,15 +324,26 @@
         <xsl:with-param name="id"><xsl:value-of select="@id"/></xsl:with-param>
       </xsl:call-template>
       <td>
+        <xsl:value-of select="freecol:localize(concat('model.foundingFather.', @type))"/>
+      </td>
+      <td>
         <xsl:value-of select="freecol:localize(concat(@id, '.birthAndDeath'))"/>
+      </td>
+      <td>
+        <xsl:value-of select="@weight1"/>
+        <xsl:text> / </xsl:text>
+        <xsl:value-of select="@weight2"/>
+        <xsl:text> / </xsl:text>
+        <xsl:value-of select="@weight3"/>
       </td>
       <td class="left">
         <xsl:value-of select="freecol:localize(concat(@id, '.description'))"/>
-        <xsl:if test="ability or modifier or event">
+        <xsl:if test="ability or modifier or event or unit">
           <ul>
             <xsl:apply-templates select="event"/>
             <xsl:apply-templates select="ability"/>
             <xsl:apply-templates select="modifier"/>
+            <xsl:apply-templates select="unit"/>
           </ul>
         </xsl:if>
       </td>
@@ -462,6 +475,13 @@
     <xsl:variable name="id" select="@type"/>
     <a href="#{$id}"><xsl:value-of select="freecol:localize(concat($id, '.name'))"/></a>
     <br />
+  </xsl:template>
+
+  <xsl:template match="unit">
+    <xsl:variable name="id" select="@id"/>
+    <li>
+      <a href="#{$id}"><xsl:value-of select="freecol:localize(concat($id, '.name'))"/></a>
+    </li>
   </xsl:template>
 
   <xsl:template match="scope">
