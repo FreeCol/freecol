@@ -44,3 +44,7 @@ div.low {
 div.veryLow {
     background-color: grey;
 }
+
+.expert {
+    background-color: lightgrey;
+}

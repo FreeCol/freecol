@@ -16,6 +16,7 @@
         <xsl:apply-templates select="//unit-types"/>
         <xsl:apply-templates select="//building-types"/>
         <xsl:apply-templates select="//founding-fathers"/>
+        <xsl:apply-templates select="//european-nation-types"/>
       </body>
     </html>
   </xsl:template>
@@ -308,7 +309,7 @@
       </caption>
       <tr>
         <th><xsl:value-of select="freecol:localize('name')"/></th>
-        <th><xsl:value-of select="freecol:localize('model.foundingFather.type')"/></th>
+        <th><xsl:value-of select="freecol:localize('colopedia.type')"/></th>
         <th><xsl:value-of select="freecol:localize('colopedia.birthAndDeath')"/></th>
         <th><xsl:value-of select="freecol:localize('colopedia.probability')"/></th>
         <th><xsl:value-of select="freecol:localize('colopedia.effects')"/></th>
@@ -349,6 +350,78 @@
       </td>
       <td class="left">
         <xsl:value-of select="freecol:localize(concat(@id, '.text'))"/>
+      </td>
+    </tr>
+  </xsl:template>
+
+  <xsl:template match="european-nation-types">
+    <h1><xsl:value-of select="freecol:localize('colopedia.europeanNationTypes')"/></h1>
+    <table>
+      <tr>
+        <th><xsl:value-of select="freecol:localize('advantage')"/></th>
+        <th><xsl:value-of select="freecol:localize('colopediaAction.UNITS.name')"/></th>
+        <th><xsl:value-of select="freecol:localize('colopedia.nationType.typeOfSettlements')"/></th>
+        <th><xsl:value-of select="freecol:localize('colopedia.effects')"/></th>
+      </tr>
+      <xsl:apply-templates />
+    </table>
+  </xsl:template>
+
+  <xsl:template match="european-nation-type">
+    <tr>
+      <xsl:variable name="id" select="@id"/>
+      <td class="name">
+        <a id="{$id}">
+          <xsl:value-of select="freecol:localize(concat($id, '.name'))"/>
+        </a>
+      </td>
+      <td class="left">
+        <ul>
+          <xsl:choose>
+            <xsl:when test="unit[@id='pioneer']">
+              <xsl:apply-templates select="unit[@id='pioneer']"/>
+            </xsl:when>
+            <xsl:when test="@extends">
+              <xsl:variable name="extends" select="@extends"/>
+              <xsl:apply-templates select="../european-nation-type[@id=$extends]/unit[@id='pioneer']"/>
+            </xsl:when>
+          </xsl:choose>
+          <xsl:choose>
+            <xsl:when test="unit[@id='soldier']">
+              <xsl:apply-templates select="unit[@id='soldier']"/>
+            </xsl:when>
+            <xsl:when test="@extends">
+              <xsl:variable name="extends" select="@extends"/>
+              <xsl:apply-templates select="../european-nation-type[@id=$extends]/unit[@id='soldier']"/>
+            </xsl:when>
+          </xsl:choose>
+          <xsl:choose>
+            <xsl:when test="unit[@id='ship']">
+              <xsl:apply-templates select="unit[@id='ship']"/>
+            </xsl:when>
+            <xsl:when test="@extends">
+              <xsl:variable name="extends" select="@extends"/>
+              <xsl:apply-templates select="../european-nation-type[@id=$extends]/unit[@id='ship']"/>
+            </xsl:when>
+          </xsl:choose>
+        </ul>
+      </td>
+      <td>
+        <xsl:choose>
+          <xsl:when test="settlement">
+            <xsl:value-of select="freecol:localize(concat(settlement/@id, '.name'))"/>
+          </xsl:when>
+          <xsl:when test="@extends">
+            <xsl:variable name="extends" select="@extends"/>
+            <xsl:value-of select="freecol:localize(concat(../european-nation-type[@id=$extends]/settlement/@id, '.name'))"/>
+          </xsl:when>
+        </xsl:choose>
+      </td>
+      <td class="left">
+        <ul>
+          <xsl:apply-templates select="ability"/>
+          <xsl:apply-templates select="modifier"/>
+        </ul>
       </td>
     </tr>
   </xsl:template>
@@ -478,9 +551,24 @@
   </xsl:template>
 
   <xsl:template match="unit">
-    <xsl:variable name="id" select="@id"/>
     <li>
-      <a href="#{$id}"><xsl:value-of select="freecol:localize(concat($id, '.name'))"/></a>
+      <xsl:choose>
+        <xsl:when test="@type">
+          <xsl:if test="@expert-starting-units">
+            <xsl:attribute name="class">expert</xsl:attribute>
+          </xsl:if>
+          <xsl:variable name="id" select="@type"/>
+          <a href="#{$id}"><xsl:value-of select="freecol:localize(concat($id, '.name'))"/></a>
+          <xsl:if test="@role">
+            <xsl:text> / </xsl:text>
+            <xsl:value-of select="freecol:localize(concat('model.unit.role.', @role))"/>
+          </xsl:if>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:variable name="id" select="@id"/>
+          <a href="#{$id}"><xsl:value-of select="freecol:localize(concat($id, '.name'))"/></a>
+        </xsl:otherwise>
+      </xsl:choose>
     </li>
   </xsl:template>
 
@@ -509,6 +597,13 @@
       </xsl:when>
       <xsl:when test="@ability-id">
         <xsl:value-of select="freecol:localize(concat(@ability-id, '.name'))"/>
+      </xsl:when>
+      <xsl:when test="@method-name">
+        <xsl:choose>
+          <xsl:when test="@method-name='isIndian'">
+            <xsl:value-of select="freecol:localize('model.ability.native.name')"/>
+          </xsl:when>
+        </xsl:choose>
       </xsl:when>
     </xsl:choose>
   </xsl:template>
