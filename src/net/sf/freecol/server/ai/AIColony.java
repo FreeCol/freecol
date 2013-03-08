@@ -93,8 +93,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     // The colony this AIColony is managing.
     private Colony colony;
 
-    // The current production plan for the colony.
-    private ColonyPlan colonyPlan;
+    // The current plan for the colony.  Does not need to be serialized.
+    private ColonyPlan colonyPlan = null;
 
     // Goods to export from the colony.
     private final List<AIGoods> aiGoods;
@@ -155,7 +155,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         this(aiMain, colony.getId());
 
         this.colony = colony;
-        colonyPlan = new ColonyPlan(aiMain, colony);
         colony.addPropertyChangeListener(Colony.REARRANGE_WORKERS, this);
         uninitialized = false;
     }
@@ -237,15 +236,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         return colony;
     }
 
-    /**
-     * Gets the current plan for this colony.
-     *
-     * @return The current <code>ColonyPlan</code>.
-     */
-    public ColonyPlan getColonyPlan() {
-        return colonyPlan;
-    }
-
     protected AIUnit getAIUnit(Unit unit) {
         return getAIMain().getAIUnit(unit);
     }
@@ -282,6 +272,9 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * @return True if the workers were rearranged.
      */
     public boolean rearrangeWorkers() {
+        final AIMain aiMain = getAIMain();
+        if (colonyPlan == null) colonyPlan = new ColonyPlan(aiMain, colony);
+
         // Skip this colony if it does not yet need rearranging, but
         // first check if it is collapsing.
         final int turn = getGame().getTurn().getNumber();
@@ -298,7 +291,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         }
 
         final Tile tile = colony.getTile();
-        final AIMain aiMain = getAIMain();
         final Player player = colony.getOwner();
         final Specification spec = getSpecification();
 
@@ -1362,6 +1354,37 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         Collections.sort(tileImprovementPlans);
     }
 
+    /**
+     * Get the list of buildables in the colony plan.
+     *
+     * Public for the test suite.
+     *
+     * @return A list of planned <code>BuildableType</code>.
+     */
+    public List<BuildableType> getPlannedBuildableTypes() {
+        if (colonyPlan == null) return Collections.emptyList();
+        return colonyPlan.getBuildableTypes();
+    }
+
+    /**
+     * Summarize the colony plan as a string.
+     *
+     * @return A summary of the colony plan.
+     */
+    public String planToString() {
+        if (colonyPlan == null) return "No plan.";
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(colonyPlan.toString()).append("\n\nTILE IMPROVEMENTS:\n");
+        for (TileImprovementPlan tip : getTileImprovementPlans()) {
+            sb.append(tip.toString()).append("\n");
+        }
+        sb.append("\n\nWISHES:\n");
+        for (Wish w : getWishes()) sb.append(w.toString()).append("\n");
+        sb.append("\n\nEXPORT GOODS:\n");
+        for (AIGoods aig : getAIGoods()) sb.append(aig.toString()).append("\n");
+        return sb.toString();
+    }
 
     /**
      * Handle REARRANGE_WORKERS property change events.
@@ -1452,7 +1475,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         aiGoods.clear();
         tileImprovementPlans.clear();
         wishes.clear();
-        colonyPlan = new ColonyPlan(aiMain, colony);
+        colonyPlan = null;
     }
 
     /**

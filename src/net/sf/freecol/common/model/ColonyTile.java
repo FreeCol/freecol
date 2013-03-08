@@ -528,7 +528,7 @@ public class ColonyTile extends WorkLocation implements Ownable {
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
 
-        workTile = getAttribute(in, WORK_TILE_TAG, Tile.class, (Tile)null);
+        workTile = getFreeColGameObject(in, WORK_TILE_TAG, Tile.class);
     }
 
     /**
