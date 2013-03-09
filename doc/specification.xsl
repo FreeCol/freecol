@@ -17,23 +17,10 @@
         <xsl:apply-templates select="//building-types"/>
         <xsl:apply-templates select="//founding-fathers"/>
         <xsl:apply-templates select="//european-nation-types"/>
+        <xsl:apply-templates select="//indian-nation-types"/>
       </body>
     </html>
   </xsl:template>
-
-
-  <xsl:template name="name">
-    <xsl:param name="id"></xsl:param>
-    <xsl:param name="key">.image</xsl:param>
-    <xsl:variable name="src" select="freecol:getResource(concat($id, $key))"/>
-    <td class="name">
-      <a id="{$id}">
-        <img src="../data/rules/classic/{$src}"/><br />
-        <xsl:value-of select="freecol:localize(concat($id, '.name'))"/>
-      </a>
-    </td>
-  </xsl:template>
-
 
   <xsl:template match="resource-types">
     <h1><xsl:value-of select="freecol:localize('colopediaAction.RESOURCES.name')"/></h1>
@@ -361,7 +348,7 @@
         <th><xsl:value-of select="freecol:localize('advantage')"/></th>
         <th><xsl:value-of select="freecol:localize('colopediaAction.UNITS.name')"/></th>
         <th><xsl:value-of select="freecol:localize('colopedia.nationType.typeOfSettlements')"/></th>
-        <th><xsl:value-of select="freecol:localize('colopedia.effects')"/></th>
+        <th><xsl:value-of select="freecol:localize('abilities')"/></th>
       </tr>
       <xsl:apply-templates />
     </table>
@@ -426,6 +413,115 @@
     </tr>
   </xsl:template>
 
+  <xsl:template match="indian-nation-types">
+    <h1><xsl:value-of select="freecol:localize('colopedia.nativeNationTypes')"/></h1>
+    <table>
+      <tr>
+        <th><xsl:value-of select="freecol:localize('name')"/></th>
+        <th><xsl:value-of select="freecol:localize('colopediaAction.SKILLS.name')"/></th>
+        <th><xsl:value-of select="freecol:localize('settlement')"/></th>
+        <th><xsl:value-of select="freecol:localize('capital')"/></th>
+        <th><xsl:value-of select="freecol:localize('abilities')"/></th>
+      </tr>
+      <xsl:apply-templates />
+    </table>
+  </xsl:template>
+
+  <xsl:template match="indian-nation-type">
+    <tr>
+      <xsl:if test="@abstract='true'">
+        <xsl:attribute name="class">abstract</xsl:attribute>
+      </xsl:if>
+      <xsl:variable name="id">
+        <xsl:choose>
+          <xsl:when test="@abstract='true'">
+            <xsl:value-of select="concat('model.settlement.', @id)"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="@id"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <td class="name">
+        <a id="{$id}">
+          <xsl:value-of select="freecol:localize(concat($id, '.name'))"/>
+        </a>
+      </td>
+      <td class="left">
+        <xsl:if test="skill">
+          <ul>
+            <xsl:apply-templates select="skill"/>
+          </ul>
+        </xsl:if>
+      </td>
+      <td class="left">
+        <xsl:choose>
+          <xsl:when test="settlement">
+            <xsl:apply-templates select="settlement[not(@capital='true')]"/>
+          </xsl:when>
+          <xsl:when test="@extends">
+            <xsl:variable name="extends" select="@extends"/>
+            <xsl:apply-templates select="../indian-nation-type[@id=$extends]/settlement[not(@capital='true')]"/>
+          </xsl:when>
+        </xsl:choose>
+      </td>
+      <td class="left">
+        <xsl:choose>
+          <xsl:when test="settlement">
+            <xsl:apply-templates select="settlement[@capital='true']"/>
+          </xsl:when>
+          <xsl:when test="@extends">
+            <xsl:variable name="extends" select="@extends"/>
+            <xsl:apply-templates select="../indian-nation-type[@id=$extends]/settlement[@capital='true']"/>
+          </xsl:when>
+        </xsl:choose>
+      </td>
+      <td class="left">
+        <xsl:if test="ability or modifier or @extends">
+          <ul>
+            <xsl:if test="@extends">
+              <li>
+                <xsl:variable name="id" select="concat('model.settlement.', @extends)"/>
+                <a href="#{$id}">
+                  <xsl:value-of select="freecol:localize(concat($id, '.name'))"/>
+                </a>
+              </li>
+            </xsl:if>
+            <xsl:apply-templates select="ability"/>
+            <xsl:apply-templates select="modifier"/>
+          </ul>
+        </xsl:if>
+      </td>
+    </tr>
+  </xsl:template>
+
+
+  <xsl:template match="settlement">
+    <div class="center">
+      <xsl:variable name="src" select="freecol:getResource(concat(@id, '.image'))"/>
+      <img src="../data/rules/classic/{$src}"/>
+    </div>
+    <ul>
+      <li>
+        <xsl:value-of select="freecol:localize('model.settlement.claimableRadius')"/>:
+        <xsl:value-of select="@claimableRadius"/>
+      </li>
+      <li>
+        <xsl:value-of select="freecol:localize('model.settlement.extraClaimableRadius')"/>:
+        <xsl:value-of select="@extraClaimableRadius"/>
+      </li>
+      <li>
+        <xsl:value-of select="freecol:localize('model.settlement.minimumSize')"/>:
+        <xsl:value-of select="@minimumSize"/>
+      </li>
+      <li>
+        <xsl:value-of select="freecol:localize('model.settlement.maximumSize')"/>:
+        <xsl:value-of select="@maximumSize"/>
+      </li>
+      <xsl:apply-templates select="ability"/>
+      <xsl:apply-templates select="modifier"/>
+    </ul>
+  </xsl:template>
 
   <xsl:template match="production">
     <xsl:choose>
@@ -550,6 +646,13 @@
     <br />
   </xsl:template>
 
+  <xsl:template match="skill">
+    <li>
+      <xsl:value-of select="freecol:localize(concat(@id, '.name'))"/>
+    </li>
+  </xsl:template>
+
+
   <xsl:template match="unit">
     <li>
       <xsl:choose>
@@ -628,6 +731,20 @@
       <xsl:otherwise><xsl:value-of select="$default"/></xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+
+  <xsl:template name="name">
+    <xsl:param name="id"></xsl:param>
+    <xsl:param name="key">.image</xsl:param>
+    <xsl:variable name="src" select="freecol:getResource(concat($id, $key))"/>
+    <td class="name">
+      <a id="{$id}">
+        <img src="../data/rules/classic/{$src}"/><br />
+        <xsl:value-of select="freecol:localize(concat($id, '.name'))"/>
+      </a>
+    </td>
+  </xsl:template>
+
+
 
 
 </xsl:stylesheet>
