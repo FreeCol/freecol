@@ -40,6 +40,9 @@ import javax.xml.stream.XMLStreamWriter;
  */
 public abstract class WorkLocation extends UnitLocation implements Ownable {
 
+
+    private static final List<AbstractGoods> EMPTY_LIST = Collections.emptyList();
+
     /**
      * The colony that contains this work location.
      */
@@ -110,12 +113,49 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
         this.productionType = newProductionType;
     }
 
-    public List<AbstractGoods> getOutputs() {
-        return (productionType == null) ? null : productionType.getOutputs();
+    public List<AbstractGoods> getInputs() {
+        if (productionType == null || productionType.getInputs() == null) {
+            return EMPTY_LIST;
+        } else {
+            return productionType.getInputs();
+        }
     }
 
-    public List<AbstractGoods> getInputs() {
-        return (productionType == null) ? null : productionType.getInputs();
+    public List<AbstractGoods> getOutputs() {
+        if (productionType == null || productionType.getOutputs() == null) {
+            return EMPTY_LIST;
+        } else {
+            return productionType.getOutputs();
+        }
+    }
+
+    /**
+     * Returns whether this WorkLocation produces the given GoodsType.
+     *
+     * @param goodsType the GoodsType
+     * @return  whether this Building produces the given GoodsType
+     */
+    public boolean produces(GoodsType goodsType) {
+        if (productionType != null) {
+            for (AbstractGoods output : productionType.getOutputs()) {
+                if (output.getType() == goodsType) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean hasInputs() {
+        return !(productionType == null
+                 || productionType.getInputs() == null
+                 || productionType.getInputs().isEmpty());
+    }
+
+    public boolean hasOutputs() {
+        return !(productionType == null
+                 || productionType.getOutputs() == null
+                 || productionType.getOutputs().isEmpty());
     }
 
     /**

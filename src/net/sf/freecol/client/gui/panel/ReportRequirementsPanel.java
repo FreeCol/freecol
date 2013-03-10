@@ -36,6 +36,7 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
@@ -155,26 +156,29 @@ public final class ReportRequirementsPanel extends ReportPanel {
         }
 
         for (Building building : colony.getBuildings()) {
-            GoodsType goodsType = building.getGoodsOutputType();
-            UnitType expert = building.getExpertUnitType();
+            for (AbstractGoods output : building.getOutputs()) {
+                GoodsType goodsType = output.getType();
+                UnitType expert = spec.getExpertForProducing(goodsType);
 
-            // check if this building has no expert producing goods
-            if (goodsType != null && expert != null
-                && !building.getUnitList().isEmpty()
-                && !missingExpertWarning.contains(expert)
-                && unitCount.get(colony).getCount(expert) == 0) {
-                addExpertWarning(doc, colony, goodsType, expert);
-                missingExpertWarning.add(expert);
-            }
-            // not enough input
-            ProductionInfo info = building.getProductionInfo();
-            if (goodsType != null
-                && info != null
-                && !info.hasMaximumProduction()
-                && !productionWarning.contains(goodsType)) {
-                addProductionWarning(doc, colony, goodsType,
-                    building.getGoodsInputType());
-                productionWarning.add(goodsType);
+                // check if this building has no expert producing goods
+                if (goodsType != null && expert != null
+                    && !building.getUnitList().isEmpty()
+                    && !missingExpertWarning.contains(expert)
+                    && unitCount.get(colony).getCount(expert) == 0) {
+                    addExpertWarning(doc, colony, goodsType, expert);
+                    missingExpertWarning.add(expert);
+                }
+                // not enough input
+                ProductionInfo info = building.getProductionInfo();
+                if (goodsType != null
+                    && info != null
+                    && !info.hasMaximumProduction()
+                    && !productionWarning.contains(goodsType)) {
+                    for (AbstractGoods input : building.getInputs()) {
+                        addProductionWarning(doc, colony, goodsType, input.getType());
+                    }
+                    productionWarning.add(goodsType);
+                }
             }
         }
 
@@ -283,7 +287,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
                     GoodsType expertise = unit.getType().getExpertProduction();
                     if ((unit.getSkillLevel() > 0) && (expertise == goodsType)) {
                         if (unit.getLocation() instanceof Building) {
-                            if (((Building) unit.getLocation()).getGoodsOutputType() != goodsType) {
+                            if (!((Building) unit.getLocation()).produces(goodsType)) {
                                 misusedExperts.add(colony);
                             }
                         } else if (expertise != unit.getWorkType()) {

@@ -1641,8 +1641,8 @@ resources of 400, lost city rumours of 500
     </building-type>
     <building-type id="model.building.country" workplaces="0" priority="700">
       <production>
-        <input goods-type="model.goods.grain" value="3"/>
-        <output goods-type="model.goods.horses" value="3"/>
+        <input goods-type="model.goods.grain" value="1"/>
+        <output goods-type="model.goods.horses" value="1"/>
       </production>
       <modifier id="model.modifier.breedingDivisor" type="additive" value="50"/>
       <modifier id="model.modifier.breedingFactor" type="additive" value="2"/>
@@ -1657,8 +1657,8 @@ resources of 400, lost city rumours of 500
     <building-type id="model.building.stables" extends="model.building.country"
                    upgradesFrom="model.building.country" upkeep="5">
       <production>
-        <input goods-type="model.goods.grain" value="3"/>
-        <output goods-type="model.goods.horses" value="3"/>
+        <input goods-type="model.goods.grain" value="1"/>
+        <output goods-type="model.goods.horses" value="1"/>
       </production>
       <modifier id="model.modifier.breedingDivisor" type="multiplicative" value="0.5" />
       <required-goods id="model.goods.hammers" value="64"/>

@@ -196,12 +196,15 @@ public class ColonyProductionTest extends FreeColTestCase {
         Colony colony = getStandardColony(1);
 
         Building pasture = colony.getBuilding(countryType);
-        assertEquals(horsesType, pasture.getGoodsOutputType());
+        List<AbstractGoods> outputs = pasture.getOutputs();
+        assertEquals(1, outputs.size());
+        assertEquals(horsesType, outputs.get(0).getType());
         assertEquals("Wrong warehouse capacity in colony",
             GoodsContainer.CARGO_SIZE, colony.getWarehouseCapacity());
 
         // Still room for more
         colony.addGoods(horsesType, 99);
+        assertEquals(99, colony.getGoodsCount(horsesType));
         assertTrue(colony.getNetProductionOf(foodType) > 0);
 
         assertEquals("Wrong horse production", 1,
@@ -444,8 +447,11 @@ public class ColonyProductionTest extends FreeColTestCase {
 
         assertEquals("Zero potential production of cotton in town hall", 0,
             townHall.getPotentialProduction(cottonType, colonistType));
+        List<AbstractGoods> outputs = townHall.getOutputs();
+        assertEquals(1, outputs.size());
+        assertEquals(bellsType, outputs.get(0).getType());
         assertEquals("Basic potential production of bells in town hall",
-            (int) FeatureContainer.applyModifiers(townHall.getOutput().getAmount(), game.getTurn(),
+            (int) FeatureContainer.applyModifiers(outputs.get(0).getAmount(), game.getTurn(),
                 townHall.getProductionModifiers(bellsType, colonistType)),
             townHall.getPotentialProduction(bellsType, colonistType));
 

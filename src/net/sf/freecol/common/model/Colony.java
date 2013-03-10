@@ -556,8 +556,10 @@ public class Colony extends Settlement implements Nameable {
     public List<Building> getBuildingsForProducing(GoodsType goodsType) {
         List<Building> buildings = new ArrayList<Building>();
         for (Building building : getBuildings()) {
-            if (building.getGoodsOutputType() == goodsType) {
-                buildings.add(building);
+            for (AbstractGoods output : building.getOutputs()) {
+                if (output.getType() == goodsType) {
+                    buildings.add(building);
+                }
             }
         }
         return buildings;
@@ -574,8 +576,10 @@ public class Colony extends Settlement implements Nameable {
     public List<Building> getBuildingsForConsuming(GoodsType goodsType) {
         List<Building> buildings = new ArrayList<Building>();
         for (Building building : getBuildings()) {
-            if (building.getGoodsInputType() == goodsType) {
-                buildings.add(building);
+            for (AbstractGoods input : building.getInputs()) {
+                if (input.getType() == goodsType) {
+                    buildings.add(building);
+                }
             }
         }
         return buildings;
@@ -1537,7 +1541,9 @@ public class Colony extends Settlement implements Nameable {
         } else {
             Building building = getBuildingFor(unit);
             if (building != null) {
-                return new Occupation(building, building.getGoodsOutputType());
+                // TODO: improve this, possible extend Occupation
+                GoodsType output = building.getOutputs().get(0).getType();
+                return new Occupation(building, output);
             }
         }
 
@@ -1561,7 +1567,9 @@ public class Colony extends Settlement implements Nameable {
         }
         Building building = getBuildingFor(unit);
         if (building != null) {
-            return new Occupation(building, building.getGoodsOutputType());
+            // TODO: improve this, possible extend Occupation
+            GoodsType output = building.getOutputs().get(0).getType();
+            return new Occupation(building, output);
         }
         return null;
     }
@@ -1574,17 +1582,18 @@ public class Colony extends Settlement implements Nameable {
      */
     public Building getBuildingFor(Unit unit) {
         GoodsType expertProduction = unit.getType().getExpertProduction();
-        Building best;
-        if (expertProduction != null && !expertProduction.isFarmed()
-            && (best = getBuildingFor(unit, expertProduction)) != null) {
-            return best;
+        if (!(expertProduction == null || expertProduction.isFarmed())) {
+            Building best = getBuildingFor(unit, expertProduction);
+            if (best != null) {
+                return best;
+            }
         }
         List<Building> buildings = new ArrayList<Building>(getBuildings());
         for (Building building : buildings) {
             switch (building.getNoAddReason(unit)) {
             case NONE: case ALREADY_PRESENT:
-                if (building.getGoodsInputType() == null
-                    || getGoodsCount(building.getGoodsInputType()) > 0) {
+                if (!building.hasInputs()
+                    || getMinimumGoodsCount(building.getInputs()) > 0) {
                     return building;
                 }
                 break;
@@ -1623,6 +1632,22 @@ public class Colony extends Settlement implements Nameable {
             }
         }
         return best;
+    }
+
+    public int getMinimumGoodsCount(List<AbstractGoods> goodsList) {
+        if (goodsList == null || goodsList.isEmpty()) {
+            return 0;
+        } else {
+            int result = -1;
+            for (AbstractGoods goods : goodsList) {
+                if (result < 0) {
+                    result = getGoodsCount(goods.getType());
+                } else {
+                    result = Math.min(result, getGoodsCount(goods.getType()));
+                }
+            }
+            return result;
+        }
     }
 
     /**
@@ -1897,10 +1922,15 @@ public class Colony extends Settlement implements Nameable {
                 productionCache.getProductionInfo(b));
         }
         Building buildingForConsuming = getBuildingForConsuming(goodsType);
-        if (buildingForConsuming != null
-            && !buildingForConsuming.getGoodsOutputType().isStorable()) {
-            //the warnings are for a non-storable good, which is not displayed in the trade report
-            addInsufficientProductionMessage(result, productionCache.getProductionInfo(buildingForConsuming));
+        if (buildingForConsuming != null) {
+            for (AbstractGoods goods : buildingForConsuming.getOutputs()) {
+                if (!goods.getType().isStorable()) {
+                    //the warnings are for a non-storable good, which
+                    //is not displayed in the trade report
+                    addInsufficientProductionMessage(result, productionCache
+                                                     .getProductionInfo(buildingForConsuming));
+                }
+            }
         }
 
         return result;

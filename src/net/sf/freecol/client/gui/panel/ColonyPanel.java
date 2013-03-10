@@ -764,8 +764,7 @@ public final class ColonyPanel extends PortPanel
                 Building workingInBuilding = unit.getWorkLocation();
                 if(workingInBuilding != null){
                     GoodsType goodsType = unit.getWorkType();
-                    int producing = workingInBuilding.getProductionOf(unit,
-                        workingInBuilding.getGoodsOutputType());
+                    int producing = workingInBuilding.getProductionOf(unit, goodsType);
                     unitIcon = imageLibrary.getUnitImageIcon(unit, 0.5);
                     String nominative = Messages.message(StringTemplate.template(goodsType.getNameKey())
                         .addAmount("%amount%", producing));

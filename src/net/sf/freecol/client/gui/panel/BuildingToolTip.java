@@ -69,7 +69,9 @@ public class BuildingToolTip extends JToolTip {
                            GUI gui) {
         final Game game = building.getGame();
         final int workplaces = building.getUnitCapacity();
-        final GoodsType output = building.getGoodsOutputType();
+        List<AbstractGoods> outputs = building.getOutputs();
+        // TODO: consider several outputs
+        final GoodsType output = outputs.isEmpty() ? null : outputs.get(0).getType();
         final Colony colony = building.getColony();
 
         String columns = "[align center]";
@@ -118,7 +120,7 @@ public class BuildingToolTip extends JToolTip {
 
         for (Unit unit : building.getUnitList()) {
             UnitLabel unitLabel = new UnitLabel(freeColClient, unit, gui, false);
-            int production = building.getUnitProduction(unit);
+            int production = building.getUnitProduction(unit, output);
             if (production > 0) {
                 add(unitLabel);
                 JLabel pLabel = new ProductionLabel(freeColClient, gui, output,

@@ -507,17 +507,21 @@ public class ServerColony extends Colony implements ServerModelObject {
      */
     private void csCheckMissingInput(Building building, ProductionInfo pi,
                                      ChangeSet cs) {
-        GoodsType type = building.getGoodsInputType();
-        if (!building.canAutoProduce() && type != null
-            && !building.isEmpty()
+        List<AbstractGoods> inputs = building.getInputs();
+        if (!(inputs == null
+              || inputs.isEmpty()
+              || building.isEmpty()
+              || building.canAutoProduce())
             && pi.getProduction().isEmpty()) {
-            cs.addMessage(See.only((ServerPlayer) owner),
-                          new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
-                                           "model.building.notEnoughInput",
-                                           this, type)
-                .add("%inputGoods%", type.getNameKey())
-                .add("%building%", building.getNameKey())
-                .addName("%colony%", getName()));
+            for (AbstractGoods goods : inputs) {
+                cs.addMessage(See.only((ServerPlayer) owner),
+                              new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
+                                               "model.building.notEnoughInput",
+                                               this, goods.getType())
+                              .add("%inputGoods%", goods.getType().getNameKey())
+                              .add("%building%", building.getNameKey())
+                              .addName("%colony%", getName()));
+            }
         }
     }
 

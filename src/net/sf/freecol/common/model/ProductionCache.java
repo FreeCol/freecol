@@ -121,14 +121,15 @@ public class ProductionCache {
             ProductionInfo info = null;
             if (consumer instanceof Building) {
                 Building building = (Building) consumer;
-                AbstractGoods output = null;
-                GoodsType outputType = building.getGoodsOutputType();
-                if (outputType != null) {
+                List<AbstractGoods> outputs = new ArrayList<AbstractGoods>();
+                for (AbstractGoods output : building.getOutputs()) {
+                    GoodsType outputType = output.getType();
                     goodsUsed.add(outputType);
-                    output = new AbstractGoods(production.get(outputType));
-                    output.setAmount(output.getAmount() + getGoodsCount(outputType));
+                    AbstractGoods newOutput = new AbstractGoods(production.get(outputType));
+                    newOutput.setAmount(newOutput.getAmount() + getGoodsCount(outputType));
+                    outputs.add(newOutput);
                 }
-                info = building.getAdjustedProductionInfo(output, goods);
+                info = building.getAdjustedProductionInfo(goods, outputs);
             } else if (consumer instanceof Unit) {
                 info = ((Unit) consumer).getProductionInfo(goods);
             } else if (consumer instanceof BuildQueue) {
