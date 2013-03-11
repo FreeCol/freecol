@@ -112,8 +112,11 @@ public final class GoalDeciders {
             public PathNode getGoal() { return best; }
             public boolean hasSubGoals() { return false; }
             public boolean check(Unit u, PathNode path) {
-                if (path.getTile() != null
-                    && path.getTile().isDirectlyHighSeasConnected()) {
+                Tile tile = path.getTile();
+                if (tile != null
+                    && tile.isDirectlyHighSeasConnected()
+                    && (tile.getFirstUnit() == null
+                        || tile.getFirstUnit().getOwner() == u.getOwner())) {
                     if (best == null || path.getCost() < best.getCost()) {
                         best = path;
                     }
