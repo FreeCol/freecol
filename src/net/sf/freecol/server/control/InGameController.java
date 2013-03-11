@@ -2309,6 +2309,17 @@ public final class InGameController extends Controller {
             if (!modifiedSettlements.isEmpty()) {
                 cs.add(See.only(serverPlayer), modifiedSettlements);
             }
+            int radius = (serverPlayer.getSpecification()
+                .getBoolean(GameOptions.ENHANCED_MISSIONARIES))
+                ? settlement.getLineOfSight()
+                : 1;
+            for (Tile x : settlement.getTile().getSurroundingTiles(radius)) {
+                if (x == null) continue;
+                if (!x.isExploredBy(serverPlayer)) {
+                    x.setExploredBy(serverPlayer, true);
+                }
+                cs.add(See.only(serverPlayer), x);
+            }
             break;
         }
         Tile tile = settlement.getTile();
