@@ -22,6 +22,7 @@ package net.sf.freecol.server;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.BindException;
@@ -1514,37 +1515,34 @@ public final class FreeColServer {
     }
 
     /**
-     * Adds a new high score for player and returns <code>true</code>
-     * if possible.
+     * Tries to adds a new high score for player.
      *
-     * @param player a <code>Player</code> value
-     * @return a <code>boolean</code> value
+     * @param player The <code>Player</code> to add a high score for.
+     * @return True if the score was high enough to be added to the
+     *     high score list.
      */
     public boolean newHighScore(Player player) {
         if (FreeColDebugger.isInDebugMode()) return false;
         getHighScores();
-        if (!highScores.isEmpty() && player.getScore() <= highScores.get(highScores.size() - 1).getScore()) {
-            return false;
-        } else {
-            highScores.add(new HighScore(player, new Date()));
-            Collections.sort(highScores, highScoreComparator);
-            if (highScores.size() == NUMBER_OF_HIGH_SCORES) {
-                highScores.remove(NUMBER_OF_HIGH_SCORES - 1);
-            }
-            return true;
+        int lowScore = (highScores.isEmpty()) ? -1
+            : highScores.get(highScores.size()-1).getScore();
+        if (player.getScore() <= lowScore) return false;
+        highScores.add(new HighScore(player, new Date()));
+        Collections.sort(highScores, highScoreComparator);
+        if (highScores.size() == NUMBER_OF_HIGH_SCORES) {
+            highScores.remove(NUMBER_OF_HIGH_SCORES - 1);
         }
+        return saveHighScores();
     }
 
     /**
      * Saves high scores.
      *
-     * @throws IOException If a problem was encountered while trying to open,
-     *             write or close the file.
+     * @return True if the high scores were saved.
      */
-    public void saveHighScores() throws IOException {
-        if (highScores == null || highScores.isEmpty()) {
-            return;
-        }
+    public boolean saveHighScores() {
+        boolean ret;
+        if (highScores == null || highScores.isEmpty()) return false;
         Collections.sort(highScores, highScoreComparator);
         XMLOutputFactory xof = XMLOutputFactory.newInstance();
         FileOutputStream fos = null;
@@ -1558,25 +1556,25 @@ public final class FreeColServer {
             for (HighScore score : highScores) {
                 score.toXML(xsw);
                 count++;
-                if (count == NUMBER_OF_HIGH_SCORES) {
-                    break;
-                }
+                if (count == NUMBER_OF_HIGH_SCORES) break;
             }
             xsw.writeEndElement();
             xsw.writeEndDocument();
             xsw.flush();
             xsw.close();
-        } catch (XMLStreamException e) {
-            throw new IOException("XMLStreamException: " + e.getMessage());
-        } catch (Exception e) {
-            throw new IOException("Exception: " + e.getMessage());
+            ret = true;
+        } catch (FileNotFoundException fnfe) {
+            logger.log(Level.WARNING, "Failed to open high scores file.", fnfe);
+            ret = false;
+        } catch (XMLStreamException xse) {
+            logger.log(Level.WARNING, "Failed to write high scores file.", xse);
+            ret = false;
         } finally {
             try {
                 if (fos != null) fos.close();
-            } catch (IOException e) {
-                // do nothing
-            }
+            } catch (IOException e) {}
         }
+        return ret;
     }
 
     /**

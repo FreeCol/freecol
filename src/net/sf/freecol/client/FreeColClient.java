@@ -719,18 +719,15 @@ public final class FreeColClient {
     }
 
     /**
-     * Quits the application.
-     * This method uses {@link net.sf.freecol.client.gui.GUI#showConfirmDialog}
-     * in order to get a "Are you sure"-confirmation from the user.
+     * Retire from the game.
      */
     public void retire() {
         if (gui.showConfirmDialog("retireDialog.areYouSure.text",
                                   "ok", "cancel")) {
-            if (askServer().retire()) {
-                // Panel exit calls quit.
-                gui.showHighScoresPanel(null);
-            }
-            quit();
+            Player player = getMyPlayer();
+            player.setPlayerType(Player.PlayerType.RETIRED);
+            askServer().retire();
+            gui.showHighScoresPanel(null);
         }
     }
 

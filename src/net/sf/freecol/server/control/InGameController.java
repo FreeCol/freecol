@@ -1146,20 +1146,10 @@ public final class InGameController extends Controller {
      * @return An element indicating the players high score state.
      */
     public Element checkHighScore(ServerPlayer serverPlayer) {
-        FreeColServer freeColServer = getFreeColServer();
-        boolean highScore = freeColServer.newHighScore(serverPlayer);
-        if (highScore) {
-            try {
-                freeColServer.saveHighScores();
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Failed to save high scores", e);
-                highScore = false;
-            }
-        }
-
+        boolean highScore = getFreeColServer().newHighScore(serverPlayer);
         ChangeSet cs = new ChangeSet();
         cs.addAttribute(See.only(serverPlayer),
-            "highScore", Boolean.toString(highScore));
+                        "highScore", Boolean.toString(highScore));
         return cs.build(serverPlayer);
     }
 
@@ -1170,9 +1160,12 @@ public final class InGameController extends Controller {
      * @return An element cleaning up the player.
      */
     public Element retire(ServerPlayer serverPlayer) {
+        boolean highScore = getFreeColServer().newHighScore(serverPlayer);
         ChangeSet cs = new ChangeSet();
         serverPlayer.csWithdraw(cs); // Clean up the player.
         sendToOthers(serverPlayer, cs);
+        cs.addAttribute(See.only(serverPlayer),
+                        "highScore", Boolean.toString(highScore));
         return cs.build(serverPlayer);
     }
 

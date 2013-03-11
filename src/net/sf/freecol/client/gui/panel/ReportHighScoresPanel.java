@@ -30,6 +30,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.HighScore;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Turn;
 
@@ -126,12 +127,15 @@ public final class ReportHighScoresPanel extends ReportPanel {
 
 
     /**
-     * Just drop the panel.  Retired players quitting is handled in
-     * Canvas.retire().
+     * Quit if the player has retired.
      *
-     * @param event The incoming ActionEvent.
+     * @param event The incoming <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent event) {
-        getGUI().removeFromCanvas(this);
+        super.actionPerformed(event);
+        if (getFreeColClient().getMyPlayer()
+            .getPlayerType() == Player.PlayerType.RETIRED) {
+            getFreeColClient().quit();
+        }
     }
 }

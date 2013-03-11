@@ -321,7 +321,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /** The type of player. */
     public static enum PlayerType {
-        NATIVE, COLONIAL, REBEL, INDEPENDENT, ROYAL, UNDEAD
+        NATIVE, COLONIAL, REBEL, INDEPENDENT, ROYAL, UNDEAD, RETIRED
     }
     protected PlayerType playerType;
 

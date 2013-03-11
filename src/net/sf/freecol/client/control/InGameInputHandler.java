@@ -566,7 +566,9 @@ public final class InGameInputHandler extends InputHandler {
         if (player == myPlayer) {
             FreeColDebugger.finishDebugRun(freeColClient, true);
             if (freeColClient.isSinglePlayer()) {
-                if (myPlayer.getPlayerType() != Player.PlayerType.UNDEAD
+                if (myPlayer.getPlayerType() == Player.PlayerType.RETIRED) {
+                    ; // Do nothing, retire routine will quit
+                } else if (myPlayer.getPlayerType() != Player.PlayerType.UNDEAD
                     && new ShowConfirmDialogSwingTask(null,
                         StringTemplate.key("defeatedSinglePlayer.text"),
                         "defeatedSinglePlayer.yes",

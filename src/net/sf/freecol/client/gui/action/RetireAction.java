@@ -23,7 +23,8 @@ import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.common.model.Player.PlayerType;
+import net.sf.freecol.common.model.Player;
+
 
 /**
  * An action for retiring from the game.
@@ -36,22 +37,23 @@ public class RetireAction extends FreeColAction {
      * Creates a new <code>RetireAction</code>.
      *
      * @param freeColClient The main controller object for the client.
-     * @param gui 
+     * @param gui
      */
-    RetireAction(FreeColClient freeColClient, GUI gui) {
+    public RetireAction(FreeColClient freeColClient, GUI gui) {
         super(freeColClient, gui, id);
     }
 
     /**
      * Checks if this action should be enabled.
      *
-     * @return true if this action should be enabled.
+     * @return True if this action should be enabled.
      */
     @Override
     protected boolean shouldBeEnabled() {
+        Player player = freeColClient.getMyPlayer();
         return super.shouldBeEnabled()
-            && freeColClient.getMyPlayer() != null
-            && freeColClient.getMyPlayer().getPlayerType() != PlayerType.INDEPENDENT;
+            && player != null
+            && player.getPlayerType() != Player.PlayerType.RETIRED;
     }
 
     /**

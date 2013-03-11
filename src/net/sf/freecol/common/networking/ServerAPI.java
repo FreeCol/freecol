@@ -849,11 +849,10 @@ public abstract class ServerAPI {
     /**
      * Retires the player from the game.
      *
-     * @return True if the player achieved a new high score.
+     * @return True if the server interaction succeeded.
      */
     public boolean retire() {
-        return askHandling(new TrivialMessage("retire"),
-            null, null);
+        return askHandling(new TrivialMessage("retire"), null, null);
     }
 
     /**
