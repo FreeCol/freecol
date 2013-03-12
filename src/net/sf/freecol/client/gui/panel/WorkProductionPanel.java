@@ -97,7 +97,7 @@ public class WorkProductionPanel extends FreeColPanel {
         } else if (unit.getLocation() instanceof Building) {
             Building building = (Building) unit.getLocation();
             // TODO: expand display to handle several outputs
-            GoodsType goodsType = building.getOutputs().get(0).getType();
+            GoodsType goodsType = unit.getWorkType();
             modifiers.addAll(building.getProductionModifiers(goodsType,
                                                              unitType));
             moreModifiers.addAll(building.getProductionModifiers(goodsType,
