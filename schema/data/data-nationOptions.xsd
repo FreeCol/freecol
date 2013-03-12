@@ -55,16 +55,22 @@
 
   <xs:simpleType name="NationalAdvantageType">
     <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="none" />
       <xs:enumeration value="NONE" />
+      <xs:enumeration value="fixed" />
       <xs:enumeration value="FIXED" />
+      <xs:enumeration value="selectable" />
       <xs:enumeration value="SELECTABLE" />
     </xs:restriction>
   </xs:simpleType>
 
   <xs:simpleType name="NationStateType">
     <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="available" />
       <xs:enumeration value="AVAILABLE" />
+      <xs:enumeration value="ai_only" />
       <xs:enumeration value="AI_ONLY" />
+      <xs:enumeration value="not_available" />
       <xs:enumeration value="NOT_AVAILABLE" />
     </xs:restriction>
   </xs:simpleType>
