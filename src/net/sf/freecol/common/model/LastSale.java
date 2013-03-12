@@ -30,18 +30,17 @@ import javax.xml.stream.XMLStreamWriter;
  */
 public final class LastSale extends FreeColObject {
 
-    // When a sale was made.
+    /** When a sale was made. */
     private Turn when;
 
-    // The price per unit returned from the sale.
+    /** The price per unit returned from the sale. */
     private int price;
 
 
     /**
      * Empty constructor for Player.
      */
-    public LastSale() {
-    }
+    public LastSale() {}
 
     /**
      * Make a new LastSale record.
@@ -100,57 +99,52 @@ public final class LastSale extends FreeColObject {
     }
 
 
+    // Serialization
+    private static final String PRICE_TAG = "price";
+    private static final String WHEN_TAG = "when";
+
+
     /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems with the stream.
+     * {@inheritDoc}
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         super.toXML(out, getXMLElementTagName());
     }
 
     /**
-     * Write the children of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *     to the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
-        out.writeAttribute("when", Integer.toString(when.getNumber()));
-        out.writeAttribute("price", Integer.toString(price));
+        writeAttribute(out, WHEN_TAG, when.getNumber());
+
+        writeAttribute(out, PRICE_TAG, price);
     }
 
     /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if there are any problems with the stream.
+     * {@inheritDoc}
      */
-    public void readFromXML(XMLStreamReader in) throws XMLStreamException {
+    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
-        when = new Turn(getAttribute(in, "when", 0));
-        price = getAttribute(in, "price", 0);
-        super.readChildren(in);
+
+        when = new Turn(getAttribute(in, WHEN_TAG, 0));
+
+        price = getAttribute(in, PRICE_TAG, 0);
     }
 
     /**
-     * Debug helper.
+     * {@inheritDoc}
      */
     @Override
     public String toString() {
-        return getXMLElementTagName() + "-" + getId() + "-"
-            + when.toString() + "-" + Integer.toString(price);
+        return getXMLElementTagName() + "-" + getId()
+            + "-" + when.toString() + "-" + Integer.toString(price);
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "lastSale"
      */
