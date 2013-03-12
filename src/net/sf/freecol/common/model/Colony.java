@@ -2875,12 +2875,7 @@ public class Colony extends Settlement implements Nameable {
                 exportData.put(data.getId(), data);
             } else if (Modifier.getXMLElementTagName().equals(in.getLocalName())) {
                 Modifier m = new Modifier(in, getSpecification());
-                if (m.hasIncrement()) {
-                    addModifier(m);
-                } else {
-                    logger.warning("Ignoring non-timed colony modifier: "
-                        + m.toString());
-                }
+                addModifier(m);
             } else if ("buildQueue".equals(in.getLocalName())) {
                 // TODO: remove support for old format, move serialization to BuildQueue
                 int size = getAttribute(in, ARRAY_SIZE, 0);
