@@ -1035,21 +1035,16 @@ public class EuropeanAIPlayer extends AIPlayer {
         for (Player p : getGame().getLiveEuropeanPlayers()) {
             if (p.isREF()) continue;
             if (p == player) {
-                String str = AIMessage.askGetNationSummary(this, p)
+                navalStrength = AIMessage.askGetNationSummary(this, p)
                     .getNavalStrength();
-                try {
-                    navalStrength = Integer.parseInt(str);
-                } catch (NumberFormatException e) {}
             } else {
-                String str = AIMessage.askGetNationSummary(this, p)
+                int ns = AIMessage.askGetNationSummary(this, p)
                     .getNavalStrength();
-                try {
-                    navalAverage = Integer.parseInt(str);
-                    nPlayers++;
-                } catch (NumberFormatException e) {}
+                if (ns >= 0) navalAverage += ns;
+                nPlayers++;
             }
         }
-        if (nPlayers <= 0) return -1.0f;
+        if (nPlayers <= 0 || navalStrength < 0) return -1.0f;
         navalAverage /= nPlayers;
         return navalStrength / navalAverage;
     }

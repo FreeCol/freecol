@@ -2890,8 +2890,9 @@ public final class InGameController implements NetworkConstants {
 
         // Offer the choices.
         NationSummary ns = getNationSummary(settlement.getOwner());
-        String number = (ns == null) ? Messages.message("many")
-            : ns.getNumberOfSettlements();
+        String number = (ns == null || ns.getNumberOfSettlements() < 0)
+            ? Messages.message("many")
+            : Integer.toString(ns.getNumberOfSettlements());
         switch (gui.showScoutIndianSettlementDialog(settlement, number)) {
         case CANCEL:
             return true;

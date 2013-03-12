@@ -33,94 +33,72 @@ import org.w3c.dom.Element;
  */
 public class NationSummary extends FreeColObject {
 
-    /**
-     * The number of settlements this player has.
-     */
-    private String numberOfSettlements;
+    /** The stance of the player toward the requesting player. */
+    private Stance stance;
 
-    /**
-     * The number of units this (European) player has.
-     */
-    private String numberOfUnits;
+    /** The number of settlements this player has. */
+    private int numberOfSettlements;
 
-    /**
-     * The military strength of this (European) player.
-     */
-    private String militaryStrength;
+    /** The number of units this (European) player has. */
+    private int numberOfUnits;
 
-    /**
-     * The naval strength of this (European) player.
-     */
-    private String navalStrength;
+    /** The military strength of this (European) player. */
+    private int militaryStrength;
 
-    /**
-     * The stance of the player toward the requesting player.
-     */
-    private String stance;
+    /** The naval strength of this (European) player. */
+    private int navalStrength;
 
-    /**
-     * The gold this (European) player has.
-     */
-    private String gold;
+    /** The gold this (European) player has. */
+    private int gold;
 
-    /**
-     * The (European) player SoL.
-     */
-    private String soL;
+    /** The (European) player SoL. */
+    private int soL;
 
-    /**
-     * The number of founding fathers this (European) player has.
-     */
-    private String foundingFathers;
+    /** The number of founding fathers this (European) player has. */
+    private int foundingFathers;
 
-    /**
-     * The tax rate of this (European) player.
-     */
-    private String tax;
+    /** The tax rate of this (European) player. */
+    private int tax;
 
 
     /**
      * Creates a nation summary for the specified player.
      *
-     * @param player The <code>Player</code> the player to create the
-     *     summary of.
+     * @param player The <code>Player</code> to create the summary for.
      * @param requester The <code>Player</code> making the request.
      */
     public NationSummary(Player player, Player requester) {
         setId("");
-        numberOfSettlements = Integer.toString(player.getSettlements().size());
-        Stance sta = player.getStance(requester);
-        stance = ((sta == Stance.UNCONTACTED) ? Stance.PEACE
-                  : sta).toString();
+
+        stance = player.getStance(requester);
+        if (stance == Stance.UNCONTACTED) stance = Stance.PEACE;
+
+        numberOfSettlements = player.getSettlements().size();
 
         if (player.isEuropean()) {
+            numberOfUnits = militaryStrength = navalStrength = 0;
             CombatModel cm = player.getGame().getCombatModel();
-            int nUnits = 0, sMilitary = 0, sNaval = 0;
             for (Unit unit : player.getUnits()) {
-                nUnits++;
+                numberOfUnits++;
                 if (unit.isNaval()) {
-                    sNaval += cm.getOffencePower(unit, null);
+                    navalStrength += cm.getOffencePower(unit, null);
                 } else {
-                    sMilitary += cm.getOffencePower(unit, null);
+                    militaryStrength += cm.getOffencePower(unit, null);
                 }
             }
-            numberOfUnits = Integer.toString(nUnits);
-            militaryStrength = Integer.toString(sMilitary);
-            navalStrength = Integer.toString(sNaval);
-            gold = Integer.toString(player.getGold());
+
+            gold = player.getGold();
             if (player == requester || requester
                 .hasAbility("model.ability.betterForeignAffairsReport")) {
-                soL = Integer.toString(player.getSoL());
-                foundingFathers = Integer.toString(player.getFatherCount());
-                tax = String.valueOf(player.getTax());
+                soL = player.getSoL();
+                foundingFathers = player.getFatherCount();
+                tax = player.getTax();
             } else {
-                soL = null;
-                foundingFathers = null;
-                tax = null;
+                soL = foundingFathers = tax = -1;
             }
         } else {
-            numberOfUnits = militaryStrength = navalStrength = gold = "-1";
-            soL = foundingFathers = tax = null;
+            numberOfUnits = militaryStrength = navalStrength = gold = soL
+                = foundingFathers = tax = -1;
         }
     }
 
@@ -135,105 +113,120 @@ public class NationSummary extends FreeColObject {
 
 
     // Trivial accessors
-    public String getNumberOfSettlements() {
+    public Stance getStance() {
+        return stance;
+    }
+
+    public int getNumberOfSettlements() {
         return numberOfSettlements;
     }
 
-    public String getNumberOfUnits() {
+    public int getNumberOfUnits() {
         return numberOfUnits;
     }
 
-    public String getMilitaryStrength() {
+    public int getMilitaryStrength() {
         return militaryStrength;
     }
 
-    public String getNavalStrength() {
+    public int getNavalStrength() {
         return navalStrength;
     }
 
-    public Stance getStance() {
-        return Enum.valueOf(Stance.class, stance);
-    }
-
     public int getGold() {
-        return Integer.parseInt(gold);
+        return gold;
     }
 
-    public String getFoundingFathers() {
+    public int getFoundingFathers() {
         return foundingFathers;
     }
 
-    public String getSoL() {
+    public int getSoL() {
         return soL;
     }
 
-    public String getTax() {
+    public int getTax() {
         return tax;
     }
 
 
+    // Serialization
+
+    private static final String FOUNDING_FATHERS_TAG = "foundingFathers";
+    private static final String GOLD_TAG = "gold";
+    private static final String MILITARY_STRENGTH_TAG = "militaryStrength";
+    private static final String NAVAL_STRENGTH_TAG = "navalStrength";
+    private static final String NUMBER_OF_SETTLEMENTS_TAG = "numberOfSettlements";
+    private static final String NUMBER_OF_UNITS_TAG = "numberOfUnits";
+    private static final String SOL_TAG = "SoL";
+    private static final String STANCE_TAG = "stance";
+    private static final String TAX_TAG = "tax";
+
+
     /**
-     * This method writes an XML-representation of this object to the given
-     * stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
+     * {@inheritDoc}
      */
+    @Override
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         super.toXML(out, getXMLElementTagName());
     }
 
     /**
-     * Write the attributes of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *     to the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
-        out.writeAttribute("numberOfSettlements", numberOfSettlements);
-        out.writeAttribute("numberOfUnits", numberOfUnits);
-        out.writeAttribute("militaryStrength", militaryStrength);
-        out.writeAttribute("navalStrength", navalStrength);
-        out.writeAttribute("stance", stance);
-        out.writeAttribute("gold", gold);
-        if (soL != null) {
-            out.writeAttribute("SoL", soL);
+        writeAttribute(out, NUMBER_OF_SETTLEMENTS_TAG, numberOfSettlements);
+
+        writeAttribute(out, NUMBER_OF_UNITS_TAG, numberOfUnits);
+
+        writeAttribute(out, MILITARY_STRENGTH_TAG, militaryStrength);
+
+        writeAttribute(out, NAVAL_STRENGTH_TAG, navalStrength);
+
+        writeAttribute(out, STANCE_TAG, stance);
+
+        writeAttribute(out, GOLD_TAG, gold);
+
+        if (soL >= 0) {
+            writeAttribute(out, SOL_TAG, soL);
         }
-        if (foundingFathers != null) {
-            out.writeAttribute("foundingFathers", foundingFathers);
+
+        if (foundingFathers >= 0) {
+            writeAttribute(out, FOUNDING_FATHERS_TAG, foundingFathers);
         }
-        if (tax != null) {
-            out.writeAttribute("tax", tax);
+
+        if (tax >= 0) {
+            writeAttribute(out, TAX_TAG, tax);
         }
     }
 
     /**
-     * Reads the attributes of this object from an XML stream.
-     *
-     * @param in The XML input stream.
-     * @throws XMLStreamException if a problem was encountered
-     *     during parsing.
+     * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
 
-        numberOfSettlements = getAttribute(in, "numberOfSettlements", "");
-        numberOfUnits = getAttribute(in, "numberOfUnits", "");
-        militaryStrength = getAttribute(in, "militaryStrength", "");
-        navalStrength = getAttribute(in, "navalStrength", "");
-        stance = getAttribute(in, "stance", "");
-        gold = getAttribute(in, "gold", "");
-        soL = in.getAttributeValue(null, "SoL");
-        foundingFathers = in.getAttributeValue(null, "foundingFathers");
-        tax = in.getAttributeValue(null, "tax");
+        stance = getAttribute(in, STANCE_TAG, Stance.class, Stance.PEACE);
+
+        numberOfSettlements = getAttribute(in, NUMBER_OF_SETTLEMENTS_TAG, -1);
+
+        numberOfUnits = getAttribute(in, NUMBER_OF_UNITS_TAG, -1);
+
+        militaryStrength = getAttribute(in, MILITARY_STRENGTH_TAG, -1);
+
+        navalStrength = getAttribute(in, NAVAL_STRENGTH_TAG, -1);
+
+        gold = getAttribute(in, GOLD_TAG, -1);
+
+        soL = getAttribute(in, SOL_TAG, -1);
+
+        foundingFathers = getAttribute(in, FOUNDING_FATHERS_TAG, -1);
+
+        tax = getAttribute(in, TAX_TAG, -1);
     }
 
     /**
