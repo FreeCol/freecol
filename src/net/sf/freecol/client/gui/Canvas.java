@@ -298,9 +298,7 @@ public final class Canvas extends JDesktopPane {
 
     private final ClientOptionsDialog clientOptionsDialog;
 
-    private final LoadingSavegameDialog loadingSavegameDialog;
-
-
+    private final LoadingSavegameDialog loadingSavegameDialog;    
 
     private boolean clientOptionsDialogShowing = false;
     /**
@@ -1531,41 +1529,6 @@ public final class Canvas extends JDesktopPane {
                                  tile, true);
     }
 
-    public void showReportCargoPanel() {
-        showSubPanel(new ReportCargoPanel(freeColClient, gui), true);
-
-    }
-
-    public void showReportColonyPanel() {
-        showSubPanel(new ReportColonyPanel(freeColClient, gui), true);
-
-    }
-
-    public void showReportContinentalCongressPanel() {
-        showSubPanel(new ReportContinentalCongressPanel(freeColClient, gui), true);
-    }
-
-    public void showReportEducationPanel() {
-        showSubPanel(new ReportEducationPanel(freeColClient, gui), true);
-
-    }
-
-    public void showReportExplorationPanel() {
-        showSubPanel(new ReportExplorationPanel(freeColClient, gui), true);
-    }
-
-    public void showReportForeignAffairPanel() {
-        showSubPanel(new ReportForeignAffairPanel(freeColClient, gui), true);
-    }
-
-    public void showReportHistoryPanel() {
-        showSubPanel(new ReportHistoryPanel(freeColClient, gui), true);
-    }
-
-    public void showReportIndianPanel() {
-        showSubPanel(new ReportIndianPanel(freeColClient, gui), true);
-    }
-
     public void showReportLabourDetailPanel(UnitType unitType, Map<UnitType, Map<Location, Integer>> data,
             TypeCountMap<UnitType> unitCount, List<Colony> colonies) {
 
@@ -1574,49 +1537,131 @@ public final class Canvas extends JDesktopPane {
         showSubPanel(details, true);
     }
 
-    public void showReportLabourPanel() {
-        showSubPanel(new ReportLabourPanel(freeColClient, gui), true);
 
+    // Singleton specialist reports
+
+    public void showReportCargoPanel() {
+        ReportCargoPanel r = getExistingFreeColPanel(ReportCargoPanel.class);
+        if (r == null) showSubPanel(new ReportCargoPanel(freeColClient,
+                                                         freeColClient.getGUI()),
+                                    true);
+    }
+
+    public void showReportColonyPanel() {
+        ReportColonyPanel r = getExistingFreeColPanel(ReportColonyPanel.class);
+        if (r == null) showSubPanel(new ReportColonyPanel(freeColClient,
+                                                          freeColClient.getGUI()),
+                                    true);
+    }
+
+    public void showReportContinentalCongressPanel() {
+        ReportContinentalCongressPanel r = getExistingFreeColPanel(ReportContinentalCongressPanel.class);
+        if (r == null) showSubPanel(new ReportContinentalCongressPanel(freeColClient,
+                                                                       freeColClient.getGUI()),
+                                    true);
+    }
+
+    public void showReportEducationPanel() {
+        ReportEducationPanel r = getExistingFreeColPanel(ReportEducationPanel.class);
+        if (r == null) showSubPanel(new ReportEducationPanel(freeColClient,
+                                                             freeColClient.getGUI()),
+                                    true);
+    }
+
+    public void showReportExplorationPanel() {
+        ReportExplorationPanel r = getExistingFreeColPanel(ReportExplorationPanel.class);
+        if (r == null) showSubPanel(new ReportExplorationPanel(freeColClient,
+                                                               freeColClient.getGUI()),
+                                    true);
+    }
+
+    public void showReportForeignAffairPanel() {
+        ReportForeignAffairPanel r = getExistingFreeColPanel(ReportForeignAffairPanel.class);
+        if (r == null) showSubPanel(new ReportForeignAffairPanel(freeColClient,
+                                                                 freeColClient.getGUI()),
+                                    true);
+    }
+
+    public void showReportHistoryPanel() {
+        ReportHistoryPanel r = getExistingFreeColPanel(ReportHistoryPanel.class);
+        if (r == null) showSubPanel(new ReportHistoryPanel(freeColClient,
+                                                           freeColClient.getGUI()),
+                                    true);
+    }
+
+    public void showReportIndianPanel() {
+        ReportIndianPanel r = getExistingFreeColPanel(ReportIndianPanel.class);
+        if (r == null) showSubPanel(new ReportIndianPanel(freeColClient,
+                                                          freeColClient.getGUI()),
+                                    true);
+    }
+
+    public void showReportLabourPanel() {
+        ReportLabourPanel r = getExistingFreeColPanel(ReportLabourPanel.class);
+        if (r == null) showSubPanel(new ReportLabourPanel(freeColClient,
+                                                          freeColClient.getGUI()),
+                                    true);
     }
 
     public void showReportMilitaryPanel() {
-        showSubPanel(new ReportMilitaryPanel(freeColClient, gui), true);
+        ReportMilitaryPanel r = getExistingFreeColPanel(ReportMilitaryPanel.class);
+        if (r == null) showSubPanel(new ReportMilitaryPanel(freeColClient,
+                                                            freeColClient.getGUI()),
+                                    true);
     }
 
     public void showReportNavalPanel() {
-        showSubPanel(new ReportNavalPanel(freeColClient, gui), true);
-
+        ReportNavalPanel r = getExistingFreeColPanel(ReportNavalPanel.class);
+        if (r == null) showSubPanel(new ReportNavalPanel(freeColClient,
+                                                         freeColClient.getGUI()),
+                                    true);
     }
 
     public void showReportProductionPanel() {
-        showSubPanel(new ReportProductionPanel(freeColClient, gui), true);
-
+        ReportProductionPanel r = getExistingFreeColPanel(ReportProductionPanel.class);
+        if (r == null) showSubPanel(new ReportProductionPanel(freeColClient,
+                                                              freeColClient.getGUI()),
+                                    true);
     }
 
-
     public void showReportReligiousPanel() {
-        showSubPanel(new ReportReligiousPanel(freeColClient, gui), true);
-
+        ReportReligiousPanel r = getExistingFreeColPanel(ReportReligiousPanel.class);
+        if (r == null) showSubPanel(new ReportReligiousPanel(freeColClient,
+                                                             freeColClient.getGUI()),
+                                    true);
     }
 
     public void showReportRequirementsPanel() {
-        showSubPanel(new ReportRequirementsPanel(freeColClient, gui), true);
+        ReportRequirementsPanel r = getExistingFreeColPanel(ReportRequirementsPanel.class);
+        if (r == null) showSubPanel(new ReportRequirementsPanel(freeColClient,
+                                                                freeColClient.getGUI()),
+                                    true);
     }
 
     public void showReportTradePanel() {
-        showSubPanel(new ReportTradePanel(freeColClient, gui), true);
-
+        ReportTradePanel r = getExistingFreeColPanel(ReportTradePanel.class);
+        if (r == null) showSubPanel(new ReportTradePanel(freeColClient,
+                                                         freeColClient.getGUI()),
+                                    true);
     }
 
-
     /**
-     * Show the new turn report.
+     * Show the turn report.
      *
      * @param messages The <code>ModelMessage</code>s to show.
      */
     public void showReportTurnPanel(ModelMessage... messages) {
-        showSubPanel(new ReportTurnPanel(freeColClient, gui, messages), true);
+        ReportTurnPanel r = getExistingFreeColPanel(ReportTurnPanel.class);
+        if (r == null) {
+            showSubPanel(new ReportTurnPanel(freeColClient,
+                                             freeColClient.getGUI(), messages),
+                         true);
+        } else {
+            r.setMessages(messages);
+        }
     }
+
+
 
     public String showRiverStyleDialog() {
         return showFreeColDialog(new RiverStylePanel(freeColClient, gui), null, true);
@@ -2226,17 +2271,53 @@ public final class Canvas extends JDesktopPane {
     /**
      * Gets any currently displayed colony panel for the specified colony.
      *
+     * This is distinct from {@link #getExistingFreeColPanel} because
+     * there can be multiple ColonyPanels.
+     *
      * @param colony The <code>Colony</code> to check.
      * @return A currently displayed colony panel, or null if not found.
      */
     private ColonyPanel getColonyPanel(Colony colony) {
         for (Component c1 : getComponents()) {
             if (c1 instanceof JInternalFrame) {
-                for (Component c2 : ((JInternalFrame) c1).getContentPane().getComponents()) {
+                for (Component c2 : ((JInternalFrame) c1).getContentPane()
+                         .getComponents()) {
                     if (c2 instanceof ColonyPanel
-                        && ((ColonyPanel) c2).getColony() == colony) {
-                        return (ColonyPanel) c2;
+                        && ((ColonyPanel)c2).getColony() == colony) {
+                        return (ColonyPanel)c2;
                     }
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Gets a currently displayed FreeColPanel of a given type.
+     *
+     * @param type The type of <code>FreeColPanel</code> to look for.
+     * @return A currently displayed <code>FreeColPanel</code> of the
+     *     requested type, or null if none found.
+     */
+    public <T extends FreeColPanel> T getExistingFreeColPanel(Class<T> type) {
+        for (Component c1 : getComponents()) {
+            if (c1 instanceof JInternalFrame) {
+                for (Component c2 : ((JInternalFrame)c1).getContentPane()
+                         .getComponents()) {
+                    try {
+                        T ret = type.cast(c2);
+                        if (ret != null) {
+                            final JInternalFrame jif = (JInternalFrame)c1;
+                            SwingUtilities.invokeLater(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        jif.toFront();
+                                        jif.repaint();
+                                    }
+                                });
+                            return ret;
+                        }
+                    } catch (ClassCastException cce) {}
                 }
             }
         }

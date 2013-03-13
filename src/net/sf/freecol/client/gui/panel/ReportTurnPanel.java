@@ -63,14 +63,17 @@ import net.sf.freecol.common.option.BooleanOption;
  * This panel displays the Turn Report.
  */
 public final class ReportTurnPanel extends ReportPanel {
+	
 
     private static final Logger logger = Logger.getLogger(ReportTurnPanel.class.getName());
 
     /** The messages to display. */
     private ModelMessage[] messages;
 
-    private Hashtable<String, Vector<JComponent>> textPanesByMessage = new Hashtable<String, Vector<JComponent>>();
-    private Hashtable<String, Vector<JComponent>> labelsByMessage = new Hashtable<String, Vector<JComponent>>();
+    private Hashtable<String, Vector<JComponent>> textPanesByMessage
+        = new Hashtable<String, Vector<JComponent>>();
+    private Hashtable<String, Vector<JComponent>> labelsByMessage
+        = new Hashtable<String, Vector<JComponent>>();
 
 
     /**
@@ -84,14 +87,22 @@ public final class ReportTurnPanel extends ReportPanel {
                            ModelMessage... messages) {
         super(freeColClient, gui, Messages.message("reportTurnAction.name"));
 
-        this.messages = messages;
-        
         // Display Panel
         reportPanel.removeAll();
         reportPanel.setLayout(new MigLayout("wrap 4", "[center][550!]:push[][]", ""));
-        if (messages != null) displayMessages();
+        setMessages(messages);
     }
 
+    /**
+     * Set the messages being displayed by this report.
+     *
+     * @param messages The <code>ModelMessages</code> to display in the report.
+     */
+    public void setMessages(ModelMessage[] messages) {
+        this.messages = messages;
+        if (messages != null) displayMessages();
+    }
+        
     private void displayMessages() {
         final Game game = getFreeColClient().getGame();
         final ClientOptions options = getClientOptions();
@@ -394,12 +405,16 @@ public final class ReportTurnPanel extends ReportPanel {
                               document.getStyle("regular"));
     }
 
-
     private void insertLinkButton(StyledDocument document, FreeColGameObject object, String name)
         throws Exception {
         JButton button = getLinkButton(name, null, object.getId());
         button.addActionListener(this);
         StyleConstants.setComponent(document.getStyle("button"), button);
         document.insertString(document.getLength(), " ", document.getStyle("button"));
+    }
+    
+    @Override
+    public void actionPerformed(ActionEvent event) {
+        super.actionPerformed(event);
     }
 }
