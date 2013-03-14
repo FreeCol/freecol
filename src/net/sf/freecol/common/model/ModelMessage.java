@@ -63,16 +63,19 @@ public class ModelMessage extends StringTemplate {
         }
     }
 
-    private String ownerId; /* deprecated */
     private String sourceId;
     private String displayId;
     private MessageType messageType;
     private boolean beenDisplayed = false;
+    // @compat 0.9.x
+    private String ownerId;
+    // end @compat
 
 
-    public ModelMessage() {
-        // empty constructor
-    }
+    /**
+     * Empty constructor for serialization.
+     */
+    public ModelMessage() {}
 
     /**
      * Creates a new <code>ModelMessage</code>.
@@ -80,9 +83,10 @@ public class ModelMessage extends StringTemplate {
      * @param id The ID of the message to display.
      * @param source The source of the message. This is what the
      *               message should be associated with.
-     * @param display The Object to display.
+     * @param display The <code>FreeColObject</code> to display.
      */
-    public ModelMessage(String id, FreeColGameObject source, FreeColObject display) {
+    public ModelMessage(String id, FreeColGameObject source,
+                        FreeColObject display) {
         this(MessageType.DEFAULT, id, source, display);
     }
 
@@ -94,7 +98,8 @@ public class ModelMessage extends StringTemplate {
      * @param source The source of the message. This is what the
      *               message should be associated with.
      */
-    public ModelMessage(MessageType messageType, String id, FreeColGameObject source) {
+    public ModelMessage(MessageType messageType, String id,
+                        FreeColGameObject source) {
         this(messageType, id, source, getDefaultDisplay(messageType, source));
     }
 
@@ -106,7 +111,8 @@ public class ModelMessage extends StringTemplate {
      *               message should be associated with.
      */
     public ModelMessage(String id, FreeColGameObject source) {
-        this(MessageType.DEFAULT, id, source, getDefaultDisplay(MessageType.DEFAULT, source));
+        this(MessageType.DEFAULT, id, source,
+             getDefaultDisplay(MessageType.DEFAULT, source));
     }
 
     /**
@@ -116,9 +122,10 @@ public class ModelMessage extends StringTemplate {
      * @param id The ID of the message to display.
      * @param source The source of the message. This is what the
      *               message should be associated with.
-     * @param display The object to display.
+     * @param display The <code>FreeColObject</code> to display.
      */
-    public ModelMessage(MessageType messageType, String id, FreeColGameObject source, FreeColObject display) {
+    public ModelMessage(MessageType messageType, String id,
+                        FreeColGameObject source, FreeColObject display) {
         super(id, TemplateType.TEMPLATE);
         this.messageType = messageType;
         this.sourceId = source.getId();
@@ -126,86 +133,6 @@ public class ModelMessage extends StringTemplate {
         this.ownerId = null;
     }
 
-    /**
-     * Set the <code>DefaultId</code> value.
-     *
-     * @param newDefaultId The new DefaultId value.
-     * @return a <code>ModelMessage</code> value
-     */
-    @Override
-    public final ModelMessage setDefaultId(final String newDefaultId) {
-        super.setDefaultId(newDefaultId);
-        return this;
-    }
-
-    /**
-     * Returns the default display object for the given type.
-     *
-     * @param messageType The type to find the default display object for.
-     * @param source The source object
-     * @return An object to be displayed for the message.
-     */
-    static private FreeColObject getDefaultDisplay(MessageType messageType,
-                                                   FreeColGameObject source) {
-        FreeColObject o = null;
-        switch (messageType) {
-        case SONS_OF_LIBERTY:
-        case GOVERNMENT_EFFICIENCY:
-            o = source.getSpecification().getGoodsType("model.goods.bells");
-            break;
-        case UNIT_IMPROVED:
-        case UNIT_DEMOTED:
-        case UNIT_LOST:
-        case UNIT_ADDED:
-        case LOST_CITY_RUMOUR:
-        case COMBAT_RESULT:
-        case DEMANDS:
-        case GOODS_MOVEMENT:
-            o = source;
-            break;
-        case BUILDING_COMPLETED:
-            o = source.getSpecification().getGoodsType("model.goods.hammers");
-            break;
-        case DEFAULT:
-        case WARNING:
-        case WAREHOUSE_CAPACITY:
-        case FOREIGN_DIPLOMACY:
-        case MARKET_PRICES:
-        case MISSING_GOODS:
-        case TUTORIAL:
-        case GIFT_GOODS:
-        default:
-            if (source instanceof Player) {
-                o = source;
-            }
-            break;
-        }
-        return o;
-    }
-
-
-    /**
-     * Checks if this <code>ModelMessage</code> has been displayed.
-     *
-     * @return <i>true</i> if this <code>ModelMessage</code> has been
-     * displayed.
-     * @see #setBeenDisplayed
-     */
-    public boolean hasBeenDisplayed() {
-        return beenDisplayed;
-    }
-
-    /**
-     * Sets the <code>beenDisplayed</code> value of this
-     * <code>ModelMessage</code>.  This is used to avoid showing the
-     * same message twice.
-     *
-     * @param beenDisplayed Should be set to <code>true</code> after the
-     *       message has been displayed.
-     */
-    public void setBeenDisplayed(boolean beenDisplayed) {
-        this.beenDisplayed = beenDisplayed;
-    }
 
     /**
      * Gets the ID of the source of the message.
@@ -244,6 +171,17 @@ public class ModelMessage extends StringTemplate {
     }
 
     /**
+     * Switch the source (and display if it is the same) to a new
+     * object.  Called when the source object becomes invalid.
+     *
+     * @param newSource A new source.
+     */
+    public void divert(FreeColGameObject newSource) {
+        if (displayId == sourceId) displayId = newSource.getId();
+        sourceId = newSource.getId();
+    }
+
+    /**
      * Gets the messageType of the message to display.
      *
      * @return The messageType.
@@ -261,19 +199,31 @@ public class ModelMessage extends StringTemplate {
         this.messageType = messageType;
     }
 
+    /**
+     * Gets a key for this type of message.
+     *
+     * @return A message key.
+     */
     public String getMessageTypeName() {
         return "model.message." + messageType.toString();
     }
 
     /**
-     * Switch the source (and display if it is the same) to a new
-     * object.  Called when an object becomes invalid.
+     * Has this message been displayed?
      *
-     * @param newSource A new source.
+     * @return True if this message has been displayed.
      */
-    public void divert(FreeColGameObject newSource) {
-        if (displayId == sourceId) displayId = newSource.getId();
-        sourceId = newSource.getId();
+    public boolean hasBeenDisplayed() {
+        return beenDisplayed;
+    }
+
+    /**
+     * Sets whether this message has been displayed.
+     *
+     * @param beenDisplayed The new displayed state.
+     */
+    public void setBeenDisplayed(boolean beenDisplayed) {
+        this.beenDisplayed = beenDisplayed;
     }
 
     /**
@@ -290,117 +240,128 @@ public class ModelMessage extends StringTemplate {
         this.ownerId = ownerId;
     }
 
+
     /**
-     * Add a new key and replacement to the ModelMessage. This is
-     * only possible if the ModelMessage is of type TEMPLATE.
+     * Gets the default display object for the given type.
      *
-     * @param key a <code>String</code> value
-     * @param value a <code>String</code> value
-     * @return a <code>ModelMessage</code> value
+     * @param messageType The type to find the default display object for.
+     * @param source The source object
+     * @return An object to be displayed for the message.
      */
+    static private FreeColObject getDefaultDisplay(MessageType messageType,
+                                                   FreeColGameObject source) {
+        FreeColObject o = null;
+        switch (messageType) {
+        case SONS_OF_LIBERTY:
+        case GOVERNMENT_EFFICIENCY:
+            o = source.getSpecification().getGoodsType("model.goods.bells");
+            break;
+        case UNIT_IMPROVED:
+        case UNIT_DEMOTED:
+        case UNIT_LOST:
+        case UNIT_ADDED:
+        case LOST_CITY_RUMOUR:
+        case COMBAT_RESULT:
+        case DEMANDS:
+        case GOODS_MOVEMENT:
+            o = source;
+            break;
+        case BUILDING_COMPLETED:
+            o = source.getSpecification().getGoodsType("model.goods.hammers");
+            break;
+        case DEFAULT:
+        case WARNING:
+        case WAREHOUSE_CAPACITY:
+        case FOREIGN_DIPLOMACY:
+        case MARKET_PRICES:
+        case MISSING_GOODS:
+        case TUTORIAL:
+        case GIFT_GOODS:
+        default:
+            if (source instanceof Player) o = source;
+            break;
+        }
+        return o;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final ModelMessage setDefaultId(final String newDefaultId) {
+        return (ModelMessage) super.setDefaultId(newDefaultId);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public ModelMessage add(String key, String value) {
-        super.add(key, value);
-        return this;
+        return (ModelMessage) super.add(key, value);
     }
 
     /**
-     * Add a replacement value without a key to the ModelMessage.
-     * This is only possible if the ModelMessage is of type LABEL.
-     *
-     * @param value a <code>String</code> value
-     * @return a <code>ModelMessage</code> value
+     * {@inheritDoc}
      */
+    @Override
     public ModelMessage add(String value) {
-        super.add(value);
-        return this;
+        return (ModelMessage) super.add(value);
     }
 
     /**
-     * Add a new key and replacement to the ModelMessage. The
-     * replacement must be a proper name. This is only possible if the
-     * ModelMessage is of type TEMPLATE.
-     *
-     * @param key a <code>String</code> value
-     * @param value a <code>String</code> value
-     * @return a <code>ModelMessage</code> value
+     * {@inheritDoc}
      */
+    @Override
     public ModelMessage addName(String key, String value) {
-        super.addName(key, value);
-        return this;
+        return (ModelMessage) super.addName(key, value);
     }
 
     /**
-     * Add a replacement value without a key to the ModelMessage.
-     * The replacement must be a proper name.  This is only possible
-     * if the ModelMessage is of type LABEL.
-     *
-     * @param value a <code>String</code> value
-     * @return a <code>ModelMessage</code> value
+     * {@inheritDoc}
      */
+    @Override
     public ModelMessage addName(String value) {
-        super.addName(value);
-        return this;
+        return (ModelMessage) super.addName(value);
     }
 
     /**
-     * Add a new key and replacement to the StringTemplate. The
-     * replacement must be a proper name. This is only possible if the
-     * StringTemplate is of type TEMPLATE.
-     *
-     * @param key a <code>String</code> value
-     * @param object a <code>FreeColObject</code> value
-     * @return a <code>ModelMessage</code> value
+     * {@inheritDoc}
      */
+    @Override
     public ModelMessage addName(String key, FreeColObject object) {
-        super.addName(key, object);
-        return this;
-    }
-
-
-    /**
-     * Add a key and an integer value to replace it to this
-     * StringTemplate.
-     *
-     * @param key a <code>String</code> value
-     * @param amount an <code>int</code> value
-     * @return a <code>ModelMessage</code> value
-     */
-    public ModelMessage addAmount(String key, int amount) {
-        super.addAmount(key, amount);
-        return this;
+        return (ModelMessage) super.addName(key, object);
     }
 
     /**
-     * Add a key and a StringTemplate to replace it to this
-     * StringTemplate.
-     *
-     * @param key a <code>String</code> value
-     * @param template a <code>StringTemplate</code> value
-     * @return a <code>ModelMessage</code> value
+     * {@inheritDoc}
      */
+    @Override
+    public ModelMessage addAmount(String key, Number amount) {
+        return (ModelMessage) super.addAmount(key, amount);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public ModelMessage addStringTemplate(String key, StringTemplate template) {
-        super.addStringTemplate(key, template);
-        return this;
+        return (ModelMessage) super.addStringTemplate(key, template);
     }
 
     /**
-     * Add a StringTemplate to this LABEL StringTemplate.
-     *
-     * @param template a <code>StringTemplate</code> value
-     * @return a <code>ModelMessage</code> value
+     * {@inheritDoc}
      */
+    @Override
     public ModelMessage addStringTemplate(StringTemplate template) {
-        super.addStringTemplate(template);
-        return this;
+        return (ModelMessage) super.addStringTemplate(template);
     }
 
 
+    // Interface Object
+
     /**
-     * Checks if this <code>ModelMessage</code> is equal to another
-     * <code>ModelMessage</code>.
-     *
-     * @param o The <code>Object</code> to compare.
-     * @return <i>true</i> if the sources, message IDs and data are equal.
+     * {@inheritDoc}
      */
     @Override
     public boolean equals(Object o) {
@@ -415,6 +376,9 @@ public class ModelMessage extends StringTemplate {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         int value = 1;
@@ -426,73 +390,81 @@ public class ModelMessage extends StringTemplate {
     }
 
 
+    // Serialization
+
+    private static final String DISPLAY_TAG = "display";
+    private static final String HAS_BEEN_DISPLAYED_TAG = "hasBeenDisplayed";
+    private static final String MESSAGE_TYPE_TAG = "messageType";
+    private static final String SOURCE_TAG = "source";
+    // @compat 0.9.x
+    private static final String OWNER_TAG = "owner";
+    // end @compat
+
+
     /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * {@inheritDoc}
      */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         super.toXML(out, getXMLElementTagName());
     }
 
     /**
-     * Write the attributes of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *     to the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
-        if (ownerId != null) {
-            out.writeAttribute("owner", ownerId);
-        }
-        out.writeAttribute("source", sourceId);
+        writeAttribute(out, SOURCE_TAG, sourceId);
+
         if (displayId != null) {
-            out.writeAttribute("display", displayId);
+            writeAttribute(out, DISPLAY_TAG, displayId);
         }
-        out.writeAttribute("messageType", messageType.toString());
-        out.writeAttribute("hasBeenDisplayed", String.valueOf(beenDisplayed));
+
+        writeAttribute(out, MESSAGE_TYPE_TAG, messageType);
+
+        writeAttribute(out, HAS_BEEN_DISPLAYED_TAG, beenDisplayed);
+
+        // @compat 0.9.x
+        if (ownerId != null) {
+            writeAttribute(out, OWNER_TAG, ownerId);
+        }
+        // end @compat
     }
 
     /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
-     * @exception XMLStreamException if a problem was encountered
-     *      during parsing.
+     * {@inheritDoc}
      */
-    public void readFromXML(XMLStreamReader in) throws XMLStreamException {
+    @Override
+    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
 
-        // Remove this when the 0.9.x save hack (in Game.java) is gone.
-        ownerId = in.getAttributeValue(null, "owner");
+        sourceId = getAttribute(in, SOURCE_TAG, (String)null);
 
-        messageType = Enum.valueOf(MessageType.class, getAttribute(in, "messageType", MessageType.DEFAULT.toString()));
-        beenDisplayed = Boolean.parseBoolean(in.getAttributeValue(null, "hasBeenDisplayed"));
-        sourceId = in.getAttributeValue(null, "source");
-        displayId = in.getAttributeValue(null, "display");
+        displayId = getAttribute(in, DISPLAY_TAG, (String)null);
 
-        super.readChildren(in);
+        messageType = getAttribute(in, MESSAGE_TYPE_TAG, 
+                                   MessageType.class, MessageType.DEFAULT);
+
+        beenDisplayed = getAttribute(in, HAS_BEEN_DISPLAYED_TAG, false);
+
+        // @compat 0.9.x
+        ownerId = getAttribute(in, OWNER_TAG, (String)null);
+        // end @compat
     }
 
     /**
-     * Debug helper.
+     * {@inheritDoc}
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("ModelMessage<" + hashCode()
-            + ", ");
-        sb.append(((sourceId == null) ? "null" : sourceId) + ", ");
-        sb.append(((displayId == null) ? "null" : displayId) + ", ");
-        sb.append(super.toString());
-        sb.append(", " + messageType + " >");
+        StringBuilder sb = new StringBuilder("ModelMessage<");
+        sb.append(hashCode()).append(", ");
+        sb.append((sourceId == null) ? "null" : sourceId).append(", ");
+        sb.append((displayId == null) ? "null" : displayId).append(", ");
+        sb.append(super.toString()).append(", ");
+        sb.append(messageType).append(" >");
         return sb.toString();
     }
 

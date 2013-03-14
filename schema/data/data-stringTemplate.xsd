@@ -48,9 +48,13 @@
   <xs:simpleType name="TemplateType">
     <xs:restriction base="xs:NMTOKEN">
       <xs:enumeration value="KEY" />
+      <xs:enumeration value="key" />
       <xs:enumeration value="NAME" />
+      <xs:enumeration value="name" />
       <xs:enumeration value="LABEL" />
+      <xs:enumeration value="label" />
       <xs:enumeration value="TEMPLATE" />
+      <xs:enumeration value="template" />
     </xs:restriction>
   </xs:simpleType>
 

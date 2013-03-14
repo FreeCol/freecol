@@ -47,182 +47,148 @@ public class HistoryEvent extends StringTemplate {
     }
 
 
-    /**
-     * The turn in which the event took place
-     */
+    /** The turn in which the event took place */
     private Turn turn;
 
-    /**
-     * The type of event.
-     */
+    /** The type of event. */
     private EventType eventType;
 
-    public HistoryEvent() {
-        // empty constructor
-    }
 
+    /**
+     * Empty constructor for serialization.
+     */
+    public HistoryEvent() {}
+
+    /**
+     * Create a new history event of given turn and type.
+     *
+     * @param turn The <code>Turn</code> of the event.
+     * @param eventType The <code>EventType</code>.
+     */
     public HistoryEvent(Turn turn, EventType eventType) {
         super("model.history." + eventType.toString(), TemplateType.TEMPLATE);
         this.turn = turn;
         this.eventType = eventType;
     }
 
+
     /**
-     * Get the <code>int</code> value.
+     * Get the turn of this history event.
      *
-     * @return a <code>int</code> value
+     * @return The turn.
      */
     public final Turn getTurn() {
         return turn;
     }
 
     /**
-     * Set the <code>int</code> value.
+     * Get the type of this history event.
      *
-     * @param newInt The new int value.
-     */
-    public final void setTurn(final Turn newInt) {
-        this.turn = newInt;
-    }
-
-    /**
-     * Get the <code>EventType</code> value.
-     *
-     * @return a <code>EventType</code> value
+     * @return The event type.
      */
     public final EventType getEventType() {
         return eventType;
     }
 
-    /**
-     * Set the <code>EventType</code> value.
-     *
-     * @param newEventType The new EventType value.
-     */
-    public final void setEventType(final EventType newEventType) {
-        this.eventType = newEventType;
-    }
 
     /**
-     * Add a new key and replacement to the HistoryEvent. This is
-     * only possible if the HistoryEvent is of type TEMPLATE.
-     *
-     * @param key a <code>String</code> value
-     * @param value a <code>String</code> value
-     * @return a <code>HistoryEvent</code> value
+     * {@inheritDoc}
      */
+    @Override
     public HistoryEvent add(String key, String value) {
-        super.add(key, value);
-        return this;
+        return (HistoryEvent) super.add(key, value);
     }
 
     /**
-     * Add a new key and replacement to the HistoryEvent. The
-     * replacement must be a proper name. This is only possible if the
-     * HistoryEvent is of type TEMPLATE.
-     *
-     * @param key a <code>String</code> value
-     * @param value a <code>String</code> value
-     * @return a <code>HistoryEvent</code> value
+     * {@inheritDoc}
      */
+    @Override
     public HistoryEvent addName(String key, String value) {
-        super.addName(key, value);
-        return this;
+        return (HistoryEvent) super.addName(key, value);
     }
 
     /**
-     * Add a key and an integer value to replace it to this
-     * StringTemplate.
-     *
-     * @param key a <code>String</code> value
-     * @param amount an <code>int</code> value
-     * @return a <code>HistoryEvent</code> value
+     * {@inheritDoc}
      */
-    public HistoryEvent addAmount(String key, int amount) {
-        super.addAmount(key, amount);
-        return this;
+    @Override
+    public HistoryEvent addAmount(String key, Number amount) {
+        return (HistoryEvent) super.addAmount(key, amount);
     }
 
     /**
-     * Add a key and a StringTemplate to replace it to this
-     * StringTemplate.
-     *
-     * @param key a <code>String</code> value
-     * @param template a <code>StringTemplate</code> value
-     * @return a <code>HistoryEvent</code> value
+     * {@inheritDoc}
      */
+    @Override
     public HistoryEvent addStringTemplate(String key, StringTemplate template) {
-        super.addStringTemplate(key, template);
-        return this;
+        return (HistoryEvent) super.addStringTemplate(key, template);
     }
 
 
+    // Serialization
+
+    private static final String EVENT_TYPE_TAG = "eventType";
+    private static final String TURN_TAG = "turn";
+    // @compat 0.9.x
+    private static final String TYPE_TAG = "type";
+    // end @compat
+
+
     /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *
-     * @param out The target stream.
-     * @exception XMLStreamException if there are any problems writing
-     *      to the stream.
+     * {@inheritDoc}
      */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         super.toXML(out, getXMLElementTagName());
     }
 
     /**
-     * Write the attributes of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *     to the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
-        out.writeAttribute("turn", Integer.toString(turn.getNumber()));
-        out.writeAttribute("eventType", eventType.toString());
+        writeAttribute(out, TURN_TAG, turn.getNumber());
+
+        writeAttribute(out, EVENT_TYPE_TAG, eventType);
     }
 
     /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *     during parsing.
+     * {@inheritDoc}
      */
-    public void readFromXML(XMLStreamReader in)
-        throws XMLStreamException {
+    @Override
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
 
-        turn = new Turn(Integer.parseInt(in.getAttributeValue(null, "turn")));
-        String eventString = in.getAttributeValue(null, "eventType");
+        turn = new Turn(getAttribute(in, "turn", 0));
+
+        eventType = getAttribute(in, EVENT_TYPE_TAG,
+                                 EventType.class, (EventType)null);
         // @compat 0.9.x
-        if (eventString == null) {
-            eventString = in.getAttributeValue(null, "type");
+        if (eventType == null) {
+            eventType = getAttribute(in, TYPE_TAG,
+                                     EventType.class, (EventType)null);
+            if ("".equals(getId())) {
+                setId("model.history." + eventType.toString());
+            }
         }
-        if ("".equals(getId())) {
-            setId("model.history." + eventString);
-        }
-        // end compatibility code
-        super.readChildren(in);
-        eventType = Enum.valueOf(EventType.class, eventString);
+        // end @compat
     }
 
     /**
-     * Builds a string representation of this object.
+     * {@inheritDoc}
      */
     @Override
     public String toString() {
-        return eventType.toString() + " (" + turn.getYear() + ") ["
-            + super.toString() + "]";
+        return "[" + getXMLElementTagName()
+            + " " + eventType.toString() + " (" + turn.getYear() + ")"
+            + "[" + super.toString() + "]";
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
-     * @return the tag name.
+     * @return "historyEvent".
      */
     public static String getXMLElementTagName() {
         return "historyEvent";

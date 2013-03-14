@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -66,19 +67,25 @@ public class StringTemplate extends FreeColObject {
     /**
      * The keys to replace within the string template.
      */
-    private List<String> keys;
+    private List<String> keys = null;
 
     /**
      * The values with which to replace the keys in the string template.
      */
-    private List<StringTemplate> replacements;
+    private List<StringTemplate> replacements = null;
 
 
+    /**
+     * Empty constructor for serialization.
+     */
+    protected StringTemplate() {}
 
-    protected StringTemplate() {
-        // empty constructor
-    }
-
+    /**
+     * Creates a new <code>StringTemplate</code> instance.
+     *
+     * @param id The object id.
+     * @param template A <code>StringTemplate</code> to copy.
+     */
     public StringTemplate(String id, StringTemplate template) {
         setId(id);
         this.templateType = template.templateType;
@@ -87,41 +94,77 @@ public class StringTemplate extends FreeColObject {
     }
 
     /**
-     * Creates a new <code>Template</code> instance.
+     * Creates a new <code>StringTemplate</code> instance.
      *
-     * @param template a <code>String</code> value
-     * @param templateType a <code>TemplateType</code> value
+     * @param id The object id.
+     * @param templateType The <code>TemplateType</code> for this template.
      */
-    protected StringTemplate(String template, TemplateType templateType) {
-	setId(template);
+    protected StringTemplate(String id, TemplateType templateType) {
+        setId(id);
         this.templateType = templateType;
-        switch (templateType) {
-        case TEMPLATE:
-            keys = new ArrayList<String>();
-        case LABEL:
-            replacements = new ArrayList<StringTemplate>();
-        }
+        this.keys = null;
+        this.replacements = null;
     }
 
     /**
-     * Get the <code>DefaultId</code> value.
+     * Get the default id.
      *
-     * @return a <code>String</code> value
+     * @return The default id.
      */
     public final String getDefaultId() {
         return defaultId;
     }
 
     /**
-     * Set the <code>DefaultId</code> value.
+     * Set the default id.
      *
-     * @param newDefaultId The new DefaultId value.
-     * @return a <code>StringTemplate</code> value
+     * @param newDefaultId The new default id.
+     * @return This <code>StringTemplate</code>.
      */
     public StringTemplate setDefaultId(final String newDefaultId) {
         this.defaultId = newDefaultId;
         return this;
     }
+
+    /**
+     * Get the template type.
+     *
+     * @return The template type.
+     */
+    public final TemplateType getTemplateType() {
+        return templateType;
+    }
+
+    /**
+     * Get the keys.
+     *
+     * @return A list of keys.
+     */
+    public final List<String> getKeys() {
+        if (keys == null) return Collections.emptyList();
+        return keys;
+    }
+
+    private void requireKeys() {
+        if (keys == null) keys = new ArrayList<String>();
+    }
+
+    /**
+     * Get the replacements.
+     *
+     * @return A list of replacements.
+     */
+    public final List<StringTemplate> getReplacements() {
+        if (replacements == null) return Collections.emptyList();
+        return replacements;
+    }
+
+    private void requireReplacements() {
+        if (replacements == null) {
+            replacements = new ArrayList<StringTemplate>();
+        }
+    }
+
 
     // Factory methods
 
@@ -143,64 +186,37 @@ public class StringTemplate extends FreeColObject {
 
 
     /**
-     * Get the <code>TemplateType</code> value.
+     * Get the replacement value for a given key.
      *
-     * @return a <code>TemplateType</code> value
-     */
-    public final TemplateType getTemplateType() {
-        return templateType;
-    }
-
-    /**
-     * Get the <code>Keys</code> value.
-     *
-     * @return a <code>List<String></code> value
-     */
-    public final List<String> getKeys() {
-        return keys;
-    }
-
-    /**
-     * Get the <code>Replacements</code> value.
-     *
-     * @return a <code>List<StringTemplate></code> value
-     */
-    public final List<StringTemplate> getReplacements() {
-        return replacements;
-    }
-
-
-    /**
-     * Return the replacement value for a given key, or null if there
-     * is none.
-     *
-     * @param key a <code>String</code> value
-     * @return a <code>String</code> value
+     * @param key The key to find a replacement for.
+     * @return The replacement found, or null if none found.
      */
     public final StringTemplate getReplacement(String key) {
-        for (int index = 0; index < keys.size(); index++) {
-            if (key.equals(keys.get(index))) {
-                if (replacements.size() > index) {
-                    return replacements.get(index);
-                } else {
-                    return null;
+        if (keys != null && replacements != null) {
+            for (int index = 0; index < keys.size(); index++) {
+                if (key.equals(keys.get(index))) {
+                    if (replacements.size() > index) {
+                        return replacements.get(index);
+                    } else {
+                        return null;
+                    }
                 }
             }
         }
         return null;
     }
 
-
     /**
-     * Add a new key and replacement to the StringTemplate. This is
+     * Add a new key and replacement to the StringTemplate.  This is
      * only possible if the StringTemplate is of type TEMPLATE.
      *
-     * @param key a <code>String</code> value
-     * @param value a <code>String</code> value
-     * @return a <code>StringTemplate</code> value
+     * @param key The key to add.
+     * @param value The corresponding replacement.
+     * @return This <code>StringTemplate</code>.
      */
     public StringTemplate add(String key, String value) {
         if (templateType == TemplateType.TEMPLATE) {
+            requireKeys(); requireReplacements();
             keys.add(key);
             replacements.add(new StringTemplate(value, TemplateType.KEY));
         } else {
@@ -214,30 +230,32 @@ public class StringTemplate extends FreeColObject {
      * Add a replacement value without a key to the StringTemplate.
      * This is only possible if the StringTemplate is of type LABEL.
      *
-     * @param value a <code>String</code> value
-     * @return a <code>StringTemplate</code> value
+     * @param value The replacement value.
+     * @return This <code>StringTemplate</code>.
      */
     public StringTemplate add(String value) {
-	if (templateType == TemplateType.LABEL) {
-	    replacements.add(new StringTemplate(value, TemplateType.KEY));
-	} else {
-	    throw new IllegalArgumentException("Cannot add a single string to StringTemplate type "
+        if (templateType == TemplateType.LABEL) {
+            requireReplacements();
+            replacements.add(new StringTemplate(value, TemplateType.KEY));
+        } else {
+            throw new IllegalArgumentException("Cannot add a single string to StringTemplate type "
                                                + templateType.toString());
-	}
-	return this;
+        }
+        return this;
     }
 
     /**
-     * Add a new key and replacement to the StringTemplate. The
-     * replacement must be a proper name. This is only possible if the
+     * Add a new key and replacement to the StringTemplate.  The
+     * replacement must be a proper name.  This is only possible if the
      * StringTemplate is of type TEMPLATE.
      *
-     * @param key a <code>String</code> value
-     * @param value a <code>String</code> value
-     * @return a <code>StringTemplate</code> value
+     * @param key The key to add.
+     * @param value The corresponding replacement.
+     * @return This <code>StringTemplate</code>.
      */
     public StringTemplate addName(String key, String value) {
         if (templateType == TemplateType.TEMPLATE) {
+            requireKeys(); requireReplacements();
             keys.add(key);
             replacements.add(new StringTemplate(value, TemplateType.NAME));
         } else {
@@ -248,18 +266,20 @@ public class StringTemplate extends FreeColObject {
     }
 
     /**
-     * Add a new key and replacement to the StringTemplate. The
-     * replacement must be a proper name. This is only possible if the
+     * Add a new key and replacement to the StringTemplate.  The
+     * replacement must be a proper name.  This is only possible if the
      * StringTemplate is of type TEMPLATE.
      *
-     * @param key a <code>String</code> value
-     * @param object a <code>FreeColObject</code> value
-     * @return a <code>StringTemplate</code> value
+     * @param key The key to add.
+     * @param object The corresponding value.
+     * @return This <code>StringTemplate</code>.
      */
     public StringTemplate addName(String key, FreeColObject object) {
         if (templateType == TemplateType.TEMPLATE) {
+            requireKeys(); requireReplacements();
             keys.add(key);
-            replacements.add(new StringTemplate(object.getId() + ".name", TemplateType.KEY));
+            replacements.add(new StringTemplate(object.getId() + ".name",
+                                                TemplateType.KEY));
         } else {
             throw new IllegalArgumentException("Cannot add key-value pair to StringTemplate type "
                                                + templateType.toString());
@@ -272,26 +292,26 @@ public class StringTemplate extends FreeColObject {
      * The replacement must be a proper name.  This is only possible
      * if the StringTemplate is of type LABEL.
      *
-     * @param value a <code>String</code> value
-     * @return a <code>StringTemplate</code> value
+     * @param value The replacement value.
+     * @return This <code>StringTemplate</code>.
      */
     public StringTemplate addName(String value) {
-	if (templateType == TemplateType.LABEL) {
-	    replacements.add(new StringTemplate(value, TemplateType.NAME));
-	} else {
-	    throw new IllegalArgumentException("Cannot add a single string to StringTemplate type "
+        if (templateType == TemplateType.LABEL) {
+            requireReplacements();
+            replacements.add(new StringTemplate(value, TemplateType.NAME));
+        } else {
+            throw new IllegalArgumentException("Cannot add a single string to StringTemplate type "
                                                + templateType.toString());
-	}
-	return this;
+        }
+        return this;
     }
 
     /**
-     * Add a key and an integer value to replace it to this
-     * StringTemplate.
+     * Add a key and an integer value to replace it to this StringTemplate.
      *
-     * @param key a <code>String</code> value
-     * @param amount a <code>Number</code> value
-     * @return a <code>StringTemplate</code> value
+     * @param key The key to add.
+     * @param amount The integer value.
+     * @return This <code>StringTemplate</code>.
      */
     public StringTemplate addAmount(String key, Number amount) {
         addName(key, amount.toString());
@@ -299,81 +319,54 @@ public class StringTemplate extends FreeColObject {
     }
 
     /**
-     * Add a key and a StringTemplate to replace it to this
-     * StringTemplate.
+     * Add a key and a StringTemplate to replace it to this StringTemplate.
      *
-     * @param key a <code>String</code> value
-     * @param template a <code>StringTemplate</code> value
-     * @return a <code>StringTemplate</code> value
+     * @param key The key to add.
+     * @param template The template value.
+     * @return This <code>StringTemplate</code>.
      */
-    public StringTemplate addStringTemplate(String key, StringTemplate template) {
+    public StringTemplate addStringTemplate(String key,
+                                                          StringTemplate template) {
         if (templateType == TemplateType.TEMPLATE) {
+            requireKeys(); requireReplacements();
             keys.add(key);
             replacements.add(template);
         } else {
             throw new IllegalArgumentException("Cannot add a key-template pair to a StringTemplate type "
                                                + templateType.toString());
         }
-	return this;
+        return this;
     }
 
     /**
      * Add a StringTemplate to this LABEL StringTemplate.
      *
-     * @param template a <code>StringTemplate</code> value
-     * @return a <code>StringTemplate</code> value
+     * @param template The replacement <code>StringTemplate</code>.
+     * @return This <code>StringTemplate</code>.
      */
     public StringTemplate addStringTemplate(StringTemplate template) {
         if (templateType == TemplateType.LABEL) {
+            requireReplacements();
             replacements.add(template);
         } else {
-	    throw new IllegalArgumentException("Cannot add a StringTemplate to StringTemplate type "
+            throw new IllegalArgumentException("Cannot add a StringTemplate to StringTemplate type "
                                                + templateType.toString());
         }
-	return this;
-    }
-
-    public String toString() {
-        String result = templateType.toString() + ": ";
-        switch (templateType) {
-        case LABEL:
-            if (replacements == null) {
-                result += getId();
-            } else {
-                for (StringTemplate object : replacements) {
-                    result += object + getId();
-                }
-            }
-            break;
-        case TEMPLATE:
-            result += getId();
-            if (defaultId != null) {
-                result += " (" + defaultId + ")";
-            }
-            result += " [";
-            for (int index = 0; index < keys.size(); index++) {
-                result += "[" + keys.get(index) + ": "
-                    + replacements.get(index).toString() + "]";
-            }
-            result += "]";
-            break;
-        case KEY:
-            result += getId();
-            if (defaultId != null) {
-                result += " (" + defaultId + ")";
-            }
-            break;
-        case NAME:
-        default:
-            result += getId();
-        }
-        return result;
+        return this;
     }
 
 
+    // Interface Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean equals(Object o) {
         if (o instanceof StringTemplate) {
-            StringTemplate t = (StringTemplate) o;
+            requireKeys(); requireReplacements();
+            StringTemplate t = (StringTemplate)o;
+            t.requireKeys(); t.requireReplacements();
             if (!getId().equals(t.getId()) || templateType != t.templateType) {
                 return false;
             }
@@ -416,6 +409,10 @@ public class StringTemplate extends FreeColObject {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public int hashCode() {
         int result = 17;
         result = result * 31 + getId().hashCode();
@@ -424,10 +421,12 @@ public class StringTemplate extends FreeColObject {
             result = result * 31 + defaultId.hashCode();
         }
         if (templateType == TemplateType.LABEL) {
+            requireReplacements();
             for (StringTemplate replacement : replacements) {
                 result = result * 31 + replacement.hashCode();
             }
         } else if (templateType == TemplateType.TEMPLATE) {
+            requireKeys(); requireReplacements();
             for (int index = 0; index < keys.size(); index++) {
                 result = result * 31 + keys.get(index).hashCode();
                 result = result * 31 + replacements.get(index).hashCode();
@@ -437,55 +436,56 @@ public class StringTemplate extends FreeColObject {
     }
 
 
+    // Serialization
+
+    private static final String DEFAULT_ID_TAG = "defaultId";
+    private static final String KEY_TAG = "key";
+    private static final String TEMPLATE_TYPE_TAG = "templateType";
+    // @compat 0.9.x
+    private static final String DATA_TAG = "data";
+    private static final String STRINGS_TAG = "strings";
+    // end @compat
+
+
     /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * {@inheritDoc}
      */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         super.toXML(out, getXMLElementTagName());
     }
 
     /**
-     * Write the attributes of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to
-     *     the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
-        out.writeAttribute("templateType", templateType.toString());
+        writeAttribute(out, TEMPLATE_TYPE_TAG, templateType);
+
         if (defaultId != null) {
-            out.writeAttribute("defaultId", defaultId);
+            writeAttribute(out, DEFAULT_ID_TAG, defaultId);
         }
     }
 
     /**
-     * Write the children of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to
-     *     the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
         super.writeChildren(out);
 
         if (keys != null) {
             for (String key : keys) {
-                out.writeStartElement("key");
-                out.writeAttribute(VALUE_TAG, key);
+                out.writeStartElement(KEY_TAG);
+
+                writeAttribute(out, VALUE_TAG, key);
+
                 out.writeEndElement();
             }
         }
+
         if (replacements != null) {
             for (StringTemplate replacement : replacements) {
                 replacement.toXMLImpl(out);
@@ -494,76 +494,118 @@ public class StringTemplate extends FreeColObject {
     }
 
     /**
-     * Reads the attributes of this object from an XML stream.
-     *
-     * @param in The XML input stream.
-     * @exception XMLStreamException if a problem was encountered
-     *     during parsing.
+     * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
-        // @compat 0.10.x
-        String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-        if (id == null) {
-            id = in.getAttributeValue(null, ID_ATTRIBUTE);
-        }
-        setId(id);
-        String typeString = in.getAttributeValue(null, "templateType");
-        if (typeString == null) {
-            templateType = TemplateType.TEMPLATE;
-        } else {
-            templateType = Enum.valueOf(TemplateType.class, typeString);
-        }
-        // end compatibility code
-        defaultId = in.getAttributeValue(null, "defaultId");
-        switch (templateType) {
-        case TEMPLATE:
-            keys = new ArrayList<String>();
-        case LABEL:
-            replacements = new ArrayList<StringTemplate>();
-        }
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
+
+        templateType = getAttribute(in, TEMPLATE_TYPE_TAG,
+                                    TemplateType.class, TemplateType.TEMPLATE);
+
+        defaultId = getAttribute(in, DEFAULT_ID_TAG, (String)null);
     }
 
     /**
-     * Reads the children of this object from an XML stream.
-     *
-     * @param in The XML input stream.
-     * @exception XMLStreamException if a problem was encountered
-     *     during parsing.
+     * {@inheritDoc}
      */
     @Override
     protected void readChildren(XMLStreamReader in) throws XMLStreamException {
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if ("key".equals(in.getLocalName())) {
-                keys.add(in.getAttributeValue(null, VALUE_TAG));
-                in.nextTag();
-            } else if (getXMLElementTagName().equals(in.getLocalName())) {
-                StringTemplate replacement = new StringTemplate();
-                replacement.readFromXML(in);
-                replacements.add(replacement);
-            } else if ("data".equals(in.getLocalName())) { // @compat 0.9.x
-                readOldFormat(readFromArrayElement("data", in, new String[0]));
-                // end compatibility code
-            } else if ("strings".equals(in.getLocalName())) { // @compat 0.9.x
-                // TODO: remove compatibility code for HistoryEvent
-                readOldFormat(readFromArrayElement("strings", in, new String[0]));
-                // end compatibility code
-            }
+        // Clear containers
+        if (keys != null) keys.clear();
+        if (replacements != null) replacements.clear();
+
+        super.readChildren(in);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+        final String tag = in.getLocalName();
+
+        if (KEY_TAG.equals(tag)) {
+            requireKeys();
+            keys.add(getAttribute(in, VALUE_TAG, (String)null));
+
+        } else if (getXMLElementTagName().equals(tag)) {
+            requireReplacements();
+            StringTemplate replacement = new StringTemplate();
+            replacement.readFromXML(in);
+            replacements.add(replacement);
+        
+        // @compat 0.9.x
+        } else if (DATA_TAG.equals(tag)) {
+            readOldFormat(readFromArrayElement(DATA_TAG, in, new String[0]));
+        // end @compat
+
+        // @compat 0.9.x
+        } else if (STRINGS_TAG.equals(tag)) {
+            // TODO: remove compatibility code for HistoryEvent
+            readOldFormat(readFromArrayElement(STRINGS_TAG, in, new String[0]));
+        // end @compat
+
+        } else {
+            super.readChild(in);
         }
     }
 
     // @compat 0.9.x
     private void readOldFormat(String[] data) {
         for (int index = 0; index < data.length; index += 2) {
+            requireKeys(); requireReplacements();
             keys.add(data[index]);
-            replacements.add(new StringTemplate(data[index + 1], TemplateType.NAME));
+            replacements.add(new StringTemplate(data[index + 1],
+                             TemplateType.NAME));
         }
     }
-    // end compatibility code
+    // end @compat
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * {@inheritDoc}
+     */
+    public String toString() {
+        StringBuilder sb = new StringBuilder(templateType.toString());
+        sb.append(": ");
+        switch (templateType) {
+        case LABEL:
+            if (replacements == null) {
+                sb.append(getId());
+            } else {
+                for (StringTemplate object : replacements) {
+                    sb.append(object).append(getId());
+                }
+            }
+            break;
+        case TEMPLATE:
+            sb.append(getId());
+            if (defaultId != null) {
+                sb.append(" (").append(defaultId).append(")");
+            }
+            sb.append(" [");
+            for (int index = 0; index < keys.size(); index++) {
+                sb.append("[").append(keys.get(index)).append(": ")
+                    .append(replacements.get(index).toString()).append("]");
+            }
+            sb.append("]");
+            break;
+        case KEY:
+            sb.append(getId());
+            if (defaultId != null) {
+                sb.append(" (").append(defaultId).append(")");
+            }
+            break;
+        case NAME:
+        default:
+            sb.append(getId());
+            break;
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Gets the tag name of the root element representing this object.
      *
      * @return "stringTemplate".
      */
