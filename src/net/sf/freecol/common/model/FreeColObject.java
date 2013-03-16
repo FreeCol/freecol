@@ -912,14 +912,23 @@ public abstract class FreeColObject {
      * Reads a single child object.  Subclasses must override to read
      * their enclosed elements.  This particular instance of the
      * routine always throws XMLStreamException because we should
-     * never arrive here.
+     * never arrive here.  However it is very useful to always call
+     * super.readChild() when an unexpected tag is encountered, as the
+     * exception thrown here provides some useful debugging context.
      *
      * @param in The XML input stream.
      * @exception XMLStreamException because subclasses should have
      *     recognized all child elements.
      */
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        throw new XMLStreamException("Unexpected tag: " + in.getLocalName());
+        StringBuilder sb = new StringBuilder("Unexpected tag: ");
+        sb.append(in.getLocalName()).append(", attributes:");
+        int n = in.getAttributeCount();
+        for (int i = 0; i < n; i++) {
+            sb.append(" ").append(in.getAttributeLocalName(i))
+                .append("=\"").append(in.getAttributeValue(i)).append("\"");
+        }
+        throw new XMLStreamException(sb.toString());
     }
 
     /**
