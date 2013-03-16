@@ -212,7 +212,8 @@ public class ProductionType extends FreeColObject {
      */
     @Override
     protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+        // ProductionType does not need an id.
+        // No need for: super.writeAttributes(out);
 
         if (colonyCenterTile) {
             writeAttribute(out, COLONY_CENTER_TILE_TAG, colonyCenterTile);
@@ -260,7 +261,8 @@ public class ProductionType extends FreeColObject {
      */
     @Override
     public void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+        // ProductionType does not need an id.
+        // No need for: super.readAttributes(in);
 
         colonyCenterTile = getAttribute(in, COLONY_CENTER_TILE_TAG, false);
 
