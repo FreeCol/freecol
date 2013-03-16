@@ -182,7 +182,7 @@ public class HistoryEvent extends StringTemplate {
     public String toString() {
         return "[" + getXMLElementTagName()
             + " " + eventType.toString() + " (" + turn.getYear() + ")"
-            + "[" + super.toString() + "]";
+            + super.toString() + "]";
     }
 
     /**
