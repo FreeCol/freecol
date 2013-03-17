@@ -63,7 +63,7 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
      * @param gui The GUI that holds information such as screen resolution.
      */
     public CanvasMapEditorMouseListener(FreeColClient freeColClient, GUI gui, Canvas canvas) {
-        super(freeColClient, gui.getMapViewer());
+        super(freeColClient);
         this.gui = gui;
         this.canvas = canvas;
     }

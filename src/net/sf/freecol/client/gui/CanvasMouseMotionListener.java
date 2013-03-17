@@ -45,12 +45,9 @@ public final class CanvasMouseMotionListener extends AbstractCanvasListener impl
      * Creates a new listener for mouse movement.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param mapViewer The <code>MapViewer</code> that holds
-     *     information such as screen resolution.
      */
-    public CanvasMouseMotionListener(FreeColClient freeColClient,
-                                     MapViewer mapViewer) {
-        super(freeColClient, mapViewer);
+    public CanvasMouseMotionListener(FreeColClient freeColClient) {
+        super(freeColClient);
     }
 
 
@@ -60,10 +57,9 @@ public final class CanvasMouseMotionListener extends AbstractCanvasListener impl
      * @param e The MouseEvent that holds all the information.
      */
     public void mouseMoved(MouseEvent e) {
-
-    	if (e.getY() >= AUTO_SCROLLSPACE){
-    		performAutoScrollIfActive(e);
-    	}
+        if (e.getY() >= AUTO_SCROLLSPACE) {
+            performAutoScrollIfActive(e);
+        }
 
         if (mapViewer.isGotoStarted()) {
             if (mapViewer.getActiveUnit() == null) {

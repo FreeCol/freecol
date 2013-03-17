@@ -1100,72 +1100,42 @@ public final class MapViewer {
         blinkingMarqueeEnabled = true;
     }
 
+    /**
+     * Scroll the map in the given direction.
+     *
+     * @param direction The <code>Direction</code> to scroll in.
+     * @return True if scrolling occurred.
+     */
+    public boolean scrollMap(Direction direction) {
+        Tile t = getFocus();
+        if (t == null) return false;
+        int fx = t.getX(), fy = t.getY();
+        if ((t = t.getNeighbourOrNull(direction)) == null) return false;
+        int tx = t.getX(), ty = t.getY();
+        int x, y;
 
-    public void scrollMap(Direction direction) {
-
-        try {
-            int x, y;
-            Tile t = getFocus();
-            if (t == null) {
-                return;
-            }
-
-            t = t.getNeighbourOrNull(direction);
-            if (t == null) {
-                return;
-            }
-
-            if (isMapNearTop(t.getY()) && isMapNearTop(getFocus().getY())) {
-                if (t.getY() > getFocus().getY()) {
-                    y = t.getY();
-                    do {
-                        y += 2;
-                    } while (isMapNearTop(y));
-                } else {
-                    y = getFocus().getY();
-                }
-            } else if (isMapNearBottom(t.getY()) && isMapNearBottom(getFocus().getY())) {
-                if (t.getY() < getFocus().getY()) {
-                    y = t.getY();
-                    do {
-                        y -= 2;
-                    } while (isMapNearBottom(y));
-                } else {
-                    y = getFocus().getY();
-                }
-            } else {
-                y = t.getY();
-            }
-
-            if (isMapNearLeft(t.getX(), t.getY())
-                && isMapNearLeft(getFocus().getX(), getFocus().getY())) {
-                if (t.getX() > getFocus().getX()) {
-                    x = t.getX();
-                    do {
-                        x++;
-                    } while (isMapNearLeft(x, y));
-                } else {
-                    x = getFocus().getX();
-                }
-            } else if (isMapNearRight(t.getX(), t.getY())
-                       && isMapNearRight(getFocus().getX(), getFocus().getY())) {
-                if (t.getX() < getFocus().getX()) {
-                    x = t.getX();
-                    do {
-                        x--;
-                    } while (isMapNearRight(x, y));
-                } else {
-                    x = getFocus().getX();
-                }
-            } else {
-                x = t.getX();
-            }
-
-            setFocus(freeColClient.getGame().getMap().getTile(x,y));
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Exception while scrolling!", e);
+        // When already close to an edge, resist moving the focus closer,
+        // but if moving away immediately jump out of the `nearTo' area.
+        if (isMapNearTop(ty) && isMapNearTop(fy)) {
+            y = (ty <= fy) ? fy : topRows;
+        } else if (isMapNearBottom(ty) && isMapNearBottom(fy)) {
+            y = (ty >= fy) ? fy : freeColClient.getGame().getMap().getWidth()
+                - bottomRows;
+        } else {
+            y = ty;
         }
-            
+        if (isMapNearLeft(tx, ty) && isMapNearLeft(fx, fy)) {
+            x = (tx <= fx) ? fx : getLeftColumns(ty);
+        } else if (isMapNearRight(tx, ty) && isMapNearRight(fx, fy)) {
+            x = (tx >= fx) ? fx : freeColClient.getGame().getMap().getWidth()
+                - getRightColumns(ty);
+        } else {
+            x = tx;
+        }
+
+        if (x == fx && y == fy) return false;
+        setFocus(freeColClient.getGame().getMap().getTile(x,y));
+        return true;
     }
 
     /**
@@ -2813,44 +2783,46 @@ public final class MapViewer {
     }
 
     /**
-     * Returns 'true' if the Tile is near the bottom.
-     * @param y The y-coordinate of a Tile.
-     * @return 'true' if the Tile is near the bottom.
+     * Is a y-coordinate near the bottom?
+     *
+     * @param y The y-coordinate.
+     * @return True if near the bottom.
      */
     private boolean isMapNearBottom(int y) {
-        return (y >= (freeColClient.getGame().getMap().getHeight() - bottomRows));
+        return y >= freeColClient.getGame().getMap().getHeight() - bottomRows;
     }
 
-
     /**
-     * Returns 'true' if the Tile is near the left.
-     * @param x The x-coordinate of a Tile.
-     * @param y The y-coordinate of a Tile.
-     * @return 'true' if the Tile is near the left.
+     * Is an x,y coordinate near the left?
+     *
+     * @param x The x-coordinate.
+     * @param y The y-coordinate.
+     * @return True if near the left.
      */
     private boolean isMapNearLeft(int x, int y) {
-        return (x < getLeftColumns(y));
+        return x < getLeftColumns(y);
     }
 
-
     /**
-     * Returns 'true' if the Tile is near the right.
-     * @param x The x-coordinate of a Tile.
-     * @param y The y-coordinate of a Tile.
-     * @return 'true' if the Tile is near the right.
+     * Is an x,y coordinate near the right?
+     *
+     * @param x The x-coordinate.
+     * @param y The y-coordinate.
+     * @return True if near the right.
      */
     private boolean isMapNearRight(int x, int y) {
-        return (x >= (freeColClient.getGame().getMap().getWidth() - getRightColumns(y)));
+        return x >= freeColClient.getGame().getMap().getWidth()
+            - getRightColumns(y);
     }
 
-
     /**
-     * Returns 'true' if the Tile is near the top.
-     * @param y The y-coordinate of a Tile.
-     * @return 'true' if the Tile is near the top.
+     * Is a y-coordinate near the top?
+     *
+     * @param y The y-coordinate.
+     * @return True if near the top.
      */
     private boolean isMapNearTop(int y) {
-        return (y < topRows);
+        return y < topRows;
     }
 
 
