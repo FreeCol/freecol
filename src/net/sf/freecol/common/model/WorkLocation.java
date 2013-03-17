@@ -113,6 +113,12 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
         this.productionType = newProductionType;
     }
 
+    /**
+     * Returns a list of <code>AbstractGoods</code> consumed by this
+     * WorkLocation.
+     *
+     * @return a list of AbstractGoods
+     */
     public List<AbstractGoods> getInputs() {
         if (productionType == null || productionType.getInputs() == null) {
             return EMPTY_LIST;
@@ -121,6 +127,12 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
         }
     }
 
+    /**
+     * Returns a list of <code>AbstractGoods</code> produced by this
+     * WorkLocation.
+     *
+     * @return a list of AbstractGoods
+     */
     public List<AbstractGoods> getOutputs() {
         if (productionType == null || productionType.getOutputs() == null) {
             return EMPTY_LIST;
@@ -133,17 +145,22 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
      * Returns whether this WorkLocation produces the given GoodsType.
      *
      * @param goodsType the GoodsType
-     * @return  whether this Building produces the given GoodsType
+     * @return  whether this WorkLocation produces the given GoodsType
      */
     public boolean produces(GoodsType goodsType) {
+        return getProductionOf(goodsType) != null;
+    }
+
+
+    public AbstractGoods getProductionOf(GoodsType goodsType) {
         if (productionType != null) {
             for (AbstractGoods output : productionType.getOutputs()) {
                 if (output.getType() == goodsType) {
-                    return true;
+                    return output;
                 }
             }
         }
-        return false;
+        return null;
     }
 
     public boolean hasInputs() {
@@ -421,16 +438,17 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
      * @param unitType The optional <code>unitType</code> to produce them.
      * @return A list of the applicable modifiers.
      */
-    public abstract List<Modifier> getProductionModifiers(GoodsType goodsType, 
+    public abstract List<Modifier> getProductionModifiers(GoodsType goodsType,
                                                           UnitType unitType);
 
     /**
-     * Gets the best work type a unit to perform at this work location.
+     * Gets the best production type for a unit to perform at this
+     * work location.
      *
      * @param unit The <code>Unit</code> to check.
-     * @return The best work type.
+     * @return The best production type.
      */
-    public abstract GoodsType getBestWorkType(Unit unit);
+    public abstract ProductionType getBestProductionType(Unit unit);
 
     /**
      * Gets a template describing whether this work location can/needs-to
@@ -474,7 +492,8 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
      */
     public void readChild(XMLStreamReader in) throws XMLStreamException {
         if ("production".equals(in.getLocalName())) {
-            productionType = new ProductionType(in);
+            productionType = new ProductionType(getSpecification());
+            productionType.readFromXML(in);
         } else {
             super.readChild(in);
         }
@@ -483,8 +502,10 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
     /**
      * {@inheritDoc}
      */
-    public void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        super.writeChildren(out);
+    protected void writeChildren(XMLStreamWriter out, Player player,
+                                 boolean showAll, boolean toSavedGame)
+        throws XMLStreamException {
+        super.writeChildren(out, player, showAll, toSavedGame);
         if (productionType != null) {
             productionType.toXML(out);
         }

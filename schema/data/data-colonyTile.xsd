@@ -30,7 +30,8 @@
   <xs:element name="colonyTile">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
-	<xs:element ref="unit"></xs:element>
+	<xs:element ref="unit" />
+	<xs:element ref="production" />
       </xs:choice>
 
       <xs:attribute name="ID" type="ColonyTileId" use="required">

@@ -89,6 +89,7 @@ import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.NoClaimReason;
 import net.sf.freecol.common.model.ProductionInfo;
+import net.sf.freecol.common.model.ProductionType;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
@@ -154,7 +155,7 @@ public final class ColonyPanel extends PortPanel
     private final BuildingsPanel buildingsPanel;
 
     private final ConstructionPanel constructionPanel;
-    
+
 
     // Buttons
     private final JButton unloadButton
@@ -752,7 +753,7 @@ public final class ColonyPanel extends PortPanel
                     + " " + Messages.message("producing.name")
                     + " " + producing + " " + nominative);
                 subMenu = new JMenuItem(menuTitle, unitIcon);
-  	            subMenu.addActionListener(new ActionListener() {
+                    subMenu.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         unitMenu.createUnitMenu(new UnitLabel(getFreeColClient(), unit, getGUI()));
                         unitMenu.show(getGUI().getCanvas(), 0, 0);
@@ -804,7 +805,7 @@ public final class ColonyPanel extends PortPanel
                         menuTitle = new String(Messages.message(innerUnit.getLabel()) + " Cargo On " + Messages.message(unit.getLabel()));
                         subMenu = new JMenuItem(menuTitle, unitIcon);
                         subMenu.addActionListener(new ActionListener() {
-    	                    public void actionPerformed(ActionEvent e) {
+                            public void actionPerformed(ActionEvent e) {
                                 unitMenu.createUnitMenu(new UnitLabel(getFreeColClient(), innerUnit, getGUI()));
                                 unitMenu.show(getGUI().getCanvas(), 0, 0);
                             }
@@ -1483,8 +1484,8 @@ public final class ColonyPanel extends PortPanel
                 getController().work(unit, building);
                 // check to see if the unit actually starts working at the building
                 // some units like a teacher may not have actually started working there
-				if(unit.getWorkBuilding() == building){
-                	return true;
+                if (unit.getWorkBuilding() == building) {
+                    return true;
                 }
                 return false;
             }
@@ -1492,7 +1493,7 @@ public final class ColonyPanel extends PortPanel
             @Override
             public void propertyChange(PropertyChangeEvent event) {
                 super.propertyChange(event);
-                
+
                 colonyPanel.updateProduction();
             }
 
@@ -1691,7 +1692,6 @@ public final class ColonyPanel extends PortPanel
                     super.add(label);
                 }
                 updateDescriptionLabel(label, true);
-
                 if (colonyTile.isColonyCenterTile()) {
                     setLayout(new GridLayout(2, 1));
                     ProductionInfo info = colony.getProductionInfo(colonyTile);
@@ -1851,10 +1851,14 @@ public final class ColonyPanel extends PortPanel
                     workType = null;
                 }
                 // Try best work type?
-                if (workType == null
-                    && (workType = colonyTile.getBestWorkType(unit)) != null
-                    && colonyTile.getProductionOf(unit, workType) <= 0) {
-                    workType = null;
+                if (workType == null) {
+                    ProductionType productionType = colonyTile.getBestProductionType(unit);
+                    if (productionType != null) {
+                        GoodsType goodsType = productionType.getOutputs().get(0).getType();
+                        if (colonyTile.getProductionOf(unit, goodsType) > 0) {
+                            workType = goodsType;
+                        }
+                    }
                 }
                 // No good, just leave it alone then.
                 if (workType == null) workType = unit.getWorkType();

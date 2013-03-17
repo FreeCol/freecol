@@ -80,6 +80,7 @@ public class ColonyTile extends WorkLocation implements Ownable {
 
         setColony(colony);
         this.workTile = workTile;
+        updateProductionType();
     }
 
     /**
@@ -174,53 +175,44 @@ public class ColonyTile extends WorkLocation implements Ownable {
     }
 
     /**
-     * Gets the primary production of a colony center tile.  In the
-     * standard rule sets, this is always some kind of food and all
-     * tile improvements contribute to the production.
+     * Updates the production type based on the tile type of the work
+     * tile (which can change at any time).
      *
-     * @return The primary production, as an <code>AbstractGoods</code>.
      */
-    private AbstractGoods getPrimaryProduction() {
-        if (workTile.getType().getPrimaryGoods() == null) return null;
-        AbstractGoods primaryProduction
-            = new AbstractGoods(workTile.getType().getPrimaryGoods());
-        int potential = primaryProduction.getAmount();
-        if (workTile.getTileItemContainer() != null) {
-            potential = workTile.getTileItemContainer()
-                .getTotalBonusPotential(primaryProduction.getType(), null,
-                                        potential, false);
+    void updateProductionType() {
+        List<ProductionType> productionTypes = getProductionTypes();
+        // TODO: in the future, this should become selectable
+        if (!productionTypes.isEmpty()) {
+            setProductionType(productionTypes.get(0));
         }
-        primaryProduction.setAmount(potential
-            + Math.max(0, getColony().getProductionBonus()));
-        return primaryProduction;
+        getColony().invalidateCache();
     }
 
     /**
-     * Gets the secondary production of a colony center tile.  Only
-     * natural tile improvements, such as rivers, contribute to the
-     * production.  Artificial tile improvements, such as plowing, are
-     * ignored.
+     * Returns the production types available for this ColonyTile,
+     * accounting for the difficulty level and whether this is a
+     * colony center tile.
      *
-     * @return The secondary production, as an <code>AbstractGoods</code>.
+     * @return available production types
      */
-    private AbstractGoods getSecondaryProduction() {
-        if (workTile.getType().getSecondaryGoods() == null) return null;
-        AbstractGoods secondaryProduction
-            = new AbstractGoods(workTile.getType().getSecondaryGoods());
-        int potential = secondaryProduction.getAmount();
-        if (workTile.getTileItemContainer() != null) {
-            potential = workTile.getTileItemContainer()
-                .getTotalBonusPotential(secondaryProduction.getType(), null,
-                                        potential, true);
-        }
-        secondaryProduction.setAmount(potential
-            + Math.max(0, getColony().getProductionBonus()));
-        return secondaryProduction;
+    public List<ProductionType> getProductionTypes() {
+        String difficulty = getSpecification()
+            .getString("model.option.tileProduction");
+        return workTile.getType()
+            .getProductionTypes(isColonyCenterTile(), difficulty);
     }
 
     /**
      * Gets the basic production information for the colony tile,
-     * ignoring any colony limited (which for now, should be irrelevant).
+     * ignoring any colony limits (which for now, should be irrelevant).
+     *
+     * The following special rules apply to colony center tiles:  All
+     * tile improvements contribute to the production of food.  Only
+     * natural tile improvements, such as rivers, contribute to the
+     * production of other types of goods.  Artificial tile
+     * improvements, such as plowing, are ignored.
+     *
+     * TODO: this arbitrary rule should be configurable.
      *
      * @return The raw production of this colony tile.
      * @see ProductionCache#update
@@ -228,13 +220,17 @@ public class ColonyTile extends WorkLocation implements Ownable {
     public ProductionInfo getBasicProductionInfo() {
         ProductionInfo pi = new ProductionInfo();
         if (isColonyCenterTile()) {
-            AbstractGoods primaryProduction = getPrimaryProduction();
-            if (primaryProduction != null) {
-                pi.addProduction(primaryProduction);
-            }
-            AbstractGoods secondaryProduction = getSecondaryProduction();
-            if (secondaryProduction != null) {
-                pi.addProduction(secondaryProduction);
+            for (AbstractGoods output : getOutputs()) {
+                boolean onlyNaturalImprovements = !output.getType().isFoodType();
+                int potential = output.getAmount();
+                if (workTile.getTileItemContainer() != null) {
+                    potential = workTile.getTileItemContainer()
+                        .getTotalBonusPotential(output.getType(), null, potential,
+                                                onlyNaturalImprovements);
+                }
+                potential += Math.max(0, getColony().getProductionBonus());
+                AbstractGoods production = new AbstractGoods(output.getType(), potential);
+                pi.addProduction(production);
             }
         } else {
             for (Unit unit : getUnitList()) {
@@ -281,15 +277,15 @@ public class ColonyTile extends WorkLocation implements Ownable {
 
             // Choose a sensible work type only if none already specified.
             if (unit.getWorkType() == null) {
-                AbstractGoods goods = workTile.getType().getPrimaryGoods();
-                if (goods == null) {
-                    goods = workTile.getType().getSecondaryGoods();
-                    if (goods == null
-                        && !workTile.getType().getProduction().isEmpty()) {
-                        goods = workTile.getType().getProduction().get(0);
-                    }
+                ProductionType best = getBestProductionType(unit);
+                if (best != null) {
+                    setProductionType(best);
+                    // TODO: unit work type needs to be a production
+                    // type rather than a goods type
+                    unit.setWorkType(best.getOutputs().get(0).getType());
                 }
-                if (goods != null) unit.setWorkType(goods.getType());
+            } else {
+                setProductionType(getBestProductionType(unit.getWorkType()));
             }
 
             getColony().invalidateCache();
@@ -297,6 +293,7 @@ public class ColonyTile extends WorkLocation implements Ownable {
         }
         return false;
     }
+
 
     /**
      * {@inheritDoc}
@@ -402,14 +399,12 @@ public class ColonyTile extends WorkLocation implements Ownable {
         int production = 0;
         TileType tileType = workTile.getType();
         if (isColonyCenterTile()) {
-            production = (unitType != null) ? 0
-                : (tileType.getPrimaryGoods() != null
-                    && tileType.getPrimaryGoods().getType() == goodsType)
-                ? getPrimaryProduction().getAmount()
-                : (tileType.getSecondaryGoods() != null
-                    && tileType.getSecondaryGoods().getType() == goodsType)
-                ? getSecondaryProduction().getAmount()
-                : 0;
+            if (unitType == null) {
+                AbstractGoods productionOf = getProductionOf(goodsType);
+                production = (productionOf == null) ? 0 : productionOf.getAmount();
+            } else {
+                production = 0;
+            }
         } else if (workTile.isLand()
             || getColony().hasAbility(Ability.PRODUCE_IN_WATER)) {
             List<Modifier> mods = getProductionModifiers(goodsType, unitType);
@@ -424,7 +419,7 @@ public class ColonyTile extends WorkLocation implements Ownable {
     /**
      * {@inheritDoc}
      */
-    public List<Modifier> getProductionModifiers(GoodsType goodsType, 
+    public List<Modifier> getProductionModifiers(GoodsType goodsType,
                                                  UnitType unitType) {
         if (goodsType == null) {
             throw new IllegalArgumentException("Null GoodsType.");
@@ -468,17 +463,48 @@ public class ColonyTile extends WorkLocation implements Ownable {
     /**
      * {@inheritDoc}
      */
-    public GoodsType getBestWorkType(Unit unit) {
-        GoodsType workType = null;
+    public ProductionType getBestProductionType(Unit unit) {
+        ProductionType best = null;
         int amount = 0;
-        for (GoodsType g : getSpecification().getFarmedGoodsTypeList()) {
-            int newAmount = getPotentialProduction(g, unit.getType());
-            if (newAmount > amount) {
-                amount = newAmount;
-                workType = g;
+        for (ProductionType productionType : getProductionTypes()) {
+            if (productionType.getOutputs() != null) {
+                for (AbstractGoods output : productionType.getOutputs()) {
+                    int newAmount = getPotentialProduction(output.getType(), unit.getType());
+                    if (newAmount > amount) {
+                        amount = newAmount;
+                        best = productionType;
+                    }
+                }
             }
         }
-        return workType;
+        return best;
+    }
+
+    /**
+     * Returns the best production type for the production of the
+     * given goods type.  This method is likely to be removed in the
+     * future.
+     *
+     * @param goodsType goods type
+     * @return production type
+     */
+    private ProductionType getBestProductionType(GoodsType goodsType) {
+        ProductionType best = null;
+        int amount = 0;
+        for (ProductionType productionType : getProductionTypes()) {
+            if (productionType.getOutputs() != null) {
+                for (AbstractGoods output : productionType.getOutputs()) {
+                    if (output.getType() == goodsType) {
+                        int newAmount = output.getAmount();
+                        if (newAmount > amount) {
+                            amount = newAmount;
+                            best = productionType;
+                        }
+                    }
+                }
+            }
+        }
+        return best;
     }
 
     /**

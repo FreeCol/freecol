@@ -601,10 +601,10 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     /**
      * {@inheritDoc}
      */
-    public GoodsType getBestWorkType(Unit unit) {
+    public ProductionType getBestProductionType(Unit unit) {
         // TODO: think of something better
-        List<AbstractGoods> outputs = getOutputs();
-        return outputs.isEmpty() ? null : outputs.get(0).getType();
+        return getType().getProductionTypes().isEmpty()
+            ? null : getType().getProductionTypes().get(0);
     }
 
     // Omitted getClaimTemplate, buildings do not need to be claimed.

@@ -591,7 +591,7 @@ public class TileTest extends FreeColTestCase {
         assertTrue(silver.isFarmed());
         assertEquals(0, tundra.getProductionOf(silver, colonistType));
         assertEquals(1, tile.potential(silver, colonistType));
-        
+
         assertFalse(tile.getProductionModifiers(silver, unit.getType())
             .isEmpty());
 
@@ -610,6 +610,16 @@ public class TileTest extends FreeColTestCase {
         assertTrue(river.getZIndex() < road.getZIndex());
         assertTrue(MapViewer.FOREST_INDEX < road.getZIndex());
         assertTrue(road.getZIndex() < TileItem.RESOURCE_ZINDEX);
+    }
+
+    public void testSerialization() {
+        Game game = getStandardGame();
+        game.setMap(getTestMap(plains));
+        Colony colony = getStandardColony();
+        ColonyTile tile = colony.getColonyTile(colony.getTile());
+
+        ColonyTile copy = cloneFreeColGameObject(ColonyTile.class, tile);
+
     }
 
 }

@@ -20,7 +20,7 @@
 
       You should have received a copy of the GNU General Public License
       along with FreeCol. If not, see http://www.gnu.org/licenses
-      
+
     </xs:documentation>
   </xs:annotation>
 
@@ -36,6 +36,7 @@
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
 	<xs:element ref="unit" />
+        <xs:element ref="production" />
       </xs:choice>
       <xs:attribute name="ID" type="BuildingId" use="required">
 	<xs:annotation>

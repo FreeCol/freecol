@@ -1060,6 +1060,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             settlement = null;
         }
 
+        updateColonyTiles();
         updatePlayerExploredTiles();
     }
 
@@ -1540,6 +1541,18 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             }
         }
         return null;
+    }
+
+    private void updateColonyTiles() {
+        for (Player player : getGame().getLiveEuropeanPlayers()) {
+            for (Colony colony : player.getColonies()) {
+                for (ColonyTile colonyTile : colony.getColonyTiles()) {
+                    if (colonyTile.getWorkTile() == this) {
+                        colonyTile.updateProductionType();
+                    }
+                }
+            }
+        }
     }
 
     /**
