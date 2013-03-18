@@ -1998,6 +1998,7 @@ public final class MapViewer {
                 if (name == null) continue;
                 Color backgroundColor = lib.getColor(settlement.getOwner());
                 Font font = ResourceManager.getFont("NormalFont", 18f);
+                Font italicFont = ResourceManager.getFont("NormalFont", Font.ITALIC, 18f);
                 Font productionFont = ResourceManager.getFont("NormalFont", 12f);
                 // int yOffset = lib.getSettlementImage(settlement).getHeight(null) + 1;
                 int yOffset = tileHeight;
@@ -2033,12 +2034,14 @@ public final class MapViewer {
                         Image leftImage = null;
                         Image rightImage = null;
                         if (settlement instanceof Colony) {
-                            String size = Integer.toString(((Colony)settlement)
-                                .getDisplayUnitCount());
-                            leftImage = createLabel(g, size, font,
-                                                    backgroundColor);
+                            Colony colony = (Colony)settlement;
+                            String size = Integer.toString(colony.getDisplayUnitCount());
+                            
+                            leftImage = createLabel(g, size,
+                                ((colony.getPreferredSizeChange() > 0) ? italicFont : font),
+                                backgroundColor);
                             if (player.owns(settlement)) {
-                                int bonusProduction = ((Colony)settlement).getProductionBonus();
+                                int bonusProduction = colony.getProductionBonus();
                                 if (bonusProduction != 0) {
                                     String bonus = (bonusProduction > 0)
                                         ? "+" + bonusProduction
@@ -2256,15 +2259,21 @@ public final class MapViewer {
 
         if (settlement != null) {
             if (settlement instanceof Colony) {
+                Colony colony = (Colony)settlement;
+
                 // Draw image of colony in center of the tile.
                 Image colonyImage = lib.getSettlementImage(settlement);
                 centerImage(g, colonyImage);
 
                 if (withNumber) {
-                    String populationString = Integer.toString(((Colony)settlement).getDisplayUnitCount());
-                    int bonus = ((Colony)settlement).getProductionBonus();
+                    String populationString = Integer.toString(colony.getDisplayUnitCount());
+                    int bonus = colony.getProductionBonus();
                     Color theColor = ResourceManager.getProductionColor(bonus);
-                    Font font = ResourceManager.getFont("SimpleFont", Font.BOLD, 12f);
+                    // if government admits even more units, use
+                    // italic and bigger number icon
+                    Font font = (colony.getPreferredSizeChange() > 0)
+                        ? ResourceManager.getFont("SimpleFont", Font.BOLD | Font.ITALIC, 18f)
+                        : ResourceManager.getFont("SimpleFont", Font.BOLD, 12f);
                     Image stringImage = lib.getStringImage(g, populationString,
                                                            theColor, font);
                     centerImage(g, stringImage);
