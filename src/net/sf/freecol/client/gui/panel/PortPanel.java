@@ -40,12 +40,13 @@ public abstract class PortPanel extends FreeColPanel {
     protected MouseListener pressListener;
     protected InPortPanel inPortPanel;
 
+
     public PortPanel(FreeColClient client, GUI gui) {
         super(client, gui);
     }
 
     /**
-     * Gets the cargo panel.
+     * Get the cargo panel.
      *
      * @return The cargo panel.
      */
@@ -54,7 +55,7 @@ public abstract class PortPanel extends FreeColPanel {
     }
 
     /**
-     * Returns the currently select unit.
+     * Get the currently select unit.
      *
      * @return The currently select unit.
      */
@@ -64,7 +65,7 @@ public abstract class PortPanel extends FreeColPanel {
     }
 
     /**
-     * Returns the currently select unit label.
+     * Get the currently select unit label.
      *
      * @return The currently select unit label.
      */
@@ -85,5 +86,4 @@ public abstract class PortPanel extends FreeColPanel {
     }
 
     public abstract List<Unit> getUnitList();
-
 }

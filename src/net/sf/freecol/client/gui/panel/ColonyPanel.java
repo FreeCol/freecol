@@ -21,6 +21,7 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.util.Comparator;
 import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
@@ -78,6 +79,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Colony.ColonyChangeEvent;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
@@ -97,9 +99,10 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitLocation.NoAddReason;
 import net.sf.freecol.common.model.UnitType;
 
+
 /**
- * This is a panel for the Colony display. It shows the units that are working
- * in the colony, the buildings and much more.
+ * This is a panel for the Colony display.  It shows the units that
+ * are working in the colony, the buildings and much more.
  *
  * Beware that in debug mode, this might be a server-side version of the colony
  * which is why we need to call getColony().getSpecification() to get the
@@ -110,16 +113,6 @@ public final class ColonyPanel extends PortPanel
 
     private static Logger logger = Logger.getLogger(ColonyPanel.class.getName());
 
-    /**
-     * The height of the area in which autoscrolling should happen.
-     */
-    public static final int SCROLL_AREA_HEIGHT = 40;
-
-    /**
-     * The speed of the scrolling.
-     */
-    public static final int SCROLL_SPEED = 40;
-
     private static final int EXIT = 0,
         BUILDQUEUE = 1,
         UNLOAD = 2,
@@ -128,17 +121,23 @@ public final class ColonyPanel extends PortPanel
         COLONY_UNITS = 6,
         SETGOODS = 7;
 
+    /** The height of the area in which autoscrolling should happen. */
+    public static final int SCROLL_AREA_HEIGHT = 40;
+
+    /** The speed of the scrolling. */
+    public static final int SCROLL_SPEED = 40;
+
+    /** Inherits PortPanel.pressListener, PortPanel.defaultTransferHandler */
+    private final MouseListener releaseListener = new DropListener();
+
+    /** The current image library. */
+    private final ImageLibrary imageLibrary = getLibrary();
+
     /** The <code>Colony</code> this panel is displaying. */
     private Colony colony;
 
-    // Inherits PortPanel.pressListener and PortPanel.defaultTransferHandler
-    private final MouseListener releaseListener = new DropListener();
-
-    private final ImageLibrary imageLibrary = getLibrary();
-
-
     // Subparts
-    // Inherits protected PortPanel.cargoPanel and PortPanel.inPortPanel
+    //   Inherits protected PortPanel.cargoPanel and PortPanel.inPortPanel
     private final JComboBox nameBox;
 
     private final JPanel netProductionPanel = new JPanel();
@@ -154,7 +153,6 @@ public final class ColonyPanel extends PortPanel
     private final BuildingsPanel buildingsPanel;
 
     private final ConstructionPanel constructionPanel;
-
 
     // Buttons
     private final JButton unloadButton
@@ -605,16 +603,6 @@ public final class ColonyPanel extends PortPanel
     }
 
     /**
-     * Gets the list of units on the colony tile.
-     * Note, does not include the units *inside* the colony.
-     *
-     * @return A list of units on the colony tile.
-     */
-    public List<Unit> getUnitList() {
-        return getColony().getTile().getUnitList();
-    }
-
-    /**
      * Initialize the entire panel.
      *
      * We can arrive here normally when a colony panel is created,
@@ -924,6 +912,18 @@ public final class ColonyPanel extends PortPanel
             logger.warning("Unknown property change event: "
                            + event.getPropertyName());
         }
+    }
+
+    // Implement PortPanel
+
+    /**
+     * Gets the list of units on the colony tile.
+     * Note, does not include the units *inside* the colony.
+     *
+     * @return A sorted list of units on the colony tile.
+     */
+    public List<Unit> getUnitList() {
+        return FreeColObject.getSortedCopy(colony.getTile().getUnitList());
     }
 
 
