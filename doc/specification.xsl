@@ -419,7 +419,7 @@
       <tr>
         <th><xsl:value-of select="freecol:localize('name')"/></th>
         <th><xsl:value-of select="freecol:localize('colopediaAction.SKILLS.name')"/></th>
-        <th><xsl:value-of select="freecol:localize('settlement')"/></th>
+        <th><xsl:value-of select="freecol:localize('Settlement')"/></th>
         <th><xsl:value-of select="freecol:localize('capital')"/></th>
         <th><xsl:value-of select="freecol:localize('abilities')"/></th>
       </tr>
