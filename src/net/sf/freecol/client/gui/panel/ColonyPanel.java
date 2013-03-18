@@ -30,7 +30,6 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.dnd.Autoscroll;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -286,7 +285,6 @@ public final class ColonyPanel extends PortPanel
         nameInputMap.put(KeyStroke.getKeyStroke("RIGHT"), "selectNext2");
         SwingUtilities.replaceUIInputMap(nameBox, JComponent.WHEN_IN_FOCUSED_WINDOW, nameInputMap);
 
-        buildingsScroll.setAutoscrolls(true);
         buildingsScroll.getViewport().setOpaque(false);
         buildingsPanel.setOpaque(false);
 
@@ -1387,7 +1385,7 @@ public final class ColonyPanel extends PortPanel
          * <code>BuildingsPanel</code>.
          */
         public final class ASingleBuildingPanel extends BuildingPanel
-            implements Autoscroll, DropTarget  {
+            implements DropTarget  {
 
             /**
              * Creates this ASingleBuildingPanel.
@@ -1421,24 +1419,6 @@ public final class ColonyPanel extends PortPanel
             }
 
             // Do not need an overriding cleanup, BuildingPanel.cleanup is good.
-
-            public void autoscroll(Point p) {
-                JViewport vp = (JViewport) colonyPanel.buildingsPanel.getParent();
-                if (getLocation().y + p.y - vp.getViewPosition().y < SCROLL_AREA_HEIGHT) {
-                    vp.setViewPosition(new Point(vp.getViewPosition().x,
-                                                 Math.max(vp.getViewPosition().y - SCROLL_SPEED, 0)));
-                } else if (getLocation().y + p.y - vp.getViewPosition().y >= vp.getHeight() - SCROLL_AREA_HEIGHT) {
-                    vp.setViewPosition(new Point(vp.getViewPosition().x,
-                                                 Math.min(vp.getViewPosition().y + SCROLL_SPEED,
-                                                          colonyPanel.buildingsPanel.getHeight()
-                                                          - vp.getHeight())));
-                }
-            }
-
-            public Insets getAutoscrollInsets() {
-                Rectangle r = getBounds();
-                return new Insets(r.x, r.y, r.width, r.height);
-            }
 
             /**
              * Adds a component to this ASingleBuildingPanel and makes
