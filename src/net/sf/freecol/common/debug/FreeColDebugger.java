@@ -63,12 +63,12 @@ public class FreeColDebugger {
      */
     private static String debugRunSave = null;
 
-    
     /**
      * Stores the standard fog of war setting when revealing all the map
      * Allows restore to previous state when re-enabling normal vision
      */
-    private static boolean normalGamefogOfWar = false;
+    private static boolean normalGameFogOfWar = false;
+
 
     /**
      * Is a debug mode enabled in this game?
@@ -217,6 +217,24 @@ public class FreeColDebugger {
     }
 
     /**
+     * Get the normal fog of war setting.
+     *
+     * @return The normal fog of war setting.
+     */
+    public static boolean getNormalGameFogOfWar() {
+        return normalGameFogOfWar;
+    }
+
+    /**
+     * Set the normal fog of war setting.
+     *
+     * @param normalGameFogOfWar The new normal fog of war setting.
+     */
+    public static void setNormalGameFogOfWar(boolean normalGameFogOfWar) {
+        FreeColDebugger.normalGameFogOfWar = normalGameFogOfWar;
+    }
+
+    /**
      * Try to complete a debug run if one is happening.
      *
      * @param freeColClient The <code>FreeColClient</code> of the game.
@@ -290,11 +308,13 @@ public class FreeColDebugger {
         return sb.toString();
     }
 
-	public static boolean getNormalGameFogOfWar() {
-		return normalGamefogOfWar;
-	}
-
-	public static void setNormalGameFogOfWar(boolean normalGamefogOfWar) {
-		FreeColDebugger.normalGamefogOfWar = normalGamefogOfWar;
-	}
+    /**
+     * Miscellaneous debug helper to just print the current call stack
+     * to stderr.
+     */
+    public static void printStackTrace() {
+        for (StackTraceElement s : Thread.currentThread().getStackTrace()) {
+            System.err.println(s.toString());
+        }
+    }
 }
