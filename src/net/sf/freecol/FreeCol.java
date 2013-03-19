@@ -488,9 +488,12 @@ public final class FreeCol {
             }
 
             if (line.hasOption("advantages")) {
-                if (!setAdvantages(line.getOptionValue("advantages"))) {
-                    System.err.println(Messages.message(StringTemplate.template("cli.error.advantages")
-                            .addName("%advantages%", getValidAdvantages())));
+                String arg = line.getOptionValue("advantages");
+                Advantages a = selectAdvantages(arg);
+                if (a == null) {
+                    fatal(Messages.message(StringTemplate.template("cli.error.advantages")
+                            .addName("%advantages%", getValidAdvantages())
+                            .addName("%arg%", arg)));
                 }
             }
 
@@ -534,21 +537,11 @@ public final class FreeCol {
 
             if (line.hasOption("difficulty")) {
                 String arg = line.getOptionValue("difficulty");
-                difficulty = null;
-                String err = "";
-                for (String d : new String[] { "veryEasy", "easy", "medium",
-                                               "hard", "veryHard" }) {
-                    String key = "model.difficulty." + d;
-                    String value = Messages.message(key + ".name");
-                    if (value.equals(arg)) {
-                        setDifficulty(key);
-                        break;
-                    }
-                    err += "," + value;
-                }
+                String difficulty = selectDifficulty(arg);
                 if (difficulty == null) {
                     fatal(Messages.message(StringTemplate.template("cli.error.difficulties")
-                            .addName("%difficulties%", err.substring(1))));
+                            .addName("%difficulties%", getValidDifficulties())
+                            .addName("%arg%", arg)));
                 }
             }
 
@@ -625,7 +618,7 @@ public final class FreeCol {
             }
 
             if (line.hasOption("tc")) {
-                setTC(line.getOptionValue("tc"));
+                setTC(line.getOptionValue("tc")); // Failure is deferred.
             }
 
             if (line.hasOption("timeout")) {
@@ -687,17 +680,17 @@ public final class FreeCol {
      * Called from NewPanel when a selection is made.
      *
      * @param advantages The name of the new advantages type.
-     * @return True of the advantages type was set.
+     * @return The type of advantages set, or null if none.
      */
-    private static boolean setAdvantages(String advantages) {
+    private static Advantages selectAdvantages(String advantages) {
         for (Advantages a : Advantages.values()) {
             String msg = Messages.message(a.getKey());
             if (msg.equals(advantages)) {
                 setAdvantages(a);
-                return true;
+                return a;
             }
         }
-        return false;
+        return null;
     }
 
     /**
@@ -732,9 +725,29 @@ public final class FreeCol {
     }
 
     /**
+     * Selects a difficulty level.
+     *
+     * @param arg The supplied difficulty argument.
+     * @return The name of the selected difficulty, or null if none.
+     */
+    public static String selectDifficulty(String arg) {
+        for (String d : new String[] { "veryEasy", "easy", "medium",
+                                       "hard", "veryHard" }) {
+            String key = "model.difficulty." + d;
+            String value = Messages.message(key + ".name");
+            if (value.equals(arg)) {
+                setDifficulty(key);
+                return key;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Sets the difficulty level.
      *
-     * @param difficulty The new difficulty level.
+     * @param difficulty The actual <code>OptionGroup</code>
+     *     containing the difficulty level.
      */
     public static void setDifficulty(OptionGroup difficulty) {
         setDifficulty(difficulty.getId());
@@ -747,6 +760,22 @@ public final class FreeCol {
      */
     public static void setDifficulty(String difficulty) {
         FreeCol.difficulty = difficulty;
+    }
+
+    /**
+     * Gets the names of the valid difficulty levels.
+     *
+     * @return The valid difficulty levels, comma separated.
+     */
+    public static String getValidDifficulties() {
+        String s = "";
+        for (String d : new String[] { "veryEasy", "easy", "medium",
+                                       "hard", "veryHard" }) {
+            String key = "model.difficulty." + d;
+            String value = Messages.message(key + ".name");
+            s += "," + value;
+        }
+        return s.substring(1);
     }
 
     /**
@@ -919,10 +948,12 @@ public final class FreeCol {
         if (debugStart) {
             try {
                 FreeColTcFile tcf = getTCFile();
-                if (tcf != null) {
-                    spec = tcf.getSpecification();
-                    spec.applyDifficultyLevel(FreeCol.getDifficulty());
+                if (tcf == null) {
+                    fatal(Messages.message(StringTemplate.template("cli.error.badTC")
+                            .addName("%tc%", getTC())));
                 }
+                spec = tcf.getSpecification();
+                spec.applyDifficultyLevel(FreeCol.getDifficulty());
             } catch (IOException ioe) {}
         }
         new FreeColClient(FreeColDirectories.getSavegameFile(), windowSize,
@@ -966,8 +997,8 @@ public final class FreeCol {
         } else {
             FreeColTcFile tcf = FreeCol.getTCFile();
             if (tcf == null) {
-                fatal(Messages.message(StringTemplate.template("server.badTC")
-                                                     .addName("%tc%", tc)));
+                fatal(Messages.message(StringTemplate.template("cli.error.badTC")
+                        .addName("%tc%", tc)));
             }
             try {
                 // TODO: command line advantages setting?
