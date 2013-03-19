@@ -1196,19 +1196,18 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * Adds a river to this tile.
      *
      * @param magnitude The magnitude of the river to be created
-     * @param style The river style.
+     * @param conns The encoded river size/connections.
      * @return The new river added, or the existing river TileImprovement.
      */
-    public TileImprovement addRiver(int magnitude, String style) {
+    public TileImprovement addRiver(int magnitude, String conns) {
         if (magnitude == TileImprovement.NO_RIVER) return null;
         TileImprovementType riverType = getSpecification()
             .getTileImprovementType("model.improvement.river");
         TileImprovement river = new TileImprovement(getGame(), this, riverType);
         river.setTurnsToComplete(0);
         river.setMagnitude(magnitude);
-        river.setStyle(TileImprovementStyle.getInstance(style));
         if (!add(river)) return null;
-        river.updateConnections();
+        river.updateRiverConnections(conns);
         return river;
     }
 
@@ -1219,7 +1218,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public TileImprovement removeRiver() {
         TileImprovement river = getRiver();
-        return (river == null || !remove(river)) ? null : river;
+        if (river == null || !remove(river)) return null;
+        river.updateRiverConnections(null);
+        return river;
     }
 
     /**
@@ -1233,8 +1234,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         TileImprovement road = new TileImprovement(getGame(), this, roadType);
         road.setMagnitude(1);
         if (!add(road)) return null;
-        road.setStyle(road.getRoadStyleFromMap());
-        road.updateConnections();
+        road.updateRoadConnections(true);
         return road;
     }
 
@@ -1245,7 +1245,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     public TileImprovement removeRoad() {
         TileImprovement road = getRoad();
-        return (road == null || !remove(road)) ? null : road;
+        if (road == null || !remove(road)) return null;
+        road.updateRoadConnections(false);
+        return road;
     }
 
 

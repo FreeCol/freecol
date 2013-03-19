@@ -457,21 +457,20 @@ public class TileItemContainer extends FreeColGameObject {
             if (item instanceof Resource) {
                 if (importResources) {
                     Resource ticR = (Resource) item;
-                    Resource r = new Resource(getGame(), tile, ticR.getType(), ticR.getQuantity());
+                    Resource r = new Resource(getGame(), tile,
+                        ticR.getType(), ticR.getQuantity());
                     tileItems.add(r);
                 }
             } else if (item instanceof LostCityRumour && !copyOnlyNatural) {
                 LostCityRumour ticR = (LostCityRumour) item;
-                LostCityRumour r = new LostCityRumour(getGame(), tile, ticR.getType(), ticR.getName());
+                LostCityRumour r = new LostCityRumour(getGame(), tile,
+                    ticR.getType(), ticR.getName());
                 addTileItem(r);
             } else if (item instanceof TileImprovement) {
-                if (!copyOnlyNatural || ((TileImprovement) item).getType().isNatural()) {
-                    TileImprovement ti = (TileImprovement) item;
-                    TileImprovement newTI = new TileImprovement(getGame(), tile, ti.getType());
-                    newTI.setMagnitude(ti.getMagnitude());
-                    newTI.setStyle(ti.getStyle());
-                    newTI.setTurnsToComplete(ti.getTurnsToComplete());
-                    addTileItem(newTI);
+                if (!copyOnlyNatural
+                    || ((TileImprovement)item).getType().isNatural()) {
+                    addTileItem(new TileImprovement(getGame(), tile, 
+                                                    (TileImprovement)item));
                 }
             }
         }

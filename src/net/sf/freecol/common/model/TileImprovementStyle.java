@@ -33,15 +33,23 @@ import net.sf.freecol.common.model.Map.Direction;
  * branches), the class caches all styles actually used. This should
  * also speed up reading maps with old base-three styles.
  *
- * <p>Tile improvement styles should be encoded as a string of base-36
- * values, one for each of the directions the improvement might be
- * connected to (counting clockwise from N). In the case of rivers,
- * which can only be connected via the "long sides" (NE, SE, SW, NW),
- * possible values range from "0000" to "zzzz". Improvement styles
- * that use only four directions can add up to three characters of
- * arbitrary style information (such as "%$&", for example).
- * Improvement styles that use eight directions can add an arbitrary
- * amount of style information.
+ * This is the documentation for the old style (<= 0.10.5):
+ *   Tile improvement styles should be encoded as a string of base-36
+ *   values, one for each of the directions the improvement might be
+ *   connected to (counting clockwise from N). In the case of rivers,
+ *   which can only be connected via the "long sides" (NE, SE, SW, NW),
+ *   possible values range from "0000" to "zzzz". Improvement styles
+ *   that use only four directions can add up to three characters of
+ *   arbitrary style information (such as "%$&", for example).
+ *   Improvement styles that use eight directions can add an arbitrary
+ *   amount of style information.
+ * As of 0.10.6 we use:
+ *   - Four character encoded strings for rivers: a "0" for no connection,
+ *     otherwise the string value of the integer magnitude of the river
+ *     for each of Direction.longSides.
+ *   - Eight character binary encoded strings for roads: a "0" or "1" for
+ *     each of Direction.values()
+ *   These are distinct so that the overlays can vary.
  */
 public class TileImprovementStyle {
 
@@ -73,81 +81,6 @@ public class TileImprovementStyle {
         this.mask = s;
     }
 
-    // @compat 0.10.5
-    /**
-     * Decode the old base-3 encoded style format.
-     *
-     * @param input An old style string.
-     * @param allDirections If true extend the string to contain a value for
-     *     all directions, if not, extend the string only for the long sides.
-     * @return The style in the new format.
-     */
-    public static String decodeOldStyle(String input, boolean allDirections) {
-        Direction[] directions = (allDirections) ? Direction.values()
-            : Direction.longSides;
-
-        String style = new String();
-        try {
-            int value = Integer.parseInt(input);
-            for (int index = 0; index < 4; index++) {
-                int magnitude = value % 3;
-                style = style.concat(Integer.toString(magnitude,
-                        Character.MAX_RADIX));
-                value /= 3;
-            }
-        } catch (NumberFormatException nfe) {
-            return null;
-        }
-        while (style.length() < directions.length) {
-            style = style.concat("0");
-        }
-        return style;
-    }
-    // @end compatibility code
-
-    /**
-     * Gets the style corresponding to the given string.
-     *
-     * @param key The key to look up.
-     * @return The corresponding <code>TileImprovementStyle</code>.
-     */
-    public static TileImprovementStyle getInstance(String key) {
-        if (key == null || "".equals(key)) return null;
-
-        TileImprovementStyle result = cache.get(key);
-        if (result == null) {
-            result = new TileImprovementStyle(key);
-            cache.put(key, result);
-            if (result.getString() != key) {
-                cache.put(result.getString(), result);
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Gets a new style derived from a base version but with an added
-     * connection in a given direction.
-     *
-     * @param direction The new direction to connect to.
-     * @param base The base style (may be null).
-     * @param magnitude The magnitude of the new connection.
-     * @param allDirections The style must include all directions.
-     * @return A new style.
-     */
-    public static TileImprovementStyle getConnectedStyle(Direction direction,
-        TileImprovementStyle base, int magnitude, boolean allDirections) {
-        String style = (base == null) ? decodeOldStyle("0", allDirections)
-            : base.getString();
-        int index = direction.ordinal();
-        if (style.length() < Direction.NUMBER_OF_DIRECTIONS) index /= 2;
-
-        String result = ((index == 0) ? "" : style.substring(0, index-1))
-            + Integer.toString(magnitude)
-            + ((index+1 == style.length()) ? "" : style.substring(index+1));
-        return getInstance(result);
-    }
-      
 
     /**
      * Gets the key suitable for looking up an appropriate tile
@@ -167,6 +100,59 @@ public class TileImprovementStyle {
      */
     public String getMask() {
         return mask;
+    }
+
+    // @compat 0.10.5
+    /**
+     * Decode the old base-3 encoded style format.
+     *
+     * @param input An old style string.
+     * @param pad Pad the result to this length.
+     * @return The style in the new format.
+     */
+    public static String decodeOldStyle(String input, int pad) {
+        if (pad <= 0) return null;
+        boolean isZero = true;
+        String style = new String();
+        try {
+            int value = Integer.parseInt(input);
+            for (int index = 0; index < 4; index++) {
+                int magnitude = value % 3;
+                isZero &= magnitude == 0;
+                style = style.concat(Integer.toString(magnitude,
+                                                      Character.MAX_RADIX));
+                value /= 3;
+            }
+        } catch (NumberFormatException nfe) {
+            return null;
+        }
+        if (isZero) return null;
+        while (style.length() < pad) {
+            style = style.concat("0");
+        }
+        return style;
+    }
+    // end @compat
+
+    /**
+     * Gets the style corresponding to the given string.
+     *
+     * @param key The key to look up.
+     * @return The corresponding <code>TileImprovementStyle</code>.
+     */
+    public static TileImprovementStyle getInstance(String key) {
+        if (key == null || "".equals(key) || "0".equals(key)
+            || "0000".equals(key) || "00000000".equals(key)) return null;
+
+        TileImprovementStyle result = cache.get(key);
+        if (result == null) {
+            result = new TileImprovementStyle(key);
+            cache.put(key, result);
+            if (result.getString() != key) {
+                cache.put(result.getString(), result);
+            }
+        }
+        return result;
     }
 
         

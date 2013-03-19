@@ -272,49 +272,20 @@ public final class MapEditorTransformPanel extends FreeColPanel {
             TileImprovementType riverType =
                 tile.getSpecification().getTileImprovementType("model.improvement.river");
 
-            if (tile.getType().canHaveImprovement(riverType)) {
-                int oldMagnitude = TileImprovement.NO_RIVER;
-                TileImprovement river = tile.getRiver();
-                if (river == null) {
-                    river = new TileImprovement(tile.getGame(), tile, riverType);
-                    river.setStyle(TileImprovementStyle.getInstance("0000"));
-                } else {
-                    oldMagnitude = river.getMagnitude();
+            if (tile.getType().canHaveImprovement(riverType)
+                && !tile.hasRiver()) {
+                String conns = "";
+                for (Direction direction : Direction.longSides) {
+                    Tile t = tile.getNeighbourOrNull(direction);
+                    TileImprovement otherRiver = (t == null) ? null
+                        : t.getRiver();
+                    conns += (t == null
+                        || (t.isLand() && otherRiver == null)) ? "0"
+                        : Integer.toString(magnitude);
                 }
-
-                if (magnitude != oldMagnitude) {
-                    tile.addRiver(magnitude, river.getStyle().getString());
-                    RiverSection mysection = new RiverSection(river.getConnections());
-                    // for each neighboring tile
-                    for (Direction direction : Direction.longSides) {
-                        Tile t = tile.getNeighbourOrNull(direction);
-                        if (t == null) {
-                            continue;
-                        }
-                        TileImprovement otherRiver = t.getRiver();
-                        if (!t.isLand() && otherRiver == null) {
-                            // add a virtual river in the ocean/lake tile
-                            // just for the purpose of drawing the river mouth
-                            otherRiver = new TileImprovement(tile.getGame(), tile, riverType);
-                            otherRiver.setMagnitude(tile.getRiver().getMagnitude());
-                        }
-                        if (otherRiver != null) {
-                            // update the other tile river branch
-                            Direction otherDirection = direction.getReverseDirection();
-                            RiverSection oppositesection =
-                                new RiverSection(otherRiver.getConnections());
-                            oppositesection.setBranch(otherDirection, tile.getRiver().getMagnitude());
-                            otherRiver.setStyle(TileImprovementStyle.getInstance(oppositesection.encodeStyle()));
-                            // update the current tile river branch
-                            mysection.setBranch(direction, tile.getRiver().getMagnitude());
-                        }
-                        // else the neighbor tile doesn't have a river, nothing to do
-                    }
-                    tile.getRiver().setStyle(TileImprovementStyle.getInstance(mysection.encodeStyle()));
-                }
+                tile.addRiver(magnitude, conns);
             }
         }
-
     }
 
     /**

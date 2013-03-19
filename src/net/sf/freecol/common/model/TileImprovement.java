@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -75,6 +76,7 @@ public class TileImprovement extends TileItem implements Named {
      * Creates a standard <code>TileImprovement</code>-instance.
      *
      * This constructor asserts that the game, tile and type are valid.
+     * Does not set the style.
      *
      * @param game The <code>Game</code> in which this object belongs.
      * @param tile The <code>Tile</code> on which this object sits.
@@ -90,20 +92,36 @@ public class TileImprovement extends TileItem implements Named {
             this.turnsToComplete = tile.getType().getBasicWorkTurns() + type.getAddWorkTurns();
         }
         this.magnitude = type.getMagnitude();
+        this.style = null;
         this.connected = 0L;
     }
 
+    /**
+     * Create an new TileImprovement from an input stream.
+     *
+     * @param game The <code>Game</code> in which this object belongs.
+     * @param in The <code>XMLStreamReader</code> to read from.
+     */
     public TileImprovement(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
         readFromXML(in);
     }
 
+    /**
+     * Create an new TileImprovement from an existing one.
+     *
+     * @param game The <code>Game</code> in which this object belongs.
+     * @param tile The <code>Tile</code> where the improvement resides.
+     * @param template The <code>TileImprovement</code> to copy.
+     */
     public TileImprovement(Game game, Tile tile, TileImprovement template) {
         super(game, tile);
-        this.type = getSpecification().getTileImprovementType(template.getId());
+        this.type = template.type;
+        this.turnsToComplete = template.turnsToComplete;
         this.magnitude = template.magnitude;
         this.style = template.style;
-        this.turnsToComplete = template.turnsToComplete;
+        this.virtual = template.virtual;
+        this.connected = getConnectionsFromStyle();
     }
 
     /**
@@ -129,17 +147,16 @@ public class TileImprovement extends TileItem implements Named {
     }
 
     /**
-     * Gets a key for message routines.
+     * Is this <code>TileImprovement</code> a river?
      *
-     * @return The name key.
+     * @return True if this is a river improvement.
      */
-    public String getNameKey() {
-        return type.getNameKey();
+    public boolean isRiver() {
+        return "model.improvement.river".equals(type.getId());
     }
 
     /**
      * Is this <code>TileImprovement</code> a road?
-     * TODO: deprecate?
      *
      * @return True if this is a road improvement.
      */
@@ -148,13 +165,28 @@ public class TileImprovement extends TileItem implements Named {
     }
 
     /**
-     * Is this <code>TileImprovement</code> a river?
-     * TODO: deprecate?
+     * Gets the directions that a connection can form across for this
+     * this type of improvement.
      *
-     * @return True if this is a river improvement.
+     * - For rivers, it is just the longSided directions.
+     * - For roads, it is all directions.
+     * - In other cases, no directions are relevant.
+     *
+     * @return An array of relevant directions, or null if none.
      */
-    public boolean isRiver() {
-        return "model.improvement.river".equals(type.getId());
+    public Direction[] getConnectionDirections() {
+        return (isRoad()) ? Direction.values()
+            : (isRiver()) ? Direction.longSides
+            : null;
+    }
+
+    /**
+     * Gets a key for message routines.
+     *
+     * @return The name key.
+     */
+    public String getNameKey() {
+        return type.getNameKey();
     }
 
     /**
@@ -212,15 +244,6 @@ public class TileImprovement extends TileItem implements Named {
     }
 
     /**
-     * Sets the style of this improvement.
-     *
-     * @param style The new style.
-     */
-    public void setStyle(TileImprovementStyle style) {
-        this.style = style;
-    }
-
-    /**
      * Is this a virtual improvement?
      *
      * @return True if this is a virtual improvement.
@@ -264,17 +287,22 @@ public class TileImprovement extends TileItem implements Named {
             } else {
                 connected &= ~(1 << direction.ordinal());
             }
+            style = TileImprovementStyle.getInstance(encodeConnections());
         }
-        style = TileImprovementStyle.getInstance(encodeConnections());
     }
 
     /**
      * Encode a style string suitable for TileImprovementStyle.getInstance.
+     *
+     * @return A style string (may be null).
      */
     private String encodeConnections() {
+        Direction[] dirns = getConnectionDirections();
+        if (dirns == null) return null;
         String s = new String();
-        for (Direction d : Direction.values()) {
-            s = s.concat((isConnectedTo(d)) ? Integer.toString(magnitude) :"0");
+        for (Direction d : dirns) {
+            s = s.concat((isConnectedTo(d)) ? Integer.toString(magnitude)
+                : "0");
         }
         return s;
     }
@@ -285,9 +313,11 @@ public class TileImprovement extends TileItem implements Named {
      * @return A map of the connections.
      */
     public Map<Direction, Integer> getConnections() {
+        Direction[] dirns = getConnectionDirections();
+        if (dirns == null) return Collections.emptyMap();
         Map<Direction, Integer> result
             = new EnumMap<Direction, Integer>(Direction.class);
-        for (Direction d : Direction.values()) {
+        for (Direction d : dirns) {
             if (isConnectedTo(d)) result.put(d, magnitude);
         }
         return result;
@@ -314,7 +344,6 @@ public class TileImprovement extends TileItem implements Named {
     public Modifier getProductionModifier(GoodsType goodsType) {
         return (isComplete()) ? type.getProductionModifier(goodsType) : null;
     }
-
 
     /**
      * Calculates the movement cost on the basis of connected tile
@@ -352,7 +381,6 @@ public class TileImprovement extends TileItem implements Named {
             : type.isWorkerAllowed(unit);
     }
 
-
     /**
      * Fixes any tile improvement style discontinuities.
      *
@@ -366,93 +394,101 @@ public class TileImprovement extends TileItem implements Named {
      *     found and corrected.
      */
     public boolean fixIntegrity() {
-        final Tile tile = getTile();
-        boolean result = true;
-        for (Tile t : tile.getSurroundingTiles(1)) {
-            Direction dForward = tile.getDirection(t);
-            Direction dReverse = dForward.getReverseDirection();
-            for (TileImprovement ti : t.getTileImprovements()) {
-                if (getType() == ti.getType()
-                    && !isConnectedTo(dForward)
-                    && ti.isConnectedTo(dReverse)) {
-                    setConnected(dForward, true);
-                    result = false;
-                    logger.warning("Connecting improvement " + this
-                        + " at " + tile + " to " + t);
-                }
-            }
+        String curr = (style == null) ? null : style.getString();
+        String found = (isRiver()) ? updateRiverConnections(curr)
+            : (isRoad() && isComplete()) ? updateRoadConnections(true)
+            : null;
+        if ((found == null && curr == null)
+            || (found != null && curr != null && found.equals(curr))) {
+            return true;
         }
-        return result;
+        logger.warning("At " + getTile() + " fixing improvement style from "
+            + curr + " to " + found);
+        this.style = TileImprovementStyle.getInstance(found);
+        return false;
     }
 
     /**
      * Updates the connections from the current style.
      *
      * Public for the test suite.
+     *
+     * @return The connections implied by the current style.
      */
-    public void updateConnections() {
-        connected = 0L;
+    public long getConnectionsFromStyle() {
+        long conn = 0L;
         if (style != null) {
-            Direction[] directions = (isRoad()) ? Direction.values()
-                : Direction.longSides;
-            String mask = style.getMask();
-            for (int i = 0; i < directions.length; i++) {
-                if (mask.charAt(i) != '0') {
-                    connected |= 1L << directions[i].ordinal();
+            Direction[] directions = getConnectionDirections();
+            if (directions != null) {
+                String mask = style.getMask();
+                for (int i = 0; i < directions.length; i++) {
+                    if (mask.charAt(i) != '0') {
+                        conn |= 1L << directions[i].ordinal();
+                    }
                 }
             }
         }
+        return conn;
     }
 
     /**
-     * Work out what the river style at this tile should be by checking
-     * its connectivity.
+     * Updates the connections from/to this river improvement on the basis
+     * of the expected encoded river style.
      *
-     * @return A suitable TileImprovementStyle.
+     * @param conns The encoded river connections, or null to disconnect.
+     * @return The actual encoded connections found.
      */
-    public TileImprovementStyle getRiverStyleFromMap() {
+    public String updateRiverConnections(String conns) {
         if (!isRiver()) return null;
         final Tile tile = getTile();
-        final Region region = tile.getRegion();
-        String s = new String();
+        int i = 0;
+        String ret = "";
         for (Direction d : Direction.longSides) {
+            Direction dReverse = d.getReverseDirection();
             Tile t = tile.getNeighbourOrNull(d);
-            s = s.concat((t != null && t.hasRiver()
-                    && t.getRegion() == region) ? "1" : "0");
+            TileImprovement river = (t == null) ? null : t.getRiver();
+            String c = (conns == null) ? "0" : conns.substring(i, i+1);
+            
+            if ("0".equals(c)) {
+                if (river != null && river.isConnectedTo(dReverse)) {
+                    river.setConnected(dReverse, false);
+                }
+                setConnected(d, false);
+            } else {
+                if (river != null) {
+                    river.setConnected(dReverse, true);
+                }
+                setConnected(d, true);
+            }
+            ret += c;
+            i++;
         }
-        return TileImprovementStyle.getInstance(s);
-    }
-
-    /**
-     * Work out what the road style at this tile should be by checking
-     * neighbouring tiles for roads.
-     *
-     * @return A suitable TileImprovementStyle.
-     */
-    public TileImprovementStyle getRoadStyleFromMap() {
-        if (!isRoad()) return null;
-        final Tile tile = getTile();
-        String s = new String();
-        for (Direction d : Direction.values()) {
-            Tile t = tile.getNeighbourOrNull(d);
-            s = s.concat((t != null && t.hasRoad()) ? "1" : "0");
-        }
-        return TileImprovementStyle.getInstance(s);
+        return (conns == null || "0000".equals(ret)) ? null : ret;
     }
 
     /**
      * Updates the connections from/to this road improvement.
      *
      * @param connect If true, add connections, otherwise remove them.
+     * @return A string encoding of the correct connections for this
+     *     improvement.
      */
-    public void updateRoadConnections(boolean connect) {
-        if (!isRoad() || !isComplete()) return;
+    public String updateRoadConnections(boolean connect) {
+        if (!isRoad() || !isComplete()) return null;
         final Tile tile = getTile();
-        for (Tile t : tile.getSurroundingTiles(1)) {
-            if (t.hasRoad()) {
-                t.getRoad().setConnected(t.getDirection(tile), connect);
+        String ret = "";
+        for (Direction d : Direction.values()) {
+            Tile t = tile.getNeighbourOrNull(d);
+            TileImprovement road = (t == null) ? null : t.getRoad();
+            if (road == null || !road.isComplete()) {
+                ret += "0";
+            } else {
+                road.setConnected(d.getReverseDirection(), connect);
+                setConnected(d, connect);
+                ret += (connect) ? "1" : "0";
             }
         }
+        return (!connect || "00000000".equals(ret)) ? null : ret;
     }
 
     // Interface TileItem
@@ -545,44 +581,34 @@ public class TileImprovement extends TileItem implements Named {
         magnitude = Integer.parseInt(in.getAttributeValue(null, "magnitude"));
 
         str = in.getAttributeValue(null, "style");
-        if (str == null) {
+        Direction dirns[] = getConnectionDirections();
+        if (dirns == null || str == null || "".equals(str)) {
             style = null;
         // @compat 0.10.5
         } else if (str.length() < 4) {
-            String old = TileImprovementStyle.decodeOldStyle(str, isRoad());
-            if (old == null) {
-                logger.warning("Ignoring bogus old TileImprovementStyle: "
-                    + str);
-            } else {
-                style = TileImprovementStyle.getInstance(old);
-            }
-        // end compatibility code
+            String old = TileImprovementStyle.decodeOldStyle(str, dirns.length);
+            style = (old == null) ? null
+                : TileImprovementStyle.getInstance(old);
+        // end @compat
         } else {
             style = TileImprovementStyle.getInstance(str);
             if (style == null) {
                 logger.warning("Ignoring bogus TileImprovementStyle: " + str);
-            } else {
-                int slen = style.toString().length();
-                if (isRiver()) {
-                    if (slen != Direction.longSides.length) {
-                        TileImprovementStyle old = style;
-                        style = getRiverStyleFromMap();
-                        logger.warning("At " + tile
-                            + " bad river style (" + old.toString()
-                            + ") replaced with " + style.toString());
-                    }
-                } else if (isRoad()) {
-                    if (slen != Direction.values().length) {
-                        TileImprovementStyle old = style;
-                        style = getRoadStyleFromMap();
-                        logger.warning("At " + tile
-                            + " bad road style (" + old.toString()
-                            + ") replaced with " + style.toString());
-                    }
-                }
             }
         }
-        updateConnections();
+        if (style != null) {
+            if (style.toString().length() != dirns.length) {
+                throw new XMLStreamException("For " + type
+                    + ", bogus style: " + str + " -> " + style
+                    + " at " + tile);
+            }
+            if (!isRiver() && !isRoad()) {
+                throw new XMLStreamException("For " + type
+                    + ", bogus non-null style: " + str + " -> " + style
+                    + " at " + tile);
+            }
+        }
+        connected = getConnectionsFromStyle();
 
         virtual = getAttribute(in, "virtual", false);
     }

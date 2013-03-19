@@ -307,14 +307,4 @@ public class FreeColDebugger {
         sb.deleteCharAt(sb.length()-1);
         return sb.toString();
     }
-
-    /**
-     * Miscellaneous debug helper to just print the current call stack
-     * to stderr.
-     */
-    public static void printStackTrace() {
-        for (StackTraceElement s : Thread.currentThread().getStackTrace()) {
-            System.err.println(s.toString());
-        }
-    }
 }

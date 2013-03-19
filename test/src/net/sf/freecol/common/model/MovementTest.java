@@ -131,7 +131,6 @@ public class MovementTest extends FreeColTestCase {
         
         assertTrue(road1.isConnectedTo(tile1.getDirection(tile2)));
         assertTrue(road2.isConnectedTo(tile2.getDirection(tile1)));
-System.err.println("TMARoad " + tile1.getDirection(tile2));
 
         Unit colonist = new ServerUnit(game, tile1, dutch, colonistType);
         int moveCost = 1;
@@ -173,7 +172,6 @@ System.err.println("TMARoad " + tile1.getDirection(tile2));
         assertTrue (river2.isConnectedTo(Map.Direction.NW));
 
         Unit colonist = new ServerUnit(game, tile1, dutch, colonistType);
-System.err.println("TMAR");
 
         // rivers start parallel, no cost reduction
         int moveCost = 3;
@@ -182,10 +180,8 @@ System.err.println("TMAR");
                      colonist.getMoveCost(tile2));
 
         // rivers are connected, cost reduction applies
-        river1.setStyle(TileImprovementStyle.getInstance("1000"));
-        river2.setStyle(TileImprovementStyle.getInstance("0010"));
-        river1.updateConnections();
-        river2.updateConnections();
+        river1.updateRiverConnections("1000");
+        river2.updateRiverConnections("0010");
 
         assertTrue (river1.isConnectedTo(Map.Direction.NE));
         assertFalse(river1.isConnectedTo(Map.Direction.SE));
