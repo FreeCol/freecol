@@ -2147,9 +2147,7 @@ public final class InGameController implements NetworkConstants {
      * @return boolean
      */
     public boolean leaveShip(Unit unit) {
-        if (!requireOurTurn()) {
-           return false;
-        }
+        if (!requireOurTurn()) return false;
 
         // Sanity check, and find our carrier before we get off.
         Unit carrier = unit.getCarrier();

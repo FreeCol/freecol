@@ -78,6 +78,7 @@ public final class UnitLabel extends JLabel
         WORK_BUILDING,   // Must match the WorkLocation actual type
         CLEAR_ORDERS,
         ASSIGN_TRADE_ROUTE,
+        LEAVE_SHIP,
     }
 
     private final Unit unit;
@@ -380,6 +381,9 @@ public final class UnitLabel extends JLabel
             break;
         case ASSIGN_TRADE_ROUTE:
             inGameController.assignTradeRoute(unit);
+            break;
+        case LEAVE_SHIP:
+            inGameController.leaveShip(unit);
             break;
         }
         updateIcon();

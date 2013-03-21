@@ -451,11 +451,13 @@ public final class QuickActionMenu extends JPopupMenu {
             && !isUnitAtSea);
         this.add(menuItem);
 
-        menuItem = new JMenuItem(Messages.message("assignTradeRoute"));
-        menuItem.setActionCommand(UnitAction.ASSIGN_TRADE_ROUTE.toString());
-        menuItem.addActionListener(unitLabel);
-        menuItem.setEnabled(tempUnit.isCarrier() && !hasTradeRoute);
-        this.add(menuItem);
+        if (tempUnit.isCarrier()) {
+            menuItem = new JMenuItem(Messages.message("assignTradeRoute"));
+            menuItem.setActionCommand(UnitAction.ASSIGN_TRADE_ROUTE.toString());
+            menuItem.addActionListener(unitLabel);
+            menuItem.setEnabled(!hasTradeRoute);
+            this.add(menuItem);
+        }
 
         if (tempUnit.canCarryTreasure() && tempUnit.canCashInTreasureTrain()) {
             menuItem = new JMenuItem(Messages.message("cashInTreasureTrain.order"));
@@ -467,6 +469,15 @@ public final class QuickActionMenu extends JPopupMenu {
                 });
             this.add(menuItem);
         }
+
+        if (tempUnit.getLocation() instanceof Unit) {
+            menuItem = new JMenuItem(Messages.message("leaveShip"));
+            menuItem.setActionCommand(UnitAction.LEAVE_SHIP.toString());
+            menuItem.addActionListener(unitLabel);
+            menuItem.setEnabled(true);
+            this.add(menuItem);
+        }
+
         return true;
     }
 
