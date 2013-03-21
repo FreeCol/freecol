@@ -478,6 +478,14 @@ public final class QuickActionMenu extends JPopupMenu {
             this.add(menuItem);
         }
 
+        if (tempUnit.isCarrier()) {
+            menuItem = new JMenuItem(Messages.message("unload"));
+            menuItem.setActionCommand(UnitAction.UNLOAD.toString());
+            menuItem.addActionListener(unitLabel);
+            menuItem.setEnabled(tempUnit.hasCargo() && !isUnitAtSea);
+            this.add(menuItem);
+        }
+
         return true;
     }
 

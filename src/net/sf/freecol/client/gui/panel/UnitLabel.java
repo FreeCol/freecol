@@ -79,6 +79,7 @@ public final class UnitLabel extends JLabel
         CLEAR_ORDERS,
         ASSIGN_TRADE_ROUTE,
         LEAVE_SHIP,
+        UNLOAD,
     }
 
     private final Unit unit;
@@ -384,6 +385,9 @@ public final class UnitLabel extends JLabel
             break;
         case LEAVE_SHIP:
             inGameController.leaveShip(unit);
+            break;
+        case UNLOAD:
+            inGameController.unload(unit);
             break;
         }
         updateIcon();
