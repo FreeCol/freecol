@@ -552,9 +552,9 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     public int getPotentialProduction(GoodsType goodsType, UnitType unitType) {
         for (AbstractGoods output : getOutputs()) {
             if (output.getType() == goodsType) {
+                int amount = (unitType == null) ? 0 : output.getAmount();
                 int production = (int) FeatureContainer
-                    .applyModifiers(output.getAmount(),
-                                    getGame().getTurn(),
+                    .applyModifiers(amount, getGame().getTurn(),
                                     getProductionModifiers(goodsType, unitType));
                 return Math.max(0, production);
             }

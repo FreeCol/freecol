@@ -1575,6 +1575,9 @@ resources of 400, lost city rumours of 500
       <ability id="model.ability.expertsUseConnections" value="true"/>
     </building-type>
     <building-type id="model.building.chapel" workplaces="0">
+      <production>
+        <output goods-type="model.goods.crosses" value="1"/>
+      </production>
       <modifier id="model.goods.crosses" type="additive" value="1">
         <scope ability-id="model.ability.person" matchNegated="true"/>
       </modifier>
