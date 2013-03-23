@@ -75,6 +75,8 @@ public class BuildingTest extends FreeColTestCase {
         = spec().getGoodsType("model.goods.cloth");
     private static final GoodsType cottonType
         = spec().getGoodsType("model.goods.cotton");
+    private static final GoodsType crossesType
+        = spec().getGoodsType("model.goods.crosses");
     private static final GoodsType foodType
         = spec().getPrimaryFoodType();
     private static final GoodsType grainType
@@ -218,12 +220,14 @@ public class BuildingTest extends FreeColTestCase {
         assertFalse(colony.hasAbility("model.ability.dressMissionary"));
         assertFalse(unit.hasAbility("model.ability.dressMissionary"));
         assertFalse(unit.canBeEquippedWith(missionary));
+        assertEquals(1, church.getPotentialProduction(crossesType, null));
 
         church.upgrade();
         assertTrue(church.getType().hasAbility("model.ability.dressMissionary"));
         assertTrue(colony.hasAbility("model.ability.dressMissionary"));
         assertTrue(unit.hasAbility("model.ability.dressMissionary"));
         assertTrue(unit.canBeEquippedWith(missionary));
+        assertEquals(2, church.getPotentialProduction(crossesType, null));
     }
 
     public void testCanAddToBuilding() {
