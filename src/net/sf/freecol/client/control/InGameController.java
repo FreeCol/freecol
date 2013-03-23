@@ -78,6 +78,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.NoClaimReason;
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.common.model.ProductionType;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
@@ -1535,22 +1536,23 @@ public final class InGameController implements NetworkConstants {
 
         java.util.Map<GoodsType, Integer> goodsMap
             = new HashMap<GoodsType, Integer>();
+        String difficulty = getSpecification().getString("model.option.tileProduction");
         for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
-            if (goodsType.isFoodType()) {
-                int potential = 0;
-                if (tile.getType().isPrimaryGoodsType(goodsType)) {
-                    potential = tile.potential(goodsType, null);
-                }
-                goodsMap.put(goodsType, new Integer(potential));
-            } else if (goodsType.isBuildingMaterial()) {
+            if (goodsType.isBuildingMaterial()) {
                 while (goodsType.isRefined()) {
                     goodsType = goodsType.getInputType();
                 }
-                int potential = 0;
-                if (tile.getType().isSecondaryGoodsType(goodsType)) {
-                    potential = tile.potential(goodsType, null);
+            } else if (!goodsType.isFoodType()) {
+                continue;
+            }
+            for (ProductionType productionType : tile.getType()
+                     .getProductionTypes(false, difficulty)) {
+                int potential = (productionType.getOutput(goodsType) == null)
+                    ? 0 : tile.potential(goodsType, null);
+                Integer oldPotential = goodsMap.get(goodsType);
+                if (oldPotential == null || potential > oldPotential) {
+                    goodsMap.put(goodsType, potential);
                 }
-                goodsMap.put(goodsType, new Integer(potential));
             }
         }
 

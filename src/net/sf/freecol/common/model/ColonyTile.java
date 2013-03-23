@@ -431,13 +431,14 @@ public class ColonyTile extends WorkLocation implements Ownable {
         final String id = goodsType.getId();
         final Turn turn = getGame().getTurn();
         if (isColonyCenterTile()) {
-            if (tileType.isPrimaryGoodsType(goodsType)
-                || tileType.isSecondaryGoodsType(goodsType)) {
-                result.addAll(workTile.getProductionModifiers(goodsType, null));
-                result.addAll(colony.getModifierSet(id, null, turn));
-                result.add(colony.getProductionModifier(goodsType));
-                if (owner != null) {
-                    result.addAll(owner.getModifierSet(id, null, turn));
+            for (AbstractGoods output : getOutputs()) {
+                if (goodsType == output.getType()) {
+                    result.addAll(workTile.getProductionModifiers(goodsType, null));
+                    result.addAll(colony.getModifierSet(id, null, turn));
+                    result.add(colony.getProductionModifier(goodsType));
+                    if (owner != null) {
+                        result.addAll(owner.getModifierSet(id, null, turn));
+                    }
                 }
             }
         } else {

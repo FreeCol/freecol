@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Set;
 
 import net.sf.freecol.client.gui.MapViewer;
+import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.FreeColTestUtils;
 
@@ -546,30 +547,34 @@ public class TileTest extends FreeColTestCase {
     */
 
     public void testArctic() {
-        arctic.applyDifficultyLevel(spec().getDifficultyLevel("model.difficulty.veryEasy"));
         assertTrue(arctic.canSettle());
-        assertEquals(2, arctic.getPrimaryGoods().getAmount());
-        assertNull(arctic.getSecondaryGoods());
 
-        arctic.applyDifficultyLevel(spec().getDifficultyLevel("model.difficulty.easy"));
-        assertTrue(arctic.canSettle());
-        assertEquals(1, arctic.getPrimaryGoods().getAmount());
-        assertNull(arctic.getSecondaryGoods());
+        OptionGroup difficultyLevel = spec().getDifficultyLevel("model.difficulty.veryEasy");
+        String tileProduction = difficultyLevel.getString("model.option.tileProduction");
+        List<ProductionType> productionTypes = arctic.getProductionTypes(true, tileProduction);
+        assertEquals(1, productionTypes.size());
+        ProductionType arcticProduction = productionTypes.get(0);
+        List<AbstractGoods> outputs = arcticProduction.getOutputs();
+        assertEquals(1, outputs.size());
+        assertEquals(grain, outputs.get(0).getType());
+        assertEquals(2, outputs.get(0).getAmount());
 
-        arctic.applyDifficultyLevel(spec().getDifficultyLevel("model.difficulty.medium"));
-        assertTrue(arctic.canSettle());
-        assertNull(arctic.getPrimaryGoods());
-        assertNull(arctic.getSecondaryGoods());
+        difficultyLevel = spec().getDifficultyLevel("model.difficulty.easy");
+        tileProduction = difficultyLevel.getString("model.option.tileProduction");
+        productionTypes = arctic.getProductionTypes(true, tileProduction);
+        assertEquals(1, productionTypes.size());
+        arcticProduction = productionTypes.get(0);
+        outputs = arcticProduction.getOutputs();
+        assertEquals(1, outputs.size());
+        assertEquals(grain, outputs.get(0).getType());
+        assertEquals(1, outputs.get(0).getAmount());
 
-        arctic.applyDifficultyLevel(spec().getDifficultyLevel("model.difficulty.hard"));
-        assertTrue(arctic.canSettle());
-        assertNull(arctic.getPrimaryGoods());
-        assertNull(arctic.getSecondaryGoods());
-
-        arctic.applyDifficultyLevel(spec().getDifficultyLevel("model.difficulty.veryHard"));
-        assertTrue(arctic.canSettle());
-        assertNull(arctic.getPrimaryGoods());
-        assertNull(arctic.getSecondaryGoods());
+        for (String level : new String[] { "medium", "hard", "veryHard" }) {
+            difficultyLevel = spec().getDifficultyLevel("model.difficulty." + level);
+            tileProduction = difficultyLevel.getString("model.option.tileProduction");
+            productionTypes = arctic.getProductionTypes(true, tileProduction);
+            assertTrue(productionTypes.isEmpty());
+        }
     }
 
     public void testMinerals() {

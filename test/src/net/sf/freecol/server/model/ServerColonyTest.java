@@ -203,6 +203,7 @@ public class ServerColonyTest extends FreeColTestCase {
 
         UnitType pioneerType = spec().getUnitType("model.unit.hardyPioneer");
         GoodsType bellsType = spec().getGoodsType("model.goods.bells");
+        GoodsType grainType = spec().getGoodsType("model.goods.grain");
         Building townHall = colony.getBuildingForProducing(bellsType);
 
         Unit unit1 = new ServerUnit(game, townHall, dutch, pioneerType);
@@ -210,7 +211,7 @@ public class ServerColonyTest extends FreeColTestCase {
         Unit unit3 = new ServerUnit(game, townHall, dutch, pioneerType);
 
         int consumption = colony.getFoodConsumption();
-        int production = colony.getTile().getType().getPrimaryGoods().getAmount();
+        int production = colony.getTile().getType().getProductionOf(grainType, null);
         assertEquals(6, consumption);
         assertEquals(3, production);
         assertEquals(-3, colony.getNetProductionOf(foodType));

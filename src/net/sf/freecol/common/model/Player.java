@@ -2680,11 +2680,24 @@ public class Player extends FreeColGameObject implements Nameable {
                 }
             }
 
-            //add secondary goods being produced by a colony on this tile
-            if (t.getType().getSecondaryGoods() != null) {
-                GoodsType secondary = t.getType().getSecondaryGoods().getType();
-                value += market.getSalePrice(secondary,t.potential(secondary, null));
+            // add good that could be produced by a colony on this tile
+            String difficulty = getSpecification()
+                .getString("model.option.tileProduction");
+            int bestValue = 0;
+            for (ProductionType productionType : t.getType()
+                     .getProductionTypes(true, difficulty)) {
+                if (productionType.getOutputs() != null) {
+                    int newValue = 0;
+                    for (AbstractGoods output: productionType.getOutputs()) {
+                        newValue += market.getSalePrice(output.getType(),
+                                                        t.potential(output.getType(), null));
+                    }
+                    if (newValue > bestValue) {
+                        bestValue = newValue;
+                    }
+                }
             }
+            value += bestValue;
             if (nearbyTileIsOcean) {
                 return Math.max(0, (int) (value * advantages));
             }
@@ -2750,9 +2763,21 @@ public class Player extends FreeColGameObject implements Nameable {
 
         //initialize tile value
         int value = 0;
-        if (tile.getType().getPrimaryGoods() != null) {
-            value += tile.potential(tile.getType().getPrimaryGoods().getType(),
-                                    null) * PRIMARY_GOODS_VALUE;
+        String difficulty = getSpecification()
+            .getString("model.option.tileProduction");
+        for (ProductionType productionType : tile.getType()
+                 .getProductionTypes(true, difficulty)) {
+            if (productionType.getOutputs() != null) {
+                for (AbstractGoods output : productionType.getOutputs()) {
+                    if (output.getType().isFoodType()) {
+                        int food = tile.potential(output.getType(), null)
+                            * PRIMARY_GOODS_VALUE;
+                        if (food > value) {
+                            value = food;
+                        }
+                    }
+                }
+            }
         }
         //value += tile.potential(tile.secondaryGoods(), null) * tile.secondaryGoods().getInitialSellPrice();
 

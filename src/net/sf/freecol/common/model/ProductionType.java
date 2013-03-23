@@ -157,6 +157,17 @@ public class ProductionType extends FreeColObject {
         this.outputs = newOutputs;
     }
 
+    public AbstractGoods getOutput(GoodsType goodsType) {
+        if (inputs == null && outputs != null) {
+            for (AbstractGoods output : outputs) {
+                if (goodsType == output.getType()) {
+                    return output;
+                }
+            }
+        }
+        return null;
+    }
+
     /**
      * Is this production from a colony center tile?
      *

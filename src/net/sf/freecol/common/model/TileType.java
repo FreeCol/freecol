@@ -297,54 +297,6 @@ public final class TileType extends FreeColGameObjectType {
     }
 
     /**
-     * Gets the primary goods of this tile type.
-     *
-     * @return The primary goods, as an <code>AbstractGoods</code>.
-     */
-    public AbstractGoods getPrimaryGoods() {
-        List<ProductionType> production = getProductionTypes(true, productionLevel);
-        if (production == null || production.isEmpty()) return null;
-        List<AbstractGoods> outputs = production.get(0).getOutputs();
-        return (outputs == null || outputs.isEmpty()) ? null
-            : outputs.get(0);
-    }
-
-    /**
-     * Is a goods type the primary goods type of this tile type?
-     *
-     * @param type The <code>GoodsType</code> to check.
-     * @return True if the goods type is the primary goods type.
-     */
-    public boolean isPrimaryGoodsType(GoodsType type) {
-        AbstractGoods primaryGoods = getPrimaryGoods();
-        return primaryGoods != null && primaryGoods.getType() == type;
-    }
-
-    /**
-     * Gets the secondary goods of this tile type.
-     *
-     * @return The secondary goods, as an <code>AbstractGoods</code>.
-     */
-    public AbstractGoods getSecondaryGoods() {
-        List<ProductionType> production = getProductionTypes(true, productionLevel);
-        if (production == null || production.isEmpty()) return null;
-        List<AbstractGoods> outputs = production.get(0).getOutputs();
-        return (outputs == null || outputs.size() < 2) ? null
-            : outputs.get(1);
-    }
-
-    /**
-     * Is a goods type the secondary goods type of this tile type?
-     *
-     * @param type The <code>GoodsType</code> to check.
-     * @return True if the goods type is the primary goods type.
-     */
-    public boolean isSecondaryGoodsType(GoodsType type) {
-        AbstractGoods secondaryGoods = getSecondaryGoods();
-        return secondaryGoods != null && secondaryGoods.getType() == type;
-    }
-
-    /**
      * Gets a list of the AbstractGoods produced by this tile type
      * when it is not the colony center tile.
      *
