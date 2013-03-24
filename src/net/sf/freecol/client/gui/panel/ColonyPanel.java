@@ -730,57 +730,63 @@ public final class ColonyPanel extends PortPanel
      * from the Colony Panel allowing keyboard access to said units.
      */
     private void generateColonyUnitsMenu() {
+        final FreeColClient freeColClient = getFreeColClient();
         final Colony colony = getColony();
-        JPopupMenu colonyUnitsMenu = new JPopupMenu("Colony Units");
+        JPopupMenu colonyUnitsMenu
+            = new JPopupMenu(Messages.message("colonyPanel.colonyUnits"));
         ImageIcon unitIcon = null;
-        final QuickActionMenu unitMenu
-            = new QuickActionMenu(getFreeColClient(), getGUI(), this);
+        final QuickActionMenu unitMenu = new QuickActionMenu(freeColClient,
+                                                             getGUI(), this);
         Tile colonyTile = colony.getTile();
         int unitNumber = 0;
         JMenuItem subMenu = null;
 
         for (final Unit unit : colony.getUnitList()) {
+            Building workingInBuilding = unit.getWorkLocation();
             ColonyTile workingOnLand = unit.getWorkTile();
-            if (workingOnLand != null) {
-                GoodsType goodsType = unit.getWorkType();
+            GoodsType goodsType = unit.getWorkType();
+            Unit student = unit.getStudent();
+
+            String menuTitle;
+            unitIcon = imageLibrary.getUnitImageIcon(unit, 0.5);
+            if (student != null) {
+                menuTitle = new String(Messages.message(unit.getLabel())
+                    + " " + Messages.message("producing.name")
+                    + " " + Messages.message(unit.getType().getSkillTaught()
+                                                           .getNameKey())
+                    + " " + Integer.toString(unit.getTurnsOfTraining())
+                    + "/" + Integer.toString(unit.getNeededTurnsOfTraining()));
+            } else if (workingOnLand != null && goodsType != null) {
                 int producing = workingOnLand.getProductionOf(unit, goodsType);
-                unitIcon = imageLibrary.getUnitImageIcon(unit, 0.5);
                 String nominative = Messages.message(StringTemplate.template(
                     goodsType.getNameKey()).addAmount("%amount%", producing));
-                String menuTitle = new String(Messages.message(unit.getLabel())
+                menuTitle = new String(Messages.message(unit.getLabel())
                     + " " + Messages.message("producing.name")
                     + " " + producing + " " + nominative);
-                subMenu = new JMenuItem(menuTitle, unitIcon);
-                    subMenu.addActionListener(new ActionListener() {
+            } else if (workingInBuilding != null && goodsType != null) {
+                int producing = workingInBuilding.getProductionOf(unit, 
+                                                                  goodsType);
+                String nominative = Messages.message(
+                    StringTemplate.template(goodsType.getNameKey())
+                        .addAmount("%amount%", producing));
+                menuTitle = new String(Messages.message(unit.getLabel())
+                    + " " + Messages.message("producing.name")
+                    + " " + producing + " " + nominative);
+            } else {
+                menuTitle = new String(Messages.message(unit.getLabel())
+                    + " " + Messages.message("producing.name")
+                    + " " + Messages.message("nothing"));
+            }
+            subMenu = new JMenuItem(menuTitle, unitIcon);
+            subMenu.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        unitMenu.createUnitMenu(new UnitLabel(getFreeColClient(), unit, getGUI()));
+                        unitMenu.createUnitMenu(new UnitLabel(freeColClient,
+                                                              unit, getGUI()));
                         unitMenu.show(getGUI().getCanvas(), 0, 0);
                     }
                 });
-                unitNumber++;
-                colonyUnitsMenu.add(subMenu);
-            }else{
-                Building workingInBuilding = unit.getWorkLocation();
-                if(workingInBuilding != null){
-                    GoodsType goodsType = unit.getWorkType();
-                    int producing = workingInBuilding.getProductionOf(unit, goodsType);
-                    unitIcon = imageLibrary.getUnitImageIcon(unit, 0.5);
-                    String nominative = Messages.message(StringTemplate.template(goodsType.getNameKey())
-                        .addAmount("%amount%", producing));
-                    String menuTitle = new String(Messages.message(unit.getLabel())
-                        + " " + Messages.message("producing.name")
-                        + " " + producing + " " + nominative);
-                    subMenu = new JMenuItem(menuTitle, unitIcon);
-                    subMenu.addActionListener(new ActionListener() {
-                        public void actionPerformed(ActionEvent e) {
-                            unitMenu.createUnitMenu(new UnitLabel(getFreeColClient(), unit, getGUI()));
-                            unitMenu.show(getGUI().getCanvas(), 0, 0);
-                        }
-                    });
-                    unitNumber++;
-                    colonyUnitsMenu.add(subMenu);
-                }
-            }
+            unitNumber++;
+            colonyUnitsMenu.add(subMenu);
         }
         colonyUnitsMenu.addSeparator();
         for (final Unit unit : colonyTile.getUnitList()) {
@@ -791,7 +797,8 @@ public final class ColonyPanel extends PortPanel
                 subMenu = new JMenuItem(menuTitle, unitIcon);
                 subMenu.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        unitMenu.createUnitMenu(new UnitLabel(getFreeColClient(), unit, getGUI()));
+                        unitMenu.createUnitMenu(new UnitLabel(freeColClient,
+                                                              unit, getGUI()));
                         unitMenu.show(getGUI().getCanvas(), 0, 0);
                     }
                 });
@@ -804,7 +811,7 @@ public final class ColonyPanel extends PortPanel
                         subMenu = new JMenuItem(menuTitle, unitIcon);
                         subMenu.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent e) {
-                                unitMenu.createUnitMenu(new UnitLabel(getFreeColClient(), innerUnit, getGUI()));
+                                unitMenu.createUnitMenu(new UnitLabel(freeColClient, innerUnit, getGUI()));
                                 unitMenu.show(getGUI().getCanvas(), 0, 0);
                             }
                         });
@@ -819,7 +826,7 @@ public final class ColonyPanel extends PortPanel
                 subMenu = new JMenuItem(menuTitle, unitIcon);
                 subMenu.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        unitMenu.createUnitMenu(new UnitLabel(getFreeColClient(), unit, getGUI()));
+                        unitMenu.createUnitMenu(new UnitLabel(freeColClient, unit, getGUI()));
                         unitMenu.show(getGUI().getCanvas(), 0, 0);
                         }
                 });
