@@ -455,15 +455,13 @@ public class TileImprovement extends TileItem implements Named {
                 }
                 setConnected(d, false);
             } else {
-                if (river != null) {
-                    river.setConnected(dReverse, true);
-                }
+                if (river != null) river.setConnected(dReverse, true);
                 setConnected(d, true);
             }
             ret += c;
             i++;
         }
-        return (conns == null || "0000".equals(ret)) ? null : ret;
+        return (style == null) ? null : style.getString();
     }
 
     /**
@@ -480,15 +478,12 @@ public class TileImprovement extends TileItem implements Named {
         for (Direction d : Direction.values()) {
             Tile t = tile.getNeighbourOrNull(d);
             TileImprovement road = (t == null) ? null : t.getRoad();
-            if (road == null || !road.isComplete()) {
-                ret += "0";
-            } else {
+            if (road != null && road.isComplete()) {
                 road.setConnected(d.getReverseDirection(), connect);
                 setConnected(d, connect);
-                ret += (connect) ? "1" : "0";
             }
         }
-        return (!connect || "00000000".equals(ret)) ? null : ret;
+        return (style == null) ? null : style.getString();
     }
 
     // Interface TileItem
@@ -619,8 +614,10 @@ public class TileImprovement extends TileItem implements Named {
      * @return The id and turns to complete if any.
      */
     public String toString() {
-        return getType().getId() + ((turnsToComplete <= 0) ? ""
-            : " (" + Integer.toString(turnsToComplete) + " turns left)");
+        return "[" + getType().getId() + ((turnsToComplete <= 0) ? ""
+            : " (" + Integer.toString(turnsToComplete) + " turns left)")
+            + ((style == null) ? "" : " " + style.getString())
+            + "]";
     }
 
     /**
