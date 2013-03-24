@@ -2212,6 +2212,11 @@ public class Unit extends GoodsLocation
         } else if (locatable instanceof Unit) {
             Unit unit = (Unit)locatable;
             if (super.add(locatable)) {
+                // TODO: there seems to be an inconsistency between
+                // units moving from an adjacent tile onto a ship and
+                // units boarding a ship in-colony.  The former does not
+                // appear to come through here (which it probably should)
+                // as the ship's moves do not get zeroed.
                 spendAllMoves();
                 ((Unit)locatable).setState(UnitState.SENTRY);
                 return true;
