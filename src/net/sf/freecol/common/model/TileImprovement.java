@@ -324,17 +324,6 @@ public class TileImprovement extends TileItem implements Named {
     }
 
     /**
-     * Gets the production bonus this improvement provides for a given type
-     * of goods.
-     *
-     * @param goodsType The <code>GoodsType</code> to test.
-     * @return A production bonus, or zero if none applicable.
-     */
-    public int getBonus(GoodsType goodsType) {
-        return (isComplete()) ? type.getBonus(goodsType) : 0;
-    }
-
-    /**
      * Gets a Modifier for the production bonus this improvement provides
      * for a given type of goods.
      *
@@ -448,7 +437,7 @@ public class TileImprovement extends TileItem implements Named {
             Tile t = tile.getNeighbourOrNull(d);
             TileImprovement river = (t == null) ? null : t.getRiver();
             String c = (conns == null) ? "0" : conns.substring(i, i+1);
-            
+
             if ("0".equals(c)) {
                 if (river != null && river.isConnectedTo(dReverse)) {
                     river.setConnected(dReverse, false);
@@ -507,6 +496,35 @@ public class TileImprovement extends TileItem implements Named {
         return type.isTileTypeAllowed(tileType);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isNatural() {
+        return type.isNatural();
+    }
+
+    /**
+     * Applies the production bonuses of this tile improvement to the
+     * given base potential. Currently, the unit type argument is
+     * ignored and is only provided for the sake of consistency. The
+     * bonuses of future improvements might depend on the unit type,
+     * however.
+     *
+     * @param goodsType The <code>GoodsType</code> to produce.
+     * @param unitType The <code>UnitType</code> that is to work.
+     * @param potential The base potential production.
+     * @return The production with resource bonuses.
+     */
+    public int applyBonus(GoodsType goodsType, UnitType unitType, int potential) {
+        int result = potential;
+        // do not apply any bonuses if the base tile does not produce
+        // any goods, and don't apply bonuses for incomplete
+        // improvements (such as roads)
+        if (potential > 0 && isComplete()) {
+            result += type.getBonus(goodsType);
+        }
+        return result;
+    }
 
     /**
      * This method writes an XML-representation of this object to the given

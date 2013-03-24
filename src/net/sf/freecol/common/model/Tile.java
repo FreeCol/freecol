@@ -219,7 +219,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         }
         return result;
     }
-        
+
     // ------------------------------------------------------------ static methods
     /**
      * Creates a temporary copy of this tile for planning purposes.
@@ -1350,7 +1350,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             if (tileType == type && hasResource()) {
                 for (TileItem item : tileItemContainer.getTileItems()) {
                     if (item instanceof Resource) {
-                        potential = ((Resource)item).getBonus(goodsType, unitType, (int) potential);
+                        potential = item.applyBonus(goodsType, unitType, (int) potential);
                     }
                 }
             }
@@ -1532,7 +1532,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             int potential = getTileTypePotential(getType(), goodsType, tileItemContainer, unitType);
             for (TileItem item : tileItemContainer.getTileItems()) {
                 if (item instanceof TileImprovement) {
-                    potential += ((TileImprovement) item).getBonus(goodsType);
+                    potential = item.applyBonus(goodsType, unitType, potential);
                 }
             }
 
@@ -1741,7 +1741,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public Tile getAdjacentTile(Direction direction) {
         return getMap().getAdjacentTile(getX(), getY(), direction);
     }
-    
+
     /**
      * Gets all the tiles surrounding a tile within the given range.
      * The center tile is not included.
@@ -1757,7 +1757,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * Gets all the tiles surrounding this tile within the given
      * inclusive upper and lower bounds.
      *
-     * getSurroundingTiles(r) is equivalent to getSurroundingTiles(1, r), 
+     * getSurroundingTiles(r) is equivalent to getSurroundingTiles(1, r),
      * thus this tile is included if rangeMin is zero.
      *
      * @param rangeMin The inclusive minimum distance from this tile.
@@ -2132,7 +2132,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         // TODO: Remove this when PETs have been revised to not store
         // the actual unit.
         if (settlement instanceof IndianSettlement) {
-            Unit missionary = ((IndianSettlement)settlement).getMissionary(); 
+            Unit missionary = ((IndianSettlement)settlement).getMissionary();
             if (missionary != null) missionary.setLocationNoUpdate(settlement);
         }
     }

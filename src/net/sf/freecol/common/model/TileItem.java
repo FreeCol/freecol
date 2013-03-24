@@ -137,4 +137,23 @@ public abstract class TileItem extends FreeColGameObject implements Locatable {
      * @return a <code>boolean</code> value
      */
     public abstract boolean isTileTypeAllowed(TileType tileType);
+
+    /**
+     * Applies the production bonus for the given goods type and unit
+     * type to the given potential production.
+     *
+     * @param goodsType The <code>GoodsType</code> to produce.
+     * @param unitType The <code>UnitType</code> that is to work.
+     * @param potential The base potential production.
+     * @return The production with resource bonuses.
+     */
+    public abstract int applyBonus(GoodsType goodsType, UnitType unitType, int potential);
+
+    /**
+     * Returns <code>true</code> if this TileItem is natural.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public abstract boolean isNatural();
+
 }

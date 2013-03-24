@@ -317,19 +317,10 @@ public class TileItemContainer extends FreeColGameObject {
      */
     public int getTotalBonusPotential(GoodsType g, UnitType unitType, int tilePotential, boolean onlyNatural) {
         int potential = tilePotential;
-        int improvementBonus = 0;
         for (TileItem item : tileItems) {
-            if (item instanceof TileImprovement) {
-                TileImprovement improvement = (TileImprovement) item;
-                if (improvement.getType().isNatural() || !onlyNatural) {
-                    improvementBonus += improvement.getBonus(g);
-                }
-            } else if (item instanceof Resource) {
-                potential = ((Resource) item).getBonus(g, unitType, potential);
+            if (item.isNatural() || !onlyNatural) {
+                potential = item.applyBonus(g, unitType, potential);
             }
-        }
-        if (potential > 0) {
-            potential += improvementBonus;
         }
         return potential;
     }
