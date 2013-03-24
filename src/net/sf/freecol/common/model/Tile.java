@@ -1224,7 +1224,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
-     * Adds a road to this tile.  It is not necessarily complete.
+     * Adds a road to this tile.  It is not complete.
      *
      * @return The new road added, or the existing one.
      */
@@ -1234,7 +1234,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         TileImprovement road = new TileImprovement(getGame(), this, roadType);
         road.setMagnitude(1);
         if (!add(road)) return null;
-        road.updateRoadConnections(true);
         return road;
     }
 
