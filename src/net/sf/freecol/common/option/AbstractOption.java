@@ -126,6 +126,28 @@ abstract public class AbstractOption<T> extends FreeColObject
     }
 
     /**
+     * Generate the choices to provide to the UI.
+     *
+     * Override if the Option needs to determine its choices dynamically.
+     */
+    public void generateChoices() {
+        // do nothing
+    }
+
+    /**
+     * Is null an acceptable value for this Option?
+     * Override it where necessary.
+     *
+     * @return False.
+     */
+    public boolean isNullValueOK() {
+        return false;
+    }
+
+
+    // Interface Option<T>
+
+    /**
      * Gets the value of this Option.
      *
      * @return The value of this Option
@@ -154,45 +176,19 @@ abstract public class AbstractOption<T> extends FreeColObject
         logger.warning("Unsupported method: setValue.");
     }
 
-    /**
-     * Is null an acceptable value for this Option?
-     * Override it where necessary.
-     *
-     * @return False.
-     */
-    public boolean isNullValueOK() {
-        return false;
-    }
-
-    /**
-     * Generate the choices to provide to the UI.
-     * Override if the Option needs to determine its choices dynamically.
-     */
-    public void generateChoices() {
-        // do nothing
-    }
-
 
     // Serialization
 
     private static final String ACTION_TAG = "action";
     private static final String DEFAULT_VALUE_TAG = "defaultValue";
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void readFromXML(XMLStreamReader in) throws XMLStreamException {
-        readAttributes(in);
-
-        super.readChildren(in);
-    }
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        // TODO: super.readAttributes(in); is inadequate.
         setId(getAttribute(in, ID_ATTRIBUTE_TAG, getId()));
         
         String defaultValue = getAttribute(in, DEFAULT_VALUE_TAG, (String)null);
@@ -271,7 +267,7 @@ abstract public class AbstractOption<T> extends FreeColObject
 
         } else {
             logger.finest("Parsing of option type '" + tag
-                + "' is not implemented yet");
+                + "' is not implemented yet.");
             in.nextTag();
         }
 

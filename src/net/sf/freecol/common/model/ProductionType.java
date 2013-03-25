@@ -207,7 +207,6 @@ public class ProductionType extends FreeColObject {
     private static final String INPUT_TAG = "input";
     private static final String OUTPUT_TAG = "output";
     private static final String PRODUCTION_LEVEL_TAG = "productionLevel";
-    private static final String VALUE_TAG = "value";
 
 
     /**

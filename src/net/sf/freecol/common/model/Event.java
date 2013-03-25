@@ -113,7 +113,6 @@ public class Event extends FreeColGameObjectType {
     // Serialization
 
     private static final String SCORE_VALUE_TAG = "scoreValue";
-    private static final String VALUE_TAG = "value";
 
 
     /**

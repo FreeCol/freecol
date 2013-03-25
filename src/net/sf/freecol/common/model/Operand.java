@@ -342,7 +342,7 @@ public class Operand extends Scope {
 
     private static final String OPERAND_TYPE_TAG = "operandType";
     private static final String SCOPE_LEVEL_TAG = "scopeLevel";
-    private static final String VALUE_TAG = "value";
+
 
     /**
      * {@inheritDoc}
