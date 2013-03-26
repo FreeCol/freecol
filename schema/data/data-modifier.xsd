@@ -57,11 +57,13 @@
   <xs:simpleType name="ModifierType">
     <xs:restriction base="xs:NMTOKEN">
       <xs:enumeration value="additive" />
-      <xs:enumeration value="ADDITIVE" />
       <xs:enumeration value="multiplicative" />
-      <xs:enumeration value="MULTIPLICATIVE" />
       <xs:enumeration value="percentage" />
+      <!-- @compat 0.10.7 -->
+      <xs:enumeration value="ADDITIVE" />
+      <xs:enumeration value="MULTIPLICATIVE" />
       <xs:enumeration value="PERCENTAGE" />
+      <!-- end @compat -->
     </xs:restriction>
   </xs:simpleType>
 
