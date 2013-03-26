@@ -34,6 +34,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.PlayerExploredTile;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Layer;
 
 
@@ -363,8 +364,10 @@ public class TileItemContainer extends FreeColGameObject {
         for (TileItem item : tileItems) {
             if (item instanceof TileImprovement
                 && ((TileImprovement) item).isComplete()) {
-                moveCost = Math.min(moveCost,
-                    ((TileImprovement)item).getMoveCost(targetTile.getDirection(fromTile), moveCost));
+                Direction direction = targetTile.getDirection(fromTile);
+                if (direction == null) return INFINITY;
+                moveCost = Math.min(moveCost, 
+                    ((TileImprovement)item).getMoveCost(direction, moveCost));
             }
         }
         return moveCost;
