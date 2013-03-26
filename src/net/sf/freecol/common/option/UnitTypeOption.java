@@ -47,31 +47,24 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
         UNITS, IMMIGRANTS, LAND_UNITS, NAVAL_UNITS
     }
 
-    /**
-     * The option value.
-     */
+    /** The option value. */
     private UnitType value;
 
-    /**
-     * Whether to add "none" to the list of choices to be generated.
-     */
+    /** Whether to add "none" to the list of choices to be generated. */
     private boolean addNone;
 
-    /**
-     * Which choices to generate.
-     */
+    /** Which choices to generate. */
     private TypeSelector generateChoices = TypeSelector.UNITS;
 
-    /**
-     * A list of choices to provide to the UI.
-     */
-    private List<UnitType> choices = new ArrayList<UnitType>();
+    /** A list of choices to provide to the UI. */
+    private final List<UnitType> choices = new ArrayList<UnitType>();
+
 
     /**
      * Creates a new <code>UnitTypeOption</code>.
      *
-     * @param id The identifier for this option. This is used when the object
-     *            should be found in an {@link OptionGroup}.
+     * @param id The identifier for this option.  This is used when
+     *     the object should be found in an {@link OptionGroup}.
      */
     public UnitTypeOption(String id) {
         super(id);
@@ -80,8 +73,7 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
     /**
      * Creates a new <code>UnitTypeOption</code>.
      *
-     * @param specification The specification this option belongs
-     *     to. May be null.
+     * @param specification The enclosing <code>Specification</code>.
      */
     public UnitTypeOption(Specification specification) {
         super(specification);
@@ -90,15 +82,48 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
     /**
      * Creates a new <code>UnitTypeOption</code>.
      *
-     * @param id The identifier for this option. This is used when the object
-     *     should be found in an {@link OptionGroup}.
-     * @param specification The specification this option belongs
-     *     to. May be null.
+     * @param id The identifier for this option.  This is used when
+     *     the object should be found in an {@link OptionGroup}.
+     * @param specification The enclosing <code>Specification</code>.
      */
     public UnitTypeOption(String id, Specification specification) {
         super(id, specification);
     }
 
+
+    /**
+     * Is "none" a valid choice for this option?
+     *
+     * @return True if "none" is a valid choice.
+     */
+    public final boolean addNone() {
+        return addNone;
+    }
+
+    /**
+     * Get the list of choices for this option.
+     *
+     * @return A list of <code>UnitType</code>s.
+     */
+    public final List<UnitType> getChoices() {
+        return choices;
+    }
+
+    /**
+     * Get the type of choices to generate.
+     *
+     * @return The type of choices to generate.
+     */
+    public final TypeSelector getGenerateChoices() {
+        return generateChoices;
+    }
+
+
+    // Interface Option
+
+    /**
+     * {@inheritDoc}
+     */
     public UnitTypeOption clone() {
         UnitTypeOption result = new UnitTypeOption(getId(), getSpecification());
         result.value = value;
@@ -111,36 +136,33 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
 
     /**
      * Gets the current value of this <code>UnitTypeOption</code>.
-     * @return The value.
+     *
+     * @return The <code>UnitType</code> value.
      */
     public UnitType getValue() {
         return value;
     }
 
-
     /**
      * Sets the current value of this <code>UnitTypeOption</code>.
-     * @param value The value.
+     *
+     * @param value The new <code>UnitType</code> value.
      */
     public void setValue(UnitType value) {
         final UnitType oldValue = this.value;
         this.value = value;
-
-        if ( value != oldValue && isDefined) {
+        
+        if (value != oldValue && isDefined) {
             firePropertyChange(VALUE_TAG, oldValue, value);
         }
         isDefined = true;
     }
 
+
+    // Override AbstractOption
+
     /**
-     * Sets the value of this Option from the given string
-     * representation. Both parameters must not be null at the same
-     * time.
-     *
-     * @param valueString the string representation of the value of
-     * this Option
-     * @param defaultValueString the string representation of the
-     * default value of this Option
+     * {@inheritDoc}
      */
     protected void setValue(String valueString, String defaultValueString) {
         if (valueString != null) {
@@ -153,74 +175,22 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
     }
 
     /**
-     * Get the <code>AddNone</code> value.
-     *
-     * @return a <code>boolean</code> value
+     * {@inheritDoc}
      */
-    public final boolean addNone() {
-        return addNone;
+    public boolean isNullValueOK() {
+        return true;
     }
 
     /**
-     * Set the <code>AddNone</code> value.
-     *
-     * @param newAddNone The new AddNone value.
-     */
-    public final void setAddNone(final boolean newAddNone) {
-        this.addNone = newAddNone;
-    }
-
-    /**
-     * Get the <code>Choices</code> value.
-     *
-     * @return a <code>List<UnitType></code> value
-     */
-    public final List<UnitType> getChoices() {
-        return choices;
-    }
-
-    /**
-     * Set the <code>Choices</code> value.
-     *
-     * @param newChoices The new Choices value.
-     */
-    public final void setChoices(final List<UnitType> newChoices) {
-        this.choices = newChoices;
-    }
-
-    /**
-     * Get the <code>GenerateChoices</code> value.
-     *
-     * @return a <code>Generate</code> value
-     */
-    public final TypeSelector getGenerateChoices() {
-        return generateChoices;
-    }
-
-    /**
-     * Set the <code>GenerateChoices</code> value.
-     *
-     * @param newGenerateChoices The new GenerateChoices value.
-     */
-    public final void setGenerateChoices(final TypeSelector newGenerateChoices) {
-        this.generateChoices = newGenerateChoices;
-    }
-
-    /**
-     * Generate the choices to provide to the UI based on the
-     * generateChoices value.
-     *
+     * {@inheritDoc}
      */
     public void generateChoices() {
         if (generateChoices == null) {
-            if (choices == null || choices.isEmpty()) {
-                choices = new ArrayList<UnitType>();
-                choices.add(getValue());
-            }
+            choices.add(getValue());
         } else {
             List<UnitType> unitTypeList = getSpecification().getUnitTypeList();
-            choices = new ArrayList<UnitType>();
-            switch(generateChoices) {
+            choices.clear();
+            switch (generateChoices) {
             case UNITS:
                 choices.addAll(unitTypeList);
                 break;
@@ -252,67 +222,55 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
         }
     }
 
-    /**
-     * Returns whether <code>null</code> is an acceptable value for
-     * this Option. This method always returns <code>true</code>.
-     *
-     * @return true
-     */
-    public boolean isNullValueOK() {
-        return true;
-    }
+
+    // Serialization
+
+    private static final String ADD_NONE_TAG = "addNone";
+    private static final String CHOICE_TAG = "choice";
+    private static final String GENERATE_TAG = "generate";
 
 
     /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * {@inheritDoc}
      */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         super.toXML(out, getXMLElementTagName());
     }
 
     /**
-     * Write the attributes of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to
-     *     the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
+
         if (value != null) {
-            out.writeAttribute(VALUE_TAG, value.getId());
+            writeAttribute(out, VALUE_TAG, value);
         }
+
         if (generateChoices != null) {
-            out.writeAttribute("generate", generateChoices.toString());
+            writeAttribute(out, GENERATE_TAG, generateChoices);
         }
+
         if (addNone) {
-            out.writeAttribute("addNone", Boolean.toString(addNone));
+            writeAttribute(out, ADD_NONE_TAG, addNone);
         }
     }
 
     /**
-     * Write the children of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to
-     *     the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
         super.writeChildren(out);
 
         if (choices != null && !choices.isEmpty()) {
             for (UnitType choice : choices) {
-                out.writeStartElement("choice");
-                out.writeAttribute(VALUE_TAG, choice.getId());
+                out.writeStartElement(CHOICE_TAG);
+
+                writeAttribute(out, VALUE_TAG, choice);
+
                 out.writeEndElement();
             }
         }
@@ -322,12 +280,23 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
      * {@inheritDoc}
      */
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
-        addNone = getAttribute(in, "addNone", false);
-        String generate = in.getAttributeValue(null, "generate");
-        if (generate != null) {
-            generateChoices = TypeSelector.valueOf(generate);
-        }
+        super.readAttributes(in); // value is read here
+
+        generateChoices = getAttribute(in, GENERATE_TAG,
+                                       TypeSelector.class, (TypeSelector)null);
+
+        addNone = getAttribute(in, ADD_NONE_TAG, false);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        // Clear container.
+        choices.clear();
+
+        super.readChildren(in);
     }
 
     /**
@@ -335,12 +304,29 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
      */
     @Override
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        if ("choice".equals(in.getLocalName())) {
-            choices.add(getSpecification().getUnitType(in.getAttributeValue(null, VALUE_TAG)));
+        final Specification spec = getSpecification();
+        final String tag = in.getLocalName();
+
+        if (CHOICE_TAG.equals(tag)) {
+            UnitType type = spec.getType(in, VALUE_TAG,
+                                         UnitType.class, (UnitType)null);
+            if (type != null) choices.add(type);
             in.nextTag();
+
+        } else {
+            super.readChild(in);
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return "[" + getXMLElementTagName() + " value=" + value
+            + ", addNone=" + addNone + ", generateChoices=" + generateChoices
+            + "]";
+    }
 
     /**
      * Gets the tag name of the root element representing this object.
@@ -350,11 +336,4 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
     public static String getXMLElementTagName() {
         return "unitTypeOption";
     }
-
-    public String toString() {
-        return getXMLElementTagName() + " [value=" + value
-            + ", addNone=" + addNone + ", generateChoices=" + generateChoices
-            + "]";
-    }
-
 }
