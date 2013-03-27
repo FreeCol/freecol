@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -826,4 +827,39 @@ public class Messages {
          }
          return -1;
      }
+
+    /**
+     * Get the <code>Locale</code> corresponding to a given language name.
+     *
+     * Public as this is needed for language option processing and the
+     * initial locale setting.
+     *
+     * @param languageID A string using the same format as {@link #getValue()}.
+     * @return The Locale.
+     */
+    public static Locale getLocale(String languageID) {
+        String language, country = "", variant = "";
+        StringTokenizer st = new StringTokenizer(languageID, "_", true);
+        language = st.nextToken();
+        if (st.hasMoreTokens()) {
+            // Skip _
+            st.nextToken();
+        }
+        if (st.hasMoreTokens()) {
+            String token = st.nextToken();
+            if (!token.equals("_")) {
+                country = token;
+            }
+            if (st.hasMoreTokens()) {
+                token = st.nextToken();
+                if (token.equals("_") && st.hasMoreTokens()) {
+                    token = st.nextToken();
+                }
+                if (!token.equals("_")) {
+                    variant = token;
+                }
+            }
+        }
+        return new Locale(language, country, variant);
+    }
 }

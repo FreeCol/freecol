@@ -1105,22 +1105,24 @@ public class GUI {
         frame.setIconImage(ResourceManager.getImage("FrameIcon.image"));
 
         // Now that there is a canvas, prepare for language changes.
-        LanguageOption o = (LanguageOption) freeColClient.getClientOptions().getOption(ClientOptions.LANGUAGE);
-        if (o != null) {
-            o.addPropertyChangeListener(new PropertyChangeListener() {
-                    public void propertyChange(PropertyChangeEvent e) {
-                        if (((Language) e.getNewValue()).getKey().equals(LanguageOption.AUTO)) {
-                            showInformationMessage("autodetectLanguageSelected");
-                        } else {
-                            Locale l = ((Language) e.getNewValue()).getLocale();
-                            Messages.setMessageBundle(l);
-                            Messages.setModMessageBundle(l);
-                            showInformationMessage(StringTemplate.template("newLanguageSelected")
-                                .addName("%language%", l.getDisplayName()));
-                        }
+        LanguageOption o = (LanguageOption)freeColClient.getClientOptions()
+            .getOption(ClientOptions.LANGUAGE);
+        o.addPropertyChangeListener(new PropertyChangeListener() {
+                public void propertyChange(PropertyChangeEvent e) {
+                    Language language = (Language)e.getNewValue();
+                    logger.info("Set language to: " + language);
+                    if (language.getKey().equals(LanguageOption.AUTO)) {
+                        showInformationMessage("autodetectLanguageSelected");
+                    } else {
+                        Locale l = language.getLocale();
+                        Messages.setMessageBundle(l);
+                        Messages.setModMessageBundle(l);
+                        showInformationMessage(StringTemplate.template("newLanguageSelected")
+                            .addName("%language%", l.getDisplayName()));
                     }
-                });
-        }
+                }
+            });
+
         mapViewer.startCursorBlinking();
     }
 

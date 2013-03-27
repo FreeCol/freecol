@@ -198,7 +198,7 @@ public final class FreeCol {
             int index = localeArg.indexOf('.');
             if (index > 0) localeArg = localeArg.substring(0, index);
 
-            locale = LanguageOption.getLocale(localeArg);
+            locale = Messages.getLocale(localeArg);
         }
 
         // Locale established, now load some messages.
@@ -254,7 +254,7 @@ public final class FreeCol {
         // machines default to Finnish but play FreeCol in English.
         String clientLanguage = ClientOptions.getLanguageOption();
         if (clientLanguage != null) {
-            locale = LanguageOption.getLocale(clientLanguage);
+            locale = Messages.getLocale(clientLanguage);
             if (!Locale.getDefault().equals(locale)) {
                 Messages.setMessageBundle(locale);
             }
