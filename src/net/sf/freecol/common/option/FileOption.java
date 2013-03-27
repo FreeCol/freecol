@@ -27,6 +27,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Specification;
 
+
 /**
  * Represents an option for specifying a <code>File</code>.
  */
@@ -35,19 +36,25 @@ public class FileOption extends AbstractOption<File> {
     @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(FileOption.class.getName());
 
+    /** The value of this option. */
     private File value = null;
 
 
     /**
      * Creates a new <code>FileOption</code>.
      *
-     * @param specification The specification this option belongs
-     *     to. May be null.
+     * @param specification The enclosing <code>Specification</code>.
      */
     public FileOption(Specification specification) {
         super(specification);
     }
 
+
+    // Interface Option
+
+    /**
+     * {@inheritDoc}
+     */
     public FileOption clone() {
         FileOption result = new FileOption(getSpecification());
         result.setValues(this);
@@ -55,18 +62,14 @@ public class FileOption extends AbstractOption<File> {
     }
 
     /**
-     * Gets the current value of this <code>FileOption</code>.
-     *
-     * @return The value using <code>null</code> for marking no value.
+     * {@inheritDoc}
      */
     public File getValue() {
         return value;
     }
 
     /**
-     * Sets the value of this <code>FileOption</code>.
-     *
-     * @param value The value to be set.
+     * {@inheritDoc}
      */
     public void setValue(File value) {
         final File oldValue = this.value;
@@ -78,6 +81,21 @@ public class FileOption extends AbstractOption<File> {
         isDefined = true;
     }
 
+
+    // Override AbstractOption
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isNullValueOK() {
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void setValue(String valueString, String defaultValueString) {
         if (valueString != null) {
             value = new File(valueString);
@@ -88,39 +106,22 @@ public class FileOption extends AbstractOption<File> {
         }
     }
 
-    /**
-     * Returns whether <code>null</code> is an acceptable value for
-     * this Option. This method always returns <code>true</code>.
-     *
-     * @return true
-     */
-    public boolean isNullValueOK() {
-        return true;
-    }
 
+    // Serialization
 
     /**
-     * This method writes an XML-representation of this object to the given
-     * stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
+     * {@inheritDoc}
      */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         super.toXML(out, getXMLElementTagName());
     }
 
     /**
-     * Write the attributes of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to
-     *     the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
         if (value != null) {
