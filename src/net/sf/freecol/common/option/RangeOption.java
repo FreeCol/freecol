@@ -27,6 +27,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Specification;
 
+
 /**
  * Represents an option where the valid choice is an integer and the
  * choices are represented by strings. In general, these strings are
@@ -49,12 +50,12 @@ public class RangeOption extends SelectOption {
     /**
      * Creates a new <code>RangeOption</code>.
      *
-     * @param specification The specification this option belongs
-     *     to. May be null.
+     * @param specification The enclosing <code>Specification</code>.
      */
     public RangeOption(Specification specification) {
         super(specification);
     }
+
 
     /**
      * Gets the rank of the current selected value in the list of values of this
@@ -89,17 +90,24 @@ public class RangeOption extends SelectOption {
         setValue(curValue);
     }
 
+    /**
+     * Gets the tag name of the item element
+     *
+     * @return "rangeValue".
+     */
+    @Override
+    public String getXMLItemElementTagName() {
+        return "rangeValue";
+    }
+
+
+    // Serialization
 
     /**
-     * This method writes an XML-representation of this object to the given
-     * stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
+     * {@inheritDoc}
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXMLImpl(out, getXMLElementTagName());
+        super.toXML(out, getXMLElementTagName());
     }
 
     /**
@@ -109,14 +117,5 @@ public class RangeOption extends SelectOption {
      */
     public static String getXMLElementTagName() {
         return "rangeOption";
-    }
-
-    /**
-     * Gets the tag name of the item element
-     *
-     * @return "rangeValue".
-     */
-    public String getXMLItemElementTagName() {
-        return "rangeValue";
     }
 }

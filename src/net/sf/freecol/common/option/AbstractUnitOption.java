@@ -196,7 +196,7 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
     protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
         super.writeChildren(out);
 
-        number.toXMLImpl(out, NUMBER_TAG);
+        number.toXML(out, NUMBER_TAG);
 
         role.toXML(out, ROLE_TAG);
 

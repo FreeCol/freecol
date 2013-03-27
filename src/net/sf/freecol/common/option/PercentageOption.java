@@ -27,6 +27,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Specification;
 
+
 /**
  * Represents an option where the result is a value between 0 and 100.
  */
@@ -39,32 +40,23 @@ public class PercentageOption extends IntegerOption {
     /**
      * Creates a new <code>PercentageOption</code>.
      *
-     * @param specification The specification this option belongs
-     *     to. May be null.
+     * @param specification The enclosing <code>Specification</code>.
      */
     public PercentageOption(Specification specification) {
         super(specification);
-    }
 
-    /**
-     * {@inheritDoc}
-     */
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
         setMinimumValue(0);
         setMaximumValue(100);
     }
 
+
+    // Serialization
+
     /**
-     * This method writes an XML-representation of this object to the given
-     * stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
+     * {@inheritDoc}
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXMLImpl(out, getXMLElementTagName());
+        super.toXML(out, getXMLElementTagName());
     }
 
     /**

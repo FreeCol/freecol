@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.option;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -36,15 +37,21 @@ public class IntegerOption extends AbstractOption<Integer> {
     @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(IntegerOption.class.getName());
 
+    /** The value of this option. */
     private int value;
-    private int minimumValue = Integer.MIN_VALUE;
+
+    /** A upper bound on the value of this option. */
     private int maximumValue = Integer.MAX_VALUE;
+
+    /** A lower bound on the value of this option. */
+    private int minimumValue = Integer.MIN_VALUE;
+
 
     /**
      * Creates a new <code>IntegerOption</code>.
      *
-     * @param id The identifier for this option. This is used when the object
-     *            should be found in an {@link OptionGroup}.
+     * @param id The identifier for this option.  This is used when
+     *     the object should be found in an {@link OptionGroup}.
      */
     public IntegerOption(String id) {
         super(id);
@@ -53,8 +60,7 @@ public class IntegerOption extends AbstractOption<Integer> {
     /**
      * Creates a new <code>IntegerOption</code>.
      *
-     * @param specification The specification this option belongs
-     *     to. May be null.
+     * @param specification The enclosing <code>Specification</code>.
      */
     public IntegerOption(Specification specification) {
         super(specification);
@@ -63,15 +69,57 @@ public class IntegerOption extends AbstractOption<Integer> {
     /**
      * Creates a new <code>IntegerOption</code>.
      *
-     * @param id The identifier for this option. This is used when the object
-     *     should be found in an {@link OptionGroup}.
-     * @param specification The specification this option belongs
-     *     to. May be null.
+     * @param id The identifier for this option.  This is used when
+     *     the object should be found in an {@link OptionGroup}.
+     * @param specification The enclosing <code>Specification</code>.
      */
     public IntegerOption(String id, Specification specification) {
         super(id, specification);
     }
 
+
+    /**
+     * Get the minimum allowed value.
+     *
+     * @return The minimum value allowed by this option.
+     */
+    public int getMinimumValue() {
+        return minimumValue;
+    }
+
+    /**
+     * Set the minimum allowed value.
+     *
+     * @param minimumValue The new minimum value.
+     */
+    public void setMinimumValue(int minimumValue) {
+        this.minimumValue = minimumValue;
+    }
+
+    /**
+     * Get the maximum allowed value.
+     *
+     * @return The maximum value allowed by this option.
+     */
+    public int getMaximumValue() {
+        return maximumValue;
+    }
+
+    /**
+     * Set the maximum allowed value.
+     *
+     * @param maximumValue The new maximum value.
+     */
+    public void setMaximumValue(int maximumValue) {
+        this.maximumValue = maximumValue;
+    }
+
+
+    // Interface Option
+
+    /**
+     * {@inheritDoc}
+     */
     public IntegerOption clone() {
         IntegerOption result = new IntegerOption(getId());
         result.setValues(this);
@@ -80,141 +128,73 @@ public class IntegerOption extends AbstractOption<Integer> {
         return result;
     }
 
-
     /**
-    * Returns the minimum allowed value.
-    * @return The minimum value allowed by this option.
-    */
-    public int getMinimumValue() {
-        return minimumValue;
-    }
-
-    /**
-     * Sets the minimum allowed value.
-     * @param minimumValue The minimum value to set
+     * {@inheritDoc}
      */
-    public void setMinimumValue(int minimumValue) {
-        this.minimumValue = minimumValue;
-    }
-
-    /**
-    * Returns the maximum allowed value.
-    * @return The maximum value allowed by this option.
-    */
-    public int getMaximumValue() {
-        return maximumValue;
-    }
-
-
-    /**
-     * Sets the maximum allowed value.
-     * @param maximumValue the maximum value to set
-     */
-    public void setMaximumValue(int maximumValue) {
-        this.maximumValue = maximumValue;
-    }
-
-    /**
-    * Gets the current value of this <code>IntegerOption</code>.
-    * @return The value.
-    */
     public Integer getValue() {
         return value;
     }
 
-
     /**
-    * Sets the value of this <code>IntegerOption</code>.
-    * @param value The value to be set.
-    */
+     * {@inheritDoc}
+     */
     public void setValue(Integer value) {
         final int oldValue = this.value;
         this.value = value;
 
         if (value != oldValue && isDefined) {
-            firePropertyChange(VALUE_TAG, Integer.valueOf(oldValue), Integer.valueOf(value));
+            firePropertyChange(VALUE_TAG, Integer.valueOf(oldValue),
+                Integer.valueOf(value));
         }
         isDefined = true;
     }
 
+    // Override AbstractOption
 
     /**
-     * Gets a <code>String</code> representation of the current value.
-     *
-     * This method can be overwritten by subclasses to allow a custom save
-     * value, since this method is used by {@link #toXML(XMLStreamWriter)}.
-     *
-     * @return The String value of the Integer.
-     * @see #setValue(String)
-     */
-    protected String getStringValue() {
-        return Integer.toString(value);
-    }
-
-    /**
-     * Converts the given <code>String</code> to an Integer and calls
-     * {@link #setValue(Integer)}.
-     *
-     * <br>
-     * <br>
-     *
-     * This method can be overwritten by subclasses to allow a custom save
-     * value, since this method is used by {@link #readFromXML(XMLStreamReader)}.
-     *
-     * @param value The String value of the Integer.
-     * @see #getStringValue()
-     */
-    protected void setValue(String value) {
-        setValue(Integer.parseInt(value));
-    }
-
-    /**
-     * Sets the value of this Option from the given string
-     * representation. Both parameters must not be null at the same
-     * time.
-     *
-     * @param valueString the string representation of the value of
-     * this Option
-     * @param defaultValueString the string representation of the
-     * default value of this Option
+     * {@inheritDoc}
      */
     @Override
     protected void setValue(String valueString, String defaultValueString) {
-        setValue(Integer.parseInt((valueString != null) ? valueString : defaultValueString));
+        String str = (valueString != null) ? valueString : defaultValueString;
+        try {
+            setValue(Integer.parseInt(str));
+        } catch (NumberFormatException nfe) {
+            logger.log(Level.WARNING, "IntegerOption fail: " + str, nfe);
+        }
     }
 
 
     // Serialization
+
+    private static final String MAXIMUM_VALUE_TAG = "maximumValue";
+    private static final String MINIMUM_VALUE_TAG = "minimumValue";
+
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        toXMLImpl(out, getXMLElementTagName());
+        super.toXML(out, getXMLElementTagName());
     }
 
     /**
-     * This method writes an XML-representation of this object to the given
-     * stream.
-     *
-     * @param out The target stream.
-     * @param tag A tag for the element to write.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
+     * {@inheritDoc}
      */
-    protected void toXMLImpl(XMLStreamWriter out, String tag) throws XMLStreamException {
-        out.writeStartElement(tag);
+    @Override
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        super.writeAttributes(out);
 
-        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
-        out.writeAttribute(VALUE_TAG, Integer.toString(value));
-        if (minimumValue > Integer.MIN_VALUE) {
-            out.writeAttribute("minimumValue", Integer.toString(minimumValue));
-        }
+        writeAttribute(out, VALUE_TAG, value);
+
         if (maximumValue < Integer.MAX_VALUE) {
-            out.writeAttribute("maximumValue", Integer.toString(maximumValue));
+            writeAttribute(out, MAXIMUM_VALUE_TAG, maximumValue);
         }
-        out.writeEndElement();
+
+        if (minimumValue > Integer.MIN_VALUE) {
+            writeAttribute(out, MINIMUM_VALUE_TAG, minimumValue);
+        }
     }
 
     /**
@@ -223,8 +203,10 @@ public class IntegerOption extends AbstractOption<Integer> {
     @Override
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
-        minimumValue = getAttribute(in, "minimumValue", Integer.MIN_VALUE);
-        maximumValue = getAttribute(in, "maximumValue", Integer.MAX_VALUE);
+
+        maximumValue = getAttribute(in, MAXIMUM_VALUE_TAG, Integer.MAX_VALUE);
+
+        minimumValue = getAttribute(in, MINIMUM_VALUE_TAG, Integer.MIN_VALUE);
     }
 
     /**
@@ -232,7 +214,7 @@ public class IntegerOption extends AbstractOption<Integer> {
      */
     @Override
     public String toString() {
-        return getXMLElementTagName() + " [value=" + value + "]";
+        return "[" + getXMLElementTagName() + " value=" + value + "]";
     }
 
     /**

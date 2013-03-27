@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Specification;
 
+
 /**
  * Represents an option where the valid choice is an integer and the choices are
  * represented by strings. In general, these strings are localized by looking up
@@ -45,20 +46,23 @@ public class SelectOption extends IntegerOption {
     @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(SelectOption.class.getName());
 
+    /** Use localized labels? */
     protected boolean localizedLabels = false;
 
-    private Map<Integer, String> itemValues = new LinkedHashMap<Integer, String>();
+    /** A map of the valid values. */
+    private final Map<Integer, String> itemValues
+        = new LinkedHashMap<Integer, String>();
 
 
     /**
      * Creates a new <code>SelectOption</code>.
      *
-     * @param specification The specification this option belongs
-     *     to. May be null.
+     * @param specification The enclosing <code>Specification</code>.
      */
     public SelectOption(Specification specification) {
         super(specification);
     }
+
 
     /**
      * Gets the range values of this <code>RangeOption</code>.
@@ -69,47 +73,68 @@ public class SelectOption extends IntegerOption {
         return itemValues;
     }
 
-
     /**
-     * Whether the labels of this option need to be localized. This is
+     * Whether the labels of this option need to be localized.  This is
      * not the case when the labels are just numeric values.
      *
-     * @return a <code>boolean</code> value
+     * @return True if localization is required.
      */
     public boolean localizeLabels() {
         return localizedLabels;
     }
 
-
     /**
-     * This method writes an XML-representation of this object to the given
-     * stream.
+     * Gets the tag name of the item element.
      *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
+     * Should be overridden by subclasses to ensure read/writeChildren work.
+     *
+     * @return "selectValue".
      */
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        toXMLImpl(out, getXMLElementTagName());
+    public String getXMLItemElementTagName() {
+        return "selectValue";
     }
 
-    protected void toXMLImpl(XMLStreamWriter out, String tag)
-        throws XMLStreamException {
-        // Start element:
-        out.writeStartElement(tag);
 
-        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
-        out.writeAttribute(VALUE_TAG, getStringValue());
-        out.writeAttribute("localizedLabels", Boolean.toString(localizedLabels));
+    // Serialization
+
+    private static final String LABEL_TAG = "label";
+    private static final String LOCALIZED_LABELS_TAG = "localizedLabels";
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        super.toXML(out, getXMLElementTagName());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        super.writeAttributes(out);
+
+        writeAttribute(out, LOCALIZED_LABELS_TAG, localizedLabels);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
+        super.writeChildren(out);
 
         for (Map.Entry<Integer, String> entry : itemValues.entrySet()) {
             out.writeStartElement(getXMLItemElementTagName());
-            out.writeAttribute(VALUE_TAG, Integer.toString(entry.getKey()));
-            out.writeAttribute("label", entry.getValue());
+
+            writeAttribute(out, VALUE_TAG, entry.getKey());
+
+            writeAttribute(out, LABEL_TAG, entry.getValue());
+
             out.writeEndElement();
         }
-
-        out.writeEndElement();
     }
 
     /**
@@ -117,7 +142,18 @@ public class SelectOption extends IntegerOption {
      */
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
-        localizedLabels = getAttribute(in, "localizedLabels", true);
+
+        localizedLabels = getAttribute(in, LOCALIZED_LABELS_TAG, true);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        itemValues.clear(); // Clear containers
+
+        super.readChildren(in);
     }
 
     /**
@@ -125,15 +161,22 @@ public class SelectOption extends IntegerOption {
      */
     @Override
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        if (in.getLocalName().equals(getXMLItemElementTagName())) {
-            String label = in.getAttributeValue(null, "label");
-            final String itemValue = in.getAttributeValue(null, VALUE_TAG);
-            itemValues.put(Integer.parseInt(itemValue), label);
+        final String tag = in.getLocalName();
+
+        if (getXMLItemElementTagName().equals(tag)) {
+            String label = getAttribute(in, LABEL_TAG, (String)null);
+            int value = getAttribute(in, VALUE_TAG, INFINITY);
+            if (label == null) {
+                logger.warning("Missing " + LABEL_TAG + " for " + tag);
+            } else if (value == INFINITY) {
+                logger.warning("Missing " + VALUE_TAG + " for " + tag);
+            } else {
+                itemValues.put(value, label);
+            }
             in.nextTag();
+
         } else {
-            throw new XMLStreamException("Unknown child \""
-                                         + in.getLocalName() + "\" in a \""
-                                         + getXMLElementTagName() + "\". ");
+            super.readChild(in);
         }
     }
 
@@ -144,15 +187,5 @@ public class SelectOption extends IntegerOption {
      */
     public static String getXMLElementTagName() {
         return "selectOption";
-    }
-
-    /**
-     * Gets the tag name of the item element This method is not static
-     * to ensure proper overriding in <code>readFromXML</code>.
-     *
-     * @return "selectValue".
-     */
-    public String getXMLItemElementTagName() {
-        return "selectValue";
     }
 }
