@@ -44,6 +44,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.ListOption;
+import net.sf.freecol.common.option.ModListOption;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.SelectOption;
 
@@ -527,9 +528,9 @@ public class ClientOptions extends OptionGroup {
     public List<FreeColModFile> getActiveMods() {
         final Collection<FreeColModFile> fcmfs = Mods.getAllMods();
         List<FreeColModFile> active = new ArrayList<FreeColModFile>();
-        ListOption<FreeColModFile> options = (ListOption<FreeColModFile>) getOption(ClientOptions.USER_MODS);
-        if (options != null) {
-            for (FreeColModFile modInfo : options.getOptionValues()) {
+        ModListOption option = (ModListOption)getOption(ClientOptions.USER_MODS);
+        if (option != null) {
+            for (FreeColModFile modInfo : option.getOptionValues()) {
                 if (modInfo != null) {
                     for (FreeColModFile f : fcmfs) {
                         if (modInfo.getId().equals(f.getId())) {
