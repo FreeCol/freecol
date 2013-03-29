@@ -222,7 +222,7 @@ public class FreeColGameObjectType extends FreeColObject {
      * @return The modifier index.
      * @see BuildingType#getModifierIndex(Modifier)
      */
-    public int getModifierIndex(Modifier modifier) {
+    protected int getModifierIndex(Modifier modifier) {
         return modifierIndex;
     }
 
