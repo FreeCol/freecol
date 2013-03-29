@@ -742,7 +742,7 @@ public final class ColonyPanel extends PortPanel
         JMenuItem subMenu = null;
 
         for (final Unit unit : colony.getUnitList()) {
-            Building workingInBuilding = unit.getWorkLocation();
+            Building workingInBuilding = unit.getWorkBuilding();
             ColonyTile workingOnLand = unit.getWorkTile();
             GoodsType goodsType = unit.getWorkType();
             Unit student = unit.getStudent();

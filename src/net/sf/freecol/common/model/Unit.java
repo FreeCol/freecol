@@ -1053,25 +1053,13 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Gets the <code>Building</code> this unit is working in.
-     * TODO: migrate usage of this to getWorkBuilding(), then delete this and rename the method below
-     */
-    public Building getWorkLocation() {
-        if (getLocation() instanceof Building) {
-            return ((Building) getLocation());
-        }
-        return null;
-    }
-
-    /**
      * Gets the <code>Location</code> this unit is working in.
+     *
+     * @return a <code>WorkLocation</code> value
      */
-    public Location getWorkLocation2() {
-        if (getLocation() instanceof Building) {
-            return getLocation();
-        }
-        else if (getLocation() instanceof ColonyTile) {
-            return getLocation();
+    public WorkLocation getWorkLocation() {
+        if (getLocation() instanceof WorkLocation) {
+            return (WorkLocation) getLocation();
         }
         return null;
     }
