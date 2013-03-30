@@ -400,8 +400,7 @@ public class ColonyTile extends WorkLocation implements Ownable {
         TileType tileType = workTile.getType();
         if (isColonyCenterTile()) {
             if (unitType == null) {
-                AbstractGoods productionOf = getProductionOf(goodsType);
-                production = (productionOf == null) ? 0 : productionOf.getAmount();
+                production = getBaseProduction(goodsType);
             } else {
                 production = 0;
             }
@@ -443,7 +442,9 @@ public class ColonyTile extends WorkLocation implements Ownable {
             }
         } else {
             result.addAll(workTile.getProductionModifiers(goodsType, unitType));
-            if (FeatureContainer.applyModifiers(0f, turn, result) > 0) {
+            // special case: a resource might provide base production
+            if (FeatureContainer.applyModifiers(0f, turn, result) > 0
+                || produces(goodsType)) {
                 result.addAll(colony.getModifierSet(id, null, turn));
                 if (unitType != null) {
                     result.add(colony.getProductionModifier(goodsType));

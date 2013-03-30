@@ -103,6 +103,15 @@ public final class TileType extends FreeColGameObjectType {
         super(id, specification);
     }
 
+    /**
+     * Creates a new <code>TileType</code> instance. This constructor
+     * is used to create the "virtual" tile types <code>LAND</code>
+     * and <code>WATER</code>, which are intended to simplify map
+     * loading.
+     *
+     * @param id a <code>String</code> value
+     * @param water a <code>boolean</code> value
+     */
     private TileType(String id, boolean water) {
         super(id, null);
         this.water = water;
