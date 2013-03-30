@@ -152,7 +152,7 @@ public abstract class FreeColObject {
      * Writes the object to the given file.
      *
      * @param file the save file
-     * @throws FileNotFoundException
+     * @exception FileNotFoundException
      */
     public void save(File file) throws FileNotFoundException {
         save(new FileOutputStream(file));
@@ -325,7 +325,7 @@ public abstract class FreeColObject {
      * All attributes will be made visible.
      *
      * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
+     * @exception XMLStreamException if there are any problems writing
      *      to the stream.
      * @see #toXML(XMLStreamWriter, Player, boolean, boolean)
      */
@@ -346,7 +346,7 @@ public abstract class FreeColObject {
      *
      * @param out The target stream.
      * @param tag The tag to use.
-     * @throws XMLStreamException if there are any problems writing
+     * @exception XMLStreamException if there are any problems writing
      *     to the stream.
      */
     public void toXML(XMLStreamWriter out, String tag)
@@ -363,7 +363,7 @@ public abstract class FreeColObject {
      * the toXML(XMLStreamWriter, String) call.
      *
      * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
+     * @exception XMLStreamException if there are any problems writing
      *     to the stream.
      */
     protected void writeAttributes(XMLStreamWriter out)
@@ -381,7 +381,7 @@ public abstract class FreeColObject {
      * toXML(XMLStreamWriter, String) call.
      *
      * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
+     * @exception XMLStreamException if there are any problems writing
      *     to the stream.
      */
     protected void writeChildren(XMLStreamWriter out)
@@ -406,7 +406,7 @@ public abstract class FreeColObject {
      *      is set to <i>false</i>.
      * @param toSavedGame If <code>true</code> then information that
      *      is only needed when saving a game is added.
-     * @throws XMLStreamException if there are any problems writing
+     * @exception XMLStreamException if there are any problems writing
      *      to the stream.
      */
     public void toXML(XMLStreamWriter out, Player player,
@@ -425,7 +425,7 @@ public abstract class FreeColObject {
      * the given stream.
      *
      * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
+     * @exception XMLStreamException if there are any problems writing
      *      to the stream.
      */
     abstract protected void toXMLImpl(XMLStreamWriter out)
@@ -440,7 +440,7 @@ public abstract class FreeColObject {
      *
      * @param out The target stream.
      * @param fields The fields to write.
-     * @throws XMLStreamException if there are any problems writing
+     * @exception XMLStreamException if there are any problems writing
      *      to the stream.
      */
     protected void toXMLPartialImpl(XMLStreamWriter out, String[] fields)
@@ -511,7 +511,7 @@ public abstract class FreeColObject {
      * a partial update of an existing object.
      *
      * @param in The input stream with the XML.
-     * @throws XMLStreamException if there are any problems writing
+     * @exception XMLStreamException if there are any problems writing
      *      to the stream.
      */
     public void readFromXML(XMLStreamReader in) throws XMLStreamException {
@@ -531,7 +531,7 @@ public abstract class FreeColObject {
      * @param in The input stream with the XML.
      * @param arrayType The type of array to be read.
      * @return The array.
-     * @throws XMLStreamException if a problem was encountered
+     * @exception XMLStreamException if a problem was encountered
      *      during parsing.
      */
     protected int[] readFromArrayElement(String tagName, XMLStreamReader in, int[] arrayType)
@@ -560,7 +560,7 @@ public abstract class FreeColObject {
      *      needs to have a constructor accepting a single
      *      <code>String</code>.
      * @return The list.
-     * @throws XMLStreamException if a problem was encountered
+     * @exception XMLStreamException if a problem was encountered
      *      during parsing.
      */
     protected <T> List<T> readFromListElement(String tagName, XMLStreamReader in, Class<T> type)
@@ -605,7 +605,7 @@ public abstract class FreeColObject {
      * @param in The input stream with the XML.
      * @param arrayType The type of array to be read.
      * @return The array.
-     * @throws XMLStreamException if a problem was encountered
+     * @exception XMLStreamException if a problem was encountered
      *      during parsing.
      */
     protected String[] readFromArrayElement(String tagName, XMLStreamReader in, String[] arrayType)
@@ -877,21 +877,38 @@ public abstract class FreeColObject {
         }
     }
 
+    // @compat 0.9.x, 0.10.x (MarketData)
+    /**
+     * Reads the id attribute.
+     *
+     * Normally a simple getAttribute() would be sufficient, but
+     * while we are allowing both the obsolete ID_ATTRIBUTE and the correct
+     * ID_ATTRIBUTE_TAG, this routine is useful.
+     *
+     * @param in The <code>XMLStreamReader</code> to read from.
+     * @return The id found, or null if none present.
+     * @exception XMLStreamException if a problem was encountered
+     *     during parsing.
+     */
+    protected String readId(XMLStreamReader in) throws XMLStreamException {
+        String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
+        if (id == null) {
+            id = in.getAttributeValue(null, ID_ATTRIBUTE);
+        }
+        return id;
+    }
+    // end @compat
+
     /**
      * Reads the attributes of this object from an XML stream.
      *
      * @param in The XML input stream.
-     * @throws XMLStreamException if a problem was encountered
+     * @exception XMLStreamException if a problem was encountered
      *     during parsing.
      */
     protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
-        String newId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-        // @compat 0.9.x, 0.10.x (MarketData)
-        if (newId == null) {
-            newId = in.getAttributeValue(null, ID_ATTRIBUTE);
-        }
-        // end compatibility code
+        String newId = readId(in);
         setId(newId);
     }
 
@@ -899,7 +916,7 @@ public abstract class FreeColObject {
      * Reads the children of this object from an XML stream.
      *
      * @param in The XML input stream.
-     * @throws XMLStreamException if a problem was encountered
+     * @exception XMLStreamException if a problem was encountered
      *     during parsing.
      */
     protected void readChildren(XMLStreamReader in) throws XMLStreamException {
@@ -938,7 +955,7 @@ public abstract class FreeColObject {
      * to be overridden where needed.
      *
      * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered
+     * @exception XMLStreamException if a problem was encountered
      *      during parsing.
      */
     public void readFromXMLPartialImpl(XMLStreamReader in)
