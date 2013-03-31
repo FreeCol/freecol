@@ -100,13 +100,15 @@ public class SerializationTest extends FreeColTestCase {
             Validator validator = buildValidator("schema/data/data-game.xsd");
             serialized = serialize(game, player, true, true);
             validator.validate(new StreamSource(new StringReader(serialized)));
-        } catch(SAXParseException e){
+        } catch (SAXParseException e) {
             int col = e.getColumnNumber();
             String errMsg = e.getMessage()
                 + "\nAt line=" + e.getLineNumber()
-                + ", column=" + col + ":\n"
-                + serialized.substring(Math.max(0, col - 100),
-                                       Math.min(col + 100, serialized.length()));
+                + ", column=" + col + ":\n";
+            if (serialized != null) {
+                errMsg += serialized.substring(Math.max(0, col - 100),
+                                               Math.min(col + 100, serialized.length()));
+            }
             fail(errMsg);
         }
 
