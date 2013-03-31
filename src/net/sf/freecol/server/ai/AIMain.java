@@ -422,11 +422,14 @@ public class AIMain extends FreeColObject
 
     // Serialization
 
-    private static final String NEXT_ID_TAG = "nextID";
+    private static final String NEXT_ID_TAG = "nextId";
     // @compat 0.10.3
     private static final String COLONIAL_AI_PLAYER_TAG = "colonialAIPlayer";
     private static final String GOODS_WISH_TAG = "GoodsWish";
     private static final String TILE_IMPROVEMENT_PLAN_TAG = "tileimprovementplan";
+    // end @compat
+    // @compat 0.10.7
+    private static final String OLD_NEXT_ID_TAG = "nextID";
     // end @compat
 
 
@@ -487,7 +490,12 @@ public class AIMain extends FreeColObject
      */
     @Override
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        nextId = getAttribute(in, NEXT_ID_TAG, 0);
+        nextId = getAttribute(in, NEXT_ID_TAG, -1);
+        // @compat 0.10.7
+        if (nextId < 0) {
+            nextId = getAttribute(in, OLD_NEXT_ID_TAG, 0);
+        }
+        // end @compat
     }
 
     /**
