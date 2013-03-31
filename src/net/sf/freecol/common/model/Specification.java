@@ -201,6 +201,8 @@ public final class Specification {
 
     private String difficultyLevel;
 
+    private String version;
+
 
 
     /**
@@ -619,7 +621,7 @@ public final class Specification {
                 Specification.this.addOptionGroup(group, recursive);
 
             } else {
-                logger.warning(OptionGroup.getXMLElementTagName() 
+                logger.warning(OptionGroup.getXMLElementTagName()
                     + " expected in OptionReader, not: " + tag);
                 xsr.nextTag();
             }
@@ -636,6 +638,15 @@ public final class Specification {
      */
     public String getId() {
         return id;
+    }
+
+    /**
+     * Get the <code>Version</code> value.
+     *
+     * @return a <code>String</code> value
+     */
+    public String getVersion() {
+        return version;
     }
 
     /**
@@ -1453,6 +1464,9 @@ public final class Specification {
         out.writeAttribute(FreeColObject.ID_ATTRIBUTE_TAG, getId());
         if (difficultyLevel != null) {
             out.writeAttribute("difficultyLevel", difficultyLevel);
+        }
+        if (version != null) {
+            out.writeAttribute("version", version);
         }
 
         // copy the order of section in specification.xml

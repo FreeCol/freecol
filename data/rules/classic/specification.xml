@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- $Revision$ -->
 <!--
-*  Copyright (C) 2002-2012  The FreeCol Team
+*  Copyright (C) 2002-2013  The FreeCol Team
 *
 *  This file is part of FreeCol.
 *
@@ -19,10 +18,9 @@
 *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
 *
 -->
-<!-- specification version 0.75 -->
 <!-- in case of incompatible changes, please update version number and
 XSD schema for validation. -->
-<freecol-specification id="classic">
+<freecol-specification id="classic" version="0.76">
 
   <!-- Modifiers that are not attached to other game object
        types. They may be modified, but MUST NOT be removed. -->
