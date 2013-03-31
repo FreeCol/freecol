@@ -153,7 +153,7 @@
         <xs:element name="input" type="AbstractGoodsType"/>
         <xs:element name="output" type="AbstractGoodsType"/>
       </xs:choice>
-      <xs:attribute name="colonyCenterTile" type="xs:boolean"/>
+      <xs:attribute name="unattended" type="xs:boolean"/>
       <xs:attribute name="productionLevel" type="xs:string"/>
     </xs:complexType>
   </xs:element>

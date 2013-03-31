@@ -51,6 +51,7 @@
      0.73: generalize preserveAttributes to preserve
      0.74: add convertThreshold to settlement
      0.75: add generalized production element
+     0.76: change attribute name from "colonyCenterTile" to "unattended"
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 
@@ -209,7 +210,7 @@
         <xs:element name="input" type="AbstractGoodsType"/>
         <xs:element name="output" type="AbstractGoodsType"/>
       </xs:choice>
-      <xs:attribute name="colonyCenterTile" type="xs:boolean"/>
+      <xs:attribute name="unattended" type="xs:boolean"/>
       <xs:attribute name="productionLevel" type="xs:string"/>
     </xs:complexType>
   </xs:element>

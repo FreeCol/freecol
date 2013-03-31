@@ -33,7 +33,7 @@ import javax.xml.stream.XMLStreamWriter;
 public class ProductionType extends FreeColObject {
 
     /** Whether this production type applies only to colony center tiles. */
-    private boolean colonyCenterTile;
+    private boolean unattended;
 
     /**
      * The production level of this production type (usually a
@@ -89,7 +89,7 @@ public class ProductionType extends FreeColObject {
     public ProductionType(AbstractGoods output, boolean center, String level) {
         outputs = new ArrayList<AbstractGoods>();
         outputs.add(output);
-        colonyCenterTile = center;
+        unattended = center;
         productionLevel = level;
     }
 
@@ -174,7 +174,7 @@ public class ProductionType extends FreeColObject {
      * @return True if this production is from a colony center tile.
      */
     public final boolean isColonyCenterTile() {
-        return colonyCenterTile;
+        return unattended;
     }
 
     /**
@@ -202,7 +202,7 @@ public class ProductionType extends FreeColObject {
 
     // Serialization
 
-    private static final String COLONY_CENTER_TILE_TAG = "colonyCenterTile";
+    private static final String UNATTENDED_TAG = "unattended";
     private static final String GOODS_TYPE_TAG = "goods-type";
     private static final String INPUT_TAG = "input";
     private static final String OUTPUT_TAG = "output";
@@ -225,8 +225,8 @@ public class ProductionType extends FreeColObject {
         // ProductionType does not need an id.
         // No need for: super.writeAttributes(out);
 
-        if (colonyCenterTile) {
-            writeAttribute(out, COLONY_CENTER_TILE_TAG, colonyCenterTile);
+        if (unattended) {
+            writeAttribute(out, UNATTENDED_TAG, unattended);
         }
 
         if (productionLevel != null) {
@@ -273,8 +273,10 @@ public class ProductionType extends FreeColObject {
     public void readAttributes(XMLStreamReader in) throws XMLStreamException {
         // ProductionType does not need an id.
         // No need for: super.readAttributes(in);
+        // TODO: as soon as we allow the user to select a production type,
+        // we will need an ID
 
-        colonyCenterTile = getAttribute(in, COLONY_CENTER_TILE_TAG, false);
+        unattended = getAttribute(in, UNATTENDED_TAG, false);
 
         productionLevel = getAttribute(in, PRODUCTION_LEVEL_TAG, (String)null);
     }
@@ -354,7 +356,7 @@ public class ProductionType extends FreeColObject {
         if (productionLevel != null) {
             result.append(productionLevel);
         }
-        if (colonyCenterTile) {
+        if (unattended) {
             result.append(", colony center tile");
         }
         if (!(inputs == null || inputs.isEmpty())) {
