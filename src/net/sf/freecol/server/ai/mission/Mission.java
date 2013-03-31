@@ -893,8 +893,7 @@ public abstract class Mission extends AIObject {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         // This routine might look redundant, but if you let its
         // default out up the tree, you reach
         // FreeColObject.writeAttributes, which complains about
@@ -905,8 +904,7 @@ public abstract class Mission extends AIObject {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         // This routine might look redundant, but if you let its
         // default out up the tree, you reach
         // FreeColObject.readAttributes, which expects to find an id

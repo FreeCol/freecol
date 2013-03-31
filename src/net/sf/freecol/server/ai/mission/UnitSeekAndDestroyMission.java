@@ -515,6 +515,9 @@ public class UnitSeekAndDestroyMission extends Mission {
 
     // Serialization
 
+    private static final String TARGET_TAG = "target";
+
+
     /**
      * {@inheritDoc}
      */
@@ -529,12 +532,11 @@ public class UnitSeekAndDestroyMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
         if (target != null) {
-            writeAttribute(out, "target", (FreeColGameObject)target);
+            writeAttribute(out, TARGET_TAG, target.getId());
         }
     }
 
@@ -542,12 +544,10 @@ public class UnitSeekAndDestroyMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
 
-        String str = in.getAttributeValue(null, "target");
-        target = (str == null) ? null : getGame().getFreeColLocation(str);
+        target = getLocationAttribute(in, TARGET_TAG, getGame());
     }
 
     /**

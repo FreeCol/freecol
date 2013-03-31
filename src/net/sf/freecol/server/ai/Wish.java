@@ -60,8 +60,8 @@ public abstract class Wish extends ValuedAIObject {
     public Wish(AIMain aiMain, String id) {
         super(aiMain, id);
 
-        destination = null;
-        transportable = null;
+        this.destination = null;
+        this.transportable = null;
     }
 
     /**
@@ -85,21 +85,10 @@ public abstract class Wish extends ValuedAIObject {
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    public Wish(AIMain aiMain, XMLStreamReader in)
-        throws XMLStreamException {
+    public Wish(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
         super(aiMain, in);
     }
 
-
-    /**
-     * Disposes of this <code>AIObject</code> by removing any references
-     * to this object.
-     */
-    public void dispose() {
-        destination = null;
-        transportable = null;
-        super.dispose();
-    }
 
     /**
      * Checks if this <code>Wish</code> needs to be stored in a savegame.
@@ -156,6 +145,20 @@ public abstract class Wish extends ValuedAIObject {
             : null;
     }
 
+
+    // Override AIObject
+
+    /**
+     * Disposes of this <code>AIObject</code> by removing any references
+     * to this object.
+     */
+    @Override
+    public void dispose() {
+        destination = null;
+        transportable = null;
+        super.dispose();
+    }
+
     /**
      * Checks the integrity of a <code>Wish</code>.
      * The destination must be neither null nor disposed, the transportable
@@ -175,6 +178,10 @@ public abstract class Wish extends ValuedAIObject {
 
     // Serialization
 
+    private static final String DESTINATION_TAG = "destination";
+    private static final String TRANSPORTABLE_TAG = "transportable";
+
+
     /**
      * {@inheritDoc}
      */
@@ -182,10 +189,13 @@ public abstract class Wish extends ValuedAIObject {
     protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
-        out.writeAttribute("destination", destination.getId());
+        // Write Id, Location will match Object
+        if (destination != null) {
+            writeAttribute(out, DESTINATION_TAG, destination.getId());
 
-        if (transportable != null) {
-            out.writeAttribute("transportable", transportable.getId());
+            if (transportable != null) {
+                writeAttribute(out, TRANSPORTABLE_TAG, transportable.getId());
+            }
         }
     }
 
@@ -193,19 +203,22 @@ public abstract class Wish extends ValuedAIObject {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
 
         final AIMain aiMain = getAIMain();
-        String str = in.getAttributeValue(null, "destination");
-        destination = aiMain.getGame().getFreeColLocation(str);
 
-        if ((str = in.getAttributeValue(null, "transportable")) != null) {
-            if ((transportable = (AIUnit)aiMain.getAIObject(str)) == null) {
-                transportable = new AIUnit(aiMain, str);
+        destination = getLocationAttribute(in, DESTINATION_TAG,
+                                           aiMain.getGame());
+
+        if (hasAttribute(in, TRANSPORTABLE_TAG)) {
+            transportable = getAttribute(in, TRANSPORTABLE_TAG,
+                                         AIUnit.class, (AIUnit)null);
+            if (transportable == null) {
+                transportable = new AIUnit(getAIMain(),
+                    getAttribute(in, TRANSPORTABLE_TAG, (String)null));
             }
-        } else {
+        } else {            
             transportable = null;
         }
     }

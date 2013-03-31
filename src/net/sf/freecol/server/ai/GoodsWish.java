@@ -29,6 +29,7 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Specification;
 
 import org.w3c.dom.Element;
 
@@ -186,16 +187,16 @@ public class GoodsWish extends Wish {
 
     // Serialization
 
+    private static final String AMOUNT_REQUESTED_TAG = "amountRequested";
+    private static final String GOODS_TYPE_TAG = "goodsType";
+
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
-
-        writeAttributes(out);
-
-        out.writeEndElement();
+        super.toXML(out, getXMLElementTagName());
     }
 
     /**
@@ -205,24 +206,35 @@ public class GoodsWish extends Wish {
     protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
-        out.writeAttribute("goodsType", goodsType.getId());
+        writeAttribute(out, GOODS_TYPE_TAG, goodsType);
 
-        out.writeAttribute("amountRequested", Integer.toString(amountRequested));
+        writeAttribute(out, AMOUNT_REQUESTED_TAG, amountRequested);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
 
-        String str = in.getAttributeValue(null, "goodsType");
-        goodsType = getSpecification().getGoodsType(str);
+        final Specification spec = getSpecification();
 
-        amountRequested = getAttribute(in, "amountRequested",
+        goodsType = spec.getType(in, GOODS_TYPE_TAG,
+                                 GoodsType.class, (GoodsType)null);
+
+        amountRequested = getAttribute(in, AMOUNT_REQUESTED_TAG,
                                        GoodsContainer.CARGO_SIZE);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        super.readChildren(in);
+
+        if (goodsType != null && amountRequested > 0) uninitialized = false;
     }
 
     /**

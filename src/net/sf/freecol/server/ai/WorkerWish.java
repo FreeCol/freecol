@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.Specification;
 
 import org.w3c.dom.Element;
 
@@ -113,8 +114,7 @@ public class WorkerWish extends Wish {
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    public WorkerWish(AIMain aiMain, XMLStreamReader in)
-        throws XMLStreamException {
+    public WorkerWish(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
         super(aiMain, in);
 
         uninitialized = unitType == null;
@@ -156,6 +156,9 @@ public class WorkerWish extends Wish {
             : unit.getType().isNaval() == unitType.isNaval();
     }
 
+
+    // Override AIObject
+
     /**
      * Checks the integrity of this AI object.
      *
@@ -170,16 +173,16 @@ public class WorkerWish extends Wish {
 
     // Serialization
 
+    private static final String EXPERT_NEEDED_TAG = "expertNeeded";
+    private static final String UNIT_TYPE_TAG = "unitType";
+
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
-
-        writeAttributes(out);
-
-        out.writeEndElement();
+        super.toXML(out, getXMLElementTagName());
     }
 
     /**
@@ -189,9 +192,9 @@ public class WorkerWish extends Wish {
     protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
-        out.writeAttribute("unitType", unitType.getId());
+        writeAttribute(out, UNIT_TYPE_TAG, unitType);
 
-        out.writeAttribute("expertNeeded", Boolean.toString(expertNeeded));
+        writeAttribute(out, EXPERT_NEEDED_TAG, expertNeeded);
     }
 
     /**
@@ -201,10 +204,22 @@ public class WorkerWish extends Wish {
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
 
-        String str = in.getAttributeValue(null, "unitType");
-        unitType = getSpecification().getUnitType(str);
+        final Specification spec = getSpecification();
 
-        expertNeeded = getAttribute(in, "expertNeeded", false);
+        unitType = spec.getType(in, UNIT_TYPE_TAG,
+                                UnitType.class, (UnitType)null);
+        
+        expertNeeded = getAttribute(in, EXPERT_NEEDED_TAG, false);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        super.readChildren(in);
+
+        if (unitType != null) uninitialized = false;
     }
 
     /**

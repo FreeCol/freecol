@@ -70,10 +70,10 @@ public class AIGoods extends AIObject implements Transportable {
     public AIGoods(AIMain aiMain, String id) {
         super(aiMain, id);
 
-        goods = null;
-        destination = null;
-        transportPriority = -1;
-        transport = null;
+        this.goods = null;
+        this.destination = null;
+        this.transportPriority = -1;
+        this.transport = null;
     }
 
     /**
@@ -90,8 +90,9 @@ public class AIGoods extends AIObject implements Transportable {
                    int amount, Location destination) {
         this(aiMain, getXMLElementTagName() + ":" + aiMain.getNextId());
 
-        goods = new Goods(aiMain.getGame(), location, type, amount);
+        this.goods = new Goods(aiMain.getGame(), location, type, amount);
         this.destination = destination;
+
         uninitialized = false;
     }
 
@@ -115,36 +116,15 @@ public class AIGoods extends AIObject implements Transportable {
      *
      * @param aiMain The main AI-object.
      * @param in The input stream containing the XML.
-     * @throws XMLStreamException if a problem was encountered
+     * @exception XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    public AIGoods(AIMain aiMain, XMLStreamReader in)
-        throws XMLStreamException {
+    public AIGoods(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
         super(aiMain, in);
 
         uninitialized = getGoods() == null;
     }
 
-
-    /**
-     * Disposes this object.
-     */
-    public void dispose() {
-        setTransport(null, "disposing");
-        if (destination != null) {
-            if (destination instanceof Colony) {
-                AIColony aic = getAIMain().getAIColony((Colony)destination);
-                if (aic != null) aic.removeAIGoods(this);
-            } else if (destination instanceof Europe) {
-                // Nothing to remove.
-            } else {
-                logger.warning("Unknown type of destination: " + destination);
-            }
-            destination = null;
-        }
-        goods = null;
-        super.dispose();
-    }
 
     /**
      * Gets the goods this <code>AIGoods</code> is controlling.
@@ -183,34 +163,7 @@ public class AIGoods extends AIObject implements Transportable {
     }
 
 
-    /**
-     * Checks the integrity of a this AIGoods.
-     *
-     * @return True if the goods are valid.
-     */
-    public boolean checkIntegrity() {
-        String why = (!super.checkIntegrity()) ? "super"
-            : (goods == null) ? "null-goods"
-            : (goods.getType() == null) ? "null-goods-type"
-            : (goods.getAmount() <= 0) ? "non-positive-goods-amount"
-            : (goods.getLocation() == null) ? "null-location"
-            : (((FreeColGameObject)goods.getLocation()).isDisposed()) ? "disposed-location"
-            : (destination == null) ? "null-destination"
-            : (((FreeColGameObject)destination).isDisposed()) ? "disposed-destination"
-            : "ok";
-        if (!"ok".equals(why)) logger.finest("checkIntegrity(" + this.toString() + ") = " + why);
-
-        return super.checkIntegrity()
-            && (goods != null 
-                && goods.getType() != null
-                && goods.getAmount() > 0
-                && goods.getLocation() != null
-                && !((FreeColGameObject)goods.getLocation()).isDisposed())
-            && (destination != null
-                && !((FreeColGameObject)destination).isDisposed());
-    }
-
-    // Transportable interface
+    // Interface Transportable
 
     /**
      * Gets the number of cargo slots taken by these AI goods.
@@ -446,19 +399,70 @@ public class AIGoods extends AIObject implements Transportable {
     }
 
 
+    // Override AIObject
+
+    /**
+     * Disposes this object.
+     */
+    @Override
+    public void dispose() {
+        setTransport(null, "disposing");
+        if (destination != null) {
+            if (destination instanceof Colony) {
+                AIColony aic = getAIMain().getAIColony((Colony)destination);
+                if (aic != null) aic.removeAIGoods(this);
+            } else if (destination instanceof Europe) {
+                // Nothing to remove.
+            } else {
+                logger.warning("Unknown type of destination: " + destination);
+            }
+            destination = null;
+        }
+        goods = null;
+        super.dispose();
+    }
+
+    /**
+     * Checks the integrity of a this AIGoods.
+     *
+     * @return True if the goods are valid.
+     */
+    @Override
+    public boolean checkIntegrity() {
+        String why = (!super.checkIntegrity()) ? "super"
+            : (goods == null) ? "null-goods"
+            : (goods.getType() == null) ? "null-goods-type"
+            : (goods.getAmount() <= 0) ? "non-positive-goods-amount"
+            : (goods.getLocation() == null) ? "null-location"
+            : (((FreeColGameObject)goods.getLocation()).isDisposed()) ? "disposed-location"
+            : (destination == null) ? "null-destination"
+            : (((FreeColGameObject)destination).isDisposed()) ? "disposed-destination"
+            : "ok";
+        if (!"ok".equals(why)) logger.finest("checkIntegrity(" + this.toString() + ") = " + why);
+
+        return super.checkIntegrity()
+            && (goods != null 
+                && goods.getType() != null
+                && goods.getAmount() > 0
+                && goods.getLocation() != null
+                && !((FreeColGameObject)goods.getLocation()).isDisposed())
+            && (destination != null
+                && !((FreeColGameObject)destination).isDisposed());
+    }
+
+
     // Serialization
+
+    private static final String DESTINATION_TAG = "destination";
+    private static final String TRANSPORT_TAG = "transport";
+    private static final String TRANSPORT_PRIORITY_TAG = "transportPriority";
+
 
     /**
      * {@inheritDoc}
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
-
-        writeAttributes(out);
-
-        goods.toXML(out);
-
-        out.writeEndElement();
+        super.toXML(out, getXMLElementTagName());
     }
 
     /**
@@ -469,19 +473,28 @@ public class AIGoods extends AIObject implements Transportable {
         super.writeAttributes(out);
 
         if (destination != null) {
-            out.writeAttribute("destination", destination.getId());
-        }
+            writeAttribute(out, DESTINATION_TAG, destination.getId());
 
-        out.writeAttribute("transportPriority",
-            Integer.toString(transportPriority));
+            writeAttribute(out, TRANSPORT_PRIORITY_TAG, transportPriority);
 
-        if (transport != null) {
-            if (getAIMain().getAIObject(transport.getId()) == null) {
-                logger.warning("broken reference to transport");
-            } else {
-                out.writeAttribute("transport", transport.getId());
+            if (transport != null) {
+                if (transport.isDisposed()) {
+                    logger.warning("broken reference to transport");
+                } else {
+                    writeAttribute(out, TRANSPORT_TAG, transport);
+                }
             }
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
+        super.writeChildren(out);
+
+        goods.toXML(out);
     }
 
     /**
@@ -489,20 +502,24 @@ public class AIGoods extends AIObject implements Transportable {
      */
     @Override
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
+
         final AIMain aiMain = getAIMain();
 
-        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
-
-        String str = in.getAttributeValue(null, "destination");
+        String str = getAttribute(in, DESTINATION_TAG, (String)null);
         destination = aiMain.getGame().getFreeColLocation(str);
 
-        transportPriority = getAttribute(in, "transportPriority", -1);
+        transportPriority = getAttribute(in, TRANSPORT_PRIORITY_TAG, -1);
 
-        if ((str = in.getAttributeValue(null, "transport")) == null) {
-            transport = null;
+        if (hasAttribute(in, TRANSPORT_TAG)) {
+            transport = getAttribute(in, TRANSPORT_TAG,
+                                     AIUnit.class, (AIUnit)null);
+            if (transport == null) {
+                transport = new AIUnit(aiMain,
+                    getAttribute(in, TRANSPORT_TAG, (String)null));
+            }
         } else {
-            transport = (AIUnit)aiMain.getAIObject(str);
-            if (transport == null) transport = new AIUnit(aiMain, str);
+            transport = null;
         }
     }
 
@@ -510,13 +527,28 @@ public class AIGoods extends AIObject implements Transportable {
      * {@inheritDoc}
      */
     @Override
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        super.readChildren(in);
+
+        if (getGoods() != null) uninitialized = false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        if (Goods.getXMLElementTagName().equals(in.getLocalName())) {
+        final String tag = in.getLocalName();
+
+        if (Goods.getXMLElementTagName().equals(tag)) {
             if (goods != null) {
                 goods.readFromXML(in);
             } else {
                 goods = new Goods(getAIMain().getGame(), in);
             }
+
+        } else {
+            super.readChild(in);
         }
     }
 

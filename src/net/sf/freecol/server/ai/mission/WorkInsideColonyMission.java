@@ -174,13 +174,16 @@ public class WorkInsideColonyMission extends Mission {
 
     // Serialization
 
+    private static final String COLONY_TAG = "colony";
+
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         if (isValid()) {
-            toXML(out, getXMLElementTagName());
+            super.toXML(out, getXMLElementTagName());
         }
     }
 
@@ -188,23 +191,20 @@ public class WorkInsideColonyMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
-        out.writeAttribute("colony", aiColony.getId());
+        writeAttribute(out, COLONY_TAG, aiColony);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
 
-        aiColony = (AIColony) getAIMain()
-            .getAIObject(in.getAttributeValue(null, "colony"));
+        aiColony = getAttribute(in, COLONY_TAG, AIColony.class, (AIColony)null);
     }
 
     /**

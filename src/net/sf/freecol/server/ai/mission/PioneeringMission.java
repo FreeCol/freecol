@@ -688,13 +688,17 @@ public class PioneeringMission extends Mission {
 
     // Serialization
 
+    private static final String TARGET_TAG = "target";
+    private static final String TILE_IMPROVEMENT_PLAN_TAG = "tileImprovementPlan";
+
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         if (isValid()) {
-            toXML(out, getXMLElementTagName());
+            super.toXML(out, getXMLElementTagName());
         }
     }
 
@@ -706,10 +710,11 @@ public class PioneeringMission extends Mission {
         super.writeAttributes(out);
 
         if (target != null) {
-            writeAttribute(out, "target", (FreeColGameObject)target);
+            writeAttribute(out, TARGET_TAG, target.getId());
+
             if (tileImprovementPlan != null) {
-                out.writeAttribute("tileImprovementPlan",
-                                   tileImprovementPlan.getId());
+                writeAttribute(out, TILE_IMPROVEMENT_PLAN_TAG,
+                               tileImprovementPlan);
             }
         }
     }
@@ -722,17 +727,17 @@ public class PioneeringMission extends Mission {
         super.readAttributes(in);
 
         // Do not use setTarget in serialization
-        String str = in.getAttributeValue(null, "target");
-        target = (str == null) ? null : getGame().getFreeColLocation(str);
+        target = getLocationAttribute(in, TARGET_TAG, getGame());
 
-        str = in.getAttributeValue(null, "tileImprovementPlan");
-        if (str == null) {
-            tileImprovementPlan = null;
+        if (hasAttribute(in, TILE_IMPROVEMENT_PLAN_TAG)) {
+            tileImprovementPlan = getAttribute(in, TILE_IMPROVEMENT_PLAN_TAG,
+                TileImprovementPlan.class, (TileImprovementPlan)null);
+            if (tileImprovementPlan == null) {
+                tileImprovementPlan = new TileImprovementPlan(getAIMain(),
+                    getAttribute(in, TILE_IMPROVEMENT_PLAN_TAG, (String)null));
+            }
         } else {
-            AIObject aio = getAIMain().getAIObject(str);
-            tileImprovementPlan = (aio instanceof TileImprovementPlan)
-                ? (TileImprovementPlan)aio
-                : new TileImprovementPlan(getAIMain(), str);
+            tileImprovementPlan = null;
         }
     }
 

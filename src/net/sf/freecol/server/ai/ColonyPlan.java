@@ -84,14 +84,16 @@ public class ColonyPlan {
 
     private static final Logger logger = Logger.getLogger(ColonyPlan.class.getName());
 
-    // Require production plans to always produce an amount exceeding this.
+    /** Require production plans to always produce an amount exceeding this. */
     private static final int LOW_PRODUCTION_THRESHOLD = 1;
 
-    // Number of turns to require production of without exhausting the
-    // input goods.
+    /**
+     * Number of turns to require production of without exhausting the
+     * input goods.
+     */
     private static final int PRODUCTION_TURNOVER_TURNS = 5;
 
-    // The profile of the colony (a sort of general flavour).
+    /** The profile of the colony (a sort of general flavour). */
     private static enum ProfileType {
         OUTPOST,
         SMALL,
@@ -114,13 +116,13 @@ public class ColonyPlan {
     };
     private ProfileType profileType;
 
-    // Private copy of the AIMain.
+    /** Private copy of the AIMain. */
     private AIMain aiMain;
 
-    // The colony this AIColony manages.
+    /** The colony this AIColony manages. */
     private Colony colony;
 
-    // The things to build, and their priority.
+    /** The things to build, and their priority. */
     private class BuildPlan {
         public BuildableType type;
         public double weight;
@@ -147,8 +149,10 @@ public class ColonyPlan {
     };
     private final List<BuildPlan> buildPlans = new ArrayList<BuildPlan>();
 
-    // Comparator to sort buildable types on their priority in the
-    // buildPlan map.
+    /**
+     * Comparator to sort buildable types on their priority in the
+     * buildPlan map.
+     */
     private static final Comparator<BuildPlan> buildPlanComparator
         = new Comparator<BuildPlan>() {
             public int compare(BuildPlan b1, BuildPlan b2) {
@@ -157,15 +161,17 @@ public class ColonyPlan {
             }
         };
 
-    // Plans for work locations available to this colony.
+    /** Plans for work locations available to this colony. */
     private final List<WorkLocationPlan> workPlans
         = new ArrayList<WorkLocationPlan>();
 
-    // The goods types to produce.
+    /** The goods types to produce. */
     private final List<GoodsType> produce = new ArrayList<GoodsType>();
 
-    // Lists of goods types to be produced in this colony.
-    // Temporary variables that do not need to be serialized.
+    /**
+     * Lists of goods types to be produced in this colony.
+     * Temporary variables that do not need to be serialized.
+     */
     private final List<GoodsType> foodGoodsTypes
         = new ArrayList<GoodsType>();
     private final List<GoodsType> libertyGoodsTypes
@@ -1686,7 +1692,7 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
      */
     public Element toXMLElement(Document document) {
         Element element = document.createElement(getXMLElementTagName());
-        element.setAttribute(FreeColObject.ID_ATTRIBUTE, colony.getId());
+        element.setAttribute(FreeColObject.ID_ATTRIBUTE_TAG, colony.getId());
         return element;
     }
 
@@ -1697,7 +1703,12 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
      * @param element The XML-representation.
      */
     public void readFromXMLElement(Element element) {
-        String colonyId = element.getAttribute(FreeColObject.ID_ATTRIBUTE);
+        String colonyId = element.getAttribute(FreeColObject.ID_ATTRIBUTE_TAG);
+        // @compat 0.10.7
+        if (colonyId == null) {
+            colonyId = element.getAttribute(FreeColObject.ID_ATTRIBUTE);
+        }
+        // end @compat
         colony = getAIMain().getGame()
             .getFreeColGameObject(colonyId, Colony.class);
 
@@ -1707,7 +1718,7 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "colonyPlan"
      */

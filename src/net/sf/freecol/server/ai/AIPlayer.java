@@ -62,9 +62,7 @@ public abstract class AIPlayer extends AIObject {
 
     private static final Logger logger = Logger.getLogger(AIPlayer.class.getName());
 
-    /**
-     * The FreeColGameObject this AIObject contains AI-information for.
-     */
+    /** The FreeColGameObject this AIObject contains AI-information for. */
     private ServerPlayer player;
 
     /** The PRNG to use for this AI player. */
@@ -95,8 +93,10 @@ public abstract class AIPlayer extends AIObject {
     public AIPlayer(AIMain aiMain, ServerPlayer player) {
         super(aiMain, player.getId());
 
-        setPlayer(player);
-        aiRandom = new Random(aiMain.getRandomSeed("Seed for " + getId()));
+        this.player = player;
+        this.aiRandom = new Random(aiMain.getRandomSeed("Seed for " + getId()));
+
+        uninitialized = false;
     }
 
     /**
@@ -105,28 +105,15 @@ public abstract class AIPlayer extends AIObject {
      *
      * @param aiMain The main AI-object.
      * @param in The input stream containing the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
+     * @exception XMLStreamException if a problem was encountered
+     *     during parsing.
      */
-    public AIPlayer(AIMain aiMain, XMLStreamReader in)
-        throws XMLStreamException {
+    public AIPlayer(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
         super(aiMain, in);
+        
+        uninitialized = player == null;
     }
 
-
-    /**
-     * Gets this AI object's identifier.
-     *
-     * @return The id of the player.
-     */
-    @Override
-    public String getId() {
-        if (player == null) {
-            logger.warning("Uninitialized AI player");
-            return null;
-        }
-        return player.getId();
-    }
 
     /**
      * Gets the <code>Player</code> this <code>AIPlayer</code> is
@@ -141,6 +128,8 @@ public abstract class AIPlayer extends AIObject {
     /**
      * Sets the ServerPlayer this AIPlayer is controlling.
      * Used by implementing subclasses.
+     *
+     * @param p The new <code>Player</code>.
      */
     protected void setPlayer(ServerPlayer p) {
         player = p;
@@ -153,45 +142,6 @@ public abstract class AIPlayer extends AIObject {
      */
     public Random getAIRandom() {
         return aiRandom;
-    }
-
-    /**
-     * Gets the advantage of this AI player from the nation type.
-     *
-     * @return A short string stating the national advantage.
-     */
-    protected String getAIAdvantage() {
-        final String prefix = "model.nationType.";
-        String id = (player == null || player.getNationType() == null) ? ""
-            : player.getNationType().getId();
-        return (id.startsWith(prefix)) ? id.substring(prefix.length())
-            : "";
-    }
-
-    /**
-     * Gets the connection to the server.
-     *
-     * @return The connection that can be used when communication with the
-     *         server.
-     */
-    public Connection getConnection() {
-        if (debuggingConnection != null) {
-            return debuggingConnection;
-        } else {
-            return ((DummyConnection) player.getConnection()).getOtherConnection();
-        }
-    }
-
-    /**
-     * Sets the <code>Connection</code> to be used while communicating with
-     * the server.
-     *
-     * This method is only used for debugging.
-     *
-     * @param debuggingConnection The connection to be used for debugging.
-     */
-    public void setDebuggingConnection(Connection debuggingConnection) {
-        this.debuggingConnection = debuggingConnection;
     }
 
     /**
@@ -232,6 +182,43 @@ public abstract class AIPlayer extends AIObject {
                                + u + " (" + u.getId() + ")");
             }
         }
+    }
+
+    /**
+     * Gets the advantage of this AI player from the nation type.
+     *
+     * @return A short string stating the national advantage.
+     */
+    protected String getAIAdvantage() {
+        final String prefix = "model.nationType.";
+        String id = (player == null || player.getNationType() == null) ? ""
+            : player.getNationType().getId();
+        return (id.startsWith(prefix)) ? id.substring(prefix.length())
+            : "";
+    }
+
+    /**
+     * Gets the connection to the server.
+     *
+     * @return The connection that can be used when communication with the
+     *     server.
+     */
+    public Connection getConnection() {
+        return (debuggingConnection != null) ? debuggingConnection
+            : ((DummyConnection) player.getConnection()).getOtherConnection();
+    }
+
+    /**
+     * Sets the <code>Connection</code> to be used while communicating with
+     * the server.
+     *
+     * This method is only used for debugging.
+     *
+     * @param debuggingConnection The <code>Connection</code> to be
+     *     used for debugging.
+     */
+    public void setDebuggingConnection(Connection debuggingConnection) {
+        this.debuggingConnection = debuggingConnection;
     }
 
     /**
@@ -292,7 +279,6 @@ public abstract class AIPlayer extends AIObject {
         if (aiUnits.size() == 0) createAIUnits();
         return aiUnits.iterator();
     }
-
 
     /**
      * Standard stance change determination.  If a change occurs,
@@ -595,16 +581,15 @@ public abstract class AIPlayer extends AIObject {
 
     // Serialization
 
+    private static final String RANDOM_STATE_TAG = "randomState";
+
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
-
-        writeAttributes(out);
-
-        out.writeEndElement();
+        super.toXML(out, getXMLElementTagName());
     }
 
     /**
@@ -614,7 +599,7 @@ public abstract class AIPlayer extends AIObject {
     protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
-        out.writeAttribute("randomState", Utils.getRandomState(aiRandom));
+        writeAttribute(out, RANDOM_STATE_TAG, Utils.getRandomState(aiRandom));
     }
 
     /**
@@ -622,18 +607,31 @@ public abstract class AIPlayer extends AIObject {
      */
     @Override
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
+
         final AIMain aiMain = getAIMain();
-        final Game game = aiMain.getGame();
 
-        String str = in.getAttributeValue(null, ID_ATTRIBUTE);
-        if ((player = game.getFreeColGameObject(str, ServerPlayer.class)) == null) {
-            throw new IllegalStateException("Not a Player: " + str);
+        ServerPlayer p = getAttribute(in, ID_ATTRIBUTE_TAG, aiMain.getGame(),
+                                      ServerPlayer.class, (ServerPlayer)null);
+        if (p == null) {
+            throw new IllegalStateException("Not a Player: " + currentTag(in));
         }
+        player = p;
 
-        Random rnd = Utils.restoreRandomState(in.getAttributeValue(null,
-                                              "randomState"));
+        Random rnd = Utils.restoreRandomState(getAttribute(in, RANDOM_STATE_TAG,
+                                              (String)null));
         aiRandom = (rnd != null) ? rnd
             : new Random(aiMain.getRandomSeed("Seed for " + getId()));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        super.readChildren(in);
+
+        if (getPlayer() != null) uninitialized = false;
     }
 
     /**

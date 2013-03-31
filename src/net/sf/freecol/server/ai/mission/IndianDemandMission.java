@@ -452,6 +452,11 @@ public class IndianDemandMission extends Mission {
 
     // Serialization
 
+    private static final String COMPLETED_TAG = "completed";
+    private static final String DEMANDED_TAG = "demanded";
+    private static final String TARGET_TAG = "target";
+
+
     /**
      * {@inheritDoc}
      */
@@ -466,35 +471,31 @@ public class IndianDemandMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
         if (target != null) {
-            out.writeAttribute("target", target.getId());
+            writeAttribute(out, TARGET_TAG, target.getId());
         }
 
-        out.writeAttribute("completed", Boolean.toString(completed));
+        writeAttribute(out, COMPLETED_TAG, completed);
 
-        out.writeAttribute("demanded", Boolean.toString(demanded));
+        writeAttribute(out, DEMANDED_TAG, demanded);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
 
-        String str = in.getAttributeValue(null, "target");
-        target = getGame().getFreeColGameObject(str, Colony.class);
+        target = getAttribute(in, TARGET_TAG, getGame(),
+                              Colony.class, (Colony)null);
 
-        str = in.getAttributeValue(null, "completed");
-        completed = Boolean.valueOf(str).booleanValue();
+        completed = getAttribute(in, COMPLETED_TAG, false);
 
-        str = in.getAttributeValue(null, "demanded");
-        demanded = Boolean.valueOf(str).booleanValue();
+        demanded = getAttribute(in, DEMANDED_TAG, false);
     }
 
     /**

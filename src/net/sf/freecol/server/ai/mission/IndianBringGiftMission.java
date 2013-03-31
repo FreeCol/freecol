@@ -314,6 +314,13 @@ public class IndianBringGiftMission extends Mission {
 
     // Serialization
 
+    private static final String COMPLETED_TAG = "completed";
+    private static final String TARGET_TAG = "target";
+    // @compat 0.9.x
+    private static final String OLD_GIFT_DELIVERED_TAG = "giftDelivered";
+    // end @compat
+
+
     /**
      * {@inheritDoc}
      */
@@ -328,33 +335,32 @@ public class IndianBringGiftMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
         if (target != null) {
-            out.writeAttribute("target", target.getId());
+            writeAttribute(out, TARGET_TAG, target.getId());
         }
 
-        out.writeAttribute("completed", Boolean.toString(completed));
+        writeAttribute(out, COMPLETED_TAG, completed);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
 
-        String str = in.getAttributeValue(null, "target");
-        target = getGame().getFreeColGameObject(str, Colony.class);
+        target = getAttribute(in, TARGET_TAG, getGame(), 
+                              Colony.class, (Colony)null);
 
-        str = in.getAttributeValue(null, "completed");
+        completed = getAttribute(in, COMPLETED_TAG, false);
         // @compat 0.9.x
-        if (str == null) str = in.getAttributeValue(null, "giftDelivered");
-        // end compatibility code
-        completed = Boolean.valueOf(str).booleanValue();
+        if (hasAttribute(in, OLD_GIFT_DELIVERED_TAG)) {
+            completed = getAttribute(in, OLD_GIFT_DELIVERED_TAG, false);
+        }
+        // end @compat
     }
 
     /**

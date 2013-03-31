@@ -44,6 +44,7 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.Role;
+import net.sf.freecol.server.ai.AIObject;
 import net.sf.freecol.server.ai.goal.Goal;
 import net.sf.freecol.server.ai.mission.BuildColonyMission;
 import net.sf.freecol.server.ai.mission.CashInTreasureTrainMission;
@@ -69,13 +70,10 @@ import org.w3c.dom.Element;
 /**
  * Objects of this class contains AI-information for a single {@link Unit}.
  *
- * <br>
- * <br>
- *
  * The method {@link #doMission()} is called once each turn, by
  * {@link AIPlayer#startWorking()}, to perform the assigned
- * <code>Mission</code>. Most of the methods in this class just delegates the
- * call to that mission.
+ * <code>Mission</code>.  Most of the methods in this class just
+ * delegates the call to that mission.
  *
  * @see Mission
  */
@@ -83,24 +81,16 @@ public class AIUnit extends AIObject implements Transportable {
 
     private static final Logger logger = Logger.getLogger(AIUnit.class.getName());
 
-    /**
-     * The Unit this AIObject contains AI-information for.
-     */
+    /** The Unit this AIObject contains AI-information for. */
     private Unit unit;
 
-    /**
-     * The mission to which this AI unit has been assigned.
-     */
+    /** The mission to which this AI unit has been assigned. */
     private Mission mission;
 
-    /**
-     * The goal this AIUnit belongs to, if one has been assigned.
-     */
+    /** The goal this AIUnit belongs to, if one has been assigned. */
     private Goal goal = null;
 
-    /**
-     * The dynamic part of the transport priority.
-     */
+    /** The dynamic part of the transport priority. */
     private int dynamicPriority;
 
     /**
@@ -119,11 +109,11 @@ public class AIUnit extends AIObject implements Transportable {
     public AIUnit(AIMain aiMain, String id) {
         super(aiMain, id);
 
-        unit = null;
-        mission = null;
-        goal = null;
-        dynamicPriority = 0;
-        transport = null;
+        this.unit = null;
+        this.mission = null;
+        this.goal = null;
+        this.dynamicPriority = 0;
+        this.transport = null;
     }
 
     /**
@@ -136,7 +126,7 @@ public class AIUnit extends AIObject implements Transportable {
         this(aiMain, unit.getId());
 
         this.unit = unit;
-        mission = null;
+
         uninitialized = unit == null;
     }
 
@@ -160,40 +150,15 @@ public class AIUnit extends AIObject implements Transportable {
      *
      * @param aiMain The main AI-object.
      * @param in The input stream containing the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
+     * @exception XMLStreamException if a problem was encountered
+     *     during parsing.
      */
-    public AIUnit(AIMain aiMain, XMLStreamReader in)
-        throws XMLStreamException {
+    public AIUnit(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
         super(aiMain, in);
 
         uninitialized = getUnit() == null;
     }
 
-
-    /**
-     * Disposes this object and any attached mission.
-     */
-    public void dispose() {
-        AIPlayer aiOwner = getAIOwner();
-        if (aiOwner != null) aiOwner.removeAIUnit(this);
-        abortMission("AIUnit-disposed");
-        setTransport(null, "disposing");
-        super.dispose();
-    }
-
-    /**
-     * Gets this AI object's identifier.
-     *
-     * @return The id of the unit.
-     */
-    public String getId() {
-        if (unit == null) {
-            logger.warning("Uninitialized AI unit: " + super.getId());
-            return null;
-        }
-        return unit.getId();
-    }
 
     /**
      * Gets the <code>Unit</code> this <code>AIUnit</code> controls.
@@ -202,6 +167,15 @@ public class AIUnit extends AIObject implements Transportable {
      */
     public Unit getUnit() {
         return unit;
+    }
+
+    /**
+     * Is this AI unit carrying any cargo (units or goods).
+     *
+     * @return True if the unit has cargo aboard.
+     */
+    public boolean hasCargo() {
+        return (unit == null) ? false : unit.hasCargo();
     }
 
     /**
@@ -224,6 +198,15 @@ public class AIUnit extends AIObject implements Transportable {
     }
 
     /**
+     * Checks if this unit has been assigned a mission.
+     *
+     * @return True if this unit has a mission.
+     */
+    public boolean hasMission() {
+        return mission != null;
+    }
+
+    /**
      * Gets the mission this unit has been assigned.
      *
      * @return The <code>Mission</code>.
@@ -233,39 +216,23 @@ public class AIUnit extends AIObject implements Transportable {
     }
 
     /**
-     * Moves a unit to the new world.
+     * Assigns a mission to unit. The dynamic priority is reset.
+     * Do not call setMission(null), use abortMission above.
      *
-     * @return True if there was no c-s problem.
+     * @param mission The new <code>Mission</code>.
      */
-    public boolean moveToAmerica() {
-        return AIMessage.askMoveTo(this, unit.getOwner().getGame().getMap());
-    }
-
-    /**
-     * Moves a unit to Europe.
-     *
-     * @return True if there was no c-s problem.
-     */
-    public boolean moveToEurope() {
-        return AIMessage.askMoveTo(this, unit.getOwner().getEurope());
-    }
-
-    /**
-     * Is this AI unit carrying any cargo (units or goods).
-     *
-     * @return True if the unit has cargo aboard.
-     */
-    public boolean hasCargo() {
-        return (unit == null) ? false : unit.hasCargo();
-    }
-
-    /**
-     * Checks if this unit has been assigned a mission.
-     *
-     * @return <code>true</code> if this unit has a mission.
-     */
-    public boolean hasMission() {
-        return mission != null;
+    public void setMission(Mission mission) {
+        if (this.mission == mission) {
+            return;
+        } else if (this.mission == null) {
+            if (!mission.isOneTime()) {
+                logger.fine("Replacing null mission with " + mission);
+            }
+        } else {
+            abortMission("replaced");
+        }
+        this.mission = mission;
+        this.dynamicPriority = 0;
     }
 
     /**
@@ -286,6 +253,42 @@ public class AIUnit extends AIObject implements Transportable {
             mission = null;
             this.dynamicPriority = 0;
         }
+    }
+
+    /**
+     * Gets the goal of this AI unit.
+     *
+     * @return The goal of this AI unit.
+     */
+    public Goal getGoal() {
+        return goal;
+    }
+
+    /**
+     * Sets the goal of this AI unit.
+     *
+     * @param goal The new <code>Goal</code>.
+     */
+    public void setGoal(Goal goal) {
+        this.goal = goal;
+    }
+
+    /**
+     * Moves a unit to the new world.
+     *
+     * @return True if there was no c-s problem.
+     */
+    public boolean moveToAmerica() {
+        return AIMessage.askMoveTo(this, unit.getOwner().getGame().getMap());
+    }
+
+    /**
+     * Moves a unit to Europe.
+     *
+     * @return True if there was no c-s problem.
+     */
+    public boolean moveToEurope() {
+        return AIMessage.askMoveTo(this, unit.getOwner().getEurope());
     }
 
     /**
@@ -316,26 +319,6 @@ public class AIUnit extends AIObject implements Transportable {
             }
         }
     }
-        
-    /**
-     * Assigns a mission to unit. The dynamic priority is reset.
-     * Do not call setMission(null), use abortMission above.
-     *
-     * @param mission The new <code>Mission</code>.
-     */
-    public void setMission(Mission mission) {
-        if (this.mission == mission) {
-            return;
-        } else if (this.mission == null) {
-            if (!mission.isOneTime()) {
-                logger.fine("Replacing null mission with " + mission);
-            }
-        } else {
-            abortMission("replaced");
-        }
-        this.mission = mission;
-        this.dynamicPriority = 0;
-    }
 
     /**
      * Performs the mission this unit has been assigned.
@@ -344,24 +327,6 @@ public class AIUnit extends AIObject implements Transportable {
         if (mission != null && mission.isValid()) {
             mission.doMission();
         }
-    }
-
-    /**
-     * Gets the goal of this AI unit.
-     *
-     * @return The goal of this AI unit.
-     */
-    public Goal getGoal() {
-        return goal;
-    }
-
-    /**
-     * Sets the goal of this AI unit.
-     *
-     * @param goal The new <code>Goal</code>.
-     */
-    public void setGoal(Goal goal) {
-        this.goal = goal;
     }
 
     /**
@@ -448,18 +413,8 @@ public class AIUnit extends AIObject implements Transportable {
             : move(path.getDirection());
     }
 
-    /**
-     * Checks the integrity of this AIUnit.
-     *
-     * @return True if the unit is intact.
-     */
-    public boolean checkIntegrity() {
-        return super.checkIntegrity()
-            && unit != null && !unit.isDisposed();
-    }
 
-
-    // Transportable interface
+    // Interface Transportable
 
     /**
      * Gets the number of cargo slots taken by this AI unit.
@@ -657,27 +612,49 @@ public class AIUnit extends AIObject implements Transportable {
     }
 
 
+    // Override AIObject
+
+    /**
+     * Disposes this object and any attached mission.
+     */
+    @Override
+    public void dispose() {
+        AIPlayer aiOwner = getAIOwner();
+        if (aiOwner != null) aiOwner.removeAIUnit(this);
+        abortMission("AIUnit-disposed");
+        setTransport(null, "disposing");
+        super.dispose();
+    }
+
+    /**
+     * Checks the integrity of this AIUnit.
+     *
+     * @return True if the unit is intact.
+     */
+    @Override
+    public boolean checkIntegrity() {
+        return super.checkIntegrity()
+            && unit != null && !unit.isDisposed();
+    }
+
+
     // Serialization
+
+    private static final String TRANSPORT_TAG = "transport";
+    // @compat 0.10.3
+    private static final String TILE_IMPROVEMENT_PLAN_MISSION_TAG = "tileImprovementPlanMission";
+    // end @compat
+    // @compat 0.10.5
+    private static final String IDLE_AT_COLONY_MISSION_TAG = "idleAtColonyMission";
+    // end @compat
+
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
-
-        writeAttributes(out);
-
-        if (mission != null && !mission.isOneTime()) {
-            String reason = mission.invalidReason();
-            if (reason != null) {
-                abortMission(reason);
-            } else {
-                mission.toXML(out);
-            }
-        }
-
-        out.writeEndElement();
+        super.toXML(out, getXMLElementTagName());
     }
 
     /**
@@ -688,12 +665,30 @@ public class AIUnit extends AIObject implements Transportable {
         super.writeAttributes(out);
 
         if (transport != null) {
-            if (transport.getUnit() == null) {
+            Unit u = transport.getUnit();
+            if (u == null) {
                 logger.warning("transport.getUnit() == null");
-            } else if (getAIMain().getAIObject(transport.getId()) == null) {
+            } else if (transport.isDisposed()) {
                 logger.warning("broken reference to transport");
             } else {
-                out.writeAttribute("transport", transport.getUnit().getId());
+                writeAttribute(out, TRANSPORT_TAG, u);
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
+        super.writeChildren(out);
+
+        if (mission != null && !mission.isOneTime()) {
+            String reason = mission.invalidReason();
+            if (reason != null) {
+                abortMission(reason);
+            } else {
+                mission.toXML(out);
             }
         }
     }
@@ -703,20 +698,34 @@ public class AIUnit extends AIObject implements Transportable {
      */
     @Override
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
+
         final AIMain aiMain = getAIMain();
-        final Game game = aiMain.getGame();
 
-        String str = in.getAttributeValue(null, ID_ATTRIBUTE);
-        if ((unit = game.getFreeColGameObject(str, Unit.class)) == null) {
-            throw new IllegalStateException("Not a Unit: " + str);
+        unit = getAttribute(in, ID_ATTRIBUTE_TAG, aiMain.getGame(),
+                            Unit.class, (Unit)null);
+        if (unit == null) {
+            throw new IllegalStateException("Not a Unit: " + currentTag(in));
         }
+        
+        if (hasAttribute(in, TRANSPORT_TAG)) {
+            transport = getAttribute(in, TRANSPORT_TAG,
+                                     AIUnit.class, (AIUnit)null);
+            if (transport == null) {
+                transport = new AIUnit(aiMain,
+                    getAttribute(in, TRANSPORT_TAG, (String)null));
+            }
+        }
+    }
 
-        if ((str = in.getAttributeValue(null, "transport")) == null) {
-            transport = null;
-        } else {
-            transport = (AIUnit)aiMain.getAIObject(str);
-            if (transport == null) transport = new AIUnit(aiMain, str);
-        }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        super.readChildren(in);
+
+        if (getUnit() != null) uninitialized = false;
     }
 
     /**
@@ -725,49 +734,67 @@ public class AIUnit extends AIObject implements Transportable {
     @Override
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
         final AIMain aiMain = getAIMain();
-        String tag = in.getLocalName();
+        final String tag = in.getLocalName();
+
         mission = null;
-        if (tag.equals(BuildColonyMission.getXMLElementTagName())) {
+        if (BuildColonyMission.getXMLElementTagName().equals(tag)) {
             mission = new BuildColonyMission(aiMain, this, in);
-        } else if (tag.equals(CashInTreasureTrainMission.getXMLElementTagName())) {
+
+        } else if (CashInTreasureTrainMission.getXMLElementTagName().equals(tag)) {
             mission = new CashInTreasureTrainMission(aiMain, this, in);
-        } else if (tag.equals(DefendSettlementMission.getXMLElementTagName())) {
+
+        } else if (DefendSettlementMission.getXMLElementTagName().equals(tag)) {
             mission = new DefendSettlementMission(aiMain, this, in);
-        } else if (tag.equals(IdleAtSettlementMission.getXMLElementTagName())
-                   // @compat 0.10.5
-                   || tag.equals("idleAtColonyMission")
-                   // @end compatibility code
+
+        } else if (IdleAtSettlementMission.getXMLElementTagName().equals(tag)
+            // @compat 0.10.5
+            || IDLE_AT_COLONY_MISSION_TAG.equals(tag)
+            // end @compat
                    ) {
             mission = new IdleAtSettlementMission(aiMain, this, in);
-        } else if (tag.equals(IndianBringGiftMission.getXMLElementTagName())) {
+
+        } else if (IndianBringGiftMission.getXMLElementTagName().equals(tag)) {
             mission = new IndianBringGiftMission(aiMain, this, in);
-        } else if (tag.equals(IndianDemandMission.getXMLElementTagName())) {
+
+        } else if (IndianDemandMission.getXMLElementTagName().equals(tag)) {
             mission = new IndianDemandMission(aiMain, this, in);
-        } else if (tag.equals(MissionaryMission.getXMLElementTagName())) {
+
+        } else if (MissionaryMission.getXMLElementTagName().equals(tag)) {
             mission = new MissionaryMission(aiMain, this, in);
-        } else if (tag.equals(PioneeringMission.getXMLElementTagName())
-                   // @compat 0.10.3
-                   || tag.equals("tileImprovementPlanMission")) {
-                   // @end compatibility code
+
+        } else if (PioneeringMission.getXMLElementTagName().equals(tag)
+            // @compat 0.10.3
+            || TILE_IMPROVEMENT_PLAN_MISSION_TAG.equals(tag)
+            // end @compat
+                   ) {
             mission = new PioneeringMission(aiMain, this, in);
-        } else if (tag.equals(PrivateerMission.getXMLElementTagName())) {
+
+        } else if (PrivateerMission.getXMLElementTagName().equals(tag)) {
             mission = new PrivateerMission(aiMain, this, in);
-        } else if (tag.equals(ScoutingMission.getXMLElementTagName())) {
+
+        } else if (ScoutingMission.getXMLElementTagName().equals(tag)) {
             mission = new ScoutingMission(aiMain, this, in);
-        } else if (tag.equals(TransportMission.getXMLElementTagName())) {
+
+        } else if (TransportMission.getXMLElementTagName().equals(tag)) {
             mission = new TransportMission(aiMain, this, in);
-        } else if (tag.equals(UnitSeekAndDestroyMission.getXMLElementTagName())) {
+
+        } else if (UnitSeekAndDestroyMission.getXMLElementTagName().equals(tag)) {
             mission = new UnitSeekAndDestroyMission(aiMain, this, in);
-        } else if (tag.equals(UnitWanderHostileMission.getXMLElementTagName())) {
+
+        } else if (UnitWanderHostileMission.getXMLElementTagName().equals(tag)) {
             mission = new UnitWanderHostileMission(aiMain, this, in);
-        } else if (tag.equals(UnitWanderMission.getXMLElementTagName())) {
+
+        } else if (UnitWanderMission.getXMLElementTagName().equals(tag)) {
             mission = new UnitWanderMission(aiMain, this, in);
-        } else if (tag.equals(WishRealizationMission.getXMLElementTagName())) {
+
+        } else if (WishRealizationMission.getXMLElementTagName().equals(tag)) {
             mission = new WishRealizationMission(aiMain, this, in);
-        } else if (tag.equals(WorkInsideColonyMission.getXMLElementTagName())) {
+
+        } else if (WorkInsideColonyMission.getXMLElementTagName().equals(tag)) {
             mission = new WorkInsideColonyMission(aiMain, this, in);
+
         } else {
-            throw new IllegalStateException("Unknown AIUnit child: " + tag);
+            super.readChild(in);
         }
     }
 
@@ -776,7 +803,7 @@ public class AIUnit extends AIObject implements Transportable {
      */
     @Override
     public String toString() {
-        return unit.toString("AIUnit ");
+        return (unit == null) ? "AIUnit-null" : unit.toString("AIUnit ");
     }
 
     /**

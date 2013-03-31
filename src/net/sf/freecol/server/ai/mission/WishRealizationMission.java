@@ -210,13 +210,19 @@ public class WishRealizationMission extends Mission {
 
     // Serialization
 
+    private static final String WISH_TAG = "wish";
+    // @compat 0.10.3
+    private static final String OLD_GOODS_WISH_TAG = "GoodsWish";
+    // end @compat
+
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         if (isValid() && wish.shouldBeStored()) {
-            toXML(out, getXMLElementTagName());
+            super.toXML(out, getXMLElementTagName());
         }
     }
 
@@ -224,33 +230,32 @@ public class WishRealizationMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
-        out.writeAttribute("wish", wish.getId());
+        writeAttribute(out, WISH_TAG, wish);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
 
-        final String wid = in.getAttributeValue(null, "wish");
-        wish = (Wish)getAIMain().getAIObject(wid);
-
+        final String wid = getAttribute(in, WISH_TAG, (String)null);
+        wish = getAttribute(in, WISH_TAG, Wish.class, (Wish)null);
         if (wish == null) {
             if (wid.startsWith(GoodsWish.getXMLElementTagName())
                 // @compat 0.10.3
-                || wid.startsWith("GoodsWish")
-                // end compatibility code
+                || wid.startsWith(OLD_GOODS_WISH_TAG)
+                // end @compat
                 ) {
                 wish = new GoodsWish(getAIMain(), wid);
+
             } else if (wid.startsWith(WorkerWish.getXMLElementTagName())) {
                 wish = new WorkerWish(getAIMain(), wid);
+
             } else {
                 logger.warning("Unknown type of Wish.");
             }

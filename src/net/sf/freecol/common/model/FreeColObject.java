@@ -745,12 +745,11 @@ public abstract class FreeColObject {
      * @param game The <code>Game</code> to look in.
      * @param returnType The <code>FreeColObject</code> type to expect.
      * @param defaultValue The default value.
-     * @return The <code>FreeColObject</code>, or the default
+     * @return The <code>FreeColObject</code> found, or the default
      *     value if not.
      */
     public <T extends FreeColGameObject> T getAttribute(XMLStreamReader in,
         String attributeName, Game game, Class<T> returnType, T defaultValue) {
-
         final String attrib = 
         // @compat 0.10.7
             (ID_ATTRIBUTE_TAG.equals(attributeName)) ? readId(in) :

@@ -26,6 +26,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.server.ai.mission.PioneeringMission;
@@ -44,14 +45,10 @@ public class TileImprovementPlan extends ValuedAIObject {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(TileImprovementPlan.class.getName());
 
-    /**
-     * The type of improvement, from TileImprovementTypes.
-     */
+    /** The type of improvement, from TileImprovementTypes. */
     private TileImprovementType type;
 
-    /**
-     * The <code>Tile</code> to be improved.
-     */
+    /** The <code>Tile</code> to be improved. */
     private Tile target;
 
     /**
@@ -68,7 +65,7 @@ public class TileImprovementPlan extends ValuedAIObject {
      * @param aiMain The main AI-object.
      * @param id The ID.
      * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
+     *     during parsing.
      */
     public TileImprovementPlan(AIMain aiMain, String id)
         throws XMLStreamException {
@@ -86,8 +83,8 @@ public class TileImprovementPlan extends ValuedAIObject {
      * @param target The target <code>Tile</code> for the improvement.
      * @param type The type of improvement.
      * @param value The value identifying the importance of
-     *        this <code>TileImprovementPlan</code> - a higher value
-     *        signals a higher importance.
+     *     this <code>TileImprovementPlan</code> - a higher value
+     *     signals a higher importance.
      */
     public TileImprovementPlan(AIMain aiMain, Tile target,
                                TileImprovementType type, int value) {
@@ -106,7 +103,7 @@ public class TileImprovementPlan extends ValuedAIObject {
      *
      * @param aiMain The main AI-object.
      * @param element The root element for the XML-representation
-     *       of a <code>Wish</code>.
+     *     of a <code>Wish</code>.
      */
     public TileImprovementPlan(AIMain aiMain, Element element) {
         super(aiMain, element);
@@ -121,7 +118,7 @@ public class TileImprovementPlan extends ValuedAIObject {
      * @param aiMain The main AI-object.
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
+     *     during parsing.
      */
     public TileImprovementPlan(AIMain aiMain, XMLStreamReader in)
         throws XMLStreamException {
@@ -132,28 +129,13 @@ public class TileImprovementPlan extends ValuedAIObject {
 
 
     /**
-     * Disposes this <code>TileImprovementPlan</code>.
-     *
-     * If a pioneer has been assigned to making this improvement, then
-     * abort its mission.
-     */
-    public void dispose() {
-        if (pioneer != null
-            && pioneer.getMission() instanceof PioneeringMission) {
-            pioneer.abortMission("disposing plan");
-        }
-        pioneer = null;
-        super.dispose();
-    }
-
-    /**
      * Gets the pioneer who have been assigned to making the
      * improvement described by this object.
      *
      * @return The pioneer which should make the improvement, if
-     *      such a <code>AIUnit</code> has been assigned, and
-     *      <code>null</code> if nobody has been assigned this
-     *      mission.
+     *     such a <code>AIUnit</code> has been assigned, and
+     *     <code>null</code> if nobody has been assigned this
+     *     mission.
      */
     public AIUnit getPioneer() {
         return pioneer;
@@ -164,9 +146,9 @@ public class TileImprovementPlan extends ValuedAIObject {
      * improvement described by this object.
      *
      * @param pioneer The pioneer which should make the improvement, if
-     *      such a <code>Unit</code> has been assigned, and
-     *      <code>null</code> if nobody has been assigned this
-     *      mission.
+     *     such a <code>Unit</code> has been assigned, and
+     *     <code>null</code> if nobody has been assigned this
+     *     mission.
      */
     public void setPioneer(AIUnit pioneer) {
         this.pioneer = pioneer;
@@ -195,8 +177,8 @@ public class TileImprovementPlan extends ValuedAIObject {
      * Gets the target of this <code>TileImprovementPlan</code>.
      *
      * @return The <code>Tile</code> where
-     *       {@link #getPioneer pioneer} should make the
-     *       given {@link #getType improvement}.
+     *     {@link #getPioneer pioneer} should make the
+     *     given {@link #getType improvement}.
      */
     public Tile getTarget() {
         return target;
@@ -284,11 +266,31 @@ public class TileImprovementPlan extends ValuedAIObject {
         return true;
     }
 
+
+    // Override AIObject
+
+    /**
+     * Disposes this <code>TileImprovementPlan</code>.
+     *
+     * If a pioneer has been assigned to making this improvement, then
+     * abort its mission.
+     */
+    @Override
+    public void dispose() {
+        if (pioneer != null
+            && pioneer.getMission() instanceof PioneeringMission) {
+            pioneer.abortMission("disposing plan");
+        }
+        pioneer = null;
+        super.dispose();
+    }
+
     /**
      * Checks the integrity of a this TileImprovementPlan.
      *
      * @return True if the plan is valid.
      */
+    @Override
     public boolean checkIntegrity() {
         return super.checkIntegrity()
             && type != null
@@ -298,6 +300,11 @@ public class TileImprovementPlan extends ValuedAIObject {
 
 
     // Serialization
+
+    private static final String PIONEER_TAG = "pioneer";
+    private static final String TARGET_TAG = "target";
+    private static final String TYPE_TAG = "type";
+
 
     /**
      * {@inheritDoc}
@@ -316,12 +323,12 @@ public class TileImprovementPlan extends ValuedAIObject {
     protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
-        out.writeAttribute("type", type.getId());
+        writeAttribute(out, TYPE_TAG, type);
 
-        out.writeAttribute("target", target.getId());
+        writeAttribute(out, TARGET_TAG, target);
 
         if (pioneer != null && pioneer.checkIntegrity()) {
-            out.writeAttribute("pioneer", pioneer.getId());
+            writeAttribute(out, PIONEER_TAG, pioneer);
         }
     }
 
@@ -331,23 +338,34 @@ public class TileImprovementPlan extends ValuedAIObject {
     @Override
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
-        
-        String str = in.getAttributeValue(null, "type");
-        type = (str == null) ? null
-            : getSpecification().getTileImprovementType(str);
 
-        str = in.getAttributeValue(null, "pioneer");
-        if (str != null) {
-            if ((pioneer = (AIUnit)getAIMain().getAIObject(str)) == null) {
-                pioneer = new AIUnit(getAIMain(), str);
+        final Specification spec = getSpecification();
+        
+        type = spec.getType(in, TYPE_TAG, 
+                            TileImprovementType.class, (TileImprovementType)null);
+
+        if (hasAttribute(in, PIONEER_TAG)) {
+            pioneer = getAttribute(in, PIONEER_TAG, AIUnit.class, (AIUnit)null);
+            if (pioneer == null) {
+                pioneer = new AIUnit(getAIMain(),
+                    getAttribute(in, PIONEER_TAG, (String)null));
             }
         } else {
             pioneer = null;
         }
 
-        str = in.getAttributeValue(null, "target");
-        target = (str == null) ? null
-            : getAIMain().getGame().getFreeColGameObject(str, Tile.class);
+        target = getAttribute(in, TARGET_TAG, getGame(),
+                              Tile.class, (Tile)null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        super.readChildren(in);
+
+        if (type != null && target != null) uninitialized = false;
     }
 
     /**

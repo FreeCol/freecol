@@ -206,14 +206,29 @@ public class AIMain extends FreeColObject
     }
 
     /**
+     * Gets the <code>AIObject</code> with the specified id and class.
+     *
+     * @param id The id.
+     * @param returnClass The expected class of the object.
+     * @return The <code>AIObject</code> found, or null if not.
+     */
+    public <T extends AIObject> T getAIObject(String id, Class<T> returnClass) {
+        AIObject aio = getAIObject(id);
+        try {
+            return returnClass.cast(aio);
+        } catch (ClassCastException e) {
+            return null;
+        }
+    }
+
+    /**
      * Gets the AI colony corresponding to a given colony.
      *
      * @param colony The <code>Colony</code> to look up.
      * @return The corresponding AI colony, or null if not found.
      */
     public AIColony getAIColony(Colony colony) {
-        AIObject aio = getAIObject(colony.getId());
-        return (aio instanceof AIColony) ? (AIColony) aio : null;
+        return getAIObject(colony.getId(), AIColony.class);
     }
 
     /**
@@ -223,8 +238,7 @@ public class AIMain extends FreeColObject
      * @return The corresponding AI player, or null if not found.
      */
     public AIPlayer getAIPlayer(Player player) {
-        AIObject aio = getAIObject(player.getId());
-        return (aio instanceof AIPlayer) ? (AIPlayer) aio : null;
+        return getAIObject(player.getId(), AIPlayer.class);
     }
 
     /**
@@ -234,8 +248,7 @@ public class AIMain extends FreeColObject
      * @return The corresponding AI unit, or null if not found.
      */
     public AIUnit getAIUnit(Unit unit) {
-        AIObject aio = getAIObject(unit.getId());
-        return (aio instanceof AIUnit) ? (AIUnit) aio : null;
+        return getAIObject(unit.getId(), AIUnit.class);
     }
 
     /**
@@ -522,6 +535,12 @@ public class AIMain extends FreeColObject
 
         try {
             Wish wish = null;
+
+            // The AI data is quite shallow, so we can get away with
+            // fixing up forward references just with this simple
+            // lookup.  AIObjects that can be forward referenced must
+            // ensure they complete initialization somewhere in their
+            // serialization read* routines.
             if (oid != null && aiObjects.containsKey(oid)) {
                 getAIObject(oid).readFromXML(in);
 

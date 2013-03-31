@@ -128,7 +128,7 @@ public abstract class ValuedAIObject extends AIObject
     protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
-        out.writeAttribute("value", Integer.toString(value));
+        writeAttribute(out, VALUE_TAG, value);
     }
 
     /**
@@ -138,6 +138,6 @@ public abstract class ValuedAIObject extends AIObject
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
 
-        setValue(getAttribute(in, "value", -1));
+        setValue(getAttribute(in, VALUE_TAG, -1));
     }
 }

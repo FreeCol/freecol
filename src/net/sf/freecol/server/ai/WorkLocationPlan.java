@@ -25,6 +25,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.WorkLocation;
 
 import org.w3c.dom.Document;
@@ -114,6 +115,9 @@ public class WorkLocationPlan extends AIObject {
 
     // Serialization
 
+    private static final String GOODS_TYPE_TAG = "goodsType";
+
+
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         // do nothing
     }
@@ -127,8 +131,9 @@ public class WorkLocationPlan extends AIObject {
     public Element toXMLElement(Document document) {
         Element element = document.createElement(getXMLElementTagName());
 
-        element.setAttribute(ID_ATTRIBUTE, workLocation.getId());
-        element.setAttribute("goodsType", goodsType.getId());
+        element.setAttribute(ID_ATTRIBUTE_TAG, workLocation.getId());
+
+        element.setAttribute(GOODS_TYPE_TAG, goodsType.getId());
 
         return element;
     }
@@ -140,12 +145,16 @@ public class WorkLocationPlan extends AIObject {
      * @param element The XML-representation.
      */
     public void readFromXMLElement(Element element) {
-        String str = element.getAttribute(ID_ATTRIBUTE);
+        final Specification spec = getSpecification();
+
+        String str = element.getAttribute(ID_ATTRIBUTE_TAG);
+        // @compat 0.10.7
+        if (str == null) str = element.getAttribute(ID_ATTRIBUTE);
+        // end @compat
         workLocation = getAIMain().getGame()
             .getFreeColGameObject(str, WorkLocation.class);
 
-        str = element.getAttribute("goodsType");
-        goodsType = getSpecification().getGoodsType(str);
+        goodsType = spec.getGoodsType(element.getAttribute(GOODS_TYPE_TAG));
     }
 
     /**

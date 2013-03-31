@@ -98,33 +98,17 @@ public abstract class AIObject extends FreeColObject {
      *
      * @param aiMain The main AI-object.
      * @param in The input stream containing the XML.
-     * @throws XMLStreamException if a problem was encountered during parsing.
+     * @exception XMLStreamException if a problem was encountered
+     *     during parsing.
      * @see AIObject#readFromXML
      */
-    public AIObject(AIMain aiMain, XMLStreamReader in)
-        throws XMLStreamException {
+    public AIObject(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
         this(aiMain);
 
         readFromXML(in);
         addAIObjectWithId();
     }
 
-    /**
-     * Disposes this <code>AIObject</code> by removing the reference
-     * to this object from the enclosing AIMain.
-     */
-    public void dispose() {
-        getAIMain().removeAIObject(getId());
-    }
-
-    /**
-     * Has this AIObject been disposed?
-     *
-     * @return True if this AIObject was disposed.
-     */
-    public boolean isDisposed() {
-        return getAIMain().getAIObject(getId()) == null;
-    }
 
     /**
      * Convenience accessor for the main AI-object.
@@ -166,21 +150,20 @@ public abstract class AIObject extends FreeColObject {
     }
 
     /**
-     * Checks the integrity of this AI object.
-     * Subclasses should override.
-     *
-     * @return True if the object is valid.
+     * Disposes this <code>AIObject</code> by removing the reference
+     * to this object from the enclosing AIMain.
      */
-    public boolean checkIntegrity() {
-        return !isUninitialized();
+    public void dispose() {
+        getAIMain().removeAIObject(getId());
     }
 
     /**
-     * Fixes integrity problems with this AI object.
-     * This simplest solution is just to dispose of the object.
+     * Has this AIObject been disposed?
+     *
+     * @return True if this AIObject was disposed.
      */
-    public void fixIntegrity() {
-        dispose();
+    public boolean isDisposed() {
+        return getAIMain().getAIObject(getId()) == null;
     }
 
     /**
@@ -206,33 +189,47 @@ public abstract class AIObject extends FreeColObject {
             : loc;
     }
 
-
-    // Serialization
-
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        out.writeAttribute(ID_ATTRIBUTE, getId());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public final void readFromXML(XMLStreamReader in) throws XMLStreamException {
-        super.readFromXML(in);
-
-        uninitialized = false;
-    }
-
-    /**
-     * Gets the tag name of the root element representing this object.
+     * Checks the integrity of this AI object.
+     * Subclasses should extend.
      *
-     * @return "AIObject".
+     * @return True if the object is valid.
      */
-    public static String getXMLElementTagName() {
-        return "AIObject";
+    public boolean checkIntegrity() {
+        return !isUninitialized();
     }
+
+    /**
+     * Fixes integrity problems with this AI object.
+     * This simplest solution is just to dispose of the object.
+     */
+    public void fixIntegrity() {
+        dispose();
+    }
+
+
+    /**
+     * Gets an AIObject by reference from an attribute in a stream.
+     *
+     * @param in The <code>XMLStreamReader</code> to read from.
+     * @param attributeName The attribute name.
+     * @param returnType The <code>AIObject</code> type to expect.
+     * @param defaultValue The default value.
+     * @return The <code>AIObject</code> found, or the default value if not.
+     */
+    protected <T extends AIObject> T getAttribute(XMLStreamReader in,
+        String attributeName, Class<T> returnType, T defaultValue) {
+        final String attrib = 
+        // @compat 0.10.7
+            (ID_ATTRIBUTE_TAG.equals(attributeName)) ? readId(in) :
+        // end @compat
+            in.getAttributeValue(null, attributeName);
+
+        return (attrib == null) ? defaultValue
+            : aiMain.getAIObject(attrib, returnType);
+    }
+
+    // Serialization is all inherited from FreeColObject.
+
+    // No getXMLElementTagName(), this is abstract.
 }

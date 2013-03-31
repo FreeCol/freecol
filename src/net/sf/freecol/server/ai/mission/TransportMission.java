@@ -1728,6 +1728,10 @@ public class TransportMission extends Mission {
     private static final String TURNS_TAG = "turns";
     private static final String TRIES_TAG = "tries";
     private static final String SPACELEFT_TAG = "space";
+    // @compat 0.10.5
+    private static final String OLD_TRANSPORTABLE_TAG = "transportable";
+    // end @compat
+
 
     /**
      * {@inheritDoc}
@@ -1771,7 +1775,7 @@ public class TransportMission extends Mission {
                 out.writeStartElement(CARGO_TAG);
 
                 AIObject aio = (AIObject)cargo.getTransportable();
-                writeAttribute(out, ID_ATTRIBUTE, aio.getId());
+                writeAttribute(out, ID_ATTRIBUTE_TAG, aio);
 
                 writeAttribute(out, CARRIER_TAG, cargo.getCarrier());
 
@@ -1822,7 +1826,7 @@ public class TransportMission extends Mission {
         final String tag = in.getLocalName();
 
         if (CARGO_TAG.equals(tag)) {
-            String tid = getAttribute(in, ID_ATTRIBUTE, (String)null);
+            String tid = readId(in);
             AIObject aio = null;
             if (tid != null) {
                 if ((aio = getAIMain().getAIObject(tid)) == null) {
@@ -1837,7 +1841,8 @@ public class TransportMission extends Mission {
                 throw new XMLStreamException("Transportable expected: " + tid);
             }
 
-            Unit carrier = game.getFreeColGameObject(in, CARRIER_TAG, Unit.class, getUnit());
+            Unit carrier = getAttribute(in, CARRIER_TAG, getGame(),
+                                        Unit.class, (Unit)null);
 
             CargoMode mode = getAttribute(in, MODE_TAG, 
                                           CargoMode.class, CargoMode.DUMP);
@@ -1855,10 +1860,10 @@ public class TransportMission extends Mission {
             in.nextTag(); // Consume closing tag
 
         // @compat 0.10.5
-        } else if ("transportable".equals(tag)) {
+        } else if (OLD_TRANSPORTABLE_TAG.equals(tag)) {
             // Ignore the old format, let checkCargoes sort it out
             in.nextTag(); // Consume closing tag
-        // @end compatibility code
+        // end @compat
 
         } else {
             super.readChild(in);

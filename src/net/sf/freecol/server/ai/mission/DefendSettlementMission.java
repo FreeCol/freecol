@@ -422,6 +422,9 @@ public class DefendSettlementMission extends Mission {
 
     // Serialization
 
+    private static final String SETTLEMENT_TAG = "settlement";
+
+
     /**
      * {@inheritDoc}
      */
@@ -436,12 +439,11 @@ public class DefendSettlementMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
         if (target != null) {
-            writeAttribute(out, "settlement", (FreeColGameObject)target);
+            writeAttribute(out, SETTLEMENT_TAG, target.getId());
         }
     }
 
@@ -449,13 +451,11 @@ public class DefendSettlementMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
 
-        String str = in.getAttributeValue(null, "settlement");
-        target = (str == null) ? null
-            : getGame().getFreeColGameObject(str, Settlement.class);
+        target = getAttribute(in, SETTLEMENT_TAG, getGame(),
+                              Settlement.class, (Settlement)null);
     }
 
     /**

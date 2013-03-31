@@ -62,6 +62,11 @@ import net.sf.freecol.common.model.UnitWas;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.util.Utils;
+import net.sf.freecol.server.ai.AIObject;
+import net.sf.freecol.server.ai.AIGoods;
+import net.sf.freecol.server.ai.GoodsWish;
+import net.sf.freecol.server.ai.TileImprovementPlan;
+import net.sf.freecol.server.ai.WorkerWish;
 import net.sf.freecol.server.ai.mission.BuildColonyMission;
 import net.sf.freecol.server.ai.mission.DefendSettlementMission;
 import net.sf.freecol.server.ai.mission.IdleAtSettlementMission;
@@ -83,38 +88,44 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
     private static final String LIST_ELEMENT = "ListElement";
 
-    // Do not perform tile improvements that would leave less than
-    // this amount of forested work locations available to the colony.
+    /**
+     * Do not perform tile improvements that would leave less than
+     * this amount of forested work locations available to the colony.
+     */
     private static final int FOREST_MINIMUM = 1;
 
-    // Do not bother trying to ship out less than this amount of goods.
+    /** Do not bother trying to ship out less than this amount of goods. */
     private static final int EXPORT_MINIMUM = 10;
 
-    // The colony this AIColony is managing.
+    /** The colony this AIColony is managing. */
     private Colony colony;
 
-    // The current plan for the colony.  Does not need to be serialized.
+    /** The current plan for the colony.  Does not need to be serialized. */
     private ColonyPlan colonyPlan = null;
 
-    // Goods to export from the colony.
+    /** Goods to export from the colony. */
     private final List<AIGoods> aiGoods;
 
-    // Useful things for the colony.
+    /** Useful things for the colony. */
     private final List<Wish> wishes;
 
-    // Plans to improve neighbouring tiles.
+    /** Plans to improve neighbouring tiles. */
     private final List<TileImprovementPlan> tileImprovementPlans;
 
-    // When should the workers in this Colony be rearranged?
+    /** When should the workers in this Colony be rearranged? */
     private Turn rearrangeTurn = new Turn(0);
 
-    // Goods that should be completely exported and only exported to
-    // prevent the warehouse filling.
+    /**
+     * Goods that should be completely exported and only exported to
+     * prevent the warehouse filling.
+     */
     private static final Set<GoodsType> fullExport = new HashSet<GoodsType>();
     private static final Set<GoodsType> partExport = new HashSet<GoodsType>();
 
-    // Comparator to favour expert scouts, then units in that role,
-    // then least skillful.
+    /**
+     * Comparator to favour expert scouts, then units in that role,
+     * then least skillful.
+     */
     private static final Comparator<Unit> scoutComparator
         = new Comparator<Unit>() {
             public int compare(Unit u1, Unit u2) {
@@ -138,11 +149,11 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     public AIColony(AIMain aiMain, String id) {
         super(aiMain, id);
 
-        colony = null;
-        colonyPlan = null;
-        aiGoods = new ArrayList<AIGoods>();
-        wishes = new ArrayList<Wish>();
-        tileImprovementPlans = new ArrayList<TileImprovementPlan>();
+        this.colony = null;
+        this.colonyPlan = null;
+        this.aiGoods = new ArrayList<AIGoods>();
+        this.wishes = new ArrayList<Wish>();
+        this.tileImprovementPlans = new ArrayList<TileImprovementPlan>();
     }
 
     /**
@@ -156,6 +167,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
         this.colony = colony;
         colony.addPropertyChangeListener(Colony.REARRANGE_WORKERS, this);
+
         uninitialized = false;
     }
 
@@ -172,6 +184,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
         readFromXMLElement(element);
         addAIObjectWithId();
+
         uninitialized = getColony() == null;
     }
     
@@ -181,51 +194,18 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      *
      * @param aiMain The main AI-object.
      * @param in The input stream containing the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
+     * @exception XMLStreamException if a problem was encountered
+     *     during parsing.
      */
-    public AIColony(AIMain aiMain, XMLStreamReader in)
-        throws XMLStreamException {
+    public AIColony(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
         this(aiMain, (String)null);
 
         readFromXML(in);
         addAIObjectWithId();
+
         uninitialized = getColony() == null;
     }
 
-    /**
-     * Disposes this <code>AIColony</code>.
-     */
-    public void dispose() {
-        List<AIObject> disposeList = new ArrayList<AIObject>();
-        for (AIGoods ag : aiGoods) {
-            if (ag.getGoods().getLocation() == colony) disposeList.add(ag);
-        }
-        for (Wish w : wishes) {
-            disposeList.add(w);
-        }
-        for (TileImprovementPlan ti : tileImprovementPlans) {
-            disposeList.add(ti);
-        }
-        for (AIObject o : disposeList) o.dispose();
-        colonyPlan = null;
-        // Do not clear this.colony, the id is still required.
-        super.dispose();
-    }
-
-    /**
-     * Gets this AI object's identifier.
-     *
-     * @return The id of the colony.
-     */
-    @Override
-    public String getId() {
-        if (colony == null) {
-            logger.warning("Uninitialized AI colony");
-            return null;
-        }
-        return colony.getId();
-    }
 
     /**
      * Gets the <code>Colony</code> this <code>AIColony</code> controls.
@@ -1407,11 +1387,36 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         rearrangeTurn = new Turn(0);
     }
 
+
+    // Override AIObject
+
+    /**
+     * Disposes this <code>AIColony</code>.
+     */
+    @Override
+    public void dispose() {
+        List<AIObject> disposeList = new ArrayList<AIObject>();
+        for (AIGoods ag : aiGoods) {
+            if (ag.getGoods().getLocation() == colony) disposeList.add(ag);
+        }
+        for (Wish w : wishes) {
+            disposeList.add(w);
+        }
+        for (TileImprovementPlan ti : tileImprovementPlans) {
+            disposeList.add(ti);
+        }
+        for (AIObject o : disposeList) o.dispose();
+        colonyPlan = null;
+        // Do not clear this.colony, the id is still required.
+        super.dispose();
+    }
+
     /**
      * Checks the integrity of a this AIColony
      *
      * @return True if the colony is intact.
      */
+    @Override
     public boolean checkIntegrity() {
         return super.checkIntegrity()
             && colony != null
@@ -1421,45 +1426,71 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
     // Serialization
 
+    private static final String AI_GOODS_LIST_TAG
+        = AIGoods.getXMLElementTagName() + LIST_ELEMENT;
+    private static final String GOODS_WISH_LIST_TAG
+        = GoodsWish.getXMLElementTagName() + LIST_ELEMENT;
+    private static final String TILE_IMPROVEMENT_PLAN_LIST_TAG
+        = TileImprovementPlan.getXMLElementTagName() + LIST_ELEMENT;
+    private static final String WORKER_WISH_LIST_TAG
+        = WorkerWish.getXMLElementTagName() + LIST_ELEMENT;
+    // @compat 0.10.3
+    private static final String OLD_GOODS_WISH_TAG
+        = GoodsWish.getXMLElementTagName() + "Wish" + LIST_ELEMENT;
+    private static final String OLD_TILE_IMPROVEMENT_PLAN_TAG
+        = "tileimprovementplan" + LIST_ELEMENT;
+    private static final String OLD_WORKER_WISH_TAG
+        = WorkerWish.getXMLElementTagName() + "Wish" + LIST_ELEMENT;
+    // end @compat
+
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
+        super.toXML(out, getXMLElementTagName());
+    }
 
-        super.writeAttributes(out);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
+        super.writeChildren(out);
 
         for (AIGoods ag : aiGoods) {
             if (!ag.checkIntegrity()) continue;
-            out.writeStartElement(AIGoods.getXMLElementTagName()
-                                  + LIST_ELEMENT);
-            out.writeAttribute(ID_ATTRIBUTE, ag.getId());
-            out.writeEndElement();
-        }
+            out.writeStartElement(AI_GOODS_LIST_TAG);
 
-        for (Wish w : wishes) {
-            String tag = (w instanceof GoodsWish)
-                ? GoodsWish.getXMLElementTagName()
-                : (w instanceof WorkerWish)
-                ? WorkerWish.getXMLElementTagName()
-                : null;
-            if (!w.checkIntegrity() || !w.shouldBeStored()
-                || tag == null) continue;
-            out.writeStartElement(tag + LIST_ELEMENT);
-            out.writeAttribute(ID_ATTRIBUTE, w.getId());
+            writeAttribute(out, ID_ATTRIBUTE_TAG, ag);
+
             out.writeEndElement();
         }
 
         for (TileImprovementPlan tip : tileImprovementPlans) {
             if (!tip.checkIntegrity()) continue;
-            out.writeStartElement(TileImprovementPlan.getXMLElementTagName()
-                                  + LIST_ELEMENT);
-            out.writeAttribute(ID_ATTRIBUTE, tip.getId());
+
+            out.writeStartElement(TILE_IMPROVEMENT_PLAN_LIST_TAG);
+
+            writeAttribute(out, ID_ATTRIBUTE_TAG, tip);
+
             out.writeEndElement();
         }
 
-        out.writeEndElement();
+        for (Wish w : wishes) {
+            String tag = (w instanceof GoodsWish) ? GOODS_WISH_LIST_TAG
+                : (w instanceof WorkerWish) ? WORKER_WISH_LIST_TAG
+                : null;
+            if (!w.checkIntegrity() || !w.shouldBeStored()
+                || tag == null) continue;
+
+            out.writeStartElement(tag);
+
+            writeAttribute(out, ID_ATTRIBUTE_TAG, w);
+
+            out.writeEndElement();
+        }
     }
 
     /**
@@ -1467,18 +1498,30 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     @Override
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
+
         final AIMain aiMain = getAIMain();
-        final Game game = aiMain.getGame();
 
-        String str = in.getAttributeValue(null, ID_ATTRIBUTE);
-        if ((colony = game.getFreeColGameObject(str, Colony.class)) == null) {
-            throw new IllegalStateException("Not a Colony: " + str);
+        colony = getAttribute(in, ID_ATTRIBUTE_TAG, aiMain.getGame(),
+                              Colony.class, (Colony)null);
+        if (colony == null) {
+            throw new IllegalStateException("Not a Colony: " + currentTag(in));
         }
+    }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        // Clear containers
         aiGoods.clear();
         tileImprovementPlans.clear();
         wishes.clear();
-        colonyPlan = null;
+
+        super.readChildren(in);
+
+        if (getColony() != null) uninitialized = false;
     }
 
     /**
@@ -1487,51 +1530,52 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     @Override
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
         final AIMain aiMain = getAIMain();
-
         final String tag = in.getLocalName();
-        if (tag.equals(AIGoods.getXMLElementTagName() + LIST_ELEMENT)) {
-            String str = in.getAttributeValue(null, ID_ATTRIBUTE);
-            AIGoods ag = (AIGoods)aiMain.getAIObject(str);
-            if (ag == null) ag = new AIGoods(aiMain, str);
+
+        if (AI_GOODS_LIST_TAG.equals(tag)) {
+            AIGoods ag = getAttribute(in, ID_ATTRIBUTE_TAG,
+                                      AIGoods.class, (AIGoods)null);
+            if (ag == null) ag = new AIGoods(aiMain, readId(in));
             aiGoods.add(ag);
-        } else if (tag.equals(TileImprovementPlan.getXMLElementTagName()
-                              + LIST_ELEMENT)
-                   // @compat 0.10.3
-                   || in.getLocalName().equals("tileimprovementplan"
-                                               + LIST_ELEMENT)
-                   // end compatibility code
+            in.nextTag();
+
+        } else if (GOODS_WISH_LIST_TAG.equals(tag)
+            // @compat 0.10.3
+            || OLD_GOODS_WISH_TAG.equals(tag)
+            // end @compat
                    ) {
-            String str = in.getAttributeValue(null, ID_ATTRIBUTE);
-            TileImprovementPlan ti
-                = (TileImprovementPlan)aiMain.getAIObject(str);
-            if (ti == null) ti = new TileImprovementPlan(aiMain, str);
-            tileImprovementPlans.add(ti);
-        } else if (tag.equals(GoodsWish.getXMLElementTagName()
-                              + LIST_ELEMENT)
-                   // @compat 0.10.3
-                   || in.getLocalName().equals(GoodsWish.getXMLElementTagName()
-                                               + "Wish" + LIST_ELEMENT)
-                   // end compatibility code
-                   ) {
-            String str = in.getAttributeValue(null, ID_ATTRIBUTE);
-            GoodsWish gw = (GoodsWish)aiMain.getAIObject(str);
-            if (gw == null) gw = new GoodsWish(aiMain, str);
+            GoodsWish gw = getAttribute(in, ID_ATTRIBUTE_TAG,
+                                        GoodsWish.class, (GoodsWish)null);
+            if (gw == null) gw = new GoodsWish(aiMain, readId(in));
             wishes.add(gw);
-        } else if (tag.equals(WorkerWish.getXMLElementTagName()
-                              + LIST_ELEMENT)
-                   // @compat 0.10.3
-                   || in.getLocalName().equals(WorkerWish.getXMLElementTagName()
-                                               + "Wish" + LIST_ELEMENT)
-                   // end compatibility code
+            in.nextTag();
+
+        } else if (TILE_IMPROVEMENT_PLAN_LIST_TAG.equals(tag)
+            // @compat 0.10.3
+            || OLD_TILE_IMPROVEMENT_PLAN_TAG.equals(tag)
+            // end @compat
                    ) {
-            String str = in.getAttributeValue(null, ID_ATTRIBUTE);
-            Wish ww = (Wish)aiMain.getAIObject(str);
-            if (ww == null) ww = new WorkerWish(aiMain, str);
+            String str = readId(in);
+            TileImprovementPlan ti = getAttribute(in, ID_ATTRIBUTE_TAG,
+                TileImprovementPlan.class, (TileImprovementPlan)null);
+            if (ti == null) ti = new TileImprovementPlan(aiMain, readId(in));
+            tileImprovementPlans.add(ti);
+            in.nextTag();
+
+        } else if (WORKER_WISH_LIST_TAG.equals(tag)
+            // @compat 0.10.3
+            || OLD_WORKER_WISH_TAG.equals(tag)
+            // end compatibility code
+                   ) {
+            WorkerWish ww = getAttribute(in, ID_ATTRIBUTE_TAG,
+                                         WorkerWish.class, (WorkerWish)null);
+            if (ww == null) ww = new WorkerWish(aiMain, readId(in));
             wishes.add(ww);
+            in.nextTag();
+
         } else {
-            logger.warning("Unknown tag name: " + in.getLocalName());
+            super.readChild(in);
         }
-        in.nextTag();
     }
 
     /**
