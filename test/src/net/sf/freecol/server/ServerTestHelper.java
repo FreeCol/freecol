@@ -121,7 +121,7 @@ public final class ServerTestHelper {
         try {
             pgc.startGame();
         } catch (FreeColException e) {
-            fail();
+            fail(e.getMessage());
         }
         assertEquals(FreeColServer.GameState.IN_GAME, serv.getGameState());
         assertNotNull(serv.getGame());
@@ -155,7 +155,7 @@ public final class ServerTestHelper {
         try {
             pgc.startGame();
         } catch (FreeColException e) {
-            fail("Failed to start game");
+            fail("Failed to start game: " + e.getMessage());
         }
 
         Game game = serv.getGame();

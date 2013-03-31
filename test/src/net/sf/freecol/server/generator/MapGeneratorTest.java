@@ -64,7 +64,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         try {
             gen.createMap(g);
         } catch (FreeColException e) {
-            fail();
+            fail(e.getMessage());
         }
 
         // Check that the map is created at all
@@ -88,7 +88,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         try {
             gen.createMap(g);
         } catch (FreeColException e) {
-            fail();
+            fail(e.getMessage());
         }
 
         // Check that the map is created at all
@@ -128,7 +128,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         try {
             gen.createMap(g);
         } catch (FreeColException e) {
-            fail();
+            fail(e.getMessage());
         }
 
         // Check that the map is created at all
@@ -187,7 +187,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         try {
             gen.createMap(g);
         } catch (FreeColException e) {
-            fail();
+            fail(e.getMessage());
         }
 
         // Check that the map is created at all
@@ -226,7 +226,8 @@ public class MapGeneratorTest extends FreeColTestCase {
                     gen.createMap(g);
                 } catch (FreeColException e) {
                     e.printStackTrace();
-                    fail("Failed to import file " + importFile.getName());
+                    fail("Failed to import file " + importFile.getName()
+                        + ": " + e.getMessage());
                 }
             }
         }
@@ -241,7 +242,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         try {
             gen.createMap(game);
         } catch (FreeColException e) {
-            fail();
+            fail(e.getMessage());
         }
 
         Map map = game.getMap();
