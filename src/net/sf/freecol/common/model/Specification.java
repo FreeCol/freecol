@@ -1265,6 +1265,19 @@ public final class Specification {
         return fastestNavalUnitType;
     }
 
+    /**
+     * Gets the REF unit types.
+     *
+     * @param naval If true, choose naval units, if not, land units.
+     */
+    public List<UnitType> getREFUnitTypes(boolean naval) {
+        List<UnitType> types = new ArrayList<UnitType>();
+        for (UnitType ut : getUnitTypesWithAbility("model.ability.refUnit")) {
+            if (naval == ut.isNaval()) types.add(ut);
+        }
+        return types;
+    }
+
     // -- Founding Fathers --
 
     public List<FoundingFather> getFoundingFathers() {
@@ -1661,6 +1674,12 @@ public final class Specification {
             }
         }
         // end compatibility code
+
+        if (getREFUnitTypes(true).isEmpty()) {
+            logger.warning("No naval REF units, REF will not function.");
+        } else if (getREFUnitTypes(false).isEmpty()) {
+            logger.warning("No land REF units, REF will not function.");
+        }
 
         initialized = true;
     }

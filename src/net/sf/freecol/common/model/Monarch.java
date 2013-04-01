@@ -102,14 +102,19 @@ public final class Monarch extends FreeColGameObject implements Named {
      */
     private Force mercenaryForce = new Force();
 
+    /** The naval unit types suitable for the REF. */
+    private List<UnitType> navalREFUnitTypes = null;
+    /** The land unit types suitable for the REF. */
+    private List<UnitType> landREFUnitTypes = null;
+
 
     /**
      * Constructor.
      *
      * @param game The <code>Game</code> this <code>Monarch</code>
-     *      should be created in.
+     *     should be created in.
      * @param player The <code>Player</code> to create the
-     *      <code>Monarch</code> for.
+     *     <code>Monarch</code> for.
      * @param name The name of the <code>Monarch</code>.
      */
     public Monarch(Game game, Player player, String name) {
@@ -122,9 +127,12 @@ public final class Monarch extends FreeColGameObject implements Named {
         this.player = player;
         this.name = name;
 
-        Specification spec = getSpecification();
-        expeditionaryForce = new Force((UnitListOption) spec.getOption("model.option.refSize"), "model.ability.refUnit");
-        interventionForce = new Force((UnitListOption) spec.getOption("model.option.interventionForce"), null);
+        final Specification spec = getSpecification();
+        UnitListOption op;
+        op = (UnitListOption)spec.getOption("model.option.refSize");
+        expeditionaryForce = new Force(op, "model.ability.refUnit");
+        op = (UnitListOption)spec.getOption("model.option.interventionForce");
+        interventionForce = new Force(op, null);
     }
 
     /**
@@ -237,6 +245,25 @@ public final class Monarch extends FreeColGameObject implements Named {
     }
 
     /**
+     * Collect the REF unit types.
+     *
+     * @param naval If true, choose naval unit types, if not, land unit types.
+     */
+    public List<UnitType> collectREFUnitTypes(boolean naval) {
+        if (naval) {
+            if (navalREFUnitTypes == null) {
+                navalREFUnitTypes = getSpecification().getREFUnitTypes(true);
+            }
+            return navalREFUnitTypes;
+        } else {
+            if (landREFUnitTypes == null) {
+                landREFUnitTypes = getSpecification().getREFUnitTypes(false);
+            }
+            return landREFUnitTypes;
+        }
+    }
+
+    /**
      * Collects a list of potential enemies for this player.
      */
     public List<Player> collectPotentialEnemies() {
@@ -292,7 +319,8 @@ public final class Monarch extends FreeColGameObject implements Named {
         case WAIVE_TAX:
             return true;
         case ADD_TO_REF:
-            return true;
+            return !(collectREFUnitTypes(true).isEmpty()
+                || collectREFUnitTypes(false).isEmpty());
         case DECLARE_PEACE:
             return !collectPotentialFriends().isEmpty();
         case DECLARE_WAR:
@@ -391,33 +419,35 @@ public final class Monarch extends FreeColGameObject implements Named {
     }
 
     /**
-     * Returns units to be added to the Royal Expeditionary Force.
+     * Gets units to be added to the Royal Expeditionary Force.
      *
      * @param random The <code>Random</code> number source to use.
      * @return An addition to the Royal Expeditionary Force.
      */
     public AbstractUnit chooseForREF(Random random) {
-        AbstractUnit result = null;
+        final Specification spec = getSpecification();
         // Preserve some extra naval capacity so that not all the REF
         // navy is completely loaded
         // TODO: magic number 2.5 * Manowar-capacity = 15
-        boolean needNaval = (expeditionaryForce.getCapacity()
-                             < expeditionaryForce.getSpaceRequired() + 15);
+        boolean needNaval = expeditionaryForce.getCapacity()
+            < expeditionaryForce.getSpaceRequired() + 15;
+        List<UnitType> types = collectREFUnitTypes(needNaval);
+        if (types.isEmpty()) return null;
+        UnitType unitType = Utils.getRandomMember(logger, "Choose REF unit",
+                                                  types, random);
+        Role role = (needNaval
+            || !unitType.hasAbility("model.ability.canBeEquipped"))
+            ? Role.DEFAULT
+            : (Utils.randomInt(logger, "Choose land role", random, 2) == 0)
+            ? Role.SOLDIER
+            : Role.DRAGOON;
+        int number = (needNaval) ? 1
+            : Utils.randomInt(logger, "Choose land#", random, 3) + 1;
+        AbstractUnit result = new AbstractUnit(unitType, role, number);
         logger.info("Add to REF: capacity=" + expeditionaryForce.getCapacity()
             + " spaceRequired=" + expeditionaryForce.getSpaceRequired()
-            + " => " + ((needNaval) ? "naval" : "land") + " unit");
-        if (needNaval) {
-            result = Utils.getRandomMember(logger, "Choose naval",
-                expeditionaryForce.getNavalUnits(), random);
-            result = result.clone();
-            result.setNumber(1);
-        } else {
-            result = Utils.getRandomMember(logger, "Choose land",
-                expeditionaryForce.getLandUnits(), random);
-            result = result.clone();
-            result.setNumber(Utils.randomInt(logger, "Choose land#",
-                    random, 3) + 1);
-        }
+            + " => " + ((needNaval) ? "naval" : "land") + " unit"
+            + " => " + result);
         return result;
     }
 
@@ -453,7 +483,6 @@ public final class Monarch extends FreeColGameObject implements Named {
             }
         }
     }
-
 
     /**
      * Gets a additions to the colonial forces.
@@ -527,7 +556,7 @@ public final class Monarch extends FreeColGameObject implements Named {
             break;
         case 0:
             support.add(new AbstractUnit(Utils.getRandomMember(logger,
-                        "Choose soldier",mountedTypes, random),
+                        "Choose soldier", mountedTypes, random),
                         Role.SOLDIER, 1));
             break;
         default:
@@ -751,10 +780,12 @@ public final class Monarch extends FreeColGameObject implements Named {
     public class Force {
 
         /** The number of land units in the REF. */
-        private final List<AbstractUnit> landUnits = new ArrayList<AbstractUnit>();
+        private final List<AbstractUnit> landUnits
+            = new ArrayList<AbstractUnit>();
 
         /** The number of naval units in the REF. */
-        private final List<AbstractUnit> navalUnits = new ArrayList<AbstractUnit>();
+        private final List<AbstractUnit> navalUnits
+            = new ArrayList<AbstractUnit>();
 
         // Internal variables that do not need serialization.
         /** The space required to transport all land units. */
@@ -763,10 +794,19 @@ public final class Monarch extends FreeColGameObject implements Named {
         /** The current naval transport capacity. */
         private int capacity;
 
-        public Force() {
-            // empty constructor
-        }
 
+        /**
+         * Empty constructor.
+         */
+        public Force() {}
+
+        /**
+         * Create a new Force.
+         *
+         * @param option The <code>Option</code> defining the force.
+         * @param ability An optional ability name required of the units
+         *     in the force.
+         */
         public Force(UnitListOption option, String ability) {
             List<AbstractUnit> units = option.getOptionValues();
             for (AbstractUnit unit : units) {
@@ -778,8 +818,8 @@ public final class Monarch extends FreeColGameObject implements Named {
                         landUnits.add(unit);
                     }
                 } else {
-                    logger.warning("Found unit lacking required ability \"" + ability + "\": "
-                                   + unit.toString());
+                    logger.warning("Found unit lacking required ability \""
+                        + ability + "\": " + unit.toString());
                 }
             }
             updateSpaceAndCapacity();
@@ -905,7 +945,6 @@ public final class Monarch extends FreeColGameObject implements Named {
         }
 
         public void readFromXML(XMLStreamReader in) throws XMLStreamException {
-
             navalUnits.clear();
             landUnits.clear();
             while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
@@ -923,8 +962,5 @@ public final class Monarch extends FreeColGameObject implements Named {
                 }
             }
         }
-
     }
-
-
 }
