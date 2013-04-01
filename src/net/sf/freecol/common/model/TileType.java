@@ -88,6 +88,8 @@ public final class TileType extends FreeColGameObjectType {
      */
     private List<ProductionType> productionTypes = null;
 
+    private static final String TILE_PRODUCTION = "model.option.tileProduction";
+
     // TODO: make this hack go away!
     private String productionLevel = null;
 
@@ -192,16 +194,6 @@ public final class TileType extends FreeColGameObjectType {
     }
 
     /**
-     * Gets the production types applicable to this tile type.
-     *
-     * @return A list of <code>ProductionType</code>s.
-     */
-    public List<ProductionType> getProductionTypes() {
-        if (productionTypes == null) return Collections.emptyList();
-        return productionTypes;
-    }
-
-    /**
      * Gets the resources that can be placed on this tile type.
      *
      * @return A weighted list of resource types.
@@ -281,6 +273,32 @@ public final class TileType extends FreeColGameObjectType {
      */
     public Set<Modifier> getProductionBonus(GoodsType goodsType) {
         return getModifierSet(goodsType.getId());
+    }
+
+    /**
+     * Gets the production types applicable to this tile type.
+     *
+     * @return A list of <code>ProductionType</code>s.
+     */
+    public List<ProductionType> getProductionTypes() {
+        if (productionTypes == null) return Collections.emptyList();
+        return productionTypes;
+    }
+
+    public String getTileProduction() {
+        return getSpecification().getString(TILE_PRODUCTION);
+    }
+
+
+    /**
+     * Gets the production types available at the current difficulty
+     * level.
+     *
+     * @param center Whether the tile is a colony center tile.
+     * @return A list of <code>ProductionType</code>s.
+     */
+    public List<ProductionType> getProductionTypes(boolean center) {
+        return getProductionTypes(center, getTileProduction());
     }
 
     /**

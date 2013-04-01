@@ -1536,7 +1536,6 @@ public final class InGameController implements NetworkConstants {
 
         java.util.Map<GoodsType, Integer> goodsMap
             = new HashMap<GoodsType, Integer>();
-        String difficulty = getSpecification().getString("model.option.tileProduction");
         for (GoodsType goodsType : getSpecification().getGoodsTypeList()) {
             if (goodsType.isBuildingMaterial()) {
                 while (goodsType.isRefined()) {
@@ -1546,7 +1545,7 @@ public final class InGameController implements NetworkConstants {
                 continue;
             }
             for (ProductionType productionType : tile.getType()
-                     .getProductionTypes(false, difficulty)) {
+                     .getProductionTypes(false)) {
                 int potential = (productionType.getOutput(goodsType) == null)
                     ? 0 : tile.potential(goodsType, null);
                 Integer oldPotential = goodsMap.get(goodsType);

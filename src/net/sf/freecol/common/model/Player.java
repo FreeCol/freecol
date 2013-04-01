@@ -2681,11 +2681,9 @@ public class Player extends FreeColGameObject implements Nameable {
             }
 
             // add good that could be produced by a colony on this tile
-            String difficulty = getSpecification()
-                .getString("model.option.tileProduction");
             int bestValue = 0;
             for (ProductionType productionType : t.getType()
-                     .getProductionTypes(true, difficulty)) {
+                     .getProductionTypes(true)) {
                 if (productionType.getOutputs() != null) {
                     int newValue = 0;
                     for (AbstractGoods output: productionType.getOutputs()) {
@@ -2763,10 +2761,8 @@ public class Player extends FreeColGameObject implements Nameable {
 
         //initialize tile value
         int value = 0;
-        String difficulty = getSpecification()
-            .getString("model.option.tileProduction");
         for (ProductionType productionType : tile.getType()
-                 .getProductionTypes(true, difficulty)) {
+                 .getProductionTypes(true)) {
             if (productionType.getOutputs() != null) {
                 for (AbstractGoods output : productionType.getOutputs()) {
                     if (output.getType().isFoodType()) {

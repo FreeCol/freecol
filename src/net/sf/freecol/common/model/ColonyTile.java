@@ -196,10 +196,8 @@ public class ColonyTile extends WorkLocation implements Ownable {
      * @return available production types
      */
     public List<ProductionType> getProductionTypes() {
-        String difficulty = getSpecification()
-            .getString("model.option.tileProduction");
         return workTile.getType()
-            .getProductionTypes(isColonyCenterTile(), difficulty);
+            .getProductionTypes(isColonyCenterTile());
     }
 
     /**
