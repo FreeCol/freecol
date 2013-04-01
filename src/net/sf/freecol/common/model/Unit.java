@@ -1053,25 +1053,13 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Gets the <code>Building</code> this unit is working in.
-     * TODO: migrate usage of this to getWorkBuilding(), then delete this and rename the method below
-     */
-    public Building getWorkLocation() {
-        if (getLocation() instanceof Building) {
-            return ((Building) getLocation());
-        }
-        return null;
-    }
-
-    /**
      * Gets the <code>Location</code> this unit is working in.
+     *
+     * @return a <code>WorkLocation</code> value
      */
-    public Location getWorkLocation2() {
-        if (getLocation() instanceof Building) {
-            return getLocation();
-        }
-        else if (getLocation() instanceof ColonyTile) {
-            return getLocation();
+    public WorkLocation getWorkLocation() {
+        if (getLocation() instanceof WorkLocation) {
+            return (WorkLocation) getLocation();
         }
         return null;
     }
@@ -2212,6 +2200,11 @@ public class Unit extends GoodsLocation
         } else if (locatable instanceof Unit) {
             Unit unit = (Unit)locatable;
             if (super.add(locatable)) {
+                // TODO: there seems to be an inconsistency between
+                // units moving from an adjacent tile onto a ship and
+                // units boarding a ship in-colony.  The former does not
+                // appear to come through here (which it probably should)
+                // as the ship's moves do not get zeroed.
                 spendAllMoves();
                 ((Unit)locatable).setState(UnitState.SENTRY);
                 return true;

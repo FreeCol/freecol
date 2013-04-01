@@ -268,7 +268,6 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 if (ti.isComplete()) {
                     setState(UnitState.ACTIVE);
                     setWorkLeft(-1);
-                    if (ti.isRoad()) ti.updateRoadConnections(true);
                 } else {
                     // Otherwise do work
                     int amount = (getType().hasAbility(Ability.EXPERT_PIONEER))
@@ -277,6 +276,13 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     if ((turns -= amount) < 0) turns = 0;
                     ti.setTurnsToComplete(turns);
                     setWorkLeft(turns);
+                    if (ti.isRoad() && ti.isComplete()) {
+                        ti.updateRoadConnections(true);
+                        for (Tile t : loc.getTile().getSurroundingTiles(1)) {
+                            if (t.hasRoad()) cs.add(See.perhaps(), t);
+                        }
+                        locDirty = true;
+                    }
                 }
                 break;
             default:

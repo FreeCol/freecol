@@ -47,14 +47,16 @@
 
   <xs:simpleType name="TemplateType">
     <xs:restriction base="xs:NMTOKEN">
-      <xs:enumeration value="KEY" />
       <xs:enumeration value="key" />
-      <xs:enumeration value="NAME" />
       <xs:enumeration value="name" />
-      <xs:enumeration value="LABEL" />
       <xs:enumeration value="label" />
-      <xs:enumeration value="TEMPLATE" />
       <xs:enumeration value="template" />
+      <!-- @compat 0.10.7 -->
+      <xs:enumeration value="KEY" />
+      <xs:enumeration value="NAME" />
+      <xs:enumeration value="LABEL" />
+      <xs:enumeration value="TEMPLATE" />
+      <!-- end @compat -->
     </xs:restriction>
   </xs:simpleType>
 

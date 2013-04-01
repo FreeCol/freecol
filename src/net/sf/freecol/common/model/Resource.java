@@ -32,6 +32,7 @@ import javax.xml.stream.XMLStreamWriter;
 public class Resource extends TileItem {
 
     private static Logger logger = Logger.getLogger(Resource.class.getName());
+    private static final int UNLIMITED = -1;
 
     private ResourceType type;
     private int quantity;
@@ -83,10 +84,10 @@ public class Resource extends TileItem {
      * </ol>
      */
     public String toString() {
-        if (quantity > -1) {
-            return Integer.toString(quantity) + " " + getType().getId();
-        } else {
+        if (quantity == UNLIMITED) {
             return getType().getId();
+        } else {
+            return Integer.toString(quantity) + " " + getType().getId();
         }
     }
 
@@ -124,23 +125,6 @@ public class Resource extends TileItem {
     }
 
     /**
-     * Gets the production (checking available stock) for next turn applying
-     * the bonuses from this resource.
-     *
-     * @param goodsType The <code>GoodsType</code> to produce.
-     * @param unitType The <code>UnitType</code> that is to work.
-     * @param potential The base potential production.
-     * @return The production with resource bonuses.
-     */
-    public int getBonus(GoodsType goodsType, UnitType unitType, int potential) {
-        Set<Modifier> bonus = type.getModifierSet(goodsType.getId(), unitType);
-        int amount = (int)FeatureContainer.applyModifierSet(potential, null,
-                                                            bonus) - potential;
-        return potential
-            + ((quantity > -1 && amount > quantity) ? quantity : amount);
-    }
-
-    /**
      * Reduces the available quantity by the bonus output of <code>GoodsType</code>.
      * @param goodsType The GoodsType to check
      * @param unitType an <code>UnitType</code> value
@@ -148,8 +132,8 @@ public class Resource extends TileItem {
      * @return an <code>int</code> value
      */
     public int useQuantity(GoodsType goodsType, UnitType unitType, int potential) {
-        // Return -1 here if not limited resource?
-        return useQuantity(getBonus(goodsType, unitType, potential) - potential);
+        // Return UNLIMITED here if not limited resource?
+        return useQuantity(applyBonus(goodsType, unitType, potential) - potential);
     }
 
     /**
@@ -160,7 +144,7 @@ public class Resource extends TileItem {
     public int useQuantity(int usedQuantity) {
         if (quantity >= usedQuantity) {
             quantity -= usedQuantity;
-        } else if (quantity == -1) {
+        } else if (quantity == UNLIMITED) {
             logger.warning("useQuantity called for unlimited resource");
         } else {
             // Shouldn't generally happen.  Do something more drastic here?
@@ -171,6 +155,7 @@ public class Resource extends TileItem {
     }
 
     /* TODO: what was this for? Named resources, such as Lost Crazy Russian Gold Mine?
+       That actually sounds like a neat idea.
     public void setName(String newName) {
         // do nothing
     }
@@ -190,6 +175,30 @@ public class Resource extends TileItem {
      */
     public boolean isTileTypeAllowed(TileType tileType) {
         return tileType.canHaveResourceType(getType());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isNatural() {
+        return true;
+    }
+
+    /**
+     * Gets the production (checking available stock) for next turn applying
+     * the bonuses from this resource.
+     *
+     * @param goodsType The <code>GoodsType</code> to produce.
+     * @param unitType The <code>UnitType</code> that is to work.
+     * @param potential The base potential production.
+     * @return The production with resource bonuses.
+     */
+    public int applyBonus(GoodsType goodsType, UnitType unitType, int potential) {
+        Set<Modifier> bonus = type.getModifierSet(goodsType.getId(), unitType);
+        int amount = (int)FeatureContainer.applyModifierSet(potential, null,
+                                                            bonus) - potential;
+        return potential
+            + ((quantity == UNLIMITED || quantity > amount) ? amount : quantity);
     }
 
 

@@ -184,7 +184,7 @@ public class GenerateDocumentation {
                 System.out.println("Generating localized documentation for language code "
                                    + languageCode);
 
-                Messages.setMessageBundle(LanguageOption.getLocale(languageCode));
+                Messages.setMessageBundle(Messages.getLocale(languageCode));
                 try {
                     TransformerFactory factory = TransformerFactory.newInstance();
                     Source xsl = new StreamSource(new File("doc", "specification.xsl"));

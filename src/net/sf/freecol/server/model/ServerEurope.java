@@ -77,8 +77,9 @@ public class ServerEurope extends Europe implements ServerModelObject {
         List<RandomChoice<UnitType>> recruits
             = player.generateRecruitablesList();
         if (spec.hasOption("model.option.immigrants")) {
-            List<AbstractUnit> immigrants =
-                ((UnitListOption) spec.getOption("model.option.immigrants")).getOptionValues();
+            UnitListOption option
+                = (UnitListOption)spec.getOption("model.option.immigrants");
+            List<AbstractUnit> immigrants = option.getOptionValues();
             for (int index = 0; index < Europe.RECRUIT_COUNT; index++) {
                 UnitType immigrant = (index < immigrants.size())
                     ? immigrants.get(index).getUnitType(getSpecification())

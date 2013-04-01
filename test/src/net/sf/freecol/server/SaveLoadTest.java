@@ -53,7 +53,7 @@ public class SaveLoadTest extends FreeColTestCase {
             server.loadGame(new FreeColSavegameFile(file));
         } catch (Exception e) {
             e.printStackTrace();
-            fail();
+            fail(e.getMessage());
         }
         assertNotNull(server.getGame());
         assertNotNull(server.getGame().getMap());

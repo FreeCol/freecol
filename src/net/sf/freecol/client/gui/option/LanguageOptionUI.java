@@ -38,17 +38,18 @@ public final class LanguageOptionUI extends OptionUI<LanguageOption>  {
     JComboBox box = new JComboBox();
 
     /**
-    * Creates a new <code>LanguageOptionUI</code> for the given <code>LanguageOption</code>.
-    * @param option The <code>LanguageOption</code> to make a user interface for.
-    * @param editable boolean whether user can modify the setting
-    */
+     * Creates a new <code>LanguageOptionUI</code> for the given
+     * <code>LanguageOption</code>.
+     *
+     * @param option The <code>LanguageOption</code> to make a user
+     *     interface for.
+     * @param editable boolean whether user can modify the setting
+     */
     @SuppressWarnings("unchecked") // FIXME in Java7
     public LanguageOptionUI(GUI gui, final LanguageOption option, boolean editable) {
         super(gui, option, editable);
 
-        Language[] languages = option.getOptions();
-
-        box.setModel(new DefaultComboBoxModel(languages));
+        box.setModel(new DefaultComboBoxModel(option.getChoices().toArray(new Language[0])));
         box.setSelectedItem(option.getValue());
 
         initialize();

@@ -33,6 +33,7 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.option.UnitTypeOption.TypeSelector;
 
+
 /**
  * Represents an option where the valid choice is an AbstractUnit.
  */
@@ -42,143 +43,126 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
 
     private static final TypeSelector DEFAULT_SELECTOR = TypeSelector.UNITS;
 
-    private AbstractUnit value;
+    /** The value of this option. */
+    private AbstractUnit value = null;
 
-    /**
-     * An Option to determine the UnitType of the AbstractUnit.
-     */
-    private UnitTypeOption unitType;
+    /** An Option to determine the UnitType of the AbstractUnit. */
+    private UnitTypeOption unitType = null;
 
-    /**
-     * An Option to determine the Role of the AbstractUnit.
-     */
-    private StringOption role;
+    /** An Option to determine the Role of the AbstractUnit. */
+    private StringOption role = null;
 
-    /**
-     * An Option to determine the number of the AbstractUnit.
-     */
-    private IntegerOption number;
+    /** An Option to determine the number of the AbstractUnit. */
+    private IntegerOption number = null;
 
 
     /**
      * Creates a new <code>AbstractUnitOption</code>.
      *
-     * @param id The identifier for this option. This is used when the object
-     *            should be found in an {@link OptionGroup}.
+     * @param id The identifier for this option.  This is used when
+     *     the object should be found in an {@link OptionGroup}.
      */
     public AbstractUnitOption(String id) {
         super(id);
     }
 
-
     /**
      * Creates a new <code>AbstractUnitOption</code>.
      *
-     * @param specification The specification this option belongs
-     *     to. May be null.
+     * @param specification The enclosing <code>Specification</code>.
      */
     public AbstractUnitOption(Specification specification) {
         super(specification);
     }
 
+    /**
+     * Creates a new <code>AbstractUnitOption</code>.
+     *
+     * @param id The identifier for this option.  This is used when
+     *     the object should be found in an {@link OptionGroup}.
+     * @param specification The enclosing <code>Specification</code>.
+     */
     public AbstractUnitOption(String id, Specification specification) {
         super(id, specification);
     }
 
-    public AbstractUnitOption clone() {
-        AbstractUnitOption result = new AbstractUnitOption(getId());
-        result.setValues(this);
-        if (getValue() != null) {
-            result.setValue(getValue().clone());
-        }
-        result.unitType = unitType.clone();
-        result.role = role.clone();
-        result.number = number.clone();
-        return result;
-    }
-
 
     /**
-     * Gets the current value of this <code>AbstractUnitOption</code>.
-     * @return The value.
-     */
-    public AbstractUnit getValue() {
-        return value;
-    }
-
-
-    /**
-     * Sets the value of this <code>AbstractUnitOption</code>.
-     * @param value The value to be set.
-     */
-    public void setValue(AbstractUnit value) {
-        final AbstractUnit oldValue = this.value;
-        this.value = value;
-
-        if (!((value == null && oldValue == null)
-              || value.equals(oldValue)) && isDefined) {
-            firePropertyChange(VALUE_TAG, oldValue, value);
-        }
-        isDefined = true;
-    }
-
-   /**
-     * Get the <code>UnitType</code> value.
+     * Get the unit type.
      *
-     * @return a <code>UnitTypeOption</code> value
+     * @return The <code>UnitTypeOption</code> containing the unit type.
      */
     public final UnitTypeOption getUnitType() {
         return unitType;
     }
 
     /**
-     * Set the <code>UnitType</code> value.
+     * Get the role.
      *
-     * @param newUnitType The new UnitType value.
-     */
-    public final void setUnitType(final UnitTypeOption newUnitType) {
-        this.unitType = newUnitType;
-    }
-
-    /**
-     * Get the <code>Role</code> value.
-     *
-     * @return a <code>StringOption</code> value
+     * @return The <code>StringOption</code> containing the role.
      */
     public final StringOption getRole() {
         return role;
     }
 
     /**
-     * Set the <code>Role</code> value.
+     * Get the number.
      *
-     * @param newRole The new Role value.
-     */
-    public final void setRole(final StringOption newRole) {
-        this.role = newRole;
-    }
-
-    /**
-     * Get the <code>Number</code> value.
-     *
-     * @return an <code>IntegerOption</code> value
+     * @return The <code>IntegerOption</code> containing the number.
      */
     public final IntegerOption getNumber() {
         return number;
     }
 
+
+    // Interface Option
+
     /**
-     * Set the <code>Number</code> value.
-     *
-     * @param newNumber The new Number value.
+     * {@inheritDoc}
      */
-    public final void setNumber(final IntegerOption newNumber) {
-        this.number = newNumber;
+    public AbstractUnitOption clone() {
+        AbstractUnitOption result = new AbstractUnitOption(getId());
+        result.setValues(this);
+        if (value != null) result.setValue(value.clone());
+        if (unitType != null) result.unitType = unitType.clone();
+        if (role != null) result.role = role.clone();
+        if (number != null) result.number = number.clone();
+        return result;
     }
 
     /**
-     * Generate the choices to provide to the UI based on the
-     * generateChoices value.
+     * {@inheritDoc}
+     */
+    public AbstractUnit getValue() {
+        return value;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setValue(AbstractUnit value) {
+        final AbstractUnit oldValue = this.value;
+        this.value = value;
+
+        if (isDefined && (((value == null) != (oldValue == null))
+                || (value != null && !value.equals(oldValue)))) {
+            firePropertyChange(VALUE_TAG, oldValue, value);
+        }
+        isDefined = true;
+    }
+
+
+    // Override AbstractOption
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isNullValueOK() {
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
      */
     public void generateChoices() {
         unitType.generateChoices();
@@ -189,58 +173,82 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
         role.setChoices(roles);
     }
 
-    /**
-     * Returns whether <code>null</code> is an acceptable value for
-     * this Option. This method always returns <code>true</code>.
-     *
-     * @return true
-     */
-    public boolean isNullValueOK() {
-        return true;
-    }
+
+    // Serialization
+
+    private static final String NUMBER_TAG = "number";
+    private static final String ROLE_TAG = "role";
+    private static final String UNIT_TYPE_TAG = "unitType";
+
 
     /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * {@inheritDoc}
      */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        // Start element:
-        out.writeStartElement(getXMLElementTagName());
-        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
-
-        // TODO: we REALLY, REALLY need to clean up serialization!
-        unitType.toXML(out, "unitType");
-        role.toXML(out, "role");
-        number.toXMLImpl(out, "number");
-
-        out.writeEndElement();
+        super.toXML(out, getXMLElementTagName());
     }
 
-    public void readFromXML(XMLStreamReader in) throws XMLStreamException {
-        setId(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
-        number = new IntegerOption(getId() + ".number", getSpecification());
-        unitType = new UnitTypeOption(getId() + ".unitType", getSpecification());
-        role = new StringOption(getId() + ".role", getSpecification());
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            String tag = in.getLocalName();
-            if ("number".equals(tag)) {
-                number.readFromXML(in);
-            } else if ("unitType".equals(tag)) {
-                unitType.readFromXML(in);
-            } else if ("role".equals(tag)) {
-                role.readFromXML(in);
-            }
-        }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
+        super.writeChildren(out);
 
-        if (unitType.getValue() != null && role.getValue() != null && number.getValue() != null) {
-            setValue(new AbstractUnit(unitType.getValue(), Role.valueOf(role.getValue()), number.getValue()));
-        } else {
-            setValue(null);
+        number.toXML(out, NUMBER_TAG);
+
+        role.toXML(out, ROLE_TAG);
+
+        unitType.toXML(out, UNIT_TYPE_TAG);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void readChildren(XMLStreamReader in) throws XMLStreamException {
+        super.readChildren(in);
+
+        AbstractUnit au = null;
+        if (unitType != null && role != null && number != null) {
+            au = new AbstractUnit(unitType.getValue(),
+                                  Role.valueOf(role.getValue()),
+                                  number.getValue());
         }
+        setValue(au);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void readChild(XMLStreamReader in) throws XMLStreamException {
+        final Specification spec = getSpecification();
+        final String tag = in.getLocalName();
+
+        if (NUMBER_TAG.equals(tag)) {
+            number = new IntegerOption(getId() + ".number", spec);
+            number.readFromXML(in);
+
+        } else if (ROLE_TAG.equals(tag)) {
+            role = new StringOption(getId() + ".role", spec);
+            role.readFromXML(in);
+
+        } else if (UNIT_TYPE_TAG.equals(tag)) {
+            unitType = new UnitTypeOption(getId() + ".unitType", spec);
+            unitType.readFromXML(in);
+
+        } else {
+            super.readChild(in);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String toString() {
+        return getId() + " <" + value.toString() + ">";
     }
 
     /**
@@ -250,9 +258,5 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
      */
     public static String getXMLElementTagName() {
         return "unitOption";
-    }
-
-    public String toString() {
-        return getId() + " <" + value.toString() + ">";
     }
 }

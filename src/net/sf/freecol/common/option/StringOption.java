@@ -39,21 +39,18 @@ public class StringOption extends AbstractOption<String> {
     @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(StringOption.class.getName());
 
-    /**
-     * The option value.
-     */
+    /** The value of this option. */
     private String value;
 
-    /**
-     * A list of choices to provide to the UI.
-     */
-    private List<String> choices;
+    /** A list of choices to provide to the UI. */
+    private final List<String> choices = new ArrayList<String>();
+
 
     /**
      * Creates a new <code>StringOption</code>.
      *
-     * @param id The identifier for this option. This is used when the object
-     *            should be found in an {@link OptionGroup}.
+     * @param id The identifier for this option.  This is used when
+     *     the object should be found in an {@link OptionGroup}.
      */
     public StringOption(String id) {
         super(id);
@@ -62,8 +59,7 @@ public class StringOption extends AbstractOption<String> {
     /**
      * Creates a new <code>StringOption</code>.
      *
-     * @param specification The specification this option belongs
-     *     to. May be null.
+     * @param specification The enclosing <code>Specification</code>.
      */
     public StringOption(Specification specification) {
         super(specification);
@@ -72,141 +68,126 @@ public class StringOption extends AbstractOption<String> {
     /**
      * Creates a new <code>StringOption</code>.
      *
-     * @param id The identifier for this option. This is used when the object
-     *     should be found in an {@link OptionGroup}.
-     * @param specification The specification this option belongs
-     *     to. May be null.
+     * @param id The identifier for this option.  This is used when
+     *     the object should be found in an {@link OptionGroup}.
+     * @param specification The enclosing <code>Specification</code>.
      */
     public StringOption(String id, Specification specification) {
         super(id, specification);
     }
 
-    public StringOption clone() {
-        StringOption result = new StringOption(getId());
-        result.setValues(this);
-        result.choices = new ArrayList<String>(choices);
-        return result;
-    }
 
     /**
-     * Gets the current value of this <code>StringOption</code>.
-     * @return The value.
-     */
-    public String getValue() {
-        return value;
-    }
-
-
-    /**
-     * Sets the current value of this <code>StringOption</code>.
-     * @param value The value.
-     */
-    public void setValue(String value) {
-        final String oldValue = this.value;
-        this.value = value;
-
-        if ( value != oldValue && isDefined) {
-            firePropertyChange(VALUE_TAG, oldValue, value);
-        }
-        isDefined = true;
-    }
-
-    /**
-     * Sets the value of this Option from the given string
-     * representation. Both parameters must not be null at the same
-     * time.
+     * Get the list of string choices.
      *
-     * @param valueString the string representation of the value of
-     * this Option
-     * @param defaultValueString the string representation of the
-     * default value of this Option
-     */
-    protected void setValue(String valueString, String defaultValueString) {
-        setValue((valueString != null) ? valueString : defaultValueString);
-    }
-
-    /**
-     * Get the <code>Choices</code> value.
-     *
-     * @return a <code>List<String></code> value
+     * @return The list of choices.
      */
     public final List<String> getChoices() {
         return choices;
     }
 
     /**
-     * Set the <code>Choices</code> value.
+     * Set the choices.
      *
-     * @param newChoices The new Choices value.
+     * @param newChoices The new list of choices.
      */
     public final void setChoices(final List<String> newChoices) {
-        this.choices = newChoices;
+        this.choices.clear();
+        this.choices.addAll(newChoices);
+    }
+
+
+    // Interface Option.
+
+    /**
+     * {@inheritDoc}
+     */
+    public StringOption clone() {
+        StringOption result = new StringOption(getId());
+        result.setValues(this);
+        result.setChoices(this.choices);
+        return result;
     }
 
     /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * {@inheritDoc}
      */
+    public String getValue() {
+        return value;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setValue(String value) {
+        final String oldValue = this.value;
+        this.value = value;
+
+        if (isDefined && value != oldValue) {
+            firePropertyChange(VALUE_TAG, oldValue, value);
+        }
+        isDefined = true;
+    }
+
+
+    // Override AbstractOption
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void setValue(String valueString, String defaultValueString) {
+        setValue((valueString != null) ? valueString : defaultValueString);
+    }
+
+
+    // Serialization
+
+    private static final String CHOICE_TAG = "choice";
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         super.toXML(out, getXMLElementTagName());
     }
 
     /**
-     * Write the attributes of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to
-     *     the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
         out.writeAttribute(VALUE_TAG, value);
     }
 
     /**
-     * Write the children of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to
-     *     the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
         super.writeChildren(out);
 
-        if (choices != null && !choices.isEmpty()) {
-            for (String choice : choices) {
-                out.writeStartElement("choice");
-                out.writeAttribute(VALUE_TAG, choice);
-                out.writeEndElement();
-            }
-        }
-    }
-
-    public void readFromXML(XMLStreamReader in) throws XMLStreamException {
-        readAttributes(in);
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            readChild(in);
-        }
-        if (choices.isEmpty()) {
-            choices.add(value);
+        for (String choice : choices) {
+            out.writeStartElement(CHOICE_TAG);
+            
+            out.writeAttribute(VALUE_TAG, choice);
+                
+            out.writeEndElement();
         }
     }
 
     /**
      * {@inheritDoc}
      */
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
-        choices = new ArrayList<String>();
+    @Override
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        choices.clear(); // Clear containers
+
+        super.readChildren(in);
     }
 
     /**
@@ -214,10 +195,29 @@ public class StringOption extends AbstractOption<String> {
      */
     @Override
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        if ("choice".equals(in.getLocalName())) {
-            choices.add(in.getAttributeValue(null, VALUE_TAG));
+        final String tag = in.getLocalName();
+
+        if (CHOICE_TAG.equals(tag)) {
+            choices.add(getAttribute(in, VALUE_TAG, (String)null));
             in.nextTag();
+
+        } else {
+            super.readChild(in);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        String result = "";
+        if (choices != null) {
+            for (String choice : choices) result += ", " + choice;
+            if (result.length() > 0) result = result.substring(2);
+        }
+        return "[" + getXMLElementTagName() + " value=" + value
+            + ", choices=[" + result + "]]";
     }
 
     /**
@@ -227,19 +227,5 @@ public class StringOption extends AbstractOption<String> {
      */
     public static String getXMLElementTagName() {
         return "stringOption";
-    }
-
-    public String toString() {
-        String result = "";
-        if (choices != null) {
-            for (String choice : choices) {
-                result += ", " + choice;
-            }
-            if (result.length() > 0) {
-                result = result.substring(2);
-            }
-        }
-        return getXMLElementTagName() + " [value=" + value
-            + ", choices=[" + result + "]]";
     }
 }

@@ -20,11 +20,9 @@
 
 package net.sf.freecol.common.option;
 
-
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
-
 
 
 /**
@@ -35,39 +33,36 @@ import javax.xml.stream.XMLStreamWriter;
 public interface Option<T> extends Cloneable {
 
     /**
-    * Returns a textual representation of this object.
-    * @return The name of this <code>Option</code>.
-    */
-    public String toString() ;
-
+     * {@inheritDoc}
+     */
+    public Option<T> clone() throws CloneNotSupportedException;
 
     /**
-    * Returns the id of this <code>Option</code>.
-    * @return The unique identifier as provided in the constructor.
-    */
+     * Gets the id of this option.
+     *
+     * @return The unique identifier as provided in the constructor.
+     */
     public String getId();
 
     /**
-     * Returns the value of this Option.
+     * Gets the value of this option.
      *
-     * @return the value of this Option
+     * @return The value of this <code>Option</code>.
      */
     public T getValue();
 
     /**
-     * Sets the value of this Option.
+     * Sets the value of this option.
      *
-     * @param value the value of this Option
+     * @param value The new value of this <code>Option</code>.
      */
     public void setValue(T value);
 
-    public Option<T> clone() throws CloneNotSupportedException;
-
     /**
      * Initializes this object from an XML-representation of this object.
+     *
      * @param in The input stream with the XML.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * @throws XMLStreamException if there are any problems reading the stream.
      */
     public void readFromXML(XMLStreamReader in) throws XMLStreamException;
 
@@ -75,8 +70,14 @@ public interface Option<T> extends Cloneable {
      * Makes an XML-representation of this object.
      *
      * @param out The output stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * @throws XMLStreamException if there are any problems writing the stream.
      */
     public void toXML(XMLStreamWriter out) throws XMLStreamException;
+
+    /**
+     * Gets a textual representation of this object.
+     *
+     * @return The name of this <code>Option</code>.
+     */
+    public String toString();
 }

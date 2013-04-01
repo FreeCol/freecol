@@ -201,6 +201,8 @@ public final class Specification {
 
     private String difficultyLevel;
 
+    private String version;
+
 
 
     /**
@@ -587,26 +589,41 @@ public final class Specification {
         }
     }
 
+    /**
+     * Options are special as they live in the allOptionGroups
+     * collection, which has its own particular semantics.  So they
+     * need their own reader.
+     */
     private class OptionReader implements ChildReader {
+
+        private static final String RECURSIVE_TAG = "recursive";
 
         public void readChildren(XMLStreamReader xsr) throws XMLStreamException {
             while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                String optionType = xsr.getLocalName();
-                String recursiveString = xsr.getAttributeValue(null, "recursive");
-                boolean recursive = !"false".equals(recursiveString);
-                if (OptionGroup.getXMLElementTagName().equals(optionType)) {
-                    String id = xsr.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG);
-                    OptionGroup group = allOptionGroups.get(id);
-                    if (group == null) {
-                        group = new OptionGroup(id, Specification.this);
-                        allOptionGroups.put(id, group);
-                    }
-                    group.readFromXML(xsr);
-                    Specification.this.addOptionGroup(group, recursive);
-                } else {
-                    logger.finest("Parsing of " + optionType + " is not implemented yet");
-                    xsr.nextTag();
+                readChild(xsr);
+            }
+        }
+
+        private void readChild(XMLStreamReader xsr) throws XMLStreamException {
+            final String tag = xsr.getLocalName();
+
+            String str = xsr.getAttributeValue(null, RECURSIVE_TAG);
+            boolean recursive = str == null || Boolean.parseBoolean(str);
+
+            if (OptionGroup.getXMLElementTagName().equals(tag)) {
+                String id = xsr.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG);
+                OptionGroup group = allOptionGroups.get(id);
+                if (group == null) {
+                    group = new OptionGroup(id, Specification.this);
+                    allOptionGroups.put(id, group);
                 }
+                group.readFromXML(xsr);
+                Specification.this.addOptionGroup(group, recursive);
+
+            } else {
+                logger.warning(OptionGroup.getXMLElementTagName()
+                    + " expected in OptionReader, not: " + tag);
+                xsr.nextTag();
             }
         }
     }
@@ -621,6 +638,15 @@ public final class Specification {
      */
     public String getId() {
         return id;
+    }
+
+    /**
+     * Get the <code>Version</code> value.
+     *
+     * @return a <code>String</code> value
+     */
+    public String getVersion() {
+        return version;
     }
 
     /**
@@ -1438,6 +1464,9 @@ public final class Specification {
         out.writeAttribute(FreeColObject.ID_ATTRIBUTE_TAG, getId());
         if (difficultyLevel != null) {
             out.writeAttribute("difficultyLevel", difficultyLevel);
+        }
+        if (version != null) {
+            out.writeAttribute("version", version);
         }
 
         // copy the order of section in specification.xml

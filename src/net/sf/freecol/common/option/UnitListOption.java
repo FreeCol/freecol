@@ -25,18 +25,18 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Specification;
 
+
 /**
  * Represents an option where the valid choice is a list of
  * AbstractUnits, e.g. the units of the REF.
- *
  */
 public class UnitListOption extends ListOption<AbstractUnit> {
 
     /**
      * Creates a new <code>UnitListOption</code>.
      *
-     * @param id The identifier for this option. This is used when the object
-     *            should be found in an {@link OptionGroup}.
+     * @param id The identifier for this option.  This is used when
+     *     the object should be found in an {@link OptionGroup}.
      */
     public UnitListOption(String id) {
         super(id);
@@ -45,18 +45,24 @@ public class UnitListOption extends ListOption<AbstractUnit> {
     /**
      * Creates a new <code>UnitListOption</code>.
      *
-     * @param specification The specification this option belongs
-     *     to. May be null.
+     * @param specification The enclosing <code>Specification</code>.
      */
     public UnitListOption(Specification specification) {
         super(specification);
     }
 
+
+    // Serialization
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXMLImpl(out, getXMLElementTagName());
+        super.toXML(out, getXMLElementTagName());
     }
 
-   /**
+    /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "unitListOption".

@@ -196,7 +196,11 @@
           </xs:complexType>
         </xs:element>
       </xs:choice>
-      <xs:attribute name="nextID" type="xs:int" />
+
+      <xs:attribute name="nextId" type="xs:int" use="required" />
+      <!-- @compat 0.10.7 -->
+      <xs:attribute name="nextID" type="xs:int" use="optional" />
+      <!-- end @compat -->
     </xs:complexType>
 
   </xs:element>

@@ -51,6 +51,7 @@
      0.73: generalize preserveAttributes to preserve
      0.74: add convertThreshold to settlement
      0.75: add generalized production element
+     0.76: change attribute name from "colonyCenterTile" to "unattended"
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 
@@ -209,7 +210,7 @@
         <xs:element name="input" type="AbstractGoodsType"/>
         <xs:element name="output" type="AbstractGoodsType"/>
       </xs:choice>
-      <xs:attribute name="colonyCenterTile" type="xs:boolean"/>
+      <xs:attribute name="unattended" type="xs:boolean"/>
       <xs:attribute name="productionLevel" type="xs:string"/>
     </xs:complexType>
   </xs:element>
@@ -783,12 +784,20 @@
       <xs:attribute name="generate">
         <xs:simpleType>
           <xs:restriction base="xs:token">
+            <xs:enumeration value="units" />
+            <xs:enumeration value="immigrants" />
+            <xs:enumeration value="land_units" />
+            <xs:enumeration value="naval_units" />
+            <xs:enumeration value="buildings" />
+            <xs:enumeration value="founding_fathers" />
+            <!-- @compat 0.10.7 -->
             <xs:enumeration value="UNITS" />
             <xs:enumeration value="IMMIGRANTS" />
             <xs:enumeration value="LAND_UNITS" />
             <xs:enumeration value="NAVAL_UNITS" />
             <xs:enumeration value="BUILDINGS" />
             <xs:enumeration value="FOUNDING_FATHERS" />
+            <!-- end @compat -->
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
@@ -919,12 +928,20 @@
       <xs:attribute name="generate">
         <xs:simpleType>
           <xs:restriction base="xs:token">
+            <xs:enumeration value="units" />
+            <xs:enumeration value="immigrants" />
+            <xs:enumeration value="land_units" />
+            <xs:enumeration value="naval_units" />
+            <xs:enumeration value="buildings" />
+            <xs:enumeration value="founding_fathers" />
+            <!-- @compat 0.10.7 -->
             <xs:enumeration value="UNITS" />
             <xs:enumeration value="IMMIGRANTS" />
             <xs:enumeration value="LAND_UNITS" />
             <xs:enumeration value="NAVAL_UNITS" />
             <xs:enumeration value="BUILDINGS" />
             <xs:enumeration value="FOUNDING_FATHERS" />
+            <!-- end @compat -->
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>

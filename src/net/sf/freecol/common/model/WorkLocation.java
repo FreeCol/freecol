@@ -148,19 +148,26 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
      * @return  whether this WorkLocation produces the given GoodsType
      */
     public boolean produces(GoodsType goodsType) {
-        return getProductionOf(goodsType) != null;
+        return getBaseProduction(goodsType) > 0;
     }
 
 
-    public AbstractGoods getProductionOf(GoodsType goodsType) {
+    /**
+     * Returns the base production of the given goods type without
+     * applying any modifiers.
+     *
+     * @param goodsType a <code>GoodsType</code> value
+     * @return an <code>int</code> value
+     */
+    public int getBaseProduction(GoodsType goodsType) {
         if (productionType != null) {
             for (AbstractGoods output : productionType.getOutputs()) {
                 if (output.getType() == goodsType) {
-                    return output;
+                    return output.getAmount();
                 }
             }
         }
-        return null;
+        return 0;
     }
 
     public boolean hasInputs() {

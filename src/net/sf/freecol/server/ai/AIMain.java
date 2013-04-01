@@ -153,70 +153,6 @@ public class AIMain extends FreeColObject
     }
 
     /**
-     * Checks the integrity of this <code>AIMain</code> by checking if
-     * there are any invalid objects.
-     *
-     * Detected problems are logged.
-     *
-     * @return <code>true</code> if the <code>Game</code> has
-     *      been loaded properly.
-     */
-    public boolean checkIntegrity() {
-        boolean ok = true;
-        for (AIObject ao : aiObjects.values()) {
-            if (!ao.checkIntegrity()) {
-                logger.warning("Invalid AIObject: " + ao.getId()
-                    + " (" + ao.getClass() + ")");
-                ok = false;
-            }
-        }
-
-        Iterator<FreeColGameObject> fit
-            = getGame().getFreeColGameObjectIterator();
-        while (fit.hasNext()) {
-            FreeColGameObject f = fit.next();
-            if ((f instanceof Unit
-                 || f instanceof Colony
-                 || (f instanceof Player && !((Player)f).isUnknownEnemy()))
-                && !aiObjects.containsKey(f.getId())) {
-                logger.warning("Missing AIObject for: " + f.getId());
-                ok = false;
-            }
-        }
-        return ok;
-    }
-
-    /**
-     * Fixes some integrity problems of this <code>AIMain</code>.
-     *
-     * @return True if the integrity problems are fixed.
-     */
-    public boolean fixIntegrity() {
-        for (AIObject ao : new ArrayList<AIObject>(aiObjects.values())) {
-            if (!ao.checkIntegrity()) {
-                logger.warning("Dropping invalid AIObject: " + ao.getId()
-                    + " (" + ao.getClass() + ")");
-                ao.fixIntegrity();
-            }
-        }
-
-        Iterator<FreeColGameObject> fit
-            = getGame().getFreeColGameObjectIterator();
-        while (fit.hasNext()) {
-            FreeColGameObject f = fit.next();
-            if ((f instanceof Unit
-                 || f instanceof Colony
-                 || (f instanceof Player && !((Player)f).isUnknownEnemy()))
-                && !aiObjects.containsKey(f.getId())) {
-                logger.warning("Added missing AIObject for: " + f.getId());
-                setFreeColGameObject(f.getId(), f);
-            }
-        }
-
-        return checkIntegrity();
-    }
-
-    /**
      * Searches for new {@link FreeColGameObject
      * FreeColGameObjects}. An AI-object is created for each object.
      *
@@ -419,8 +355,83 @@ public class AIMain extends FreeColObject
         return stats;
     }
 
+    /**
+     * Checks the integrity of this <code>AIMain</code> by checking if
+     * there are any invalid objects.
+     *
+     * Detected problems are logged.
+     *
+     * @return <code>true</code> if the <code>Game</code> has
+     *      been loaded properly.
+     */
+    public boolean checkIntegrity() {
+        boolean ok = true;
+        for (AIObject ao : aiObjects.values()) {
+            if (!ao.checkIntegrity()) {
+                logger.warning("Invalid AIObject: " + ao.getId()
+                    + " (" + ao.getClass() + ")");
+                ok = false;
+            }
+        }
+
+        Iterator<FreeColGameObject> fit
+            = getGame().getFreeColGameObjectIterator();
+        while (fit.hasNext()) {
+            FreeColGameObject f = fit.next();
+            if ((f instanceof Unit
+                 || f instanceof Colony
+                 || (f instanceof Player && !((Player)f).isUnknownEnemy()))
+                && !aiObjects.containsKey(f.getId())) {
+                logger.warning("Missing AIObject for: " + f.getId());
+                ok = false;
+            }
+        }
+        return ok;
+    }
+
+    /**
+     * Fixes some integrity problems of this <code>AIMain</code>.
+     *
+     * @return True if the integrity problems are fixed.
+     */
+    public boolean fixIntegrity() {
+        for (AIObject ao : new ArrayList<AIObject>(aiObjects.values())) {
+            if (!ao.checkIntegrity()) {
+                logger.warning("Dropping invalid AIObject: " + ao.getId()
+                    + " (" + ao.getClass() + ")");
+                ao.fixIntegrity();
+            }
+        }
+
+        Iterator<FreeColGameObject> fit
+            = getGame().getFreeColGameObjectIterator();
+        while (fit.hasNext()) {
+            FreeColGameObject f = fit.next();
+            if ((f instanceof Unit
+                 || f instanceof Colony
+                 || (f instanceof Player && !((Player)f).isUnknownEnemy()))
+                && !aiObjects.containsKey(f.getId())) {
+                logger.warning("Added missing AIObject for: " + f.getId());
+                setFreeColGameObject(f.getId(), f);
+            }
+        }
+
+        return checkIntegrity();
+    }
+
 
     // Serialization
+
+    private static final String NEXT_ID_TAG = "nextId";
+    // @compat 0.10.3
+    private static final String COLONIAL_AI_PLAYER_TAG = "colonialAIPlayer";
+    private static final String GOODS_WISH_TAG = "GoodsWish";
+    private static final String TILE_IMPROVEMENT_PLAN_TAG = "tileimprovementplan";
+    // end @compat
+    // @compat 0.10.7
+    private static final String OLD_NEXT_ID_TAG = "nextID";
+    // end @compat
+
 
     /**
      * {@inheritDoc}
@@ -435,7 +446,9 @@ public class AIMain extends FreeColObject
      */
     @Override
     protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        out.writeAttribute("nextID", Integer.toString(nextId));
+        // Does not have an id, so no need for super.writeAttributes()
+
+        writeAttribute(out, NEXT_ID_TAG, nextId);
     }
 
     /**
@@ -445,6 +458,8 @@ public class AIMain extends FreeColObject
     protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
         super.writeChildren(out);
 
+        // Wrap an integrity check around the output.  We should not need to do
+        // this, but for now, we do.
         // Using a copy of the objects defensively against races.
         for (AIObject aio : new ArrayList<AIObject>(aiObjects.values())) {
             if (!aio.checkIntegrity()) {
@@ -475,12 +490,12 @@ public class AIMain extends FreeColObject
      */
     @Override
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        aiObjects.clear();
-
-        if (!in.getLocalName().equals(getXMLElementTagName())) {
-            logger.warning("Expected element name, got: " + in.getLocalName());
+        nextId = getAttribute(in, NEXT_ID_TAG, -1);
+        // @compat 0.10.7
+        if (nextId < 0) {
+            nextId = getAttribute(in, OLD_NEXT_ID_TAG, 0);
         }
-        nextId = getAttribute(in, "nextID", 0);
+        // end @compat
     }
 
     /**
@@ -488,83 +503,96 @@ public class AIMain extends FreeColObject
      */
     @Override
     protected void readChildren(XMLStreamReader in) throws XMLStreamException {
-        String lastTag = "";
-        Wish wish;
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            final String tagName = in.getLocalName();
-            final String oid = in.getAttributeValue(null, ID_ATTRIBUTE);
-            wish = null;
-            try {
-                if (oid != null && aiObjects.containsKey(oid)) {
-                    getAIObject(oid).readFromXML(in);
-                } else if (tagName.equals(AIUnit.getXMLElementTagName())) {
-                    new AIUnit(this, in);
-                } else if (tagName.equals(AIPlayer.getXMLElementTagName())) {
-                    Player p = getGame().getFreeColGameObject(oid, Player.class);
-                    if (p != null) {
-                        if (p.isIndian()) {
-                            new NativeAIPlayer(this, in);
-                        } else if (p.isREF()) {
-                            new REFAIPlayer(this, in);
-                        } else if (p.isEuropean()) {
-                            new EuropeanAIPlayer(this, in);
-                        } else {
-                            logger.warning("Bogus AIPlayer: " + p);
-                            in.nextTag();
-                        }
-                    }
-                // @compat 0.10.1
-                } else if (tagName.equals("colonialAIPlayer")) {
-                    new EuropeanAIPlayer(this, in);
-                // end compatibility code
-                } else if (tagName.equals(AIColony.getXMLElementTagName())) {
-                    new AIColony(this, in);
-                } else if (tagName.equals(AIGoods.getXMLElementTagName())) {
-                    new AIGoods(this, in);
-                } else if (tagName.equals(WorkerWish.getXMLElementTagName())) {
-                    wish = new WorkerWish(this, in);
-                } else if (tagName.equals(GoodsWish.getXMLElementTagName())
-                    // @compat 0.10.3
-                    || tagName.equals("GoodsWish")
-                    // end compatibility code
-                    ) {
-                    wish = new GoodsWish(this, in);
-                } else if (tagName.equals(TileImprovementPlan.getXMLElementTagName())
-                    // @compat 0.10.3
-                    || tagName.equals("tileimprovementplan")
-                    // end compatibility code
-                    ) {
-                    new TileImprovementPlan(this, in);
-                } else {
-                    throw new IllegalStateException("Unknown AI-object read: "
-                        + tagName + "(" + lastTag + ")");
-                }
-                if (wish != null) {
-                    AIColony ac = wish.getDestinationAIColony();
-                    if (ac != null) ac.addWish(wish);
-                }
-                lastTag = in.getLocalName();
+        // Clear containers.
+        aiObjects.clear();
 
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Exception reading AIObject("
-                    + tagName + ", " + oid + ")", e);
-                while (!in.getLocalName().equals(tagName)
-                    && !in.getLocalName().equals(getXMLElementTagName())) {
-                    in.nextTag();
-                }
-                if (!in.getLocalName().equals(getXMLElementTagName())) {
-                    in.nextTag();
-                }
-            }
-        }
-
-        if (!in.getLocalName().equals(getXMLElementTagName())) {
-            logger.warning("Expected closing element name, got: "
-                + in.getLocalName());
-        }
+        super.readChildren(in);
 
         // TODO: This should not be necessary.  Try dropping it.
         findNewObjects(false);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+        final String tag = in.getLocalName();
+        final String oid = readId(in);
+
+        try {
+            Wish wish = null;
+            if (oid != null && aiObjects.containsKey(oid)) {
+                getAIObject(oid).readFromXML(in);
+
+            // @compat 0.10.1
+            } else if (COLONIAL_AI_PLAYER_TAG.equals(tag)) {
+                new EuropeanAIPlayer(this, in);
+            // end @compat
+
+            } else if (AIColony.getXMLElementTagName().equals(tag)) {
+                new AIColony(this, in);
+
+            } else if (AIGoods.getXMLElementTagName().equals(tag)) {
+                new AIGoods(this, in);
+
+            } else if (AIPlayer.getXMLElementTagName().equals(tag)) {
+                Player p = getGame().getFreeColGameObject(oid, Player.class);
+                if (p != null) {
+                    if (p.isIndian()) {
+                        new NativeAIPlayer(this, in);
+                    } else if (p.isREF()) {
+                        new REFAIPlayer(this, in);
+                    } else if (p.isEuropean()) {
+                        new EuropeanAIPlayer(this, in);
+                    } else {
+                        logger.warning("Bogus AIPlayer: " + p);
+                        in.nextTag();
+                    }
+                }
+
+            } else if (AIUnit.getXMLElementTagName().equals(tag)) {
+                new AIUnit(this, in);
+
+            } else if (GoodsWish.getXMLElementTagName().equals(tag)
+                // @compat 0.10.3
+                || GOODS_WISH_TAG.equals(tag)
+                // end @compat
+                       ) {
+                wish = new GoodsWish(this, in);
+
+            } else if (TileImprovementPlan.getXMLElementTagName().equals(tag)
+                // @compat 0.10.3
+                || TILE_IMPROVEMENT_PLAN_TAG.equals(tag)
+                // end @compat
+                       ) {
+                new TileImprovementPlan(this, in);
+
+            } else if (WorkerWish.getXMLElementTagName().equals(tag)) {
+                wish = new WorkerWish(this, in);
+            
+            } else {
+                super.readChild(in);
+            }
+            
+            if (wish != null) {
+                AIColony ac = wish.getDestinationAIColony();
+                if (ac != null) ac.addWish(wish);
+            }
+
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Exception reading AIObject: "
+                + tag + ", id=" + oid, e);
+            // We are hosed.  Try to at least resynchronize at the end
+            // of aiMain.
+            while (!in.getLocalName().equals(tag)
+                && !in.getLocalName().equals(getXMLElementTagName())) {
+                in.nextTag();
+            }
+            if (!in.getLocalName().equals(getXMLElementTagName())) {
+                in.nextTag();
+            }
+        }
     }
 
     /**

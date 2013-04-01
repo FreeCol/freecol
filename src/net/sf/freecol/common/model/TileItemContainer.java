@@ -34,6 +34,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.PlayerExploredTile;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Layer;
 
 
@@ -317,19 +318,10 @@ public class TileItemContainer extends FreeColGameObject {
      */
     public int getTotalBonusPotential(GoodsType g, UnitType unitType, int tilePotential, boolean onlyNatural) {
         int potential = tilePotential;
-        int improvementBonus = 0;
         for (TileItem item : tileItems) {
-            if (item instanceof TileImprovement) {
-                TileImprovement improvement = (TileImprovement) item;
-                if (improvement.getType().isNatural() || !onlyNatural) {
-                    improvementBonus += improvement.getBonus(g);
-                }
-            } else if (item instanceof Resource) {
-                potential = ((Resource) item).getBonus(g, unitType, potential);
+            if (item.isNatural() || !onlyNatural) {
+                potential = item.applyBonus(g, unitType, potential);
             }
-        }
-        if (potential > 0) {
-            potential += improvementBonus;
         }
         return potential;
     }
@@ -372,8 +364,10 @@ public class TileItemContainer extends FreeColGameObject {
         for (TileItem item : tileItems) {
             if (item instanceof TileImprovement
                 && ((TileImprovement) item).isComplete()) {
-                moveCost = Math.min(moveCost,
-                    ((TileImprovement)item).getMoveCost(targetTile.getDirection(fromTile), moveCost));
+                Direction direction = targetTile.getDirection(fromTile);
+                if (direction == null) return INFINITY;
+                moveCost = Math.min(moveCost, 
+                    ((TileImprovement)item).getMoveCost(direction, moveCost));
             }
         }
         return moveCost;

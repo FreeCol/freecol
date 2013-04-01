@@ -159,6 +159,27 @@ public class LostCityRumour extends TileItem {
         return !tileType.isWater();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isNatural() {
+        return false;
+    }
+
+    /**
+     * Returns the given potential, since lost cities do not provide
+     * any production bonuses. TODO: maybe we should return zero,
+     * since lost cities actually prevent production?
+     *
+     * @param goodsType The <code>GoodsType</code> to produce.
+     * @param unitType The <code>UnitType</code> that is to work.
+     * @param potential The base potential production.
+     * @return The production with resource bonuses.
+     */
+    public int applyBonus(GoodsType goodsType, UnitType unitType, int potential) {
+        return potential;
+    }
+
 
     /**
      * Chooses a type of Lost City Rumour. The type of rumour depends on the

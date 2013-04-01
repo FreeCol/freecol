@@ -80,12 +80,12 @@ public class REFTest extends FreeColTestCase {
                     dragoonsBeforeIndependence += unit.getNumber();
                     break;
                 default:
-                    fail("Unkown REF role: " + unit.getRole().toString());
+                    fail("Unknown REF role: " + unit.getRole().toString());
                     break;
                 }
                 continue;
             }
-            fail("Unkown REF unit: " +  unit.toString());
+            fail("Unknown REF unit: " +  unit.toString());
         }
 
         ServerPlayer refPlayer = igc.createREFPlayer(player1);
@@ -122,12 +122,12 @@ public class REFTest extends FreeColTestCase {
                     dragoonsAfterIndependence++;
                     break;
                 default:
-                    fail("Unkown REF role: " + unit.getRole().toString());
+                    fail("Unknown REF role: " + unit.getRole().toString());
                     break;
                 }
                 continue;
             }
-            fail("Unkown REF unit: " +  unit.toString());
+            fail("Unknown REF unit: " +  unit.toString());
         }
 
         // Verify results

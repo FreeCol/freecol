@@ -200,7 +200,8 @@ public final class BuildingType extends BuildableType
      *
      * @return The consumed <code>GoodsType</code>.
      */
-    public GoodsType getConsumedGoodsType() {
+    // @compat 0.10.6
+    private GoodsType getConsumedGoodsType() {
         if (productionTypes == null || productionTypes.isEmpty()) {
             return null;
         } else {
@@ -212,6 +213,7 @@ public final class BuildingType extends BuildableType
             }
         }
     }
+    // end @compat
 
     /**
      * Gets the type of goods produced by this BuildingType.
@@ -238,7 +240,7 @@ public final class BuildingType extends BuildableType
      * @return A modifier index.
      */
     @Override
-    public final int getModifierIndex(Modifier modifier) {
+    protected final int getModifierIndex(Modifier modifier) {
         GoodsType produces = getProducedGoodsType();
         if (produces != null && produces.getId().equals(modifier.getId())) {
             return Modifier.AUTO_PRODUCTION_INDEX;

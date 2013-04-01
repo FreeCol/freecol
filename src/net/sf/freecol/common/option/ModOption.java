@@ -39,22 +39,19 @@ public class ModOption extends AbstractOption<FreeColModFile> {
     @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(ModOption.class.getName());
 
-    /**
-     * The option value.
-     */
-    private FreeColModFile value;
+    /** A list of mod files to provide to the UI. */
+    private List<FreeColModFile> choices
+        = new ArrayList<FreeColModFile>(Mods.getAllMods());
 
-    /**
-     * A list of choices to provide to the UI.
-     */
-    private List<FreeColModFile> choices =
-        new ArrayList<FreeColModFile>(Mods.getAllMods());
+    /** The value of this option. */
+    private FreeColModFile value = null;
+
 
     /**
      * Creates a new <code>ModOption</code>.
      *
-     * @param id The identifier for this option. This is used when the object
-     *            should be found in an {@link OptionGroup}.
+     * @param id The identifier for this option.  This is used when
+     *     the object should be found in an {@link OptionGroup}.
      */
     public ModOption(String id) {
         super(id);
@@ -63,8 +60,7 @@ public class ModOption extends AbstractOption<FreeColModFile> {
     /**
      * Creates a new <code>ModOption</code>.
      *
-     * @param specification The specification this option belongs
-     *     to. May be null.
+     * @param specification The enclosing <code>Specification</code>.
      */
     public ModOption(Specification specification) {
         super(specification);
@@ -73,59 +69,14 @@ public class ModOption extends AbstractOption<FreeColModFile> {
     /**
      * Creates a new <code>ModOption</code>.
      *
-     * @param id The identifier for this option. This is used when the object
-     *     should be found in an {@link OptionGroup}.
-     * @param specification The specification this option belongs
-     *     to. May be null.
+     * @param id The identifier for this option.  This is used when
+     *     the object should be found in an {@link OptionGroup}.
+     * @param specification The enclosing <code>Specification</code>.
      */
     public ModOption(String id, Specification specification) {
         super(id, specification);
     }
 
-    public ModOption clone() {
-        ModOption result = new ModOption(getId());
-        result.setValues(this);
-        result.choices = new ArrayList<FreeColModFile>(choices);
-        return result;
-    }
-
-    /**
-     * Gets the current value of this <code>ModOption</code>.
-     * @return The value.
-     */
-    public FreeColModFile getValue() {
-        return value;
-    }
-
-
-    /**
-     * Sets the current value of this <code>ModOption</code>.
-     * @param value The value.
-     */
-    public void setValue(FreeColModFile value) {
-        final FreeColModFile oldValue = this.value;
-        this.value = value;
-
-        if ( value != oldValue && isDefined) {
-            firePropertyChange(VALUE_TAG, oldValue, value);
-        }
-        isDefined = true;
-    }
-
-    /**
-     * Sets the value of this Option from the given string
-     * representation. Both parameters must not be null at the same
-     * time.
-     *
-     * @param valueString the string representation of the value of
-     * this Option
-     * @param defaultValueString the string representation of the
-     * default value of this Option
-     */
-    protected void setValue(String valueString, String defaultValueString) {
-        String id = ((valueString != null) ? valueString : defaultValueString);
-        setValue(Mods.getModFile(id));
-    }
 
     /**
      * Get the <code>Choices</code> value.
@@ -136,51 +87,100 @@ public class ModOption extends AbstractOption<FreeColModFile> {
         return choices;
     }
 
+
+    // Interface Option
+
     /**
-     * Set the <code>Choices</code> value.
-     *
-     * @param newChoices The new Choices value.
+     * {@inheritDoc}
      */
-    public final void setChoices(final List<FreeColModFile> newChoices) {
-        this.choices = newChoices;
+    public ModOption clone() {
+        ModOption result = new ModOption(getId());
+        result.setValues(this);
+        result.choices = new ArrayList<FreeColModFile>(choices);
+        return result;
     }
 
     /**
-     * Returns whether <code>null</code> is an acceptable value for
-     * this Option. This method always returns <code>true</code>.
+     * Gets the current value of this <code>ModOption</code>.
      *
-     * @return true
+     * @return The value.
      */
+    public FreeColModFile getValue() {
+        return value;
+    }
+
+    /**
+     * Sets the current value of this option.
+     *
+     * @param value The new value.
+     */
+    public void setValue(FreeColModFile value) {
+        final FreeColModFile oldValue = this.value;
+        this.value = value;
+
+        if (isDefined && value != oldValue) {
+            firePropertyChange(VALUE_TAG, oldValue, value);
+        }
+        isDefined = true;
+    }
+
+
+    // Override AbstractOption
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void setValue(String valueString, String defaultValueString) {
+        String id = (valueString != null) ? valueString : defaultValueString;
+        setValue(Mods.getModFile(id));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean isNullValueOK() {
         return true;
     }
 
+
+    // Serialization
+
     /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * {@inheritDoc}
      */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         super.toXML(out, getXMLElementTagName());
     }
 
     /**
-     * Write the attributes of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to
-     *     the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
+
         if (value != null) {
             out.writeAttribute(VALUE_TAG, value.getId());
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        String result = "";
+        if (choices != null) {
+            for (FreeColModFile choice : choices) {
+                result += ", " + choice.getId();
+            }
+            if (result.length() > 0) result = result.substring(2);
+        }
+        return "[" + getXMLElementTagName() + " value=" + value
+            + " choices=[" + result + "]]";
     }
 
     /**
@@ -190,19 +190,5 @@ public class ModOption extends AbstractOption<FreeColModFile> {
      */
     public static String getXMLElementTagName() {
         return "modOption";
-    }
-
-    public String toString() {
-        String result = "";
-        if (choices != null) {
-            for (FreeColModFile choice : choices) {
-                result += ", " + choice.getId();
-            }
-            if (result.length() > 0) {
-                result = result.substring(2);
-            }
-        }
-        return getXMLElementTagName() + " [value=" + value
-            + ", choices=[" + result + "]]";
     }
 }

@@ -36,56 +36,129 @@ import net.sf.freecol.common.model.Specification;
 
 
 /**
- * Used for grouping objects of {@link Option}s.
+ * Used for grouping {@link Option}s.
  */
 public class OptionGroup extends AbstractOption<OptionGroup> {
 
     private static Logger logger = Logger.getLogger(OptionGroup.class.getName());
 
-    private List<Option> options = new ArrayList<Option>();
+    /** The options in this group. */
+    private final List<Option> options = new ArrayList<Option>();
 
-    private Map<String, Option> optionMap = new HashMap<String, Option>();
+    /**
+     * A map of all option ids to its option.  Unlike the options
+     * array, this contains all child options of options that are
+     * themselves groups.
+     */
+    private final Map<String, Option> optionMap = new HashMap<String, Option>();
 
+    /** Is this option group user editable? */
     private boolean editable = true;
 
 
     /**
      * Creates a new <code>OptionGroup</code>.
-     * @param id The identifier for this option.
+     *
+     * @param id The identifier for this option.  This is used when
+     *     the object should be found in an {@link OptionGroup}.
      */
     public OptionGroup(String id) {
         super(id);
     }
 
+    /**
+     * Creates a new <code>OptionGroup</code>.
+     *
+     * @param specification The enclosing <code>Specification</code>.
+     */
     public OptionGroup(Specification specification) {
         super(specification);
     }
 
+    /**
+     * Creates a new <code>OptionGroup</code>.
+     *
+     * @param id The identifier for this option.  This is used when
+     *     the object should be found in an {@link OptionGroup}.
+     * @param specification The enclosing <code>Specification</code>.
+     */
     public OptionGroup(String id, Specification specification) {
         super(id, specification);
     }
 
-    public OptionGroup clone() throws CloneNotSupportedException {
-        OptionGroup result = new OptionGroup(getId());
-        result.editable = editable;
-        result.setValues(this);
-        result.options = new ArrayList<Option>(options);
-        result.optionMap = new HashMap<String, Option>(optionMap);
-        return result;
-    }
 
+    /**
+     * Is this option group editable?
+     *
+     * @return True if the option group is editable.
+     */
     public boolean isEditable() {
         return editable;
     }
 
+    /**
+     * Set the editable status of this group.
+     *
+     * @param editable The new editable status.
+     */
     public void setEditable(boolean editable) {
         this.editable = editable;
     }
 
     /**
-     * Adds the given <code>Option</code>.
-     * @param option The <code>Option</code> that should be
-     *               added to this <code>OptionGroup</code>.
+     * Gets the i18n-name of this <code>Option</code>.
+     *
+     * @return The name as provided in the constructor.
+     */
+    public String getName() {
+        return Messages.message(getId() + ".name");
+    }
+
+    /**
+     * Gets the i18n short description of this <code>Option</code>.
+     * Should be suitable for use as a tooltip text.
+     *
+     * @return A short description of this <code>Option</code>.
+     */
+    public String getShortDescription() {
+        return Messages.message(getId() + ".shortDescription");
+    }
+
+    /**
+     * Get the options in this group.
+     *
+     * @return The list of <code>Option</code>s.
+     */
+    public List<Option> getOptions() {
+        return options;
+    }
+
+    /**
+     * Get an option in this group (or descendents) by id.
+     *
+     * @param id The id to look for.
+     * @return The option, or null if not found.
+     */
+    public Option getOption(String id) {
+        return optionMap.get(id);
+    }
+
+    /**
+     * Does this option group contain any subgroups?
+     *
+     * @return True if there are any child <code>OptionGroup</code>s present.
+     */
+    public boolean hasOptionGroup() {
+        for (Option o : options) {
+            if (o instanceof OptionGroup) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Adds the given <code>Option</code> to this group.
+     *
+     * @param option The <code>Option</code> to add.
      */
     public void add(Option option) {
         String id = option.getId();
@@ -108,6 +181,12 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
         }
     }
 
+    /**
+     * Helper function to recursively add option group members to the
+     * optionMap.
+     *
+     * @param group The initial <code>OptionGroup</code> to add.
+     */
     private void addOptionGroup(OptionGroup group) {
         for (Option option : group.getOptions()) {
             optionMap.put(option.getId(), option);
@@ -117,32 +196,36 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
         }
     }
 
-
-    public List<Option> getOptions() {
-        return options;
+    /**
+     * Removes all of the <code>Option</code>s from this
+     * <code>OptionGroup</code>.
+     */
+    public void removeAll() {
+        options.clear();
+        optionMap.clear();
     }
 
-    public Option getOption(String id) {
-        return optionMap.get(id);
+    /**
+     * Gets an <code>Iterator</code> for the <code>Option</code>s.
+     *
+     * @return The <code>Iterator</code>.
+     */
+    public Iterator<Option> iterator() {
+        return options.iterator();
     }
 
-    public boolean hasOptionGroup() {
-        for (Option o : options) {
-            if (o instanceof OptionGroup) {
-                return true;
-            }
-        }
-        return false;
-    }
+
+    // Convenience accessors.
 
     /**
      * Gets the value of an option as an option group.
      *
      * @param id The id of the option.
-     * @return The value.
+     * @return The <code>OptionGroup</code> value.
      * @exception IllegalArgumentException If there is no option group
-     *            value associated with the specified option.
-     * @exception NullPointerException if the given <code>Option</code> does not exist.
+     *     value associated with the specified option.
+     * @exception NullPointerException if the given
+     *     <code>Option</code> does not exist.
      */
     public OptionGroup getOptionGroup(String id) {
         try {
@@ -156,10 +239,11 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      * Gets the integer value of an option.
      *
      * @param id The id of the option.
-     * @return The value.
+     * @return The integer value.
      * @exception IllegalArgumentException If there is no integer
-     *            value associated with the specified option.
-     * @exception NullPointerException if the given <code>Option</code> does not exist.
+     *     value associated with the specified option.
+     * @exception NullPointerException if the given
+     *     <code>Option</code> does not exist.
      */
     public int getInteger(String id) {
         try {
@@ -169,15 +253,15 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
         }
     }
 
-
     /**
      * Sets the integer value of an option.
      *
      * @param id The id of the option.
-     * @param value the new value of the option.
+     * @param value The new integer value of the option.
      * @exception IllegalArgumentException If there is no integer
-     *            value associated with the specified option.
-     * @exception NullPointerException if the given <code>Option</code> does not exist.
+     *     value associated with the specified option.
+     * @exception NullPointerException if the given
+     *     <code>Option</code> does not exist.
      */
     public void setInteger(String id, int value) {
         try {
@@ -187,15 +271,15 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
         }
     }
 
-
     /**
      * Gets the boolean value of an option.
      *
      * @param id The id of the option.
-     * @return The value.
+     * @return The boolean value.
      * @exception IllegalArgumentException If there is no boolean
-     *            value associated with the specified option.
-     * @exception NullPointerException if the given <code>Option</code> does not exist.
+     *     value associated with the specified option.
+     * @exception NullPointerException if the given
+     *     <code>Option</code> does not exist.
      */
     public boolean getBoolean(String id) {
         try {
@@ -209,10 +293,11 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      * Sets the boolean value of an option.
      *
      * @param id The id of the option.
-     * @param value the new value of the option.
+     * @param value The new boolean value of the option.
      * @exception IllegalArgumentException If there is no boolean
-     *            value associated with the specified option.
-     * @exception NullPointerException if the given <code>Option</code> does not exist.
+     *     value associated with the specified option.
+     * @exception NullPointerException if the given
+     *     <code>Option</code> does not exist.
      */
     public void setBoolean(String id, boolean value) {
         try {
@@ -225,10 +310,12 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     /**
      * Gets the string value of an option.
      *
-     * @param id String, option ID
-     * @return String option value.
-     * @throws IllegalArgumentException If the specified option is not of String type
-     * @throws NullPointerException if the given <code>Option</code> does not exist.
+     * @param id The id of the option.
+     * @return The string value.
+     * @exception IllegalArgumentException If there is no string value
+     *     associated with the specified option.
+     * @exception NullPointerException if the given
+     *     <code>Option</code> does not exist.
      */
     public String getString(String id) {
         try {
@@ -238,14 +325,15 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
         }
     }
 
-
     /**
      * Sets the string value of an option.
      *
-     * @param id String, option ID
-     * @param value String, the new value of the option
-     * @throws IllegalArgumentException If the specified option is not of String type
-     * @throws NullPointerException if the given <code>Option</code> does not exist.
+     * @param id The id of the option.
+     * @param value The new string value.
+     * @exception IllegalArgumentException If there is no string value
+     *     associated with the specified option.
+     * @exception NullPointerException if the given
+     *     <code>Option</code> does not exist.
      */
     public void setString(String id, String value) {
         try {
@@ -256,137 +344,147 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     }
 
 
-    /**
-     * Removes all of the <code>Option</code>s from this <code>OptionGroup</code>.
-     */
-    public void removeAll() {
-        options.clear();
-        optionMap.clear();
-    }
-
+    // Interface Option
 
     /**
-     * Returns an <code>Iterator</code> for the <code>Option</code>s.
-     * @return The <code>Iterator</code>.
-     */
-    public Iterator<Option> iterator() {
-        return options.iterator();
-    }
-
-    /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
-     */
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        // Start element:
-        out.writeStartElement(getXMLElementTagName());
-        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
-        out.writeAttribute("editable", Boolean.toString(editable));
-        Iterator<Option> oi = options.iterator();
-        while (oi.hasNext()) {
-            (oi.next()).toXML(out);
-        }
-
-        out.writeEndElement();
-    }
-
-    /**
-     * Initialize this object from an XML-representation of this object.
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
+     * {@inheritDoc}
      */
     @Override
-    public void readFromXML(XMLStreamReader in) throws XMLStreamException {
-        final String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-        editable = getAttribute(in, "editable", true);
-        if (id != null) {
-            setId(id);
-        }
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            String optionId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-            Option option = getOption(optionId);
-            if (option == null) {
-                AbstractOption abstractOption = readOption(in);
-                if (abstractOption != null) {
-                    add(abstractOption);
-                    abstractOption.setGroup(this.getId());
-                }
-            } else {
-                option.readFromXML(in);
-            }
-        }
+    public OptionGroup clone() throws CloneNotSupportedException {
+        OptionGroup result = new OptionGroup(this.getId());
+        result.editable = this.editable;
+        result.setValues(this);
+        result.options.addAll(this.options);
+        result.optionMap.putAll(this.optionMap);
+        return result;
     }
 
     /**
-     * Returns the name of this <code>Option</code>.
-     *
-     * @return The name as provided in the constructor.
-     */
-    public String getName() {
-        return Messages.message(getId() + ".name");
-    }
-
-    /**
-     * Gives a short description of this <code>Option</code>. Can for
-     * instance be used as a tooltip text.
-     *
-     * @return A short description of this <code>Option</code>.
-     */
-    public String getShortDescription() {
-        return Messages.message(getId() + ".shortDescription");
-    }
-
-    /**
-     * Returns the OptionGroup itself.
-     *
-     * @return an <code>Object</code> value
+     * {@inheritDoc}
      */
     public OptionGroup getValue() {
         return this;
     }
 
     /**
-     * Copy the options of another OptionGroup.
-     *
-     * @param value an <code>Object</code> value
+     * {@inheritDoc}
      */
     @SuppressWarnings("unchecked")
     public void setValue(OptionGroup value) {
-        for (Option other : value.getOptions()) {
-            Option mine = getOption(other.getId());
-            // could be null if using custom.xml generated from an
-            // older version of the specification, for example
-            if (mine != null) {
-                mine.setValue(other.getValue());
+        if (value != null) {
+            for (Option other : value.getOptions()) {
+                Option mine = getOption(other.getId());
+                // could be null if using custom.xml generated from an
+                // older version of the specification, for example
+                if (mine != null) {
+                    mine.setValue(other.getValue());
+                }
             }
         }
     }
 
     /**
-     * Debug print helper.
-     *
-     * @return Human-readable description of this OptionGroup.
+     * {@inheritDoc}
+     */
+    public void setValue(String valueString, String defaultValueString) {
+        // No op.  Needed to avoid endless warnings from parent implementation.
+    }
+
+
+    // Override AbstractOption
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isNullValueOK() {
+        return true;
+    }
+
+
+    // Serialization
+
+    private static final String EDITABLE_TAG = "editable";
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        super.toXML(out, getXMLElementTagName());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        super.writeAttributes(out);
+
+        writeAttribute(out, EDITABLE_TAG, editable);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
+        super.writeChildren(out);
+
+        for (Option o : options) o.toXML(out);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
+
+        editable = getAttribute(in, EDITABLE_TAG, true);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void readChildren(XMLStreamReader in) throws XMLStreamException {
+        // Do *not* clear containers.
+        // ATM OptionGroups are purely additive/overwriting.
+
+        super.readChildren(in);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void readChild(XMLStreamReader in) throws XMLStreamException {
+        String optionId = getAttribute(in, ID_ATTRIBUTE_TAG, (String)null);
+        Option option = getOption(optionId);
+        if (option == null) {
+            AbstractOption abstractOption = readOption(in);
+            if (abstractOption != null) {
+                add(abstractOption);
+                abstractOption.setGroup(this.getId());
+            }
+        } else {
+            option.readFromXML(in);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     public String toString() {
         StringBuilder g = new StringBuilder();
-        g.append(getName() + "<");
+        g.append("[").append(getId()).append("<");
         for (Option o : getOptions()) {
-            g.append(" ");
-            if (o instanceof OptionGroup) {
-                g.append(((OptionGroup)o).toString());
-            } else if (o instanceof ListOption) {
-                g.append(((ListOption)o).toString());
-            } else {
-                g.append(o.getId()); // TODO: add useful toString() to others
-            }
+            g.append(" ").append(o.toString());
         }
-        g.append(" >\n");
+        g.append(" >]\n");
         return g.toString();
     }
 

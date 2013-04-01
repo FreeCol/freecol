@@ -148,8 +148,7 @@ public final class CostDeciders {
                     && defender.getOwner() != unit.getOwner()) {
                     return ILLEGAL_MOVE;
                 } else if (unit.getTradeRoute() != null
-                    && (unit.getMoveType(tile)
-                        == Unit.MoveType.EXPLORE_LOST_CITY_RUMOUR)) {
+                    && tile.hasLostCityRumour()) {
                     return ILLEGAL_MOVE;
                 }
             }

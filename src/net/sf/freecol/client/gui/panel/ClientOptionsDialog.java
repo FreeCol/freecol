@@ -82,7 +82,7 @@ public final class ClientOptionsDialog extends OptionsDialog  {
                 getGUI().resetMenuBar();
                 // Immediately redraw the minimap if that was updated.
                 getGUI().updateMapControls();
-            } catch(FileNotFoundException e) {
+            } catch (FileNotFoundException e) {
                 logger.warning(e.toString());
                 StringTemplate t = StringTemplate.template("failedToSave")
                     .addName("%name%", file.getPath());

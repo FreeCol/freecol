@@ -179,12 +179,12 @@ public class ServerPlayerTest extends FreeColTestCase {
         // Check that it does not work if current Location == null
         try {
             igc.moveGoods(cotton, wagonInColony);
-            fail();
+            fail("Goods move must fail(1).");
         } catch (IllegalStateException e) {
         }
         try {
             igc.moveGoods(cotton, wagonNotInColony);
-            fail();
+            fail("Goods move must fail(2).");
         } catch (IllegalStateException e) {
         }
 
@@ -202,14 +202,14 @@ public class ServerPlayerTest extends FreeColTestCase {
         // Check failure units not co-located
         try {
             igc.moveGoods(cotton, wagonNotInColony);
-            fail();
+            fail("Goods move must fail(3).");
         } catch (IllegalStateException e) {
         }
 
         // Check failure to non-GoodsContainer (Tile)
         try {
             igc.moveGoods(cotton, map.getTile(9, 10));
-            fail();
+            fail("Goods move must fail(4).");
         } catch (IllegalStateException e) {
         }
 
@@ -238,7 +238,7 @@ public class ServerPlayerTest extends FreeColTestCase {
         // Can not unload directly to Europe
         try {
             igc.moveGoods(cotton, europe);
-            fail();
+            fail("Goods move must fail(5).");
         } catch (IllegalStateException e) {
         }
 
@@ -248,7 +248,7 @@ public class ServerPlayerTest extends FreeColTestCase {
         igc.moveTo(dutch, privateer1, america);
         try {
             igc.moveGoods(cotton, privateer2);
-            fail();
+            fail("Goods move must fail(6).");
         } catch (IllegalStateException e) {
         }
 
@@ -257,7 +257,7 @@ public class ServerPlayerTest extends FreeColTestCase {
         igc.moveTo(dutch, privateer1, europe);
         try {
             igc.moveGoods(cotton, privateer2);
-            fail();
+            fail("Goods move must fail(7).");
         } catch (IllegalStateException e) {
         }
 
@@ -267,7 +267,7 @@ public class ServerPlayerTest extends FreeColTestCase {
         cotton.setLocation(privateer1);
         try {
             igc.moveGoods(cotton, privateer2);
-            fail();
+            fail("Goods move must fail(8).");
         } catch (IllegalStateException e) {
         }
 
@@ -276,7 +276,7 @@ public class ServerPlayerTest extends FreeColTestCase {
         igc.moveTo(dutch, privateer1, america);
         try {
             igc.moveGoods(cotton, privateer2);
-            fail();
+            fail("Goods move must fail(9).");
         } catch (IllegalStateException e) {
         }
 
@@ -285,7 +285,7 @@ public class ServerPlayerTest extends FreeColTestCase {
         igc.moveTo(dutch, privateer1, europe);
         try {
             igc.moveGoods(cotton, privateer2);
-            fail();
+            fail("Goods move must fail(10).");
         } catch (IllegalStateException e) {
         }
 
@@ -296,7 +296,7 @@ public class ServerPlayerTest extends FreeColTestCase {
         cotton.setLocation(privateer1);
         try {
             igc.moveGoods(cotton, privateer2);
-            fail();
+            fail("Goods move must fail(11).");
         } catch (IllegalStateException e) {
         }
 
@@ -305,7 +305,7 @@ public class ServerPlayerTest extends FreeColTestCase {
         igc.moveTo(dutch, privateer1, america);
         try {
             igc.moveGoods(cotton, privateer2);
-            fail();
+            fail("Goods move must fail(12).");
         } catch (IllegalStateException e) {
         }
 
@@ -314,7 +314,7 @@ public class ServerPlayerTest extends FreeColTestCase {
         igc.moveTo(dutch, privateer1, europe);
         try {
             igc.moveGoods(cotton, privateer2);
-            fail();
+            fail("Goods move must fail(13).");
         } catch (IllegalStateException e) {
         }
     }

@@ -38,9 +38,9 @@ import net.sf.freecol.common.option.AudioMixerOption.MixerWrapper;
 
 
 /**
- * This class provides visualization for an {@link
- * net.sf.freecol.common.option.AudioMixerOption}. In order to enable
- * values to be both seen and changed.
+ * This class provides visualization for an
+ * {@link net.sf.freecol.common.option.AudioMixerOption}.
+ * In order to enable values to be both seen and changed.
  */
 public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
 
@@ -98,7 +98,7 @@ public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
         button2.addActionListener(aHandler);
 
         cbox.add(super.getLabel());
-        cbox.setModel(new DefaultComboBoxModel(getOption().getOptions()));
+        cbox.setModel(new DefaultComboBoxModel(getOption().getChoices().toArray(new MixerWrapper[0])));
         reset();
 
         cbox.setEnabled(editable);

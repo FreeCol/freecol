@@ -2794,10 +2794,11 @@ public final class InGameController implements NetworkConstants {
         // If we are in a colony, or Europe, load sentries.
         if (unit.canCarryUnits() && unit.hasSpaceLeft()
             && (unit.getColony() != null || unit.isInEurope())) {
+            boolean boarded = false;
             for (Unit sentry : unit.getLocation().getUnitList()) {
                 if (sentry.getState() == UnitState.SENTRY) {
                     if (unit.canAdd(sentry)) {
-                        boardShip(sentry, unit);
+                        boarded |= boardShip(sentry, unit);
                         logger.finest("Unit " + unit.toString()
                             + " loaded sentry " + sentry.toString());
                     } else {
@@ -2806,6 +2807,8 @@ public final class InGameController implements NetworkConstants {
                     }
                 }
             }
+            // Boarding consumed this unit's moves.
+            if (boarded && unit.getMovesLeft() <= 0) return false;
         }
 
         // Ask the server

@@ -30,7 +30,7 @@ import net.sf.freecol.common.model.Specification;
 
 
 /**
- * The super class of all options. GUI components making use of this
+ * The super class of all options.  GUI components making use of this
  * class can refer to its name and shortDescription properties.  The
  * complete keys of these properties consist of the id of the option
  * group (if any), followed by a "."  unless the option group is null,
@@ -55,8 +55,8 @@ abstract public class AbstractOption<T> extends FreeColObject
     /**
      * Creates a new <code>AbstractOption</code>.
      *
-     * @param id The identifier for this option. This is used when the object
-     *            should be found in an {@link OptionGroup}.
+     * @param id The identifier for this option.  This is used when
+     *     the object should be found in an {@link OptionGroup}.
      */
     public AbstractOption(String id) {
         this(id, null);
@@ -65,9 +65,7 @@ abstract public class AbstractOption<T> extends FreeColObject
     /**
      * Creates a new <code>AbstractOption</code>.
      *
-     * @param specification The <code>Specification</code> this
-     *     <code>Option</code> refers to.  This may be null, since only
-     *     some options need access to the specification.
+     * @param specification The enclosing <code>Specification</code>.
      */
     public AbstractOption(Specification specification) {
         this(null, specification);
@@ -76,31 +74,15 @@ abstract public class AbstractOption<T> extends FreeColObject
     /**
      * Creates a new <code>AbstractOption</code>.
      *
-     * @param id The identifier for this option.  This is used when the
-     *     object should be found in an {@link OptionGroup}.
-     * @param specification The <code>Specification</code> this
-     *     <code>Option</code> refers to.  This may be null, since only
-     *     some options need access to the specification.
+     * @param id The identifier for this option.  This is used when
+     *     the object should be found in an {@link OptionGroup}.
+     * @param specification The enclosing <code>Specification</code>.
      */
     public AbstractOption(String id, Specification specification) {
         setId(id);
         setSpecification(specification);
     }
 
-    public abstract AbstractOption<T> clone() throws CloneNotSupportedException;
-
-    /**
-     * Sets the values from another option.
-     *
-     * @param source The other <code>AbstractOption</code>.
-     */
-    protected void setValues(AbstractOption<T> source) {
-        setId(source.getId());
-        setSpecification(source.getSpecification());
-        setValue(source.getValue());
-        setGroup(source.getGroup());
-        isDefined = source.isDefined;
-    }
 
     /**
      * Gets the string prefix that identifies the group of this
@@ -118,45 +100,50 @@ abstract public class AbstractOption<T> extends FreeColObject
      * @param group The prefix to set.
      */
     public void setGroup(String group) {
-        if (group == null) {
-            optionGroup = "";
-        } else {
-            optionGroup = group;
-        }
+        optionGroup = (group == null) ? "" : group;
     }
 
     /**
-     * Gets the value of this Option.
+     * Sets the values from another option.
      *
-     * @return The value of this Option
+     * @param source The other <code>AbstractOption</code>.
      */
-    public abstract T getValue();
+    protected void setValues(AbstractOption<T> source) {
+        setId(source.getId());
+        setSpecification(source.getSpecification());
+        setValue(source.getValue());
+        setGroup(source.getGroup());
+        isDefined = source.isDefined;
+    }
 
     /**
-     * Sets the value of this Option.
-     *
-     * @param value The new value of this Option.
-     */
-    public abstract void setValue(T value);
-
-    /**
-     * Sets the value of this Option from the given string
+     * Sets the value of this option from the given string
      * representation.  Both parameters must not be null at the same
-     * time.  This method does nothing.  Override it if the Option has
+     * time.  This method does nothing.  Override it if the option has
      * a suitable string representation.
      *
      * @param valueString The string representation of the value of
-     *     this Option.
+     *     this <code>Option</code>.
      * @param defaultValueString The string representation of the
-     *     default value of this Option
+     *     default value of this <code>Option</code>.
      */
     protected void setValue(String valueString, String defaultValueString) {
         logger.warning("Unsupported method: setValue.");
     }
 
     /**
-     * Is null an acceptable value for this Option?
-     * Override it where necessary.
+     * Generate the choices to provide to the UI.
+     *
+     * Override if the subclass needs to determine its choices dynamically.
+     */
+    public void generateChoices() {
+        // do nothing
+    }
+
+    /**
+     * Is null an acceptable value for this option?
+     *
+     * Override this in subclasses where necessary.
      *
      * @return False.
      */
@@ -164,13 +151,27 @@ abstract public class AbstractOption<T> extends FreeColObject
         return false;
     }
 
+
+    // Interface Option
+
     /**
-     * Generate the choices to provide to the UI.
-     * Override if the Option needs to determine its choices dynamically.
+     * {@inheritDoc}
      */
-    public void generateChoices() {
-        // do nothing
-    }
+    public abstract AbstractOption<T> clone() throws CloneNotSupportedException;
+
+    /**
+     * Gets the value of this option.
+     *
+     * @return The value of this <code>Option</code>.
+     */
+    public abstract T getValue();
+
+    /**
+     * Sets the value of this option.
+     *
+     * @param value The new value of this <code>Option</code>.
+     */
+    public abstract void setValue(T value);
 
 
     // Serialization
@@ -178,34 +179,33 @@ abstract public class AbstractOption<T> extends FreeColObject
     private static final String ACTION_TAG = "action";
     private static final String DEFAULT_VALUE_TAG = "defaultValue";
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void readFromXML(XMLStreamReader in) throws XMLStreamException {
-        readAttributes(in);
-
-        super.readChildren(in);
-    }
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        // TODO: super.readAttributes(in); is inadequate.
         setId(getAttribute(in, ID_ATTRIBUTE_TAG, getId()));
         
         String defaultValue = getAttribute(in, DEFAULT_VALUE_TAG, (String)null);
 
         String value = getAttribute(in, VALUE_TAG, (String)null);
 
-        if (!isNullValueOK() && defaultValue == null && value == null) {
-            throw new XMLStreamException("invalid option " + getId()
-                + ": no value nor default value found.");
+        if (defaultValue == null && value == null) {
+            if (!isNullValueOK()) {
+                throw new XMLStreamException("invalid option " + getId()
+                    + ": no value nor default value found.");
+            }
+        } else {
+            setValue(value, defaultValue);
         }
-
-        setValue(value, defaultValue);
     }
+
+    // Note: writeAttributes() is not needed/present.
+    // - The id is correctly written by the super class.
+    // - The default value does not need to be written in general.
+    // - The value *must* be written by the implementing subclass.
 
     /**
      * General option reader routine.
@@ -271,7 +271,7 @@ abstract public class AbstractOption<T> extends FreeColObject
 
         } else {
             logger.finest("Parsing of option type '" + tag
-                + "' is not implemented yet");
+                + "' is not implemented yet.");
             in.nextTag();
         }
 
