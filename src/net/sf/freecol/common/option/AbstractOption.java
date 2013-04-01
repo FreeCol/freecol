@@ -192,12 +192,14 @@ abstract public class AbstractOption<T> extends FreeColObject
 
         String value = getAttribute(in, VALUE_TAG, (String)null);
 
-        if (!isNullValueOK() && defaultValue == null && value == null) {
-            throw new XMLStreamException("invalid option " + getId()
-                + ": no value nor default value found.");
+        if (defaultValue == null && value == null) {
+            if (!isNullValueOK()) {
+                throw new XMLStreamException("invalid option " + getId()
+                    + ": no value nor default value found.");
+            }
+        } else {
+            setValue(value, defaultValue);
         }
-
-        setValue(value, defaultValue);
     }
 
     // Note: writeAttributes() is not needed/present.
