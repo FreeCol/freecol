@@ -337,7 +337,7 @@ public abstract class FreeColObject {
      * This method writes an XML-representation of this object with
      * a specified tag to the given stream.
      *
-     * Almost all FreeColObjects end up calling this, and implementing
+     * Almost all FreeColObjects end up calling these, and implementing
      * their own write{Attributes,Children} methods which begin by
      * calling their superclass.  This allows a clean nesting of the
      * serialization routines throughout the class hierarchy.
@@ -349,8 +349,7 @@ public abstract class FreeColObject {
      * @exception XMLStreamException if there are any problems writing
      *     to the stream.
      */
-    public void toXML(XMLStreamWriter out, String tag)
-        throws XMLStreamException {
+    public void toXML(XMLStreamWriter out, String tag) throws XMLStreamException {
         out.writeStartElement(tag);
         writeAttributes(out);
         writeChildren(out);
@@ -667,8 +666,7 @@ public abstract class FreeColObject {
             try {
                 result = Float.parseFloat(attrib);
             } catch (NumberFormatException e) {
-                logger.warning("Attribute '" + attributeName
-                    + "' should be a float, not '" + attrib + "'.");
+                logger.warning(attributeName + " is not a float: " + attrib);
             }
         }
         return result;
@@ -691,8 +689,7 @@ public abstract class FreeColObject {
             try {
                 result = Integer.parseInt(attrib);
             } catch (NumberFormatException e) {
-                logger.warning("Attribute '" + attributeName
-                    + "' should be an integer, not '" + attrib + "'.");
+                logger.warning(attributeName + " is not an integer: " + attrib);
             }
         }
         return result;
@@ -725,7 +722,6 @@ public abstract class FreeColObject {
      */
     public <T extends Enum<T>> T getAttribute(XMLStreamReader in,
         String attributeName, Class<T> returnType, T defaultValue) {
-
         final String attrib = in.getAttributeValue(null, attributeName);
 
         T result = defaultValue;
@@ -734,9 +730,8 @@ public abstract class FreeColObject {
                 result = Enum.valueOf(returnType,
                                       attrib.toUpperCase(Locale.US));
             } catch (Exception e) {
-                logger.warning("Attribute '" + attributeName
-                    + "' should be a " + defaultValue.getClass().getName()
-                    + " value, not '" + attrib + "'.");
+                logger.warning(attributeName + " is not a "
+                    + defaultValue.getClass().getName() + ": " + attrib);
             }
         }
         return result;
@@ -756,7 +751,11 @@ public abstract class FreeColObject {
     public <T extends FreeColGameObject> T getAttribute(XMLStreamReader in,
         String attributeName, Game game, Class<T> returnType, T defaultValue) {
 
-        final String attrib = in.getAttributeValue(null, attributeName);
+        final String attrib = 
+        // @compat 0.10.7
+            (ID_ATTRIBUTE_TAG.equals(attributeName)) ? readId(in) :
+        // end @compat
+            in.getAttributeValue(null, attributeName);
 
         return (attrib == null) ? defaultValue
             : game.getFreeColGameObject(attrib, returnType);
@@ -867,17 +866,15 @@ public abstract class FreeColObject {
      * @param value The <code>Location</code> to write the id of.
      * @exception XMLStreamException if an error occurs
      */
-    public void writeLocationAttribute(XMLStreamWriter out,
-                                       String attributeName,
-                                       Location value)
-        throws XMLStreamException {
+    public void writeLocationAttribute(XMLStreamWriter out, String attributeName,
+                                       Location value) throws XMLStreamException {
         if (value != null) {
             out.writeAttribute(attributeName,
                                ((FreeColGameObject)value).getId());
         }
     }
 
-    // @compat 0.9.x, 0.10.x (MarketData)
+    // @compat 0.10.x
     /**
      * Reads the id attribute.
      *
@@ -885,16 +882,15 @@ public abstract class FreeColObject {
      * while we are allowing both the obsolete ID_ATTRIBUTE and the correct
      * ID_ATTRIBUTE_TAG, this routine is useful.
      *
+     * When 0.10.x is obsolete, remove this routine and replace its uses
+     * with getAttribute(in, ID_ATTRIBUTE_TAG, -1) or equivalent.
+     *
      * @param in The <code>XMLStreamReader</code> to read from.
      * @return The id found, or null if none present.
-     * @exception XMLStreamException if a problem was encountered
-     *     during parsing.
      */
-    protected String readId(XMLStreamReader in) throws XMLStreamException {
+    public String readId(XMLStreamReader in) {
         String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-        if (id == null) {
-            id = in.getAttributeValue(null, ID_ATTRIBUTE);
-        }
+        if (id == null) id = in.getAttributeValue(null, ID_ATTRIBUTE);
         return id;
     }
     // end @compat
@@ -906,8 +902,7 @@ public abstract class FreeColObject {
      * @exception XMLStreamException if a problem was encountered
      *     during parsing.
      */
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         String newId = readId(in);
         setId(newId);
     }
@@ -938,14 +933,7 @@ public abstract class FreeColObject {
      *     recognized all child elements.
      */
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        StringBuilder sb = new StringBuilder("Unexpected tag: ");
-        sb.append(in.getLocalName()).append(", attributes:");
-        int n = in.getAttributeCount();
-        for (int i = 0; i < n; i++) {
-            sb.append(" ").append(in.getAttributeLocalName(i))
-                .append("=\"").append(in.getAttributeValue(i)).append("\"");
-        }
-        throw new XMLStreamException(sb.toString());
+        throw new XMLStreamException("Unexpected tag: " + currentTag(in));
     }
 
     /**
@@ -958,9 +946,26 @@ public abstract class FreeColObject {
      * @exception XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    public void readFromXMLPartialImpl(XMLStreamReader in)
-        throws XMLStreamException {
-        throw new UnsupportedOperationException("Partial update of unsupported type");
+    public void readFromXMLPartialImpl(XMLStreamReader in) throws XMLStreamException {
+        throw new UnsupportedOperationException("Partial update of unsupported type: "
+            + currentTag(in));
+    }
+
+    /**
+     * Extract the current tag and its attributes from an input stream.
+     * Useful for error messages.
+     *
+     * @param in The XML input stream.
+     */
+    public String currentTag(XMLStreamReader in) {
+        StringBuilder sb = new StringBuilder(in.getLocalName());
+        sb.append(", attributes:");
+        int n = in.getAttributeCount();
+        for (int i = 0; i < n; i++) {
+            sb.append(" ").append(in.getAttributeLocalName(i))
+                .append("=\"").append(in.getAttributeValue(i)).append("\"");
+        }
+        return sb.toString();
     }
 
     //  ---------- PROPERTY CHANGE SUPPORT DELEGATES ----------
