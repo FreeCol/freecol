@@ -629,7 +629,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         for (Tile t : tile.getSurroundingTiles(1)) {
             Player owner = t.getOwner();
             if (owner == null || owner == player
-                || owner.isEuropean()) continue;
+                || owner.isEuropean()
+                || !player.canClaimForSettlement(t)) continue;
             if (owner.atWarWith(player)) {
                 if (AIMessage.askClaimLand(t, this, NetworkConstants.STEAL_LAND)
                     && player.owns(t)) {

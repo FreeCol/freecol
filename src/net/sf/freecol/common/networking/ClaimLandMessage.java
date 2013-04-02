@@ -22,6 +22,7 @@ package net.sf.freecol.common.networking;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Player.NoClaimReason;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -131,7 +132,8 @@ public class ClaimLandMessage extends DOMMessage {
         } else if (owner == player) { // capture vacant colony tiles only
             if (settlement != null && ownerSettlement != null
                 && tile.isInUse()) {
-                return DOMMessage.createError("tileTakenSelf", null);
+                return DOMMessage.clientError("Can not claim tile "
+                    + tile.getId() + ": already owned.");
             }
             price = 0;
         } else if (owner.isEuropean()) {
@@ -139,13 +141,24 @@ public class ClaimLandMessage extends DOMMessage {
                 || tile.getOwningSettlement() == settlement) { // pre-attached
                 price = 0;
             } else { // must fail
-                return DOMMessage.createError("tileTakenEuro", null);
+                return DOMMessage.clientError("Can not claim tile " 
+                    + tile.getId() + ": European owners will not sell.");
             }
         } else { // natives
-            if (price < 0 || price >= value) { // price is valid
-                ;
-            } else { // refuse
-                return DOMMessage.createError("tileTakenInd", null);
+            NoClaimReason why = player.canClaimForSettlementReason(tile);
+            switch (why) {
+            case NONE:
+                break; // Succeed.
+            case NATIVES:
+                if (price >= 0 && price < value) {
+                    return DOMMessage.clientError("Can not claim tile "
+                        + tile.getId() + ": insufficient offer.");
+                }
+                // Succeed: either sufficient offer, or stealing.
+                break;
+            default: // Fail
+                return DOMMessage.clientError("Can not claim tile "
+                    + tile.getId() + ": " + why.toString());
             }
         }
 
