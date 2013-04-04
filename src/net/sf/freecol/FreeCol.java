@@ -313,9 +313,11 @@ public final class FreeCol {
      * @param err The error message to print.
      */
     private static void fatal(String err) {
-        System.err.println((err == null || "".equals(err))
-            ? "Bogus null fatal error message"
-            : err);
+        if (err == null || "".equals(err)) {
+            err = "Bogus null fatal error message";
+            Thread.dumpStack();
+        }
+        System.err.println(err);
         System.exit(1);
     }
 
@@ -561,7 +563,7 @@ public final class FreeCol {
             if (line.hasOption("load-savegame")) {
                 String arg = line.getOptionValue("load-savegame");
                 if (!FreeColDirectories.setSavegameFile(arg)) {
-                    fatal(Messages.message(StringTemplate.template("cli.err.save")
+                    fatal(Messages.message(StringTemplate.template("cli.error.save")
                             .addName("%string%", arg)));
                 }
             }
