@@ -238,7 +238,7 @@ public final class FreeColClient {
         try {
             FreeColLookAndFeel fclaf = new FreeColLookAndFeel();
             FreeColLookAndFeel.install(fclaf, font);
-        } catch (FreeColException e) {
+        } catch (Exception e) {
             fatal(Messages.message("client.laf") + "\n" + e.getMessage());
         }
 
