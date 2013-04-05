@@ -46,133 +46,96 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(Location.class.getName());
 
+    /** The size of a standard `hold' of data. */
     public static final int CARGO_SIZE = 100;
-    public static final String STORED_GOODS_TAG = "storedGoods";
-    public static final String OLD_STORED_GOODS_TAG = "oldStoredGoods";
 
     /** The list of Goods stored in this <code>GoodsContainer</code>. */
-    private Map<GoodsType, Integer> storedGoods = new HashMap<GoodsType, Integer>();
+    private final Map<GoodsType, Integer> storedGoods
+        = new HashMap<GoodsType, Integer>();
 
-    /** The previous list of Goods stored in this <code>GoodsContainer</code>. */
-    private Map<GoodsType, Integer> oldStoredGoods = new HashMap<GoodsType, Integer>();
+    /** 
+     * The previous list of Goods stored in this
+     * <code>GoodsContainer</code>.
+     */
+    private final Map<GoodsType, Integer> oldStoredGoods
+        = new HashMap<GoodsType, Integer>();
 
-    /** The owner of this <code>GoodsContainer</code>. */
-    private final Location parent;
+    /** The location for this <code>GoodsContainer</code>. */
+    private Location parent = null;
+
 
     /**
      * Creates an empty <code>GoodsContainer</code>.
      *
-     * @param game The <code>Game</code> in which this <code>GoodsContainer</code> belong.
-     * @param parent The <code>Location</code> this <code>GoodsContainer</code> will be containg goods for.
+     * @param game The enclosing <code>Game</code>.
+     * @param parent The <code>Location</code> this
+     *     <code>GoodsContainer</code> contains goods for.
      */
     public GoodsContainer(Game game, Location parent) {
         super(game);
 
-        if (parent == null) {
-            throw new IllegalArgumentException("Location of GoodsContainer must not be null!");
-        }
-
         this.parent = parent;
     }
 
     /**
-     * Initiates a new <code>GoodsContainer</code> from an <code>Element</code>.
+     * Create a new <code>GoodsContainer</code>.
      *
-     * @param game The <code>Game</code> in which this <code>GoodsContainer</code>
-     *       belong.
-     * @param parent The object using this <code>GoodsContainer</code>
-     *       for storing it's goods.
-     * @param in The input stream containing the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
+     * @param game The enclosing <code>Game</code>.
+     * @param id The identifier string.
      */
-    public GoodsContainer(Game game, Location parent, XMLStreamReader in) throws XMLStreamException {
-        super(game, null);
-
-        if (parent == null) {
-            throw new IllegalArgumentException("Location of GoodsContainer must not be null!");
-        }
-
-        this.parent = parent;
-        readFromXML(in);
+    public GoodsContainer(Game game, String id) {
+        super(game, id);
     }
 
     /**
-     * Initiates a new <code>GoodsContainer</code> from an <code>Element</code>.
+     * Create a new <code>GoodsContainer</code> from an
+     * <code>Element</code>.
      *
-     * @param game The <code>Game</code> in which this <code>GoodsContainer</code>
-     *       belong.
-     * @param parent The object using this <code>GoodsContainer</code>
-     *       for storing it's goods.
+     * @param game The enclosing <code>Game</code>.
+     * @param parent The <code>Location</code> this
+     *     <code>GoodsContainer</code> contains goods for.
      * @param e An XML-element that will be used to initialize
-     *      this object.
+     *     this object.
      */
     public GoodsContainer(Game game, Location parent, Element e) {
         super(game, null);
 
-        if (parent == null) {
-            throw new IllegalArgumentException("Location of GoodsContainer must not be null!");
-        }
-
         this.parent = parent;
+
         readFromXMLElement(e);
     }
 
+
     /**
-     * Gets the owner of this <code>GoodsContainer</code>.
+     * Set the goods location.
      *
-     * @return The <code>Player</code> controlling this
-     *         {@link Ownable}.
+     * @param location The <code>Location</code> to set.
      */
-    public Player getOwner() {
-        return (parent instanceof Ownable) ? ((Ownable) parent).getOwner()
-            : null;
+    public void setLocation(Location location) {
+        if (location == null) {
+            throw new IllegalArgumentException("Null GoodsContainer Location.");
+        }
+        this.parent = location;
     }
 
     /**
-     * Sets the owner of this <code>Ownable</code>.
+     * Adds goods to this goods container.
      *
-     * @param p The <code>Player</code> that should take ownership
-     *      of this {@link Ownable}.
-     * @exception UnsupportedOperationException if not implemented.
+     * @param goods The <code>Goods</code> to add.
+     * @return True if the addition succeeds.
      */
-    public void setOwner(Player p) {
-        throw new UnsupportedOperationException("Can not set GoodsContainer owner");
+    public boolean addGoods(AbstractGoods goods) {
+        return addGoods(goods.getType(), goods.getAmount());
     }
 
     /**
-     * Removes all references to this object.
+     * Adds goods by type and amount to this goods container.
      *
-     * @return A list of disposed objects.
-     */
-    public List<FreeColGameObject> disposeList() {
-        storedGoods.clear();
-
-        List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
-        objects.addAll(super.disposeList());
-        return objects;
-    }
-
-    /**
-     * Dispose of this GoodsContainer.
-     */
-    public void dispose() {
-        disposeList();
-    }
-
-
-    /**
-     * Adds a <code>Goods</code> to this containter.
-     * @param g The Goods to add to this container.
-     */
-    public boolean addGoods(AbstractGoods g) {
-        return addGoods(g.getType(), g.getAmount());
-    }
-
-    /**
-     * Adds the given amount of the given type of goods.
-     * @param type The type of goods to add.
-     * @param amount The type of amount to add.
+     * Note: negative amounts are allowed.
+     *
+     * @param type The <code>GoodsType</code> to add.
+     * @param amount The amount of goods to add.
+     * @return True if the addition succeeds.
      */
     public boolean addGoods(GoodsType type, int amount) {
         int oldAmount = getGoodsCount(type);
@@ -191,28 +154,37 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     }
 
     /**
-     * Removes Goods from this containter.
-     * @param g The Goods to remove from this container.
+     * Removes goods from this goods container.
+     *
+     * @param goods The <code>Goods</code> to remove from this container.
+     * @return The <code>Goods</code> actually removed.
      */
-    public Goods removeGoods(AbstractGoods g) {
-        return removeGoods(g.getType(), g.getAmount());
+    public Goods removeGoods(AbstractGoods goods) {
+        return removeGoods(goods.getType(), goods.getAmount());
     }
 
+    /**
+     * Removes all goods of a given type from this goods container.
+     *
+     * @param type The <code>GoodsType</code> to remove.
+     * @return The <code>Goods</code> actually removed.
+     */
     public Goods removeGoods(GoodsType type) {
         return removeGoods(type, INFINITY);
     }
 
     /**
-     * Removes the given amount of the given type of goods.
+     * Removes goods by type and amount from this goods container.
      *
-     * @param type The type of goods to remove.
-     * @param amount The type of amount to remove.
-     * @return A Goods with the requested or available amount that has
-     *      been removed, or null if none was removed.
+     * @param type The <code>GoodsType</code> to remove.
+     * @param amount The amount of goods to remove.
+     * @return The <code>Goods</code> actually removed, which may have a
+     *     lower actual amount, or null if nothing removed.
      */
     public Goods removeGoods(GoodsType type, int amount) {
         int oldAmount = getGoodsCount(type);
         if (oldAmount <= 0) return null;
+
         int newAmount = oldAmount - amount;
         Goods removedGoods;
         if (newAmount > 0) {
@@ -223,21 +195,6 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
             storedGoods.remove(type);
         }
         return removedGoods;
-    }
-
-    /**
-     * Removes all goods above given amount, provided that the goods
-     * are storable and do not ignore warehouse limits.
-     *
-     * @param newAmount The treshold.
-     */
-    public void removeAbove(int newAmount) {
-        for (GoodsType goodsType : storedGoods.keySet()) {
-            if (goodsType.isStorable() && !goodsType.limitIgnored() &&
-                storedGoods.get(goodsType) > newAmount) {
-                setAmount(goodsType, newAmount);
-            }
-        }
     }
 
     /**
@@ -255,27 +212,38 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     }
 
     /**
-     * Removes all goods.
-     *
+     * Remove all goods.
      */
     public void removeAll() {
         storedGoods.clear();
     }
 
+    /**
+     * Removes all goods above given amount, provided that the goods
+     * are storable and do not ignore warehouse limits.
+     *
+     * @param newAmount The threshold.
+     */
+    public void removeAbove(int newAmount) {
+        for (GoodsType goodsType : storedGoods.keySet()) {
+            if (goodsType.isStorable() && !goodsType.limitIgnored()
+                && storedGoods.get(goodsType) > newAmount) {
+                setAmount(goodsType, newAmount);
+            }
+        }
+    }
 
     /**
-     * Checks if any storable type of goods has reached the given
-     * amount.
+     * Checks if any storable type of goods has reached the given amount.
      *
-     * @param amount The amount.
-     * @return <code>true</code> if any type of goods,
-     * except for <code>Goods.FOOD</code>, has reached
-     * the given amount.
+     * @param amount The amount to check.
+     * @return True if any storable, capacity limited goods has reached the
+     *     given amount.
      */
     public boolean hasReachedCapacity(int amount) {
         for (GoodsType goodsType : storedGoods.keySet()) {
-            if (goodsType.isStorable() && !goodsType.limitIgnored() &&
-                storedGoods.get(goodsType) > amount) {
+            if (goodsType.isStorable() && !goodsType.limitIgnored()
+                && storedGoods.get(goodsType) > amount) {
                 return true;
             }
         }
@@ -289,7 +257,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * @return The result.
      */
     public boolean contains(Goods g) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("GoodsContainer.contains NYI");
     }
 
     /**
@@ -335,11 +303,9 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
         return count;
     }
 
-
     /**
-     * Gets an <code>Iterator</code> of every <code>Goods</code> in this
-     * <code>GoodsContainer</code>. Each <code>Goods</code> have a maximum
-     * amount of CARGO_SIZE.
+     * Gets an iterator over all holds of goods in this goods container.
+     * Each <code>Goods</code> returned has a maximum amount of CARGO_SIZE.
      *
      * @return The <code>Iterator</code>.
      * @see #getCompactGoods
@@ -349,73 +315,52 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     }
 
     /**
-     * Returns an <code>ArrayList</code> containing all
-     * <code>Goods</code> in this <code>GoodsContainer</code>. Each
-     * <code>Goods</code> has a maximum amount of CARGO_SIZE.
+     * Gets a list containing all holds of goods in this goods container.
+     * Each <code>Goods</code> returned has a maximum amount of CARGO_SIZE.
      *
-     * @return The <code>ArrayList</code>.
+     * @return A list of <code>Goods</code>.
      * @see #getGoodsIterator
      */
     public List<Goods> getGoods() {
-        ArrayList<Goods> totalGoods = new ArrayList<Goods>();
-
+        List<Goods> totalGoods = new ArrayList<Goods>();
         for (GoodsType goodsType : storedGoods.keySet()) {
             int amount = storedGoods.get(goodsType).intValue();
             while (amount > 0) {
-                totalGoods.add(new Goods(getGame(), parent, goodsType, (amount >= CARGO_SIZE ? CARGO_SIZE : amount)));
+                totalGoods.add(new Goods(getGame(), parent, goodsType,
+                        ((amount >= CARGO_SIZE) ? CARGO_SIZE : amount)));
                 amount -= CARGO_SIZE;
             }
         }
-
         return totalGoods;
     }
 
-
     /**
-     * Gets an <code>Iterator</code> of every <code>Goods</code> in this
-     * <code>GoodsContainer</code>. There is only one <code>Goods</code>
-     * for each type of goods.
+     * Gets a list of all goods in this goods container.
+     * There is only one <code>Goods</code> for each distinct
+     * <code>GoodsType</code>.
      *
-     * @return The <code>Iterator</code>.
-     * @see #getGoodsIterator
+     * @return A list of <code>Goods</code>.
      */
     public List<Goods> getCompactGoods() {
-        ArrayList<Goods> totalGoods = new ArrayList<Goods>();
-
+        List<Goods> totalGoods = new ArrayList<Goods>();
         for (Entry<GoodsType, Integer> entry : storedGoods.entrySet()) {
             if (entry.getValue() > 0) {
-                totalGoods.add(new Goods(getGame(), parent, entry.getKey(), entry.getValue()));
+                totalGoods.add(new Goods(getGame(), parent, entry.getKey(),
+                                         entry.getValue()));
             }
         }
-
         return totalGoods;
     }
 
     /**
-     * Gets an <code>Iterator</code> of every <code>Goods</code> in this
-     * <code>GoodsContainer</code>. There is only one <code>Goods</code>
-     * for each type of goods.
-     *
-     * @return The <code>Iterator</code>.
-     * @see #getGoodsIterator
-     */
-    public List<Goods> getFullGoods() {
-        ArrayList<Goods> totalGoods = new ArrayList<Goods>();
-
-        for (GoodsType goodsType : storedGoods.keySet()) {
-            totalGoods.add(new Goods(getGame(), parent, goodsType, storedGoods.get(goodsType)));
-        }
-
-        return totalGoods;
-    }
-
-    /**
-     * Prepares this <code>GoodsContainer</code> for a new turn.
+     * Save the current stored goods of this goods container in the old
+     * stored goods.
      */
     public void saveState() {
         oldStoredGoods.clear();
         for (Map.Entry<GoodsType, Integer> entry : storedGoods.entrySet()) {
-            oldStoredGoods.put(entry.getKey(), new Integer(entry.getValue().intValue()));
+            oldStoredGoods.put(entry.getKey(), 
+                               new Integer(entry.getValue().intValue()));
         }
     }
 
@@ -449,112 +394,114 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
         oldStoredGoods.clear();
     }
 
-    /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *
-     * <br><br>
-     *
-     * Only attributes visible to the given <code>Player</code> will
-     * be added to that representation if <code>showAll</code> is
-     * set to <code>false</code>.
-     *
-     * @param out The target stream.
-     * @param player The <code>Player</code> this XML-representation
-     *      should be made for, or <code>null</code> if
-     *      <code>showAll == true</code>.
-     * @param showAll Only attributes visible to <code>player</code>
-     *      will be added to the representation if <code>showAll</code>
-     *      is set to <i>false</i>.
-     * @param toSavedGame If <code>true</code> then information that
-     *      is only needed when saving a game is added.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
-     */
-    protected void toXMLImpl(XMLStreamWriter out, Player player,
-                             boolean showAll, boolean toSavedGame)
-        throws XMLStreamException {
-        // Start element:
-        out.writeStartElement(getXMLElementTagName());
+    // Interface Ownable
 
-        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+    /**
+     * {@inheritDoc}
+     */
+    public Player getOwner() {
+        return (parent instanceof Ownable) ? ((Ownable)parent).getOwner()
+            : null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setOwner(Player p) {
+        throw new UnsupportedOperationException("Can not set GoodsContainer owner");
+    }
+
+    // Override FreeColGameObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<FreeColGameObject> disposeList() {
+        oldStoredGoods.clear();
+        storedGoods.clear();
+
+        List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
+        objects.addAll(super.disposeList());
+        return objects;
+    }
+
+
+    // Serialization
+
+    public static final String AMOUNT_TAG = "amount";
+    public static final String OLD_STORED_GOODS_TAG = "oldStoredGoods";
+    public static final String STORED_GOODS_TAG = "storedGoods";
+    public static final String TYPE_TAG = "type";
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void toXMLImpl(XMLStreamWriter out, Player player,
+                             boolean showAll,
+                             boolean toSavedGame) throws XMLStreamException {
+        super.toXML(out, getXMLElementTagName(), player, showAll, toSavedGame);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeChildren(XMLStreamWriter out, Player player,
+                                 boolean showAll,
+                                 boolean toSavedGame) throws XMLStreamException {
+        super.writeChildren(out);
+
         if (showAll || toSavedGame || player == getOwner()) {
             writeStorage(out, STORED_GOODS_TAG, storedGoods);
             writeStorage(out, OLD_STORED_GOODS_TAG, oldStoredGoods);
         }
+    }
+
+    /**
+     * Write a storage container to a stream.
+     *
+     * @param out The <code>XMLStreamWriter</code> to write to.
+     * @param tag The element tag.
+     * @param storage The storage container.
+     * @exception XMLStreamException if there is a problem writing to
+     *     the stream.
+     */
+    private void writeStorage(XMLStreamWriter out, String tag,
+                              Map<GoodsType, Integer> storage) throws XMLStreamException {
+        if (storage.isEmpty()) return;
+
+        out.writeStartElement(tag);
+
+        for (Map.Entry<GoodsType, Integer> entry : storage.entrySet()) {
+            out.writeStartElement(Goods.getXMLElementTagName());
+
+            writeAttribute(out, TYPE_TAG, entry.getKey().getId());
+
+            writeAttribute(out, AMOUNT_TAG, entry.getValue().toString());
+
+            out.writeEndElement();
+        }
+
         out.writeEndElement();
     }
 
-    private void writeStorage(XMLStreamWriter out, String tag, Map<GoodsType, Integer> storage)
-        throws XMLStreamException {
-        if (!storage.isEmpty()) {
-            out.writeStartElement(tag);
-            for (Map.Entry<GoodsType, Integer> entry : storage.entrySet()) {
-                out.writeStartElement(Goods.getXMLElementTagName());
-                out.writeAttribute("type", entry.getKey().getId());
-                out.writeAttribute("amount", entry.getValue().toString());
-                out.writeEndElement();
-            }
-            out.writeEndElement();
-        }
-    }
-
     /**
-     * Initialize this object from an XML-representation of this object.
-     * @param in The input stream with the XML.
-     */
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        setId(readId(in));
-        storedGoods.clear();
-        oldStoredGoods.clear();
-    }
-
-    @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
-        Map<GoodsType, Integer> storage;
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if (in.getLocalName().equals(STORED_GOODS_TAG)) {
-                storage = storedGoods;
-            } else if (in.getLocalName().equals(OLD_STORED_GOODS_TAG)) {
-                storage = oldStoredGoods;
-            } else {
-                continue;
-            }
-            while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                if (in.getLocalName().equals(Goods.getXMLElementTagName())) {
-                    GoodsType goodsType = getGame().getSpecification()
-                        .getGoodsType(in.getAttributeValue(null, "type"));
-                    Integer amount = new Integer(in.getAttributeValue(null, "amount"));
-                    storage.put(goodsType, amount);
-                }
-                in.nextTag();
-            }
-        }
-    }
-
-
-    /**
-     * Partial writer, so that "remove" messages can be brief.
-     *
-     * @param out The target stream.
-     * @param fields The fields to write.
-     * @throws XMLStreamException If there are problems writing the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void toXMLPartialImpl(XMLStreamWriter out, String[] fields)
-        throws XMLStreamException {
+    protected void toXMLPartialImpl(XMLStreamWriter out,
+                                    String[] fields) throws XMLStreamException {
         toXMLPartialByClass(out, getClass(), fields);
     }
 
     /**
-     * Partial reader, so that "remove" messages can be brief.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException If there are problems reading the stream.
+     * {@inheritDoc}
      */
     @Override
-    public void readFromXMLPartialImpl(XMLStreamReader in)
-        throws XMLStreamException {
+    public void readFromXMLPartialImpl(XMLStreamReader in) throws XMLStreamException {
         readFromXMLPartialByClass(in, getClass());
     }
 
@@ -562,11 +509,71 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * {@inheritDoc}
      */
     @Override
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        // Clear containers.
+        storedGoods.clear();
+        oldStoredGoods.clear();
+
+        super.readChildren(in);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+        final String tag = in.getLocalName();
+
+        if (OLD_STORED_GOODS_TAG.equals(tag)) {
+            readStorage(in, oldStoredGoods);
+
+        } else if (STORED_GOODS_TAG.equals(tag)) {
+            readStorage(in, storedGoods);
+
+        } else {
+            super.readChild(in);
+        }
+    }
+
+    /**
+     * Read a storage container from a stream.
+     *
+     * @param out The <code>XMLStreamReader</code> to read from.
+     * @param storage The storage container.
+     * @exception XMLStreamException if there is a problem reading from
+     *     the stream.
+     */
+    private void readStorage(XMLStreamReader in,
+        Map<GoodsType, Integer> storage) throws XMLStreamException {
+        final Specification spec = getGame().getSpecification();
+
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            String tag = in.getLocalName();
+
+            if (Goods.getXMLElementTagName().equals(tag)) {
+                GoodsType goodsType = spec.getType(in, TYPE_TAG,
+                    GoodsType.class, (GoodsType)null);
+
+                Integer amount = new Integer(getAttribute(in, AMOUNT_TAG, 0));
+
+                storage.put(goodsType, amount);
+
+            } else {
+                logger.warning("Ignoring bogus GoodsContainer tag: " + tag);
+            }
+            in.nextTag();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public String toString() {
-        StringBuffer sb = new StringBuffer(200);
+        StringBuilder sb = new StringBuilder(128);
         sb.append("[").append(getId()).append(" ");
         for (Map.Entry<GoodsType, Integer> entry : storedGoods.entrySet()) {
-            sb.append(entry.getKey() + "=" + entry.getValue() + ", ");
+            sb.append(entry.getKey()).append("=").append(entry.getValue())
+                .append(", ");
         }
         sb.setLength(sb.length() - 2);
         sb.append("]");
@@ -575,6 +582,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
 
     /**
      * Gets the tag name of the root element representing this object.
+     *
      * @return "goodsContainer".
      */
     public static String getXMLElementTagName() {

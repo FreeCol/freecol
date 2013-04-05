@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
@@ -42,10 +43,8 @@ public abstract class GoodsLocation extends UnitLocation {
 
     private static final Logger logger = Logger.getLogger(GoodsLocation.class.getName());
 
-    /**
-     * The container for the goods.
-     */
-    private GoodsContainer goodsContainer;
+    /** The container for the goods. */
+    private GoodsContainer goodsContainer = null;
 
 
     protected GoodsLocation() {
@@ -160,7 +159,8 @@ public abstract class GoodsLocation extends UnitLocation {
      * @return The amount of goods.
      */
     public final int getGoodsCount(GoodsType type) {
-        return goodsContainer.getGoodsCount(type);
+        return (goodsContainer == null) ? 0
+            : goodsContainer.getGoodsCount(type);
     }
 
     /**
@@ -170,7 +170,8 @@ public abstract class GoodsLocation extends UnitLocation {
      * @return The <code>Iterator</code>.
      */
     public final Iterator<Goods> getGoodsIterator() {
-        return goodsContainer.getGoodsIterator();
+        return (goodsContainer == null) ? null
+            : goodsContainer.getGoodsIterator();
     }
 
     /**
@@ -181,6 +182,7 @@ public abstract class GoodsLocation extends UnitLocation {
      * @return A list of goods.
      */
     public final List<Goods> getGoods() {
+        if (goodsContainer == null) return Collections.emptyList();
         return goodsContainer.getGoods();
     }
 
@@ -192,6 +194,7 @@ public abstract class GoodsLocation extends UnitLocation {
      * @return A list of goods.
      */
     public final List<Goods> getCompactGoods() {
+        if (goodsContainer == null) return Collections.emptyList();
         return goodsContainer.getCompactGoods();
     }
 
@@ -248,10 +251,10 @@ public abstract class GoodsLocation extends UnitLocation {
     public NoAddReason getNoAddReason(Locatable locatable) {
         if (locatable instanceof Goods) {
             Goods goods = (Goods)locatable;
-            return (goods.getSpaceTaken() + goodsContainer.getSpaceTaken()
-                > getGoodsCapacity())
-                ? NoAddReason.CAPACITY_EXCEEDED
-                : NoAddReason.NONE;
+            if (goods.getSpaceTaken() + ((goodsContainer == null) ? 0
+                    : goodsContainer.getSpaceTaken())
+                > getGoodsCapacity()) return NoAddReason.CAPACITY_EXCEEDED;
+            return NoAddReason.NONE;
         }
         return super.getNoAddReason(locatable);
     }
@@ -274,6 +277,9 @@ public abstract class GoodsLocation extends UnitLocation {
      * @return True if the goods were added.
      */
     public boolean addGoods(GoodsType type, int amount) {
+        if (goodsContainer == null) {
+            goodsContainer = new GoodsContainer(getGame(), this);
+        }
         return goodsContainer.addGoods(type, amount);
     }
 
@@ -286,7 +292,8 @@ public abstract class GoodsLocation extends UnitLocation {
      *     requested, or null if none.
      */
     public Goods removeGoods(GoodsType type, int amount) {
-        return goodsContainer.removeGoods(type, amount);
+        return (goodsContainer == null) ? null
+            : goodsContainer.removeGoods(type, amount);
     }
 
     // Serialization
@@ -294,10 +301,12 @@ public abstract class GoodsLocation extends UnitLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void writeChildren(XMLStreamWriter out, Player player,
-                                 boolean showAll, boolean toSavedGame)
-        throws XMLStreamException {
+                                 boolean showAll,
+                                 boolean toSavedGame) throws XMLStreamException {
         super.writeChildren(out, player, showAll, toSavedGame);
+
         if (goodsContainer != null) {
             goodsContainer.toXML(out, player, showAll, toSavedGame);
         }
@@ -306,15 +315,23 @@ public abstract class GoodsLocation extends UnitLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        // Clear containers
+        if (goodsContainer != null) goodsContainer.removeAll();
+
+        super.readChildren(in);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
         if (GoodsContainer.getXMLElementTagName().equals(in.getLocalName())) {
-            goodsContainer = getGame()
-                .getFreeColGameObject(readId(in), GoodsContainer.class);
-            if (goodsContainer == null) {
-                goodsContainer = new GoodsContainer(getGame(), this, in);
-            } else {
-                goodsContainer.readFromXML(in);
-            }
+            goodsContainer = readFreeColGameObject(in, GoodsContainer.class);
+            goodsContainer.setLocation(this);
+
         } else {
             super.readChild(in);
         }
