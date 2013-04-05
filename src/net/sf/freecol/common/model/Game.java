@@ -21,7 +21,6 @@ package net.sf.freecol.common.model;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -47,32 +46,36 @@ import org.w3c.dom.Element;
 /**
  * The main component of the game model.
  *
- * <br>
- * <br>
- *
- * If an object of this class returns a non-null result to {@link #getViewOwner},
- * then this object just represents a view of the game from a single player's
- * perspective. In that case, some information might be missing from the model.
+ * If an object of this class returns a non-null result to
+ * {@link #getViewOwner}, then this object just represents a view of the game
+ * from a single player's perspective.  In that case, some information
+ * might be missing from the model.
  */
 public class Game extends FreeColGameObject {
 
     private static final Logger logger = Logger.getLogger(Game.class.getName());
 
+    /** The Specification this game uses. */
+    private Specification specification = null;
+
+    /**
+     * The next available id, that can be given to a new
+     * <code>FreeColGameObject</code>.
+     */
+    protected int nextId = 1;
+
+    /** References to all objects created in this game. */
+    protected HashMap<String, WeakReference<FreeColGameObject>> freeColGameObjects
+        = new HashMap<String, WeakReference<FreeColGameObject>>(10000);
+
     /** Game UUID, persistent in savegame files */
     private UUID uuid = UUID.randomUUID();
 
-    /**
-     * A virtual player to use with enemy privateers
-     */
+    /** All the players in the game. */
+    protected final List<Player> players = new ArrayList<Player>();
+
+    /** A virtual player to use for enemy privateers. */
     private Player unknownEnemy;
-
-    /** Contains all the players in the game. */
-    protected List<Player> players = new ArrayList<Player>();
-
-    private Map map;
-
-    /** The name of the player whose turn it is. */
-    protected Player currentPlayer = null;
 
     /**
      * The owner of this view of the game, or <code>null</code> if this game
@@ -80,70 +83,56 @@ public class Game extends FreeColGameObject {
      */
     protected Player viewOwner = null;
 
-    /** Contains references to all objects created in this game. */
-    protected HashMap<String, WeakReference<FreeColGameObject>> freeColGameObjects =
-              new HashMap<String, WeakReference<FreeColGameObject>>(10000);
+    /** The player whose turn it is. */
+    protected Player currentPlayer = null;
+
+    /** The map of the New World. */
+    private Map map = null;
 
     /**
-     * The next available ID, that can be given to a new
-     * <code>FreeColGameObject</code>.
+     * The current nation options.  Mainly used to see if a player
+     * nation is available.
      */
-    protected int nextId = 1;
+    private NationOptions nationOptions = null;
 
+    /** The current turn. */
     private Turn turn = new Turn(1);
 
     /**
-     * Describe nationOptions here.
+     * The combat model this game uses. At the moment, the only combat
+     * model available is the SimpleCombatModel, which strives to
+     * implement the combat model of the original game.  However, it is
+     * anticipated that other, more complex combat models will be
+     * implemented in future.  As soon as that happens, we will also
+     * have to make the combat model selectable.
      */
-    private NationOptions nationOptions;
+    protected CombatModel combatModel = null;
 
-    /**
-     * Whether the War of Spanish Succession has already taken place.
-     */
+    /** Whether the War of Spanish Succession has already taken place. */
     private boolean spanishSuccession = false;
-
-    protected FreeColGameObjectListener freeColGameObjectListener;
 
     /** The cities of Cibola remaining in this game. */
     protected final List<String> citiesOfCibola = new ArrayList<String>();
 
     /**
-     * The combat model this game uses. At the moment, the only combat
-     * model available is the SimpleCombatModel, which strives to
-     * implement the combat model of the original game. However, it is
-     * anticipated that other, more complex combat models will be
-     * implemented in future. As soon as that happens, we will also
-     * have to make the combat model selectable.
+     * A FreeColGameObjectListener to watch the objects in the game.
+     * Usually this is the AIMain instance.
+     * TODO: is this better done with a property change listener?
+     * Does not need serialization.
      */
-    protected CombatModel combatModel;
-
-    /**
-     * The Specification this game uses.
-     */
-    private Specification specification = null;
+    protected FreeColGameObjectListener freeColGameObjectListener = null;
 
 
     /**
      * This constructor is used by the Server to create a new Game
      * with the given Specification.
      *
-     * @param specification
+     * @param specification The <code>Specification</code> for this game.
      */
     protected Game(Specification specification) {
         super(null);
-        this.specification = specification;
-    }
 
-    /**
-     * Minimal constructor,
-     * Just necessary to call parent constructor
-     *
-     * @param game <code>Game</code>
-     * @param in <code>XMLStreamReader</code>
-     * @throws XMLStreamException
-     */
-    protected Game(Game game, XMLStreamReader in) throws XMLStreamException {
-        super(game, null);
+        this.specification = specification;
     }
 
     /**
@@ -152,7 +141,7 @@ public class Game extends FreeColGameObject {
      *
      * @param element The <code>Element</code> containing the game.
      * @param viewOwnerUsername The username of the owner of this view of the
-     *            game.
+     *     game.
      */
     public Game(Element element, String viewOwnerUsername) {
         super(null);
@@ -164,74 +153,519 @@ public class Game extends FreeColGameObject {
         this.setFreeColGameObject(getId(), this);
     }
 
-    /**
-     * Initiate a new <code>Game</code> object from an XML-representation.
-     * <p>
-     * Note that this is used on the client side; the game is really a partial
-     * view of the server-side game.
-     *
-     * @param in The XML stream to read the data from.
-     * @param viewOwnerUsername The username of the owner of this view of the
-     *            game.
-     * @throws XMLStreamException if an error occured during parsing.
-     * @see net.sf.freecol.client.control.ConnectController#login(String,
-     *      String, int)
-     */
-    public Game(XMLStreamReader in, String viewOwnerUsername) throws XMLStreamException {
-        super(null);
 
-        this.combatModel = new SimpleCombatModel();
-        readFromXML(in);
-        this.viewOwner = getPlayerByName(viewOwnerUsername);
-        // setId() does not add Games to the freeColGameObjects
-        this.setFreeColGameObject(getId(), this);
+    /**
+     * Get the specification for this game.
+     *
+     * @return The <code>Specification</code> for this game.
+     */
+    @Override
+    public Specification getSpecification() {
+        return specification;
+    }
+
+    /**
+     * Get the difficulty level of this game.
+     *
+     * @return An <code>OptionGroup</code> containing the difficulty settings.
+     */
+    public final OptionGroup getDifficultyLevel() {
+        return specification.getDifficultyLevel();
+    }
+
+    /**
+     * Gets the map generator options associated with this game.
+     *
+     * @return An <code>OptionGroup</code> containing the map
+     *     generator options.
+     */
+    public OptionGroup getMapGeneratorOptions() {
+        return specification.getMapGeneratorOptions();
     }
 
     /**
      * Stub for routine only meaningful in the server.
+     *
+     * @return Nothing.
+     * @exception IllegalStateException, unimplemented in the client.
      */
     public String getNextId() {
         throw new IllegalStateException("game.getNextId not implemented");
     }
 
     /**
+     * Gets the <code>FreeColGameObject</code> with the given id.
+     *
+     * @param id The id, which may be null or invalid.
+     * @return The game object, or null if not found.
+     */
+    public FreeColGameObject getFreeColGameObject(String id) {
+        if (id != null && id.length() > 0) {
+            final WeakReference<FreeColGameObject> ro
+                = freeColGameObjects.get(id);
+            if (ro != null) {
+                final FreeColGameObject o = ro.get();
+                if (o != null) return o;
+                freeColGameObjects.remove(id);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Gets the <code>FreeColGameObject</code> with the specified
+     * identifier and class.
+     *
+     * @param id The identifier.
+     * @param returnClass The expected class of the object.
+     * @return The game object, or null if not found.
+     */
+    public <T extends FreeColGameObject> T getFreeColGameObject(String id,
+        Class<T> returnClass) {
+        FreeColGameObject fcgo = getFreeColGameObject(id);
+        try {
+            return returnClass.cast(fcgo);
+        } catch (ClassCastException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Convenience wrapper to get a location by id.
+     * Location is an interface, precluding using the typed version
+     * of getFreeColGameObject().
+     *
+     * @param id The identifier.
+     * @return The <code>Location</code> if any.
+     */
+    public Location getFreeColLocation(String id) {
+        FreeColGameObject fcgo = getFreeColGameObject(id);
+        if (fcgo instanceof Location) return (Location)fcgo;
+        if (fcgo != null) {
+            logger.warning("Not a location: " + id);
+            return null;
+        }
+        final String tag = id.substring(0, id.indexOf(':'));
+        // @compat 0.10.x
+        if ("newWorld".equals(tag)) {
+            // do nothing
+        // end @compat
+        } else if (Building.getXMLElementTagName().equals(tag)) {
+            return new Building(this, id);
+        } else if (Colony.getXMLElementTagName().equals(tag)) {
+            return new Colony(this, id);
+        } else if (ColonyTile.getXMLElementTagName().equals(tag)) {
+            return new ColonyTile(this, id);
+        } else if (Europe.getXMLElementTagName().equals(tag)) {
+            return new Europe(this, id);
+        } else if (HighSeas.getXMLElementTagName().equals(tag)) {
+            return new HighSeas(this, id);
+        } else if (IndianSettlement.getXMLElementTagName().equals(tag)) {
+            return new IndianSettlement(this, id);
+        } else if (Map.getXMLElementTagName().equals(tag)) {
+            return new Map(this, id);
+        } else if (Tile.getXMLElementTagName().equals(tag)) {
+            return new Tile(this, id);
+        } else if (Unit.getXMLElementTagName().equals(tag)) {
+            return new Unit(this, id);
+        } else {
+            logger.warning("Not a FCGO: " + id);
+        }
+        return null;
+    }
+
+    /**
+     * Registers a new <code>FreeColGameObject</code> with a given
+     * identifier.
+     *
+     * @param id The unique identifier of the <code>FreeColGameObject</code>.
+     * @param fcgo The <code>FreeColGameObject</code> to add to this
+     *     <code>Game</code>.
+     * @exception IllegalArgumentException If either the id or object are null.
+     */
+    public void setFreeColGameObject(String id, FreeColGameObject fcgo) {
+        if (id == null || id.length() == 0) {
+            throw new IllegalArgumentException("Null/empty id.");
+        } else if (fcgo == null) {
+            throw new IllegalArgumentException("Null FreeColGameObject.");
+        }
+
+        final WeakReference<FreeColGameObject> wr
+            = new WeakReference<FreeColGameObject>(fcgo);
+        final FreeColGameObject old = getFreeColGameObject(id);
+        if (old != null) {
+            throw new IllegalArgumentException("Replacing FreeColGameObject "
+                + id + " : " + old.getClass()
+                + " with " + fcgo.getId() + " : " + fcgo.getClass());
+        }
+        freeColGameObjects.put(id, wr);
+
+        notifySetFreeColGameObject(id, fcgo);
+    }
+
+    /**
+     * Removes the <code>FreeColGameObject</code> with the specified
+     * identifier.
+     *
+     * @param id The identifier of the <code>FreeColGameObject</code>
+     *     to remove from this <code>Game</code>.
+     * @return The <code>FreeColGameObject</code> that has been removed.
+     * @exception IllegalArgumentException If the identifier is null or empty.
+     */
+    public FreeColGameObject removeFreeColGameObject(String id) {
+        if (id == null || id.length() == 0) {
+            throw new IllegalArgumentException("Null/empty id.");
+        }
+
+        final FreeColGameObject o = getFreeColGameObject(id);
+        notifyRemoveFreeColGameObject(id);
+        
+        freeColGameObjects.remove(id);
+        return o;
+    }
+
+    /**
+     * Gets an <code>Iterator</code> over every registered
+     * <code>FreeColGameObject</code>.
+     *
+     * This <code>Iterator</code> should be iterated at least once
+     * in a while since it cleans the <code>FreeColGameObject</code>
+     * cache.  TODO: formalize this better.
+     *
+     * @return An <code>Iterator</code> containing every registered
+     *     <code>FreeColGameObject</code>.
+     * @see #setFreeColGameObject
+     */
+    public Iterator<FreeColGameObject> getFreeColGameObjectIterator() {
+        return new Iterator<FreeColGameObject>() {
+            final Iterator<Entry<String, WeakReference<FreeColGameObject>>> it
+                = freeColGameObjects.entrySet().iterator();
+            FreeColGameObject nextValue = null;
+
+            public boolean hasNext() {
+                while (nextValue == null) {
+                    if (!it.hasNext()) {
+                        return false;
+                    }
+                    final Entry<String, WeakReference<FreeColGameObject>> entry
+                        = it.next();
+                    final WeakReference<FreeColGameObject> wr = entry.getValue();
+                    final FreeColGameObject o = wr.get();
+                    if (o == null) {
+                        final String id = entry.getKey();
+                        notifyRemoveFreeColGameObject(id);
+                        it.remove();
+                    } else {
+                        nextValue = o;
+                    }
+                }
+
+                return nextValue != null;
+            }
+
+            public FreeColGameObject next() {
+                hasNext();
+                final FreeColGameObject o = nextValue;
+                nextValue = null;
+                return o;
+            }
+
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+        };
+    }
+
+    /**
      * Gets the unique identifier for this game. 
      * A game UUID persists in save game files.
      *
-     * @return java.util.UUID
+     * @return The game <code>UUID</code>.
      */
     public UUID getUUID () {
        return uuid;
     }
 
     /**
-     * Returns the "Unknown Enemy" Player, which is used for
-     * privateers.
+     * Get all the players in the game.
      *
-     * @return a <code>Player</code> value
+     * @return The list of <code>Player</code>s.
      */
-    public Player getUnknownEnemy() {
-    	return unknownEnemy;
+    public List<Player> getPlayers() {
+        return players;
     }
 
     /**
-     * Sets the "Unknown Enemy" Player, which is used for
-     * privateers.
+     * Get the live European players in this game.
      *
-     * @param player a <code>Player</code> value
+     * @return A list of live European <code>Player</code>s in this game.
+     */
+    public List<Player> getLiveEuropeanPlayers() {
+        List<Player> europeans = new ArrayList<Player>();
+        for (Player player : players) {
+            if (player.isEuropean() && !player.isDead()) europeans.add(player);
+        }
+        return europeans;
+    }
+
+    /**
+     * Get a <code>Player</code> identified by its nation id.
+     *
+     * @param nationId The nation id to search for.
+     * @return The <code>Player</code> of the given nation, or null if
+     *     not found.
+     */
+    public Player getPlayer(String nationId) {
+        for (Player player : players) {
+            if (player.getNationID().equals(nationId)) return player;
+        }
+        return null;
+    }
+
+    /**
+     * Gets the next current player.
+     *
+     * @return The <code>Player</code> whose turn follows the current player.
+     */
+    public Player getNextPlayer() {
+        return getPlayerAfter(currentPlayer);
+    }
+
+    /**
+     * Gets the live player after the given player.
+     *
+     * @param beforePlayer The <code>Player</code> before the
+     *     <code>Player</code> to be returned.
+     * @return The <code>Player</code> after the <code>beforePlayer</code>
+     *     in the list which determines the order each player becomes the
+     *     current player.
+     * @see #getNextPlayer
+     */
+    public Player getPlayerAfter(Player beforePlayer) {
+        if (players.isEmpty()) return null;
+
+        final int start = players.indexOf(beforePlayer);
+        int index = start;
+        do {
+            if (++index >= players.size()) index = 0;
+            Player player = players.get(index);
+            if (!player.isDead()) return player;
+        } while (index != start);
+        return null;
+    }
+
+    /**
+     * Get the first player in this game.
+     *
+     * @return The first player, or null if none present.
+     */
+    public Player getFirstPlayer() {
+        return (players.isEmpty()) ? null : players.get(0);
+    }
+
+    /**
+     * Gets a player specified by a name.
+     *
+     * @param name The name identifying the <code>Player</code>.
+     * @return The <code>Player</code> or null if none found.
+     */
+    public Player getPlayerByName(String name) {
+        for (Player player : players) {
+            if (player.getName().equals(name)) return player;
+        }
+        return null;
+    }
+
+    /**
+     * Checks if the specified player name is in use.
+     *
+     * @param name The name to check.
+     * @return True if the name is already in use.
+     */
+    public boolean playerNameInUse(String name) {
+        for (Player player : players) {
+            if (player.getName().equals(name)) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Adds the specified player to the game.
+     *
+     * @param player The <code>Player</code> to add.
+     * @return True if the player was added.
+     */
+    public boolean addPlayer(Player player) {
+        if (player.isAI() || canAddNewPlayer()) {
+            players.add(player);
+            Nation nation = getSpecification().getNation(player.getNationID());
+            nationOptions.getNations().put(nation, NationState.NOT_AVAILABLE);
+            if (currentPlayer == null) currentPlayer = player;
+            return true;
+        }
+        logger.warning("Game already full, but tried to add: "
+            + player.getName());
+        return false;
+    }
+
+    /**
+     * Removes the specified player from the game.
+     *
+     * @param player The <code>Player</code> to remove.
+     * @return True if the player was removed.
+     */
+    public boolean removePlayer(Player player) {
+        Player newCurrent = (currentPlayer != player) ? null
+            : getPlayerAfter(currentPlayer);
+
+        if (!players.remove(player)) return false;
+
+        Nation nation = getSpecification().getNation(player.getNationID());
+        nationOptions.getNations().put(nation, NationState.AVAILABLE);
+        player.dispose();
+
+        if (newCurrent != null) currentPlayer = newCurrent;
+        return true;
+    }
+
+    /**
+     * Gets the "Unknown Enemy" player, which is used for privateers.
+     *
+     * @return The unknown enemy <code>Player</code>.
+     */
+    public Player getUnknownEnemy() {
+        return unknownEnemy;
+    }
+
+    /**
+     * Sets the "Unknown Enemy" Player.
+     *
+     * @param player The <code>Player</code> to serve as the unknown enemy.
      */
     public void setUnknownEnemy(Player player) {
         this.unknownEnemy = player;
     }
 
     /**
-     * Get the <code>VacantNations</code> value.
+     * Get the owner of this view of the game, or null if this game
+     * has all the information.
      *
-     * @return a <code>List<Nation></code> value
+     * If this value is null, then it means that this game object has
+     * access to all information (i.e. is the server model).
+     *
+     * TODO: This is not used much except in Tile, and perhaps could
+     * go away if we had ServerTiles?
+     *
+     * @return The <code>Player</code> using this <code>Game</code>-object
+     *     as a view.
+     */
+    public Player getViewOwner() {
+        return viewOwner;
+    }
+
+    /**
+     * Is this view visible to a player?
+     *
+     * @return True if there is a player attached to this game/view.
+     */
+    public boolean isViewShared() {
+        return getViewOwner() != null;
+    }
+
+    /**
+     * Gets the current player.
+     *
+     * @return The current player.
+     */
+    public Player getCurrentPlayer() {
+        return currentPlayer;
+    }
+
+    /**
+     * Sets the current player.
+     *
+     * @param newCurrentPlayer The new current <code>Player</code>.
+     */
+    public void setCurrentPlayer(Player newCurrentPlayer) {
+        if (newCurrentPlayer != null) {
+            if (currentPlayer != null) {
+                currentPlayer.removeModelMessages();
+                currentPlayer.invalidateCanSeeTiles();
+            }
+        } else {
+            logger.info("Current player set to 'null'.");
+        }
+        currentPlayer = newCurrentPlayer;
+    }
+
+    /**
+     * Gets the map that is being used in this game.
+     *
+     * @return The game <code>Map</code>.
+     */
+    public Map getMap() {
+        return map;
+    }
+
+    /**
+     * Sets the game map.
+     *
+     * @param newMap The new <code>Map</code> to use.
+     */
+    public void setMap(Map newMap) {
+        if (this.map != newMap) {
+            for (Player player : getPlayers()) {
+                if (player.getHighSeas() != null) {
+                    player.getHighSeas().removeDestination(this.map);
+                    player.getHighSeas().addDestination(newMap);
+                }
+            }
+        }
+        this.map = newMap;
+    }
+
+    /**
+     * Get the current nation options.
+     *
+     * @return The current <code>NationOptions</code>.
+     */
+    public final NationOptions getNationOptions() {
+        return nationOptions;
+    }
+
+    /**
+     * Set the current ntion options.
+     *
+     * @param newNationOptions The new <code>NationOptions<code> value.
+     */
+    public final void setNationOptions(final NationOptions newNationOptions) {
+        this.nationOptions = newNationOptions;
+    }
+
+    /**
+     * Find an available (i.e. vacant) nation.
+     *
+     * @return A vacant <code>Nation</code> or null if none found.
+     */
+    public Nation getVacantNation() {
+        for (Entry<Nation, NationState> entry
+                 : nationOptions.getNations().entrySet()) {
+            if (entry.getValue() == NationState.AVAILABLE) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Get the currently available nations.
+     *
+     * @return A list of available <code>Nation</code>s.
      */
     public final List<Nation> getVacantNations() {
         List<Nation> result = new ArrayList<Nation>();
-        for (Entry<Nation, NationState> entry : nationOptions.getNations().entrySet()) {
+        for (Entry<Nation, NationState> entry
+                 : nationOptions.getNations().entrySet()) {
             if (entry.getValue() == NationState.AVAILABLE) {
                 result.add(entry.getKey());
             }
@@ -240,40 +674,12 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Returns the owner of this view of the game, or <code>null</code> if
-     * this game has all the information. <br>
-     * <br>
-     * If this value is <code>null</code>, then it means that this
-     * <code>Game</code> object has access to all information (ie is the
-     * server model).
+     * Can a new player be added to this game?
      *
-     * @return The <code>Player</code> using this <code>Game</code>-object
-     *         as a view.
+     * @return True if a new player can be added.
      */
-    public Player getViewOwner() {
-        return viewOwner;
-    }
-
-    public boolean isViewShared() {
-        return viewOwner != null;
-    }
-
-    /**
-     * Finds a settlement by name.
-     *
-     * @param name The name of the <code>Settlement</code>.
-     * @return The <code>Settlement</code> or <code>null</code> if
-     *         there is no known <code>Settlement</code> with the
-     *         specified name (the settlement might not be visible to
-     *         a client).
-     */
-    public Settlement getSettlement(String name) {
-        for (Player p : getPlayers()) {
-            for (Settlement s : p.getSettlements()) {
-                if (name.equals(s.getName())) return s;
-            }
-        }
-        return null;
+    public boolean canAddNewPlayer() {
+        return getVacantNation() != null;
     }
 
     /**
@@ -295,22 +701,52 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Get the <code>CombatModel</code> value.
+     * Get the combat model in this game.
      *
-     * @return a <code>CombatModel</code> value
+     * @return The <code>CombatModel</code>.
      */
     public final CombatModel getCombatModel() {
         return combatModel;
     }
 
     /**
-     * Set the <code>CombatModel</code> value.
+     * Set the game combat model.
      *
-     * @param newCombatModel The new CombatModel value.
+     * @param newCombatModel The new <code>CombatModel</code> value.
      */
     public final void setCombatModel(final CombatModel newCombatModel) {
         this.combatModel = newCombatModel;
     }
+
+    /**
+     * Has the Spanish Succession event occured?
+     *
+     * @return True if the Spanish Succession has occurred.
+     */
+    public final boolean getSpanishSuccession() {
+        return spanishSuccession;
+    }
+
+    /**
+     * Set the Spanish Succession value.
+     *
+     * @param spanishSuccession The new Spanish Succession value.
+     */
+    public final void setSpanishSuccession(final boolean spanishSuccession) {
+        this.spanishSuccession = spanishSuccession;
+    }
+
+    /**
+     * Get the next name for a city of Cibola, removing it from the
+     * list of available names.
+     *
+     * @return The next name key for a city of Cibola, or null if none
+     *     available.
+     */
+    public String nextCityOfCibola() {
+        return (citiesOfCibola.isEmpty()) ? null : citiesOfCibola.remove(0);
+    }
+
 
     /**
      * Sets the <code>FreeColGameObjectListener</code> attached to this game.
@@ -358,569 +794,36 @@ public class Game extends FreeColGameObject {
         }
     }
 
-    /**
-     * Get the difficulty level of this game.
-     *
-     * @return An <code>OptionGroup</code> containing the difficulty settings.
-     */
-    public final OptionGroup getDifficultyLevel() {
-        return specification.getDifficultyLevel();
-    }
 
-    /**
-     * Gets the map generator options associated with this game.
-     *
-     * @return An <code>OptionGroup</code> containing the map
-     *     generator options.
-     */
-    public OptionGroup getMapGeneratorOptions() {
-        return specification.getMapGeneratorOptions();
-    }
-
-    /**
-     * Adds the specified player to the game.
-     *
-     * @param player The <code>Player</code> that shall be added to this
-     *            <code>Game</code>.
-     */
-    public void addPlayer(Player player) {
-        if (player.isAI() || canAddNewPlayer()) {
-            players.add(player);
-            Nation nation = getSpecification().getNation(player.getNationID());
-            nationOptions.getNations().put(nation, NationState.NOT_AVAILABLE);
-            if (currentPlayer == null) {
-                currentPlayer = player;
-            }
-        } else {
-            logger.warning("Game already full, but tried to add: "
-                + player.getName());
-        }
-    }
-
-    /**
-     * Removes the specified player from the game.
-     *
-     * @param player The <code>Player</code> that shall be removed from this
-     *            <code>Game</code>.
-     */
-    public void removePlayer(Player player) {
-        boolean updateCurrentPlayer = (currentPlayer == player);
-
-        players.remove(players.indexOf(player));
-        Nation nation = getSpecification().getNation(player.getNationID());
-        nationOptions.getNations().put(nation, NationState.AVAILABLE);
-        player.dispose();
-
-        if (updateCurrentPlayer) {
-            currentPlayer = getFirstPlayer();
-        }
-    }
-
-    /**
-     * Registers a new <code>FreeColGameObject</code> with the specified ID.
-     *
-     * @param id The unique ID of the <code>FreeColGameObject</code>.
-     * @param fcgo The <code>FreeColGameObject</code> to add to this
-     *      <code>Game</code>.
-     * @exception IllegalArgumentException If either <code>id</code>
-     *                or <code>freeColGameObject </code> are
-     *                <i>null</i>.
-     */
-    public void setFreeColGameObject(String id, FreeColGameObject fcgo) {
-        if (id == null || id.equals("")) {
-            throw new IllegalArgumentException("Null/empty id.");
-        } else if (fcgo == null) {
-            throw new IllegalArgumentException("Null FreeColGameObject.");
-        }
-
-        final WeakReference<FreeColGameObject> wr
-            = new WeakReference<FreeColGameObject>(fcgo);
-        final FreeColGameObject old = getFreeColGameObject(id);
-        if (old != null) {
-            throw new IllegalArgumentException("Replacing FreeColGameObject "
-                + id + ": " + old.getClass()
-                + " with " + fcgo.getClass());
-        }
-        freeColGameObjects.put(id, wr);
-
-        if (freeColGameObjectListener != null) {
-            freeColGameObjectListener.setFreeColGameObject(id, fcgo);
-        }
-    }
-
-    /**
-     * Gets the <code>FreeColGameObject</code> with the given id.
-     *
-     * @param id The id, which may be null or invalid.
-     * @return The game object, or null if not found.
-     */
-    public FreeColGameObject getFreeColGameObject(String id) {
-        if (id != null && id.length() > 0) {
-            final WeakReference<FreeColGameObject> ro
-                = freeColGameObjects.get(id);
-            if (ro != null) {
-                final FreeColGameObject o = ro.get();
-                if (o != null) return o;
-                freeColGameObjects.remove(id);
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Gets the <code>FreeColGameObject</code> with the specified id and
-     * class.
-     *
-     * @param id The id.
-     * @param returnClass The expected class of the object.
-     * @return The game object, or null if not found.
-     */
-    public <T extends FreeColGameObject> T getFreeColGameObject(String id,
-        Class<T> returnClass) {
-        FreeColGameObject fcgo = getFreeColGameObject(id);
-        try {
-            return returnClass.cast(fcgo);
-        } catch (ClassCastException e) {
-            return null;
-        }
-    }
-
-    /**
-     * Convenience wrapper to get a location (which is an interface, precluding
-     * using the typed version of getFreeColGameObject()) by id.
-     *
-     * @param id The id.
-     * @return The <code>Location</code> if any.
-     */
-    public Location getFreeColLocation(String id) {
-        FreeColGameObject fcgo = getFreeColGameObject(id);
-        if (fcgo instanceof Location) return (Location)fcgo;
-        if (fcgo != null) {
-            logger.warning("Not a location: " + id);
-            return null;
-        }
-        final String tag = id.substring(0, id.indexOf(':'));
-        if ("newWorld".equals(tag)) {
-            // do nothing
-        } else if (Building.getXMLElementTagName().equals(tag)) {
-            return new Building(this, id);
-        } else if (Colony.getXMLElementTagName().equals(tag)) {
-            return new Colony(this, id);
-        } else if (ColonyTile.getXMLElementTagName().equals(tag)) {
-            return new ColonyTile(this, id);
-        } else if (Europe.getXMLElementTagName().equals(tag)) {
-            return new Europe(this, id);
-        } else if (HighSeas.getXMLElementTagName().equals(tag)) {
-            return new HighSeas(this, id);
-        } else if (IndianSettlement.getXMLElementTagName().equals(tag)) {
-            return new IndianSettlement(this, id);
-        } else if (Map.getXMLElementTagName().equals(tag)) {
-            return new Map(this, id);
-        } else if (Tile.getXMLElementTagName().equals(tag)) {
-            return new Tile(this, id);
-        } else if (Unit.getXMLElementTagName().equals(tag)) {
-            return new Unit(this, id);
-        } else {
-            logger.warning("Not a FCGO: " + id);
-        }
-        return null;
-    }
-
-
-    /**
-     * Removes the <code>FreeColGameObject</code> with the specified ID.
-     *
-     * @param id The identifier of the <code>FreeColGameObject</code> that
-     *            shall be removed from this <code>Game</code>.
-     * @return The <code>FreeColGameObject</code> that has been removed.
-     * @throws IllegalArgumentException If <code>id == null</code>,
-     *     or <code>id = ""</code>.
-     */
-    public FreeColGameObject removeFreeColGameObject(String id) {
-        if (id == null || id.equals("")) {
-            throw new IllegalArgumentException("Parameter 'id' must not be null or empty string.");
-        }
-
-        final FreeColGameObject o = getFreeColGameObject(id);
-
-        if (freeColGameObjectListener != null) {
-            freeColGameObjectListener.removeFreeColGameObject(id);
-        }
-
-        freeColGameObjects.remove(id);
-        return o;
-    }
-
-    /**
-     * Gets the <code>Map</code> that is being used in this game.
-     *
-     * @return The <code>Map</code> that is being used in this game or
-     *         <i>null</i> if no <code>Map</code> has been created.
-     */
-    public Map getMap() {
-        return map;
-    }
-
-    /**
-     * Sets the <code>Map</code> that is going to be used in this game.
-     *
-     * @param map The <code>Map</code> that is going to be used in this game.
-     */
-    public void setMap(Map map) {
-        this.map = map;
-        for (Player player : getPlayers()) {
-            if (player.getHighSeas() != null) {
-                player.getHighSeas().addDestination(map);
-            }
-        }
-    }
-
-    /**
-     * Get the <code>NationOptions</code> value.
-     *
-     * @return a <code>NationOptions</code> value
-     */
-    public final NationOptions getNationOptions() {
-        return nationOptions;
-    }
-
-    /**
-     * Set the <code>NationOptions</code> value.
-     *
-     * @param newNationOptions The new NationOptions value.
-     */
-    public final void setNationOptions(final NationOptions newNationOptions) {
-        this.nationOptions = newNationOptions;
-    }
-
-    /**
-     * Returns a vacant nation.
-     *
-     * @return A vacant nation.
-     */
-    public Nation getVacantNation() {
-        for (Entry<Nation, NationState> entry : nationOptions.getNations().entrySet()) {
-            if (entry.getValue() == NationState.AVAILABLE) {
-                return entry.getKey();
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Return a <code>Player</code> identified by it's nation.
-     *
-     * @param nationID The nation.
-     * @return The <code>Player</code> of the given nation.
-     */
-    public Player getPlayer(String nationID) {
-        Iterator<Player> playerIterator = getPlayerIterator();
-        while (playerIterator.hasNext()) {
-            Player player = playerIterator.next();
-            if (player.getNationID().equals(nationID)) {
-                return player;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Sets the current player.
-     *
-     * @param newCp The new current player.
-     */
-    public void setCurrentPlayer(Player newCp) {
-        if (newCp != null) {
-            if (currentPlayer != null) {
-                currentPlayer.removeModelMessages();
-                currentPlayer.invalidateCanSeeTiles();
-            }
-        } else {
-            logger.info("Current player set to 'null'.");
-        }
-
-        currentPlayer = newCp;
-    }
-
-    /**
-     * Gets the current player. This is the <code>Player</code> currently
-     * playing the <code>Game</code>.
-     *
-     * @return The current player.
-     */
-    public Player getCurrentPlayer() {
-        return currentPlayer;
-    }
-
-    /**
-     * Gets the next current player.
-     *
-     * @return The player that will start its turn as soon as the current player
-     *         is ready.
-     * @see #getCurrentPlayer
-     */
-    public Player getNextPlayer() {
-        return getPlayerAfter(currentPlayer);
-    }
-
-    /**
-     * Gets the player after the given player.
-     *
-     * @param beforePlayer The <code>Player</code> before the
-     *            <code>Player</code> to be returned.
-     * @return The <code>Player</code> after the <code>beforePlayer</code>
-     *         in the list which determines the order each player becomes the
-     *         current player.
-     * @see #getNextPlayer
-     */
-    public Player getPlayerAfter(Player beforePlayer) {
-        if (players.size() == 0) {
-            return null;
-        }
-
-        int index = players.indexOf(beforePlayer) + 1;
-
-        if (index >= players.size()) {
-            index = 0;
-        }
-
-        // Find first non-dead player:
-        while (true) {
-            Player player = players.get(index);
-            if (!player.isDead()) {
-                return player;
-            }
-
-            index++;
-
-            if (index >= players.size()) {
-                index = 0;
-            }
-        }
-    }
-
-    /**
-     * Gets the first player in this game.
-     *
-     * @return the <code>Player</code> that was first added to this
-     *         <code>Game</code>.
-     */
-    public Player getFirstPlayer() {
-        if (players.isEmpty()) {
-            return null;
-        } else {
-            return players.get(0);
-        }
-    }
-
-    /**
-     * Gets an <code>Iterator</code> of every registered
-     * <code>FreeColGameObject</code>.
-     *
-     * This <code>Iterator</code> should be iterated at least once
-     * in a while since it cleans the <code>FreeColGameObject</code>
-     * cache.
-     *
-     * @return an <code>Iterator</code> containing every registered
-     *         <code>FreeColGameObject</code>.
-     * @see #setFreeColGameObject
-     */
-    public Iterator<FreeColGameObject> getFreeColGameObjectIterator() {
-        return new Iterator<FreeColGameObject>() {
-            final Iterator<Entry<String, WeakReference<FreeColGameObject>>> it = freeColGameObjects.entrySet().iterator();
-            FreeColGameObject nextValue = null;
-
-            public boolean hasNext() {
-                while (nextValue == null) {
-                    if (!it.hasNext()) {
-                        return false;
-                    }
-                    final Entry<String, WeakReference<FreeColGameObject>> entry = it.next();
-                    final WeakReference<FreeColGameObject> wr = entry.getValue();
-                    final FreeColGameObject o = wr.get();
-                    if (o == null) {
-                        final String id = entry.getKey();
-                        if (freeColGameObjectListener != null) {
-                            freeColGameObjectListener.removeFreeColGameObject(id);
-                        }
-                        it.remove();
-                    } else {
-                        nextValue = o;
-                    }
-                }
-
-                return nextValue != null;
-            }
-
-            public FreeColGameObject next() {
-                hasNext();
-                final FreeColGameObject o = nextValue;
-                nextValue = null;
-                return o;
-            }
-
-            public void remove() {
-                throw new UnsupportedOperationException();
-            }
-        };
-    }
-
-    /**
-     * Gets a <code>Player</code> specified by a name.
-     *
-     * @param name The name identifying the <code>Player</code>.
-     * @return The <code>Player</code>.
-     */
-    public Player getPlayerByName(String name) {
-        Iterator<Player> playerIterator = getPlayerIterator();
-
-        while (playerIterator.hasNext()) {
-            Player player = playerIterator.next();
-            if (player.getName().equals(name)) {
-                return player;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Checks if the specified name is in use.
-     *
-     * @param username The name.
-     * @return <i>true</i> if the name is already in use and <i>false</i>
-     *         otherwise.
-     */
-    public boolean playerNameInUse(String username) {
-
-        for (Player player : players) {
-            if (player.getName().equals(username)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Gets an <code>Iterator</code> of every <code>Player</code> in this
-     * game.
-     *
-     * @return The <code>Iterator</code>.
-     */
-    public Iterator<Player> getPlayerIterator() {
-        return players.iterator();
-    }
-
-    /**
-     * Gets an <code>Vector</code> containing every <code>Player</code> in
-     * this game.
-     *
-     * @return The <code>Vector</code>.
-     */
-    public List<Player> getPlayers() {
-        return players;
-    }
-
-    public int getNumberOfPlayers() {
-        return players.size();
-    }
-
-    /**
-     * Returns all the live European players known by the player of this game.
-     *
-     * @return All the live European players known by the player of this game.
-     */
-    public List<Player> getLiveEuropeanPlayers() {
-        List<Player> europeans = new ArrayList<Player>();
-        for (Player player : players) {
-            if (player.isEuropean() && !player.isDead()) {
-                europeans.add(player);
-            }
-        }
-        return europeans;
-    }
+    // Miscellaneous utilities.
 
     /**
      * Checks if all players are ready to launch.
      *
-     * @return True if all players are ready to launch and <i>false</i>
-     *         otherwise.
+     * @return True if all players are ready to launch.
      */
     public boolean allPlayersReadyToLaunch() {
-        for (Player player : players) if (!player.isReady()) return false;
+        for (Player player : getPlayers()) {
+            if (!player.isReady()) return false;
+        }
         return true;
     }
 
     /**
-     * Checks if a new <code>Player</code> can be added.
+     * Finds a settlement by name.
      *
-     * @return <i>true</i> if a new player can be added and <i>false</i>
-     *         otherwise.
+     * @param name The name of the <code>Settlement</code>.
+     * @return The <code>Settlement</code> found, or <code>null</code>
+     *     if there is no known <code>Settlement</code> with the
+     *     specified name (the settlement might not be visible to a client).
      */
-    public boolean canAddNewPlayer() {
-        return (getVacantNation() != null);
-    }
-
-    /**
-     * Get the <code>SpanishSuccession</code> value.
-     *
-     * @return a <code>boolean</code> value
-     */
-    public final boolean getSpanishSuccession() {
-        return spanishSuccession;
-    }
-
-    /**
-     * Set the <code>SpanishSuccession</code> value.
-     *
-     * @param newSpanishSuccession The new SpanishSuccession value.
-     */
-    public final void setSpanishSuccession(final boolean newSpanishSuccession) {
-        this.spanishSuccession = newSpanishSuccession;
-    }
-
-    /**
-     * Checks the integrity of this <code>Game</code>.
-     * 
-     * - Detects {@link FreeColGameObject#isUninitialized() uninitialized}
-     *   <code>FreeColGameObject</code>s.
-     * - Detects and fixes map inconsistencies
-     * - Detects and fixes player inconsistencies
-     *
-     * @return True if there were no problems found.
-     */
-    public boolean checkIntegrity() {
-        boolean ok = true;
-        Iterator<FreeColGameObject> iterator = getFreeColGameObjectIterator();
-        while (iterator.hasNext()) {
-            FreeColGameObject fgo = iterator.next();
-            if (fgo.isUninitialized()) {
-                logger.warning("Uninitialized object: " + fgo.getId()
-                    + " (" + fgo.getClass() + ")");
-                ok = false;
+    public Settlement getSettlement(String name) {
+        for (Player p : getPlayers()) {
+            for (Settlement s : p.getSettlements()) {
+                if (name.equals(s.getName())) return s;
             }
         }
-        Map map = getMap();
-        if (map != null) ok &= map.fixIntegrity();
-        for (Player player : getPlayers()) {
-            ok &= player.fixIntegrity();
-        }
-        if (ok) {
-            logger.info("Game integrity ok.");
-        } else {
-            logger.warning("Game integrity test failed.");
-        }
-        return ok;
-    }
-
-    /**
-     * Get the next name for a city of Cibola.
-     *
-     * @return The next name for a city of Cibola, or null if none available.
-     */
-    public String nextCityOfCibola() {
-        return (citiesOfCibola.isEmpty()) ? null : citiesOfCibola.remove(0);
+        return null;
     }
 
     /**
@@ -953,27 +856,6 @@ public class Game extends FreeColGameObject {
         }
         return o;
     }
-
-
-    /**
-     * Return the specification for this Game.
-     *
-     * @return a <code>Specification</code> value
-     */
-    @Override
-    public Specification getSpecification() {
-        return specification;
-    }
-
-    /**
-     * Need to overwrite behavior of equals inherited from FreeColGameObject,
-     * since two games are not the same if they have the same id.
-     */
-    @Override
-    public boolean equals(Object o) {
-        return this == o;
-    }
-
 
     /**
      * Gets the statistics of this game.
@@ -1018,6 +900,55 @@ public class Game extends FreeColGameObject {
     }
 
 
+    /**
+     * Checks the integrity of this <code>Game</code>.
+     * 
+     * - Detects {@link FreeColGameObject#isUninitialized() uninitialized}
+     *   <code>FreeColGameObject</code>s.
+     * - Detects and fixes map inconsistencies
+     * - Detects and fixes player inconsistencies
+     *
+     * @return True if there were no problems found.
+     */
+    public boolean checkIntegrity() {
+        boolean ok = true;
+        Iterator<FreeColGameObject> iterator = getFreeColGameObjectIterator();
+        while (iterator.hasNext()) {
+            FreeColGameObject fgo = iterator.next();
+            if (fgo.isUninitialized()) {
+                logger.warning("Uninitialized object: " + fgo.getId()
+                    + " (" + fgo.getClass() + ")");
+                ok = false;
+            }
+        }
+        Map map = getMap();
+        if (map != null) ok &= map.fixIntegrity();
+        for (Player player : getPlayers()) {
+            ok &= player.fixIntegrity();
+        }
+        if (ok) {
+            logger.info("Game integrity ok.");
+        } else {
+            logger.warning("Game integrity test failed.");
+        }
+        return ok;
+    }
+
+
+    // Interface Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object o) {
+        // We need to override the behavior of equals inherited from
+        // FreeColGameObject, since two games are not the same if they
+        // have the same id.
+        return this == o;
+    }
+
+
     // Serialization
 
     private static final String CIBOLA_TAG = "cibola";
@@ -1046,6 +977,7 @@ public class Game extends FreeColGameObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out, Player player,
                              boolean showAll,
                              boolean toSavedGame) throws XMLStreamException {
@@ -1101,7 +1033,7 @@ public class Game extends FreeColGameObject {
 
         Player enemy = getUnknownEnemy();
         if (enemy != null) enemy.toXML(out, player, showAll, toSavedGame);
- 
+
         if (map != null) map.toXML(out, player, showAll, toSavedGame);
     }
 
@@ -1171,7 +1103,7 @@ public class Game extends FreeColGameObject {
                 + Game.getXMLElementTagName() + ">, "
                 + " found instead: " + in.getLocalName());
         }
- 
+
         // @compat 0.9.x
         if (gameOptions != null) {
             addOldOptions(gameOptions);
@@ -1195,31 +1127,31 @@ public class Game extends FreeColGameObject {
             if (id != null) citiesOfCibola.add(id);
             in.nextTag();
 
-            // @compat 0.9.x
+        // @compat 0.9.x
         } else if (CITIES_OF_CIBOLA_TAG.equals(tag)) {
             List<String> cities = readFromListElement(CITIES_OF_CIBOLA_TAG, in, 
-                String.class);
+                                                      String.class);
             citiesOfCibola.clear();
             citiesOfCibola.addAll(cities);
-            // end @compat
+        // end @compat
 
-            // @compat 0.9.x
+        // @compat 0.9.x
         } else if (GAME_OPTIONS_1_TAG.equals(tag) 
             || GAME_OPTIONS_2_TAG.equals(tag)) {
             gameOptions = new OptionGroup(specification);
             gameOptions.readFromXML(in);
-            // end @compat
+        // end @compat
 
         } else if (Map.getXMLElementTagName().equals(tag)) {
             map = readFreeColGameObject(in, Map.class);
 
-            // @compat 0.9.x
+        // @compat 0.9.x
         } else if (MapGeneratorOptions.getXMLElementTagName().equals(tag)) {
             mapGeneratorOptions = new OptionGroup(specification);
             mapGeneratorOptions.readFromXML(in);
-            // end @compat
+        // end @compat
 
-            // @compat 0.9.x
+        // @compat 0.9.x
         } else if (ModelMessage.getXMLElementTagName().equals(tag)) {
             ModelMessage m = new ModelMessage();
             m.readFromXML(in);
@@ -1229,13 +1161,21 @@ public class Game extends FreeColGameObject {
                 Player player = getFreeColGameObject(owner, Player.class);
                 player.addModelMessage(m);
             }
-            // end @compat
+        // end @compat
 
         } else if (NationOptions.getXMLElementTagName().equals(tag)) {
             if (nationOptions == null) {
                 nationOptions = new NationOptions(specification);
             }
             nationOptions.readFromXML(in);
+
+        } else if (OptionGroup.getXMLElementTagName().equals(tag)
+            // @compat 0.9.x
+            || DIFFICULTY_LEVEL_TAG.equals(tag)
+            // end @compat
+            ) {
+            OptionGroup difficultyLevel = new OptionGroup(specification);
+            difficultyLevel.readFromXML(in);
 
         } else if (Player.getXMLElementTagName().equals(tag)) {
             Player player = readFreeColGameObject(in, Player.class);
@@ -1244,14 +1184,6 @@ public class Game extends FreeColGameObject {
             } else {
                 players.add(player);
             }
-
-        } else if (OptionGroup.getXMLElementTagName().equals(tag)
-            // @compat 0.9.x
-            || DIFFICULTY_LEVEL_TAG.equals(tag)
-            // end @compat
-                   ) {
-            OptionGroup difficultyLevel = new OptionGroup(specification);
-            difficultyLevel.readFromXML(in);
 
         } else if (Specification.getXMLElementTagName().equals(tag)) {
             logger.info(((specification == null) ? "Loading" : "Reloading")
