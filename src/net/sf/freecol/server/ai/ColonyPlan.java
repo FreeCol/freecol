@@ -291,7 +291,7 @@ public class ColonyPlan {
         }
         return null;
     }
-        
+
     /**
      * Gets the food-producing and non-autoproducing work location
      * plans associated with this <code>ColonyPlan</code>.
@@ -733,7 +733,7 @@ public class ColonyPlan {
         }
         return ret;
     }
-            
+
     /**
      * Updates the build plans for this colony.
      */
@@ -860,7 +860,7 @@ public class ColonyPlan {
                 logger.warning("No building priority found for: " + type);
             }
         }
-        
+
         double wagonNeed = 0.0;
         if (!colony.isConnectedPort()) { // Inland colonies need transportation
             int wagons = euaip.getNeededWagons(colony.getTile());
@@ -898,7 +898,7 @@ public class ColonyPlan {
                     double f = (produce.contains(g.getInputType())) ? 1.0
                         : 5.0;
                     difficulty += need * f;
-                }                    
+                }
             }
             bp.difficulty = Math.max(1.0f, Math.sqrt(difficulty));
         }
@@ -990,7 +990,7 @@ public class ColonyPlan {
                 }
             };
         List<GoodsType> toAdd = new ArrayList<GoodsType>();
-        
+
         // If we need liberty put it before the new world production.
         if (colony.getSoL() < 100) {
             for (GoodsType g : libertyGoodsTypes) {
@@ -1131,7 +1131,7 @@ public class ColonyPlan {
         }
         return null;
     }
-    
+
     /**
      * Gets the best worker to execute a work location plan.
      * - The most productive one wins (which will automatically pick a
@@ -1155,7 +1155,7 @@ public class ColonyPlan {
                                      List<Unit> workers) {
         if (workers == null || workers.isEmpty()) return null;
         final Colony colony = wl.getColony();
-        final GoodsType outputType = (goodsType.isStoredAs()) 
+        final GoodsType outputType = (goodsType.isStoredAs())
             ? goodsType.getStoredAs() : goodsType;
 
         // Avoid some nasty autodestructions by accepting singleton
@@ -1200,7 +1200,7 @@ public class ColonyPlan {
                     special = u;
                 }
             }
-            
+
             u.setLocation(oldLoc);
             u.setWorkType(oldWork);
         }
@@ -1527,7 +1527,7 @@ locations:      for (WorkLocation wl : scratch.getAvailableWorkLocations()) {
                     for (Unit u : new ArrayList<Unit>(workers)) {
                         for (GoodsType type : libertyGoodsTypes) {
                             if (wl.canAdd(u)
-                                && wl.getPotentialProduction(type, 
+                                && wl.getPotentialProduction(type,
                                     u.getType()) > 0) {
                                 u.setLocation(wl);
                                 u.setWorkType(type);

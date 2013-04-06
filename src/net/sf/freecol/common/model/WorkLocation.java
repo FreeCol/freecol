@@ -110,7 +110,10 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
      * @param newProductionType The new ProductionType value.
      */
     public final void setProductionType(final ProductionType newProductionType) {
-        this.productionType = newProductionType;
+        if (newProductionType != productionType) {
+            productionType = newProductionType;
+            colony.invalidateCache();
+        }
     }
 
     /**

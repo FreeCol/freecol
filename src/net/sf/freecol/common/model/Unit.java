@@ -1112,6 +1112,10 @@ public class Unit extends GoodsLocation
         if (type != null) {
             experienceType = type;
         }
+        ColonyTile workTile = getWorkTile();
+        if (workTile != null) {
+            workTile.setProductionType(workTile.getBestProductionType(type));
+        }
     }
 
     /**

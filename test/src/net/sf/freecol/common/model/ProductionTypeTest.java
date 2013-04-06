@@ -25,6 +25,7 @@ import java.util.Map;
 
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.FreeColTestUtils;
+import net.sf.freecol.common.model.Map.Direction;
 
 
 public class ProductionTypeTest extends FreeColTestCase {
@@ -83,6 +84,29 @@ public class ProductionTypeTest extends FreeColTestCase {
         assertEquals(5, plains.getProductionOf(grain, null));
         assertEquals(2, (int) production.get("model.goods.cotton"));
         assertEquals(1, (int) production.get("model.goods.ore"));
+    }
+
+    public void testResource() {
+        TileType tundra = spec().getTileType("model.tile.tundra");
+        GoodsType silver = spec().getGoodsType("model.goods.silver");
+
+        Game game = getGame();
+        game.setMap(getTestMap(tundra));
+
+        Colony colony = getStandardColony(1);
+        Tile tile = colony.getTile().getNeighbourOrNull(Direction.N);
+        ColonyTile colonyTile = colony.getColonyTile(tile);
+        ProductionType productionType = colonyTile.getBestProductionType(silver);
+        assertNull("tundra can not produce silver", productionType);
+
+        ResourceType minerals = spec().getResourceType("model.resource.minerals");
+        tile.addResource(new Resource(game, tile, minerals));
+        productionType = colonyTile.getBestProductionType(silver);
+        assertNotNull("production type should not be null", productionType);
+        assertNotNull("resource should produce silver", productionType.getOutput(silver));
+        assertEquals("base production still must be zero",
+                     0, productionType.getOutput(silver).getAmount());
+
     }
 
 
