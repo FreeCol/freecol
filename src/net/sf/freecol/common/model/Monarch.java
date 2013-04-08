@@ -660,7 +660,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute(ID_ATTRIBUTE, getId());
+        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
         out.writeAttribute("player", this.player.getId());
         out.writeAttribute("name", name);
         out.writeAttribute("supportSea", String.valueOf(supportSea));

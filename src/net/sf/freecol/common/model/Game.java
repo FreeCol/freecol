@@ -195,8 +195,8 @@ public class Game extends FreeColGameObject {
     /**
      * Stub for routine only meaningful in the server.
      */
-    public String getNextID() {
-        throw new IllegalStateException("game.getNextID not implemented");
+    public String getNextId() {
+        throw new IllegalStateException("game.getNextId not implemented");
     }
 
     /**
@@ -448,8 +448,34 @@ public class Game extends FreeColGameObject {
     public Location getFreeColLocation(String id) {
         FreeColGameObject fcgo = getFreeColGameObject(id);
         if (fcgo instanceof Location) return (Location)fcgo;
-        logger.warning("Not a "
-            + ((fcgo == null) ? "FreeColGameObject" : "Location") + ": " + id);
+        if (fcgo != null) {
+            logger.warning("Not a location: " + id);
+            return null;
+        }
+        final String tag = id.substring(0, id.indexOf(':'));
+        if ("newWorld".equals(tag)) {
+            // do nothing
+        } else if (Building.getXMLElementTagName().equals(tag)) {
+            return new Building(this, id);
+        } else if (Colony.getXMLElementTagName().equals(tag)) {
+            return new Colony(this, id);
+        } else if (ColonyTile.getXMLElementTagName().equals(tag)) {
+            return new ColonyTile(this, id);
+        } else if (Europe.getXMLElementTagName().equals(tag)) {
+            return new Europe(this, id);
+        } else if (HighSeas.getXMLElementTagName().equals(tag)) {
+            return new HighSeas(this, id);
+        } else if (IndianSettlement.getXMLElementTagName().equals(tag)) {
+            return new IndianSettlement(this, id);
+        } else if (Map.getXMLElementTagName().equals(tag)) {
+            return new Map(this, id);
+        } else if (Tile.getXMLElementTagName().equals(tag)) {
+            return new Tile(this, id);
+        } else if (Unit.getXMLElementTagName().equals(tag)) {
+            return new Unit(this, id);
+        } else {
+            logger.warning("Not a FCGO: " + id);
+        }
         return null;
     }
 
@@ -1006,7 +1032,7 @@ public class Game extends FreeColGameObject {
             throw new IllegalArgumentException("showAll must be set to true when toSavedGame is true.");
         }
 
-        out.writeAttribute(ID_ATTRIBUTE, getId());
+        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
         out.writeAttribute("UUID", getUUID().toString());
         out.writeAttribute("turn", Integer.toString(getTurn().getNumber()));
         out.writeAttribute("spanishSuccession", Boolean.toString(spanishSuccession));
@@ -1014,7 +1040,7 @@ public class Game extends FreeColGameObject {
         writeAttribute(out, "currentPlayer", currentPlayer);
 
         if (toSavedGame) {
-            out.writeAttribute("nextID", Integer.toString(nextId));
+            out.writeAttribute("nextId", Integer.toString(nextId));
         }
 
         specification.toXMLImpl(out);
@@ -1062,7 +1088,7 @@ public class Game extends FreeColGameObject {
      */
     @Override
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
+        setId(readId(in));
 
         String hs = in.getAttributeValue(null, "UUID");
         if (hs != null) {
@@ -1072,10 +1098,10 @@ public class Game extends FreeColGameObject {
         turn = new Turn(getAttribute(in, "turn", 1));
         setSpanishSuccession(getAttribute(in, "spanishSuccession", false));
 
-        final String nextIDStr = in.getAttributeValue(null, "nextID");
-        if (nextIDStr != null) {
-            nextId = Integer.parseInt(nextIDStr);
-        }
+        nextId = getAttribute(in, "nextId", -1);
+        // @compat 0.10.x
+        if (nextId < 0) nextId = getAttribute(in, "nextID", -1);
+        // end @compat
 
         final String currentPlayerStr = in.getAttributeValue(null, "currentPlayer");
         if (currentPlayerStr != null) {
@@ -1107,7 +1133,7 @@ public class Game extends FreeColGameObject {
                 }
                 nationOptions.readFromXML(in);
             } else if (tagName.equals(Player.getXMLElementTagName())) {
-                Player player = getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE),
+                Player player = getFreeColGameObject(readId(in),
                                                      Player.class);
                 if (player == null) {
                     player = new Player(this, in);
@@ -1120,7 +1146,7 @@ public class Game extends FreeColGameObject {
                     player.readFromXML(in);
                 }
             } else if (tagName.equals(Map.getXMLElementTagName())) {
-                String mapId = in.getAttributeValue(null, ID_ATTRIBUTE);
+                String mapId = readId(in);
                 map = getFreeColGameObject(mapId, Map.class);
                 if (map == null) {
                     map = new Map(this, mapId);
@@ -1140,7 +1166,7 @@ public class Game extends FreeColGameObject {
                 // @compat 0.9.x
                 citiesOfCibola = readFromListElement("citiesOfCibola", in, String.class);
             } else if (tagName.equals(CIBOLA_TAG)) {
-                citiesOfCibola.add(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
+                citiesOfCibola.add(readId(in));
                 in.nextTag();
             } else if (OptionGroup.getXMLElementTagName().equals(tagName)
                        || "difficultyLevel".equals(tagName)) {

@@ -400,7 +400,7 @@ public class ClientOptions extends OptionGroup {
                 && s2.getEstablished().getNumber() > 0) {
                 return s1.getEstablished().getNumber() - s2.getEstablished().getNumber();
             } else { // @compat 0.9.x
-                return s1.getIntegerID().compareTo(s2.getIntegerID());
+                return s1.getIntegerId().compareTo(s2.getIntegerId());
             } // end compatibility code
         }
     };

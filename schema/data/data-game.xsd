@@ -32,24 +32,27 @@
   <xs:element name="game">
     <xs:annotation>
       <xs:documentation>
-	This class contains the game.
+	      This class contains the game.
       </xs:documentation>
     </xs:annotation>
     <xs:complexType>
 
       <xs:choice minOccurs="0" maxOccurs="unbounded">
-	<xs:element ref="gameOptions" />
-	<xs:element ref="nationOptions" />
-	<xs:element ref="mapGeneratorOptions" />
-	<xs:element ref="player" />
-	<xs:element ref="map" />
-	<xs:element ref="modelMessage" />
+	      <xs:element ref="gameOptions" />
+	      <xs:element ref="nationOptions" />
+	      <xs:element ref="mapGeneratorOptions" />
+	      <xs:element ref="player" />
+	      <xs:element ref="map" />
+	      <xs:element ref="modelMessage" />
         <xs:element ref="cibola" />
         <xs:element ref="freecol-specification" />
         <xs:element name="newWorld" />
       </xs:choice>
 
-      <xs:attribute name="ID" type="GameId" use="required" />
+      <xs:attribute name="id" type="GameId" use="required"/>
+      <!-- @compat 0.10.x -->
+      <xs:attribute name="ID" type="GameId" use="optional"/>
+      <!-- end @compat -->
       <xs:attribute name="UUID" type="xs:string" use="optional" />
       <xs:attribute name="turn" type="xs:int" use="required" />
       <xs:attribute name="spanishSuccession" type="xs:boolean" use="optional"
@@ -57,13 +60,15 @@
       <xs:attribute name="currentPlayer" type="PlayerId" use="optional" >
         <xs:annotation>
           <xs:documentation>
-	    May be absent in map files.
+	          May be absent in map files.
           </xs:documentation>
         </xs:annotation>
       </xs:attribute>
 
-      <xs:attribute name="nextID" type="xs:int" use="required" />
-
+      <xs:attribute name="nextId" type="xs:int" use="required"/>
+      <!-- @compat 0.10.x -->
+      <xs:attribute name="nextID" type="xs:int" use="optional"/>
+      <!-- end @compat -->
     </xs:complexType>
   </xs:element>
 
@@ -76,15 +81,15 @@
   <xs:element name="gameOptions">
     <xs:annotation>
       <xs:documentation>
-	This class contains the game options.
+	      This class contains the game options.
       </xs:documentation>
     </xs:annotation>
     <xs:complexType>
 
       <xs:choice minOccurs="0" maxOccurs="unbounded">
-	<xs:element ref="booleanOption" />
-	<xs:element ref="integerOption" />
-	<xs:element ref="selectOption" />
+	      <xs:element ref="booleanOption" />
+	      <xs:element ref="integerOption" />
+	      <xs:element ref="selectOption" />
       </xs:choice>
 
     </xs:complexType>
@@ -93,16 +98,16 @@
   <xs:element name="mapGeneratorOptions">
     <xs:annotation>
       <xs:documentation>
-	This class contains the game options.
+	      This class contains the game options.
       </xs:documentation>
     </xs:annotation>
     <xs:complexType>
-
+      
       <xs:choice minOccurs="0" maxOccurs="unbounded">
-	<xs:element ref="booleanOption" />
-	<xs:element ref="integerOption" />
-	<xs:element ref="selectOption" />
-	<xs:element ref="fileOption" />
+	      <xs:element ref="booleanOption" />
+	      <xs:element ref="integerOption" />
+	      <xs:element ref="selectOption" />
+	      <xs:element ref="fileOption" />
       </xs:choice>
 
     </xs:complexType>

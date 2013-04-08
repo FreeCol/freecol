@@ -477,7 +477,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute(ID_ATTRIBUTE, getId());
+        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
         if (showAll || toSavedGame || player == getOwner()) {
             writeStorage(out, STORED_GOODS_TAG, storedGoods);
             writeStorage(out, OLD_STORED_GOODS_TAG, oldStoredGoods);
@@ -504,7 +504,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * @param in The input stream with the XML.
      */
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
+        setId(readId(in));
         storedGoods.clear();
         oldStoredGoods.clear();
     }

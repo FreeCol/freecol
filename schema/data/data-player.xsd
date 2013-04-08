@@ -90,7 +90,10 @@
         <xs:element ref="highSeas" />
       </xs:choice>
 
-      <xs:attribute name="ID" type="PlayerId" use="required"/>
+      <xs:attribute name="id" type="PlayerId" use="required"/>
+      <!-- @compat 0.10.x -->
+      <xs:attribute name="ID" type="PlayerId" use="optional"/>
+      <!-- end @compat -->
       <xs:attribute name="username" type="xs:string" use="required"/>
       <xs:attribute name="nationID" type="NationId" use="required"/>
       <xs:attribute name="nationType" type="NationTypeId" use="optional"/>
@@ -162,11 +165,17 @@
         <xs:element ref="unit" />
         <xs:element name="destination">
           <xs:complexType>
-            <xs:attribute name="ID" type="xs:string" use="required"/>
+            <xs:attribute name="id" type="xs:string" use="required"/>
+            <!-- @compat 0.10.x -->
+            <xs:attribute name="ID" type="xs:string" use="optional"/>
+            <!-- end @compat -->
           </xs:complexType>
         </xs:element>
       </xs:choice>
-      <xs:attribute name="ID" type="xs:string" use="required"/>
+      <xs:attribute name="id" type="xs:string" use="required"/>
+      <!-- @compat 0.10.x -->
+      <xs:attribute name="ID" type="xs:string" use="optional"/>
+      <!-- end @compat -->
     </xs:complexType>
   </xs:element>
 

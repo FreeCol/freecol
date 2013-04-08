@@ -186,7 +186,9 @@ abstract public class AbstractOption<T> extends FreeColObject
     @Override
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         // TODO: super.readAttributes(in); is inadequate.
-        setId(getAttribute(in, ID_ATTRIBUTE_TAG, getId()));
+        String id = readId(in);
+        if (id == null) id = getId();
+        setId(id);
         
         String defaultValue = getAttribute(in, DEFAULT_VALUE_TAG, (String)null);
 
@@ -220,8 +222,7 @@ abstract public class AbstractOption<T> extends FreeColObject
 
         if (ACTION_TAG.equals(tag)) {
             // TODO: load FreeColActions from client options?
-            logger.finest("Skipping action "
-                + getAttribute(in, ID_ATTRIBUTE_TAG, ""));
+            logger.finest("Skipping action " + readId(in));
             in.nextTag();
 
         } else if (AbstractUnitOption.getXMLElementTagName().equals(tag)) {

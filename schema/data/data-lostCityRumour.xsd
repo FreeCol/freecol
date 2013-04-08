@@ -32,7 +32,10 @@
       </xs:documentation>
     </xs:annotation>
     <xs:complexType>
-      <xs:attribute name="ID" type="LostCityRumourId" use="required"/>
+      <xs:attribute name="id" type="LostCityRumourId" use="required"/>
+      <!-- @compat 0.10.x -->
+      <xs:attribute name="ID" type="LostCityRumourId" use="optional"/>
+      <!-- end @compat -->
       <xs:attribute name="tile" type="TileId" use="required"/>
       <xs:attribute name="type" type="LostCityRumourType" use="optional"/>
       <xs:attribute name="name" type="xs:string" use="optional"/>

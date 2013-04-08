@@ -386,7 +386,7 @@ public class TradeRoute extends FreeColGameObject
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute(ID_ATTRIBUTE, getId());
+        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
         out.writeAttribute("name", getName());
         out.writeAttribute("owner", getOwner().getId());
         for (Stop stop : stops) {
@@ -446,7 +446,7 @@ public class TradeRoute extends FreeColGameObject
             Stop stop = new Stop(findLocation(getGame(), locationId));
             while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 if (in.getLocalName().equals(CARGO_TAG)) {
-                    String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
+                    String id = readId(in);
                     if (id == null) {
                         // TODO: remove support for old format
                         List<GoodsType> goodsList = getSpecification().getGoodsTypeList();

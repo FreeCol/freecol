@@ -1703,12 +1703,7 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
      * @param element The XML-representation.
      */
     public void readFromXMLElement(Element element) {
-        String colonyId = element.getAttribute(FreeColObject.ID_ATTRIBUTE_TAG);
-        // @compat 0.10.7
-        if (colonyId == null) {
-            colonyId = element.getAttribute(FreeColObject.ID_ATTRIBUTE);
-        }
-        // end @compat
+        String colonyId = FreeColObject.readId(element);
         colony = getAIMain().getGame()
             .getFreeColGameObject(colonyId, Colony.class);
 

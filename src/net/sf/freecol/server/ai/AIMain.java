@@ -504,10 +504,8 @@ public class AIMain extends FreeColObject
     @Override
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         nextId = getAttribute(in, NEXT_ID_TAG, -1);
-        // @compat 0.10.7
-        if (nextId < 0) {
-            nextId = getAttribute(in, OLD_NEXT_ID_TAG, 0);
-        }
+        // @compat 0.10.x
+        if (nextId < 0) nextId = getAttribute(in, OLD_NEXT_ID_TAG, 0);
         // end @compat
     }
 

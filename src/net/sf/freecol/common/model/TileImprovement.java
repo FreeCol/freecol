@@ -552,7 +552,7 @@ public class TileImprovement extends TileItem implements Named {
         out.writeStartElement(getXMLElementTagName());
 
         // Add attributes:
-        out.writeAttribute(ID_ATTRIBUTE, getId());
+        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
         out.writeAttribute("tile", getTile().getId());
         out.writeAttribute("type", getType().getId());
         out.writeAttribute("turns", Integer.toString(turnsToComplete));
@@ -578,7 +578,7 @@ public class TileImprovement extends TileItem implements Named {
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         Game game = getGame();
 
-        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
+        setId(readId(in));
 
         tile = game.getFreeColGameObject(in.getAttributeValue(null, "tile"),
                                          Tile.class);

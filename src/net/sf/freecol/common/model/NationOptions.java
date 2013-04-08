@@ -222,8 +222,7 @@ public class NationOptions extends FreeColObject {
                     Nation nation = specification.getType(in, ID_ATTRIBUTE_TAG,
                         Nation.class, (Nation)null);
                     if (nation == null) {
-                        logger.warning("Invalid nation id: "
-                            + in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
+                        logger.warning("Invalid nation id: " + readId(in));
                     }
 
                     NationState state = getAttribute(in, STATE_TAG,

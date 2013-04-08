@@ -370,7 +370,7 @@ public abstract class FreeColObject {
         if (getId() == null) {
             logger.warning("FreeColObject with null id: " + toString());
         } else {
-            out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+            writeAttribute(out, ID_ATTRIBUTE_TAG, getId());
         }
     }
 
@@ -770,7 +770,11 @@ public abstract class FreeColObject {
      */
     public Location getLocationAttribute(XMLStreamReader in,
                                          String attributeName, Game game) {
-        final String attrib = in.getAttributeValue(null, attributeName);
+        final String attrib =
+        // @compat 0.10.7
+            (ID_ATTRIBUTE_TAG.equals(attributeName)) ? readId(in) :
+        // end @compat
+            in.getAttributeValue(null, attributeName);
         
         return (attrib == null) ? null
             : game.getFreeColLocation(attrib);
@@ -887,9 +891,24 @@ public abstract class FreeColObject {
      * @param in The <code>XMLStreamReader</code> to read from.
      * @return The id found, or null if none present.
      */
-    public String readId(XMLStreamReader in) {
+    public static String readId(XMLStreamReader in) {
         String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
         if (id == null) id = in.getAttributeValue(null, ID_ATTRIBUTE);
+        return id;
+    }
+
+    /**
+     * Version of readId(XMLStreamReader) that reads from an element.
+     *
+     * To be replaced with just:
+     *   element.getAttribute(FreeColObject.ID_ATTRIBUTE_TAG);
+     *
+     * @param element An element to read the id attribute from.
+     * @return The id attribute value.
+     */
+    public static String readId(Element element) {
+        String id = element.getAttribute(ID_ATTRIBUTE_TAG);
+        if (id == null) id = element.getAttribute(ID_ATTRIBUTE);
         return id;
     }
     // end @compat

@@ -172,7 +172,7 @@ public class GoToMission extends AbstractMission {
     protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
         super.readAttributes(in);
-        destination = newLocation(in.getAttributeValue(null, "destination"));
+        destination = getLocationAttribute(in, "destination", getGame());
         blockedCount = getAttribute(in, "blockedCount", 0);
     }
 

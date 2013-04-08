@@ -3670,7 +3670,7 @@ public class Player extends FreeColGameObject implements Nameable {
                                    boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
 
-        out.writeAttribute(ID_ATTRIBUTE, getId());
+        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
         out.writeAttribute("username", name);
         out.writeAttribute("nationID", nationID);
         if (nationType != null) {

@@ -386,7 +386,7 @@ public class Europe extends UnitLocation implements Ownable, Named {
      */
     public void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
-        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
+        setId(readId(in));
 
         // @compat 0.10.0
         if (!hasAbility("model.ability.dressMissionary")) {
@@ -411,7 +411,7 @@ public class Europe extends UnitLocation implements Ownable, Named {
     }
 
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        if (in.getLocalName().equals(UNITS_TAG_NAME)) {
+        if (in.getLocalName().equals(UNITS_TAG)) {
             while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 super.readChild(in);
             }

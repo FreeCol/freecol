@@ -27,34 +27,43 @@
   <xs:element name="serverObjects">
     <xs:annotation>
       <xs:documentation>
-	This class contains server objects.
+	      This class contains server objects.
       </xs:documentation>
     </xs:annotation>
     <xs:complexType>
 
       <xs:choice minOccurs="0" maxOccurs="unbounded">
-	<xs:element ref="serverPlayer" />
+	      <xs:element ref="serverPlayer" />
         <xs:element ref="serverUnit" />
         <xs:element ref="serverIndianSettlement" />
       </xs:choice>
     </xs:complexType>
   </xs:element>
-
+  
   <xs:element name="serverPlayer">
     <xs:complexType>
-      <xs:attribute name="ID" type="PlayerId" use="required" />
+      <xs:attribute name="id" type="PlayerId" use="required"/>
+      <!-- @compat 0.10.x -->
+      <xs:attribute name="ID" type="PlayerId" use="optional"/>
+      <!-- end @compat -->
     </xs:complexType>
   </xs:element>
 
   <xs:element name="serverUnit">
     <xs:complexType>
-      <xs:attribute name="ID" type="UnitId" use="required" />
+      <xs:attribute name="id" type="UnitId" use="required"/>
+      <!-- @compat 0.10.x -->
+      <xs:attribute name="ID" type="UnitId" use="optional"/>
+      <!-- end @compat -->
     </xs:complexType>
   </xs:element>
 
   <xs:element name="serverIndianSettlement">
     <xs:complexType>
-      <xs:attribute name="ID" type="IndianSettlementId" use="required" />
+      <xs:attribute name="id" type="IndianSettlementId" use="required"/>
+      <!-- @compat 0.10.x -->
+      <xs:attribute name="ID" type="IndianSettlementId" use="optional"/>
+      <!-- end @compat -->
     </xs:complexType>
   </xs:element>
 

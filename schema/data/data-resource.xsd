@@ -25,19 +25,22 @@ along with FreeCol. If not, see http://www.gnu.org/licenses
 
 	<xs:include schemaLocation="data-common.xsd" />
 
-    <xs:element name="resource">
-        <xs:annotation>
-            <xs:documentation>
-                Represents a locatable goods of a specified type
-                and quantity.
-            </xs:documentation>
-        </xs:annotation>
-        <xs:complexType>
-            <xs:attribute name="ID" type="ResourceId" use="required" />
-            <xs:attribute name="tile" type="TileId" use="required" />
-            <xs:attribute name="type" type="ResourceTypeId" use="required" />
-            <xs:attribute name="quantity" type="xs:int" use="required" />
-        </xs:complexType>
-    </xs:element>
-
+  <xs:element name="resource">
+    <xs:annotation>
+      <xs:documentation>
+        Represents a locatable goods of a specified type
+        and quantity.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attribute name="id" type="ResourceId" use="required"/>
+      <!-- @compat 0.10.x -->
+      <xs:attribute name="ID" type="ResourceId" use="optional"/>
+      <!-- end @compat -->
+      <xs:attribute name="tile" type="TileId" use="required" />
+      <xs:attribute name="type" type="ResourceTypeId" use="required" />
+      <xs:attribute name="quantity" type="xs:int" use="required" />
+    </xs:complexType>
+  </xs:element>
+  
 </xs:schema>

@@ -27,7 +27,7 @@
   <xs:element name="stringTemplate" type="StringTemplateType">
     <xs:annotation>
       <xs:documentation>
-	This class contains string templates to be localized.
+	      This class contains string templates to be localized.
       </xs:documentation>
     </xs:annotation>
   </xs:element>

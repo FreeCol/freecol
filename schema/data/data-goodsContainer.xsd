@@ -26,7 +26,7 @@
   <xs:include schemaLocation="data-common.xsd">
     <xs:annotation>
       <xs:documentation>
-	Include common data model type definitions.
+	      Include common data model type definitions.
       </xs:documentation>
     </xs:annotation>
   </xs:include>
@@ -36,23 +36,26 @@
   <xs:element name="goodsContainer">
     <xs:complexType>
       <xs:sequence>
-	<xs:element name="storedGoods" minOccurs="0" maxOccurs="1">
-	  <xs:complexType>
-	    <xs:choice minOccurs="0" maxOccurs="unbounded">
-	      <xs:element ref="goods"/>
-	    </xs:choice>
-	  </xs:complexType>
-	</xs:element>
-
-	<xs:element name="oldStoredGoods" minOccurs="0" maxOccurs="1">
-	  <xs:complexType>
-	    <xs:choice minOccurs="0" maxOccurs="unbounded">
-	      <xs:element ref="goods"/>
-	    </xs:choice>
-	  </xs:complexType>
-	</xs:element>
+	      <xs:element name="storedGoods" minOccurs="0" maxOccurs="1">
+	        <xs:complexType>
+	          <xs:choice minOccurs="0" maxOccurs="unbounded">
+	            <xs:element ref="goods"/>
+	          </xs:choice>
+	        </xs:complexType>
+	      </xs:element>
+        
+	      <xs:element name="oldStoredGoods" minOccurs="0" maxOccurs="1">
+	        <xs:complexType>
+	          <xs:choice minOccurs="0" maxOccurs="unbounded">
+	            <xs:element ref="goods"/>
+	          </xs:choice>
+	        </xs:complexType>
+	      </xs:element>
       </xs:sequence>
-      <xs:attribute name="ID" type="GoodsContainerId" use="required"/>
+      <xs:attribute name="id" type="GoodsContainerId" use="required"/>
+      <!-- @compat 0.10.x -->
+      <xs:attribute name="ID" type="GoodsContainerId" use="optional"/>
+      <!-- end @compat -->
     </xs:complexType>
   </xs:element>
 

@@ -160,11 +160,11 @@ public class ServerGame extends Game implements ServerModelObject {
 
 
     /**
-     * Get a unique ID to identify a <code>FreeColGameObject</code>.
+     * Get a unique id to identify a <code>FreeColGameObject</code>.
      * 
-     * @return A unique ID.
+     * @return A unique id.
      */
-    public String getNextID() {
+    public String getNextId() {
         String id = Integer.toString(nextId);
         nextId++;
         return id;

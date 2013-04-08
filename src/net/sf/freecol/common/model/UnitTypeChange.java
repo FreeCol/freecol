@@ -100,7 +100,7 @@ public class UnitTypeChange extends FreeColObject {
      */
     public UnitTypeChange(XMLStreamReader in, Specification specification)
         throws XMLStreamException {
-        setId(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
+        setId(readId(in));
         setSpecification(specification);
         readFromXML(in);
     }

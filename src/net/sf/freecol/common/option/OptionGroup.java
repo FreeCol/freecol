@@ -461,7 +461,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      */
     @Override
     public void readChild(XMLStreamReader in) throws XMLStreamException {
-        String optionId = getAttribute(in, ID_ATTRIBUTE_TAG, (String)null);
+        String optionId = readId(in);
         Option option = getOption(optionId);
         if (option == null) {
             AbstractOption abstractOption = readOption(in);

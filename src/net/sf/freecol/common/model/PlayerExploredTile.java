@@ -228,7 +228,7 @@ public class PlayerExploredTile extends FreeColGameObject {
 
         // Start element:
         out.writeStartElement(getXMLElementTagName());
-        out.writeAttribute(ID_ATTRIBUTE, getId());
+        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
 
         out.writeAttribute("player", player.getId());
         out.writeAttribute("tile", tile.getId());
@@ -321,7 +321,7 @@ public class PlayerExploredTile extends FreeColGameObject {
             missionary = updateFreeColGameObject(in, Unit.class);
             in.nextTag(); // close <missionary> tag
         } else if (in.getLocalName().equals(Resource.getXMLElementTagName())) {
-            Resource resource = game.getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE),
+            Resource resource = game.getFreeColGameObject(readId(in),
                                                           Resource.class);
             if (resource != null) {
                 resource.readFromXML(in);
@@ -330,7 +330,7 @@ public class PlayerExploredTile extends FreeColGameObject {
             }
             tileItems.add(resource);
         } else if (in.getLocalName().equals(LostCityRumour.getXMLElementTagName())) {
-            LostCityRumour lostCityRumour = game.getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE),
+            LostCityRumour lostCityRumour = game.getFreeColGameObject(readId(in),
                                                                       LostCityRumour.class);
             if (lostCityRumour != null) {
                 lostCityRumour.readFromXML(in);
@@ -339,7 +339,7 @@ public class PlayerExploredTile extends FreeColGameObject {
             }
             tileItems.add(lostCityRumour);
         } else if (in.getLocalName().equals(TileImprovement.getXMLElementTagName())) {
-            TileImprovement ti = game.getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE),
+            TileImprovement ti = game.getFreeColGameObject(readId(in),
                                                            TileImprovement.class);
             if (ti != null) {
                 ti.readFromXML(in);

@@ -141,7 +141,7 @@ public class HighSeas extends UnitLocation {
         for (Location destination : destinations) {
             if(destination != null) {
                 out.writeStartElement("destination");
-                out.writeAttribute(ID_ATTRIBUTE, destination.getId());
+                out.writeAttribute(ID_ATTRIBUTE_TAG, destination.getId());
                 out.writeEndElement();
             } else {
                 logger.warning("Tried to write out null destination from " + getId());
@@ -162,7 +162,8 @@ public class HighSeas extends UnitLocation {
      */
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
         if ("destination".equals(in.getLocalName())) {
-            destinations.add(newLocation(in.getAttributeValue(null, ID_ATTRIBUTE)));
+            destinations.add(getLocationAttribute(in, ID_ATTRIBUTE_TAG,
+                                                  getGame()));
             in.nextTag();
         } else {
             super.readChild(in);

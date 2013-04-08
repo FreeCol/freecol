@@ -90,7 +90,7 @@ public class DiplomacyMessage extends DOMMessage {
             this.unit = null;
         } else {
             Element ue = (Element)nodes.item(1);
-            String unitId = ue.getAttribute(FreeColObject.ID_ATTRIBUTE);
+            String unitId = FreeColObject.readId(ue);
             this.unit = game.getFreeColGameObject(unitId, Unit.class);
             if (this.unit == null) this.unit = new Unit(game, ue);
         }

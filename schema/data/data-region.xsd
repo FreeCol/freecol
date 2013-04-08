@@ -49,14 +49,16 @@
           </xs:complexType>
         </xs:element>
       </xs:choice>
-      <xs:attribute name="id" type="RegionId"/>
-      <xs:attribute name="ID" type="RegionId">
-	<xs:annotation>
-	  <xs:documentation>
-	    Object ID
-    </xs:documentation>
-	</xs:annotation>
+      <xs:attribute name="id" type="RegionId" use="required">
+	      <xs:annotation>
+	        <xs:documentation>
+	          Object ID
+          </xs:documentation>
+	      </xs:annotation>
       </xs:attribute>
+      <!-- @compat 0.10.x -->
+      <xs:attribute name="ID" type="RegionId" use="optional"/>
+      <!-- end @compat -->
       <xs:attribute name="nameKey" type="xs:string" use="required">
 	      <xs:annotation>
 	        <xs:documentation>

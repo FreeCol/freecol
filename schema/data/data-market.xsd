@@ -30,7 +30,10 @@
       <xs:choice minOccurs="0" maxOccurs="unbounded">
 	      <xs:element name="marketData">
 	        <xs:complexType>
-            <xs:attribute name="ID" type="MarketDataId" use="required" />
+            <xs:attribute name="id" type="MarketDataId" use="required" />
+            <!-- @compat 0.10.x -->
+            <xs:attribute name="ID" type="MarketDataId" use="optional" />
+            <!-- end @compat -->
 	          <xs:attribute name="goods-type" type="GoodsTypeId" use="required" />
 	          <xs:attribute name="amount" type="xs:string" use="required" />
 	          <xs:attribute name="initialPrice" type="xs:int" use="optional"
@@ -46,7 +49,10 @@
 	      </xs:element>
       </xs:choice>
       
-      <xs:attribute name="ID" type="MarketId" use="required" />
+      <xs:attribute name="id" type="MarketId" use="required" />
+      <!-- @compat 0.10.x -->
+      <xs:attribute name="ID" type="MarketId" use="optional" />
+      <!-- end @compat -->
       <xs:attribute name="owner" type="PlayerId" use="required" />
 
     </xs:complexType>

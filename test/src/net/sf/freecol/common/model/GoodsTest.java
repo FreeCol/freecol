@@ -259,7 +259,7 @@ public class GoodsTest extends FreeColTestCase {
         Document document = DOMMessage.createNewDocument();
         Element element = goods1.toXMLElement(null, document, true, true);
 
-        element.setAttribute(FreeColObject.ID_ATTRIBUTE, "newID");
+        element.setAttribute(FreeColObject.ID_ATTRIBUTE_TAG, "newID");
         Goods goods2 = new Goods(colony.getGame(), element);
 
         assertEquals(goods1.getGame(), goods2.getGame());

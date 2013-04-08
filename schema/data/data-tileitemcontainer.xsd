@@ -41,7 +41,10 @@
         <xs:element ref="tileimprovement" />
         <xs:element ref="lostCityRumour" />
       </xs:choice>
-      <xs:attribute name="ID" type="TileItemContainerId" use="required" />
+      <xs:attribute name="id" type="TileItemContainerId" use="required"/>
+      <!-- @compat 0.10.x -->
+      <xs:attribute name="ID" type="TileItemContainerId" use="optional"/>
+      <!-- end @compat -->
       <xs:attribute name="tile" type="TileId" use="required" />
     </xs:complexType>
   </xs:element>

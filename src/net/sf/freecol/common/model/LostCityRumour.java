@@ -327,7 +327,7 @@ public class LostCityRumour extends TileItem {
         out.writeStartElement(getXMLElementTagName());
 
         // Add attributes:
-        out.writeAttribute(ID_ATTRIBUTE, getId());
+        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
         out.writeAttribute("tile", getTile().getId());
         if (type != null && (showAll || toSavedGame)) {
             out.writeAttribute("type", getType().toString());
@@ -348,7 +348,7 @@ public class LostCityRumour extends TileItem {
      */
     @Override
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
+        setId(readId(in));
 
         tile = getFreeColGameObject(in, "tile", Tile.class);
 

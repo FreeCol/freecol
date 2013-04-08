@@ -88,8 +88,8 @@ public class SetTradeRoutesMessage extends DOMMessage {
      * @return A <code>TradeRoute</code> on success, null on error.
      */
     public static TradeRoute tradeRouteFromElement(Game game, Element element) {
-        String id = element.getAttribute(FreeColObject.ID_ATTRIBUTE);
-        element.setAttribute(FreeColObject.ID_ATTRIBUTE, idPrefix + id);
+        String id = FreeColObject.readId(element);
+        element.setAttribute(FreeColObject.ID_ATTRIBUTE_TAG, idPrefix + id);
         try {
             return new TradeRoute(game, element);
         } catch (Exception e) {

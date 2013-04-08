@@ -257,7 +257,7 @@ public abstract class NationType extends FreeColGameObjectType {
         final String tag = in.getLocalName();
 
         if (SETTLEMENT_TAG.equals(tag)) {
-            String id = getAttribute(in, ID_ATTRIBUTE_TAG, (String)null);
+            String id = readId(in);
             SettlementType settlementType = new SettlementType(id, spec);
             settlementType.readFromXML(in);
             if (settlementTypes == null) {

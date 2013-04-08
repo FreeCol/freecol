@@ -445,7 +445,7 @@ public class MarketData extends FreeColGameObject {
      */
     @Override
     protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        writeAttribute(out, ID_ATTRIBUTE, getId());
+        writeAttribute(out, ID_ATTRIBUTE_TAG, getId());
 
         writeAttribute(out, GOODS_TYPE_TAG, goodsType);
 
@@ -478,7 +478,7 @@ public class MarketData extends FreeColGameObject {
         // @compat 0.9.x
         if (goodsType == null) {
             setDefaultId(getGame());
-            goodsType = spec.getType(in, ID_ATTRIBUTE, GoodsType.class,
+            goodsType = spec.getType(in, ID_ATTRIBUTE_TAG, GoodsType.class,
                                      (GoodsType)null);
         }
         // end compatibility code

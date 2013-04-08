@@ -30,34 +30,37 @@
   <xs:element name="building">
     <xs:annotation>
       <xs:documentation>
-	Represents a building in a colony.
+	      Represents a building in a colony.
       </xs:documentation>
     </xs:annotation>
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
-	<xs:element ref="unit" />
+	      <xs:element ref="unit" />
         <xs:element ref="production" />
       </xs:choice>
-      <xs:attribute name="ID" type="BuildingId" use="required">
-	<xs:annotation>
-	  <xs:documentation>
-	    ID of this object
-	  </xs:documentation>
-	</xs:annotation>
+      <xs:attribute name="id" type="BuildingId" use="required">
+	      <xs:annotation>
+	        <xs:documentation>
+	          ID of this object
+	        </xs:documentation>
+	      </xs:annotation>
       </xs:attribute>
+      <!-- @compat 0.10.x -->
+      <xs:attribute name="ID" type="BuildingId" use="optional"/>
+      <!-- end @compat -->
       <xs:attribute name="colony" type="ColonyId" use="required">
-	<xs:annotation>
-	  <xs:documentation>
-	    The colony containing this building.
-	  </xs:documentation>
-	</xs:annotation>
+	      <xs:annotation>
+	        <xs:documentation>
+	          The colony containing this building.
+	        </xs:documentation>
+	      </xs:annotation>
       </xs:attribute>
       <xs:attribute name="buildingType" type="xs:string" use="required">
-	<xs:annotation>
-	  <xs:documentation>
-	    The type of building
-	  </xs:documentation>
-	</xs:annotation>
+	      <xs:annotation>
+	        <xs:documentation>
+	          The type of building
+	        </xs:documentation>
+	      </xs:annotation>
       </xs:attribute>
     </xs:complexType>
   </xs:element>

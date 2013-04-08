@@ -233,7 +233,7 @@ public class Resource extends TileItem {
         out.writeStartElement(getXMLElementTagName());
 
         // Add attributes:
-        out.writeAttribute(ID_ATTRIBUTE, getId());
+        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
         out.writeAttribute("tile", getTile().getId());
         out.writeAttribute("type", getType().getId());
         out.writeAttribute("quantity", Integer.toString(quantity));
@@ -250,7 +250,7 @@ public class Resource extends TileItem {
      */
     @Override
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
+        setId(readId(in));
 
         tile = getFreeColGameObject(in, "tile", Tile.class);
 

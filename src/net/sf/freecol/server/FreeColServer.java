@@ -811,8 +811,8 @@ public final class FreeColServer {
             xsw.writeStartElement("serverObjects");
             for (ServerModelObject smo : game.getServerModelObjects()) {
                 xsw.writeStartElement(smo.getServerXMLElementTagName());
-                xsw.writeAttribute(FreeColObject.ID_ATTRIBUTE,
-                    ((FreeColGameObject) smo).getId());
+                xsw.writeAttribute(FreeColObject.ID_ATTRIBUTE_TAG,
+                    ((FreeColGameObject)smo).getId());
                 xsw.writeEndElement();
             }
             xsw.writeEndElement();
@@ -913,8 +913,7 @@ public final class FreeColServer {
                     serverStrings = new ArrayList<String>();
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                         serverStrings.add(xsr.getLocalName());
-                        serverStrings.add(xsr.getAttributeValue(null,
-                                          FreeColObject.ID_ATTRIBUTE));
+                        serverStrings.add(FreeColObject.readId(xsr));
                         xsr.nextTag();
                     }
                     // @compat 0.9.x

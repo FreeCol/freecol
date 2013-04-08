@@ -256,7 +256,7 @@ public class EuropeanNationType extends NationType {
         final String tag = in.getLocalName();
 
         if (UNIT_TAG.equals(tag)) {
-            String id = getAttribute(in, ID_ATTRIBUTE_TAG, (String)null);
+            String id = readId(in);
 
             String type = getAttribute(in, TYPE_TAG, (String)null);
 

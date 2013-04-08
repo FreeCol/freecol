@@ -1351,7 +1351,7 @@ public class IndianSettlement extends Settlement {
             }
             for (Unit unit : ownedUnits) {
                 out.writeStartElement(OWNED_UNITS_TAG_NAME);
-                out.writeAttribute(ID_ATTRIBUTE, unit.getId());
+                out.writeAttribute(ID_ATTRIBUTE_TAG, unit.getId());
                 out.writeEndElement();
             }
             super.writeChildren(out, player, showAll, toSavedGame);
@@ -1463,7 +1463,7 @@ public class IndianSettlement extends Settlement {
             missionary.setLocationNoUpdate(this);
             in.nextTag(); // close element
 
-        } else if (UNITS_TAG_NAME.equals(tag)) {
+        } else if (UNITS_TAG.equals(tag)) {
             while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 if (in.getLocalName().equals(Unit.getXMLElementTagName())) {
                     Unit unit = updateFreeColGameObject(in, Unit.class);
@@ -1478,7 +1478,7 @@ public class IndianSettlement extends Settlement {
             }
 
         } else if (OWNED_UNITS_TAG_NAME.equals(tag)) {
-            Unit unit = getFreeColGameObject(in, ID_ATTRIBUTE, Unit.class);
+            Unit unit = getFreeColGameObject(in, ID_ATTRIBUTE_TAG, Unit.class);
             if (unit.getOwner() != null && !owner.owns(unit)) {
                 logger.warning("Error in savegame: unit " + unit.getId()
                                + " does not belong to settlement " + getId());

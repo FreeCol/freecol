@@ -50,13 +50,19 @@
         </xs:element>
         <xs:element name="ownedUnits">
           <xs:complexType>
-            <xs:attribute name="ID" type="UnitId"/>
+            <xs:attribute name="id" type="UnitId"/>
+            <!-- @compat 0.10.x -->
+            <xs:attribute name="ID" type="UnitId" use="optional"/>
+            <!-- end @compat -->
           </xs:complexType>
         </xs:element>
         <xs:element ref="goodsContainer"/>
       </xs:choice>
 
-      <xs:attribute name="ID" type="IndianSettlementId" use="required"/>
+      <xs:attribute name="id" type="IndianSettlementId" use="required"/>
+      <!-- @compat 0.10.x -->
+      <xs:attribute name="ID" type="IndianSettlementId" use="optional"/>
+      <!-- end @compat -->
 
       <xs:attribute name="name" type="xs:string" use="optional"/>
       <xs:attribute name="owner" type="PlayerId" use="required"/>

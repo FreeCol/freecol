@@ -232,7 +232,7 @@ public final class InGameInputHandler extends InputHandler {
     private void updateGameObjects(NodeList nodeList) {
         for (int i = 0; i < nodeList.getLength(); i++) {
             Element element = (Element) nodeList.item(i);
-            String id = element.getAttribute(FreeColObject.ID_ATTRIBUTE);
+            String id = FreeColObject.readId(element);
             FreeColGameObject fcgo = getGame().getFreeColGameObject(id);
             if (fcgo == null) {
                 logger.warning("Update object not present in client: " + id);
@@ -256,7 +256,7 @@ public final class InGameInputHandler extends InputHandler {
         NodeList nodeList = removeElement.getChildNodes();
         for (int i = 0; i < nodeList.getLength(); i++) {
             Element element = (Element) nodeList.item(i);
-            String idString = element.getAttribute(FreeColObject.ID_ATTRIBUTE);
+            String idString = FreeColObject.readId(element);
             FreeColGameObject fcgo = game.getFreeColGameObject(idString);
             if (fcgo == null) {
                 logger.warning("Could not find FreeColGameObject with ID: "
@@ -297,9 +297,7 @@ public final class InGameInputHandler extends InputHandler {
         NodeList nodes = parent.getChildNodes();
         for (int i = 0; i < nodes.getLength(); i++) {
             Element e = (Element)nodes.item(i);
-            if (id.equals(e.getAttribute(FreeColObject.ID_ATTRIBUTE))) {
-                return e;
-            }
+            if (id.equals(FreeColObject.readId(e))) return e;
         }
         return null;
     }
@@ -971,13 +969,13 @@ public final class InGameInputHandler extends InputHandler {
      *            holds all the information.
      */
     private Element addPlayer(Element element) {
-
         Element playerElement = (Element) element.getElementsByTagName(Player.getXMLElementTagName()).item(0);
-        if (getGame().getFreeColGameObject(playerElement.getAttribute(FreeColObject.ID_ATTRIBUTE), Player.class) == null) {
-            Player newPlayer = new Player(getGame(), playerElement);
-            getGame().addPlayer(newPlayer);
+        Game game = getGame();
+        String id = FreeColObject.readId(playerElement);
+        if (game.getFreeColGameObject(id, Player.class) == null) {
+            game.addPlayer(new Player(game, playerElement));
         } else {
-            getGame().getFreeColGameObject(playerElement.getAttribute(FreeColObject.ID_ATTRIBUTE)).readFromXMLElement(playerElement);
+            game.getFreeColGameObject(id).readFromXMLElement(playerElement);
         }
 
         return null;
@@ -1000,7 +998,8 @@ public final class InGameInputHandler extends InputHandler {
             // server may have already done so and its view will only
             // mislead us here in the client.
             Element e = (Element) nodes.item(i);
-            Unit u = game.getFreeColGameObject(e.getAttribute(FreeColObject.ID_ATTRIBUTE), Unit.class);
+            String id = FreeColObject.readId(e);
+            Unit u = game.getFreeColGameObject(id, Unit.class);
             if (u == null) {
                 logger.warning("Object is not a unit");
             } else {

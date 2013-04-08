@@ -2225,7 +2225,7 @@ public class Map extends FreeColGameObject implements Location {
     protected void writeAttributes(XMLStreamWriter out, Player player,
                                    boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
-        out.writeAttribute(ID_ATTRIBUTE, getId());
+        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
         out.writeAttribute("width", Integer.toString(getWidth()));
         out.writeAttribute("height", Integer.toString(getHeight()));
         out.writeAttribute("layer", layer.toString());
@@ -2265,8 +2265,9 @@ public class Map extends FreeColGameObject implements Location {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        setId(readId(in));
+
         setLayer(Layer.valueOf(getAttribute(in, "layer", "ALL")));
 
         if (tiles == null) {

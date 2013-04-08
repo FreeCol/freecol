@@ -146,11 +146,7 @@ public class WorkLocationPlan extends AIObject {
      */
     public void readFromXMLElement(Element element) {
         final Specification spec = getSpecification();
-
-        String str = element.getAttribute(ID_ATTRIBUTE_TAG);
-        // @compat 0.10.7
-        if (str == null) str = element.getAttribute(ID_ATTRIBUTE);
-        // end @compat
+        String str = readId(element);
         workLocation = getAIMain().getGame()
             .getFreeColGameObject(str, WorkLocation.class);
 

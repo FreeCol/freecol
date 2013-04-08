@@ -224,7 +224,7 @@ public class ListOption<T> extends AbstractOption<List<AbstractOption<T>>> {
 
         // @compat 0.10.4
         if (OPTION_VALUE_TAG.equals(tag)) {
-            String modId = getAttribute(in, ID_ATTRIBUTE_TAG, (String)null);
+            String modId = readId(in);
             logger.finest("Found old-style mod value: " + modId);
             if (modId != null) {
                 FreeColModFile fcmf = Mods.getModFile(modId);

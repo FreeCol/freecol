@@ -96,7 +96,7 @@
                       <xs:complexType>
                         <xs:attribute name="id" type="TransportableId" use="required"/>
                         <!-- @compat 0.10.7 -->
-                        <xs:attribute name="ID" type="xs:int" use="optional" />
+                        <xs:attribute name="ID" type="TransportableId" use="optional"/>
                         <!-- end @compat -->
                       </xs:complexType>
                     </xs:element>
@@ -176,7 +176,7 @@
           <xs:complexType>
             <xs:attribute name="id" type="xs:string" use="required"/>
             <!-- @compat 0.10.7 -->
-            <xs:attribute name="ID" type="xs:string" use="optional" />
+            <xs:attribute name="ID" type="xs:string" use="optional"/>
             <!-- end @compat -->
             <xs:attribute name="destination" type="xs:string" />
             <xs:attribute name="transportable" type="TransportableId" />
@@ -189,7 +189,7 @@
           <xs:complexType>
             <xs:attribute name="id" type="xs:string" use="required"/>
             <!-- @compat 0.10.7 -->
-            <xs:attribute name="ID" type="xs:string" use="optional" />
+            <xs:attribute name="ID" type="xs:string" use="optional"/>
             <!-- end @compat -->
             <xs:attribute name="destination" type="xs:string" />
             <xs:attribute name="transportable" type="TransportableId" />
@@ -217,7 +217,7 @@
           <xs:complexType>
             <xs:attribute name="id" type="xs:string" use="required"/>
             <!-- @compat 0.10.7 -->
-            <xs:attribute name="ID" type="xs:string" use="optional" />
+            <xs:attribute name="ID" type="xs:string" use="optional"/>
             <!-- end @compat -->
             <xs:attribute name="type" type="TileImprovementTypeId" />
             <xs:attribute name="value" type="xs:int" />

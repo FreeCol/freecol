@@ -3706,7 +3706,7 @@ public class Unit extends GoodsLocation
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute(ID_ATTRIBUTE, getId());
+        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
         if (name != null) {
             out.writeAttribute("name", name);
         }
@@ -3843,7 +3843,7 @@ public class Unit extends GoodsLocation
 
         treasureAmount = getAttribute(in, "treasureAmount", 0);
 
-        destination = newLocation(in.getAttributeValue(null, "destination"));
+        destination = getLocationAttribute(in, "destination", game);
 
         currentStop = -1;
         tradeRoute = null;
@@ -3882,9 +3882,9 @@ public class Unit extends GoodsLocation
         experience = getAttribute(in, "experience", 0);
         visibleGoodsCount = getAttribute(in, "visibleGoodsCount", -1);
 
-        entryLocation = newLocation(in.getAttributeValue(null, "entryLocation"));
+        entryLocation = getLocationAttribute(in, "entryLocation", game);
 
-        location = newLocation(in.getAttributeValue(null, "location"));
+        location = getLocationAttribute(in, "location", game);
         clearUnitList();
         if (getGoodsContainer() != null) getGoodsContainer().removeAll();
         clearEquipment();
@@ -3894,7 +3894,7 @@ public class Unit extends GoodsLocation
     protected void readChildren(XMLStreamReader in) throws XMLStreamException {
         Game game = getGame();
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if (in.getLocalName().equals(UNITS_TAG_NAME)) {
+            if (in.getLocalName().equals(UNITS_TAG)) {
                 // @compat 0.10.5
                 while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
                     super.readChild(in);
@@ -3903,7 +3903,7 @@ public class Unit extends GoodsLocation
             } else if (in.getLocalName().equals(EQUIPMENT_TAG)) {
                 String xLength = in.getAttributeValue(null, ARRAY_SIZE);
                 if (xLength == null) {
-                    String equipmentId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
+                    String equipmentId = readId(in);
                     int count = Integer.parseInt(in.getAttributeValue(null, "count"));
                     equipment.incrementCount(getSpecification().getEquipmentType(equipmentId), count);
                 } else { // @compat 0.9.x

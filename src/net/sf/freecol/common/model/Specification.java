@@ -556,7 +556,7 @@ public final class Specification {
 
         public void readChildren(XMLStreamReader xsr) throws XMLStreamException {
             while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                String id = xsr.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG);
+                String id = FreeColObject.readId(xsr);
                 if (id == null) {
                     logger.warning("ID is 'null', element name is " + xsr.getLocalName());
                 } else if ("delete".equals(xsr.getLocalName())) {
@@ -565,7 +565,7 @@ public final class Specification {
                         result.remove(object);
                     }
                 } else {
-                    T object = getType(xsr.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG), type);
+                    T object = getType(FreeColObject.readId(xsr), type);
                     // If this an existing object (with id) and the
                     // PRESERVE tag is present, then leave the
                     // attributes intact and only read the child
@@ -611,7 +611,7 @@ public final class Specification {
             boolean recursive = str == null || Boolean.parseBoolean(str);
 
             if (OptionGroup.getXMLElementTagName().equals(tag)) {
-                String id = xsr.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG);
+                String id = FreeColObject.readId(xsr);
                 OptionGroup group = allOptionGroups.get(id);
                 if (group == null) {
                     group = new OptionGroup(id, Specification.this);
@@ -1524,7 +1524,7 @@ public final class Specification {
      * {@inheritDoc}
      */
     public void readFromXML(XMLStreamReader xsr) throws XMLStreamException {
-        String newId = xsr.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG);
+        String newId = FreeColObject.readId(xsr);
         if (difficultyLevel == null) {
             difficultyLevel = xsr.getAttributeValue(null, "difficultyLevel");
         }

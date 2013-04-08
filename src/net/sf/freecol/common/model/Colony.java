@@ -2887,11 +2887,11 @@ public class Colony extends Settlement implements Nameable {
                 }
                 in.nextTag();
             } else if (BUILD_QUEUE_TAG.equals(in.getLocalName())) {
-                String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
+                String id = readId(in);
                 buildQueue.add(getSpecification().getType(id, BuildableType.class));
                 in.nextTag();
             } else if (POPULATION_QUEUE_TAG.equals(in.getLocalName())) {
-                String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
+                String id = readId(in);
                 populationQueue.add(getSpecification().getType(id, UnitType.class));
                 in.nextTag();
             } else {

@@ -23,6 +23,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -45,21 +46,22 @@ abstract public class FreeColGameObject extends FreeColObject {
 
     private static final Logger logger = Logger.getLogger(FreeColGameObject.class.getName());
 
-    public static final String UNITS_TAG_NAME = "units";
+    public static final String UNITS_TAG = "units";
 
     private Game game;
     private boolean disposed = false;
     private boolean uninitialized;
 
     protected FreeColGameObject() {
-        logger.info("FreeColGameObject without ID created.");
+        logger.info("FreeColGameObject without id created.");
         uninitialized = false;
     }
 
 
     /**
-     * Creates a new <code>FreeColGameObject</code> with an automatically assigned
-     * ID and registers this object at the specified <code>Game</code>.
+     * Creates a new <code>FreeColGameObject</code> with an
+     * automatically assigned id and registers this object at the
+     * specified <code>Game</code>.
      *
      * @param game The <code>Game</code> in which this object belong.
      */
@@ -115,11 +117,10 @@ abstract public class FreeColGameObject extends FreeColObject {
     }
 
     /**
-     * Initiates a new <code>FreeColGameObject</code>
-     * with the given ID. The object should later be
-     * initialized by calling either
-     * {@link #readFromXML(XMLStreamReader)} or
-     * {@link #readFromXMLElement(Element)}.
+     * Initiates a new <code>FreeColGameObject</code> with the given
+     * id.  The object should later be initialized by calling one of:
+     * - {@link #readFromXML(XMLStreamReader)}
+     * - {@link #readFromXMLElement(Element)}.
      *
      * @param game The <code>Game</code> in which this object belong.
      * @param id The unique identifier for this object.
@@ -144,7 +145,7 @@ abstract public class FreeColGameObject extends FreeColObject {
      */
     protected void setDefaultId(Game game) {
         setId(getRealXMLElementTagName() + ":"
-              + game.getNextID());
+              + game.getNextId());
     }
 
     /**
@@ -224,38 +225,40 @@ abstract public class FreeColGameObject extends FreeColObject {
     }
 
     /**
-     * Gets the ID's integer part of this object. The age of two
-     * FreeColGameObjects can be compared by comparing their integer
-     * IDs.
+     * Gets the integer part of an id.
      *
-     * @return The unique ID of this object.
+     * The age of two FreeColGameObjects can be compared by comparing
+     * their integer identifiers.
+     *
+     * @return The unique id of this object.
      */
     // TODO: remove compatibility code: use established instead
-    public Integer getIntegerID() {
+    public Integer getIntegerId() {
         String stringPart = getRealXMLElementTagName() + ":";
         return new Integer(getId().substring(stringPart.length()));
     }
 
     /**
-     * Sets the unique ID of this object. When setting a new ID to this object,
-     * it it automatically registered at the corresponding <code>Game</code>
-     * with the new ID.
+     * Sets the unique identifier of this object.
      *
-     * @param newID the unique ID of this object,
+     * When setting a new identifier it is automatically registered in
+     * the corresponding <code>Game</code>.
+     *
+     * @param newId The unique id of this object.
      */
     @Override
-    public final void setId(String newID) {
+    public final void setId(String newId) {
         if (game != null && !(this instanceof Game)) {
-            if (!newID.equals(getId())) {
+            if (!newId.equals(getId())) {
                 if (getId() != null) {
                     game.removeFreeColGameObject(getId());
                 }
 
-                super.setId(newID);
-                game.setFreeColGameObject(newID, this);
+                super.setId(newId);
+                game.setFreeColGameObject(newId, this);
             }
         } else {
-            super.setId(newID);
+            super.setId(newId);
         }
     }
 
@@ -305,45 +308,62 @@ abstract public class FreeColGameObject extends FreeColObject {
                             returnType, defaultValue);
     }
 
-    public <T extends FreeColGameObject> T getFreeColGameObject(XMLStreamReader in, String attributeName,
-                                                                Class<T> returnClass) {
-        final String attributeString = in.getAttributeValue(null, attributeName);
-        if (attributeString == null) {
-            return null;
-        } else {
-            T returnValue = returnClass.cast(getGame().getFreeColGameObject(attributeString));
-            try {
-                if (returnValue == null) {
-                    Constructor<T> c = returnClass.getConstructor(Game.class, String.class);
-                    returnValue = returnClass.cast(c.newInstance(getGame(), attributeString));
-                }
-                return returnValue;
-            } catch(Exception e) {
-                logger.warning("Failed to create FreeColGameObject with ID " + attributeString);
-                return null;
+    /**
+     * Read a <code>FreeColGameObject</code> value from a stream.
+     *
+     * @param in The <code>XMLStreamReader</code> to read from.
+     * @param attributeName The identifying attribute name.
+     * @param returnClass The <code>FreeColObject</code> type to expect.
+     * @return The <code>FreeColGameObject</code> found, or null if none.
+     */
+    public <T extends FreeColGameObject> T getFreeColGameObject(XMLStreamReader in,
+        String attributeName, Class<T> returnClass) {
+        final String value =
+            // @compat 0.10.x
+            (attributeName.equals(ID_ATTRIBUTE_TAG)) ? readId(in) :
+            // end @compat
+            in.getAttributeValue(null, attributeName);
+        if (value == null) return null;
+        T ret = returnClass.cast(getGame().getFreeColGameObject(value));
+        try {
+            if (ret == null) {
+                Constructor<T> c = returnClass.getConstructor(Game.class,
+                                                              String.class);
+                ret = returnClass.cast(c.newInstance(getGame(), value));
             }
+            return ret;
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Failed to create FCGO with id " + value,
+                e);
+            return null;
         }
     }
 
-    public <T extends FreeColGameObject> T getFreeColGameObject(XMLStreamReader in, String attributeName,
-                                                                Class<T> returnClass, T defaultValue) {
-        final String attributeString = in.getAttributeValue(null, attributeName);
-        if (attributeString != null) {
-            return returnClass.cast(getGame().getFreeColGameObject(attributeString));
-        } else {
-            return defaultValue;
-        }
+    /**
+     * Read a <code>FreeColGameObject</code> value from a stream.
+     *
+     * @param in The <code>XMLStreamReader</code> to read from.
+     * @param attributeName The identifying attribute name.
+     * @param returnClass The <code>FreeColObject</code> type to expect.
+     * @param defaultValue A default value to return if the attribute has
+     *     no value.
+     * @return The <code>FreeColGameObject</code> found, or null if none.
+     */
+    public <T extends FreeColGameObject> T getFreeColGameObject(XMLStreamReader in,
+        String attributeName, Class<T> returnClass, T defaultValue) {
+        final String value =
+            // @compat 0.10.x
+            (attributeName.equals(ID_ATTRIBUTE_TAG)) ? readId(in) :
+            // end @compat
+            in.getAttributeValue(null, attributeName);
+        return (value == null) ? defaultValue
+            : returnClass.cast(getGame().getFreeColGameObject(value));
     }
 
     public <T extends FreeColGameObject> T updateFreeColGameObject(XMLStreamReader in, Class<T> returnClass) {
-        String idString = in.getAttributeValue(null, ID_ATTRIBUTE);
-        if (idString == null) {
-            idString = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-        }
-        if (idString == null) {
-            return null;
-        }
-        FreeColGameObject fcgo = getGame().getFreeColGameObject(idString);
+        String id = readId(in);
+        if (id == null) return null;
+        FreeColGameObject fcgo = getGame().getFreeColGameObject(id);
         T returnValue = (fcgo == null) ? null : returnClass.cast(fcgo);
         try {
             if (returnValue == null) {
@@ -354,9 +374,7 @@ abstract public class FreeColGameObject extends FreeColObject {
             }
             return returnValue;
         } catch (Exception e) {
-            logger.warning("Failed to update FreeColGameObject with ID "
-                           + idString);
-            e.printStackTrace();
+            logger.log(Level.WARNING, "Failed to update FCGO with id " + id, e);
             return null;
         }
     }
@@ -512,11 +530,11 @@ abstract public class FreeColGameObject extends FreeColObject {
             Introspector tag = new Introspector(theClass, "XMLElementTagName");
             out.writeStartElement(tag.getter(this));
         } catch (IllegalArgumentException e) {
-            logger.warning("Could not get tag field: " + e.toString());
+            logger.log(Level.WARNING, "Could not get tag name.", e);
         }
 
         // Partial element
-        out.writeAttribute(ID_ATTRIBUTE, getId());
+        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
         out.writeAttribute(PARTIAL_ATTRIBUTE, String.valueOf(true));
 
         // All the fields
@@ -525,8 +543,8 @@ abstract public class FreeColGameObject extends FreeColObject {
                 Introspector intro = new Introspector(theClass, fields[i]);
                 out.writeAttribute(fields[i], intro.getter(this));
             } catch (IllegalArgumentException e) {
-                logger.warning("Could not get field " + fields[i]
-                               + ": " + e.toString());
+                logger.log(Level.WARNING, "Could not get field: " + fields[i],
+                           e);
             }
         }
 
@@ -544,28 +562,27 @@ abstract public class FreeColGameObject extends FreeColObject {
      *
      * @param in The input stream with the XML.
      * @param theClass The real class of this object, required by the
-     *                 <code>Introspector</code>.
+     *     <code>Introspector</code>.
      * @throws XMLStreamException If there are problems reading the stream.
      */
-    public void readFromXMLPartialByClass(XMLStreamReader in,
-                                             Class<?> theClass)
+    public void readFromXMLPartialByClass(XMLStreamReader in, Class<?> theClass)
         throws XMLStreamException {
         int n = in.getAttributeCount();
 
-        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
+        setId(readId(in));
 
         for (int i = 0; i < n; i++) {
             String name = in.getAttributeLocalName(i);
 
             if (name.equals(ID_ATTRIBUTE)
+                || name.equals(ID_ATTRIBUTE_TAG)
                 || name.equals(PARTIAL_ATTRIBUTE)) continue;
 
             try {
                 Introspector intro = new Introspector(theClass, name);
                 intro.setter(this, in.getAttributeValue(i));
             } catch (IllegalArgumentException e) {
-                logger.warning("Could not set field " + name
-                               + ": " + e.toString());
+                logger.log(Level.WARNING, "Could not set field " + name, e);
             }
         }
 

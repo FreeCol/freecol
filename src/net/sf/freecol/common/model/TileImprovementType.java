@@ -587,7 +587,7 @@ public final class TileImprovementType extends FreeColGameObjectType {
             in.nextTag(); // close this element
 
         } else if (WORKER_TAG.equals(tag)) {
-            String id = getAttribute(in, ID_ATTRIBUTE_TAG, (String)null);
+            String id = readId(in);
             if (id != null) {
                 if (allowedWorkers == null) {
                     allowedWorkers = new HashSet<String>();

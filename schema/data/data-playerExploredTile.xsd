@@ -40,7 +40,10 @@
         <xs:element ref="resource" />
         <xs:element ref="tileimprovement" />
       </xs:choice>
-      <xs:attribute name="ID" type="PlayerExploredTileId" use="required" />
+      <xs:attribute name="id" type="PlayerExploredTileId" use="required"/>
+      <!-- @compat 0.10.x -->
+      <xs:attribute name="ID" type="PlayerExploredTileId" use="optional"/>
+      <!-- end @compat -->
       <xs:attribute name="player" type="PlayerId" use="required" />
       <xs:attribute name="tile" type="TileId" use="required" />
       <xs:attribute name="owner" type="PlayerId" use="optional" />

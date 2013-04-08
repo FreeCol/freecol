@@ -30,30 +30,27 @@
   <xs:element name="colonyTile">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
-	<xs:element ref="unit" />
-	<xs:element ref="production" />
+	      <xs:element ref="unit" />
+	      <xs:element ref="production" />
       </xs:choice>
-
-      <xs:attribute name="ID" type="ColonyTileId" use="required">
-	<xs:annotation>
-	  <xs:documentation>
-	    ID of this object
-	  </xs:documentation>
-	</xs:annotation>
-      </xs:attribute>
+      
+      <xs:attribute name="id" type="ColonyTileId" use="required"/>
+      <!-- @compat 0.10.x -->
+      <xs:attribute name="ID" type="ColonyTileId" use="optional"/>
+      <!-- end @compat -->
       <xs:attribute name="colony" type="ColonyId" use="required">
-	<xs:annotation>
-	  <xs:documentation>
-	    Parent colony
-	  </xs:documentation>
-	</xs:annotation>
+	      <xs:annotation>
+	        <xs:documentation>
+	          Parent colony
+	        </xs:documentation>
+	      </xs:annotation>
       </xs:attribute>
       <xs:attribute name="workTile" type="TileId" use="required">
-	<xs:annotation>
-	  <xs:documentation>
-	    ID of the Map tile
-	  </xs:documentation>
-	</xs:annotation>
+	      <xs:annotation>
+	        <xs:documentation>
+	          ID of the Map tile
+	        </xs:documentation>
+	      </xs:annotation>
       </xs:attribute>
     </xs:complexType>
   </xs:element>

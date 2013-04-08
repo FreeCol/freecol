@@ -306,13 +306,13 @@ public class EquipmentType extends BuildableType {
         final String tag = in.getLocalName();
 
         if (CAPTURE_EQUIPMENT_TAG.equals(tag)) {
-            captureEquipmentId = getAttribute(in, ID_ATTRIBUTE_TAG, (String)null);
+            captureEquipmentId = readId(in);
             captureEquipmentByIndians = getAttribute(in, BY_INDIANS_TAG, false);
 
             in.nextTag();
 
         } else if (COMPATIBLE_EQUIPMENT_TAG.equals(tag)) {
-            String equipmentId = getAttribute(in, ID_ATTRIBUTE_TAG, (String)null);
+            String equipmentId = readId(in);
             if (equipmentId != null) {
                 if (compatibleEquipment == null) {
                     compatibleEquipment = new ArrayList<String>();
@@ -323,7 +323,7 @@ public class EquipmentType extends BuildableType {
 
         // @compat 0.10.0
         } else if (REQUIRED_LOCATION_ABILITY_TAG.equals(tag)) {
-            String abilityId = getAttribute(in, ID_ATTRIBUTE_TAG, (String)null);
+            String abilityId = readId(in);
             Map<String, Boolean> required = getRequiredAbilities();
             required.put(abilityId, getAttribute(in, VALUE_TAG, true));
             setRequiredAbilities(required);

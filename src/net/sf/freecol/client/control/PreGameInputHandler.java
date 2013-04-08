@@ -118,7 +118,7 @@ public final class PreGameInputHandler extends InputHandler {
 
         Element playerElement = (Element)element
             .getElementsByTagName(Player.getXMLElementTagName()).item(0);
-        String id = playerElement.getAttribute(FreeColObject.ID_ATTRIBUTE);
+        String id = FreeColObject.readId(playerElement);
         FreeColGameObject fcgo = game.getFreeColGameObject(id);
         if (fcgo == null) {
             game.addPlayer(new Player(game, playerElement));

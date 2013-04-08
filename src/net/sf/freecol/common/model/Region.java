@@ -477,7 +477,7 @@ public class Region extends FreeColGameObject implements Nameable {
                              boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
-        out.writeAttribute(ID_ATTRIBUTE, getId());
+        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
         out.writeAttribute("nameKey", nameKey);
         out.writeAttribute("type", type.toString());
         if (name != null) {

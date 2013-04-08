@@ -84,7 +84,10 @@
       </xs:element>
     </xs:choice>
 
-    <xs:attribute name="ID" type="UnitId" use="required" />
+    <xs:attribute name="id" type="UnitId" use="required" />
+    <!-- @compat 0.10.x -->
+    <xs:attribute name="ID" type="UnitId" use="optional"/>
+    <!-- end @compat -->
     <xs:attribute name="name" type="xs:string" use="optional"/>
     <xs:attribute name="unitType" type="xs:string" use="required"/>
     <xs:attribute name="movesLeft" type="xs:int" use="required"/>

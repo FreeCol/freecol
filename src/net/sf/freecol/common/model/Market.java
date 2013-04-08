@@ -507,7 +507,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     */
     @Override
     protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        writeAttribute(out, ID_ATTRIBUTE, getId());
+        writeAttribute(out, ID_ATTRIBUTE_TAG, getId());
 
         writeAttribute(out, OWNER_TAG, owner.getId());
     }

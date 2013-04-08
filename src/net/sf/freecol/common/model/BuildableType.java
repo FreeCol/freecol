@@ -277,7 +277,7 @@ public abstract class BuildableType extends FreeColGameObjectType {
         final String tag = in.getLocalName();
 
         if (REQUIRED_ABILITY_TAG.equals(tag)) {
-            String str = getAttribute(in, ID_ATTRIBUTE_TAG, (String)null);
+            String str = readId(in);
             if (str != null) {
                 if (requiredAbilities == null) {
                     requiredAbilities = new HashMap<String, Boolean>();

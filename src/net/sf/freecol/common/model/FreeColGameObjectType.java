@@ -304,12 +304,9 @@ public class FreeColGameObjectType extends FreeColObject {
      */
     @Override
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        String newId = getAttribute(in, ID_ATTRIBUTE_TAG, (String)null);
-        if (newId == null) {
-            throw new XMLStreamException("Null " + ID_ATTRIBUTE_TAG);
-        } else {
-            setId(newId);
-        }
+        String newId = readId(in);
+        if (newId == null) throw new XMLStreamException("Null id");
+        setId(newId);
 
         abstractType = getAttribute(in, ABSTRACT_TAG, false);
     }
@@ -348,8 +345,7 @@ public class FreeColGameObjectType extends FreeColObject {
 
         if (Ability.getXMLElementTagName().equals(tag)) {
             if (getAttribute(in, DELETE_TAG, false)) {
-                String id = getAttribute(in, ID_ATTRIBUTE_TAG, (String)null);
-                removeAbilities(id);
+                removeAbilities(readId(in));
                 in.nextTag();
             } else {
                 Ability ability = new Ability(in, spec); // Closes the element
@@ -360,8 +356,7 @@ public class FreeColGameObjectType extends FreeColObject {
 
         } else if (Modifier.getXMLElementTagName().equals(tag)) {
             if (getAttribute(in, DELETE_TAG, false)) {
-                String id = getAttribute(in, ID_ATTRIBUTE_TAG, (String)null);
-                removeModifiers(id);
+                removeModifiers(readId(in));
                 in.nextTag();
             } else {
                 Modifier modifier = new Modifier(in, spec);// Closes the element

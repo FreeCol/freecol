@@ -43,7 +43,10 @@
 	</xs:element>
 
       </xs:choice>
-      <xs:attribute name="ID" type="EuropeId" use="required"/>
+      <xs:attribute name="id" type="EuropeId" use="required"/>
+      <!-- @compat 0.10.x -->
+      <xs:attribute name="ID" type="EuropeId" use="optional"/>
+      <!-- end @compat -->
       <xs:attribute name="recruit0" type="UnitTypeId" use="optional"/>
       <xs:attribute name="recruit1" type="UnitTypeId" use="optional"/>
       <xs:attribute name="recruit2" type="UnitTypeId" use="optional"/>
