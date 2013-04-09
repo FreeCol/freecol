@@ -123,9 +123,8 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      * @param in a <code>XMLStreamReader</code> value
      * @exception XMLStreamException if an error occurs
      */
-    public UnitLocation(Game game, XMLStreamReader in)
-        throws XMLStreamException {
-        super(game, in);
+    public UnitLocation(Game game, XMLStreamReader in) throws XMLStreamException {
+        super(game, null);
     }
 
     /**
@@ -140,7 +139,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
 
     // Only Unit needs this
     public UnitLocation(Game game, Element e) {
-        super(game, e);
+        super(game, null);
     }
 
     /**

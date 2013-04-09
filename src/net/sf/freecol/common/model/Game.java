@@ -147,7 +147,7 @@ public class Game extends FreeColGameObject {
      * @throws XMLStreamException
      */
     protected Game(Game game, XMLStreamReader in) throws XMLStreamException {
-        super(game, in);
+        super(game, null);
     }
 
     /**
@@ -159,7 +159,7 @@ public class Game extends FreeColGameObject {
      *            game.
      */
     public Game(Element element, String viewOwnerUsername) {
-        super(null, element);
+        super(null);
      
         this.combatModel = new SimpleCombatModel();
         readFromXMLElement(element);
@@ -181,9 +181,8 @@ public class Game extends FreeColGameObject {
      * @see net.sf.freecol.client.control.ConnectController#login(String,
      *      String, int)
      */
-    public Game(XMLStreamReader in, String viewOwnerUsername)
-        throws XMLStreamException {
-        super(null, in);
+    public Game(XMLStreamReader in, String viewOwnerUsername) throws XMLStreamException {
+        super(null);
 
         this.combatModel = new SimpleCombatModel();
         readFromXML(in);

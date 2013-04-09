@@ -442,7 +442,7 @@ public class Map extends FreeColGameObject implements Location {
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
     public Map(Game game, XMLStreamReader in) throws XMLStreamException {
-        super(game, in);
+        super(game, null);
 
         readFromXML(in);
     }

@@ -37,6 +37,7 @@ import javax.xml.validation.Validator;
 
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -57,7 +58,7 @@ public class SerializationTest extends FreeColTestCase {
     private Source buildSource(FreeColObject object, Player player,
                                boolean showAll, boolean toSavedGame)
         throws Exception {
-        return new StreamSource(new StringReader(serialize(object, player, showAll, toSavedGame)));
+        return new StreamSource(new StringReader(object.serialize(player, showAll, toSavedGame)));
     }
 
 
@@ -98,7 +99,7 @@ public class SerializationTest extends FreeColTestCase {
         String serialized = null;
         try {
             Validator validator = buildValidator("schema/data/data-game.xsd");
-            serialized = serialize(game, player, true, true);
+            serialized = game.serialize(player, true, true);
             validator.validate(new StreamSource(new StringReader(serialized)));
         } catch (SAXParseException e) {
             int col = e.getColumnNumber();

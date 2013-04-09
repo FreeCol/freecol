@@ -19,20 +19,14 @@
 
 package net.sf.freecol.util.test;
 
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
 
 import junit.framework.TestCase;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -654,50 +648,4 @@ public class FreeColTestCase extends TestCase {
         } while (crs.get(0) != result);
         return crs;
     }
-
-    public String serialize(FreeColObject object, Player player,
-                            boolean showAll, boolean toSavedGame)
-        throws Exception {
-        StringWriter sw = new StringWriter();
-        XMLOutputFactory xif = XMLOutputFactory.newInstance();
-        XMLStreamWriter out = xif.createXMLStreamWriter(sw);
-        object.toXML(out, player, showAll, toSavedGame);
-        out.close();
-        return sw.toString();
-    }
-
-    /**
-     * "Clone" the given FreeColGameObject by serializing it and
-     * creating a new object from the resulting XML. We need to pass
-     * the result class, since the object we are about to "clone" is
-     * likely a server object.
-     *
-     * @param resultClass the class of the "clone"
-     * @param object the FreeColGameObject to "clone"
-     * @return the "clone" of the FreeColGameObject
-     */
-    public <T extends FreeColGameObject> T cloneFreeColGameObject(Class<T> resultClass,
-                                                                  FreeColGameObject object) {
-        try {
-            Constructor<T> constructor = resultClass.getConstructor(Game.class, XMLStreamReader.class);
-            Game game = object.getGame();
-            Player owner = (object instanceof Ownable) ? ((Ownable) object).getOwner() : null;
-            String xml = serialize(object, owner, true, true);
-            Field nextId = Game.class.getDeclaredField("nextId");
-            nextId.setAccessible(true);
-            int id = nextId.getInt(game);
-            nextId.setInt(game, id + 1);
-            xml = xml.replace(object.getId(), T.getXMLElementTagName() + ":" + id);
-            XMLInputFactory xif = XMLInputFactory.newInstance();
-            XMLStreamReader in = xif.createXMLStreamReader(new StringReader(xml));
-            in.nextTag();
-            return constructor.newInstance(game, in);
-        } catch(Exception e) {
-            e.printStackTrace();
-            fail(e.getMessage());
-            return null;
-        }
-    }
-
-
 }

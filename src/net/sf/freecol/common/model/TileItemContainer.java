@@ -97,7 +97,7 @@ public class TileItemContainer extends FreeColGameObject {
      *      during parsing.
      */
     public TileItemContainer(Game game, Tile tile, XMLStreamReader in) throws XMLStreamException {
-        super(game, in);
+        super(game, null);
 
         if (tile == null) {
             throw new IllegalArgumentException("Tile must not be 'null'.");

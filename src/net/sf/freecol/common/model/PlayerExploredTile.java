@@ -88,7 +88,8 @@ public class PlayerExploredTile extends FreeColGameObject {
      * @throws XMLStreamException if an error occurred during parsing.
      */
     public PlayerExploredTile(Game game, XMLStreamReader in) throws XMLStreamException {
-        super(game, in);
+        super(game, null);
+
         readFromXML(in);
     }
 

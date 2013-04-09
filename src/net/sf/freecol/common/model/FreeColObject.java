@@ -184,6 +184,58 @@ public abstract class FreeColObject {
     }
 
     /**
+     * Serialize this FreeColObject to a string.
+     *
+     * @param player The <code>Player</code> this XML-representation
+     *     should be made for, or null if <code>showAll == true</code>.
+     * @param showAll Show all attributes.
+     * @param toSavedGame Also show some extra attributes when saving the game.
+     * @exception XMLStreamException if there are any problems writing
+     *     to the stream.
+     */
+    public String serialize(Player player, boolean showAll,
+                            boolean toSavedGame) throws XMLStreamException {
+        StringWriter sw = new StringWriter();
+        XMLOutputFactory xif = XMLOutputFactory.newInstance();
+        XMLStreamWriter out = xif.createXMLStreamWriter(sw);
+        this.toXML(out, player, showAll, toSavedGame);
+        out.close();
+        return sw.toString();
+    }
+
+    /**
+     * Unserialize from XML to a FreeColObject.
+     *
+     * @param xml The xml serialized version of an object.
+     * @param game The <code>Game</code> to add the object to.
+     * @param returnClass The required object class.
+     * @return The unserialized object.
+     * @exception XMLStreamException if there are any problems reading
+     *     from the stream.
+     */
+    public static <T extends FreeColObject> T unserialize(String xml,
+        Game game, Class<T> returnClass) throws XMLStreamException {
+        XMLInputFactory xif = XMLInputFactory.newInstance();
+        XMLStreamReader in = xif.createXMLStreamReader(new StringReader(xml));
+        in.nextTag();
+
+        T ret = null;
+        try {
+            Constructor<T> c = returnClass.getConstructor(Game.class,
+                                                          String.class);
+            ret = c.newInstance(game, (String)null);
+        } catch (NoSuchMethodException nsme) { // Specific to getConstructor
+            logger.log(Level.WARNING, "No constructor for "
+                + returnClass.getName(), nsme);
+        } catch (Exception e) { // Handles multiple fails from newInstance
+            logger.log(Level.WARNING, "Failed to instantiate "
+                + returnClass.getName(), e);
+        }
+        if (ret != null) ret.readFromXML(in);
+        return ret;
+    }
+
+    /**
      * This method writes an XML-representation of this object to
      * the given stream.
      *

@@ -92,7 +92,8 @@ public class TradeRoute extends FreeColGameObject
      * @exception XMLStreamException if an error occurs
      */
     public TradeRoute(Game game, XMLStreamReader in) throws XMLStreamException {
-        super(game, in);
+        super(game, null);
+
         readFromXML(in);
     }
 
@@ -103,7 +104,8 @@ public class TradeRoute extends FreeColGameObject
      * @param e an <code>Element</code> value
      */
     public TradeRoute(Game game, Element e) {
-        super(game, e);
+        super(game, null);
+
         readFromXMLElement(e);
     }
 

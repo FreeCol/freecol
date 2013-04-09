@@ -129,7 +129,7 @@ public class MarketData extends FreeColGameObject {
      * @throws XMLStreamException if an error occured during parsing.
      */
     public MarketData(Game game, XMLStreamReader in) throws XMLStreamException {
-        super(game, in);
+        super(game, null);
 
         readFromXML(in);
     }

@@ -55,7 +55,7 @@ public abstract class TileItem extends FreeColGameObject implements Locatable {
      *      during parsing.
      */
     public TileItem(Game game, XMLStreamReader in) throws XMLStreamException {
-        super(game, in);
+        super(game, null);
     }
 
     /**

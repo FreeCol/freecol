@@ -87,7 +87,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      *      during parsing.
      */
     public GoodsContainer(Game game, Location parent, XMLStreamReader in) throws XMLStreamException {
-        super(game, in);
+        super(game, null);
 
         if (parent == null) {
             throw new IllegalArgumentException("Location of GoodsContainer must not be null!");
@@ -108,7 +108,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      *      this object.
      */
     public GoodsContainer(Game game, Location parent, Element e) {
-        super(game, e);
+        super(game, null);
 
         if (parent == null) {
             throw new IllegalArgumentException("Location of GoodsContainer must not be null!");

@@ -68,7 +68,7 @@ public class ServerRegion extends Region {
      */
     public ServerRegion(Game game, String nameKey, RegionType type,
                         Region parent) {
-        super(game, nameKey);
+        super(game);
         setNameKey(nameKey);
         setType(type);
         setParent(parent);

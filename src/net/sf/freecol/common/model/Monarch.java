@@ -145,7 +145,8 @@ public final class Monarch extends FreeColGameObject implements Named {
      *      during parsing.
      */
     public Monarch(Game game, XMLStreamReader in) throws XMLStreamException {
-        super(game, in);
+        super(game, null);
+
         readFromXML(in);
     }
 

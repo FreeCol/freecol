@@ -623,8 +623,6 @@ public class TileTest extends FreeColTestCase {
         Colony colony = getStandardColony();
         ColonyTile tile = colony.getColonyTile(colony.getTile());
 
-        ColonyTile copy = cloneFreeColGameObject(ColonyTile.class, tile);
-
+        assertNotNull(tile.cloneFreeColGameObject(ColonyTile.class));
     }
-
 }

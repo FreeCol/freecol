@@ -81,7 +81,7 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
      * @exception XMLStreamException if an error occurs
      */
     public AbstractMission(Game game, XMLStreamReader in) throws XMLStreamException {
-        super(game, in);
+        super(game, null);
     }
 
     /**
@@ -91,7 +91,8 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
      * @param e an <code>Element</code> value
      */
     public AbstractMission(Game game, Element e) {
-        super(game, e);
+        super(game, null);
+
         readFromXMLElement(e);
     }
 

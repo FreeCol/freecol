@@ -144,7 +144,8 @@ public class Region extends FreeColGameObject implements Nameable {
      * @throws XMLStreamException if an error occurred during parsing.
      */
     public Region(Game game, XMLStreamReader in) throws XMLStreamException {
-        super(game, in);
+        super(game, null);
+
         readFromXML(in);
     }
 

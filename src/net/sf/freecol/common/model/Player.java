@@ -453,7 +453,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
     public Player(Game game, XMLStreamReader in) throws XMLStreamException {
-        super(game, in);
+        super(game, null);
+
         readFromXML(in);
     }
 
@@ -466,7 +467,8 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      */
     public Player(Game game, Element e) {
-        super(game, e);
+        super(game, null);
+
         readFromXMLElement(e);
     }
 

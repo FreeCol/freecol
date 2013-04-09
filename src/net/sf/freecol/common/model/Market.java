@@ -102,7 +102,7 @@ public final class Market extends FreeColGameObject implements Ownable {
      *      during parsing.
      */
     public Market(Game game, XMLStreamReader in) throws XMLStreamException {
-        super(game, in);
+        super(game, null);
 
         readFromXML(in);
     }

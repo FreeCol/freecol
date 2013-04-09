@@ -663,7 +663,7 @@ public class UnitTest extends FreeColTestCase {
         Goods goods = new Goods(game, merchantman, cottonType, 44);
         merchantman.add(goods);
 
-        Unit clone = cloneFreeColGameObject(Unit.class, merchantman);
+        Unit clone = merchantman.cloneFreeColGameObject(Unit.class);
 
         assertFalse(merchantman == clone);
         assertFalse(merchantman.getId().equals(clone.getId()));
@@ -691,7 +691,7 @@ public class UnitTest extends FreeColTestCase {
         merchantman.add(goods);
 
         try {
-            String xml = serialize(merchantman, dutch, true, true);
+            String xml = merchantman.serialize(dutch, true, true);
             Field nextId = Game.class.getDeclaredField("nextId");
             nextId.setAccessible(true);
             int id = nextId.getInt(game);
