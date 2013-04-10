@@ -19,6 +19,8 @@
 
 package net.sf.freecol.client.control;
 
+import java.awt.Color;
+
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
@@ -64,6 +66,15 @@ public final class PreGameController {
 
 
     /**
+     * Sends a chat message.
+     *
+     * @param message The text of the message.
+     */
+    public void chat(String message) {
+        freeColClient.askServer().chat(freeColClient.getMyPlayer(), message);
+    }
+
+    /**
      * Sets this client to be (or not be) ready to start the game.
      *
      * @param ready Indicates whether or not this client is ready to
@@ -73,8 +84,45 @@ public final class PreGameController {
         freeColClient.getMyPlayer().setReady(ready);
         
         freeColClient.askServer().setReady(ready);
+    }
 
-       
+    /**
+     * Requests the game to be started.  This will only be successful
+     * if all players are ready to start the game.
+     */
+    public void requestLaunch() {
+        if (freeColClient.getGame().allPlayersReadyToLaunch()) {
+            gui.showStatusPanel(Messages.message("status.startingGame"));
+            freeColClient.askServer().requestLaunch();
+
+        } else {
+            gui.errorMessage("server.notAllReady");
+        }
+    }
+
+    /**
+     * Sets a nation's state.
+     *
+     * @param nation The <code>Nation</code> to set.
+     * @param state The <code>NationState</code> value to set.
+     */
+    public void setAvailable(Nation nation, NationState state) {
+        freeColClient.getGame().getNationOptions()
+            .getNations().put(nation, state);
+
+        freeColClient.askServer().setAvailable(nation, state);
+
+    }
+
+    /**
+     * Sets a nation's colour.
+     *
+     * @param nation The <code>Nation</code> to set the color for.
+     * @param color The <code>Color</code> to set.
+     */
+    public void setColor(Nation nation, Color color) {
+        freeColClient.getMyPlayer().getNation().setColor(color);
+        freeColClient.askServer().setColor(nation, color);
     }
 
     /**
@@ -99,43 +147,6 @@ public final class PreGameController {
 
         freeColClient.askServer().setNationType(nationType);
 
-    }
-
-    /**
-     * Sets a nation's state.
-     *
-     * @param nation The <code>Nation</code> to set.
-     * @param state The <code>NationState</code> value to set.
-     */
-    public void setAvailable(Nation nation, NationState state) {
-        freeColClient.getGame().getNationOptions()
-            .getNations().put(nation, state);
-
-        freeColClient.askServer().setAvailable(nation, state);
-
-    }
-
-    /**
-     * Requests the game to be started.  This will only be successful
-     * if all players are ready to start the game.
-     */
-    public void requestLaunch() {
-        if (freeColClient.getGame().allPlayersReadyToLaunch()) {
-            gui.showStatusPanel(Messages.message("status.startingGame"));
-            freeColClient.askServer().requestLaunch();
-
-        } else {
-            gui.errorMessage("server.notAllReady");
-        }
-    }
-
-    /**
-     * Sends a chat message.
-     *
-     * @param message The text of the message.
-     */
-    public void chat(String message) {
-        freeColClient.askServer().chat(freeColClient.getMyPlayer(), message);
     }
 
     /**

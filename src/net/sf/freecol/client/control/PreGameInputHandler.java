@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.control;
 
+import java.awt.Color;
 import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
@@ -92,6 +93,8 @@ public final class PreGameInputHandler extends InputHandler {
             ? setAvailable(element)
             : ("startGame".equals(type))
             ? startGame(element)
+            : ("updateColor".equals(type))
+            ? updateColor(element)
             : ("updateGame".equals(type))
             ? updateGame(element)
             : ("updateGameOptions".equals(type))
@@ -291,6 +294,36 @@ public final class PreGameInputHandler extends InputHandler {
                         });
                 }
             }.start();
+        return null;
+    }
+
+    /**
+     * Handles an "updateColor"-message.
+     *
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *                holds all the information.
+     * @return Null.
+     */
+    private Element updateColor(Element element) {
+        Game game = getFreeColClient().getGame();
+        Specification spec = game.getSpecification();
+        String str = element.getAttribute("nation");
+        Nation nation = spec.getNation(str);
+        if (nation == null) {
+            logger.warning("Invalid nation: " + str);
+            return null;
+        }
+        Color color;
+        try {
+            str = element.getAttribute("color");
+            int rgb = Integer.parseInt(str);
+            color = new Color(rgb);
+        } catch (NumberFormatException nfe) {
+            logger.warning("Invalid color: " + str);
+            return null;
+        }
+        nation.setColor(color);
+        getFreeColClient().getGUI().refreshPlayersTable();
         return null;
     }
 

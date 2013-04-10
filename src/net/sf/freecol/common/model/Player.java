@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.model;
 
+import java.awt.Color;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -1090,8 +1092,8 @@ public class Player extends FreeColGameObject implements Nameable {
         nationId = newNation.getId();
         java.util.Map<Nation, NationState> nations
             = getGame().getNationOptions().getNations();
-        nations.put(newNation, NationState.NOT_AVAILABLE);
         nations.put(oldNation, NationState.AVAILABLE);
+        nations.put(newNation, NationState.NOT_AVAILABLE);
     }
 
     /**
@@ -1226,6 +1228,15 @@ public class Player extends FreeColGameObject implements Nameable {
     public Player getREFPlayer() {
         Nation ref = getNation().getREFNation();
         return (ref == null) ? null : getGame().getPlayer(ref.getId());
+    }
+
+    /**
+     * Gets the player nation color.
+     *
+     * @return The <code>Color</code>.
+     */
+    public Color getNationColor() {
+        return getNation().getColor();
     }
 
 

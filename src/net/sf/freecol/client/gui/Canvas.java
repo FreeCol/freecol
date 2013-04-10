@@ -2127,7 +2127,7 @@ public final class Canvas extends JDesktopPane {
      * @param popupPosition a <code>PopupPosition</code> value
      * @return The <code>JInternalFrame</code> that was created and added.
      */
-    private JInternalFrame addAsFrame(JComponent comp, boolean toolBox, PopupPosition popupPosition, boolean resizable) {
+    public JInternalFrame addAsFrame(JComponent comp, boolean toolBox, PopupPosition popupPosition, boolean resizable) {
         final int FRAME_EMPTY_SPACE = 60;
 
         final JInternalFrame f = (toolBox) ? new ToolBoxFrame() : new JInternalFrame();

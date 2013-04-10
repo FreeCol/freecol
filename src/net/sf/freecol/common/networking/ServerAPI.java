@@ -20,6 +20,7 @@
 
 package net.sf.freecol.common.networking;
 
+import java.awt.Color;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.util.ArrayList;
@@ -1214,6 +1215,21 @@ public abstract class ServerAPI {
     public boolean setBuildQueue(Colony colony,
                                      List<BuildableType> buildQueue) {
         return askHandling(new SetBuildQueueMessage(colony, buildQueue),
+            null, null);
+    }
+
+    /**
+     * Server query-response to set a nation colour
+     * (pre-game).
+     *
+     * @param nation The <code>Nation</code> to set the color for.
+     * @param color The <code>Color</code> selected.
+     * @return True if the server interaction succeeded.
+     */
+    public boolean setColor(Nation nation, Color color) {
+        return askHandling(new TrivialMessage("setColor",
+                "nation", nation.getId(),
+                "color", Integer.toString(color.getRGB())),
             null, null);
     }
 

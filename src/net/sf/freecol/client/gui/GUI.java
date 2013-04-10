@@ -344,7 +344,7 @@ public class GUI {
     public void displayChatMessage(Player player, String message,
                                    boolean privateChat) {
         mapViewer.addMessage(new GUIMessage(player.getName() + ": " + message,
-                imageLibrary.getColor(player)));
+                                            player.getNationColor()));
 
         canvas.repaint(0, 0, canvas.getWidth(), canvas.getHeight());
     }

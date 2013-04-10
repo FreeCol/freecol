@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.io.File;
@@ -49,6 +50,7 @@ import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
@@ -601,6 +603,20 @@ public final class FreeColClient {
 
 
     // Utilities
+
+    /**
+     * Load the default colors into the nations in the specification.
+     *
+     * @param spec The <code>Specification</code> to find nations in.
+     */
+    public void loadDefaultColors(Specification spec) {
+        if (spec == null) return;
+        for (Nation nation : spec.getNations()) {
+            if (nation.getColor() != null) continue;
+            Color color = ResourceManager.getColor(nation.getId() + ".color");
+            if (color != null) nation.setColor(color);
+        }
+    }            
 
     /**
      * Updates the game actions.  Generally useful when menu actions

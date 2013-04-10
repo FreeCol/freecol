@@ -296,13 +296,13 @@ public final class MiniMap extends JPanel implements MouseInputListener {
                         if (unit != null) {
                             g.setColor(Color.BLACK);
                             g.draw(unitPath);
-                            g.setColor(library.getColor(unit.getOwner()));
+                            g.setColor(unit.getOwner().getNationColor());
                             g.fill(unitPath);
                         }
                     } else {
                         g.setColor(Color.BLACK);
                         g.draw(settlementPath);
-                        g.setColor(library.getColor(tile.getSettlement().getOwner()));
+                        g.setColor(tile.getSettlement().getOwner().getNationColor());
                         g.fill(settlementPath);
                     }
                 }

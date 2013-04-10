@@ -347,71 +347,67 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         String command = event.getActionCommand();
         OptionGroup level;
         int port;
-        try {
-            switch (Enum.valueOf(NewPanelAction.class, command)) {
-            case OK:
-                FreeCol.setName(name.getText());
-                FreeCol.setTC(getTC().getId());
-                FreeCol.setAdvantages(getAdvantages());
-                NewPanelAction action = Enum.valueOf(NewPanelAction.class,
-                    group.getSelection().getActionCommand());
-                switch (action) {
-                case SINGLE:
-                    level = getGUI().showDifficultyDialog(spec);
-                    if (level == null) break;
-                    spec.applyDifficultyLevel(level);
-                    // Launch!
-                    if (connectController.startSinglePlayerGame(spec,
-                                                                false)) return;
-                    break;
-                case JOIN:
-                    try {
-                        port = Integer.valueOf(port1.getText()).intValue();
-                    } catch (NumberFormatException e) {
-                        port1Label.setForeground(Color.red);
-                        break;
-                    }
-                    // Launch!
-                    if (connectController.joinMultiplayerGame(server.getText(),
-                                                              port)) return;
-                    break;
-                case START:
-                    try {
-                        port = Integer.valueOf(port2.getText()).intValue();
-                    } catch (NumberFormatException e) {
-                        port2Label.setForeground(Color.red);
-                        break;
-                    }
-                    level = getGUI().showDifficultyDialog(spec);
-                    if (level == null) break;
-                    spec.applyDifficultyLevel(level);
-                    // Launch!
-                    if (connectController.startMultiplayerGame(spec,
-                            publicServer.isSelected(), port)) return;
-                    break;
-                case META_SERVER:
-                    List<ServerInfo> servers = connectController.getServerList();
-                    if (servers != null) {
-                        getGUI().showServerListPanel(servers);
-                    }
+        switch (Enum.valueOf(NewPanelAction.class, command)) {
+        case OK:
+            FreeCol.setName(name.getText());
+            FreeCol.setTC(getTC().getId());
+            FreeCol.setAdvantages(getAdvantages());
+            NewPanelAction action = Enum.valueOf(NewPanelAction.class,
+                group.getSelection().getActionCommand());
+            switch (action) {
+            case SINGLE:
+                level = getGUI().showDifficultyDialog(spec);
+                if (level == null) break;
+                spec.applyDifficultyLevel(level);
+                // Launch!
+                if (connectController.startSinglePlayerGame(spec,
+                        false)) return;
+                break;
+            case JOIN:
+                try {
+                    port = Integer.valueOf(port1.getText()).intValue();
+                } catch (NumberFormatException e) {
+                    port1Label.setForeground(Color.red);
                     break;
                 }
+                // Launch!
+                if (connectController.joinMultiplayerGame(server.getText(),
+                        port)) return;
                 break;
-            case CANCEL:
-                getGUI().removeFromCanvas(this);
-                getGUI().showMainPanel();
-                break;
-            case SINGLE:
-            case JOIN:
             case START:
-            case META_SERVER:
-                enableComponents();
+                try {
+                    port = Integer.valueOf(port2.getText()).intValue();
+                } catch (NumberFormatException e) {
+                    port2Label.setForeground(Color.red);
+                    break;
+                }
+                level = getGUI().showDifficultyDialog(spec);
+                if (level == null) break;
+                spec.applyDifficultyLevel(level);
+                // Launch!
+                if (connectController.startMultiplayerGame(spec,
+                        publicServer.isSelected(), port)) return;
                 break;
-            default:
-                logger.warning("Invalid Action command: " + command);
+            case META_SERVER:
+                List<ServerInfo> servers = connectController.getServerList();
+                if (servers != null) {
+                    getGUI().showServerListPanel(servers);
+                }
+                break;
             }
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Unexpected NewPanel fail", e);
+            break;
+        case CANCEL:
+            getGUI().removeFromCanvas(this);
+            getGUI().showMainPanel();
+            break;
+        case SINGLE:
+        case JOIN:
+        case START:
+        case META_SERVER:
+            enableComponents();
+            break;
+        default:
+            logger.warning("Invalid Action command: " + command);
         }
     }
 }

@@ -264,14 +264,14 @@ public final class ImageLibrary {
      * @return An alarm chip, or null if none suitable.
      */
     public Image getAlarmChip(IndianSettlement is, Player player, String text) {
-        Color ownerColor = getColor(is.getOwner());
+        Color ownerColor = is.getOwner().getNationColor();
         Color foreground = getForegroundColor(ownerColor);
         Color enemyColor = null;
         int amount = 0;
         Player enemy = is.getMostHated();
         Tension alarm;
         if (player != null && (alarm = is.getAlarm(player)) != null) {
-            enemyColor = getColor(player);
+            enemyColor = player.getNationColor();
             // Set amount to [0-4] corresponding to HAPPY, CONTENT,
             // DISPLEASED, ANGRY, HATEFUL.
             amount = alarm.getLevel().ordinal() - Tension.Level.HAPPY.ordinal();
@@ -407,16 +407,6 @@ public final class ImageLibrary {
      */
     public ImageIcon getCoatOfArmsImageIcon(Nation nation) {
         return ResourceManager.getImageIcon(nation.getId() + ".image");
-    }
-
-    /**
-     * Returns the color of the given player.
-     *
-     * @param player a <code>Player</code> value
-     * @return The color of the given player.
-     */
-    public Color getColor(Player player) {
-        return ResourceManager.getColor(player.getNationId() + ".color");
     }
 
     /**
@@ -571,7 +561,7 @@ public final class ImageLibrary {
      * @return A chip.
      */
     public Image getIndianSettlementChip(IndianSettlement is, String text) {
-        Color background = getColor(is.getOwner());
+        Color background = is.getOwner().getNationColor();
         String key = "dynamic.indianSettlement." + text + "."
              + Integer.toHexString(background.getRGB());
         Image img = ResourceManager.getImage(key);
@@ -687,7 +677,7 @@ public final class ImageLibrary {
         if (missionary == null) return null;
 
         boolean expert = missionary.hasAbility(Ability.EXPERT_MISSIONARY);
-        Color background = getColor(missionary.getOwner());
+        Color background = missionary.getOwner().getNationColor();
         String key = "dynamic.mission." + ((expert) ? "expert" : "normal")
             + "." + Integer.toHexString(background.getRGB());
         Image img = ResourceManager.getImage(key, 1.0);
@@ -732,7 +722,7 @@ public final class ImageLibrary {
      * @return A suitable chip.
      */
     public Image getOccupationIndicatorChip(Unit unit, String text) {
-        Color backgroundColor = getColor(unit.getOwner());
+        Color backgroundColor = unit.getOwner().getNationColor();
         Color foregroundColor = (unit.getState() == Unit.UnitState.FORTIFIED)
             ? Color.GRAY : getForegroundColor(backgroundColor);
         String key = "dynamic.occupationIndicator." + text

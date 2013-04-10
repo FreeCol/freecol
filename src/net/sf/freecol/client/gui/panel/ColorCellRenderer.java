@@ -40,23 +40,24 @@ public class ColorCellRenderer extends JLabel implements TableCellRenderer {
 
     /**
      * The constructor to use.
+     *
      * @param useBorder Indicated whether or not a border should be drawn.
      */
     public ColorCellRenderer(boolean useBorder) {
         if (useBorder) {
-            ImageIcon background = ResourceManager.getImageIcon("background.ColorCellRenderer");
-            setBorder(BorderFactory
-                      .createCompoundBorder(BorderFactory
-                                            .createMatteBorder(5, 10, 5, 10, background),
-                                            BorderFactory
-                                            .createLineBorder(Color.BLACK)));
+            ImageIcon background
+                = ResourceManager.getImageIcon("background.ColorCellRenderer");
+            setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(5, 10, 5, 10, background),
+                BorderFactory.createLineBorder(Color.BLACK)));
         }
         // This must be done because the background displays the actual color:
         setOpaque(true);
     }
 
     /**
-     * Returns the component used to render the cell's value.
+     * Gets the component used to render the cell's value.
+     *
      * @param table The table whose cell needs to be rendered.
      * @param color The value of the cell being rendered.
      * @param hasFocus Indicates whether or not the cell in question has focus.
@@ -65,15 +66,13 @@ public class ColorCellRenderer extends JLabel implements TableCellRenderer {
      * @return The component used to render the cell's value.
      */
     public Component getTableCellRendererComponent(JTable table, Object color,
-                                                   boolean isSelected, boolean hasFocus, int row, int column) {
-
+        boolean isSelected, boolean hasFocus, int row, int column) {
         Color myColor = (Color)color;
 
         setBackground(myColor);
 
-        setToolTipText("RGB value: " + myColor.getRed() + ", " + myColor.getGreen() + ", "
-                       + myColor.getBlue());
-
+        setToolTipText("RGB value: " + myColor.getRed()
+            + ", " + myColor.getGreen() + ", " + myColor.getBlue());
         return this;
     }
 }

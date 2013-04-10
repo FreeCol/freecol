@@ -53,12 +53,14 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.ColorCellEditor;
 import net.sf.freecol.common.model.EuropeanNationType;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.resources.ResourceManager;
 
 
@@ -70,8 +72,11 @@ public final class PlayersTable extends JTable {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(PlayersTable.class.getName());
 
-    public static final int NATION_COLUMN = 0, AVAILABILITY_COLUMN = 1, ADVANTAGE_COLUMN = 2,
-        COLOR_COLUMN = 3, PLAYER_COLUMN = 4;
+    public static final int NATION_COLUMN = 0,
+        AVAILABILITY_COLUMN = 1,
+        ADVANTAGE_COLUMN = 2,
+        COLOR_COLUMN = 3,
+        PLAYER_COLUMN = 4;
 
     private static final String[] columnNames = {
         Messages.message("nation"),
@@ -80,7 +85,6 @@ public final class PlayersTable extends JTable {
         Messages.message("color"),
         Messages.message("player")
     };
-
 
     private static final NationState[] allStates = new NationState[] {
         NationState.AVAILABLE,
@@ -108,9 +112,11 @@ public final class PlayersTable extends JTable {
                         NationOptions nationOptions, Player myPlayer) {
         super();
 
+        final Specification spec = freeColClient.getGame().getSpecification();
         library = gui.getImageLibrary();
 
-        setModel(new PlayersTableModel(freeColClient.getPreGameController(), nationOptions, myPlayer));
+        setModel(new PlayersTableModel(freeColClient.getPreGameController(),
+                nationOptions, myPlayer));
         setRowHeight(47);
 
         JButton nationButton = new JButton(Messages.message("nation"));
@@ -134,8 +140,8 @@ public final class PlayersTable extends JTable {
         DefaultTableCellRenderer dtcr = new DefaultTableCellRenderer();
         dtcr.setOpaque(false);
 
-        HeaderRenderer renderer = new HeaderRenderer(nationButton, availabilityLabel,
-                                                     advantageButton, colorLabel, playerLabel);
+        HeaderRenderer renderer = new HeaderRenderer(nationButton,
+            availabilityLabel, advantageButton, colorLabel, playerLabel);
         JTableHeader header = getTableHeader();
         header.addMouseListener(new HeaderListener(header, renderer));
 
@@ -143,29 +149,32 @@ public final class PlayersTable extends JTable {
         nationColumn.setCellRenderer(new NationCellRenderer());
         nationColumn.setHeaderRenderer(renderer);
 
-        TableColumn availableColumn = getColumnModel().getColumn(AVAILABILITY_COLUMN);
+        TableColumn availableColumn
+            = getColumnModel().getColumn(AVAILABILITY_COLUMN);
         availableColumn.setCellRenderer(new AvailableCellRenderer());
         availableColumn.setCellEditor(new AvailableCellEditor());
 
-        TableColumn advantagesColumn = getColumnModel().getColumn(ADVANTAGE_COLUMN);
-        if (nationOptions.getNationalAdvantages() == NationOptions.Advantages.SELECTABLE) {
-            advantagesColumn.setCellEditor(new AdvantageCellEditor(freeColClient.getGame().getSpecification().getEuropeanNationTypes()));
+        TableColumn advantagesColumn
+            = getColumnModel().getColumn(ADVANTAGE_COLUMN);
+        if (nationOptions.getNationalAdvantages()
+            == NationOptions.Advantages.SELECTABLE) {
+            advantagesColumn.setCellEditor(new AdvantageCellEditor(spec
+                    .getEuropeanNationTypes()));
         }
         advantagesColumn.setCellRenderer(new AdvantageCellRenderer(nationOptions.getNationalAdvantages()));
         advantagesColumn.setHeaderRenderer(renderer);
 
         TableColumn colorsColumn = getColumnModel().getColumn(COLOR_COLUMN);
         colorsColumn.setCellRenderer(new ColorCellRenderer(true));
+        colorsColumn.setCellEditor(new ColorCellEditor(freeColClient));
 
         TableColumn playerColumn = getColumnModel().getColumn(PLAYER_COLUMN);
         playerColumn.setCellEditor(new PlayerCellEditor());
         playerColumn.setCellRenderer(new PlayerCellRenderer());
-
     }
 
-
     public void update() {
-        ((PlayersTableModel) getModel()).update();
+        ((PlayersTableModel)getModel()).update();
     }
 
     private class HeaderRenderer implements TableCellRenderer {
@@ -198,11 +207,12 @@ public final class PlayersTable extends JTable {
     }
 
     private class HeaderListener extends MouseAdapter {
-        JTableHeader header;
 
-        HeaderRenderer renderer;
+        private JTableHeader header;
 
-        HeaderListener(JTableHeader header, HeaderRenderer renderer) {
+        private HeaderRenderer renderer;
+
+        public HeaderListener(JTableHeader header, HeaderRenderer renderer) {
             this.header = header;
             this.renderer = renderer;
         }
@@ -219,29 +229,7 @@ public final class PlayersTable extends JTable {
         }
     }
 
-
-    class NationCellRenderer extends JLabel implements TableCellRenderer {
-
-        /**
-         * Returns the component used to render the cell's value.
-         * @param table The table whose cell needs to be rendered.
-         * @param value The value of the cell being rendered.
-         * @param hasFocus Indicates whether or not the cell in question has focus.
-         * @param row The row index of the cell that is being rendered.
-         * @param column The column index of the cell that is being rendered.
-         * @return The component used to render the cell's value.
-         */
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                                                       boolean hasFocus, int row, int column) {
-
-            Nation nation = (Nation) value;
-            setText(Messages.message(nation.getNameKey()));
-            setIcon(new ImageIcon(library.getCoatOfArmsImage(nation, 0.5)));
-            return this;
-        }
-    }
-
-    class AvailableCellRenderer implements TableCellRenderer {
+    private class AvailableCellRenderer implements TableCellRenderer {
 
         @SuppressWarnings("unchecked") // FIXME in Java7
         private JComboBox box = new JComboBox(allStates);
@@ -252,30 +240,26 @@ public final class PlayersTable extends JTable {
         }
 
         /**
-         * Returns the component used to render the cell's value.
+         * Gets the component used to render the cell's value.
+         *
          * @param table The table whose cell needs to be rendered.
          * @param value The value of the cell being rendered.
-         * @param hasFocus Indicates whether or not the cell in question has focus.
+         * @param hasFocus Indicates whether or not the cell in
+         *     question has focus.
          * @param row The row index of the cell that is being rendered.
          * @param column The column index of the cell that is being rendered.
          * @return The component used to render the cell's value.
          */
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                                                       boolean hasFocus, int row, int column) {
+        public Component getTableCellRendererComponent(JTable table,
+            Object value, boolean isSelected, boolean hasFocus,
+            int row, int column) {
             box.setSelectedItem(value);
             return box;
         }
     }
 
-    class NationStateRenderer extends JLabel implements ListCellRenderer {
-        public Component getListCellRendererComponent(JList list, Object value, int index,
-                                                      boolean isSelected, boolean cellHasFocus) {
-            setText(Messages.message("nationState." + ((NationState) value).toString()));
-            return this;
-        }
-    }
-
-    public final class AvailableCellEditor extends AbstractCellEditor implements TableCellEditor {
+    private final class AvailableCellEditor extends AbstractCellEditor
+        implements TableCellEditor {
 
         @SuppressWarnings("unchecked") // FIXME in Java7
         private JComboBox aiStateBox = new JComboBox(aiStates);
@@ -297,14 +281,13 @@ public final class PlayersTable extends JTable {
             allStateBox.addActionListener(listener);
         }
 
-        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected,
-                                                     int row, int column) {
-            NationType nationType = ((Nation) getValueAt(row, NATION_COLUMN)).getType();
-            if (nationType instanceof EuropeanNationType) {
-                activeBox = allStateBox;
-            } else {
-                activeBox = aiStateBox;
-            }
+        public Component getTableCellEditorComponent(JTable table,
+            Object value, boolean isSelected, int row, int column) {
+            NationType nationType = ((Nation) getValueAt(row, NATION_COLUMN))
+                .getType();
+            activeBox = (nationType instanceof EuropeanNationType)
+                ? allStateBox
+                : aiStateBox;
             return activeBox;
         }
 
@@ -313,7 +296,42 @@ public final class PlayersTable extends JTable {
         }
     }
 
-    class PlayerCellRenderer implements TableCellRenderer {
+    private class NationCellRenderer extends JLabel
+        implements TableCellRenderer {
+
+        /**
+         * Gets the component used to render the cell's value.
+         *
+         * @param table The table whose cell needs to be rendered.
+         * @param value The value of the cell being rendered.
+         * @param hasFocus Indicates whether or not the cell in
+         *     question has focus.
+         * @param row The row index of the cell that is being rendered.
+         * @param column The column index of the cell that is being rendered.
+         * @return The component used to render the cell's value.
+         */
+        public Component getTableCellRendererComponent(JTable table,
+            Object value, boolean isSelected, boolean hasFocus,
+            int row, int column) {
+            Nation nation = (Nation) value;
+            setText(Messages.message(nation.getNameKey()));
+            setIcon(new ImageIcon(library.getCoatOfArmsImage(nation, 0.5)));
+            return this;
+        }
+    }
+
+    private class NationStateRenderer extends JLabel
+        implements ListCellRenderer {
+
+        public Component getListCellRendererComponent(JList list, Object value,
+            int index, boolean isSelected, boolean cellHasFocus) {
+            setText(Messages.message("nationState."
+                    + ((NationState)value).toString()));
+            return this;
+        }
+    }
+
+    private class PlayerCellRenderer implements TableCellRenderer {
 
         JLabel label = new JLabel();
         JButton button = new JButton(Messages.message("select"));
@@ -321,28 +339,31 @@ public final class PlayersTable extends JTable {
         public PlayerCellRenderer() {
             label.setHorizontalAlignment(JLabel.CENTER);
             button.setBorder(BorderFactory
-                             .createCompoundBorder(BorderFactory
-                                                   .createEmptyBorder(5, 10, 5, 10),
-                                                   button.getBorder()));
+                .createCompoundBorder(BorderFactory
+                    .createEmptyBorder(5, 10, 5, 10),
+                    button.getBorder()));
         }
 
         /**
-         * Returns the component used to render the cell's value.
+         * Gets the component used to render the cell's value.
+         *
          * @param table The table whose cell needs to be rendered.
          * @param value The value of the cell being rendered.
-         * @param hasFocus Indicates whether or not the cell in question has focus.
+         * @param hasFocus Indicates whether or not the cell in
+         *     question has focus.
          * @param row The row index of the cell that is being rendered.
          * @param column The column index of the cell that is being rendered.
          * @return The component used to render the cell's value.
          */
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                                                       boolean hasFocus, int row, int column) {
-
-            Player player = (Player) value;
+        public Component getTableCellRendererComponent(JTable table,
+            Object value, boolean isSelected, boolean hasFocus,
+            int row, int column) {
+            Player player = (Player)value;
             if (player == null) {
-                NationType nationType = (NationType) table.getValueAt(row, ADVANTAGE_COLUMN);
+                NationType nationType
+                    = (NationType)table.getValueAt(row, ADVANTAGE_COLUMN);
                 if (nationType instanceof EuropeanNationType) {
-                    NationState nationState = (NationState) table
+                    NationState nationState = (NationState)table
                         .getValueAt(row, AVAILABILITY_COLUMN);
                     if (nationState == NationState.AVAILABLE) {
                         return button;
@@ -357,7 +378,8 @@ public final class PlayersTable extends JTable {
         }
     }
 
-    public final class PlayerCellEditor extends AbstractCellEditor implements TableCellEditor {
+    private final class PlayerCellEditor extends AbstractCellEditor
+        implements TableCellEditor {
 
         private JButton button = new JButton(Messages.message("select"));
 
@@ -369,55 +391,56 @@ public final class PlayersTable extends JTable {
                 });
         }
 
-        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected,
-                                                     int row, int column) {
+        public Component getTableCellEditorComponent(JTable table,
+            Object value, boolean isSelected, int row, int column) {
             return button;
         }
 
         public Object getCellEditorValue() {
             return true;
         }
-
     }
-
 
     /**
      * The TableModel for the players table.
      */
     private class PlayersTableModel extends AbstractTableModel {
 
-        private List<Nation> nations;
-
-        private Map<Nation, Player> players;
-
-        private Player thisPlayer;
-
         private final PreGameController preGameController;
 
         private NationOptions nationOptions;
 
+        private Player thisPlayer;
+
+        private List<Nation> nations;
+
+        private Map<Nation, Player> players;
+
+
         /**
          * A standard constructor.
          *
-         * @param pgc The PreGameController to use when updates need to be notified
-         *            across the network.
-         * @param nationOptions a <code>NationOptions</code> value
-         * @param owningPlayer a <code>Player</code> value
+         * @param preGameController The <code>PreGameController</code>
+         *     to use notify of updates.
+         * @param nationOptions The current <code>NationOptions</code>.
+         * @param thisPlayer The <code>Player</code> that owns the client.
          */
-        public PlayersTableModel(PreGameController pgc, NationOptions nationOptions, Player owningPlayer) {
+        public PlayersTableModel(PreGameController preGameController,
+                                 NationOptions nationOptions,
+                                 Player thisPlayer) {
+            this.preGameController = preGameController;
+            this.nationOptions = nationOptions;
+            this.thisPlayer = thisPlayer;
             nations = new ArrayList<Nation>();
             players = new HashMap<Nation, Player>();
-            for (Nation nation : owningPlayer.getSpecification().getNations()) {
+            for (Nation nation : thisPlayer.getSpecification().getNations()) {
                 NationState state = nationOptions.getNations().get(nation);
                 if (state != null) {
                     nations.add(nation);
                     players.put(nation, null);
                 }
             }
-            thisPlayer = owningPlayer;
             players.put(thisPlayer.getNation(), thisPlayer);
-            preGameController = pgc;
-            this.nationOptions = nationOptions;
         }
 
         public void update() {
@@ -431,10 +454,10 @@ public final class PlayersTable extends JTable {
         }
 
         /**
-         * Returns the Class of the objects in the given column.
+         * Gets the class of the objects in the given column.
          *
-         * @param column The column to return the Class of.
-         * @return The Class of the objects in the given column.
+         * @param column The column to return the class of.
+         * @return The <code>Class</code> of the objects in the given column.
          */
         public Class<?> getColumnClass(int column) {
             switch(column) {
@@ -453,17 +476,18 @@ public final class PlayersTable extends JTable {
         }
 
         /**
-         * Returns the amount of columns in this statesTable.
+         * Get the number of columns in this table.
          *
-         * @return The amount of columns in this statesTable.
+         * @return The number of columns.
          */
         public int getColumnCount() {
             return columnNames.length;
         }
 
         /**
-         * Returns the name of the specified column.
+         * Get the name of a column.
          *
+         * @param column The column number to look up.
          * @return The name of the specified column.
          */
         public String getColumnName(int column) {
@@ -471,23 +495,24 @@ public final class PlayersTable extends JTable {
         }
 
         /**
-         * Returns the amount of rows in this statesTable.
+         * Get the number of rows in this table.
          *
-         * @return The amount of rows in this statesTable.
+         * @return The number of rows.
          */
         public int getRowCount() {
             return nations.size();
         }
 
         /**
-         * Returns the value at the requested location.
+         * Get the value at the requested location.
          *
          * @param row The requested row.
          * @param column The requested column.
          * @return The value at the requested location.
          */
         public Object getValueAt(int row, int column) {
-            if ((row < getRowCount()) && (column < getColumnCount()) && (row >= 0) && (column >= 0)) {
+            if (row >= 0 && row < getRowCount()
+                && column >= 0 && column < getColumnCount()) {
                 Nation nation = nations.get(row);
                 switch (column) {
                 case NATION_COLUMN:
@@ -495,13 +520,10 @@ public final class PlayersTable extends JTable {
                 case AVAILABILITY_COLUMN:
                     return nationOptions.getNationState(nation);
                 case ADVANTAGE_COLUMN:
-                    if (players.get(nation) == null) {
-                        return nation.getType();
-                    } else {
-                        return players.get(nation).getNationType();
-                    }
+                    return (players.get(nation) == null) ? nation.getType()
+                        : players.get(nation).getNationType();
                 case COLOR_COLUMN:
-                    return ResourceManager.getColor(nation.getId() + ".color");
+                    return nation.getColor();
                 case PLAYER_COLUMN:
                     return players.get(nation);
                 }
@@ -510,24 +532,33 @@ public final class PlayersTable extends JTable {
         }
 
         /**
-         * Returns 'true' if the specified cell is editable, 'false' otherwise.
+         * Is a cell editable?
          *
          * @param row The specified row.
          * @param column The specified column.
-         * @return 'true' if the specified cell is editable, 'false' otherwise.
+         * @return True if the specified cell is editable.
          */
         public boolean isCellEditable(int row, int column) {
-            if ((row >= 0) && (row < nations.size())) {
+            if (row >= 0 && row < getRowCount()) {
                 Nation nation = nations.get(row);
-                boolean ownRow = (thisPlayer == players.get(nation) && !thisPlayer.isReady());
-                switch(column) {
+                boolean ownRow = thisPlayer == players.get(nation)
+                    && !thisPlayer.isReady();
+                switch (column) {
                 case AVAILABILITY_COLUMN:
-                    return (!ownRow && thisPlayer.isAdmin());
+                    return !ownRow && thisPlayer.isAdmin();
                 case ADVANTAGE_COLUMN:
+                    return nation.getType() instanceof EuropeanNationType
+                        && ownRow;
                 case COLOR_COLUMN:
-                    return (nation.getType() instanceof EuropeanNationType && ownRow);
+                    // Allow a player to change all the colors. 
+                    // This is an accessibility issue for users with a
+                    // colour vision deficiency.  Better to support them
+                    // and just admit that if someone wants to be a pain
+                    // and set all the colours the same, they can.
+                    return nation.getType() instanceof EuropeanNationType;
                 case PLAYER_COLUMN:
-                    return (nation.getType() instanceof EuropeanNationType && players.get(nation) == null);
+                    return nation.getType() instanceof EuropeanNationType
+                        && players.get(nation) == null;
                 }
             }
             return false;
@@ -541,20 +572,25 @@ public final class PlayersTable extends JTable {
          * @param column The specified column.
          */
         public void setValueAt(Object value, int row, int column) {
-            if ((row < getRowCount()) && (column < getColumnCount()) && (row >= 0) && (column >= 0)) {
+            if (row >= 0 && row < getRowCount()
+                && column > 0 && column < getColumnCount()) {
                 // Column 0 can't be updated.
-
-                switch(column) {
+                Nation nation = nations.get(row);
+                switch (column) {
                 case ADVANTAGE_COLUMN:
-                    preGameController.setNationType((NationType) value);
+                    preGameController.setNationType((NationType)value);
                     break;
                 case AVAILABILITY_COLUMN:
-                    preGameController.setAvailable(nations.get(row), (NationState) value);
+                    preGameController.setAvailable(nations.get(row),
+                        (NationState)value);
                     update();
                     break;
+                case COLOR_COLUMN:
+                    preGameController.setColor(nation, (Color)value);
+                    break;
                 case PLAYER_COLUMN:
-                    Nation nation = nations.get(row);
-                    if (nationOptions.getNationState(nation) == NationState.AVAILABLE) {
+                    if (nationOptions.getNationState(nation)
+                        == NationState.AVAILABLE) {
                         preGameController.setNation(nation);
                         preGameController.setNationType(nation.getType());
                         update();

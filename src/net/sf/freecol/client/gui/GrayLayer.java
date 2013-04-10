@@ -132,7 +132,7 @@ public class GrayLayer extends Component {
         if (textBounds.intersects(clipArea)) {
             // show message
             g.setFont(nameFont);
-            g.setColor(imageLibrary.getColor(player));
+            g.setColor(player.getNationColor());
             g.drawString(message, textBounds.x, textBounds.y
                     + textBounds.height);
         }

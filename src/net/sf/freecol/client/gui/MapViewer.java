@@ -1986,7 +1986,7 @@ public final class MapViewer {
                 }
                 String name = Messages.message(settlement.getLocationNameFor(player));
                 if (name == null) continue;
-                Color backgroundColor = lib.getColor(settlement.getOwner());
+                Color backgroundColor = settlement.getOwner().getNationColor();
                 Font font = ResourceManager.getFont("NormalFont", 18f);
                 Font italicFont = ResourceManager.getFont("NormalFont", Font.ITALIC, 18f);
                 Font productionFont = ResourceManager.getFont("NormalFont", 12f);
@@ -2049,7 +2049,7 @@ public final class MapViewer {
                             Unit missionary = is.getMissionary();
                             if (missionary != null) {
                                 boolean expert = missionary.hasAbility(Ability.EXPERT_MISSIONARY);
-                                backgroundColor = lib.getColor(missionary.getOwner());
+                                backgroundColor = missionary.getOwner().getNationColor();
                                 backgroundColor = new Color(backgroundColor.getRed(), backgroundColor.getGreen(), backgroundColor.getBlue(), 128);
                                 rightImage = createReligiousMissionLabel(nameImage.getHeight(null), 5, backgroundColor, expert);
                             }
@@ -2278,7 +2278,7 @@ public final class MapViewer {
 
                 String text = null;
                 Image chip = null;
-                Color background = lib.getColor(is.getOwner());
+                Color background = is.getOwner().getNationColor();
                 Color foreground = lib.getForegroundColor(background);
                 float xOffset = STATE_OFFSET_X * lib.getScalingFactor();
                 float yOffset = STATE_OFFSET_Y * lib.getScalingFactor();
@@ -2893,10 +2893,9 @@ public final class MapViewer {
             Color oldColor = g.getColor();
             Color newColor = Color.WHITE;
             if (type == BorderType.COUNTRY) {
-                newColor = new Color(lib.getColor(owner).getRed(),
-                                     lib.getColor(owner).getGreen(),
-                                     lib.getColor(owner).getBlue(),
-                                     opaque ? 255 : 100);
+                Color c = owner.getNationColor();
+                newColor = new Color(c.getRed(), c.getGreen(), c.getBlue(),
+                                     (opaque) ? 255 : 100);
             }
             g.setColor(newColor);
             GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);

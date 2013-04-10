@@ -19,10 +19,13 @@
 
 package net.sf.freecol.common.model;
 
+import java.awt.Color;
+
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -55,6 +58,9 @@ public class Nation extends FreeColGameObjectType {
 
     /** Whether this nation starts on the East coast by default. */
     private boolean startsOnEastCoast = true;
+
+    /** The color of this nation. */
+    private Color color;
 
 
     /**
@@ -123,9 +129,28 @@ public class Nation extends FreeColGameObjectType {
         return getId() + ".ruler";
     }
 
+    /**
+     * Get the nation color.
+     *
+     * @return The color for this nation.
+     */
+    public Color getColor() {
+        return color;
+    }
+
+    /**
+     * Set the nation color.
+     *
+     * @param color The new nation color.
+     */
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
 
     // Serialization
 
+    private static final String COLOR_TAG = "color";
     private static final String NATION_TYPE_TAG = "nation-type";
     private static final String PREFERRED_LATITUDE_TAG = "preferredLatitude";
     private static final String REF_TAG = "ref";
@@ -149,6 +174,8 @@ public class Nation extends FreeColGameObjectType {
         xw.writeAttribute(STARTS_ON_EAST_COAST_TAG, startsOnEastCoast);
 
         if (refNation != null) xw.writeAttribute(REF_TAG, refNation);
+
+        if (color != null) xw.writeAttribute(COLOR_TAG, color.getRGB());
     }
 
     /**
@@ -170,6 +197,9 @@ public class Nation extends FreeColGameObjectType {
         startsOnEastCoast = xr.getAttribute(STARTS_ON_EAST_COAST_TAG, true);
 
         refNation = xr.getType(spec, REF_TAG, Nation.class, (Nation)null);
+
+        int rgb = xr.getAttribute(COLOR_TAG, UNDEFINED);
+        if (rgb != UNDEFINED) setColor(new Color(rgb));
     }
 
     /**

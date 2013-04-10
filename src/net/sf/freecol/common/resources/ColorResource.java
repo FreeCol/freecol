@@ -47,11 +47,12 @@ public class ColorResource extends Resource {
 
     /**
      * Do not use directly.
+     *
      * @param resourceLocator The <code>URI</code> used when loading this
      *      resource.
      * @see ResourceFactory#createResource(URI)
      */
-    ColorResource(URI resourceLocator) throws Exception {
+    public ColorResource(URI resourceLocator) throws Exception {
         super(resourceLocator);
         String colorName = resourceLocator.getSchemeSpecificPart().substring(SCHEME.length());
         color = getColor(colorName);
