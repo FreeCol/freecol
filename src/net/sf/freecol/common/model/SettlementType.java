@@ -394,14 +394,12 @@ public class SettlementType extends FreeColGameObjectType {
         final String tag = in.getLocalName();
 
         if (GIFTS_TAG.equals(tag)) {
-            RandomRange range = new RandomRange();
-            range.readFromXML(in);
+            RandomRange range = new RandomRange(in);
             if (gifts == null) gifts = new ArrayList<RandomRange>();
             gifts.add(range);
 
         } else if (PLUNDER_TAG.equals(tag)) {
-            RandomRange range = new RandomRange();
-            range.readFromXML(in);
+            RandomRange range = new RandomRange(in);
             if (plunder == null) plunder = new ArrayList<RandomRange>();
             plunder.add(range);
 

@@ -1,6 +1,26 @@
+/**
+ *  Copyright (C) 2002-2012   The FreeCol Team
+ *
+ *  This file is part of FreeCol.
+ *
+ *  FreeCol is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  FreeCol is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
@@ -17,230 +37,219 @@ public class RandomRange {
 
     private static Logger logger = Logger.getLogger(RandomRange.class.getName());
 
-    /**
-     * Probability that the result is not zero.
-     */
+    /** Percentage probability that the result is not zero. */
     private int probability = 0;
 
-    /**
-     * Minimum value.
-     */
+    /** The inclusive lower bound of the range. */
     private int minimum = 0;
 
-    /**
-     * Maximum value.
-     */
+    /** The inclusive upper bound of the range. */
     private int maximum = 0;
 
-    /**
-     * Factor to multiply the value with.
-     */
+    /** Factor to multiply the final value with. */
     private int factor = 1;
 
-    /**
-     * A list of Scopes limiting the applicability of this Feature.
-     */
-    private List<Scope> scopes = new ArrayList<Scope>();
+    /** A list of Scopes limiting the applicability of this Feature. */
+    private List<Scope> scopes = null;
 
-
-    public RandomRange() {
-        // empty constructor
-    }
 
     /**
      * Creates a new <code>RandomRange</code> instance.
      *
-     * @param probability an <code>int</code> value
+     * @param probability The probability of this result.
      * @param minimum an <code>int</code> value
      * @param maximum an <code>int</code> value
-     * @param factor an <code>int</code> value
+     * @param factor The result multiplier.
      */
     public RandomRange(int probability, int minimum, int maximum, int factor) {
+        if (probability < 0) {
+            throw new IllegalArgumentException("Negative probability "
+                + probability);
+        }
+        if (minimum > maximum) {
+            throw new IllegalArgumentException("Min " + minimum
+                + " > Max " + maximum);
+        }
         this.probability = probability;
         this.minimum = minimum;
         this.maximum = maximum;
         this.factor = factor;
     }
 
-
     /**
-     * Creates a new <code>RandomRange</code> instance.
+     * Read a new <code>RandomRange</code> instance from a stream.
      *
-     * @param in a <code>XMLStreamReader</code> value
+     * @param in The <code>XMLStreamReader</code> to read from.
+     * @exception XMLStreamException if there is a problem reading the
+     *     stream.
      */
     public RandomRange(XMLStreamReader in) throws XMLStreamException {
         readFromXML(in);
     }
 
+
     /**
-     * Get the <code>Probability</code> value.
+     * Get the result probability.
      *
-     * @return an <code>int</code> value
+     * @return The probability.
      */
     public final int getProbability() {
         return probability;
     }
 
     /**
-     * Set the <code>Probability</code> value.
+     * Get the range lower bound.
      *
-     * @param newProbability The new Probability value.
-     */
-    public final void setProbability(final int newProbability) {
-        this.probability = newProbability;
-    }
-
-    /**
-     * Get the <code>Minimum</code> value.
-     *
-     * @return an <code>int</code> value
+     * @return The lower bound.
      */
     public final int getMinimum() {
         return minimum;
     }
 
     /**
-     * Set the <code>Minimum</code> value.
+     * Get the range upper bound.
      *
-     * @param newMinimum The new Minimum value.
-     */
-    public final void setMinimum(final int newMinimum) {
-        this.minimum = newMinimum;
-    }
-
-    /**
-     * Get the <code>Maximum</code> value.
-     *
-     * @return an <code>int</code> value
+     * @return The upper bound.
      */
     public final int getMaximum() {
         return maximum;
     }
 
     /**
-     * Set the <code>Maximum</code> value.
+     * Get the multiplication factor.
      *
-     * @param newMaximum The new Maximum value.
-     */
-    public final void setMaximum(final int newMaximum) {
-        this.maximum = newMaximum;
-    }
-
-    /**
-     * Get the <code>Factor</code> value.
-     *
-     * @return an <code>int</code> value
+     * @return The factor.
      */
     public final int getFactor() {
         return factor;
     }
 
     /**
-     * Set the <code>Factor</code> value.
+     * Get the scopes of this random range.
      *
-     * @param newFactor The new Factor value.
+     * @return The scopes of this <code>RandomRange</code>.
      */
-    public final void setFactor(final int newFactor) {
-        this.factor = newFactor;
+    public List<Scope> getScopes() {
+        if (scopes == null) return Collections.emptyList();
+        return scopes;
     }
 
-    /**
-     * Describe <code>getRange</code> method here.
-     *
-     * @return an <code>int</code> value
-     */
-    public int getRange() {
-        return maximum - minimum;
-    }
 
     /**
-     * Describe <code>getRandomLimit</code> method here.
-     *
-     * @return an <code>int</code> value
-     */
-    public int getRandomLimit() {
-        return getRange() * 100 / factor;
-    }
-
-    /**
-     * Describe <code>getAmount</code> method here.
-     *
-     * @param random an <code>int</code> value
-     * @return an <code>int</code> value
-     */
-    public int getAmount(int random) {
-        int value = minimum + random;
-        if (value <= maximum) {
-            return value * factor;
-        } else {
-            return 0;
-        }
-    }
-
-    /**
-     * Gets the amount of plunder.
+     * Gets a random value from this range.
      *
      * @param prefix A logger prefix.
      * @param random A pseudo-random number source.
      * @param continuous Choose a continuous or discrete result.
-     * @return A random amount of plunder as defined by this RandomRange.
+     * @return A random amount of plunder as defined by this
+     *     <code>RandomRange</code>.
      */
     public int getAmount(String prefix, Random random, boolean continuous) {
         if (probability >= 100
             || (probability > 0
-                && Utils.randomInt(logger, prefix + " check-for-zero",
+                && Utils.randomInt(logger, prefix + " check-probability",
                                    random, 100) < probability)) {
+            int range = maximum - minimum + 1;
             if (continuous) {
                 int r = Utils.randomInt(logger, prefix + " random-range",
-                                        random, getRange() * factor);
+                                        random, range * factor);
                 return r + minimum * factor;
             } else {
                 int r = Utils.randomInt(logger, prefix + " random-range",
-                                    random, getRange());
-                return getAmount(r);
+                                        random, range);
+                return (r + minimum) * factor;
             }
         }
         return 0;
     }
 
-    /**
-     * Return the scopes of this RandomRange.
-     *
-     * @return the scopes of this RandomRange
-     */
-    public List<Scope> getScopes() {
-        return scopes;
-    }
 
+    // Interface Object
+
+    /**
+     * {@inheritDoc}
+     */
     public RandomRange clone() {
         return new RandomRange(probability, maximum, minimum, factor);
     }
 
 
+    // Serialization
+    // Note, this is not a FreeColObject, so the usual convenience functions
+    // are not available.
+
+    private static final String FACTOR_TAG = "factor";
+    private static final String MAXIMUM_TAG = "maximum";
+    private static final String MINIMUM_TAG = "minimum";
+    private static final String PROBABILITY_TAG = "probability";
+    private static final String SCOPE_TAG = "scope";
+
+
+    /**
+     * Initializes this object from an XML-representation of this object.
+     *
+     * @param in The input stream with the XML.
+     * @exception XMLStreamException if there are any problems reading
+     *     from the stream.
+     */
     public void readFromXML(XMLStreamReader in) throws XMLStreamException {
-        probability = Integer.parseInt(in.getAttributeValue(null, "probability"));
-        minimum = Integer.parseInt(in.getAttributeValue(null, "minimum"));
-        maximum = Integer.parseInt(in.getAttributeValue(null, "maximum"));
-        factor = Integer.parseInt(in.getAttributeValue(null, "factor"));
-        scopes.clear();
+        String str = null;
+        try {
+            str = in.getAttributeValue(null, PROBABILITY_TAG);
+            probability = Integer.parseInt(str);
+
+            str = in.getAttributeValue(null, MINIMUM_TAG);
+            minimum = Integer.parseInt(str);
+
+            str = in.getAttributeValue(null, MAXIMUM_TAG);
+            maximum = Integer.parseInt(str);
+
+            str = in.getAttributeValue(null, FACTOR_TAG);
+            factor = Integer.parseInt(str);
+        } catch (NumberFormatException nfe) {
+            throw new XMLStreamException("Integer expected: " + str);
+        }
+
+        // Clear containers
+        if (scopes != null) scopes.clear();
+
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            String nodeName = in.getLocalName();
-            if ("scope".equals(nodeName)) {
-                scopes.add(new Scope(in));
+            final String tag = in.getLocalName();
+
+            if (SCOPE_TAG.equals(tag)) {
+                Scope scope = new Scope(in);
+                if (scope != null) {
+                    if (scopes == null) scopes = new ArrayList<Scope>();
+                    scopes.add(scope);
+                }
+
+            } else {
+                logger.warning("Bad RandomRange tag: " + tag);
             }
         }
     }
 
+    /**
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     *
+     * @param out The target stream.
+     * @exception XMLStreamException if there are any problems writing
+     *     to the stream.
+     */
     public void toXML(XMLStreamWriter out, String tag) throws XMLStreamException {
         out.writeStartElement(tag);
-        out.writeAttribute("probability", Integer.toString(probability));
-        out.writeAttribute("minimum", Integer.toString(minimum));
-        out.writeAttribute("maximum", Integer.toString(maximum));
-        out.writeAttribute("factor", Integer.toString(factor));
-        for (Scope scope : scopes) {
-            scope.toXML(out);
-        }
+
+        out.writeAttribute(PROBABILITY_TAG, Integer.toString(probability));
+
+        out.writeAttribute(MINIMUM_TAG, Integer.toString(minimum));
+
+        out.writeAttribute(MAXIMUM_TAG, Integer.toString(maximum));
+
+        out.writeAttribute(FACTOR_TAG, Integer.toString(factor));
+
+        for (Scope scope : getScopes()) scope.toXML(out);
+
         out.writeEndElement();
     }
-
 }
