@@ -2864,10 +2864,10 @@ public class Colony extends Settlement implements Nameable {
         // Read child elements:
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(ColonyTile.getXMLElementTagName())) {
-                ColonyTile ct = updateFreeColGameObject(in, ColonyTile.class);
+                ColonyTile ct = readFreeColGameObject(in, ColonyTile.class);
                 colonyTiles.add(ct);
             } else if (in.getLocalName().equals(Building.getXMLElementTagName())) {
-                Building building = updateFreeColGameObject(in, Building.class);
+                Building building = readFreeColGameObject(in, Building.class);
                 addBuilding(building);
             } else if (in.getLocalName().equals(ExportData.getXMLElementTagName())) {
                 ExportData data = new ExportData();

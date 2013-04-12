@@ -432,12 +432,10 @@ public class TradeRoute extends FreeColGameObject
      */
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
+        final Game game = getGame();
         setName(in.getAttributeValue(null, "name"));
-        String ownerID = in.getAttributeValue(null, "owner");
 
-        Game game = getGame();
-        owner = game.getFreeColGameObject(ownerID, Player.class);
-        if (owner == null) owner = new Player(game, ownerID);
+        owner = makeFreeColGameObject(in, "owner", Player.class);
 
         stops.clear();
     }

@@ -162,8 +162,8 @@ public class ImprovementMission extends AbstractMission {
         throws XMLStreamException {
         super.readAttributes(in);
 
-        improvement = getFreeColGameObject(in, "improvement",
-                                           TileImprovement.class);
+        improvement = makeFreeColGameObject(in, "improvement",
+                                            TileImprovement.class);
     }
 
     /**

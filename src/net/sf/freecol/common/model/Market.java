@@ -531,7 +531,8 @@ public final class Market extends FreeColGameObject implements Ownable {
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
 
-        owner = getAttribute(in, OWNER_TAG, Player.class, (Player)null);
+        owner = findFreeColGameObject(in, OWNER_TAG,
+                                      Player.class, (Player)null);
     }
 
     /**
@@ -552,7 +553,7 @@ public final class Market extends FreeColGameObject implements Ownable {
         final String tag = in.getLocalName();
 
         if (MarketData.getXMLElementTagName().equals(tag)) {
-            MarketData data = updateFreeColGameObject(in, MarketData.class);
+            MarketData data = readFreeColGameObject(in, MarketData.class);
             if (data != null) {
                 putMarketData(data.getGoodsType(), data);
             }

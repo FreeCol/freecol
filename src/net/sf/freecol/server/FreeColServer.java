@@ -950,7 +950,8 @@ public final class FreeColServer {
                     server.setAIMain(new AIMain(server, xsr));
 
                 } else {
-                    throw new XMLStreamException("Unknown tag: " + tag);
+                    throw new XMLStreamException("Unknown tag"
+                        + " reading server game: " + tag);
                 }
             }
 

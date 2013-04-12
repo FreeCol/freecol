@@ -252,7 +252,7 @@ public class Resource extends TileItem {
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         setId(readId(in));
 
-        tile = getFreeColGameObject(in, "tile", Tile.class);
+        tile = makeFreeColGameObject(in, "tile", Tile.class);
 
         type = getSpecification().getResourceType(in.getAttributeValue(null, "type"));
 

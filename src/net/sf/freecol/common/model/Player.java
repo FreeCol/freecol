@@ -3887,8 +3887,8 @@ public class Player extends FreeColGameObject implements Nameable {
     protected void readChildren(XMLStreamReader in) throws XMLStreamException {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(TENSION_TAG)) {
-                Player player = getGame().getFreeColGameObject(in.getAttributeValue(null, "player"),
-                                                               Player.class);
+                Player player = makeFreeColGameObject(in, "player",
+                                                      Player.class);
                 tension.put(player, new Tension(getAttribute(in, VALUE_TAG, 0)));
                 in.nextTag(); // close element
             } else if (in.getLocalName().equals(FOUNDING_FATHER_TAG)) {
@@ -3912,20 +3912,20 @@ public class Player extends FreeColGameObject implements Nameable {
                 stance.put(playerId, Enum.valueOf(Stance.class, in.getAttributeValue(null, VALUE_TAG)));
                 in.nextTag(); // close element
             } else if (in.getLocalName().equals(HighSeas.getXMLElementTagName())) {
-                highSeas = updateFreeColGameObject(in, HighSeas.class);
+                highSeas = readFreeColGameObject(in, HighSeas.class);
             } else if (in.getLocalName().equals(Europe.getXMLElementTagName())) {
-                europe = updateFreeColGameObject(in, Europe.class);
+                europe = readFreeColGameObject(in, Europe.class);
             } else if (in.getLocalName().equals(Monarch.getXMLElementTagName())) {
-                monarch = updateFreeColGameObject(in, Monarch.class);
+                monarch = readFreeColGameObject(in, Monarch.class);
             } else if (in.getLocalName().equals(HistoryEvent.getXMLElementTagName())) {
                 HistoryEvent event = new HistoryEvent();
                 event.readFromXML(in);
                 getHistory().add(event);
             } else if (in.getLocalName().equals(TradeRoute.getXMLElementTagName())) {
-                TradeRoute route = updateFreeColGameObject(in, TradeRoute.class);
+                TradeRoute route = readFreeColGameObject(in, TradeRoute.class);
                 tradeRoutes.add(route);
             } else if (in.getLocalName().equals(Market.getXMLElementTagName())) {
-                market = updateFreeColGameObject(in, Market.class);
+                market = readFreeColGameObject(in, Market.class);
             } else if (in.getLocalName().equals(ModelMessage.getXMLElementTagName())) {
 
                 ModelMessage message = new ModelMessage();

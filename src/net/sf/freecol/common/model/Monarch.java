@@ -683,11 +683,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         Game game = getGame();
         super.readAttributes(in);
 
-        player = game.getFreeColGameObject(in.getAttributeValue(null, "player"),
-                                           Player.class);
-        if (player == null) {
-            player = new Player(game, in.getAttributeValue(null, "player"));
-        }
+        player = makeFreeColGameObject(in, "player", Player.class);
 
         name = getAttribute(in, "name", player.getNation().getRulerNameKey());
 

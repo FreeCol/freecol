@@ -410,15 +410,15 @@ public abstract class FreeColObject {
 
     /**
      * Write the attributes of this object to a stream.
-     * To be overridden by any object that uses
-     * the toXML(XMLStreamWriter, String) call.
+     *
+     * To be overridden if required by any object that has attributes
+     * and uses the toXML(XMLStreamWriter, String) call.
      *
      * @param out The target stream.
      * @exception XMLStreamException if there are any problems writing
      *     to the stream.
      */
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         if (getId() == null) {
             logger.warning("FreeColObject with null id: " + toString());
         } else {
@@ -428,15 +428,15 @@ public abstract class FreeColObject {
 
     /**
      * Write the children of this object to a stream.
-     * To be overridden by any object that has children and uses the
-     * toXML(XMLStreamWriter, String) call.
+     *
+     * To be overridden if required by any object that has children
+     * and uses the toXML(XMLStreamWriter, String) call.
      *
      * @param out The target stream.
      * @exception XMLStreamException if there are any problems writing
      *     to the stream.
      */
-    protected void writeChildren(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
         // do nothing
     }
 
@@ -802,7 +802,7 @@ public abstract class FreeColObject {
      */
     public <T extends FreeColGameObject> T getAttribute(XMLStreamReader in,
         String attributeName, Game game, Class<T> returnType, T defaultValue) {
-        final String attrib = 
+        final String attrib =
         // @compat 0.10.7
             (ID_ATTRIBUTE_TAG.equals(attributeName)) ? readId(in) :
         // end @compat
@@ -828,8 +828,7 @@ public abstract class FreeColObject {
         // end @compat
             in.getAttributeValue(null, attributeName);
         
-        return (attrib == null) ? null
-            : game.getFreeColLocation(attrib);
+        return (attrib == null) ? null : game.getFreeColLocation(attrib);
     }
         
     /**

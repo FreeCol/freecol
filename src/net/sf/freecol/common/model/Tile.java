@@ -2017,9 +2017,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             }
         }
 
-        owner = getFreeColGameObject(in, "owner", Player.class, null);
+        owner = makeFreeColGameObject(in, "owner", Player.class);
 
-        region = getFreeColGameObject(in, "region", Region.class, null);
+        region = makeFreeColGameObject(in, "region", Region.class);
 
         moveToEurope = (in.getAttributeValue(null, "moveToEurope") == null)
             ? null
@@ -2094,14 +2094,14 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
         if (in.getLocalName().equals(Colony.getXMLElementTagName())) {
-            settlement = updateFreeColGameObject(in, Colony.class);
+            settlement = readFreeColGameObject(in, Colony.class);
         } else if (in.getLocalName().equals(IndianSettlement.getXMLElementTagName())) {
-            settlement = updateFreeColGameObject(in, IndianSettlement.class);
+            settlement = readFreeColGameObject(in, IndianSettlement.class);
         // @compat 0.10.1
         } else if (in.getLocalName().equals(UNITS_TAG)) {
             while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 if (in.getLocalName().equals(Unit.getXMLElementTagName())) {
-                    add(updateFreeColGameObject(in, Unit.class));
+                    add(readFreeColGameObject(in, Unit.class));
                 }
             }
         // end @compat
@@ -2114,16 +2114,12 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                 tileItemContainer = new TileItemContainer(getGame(), this, in);
             }
         } else if (in.getLocalName().equals(PlayerExploredTile.getXMLElementTagName())) {
-            // Only from a savegame:
-            Player player = getGame().getFreeColGameObject(in.getAttributeValue(null, "player"),
-                                                           Player.class);
-            PlayerExploredTile pet = getPlayerExploredTile(player);
-            if (pet == null) {
-                pet = new PlayerExploredTile(getGame(), in);
-                playerExploredTiles.put(player, pet);
-            } else {
-                pet.readFromXML(in);
-            }
+            // Only from a saved game.
+            Player player = findFreeColGameObject(in, "player",
+                                                  Player.class, (Player)null);
+            PlayerExploredTile pet = readFreeColGameObject(in,
+                PlayerExploredTile.class);
+            if (player != null) playerExploredTiles.put(player, pet);
         } else {
             super.readChild(in);
         }

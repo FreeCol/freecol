@@ -224,42 +224,8 @@ abstract public class FreeColGameObject extends FreeColObject {
     }
 
     /**
-     * Gets a <code>FreeColGameObject</code> of a given class.
-     * If the object does not exist, create it.
-     *
-     * @param in The <code>XMLStreamReader</code> to read from.
-     * @param attributeName The attribute name.
-     * @param returnClass The class to expect.
-     * @return The <code>FreeColGameObject</code> found, or null if not found.
-     */
-    public <T extends FreeColGameObject> T getFreeColGameObject(XMLStreamReader in,
-        String attributeName, Class<T> returnClass) {
-        final String id =
-        // @compat 0.10.7
-            (ID_ATTRIBUTE_TAG.equals(attributeName)) ? readId(in) :
-        // end @compat
-            in.getAttributeValue(null, attributeName);
-        if (id == null) return null;
-
-        Game game = getGame();
-        T ret = game.getFreeColGameObject(id, returnClass);
-        try {
-            if (ret == null) {
-                Constructor<T> c = returnClass.getConstructor(Game.class,
-                                                              String.class);
-                ret = returnClass.cast(c.newInstance(game, id));
-            }
-            return ret;
-
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Failed to create FCGO with id: " + id,
-                       e);
-        }
-        return null;
-    }
-
-    /**
-     * Gets a <code>FreeColGameObject</code> of a given class.
+     * Find a <code>FreeColGameObject</code> of a given class
+     * from a stream attribute.
      *
      * @param in The <code>XMLStreamReader</code> to read from.
      * @param attributeName The attribute name.
@@ -268,30 +234,62 @@ abstract public class FreeColGameObject extends FreeColObject {
      * @return The <code>FreeColGameObject</code> found, or the default
      *     value if not found.
      */
-    public <T extends FreeColGameObject> T getFreeColGameObject(XMLStreamReader in,
+    public <T extends FreeColGameObject> T findFreeColGameObject(XMLStreamReader in,
         String attributeName, Class<T> returnClass, T defaultValue) {
-        final String id =
-        // @compat 0.10.7
-            (ID_ATTRIBUTE_TAG.equals(attributeName)) ? readId(in) :
-        // end @compat
-            in.getAttributeValue(null, attributeName);
-        return (id == null) ? defaultValue
-            : getGame().getFreeColGameObject(id, returnClass);
+        return getAttribute(in, attributeName, getGame(), returnClass,
+                            defaultValue);
     }
 
     /**
-     * Updates an existing <code>FreeColGameObject</code> from a stream.
+     * Either get an existing <code>FreeColGameObject</code> from a stream
+     * attribute or create it if it does not exist.
+     *
+     * @param in The <code>XMLStreamReader</code> to read from.
+     * @param attributeName The required attribute name.
+     * @param returnClass The class of object.
+     * @return The <code>FreeColGameObject</code> found or made, or null
+     *     if the attribute was not present.
+     */
+    public <T extends FreeColGameObject> T makeFreeColGameObject(XMLStreamReader in,
+        String attributeName, Class<T> returnClass) {
+        final String id =
+            // @compat 0.10.7
+            (ID_ATTRIBUTE_TAG.equals(attributeName)) ? readId(in) :
+            // end @compat
+            in.getAttributeValue(null, attributeName);
+        if (id == null) return null;
+
+        T ret = getGame().getFreeColGameObject(id, returnClass);
+        if (ret == null) {
+            try {
+                Constructor<T> c = returnClass.getConstructor(Game.class,
+                                                              String.class);
+                ret = returnClass.cast(c.newInstance(game, id));
+
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Failed to create FCGO with id: "
+                    + id, e);
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * Reads a <code>FreeColGameObject</code> from a stream.
+     * Expects the object to be identified by the standard ID_ATTRIBUTE_TAG.
      *
      * @param in The <code>XMLStreamReader</code> to read from.
      * @param returnClass The class to expect.
-     * @return The <code>FreeColGameObject</code> found, or null if not found.
+     * @return The <code>FreeColGameObject</code> found, or null there
+     *     was no ID_ATTRIBUTE_TAG present.
      */
-    public <T extends FreeColGameObject> T updateFreeColGameObject(XMLStreamReader in,
+    public <T extends FreeColGameObject> T readFreeColGameObject(XMLStreamReader in,
         Class<T> returnClass) {
-        T ret = getFreeColGameObject(in, ID_ATTRIBUTE_TAG, returnClass);
+        T ret = makeFreeColGameObject(in, ID_ATTRIBUTE_TAG, returnClass);
         if (ret != null) {
             try {
                 ret.readFromXML(in);
+
             } catch (XMLStreamException xse) {
                 logger.log(Level.WARNING, "Failed to update " + ret.getId()
                     + " from stream.", xse);
@@ -341,12 +339,12 @@ abstract public class FreeColGameObject extends FreeColObject {
      * @param defaultValue The default value.
      * @return The <code>FreeColGameObject</code> found, or the
      *     default value if not.
-     */
     public <T extends FreeColGameObject> T getAttribute(XMLStreamReader in,
         String attributeName, Class<T> returnType, T defaultValue) {
         return getAttribute(in, attributeName, getGame(),
                             returnType, defaultValue);
     }
+     */
 
     /**
      * FreeColGameObjects are equal if the two fcgos are in the same
@@ -420,32 +418,19 @@ abstract public class FreeColGameObject extends FreeColObject {
 
 
     // Serialization
+    // FreeColGameObjects use the 4-arg toXMLImpl
 
-    private static final String NEW_WORLD_TAG = "newWorld";
     // Several classes use this for lists of units.
     public static final String UNITS_TAG = "units";
 
 
     /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *
-     * Only attributes visible to the given <code>Player</code> will
-     * be added to that representation if <code>showAll</code> is
-     * set to <code>false</code>.
-     *
-     * @param out The output <code>XMLStreamWriter</code>.
-     * @param player The <code>Player</code> this XML-representation
-     *      should be made for, or null if <code>showAll == true</code>.
-     * @param showAll Show all attributes.
-     * @param toSavedGame Also show some extra attributes when saving the game.
-     * @exception XMLStreamException if there are any problems writing
-     *      to the stream.
+     * {@inheritDoc}
      */
     @Override
     public final void toXML(XMLStreamWriter out, Player player,
-                            boolean showAll,
-                            boolean toSavedGame) throws XMLStreamException {
+                            boolean showAll, boolean toSavedGame)
+        throws XMLStreamException {
         if (!showAll && toSavedGame) {
             throw new IllegalArgumentException("'showAll' should be true when saving a game.");
         }
@@ -453,14 +438,81 @@ abstract public class FreeColGameObject extends FreeColObject {
     }
 
     /**
-     * Makes an XML-representation of this object.
-     *
-     * @param out The output stream.
-     * @exception XMLStreamException if there are any problems writing to the
-     *             stream.
+     * {@inheritDoc}
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         toXMLImpl(out, null, false, false);
+    }
+
+    /**
+     * This method writes an XML-representation of this object with
+     * a specified tag to the given stream.
+     *
+     * Almost all FreeColGameObjects end up calling this, and implementing
+     * their own write{Attributes,Children} methods which begin by
+     * calling their superclass.  This allows a clean nesting of the
+     * serialization routines throughout the class hierarchy.
+     *
+     * Attribute and child visibility are controlled by the player, showAll,
+     * and toSavedGame arguments.
+     *
+     * @param out The target stream.
+     * @param tag The tag to use.
+     * @param player The <code>Player</code> this XML-representation
+     *      should be made for, or null if <code>showAll == true</code>.
+     * @param showAll Show all attributes.
+     * @param toSavedGame Also show some extra attributes when saving the game.
+     * @exception XMLStreamException if there are any problems writing
+     *     to the stream.
+     */
+    public void toXML(XMLStreamWriter out, String tag, Player player,
+                      boolean showAll, boolean toSavedGame) 
+        throws XMLStreamException {
+        out.writeStartElement(tag);
+        writeAttributes(out, player, showAll, toSavedGame);
+        writeChildren(out, player, showAll, toSavedGame);
+        out.writeEndElement();
+    }
+
+    /**
+     * Write the attributes of this object to a stream.
+     *
+     * To be overridden if required by any object that has attributes
+     * and uses the toXML(XMLStreamWriter, String, Player, boolean,
+     * boolean) call.
+     *
+     * @param out The target stream.
+     * @param player The <code>Player</code> this XML-representation
+     *      should be made for, or null if <code>showAll == true</code>.
+     * @param showAll Show all attributes.
+     * @param toSavedGame Also show some extra attributes when saving the game.
+     * @exception XMLStreamException if there are any problems writing
+     *     to the stream.
+     */
+    protected void writeAttributes(XMLStreamWriter out, Player player,
+                                   boolean showAll, boolean toSavedGame)
+        throws XMLStreamException {
+        super.writeAttributes(out);
+    }
+
+    /**
+     * Write the children of this object to a stream.
+     *
+     * To be overridden if required by any object that has children
+     * and uses the toXML(XMLStreamWriter, String) call.
+     *
+     * @param out The target stream.
+     * @param player The <code>Player</code> this XML-representation
+     *      should be made for, or null if <code>showAll == true</code>.
+     * @param showAll Show all attributes.
+     * @param toSavedGame Also show some extra attributes when saving the game.
+     * @exception XMLStreamException if there are any problems writing
+     *     to the stream.
+     */
+    protected void writeChildren(XMLStreamWriter out, Player player,
+                                 boolean showAll, boolean toSavedGame)
+        throws XMLStreamException {
+        super.writeChildren(out);
     }
 
     /**
@@ -566,7 +618,7 @@ abstract public class FreeColGameObject extends FreeColObject {
     }
 
     /**
-     * Get a new location from a given id.
+     * Get a new location from a stream attribute.
      *
      * @param in The input <code>XMLStreamReader</code>.
      * @param attrib The attribute to check.
@@ -576,46 +628,7 @@ abstract public class FreeColGameObject extends FreeColObject {
         if (attrib == null) return null;
 
         String id = getAttribute(in, attrib, (String)null);
-        if (id == null) return null;
-
-        FreeColGameObject fcgo = game.getFreeColGameObject(id);
-        if (fcgo instanceof Location) return (Location)fcgo;
-
-        final String tag = id.substring(0, id.indexOf(':'));
-        if (NEW_WORLD_TAG.equals(tag)) {
-            // do nothing
-
-        } else if (Building.getXMLElementTagName().equals(tag)) {
-            return new Building(game, id);
-
-        } else if (Colony.getXMLElementTagName().equals(tag)) {
-            return new Colony(game, id);
-
-        } else if (ColonyTile.getXMLElementTagName().equals(tag)) {
-            return new ColonyTile(game, id);
-
-        } else if (Europe.getXMLElementTagName().equals(tag)) {
-            return new Europe(game, id);
-
-        } else if (HighSeas.getXMLElementTagName().equals(tag)) {
-            return new HighSeas(game, id);
-
-        } else if (IndianSettlement.getXMLElementTagName().equals(tag)) {
-            return new IndianSettlement(game, id);
-
-        } else if (Map.getXMLElementTagName().equals(tag)) {
-            return new Map(game, id);
-
-        } else if (Tile.getXMLElementTagName().equals(tag)) {
-            return new Tile(game, id);
-
-        } else if (Unit.getXMLElementTagName().equals(tag)) {
-            return new Unit(game, id);
-
-        } else {
-            throw new IllegalStateException("Unknown type of Location: " + id);
-        }
-        return null;
+        return (id == null) ? null : game.getFreeColLocation(id);
     }
 
     /**

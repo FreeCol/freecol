@@ -660,9 +660,9 @@ abstract public class Settlement extends GoodsLocation
 
         setName(in.getAttributeValue(null, "name"));
 
-        owner = getFreeColGameObject(in, "owner", Player.class);
+        owner = makeFreeColGameObject(in, "owner", Player.class);
 
-        tile = getFreeColGameObject(in, "tile", Tile.class);
+        tile = makeFreeColGameObject(in, "tile", Tile.class);
 
         // @compat 0.9.x
         String typeStr = in.getAttributeValue(null, "settlementType");

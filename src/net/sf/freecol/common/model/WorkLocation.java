@@ -535,7 +535,8 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
 
-        colony = getAttribute(in, COLONY_TAG, Colony.class, (Colony)null);
+        colony = findFreeColGameObject(in, COLONY_TAG,
+                                       Colony.class, (Colony)null);
     }
 
     /**

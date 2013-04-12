@@ -72,6 +72,7 @@ public class PlayerExploredTile extends FreeColGameObject {
     /**
      * Creates a new <code>PlayerExploredTile</code>.
      *
+     * @param game The enclosing <code>Game</code>.
      * @param player The <code>Player</code> that owns this view.
      * @param tile The <code>Tile</code> to view.
      */
@@ -79,6 +80,16 @@ public class PlayerExploredTile extends FreeColGameObject {
         super(game);
         this.player = player;
         this.tile = tile;
+    }
+
+    /**
+     * Create a new player explored tile.
+     *
+     * @param game The enclosing <code>Game</code>.
+     * @param id The object identifier.
+     */
+    public PlayerExploredTile(Game game, String id) {
+        super(game, id);
     }
 
     /**
@@ -284,14 +295,19 @@ public class PlayerExploredTile extends FreeColGameObject {
         Game game = getGame();
         super.readAttributes(in);
 
-        player = getFreeColGameObject(in, "player", Player.class);
+        player = makeFreeColGameObject(in, "player", Player.class);
 
-        tile = getFreeColGameObject(in, "tile", Tile.class);
+        tile = makeFreeColGameObject(in, "tile", Tile.class);
 
-        owner = getFreeColGameObject(in, "owner", Player.class, null);
+        owner = makeFreeColGameObject(in, "owner", Player.class);
 
-        owningSettlement = getFreeColGameObject(in, "owningSettlement",
-                                                Settlement.class, null);
+        // TODO: makeFreeColGameObject is more logical, but will fail ATM
+        // if the settlement has been destroyed while this pet-player can
+        // not see it.  Since pets are only read in the server, there will be
+        // a ServerObject for existing settlements so findFreeColGameObject
+        // will do the right thing for now.
+        owningSettlement = findFreeColGameObject(in, "owningSettlement",
+            Settlement.class, (Settlement)null);
 
         colonyUnitCount = getAttribute(in, "colonyUnitCount", 0);
 
@@ -299,14 +315,11 @@ public class PlayerExploredTile extends FreeColGameObject {
 
         skill = spec.getType(in, "learnableSkill", UnitType.class, null);
 
-        wantedGoods[0] = spec.getType(in, "wantedGoods0", GoodsType.class,
-                                      null);
-        wantedGoods[1] = spec.getType(in, "wantedGoods1", GoodsType.class,
-                                      null);
-        wantedGoods[2] = spec.getType(in, "wantedGoods2", GoodsType.class,
-                                      null);
+        wantedGoods[0] = spec.getType(in, "wantedGoods0", GoodsType.class,null);
+        wantedGoods[1] = spec.getType(in, "wantedGoods1", GoodsType.class,null);
+        wantedGoods[2] = spec.getType(in, "wantedGoods2", GoodsType.class,null);
 
-        mostHated = getFreeColGameObject(in, "mostHated", Player.class, null);
+        mostHated = makeFreeColGameObject(in, "mostHated", Player.class);
 
         tileItems.clear();
         missionary = null;
@@ -319,7 +332,7 @@ public class PlayerExploredTile extends FreeColGameObject {
         Game game = getGame();
         if (in.getLocalName().equals(IndianSettlement.MISSIONARY_TAG_NAME)) {
             in.nextTag(); // advance to the Unit tag
-            missionary = updateFreeColGameObject(in, Unit.class);
+            missionary = readFreeColGameObject(in, Unit.class);
             in.nextTag(); // close <missionary> tag
         } else if (in.getLocalName().equals(Resource.getXMLElementTagName())) {
             Resource resource = game.getFreeColGameObject(readId(in),

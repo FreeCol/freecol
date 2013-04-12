@@ -2291,15 +2291,16 @@ public class Map extends FreeColGameObject implements Location {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String tag = in.getLocalName();
             if (Tile.getXMLElementTagName().equals(tag)) {
-                Tile t = updateFreeColGameObject(in, Tile.class);
+                Tile t = readFreeColGameObject(in, Tile.class);
                 setTile(t, t.getX(), t.getY());
+
                 // @compat 0.10.5
                 if (t.getHighSeasCount() == Tile.FLAG_RECALCULATE) {
                     fixupHighSeas = true;
                 }
                 // @end compatibility code
             } else if (Region.getXMLElementTagName().equals(tag)) {
-                putRegion(updateFreeColGameObject(in, Region.class));
+                putRegion(readFreeColGameObject(in, Region.class));
             } else {
                 logger.warning("Unknown tag: " + tag + " loading map");
                 in.nextTag();

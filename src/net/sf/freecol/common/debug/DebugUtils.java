@@ -369,9 +369,9 @@ public class DebugUtils {
                 .createXMLStreamReader(new StringReader(sw.toString()));
             xsr.nextTag();
             if (carrier == null) {
-                tile.updateFreeColGameObject(xsr, Tile.class);
+                tile.readFreeColGameObject(xsr, Tile.class);
             } else {
-                carrier.updateFreeColGameObject(xsr, Unit.class);
+                carrier.readFreeColGameObject(xsr, Unit.class);
             }
             xsr.close();
         } catch (Exception e) {
@@ -989,7 +989,7 @@ public class DebugUtils {
         final FreeColServer server = freeColClient.getFreeColServer();
         final Game sGame = server.getGame();
         final Settlement sSettlement
-            = (Settlement) sGame.getFreeColGameObject(settlement.getId());
+            = sGame.getFreeColGameObject(settlement.getId(), Settlement.class);
         final Player player = freeColClient.getMyPlayer();
         final Player sPlayer = sGame.getFreeColGameObject(player.getId(),
                                                           Player.class);

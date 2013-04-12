@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamConstants;
@@ -34,6 +36,8 @@ import javax.xml.stream.XMLStreamWriter;
  * A named region on the map.
  */
 public class Region extends FreeColGameObject implements Nameable {
+
+    private static final Logger logger = Logger.getLogger(Region.class.getName());
 
     public static final String PACIFIC_NAME_KEY = "model.region.pacific";
     public static final String CHILD_TAG = "child";
@@ -480,7 +484,7 @@ public class Region extends FreeColGameObject implements Nameable {
         out.writeStartElement(getXMLElementTagName());
         out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
         out.writeAttribute("nameKey", nameKey);
-        out.writeAttribute("type", type.toString());
+        writeAttribute(out, "type", type);
         if (name != null) {
             out.writeAttribute("name", name);
         }
@@ -529,29 +533,31 @@ public class Region extends FreeColGameObject implements Nameable {
         discoverable = getAttribute(in, "discoverable", false);
         prediscovered = getAttribute(in, "prediscovered", false);
         scoreValue = getAttribute(in, "scoreValue", 0);
-        type = Enum.valueOf(RegionType.class, in.getAttributeValue(null, "type"));
+        type = getAttribute(in, "type", RegionType.class, (RegionType)null);
         int turn = getAttribute(in, "discoveredIn", -1);
         if (turn > 0) {
             discoveredIn = new Turn(turn);
         }
 
-        discoveredBy = getFreeColGameObject(in, "discoveredBy", Player.class);
-        parent = getFreeColGameObject(in, "parent", Region.class);
-
+        discoveredBy = makeFreeColGameObject(in, "discoveredBy", Player.class);
+        parent = makeFreeColGameObject(in, "parent", Region.class);
     }
 
     public void readChildren(XMLStreamReader in) throws XMLStreamException {
         children = new ArrayList<Region>();
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if (in.getLocalName().equals("children")) {
+            final String tag = in.getLocalName();
+            if (tag.equals("children")) {
                 // TODO: remove support for old format
                 String[] childArray = readFromArrayElement("children", in, new String[0]);
                 for (String child : childArray) {
                     children.add(getGame().getMap().getRegion(child));
                 }
-            } else if (CHILD_TAG.equals(in.getLocalName())) {
-                children.add(getFreeColGameObject(in, ID_ATTRIBUTE_TAG, Region.class));
+            } else if (CHILD_TAG.equals(tag)) {
+                children.add(makeFreeColGameObject(in, ID_ATTRIBUTE_TAG, Region.class));
                 in.nextTag();
+            } else {
+                logger.warning("Bad Region tag: " + tag);
             }
         }
         if (children.isEmpty()) {

@@ -580,11 +580,7 @@ public class TileImprovement extends TileItem implements Named {
 
         setId(readId(in));
 
-        tile = game.getFreeColGameObject(in.getAttributeValue(null, "tile"),
-                                         Tile.class);
-        if (tile == null) {
-            tile = new Tile(game, in.getAttributeValue(null, "tile"));
-        }
+        tile = makeFreeColGameObject(in, "tile", Tile.class);
 
         String str = in.getAttributeValue(null, "type");
         type = getSpecification().getTileImprovementType(str);

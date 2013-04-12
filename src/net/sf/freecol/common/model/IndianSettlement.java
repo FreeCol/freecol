@@ -1402,7 +1402,7 @@ public class IndianSettlement extends Settlement {
         lastTribute = getAttribute(in, "lastTribute", 0);
         learnableSkill = getSpecification().getType(in, "learnableSkill",
                                                     UnitType.class, null);
-        mostHated = getFreeColGameObject(in, "mostHated", Player.class, null);
+        mostHated = makeFreeColGameObject(in, "mostHated", Player.class);
     }
 
     /**
@@ -1424,7 +1424,7 @@ public class IndianSettlement extends Settlement {
         final String tag = in.getLocalName();
 
         if (ALARM_TAG_NAME.equals(tag)) {
-            Player player = getFreeColGameObject(in, "player", Player.class);
+            Player player = makeFreeColGameObject(in, "player", Player.class);
             // @compat 0.10.5
             setContacted(player); // Alarm used to imply contact
             // @end compatibility code
@@ -1435,13 +1435,13 @@ public class IndianSettlement extends Settlement {
             String levelString = in.getAttributeValue(null, "level");
             ContactLevel cl = Enum.valueOf(ContactLevel.class,
                 levelString.toUpperCase(Locale.US));
-            Player player = getFreeColGameObject(in, "player", Player.class);
+            Player player = makeFreeColGameObject(in, "player", Player.class);
             contactLevels.put(player, cl);
             in.nextTag(); // close element
 
         // @compat 0.10.5
         } else if (IS_VISITED_TAG_NAME.equals(tag)) {
-            Player player = getFreeColGameObject(in, "player", Player.class);
+            Player player = makeFreeColGameObject(in, "player", Player.class);
             setScouted(player);
             in.nextTag(); // close element
         // @end compatibility code
@@ -1459,14 +1459,14 @@ public class IndianSettlement extends Settlement {
 
         } else if (MISSIONARY_TAG_NAME.equals(tag)) {
             in.nextTag();
-            missionary = updateFreeColGameObject(in, Unit.class);
+            missionary = readFreeColGameObject(in, Unit.class);
             missionary.setLocationNoUpdate(this);
             in.nextTag(); // close element
 
         } else if (UNITS_TAG.equals(tag)) {
             while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 if (in.getLocalName().equals(Unit.getXMLElementTagName())) {
-                    Unit unit = updateFreeColGameObject(in, Unit.class);
+                    Unit unit = readFreeColGameObject(in, Unit.class);
                     // @compat 0.10.1
                     if (unit.getLocation() != this) {
                         logger.warning("fixing unit location");
@@ -1478,7 +1478,7 @@ public class IndianSettlement extends Settlement {
             }
 
         } else if (OWNED_UNITS_TAG_NAME.equals(tag)) {
-            Unit unit = getFreeColGameObject(in, ID_ATTRIBUTE_TAG, Unit.class);
+            Unit unit = makeFreeColGameObject(in, ID_ATTRIBUTE_TAG, Unit.class);
             if (unit.getOwner() != null && !owner.owns(unit)) {
                 logger.warning("Error in savegame: unit " + unit.getId()
                                + " does not belong to settlement " + getId());

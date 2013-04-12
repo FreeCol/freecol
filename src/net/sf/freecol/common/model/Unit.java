@@ -3812,7 +3812,7 @@ public class Unit extends GoodsLocation
         workLeft = Integer.parseInt(in.getAttributeValue(null, "workLeft"));
         attrition = getAttribute(in, "attrition", 0);
 
-        owner = getFreeColGameObject(in, "owner", Player.class);
+        owner = makeFreeColGameObject(in, "owner", Player.class);
 
         nationality = in.getAttributeValue(null, "nationality");
         ethnicity = in.getAttributeValue(null, "ethnicity");
@@ -3826,31 +3826,23 @@ public class Unit extends GoodsLocation
         turnsOfTraining = Integer.parseInt(in.getAttributeValue(null, "turnsOfTraining"));
         hitpoints = Integer.parseInt(in.getAttributeValue(null, "hitpoints"));
 
-        teacher = getFreeColGameObject(in, "teacher", Unit.class);
+        teacher = makeFreeColGameObject(in, "teacher", Unit.class);
 
-        student = getFreeColGameObject(in, "student", Unit.class);
+        student = makeFreeColGameObject(in, "student", Unit.class);
 
-        final String indianSettlementStr = in.getAttributeValue(null, "indianSettlement");
-        if (indianSettlementStr != null) {
-            indianSettlement = game.getFreeColGameObject(indianSettlementStr,
-                                                         IndianSettlement.class);
-            if (indianSettlement == null) {
-                indianSettlement = new IndianSettlement(game, indianSettlementStr);
-            }
-        } else {
-            setIndianSettlement(null);
-        }
+        setIndianSettlement(makeFreeColGameObject(in, "indianSettlement",
+                                                  IndianSettlement.class));
 
         treasureAmount = getAttribute(in, "treasureAmount", 0);
 
         destination = getLocationAttribute(in, "destination", game);
 
         currentStop = -1;
-        tradeRoute = null;
-        final String tradeRouteStr = in.getAttributeValue(null, "tradeRoute");
-        if (tradeRouteStr != null) {
-            tradeRoute = game.getFreeColGameObject(tradeRouteStr,
-                                                   TradeRoute.class);
+
+        tradeRoute = findFreeColGameObject(in, "tradeRoute",
+                                           TradeRoute.class, (TradeRoute)null);
+
+        if (tradeRoute != null) {
             final String currentStopStr = in.getAttributeValue(null, "currentStop");
             if (currentStopStr != null) {
                 currentStop = Integer.parseInt(currentStopStr);
@@ -3915,7 +3907,7 @@ public class Unit extends GoodsLocation
                 } // end compatibility code
                 in.nextTag();
             } else if (in.getLocalName().equals(TileImprovement.getXMLElementTagName())) {
-                setWorkImprovement(updateFreeColGameObject(in, TileImprovement.class));
+                setWorkImprovement(readFreeColGameObject(in, TileImprovement.class));
             } else {
                 super.readChild(in);
             }
