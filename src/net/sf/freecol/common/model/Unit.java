@@ -2850,7 +2850,7 @@ public class Unit extends GoodsLocation
      *         otherwise.
      */
     public boolean isNaval() {
-        return getType().isNaval();
+        return (unitType == null) ? false : unitType.isNaval();
     }
 
     /**
