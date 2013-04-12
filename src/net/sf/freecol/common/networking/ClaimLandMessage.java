@@ -92,9 +92,12 @@ public class ClaimLandMessage extends DOMMessage {
             return DOMMessage.clientError("Not a file: " + tileId);
         }
 
-        Unit unit = player.getOurFreeColGameObject(claimantId, Unit.class);
-        Settlement settlement
-            = player.getOurFreeColGameObject(claimantId, Settlement.class);
+        Unit unit = null;
+        Settlement settlement = null;
+        try {
+            unit = player.getOurFreeColGameObject(claimantId, Unit.class);
+            settlement = player.getOurFreeColGameObject(claimantId, Settlement.class);
+        } catch (IllegalStateException e) {} // One must fail.
         if (unit != null) {
             if (unit.getTile() != tile) {
                 return DOMMessage.clientError("Unit not at tile: " + tileId);
