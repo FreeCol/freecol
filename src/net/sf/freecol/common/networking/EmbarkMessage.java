@@ -97,14 +97,14 @@ public class EmbarkMessage extends DOMMessage {
 
         Unit unit;
         try {
-            unit = player.getFreeColGameObject(unitId, Unit.class);
+            unit = player.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }
 
         Unit carrier;
         try {
-            carrier = player.getFreeColGameObject(carrierId, Unit.class);
+            carrier = player.getOurFreeColGameObject(carrierId, Unit.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }

@@ -84,14 +84,14 @@ public class JoinColonyMessage extends DOMMessage {
 
         Unit unit;
         try {
-            unit = player.getFreeColGameObject(builderId, Unit.class);
+            unit = player.getOurFreeColGameObject(builderId, Unit.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }
 
         Colony colony;
         try {
-            colony = player.getFreeColGameObject(colonyId, Colony.class);
+            colony = player.getOurFreeColGameObject(colonyId, Colony.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }

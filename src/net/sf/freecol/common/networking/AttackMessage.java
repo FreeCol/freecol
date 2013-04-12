@@ -85,7 +85,7 @@ public class AttackMessage extends DOMMessage {
         
         Unit unit;
         try {
-            unit = serverPlayer.getFreeColGameObject(unitId, Unit.class);
+            unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }

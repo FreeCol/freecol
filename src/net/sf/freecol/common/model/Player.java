@@ -3490,7 +3490,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @throws IllegalStateException on failure to validate the object
      *     in any way.
      */
-    public <T extends FreeColGameObject> T getFreeColGameObject(String id,
+    public <T extends FreeColGameObject> T getOurFreeColGameObject(String id,
         Class<T> returnClass) throws IllegalStateException {
         T t = getGame().getFreeColGameObject(id, returnClass);
         if (t == null) {

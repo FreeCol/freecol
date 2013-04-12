@@ -82,7 +82,7 @@ public class AssignTradeRouteMessage extends DOMMessage {
 
         Unit unit;
         try {
-            unit = serverPlayer.getFreeColGameObject(unitId, Unit.class);
+            unit = serverPlayer.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }
@@ -92,7 +92,7 @@ public class AssignTradeRouteMessage extends DOMMessage {
             tradeRoute = null;
         } else {
             try {
-                tradeRoute = serverPlayer.getFreeColGameObject(tradeRouteId, 
+                tradeRoute = serverPlayer.getOurFreeColGameObject(tradeRouteId, 
                     TradeRoute.class);
             } catch (Exception e) {
                 return DOMMessage.clientError(e.getMessage());

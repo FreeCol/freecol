@@ -83,14 +83,14 @@ public class AssignTeacherMessage extends DOMMessage {
 
         Unit student;
         try {
-            student = player.getFreeColGameObject(studentId, Unit.class);
+            student = player.getOurFreeColGameObject(studentId, Unit.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }
 
         Unit teacher;
         try {
-            teacher = player.getFreeColGameObject(teacherId, Unit.class);
+            teacher = player.getOurFreeColGameObject(teacherId, Unit.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }

@@ -82,7 +82,7 @@ public class LoadCargoMessage extends DOMMessage {
 
         Unit unit;
         try {
-            unit = player.getFreeColGameObject(carrierId, Unit.class);
+            unit = player.getOurFreeColGameObject(carrierId, Unit.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }

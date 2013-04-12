@@ -128,7 +128,7 @@ public class LootCargoMessage extends DOMMessage {
 
         Unit winner;
         try {
-            winner = player.getFreeColGameObject(winnerId, Unit.class);
+            winner = player.getOurFreeColGameObject(winnerId, Unit.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }

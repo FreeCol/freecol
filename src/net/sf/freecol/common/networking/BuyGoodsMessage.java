@@ -89,7 +89,7 @@ public class BuyGoodsMessage extends DOMMessage {
 
         Unit carrier;
         try {
-            carrier = player.getFreeColGameObject(carrierId, Unit.class);
+            carrier = player.getOurFreeColGameObject(carrierId, Unit.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }

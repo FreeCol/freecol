@@ -130,8 +130,7 @@ public class SetTradeRoutesMessage extends DOMMessage {
             String id = removePrefix(tradeRoute);
             TradeRoute realRoute;
             try {
-                realRoute = serverPlayer.getFreeColGameObject(id,
-                                                              TradeRoute.class);
+                realRoute = serverPlayer.getOurFreeColGameObject(id, TradeRoute.class);
             } catch (Exception e) {
                 errors += e.getMessage() + ". ";
                 continue;

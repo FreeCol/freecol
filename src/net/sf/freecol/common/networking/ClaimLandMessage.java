@@ -92,21 +92,15 @@ public class ClaimLandMessage extends DOMMessage {
             return DOMMessage.clientError("Not a file: " + tileId);
         }
 
-        Unit unit = game.getFreeColGameObject(claimantId, Unit.class);
-        Settlement settlement = game.getFreeColGameObject(claimantId,
-                                                          Settlement.class);
+        Unit unit = player.getOurFreeColGameObject(claimantId, Unit.class);
+        Settlement settlement
+            = player.getOurFreeColGameObject(claimantId, Settlement.class);
         if (unit != null) {
-            if (!player.owns(unit)) {
-                return DOMMessage.clientError("Not your unit: " + claimantId);
-            } else if (unit.getTile() != tile) {
-                return DOMMessage.clientError("Unit not at tile: "
-                    + tileId);
+            if (unit.getTile() != tile) {
+                return DOMMessage.clientError("Unit not at tile: " + tileId);
             }
         } else if (settlement != null) {
-            if (!player.owns(settlement)) {
-                return DOMMessage.clientError("Not your settlement: "
-                    + claimantId);
-            } else if (settlement.getOwner().isEuropean()
+            if (settlement.getOwner().isEuropean()
                 && !settlement.getTile().isAdjacent(tile)) {
                 return DOMMessage.clientError("Settlement can not claim tile: "
                     + tileId);

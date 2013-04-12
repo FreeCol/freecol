@@ -155,7 +155,7 @@ public class IndianDemandMessage extends DOMMessage {
         Unit unit;
         try {
             if (resultString == null) { // Initial demand
-                unit = player.getFreeColGameObject(unitId, Unit.class);
+                unit = player.getOurFreeColGameObject(unitId, Unit.class);
                 if (unit.getMovesLeft() <= 0) {
                     return DOMMessage.clientError("Unit has no moves left: "
                         + unitId);

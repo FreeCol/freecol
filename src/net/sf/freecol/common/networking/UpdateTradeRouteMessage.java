@@ -80,7 +80,7 @@ public class UpdateTradeRouteMessage extends DOMMessage {
         String id = SetTradeRoutesMessage.removePrefix(tradeRoute);
         TradeRoute realRoute;
         try {
-            realRoute = serverPlayer.getFreeColGameObject(id, TradeRoute.class);
+            realRoute = serverPlayer.getOurFreeColGameObject(id, TradeRoute.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }

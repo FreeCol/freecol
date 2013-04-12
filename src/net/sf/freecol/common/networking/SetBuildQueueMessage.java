@@ -107,7 +107,7 @@ public class SetBuildQueueMessage extends DOMMessage {
 
         Colony colony;
         try {
-            colony = player.getFreeColGameObject(colonyId, Colony.class);
+            colony = player.getOurFreeColGameObject(colonyId, Colony.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }

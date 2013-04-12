@@ -166,7 +166,7 @@ public class NewLandNameMessage extends DOMMessage {
 
         Unit unit;
         try {
-            unit = player.getFreeColGameObject(unitId, Unit.class);
+            unit = player.getOurFreeColGameObject(unitId, Unit.class);
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }
