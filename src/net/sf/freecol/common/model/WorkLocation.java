@@ -41,7 +41,7 @@ import javax.xml.stream.XMLStreamWriter;
 public abstract class WorkLocation extends UnitLocation implements Ownable {
 
 
-    private static final List<AbstractGoods> EMPTY_LIST = Collections.emptyList();
+    public static final List<AbstractGoods> EMPTY_LIST = Collections.emptyList();
 
     /**
      * The colony that contains this work location.
