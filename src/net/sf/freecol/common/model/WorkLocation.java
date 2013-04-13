@@ -452,6 +452,13 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
                                                           UnitType unitType);
 
     /**
+     * Returns the production types available for this WorkLocation.
+     *
+     * @return available production types
+     */
+    public abstract List<ProductionType> getProductionTypes();
+
+    /**
      * Gets the best production type for a unit to perform at this
      * work location.
      *
@@ -459,6 +466,33 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
      * @return The best production type.
      */
     public abstract ProductionType getBestProductionType(Unit unit);
+
+    /**
+     * Returns the best production type for the production of the
+     * given goods type.  This method is likely to be removed in the
+     * future.
+     *
+     * @param goodsType goods type
+     * @return production type
+     */
+    public ProductionType getBestProductionType(GoodsType goodsType) {
+        ProductionType best = null;
+        int amount = 0;
+        for (ProductionType productionType : getProductionTypes()) {
+            if (productionType.getOutputs() != null) {
+                for (AbstractGoods output : productionType.getOutputs()) {
+                    if (output.getType() == goodsType) {
+                        int newAmount = output.getAmount();
+                        if (newAmount > amount) {
+                            amount = newAmount;
+                            best = productionType;
+                        }
+                    }
+                }
+            }
+        }
+        return best;
+    }
 
     /**
      * Gets a template describing whether this work location can/needs-to
@@ -504,6 +538,15 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
         if ("production".equals(in.getLocalName())) {
             productionType = new ProductionType(getSpecification());
             productionType.readFromXML(in);
+        } else if (Unit.getXMLElementTagName().equals(in.getLocalName())) {
+            // @compat 0.10.6
+            // 0.10.6 has no production types, so we must infer it
+            // from the work type of the unit(s) present
+            super.readChild(in);
+            if (productionType == null) {
+                setProductionType(getBestProductionType(getFirstUnit().getWorkType()));
+            }
+            // end @compat
         } else {
             super.readChild(in);
         }

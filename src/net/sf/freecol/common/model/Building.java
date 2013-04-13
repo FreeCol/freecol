@@ -294,6 +294,16 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     }
 
     /**
+     * Returns the production types available for this Building.
+     *
+     * @return available production types
+     */
+    public List<ProductionType> getProductionTypes() {
+        return getType().getProductionTypes();
+    }
+
+
+    /**
      * Gets the production information for this building taking account
      * of the available input and output goods.
      *

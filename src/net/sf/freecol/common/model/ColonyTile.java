@@ -507,25 +507,11 @@ public class ColonyTile extends WorkLocation implements Ownable {
      * @return production type
      */
     public ProductionType getBestProductionType(GoodsType goodsType) {
-        ProductionType best = null;
-        int amount = 0;
-        for (ProductionType productionType : getProductionTypes()) {
-            if (productionType.getOutputs() != null) {
-                for (AbstractGoods output : productionType.getOutputs()) {
-                    if (output.getType() == goodsType) {
-                        int newAmount = output.getAmount();
-                        if (newAmount > amount) {
-                            amount = newAmount;
-                            best = productionType;
-                        }
-                    }
-                }
-            }
-        }
+        ProductionType best = super.getBestProductionType(goodsType);
         if (best == null) {
             TileItemContainer container = workTile.getTileItemContainer();
             if (container != null) {
-                amount = container.getTotalBonusPotential(goodsType, null, 0, false);
+                int amount = container.getTotalBonusPotential(goodsType, null, 0, false);
                 if (amount > 0) {
                     // special case: resource is present
                     best = new ProductionType(null, goodsType, 0);
