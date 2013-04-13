@@ -93,11 +93,13 @@ public class ClaimLandMessage extends DOMMessage {
         }
 
         Unit unit = null;
-        Settlement settlement = null;
         try {
             unit = player.getOurFreeColGameObject(claimantId, Unit.class);
+        } catch (IllegalStateException e) {} // Expected to fail sometimes...
+        Settlement settlement = null;
+        try {
             settlement = player.getOurFreeColGameObject(claimantId, Settlement.class);
-        } catch (IllegalStateException e) {} // One must fail.
+        } catch (IllegalStateException e) {} // ...as is this one...
         if (unit != null) {
             if (unit.getTile() != tile) {
                 return DOMMessage.clientError("Unit not at tile: " + tileId);
@@ -108,7 +110,7 @@ public class ClaimLandMessage extends DOMMessage {
                 return DOMMessage.clientError("Settlement can not claim tile: "
                     + tileId);
             }
-        } else {
+        } else { // ...but not both of them.
             return DOMMessage.clientError("Not a unit or settlement: "
                 + claimantId);
         }
