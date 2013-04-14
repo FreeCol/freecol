@@ -1207,7 +1207,9 @@ public class Game extends FreeColGameObject {
         for (Player player : getLiveEuropeanPlayers()) {
             for (Colony colony : player.getColonies()) {
                 for (WorkLocation workLocation : colony.getCurrentWorkLocations()) {
-                    workLocation.updateProductionType();
+                    if (workLocation.getProductionType() == null) {
+                        workLocation.updateProductionType();
+                    }
                 }
             }
         }
