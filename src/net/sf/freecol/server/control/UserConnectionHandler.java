@@ -178,7 +178,15 @@ public final class UserConnectionHandler implements MessageHandler {
             game = freeColServer.getGame();
             player = (ServerPlayer)game.getPlayerByName(userName);
             if (player == null) {
-                return DOMMessage.createError("server.alreadyStarted", null);
+                StringBuilder sb = new StringBuilder("Player \"");
+                sb.append(userName).append("\" is not present in the game.")
+                    .append("\n  Known players = ( ");
+                for (Player p : game.getPlayers()) {
+                    sb.append(p.getName()).append(" ");
+                }
+                sb.append(")");
+                return DOMMessage.createError("server.userNameNotPresent",
+                                              sb.toString());
             } else if (player.isConnected() && !player.isAI()) {
                 return DOMMessage.createError("server.userNameInUse",
                     userName + " is already in use.");

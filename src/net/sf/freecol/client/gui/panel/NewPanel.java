@@ -361,8 +361,9 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                     if (level == null) break;
                     spec.applyDifficultyLevel(level);
                     // Launch!
-                    connectController.startSinglePlayerGame(spec, false);
-                    return;
+                    if (connectController.startSinglePlayerGame(spec,
+                                                                false)) return;
+                    break;
                 case JOIN:
                     try {
                         port = Integer.valueOf(port1.getText()).intValue();
@@ -371,9 +372,9 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                         break;
                     }
                     // Launch!
-                    connectController.joinMultiplayerGame(server.getText(),
-                                                          port);
-                    return;
+                    if (connectController.joinMultiplayerGame(server.getText(),
+                                                              port)) return;
+                    break;
                 case START:
                     try {
                         port = Integer.valueOf(port2.getText()).intValue();
@@ -385,14 +386,15 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                     if (level == null) break;
                     spec.applyDifficultyLevel(level);
                     // Launch!
-                    connectController.startMultiplayerGame(spec,
-                        publicServer.isSelected(), port);
-                    return;
+                    if (connectController.startMultiplayerGame(spec,
+                            publicServer.isSelected(), port)) return;
+                    break;
                 case META_SERVER:
                     List<ServerInfo> servers = connectController.getServerList();
                     if (servers != null) {
                         getGUI().showServerListPanel(servers);
                     }
+                    break;
                 }
                 break;
             case CANCEL:
