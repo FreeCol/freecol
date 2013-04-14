@@ -65,7 +65,7 @@ public class Building extends WorkLocation implements Named, Comparable<Building
         setColony(colony);
         this.buildingType = type;
         // set production type to default value
-        setDefaultProductionType(type);
+        updateProductionType();
     }
 
     /**
@@ -102,13 +102,26 @@ public class Building extends WorkLocation implements Named, Comparable<Building
         return buildingType;
     }
 
-    private void setDefaultProductionType(BuildingType type) {
-        List<ProductionType> production = type.getProductionTypes();
-        if (production == null || production.isEmpty()) {
-            setProductionType(null);
+    /**
+     * Update production type on the basis of the current building
+     * type (which might change due to an upgrade) and the work type
+     * of units present.
+     */
+    public void updateProductionType() {
+        if (isEmpty()) {
+            List<ProductionType> production = buildingType.getProductionTypes();
+            if (production == null || production.isEmpty()) {
+                setProductionType(null);
+            } else {
+                setProductionType(production.get(0));
+            }
         } else {
-            setProductionType(production.get(0));
+            Unit unit = getFirstUnit();
+            if (unit != null) {
+                setProductionType(getBestProductionType(unit.getWorkType()));
+            }
         }
+        getColony().invalidateCache();
     }
 
     /**
@@ -128,7 +141,7 @@ public class Building extends WorkLocation implements Named, Comparable<Building
             buildingType = newBuildingType;
 
             // change default production type
-            setDefaultProductionType(newBuildingType);
+            updateProductionType();
 
             // add new features and abilities from new type
             colony.addFeatures(buildingType);

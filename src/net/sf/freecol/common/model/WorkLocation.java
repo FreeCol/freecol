@@ -495,6 +495,13 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
     }
 
     /**
+     * Update the production type. This might be necessary for
+     * compatibility code, or because the type of the work location
+     * changes.
+     */
+    public abstract void updateProductionType();
+
+    /**
      * Gets a template describing whether this work location can/needs-to
      * be claimed.  To be overridden by classes where this is meaningful.
      *
@@ -538,15 +545,6 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
         if ("production".equals(in.getLocalName())) {
             productionType = new ProductionType(getSpecification());
             productionType.readFromXML(in);
-        } else if (Unit.getXMLElementTagName().equals(in.getLocalName())) {
-            // @compat 0.10.6
-            // 0.10.6 has no production types, so we must infer it
-            // from the work type of the unit(s) present
-            super.readChild(in);
-            if (productionType == null) {
-                setProductionType(getBestProductionType(getFirstUnit().getWorkType()));
-            }
-            // end @compat
         } else {
             super.readChild(in);
         }

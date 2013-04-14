@@ -1200,6 +1200,19 @@ public class Game extends FreeColGameObject {
             addOldOptions(mapGeneratorOptions);
         }
         // end compatibility code
+
+        // @compat 0.10.6
+        // in 0.10.6 work locations had no production types, so we
+        // must infer them from the work type of the unit(s) present
+        for (Player player : getLiveEuropeanPlayers()) {
+            for (Colony colony : player.getColonies()) {
+                for (WorkLocation workLocation : colony.getCurrentWorkLocations()) {
+                    workLocation.updateProductionType();
+                }
+            }
+        }
+        // end @compat
+
     }
 
     // @compat 0.9.x

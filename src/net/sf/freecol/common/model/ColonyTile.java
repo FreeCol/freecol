@@ -80,7 +80,6 @@ public class ColonyTile extends WorkLocation implements Ownable {
 
         setColony(colony);
         this.workTile = workTile;
-        updateProductionType();
     }
 
     /**
@@ -176,14 +175,21 @@ public class ColonyTile extends WorkLocation implements Ownable {
 
     /**
      * Updates the production type based on the tile type of the work
-     * tile (which can change at any time).
-     *
+     * tile (which can change at any time) and the work type of units
+     * present.
      */
-    void updateProductionType() {
-        List<ProductionType> productionTypes = getProductionTypes();
-        // TODO: in the future, this should become selectable
-        if (!productionTypes.isEmpty()) {
-            setProductionType(productionTypes.get(0));
+    public void updateProductionType() {
+        if (isColonyCenterTile()) {
+            List<ProductionType> productionTypes = getProductionTypes();
+            // TODO: in the future, this should become selectable
+            if (!productionTypes.isEmpty()) {
+                setProductionType(productionTypes.get(0));
+            }
+        } else {
+            Unit unit = getFirstUnit();
+            if (unit != null) {
+                setProductionType(getBestProductionType(unit.getWorkType()));
+            }
         }
         getColony().invalidateCache();
     }
