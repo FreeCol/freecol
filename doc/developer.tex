@@ -7,8 +7,8 @@
 \makeindex
 
 \begin{document}
-\author{\href{http://freecol.sourceforge.net/index.php?section=8}{The FreeCol Team}}
-\title{FreeCol Documentation\\Developer Guide for Version v0.10.3}
+\author{\href{http://www.freecol.org/team-and-credits.html}{The FreeCol Team}}
+\title{FreeCol Documentation\\Developer Guide for Version v0.10.7}
 \maketitle{}
 
 \tableofcontents
@@ -17,7 +17,6 @@
 
 \hypertarget{How to become a FreeCol developer}
             {\chapter{How to become a FreeCol developer}}
-
 
 
 \hypertarget{The goal of our project}{\section{The goal of our project}}
@@ -38,13 +37,13 @@ The big exception to this rule is the our client-server model that
 will allow players from all over the world to compete in a game
 of FreeCol.
 
-Read more \href{http://www.freecol.org/index.php?section=2}{here}.
+Read more \href{http://www.freecol.org/about.html}{here}.
 
 
 \hypertarget{SourceForge project site}{\section{SourceForge project site}}
 
 You should visit and get familiar with our project site at
-\href{http://sourceforge.net/projects/freecol/}{SourceForge}.
+\href{https://sourceforge.net/projects/freecol/}{SourceForge}.
 
 This site contains trackers for bugs and features requests,
 a task manager and lots of other important services.
@@ -55,25 +54,28 @@ changes to the codebase.
 
 \hypertarget{How to get tasks}{\section{How to get tasks}}
 
-You may find available tasks in the bug and feature request
-trackers --- just grab any task you are planning to do (in the
-immediate future) by posting a comment telling that you intend
-to do this task. Please create a new bug report/feature request
-for tasks that is not being listed here (and before you start
-working on them). Please remember to post a comment when
-you are done, or if you are unable to complete the work.
+You may find available tasks in the bug and feature request trackers
+--- just grab any task you are planning to do (in the immediate
+future) by posting a comment telling that you intend to do this task.
+Please create a new bug report/feature request for tasks that are not
+listed here (and before you start working on them).  Please remember
+to post a comment when you are done, or if you are unable to complete
+the work.
 
-Major changes to the code should be discussed on the
-developer's mailing list before they are implemented. This is to
-ensure that your work will not be in vain if somebody else knows
-a better way of doing it. It is also a good idea to discuss changes
-that is not directly related to the next release on our
-\href{http://www.freecol.org/index.php?section=18}{roadmap}.
+Major changes to the code should be discussed on the developer's
+mailing list before they are implemented.  This is to ensure that your
+work will not be in vain if somebody else knows a better way of doing
+it.
+% [Currently moot, we have no working roadmap] 
+% It is also a good idea to discuss changes that is not directly
+% related to the next release on our
+% \href{http://www.freecol.org/index.php?section=18}{roadmap}.
 
 
 \hypertarget{How to use the trackers}{\section{How to use the trackers}}
 
-This is how a bug tracker item should be updated while you are working:
+If you are a full developer (i.e. with write privileges), this is how
+a bug tracker item should be updated while you are working:
 
 \begin{enumerate}
 \item Assign yourself to the tracker item before you start working on it.
@@ -81,28 +83,36 @@ This is how a bug tracker item should be updated while you are working:
 \item Please verify that no duplicate entry has been posted.
 
 \begin{itemize}
-\item If you can find a duplicate and the bug has NOT been fixed:
-  Please use the resolution "Duplicate", set the status to "Closed"
-  and post a comment with the ID of the other tracker item (add a
-  comment to the other tracker item as well).
+\item If you can find a duplicate and the bug has \emph{not} been
+  fixed, please set its status to ``Closed-Duplicate'', its milestone
+  to ``Unspecified'', and post a comment with the ID of the other
+  tracker item (add a comment to the other tracker item as well).
 
-\item If you can find a duplicate and the bug has been fixed: Use the
-  resolution "Out of date" and close the tracker item.
+\item If you can find a duplicate and the bug has been fixed, use the
+  ``Closed-out-of-date'' status to close the tracker item.
 \end{itemize}
 
-\item Set the item's status to pending if you require input from the person
-   originally submitting the item.
+\item Set the item's status to ``Open-Needs-Info'' if you require
+  input from the person originally submitting the item.
 
-\item If you are unable to complete the item: Assign it to "None" and
-   make a comment describing any problems relevant for another developer.
+\item Set the item's status to ``Open-WWC1D'' if the fix requires
+  determining what Col1 did (``What Would Col1 Do?'').
 
-\item After you have completed the work: Set the group to "Fixed (SVN)",
-   resolution to "Fixed" and the status to "Closed". Please also write
-   a comment telling that the work is done.
+\item If you are unable to complete the item: assign it back to
+  ``None'' and make a comment describing any problems relevant for
+  another developer.  The milestone of open bugs should be ``Current''.
+
+\item If you successfully commit a fix for a bug, set the milestone to
+  ``Fixed-trunk'', the status to ``Closed'' if you are certain of the
+  fix, or ``Pending-Fixed'' if there is some uncertainty and/or
+  further comment is welcome.  Please also write a comment telling
+  that the work is done, and it is helpful to refer to any commit/s
+  where relevant changes occurred.
 \end{enumerate}
 
+
 This is how a feature request item should be updated while you are
-working:
+working:\emph{(Needs updating since the sourceforge migration)}
 
 \begin{enumerate}
 \item Assign yourself to the tracker item before you start working on it.
@@ -149,23 +159,22 @@ You can (and should) subscribe to this list
 \href{http://lists.sourceforge.net/lists/listinfo/freecol-developers}{here}.
 
 
-\hypertarget{Subversion (SVN)}{\section{Subversion (SVN)}}
+\hypertarget{Git}{\section{Git}}
 
-Subversion (SVN) is the tool we are using to
-manage the changes within our source code tree. This system
-makes it possible for all developers to have their own
-"working copy" by supporting synchronization between the
-central version of the code ("the repository") and a copy.
-SVN also makes it possible to "undo" changes that were
+Git is the tool we are using to manage the changes within our source
+code tree.  This system makes it possible for all developers to have
+their own full copy of the project, and supports synchronization
+between the central version of the code (`the repository') and the
+local copies.  Git also makes it possible to undo changes that were
 previously committed to the repository.
 
-\href{http://www.freecol.org/index.php?section=17}{This page}
-describes how you can start using SVN and get a working copy of the
+\href{http://www.freecol.org/documentation/git.html}{This page}
+describes how you can start using Git and get a working copy of the
 code (without commit privileges).
 
-You can use \verb+svn update+ for updating an existing working
-copy. Changes can only be applied by those who have write-access, so
-you will need to either send the changes to the developer mailing list
+You can use \verb+git pull+ for updating an existing working
+copy.  Changes can only be applied by those who have write-access, so
+you may need to either send the changes to the developer mailing list
 or use the patch tracking system.
 
 
@@ -178,7 +187,7 @@ simply type \verb+ant+ in the top directory of your "working copy" in
 order to compile the game.  The file \verb+FreeCol.jar+ will then be
 generated, and you can start the game simply by writing:
 
-\verb+java -Xmx128M -jar FreeCol.jar+
+\verb+java -Xmx256M -jar FreeCol.jar+
 
 
 \hypertarget{Using an IDE}{\section{Using an IDE}}
@@ -190,6 +199,9 @@ The following information has also been contributed by players that do
 use an IDE.
 
 \hypertarget{Using Eclipse}{\subsection{Using Eclipse (thanks to ``nobody'')}}
+
+\emph{This section is out of date since we migrated from svn to git.
+Leaving as-is for now in the hope the procedure is similar.}
 
 Since I'm quite a fan of the Eclipse IDE, I thought I would share my
 experience with building FreeCol in Eclipse on the Windows platform.
@@ -306,13 +318,13 @@ created and you can start watching the documentation by opening
 "index.html" from that directory.
 
 There is also some additional documentation
-\href{http://www.freecol.org/index.php?section=3}{here}.
+\href{http://www.freecol.org/documentation/}{here}.
 
 
 \hypertarget{Quality of code}{\section{Quality of code}}
 
 First of all, your code will be read and modified by several
-different developers. Therefore it is important to create a
+different developers.  Therefore it is important to create a
 block of JavaDoc documentation with all methods/classes/packages
 you implement.
 
@@ -320,17 +332,17 @@ You should also spend more time thinking about the overall
 structure than when you are working alone.
 
 Please read the \href{http://java.sun.com/docs/codeconv/}{Java Code
-  Conventions}. This will only take about 15 minutes and will really
+  Conventions}.  This will only take about 15 minutes and will really
 help you write beautiful code.
 
-And one more thing. Please configure your editor in such a way
-that code indentations result in the insertion of 4 spaces. Tabs
-are the work of the devil!
-
-
+And one more thing.  Please configure your editor in such a way
+that code indentations result in the insertion of 4 spaces, and avoid
+using tabs.
 
 
 \hypertarget{How to build a FreeCol release}{\chapter{How to build a FreeCol release}}
+
+\emph{svn instructions need revision for git next time we do a release}
 
 \begin{itemize}
 
