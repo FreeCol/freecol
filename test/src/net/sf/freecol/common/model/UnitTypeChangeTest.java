@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.freecol.common.model.UnitType;
@@ -59,11 +60,11 @@ public class UnitTypeChangeTest extends FreeColTestCase {
         UnitTypeChange change = new UnitTypeChange();
         change.setNewUnitType(farmer);
         change.getChangeTypes().put(education, 100);
-        List<Scope> scopes = change.getScopes();
+        List<Scope> scopes = new ArrayList<Scope>(change.getScopes());
         scopes.add(scope);
         change.setScopes(scopes);
 
-        List<UnitTypeChange> ch = gardener.getTypeChanges();
+        List<UnitTypeChange> ch = new ArrayList<UnitTypeChange>(gardener.getTypeChanges());
         ch.add(change);
         gardener.setTypeChanges(ch);
 
@@ -92,7 +93,7 @@ public class UnitTypeChangeTest extends FreeColTestCase {
         change.setNewUnitType(farmer);
         change.getChangeTypes().put(creation, 100);
 
-        List<UnitTypeChange> ch = gardener.getTypeChanges();
+        List<UnitTypeChange> ch = new ArrayList<UnitTypeChange>(gardener.getTypeChanges());
         ch.add(change);
         gardener.setTypeChanges(ch);
 

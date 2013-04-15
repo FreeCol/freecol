@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -406,8 +407,8 @@ public final class UnitType extends BuildableType
      * @return The list of type changes.
      */
     public List<UnitTypeChange> getTypeChanges() {
-        return (typeChanges == null) ? new ArrayList<UnitTypeChange>()
-            : typeChanges;
+        if (typeChanges == null) return Collections.emptyList();
+        return typeChanges;
     }
 
     /**
@@ -735,11 +736,7 @@ public final class UnitType extends BuildableType
             out.writeEndElement();
         }
 
-        if (typeChanges != null) {
-            for (UnitTypeChange change : typeChanges) {
-                change.toXMLImpl(out);
-            }
-        }
+        for (UnitTypeChange change : getTypeChanges()) change.toXML(out);
 
         if (consumption != null) {
             for (GoodsType goodsType : consumption.keySet()) {

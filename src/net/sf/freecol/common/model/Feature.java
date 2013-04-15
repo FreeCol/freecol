@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -149,8 +150,8 @@ public abstract class Feature extends FreeColObject {
      * @return A list of <code>Scope</code>s.
      */
     public final List<Scope> getScopes() {
-        return (scopes == null) ? new ArrayList<Scope>()
-            : scopes;
+        if (scopes == null) return Collections.emptyList();
+        return scopes;
     }
 
     /**
@@ -393,11 +394,7 @@ public abstract class Feature extends FreeColObject {
     protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
         super.writeChildren(out);
 
-        if (scopes != null) {
-            for (Scope scope : scopes) {
-                scope.toXMLImpl(out);
-            }
-        }
+        for (Scope scope : getScopes()) scope.toXML(out);
     }
 
     /**

@@ -1516,7 +1516,7 @@ public final class Specification {
     private <T extends FreeColObject> void writeSection(XMLStreamWriter out,
         String section, Collection<T> items) throws XMLStreamException {
         out.writeStartElement(section);
-        for (T item : items) item.toXMLImpl(out);
+        for (T item : items) item.toXML(out);
         out.writeEndElement();
     }
 

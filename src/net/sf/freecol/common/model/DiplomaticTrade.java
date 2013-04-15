@@ -308,7 +308,7 @@ public class DiplomaticTrade extends FreeColObject {
 
         writeAttribute(out, RECIPIENT_TAG, recipient);
 
-        out.writeAttribute(STATUS_TAG, status.toString());
+        writeAttribute(out, STATUS_TAG, status.toString());
     }
 
     /**
@@ -374,7 +374,6 @@ public class DiplomaticTrade extends FreeColObject {
 
         } else {
             super.readChild(in);
-            return;
         }
 
         if (item != null) items.add(item);

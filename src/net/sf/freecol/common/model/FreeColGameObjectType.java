@@ -247,7 +247,6 @@ public class FreeColGameObjectType extends FreeColObject {
 
     // Serialization
 
-    // FreeColGameObjectTypes use the ID_ATTRIBUTE_TAG for their ids.
     // We do not serialize index, so no INDEX_TAG.
     private static final String ABSTRACT_TAG = "abstract";
 
@@ -256,26 +255,16 @@ public class FreeColGameObjectType extends FreeColObject {
      * {@inheritDoc}
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        // don't use this
-    }
-
-    /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *
-     * @param out The target stream.
-     * @exception XMLStreamException if there are any problems writing
-     *      to the stream.
-     */
-    protected void toXMLImpl(XMLStreamWriter out, String tag) throws XMLStreamException {
-        super.toXML(out, tag);
+        // This routine only exists so that Specification can build
+        // some FCGOT objects to act as dummy sources.  Otherwise we
+        // would just not implement this and make the class abstract.
     }
 
     /**
      * {@inheritDoc}
      */
     protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        writeAttribute(out, ID_ATTRIBUTE_TAG, getId());
+        super.writeAttributes(out);
 
         // We do not need to write the abstractType attribute, as once
         // the spec is read, all cases of abstractType==true are
@@ -289,14 +278,9 @@ public class FreeColGameObjectType extends FreeColObject {
     protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
         super.writeChildren(out);
 
-        if (featureContainer != null) {
-            for (Ability ability : getAbilities()) {
-                ability.toXMLImpl(out);
-            }
-            for (Modifier modifier : getModifiers()) {
-                modifier.toXMLImpl(out);
-            }
-        }
+        for (Ability ability : getAbilities()) ability.toXML(out);
+
+        for (Modifier modifier : getModifiers()) modifier.toXML(out);
     }
 
     /**
@@ -304,9 +288,8 @@ public class FreeColGameObjectType extends FreeColObject {
      */
     @Override
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        String newId = readId(in);
-        if (newId == null) throw new XMLStreamException("Null id");
-        setId(newId);
+        super.readAttributes(in);
+        if (getId() == null) throw new XMLStreamException("Null id");
 
         abstractType = getAttribute(in, ABSTRACT_TAG, false);
     }

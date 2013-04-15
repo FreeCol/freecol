@@ -150,7 +150,7 @@ public class Effect extends FreeColGameObjectType {
     protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
         super.writeChildren(out);
 
-        for (Scope scope : getScopes()) scope.toXMLImpl(out);
+        for (Scope scope : getScopes()) scope.toXML(out);
     }
 
     /**

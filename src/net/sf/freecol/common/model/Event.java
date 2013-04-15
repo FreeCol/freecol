@@ -146,9 +146,7 @@ public class Event extends FreeColGameObjectType {
     protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
         super.writeChildren(out);
 
-        if (limits != null) {
-            for (Limit limit : limits.values()) limit.toXMLImpl(out);
-        }
+        for (Limit limit : getLimits()) limit.toXML(out);
     }
 
     /**

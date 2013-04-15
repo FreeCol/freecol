@@ -488,7 +488,7 @@ public class StringTemplate extends FreeColObject {
 
         if (replacements != null) {
             for (StringTemplate replacement : replacements) {
-                replacement.toXMLImpl(out);
+                replacement.toXML(out);
             }
         }
     }

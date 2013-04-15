@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -133,8 +134,8 @@ public abstract class BuildableType extends FreeColGameObjectType {
      * @return A list of required goods.
      */
     public List<AbstractGoods> getRequiredGoods() {
-        return (requiredGoods != null) ? requiredGoods
-            : new ArrayList<AbstractGoods>();
+        if (requiredGoods == null) return Collections.emptyList();
+        return requiredGoods;
     }
 
     /**
@@ -175,8 +176,8 @@ public abstract class BuildableType extends FreeColGameObjectType {
      * @return A <code>List<Limit></code> of limits.
      */
     public List<Limit> getLimits() {
-        return (limits != null) ? limits
-            : new ArrayList<Limit>();
+        if (limits == null) return Collections.emptyList();
+        return limits;
     }
 
     /**
@@ -238,9 +239,7 @@ public abstract class BuildableType extends FreeColGameObjectType {
             out.writeEndElement();
         }
 
-        for (Limit limit : getLimits()) {
-            limit.toXMLImpl(out);
-        }
+        for (Limit limit : getLimits()) limit.toXML(out);
     }
 
     /**

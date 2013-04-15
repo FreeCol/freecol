@@ -131,7 +131,7 @@ public class Disaster extends FreeColGameObjectType {
         super.writeChildren(out);
 
         for (RandomChoice<Effect> choice : getEffects()) {
-            choice.getObject().toXMLImpl(out);
+            choice.getObject().toXML(out);
         }
     }
 

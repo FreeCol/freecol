@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -190,7 +191,8 @@ public class UnitTypeChange extends FreeColObject {
      * @return The list of scopes.
      */
     public List<Scope> getScopes() {
-        return (scopes == null) ? new ArrayList<Scope>() : scopes;
+        if (scopes == null) return Collections.emptyList();
+        return scopes;
     }
 
     /**
@@ -210,10 +212,9 @@ public class UnitTypeChange extends FreeColObject {
      * @return True if this change is applicable.
      */
     public boolean appliesTo(Player player) {
-        if (scopes == null || scopes.isEmpty()) return true;
-        for (Scope scope : scopes) {
-            if (scope.appliesTo(player)) return true;
-        }
+        List<Scope> scopeList = getScopes();
+        if (scopeList.isEmpty()) return true;
+        for (Scope scope : scopeList) if (scope.appliesTo(player)) return true;
         return false;
     }
 

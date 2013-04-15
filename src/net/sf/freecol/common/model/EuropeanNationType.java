@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -106,8 +107,8 @@ public class EuropeanNationType extends NationType {
      * @return A list of <code>AbstractUnit</code>s to start with.
      */
     public List<AbstractUnit> getStartingUnits() {
-        return (startingUnits == null) ? new ArrayList<AbstractUnit>()
-            : startingUnits;
+        if (startingUnits == null) return Collections.emptyList();
+        return startingUnits;
     }
 
     /**

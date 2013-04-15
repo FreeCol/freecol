@@ -278,14 +278,14 @@ public class FoundingFather extends FreeColGameObjectType {
     protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
         super.writeChildren(out);
 
-        for (Event event : getEvents()) event.toXMLImpl(out);
+        for (Event event : getEvents()) event.toXML(out);
 
-        for (Scope scope : getScopes()) scope.toXMLImpl(out);
+        for (Scope scope : getScopes()) scope.toXML(out);
 
         for (AbstractUnit unit : getUnits()) {
             out.writeStartElement(UNIT_TAG);
 
-            writeAttribute(out, ID_ATTRIBUTE_TAG, unit.getId());
+            writeAttribute(out, ID_ATTRIBUTE_TAG, unit);
 
             out.writeEndElement();
         }

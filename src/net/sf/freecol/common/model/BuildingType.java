@@ -393,7 +393,7 @@ public final class BuildingType extends BuildableType
     protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
         super.writeChildren(out);
         for (ProductionType productionType : productionTypes) {
-            productionType.toXMLImpl(out);
+            productionType.toXML(out);
         }
     }
 

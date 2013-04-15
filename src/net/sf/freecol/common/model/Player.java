@@ -3788,10 +3788,9 @@ public class Player extends FreeColGameObject implements Nameable {
                 }
             }
             if (lastSales != null) {
-                for (LastSale sale : lastSales.values()) {
-                    sale.toXMLImpl(out);
-                }
+                for (LastSale sale : lastSales.values()) sale.toXML(out);
             }
+
             Turn turn = getGame().getTurn();
             for (Modifier modifier : getModifiers()) {
                 if (modifier.isTemporary() && !modifier.isOutOfDate(turn)) {

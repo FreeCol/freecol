@@ -927,15 +927,15 @@ public final class Monarch extends FreeColGameObject implements Named {
             out.writeStartElement(tag);
 
             out.writeStartElement("navalUnits");
-            for (AbstractUnit unit : navalUnits) {
-                unit.toXMLImpl(out);
-            }
+
+            for (AbstractUnit unit : navalUnits) unit.toXML(out);
+
             out.writeEndElement();
 
             out.writeStartElement("landUnits");
-            for (AbstractUnit unit : landUnits) {
-                unit.toXMLImpl(out);
-            }
+
+            for (AbstractUnit unit : landUnits) unit.toXML(out);
+
             out.writeEndElement();
 
             out.writeEndElement();

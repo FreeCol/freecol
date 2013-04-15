@@ -290,7 +290,7 @@ public class SettlementType extends FreeColGameObjectType {
      */
     @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXMLImpl(out, getXMLElementTagName());
+        super.toXML(out, getXMLElementTagName());
     }
 
     /**

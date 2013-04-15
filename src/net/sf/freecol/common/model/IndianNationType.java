@@ -147,8 +147,8 @@ public class IndianNationType extends NationType {
      * @return A list of national skills.
      */
     public List<RandomChoice<UnitType>> getSkills() {
-        return (skills == null) ? new ArrayList<RandomChoice<UnitType>>()
-            : skills;
+        if (skills == null) return Collections.emptyList();
+        return skills;
     }
 
     /**

@@ -465,7 +465,7 @@ public final class TileImprovementType extends FreeColGameObjectType {
     protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
         super.writeChildren(out);
 
-        for (Scope scope : getScopes()) scope.toXMLImpl(out);
+        for (Scope scope : getScopes()) scope.toXML(out);
 
         if (allowedWorkers != null) {
             for (String id : allowedWorkers) {
