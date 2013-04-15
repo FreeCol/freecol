@@ -197,11 +197,14 @@ public class Effect extends FreeColGameObjectType {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String toString() {
-        String result = "[" + getId() + "probability=" + probability + "%";
-        for (Scope scope : getScopes()) result += " " + scope;
-        result += "]";
-        return result;
+        StringBuilder sb = new StringBuilder(32);
+        sb.append("[").append(getId())
+            .append(" probability=").append(probability).append("%");
+        for (Scope scope : getScopes()) sb.append(" ").append(scope);
+        sb.append("]");
+        return sb.toString();
     }
 
     /**

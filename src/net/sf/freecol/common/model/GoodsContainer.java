@@ -559,16 +559,17 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     }
 
     /**
-     * Creates a <code>String</code> representation of this
-     * <code>GoodsContainer</code>.
+     * {@inheritDoc}
      */
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer(200);
-        sb.append("GoodsContainer with: ");
+        sb.append("[").append(getId()).append(" ");
         for (Map.Entry<GoodsType, Integer> entry : storedGoods.entrySet()) {
             sb.append(entry.getKey() + "=" + entry.getValue() + ", ");
         }
         sb.setLength(sb.length() - 2);
+        sb.append("]");
         return sb.toString();
     }
 

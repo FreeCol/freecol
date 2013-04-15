@@ -242,9 +242,15 @@ public class GoodsWish extends Wish {
      */
     @Override
     public String toString() {
-        return "[" + getId() + " for " + destination
-            + " on " + transportable + " " + amountRequested
-            + " " + goodsType + " (" + getValue() + ")]";
+        StringBuilder sb = new StringBuilder(32);
+        sb.append("[").append(getId())
+            .append(" for ").append(destination)
+            .append(" on ").append(transportable)
+            .append(" ").append(amountRequested)
+            .append(" ").append(goodsType)
+            .append(" (").append(getValue())
+            .append(")]");
+        return sb.toString();
     }
 
     /**

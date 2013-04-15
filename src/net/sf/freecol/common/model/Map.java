@@ -1269,17 +1269,20 @@ public class Map extends FreeColGameObject implements Location {
         }
 
         /**
-         * Debug helper.
+         * {@inheritDoc}
          */
+        @Override
         public String toString() {
-            return "[candidate unit=" + unit.toString()
-                + " dst=" + ((FreeColGameObject)dst).toString()
-                + " movesLeft=" + movesLeft
-                + " turns=" + turns
-                + " onCarrier=" + onCarrier
-                + " decider=" + decider
-                + " cost=" + cost
-                + "]";
+            StringBuilder sb = new StringBuilder(128);
+            sb.append("[candidate unit=").append(unit)
+                .append(" dst=").append((FreeColGameObject)dst)
+                .append(" movesLeft=").append(movesLeft)
+                .append(" turns=").append(turns)
+                .append(" onCarrier=").append(onCarrier)
+                .append(" decider=").append(decider)
+                .append(" cost=").append(cost)
+                .append("]");
+            return sb.toString();
         }
     };
 

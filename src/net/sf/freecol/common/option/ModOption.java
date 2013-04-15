@@ -172,15 +172,17 @@ public class ModOption extends AbstractOption<FreeColModFile> {
      */
     @Override
     public String toString() {
-        String result = "";
+        StringBuilder sb = new StringBuilder(32);
+        sb.append("[").append(getId())
+            .append(" value=").append(value)
+            .append(" choices=[");
         if (choices != null) {
             for (FreeColModFile choice : choices) {
-                result += ", " + choice.getId();
+                sb.append(" ").append(choice.getId());
             }
-            if (result.length() > 0) result = result.substring(2);
         }
-        return "[" + getXMLElementTagName() + " value=" + value
-            + " choices=[" + result + "]]";
+        sb.append(" ]]");
+        return sb.toString();
     }
 
     /**

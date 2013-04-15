@@ -393,12 +393,17 @@ public class TransportMission extends Mission {
         /**
          * {@inheritDoc}
          */
+        @Override
         public String toString() {
-            return "[" + transportable.toString() + " mode=" + mode
-                + ((mode.isCollection()) ? " from " : " to ") + target
-                + " " + turns + "/" + tries
-                + " space=" + spaceLeft + ((wrapped==null) ? "" : " wrap")
-                + "]";
+            StringBuilder sb = new StringBuilder(64);
+            sb.append("[").append(transportable.toString())
+                .append(" mode=").append(mode)
+                .append((mode.isCollection()) ? " from " : " to ").append(target)
+                .append(" ").append(turns).append("/").append(tries)
+                .append(" space=").append(spaceLeft)
+                .append((wrapped == null) ? "" : " wrap")
+                .append("]");
+            return sb.toString();
         }            
     };
 
@@ -1876,8 +1881,7 @@ public class TransportMission extends Mission {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(super.toString());
-        sb.append(" -> ");
-        sb.append(target);
+        sb.append(" -> ").append(target);
         return sb.toString();
     }
 

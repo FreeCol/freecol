@@ -504,21 +504,22 @@ public class MarketData extends FreeColGameObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("[");
-        sb.append(getId());
-        sb.append(" ").append(goodsType.getId());
-        sb.append(" costToBuy=").append(costToBuy);
-        sb.append(" paidForSale=").append(paidForSale);
-        sb.append(" amountInMarket=").append(amountInMarket);
-        sb.append(" initialPrice=").append(initialPrice);
-        sb.append(" arrears=").append(arrears);
-        sb.append(" sales=").append(sales);
-        sb.append(" incomeBeforeTaxes=").append(incomeBeforeTaxes);
-        sb.append(" incomeAfterTaxes=").append(incomeAfterTaxes);
-        sb.append(" oldPrice=").append(oldPrice);
-        sb.append(" traded=").append(traded);
-        sb.append("]");
+        StringBuilder sb = new StringBuilder(128);
+        sb.append("[").append(getId())
+            .append(" ").append(goodsType.getId())
+            .append(" costToBuy=").append(costToBuy)
+            .append(" paidForSale=").append(paidForSale)
+            .append(" amountInMarket=").append(amountInMarket)
+            .append(" initialPrice=").append(initialPrice)
+            .append(" arrears=").append(arrears)
+            .append(" sales=").append(sales)
+            .append(" incomeBeforeTaxes=").append(incomeBeforeTaxes)
+            .append(" incomeAfterTaxes=").append(incomeAfterTaxes)
+            .append(" oldPrice=").append(oldPrice)
+            .append(" traded=").append(traded)
+            .append("]");
         return sb.toString();
     }
 

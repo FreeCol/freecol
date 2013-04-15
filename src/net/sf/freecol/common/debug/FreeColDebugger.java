@@ -299,10 +299,9 @@ public class FreeColDebugger {
      * @return A stack trace as a string.
      */
     public static String stackTraceToString() {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(512);
         for (StackTraceElement s : Thread.currentThread().getStackTrace()) {
-            sb.append(s.toString());
-            sb.append("\n");
+            sb.append(s.toString()).append("\n");
         }
         sb.deleteCharAt(sb.length()-1);
         return sb.toString();

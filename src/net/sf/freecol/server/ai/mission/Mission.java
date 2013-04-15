@@ -914,8 +914,12 @@ public abstract class Mission extends AIObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String toString() {
-        return Utils.lastPart(getClass().getName(), ".")
-            + "@" + Integer.toString(hashCode()) + "-" + aiUnit;
+        StringBuilder sb = new StringBuilder(24);
+        sb.append(Utils.lastPart(getClass().getName(), "."))
+            .append("@").append(hashCode())
+            .append("-").append(aiUnit);
+        return sb.toString();
     }
 }

@@ -178,7 +178,7 @@ public class AbstractGoods extends FreeColObject implements Named {
      */
     @Override
     public String toString() {
-        return toString(this);
+        return AbstractGoods.toString(this);
     }
 
     /**

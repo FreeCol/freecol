@@ -252,15 +252,16 @@ public class NationOptions extends FreeColObject {
      */
     @Override
     public String toString() {
-        StringBuilder result = new StringBuilder(NATIONAL_ADVANTAGES_TAG);
-        result.append(": ").append(nationalAdvantages.toString()).append("\n");
-        result.append(NATIONS_TAG).append(":\n");
+        StringBuilder sb = new StringBuilder(128);
+        sb.append(NATIONAL_ADVANTAGES_TAG).append(": ")
+            .append(nationalAdvantages.toString()).append("\n")
+            .append(NATIONS_TAG).append(":\n");
         for (Map.Entry<Nation, NationState> entry : nations.entrySet()) {
-            result.append("   ").append(entry.getKey().getId())
+            sb.append("   ").append(entry.getKey().getId())
                 .append(" ").append(entry.getValue().toString())
                 .append("\n");
         }
-        return result.toString();
+        return sb.toString();
     }
 
     /**

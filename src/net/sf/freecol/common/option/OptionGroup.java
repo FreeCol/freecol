@@ -479,13 +479,13 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      */
     @Override
     public String toString() {
-        StringBuilder g = new StringBuilder();
-        g.append("[").append(getId()).append("<");
+        StringBuilder sb = new StringBuilder();
+        sb.append("[").append(getId()).append(" <");
         for (Option o : getOptions()) {
-            g.append(" ").append(o.toString());
+            sb.append(" ").append(o.toString());
         }
-        g.append(" >]\n");
-        return g.toString();
+        sb.append(" >]\n");
+        return sb.toString();
     }
 
     /**

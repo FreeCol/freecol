@@ -1137,10 +1137,12 @@ public class SimpleMapGenerator implements MapGenerator {
             }
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public String toString() {
             return player + " territory at " + region.toString();
         }
     }
-
-
 }

@@ -227,8 +227,10 @@ public class AbstractUnit extends FreeColObject {
      */
     @Override
     public String toString() {
-        return Integer.toString(number) + " " + getId()
-            + " (" + role.toString() + ")";
+        StringBuilder sb = new StringBuilder(16);
+        sb.append(number).append(" ").append(getId())
+            .append(" (").append(role).append(")");
+        return sb.toString();
     }
 
     /**

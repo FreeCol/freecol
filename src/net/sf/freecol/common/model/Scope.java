@@ -405,13 +405,20 @@ public class Scope extends FreeColObject implements Cloneable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String toString() {
-        return "[Scope " + type
-            + ((abilityID == null) ? "" : " " + abilityID + "=" + abilityValue)
-            + ((methodName == null) ? "" : " " + methodName + "=" + methodValue)
-            + ((matchesNull) ? " matchesNull" : "")
-            + ((matchNegated) ? " matchNegated" : "")
-            + "]";
+        StringBuilder sb = new StringBuilder(64);
+        sb.append("[Scope ").append(type);
+        if (abilityID != null) {
+            sb.append(" ").append(abilityID).append("=").append(abilityValue);
+        }
+        if (methodName != null) {
+            sb.append(" ").append(methodName).append("=").append(methodValue);
+        }
+        if (matchesNull) sb.append(" matchesNull");
+        if (matchNegated) sb.append(" matchNegated");
+        sb.append("]");
+        return sb.toString();
     }
 
     /**

@@ -243,13 +243,17 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
-        String result = "BuildQueue:";
+        StringBuilder sb = new StringBuilder(64);
+        sb.append("[BuildQueue (").append(colony.getName()).append(")");
         for (BuildableType item : buildQueue) {
-            result += " " + item.getId();
+            sb.append(" ").append(item.getId());
         }
-        result += " [" + colony.getName() + "]";
-        return result;
+        sb.append("]");
+        return sb.toString();
     }
 }

@@ -494,13 +494,12 @@ public class Modifier extends Feature implements Comparable<Modifier> {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("[Modifier ");
-        sb.append(getId());
+        StringBuilder sb = new StringBuilder(64);
+        sb.append("[Modifier ").append(getId());
         if (getSource() != null) sb.append(" (" + getSource().getId() + ")");
-        sb.append(" ").append(type).append(" ").append(value);
-        for (Scope s : getScopes()) {
-            sb.append(" ").append(s.toString());
-        }
+        sb.append(" ").append(type)
+            .append(" ").append(value);
+        for (Scope s : getScopes()) sb.append(" ").append(s.toString());
         sb.append("]");
         return sb.toString();
     }

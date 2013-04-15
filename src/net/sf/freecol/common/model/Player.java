@@ -2259,15 +2259,6 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Returns the name of this player.
-     *
-     * @return The name of this player.
-     */
-    public String toString() {
-        return getName() + " (" + nationID + ")";
-    }
-
-    /**
      * Set the <code>Name</code> value.
      *
      * @param newName The new Name value.
@@ -3988,6 +3979,14 @@ public class Player extends FreeColGameObject implements Nameable {
     public void readFromXMLPartialImpl(XMLStreamReader in)
         throws XMLStreamException {
         readFromXMLPartialByClass(in, getClass());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return getName() + " (" + nationID + ")";
     }
 
     /**

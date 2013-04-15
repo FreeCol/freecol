@@ -360,8 +360,10 @@ public final class Limit extends FreeColGameObjectType {
      */
     @Override
     public String toString() {
-        return leftHandSide.toString() + " " + operator.toString() + " "
-            + rightHandSide.toString();
+        StringBuilder sb = new StringBuilder(leftHandSide.toString());
+        sb.append(" ").append(operator.toString())
+            .append(" ").append(rightHandSide.toString());
+        return sb.toString();
     }
 
     /**

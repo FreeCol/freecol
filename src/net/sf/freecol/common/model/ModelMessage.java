@@ -459,12 +459,13 @@ public class ModelMessage extends StringTemplate {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("ModelMessage<");
-        sb.append(hashCode()).append(", ");
-        sb.append((sourceId == null) ? "null" : sourceId).append(", ");
-        sb.append((displayId == null) ? "null" : displayId).append(", ");
-        sb.append(super.toString()).append(", ");
-        sb.append(messageType).append(" >");
+        StringBuilder sb = new StringBuilder(128);
+        sb.append("ModelMessage<").append(hashCode())
+            .append(", ").append((sourceId == null) ? "null" : sourceId)
+            .append(", ").append((displayId == null) ? "null" : displayId)
+            .append(", ").append(super.toString())
+            .append(", ").append(messageType)
+            .append(" >");
         return sb.toString();
     }
 

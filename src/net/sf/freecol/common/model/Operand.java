@@ -380,11 +380,8 @@ public class Operand extends Scope {
      */
     @Override
     public String toString() {
-        if (value == null) {
-            return scopeLevel + "'s number of " + operandType + "s";
-        } else {
-            return Integer.toString(value);
-        }
+        return (value != null) ? Integer.toString(value)
+            : scopeLevel + "'s number of " + operandType + "s";
     }
 
     // getXMLElementTagName apparently not needed, uses parents.

@@ -66,9 +66,7 @@ class ColopediaTreeItem {
     }
 
     /**
-     * Returns the item's name.
-     *
-     * @return The item's name
+     * {@inheritDoc}
      */
     @Override
     public String toString() {

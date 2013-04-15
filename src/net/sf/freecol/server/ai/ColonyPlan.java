@@ -140,6 +140,10 @@ public class ColonyPlan {
             return weight * support / difficulty;
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public String toString() {
             String t = type.toString();
             return String.format("%s (%1.3f * %1.3f / %1.3f = %1.3f)",
@@ -1640,9 +1644,10 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String toString() {
         final Tile tile = colony.getTile();
-        final StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder(256);
         sb.append("ColonyPlan: " + colony.getName()
             + " " + colony.getTile().getPosition()
             + "\nProfile: " + profileType.toString()

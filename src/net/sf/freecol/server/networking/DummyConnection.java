@@ -138,10 +138,9 @@ public final class DummyConnection extends Connection {
     }
 
     /**
-     * Return a human-readable string with the dummy connection name.
-     *
-     * @return string for debugging.
+     * {@inheritDoc}
      */
+    @Override
     public String toString() {
         return "[DummyConnection " + getName() + "]";
     }

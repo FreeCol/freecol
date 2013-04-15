@@ -227,9 +227,13 @@ public class WorkerWish extends Wish {
      */
     @Override
     public String toString() {
-        return "[" + getId()
-            + " " + ((unitType == null) ? "null" : unitType.getNameKey())
-            + " (" + getValue() + (expertNeeded ? ", expert" : "") + ")]";
+        StringBuilder sb = new StringBuilder(32);
+        sb.append("[").append(getId())
+            .append(" ").append((unitType == null) ? "null" : unitType.getNameKey())
+            .append(" (").append(getValue())
+            .append((expertNeeded) ? ", expert" : "")
+            .append(")]");
+        return sb.toString();
     }
 
     /**

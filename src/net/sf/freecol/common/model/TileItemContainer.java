@@ -614,8 +614,7 @@ public class TileItemContainer extends FreeColGameObject {
     }
 
     /**
-     * Creates a <code>String</code> representation of this
-     * <code>TileItemContainer</code>.
+     * {@inheritDoc}
      */
     @Override
     public String toString() {

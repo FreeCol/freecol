@@ -182,16 +182,6 @@ public class ProductionInfo {
         maximumConsumption.add(goods);
     }
 
-    public String toString() {
-        StringBuilder result = new StringBuilder();
-        append(result, "Production", production);
-        append(result, "Consumption", consumption);
-        append(result, "Maximum Production", maximumProduction);
-        append(result, "Maximum Consumption", maximumConsumption);
-        return result.toString();
-    }
-
-
     private void append(StringBuilder result, String key, List<AbstractGoods> list) {
         if (!list.isEmpty()) {
             result.append(key + ": ");
@@ -207,4 +197,16 @@ public class ProductionInfo {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+        append(result, "Production", production);
+        append(result, "Consumption", consumption);
+        append(result, "Maximum Production", maximumProduction);
+        append(result, "Maximum Consumption", maximumConsumption);
+        return result.toString();
+    }
 }

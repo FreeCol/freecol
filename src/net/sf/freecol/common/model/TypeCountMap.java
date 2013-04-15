@@ -86,14 +86,18 @@ public class TypeCountMap<T extends FreeColGameObjectType> {
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
-        String result = "[" + getClass().getName();
+        StringBuilder sb = new StringBuilder(64);
+        sb.append("[").append(getClass().getName());
         for (Map.Entry<T, Integer> entry : values.entrySet()) {
-            result += " [" + entry.getKey().getIndex()
-                + "," + entry.getValue() + "]";
+            sb.append(" [").append(entry.getKey().getIndex())
+                .append(",").append(entry.getValue()).append("]");
         }
-        result += "]";
-        return result;
+        sb.append("]");
+        return sb.toString();
     }
 }

@@ -566,10 +566,11 @@ public final class Market extends FreeColGameObject implements Ownable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("[");
-        sb.append(getId());
-        sb.append(" owner=").append(owner.getId());
+        StringBuilder sb = new StringBuilder(64);
+        sb.append("[").append(getId())
+            .append(" owner=").append(owner.getId());
         for (MarketData md : marketData.values()) {
             sb.append(" ").append(md.toString());
         }

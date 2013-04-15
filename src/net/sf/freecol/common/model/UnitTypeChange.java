@@ -314,16 +314,12 @@ public class UnitTypeChange extends FreeColObject {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("[");
-        sb.append(newUnitType.toString());
-        sb.append(" ");
-        sb.append(Integer.toString(turnsToLearn));
+        StringBuilder sb = new StringBuilder(32);
+        sb.append("[").append(newUnitType.toString())
+            .append(" ").append(Integer.toString(turnsToLearn));
         for (Map.Entry<ChangeType, Integer> entry : changeTypes.entrySet()) {
-            sb.append(" ");
-            sb.append(tags.get(entry.getKey()));
-            sb.append("/");
-            sb.append(entry.getValue().toString());
+            sb.append(" ").append(tags.get(entry.getKey()))
+                .append("/").append(entry.getValue().toString());
         }
         sb.append("]");
         return sb.toString();

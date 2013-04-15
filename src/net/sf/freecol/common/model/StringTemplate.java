@@ -566,9 +566,10 @@ public class StringTemplate extends FreeColObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(templateType.toString());
-        sb.append(": ");
+        StringBuilder sb = new StringBuilder(64);
+        sb.append(templateType.toString()).append(": ");
         switch (templateType) {
         case LABEL:
             if (replacements == null) {

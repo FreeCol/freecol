@@ -114,8 +114,7 @@ public class ChoiceItem<T> {
     }
 
     /**
-     * Gets a textual presentation of this object.
-     * @return The <code>text</code> set in the constructor.
+     * {@inheritDoc}
      */
     @Override
     public String toString() {

@@ -139,8 +139,12 @@ public final class LastSale extends FreeColObject {
      */
     @Override
     public String toString() {
-        return getXMLElementTagName() + "-" + getId()
-            + "-" + when.toString() + "-" + Integer.toString(price);
+        StringBuilder sb = new StringBuilder(32);
+        sb.append("[").append(getId())
+            .append(" when=").append(when)
+            .append(" price=").append(price)
+            .append("]");
+        return sb.toString();
     }
 
     /**

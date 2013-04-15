@@ -557,12 +557,15 @@ public class AIGoods extends AIObject implements Transportable {
      */
     @Override
     public String toString() {
-        return "[" + getId()
-            + " " + goods
-            + ((goods == null) ? "" : " at " + goods.getLocation())
-            + " -> " + destination
-            + ((transport == null) ? "" : " using " + transport)
-            + " /" + transportPriority + "]";
+        StringBuilder sb = new StringBuilder(64);
+        sb.append("[").append(getId())
+            .append(" ").append(goods);
+        if (goods != null) sb.append(" at ").append(goods.getLocation());
+        sb.append(" -> ").append(destination);
+        if (transport != null) sb.append(" using ").append(transport);
+        sb.append(" /").append(transportPriority)
+            .append("]");
+        return sb.toString();
     }
 
     /**

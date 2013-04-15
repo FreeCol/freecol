@@ -247,6 +247,7 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String toString() {
         return getId() + " <" + value.toString() + ">";
     }

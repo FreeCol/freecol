@@ -136,14 +136,6 @@ public class TradeRouteStop {
         this.location = newLocation;
     }
 
-    public String toString() {
-        if (location == null) {
-            return null;
-        } else {
-            return location.getLocationName().getId();
-        }
-    }
-
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
         out.writeAttribute("location", this.location.getId());
@@ -213,6 +205,14 @@ public class TradeRouteStop {
 
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return (location == null) ? "" : location.getLocationName().getId();
+    }
+
+    /**
      * Returns the tag name of the root element representing this object.
      * 
      * @return "tradeRoute".
@@ -221,6 +221,3 @@ public class TradeRouteStop {
         return "tradeRouteStop";
     }
 }
-
-
-

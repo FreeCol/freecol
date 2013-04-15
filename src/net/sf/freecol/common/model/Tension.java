@@ -151,13 +151,10 @@ public class Tension {
     }
 
     /**
-     * Returns the current tension level as a string.
-     *
-     * @return A <code>String</code>-representation of the
-     *      current tension level.
+     * {@inheritDoc}
      */
+    @Override
     public String toString() {
         return getLevel().toString();
     }    
-
 }

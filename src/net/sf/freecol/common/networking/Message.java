@@ -231,10 +231,7 @@ public class Message {
     }
 
     /**
-     * Returns the <code>String</code> representation of the message.
-     * This is what actually gets transmitted to the other peer.
-     * 
-     * @return The <code>String</code> representation of the message.
+     * {@inheritDoc}
      */
     @Override
     public String toString() {

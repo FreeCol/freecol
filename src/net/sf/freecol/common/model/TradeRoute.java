@@ -464,6 +464,9 @@ public class TradeRoute extends FreeColGameObject
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return getName();

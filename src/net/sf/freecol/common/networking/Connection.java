@@ -449,9 +449,7 @@ public class Connection {
     }
 
     /**
-     * Override the default and return socket details.
-     *
-     * @return human-readable description of connection.
+     * {@inheritDoc}
      */
     @Override
     public String toString() {

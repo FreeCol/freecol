@@ -213,10 +213,7 @@ public abstract class FreeColAction extends AbstractAction implements Option<Fre
     }
 
     /**
-     * Returns a textual representation of this object.
-     *
-     * @return The name of this <code>Option</code>.
-     * @see #getName
+     * {@inheritDoc}
      */
     @Override
     public String toString() {

@@ -211,11 +211,13 @@ public class Disaster extends FreeColGameObjectType {
      */
     @Override
     public String toString() {
-        String result = getId();
+        StringBuilder sb = new StringBuilder(64);
+        sb.append("[").append(getId());
         for (RandomChoice<Effect> choice : getEffects()) {
-            result += " " + choice.getObject();
+            sb.append(" ").append(choice.getObject());
         }
-        return result;
+        sb.append("]");
+        return sb.toString();
     }
 
     /**

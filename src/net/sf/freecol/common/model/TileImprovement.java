@@ -623,15 +623,18 @@ public class TileImprovement extends TileItem implements Named {
     }
 
     /**
-     * Gets a textual representation of this object.
-     *
-     * @return The id and turns to complete if any.
+     * {@inheritDoc}
      */
+    @Override
     public String toString() {
-        return "[" + getType().getId() + ((turnsToComplete <= 0) ? ""
-            : " (" + Integer.toString(turnsToComplete) + " turns left)")
-            + ((style == null) ? "" : " " + style.getString())
-            + "]";
+        StringBuilder sb = new StringBuilder(64);
+        sb.append("[").append(getType().getId());
+        if (turnsToComplete > 0) {
+            sb.append(" (").append(turnsToComplete).append(" turns left)");
+        }
+        if (style != null) sb.append(" ").append(style.getString());
+        sb.append("]");
+        return sb.toString();
     }
 
     /**

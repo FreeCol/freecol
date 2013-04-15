@@ -269,6 +269,10 @@ public class UnitWas implements Comparable<UnitWas> {
         return work;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String toString() {
         Tile tile = colony.getTile();
         String eqStr = "/";

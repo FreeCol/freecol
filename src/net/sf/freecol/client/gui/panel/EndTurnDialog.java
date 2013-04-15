@@ -83,6 +83,10 @@ public final class EndTurnDialog extends FreeColDialog<Boolean> implements ListS
             return unit;
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public String toString() {
             return name;
         }

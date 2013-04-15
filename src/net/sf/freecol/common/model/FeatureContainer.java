@@ -509,23 +509,23 @@ public final class FeatureContainer {
      */
     @Override
     public String toString() {
-        StringBuilder result = new StringBuilder();
-        result.append("[FeatureContainer");
+        StringBuilder sb = new StringBuilder(256);
+        sb.append("[FeatureContainer");
         if (abilities != null) {
-            result.append("[abilities");
+            sb.append(" [abilities");
             for (Ability ability : getAbilities(this)) {
-                result.append(" ").append(ability.toString());
+                sb.append(" ").append(ability.toString());
             }
-            result.append("]");
+            sb.append("]");
         }
         if (modifiers != null) {
-            result.append("[modifiers");
+            sb.append(" [modifiers");
             for (Modifier modifier : getModifiers(this)) {
-                result.append(" ").append(modifier.toString());
+                sb.append(" ").append(modifier.toString());
             }
-            result.append("]");
+            sb.append("]");
         }
-        result.append("]");
-        return result.toString();
+        sb.append("]");
+        return sb.toString();
     }
 }

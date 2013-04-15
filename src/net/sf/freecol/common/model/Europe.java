@@ -460,6 +460,7 @@ public class Europe extends UnitLocation implements Ownable, Named {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String toString() {
         return "Europe";
     }

@@ -323,9 +323,13 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
      */
     @Override
     public String toString() {
-        return "[" + getXMLElementTagName() + " value=" + value
-            + ", addNone=" + addNone + ", generateChoices=" + generateChoices
-            + "]";
+        StringBuilder sb = new StringBuilder(64);
+        sb.append("[").append(getId())
+            .append(" value=").append(value)
+            .append(" addNone=").append(addNone)
+            .append(" generateChoices=").append(generateChoices)
+            .append("]");
+        return sb.toString();
     }
 
     /**

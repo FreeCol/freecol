@@ -373,8 +373,13 @@ public class TileImprovementPlan extends ValuedAIObject {
      */
     @Override
     public String toString() {
-        return "[" + getId() + " " + type.getNameKey()
-            + " at " + target + "/" + getValue() + "]";
+        StringBuilder sb = new StringBuilder(32);
+        sb.append("[").append(getId())
+            .append(" ").append(type.getNameKey())
+            .append(" at ").append(target)
+            .append("/").append(getValue())
+            .append("]");
+        return sb.toString();
     }
 
     /**

@@ -180,9 +180,12 @@ public class HistoryEvent extends StringTemplate {
      */
     @Override
     public String toString() {
-        return "[" + getXMLElementTagName()
-            + " " + eventType.toString() + " (" + turn.getYear() + ")"
-            + super.toString() + "]";
+        StringBuilder sb = new StringBuilder(32);
+        sb.append("[").append(getId())
+            .append(" ").append(eventType.toString())
+            .append(" (").append(turn.getYear()).append(")")
+            .append(super.toString()).append("]");
+        return sb.toString();
     }
 
     /**

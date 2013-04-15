@@ -284,11 +284,9 @@ public class Turn {
     }
 
     /**
-     * Gets a string representation of this turn.
-     *
-     * @return A string with the format: "<i>[season] year</i>".
-     *         Examples: "Spring 1602", "1503"...
+     * {@inheritDoc}
      */
+    @Override
     public String toString() {
         return toString(turn);
     }
@@ -297,7 +295,7 @@ public class Turn {
      * Gets a non-localized string representation of the given turn.
      *
      * @return A string with the format: "<i>season year</i>".
-     *         Examples: "SPRING 1602", "YEAR 1503"...
+     *     Examples: "SPRING 1602", "YEAR 1503"...
      */
     public static String toString(int turn) {
         return getSeason(turn).toString()

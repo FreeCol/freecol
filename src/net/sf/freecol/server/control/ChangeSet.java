@@ -190,15 +190,23 @@ public class ChangeSet {
         }
 
         /**
-         * Debug helper.
+         * {@inheritDoc}
          */
+        @Override
         public String toString() {
-            String ret = (type == ALL) ? "ALL" : (type == PERHAPS) ? "PERHAPS"
-                : (type == ONLY) ? "ONLY" : "BADTYPE";
-            if (seeAlways != null) ret += ",always(" + seeAlways.getId() + ")";
-            if (seePerhaps != null) ret += ",perhaps(" + seePerhaps.getId() + ")";
-            if (seeNever != null) ret += ",never(" + seeNever.getId() + ")";
-            return ret;
+            StringBuilder sb = new StringBuilder(64);
+            sb.append((type == ALL) ? "ALL" : (type == PERHAPS) ? "PERHAPS"
+                : (type == ONLY) ? "ONLY" : "BADTYPE");
+            if (seeAlways != null) {
+                sb.append(",always(").append(seeAlways.getId()).append(")");
+            }
+            if (seePerhaps != null) {
+                sb.append(",perhaps(").append(seePerhaps.getId()).append(")");
+            }
+            if (seeNever != null) {
+                sb.append(",never(").append(seeNever.getId()).append(")");
+            }
+            return sb.toString();
         }
     }
 
@@ -289,7 +297,7 @@ public class ChangeSet {
         }
 
         /**
-         * Debug helper.
+         * {@inheritDoc}
          */
         public abstract String toString();
     }
@@ -386,15 +394,21 @@ public class ChangeSet {
         }
 
         /**
-         * Debug helper.
+         * {@inheritDoc}
          */
+        @Override
         public String toString() {
-            return "[" + getClass().getName() + " " + see.toString()
-                + " #" + getPriority()
-                + " " + attacker.getId() + "@" + attackerTile.getId()
-                + " " + success
-                + " " + defender.getId() + "@" + defenderTile.getId()
-                + "]";
+            StringBuilder sb = new StringBuilder(64);
+            sb.append("[").append(getClass().getName())
+                .append(" ").append(see.toString())
+                .append(" #").append(getPriority())
+                .append(" ").append(attacker.getId())
+                .append("@").append(attackerTile.getId())
+                .append(" ").append(success)
+                .append(" ").append(defender.getId())
+                .append("@").append(defenderTile.getId())
+                .append("]");
+            return sb.toString();
         }
     }
 
@@ -460,12 +474,18 @@ public class ChangeSet {
         }
 
         /**
-         * Debug helper.
+         * {@inheritDoc}
          */
+        @Override
         public String toString() {
-            return "[" + getClass().getName() + " " + see.toString()
-                + " #" + getPriority()
-                + " " + key + "=" + value + "]";
+            StringBuilder sb = new StringBuilder(32);
+            sb.append("[").append(getClass().getName())
+                .append(" ").append(see.toString())
+                .append(" #").append(getPriority())
+                .append(" ").append(key)
+                .append("=").append(value)
+                .append("]");
+            return sb.toString();
         }
     }
 
@@ -512,12 +532,17 @@ public class ChangeSet {
         }
 
         /**
-         * Debug helper.
+         * {@inheritDoc}
          */
+        @Override
         public String toString() {
-            return "[" + getClass().getName() + " " + see.toString()
-                + " #" + getPriority()
-                + " " + message + "]";
+            StringBuilder sb = new StringBuilder(32);
+            sb.append("[").append(getClass().getName())
+                .append(" ").append(see.toString())
+                .append(" #").append(getPriority())
+                .append(" ").append(message)
+                .append("]");
+            return sb.toString();
         }
     }
 
@@ -625,14 +650,19 @@ public class ChangeSet {
         }
 
         /**
-         * Debug helper.
+         * {@inheritDoc}
          */
+        @Override
         public String toString() {
-            return "[" + getClass().getName() + " " + see.toString()
-                + " #" + getPriority()
-                + " " + unit.getId()
-                + " " + ((FreeColGameObject)oldLocation).getId()
-                + " " + newTile.getId() + "]";
+            StringBuilder sb = new StringBuilder(32);
+            sb.append("[").append(getClass().getName())
+                .append(" ").append(see.toString())
+                .append(" #").append(getPriority())
+                .append(" ").append(unit.getId())
+                .append(" ").append(((FreeColGameObject)oldLocation).getId())
+                .append(" ").append(newTile.getId())
+                .append("]");
+            return sb.toString();
         }
     }
 
@@ -710,12 +740,17 @@ public class ChangeSet {
         }
 
         /**
-         * Debug helper.
+         * {@inheritDoc}
          */
+        @Override
         public String toString() {
-            return "[" + getClass().getName() + " " + see.toString()
-                + " #" + getPriority()
-                + " " + fcgo.getId() + "]";
+            StringBuilder sb = new StringBuilder(32);
+            sb.append("[").append(getClass().getName())
+                .append(" ").append(see.toString())
+                .append(" #").append(getPriority())
+                .append(" ").append(fcgo.getId())
+                .append("]");
+            return sb.toString();
         }
     }
 
@@ -774,14 +809,18 @@ public class ChangeSet {
         }
 
         /**
-         * Debug helper.
+         * {@inheritDoc}
          */
+        @Override
         public String toString() {
-            String ret = "[" + getClass().getName() + " " + see.toString()
-                + " #" + getPriority()
-                + " " + fcgo.getId();
-            for (String f : fields) ret += " " + f;
-            return ret + "]";
+            StringBuilder sb = new StringBuilder(32);
+            sb.append("[").append(getClass().getName())
+                .append(" ").append(see.toString())
+                .append(" #").append(getPriority())
+                .append(" ").append(fcgo.getId());
+            for (String f : fields) sb.append(" ").append(f);
+            sb.append("]");
+            return sb.toString();
         }
     }
 
@@ -856,14 +895,20 @@ public class ChangeSet {
         }
 
         /**
-         * Debug helper.
+         * {@inheritDoc}
          */
+        @Override
         public String toString() {
-            String ret = "[" + getClass().getName() + " " + see.toString()
-                + " #" + getPriority()
-                + " " + ((tile == null) ? "<null>" : tile.getId());
-            for (FreeColGameObject f : contents) ret += " " + f.getId();
-            return ret + " " + fcgo.getId() + "]";
+            StringBuilder sb = new StringBuilder(32);
+            sb.append("[").append(getClass().getName())
+                .append(" ").append(see.toString())
+                .append(" #").append(getPriority())
+                .append(" ").append(((tile == null) ? "<null>" : tile.getId()));
+            for (FreeColGameObject f : contents) {
+                sb.append(" ").append(f.getId());
+            }
+            sb.append(" ").append(fcgo.getId()).append("]");
+            return sb.toString();
         }
     }
 
@@ -910,13 +955,17 @@ public class ChangeSet {
         }
 
         /**
-         * Debug helper.
+         * {@inheritDoc}
          */
+        @Override
         public String toString() {
-            return "[" + getClass().getName()
-                + " " + see.toString()
-                + " #" + getPriority()
-                + " " + fco.getId() + "]";
+            StringBuilder sb = new StringBuilder(32);
+            sb.append("[").append(getClass().getName())
+                .append(" ").append(see.toString())
+                .append(" #").append(getPriority())
+                .append(" ").append(fco.getId())
+                .append("]");
+            return sb.toString();
         }
     }
 
@@ -971,16 +1020,20 @@ public class ChangeSet {
         }
 
         /**
-         * Debug helper.
+         * {@inheritDoc}
          */
+        @Override
         public String toString() {
-            return "[" + getClass().getName()
-                + " " + see.toString()
-                + " #" + getPriority()
-                + " " + (add ? "add" : "remove")
-                + " " + feature
-                + " " + (add ? "to" : "from")
-                + " " + object.getId() + "]";
+            StringBuilder sb = new StringBuilder(32);
+            sb.append("[").append(getClass().getName())
+                .append(" ").append(see.toString())
+                .append(" #").append(getPriority())
+                .append(" ").append((add) ? "add" : "remove")
+                .append(" ").append(feature)
+                .append(" ").append((add) ? "to" : "from")
+                .append(" ").append(object.getId())
+                .append("]");
+            return sb.toString();
         }
     }
 
@@ -1027,12 +1080,17 @@ public class ChangeSet {
         }
 
         /**
-         * Debug helper.
+         * {@inheritDoc}
          */
+        @Override
         public String toString() {
-            return "[" + getClass().getName() + " " + see.toString()
-                + " #" + getPriority()
-                + " " + tile.getId() + "]";
+            StringBuilder sb = new StringBuilder(32);
+            sb.append("[").append(getClass().getName())
+                .append(" ").append(see.toString())
+                .append(" #").append(getPriority())
+                .append(" ").append(tile.getId())
+                .append("]");
+            return sb.toString();
         }
     }
 
@@ -1086,13 +1144,19 @@ public class ChangeSet {
         }
 
         /**
-         * Debug helper.
+         * {@inheritDoc}
          */
+        @Override
         public String toString() {
-            return "[" + getClass().getName() + " " + see.toString()
-                + " #" + getPriority()
-                + " " + first.getId()
-                + " " + stance + " " + second.getId() + "]";
+            StringBuilder sb = new StringBuilder(32);
+            sb.append("[").append(getClass().getName())
+                .append(" ").append(see.toString())
+                .append(" #").append(getPriority())
+                .append(" ").append(first.getId())
+                .append(" ").append(stance)
+                .append(" ").append(second.getId())
+                .append("]");
+            return sb.toString();
         }
     }
 
@@ -1658,12 +1722,12 @@ public class ChangeSet {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         Collections.sort(changes, changeComparator);
         for (Change c : changes) {
-            sb.append(c.toString());
-            sb.append("\n");
+            sb.append(c.toString()).append("\n");
         }
         return sb.toString();
     }

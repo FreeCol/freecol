@@ -638,6 +638,9 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade>
                 this.value = value;
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public String toString() {
                 return Messages.message(value.getLabel(true));
@@ -746,6 +749,9 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade>
                 this.value = value;
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public String toString() {
                 return Messages.message(value.getKey());

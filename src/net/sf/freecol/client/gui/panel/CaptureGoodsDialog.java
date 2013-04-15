@@ -210,6 +210,10 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>>
             return good;
         }
 
+
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public String toString() {
             StringTemplate template

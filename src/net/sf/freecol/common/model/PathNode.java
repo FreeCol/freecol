@@ -315,13 +315,16 @@ public class PathNode {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String toString() {
-        return "PathNode loc=" + ((FreeColGameObject)location).toString()
-            + " movesLeft=" + Integer.toString(movesLeft)
-            + " turns=" + Integer.toString(turns)
-            + " onCarrier=" + Boolean.toString(onCarrier)
-            + " direction=" + getDirection()
-            + " cost=" + getCost();
+        StringBuilder sb = new StringBuilder("PathNode loc=");
+        sb.append(((FreeColGameObject)location).toString())
+            .append(" movesLeft=").append(movesLeft)
+            .append(" turns=").append(turns)
+            .append(" onCarrier=").append(onCarrier)
+            .append(" direction=").append(getDirection())
+            .append(" cost=").append(getCost());
+        return sb.toString();
     }
 
     /**
@@ -333,8 +336,7 @@ public class PathNode {
         StringBuilder sb = new StringBuilder(500);
         PathNode p;
         for (p = this; p != null; p = p.next) {
-            sb.append(p.toString());
-            sb.append("\n");
+            sb.append(p.toString()).append("\n");
         }
         return sb.toString();
     }

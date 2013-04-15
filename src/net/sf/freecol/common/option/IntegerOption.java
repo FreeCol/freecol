@@ -214,7 +214,11 @@ public class IntegerOption extends AbstractOption<Integer> {
      */
     @Override
     public String toString() {
-        return "[" + getXMLElementTagName() + " value=" + value + "]";
+        StringBuilder sb = new StringBuilder(16);
+        sb.append("[").append(getId())
+            .append(" value=").append(value)
+            .append("]");
+        return sb.toString();
     }
 
     /**

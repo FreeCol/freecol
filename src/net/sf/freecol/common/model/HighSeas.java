@@ -173,6 +173,7 @@ public class HighSeas extends UnitLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String toString() {
         return getId();
     }

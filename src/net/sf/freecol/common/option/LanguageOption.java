@@ -130,6 +130,7 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
         /**
          * {@inheritDoc}
          */
+        @Override
         public String toString() {
             if (getKey().equals(AUTO)) {
                 return Messages.message("clientOptions.gui.languageOption.autoDetectLanguage");

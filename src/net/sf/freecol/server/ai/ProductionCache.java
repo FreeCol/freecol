@@ -404,10 +404,9 @@ public class ProductionCache {
         }
 
         /**
-         * Returns a string representation of this entry.
-         *
-         * @return a <code>String</code> value
+         * {@inheritDoc}
          */
+        @Override
         public String toString() {
             String result = "Cache entry: " + unit.toString();
             if (workLocation instanceof ColonyTile) {
