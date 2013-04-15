@@ -707,8 +707,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     "lostCityRumour.colonist", serverPlayer, newUnit));
             break;
         case CIBOLA:
-            String cityName = game.getCityOfCibola();
-            if (cityName != null) {
+            String cityKey = game.nextCityOfCibola();
+            if (cityKey != null) {
                 int treasureAmount = Utils.randomInt(logger,
                     "Base treasure amount", random, dx * 600) + dx * 300;
                 unitType = Utils.getRandomMember(logger, "Choose train",
@@ -718,13 +718,13 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 cs.addMessage(See.only(serverPlayer),
                     new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                         "lostCityRumour.cibola", serverPlayer, newUnit)
-                    .add("%city%", cityName)
+                    .add("%city%", cityKey)
                     .addAmount("%money%", treasureAmount));
                 cs.addGlobalHistory(game,
                     new HistoryEvent(game.getTurn(),
                         HistoryEvent.EventType.CITY_OF_GOLD)
                     .addStringTemplate("%nation%", serverPlayer.getNationName())
-                    .add("%city%", cityName)
+                    .add("%city%", cityKey)
                     .addAmount("%treasure%", treasureAmount));
                 break;
             }

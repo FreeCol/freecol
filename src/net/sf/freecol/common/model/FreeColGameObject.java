@@ -80,13 +80,14 @@ abstract public class FreeColGameObject extends FreeColObject {
      * @param game The <code>Game</code> in which this object belongs.
      */
     public FreeColGameObject(Game game) {
-        this.game = game;
-
         if (game != null && game instanceof Game) {
+            this.game = game;
             setDefaultId(game);
         } else if (this instanceof Game) {
+            this.game = (Game)this;
             setId("0");
         } else {
+            this.game = null;
             logger.warning("FreeColGameObject with null game: " + getId());
         }
 
@@ -204,7 +205,7 @@ abstract public class FreeColGameObject extends FreeColObject {
     /**
      * Removes all references to this object.
      *
-     * Override this in subclasses.
+     * To be overridden in subclasses, but reference this routine.
      *
      * @return A list of disposed objects.
      */

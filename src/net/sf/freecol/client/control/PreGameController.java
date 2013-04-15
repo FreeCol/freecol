@@ -123,7 +123,7 @@ public final class PreGameController {
      * if all players are ready to start the game.
      */
     public void requestLaunch() {
-        if (freeColClient.getGame().isAllPlayersReadyToLaunch()) {
+        if (freeColClient.getGame().allPlayersReadyToLaunch()) {
             gui.showStatusPanel(Messages.message("status.startingGame"));
             freeColClient.askServer().requestLaunch();
 

@@ -292,7 +292,7 @@ public final class PreGameInputHandler extends InputHandler {
         }
 
         // Check if all players are ready.
-        if (!freeColServer.getGame().isAllPlayersReadyToLaunch()) {
+        if (!freeColServer.getGame().allPlayersReadyToLaunch()) {
             return DOMMessage.createError("server.notAllReady",
                 "Not all players are ready to begin the game!");
         }

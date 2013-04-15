@@ -250,6 +250,7 @@ public final class FreeColServer {
 
         game = new ServerGame(specification);
         game.setNationOptions(new NationOptions(specification));
+        game.initializeCitiesOfCibola();
         // @compat 0.9.x, 0.10.x
         fixGameOptions();
         // end compatibility code

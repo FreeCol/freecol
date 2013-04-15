@@ -103,8 +103,7 @@ public final class MarketLabel extends AbstractGoodsLabel implements Draggable {
      */
     @Override
     public void paintComponent(Graphics g) {
-
-        Player player = market.getGame().getViewOwner();
+        Player player = market.getOwner();
         String toolTipText = Messages.message(getType().getNameKey());
         if (player == null || player.canTrade(getType())) {
             setEnabled(true);

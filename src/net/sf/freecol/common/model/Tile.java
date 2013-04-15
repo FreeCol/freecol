@@ -107,9 +107,11 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     private Settlement owningSettlement;
 
     /**
-     * Stores each player's image of this tile. Only initialized when needed.
+     * Stores each player's image of this tile.
+     * Only initialized when needed.
      */
-    private java.util.Map<Player, PlayerExploredTile> playerExploredTiles;
+    private java.util.Map<Player, PlayerExploredTile> playerExploredTiles
+        = null;
 
     /**
      * Describe region here.
@@ -168,7 +170,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         owningSettlement = null;
         settlement = null;
 
-        if (!isViewShared()) {
+        if (!game.isViewShared()) {
             playerExploredTiles = new HashMap<Player, PlayerExploredTile>();
         }
     }
@@ -184,7 +186,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public Tile(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
 
-        if (!isViewShared()) {
+        if (!game.isViewShared()) {
             playerExploredTiles = new HashMap<Player, PlayerExploredTile>();
         }
 
@@ -202,7 +204,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public Tile(Game game, String id) {
         super(game, id);
 
-        if (!isViewShared()) {
+        if (!game.isViewShared()) {
             playerExploredTiles = new HashMap<Player, PlayerExploredTile>();
         }
     }
@@ -263,10 +265,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         dispose();
     }
 
-    public boolean isViewShared() {
-        return (getGame().getViewOwner() != null);
-    }
-
     /**
      * Get the <code>Region</code> value.
      *
@@ -305,7 +303,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return The name as a <code>String</code>.
      */
     public String getNameKey() {
-        if (isViewShared()) {
+        if (getGame().isViewShared()) {
             if (isExplored()) {
                 return getType().getNameKey();
             } else {
@@ -1574,9 +1572,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *     had visibility of this tile and should see the change.
      */
     public void updatePlayerExploredTiles(Player oldPlayer) {
-        if (playerExploredTiles == null || getGame().getViewOwner() != null) {
-            return;
-        }
+        if (playerExploredTiles == null) return;
         for (Player player : getGame().getLiveEuropeanPlayers()) {
             if (player == oldPlayer || player.canSee(this)) {
                 updatePlayerExploredTile(player, false);
@@ -1605,10 +1601,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *    settlement present on the tile.
      */
     public void updatePlayerExploredTile(Player player, boolean full) {
-        if (playerExploredTiles == null || getGame().getViewOwner() != null
-            || !player.isEuropean()) {
-            return;
-        }
+        if (playerExploredTiles == null || !player.isEuropean()) return;
         PlayerExploredTile pet = playerExploredTiles.get(player);
         if (pet == null) {
             pet = new PlayerExploredTile(getGame(), player, this);

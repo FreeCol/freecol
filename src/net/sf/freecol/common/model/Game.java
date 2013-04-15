@@ -106,10 +106,8 @@ public class Game extends FreeColGameObject {
 
     protected FreeColGameObjectListener freeColGameObjectListener;
 
-    /**
-     * The cities of Cibola remaining in this game.
-     */
-    private List<String> citiesOfCibola = null;
+    /** The cities of Cibola remaining in this game. */
+    protected final List<String> citiesOfCibola = new ArrayList<String>();
 
     /**
      * The combat model this game uses. At the moment, the only combat
@@ -256,6 +254,10 @@ public class Game extends FreeColGameObject {
      */
     public Player getViewOwner() {
         return viewOwner;
+    }
+
+    public boolean isViewShared() {
+        return viewOwner != null;
     }
 
     /**
@@ -804,6 +806,17 @@ public class Game extends FreeColGameObject {
     }
 
     /**
+     * Checks if all players are ready to launch.
+     *
+     * @return True if all players are ready to launch and <i>false</i>
+     *         otherwise.
+     */
+    public boolean allPlayersReadyToLaunch() {
+        for (Player player : players) if (!player.isReady()) return false;
+        return true;
+    }
+
+    /**
      * Checks if a new <code>Player</code> can be added.
      *
      * @return <i>true</i> if a new player can be added and <i>false</i>
@@ -811,21 +824,6 @@ public class Game extends FreeColGameObject {
      */
     public boolean canAddNewPlayer() {
         return (getVacantNation() != null);
-    }
-
-    /**
-     * Checks if all players are ready to launch.
-     *
-     * @return <i>true</i> if all players are ready to launch and <i>false</i>
-     *         otherwise.
-     */
-    public boolean isAllPlayersReadyToLaunch() {
-        for (Player player : players) {
-            if (!player.isReady()) {
-                return false;
-            }
-        }
-        return true;
     }
 
     /**
@@ -881,25 +879,12 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Initialize the list of cities of Cibola.
-     * Pull them out of the message file and randomize the order.
-     */
-    private void initializeCitiesOfCibola() {
-        citiesOfCibola = new ArrayList<String>();
-        for (int index = 0; index < 7; index++) {
-            citiesOfCibola.add("lostCityRumour.cityName." + index);
-        }
-        Collections.shuffle(citiesOfCibola);
-    }
-
-    /**
      * Get the next name for a city of Cibola.
      *
      * @return The next name for a city of Cibola, or null if none available.
      */
-    public String getCityOfCibola() {
-        if (citiesOfCibola == null) initializeCitiesOfCibola();
-        return (citiesOfCibola.size() == 0) ? null : citiesOfCibola.remove(0);
+    public String nextCityOfCibola() {
+        return (citiesOfCibola.isEmpty()) ? null : citiesOfCibola.remove(0);
     }
 
     /**
@@ -1045,7 +1030,6 @@ public class Game extends FreeColGameObject {
 
         specification.toXMLImpl(out);
 
-        if (citiesOfCibola == null) initializeCitiesOfCibola();
         for (String cityName : citiesOfCibola) {
             out.writeStartElement(CIBOLA_TAG);
             out.writeAttribute(ID_ATTRIBUTE_TAG, cityName);
@@ -1117,7 +1101,7 @@ public class Game extends FreeColGameObject {
 
     @Override
     protected void readChildren(XMLStreamReader in) throws XMLStreamException {
-        citiesOfCibola = new ArrayList<String>(7);
+        citiesOfCibola.clear();
         OptionGroup gameOptions = null;
         OptionGroup mapGeneratorOptions = null;
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
@@ -1164,7 +1148,9 @@ public class Game extends FreeColGameObject {
                 }
             } else if (tagName.equals("citiesOfCibola")) {
                 // @compat 0.9.x
-                citiesOfCibola = readFromListElement("citiesOfCibola", in, String.class);
+                List<String> cities
+                    = readFromListElement("citiesOfCibola", in, String.class);
+                citiesOfCibola.addAll(cities);
             } else if (tagName.equals(CIBOLA_TAG)) {
                 citiesOfCibola.add(readId(in));
                 in.nextTag();

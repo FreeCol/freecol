@@ -3108,10 +3108,6 @@ public class Unit extends GoodsLocation
      * Returns the amount of goods that is carried by this unit.
      *
      * @return The amount of goods carried by this <code>Unit</code>.
-     *     This value might different from the one returned by
-     *     {@link #getGoodsSpaceTaken()} when the model is
-     *     {@link Game#getViewOwner()} owned by a client and cargo
-     *     hiding has been enabled.
      */
     public int getVisibleGoodsCount() {
         return (visibleGoodsCount >= 0) ? visibleGoodsCount

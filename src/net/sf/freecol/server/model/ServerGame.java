@@ -22,6 +22,7 @@ package net.sf.freecol.server.model;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -63,6 +64,9 @@ public class ServerGame extends Game implements ServerModelObject {
 
     private static final Logger logger = Logger.getLogger(ServerGame.class.getName());
 
+    /** How many cities of Cibola? */
+    private static final int CIBOLA_COUNT = 7;
+
     // Timestamp of last move, if any.
     // Do not serialize.
     private long lastTime = -1L;
@@ -98,10 +102,9 @@ public class ServerGame extends Game implements ServerModelObject {
                       XMLStreamReader in, List<String> serverStrings,
                       Specification specification)
         throws XMLStreamException {
-        super(specification);
+        this(specification);
 
-        setFreeColGameObjectListener(freeColGameObjectListener);
-        this.combatModel = new SimpleCombatModel();
+        this.freeColGameObjectListener = freeColGameObjectListener;
         this.viewOwner = null;
         this.setGame(this);
 
@@ -359,16 +362,6 @@ public class ServerGame extends Game implements ServerModelObject {
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
-     *
-     * @return "serverGame".
-     */
-    public String getServerXMLElementTagName() {
-        return "serverGame";
-    }
-    
-
-    /**
      * Collects a list of all the ServerModelObjects in this game.
      *
      * @return A list of all the ServerModelObjects in this game.
@@ -381,5 +374,25 @@ public class ServerGame extends Game implements ServerModelObject {
             }
         }
         return objs;
+    }
+
+    /**
+     * Initialize the list of cities of Cibola.
+     */
+    public void initializeCitiesOfCibola() {
+        citiesOfCibola.clear();
+        for (int index = 0; index < CIBOLA_COUNT; index++) {
+            citiesOfCibola.add("lostCityRumour.cityName." + index);
+        }
+        Collections.shuffle(citiesOfCibola);
+    }
+
+    /**
+     * Gets the tag name of the root element representing this object.
+     *
+     * @return "serverGame".
+     */
+    public String getServerXMLElementTagName() {
+        return "serverGame";
     }
 }
