@@ -794,10 +794,11 @@ public final class FreeColServer {
             xsw = xof.createXMLStreamWriter(fos, "UTF-8");
 
             xsw.writeStartDocument("UTF-8", "1.0");
-            xsw.writeComment("Game version: "+FreeCol.getRevision());
+            xsw.writeComment("Game version: " + FreeCol.getRevision());
             xsw.writeStartElement("savedGame");
 
             // Add the attributes:
+            xsw.writeAttribute("owner", FreeCol.getName());
             xsw.writeAttribute("publicServer", Boolean.toString(publicServer));
             xsw.writeAttribute("singleplayer", Boolean.toString(singlePlayer));
             xsw.writeAttribute("version", Integer.toString(SAVEGAME_VERSION));
