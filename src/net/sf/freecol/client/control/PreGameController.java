@@ -147,7 +147,7 @@ public final class PreGameController {
      */
     public void sendGameOptions() {
         Specification spec = freeColClient.getGame().getSpecification();
-        OptionGroup gameOptions = spec.getOptionGroup("gameOptions");
+        OptionGroup gameOptions = spec.getGameOptions();
         spec.clean("update game options (client initiated)");
 
         freeColClient.askServer().updateGameOptions(gameOptions);
@@ -159,11 +159,10 @@ public final class PreGameController {
      * This method should be called after updating that object.
      */
     public void sendMapGeneratorOptions() {
-        OptionGroup mapOptions = freeColClient.getGame()
-            .getMapGeneratorOptions();
+        Specification spec = freeColClient.getGame().getSpecification();
+        OptionGroup mapOptions = spec.getMapGeneratorOptions();
 
         freeColClient.askServer().updateMapGeneratorOption(mapOptions);
-
     }
 
     /**

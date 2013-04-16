@@ -53,7 +53,7 @@ public final class GameOptionsDialog extends OptionsDialog {
             loadCustomOptions();
         }
 
-        initialize(getSpecification().getOptionGroup(OPTION_GROUP_ID),
+        initialize(getSpecification().getGameOptions(),
                    Messages.message(OPTION_GROUP_ID), null);
 
         // Set special cases

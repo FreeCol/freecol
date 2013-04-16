@@ -1010,8 +1010,9 @@ public final class Canvas extends JDesktopPane {
     }
 
     public void showDifficultyDialog(boolean editable) {
-        showSubPanel(new DifficultyDialog(freeColClient, gui, freeColClient.getGame()
-                                          .getDifficultyLevel(), editable), false);
+        Game game = freeColClient.getGame();
+        showSubPanel(new DifficultyDialog(freeColClient, gui,
+                game.getSpecification().getDifficultyLevel(), editable), false);
     }
 
     public OptionGroup showDifficultyDialog(Specification specification) {

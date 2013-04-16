@@ -321,12 +321,22 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Get the <code>OptionGroup</code> value.
+     * Get the difficulty level of this game.
      *
-     * @return a <code>OptionGroup</code> value
+     * @return An <code>OptionGroup</code> containing the difficulty settings.
      */
     public final OptionGroup getDifficultyLevel() {
         return specification.getDifficultyLevel();
+    }
+
+    /**
+     * Gets the map generator options associated with this game.
+     *
+     * @return An <code>OptionGroup</code> containing the map
+     *     generator options.
+     */
+    public OptionGroup getMapGeneratorOptions() {
+        return specification.getMapGeneratorOptions();
     }
 
     /**
@@ -868,15 +878,6 @@ public class Game extends FreeColGameObject {
             logger.warning("Game integrity test failed.");
         }
         return ok;
-    }
-
-    /**
-     * Gets the <code>MapGeneratorOptions</code> that is associated with this
-     * {@link Game}.
-     * @return <code>OptionGroup</code>
-     */
-    public OptionGroup getMapGeneratorOptions() {
-        return specification.getOptionGroup("mapGeneratorOptions");
     }
 
     /**

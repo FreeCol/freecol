@@ -114,7 +114,7 @@ public final class PreGameInputHandler extends InputHandler {
             throw new IllegalStateException("Not an admin");
         }
         Specification spec = getFreeColServer().getGame().getSpecification();
-        OptionGroup gameOptions = spec.getOptionGroup("gameOptions");
+        OptionGroup gameOptions = spec.getGameOptions();
         Element child = (Element)element.getChildNodes().item(0);
         gameOptions.readFromXMLElement(child);
         spec.clean("update game options (server)");

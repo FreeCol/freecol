@@ -523,7 +523,7 @@ public final class Specification {
                 addAbstractOption(price);
             }
         }
-        getOptionGroup("gameOptions").add(prices);
+        getGameOptions().add(prices);
     }
 
 
@@ -1421,6 +1421,15 @@ public final class Specification {
 
         this.difficultyLevel = level.getId();
     }
+
+    public OptionGroup getGameOptions() {
+        return getOptionGroup("gameOptions");
+    }
+
+    public OptionGroup getMapGeneratorOptions() {
+        return getOptionGroup("mapGeneratorOptions");
+    }
+
 
     // -- Events --
     public List<Event> getEvents() {

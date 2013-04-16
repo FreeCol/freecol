@@ -157,17 +157,17 @@ public final class MapEditorController {
      */
     public void newMap() {
         final Game game = freeColClient.getGame();
-        final MapGenerator mapGenerator = freeColClient.getFreeColServer().getMapGenerator();
+        final Specification spec = game.getSpecification();
+        final MapGenerator mapGenerator = freeColClient.getFreeColServer()
+            .getMapGenerator();
 
-        OptionGroup group = freeColClient.getGame().getMapGeneratorOptions();
+        OptionGroup group = spec.getMapGeneratorOptions();
         group = gui.showMapGeneratorOptionsDialog(group, true, true);
-        if (group == null) {
-            return;
-        }
+        if (group == null) return;
 
         try {
-            if (game.getSpecification().getDifficultyLevel() == null) {
-                game.getSpecification().applyDifficultyLevel(FreeCol.getDifficulty());
+            if (spec.getDifficultyLevel() == null) {
+                spec.applyDifficultyLevel(FreeCol.getDifficulty());
             }
             mapGenerator.createMap(game);
             gui.setFocus(game.getMap().getTile(1,1));

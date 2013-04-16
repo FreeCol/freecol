@@ -940,8 +940,8 @@ public final class FreeColServer {
                     if (server != null) server.setGame(game);
                     // @compat 0.9.x
                     if (savegameVersion < 9
-                        && game.getDifficultyLevel() == null) {
-                        game.getSpecification().applyDifficultyLevel("model.difficulty.medium");
+                        && specification.getDifficultyLevel() == null) {
+                        specification.applyDifficultyLevel("model.difficulty.medium");
                         logger.info("Applying default difficulty of medium.");
                     }
                     // @end compatibility code
@@ -1042,11 +1042,11 @@ public final class FreeColServer {
         game.getMap().resetContiguity();
         // end compatibility code
 
-        // ensure that option groups can not be edited
-        game.getMapGeneratorOptions().setEditable(false);
+        // Ensure that critical option groups can not be edited.
         try {
             specification = getSpecification();
-            specification.getOptionGroup("gameOptions").setEditable(false);
+            specification.getMapGeneratorOptions().setEditable(false);
+            specification.getGameOptions().setEditable(false);
             specification.getOptionGroup("difficultyLevels").setEditable(false);
         } catch (Exception e) {
             logger.log(Level.WARNING, "Failed to set option groups read-only.",
@@ -1316,7 +1316,7 @@ public final class FreeColServer {
         // TODO: This might not be the best way to do it, the
         // createMap should not really use the entire loadGame method.
         final Specification spec = game.getSpecification();
-        OptionGroup gameOptions = spec.getOptionGroup("gameOptions");
+        OptionGroup gameOptions = spec.getGameOptions();
         Element oldGameOptions = gameOptions.toXMLElement(DOMMessage.createMessage("oldGameOptions").getOwnerDocument());
 
         // Make the map.
@@ -1348,7 +1348,7 @@ public final class FreeColServer {
         }
 
         // Ensure that option groups can not be edited any more.
-        game.getMapGeneratorOptions().setEditable(false);
+        spec.getMapGeneratorOptions().setEditable(false);
         gameOptions.setEditable(false);
         spec.getOptionGroup("difficultyLevels").setEditable(false);
 
@@ -1478,12 +1478,9 @@ public final class FreeColServer {
      * @return The player.
      */
     public ServerPlayer getPlayer(Connection connection) {
-        Iterator<Player> playerIterator = getGame().getPlayerIterator();
-        while (playerIterator.hasNext()) {
-            ServerPlayer player = (ServerPlayer) playerIterator.next();
-            if (player.getConnection() == connection) {
-                return player;
-            }
+        for (Player p : game.getPlayers()) {
+            ServerPlayer serverPlayer = (ServerPlayer)p;
+            if (serverPlayer.getConnection() == connection) return serverPlayer;
         }
         return null;
     }

@@ -105,7 +105,7 @@ public class SimpleMapGenerator implements MapGenerator {
      */
     public SimpleMapGenerator(Random random, Specification specification) {
         this.random = random;
-        this.mapGeneratorOptions = specification.getOptionGroup("mapGeneratorOptions");
+        this.mapGeneratorOptions = specification.getMapGeneratorOptions();
         landGenerator = new LandGenerator(mapGeneratorOptions, random);
         terrainGenerator = new TerrainGenerator(mapGeneratorOptions, random);
     }
