@@ -203,8 +203,8 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
 
 
     // Interface Location
-
-    // getId() inherited from FreeColGameObject
+    // Inheriting
+    //   FreeColObject.getId()
 
     /**
      * {@inheritDoc}
@@ -295,10 +295,9 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
 
     /**
      * {@inheritDoc}
-     *
-     * Note: Marked final as this will always work if getUnitList() does.
      */
     public final Iterator<Unit> getUnitIterator() {
+        // Marked final as this will always work if getUnitList() does.
         return getUnitList().iterator();
     }
 

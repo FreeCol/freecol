@@ -93,6 +93,7 @@ public class Building extends WorkLocation implements Named, Comparable<Building
         super(game, id);
     }
 
+
     /**
      * Gets the type of this building.
      *
@@ -100,28 +101,6 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      */
     public BuildingType getType() {
         return buildingType;
-    }
-
-    /**
-     * Update production type on the basis of the current building
-     * type (which might change due to an upgrade) and the work type
-     * of units present.
-     */
-    public void updateProductionType() {
-        if (isEmpty()) {
-            List<ProductionType> production = buildingType.getProductionTypes();
-            if (production == null || production.isEmpty()) {
-                setProductionType(null);
-            } else {
-                setProductionType(production.get(0));
-            }
-        } else {
-            Unit unit = getFirstUnit();
-            if (unit != null) {
-                setProductionType(getBestProductionType(unit.getWorkType()));
-            }
-        }
-        getColony().invalidateCache();
     }
 
     /**
@@ -307,16 +286,6 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     }
 
     /**
-     * Returns the production types available for this Building.
-     *
-     * @return available production types
-     */
-    public List<ProductionType> getProductionTypes() {
-        return getType().getProductionTypes();
-    }
-
-
-    /**
      * Gets the production information for this building taking account
      * of the available input and output goods.
      *
@@ -455,6 +424,18 @@ public class Building extends WorkLocation implements Named, Comparable<Building
 
 
     // Interface Location
+    // Inherits:
+    //   FreeColObject.getId
+    //   WorkLocation.getTile
+    //   UnitLocation.getLocationNameFor
+    //   UnitLocation.contains
+    //   UnitLocation.canAdd
+    //   UnitLocation.getUnitCount
+    //   final UnitLocation.getUnitIterator
+    //   UnitLocation.getUnitList
+    //   UnitLocation.getGoodsContainer
+    //   final WorkLocation getSettlement
+    //   final WorkLocation getColony
 
     /**
      * {@inheritDoc}
@@ -513,7 +494,11 @@ public class Building extends WorkLocation implements Named, Comparable<Building
 
 
     // Interface UnitLocation
-
+    // Inherits:
+    //   UnitLocation.getSpaceTaken
+    //   UnitLocation.moveToFront
+    //   UnitLocation.clearUnitList
+    
     /**
      * {@inheritDoc}
      */
@@ -539,6 +524,9 @@ public class Building extends WorkLocation implements Named, Comparable<Building
 
 
     // Interface WorkLocation
+    // Inherits:
+    //   WorkLocation.getBestProductionType(goodsType): moot for buildings.
+    //   WorkLocation.getClaimTemplate: buildings do not need to be claimed.
 
     /**
      * {@inheritDoc}
@@ -622,6 +610,15 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     }
 
     /**
+     * Returns the production types available for this Building.
+     *
+     * @return available production types
+     */
+    public List<ProductionType> getProductionTypes() {
+        return getType().getProductionTypes();
+    }
+
+    /**
      * {@inheritDoc}
      */
     public ProductionType getBestProductionType(Unit unit) {
@@ -629,8 +626,6 @@ public class Building extends WorkLocation implements Named, Comparable<Building
         return getType().getProductionTypes().isEmpty()
             ? null : getType().getProductionTypes().get(0);
     }
-
-    // Omitted getClaimTemplate, buildings do not need to be claimed.
 
 
     // Interface Consumer
@@ -707,7 +702,8 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      */
     @Override
     protected void toXMLImpl(XMLStreamWriter out, Player player,
-                             boolean showAll, boolean toSavedGame) throws XMLStreamException {
+                             boolean showAll,
+                             boolean toSavedGame) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
 
         writeAttributes(out);
@@ -730,18 +726,6 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
-
-        final Specification spec = getSpecification();
-        buildingType = spec.getType(in, BUILDING_TYPE_TAG,
-                                    BuildingType.class, (BuildingType)null);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected void toXMLPartialImpl(XMLStreamWriter out, String[] fields) throws XMLStreamException {
         toXMLPartialByClass(out, Building.class, fields);
     }
@@ -758,9 +742,24 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      * {@inheritDoc}
      */
     @Override
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
+
+        final Specification spec = getSpecification();
+        buildingType = spec.getType(in, BUILDING_TYPE_TAG,
+                                    BuildingType.class, (BuildingType)null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String toString() {
-        return Utils.lastPart(getType().getId(), ".")
-            + "/" + getColony().getName();
+        StringBuilder sb = new StringBuilder(32);
+        sb.append("[").append(getId())
+            .append("/").append(getColony().getName())
+            .append("]");
+        return sb.toString();
     }
 
     /**

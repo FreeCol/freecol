@@ -95,6 +95,16 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
         super(game, id);
     }
 
+
+    /**
+     * Set the <code>Colony</code> value.
+     *
+     * @param newColony The new Colony value.
+     */
+    public final void setColony(final Colony newColony) {
+        this.colony = newColony;
+    }
+
     /**
      * Get the <code>ProductionType</code> value.
      *
@@ -186,15 +196,6 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
     }
 
     /**
-     * Set the <code>Colony</code> value.
-     *
-     * @param newColony The new Colony value.
-     */
-    public final void setColony(final Colony newColony) {
-        this.colony = newColony;
-    }
-
-    /**
      * Gets the owning settlement for this work location.
      *
      * Usually the same as getColony() but overridden by ColonyTile
@@ -204,30 +205,6 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
      */
     public Settlement getOwningSettlement() {
         return colony;
-    }
-
-    /**
-     * Gets the owner of this <code>Ownable</code>.
-     *
-     * @return The <code>Player</code> controlling this
-     *         {@link Ownable}.
-     */
-    public Player getOwner() {
-        return colony.getOwner();
-    }
-
-    /**
-     * Sets the owner of this <code>Ownable</code>. Do not call this
-     * method, ever. Since the owner of this WorkLocation is the owner
-     * of the Colony, you must set the owner of the Colony instead.
-     *
-     * @param p The <code>Player</code> that should take ownership
-     *      of this {@link Ownable}.
-     * @exception UnsupportedOperationException is always thrown by
-     *      this method.
-     */
-    public void setOwner(Player p) {
-        throw new UnsupportedOperationException();
     }
 
     /**
@@ -306,7 +283,33 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
         return getTotalProductionOf(goodsType);
     }
 
+    /**
+     * Update production type on the basis of the current building
+     * type (which might change due to an upgrade) and the work type
+     * of units present.
+     */
+    public void updateProductionType() {
+        Unit unit = getFirstUnit();
+        if (unit == null) {
+            List<ProductionType> production = getProductionTypes();
+            setProductionType((production.isEmpty()) ? null
+                : production.get(0));
+        } else {
+            setProductionType(getBestProductionType(unit.getWorkType()));
+        }
+    }
+
+
     // Interface Location
+    // Inherits:
+    //   FreeColObject.getId
+    //   UnitLocation.getLocationName
+    //   UnitLocation.getLocationNameFor
+    //   UnitLocation.contains
+    //   UnitLocation.canAdd
+    //   UnitLocation.getUnitCount
+    //   final UnitLocation.getUnitIterator
+    //   UnitLocation.getGoodsContainer
 
     /**
      * {@inheritDoc}
@@ -314,8 +317,6 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
     public final Tile getTile() {
         return colony.getTile();
     }
-
-    // Omit getLocationName, getLocationNameFor
 
     /**
      * {@inheritDoc}
@@ -390,6 +391,11 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
 
 
     // Interface UnitLocation
+    // Inherits:
+    //   UnitLocation.getSpaceTaken
+    //   UnitLocation.moveToFront
+    //   UnitLocation.clearUnitList
+    //   UnitLocation.getUnitCapacity
 
     /**
      * {@inheritDoc}
@@ -400,8 +406,6 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
             ? super.getNoAddReason(locatable)
             : NoAddReason.WRONG_TYPE;
     }
-
-    // Omitted getUnitCapacity, the superclass implementation is still ok.
 
 
     // Abstract and overrideable routines to be implemented by
@@ -495,13 +499,6 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
     }
 
     /**
-     * Update the production type. This might be necessary for
-     * compatibility code, or because the type of the work location
-     * changes.
-     */
-    public abstract void updateProductionType();
-
-    /**
      * Gets a template describing whether this work location can/needs-to
      * be claimed.  To be overridden by classes where this is meaningful.
      *
@@ -514,9 +511,37 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
     }
 
 
+    // Interface Ownable
+
+    /**
+     * Gets the owner of this <code>Ownable</code>.
+     *
+     * @return The <code>Player</code> controlling this
+     *         {@link Ownable}.
+     */
+    public Player getOwner() {
+        return colony.getOwner();
+    }
+
+    /**
+     * Sets the owner of this <code>Ownable</code>. Do not call this
+     * method, ever. Since the owner of this WorkLocation is the owner
+     * of the Colony, you must set the owner of the Colony instead.
+     *
+     * @param p The <code>Player</code> that should take ownership
+     *      of this {@link Ownable}.
+     * @exception UnsupportedOperationException is always thrown by
+     *      this method.
+     */
+    public void setOwner(Player p) {
+        throw new UnsupportedOperationException();
+    }
+
+
     // Serialization
 
     private static final String COLONY_TAG = "colony";
+
 
     /**
      * {@inheritDoc}
@@ -542,10 +567,25 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
     /**
      * {@inheritDoc}
      */
+    @Override
+    public void readChildren(XMLStreamReader in) throws XMLStreamException {
+        super.readChildren(in);
+
+        // @compat 0.10.7
+        // Production types were introduced post-0.10.7
+        if (productionType == null) updateProductionType();
+        // end @compat
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void readChild(XMLStreamReader in) throws XMLStreamException {
-        if ("production".equals(in.getLocalName())) {
+        if (ProductionType.getXMLElementTagName().equals(in.getLocalName())) {
             productionType = new ProductionType(getSpecification());
             productionType.readFromXML(in);
+
         } else {
             super.readChild(in);
         }
@@ -554,13 +594,12 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void writeChildren(XMLStreamWriter out, Player player,
-                                 boolean showAll, boolean toSavedGame)
-        throws XMLStreamException {
+                                 boolean showAll,
+                                 boolean toSavedGame) throws XMLStreamException {
         super.writeChildren(out, player, showAll, toSavedGame);
-        if (productionType != null) {
-            productionType.toXML(out);
-        }
-    }
 
+        if (productionType != null) productionType.toXML(out);
+    }
 }

@@ -80,6 +80,7 @@ public class ColonyTile extends WorkLocation implements Ownable {
 
         setColony(colony);
         this.workTile = workTile;
+        updateProductionType();
     }
 
     /**
@@ -174,44 +175,6 @@ public class ColonyTile extends WorkLocation implements Ownable {
     }
 
     /**
-     * Updates the production type based on the tile type of the work
-     * tile (which can change at any time) and the work type of units
-     * present.
-     */
-    public void updateProductionType() {
-        if (isColonyCenterTile()) {
-            List<ProductionType> productionTypes = getProductionTypes();
-            // TODO: in the future, this should become selectable
-            if (!productionTypes.isEmpty()) {
-                setProductionType(productionTypes.get(0));
-            }
-        } else {
-            Unit unit = getFirstUnit();
-            if (unit != null) {
-                setProductionType(getBestProductionType(unit.getWorkType()));
-            }
-        }
-        getColony().invalidateCache();
-    }
-
-    /**
-     * Returns the production types available for this ColonyTile,
-     * accounting for the difficulty level and whether this is a
-     * colony center tile.
-     *
-     * @return available production types
-     */
-    public List<ProductionType> getProductionTypes() {
-        if (workTile != null
-            && workTile.getType() != null) {
-            return workTile.getType()
-                .getProductionTypes(isColonyCenterTile());
-        } else {
-            return new ArrayList<ProductionType>();
-        }
-    }
-
-    /**
      * Gets the basic production information for the colony tile,
      * ignoring any colony limits (which for now, should be irrelevant).
      *
@@ -272,6 +235,18 @@ public class ColonyTile extends WorkLocation implements Ownable {
 
 
     // Interface Location
+    // Inheriting
+    //   FreeColObject.getId
+    //   WorkLocation.getTile (Beware, this returns the colony center tile!),
+    //   UnitLocation.getLocationNameFor
+    //   UnitLocation.contains
+    //   UnitLocation.canAdd
+    //   UnitLocation.getUnitCount
+    //   final UnitLocation.getUnitIterator
+    //   UnitLocation.getUnitList
+    //   UnitLocation.getGoodsContainer
+    //   final WorkLocation getSettlement
+    //   final WorkLocation getColony
 
     /**
      * {@inheritDoc}
@@ -284,8 +259,6 @@ public class ColonyTile extends WorkLocation implements Ownable {
                      + getTile().getDirection(workTile).toString())
                 .addName("%location%", name);
     }
-
-    // Omit getLocationNameFor
 
     /**
      * {@inheritDoc}
@@ -321,7 +294,6 @@ public class ColonyTile extends WorkLocation implements Ownable {
         return false;
     }
 
-
     /**
      * {@inheritDoc}
      */
@@ -344,6 +316,10 @@ public class ColonyTile extends WorkLocation implements Ownable {
 
 
     // Interface UnitLocation
+    // Inherits:
+    //   UnitLocation.getSpaceTaken
+    //   UnitLocation.moveToFront
+    //   UnitLocation.clearUnitList
 
     /**
      * {@inheritDoc}
@@ -492,6 +468,19 @@ public class ColonyTile extends WorkLocation implements Ownable {
     /**
      * {@inheritDoc}
      */
+    public List<ProductionType> getProductionTypes() {
+        if (workTile != null
+            && workTile.getType() != null) {
+            return workTile.getType()
+                .getProductionTypes(isColonyCenterTile());
+        } else {
+            return new ArrayList<ProductionType>();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public ProductionType getBestProductionType(Unit unit) {
         ProductionType best = null;
         int amount = 0;
@@ -510,13 +499,9 @@ public class ColonyTile extends WorkLocation implements Ownable {
     }
 
     /**
-     * Returns the best production type for the production of the
-     * given goods type.  This method is likely to be removed in the
-     * future.
-     *
-     * @param goodsType goods type
-     * @return production type
+     * {@inheritDoc}
      */
+    @Override
     public ProductionType getBestProductionType(GoodsType goodsType) {
         ProductionType best = super.getBestProductionType(goodsType);
         if (best == null) {
@@ -535,6 +520,7 @@ public class ColonyTile extends WorkLocation implements Ownable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public StringTemplate getClaimTemplate() {
         return (isColonyCenterTile()) ? super.getClaimTemplate()
             : StringTemplate.template("workClaimColonyTile")
@@ -552,11 +538,12 @@ public class ColonyTile extends WorkLocation implements Ownable {
      */
     @Override
     protected void toXMLImpl(XMLStreamWriter out, Player player,
-                             boolean showAll, boolean toSavedGame)
-        throws XMLStreamException {
+                             boolean showAll,
+                             boolean toSavedGame) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
 
         writeAttributes(out);
+
         super.writeChildren(out, player, showAll, toSavedGame);
 
         out.writeEndElement();
@@ -570,16 +557,6 @@ public class ColonyTile extends WorkLocation implements Ownable {
         super.writeAttributes(out);
 
         writeAttribute(out, WORK_TILE_TAG, workTile);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
-
-        workTile = makeFreeColGameObject(in, WORK_TILE_TAG, Tile.class);
     }
 
     /**
@@ -602,9 +579,23 @@ public class ColonyTile extends WorkLocation implements Ownable {
      * {@inheritDoc}
      */
     @Override
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
+
+        workTile = makeFreeColGameObject(in, WORK_TILE_TAG, Tile.class);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String toString() {
-        return "ColonyTile" + getWorkTile().getPosition().toString()
-            + "/" + getColony().getName();
+        StringBuilder sb = new StringBuilder(64);
+        sb.append("[").append(getId())
+            .append(" ").append(getWorkTile().getPosition().toString())
+            .append("/").append(getColony().getName())
+            .append("]");
+        return sb.toString();
     }
 
     /**
