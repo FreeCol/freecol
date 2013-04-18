@@ -292,10 +292,7 @@ abstract public class Settlement extends GoodsLocation
         oldOwner.invalidateCanSeeTiles();
         newOwner.invalidateCanSeeTiles();
 
-        if (getGame().getFreeColGameObjectListener() != null) {
-            getGame().getFreeColGameObjectListener()
-                .ownerChanged(this, oldOwner, newOwner);
-        }
+        getGame().notifyOwnerChanged(this, oldOwner, newOwner);
     }
 
     /**

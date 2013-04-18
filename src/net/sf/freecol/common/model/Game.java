@@ -314,12 +314,50 @@ public class Game extends FreeColGameObject {
         this.combatModel = newCombatModel;
     }
 
-    public void setFreeColGameObjectListener(FreeColGameObjectListener freeColGameObjectListener) {
-        this.freeColGameObjectListener = freeColGameObjectListener;
+    /**
+     * Sets the <code>FreeColGameObjectListener</code> attached to this game.
+     *
+     * @param fcgol The new <code>FreeColGameObjectListener</code>.
+     */
+    public void setFreeColGameObjectListener(FreeColGameObjectListener fcgol) {
+        freeColGameObjectListener = fcgol;
     }
 
-    public FreeColGameObjectListener getFreeColGameObjectListener() {
-        return freeColGameObjectListener;
+    /**
+     * Notify a listener (if any) of a new game object.
+     *
+     * @param id The identifier of the new object.
+     * @param fcgo The new <code>FreeColGameObject</code>.
+     */
+    public void notifySetFreeColGameObject(String id, FreeColGameObject fcgo) {
+        if (freeColGameObjectListener != null) {
+            freeColGameObjectListener.setFreeColGameObject(id, fcgo);
+        }
+    }
+
+    /**
+     * Notify a listener (if any) of that a game object has gone.
+     *
+     * @param id The identifier of the removed object.
+     */
+    public void notifyRemoveFreeColGameObject(String id) {
+        if (freeColGameObjectListener != null) {
+            freeColGameObjectListener.removeFreeColGameObject(id);
+        }
+    }
+
+    /**
+     * Notify a listener (if any) of that a game object has changed owner.
+     *
+     * @param source The <code>FreeColGameObject</code> that changed owner.
+     * @param oldOwner The old owning <code>Player</code>.
+     * @param newOwner The new owning <code>Player</code>.
+     */
+    public void notifyOwnerChanged(FreeColGameObject source,
+                                   Player oldOwner, Player newOwner) {
+        if (freeColGameObjectListener != null) {
+            freeColGameObjectListener.ownerChanged(source, oldOwner, newOwner);
+        }
     }
 
     /**

@@ -27,11 +27,28 @@ package net.sf.freecol.common.model;
  */
 public interface FreeColGameObjectListener {
 
+    /**
+     * Notify a listener (if any) of a new object.
+     *
+     * @param id The identifier of the new object.
+     * @param fcgo The new <code>FreeColGameObject</code>.
+     */
+    public void setFreeColGameObject(String id, FreeColGameObject fcgo);
 
-
-    public void setFreeColGameObject(String id, FreeColGameObject freeColGameObject);
-
+    /**
+     * Notify a listener (if any) of that an object has gone.
+     *
+     * @param id The identifier of the removed object.
+     */
     public void removeFreeColGameObject(String id);
 
-    public void ownerChanged(FreeColGameObject source, Player oldOwner, Player newOwner);
+    /**
+     * Notify a listener (if any) of that an object has changed owner.
+     *
+     * @param source The <code>FreeColGameObject</code> that changed owner.
+     * @param oldOwner The old owning <code>Player</code>.
+     * @param newOwner The new owning <code>Player</code>.
+     */
+    public void ownerChanged(FreeColGameObject source,
+                             Player oldOwner, Player newOwner);
 }

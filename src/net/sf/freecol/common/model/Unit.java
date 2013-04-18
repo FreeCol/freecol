@@ -2568,9 +2568,7 @@ public class Unit extends GoodsLocation
             getOwner().setExplored(this);
         }
 
-        if (getGame().getFreeColGameObjectListener() != null) {
-            getGame().getFreeColGameObjectListener().ownerChanged(this, oldOwner, owner);
-        }
+        getGame().notifyOwnerChanged(this, oldOwner, owner);
     }
 
     /**
