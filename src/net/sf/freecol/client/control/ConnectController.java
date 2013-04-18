@@ -483,8 +483,8 @@ public final class ConnectController {
      * @return True if the reconnection succeeds.
      */
     public boolean reconnect() {
-        final String host = freeColClient.askServer().getClient().getHost();
-        final int port = freeColClient.askServer().getClient().getPort();
+        final String host = freeColClient.askServer().getHost();
+        final int port = freeColClient.askServer().getPort();
 
         gui.removeInGameComponents();
         logout(true);

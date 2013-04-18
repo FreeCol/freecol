@@ -119,13 +119,10 @@ public final class Client {
      *                holds all the information
      * @see #sendAndWait(Element)
      * @see #ask(Element)
+     * @exception IOException
      */
-    public void send(Element element) {
-        try {
-            c.sendDumping(element);
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "Could not send: " + element, e);
-        }
+    public void send(Element element) throws IOException {
+        c.sendDumping(element);
     }
 
     /**
@@ -136,13 +133,10 @@ public final class Client {
      *                holds all the information
      * @see #send(Element)
      * @see #ask(Element)
+     * @exception IOException
      */
-    public void sendAndWait(Element element) {
-        try {
-            c.sendAndWait(element);
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "Could not sendAndWait: " + element, e);
-        }
+    public void sendAndWait(Element element) throws IOException {
+        c.sendAndWait(element);
     }
 
     /**
@@ -154,17 +148,12 @@ public final class Client {
      *       an error occured or the server did not send a reply.
      * @see #sendAndWait
      * @see #send
+     * @exception IOException
      */
-    public Element ask(Element element) {
-        try {
-            return c.askDumping(element);
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "Could not ask: " + element, e);
-        }
-        return null;
+    public Element ask(Element element) throws IOException {
+        return c.askDumping(element);
     }
     
-
     /**
      * Handle a reply element using the client input handler.
      *
@@ -173,8 +162,7 @@ public final class Client {
     public void handleReply(Element reply) {
         if (reply != null) {
             try {
-                c.getMessageHandler()
-                    .handle(c, reply);
+                c.getMessageHandler().handle(c, reply);
             } catch (FreeColException e) {
                 logger.log(Level.WARNING, "Could not handle reply: " + reply, e);
             }

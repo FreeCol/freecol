@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -90,17 +91,283 @@ public abstract class ServerAPI {
         }
     }
 
-
     private Client client;
 
 
     /**
      * Creates a new <code>ServerAPI</code>.
-     *
      */
-    public ServerAPI() {
-    };
+    public ServerAPI() {}
 
+
+    protected abstract void doClientProcessingFor(Element reply);
+
+    protected abstract void doRaiseErrorMessage(String complaint);
+
+    // Internal message passing routines
+
+    /**
+     * Sends an Element to the server.
+     *
+     * @param element The <code>Element</code> to send.
+     * @return True if the send succeeded.
+     */
+    private boolean send(Element element) {
+        try {
+            client.send(element);
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Could not send: " + element, e);
+        }
+        return false;
+    }
+
+    /**
+     * Sends a DOMMessage to the server.
+     *
+     * @param message The <code>DOMMessage</code> to send.
+     * @return True if the send succeeded.
+     */
+    private boolean send(DOMMessage message) {
+        return send(message.toXMLElement());
+    }
+
+    /**
+     * Sends a DOMMessage to the server and waits for a reply.
+     *
+     * @param message The <code>DOMMessage</code> to send.
+     * @return True if the send succeeded.
+     */
+    private boolean sendAndWait(DOMMessage message) {
+        try {
+            client.sendAndWait(message.toXMLElement());
+            return true;
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Could not send: " + message, e);
+        }
+        return false;
+    }
+
+    /**
+     * Sends a DOMMessage query the server and waits for a reply.
+     *
+     * @param message The <code>DOMMessage</code> to send.
+     * @return The reply, or null if there was a problem.
+     */
+    private Element ask(DOMMessage message) {
+        Element reply = null;
+        try {
+            reply = client.ask(message.toXMLElement());
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Could not ask: " + message, e);
+        }
+        return reply;
+    }
+
+    /**
+     * Sends the specified message to the server and returns the reply,
+     * if it has the specified tag.
+     * Handle "error" replies if they have a messageID or when in debug mode.
+     * This routine allows code simplification in much of the following
+     * client-server communication.
+     *
+     * In following routines we follow the convention that server I/O
+     * is confined to the ask<foo>() routine, which typically returns
+     * true if the server interaction succeeded, which does *not*
+     * necessarily imply that the actual substance of the request was
+     * allowed (e.g. a move may result in the death of a unit rather
+     * than actually moving).
+     *
+     * @param message A <code>DOMMessage</code> to send.
+     * @param tag The expected tag
+     * @param results A <code>Map</code> to store special attribute results in.
+     * @return The answer from the server if it has the specified tag,
+     *         otherwise <code>null</code>.
+     */
+    private Element askExpecting(DOMMessage message, String tag,
+                                 HashMap<String, String> results) {
+        Element reply = ask(message);
+        if (reply == null) return null;
+
+        if ("error".equals(reply.getTagName())) {
+            String messageId = reply.getAttribute("messageID");
+            String messageText = reply.getAttribute("message");
+            if (messageId != null && messageText != null
+                && FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.COMMS)) {
+                // If debugging suppress the bland but i18n compliant
+                // failure message in favour of the higher detail
+                // non-i18n text.
+                reply.removeAttribute("messageID");
+            }
+            if (messageId == null && messageText == null) {
+                logger.warning("Received null error response");
+            } else {
+                logger.warning("Received error response: "
+                               + ((messageId != null) ? messageId : "")
+                               + "/" + ((messageText != null)
+                                   ? messageText : ""));
+                client.handleReply(reply);
+            }
+            return null;
+        }
+
+        // Success!
+        if (tag == null || tag.equals(reply.getTagName())) {
+            // Do the standard processing.
+            doClientProcessingFor(reply);
+            // Look for special attributes
+            if (results != null) {
+                if (results.containsKey("*")) {
+                    results.remove("*");
+                    int len = reply.getAttributes().getLength();
+                    for (int i = 0; i < len; i++) {
+                        Node n = reply.getAttributes().item(i);
+                        results.put(n.getNodeName(), n.getNodeValue());
+                    }
+                } else {
+                    for (String k : results.keySet()) {
+                        if (reply.hasAttribute(k)) {
+                            results.put(k, reply.getAttribute(k));
+                        }
+                    }
+                }
+            }
+            return reply;
+        }
+
+        // Unexpected reply.  Whine and fail.
+        String complaint = "Received reply with tag " + reply.getTagName()
+            + " which should have been " + tag
+            + " to message " + message;
+        logger.warning(complaint);
+        doRaiseErrorMessage(complaint);
+        return null;
+    }
+
+    /**
+     * Extends askExpecting to also handle returns from the server.
+     *
+     * @param message A <code>DOMMessage</code> to send.
+     * @param tag The expected tag
+     * @param results A <code>Map</code> to store special attribute results in.
+     * @return True if the server interaction succeeded, else false.
+     */
+    private boolean askHandling(DOMMessage message, String tag,
+                                HashMap<String, String> results) {
+        Element reply = askExpecting(message, tag, results);
+        if (reply == null) return false;
+
+        client.handleReply(reply);
+        return true;
+    }
+
+    /**
+     * Helper to load a map.
+     *
+     * @param queries Query strings.
+     * @return A map with null mappings for the query strings.
+     */
+    private HashMap<String, String> loadMap(String... queries) {
+        HashMap<String, String> result = new HashMap<String, String>();
+        for (String q : queries) result.put(q, null);
+        return result;
+    }
+
+
+    // Public routines for manipulation of the connection to the server.
+
+    /**
+     * Get the host we are connected to.
+     *
+     * @return The current host, or null if none.
+     */
+    public String getHost() {
+        return (client == null) ? null : client.getHost();
+    }
+
+    /**
+     * Get the port we are connected to.
+     *
+     * @return The current port, or negative if none.
+     */     
+    public int getPort() {
+        return (client == null) ? -1 : client.getPort();
+    }
+
+    /**
+     * Get the raw connection.
+     *
+     * Do not use this.  It exists only for debugging purposes.
+     *
+     * @return The server <code>Connection</code>.
+     */
+    public Connection getConnection() {
+        return (client == null) ? null : client.getConnection();
+    }
+
+    /**
+     * Register a message handler to handle messages from the server.
+     * Used when switching from pre-game to in-game.
+     *
+     * @param messageHandler The new <code>MessageHandler</code>.
+     */
+    public void registerMessageHandler(MessageHandler messageHandler) {
+        if (client != null) {
+            client.setMessageHandler(messageHandler);
+        }
+    }
+
+    /**
+     * Disconnect the client.
+     */
+    public void disconnect() {
+        if (client != null) {
+            client.disconnect();
+            reset();
+        }
+    }
+
+    /**
+     * Just forget about the client.
+     * Only call this if sure it is dead.
+     */
+    public void reset() {
+        client = null;
+    }
+
+    /**
+     * Connects a client to host:port (or more).
+     *
+     * @param threadName The name for the thread.
+     * @param host The name of the machine running the
+     *     <code>FreeColServer</code>.
+     * @param port The port to use when connecting to the host.
+     * @exception ConnectException
+     * @exception IOException
+     */
+    public void connect(String threadName, String host, int port,
+                        MessageHandler messageHandler) 
+        throws ConnectException, IOException {
+        int tries;
+        if (port < 0) {
+            port = FreeCol.getServerPort();
+            tries = 10;
+        } else {
+            tries = 1;
+        }
+        for (int i = tries; i > 0; i--) {
+            try {
+                client = new Client(host, port, messageHandler, threadName);
+                if (client != null) break;
+            } catch (ConnectException e) {
+                if (i == 1) throw e;
+            } catch (IOException e) {
+                if (i == 1) throw e;
+            }
+        }
+    }
+
+
+    // Public messaging routines for game actions
 
     /**
      * Server query-response to abandon a colony.
@@ -163,7 +430,6 @@ public abstract class ServerAPI {
             null, null);
     }
 
-
     /**
      * Server query-response for attacking.
      *
@@ -175,9 +441,6 @@ public abstract class ServerAPI {
         return askHandling(new AttackMessage(unit, direction),
             null, null);
     }
-
-
-    // Public interface
 
     /**
      * Server query-response for building a colony.
@@ -289,7 +552,7 @@ public abstract class ServerAPI {
     }
 
     /**
-     * Send a chat message.
+     * Send a chat message (pre and in-game).
      *
      * @param chat The text of the message.
      * @return True if the send succeeded.
@@ -349,8 +612,13 @@ public abstract class ServerAPI {
             null, null);
     }
 
-    public void continuePlaying() {
-        client.send(DOMMessage.createMessage("continuePlaying"));        
+    /**
+     * Server query-response to continue with a won game.
+     *
+     * @return True if the server interaction succeeded.
+     */
+    public boolean continuePlaying() {
+        return send(new TrivialMessage("continuePlaying"));        
     }
 
     /**
@@ -487,7 +755,7 @@ public abstract class ServerAPI {
     }
 
     /**
-     * Server query-response for asking to enter revenge mode.
+     * Server query-response for asking to enter revenge mode (post-game).
      *
      * @return True if the server interaction succeeded.
      */
@@ -507,10 +775,6 @@ public abstract class ServerAPI {
     public boolean equipUnit(Unit unit, EquipmentType type, int amount) {
         return askHandling(new EquipUnitMessage(unit, type, amount),
             null, null);
-    }
-
-    public Client getClient() {
-        return client;
     }
 
     /**
@@ -672,7 +936,7 @@ public abstract class ServerAPI {
     }
 
     /**
-     * Server query-response for logging in a player.
+     * Server query-response for logging in a player (pre-game).
      *
      * @param userName The user name.
      * @param version The client version.
@@ -684,6 +948,16 @@ public abstract class ServerAPI {
                                                         "version", version),
                                      "login", null);
         return (reply == null) ? null : new LoginMessage(null, reply);
+    }
+
+    /**
+     * Server query-response for logging out.
+     *
+     * @return True if the server interaction succeeded.
+     */
+    public boolean logout() {
+        return sendAndWait(new TrivialMessage("logout",
+                "reason", "User has quit the client."));
     }
 
     /**
@@ -830,19 +1104,24 @@ public abstract class ServerAPI {
      *
      * @param object A <code>FreeColGameObject</code> to rename.
      * @param name The name to apply.
-     * @return True if the renaming succeeded.
+     * @return True if the server interaction succeeded.
      */
     public boolean rename(FreeColGameObject object, String name) {
         return askHandling(new RenameMessage(object, name),
             null, null);
     }
 
-    public void requestLaunch() {
-        client.send(DOMMessage.createMessage("requestLaunch"));    
+    /**
+     * Server query-response to launch the game (pre-game).
+     *
+     * @return True if the server interaction succeeded.
+     */
+    public boolean requestLaunch() {
+        return send(new TrivialMessage("requestLaunch"));    
     }
 
     /**
-     * Retires the player from the game.
+     * Server query-response to retire the player from the game.
      *
      * @return True if the server interaction succeeded.
      */
@@ -913,10 +1192,18 @@ public abstract class ServerAPI {
             null, null);
     }
 
-    public void setAvailable(Nation nation, NationState state) {
-        client.sendAndWait(DOMMessage.createMessage("setAvailable",
-                    "nation", nation.getId(),
-                    "state", state.toString()));    
+    /**
+     * Server query-response to set a nation's availablility (pre-game).
+     *
+     * @param nation The <code>Nation</code> to whose availability is to be set.
+     * @param state The <code>NationState</code> defining the availability.
+     * @return True if the server interaction succeeded.
+     */
+    public boolean setAvailable(Nation nation, NationState state) {
+        return askHandling(new TrivialMessage("setAvailable",
+                "nation", nation.getId(),
+                "state", state.toString()),
+            null, null);
     }
 
     /**
@@ -930,11 +1217,6 @@ public abstract class ServerAPI {
                                      List<BuildableType> buildQueue) {
         return askHandling(new SetBuildQueueMessage(colony, buildQueue),
             null, null);
-    }
-
-    public void setClient(Client client) {
-        this.client = client;
-        
     }
 
     /**
@@ -962,19 +1244,42 @@ public abstract class ServerAPI {
             null, null);
     }
 
-    public void setNation(Nation nation) {
-       client.sendAndWait(DOMMessage.createMessage("setNation",
-                    "value", nation.getId()));        
+    /**
+     * Server query-response to show which nation a player has selected
+     * (pre-game).
+     *
+     * @param nation The <code>Nation</code> selected.
+     * @return True if the server interaction succeeded.
+     */
+    public boolean setNation(Nation nation) {
+        return askHandling(new TrivialMessage("setNation",
+                "value", nation.getId()),
+            null, null);
     }
 
-    public void setNationType(NationType nationType) {
-        client.sendAndWait(DOMMessage.createMessage("setNationType",
-                    "value", nationType.getId()));    
+    /**
+     * Server query-response to show which nation type a player has selected
+     * (pre-game).
+     *
+     * @param nationType The <code>NationType</code> selected.
+     * @return True if the server interaction succeeded.
+     */
+    public boolean setNationType(NationType nationType) {
+        return askHandling(new TrivialMessage("setNationType",
+                "value", nationType.getId()),
+            null, null);
     }
 
-    public void setReady(boolean ready) {
-        client.send(DOMMessage.createMessage("ready",
-                "value", Boolean.toString(ready)));        
+    /**
+     * Server query-response for indicating that this player is ready
+     * (pre-game).
+     *
+     * @param ready The readiness state to signal.
+     * @return True if the server interaction succeeded.
+     */
+    public boolean setReady(boolean ready) {
+        return send(new TrivialMessage("ready",
+                "value", Boolean.toString(ready)));
     }
 
     /**
@@ -1042,16 +1347,32 @@ public abstract class ServerAPI {
             null, null);
     }
 
-    public void updateGameOptions(OptionGroup gameOptions) {
+    /**
+     * Server query-response to update the game options
+     * (pre-game).
+     *
+     * @param gameOptions The <code>OptionGroup</code> containing the
+     *     game options.
+     * @return True if the server interaction succeeded.
+     */
+    public boolean updateGameOptions(OptionGroup gameOptions) {
         Element up = DOMMessage.createMessage("updateGameOptions");
         up.appendChild(gameOptions.toXMLElement(up.getOwnerDocument()));
-        client.send(up);        
+        return send(up);        
     }
 
-    public void updateMapGeneratorOption(OptionGroup mapOptions) {
+    /**
+     * Server query-response to update the map generator options
+     * (pre-game).
+     *
+     * @param mapOptions The <code>OptionGroup</code> containing the
+     *     map generator options.
+     * @return True if the server interaction succeeded.
+     */
+    public boolean updateMapGeneratorOption(OptionGroup mapOptions) {
         Element up = DOMMessage.createMessage("updateMapGeneratorOptions");
         up.appendChild(mapOptions.toXMLElement(up.getOwnerDocument()));
-        client.send(up);    
+        return send(up);    
     }
 
     /**
@@ -1075,188 +1396,5 @@ public abstract class ServerAPI {
     public boolean work(Unit unit, WorkLocation workLocation) {
         return askHandling(new WorkMessage(unit, workLocation),
             null, null);
-    }
-
-    protected abstract void doClientProcessingFor(Element reply);
-
-    protected abstract void doRaiseErrorMessage(String complaint);
-
-    /**
-     * Sends the specified message to the server and returns the reply,
-     * if it has the specified tag.
-     * Handle "error" replies if they have a messageID or when in debug mode.
-     * This routine allows code simplification in much of the following
-     * client-server communication.
-     *
-     * In following routines we follow the convention that server I/O
-     * is confined to the ask<foo>() routine, which typically returns
-     * true if the server interaction succeeded, which does *not*
-     * necessarily imply that the actual substance of the request was
-     * allowed (e.g. a move may result in the death of a unit rather
-     * than actually moving).
-     *
-     * @param message A <code>DOMMessage</code> to send.
-     * @param tag The expected tag
-     * @param results A <code>Map</code> to store special attribute results in.
-     * @return The answer from the server if it has the specified tag,
-     *         otherwise <code>null</code>.
-     */
-    private Element askExpecting(DOMMessage message, String tag,
-                                 HashMap<String, String> results) {
-        Element reply = client.ask(message.toXMLElement());
-
-        if (reply == null) return null;
-        if ("error".equals(reply.getTagName())) {
-            String messageId = reply.getAttribute("messageID");
-            String messageText = reply.getAttribute("message");
-            if (messageId != null && messageText != null
-                && FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.COMMS)) {
-                // If debugging suppress the bland but i18n compliant
-                // failure message in favour of the higher detail
-                // non-i18n text.
-                reply.removeAttribute("messageID");
-            }
-            if (messageId == null && messageText == null) {
-                logger.warning("Received null error response");
-            } else {
-                logger.warning("Received error response: "
-                               + ((messageId != null) ? messageId : "")
-                               + "/" + ((messageText != null)
-                                   ? messageText : ""));
-                client.handleReply(reply);
-            }
-            return null;
-        }
-
-        // Success!
-        if (tag == null || tag.equals(reply.getTagName())) {
-            // Do the standard processing.
-            doClientProcessingFor(reply);
-            // Look for special attributes
-            if (results != null) {
-                if (results.containsKey("*")) {
-                    results.remove("*");
-                    int len = reply.getAttributes().getLength();
-                    for (int i = 0; i < len; i++) {
-                        Node n = reply.getAttributes().item(i);
-                        results.put(n.getNodeName(), n.getNodeValue());
-                    }
-                } else {
-                    for (String k : results.keySet()) {
-                        if (reply.hasAttribute(k)) {
-                            results.put(k, reply.getAttribute(k));
-                        }
-                    }
-                }
-            }
-            return reply;
-        }
-
-        // Unexpected reply.  Whine and fail.
-        String complaint = "Received reply with tag " + reply.getTagName()
-            + " which should have been " + tag
-            + " to message " + message;
-        logger.warning(complaint);
-        doRaiseErrorMessage(complaint);
-        return null;
-    }
-
-    /**
-     * Extends askExpecting to also handle returns from the server.
-     *
-     * @param message A <code>DOMMessage</code> to send.
-     * @param tag The expected tag
-     * @param results A <code>Map</code> to store special attribute results in.
-     * @return True if the server interaction succeeded, else false.
-     */
-    private boolean askHandling(DOMMessage message, String tag,
-                                HashMap<String, String> results) {
-        Element reply = askExpecting(message, tag, results);
-        if (reply == null) return false;
-
-        client.handleReply(reply);
-        return true;
-    }
-
-    /**
-     * Helper to load a map.
-     *
-     * @param queries Query strings.
-     * @return A map with null mappings for the query strings.
-     */
-    private HashMap<String, String> loadMap(String... queries) {
-        HashMap<String, String> result = new HashMap<String, String>();
-        for (String q : queries) result.put(q, null);
-        return result;
-    }
-
-    /**
-     * Sends a DOMMessage to the server.
-     *
-     * @param message The <code>DOMMessage</code> to send.
-     * @return True if the send succeeded.
-     */
-    private boolean send(DOMMessage message) {
-        client.send(message.toXMLElement());
-        return true;
-    }
-
-
-    public void logout() {
-        client.sendAndWait(DOMMessage.createMessage("logout",
-                "reason", "User has quit the client."));        
-    }
-
-
-    public void disconnect() {
-        if (client != null) client.disconnect();        
-    }
-
-
-    /**
-     * Connects a client to host:port (or more).
-     *
-     * @param threadName The name for the thread.
-     * @param host The name of the machine running the
-     *            <code>FreeColServer</code>.
-     * @param port The port to use when connecting to the host.
-     * @throws ConnectException
-     * @throws IOException
-     */
-    public void connect(String threadName, String host, int port, MessageHandler messageHandler) 
-        throws ConnectException, IOException {
-        int tries;
-            if (port < 0) {
-                port = FreeCol.getServerPort();
-                tries = 10;
-            } else {
-                tries = 1;
-            }
-            for (int i = tries; i > 0; i--) {
-                try {
-                    client = new Client(host, port,
-                                        messageHandler,
-                                        threadName);
-                    if (client != null) 
-                        break;
-                } catch (ConnectException e) {
-                    if (i == 1) 
-                        throw e;
-                } catch (IOException e) {
-                    if (i == 1) 
-                        throw e;
-                }
-            }
-    }
-
-
-    public void reset() {
-        client = null;
-    }
-
-
-    public void registerMessageHandler(MessageHandler messageHandler) {
-        client.setMessageHandler(messageHandler);
-        
     }
 }
