@@ -253,9 +253,11 @@ final class ReceivingThread extends Thread {
      * Tells this thread that it does not need to do any more work.
      */
     public synchronized void askToStop() {
-        shouldRun = false;
-        for (NetworkReplyObject o : waitingThreads.values()) {
-            o.interrupt();
+        if (shouldRun) {
+            shouldRun = false;
+            for (NetworkReplyObject o : waitingThreads.values()) {
+                o.interrupt();
+            }
         }
     }
 
@@ -288,7 +290,7 @@ final class ReceivingThread extends Thread {
         if (!shouldRun()) return;
         in.enable();
 
-        final int LOOK_AHEAD = 4096;
+        final int LOOK_AHEAD = 5000;
         BufferedInputStream bis = new BufferedInputStream(in, LOOK_AHEAD);
         bis.mark(LOOK_AHEAD);
 
@@ -311,8 +313,8 @@ final class ReceivingThread extends Thread {
                 nro.setResponse(new DOMMessage(bis));
             }
         } else {
-            bis.reset();
             try {
+                bis.reset();
                 connection.handleAndSendReply(bis);
             } catch (IOException ioe) {
                 logger.log(Level.WARNING, "IO error", ioe);

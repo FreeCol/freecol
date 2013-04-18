@@ -218,11 +218,20 @@ public class Connection {
     public void reallyClose() throws IOException {
         if (thread != null) thread.askToStop();
 
-        if (out != null) out.close();
+        if (out != null) {
+            out.close();
+            out = null;
+        }
 
-        if (socket != null) socket.close();
+        if (socket != null) {
+            socket.close();
+            socket = null;
+        }
 
-        if (in != null) in.close();
+        if (in != null) {
+            in.close();
+            in = null;
+        }
         logger.fine("Connection really closed.");
     }
 
