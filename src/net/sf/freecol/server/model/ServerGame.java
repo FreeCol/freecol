@@ -128,18 +128,6 @@ public class ServerGame extends Game implements ServerModelObject {
         }
 
         readFromXML(in);
-
-        // Initialize players.
-        for (Object o : serverObjects) {
-            if (o instanceof Player) {
-                Player player = (Player)o;
-                if (player.isUnknownEnemy()) {
-                    setUnknownEnemy(player);
-                } else {
-                    players.add(player);
-                }
-            }
-        }
     }
 
     /**

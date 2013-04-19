@@ -56,8 +56,6 @@ import org.w3c.dom.Element;
  */
 public class Game extends FreeColGameObject {
 
-    public static final String CIBOLA_TAG = "cibola";
-
     private static final Logger logger = Logger.getLogger(Game.class.getName());
 
     /** Game UUID, persistent in savegame files */
@@ -1022,199 +1020,158 @@ public class Game extends FreeColGameObject {
 
     // Serialization
 
+    private static final String CIBOLA_TAG = "cibola";
+    private static final String CURRENT_PLAYER_TAG = "currentPlayer";
+    private static final String NEXT_ID_TAG = "nextId";
+    private static final String SPANISH_SUCCESSION_TAG = "spanishSuccession";
+    private static final String TURN_TAG = "turn";
+    private static final String UUID_TAG = "UUID";
+    // @compat 0.9.x
+    private static final String CITIES_OF_CIBOLA_TAG = "citiesOfCibola";
+    private static final String DIFFICULTY_LEVEL_TAG = "difficultyLevel";
+    private static final String GAME_OPTIONS_1_TAG = "gameOptions";
+    private static final String GAME_OPTIONS_2_TAG = "game-options";
+    // end @compat
+    // @compat 0.10.x
+    private static final String OLD_NEXT_ID_TAG = "nextID";
+    // end @compat
+
+    // @compat 0.9.x
+    // Nasty hacks for I/O.
+    private OptionGroup gameOptions = null;
+    private OptionGroup mapGeneratorOptions = null;
+    // end @compat
+
+
     /**
-     * This method writes an XML-representation of this object to the given
-     * stream.
-     *
-     * <br>
-     * <br>
-     *
-     * Only attributes visible to the given <code>Player</code> will be added
-     * to that representation if <code>showAll</code> is set to
-     * <code>false</code>.
-     *
-     * @param out The target stream.
-     * @param player The <code>Player</code> this XML-representation should be
-     *            made for, or <code>null</code> if
-     *            <code>showAll == true</code>.
-     * @param showAll Only attributes visible to <code>player</code> will be
-     *            added to the representation if <code>showAll</code> is set
-     *            to <i>false</i>.
-     * @param toSavedGame If <code>true</code> then information that is only
-     *            needed when saving a game is added.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
+     * {@inheritDoc}
      */
     protected void toXMLImpl(XMLStreamWriter out, Player player,
-                             boolean showAll, boolean toSavedGame)
-        throws XMLStreamException {
-        // Start element:
-        out.writeStartElement(getXMLElementTagName());
+                             boolean showAll,
+                             boolean toSavedGame) throws XMLStreamException {
+        super.toXML(out, getXMLElementTagName(), player, showAll, toSavedGame);
+    }
 
-        if (toSavedGame && !showAll) {
-            throw new IllegalArgumentException("showAll must be set to true when toSavedGame is true.");
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out, Player player,
+                                   boolean showAll,
+                                   boolean toSavedGame) throws XMLStreamException {
+        super.writeAttributes(out);
+
+        if (toSavedGame) writeAttribute(out, NEXT_ID_TAG, nextId);
+
+        writeAttribute(out, UUID_TAG, getUUID());
+
+        writeAttribute(out, TURN_TAG, getTurn().getNumber());
+
+        writeAttribute(out, SPANISH_SUCCESSION_TAG, spanishSuccession);
+
+        if (currentPlayer != null) {
+            writeAttribute(out, CURRENT_PLAYER_TAG, currentPlayer);
         }
+    }
 
-        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
-        out.writeAttribute("UUID", getUUID().toString());
-        out.writeAttribute("turn", Integer.toString(getTurn().getNumber()));
-        out.writeAttribute("spanishSuccession", Boolean.toString(spanishSuccession));
-
-        writeAttribute(out, "currentPlayer", currentPlayer);
-
-        if (toSavedGame) {
-            out.writeAttribute("nextId", Integer.toString(nextId));
-        }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeChildren(XMLStreamWriter out, Player player,
+                                 boolean showAll,
+                                 boolean toSavedGame) throws XMLStreamException {
+        super.writeChildren(out);
 
         specification.toXMLImpl(out);
 
         for (String cityName : citiesOfCibola) {
             out.writeStartElement(CIBOLA_TAG);
-            out.writeAttribute(ID_ATTRIBUTE_TAG, cityName);
+
+            writeAttribute(out, ID_ATTRIBUTE_TAG, cityName);
+
             out.writeEndElement();
         }
+
         nationOptions.toXML(out);
 
-        // serialize players
         for (Player p : getSortedCopy(getPlayers())) {
             p.toXML(out, player, showAll, toSavedGame);
         }
+
         Player enemy = getUnknownEnemy();
         if (enemy != null) enemy.toXML(out, player, showAll, toSavedGame);
-
-        // serialize map
+ 
         if (map != null) map.toXML(out, player, showAll, toSavedGame);
-
-        /* Moved to within player.  Last used in 0.9.x.
-        // serialize messages
-        playerIterator = getPlayerIterator();
-        while (playerIterator.hasNext()) {
-            Player p = playerIterator.next();
-            if (showAll || p.equals(player)) {
-                for (ModelMessage message : p.getModelMessages()) {
-                    message.toXML(out);
-                }
-            }
-        }
-        */
-
-        out.writeEndElement();
     }
 
     /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
+     * {@inheritDoc}
+     */
+    @Override
+    protected void toXMLPartialImpl(XMLStreamWriter out,
+                                    String[] fields) throws XMLStreamException {
+        toXMLPartialByClass(out, getClass(), fields);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void readFromXMLPartialImpl(XMLStreamReader in) throws XMLStreamException {
+        readFromXMLPartialByClass(in, getClass());
+    }
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        setId(readId(in));
+        super.readAttributes(in);
 
-        String hs = in.getAttributeValue(null, "UUID");
-        if (hs != null) {
-           uuid = UUID.fromString(hs);
-        }
-
-        turn = new Turn(getAttribute(in, "turn", 1));
-        setSpanishSuccession(getAttribute(in, "spanishSuccession", false));
-
-        nextId = getAttribute(in, "nextId", -1);
+        nextId = getAttribute(in, NEXT_ID_TAG, -1);
         // @compat 0.10.x
-        if (nextId < 0) nextId = getAttribute(in, "nextID", -1);
+        if (nextId < 0) nextId = getAttribute(in, OLD_NEXT_ID_TAG, 0);
         // end @compat
 
-        final String currentPlayerStr = in.getAttributeValue(null, "currentPlayer");
-        if (currentPlayerStr != null) {
-            currentPlayer = getFreeColGameObject(currentPlayerStr, Player.class);
-            if (currentPlayer == null) {
-                currentPlayer = new Player(this, currentPlayerStr);
-                players.add(currentPlayer);
-            }
-        } else {
-            currentPlayer = null;
-        }
+        String str = getAttribute(in, UUID_TAG, (String)null);
+        uuid = (str == null) ? null : UUID.fromString(str);
+
+        turn = new Turn(getAttribute(in, TURN_TAG, 1));
+
+        spanishSuccession = getAttribute(in, SPANISH_SUCCESSION_TAG, false);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        // Clear containers.
         citiesOfCibola.clear();
-        OptionGroup gameOptions = null;
-        OptionGroup mapGeneratorOptions = null;
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            String tagName = in.getLocalName();
-            logger.finest("Found tag " + tagName);
-            if (tagName.equals("gameOptions") || tagName.equals("game-options")) {
-                // @compat 0.9.x
-                gameOptions = new OptionGroup(specification);
-                gameOptions.readFromXML(in);
-            } else if (tagName.equals(NationOptions.getXMLElementTagName())) {
-                if (nationOptions == null) {
-                    nationOptions = new NationOptions(specification);
-                }
-                nationOptions.readFromXML(in);
-            } else if (tagName.equals(Player.getXMLElementTagName())) {
-                Player player = getFreeColGameObject(readId(in),
-                                                     Player.class);
-                if (player == null) {
-                    player = new Player(this, in);
-                    if (player.isUnknownEnemy()) {
-                        setUnknownEnemy(player);
-                    } else {
-                        players.add(player);
-                    }
-                } else {
-                    player.readFromXML(in);
-                }
-            } else if (tagName.equals(Map.getXMLElementTagName())) {
-                String mapId = readId(in);
-                map = getFreeColGameObject(mapId, Map.class);
-                if (map == null) {
-                    map = new Map(this, mapId);
-                }
-                map.readFromXML(in);
-            } else if (tagName.equals(ModelMessage.getXMLElementTagName())) {
-                // @compat 0.9.x
-                ModelMessage m = new ModelMessage();
-                m.readFromXML(in);
-                // When this goes, remove getOwnerId().
-                String owner = m.getOwnerId();
-                if (owner != null) {
-                    Player player = getFreeColGameObject(owner, Player.class);
-                    player.addModelMessage(m);
-                }
-            } else if (tagName.equals("citiesOfCibola")) {
-                // @compat 0.9.x
-                List<String> cities
-                    = readFromListElement("citiesOfCibola", in, String.class);
-                citiesOfCibola.addAll(cities);
-            } else if (tagName.equals(CIBOLA_TAG)) {
-                citiesOfCibola.add(readId(in));
-                in.nextTag();
-            } else if (OptionGroup.getXMLElementTagName().equals(tagName)
-                       || "difficultyLevel".equals(tagName)) {
-                // @compat 0.9.x
-                OptionGroup difficultyLevel = new OptionGroup(specification);
-                difficultyLevel.readFromXML(in);
-            } else if (MapGeneratorOptions.getXMLElementTagName().equals(tagName)) {
-                // @compat 0.9.x
-                mapGeneratorOptions = new OptionGroup(specification);
-                mapGeneratorOptions.readFromXML(in);
-            } else if (Specification.getXMLElementTagName().equals(tagName)) {
-                logger.info(((specification == null) ? "Loading" : "Reloading")
-                    + " specification.");
-                specification = new Specification(in);
+        players.clear();
+        unknownEnemy = null;
+        // @compat 0.9.x
+        gameOptions = null;
+        mapGeneratorOptions = null;
+        // end @compat
 
-            } else {
-                logger.warning("Unknown tag: " + tagName + " loading game");
-                in.nextTag();
-            }
-        }
-        // sanity check: we should be on the closing tag
-        if (!in.getLocalName().equals(Game.getXMLElementTagName())) {
-            logger.warning("Error parsing xml: expecting closing tag </" + Game.getXMLElementTagName() + "> "+
-                           "found instead: " + in.getLocalName());
-        }
+        // Special case for the current player.  Defer lookup of the
+        // current player tag until we read the children, because that
+        // is where the players are defined.
+        String current = getAttribute(in, CURRENT_PLAYER_TAG, (String)null);
 
+        super.readChildren(in);
+
+        currentPlayer = (current == null) ? null
+            : getFreeColGameObject(current, Player.class);
+
+        if (!Game.getXMLElementTagName().equals(in.getLocalName())) {
+            logger.warning("Error parsing xml, expecting closing tag </"
+                + Game.getXMLElementTagName() + ">, "
+                + " found instead: " + in.getLocalName());
+        }
+ 
         // @compat 0.9.x
         if (gameOptions != null) {
             addOldOptions(gameOptions);
@@ -1222,7 +1179,88 @@ public class Game extends FreeColGameObject {
         if (mapGeneratorOptions != null) {
             addOldOptions(mapGeneratorOptions);
         }
-        // end compatibility code
+        // end @compat
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+        final String tag = in.getLocalName();
+        logger.finest("Found game tag " + tag + " id=" + readId(in));
+
+        if (CIBOLA_TAG.equals(tag)) {
+            String id = readId(in);
+            if (id != null) citiesOfCibola.add(id);
+            in.nextTag();
+
+            // @compat 0.9.x
+        } else if (CITIES_OF_CIBOLA_TAG.equals(tag)) {
+            List<String> cities = readFromListElement(CITIES_OF_CIBOLA_TAG, in, 
+                String.class);
+            citiesOfCibola.clear();
+            citiesOfCibola.addAll(cities);
+            // end @compat
+
+            // @compat 0.9.x
+        } else if (GAME_OPTIONS_1_TAG.equals(tag) 
+            || GAME_OPTIONS_2_TAG.equals(tag)) {
+            gameOptions = new OptionGroup(specification);
+            gameOptions.readFromXML(in);
+            // end @compat
+
+        } else if (Map.getXMLElementTagName().equals(tag)) {
+            map = readFreeColGameObject(in, Map.class);
+
+            // @compat 0.9.x
+        } else if (MapGeneratorOptions.getXMLElementTagName().equals(tag)) {
+            mapGeneratorOptions = new OptionGroup(specification);
+            mapGeneratorOptions.readFromXML(in);
+            // end @compat
+
+            // @compat 0.9.x
+        } else if (ModelMessage.getXMLElementTagName().equals(tag)) {
+            ModelMessage m = new ModelMessage();
+            m.readFromXML(in);
+            // When this goes, remove getOwnerId().
+            String owner = m.getOwnerId();
+            if (owner != null) {
+                Player player = getFreeColGameObject(owner, Player.class);
+                player.addModelMessage(m);
+            }
+            // end @compat
+
+        } else if (NationOptions.getXMLElementTagName().equals(tag)) {
+            if (nationOptions == null) {
+                nationOptions = new NationOptions(specification);
+            }
+            nationOptions.readFromXML(in);
+
+        } else if (Player.getXMLElementTagName().equals(tag)) {
+            Player player = readFreeColGameObject(in, Player.class);
+            if (player.isUnknownEnemy()) {
+                setUnknownEnemy(player);
+            } else {
+                players.add(player);
+            }
+
+        } else if (OptionGroup.getXMLElementTagName().equals(tag)
+            // @compat 0.9.x
+            || DIFFICULTY_LEVEL_TAG.equals(tag)
+            // end @compat
+                   ) {
+            OptionGroup difficultyLevel = new OptionGroup(specification);
+            difficultyLevel.readFromXML(in);
+
+        } else if (Specification.getXMLElementTagName().equals(tag)) {
+            logger.info(((specification == null) ? "Loading" : "Reloading")
+                + " specification.");
+            specification = new Specification(in);
+
+        } else {
+            super.readChild(in);
+        }
     }
 
     // @compat 0.9.x
@@ -1249,35 +1287,10 @@ public class Game extends FreeColGameObject {
             }
         }
     }
-    // end compatibility code
+    // end @compat
 
     /**
-     * Partial writer, so that simple updates can be brief.
-     *
-     * @param out The target stream.
-     * @param fields The fields to write.
-     * @throws XMLStreamException If there are problems writing the stream.
-     */
-    @Override
-    protected void toXMLPartialImpl(XMLStreamWriter out, String[] fields)
-        throws XMLStreamException {
-        toXMLPartialByClass(out, getClass(), fields);
-    }
-
-    /**
-     * Partial reader, so that simple updates can be brief.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException If there are problems reading the stream.
-     */
-    @Override
-    public void readFromXMLPartialImpl(XMLStreamReader in)
-        throws XMLStreamException {
-        readFromXMLPartialByClass(in, getClass());
-    }
-
-    /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "game".
      */
