@@ -3798,7 +3798,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 out.writeEndElement();
             }
             Stance s = getStance(player);
-            for (Entry<String, Stance> entry : stance.entrySet()) {
+            if (s != null) {
                 out.writeStartElement(STANCE_TAG);
                 out.writeAttribute("player", player.getId());
                 out.writeAttribute(VALUE_TAG, s.toString());
