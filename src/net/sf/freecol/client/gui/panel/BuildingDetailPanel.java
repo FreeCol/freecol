@@ -246,8 +246,7 @@ public class BuildingDetailPanel extends ColopediaGameObjectTypePanel<BuildingTy
             }
         }
 
-        Set<Ability> abilities = buildingType.getAbilities();
-        for (Ability ability : abilities) {
+        for (Ability ability : buildingType.getAbilities()) {
             JComponent component = getAbilityComponent(ability);
             if (component != null) {
                 labels.add(component);

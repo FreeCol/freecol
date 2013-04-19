@@ -19,7 +19,10 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -170,12 +173,13 @@ public class NationOptions extends FreeColObject {
 
         out.writeStartElement(NATIONS_TAG);
 
-        for (Map.Entry<Nation, NationState> entry : nations.entrySet()) {
+        List<Nation> sorted = getSortedCopy(nations.keySet());
+        for (Nation nation : sorted) {
             out.writeStartElement(NATION_TAG);
 
-            writeAttribute(out, ID_ATTRIBUTE_TAG, entry.getKey());
+            writeAttribute(out, ID_ATTRIBUTE_TAG, nation);
 
-            writeAttribute(out, STATE_TAG, entry.getValue());
+            writeAttribute(out, STATE_TAG, nations.get(nation));
             
             out.writeEndElement();
         }

@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -519,7 +520,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
         super.writeChildren(out);
 
-        for (MarketData data : marketData.values()) {
+        for (MarketData data : getSortedCopy(marketData.values())) {
             data.toXML(out);
         }
     }

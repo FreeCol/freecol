@@ -25,7 +25,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 
-public class TileTypeChange {
+public class TileTypeChange implements Comparable<TileTypeChange> {
 
     /** The original tile type. */
     private TileType from;
@@ -92,6 +92,27 @@ public class TileTypeChange {
      */
     public final void setProduction(final AbstractGoods production) {
         this.production = production;
+    }
+
+
+    // Interface Comparable<TileTypeChange>
+
+    /**
+     * Compares this object with the specified object.
+     *
+     * @param other The <code>TileTypeChange</code> to compare to.
+     * @return A comparison result.
+     */
+    public int compareTo(TileTypeChange other) {
+        int cmp;
+        cmp = (from == null) ? ((other.from == null) ? 0 : -1)
+            : (other.from == null) ? 1
+            : from.getId().compareTo(other.from.getId());
+        if (cmp != 0) return cmp;
+        cmp = (to == null) ? ((other.to == null) ? 0 : -1)
+            : (other.to == null) ? 1
+            : to.getId().compareTo(other.to.getId());
+        return cmp;
     }
 
 

@@ -426,8 +426,10 @@ public class Modifier extends Feature implements Comparable<Modifier> {
      * @return A comparison result.
      */
     public int compareTo(Modifier modifier) {
-        return (index == modifier.index) ? type.compareTo(modifier.type)
-            : (index - modifier.index);
+        int cmp = index - modifier.index;
+        if (cmp == 0) cmp = type.compareTo(modifier.type);
+        if (cmp == 0) cmp = getIdComparator().compare(this, modifier);
+        return cmp;
     }
 
 

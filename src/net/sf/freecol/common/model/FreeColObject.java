@@ -32,6 +32,9 @@ import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -120,6 +123,71 @@ public abstract class FreeColObject {
      */
     protected void setId(final String newId) {
         this.id = newId;
+    }
+
+    /**
+     * Get the type part of the identifier.
+     *
+     * @return The type part of the identifier, or null on error.
+     */
+    public String getIdType() {
+        if (id != null) {
+            int col = id.indexOf(':');
+            return (col >= 0) ? id.substring(0, col) : id;
+        }
+        return null;
+    }
+
+    /**
+     * Gets the numeric part of the identifier.
+     *
+     * @return The numeric part of the identifier, or negative on error.
+     */
+    public int getIdNumber() {
+        if (id != null) {
+            int col = id.indexOf(':');
+            if (col >= 0) {
+                try {
+                    return Integer.parseInt(id.substring(col + 1));
+                } catch (NumberFormatException nfe) {}
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * Get a comparator by id for <code>FreeColObject</code>s.
+     *
+     * @return A new id comparator.
+     */
+    public static <T extends FreeColObject> Comparator<T> getIdComparator() {
+        return new Comparator<T>() {
+            public int compare(T fco1, T fco2) {
+                String id1 = fco1.getId();
+                String id2 = fco2.getId();
+                if (id1 == null) {
+                    return (id2 == null) ? 0 : -1;
+                } else if (id2 == null) {
+                    return 1;
+                }
+                int cmp = fco1.getIdType().compareTo(fco2.getIdType());
+                if (cmp == 0) cmp = fco1.getIdNumber() - fco2.getIdNumber();
+                if (cmp == 0) cmp = fco1.hashCode() - fco2.hashCode();
+                return cmp;
+            }
+        };
+    }
+
+    /**
+     * Sort a collection of <code>FreeColObject</code>s.
+     *
+     * @param c The <code>Collection</code> to sort.
+     * @return A sorted copy of the collection.
+     */
+    public static <T extends FreeColObject> List<T> getSortedCopy(Collection<T> c) {
+        List<T> newC = new ArrayList<T>(c);
+        Collections.sort(newC, getIdComparator());
+        return newC;
     }
 
     /**
@@ -1291,6 +1359,18 @@ public abstract class FreeColObject {
      */
     public final Set<Modifier> getModifiers() {
         return FeatureContainer.getModifiers(getFeatureContainer());
+    }
+
+    /**
+     * Gets a sorted copy of the modifiers of this object.
+     *
+     * @return A list of modifiers.
+     */
+    public List<Modifier> getSortedModifiers() {
+        List<Modifier> modifiers = new ArrayList<Modifier>();
+        modifiers.addAll(getModifiers());
+        Collections.sort(modifiers);
+        return modifiers;
     }
 
     /**

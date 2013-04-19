@@ -478,9 +478,10 @@ public final class TileImprovementType extends FreeColGameObjectType {
         }
 
         if (tileTypeChanges != null) {
-            for (TileTypeChange change : tileTypeChanges.values()) {
-                change.toXML(out);
-            }
+            List<TileTypeChange> sorted
+                = new ArrayList<TileTypeChange>(tileTypeChanges.values());
+            Collections.sort(sorted);
+            for (TileTypeChange change : sorted) change.toXML(out);
         }
 
         for (RandomChoice<Disaster> choice : getDisasters()) {

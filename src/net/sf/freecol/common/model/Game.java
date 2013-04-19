@@ -1076,9 +1076,7 @@ public class Game extends FreeColGameObject {
         nationOptions.toXML(out);
 
         // serialize players
-        Iterator<Player> playerIterator = getPlayerIterator();
-        while (playerIterator.hasNext()) {
-            Player p = playerIterator.next();
+        for (Player p : getSortedCopy(getPlayers())) {
             p.toXML(out, player, showAll, toSavedGame);
         }
         Player enemy = getUnknownEnemy();

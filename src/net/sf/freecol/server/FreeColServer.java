@@ -831,6 +831,7 @@ public final class FreeColServer {
         } catch (XMLStreamException e) {
             throw new IOException("XMLStreamException: " + e.getMessage());
         } catch (Exception e) {
+            logger.log(Level.WARNING, e.getMessage(), e);
             throw new IOException("Exception: " + e.getMessage());
         } finally {
             try {
