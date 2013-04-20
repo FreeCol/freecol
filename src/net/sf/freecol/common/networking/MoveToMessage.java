@@ -89,7 +89,7 @@ public class MoveToMessage extends DOMMessage {
             return DOMMessage.clientError(e.getMessage());
         }
 
-        Location destination = game.getFreeColLocation(destinationId);
+        Location destination = game.findFreeColLocation(destinationId);
         if (destination == null) {
             return DOMMessage.clientError("Not a location: " + destinationId);
         }

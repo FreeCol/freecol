@@ -231,50 +231,6 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Convenience wrapper to get a location by id.
-     * Location is an interface, precluding using the typed version
-     * of getFreeColGameObject().
-     *
-     * @param id The identifier.
-     * @return The <code>Location</code> if any.
-     */
-    public Location getFreeColLocation(String id) {
-        FreeColGameObject fcgo = getFreeColGameObject(id);
-        if (fcgo instanceof Location) return (Location)fcgo;
-        if (fcgo != null) {
-            logger.warning("Not a location: " + id);
-            return null;
-        }
-        final String tag = id.substring(0, id.indexOf(':'));
-        // @compat 0.10.x
-        if ("newWorld".equals(tag)) {
-            // do nothing
-        // end @compat
-        } else if (Building.getXMLElementTagName().equals(tag)) {
-            return new Building(this, id);
-        } else if (Colony.getXMLElementTagName().equals(tag)) {
-            return new Colony(this, id);
-        } else if (ColonyTile.getXMLElementTagName().equals(tag)) {
-            return new ColonyTile(this, id);
-        } else if (Europe.getXMLElementTagName().equals(tag)) {
-            return new Europe(this, id);
-        } else if (HighSeas.getXMLElementTagName().equals(tag)) {
-            return new HighSeas(this, id);
-        } else if (IndianSettlement.getXMLElementTagName().equals(tag)) {
-            return new IndianSettlement(this, id);
-        } else if (Map.getXMLElementTagName().equals(tag)) {
-            return new Map(this, id);
-        } else if (Tile.getXMLElementTagName().equals(tag)) {
-            return new Tile(this, id);
-        } else if (Unit.getXMLElementTagName().equals(tag)) {
-            return new Unit(this, id);
-        } else {
-            logger.warning("Not a FCGO: " + id);
-        }
-        return null;
-    }
-
-    /**
      * Registers a new <code>FreeColGameObject</code> with a given
      * identifier.
      *
@@ -322,6 +278,66 @@ public class Game extends FreeColGameObject {
         
         freeColGameObjects.remove(id);
         return o;
+    }
+
+    /**
+     * Convenience wrapper to find a location (which is an interface,
+     * precluding using the typed version of getFreeColGameObject())
+     * by id.
+     *
+     * Use this routine when the object should already be present in the game.
+     *
+     * @param id The identifier.
+     * @return The <code>Location</code> if any.
+     */
+    public Location findFreeColLocation(String id) {
+        FreeColGameObject fcgo = getFreeColGameObject(id);
+        return (fcgo instanceof Location) ? (Location)fcgo : null;
+    }
+
+    /**
+     * Convenience wrapper to find or make a location (which is an
+     * interface, precluding using the typed version of
+     * getFreeColGameObject()) by id.
+     *
+     * Use this routine when the object may not necessarily already be
+     * present in the game, but is expected to be defined eventually.
+     *
+     * @param id The id.
+     * @return The <code>Location</code> if any.
+     */
+    public Location makeFreeColLocation(String id) {
+        FreeColGameObject fcgo = getFreeColGameObject(id);
+        if (fcgo instanceof Location) return (Location)fcgo;
+        if (fcgo != null) {
+            logger.warning("Not a location: " + id);
+            return null;
+        }
+        final String tag = id.substring(0, id.indexOf(':'));
+        if ("newWorld".equals(tag)) {
+            // do nothing
+        } else if (Building.getXMLElementTagName().equals(tag)) {
+            return new Building(this, id);
+        } else if (Colony.getXMLElementTagName().equals(tag)) {
+            return new Colony(this, id);
+        } else if (ColonyTile.getXMLElementTagName().equals(tag)) {
+            return new ColonyTile(this, id);
+        } else if (Europe.getXMLElementTagName().equals(tag)) {
+            return new Europe(this, id);
+        } else if (HighSeas.getXMLElementTagName().equals(tag)) {
+            return new HighSeas(this, id);
+        } else if (IndianSettlement.getXMLElementTagName().equals(tag)) {
+            return new IndianSettlement(this, id);
+        } else if (Map.getXMLElementTagName().equals(tag)) {
+            return new Map(this, id);
+        } else if (Tile.getXMLElementTagName().equals(tag)) {
+            return new Tile(this, id);
+        } else if (Unit.getXMLElementTagName().equals(tag)) {
+            return new Unit(this, id);
+        } else {
+            logger.warning("Not a FCGO: " + id);
+        }
+        return null;
     }
 
     /**

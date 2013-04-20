@@ -208,8 +208,8 @@ public abstract class Wish extends ValuedAIObject {
 
         final AIMain aiMain = getAIMain();
 
-        destination = getLocationAttribute(in, DESTINATION_TAG,
-                                           aiMain.getGame());
+        destination = findLocationAttribute(in, DESTINATION_TAG,
+                                            aiMain.getGame());
 
         if (hasAttribute(in, TRANSPORTABLE_TAG)) {
             transportable = getAttribute(in, TRANSPORTABLE_TAG,

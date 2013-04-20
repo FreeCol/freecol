@@ -466,7 +466,7 @@ public class MissionaryMission extends Mission {
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
         
-        target = getLocationAttribute(in, TARGET_TAG, getGame());
+        target = findLocationAttribute(in, TARGET_TAG, getGame());
     }
 
     /**

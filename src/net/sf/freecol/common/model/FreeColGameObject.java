@@ -228,6 +228,8 @@ abstract public class FreeColGameObject extends FreeColObject {
      * Find a <code>FreeColGameObject</code> of a given class
      * from a stream attribute.
      *
+     * Use this routine when the object should already be present in the game.
+     *
      * @param in The <code>XMLStreamReader</code> to read from.
      * @param attributeName The attribute name.
      * @param returnClass The class to expect.
@@ -244,6 +246,9 @@ abstract public class FreeColGameObject extends FreeColObject {
     /**
      * Either get an existing <code>FreeColGameObject</code> from a stream
      * attribute or create it if it does not exist.
+     *
+     * Use this routine when the object may not necessarily already be
+     * present in the game, but is expected to be defined eventually.
      *
      * @param in The <code>XMLStreamReader</code> to read from.
      * @param attributeName The required attribute name.
@@ -278,6 +283,10 @@ abstract public class FreeColGameObject extends FreeColObject {
     /**
      * Reads a <code>FreeColGameObject</code> from a stream.
      * Expects the object to be identified by the standard ID_ATTRIBUTE_TAG.
+     *
+     * Use this routine when the object may or may not have been
+     * referenced and created-by-id in this game, but this is the
+     * point where it is authoritatively defined.
      *
      * @param in The <code>XMLStreamReader</code> to read from.
      * @param returnClass The class to expect.
@@ -330,6 +339,8 @@ abstract public class FreeColGameObject extends FreeColObject {
         }
         return null;
     }
+
+
 
     /**
      * Gets a <code>FreeColGameObject</code> value or the default value.
@@ -441,6 +452,7 @@ abstract public class FreeColGameObject extends FreeColObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         toXMLImpl(out, null, false, false);
     }
@@ -616,20 +628,6 @@ abstract public class FreeColGameObject extends FreeColObject {
         }
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT);
-    }
-
-    /**
-     * Get a new location from a stream attribute.
-     *
-     * @param in The input <code>XMLStreamReader</code>.
-     * @param attrib The attribute to check.
-     * @return The <code>Location</code> found.
-     */
-    protected Location getLocationAttribute(XMLStreamReader in, String attrib) {
-        if (attrib == null) return null;
-
-        String id = getAttribute(in, attrib, (String)null);
-        return (id == null) ? null : game.getFreeColLocation(id);
     }
 
     /**

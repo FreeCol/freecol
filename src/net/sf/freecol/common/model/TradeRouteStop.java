@@ -177,7 +177,7 @@ public class TradeRouteStop {
         throws XMLStreamException {
         if (game != null) {
             String str = in.getAttributeValue(null, "location");
-            location = game.getFreeColLocation(str);
+            location = game.makeFreeColLocation(str);
         }
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {

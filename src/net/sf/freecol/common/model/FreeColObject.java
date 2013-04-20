@@ -881,22 +881,45 @@ public abstract class FreeColObject {
     }
 
     /**
-     * Gets a FreeCol location from an attribute in a stream.
+     * Find a new location from a stream attribute.
      *
-     * @param in The <code>XMLStreamReader</code> to read from.
-     * @param attributeName The attribute name.
+     * @param in The input <code>XMLStreamReader</code>.
+     * @param attributeName The attribute to check.
      * @param game The <code>Game</code> to look in.
-     * @return The <code>Location</code>, or null if none found.
+     * @return The <code>Location</code> found.
      */
-    public Location getLocationAttribute(XMLStreamReader in,
-                                         String attributeName, Game game) {
+    protected Location findLocationAttribute(XMLStreamReader in,
+                                             String attributeName, Game game) {
+        if (attributeName == null) return null;
+
         final String attrib =
         // @compat 0.10.7
             (ID_ATTRIBUTE_TAG.equals(attributeName)) ? readId(in) :
         // end @compat
             in.getAttributeValue(null, attributeName);
         
-        return (attrib == null) ? null : game.getFreeColLocation(attrib);
+        return (attrib == null) ? null : game.findFreeColLocation(attrib);
+    }
+
+    /**
+     * Makes a FreeCol location from an attribute in a stream.
+     *
+     * @param in The <code>XMLStreamReader</code> to read from.
+     * @param attributeName The attribute name.
+     * @param game The <code>Game</code> to look in.
+     * @return The <code>Location</code>, or null if none found.
+     */
+    public Location makeLocationAttribute(XMLStreamReader in,
+                                          String attributeName, Game game) {
+        if (attributeName == null) return null;
+
+        final String attrib =
+        // @compat 0.10.7
+            (ID_ATTRIBUTE_TAG.equals(attributeName)) ? readId(in) :
+        // end @compat
+            in.getAttributeValue(null, attributeName);
+        
+        return (attrib == null) ? null : game.makeFreeColLocation(attrib);
     }
         
     /**

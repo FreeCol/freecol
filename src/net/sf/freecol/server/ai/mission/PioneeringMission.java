@@ -727,7 +727,7 @@ public class PioneeringMission extends Mission {
         super.readAttributes(in);
 
         // Do not use setTarget in serialization
-        target = getLocationAttribute(in, TARGET_TAG, getGame());
+        target = findLocationAttribute(in, TARGET_TAG, getGame());
 
         if (hasAttribute(in, TILE_IMPROVEMENT_PLAN_TAG)) {
             tileImprovementPlan = getAttribute(in, TILE_IMPROVEMENT_PLAN_TAG,

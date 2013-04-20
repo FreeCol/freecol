@@ -3829,7 +3829,7 @@ public class Unit extends GoodsLocation
 
         treasureAmount = getAttribute(in, "treasureAmount", 0);
 
-        destination = getLocationAttribute(in, "destination", game);
+        destination = makeLocationAttribute(in, "destination", game);
 
         currentStop = -1;
 
@@ -3868,9 +3868,9 @@ public class Unit extends GoodsLocation
         experience = getAttribute(in, "experience", 0);
         visibleGoodsCount = getAttribute(in, "visibleGoodsCount", -1);
 
-        entryLocation = getLocationAttribute(in, "entryLocation", game);
+        entryLocation = makeLocationAttribute(in, "entryLocation", game);
 
-        location = getLocationAttribute(in, "location", game);
+        location = makeLocationAttribute(in, "location", game);
         clearUnitList();
         if (getGoodsContainer() != null) getGoodsContainer().removeAll();
         clearEquipment();

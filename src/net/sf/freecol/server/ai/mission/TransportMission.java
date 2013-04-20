@@ -1808,7 +1808,7 @@ public class TransportMission extends Mission {
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
 
-        target = getLocationAttribute(in, TARGET_TAG, getGame());
+        target = findLocationAttribute(in, TARGET_TAG, getGame());
     }
 
     /**
@@ -1852,7 +1852,7 @@ public class TransportMission extends Mission {
             CargoMode mode = getAttribute(in, MODE_TAG, 
                                           CargoMode.class, CargoMode.DUMP);
             
-            Location target = getLocationAttribute(in, TARGET_TAG, game);
+            Location target = findLocationAttribute(in, TARGET_TAG, game);
             
             int turns = getAttribute(in, TURNS_TAG, -1);
             

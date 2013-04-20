@@ -162,8 +162,8 @@ public class HighSeas extends UnitLocation {
      */
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
         if ("destination".equals(in.getLocalName())) {
-            destinations.add(getLocationAttribute(in, ID_ATTRIBUTE_TAG,
-                                                  getGame()));
+            destinations.add(makeLocationAttribute(in, ID_ATTRIBUTE_TAG,
+                                                   getGame()));
             in.nextTag();
         } else {
             super.readChild(in);
