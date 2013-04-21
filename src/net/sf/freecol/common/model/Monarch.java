@@ -111,8 +111,7 @@ public final class Monarch extends FreeColGameObject implements Named {
     /**
      * Constructor.
      *
-     * @param game The <code>Game</code> this <code>Monarch</code>
-     *     should be created in.
+     * @param game The enclosing <code>Game</code>.
      * @param player The <code>Player</code> to create the
      *     <code>Monarch</code> for.
      * @param name The name of the <code>Monarch</code>.
@@ -136,55 +135,49 @@ public final class Monarch extends FreeColGameObject implements Named {
     }
 
     /**
-     * Initiates a new <code>Monarch</code> from an <code>Element</code>
-     * and registers this <code>Monarch</code> at the specified game.
-     *
-     * @param game The <code>Game</code> this object belongs to.
-     * @param in The input stream containing the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
-     */
-    public Monarch(Game game, XMLStreamReader in) throws XMLStreamException {
-        super(game, null);
-
-        readFromXML(in);
-    }
-
-    /**
-     * Initiates a new <code>Monarch</code>
-     * with the given ID. The object should later be
-     * initialized by calling either
+     * Initiates a new <code>Monarch</code> with the given identifier.
+     * The object should later be initialized by calling
      * {@link #readFromXML(XMLStreamReader)}.
      *
-     * @param game The <code>Game</code> in which this object belong.
+     * @param game The enclosing <code>Game</code>.
      * @param id The unique identifier for this object.
      */
     public Monarch(Game game, String id) {
         super(game, id);
     }
 
+
     /**
-     * Describe <code>getExpeditionaryForce</code> method here.
+     * Get the name key of this Monarch.
      *
-     * @return a <code>Force</code> value
+     * @return The monarch name key.
+     */
+    public String getNameKey() {
+        return name;
+    }
+
+    /**
+     * Get the force describing the REF.
+     *
+     * @return The REF.
      */
     public Force getExpeditionaryForce() {
         return expeditionaryForce;
     }
 
     /**
-     * Describe <code>getInterventionForce</code> method here.
+     * Get the force describing the Intervention Force.
      *
-     * @return a <code>Force</code> value
+     * @return The Intervention Force.
      */
     public Force getInterventionForce() {
         return interventionForce;
     }
 
     /**
-     * Returns the Mercenary Force.
+     * Gets the force describing the Mercenary Force.
      *
-     * @return a <code>Force</code> value
+     * @return The Mercenary Force.
      */
     public Force getMercenaryForce() {
         return interventionForce;
@@ -228,15 +221,6 @@ public final class Monarch extends FreeColGameObject implements Named {
 
 
     /**
-     * Return the name key of this Monarch.
-     *
-     * @return a <code>String</code> value
-     */
-    public String getNameKey() {
-        return name;
-    }
-
-    /**
      * Gets the maximum tax rate in this game.
      *
      * @return The maximum tax rate in the game.
@@ -248,7 +232,9 @@ public final class Monarch extends FreeColGameObject implements Named {
     /**
      * Collect the REF unit types.
      *
-     * @param naval If true, choose naval unit types, if not, land unit types.
+     * @param naval If true, choose naval unit types, if not, land
+     *     unit types.
+     * @return A list of possible REF unit types.
      */
     public List<UnitType> collectREFUnitTypes(boolean naval) {
         if (naval) {
@@ -266,6 +252,8 @@ public final class Monarch extends FreeColGameObject implements Named {
 
     /**
      * Collects a list of potential enemies for this player.
+     *
+     * @return A list of potential enemy <code>Player</code>s.
      */
     public List<Player> collectPotentialEnemies() {
         List<Player> enemies = new ArrayList<Player>();
@@ -285,6 +273,8 @@ public final class Monarch extends FreeColGameObject implements Named {
 
     /**
      * Collects a list of potential friends for this player.
+     *
+     * @return A list of potential friendly <code>Player</code>s.
      */
     public List<Player> collectPotentialFriends() {
         List<Player> friends = new ArrayList<Player>();
@@ -306,6 +296,7 @@ public final class Monarch extends FreeColGameObject implements Named {
      * Checks if a specified action is valid at present.
      *
      * @param action The <code>MonarchAction</code> to check.
+     * @return True if the action is valid.
      */
     public boolean actionIsValid(MonarchAction action) {
         switch (action) {
@@ -380,6 +371,14 @@ public final class Monarch extends FreeColGameObject implements Named {
         return choices;
     }
 
+    /**
+     * Convenience hack to check if an action is valid, and if so add
+     * it to a choice list with a given weight.
+     *
+     * @param choices The list of choices.
+     * @param action The <code>MonarchAction</code> to check.
+     * @param weight The weight to add the action with if valid.
+     */
     private void addIfValid(List<RandomChoice<MonarchAction>> choices,
                             MonarchAction action, int weight) {
         if (actionIsValid(action)) {
@@ -567,7 +566,7 @@ public final class Monarch extends FreeColGameObject implements Named {
     }
 
     /**
-     * Returns units available as mercenaries.
+     * Gets some units available as mercenaries.
      *
      * @param random The <code>Random</code> number source to use.
      * @return A troop of mercenaries.
@@ -633,147 +632,10 @@ public final class Monarch extends FreeColGameObject implements Named {
         return mercs;
     }
 
-    /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *
-     * <br><br>
-     *
-     * Only attributes visible to the given <code>Player</code> will
-     * be added to that representation if <code>showAll</code> is
-     * set to <code>false</code>.
-     *
-     * @param out The target stream.
-     * @param player The <code>Player</code> this XML-representation
-     *      should be made for, or <code>null</code> if
-     *      <code>showAll == true</code>.
-     * @param showAll Only attributes visible to <code>player</code>
-     *      will be added to the representation if <code>showAll</code>
-     *      is set to <i>false</i>.
-     * @param toSavedGame If <code>true</code> then information that
-     *      is only needed when saving a game is added.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
-     */
-    protected void toXMLImpl(XMLStreamWriter out, Player player,
-                             boolean showAll, boolean toSavedGame)
-        throws XMLStreamException {
-        // Start element:
-        out.writeStartElement(getXMLElementTagName());
-
-        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
-        out.writeAttribute("player", this.player.getId());
-        out.writeAttribute("name", name);
-        out.writeAttribute("supportSea", String.valueOf(supportSea));
-        out.writeAttribute("displeasure", String.valueOf(displeasure));
-
-        expeditionaryForce.toXML(out, "expeditionaryForce");
-        interventionForce.toXML(out, "interventionForce");
-        mercenaryForce.toXML(out, "mercenaryForce");
-
-        out.writeEndElement();
-    }
 
     /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
+     * A group of units with a common origin and purpose.
      */
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        Game game = getGame();
-        super.readAttributes(in);
-
-        player = makeFreeColGameObject(in, "player", Player.class);
-
-        name = getAttribute(in, "name", player.getNation().getRulerNameKey());
-
-        supportSea = getAttribute(in, "supportSea", false);
-
-        displeasure = getAttribute(in, "displeasure", false);
-    }
-
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
-
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            String childName = in.getLocalName();
-            if ("expeditionaryForce".equals(childName)) {
-                expeditionaryForce.readFromXML(in);
-            } else if ("interventionForce".equals(childName)) {
-                interventionForce.readFromXML(in);
-            } else if ("mercenaryForce".equals(childName)) {
-                interventionForce.readFromXML(in);
-            } else {
-                // @compat 0.10.5
-                if ("navalUnits".equals(childName)) {
-                    expeditionaryForce.getNavalUnits().clear();
-                    while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        AbstractUnit newUnit = new AbstractUnit(in);
-                        expeditionaryForce.getNavalUnits().add(newUnit);
-                    }
-                } else if ("landUnits".equals(childName)) {
-                    expeditionaryForce.getLandUnits().clear();
-                    while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        AbstractUnit newUnit = new AbstractUnit(in);
-                        expeditionaryForce.getLandUnits().add(newUnit);
-                    }
-                }
-                // end @compat
-            }
-        }
-        // @compat 0.10.5
-        if (interventionForce.getUnits().isEmpty()) {
-            interventionForce = new Force((UnitListOption) getSpecification()
-                                          .getOption("model.option.interventionForce"), null);
-        }
-        if (mercenaryForce.getUnits().isEmpty()) {
-            mercenaryForce = new Force((UnitListOption) getSpecification()
-                                       .getOption("model.option.mercenaryForce"), null);
-        }
-        // end @compat
-
-        // sanity check: we should be on the closing tag
-        if (!in.getLocalName().equals(Monarch.getXMLElementTagName())) {
-            logger.warning("Error parsing xml: expecting closing tag </"
-                           + Monarch.getXMLElementTagName()
-                           + "> found instead: " + in.getLocalName());
-        }
-    }
-
-    /**
-     * Partial writer, so that simple updates can be brief.
-     *
-     * @param out The target stream.
-     * @param fields The fields to write.
-     * @throws XMLStreamException If there are problems writing the stream.
-     */
-    @Override
-    protected void toXMLPartialImpl(XMLStreamWriter out, String[] fields)
-        throws XMLStreamException {
-        toXMLPartialByClass(out, getClass(), fields);
-    }
-
-    /**
-     * Partial reader, so that simple updates can be brief.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException If there are problems reading the stream.
-     */
-    @Override
-    public void readFromXMLPartialImpl(XMLStreamReader in)
-        throws XMLStreamException {
-        readFromXMLPartialByClass(in, getClass());
-    }
-
-    /**
-     * Gets the tag name of the root element representing this object.
-     *
-     * @return "monarch".
-     */
-    public static String getXMLElementTagName() {
-        return "monarch";
-    }
-
-
     public class Force {
 
         /** The number of land units in the REF. */
@@ -877,12 +739,11 @@ public final class Monarch extends FreeColGameObject implements Named {
         }
 
         /**
-         * Returns true if this Force does not contain any units.
+         * Is this Force empty?
          *
          * @return True if there are no land or naval units.
          */
         public boolean isEmpty() {
-            // @compat 0.10.4
             return landUnits.isEmpty() && navalUnits.isEmpty();
         }
 
@@ -923,16 +784,26 @@ public final class Monarch extends FreeColGameObject implements Named {
             updateSpaceAndCapacity();
         }
 
+
+        // Serialization
+
+        public static final String LAND_UNITS_TAG = "landUnits";
+        public static final String NAVAL_UNITS_TAG = "navalUnits";
+        // @compat 0.10.5
+        // public for now, revert to private
+        // end @compat
+
+
         public void toXML(XMLStreamWriter out, String tag) throws XMLStreamException {
             out.writeStartElement(tag);
 
-            out.writeStartElement("navalUnits");
+            out.writeStartElement(NAVAL_UNITS_TAG);
 
             for (AbstractUnit unit : navalUnits) unit.toXML(out);
 
             out.writeEndElement();
 
-            out.writeStartElement("landUnits");
+            out.writeStartElement(LAND_UNITS_TAG);
 
             for (AbstractUnit unit : landUnits) unit.toXML(out);
 
@@ -942,22 +813,187 @@ public final class Monarch extends FreeColGameObject implements Named {
         }
 
         public void readFromXML(XMLStreamReader in) throws XMLStreamException {
+            // Clear containers.
             navalUnits.clear();
             landUnits.clear();
+
             while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                String childName = in.getLocalName();
-                if ("navalUnits".equals(childName)) {
+                final String tag = in.getLocalName();
+
+                if (LAND_UNITS_TAG.equals(tag)) {
                     while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
                         AbstractUnit newUnit = new AbstractUnit(in);
-                        navalUnits.add(newUnit);
+                        if (newUnit != null) landUnits.add(newUnit);
                     }
-                } else if ("landUnits".equals(childName)) {
+                } else if (NAVAL_UNITS_TAG.equals(tag)) {
                     while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
                         AbstractUnit newUnit = new AbstractUnit(in);
-                        landUnits.add(newUnit);
+                        if (newUnit != null) navalUnits.add(newUnit);
                     }
+                } else {
+                    logger.warning("Bogus Force tag: " + tag);
                 }
             }
         }
+    }
+
+
+    // Serialization
+
+    private static final String DISPLEASURE_TAG = "displeasure";
+    private static final String EXPEDITIONARY_FORCE_TAG = "expeditionaryForce";
+    private static final String INTERVENTION_FORCE_TAG = "interventionForce";
+    private static final String MERCENARY_FORCE_TAG = "mercenaryForce";
+    private static final String NAME_TAG = "name";
+    private static final String PLAYER_TAG = "player";
+    private static final String SUPPORT_SEA_TAG = "supportSea";
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void toXMLImpl(XMLStreamWriter out, Player player,
+                             boolean showAll,
+                             boolean toSavedGame) throws XMLStreamException {
+        super.toXML(out, getXMLElementTagName(), player, showAll, toSavedGame);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected void writeAttributes(XMLStreamWriter out, Player player,
+                                   boolean showAll,
+                                   boolean toSavedGame) throws XMLStreamException {
+        super.writeAttributes(out);
+
+        writeAttribute(out, PLAYER_TAG, this.player);
+
+        writeAttribute(out, NAME_TAG, name);
+
+        writeAttribute(out, SUPPORT_SEA_TAG, supportSea);
+
+        writeAttribute(out, DISPLEASURE_TAG, displeasure);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected void writeChildren(XMLStreamWriter out, Player player,
+                                 boolean showAll,
+                                 boolean toSavedGame) throws XMLStreamException {
+        super.writeChildren(out);
+
+        if (showAll || toSavedGame
+            || (player != null && player == this.player)) {
+            expeditionaryForce.toXML(out, EXPEDITIONARY_FORCE_TAG);
+
+            interventionForce.toXML(out, INTERVENTION_FORCE_TAG);
+
+            mercenaryForce.toXML(out, MERCENARY_FORCE_TAG);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void toXMLPartialImpl(XMLStreamWriter out,
+                                    String[] fields) throws XMLStreamException {
+        toXMLPartialByClass(out, getClass(), fields);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void readFromXMLPartialImpl(XMLStreamReader in) throws XMLStreamException {
+        readFromXMLPartialByClass(in, getClass());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        super.readAttributes(in);
+
+        player = findFreeColGameObject(in, PLAYER_TAG,
+                                       Player.class, (Player)null);
+
+        name = getAttribute(in, NAME_TAG,
+                            player.getNation().getRulerNameKey());
+
+        supportSea = getAttribute(in, SUPPORT_SEA_TAG, false);
+
+        displeasure = getAttribute(in, DISPLEASURE_TAG, false);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        super.readChildren(in);
+
+        // @compat 0.10.5
+        // Intervention and mercenary forces introduced here.  Add
+        // default definitions for the benefit of earlier versions.        
+        final Specification spec = getSpecification();
+        if (interventionForce.getUnits().isEmpty()) {
+            interventionForce = new Force((UnitListOption)spec.getOption("model.option.interventionForce"), null);
+        }
+        if (mercenaryForce.getUnits().isEmpty()) {
+            mercenaryForce = new Force((UnitListOption)spec.getOption("model.option.mercenaryForce"), null);
+        }
+        // end @compat
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+        final String tag = in.getLocalName();
+
+        if (EXPEDITIONARY_FORCE_TAG.equals(tag)) {
+            expeditionaryForce.readFromXML(in);
+
+        } else if (INTERVENTION_FORCE_TAG.equals(tag)) {
+            interventionForce.readFromXML(in);
+
+        // @compat 0.10.5
+        } else if (Force.LAND_UNITS_TAG.equals(tag)) {
+            expeditionaryForce.getLandUnits().clear();
+            while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                AbstractUnit newUnit = new AbstractUnit(in);
+                expeditionaryForce.getLandUnits().add(newUnit);
+            }
+        // end @compat
+
+        } else if (MERCENARY_FORCE_TAG.equals(tag)) {
+            interventionForce.readFromXML(in);
+
+        // @compat 0.10.5
+        } else if (Force.NAVAL_UNITS_TAG.equals(tag)) {
+            expeditionaryForce.getNavalUnits().clear();
+            while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                AbstractUnit newUnit = new AbstractUnit(in);
+                expeditionaryForce.getNavalUnits().add(newUnit);
+            }
+        // end @compat
+
+        } else {
+            super.readChild(in);
+        }
+    }
+
+    /**
+     * Gets the tag name of the root element representing this object.
+     *
+     * @return "monarch".
+     */
+    public static String getXMLElementTagName() {
+        return "monarch";
     }
 }
