@@ -36,55 +36,37 @@ public class MarketData extends FreeColGameObject {
 
     private static final Logger logger = Logger.getLogger(MarketData.class.getName());
 
-    /**
-     * Bounds on price movements.
-     */
+    /** Inclusive lower bound on goods price. */
     public static final int MINIMUM_PRICE = 1;
+
+    /** Inclusive upper bound on goods price. */
     public static final int MAXIMUM_PRICE = 19;
 
-    /**
-     * What type of goods is this.
-     */
+    /** What type of goods is this. */
     private GoodsType goodsType;
 
-    /**
-     * Purchase price.
-     */
+    /** Current purchase price. */
     private int costToBuy;
 
-    /**
-     * Sale price.
-     */
+    /** Current selling price. */
     private int paidForSale;
 
-    /**
-     * Amount of this goods in the market.
-     */
+    /** Amount of this goods in the market. */
     private int amountInMarket;
 
-    /**
-     * The initial price.
-     */
+    /** The initial price. */
     private int initialPrice;
 
-    /**
-     * Arrears owed to the crown.
-     */
+    /** Arrears owed to the crown. */
     private int arrears;
 
-    /**
-     * Total sales.
-     */
+    /** Total sales. */
     private int sales;
 
-    /**
-     * Total income before taxes.
-     */
+    /** Total income before taxes. */
     private int incomeBeforeTaxes;
 
-    /**
-     * Total income after taxes.
-     */
+    /** Total income after taxes. */
     private int incomeAfterTaxes;
 
     /**
@@ -93,16 +75,14 @@ public class MarketData extends FreeColGameObject {
      */
     private int oldPrice;
 
-    /**
-     * Has this good been traded?
-     */
+    /** Has this good been traded? */
     private boolean traded;
 
 
     /**
      * Creates a new <code>MarketData</code> instance.
      *
-     * @param goodsType a <code>GoodsType</code> value
+     * @param goodsType The <code>GoodsType</code> this market data describes.
      */
     public MarketData(Game game, GoodsType goodsType) {
         super(game);
@@ -121,24 +101,10 @@ public class MarketData extends FreeColGameObject {
     }
 
     /**
-     * Instantiate a new <code>MarketData</code> from an
-     * XML representation.
-     *
-     * @param game The <code>Game</code> this object belongs to.
-     * @param in The input stream containing the XML.
-     * @throws XMLStreamException if an error occured during parsing.
-     */
-    public MarketData(Game game, XMLStreamReader in) throws XMLStreamException {
-        super(game, null);
-
-        readFromXML(in);
-    }
-
-    /**
      * Instantiates a new <code>MarketData</code> with the given
-     * ID. The object should later be initialized by calling either
-     * {@link #readFromXML(XMLStreamReader)} or
-     * {@link #readFromXMLElement(Element)}.
+     * identifier. The object should later be initialized by calling
+     * either {@link #readFromXML(XMLStreamReader)} or {@link
+     * #readFromXMLElement(Element)}.
      *
      * @param game The <code>Game</code> in which this object belong.
      * @param id The unique identifier for this object.
@@ -158,151 +124,151 @@ public class MarketData extends FreeColGameObject {
     }
 
     /**
-     * Get the <code>CostToBuy</code> value.
+     * Get the current purchase price.
      *
-     * @return an <code>int</code> value
+     * @return The purchase price.
      */
     public final int getCostToBuy() {
         return costToBuy;
     }
 
     /**
-     * Set the <code>CostToBuy</code> value.
+     * Set the current purchase price.
      *
-     * @param newCostToBuy The new CostToBuy value.
+     * @param newCostToBuy The new purchase price.
      */
     public final void setCostToBuy(final int newCostToBuy) {
         this.costToBuy = newCostToBuy;
     }
 
     /**
-     * Get the <code>PaidForSale</code> value.
+     * Get the current sale price.
      *
-     * @return an <code>int</code> value
+     * @return The sale price.
      */
     public final int getPaidForSale() {
         return paidForSale;
     }
 
     /**
-     * Set the <code>PaidForSale</code> value.
+     * Set the current sale price.
      *
-     * @param newPaidForSale The new PaidForSale value.
+     * @param newPaidForSale The new sale price.
      */
     public final void setPaidForSale(final int newPaidForSale) {
         this.paidForSale = newPaidForSale;
     }
 
     /**
-     * Get the <code>AmountInMarket</code> value.
+     * Get the amount of the goods type in the market.
      *
-     * @return an <code>int</code> value
+     * @return The amount of goods.
      */
     public final int getAmountInMarket() {
         return amountInMarket;
     }
 
     /**
-     * Set the <code>AmountInMarket</code> value.
+     * Set the amount of goods in the market.
      *
-     * @param newAmountInMarket The new AmountInMarket value.
+     * @param newAmountInMarket The new amount of goods in the market.
      */
     public final void setAmountInMarket(final int newAmountInMarket) {
         this.amountInMarket = newAmountInMarket;
     }
 
     /**
-     * Get the <code>InitialPrice</code> value.
+     * Get the initial price of these goods.
      *
-     * @return an <code>int</code> value
+     * @return The initial price.
      */
     public final int getInitialPrice() {
         return initialPrice;
     }
 
     /**
-     * Set the <code>InitialPrice</code> value.
+     * Set the initial price value.
      *
-     * @param newInitialPrice The new InitialPrice value.
+     * @param newInitialPrice The new initial price value.
      */
     public final void setInitialPrice(final int newInitialPrice) {
         this.initialPrice = newInitialPrice;
     }
 
     /**
-     * Get the <code>Arrears</code> value.
+     * Get the amount of arrears owned to the crown for this goods type.
      *
-     * @return an <code>int</code> value
+     * @return The arrears amount.
      */
     public final int getArrears() {
         return arrears;
     }
 
     /**
-     * Set the <code>Arrears</code> value.
+     * Set the amount of arrears owed to the crown.
      *
-     * @param newArrears The new Arrears value.
+     * @param newArrears The new amount of arrears.
      */
     public final void setArrears(final int newArrears) {
         this.arrears = newArrears;
     }
 
     /**
-     * Get the <code>Sales</code> value.
+     * Get the total sales.
      *
-     * @return an <code>int</code> value
+     * @return The total sales.
      */
     public final int getSales() {
         return sales;
     }
 
     /**
-     * Set the <code>Sales</code> value.
+     * Set the total sales value.
      *
-     * @param newSales The new Sales value.
+     * @param newSales The new total sales value.
      */
     public final void setSales(final int newSales) {
         this.sales = newSales;
     }
 
     /**
-     * Get the <code>IncomeBeforeTaxes</code> value.
+     * Get the income before taxes from trading in this goods type.
      *
-     * @return an <code>int</code> value
+     * @return The income before taxes.
      */
     public final int getIncomeBeforeTaxes() {
         return incomeBeforeTaxes;
     }
 
     /**
-     * Set the <code>IncomeBeforeTaxes</code> value.
+     * Set the income before taxes value.
      *
-     * @param newIncomeBeforeTaxes The new IncomeBeforeTaxes value.
+     * @param newIncomeBeforeTaxes The new income before taxes value.
      */
     public final void setIncomeBeforeTaxes(final int newIncomeBeforeTaxes) {
         this.incomeBeforeTaxes = newIncomeBeforeTaxes;
     }
 
     /**
-     * Get the <code>IncomeAfterTaxes</code> value.
+     * Get the income after taxes from trading in this goods type.
      *
-     * @return an <code>int</code> value
+     * @return The income after taxes.
      */
     public final int getIncomeAfterTaxes() {
         return incomeAfterTaxes;
     }
 
     /**
-     * Set the <code>IncomeAfterTaxes</code> value.
+     * Set the income after taxes value.
      *
-     * @param newIncomeAfterTaxes The new IncomeAfterTaxes value.
+     * @param newIncomeAfterTaxes The new income after taxes value.
      */
     public final void setIncomeAfterTaxes(final int newIncomeAfterTaxes) {
         this.incomeAfterTaxes = newIncomeAfterTaxes;
     }
 
     /**
-     * Get the old price in this <code>MarketData</code>.
+     * Get the old price.
      *
      * @return The old price.
      */
@@ -311,7 +277,7 @@ public class MarketData extends FreeColGameObject {
     }
 
     /**
-     * Set the old price in this <code>MarketData</code>.
+     * Set the old price.
      *
      * @param oldPrice A `new' old price.
      */
@@ -322,14 +288,14 @@ public class MarketData extends FreeColGameObject {
     /**
      * Has there been trading in this <code>MarketData</code>?
      *
-     * @return Whether trading has occurred.
+     * @return True if trading has occurred.
      **/
     public final boolean getTraded() {
         return traded;
     }
 
     /**
-     * Set the trade status of this <code>MarketData</code>.
+     * Set the trading status of this <code>MarketData</code>.
      *
      * @param traded The trade status to set.
      **/
@@ -431,21 +397,19 @@ public class MarketData extends FreeColGameObject {
      */
     @Override
     protected void toXMLImpl(XMLStreamWriter out, Player player,
-                             boolean showAll, boolean toSavedGame)
-        throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
-
-        writeAttributes(out);
-
-        out.writeEndElement();
+                             boolean showAll,
+                             boolean toSavedGame) throws XMLStreamException {
+        super.toXML(out, getXMLElementTagName(), player, showAll, toSavedGame);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        writeAttribute(out, ID_ATTRIBUTE_TAG, getId());
+    protected void writeAttributes(XMLStreamWriter out, Player player,
+                                   boolean showAll,
+                                   boolean toSavedGame) throws XMLStreamException {
+        super.writeAttributes(out);
 
         writeAttribute(out, GOODS_TYPE_TAG, goodsType);
 

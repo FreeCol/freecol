@@ -94,21 +94,6 @@ public final class Market extends FreeColGameObject implements Ownable {
     }
 
     /**
-     * Initiates a new <code>Market</code> from an
-     * XML representation.
-     *
-     * @param game The <code>Game</code> this object belongs to.
-     * @param in The input stream containing the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
-     */
-    public Market(Game game, XMLStreamReader in) throws XMLStreamException {
-        super(game, null);
-
-        readFromXML(in);
-    }
-
-    /**
      * Initiates a new <code>Market</code> with the given ID.
      * The object should later be initialized by calling either
      * {@link #readFromXML(XMLStreamReader)} or
@@ -491,37 +476,36 @@ public final class Market extends FreeColGameObject implements Ownable {
      */
     @Override
     protected void toXMLImpl(XMLStreamWriter out, Player player,
-                             boolean showAll, boolean toSavedGame)
-        throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
-
-        writeAttributes(out);
-        if (player == owner || showAll || toSavedGame) {
-            writeChildren(out);
-        }
-
-        out.writeEndElement();
+                             boolean showAll,
+                             boolean toSavedGame) throws XMLStreamException {
+        super.toXML(out, getXMLElementTagName(), player, showAll, toSavedGame);
     }
 
     /**
      * {@inheritDoc}
     */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        writeAttribute(out, ID_ATTRIBUTE_TAG, getId());
+    protected void writeAttributes(XMLStreamWriter out, Player player,
+                                   boolean showAll,
+                                   boolean toSavedGame) throws XMLStreamException {
+        super.writeAttributes(out);
 
-        writeAttribute(out, OWNER_TAG, owner.getId());
+        writeAttribute(out, OWNER_TAG, owner);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
+    protected void writeChildren(XMLStreamWriter out, Player player,
+                                 boolean showAll,
+                                 boolean toSavedGame) throws XMLStreamException {
         super.writeChildren(out);
 
-        for (MarketData data : getSortedCopy(marketData.values())) {
-            data.toXML(out);
+        if (showAll || toSavedGame || (player != null && player == owner)) {
+            for (MarketData data : getSortedCopy(marketData.values())) {
+                data.toXML(out);
+            }
         }
     }
     
@@ -541,6 +525,7 @@ public final class Market extends FreeColGameObject implements Ownable {
      */
     @Override
     protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        // Clear containers.
         marketData.clear();
 
         super.readChildren(in);
