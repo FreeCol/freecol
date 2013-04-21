@@ -2201,65 +2201,63 @@ public class Map extends FreeColGameObject implements Location {
 
     // Serialization
 
+    private static final String HEIGHT_TAG = "height";
+    private static final String LAYER_TAG = "layer";
+    private static final String MAXIMUM_LATITUDE_TAG = "maximumLatitude";
+    private static final String MINIMUM_LATITUDE_TAG = "minimumLatitude";
+    private static final String WIDTH_TAG = "width";
+    // @compat 0.10.5, nasty I/O hack
+    private boolean fixupHighSeas = false;
+    // end @compat
+
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected void toXMLImpl(XMLStreamWriter out, Player player,
-                             boolean showAll, boolean toSavedGame)
-        throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
-        writeAttributes(out, player, showAll, toSavedGame);
-        writeChildren(out, player, showAll, toSavedGame);
-        out.writeEndElement();
+                             boolean showAll,
+                             boolean toSavedGame) throws XMLStreamException {
+        super.toXML(out, getXMLElementTagName(), player, showAll, toSavedGame);
     }
 
     /**
-     * Serialize the attributes of the Map.
-     *
-     * @param out a <code>XMLStreamWriter</code> value
-     * @param player a <code>Player</code> value
-     * @param showAll a <code>boolean</code> value
-     * @param toSavedGame a <code>boolean</code> value
-     * @exception XMLStreamException if an error occurs
+     * {@inheritDoc}
      */
     protected void writeAttributes(XMLStreamWriter out, Player player,
-                                   boolean showAll, boolean toSavedGame)
-        throws XMLStreamException {
-        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
-        out.writeAttribute("width", Integer.toString(getWidth()));
-        out.writeAttribute("height", Integer.toString(getHeight()));
-        out.writeAttribute("layer", layer.toString());
-        out.writeAttribute("minimumLatitude",
-                           Integer.toString(minimumLatitude));
-        out.writeAttribute("maximumLatitude",
-                           Integer.toString(maximumLatitude));
+                                   boolean showAll,
+                                   boolean toSavedGame) throws XMLStreamException {
+        super.writeAttributes(out);
+
+        writeAttribute(out, WIDTH_TAG, getWidth());
+
+        writeAttribute(out, HEIGHT_TAG, getHeight());
+
+        writeAttribute(out, LAYER_TAG, layer);
+
+        writeAttribute(out, MINIMUM_LATITUDE_TAG, minimumLatitude);
+
+        writeAttribute(out, MAXIMUM_LATITUDE_TAG, maximumLatitude);
     }
 
     /**
-     * Serialize the children (regions and tiles) of this Map.
-     *
-     * @param out a <code>XMLStreamWriter</code> value
-     * @param player a <code>Player</code> value
-     * @param showAll a <code>boolean</code> value
-     * @param toSavedGame a <code>boolean</code> value
-     * @exception XMLStreamException if an error occurs
+     * {@inheritDoc}
      */
     protected void writeChildren(XMLStreamWriter out, Player player,
-                                 boolean showAll, boolean toSavedGame)
-        throws XMLStreamException {
-        for (Region region : regions.values()) {
-            region.toXML(out);
-        }
+                                 boolean showAll,
+                                 boolean toSavedGame) throws XMLStreamException {
+        super.writeChildren(out);
+
+        for (Region region : getSortedCopy(regions.values())) region.toXML(out);
 
         for (Tile tile: getAllTiles()) {
-            if (showAll || toSavedGame || player.hasExplored(tile)) {
+            if (showAll || toSavedGame
+                || (player != null && player.hasExplored(tile))) {
                 tile.toXML(out, player, showAll, toSavedGame);
             } else {
                 tile.toXMLMinimal(out);
             }
         }
-
     }
 
     /**
@@ -2267,19 +2265,24 @@ public class Map extends FreeColGameObject implements Location {
      */
     @Override
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        setId(readId(in));
+        super.readAttributes(in);
 
-        setLayer(Layer.valueOf(getAttribute(in, "layer", "ALL")));
+        setLayer(getAttribute(in, LAYER_TAG, Layer.class, Layer.ALL));
 
         if (tiles == null) {
-            int width = Integer.parseInt(in.getAttributeValue(null, "width"));
-            int height = Integer.parseInt(in.getAttributeValue(null, "height"));
+            int width = getAttribute(in, WIDTH_TAG, -1);
 
-            tiles = new Tile[width][height];
+            int height = getAttribute(in, HEIGHT_TAG, -1);
+
+            if (width > 0 && height > 0) {
+                tiles = new Tile[width][height];
+            }
         }
 
-        minimumLatitude = getAttribute(in, "minimumLatitude", -90);
-        maximumLatitude = getAttribute(in, "maximumLatitude", 90);
+        minimumLatitude = getAttribute(in, MINIMUM_LATITUDE_TAG, -90);
+
+        maximumLatitude = getAttribute(in, MAXIMUM_LATITUDE_TAG, 90);
+
         calculateLatitudePerRow();
     }
 
@@ -2288,31 +2291,50 @@ public class Map extends FreeColGameObject implements Location {
      */
     @Override
     protected void readChildren(XMLStreamReader in) throws XMLStreamException {
-        boolean fixupHighSeas = false; // @compat 0.10.5
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            String tag = in.getLocalName();
-            if (Tile.getXMLElementTagName().equals(tag)) {
-                Tile t = readFreeColGameObject(in, Tile.class);
+        // The tiles structure is large, and individually
+        // overwriteable, so we do not clear it unlike most other containers.
+
+        // @compat 0.10.5
+        fixupHighSeas = false;
+        // end @compat
+
+        super.readChildren(in);
+
+        // @compat 0.10.5
+        if (fixupHighSeas) resetHighSeasCount();
+        // end @compat
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+        final String tag = in.getLocalName();
+
+        if (Region.getXMLElementTagName().equals(tag)) {
+            Region region = readFreeColGameObject(in, Region.class);
+            if (region != null) putRegion(region);
+
+        } else if (Tile.getXMLElementTagName().equals(tag)) {
+            Tile t = readFreeColGameObject(in, Tile.class);
+            if (t != null) {
                 setTile(t, t.getX(), t.getY());
 
                 // @compat 0.10.5
                 if (t.getHighSeasCount() == Tile.FLAG_RECALCULATE) {
                     fixupHighSeas = true;
                 }
-                // @end compatibility code
-            } else if (Region.getXMLElementTagName().equals(tag)) {
-                putRegion(readFreeColGameObject(in, Region.class));
-            } else {
-                logger.warning("Unknown tag: " + tag + " loading map");
-                in.nextTag();
+                // end @compat
             }
-        }
 
-        if (fixupHighSeas) resetHighSeasCount(); // @compat 0.10.5
+        } else {
+            super.readChild(in);
+        }
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "map".
      */

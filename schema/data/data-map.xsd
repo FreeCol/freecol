@@ -53,6 +53,14 @@
 
   <xs:simpleType name="MapLayerType">
     <xs:restriction base="xs:token">
+      <xs:enumeration value="none"/>
+      <xs:enumeration value="land"/>
+      <xs:enumeration value="terrain"/>
+      <xs:enumeration value="rivers"/>
+      <xs:enumeration value="resources"/>
+      <xs:enumeration value="natives"/>
+      <xs:enumeration value="all"/>
+      <!-- @compat 0.10.x -->
       <xs:enumeration value="NONE"/>
       <xs:enumeration value="LAND"/>
       <xs:enumeration value="TERRAIN"/>
@@ -60,6 +68,7 @@
       <xs:enumeration value="RESOURCES"/>
       <xs:enumeration value="NATIVES"/>
       <xs:enumeration value="ALL"/>
+      <!-- end @compat -->
     </xs:restriction>
   </xs:simpleType>
 
