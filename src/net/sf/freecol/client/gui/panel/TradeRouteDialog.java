@@ -26,7 +26,9 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.swing.DefaultListCellRenderer;
@@ -133,13 +135,16 @@ public final class TradeRouteDialog extends FreeColDialog<Boolean>
 
         Player player = getMyPlayer();
 
+        final Map<TradeRoute, Integer> counts
+            = new HashMap<TradeRoute, Integer>();
         List<TradeRoute> theRoutes
             = new ArrayList<TradeRoute>(player.getTradeRoutes());
-        for (TradeRoute tradeRoute : theRoutes) tradeRoute.setCount(0);
         for (Unit u : player.getUnits()) {
             TradeRoute tradeRoute = u.getTradeRoute();
             if (tradeRoute != null) {
-                tradeRoute.setCount(1 + tradeRoute.getCount());
+                Integer i = counts.get(tradeRoute);
+                int value = (i == null) ? 0 : i.intValue();
+                counts.put(tradeRoute, new Integer(value + 1));
             }
         }
         Collections.sort(theRoutes, tradeRouteComparator);
@@ -157,10 +162,10 @@ public final class TradeRouteDialog extends FreeColDialog<Boolean>
                         value, index, selected, focus);
                     TradeRoute tradeRoute = (TradeRoute) value;
                     String name = tradeRoute.getName();
-                    int n = tradeRoute.getCount();
+                    int n = counts.get(tradeRoute).intValue();
 
                     if (n > 0) {
-                        setText(name + "  (" + String.valueOf(n) + ")");
+                        setText(name + "  (" + n + ")");
                     } else {
                         setText(name);
                     }

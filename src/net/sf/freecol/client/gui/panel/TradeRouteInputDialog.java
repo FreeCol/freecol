@@ -337,11 +337,10 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
             if (verifyNewTradeRoute()) {
                 getGUI().removeFromCanvas(this);
                 originalRoute.setName(tradeRouteName.getText());
-                ArrayList<Stop> stops = new ArrayList<Stop>();
+                originalRoute.clearStops();
                 for (int index = 0; index < stopListModel.getSize(); index++) {
-                    stops.add((Stop) stopListModel.get(index));
+                    originalRoute.addStop((Stop)stopListModel.get(index));
                 }
-                originalRoute.setStops(stops);
                 // TODO: update trade routes only if they have been modified
                 getController().updateTradeRoute(originalRoute);
                 setResponse(Boolean.TRUE);
@@ -456,7 +455,6 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
                         for (int index : indices) {
                             Stop stop = (Stop) stopListModel.get(index);
                             stop.addCargo(label.getType());
-                            stop.setModified(true);
                         }
                         stopList.revalidate();
                         stopList.repaint();
@@ -484,7 +482,6 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
                         for (int index = 0; index < cargo.size(); index++) {
                             if (cargo.get(index) == label.getType()) {
                                 cargo.remove(index);
-                                stop.setModified(true);
                                 break;
                             }
                         }
