@@ -28,6 +28,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
@@ -225,8 +226,8 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
                 ui.updateOption();
                 try {
                     group.save(saveFile);
-                } catch(FileNotFoundException e) {
-                    logger.warning(e.toString());
+                } catch (FileNotFoundException e) {
+                    logger.log(Level.WARNING, "Save failed", e);
                     StringTemplate t = StringTemplate.template("failedToSave")
                         .addName("%name%", saveFile.getPath());
                     getGUI().showInformationMessage(t);

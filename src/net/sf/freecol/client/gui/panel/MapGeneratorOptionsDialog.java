@@ -26,6 +26,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
@@ -104,13 +105,13 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog implements Ac
                             mapButton.setToolTipText(properties.getProperty("map.width")
                                                      + "\u00D7"
                                                      + properties.getProperty("map.height"));
-                        } catch(Exception e) {
-                            logger.fine("Unable to load savegame properties.");
+                        } catch (Exception e) {
+                            logger.log(Level.WARNING, "Unable to load savegame properties.", e);
                         }
                         mapButton.setHorizontalTextPosition(JButton.CENTER);
                         mapButton.setVerticalTextPosition(JButton.BOTTOM);
-                    } catch(Exception e) {
-                        logger.warning("Failed to read thumbnail.");
+                    } catch (Exception e) {
+                        logger.log(Level.WARNING, "Failed to read thumbnail.", e);
                     }
 
                     mapButton.addActionListener(new ActionListener() {

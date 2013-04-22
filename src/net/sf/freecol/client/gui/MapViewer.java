@@ -1412,7 +1412,7 @@ public final class MapViewer {
                 setImageLibrary(new ImageLibrary(newScale));
             }
         } catch (Exception ex) {
-            logger.warning("Failed to retrieve scaled image library.");
+            logger.log(Level.WARNING, "Failed to retrieve scaled image library.", ex);
         }
     }
 

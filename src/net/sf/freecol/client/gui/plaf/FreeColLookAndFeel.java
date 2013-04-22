@@ -165,7 +165,7 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
 
         } catch (ClassNotFoundException e) {
             logger.log(Level.SEVERE, "Failed to load look and feel!", e);
-            System.exit(-1);
+            System.exit(1);
         }
 
         return u;

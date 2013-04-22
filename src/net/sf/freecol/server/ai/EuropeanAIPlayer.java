@@ -647,8 +647,8 @@ public class EuropeanAIPlayer extends AIPlayer {
             try {
                 turns = carrier.getTurnsToReach(w.getDestination());
             } catch (Exception e) {
-                logger.warning("Bogus wish destination: " + w.getDestination()
-                    + " for wish: " + w.toString());
+                logger.log(Level.WARNING, "Bogus wish destination: "
+                    + w.getDestination() + " for wish: " + w.toString(), e);
                 continue;
             }
             if (turns == INFINITY) {

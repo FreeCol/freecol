@@ -741,7 +741,7 @@ public final class Specification {
             try {
                 return type.cast(allTypes.get(Id));
             } catch(ClassCastException cce) {
-                logger.warning(Id + " caused ClassCastException!");
+                logger.log(Level.WARNING, Id + " caused ClassCastException!", cce);
                 throw(cce);
             }
         } else if (allTypes.containsKey(mangle(Id))) {
@@ -757,8 +757,8 @@ public final class Specification {
                 T result = c.newInstance(Id, this);
                 allTypes.put(Id, result);
                 return result;
-            } catch(Exception e) {
-                logger.warning(e.toString());
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Could not construct: " + Id, e);
                 return null;
             }
         }

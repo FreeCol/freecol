@@ -27,6 +27,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -731,15 +732,17 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * @param action The state of the goods.
      */
     private void goodsLog(AIGoods ag, String action) {
-        Goods goods = (ag == null) ? null : ag.getGoods();
-        int amount = (goods == null) ? -1 : goods.getAmount();
-        String type = (goods == null) ? "(null)"
-            : Utils.lastPart(ag.getGoods().getType().getId(), ".");
-        logger.finest(String.format("%-20s %-10s %s %s %s",
-                colony.getName(), action,
-                ((ag == null) ? "(null)" : ag.getId()),
-                ((amount >= GoodsContainer.CARGO_SIZE) ? "full"
-                    : Integer.toString(amount)), type));
+        if (logger.isLoggable(Level.FINEST)) {
+            Goods goods = (ag == null) ? null : ag.getGoods();
+            int amount = (goods == null) ? -1 : goods.getAmount();
+            String type = (goods == null) ? "(null)"
+                : Utils.lastPart(ag.getGoods().getType().getId(), ".");
+            logger.finest(String.format("%-20s %-10s %s %s %s",
+                    colony.getName(), action,
+                    ((ag == null) ? "(null)" : ag.getId()),
+                    ((amount >= GoodsContainer.CARGO_SIZE) ? "full"
+                        : Integer.toString(amount)), type));
+        }
     }
 
     /**

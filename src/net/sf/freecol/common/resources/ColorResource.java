@@ -22,6 +22,7 @@ package net.sf.freecol.common.resources;
 import java.awt.Color;
 import java.lang.reflect.Field;
 import java.net.URI;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -87,7 +88,8 @@ public class ColorResource extends Resource {
                 int col = Integer.decode(colorName);
                 return new Color(col, colorName.length() > 8);
             } catch (NumberFormatException e) {
-                logger.warning("Failed to decode colour string: " + colorName);
+                logger.warning("Failed to decode hex colour string: "
+                    + colorName);
             }
         } else {
             try {
@@ -95,7 +97,7 @@ public class ColorResource extends Resource {
                 return (Color) field.get(null);
             } catch (Exception e) {
                 // probably a non-standard color name
-                logger.warning(e.toString());
+                logger.log(Level.WARNING, "Failed to decode colour", e);
             }
         }
         // Fall back to black.  There are places where a null colour

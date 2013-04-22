@@ -226,7 +226,8 @@ public class FreeColDataFile {
                     } catch (Exception e) {}
                 }
             } catch (FileNotFoundException e) {
-                logger.finest("No ResourceMapping " + fileName + " in " + file + ".");
+                logger.log(Level.FINEST, "No ResourceMapping " + fileName
+                    + " in " + file + ".", e);
             } catch (IOException e) {
                 logger.log(Level.WARNING, "Exception while reading ResourceMapping from: " + file, e);
                 return null;

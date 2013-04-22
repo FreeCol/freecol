@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 import java.util.Locale;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.LogRecord;
 
@@ -156,7 +157,8 @@ public class FreeColDebugger {
                                               s.toUpperCase(Locale.US));
                 enableDebugMode(mode);
             } catch (Exception e) {
-                logger.warning("Unrecognized debug mode: " + optionValue);
+                logger.log(Level.WARNING, "Unrecognized debug mode: "
+                    + optionValue, e);
                 return false;
             }
         }

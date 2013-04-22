@@ -94,7 +94,7 @@ public final class AIInGameInputHandler implements MessageHandler {
             throw new NullPointerException("aiMain == null");
         }
         if (!me.isAI()) {
-            logger.warning("VERY BAD: Applying AIInGameInputHandler to a non-AI player!!!");
+            logger.severe("VERY BAD: Applying AIInGameInputHandler to a non-AI player!!!");
         }
     }
 

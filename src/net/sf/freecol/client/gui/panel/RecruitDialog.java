@@ -152,7 +152,7 @@ public final class RecruitDialog extends FreeColDialog<Integer> implements Actio
                     setResponse(new Integer(-1));
                 }
             } catch (NumberFormatException e) {
-                logger.warning("Invalid action number");
+                logger.warning("Invalid action number: " + command);
                 setResponse(new Integer(-1));
             }
         }

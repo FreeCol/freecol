@@ -258,16 +258,31 @@ public abstract class FreeColObject {
      *     should be made for, or null if <code>showAll == true</code>.
      * @param showAll Show all attributes.
      * @param toSavedGame Also show some extra attributes when saving the game.
+     * @return The serialized object, or null if the stream could not be
+     *     created.
      * @exception XMLStreamException if there are any problems writing
      *     to the stream.
      */
     public String serialize(Player player, boolean showAll,
                             boolean toSavedGame) throws XMLStreamException {
         StringWriter sw = new StringWriter();
-        XMLOutputFactory xif = XMLOutputFactory.newInstance();
-        XMLStreamWriter out = xif.createXMLStreamWriter(sw);
-        this.toXML(out, player, showAll, toSavedGame);
-        out.close();
+        XMLStreamWriter xsw = null;
+        try {
+            XMLOutputFactory xof = XMLOutputFactory.newInstance();
+            xsw = xof.createXMLStreamWriter(sw);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Error creating XMLStreamWriter", e);
+            return null;
+        }
+        try {
+            this.toXML(xsw, player, showAll, toSavedGame);
+        } finally {
+            try {
+                if (xsw != null) xsw.close();
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Error closing XMLStreamWriter", e);
+            }
+        }
         return sw.toString();
     }
 
@@ -432,7 +447,12 @@ public abstract class FreeColObject {
                     + ie.getMessage());
             }
         } catch (XMLStreamException e) {
-            logger.warning(e.toString());
+            try {
+                String x = serialize(player, showAll, toSavedGame);
+                logger.log(Level.WARNING, "Error writing stream: " + x, e);
+            } catch (XMLStreamException xse) {
+                logger.log(Level.WARNING, "Serialize died", xse);
+            }
             throw new IllegalStateException("XMLStreamException: "
                 + e.getMessage());
         }

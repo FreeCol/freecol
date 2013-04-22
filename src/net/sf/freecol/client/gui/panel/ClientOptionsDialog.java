@@ -23,6 +23,7 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
@@ -83,7 +84,7 @@ public final class ClientOptionsDialog extends OptionsDialog  {
                 // Immediately redraw the minimap if that was updated.
                 getGUI().updateMapControls();
             } catch (FileNotFoundException e) {
-                logger.warning(e.toString());
+                logger.log(Level.WARNING, "Save failure", e);
                 StringTemplate t = StringTemplate.template("failedToSave")
                     .addName("%name%", file.getPath());
                 getGUI().showInformationMessage(t);

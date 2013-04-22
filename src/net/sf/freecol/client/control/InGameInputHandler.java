@@ -637,8 +637,8 @@ public final class InGameInputHandler extends InputHandler {
             new ShowErrorMessageSwingTask(element.getAttribute("messageID"),
                                           element.getAttribute("message"))
                 .invokeSpecial();
-        } catch (Exception exception) {
-            logger.warning("error() raised " + exception.toString());
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "error() raised exception", e);
         }
         return null;
     }

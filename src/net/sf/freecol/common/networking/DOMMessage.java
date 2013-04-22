@@ -387,7 +387,7 @@ public class DOMMessage {
             }
             out.writeEndElement();
         } catch (XMLStreamException e) {
-            logger.warning("Could not send error message.");
+            logger.log(Level.WARNING, "Could not send error message.", e);
         }
     }
 

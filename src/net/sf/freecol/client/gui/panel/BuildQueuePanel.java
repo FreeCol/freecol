@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
@@ -691,7 +692,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
                     buildQueue.add((BuildableType) object);
                 }
             } catch (Exception e) {
-                logger.warning(e.toString());
+                logger.log(Level.WARNING, "Build queue import fail", e);
                 return false;
             }
 

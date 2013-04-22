@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -549,7 +550,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                 // to throw.
                 u = settlement.getDefendingUnit(attacker);
             } catch (IllegalStateException e) {
-                logger.warning("Empty settlement: " + settlement.getName());
+                logger.log(Level.WARNING, "Empty settlement: "
+                    + settlement.getName(), e);
             }
             // This routine can be called on the client for the pre-combat
             // popup where enemy settlement defenders are not visible,

@@ -25,6 +25,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JTextPane;
@@ -55,6 +57,8 @@ import net.sf.freecol.common.model.UnitType;
  * This panel displays the Advanced Colony Report.
  */
 public final class ReportRequirementsPanel extends ReportPanel {
+
+    private static final Logger logger = Logger.getLogger(ReportRequirementsPanel.class.getName());
 
     /**
      * A list of all the player's colonies.
@@ -126,7 +130,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
                 createColonyButton(colony, true));
             doc.insertString(doc.getLength(), " ", doc.getStyle("button"));
         } catch (Exception e) {
-            logger.warning(e.toString());
+            logger.log(Level.WARNING, "Colony check fail", e);
         }
 
         Set<UnitType> missingExpertWarning = new HashSet<UnitType>();
@@ -217,7 +221,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
                     + Messages.message("report.requirements.met"),
                     doc.getStyle("regular"));
             } catch (Exception e) {
-                logger.warning(e.toString());
+                logger.log(Level.WARNING, "Colony check fail", e);
             }
         }
     }
@@ -233,7 +237,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
             doc.insertString(doc.getLength(), "\n\n" + message,
                 doc.getStyle("regular"));
         } catch (Exception e) {
-            logger.warning(e.toString());
+            logger.log(Level.WARNING, "Tile warning fail", e);
         }
     }
 
@@ -244,7 +248,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
             doc.insertString(doc.getLength(), "\n\n" + message,
                 doc.getStyle("regular"));
         } catch (Exception e) {
-            logger.warning(e.toString());
+            logger.log(Level.WARNING, "Center warning fail", e);
         }
     }
 
@@ -265,8 +269,8 @@ public final class ReportRequirementsPanel extends ReportPanel {
 
         try {
             doc.insertString(doc.getLength(), "\n\n" + newMessage, doc.getStyle("regular"));
-        } catch(Exception e) {
-            logger.warning(e.toString());
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Bad assignment fail", e);
         }
     }
 
@@ -329,7 +333,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
             }
 
         } catch(Exception e) {
-            logger.warning(e.toString());
+            logger.log(Level.WARNING, "Assign experts fail", e);
         }
 
     }
@@ -384,7 +388,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
 
 
         } catch(Exception e) {
-            logger.warning(e.toString());
+            logger.log(Level.WARNING, "Production warning fail", e);
         }
 
     }

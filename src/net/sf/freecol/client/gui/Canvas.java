@@ -34,6 +34,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -407,9 +408,9 @@ public final class Canvas extends JDesktopPane {
             } else {
                 super.add(comp, i);
             }
-        } catch(Exception e) {
-            logger.warning("add component failed with layer " + i);
-            e.printStackTrace();
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "addToCanvas(" + comp + ", " + i
+                + ") failed.", e);
         }
     }
 

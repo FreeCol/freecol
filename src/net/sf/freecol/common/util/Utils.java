@@ -218,11 +218,12 @@ public class Utils {
                                    int range, int n) {
         int[] ret = new int[n];
         for (int i = 0; i < n; i++) ret[i] = random.nextInt(range);
-        if (logger != null) {
-            String msg = logMe + " random(" + range + ") = [";
-            for (int i = 0; i < n; i++) msg += " " + Integer.toString(ret[i]);
-            msg += " ]";
-            logger.finest(msg);
+        if (logger != null && logger.isLoggable(Level.FINEST)) {
+            StringBuilder sb = new StringBuilder(64);
+            sb.append(logMe).append(" random(").append(range).append(") = [");
+            for (int i = 0; i < n; i++) sb.append(" ").append(ret[i]);
+            sb.append(" ]");
+            logger.finest(sb.toString());
         }
         return ret;
     }
@@ -238,7 +239,7 @@ public class Utils {
     public static double randomDouble(Logger logger, String logMe,
                                       Random random) {
         double ret = random.nextDouble();
-        if (logger != null) {
+        if (logger != null && logger.isLoggable(Level.FINEST)) {
             logger.finest(logMe + " random(1.0) = " + ret);
         }
         return ret;

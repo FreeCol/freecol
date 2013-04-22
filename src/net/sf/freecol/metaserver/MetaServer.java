@@ -93,7 +93,7 @@ public final class MetaServer extends Thread {
         try {
             metaServer = new MetaServer(port);
         } catch (IOException e) {
-            logger.warning("Could not create MetaServer!");
+            logger.log(Level.WARNING, "Could not create MetaServer!", e);
             System.exit(-1);
         }
 
@@ -120,7 +120,7 @@ public final class MetaServer extends Thread {
                 try {
                     mr.removeDeadServers();
                 } catch (Exception ex) {
-                    logger.warning("Exception: " + ex.getMessage());
+                    logger.log(Level.WARNING, "Could not remove servers.", ex);
                 }
             }
         }, REMOVE_DEAD_SERVERS_INTERVAL, REMOVE_DEAD_SERVERS_INTERVAL);

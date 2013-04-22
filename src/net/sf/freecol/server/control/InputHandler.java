@@ -227,7 +227,7 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
             try {
                 connection.reallyClose();
             } catch (IOException e) {
-                logger.warning("Could not close the connection.");
+                logger.log(Level.WARNING, "Could not close the connection.", e);
             }
             Server server = getFreeColServer().getServer();
             if (server != null) {

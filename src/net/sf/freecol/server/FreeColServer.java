@@ -831,7 +831,7 @@ public final class FreeColServer {
         } catch (XMLStreamException e) {
             throw new IOException("XMLStreamException: " + e.getMessage());
         } catch (Exception e) {
-            logger.log(Level.WARNING, e.getMessage(), e);
+            logger.log(Level.WARNING, "Failed to save", e);
             throw new IOException("Exception: " + e.getMessage());
         } finally {
             try {
@@ -1507,7 +1507,7 @@ public final class FreeColServer {
             try {
                 loadHighScores();
             } catch (Exception e) {
-                logger.warning(e.toString());
+                logger.log(Level.WARNING, "Failed to load high scores.", e);
                 highScores = new ArrayList<HighScore>();
             }
         }

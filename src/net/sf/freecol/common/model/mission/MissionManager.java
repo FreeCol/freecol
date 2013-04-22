@@ -22,7 +22,9 @@ package net.sf.freecol.common.model.mission;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -50,7 +52,7 @@ public class MissionManager {
                            ImprovementMission.class.getConstructor(Game.class, XMLStreamReader.class));
 
         } catch (NoSuchMethodException e) {
-            logger.warning("Missing constructor: " + e.toString());
+            logger.log(Level.WARNING, "Missing constructor", e);
         }
     }
 
@@ -85,8 +87,9 @@ public class MissionManager {
         } else {
             try {
                 return c.newInstance(game, in);
-            } catch(Exception e) {
-                logger.warning("Failed to instatiate mission with tag '" + tag + "'.");
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Failed to instatiate mission with tag: "
+                    + tag, e);
                 return null;
             }
         }

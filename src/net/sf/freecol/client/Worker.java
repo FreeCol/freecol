@@ -58,7 +58,7 @@ public final class Worker extends Thread {
                     logger.log(Level.SEVERE, "Worker task failed!", e);
                 }
             } catch (InterruptedException e) {
-                logger.log(Level.INFO, "Worker interrupted, aborting!");
+                logger.log(Level.INFO, "Worker interrupted, aborting!", e);
             }
         }
     }

@@ -198,7 +198,7 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
                 StyledDocument doc = textPane.getStyledDocument();
                 appendRequiredAbilities(doc, type);
                 panel.add(textPane, "span, width 70%");
-            } catch(BadLocationException e) {
+            } catch (BadLocationException e) {
                 //logger.warning(e.toString());
             }
         }

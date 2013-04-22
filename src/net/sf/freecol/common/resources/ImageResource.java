@@ -160,8 +160,8 @@ public class ImageResource extends Resource {
                 }
                 return scaled;
             } catch (Exception e) {
-                logger.warning("Failed to scale image: " + getResourceLocator()
-                               + "\r\nProblem: " + e );
+                logger.log(Level.WARNING, "Failed to scale image: "
+                    + getResourceLocator(), e);
             }
         }
         return null;

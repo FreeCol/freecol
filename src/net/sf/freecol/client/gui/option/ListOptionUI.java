@@ -25,6 +25,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -91,8 +92,8 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
         for (AbstractOption<T> o : option.getValue()) {
             try {
                 model.addElement(o.clone());
-            } catch(CloneNotSupportedException e) {
-                logger.warning(e.toString());
+            } catch (CloneNotSupportedException e) {
+                logger.log(Level.WARNING, "Can not clone: " + o, e);
             }
         }
         list = new JList(model);
@@ -127,8 +128,8 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
                         list.setSelectedValue(value, true);
                         list.repaint();
                     }
-                } catch(CloneNotSupportedException ex) {
-                    logger.warning(ex.toString());
+                } catch (CloneNotSupportedException ex) {
+                    logger.log(Level.WARNING, "Can not clone: " + oldValue, ex);
                 }
             }
         });

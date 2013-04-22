@@ -23,6 +23,7 @@ import java.lang.reflect.Method;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -188,8 +189,9 @@ public class Operand extends Scope {
                         Integer.class.isAssignableFrom(method.getReturnType())) {
                         return (Integer) method.invoke(game);
                     }
-                } catch(Exception e) {
-                    logger.warning(e.toString());
+                } catch (Exception e) {
+                    logger.log(Level.WARNING, "Unable to invoke: "
+                        + getMethodName(), e);
                 }
             }
             return null;
@@ -257,8 +259,9 @@ public class Operand extends Scope {
                                     || Integer.class.equals(method.getReturnType()))) {
                                 return (Integer) method.invoke(player);
                             }
-                        } catch(Exception e) {
-                            logger.warning(e.toString());
+                        } catch (Exception e) {
+                            logger.log(Level.WARNING, "Unable to invoke: "
+                                + getMethodName(), e);
                             return null;
                         }
                     }
@@ -302,8 +305,9 @@ public class Operand extends Scope {
                                 Integer.class.isAssignableFrom(method.getReturnType())) {
                                 return (Integer) method.invoke(colony);
                             }
-                        } catch(Exception e) {
-                            logger.warning(e.toString());
+                        } catch (Exception e) {
+                            logger.log(Level.WARNING, "Unable to invoke: "
+                                + getMethodName(), e);
                             return null;
                         }
                     }

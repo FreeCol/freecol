@@ -113,7 +113,7 @@ public final class EmigrationPanel extends FreeColDialog<Integer> {
                 logger.warning("Invalid Actioncommand: invalid number.");
             }
         } catch (NumberFormatException e) {
-            logger.warning("Invalid Actioncommand: not a number.");
+            logger.warning("Invalid Actioncommand: not a number: " + command);
         }
     }
 

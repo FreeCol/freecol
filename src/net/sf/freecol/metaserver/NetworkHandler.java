@@ -22,6 +22,7 @@ package net.sf.freecol.metaserver;
 
 
 import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.networking.Connection;
@@ -185,7 +186,7 @@ public final class NetworkHandler implements MessageHandler {
         try {
             connection.reallyClose();
         } catch (IOException e) {
-            logger.warning("Could not close the connection.");
+            logger.log(Level.WARNING, "Could not close the connection.", e);
         }
 
         metaServer.removeConnection(connection);
