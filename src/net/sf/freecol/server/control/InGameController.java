@@ -3518,7 +3518,7 @@ public final class InGameController extends Controller {
         }
 
         Unit unit = new ServerUnit(getGame(), europe, serverPlayer, type);
-        unit.setName(serverPlayer.getUnitName(type, random));
+        unit.setName(serverPlayer.getNameForUnit(type, random));
         serverPlayer.modifyGold(-price);
         ((ServerEurope) europe).increasePrice(type, price);
 

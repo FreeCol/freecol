@@ -331,7 +331,7 @@ public final class ReportTurnPanel extends ReportPanel {
                 if (item != null && var.equals(item[0])) {
                     // found variable to replace
                     if (var.equals("%colony%")) {
-                        Colony colony = player.getColony(item[1]);
+                        Colony colony = player.getColonyByName(item[1]);
                         if (colony != null) {
                             insertLinkButton(document, colony, item[1]);
                         } else if (messageSource instanceof Tile) {

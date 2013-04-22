@@ -903,7 +903,7 @@ public final class InGameController implements NetworkConstants {
      */
     private boolean loadGoods(Goods goods, Unit carrier) {
         if (carrier.isInEurope() && goods.getLocation() instanceof Europe) {
-            if (!carrier.getOwner().canTrade(goods)) return false;
+            if (!carrier.getOwner().canTrade(goods.getType())) return false;
             return buyGoods(goods.getType(), goods.getAmount(), carrier);
         }
         GoodsType type = goods.getType();
@@ -931,7 +931,9 @@ public final class InGameController implements NetworkConstants {
      */
     private boolean unloadGoods(Goods goods, Unit carrier, Colony colony) {
         if (colony == null && carrier.isInEurope()
-            && carrier.getOwner().canTrade(goods)) return sellGoods(goods);
+            && carrier.getOwner().canTrade(goods.getType())) {
+            return sellGoods(goods);
+        }
 
         GoodsType type = goods.getType();
         int oldAmount = carrier.getGoodsContainer().getGoodsCount(type);
@@ -1498,7 +1500,7 @@ public final class InGameController implements NetworkConstants {
             "nameColony.yes", "nameColony.no", true);
         if (name == null) return; // User cancelled, 0-length invalid.
 
-        if (player.getSettlement(name) != null) {
+        if (player.getSettlementByName(name) != null) {
             // Colony name must be unique.
             gui.showInformationMessage(tile,
                 StringTemplate.template("nameColony.notUnique")
@@ -3550,7 +3552,7 @@ public final class InGameController implements NetworkConstants {
             } else if (colony.getName().equals(name)) {
                 // No change
                 return;
-            } else if (player.getSettlement(name) != null) {
+            } else if (player.getSettlementByName(name) != null) {
                 // Colony name must be unique.
                 gui.showInformationMessage((Colony) object,
                     StringTemplate.template("nameColony.notUnique")
@@ -3624,7 +3626,7 @@ public final class InGameController implements NetworkConstants {
             throw new IllegalStateException("Goods not on carrier.");
         } else if (!carrier.isInEurope()) {
             throw new IllegalStateException("Goods not on carrier in Europe.");
-        } else if (!player.canTrade(goods)) {
+        } else if (!player.canTrade(goods.getType())) {
             throw new IllegalStateException("Goods are boycotted.");
         }
 
@@ -3710,7 +3712,7 @@ public final class InGameController implements NetworkConstants {
 
            // GUI management.
            if (!freeColClient.isSinglePlayer()) {
-               gui.playSound("sound.anthem." + player.getNationID());
+               gui.playSound("sound.anthem." + player.getNationId());
            }
            displayModelMessages(true, true);
         }
@@ -3824,7 +3826,7 @@ public final class InGameController implements NetworkConstants {
         } else {
             if (inEurope) { // In Europe, unload non-boycotted goods
                 for (Goods goods : new ArrayList<Goods>(unit.getGoodsList())) {
-                    if (player.canTrade(goods)) {
+                    if (player.canTrade(goods.getType())) {
                         unloadCargo(goods, false);
                     }
                 }

@@ -353,7 +353,7 @@ public final class EuropePanel extends PortPanel {
             Iterator<Goods> goodsIterator = unit.getGoodsIterator();
             while (goodsIterator.hasNext()) {
                 Goods goods = goodsIterator.next();
-                if (getMyPlayer().canTrade(goods)) {
+                if (getMyPlayer().canTrade(goods.getType())) {
                     getController().sellGoods(goods);
                 } else {
                     getController().payArrears(goods.getType());
@@ -663,7 +663,7 @@ public final class EuropePanel extends PortPanel {
                 }
 
                 Goods goods = ((GoodsLabel) comp).getGoods();
-                if (getMyPlayer().canTrade(goods)) {
+                if (getMyPlayer().canTrade(goods.getType())) {
                     getController().sellGoods(goods);
                 } else {
                     switch (getGUI().showBoycottedGoodsDialog(goods, europe)) {

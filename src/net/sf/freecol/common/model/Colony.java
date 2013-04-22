@@ -893,7 +893,7 @@ public class Colony extends Settlement implements Nameable {
                 .applyModifierSet(amount, getGame().getTurn(),
                                   libertyModifiers);
             incrementLiberty(newLiberty);
-            getOwner().incrementLiberty(newLiberty);
+            getOwner().modifyLiberty(newLiberty);
         }
 
         Set<Modifier> immigrationModifiers
@@ -903,7 +903,7 @@ public class Colony extends Settlement implements Nameable {
                 .applyModifierSet(amount, getGame().getTurn(),
                                   immigrationModifiers);
             incrementImmigration(newImmigration);
-            getOwner().incrementImmigration(newImmigration);
+            getOwner().modifyImmigration(newImmigration);
         }
 
     }
@@ -1322,7 +1322,7 @@ public class Colony extends Settlement implements Nameable {
      * @param amount The number of liberty to add.
      */
     public void addLiberty(int amount) {
-        getOwner().incrementLiberty(amount);
+        getOwner().modifyLiberty(amount);
         List<GoodsType> libertyTypeList = getSpecification()
             .getLibertyGoodsTypeList();
         final int uc = getUnitCount();

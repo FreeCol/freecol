@@ -127,7 +127,7 @@ public class FoundingFatherTest extends FreeColTestCase {
         Game game = getGame();
         for (FoundingFather father : spec().getFoundingFathers()) {
             for (Player player : game.getPlayers()) {
-                assertEquals(player.getNationID(), player.isEuropean(), 
+                assertEquals(player.getNationId(), player.isEuropean(), 
                              father.isAvailableTo(player));
             }
         }
@@ -138,7 +138,7 @@ public class FoundingFatherTest extends FreeColTestCase {
         newFather.setType(FoundingFatherType.TRADE);
 
         Scope dutchScope = new Scope();
-        dutchScope.setMethodName("getNationID");
+        dutchScope.setMethodName("getNationId");
         dutchScope.setMethodValue("model.nation.dutch");
         assertTrue(dutchScope.appliesTo(dutch));
 
@@ -152,7 +152,7 @@ public class FoundingFatherTest extends FreeColTestCase {
         scopes.add(frenchScope);
         newFather.setScopes(scopes);
         for (Player player : game.getPlayers()) {
-            assertEquals(player.getNationID(),
+            assertEquals(player.getNationId(),
                          (player == french || player == dutch),
                          newFather.isAvailableTo(player));
         }

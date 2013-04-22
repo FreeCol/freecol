@@ -416,7 +416,7 @@ public final class ImageLibrary {
      * @return The color of the given player.
      */
     public Color getColor(Player player) {
-        return ResourceManager.getColor(player.getNationID() + ".color");
+        return ResourceManager.getColor(player.getNationId() + ".color");
     }
 
     /**

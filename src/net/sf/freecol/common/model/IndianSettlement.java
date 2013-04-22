@@ -1144,7 +1144,7 @@ public class IndianSettlement extends Settlement {
      * {@inheritDoc}
      */
     public String getImageKey() {
-        return getOwner().getNationID()
+        return getOwner().getNationId()
             + (isCapital() ? ".capital" : ".settlement")
             + ((hasMissionary()) ? "" : ".mission")
             + ".image";
@@ -1484,7 +1484,7 @@ public class IndianSettlement extends Settlement {
                                + " does not belong to settlement " + getId());
             } else {
                 ownedUnits.add(unit);
-                owner.setUnit(unit);
+                owner.addUnit(unit);
             }
             closeTag(in, OWNED_UNITS_TAG_NAME);
 

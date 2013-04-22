@@ -1518,7 +1518,7 @@ public class ChangeSet {
         Game game = settlement.getGame();
         LastSale sale = new LastSale(settlement, type, game.getTurn(), price);
         changes.add(new OwnedChange(See.only(serverPlayer), sale));
-        serverPlayer.saveSale(sale);
+        serverPlayer.addLastSale(sale);
         return this;
     }
 

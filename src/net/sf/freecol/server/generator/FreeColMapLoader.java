@@ -99,10 +99,10 @@ public class FreeColMapLoader implements MapLoader {
                             if (layer.compareTo(Layer.NATIVES) >= 0) {
                                 // import native settlements
                                 if (template.getOwner() != null) {
-                                    String nationID = template.getOwner().getNationID();
-                                    Player player = game.getPlayer(nationID);
+                                    String nationId = template.getOwner().getNationId();
+                                    Player player = game.getPlayer(nationId);
                                     if (player == null) {
-                                        Nation nation = game.getSpecification().getNation(nationID);
+                                        Nation nation = game.getSpecification().getNation(nationId);
                                         player = new ServerPlayer(game, null, false, nation, null, null);
                                         game.addPlayer(player);
                                     }

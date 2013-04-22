@@ -2556,7 +2556,7 @@ public class Unit extends GoodsLocation
                 oldOwner.invalidateCanSeeTiles();
             }
         }
-        owner.setUnit(this);
+        owner.addUnit(this);
         if(getType() != null) {     // can be null if setOwner() is called from fixIntegrity()
             owner.modifyScore(getType().getScoreValue());
         }
@@ -3714,10 +3714,10 @@ public class Unit extends GoodsLocation
                 // Do not write out nationality and ethnicity for non-persons.
                 out.writeAttribute("nationality",
                     (nationality != null) ? nationality
-                    : getOwner().getNationID());
+                    : getOwner().getNationId());
                 out.writeAttribute("ethnicity",
                     (ethnicity != null) ? ethnicity
-                    : getOwner().getNationID());
+                    : getOwner().getNationId());
             }
         }
         out.writeAttribute("turnsOfTraining", Integer.toString(turnsOfTraining));
@@ -3905,7 +3905,7 @@ public class Unit extends GoodsLocation
         }
 
         setRole();
-        getOwner().setUnit(this);
+        getOwner().addUnit(this);
         getOwner().invalidateCanSeeTiles();
     }
 
@@ -3943,7 +3943,7 @@ public class Unit extends GoodsLocation
     public String toString(String prefix) {
         String rest = (isUninitialized()) ? "uninitialized"
             : (isDisposed()) ? "disposed"
-            : (Utils.lastPart(owner.getNationID(), ".")
+            : (Utils.lastPart(owner.getNationId(), ".")
                 + " " + Utils.lastPart(getType().getId(), ".")
                 + ((getRole() == Role.DEFAULT) ? "" : "-" + getRole())
                 + " " + getMovesAsString());

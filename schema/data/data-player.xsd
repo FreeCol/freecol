@@ -141,21 +141,35 @@
 
   <xs:simpleType name="PlayerType">
     <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="native" />
+      <xs:enumeration value="colonial" />
+      <xs:enumeration value="rebel" />
+      <xs:enumeration value="independent" />
+      <xs:enumeration value="royal" />
+      <xs:enumeration value="undead" />
+      <!-- @compat 0.10.x -->
       <xs:enumeration value="NATIVE" />
       <xs:enumeration value="COLONIAL" />
       <xs:enumeration value="REBEL" />
       <xs:enumeration value="INDEPENDENT" />
       <xs:enumeration value="ROYAL" />
       <xs:enumeration value="UNDEAD" />
+      <!-- end @compat 0.10.x -->
     </xs:restriction>
   </xs:simpleType>
 
   <xs:simpleType name="PlayerStance">
     <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="war" />
+      <xs:enumeration value="cease_fire" />
+      <xs:enumeration value="peace" />
+      <xs:enumeration value="alliance" />
+      <!-- @compat 0.10.x -->
       <xs:enumeration value="WAR" />
       <xs:enumeration value="CEASE_FIRE" />
       <xs:enumeration value="PEACE" />
       <xs:enumeration value="ALLIANCE" />
+      <!-- end @compat 0.10.x -->
     </xs:restriction>
   </xs:simpleType>
 

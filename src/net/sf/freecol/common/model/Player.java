@@ -49,52 +49,220 @@ import org.w3c.dom.Element;
 
 
 /**
- * Represents a player. The player can be either a human player or an
- * AI-player.
+ * Represents a player.  The player can be either a human player or an
+ * AI-player, which is further subdivided by PlayerType.
  *
- * In addition to storing the name, nation e.t.c. of the player, it also stores
- * various defaults for the player. One example of this is the
+ * In addition to storing the name, nation etc of the player, it also
+ * stores various defaults for the player.  One example of this is the
  * {@link #getEntryLocation entry location}.
  */
 public class Player extends FreeColGameObject implements Nameable {
 
     private static final Logger logger = Logger.getLogger(Player.class.getName());
+    //
+    // Types
+    //
 
-    // A magic constant to denote that a players gold is not tracked.
-    public static final int GOLD_NOT_ACCOUNTED = Integer.MIN_VALUE;
-
-    public static final int SCORE_SETTLEMENT_DESTROYED = -40;
-
-    public static final String ASSIGN_SETTLEMENT_NAME = "";
-
-    /**
-     * The XML tag name for the set of founding fathers.
-     */
-    private static final String FOUNDING_FATHER_TAG = "foundingFathers";
+    /** Types of players. */
+    public static enum PlayerType {
+        NATIVE, COLONIAL, REBEL, INDEPENDENT, ROYAL, UNDEAD, RETIRED
+    }
 
     /**
-     * The XML tag name for the set of offered founding fathers.
+     * A predicate that can be applied to a unit.
      */
-    private static final String OFFERED_FATHER_TAG = "offeredFathers";
+    public abstract class UnitPredicate {
+        public abstract boolean obtains(Unit unit);
+    }
 
     /**
-     * The XML tag name for the stance array.
+     * A predicate for determining active units.
      */
-    private static final String STANCE_TAG = "stance";
+    public class ActivePredicate extends UnitPredicate {
+
+        private final Player player;
+
+        /**
+         * Creates a new active predicate.
+         *
+         * @param player The owning <code>Player</code>.
+         */
+        public ActivePredicate(Player player) {
+            this.player = player;
+        }
+
+        /**
+         * Is the unit active and going nowhere, and thus available to
+         * be moved by the player?
+         *
+         * @return True if the unit can be moved.
+         */
+        public boolean obtains(Unit unit) {
+            return unit.couldMove();
+        }
+    }
 
     /**
-     * The XML tag name for the tension array.
+     * A predicate for determining units going somewhere.
      */
-    private static final String TENSION_TAG = "tension";
+    public class GoingToPredicate extends UnitPredicate {
+
+        private final Player player;
+
+        /**
+         * Creates a new going-to predicate.
+         *
+         * @param player The owning <code>Player</code>.
+         */
+        public GoingToPredicate(Player player) {
+            this.player = player;
+        }
+
+        /**
+         * Does this unit have orders to go somewhere?
+         *
+         * @return True if the unit has orders to go somewhere.
+         */
+        public boolean obtains(Unit unit) {
+            return !unit.isDisposed()
+                && unit.getOwner() == player
+                && unit.getState() != Unit.UnitState.SKIPPED
+                && unit.getMovesLeft() > 0
+                && (unit.getDestination() != null
+                    || unit.getTradeRoute() != null)
+                && !unit.isUnderRepair()
+                && !unit.isAtSea()
+                && !unit.isOnCarrier()
+                && !(unit.getLocation() instanceof WorkLocation);
+        }
+    }
 
     /**
-     * The name of the unknown enemy.
+     * An <code>Iterator</code> of {@link Unit}s that can be made active.
      */
-    public static final String UNKNOWN_ENEMY = "unknown enemy";
+    public class UnitIterator implements Iterator<Unit> {
 
-    /**
-     * Constants for describing the stance towards a player.
-     */
+        private Player owner;
+
+        private UnitPredicate predicate;
+
+        private List<Unit> units = null;
+
+        /**
+         * A comparator to compare units by position, top to bottom,
+         * left to right.
+         */
+        private final Comparator<Unit> xyComparator = new Comparator<Unit>() {
+            public int compare(Unit unit1, Unit unit2) {
+                Tile tile1 = unit1.getTile();
+                Tile tile2 = unit2.getTile();
+                int cmp = ((tile1 == null) ? 0 : tile1.getY())
+                    - ((tile2 == null) ? 0 : tile2.getY());
+                return (cmp != 0 || tile1 == null || tile2 == null) ? cmp
+                    : (tile1.getX() - tile2.getX());
+            }
+        };
+
+        /**
+         * Creates a new <code>UnitIterator</code>.
+         *
+         * @param owner The <code>Player</code> that needs an iterator of it's
+         *            units.
+         * @param predicate An object for deciding whether a <code>Unit</code>
+         *            should be included in the <code>Iterator</code> or not.
+         */
+        public UnitIterator(Player owner, UnitPredicate predicate) {
+            this.owner = owner;
+            this.predicate = predicate;
+            reset();
+        }
+
+        /**
+         * Reset the internal units list, initially only with units that
+         * satisfy the predicate.
+         */
+        public void reset() {
+            units = new ArrayList<Unit>();
+            for (Unit u : owner.getUnits()) {
+                if (predicate.obtains(u)) units.add(u);
+            }
+            Collections.sort(units, xyComparator);
+        }
+
+        /**
+         * Check if there is any more valid units.
+         * If there are, it will be at the head of the internal units list.
+         *
+         * @return True if there are any valid units left.
+         */
+        public boolean hasNext() {
+            // Try to find a unit that still satisfies the predicate.
+            while (!units.isEmpty()) {
+                if (predicate.obtains(units.get(0))) {
+                    return true; // Still valid
+                }
+                units.remove(0);
+            }
+            // Nothing left, so refill the units list.  If it is still
+            // empty then there is definitely nothing left.
+            reset();
+            return !units.isEmpty();
+        }
+
+        /**
+         * Get the next valid unit.
+         * Always call hasNext to enforce validity.
+         *
+         * @return The next valid unit, or null if none.
+         */
+        public Unit next() {
+            return (hasNext()) ? units.remove(0) : null;
+        }
+
+        /**
+         * Set the next valid unit.
+         *
+         * @param unit The <code>Unit</code> to put at the front of the list.
+         * @return True if the operation succeeds.
+         */
+        public boolean setNext(Unit unit) {
+            if (predicate.obtains(unit)) { // Of course, it has to be valid...
+                Unit first = (units.isEmpty()) ? null : units.get(0);
+                while (!units.isEmpty()) {
+                    if (units.get(0) == unit) return true;
+                    units.remove(0);
+                }
+                reset();
+                while (!units.isEmpty() && units.get(0) != first) {
+                    if (units.get(0) == unit) return true;
+                    units.remove(0);
+                }
+            }
+            return false;
+        }
+
+        /**
+         * Removes from the underlying collection the last element returned by
+         * the iterator (optional operation).
+         *
+         * @exception UnsupportedOperationException no matter what.
+         */
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+
+        /**
+         * Removes a specific unit from this unit iterator.
+         *
+         * @param u The <code>Unit</code> to remove.
+         * @return True if the unit was removed.
+         */
+        public boolean remove(Unit u) {
+            return units.remove(u);
+        }
+    }
+
+    /** The stance one player has towards another player. */
     public static enum Stance {
         // Valid transitions:
         //
@@ -212,9 +380,9 @@ public class Player extends FreeColGameObject implements Nameable {
         }
 
         /**
-         * Gets a message id for this stance.
+         * Gets a message key for this stance.
          *
-         * @return A message id string.
+         * @return The stance message key.
          */
         public String getKey() {
             return "model.stance." + toString().toLowerCase(Locale.US);
@@ -222,41 +390,87 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
 
-    /**
-     * Only used by AI - stores the tension levels, 0-1000 with 1000 maximum
-     * hostility.
-     */
-    protected java.util.Map<Player, Tension> tension
-        = new HashMap<Player, Tension>();
-    // TODO: move this to AIPlayer
+    //
+    // Constants
+    //
+
+    /** A comparator for ordering players. */
+    public static final Comparator<Player> playerComparator
+        = new Comparator<Player>() {
+            public int compare(Player player1, Player player2) {
+                int counter1 = 0;
+                int counter2 = 0;
+
+                if (player1.isAdmin()) counter1 += 8;
+                if (!player1.isAI()) counter1 += 4;
+                if (player1.isEuropean()) counter1 += 2;
+                if (player2.isAdmin()) counter2 += 8;
+                if (!player2.isAI()) counter2 += 4;
+                if (player2.isEuropean()) counter2 += 2;
+                
+                return counter2 - counter1;
+            }
+        };
+
+    /** A magic constant to denote that a players gold is not tracked. */
+    public static final int GOLD_NOT_ACCOUNTED = Integer.MIN_VALUE;
 
     /**
-     * Stores the stance towards the other players. One of: WAR, CEASE_FIRE,
-     * PEACE and ALLIANCE.
+     * A token to use for the settlement name in requests to the server
+     * to ask the server to choose a settlement name.
      */
-    protected java.util.Map<String, Stance> stance
-        = new HashMap<String, Stance>();
+    public static final String ASSIGN_SETTLEMENT_NAME = "";
+
+    /** The name of the unknown enemy. */
+    public static final String UNKNOWN_ENEMY = "unknown enemy";
+
+
+    //
+    // Class variables
+    //
 
     /**
-     * The name of this player. This defaults to the user name in case of a
-     * human player and the rulerName of the NationType in case of an AI player.
+     * The name of this player.  This defaults to the user name in
+     * case of a human player and the rulerName of the NationType in
+     * case of an AI player.
      */
     protected String name;
 
     /** The name of this player as an independent nation. */
     protected String independentNationName;
 
-    /** The NationType of this player. */
+    /** The type of player. */
+    protected PlayerType playerType;
+
+    /** The player nation type. */
     protected NationType nationType;
 
-    /** The nation ID of this player, e.g. "model.nation.dutch". */
-    protected String nationID;
+    /** The nation identifier of this player, e.g. "model.nation.dutch". */
+    protected String nationId;
 
     /** The name this player uses for the New World. */
     protected String newLandName = null;
 
     /** Is this player an admin? */
     protected boolean admin;
+
+    /** Is this player an AI? */
+    protected boolean ai;
+
+    /** Is this player ready to start? */
+    protected boolean ready;
+
+    /** Is this player dead? */
+    protected boolean dead = false;
+
+    /** True if player has been attacked by privateers. */
+    protected boolean attackedByPrivateers = false;
+
+    /**
+     * Whether the player is bankrupt, i.e. unable to pay for the
+     * maintenance of all buildings.
+     */
+    private boolean bankrupt;
 
     /** The current score of this player. */
     protected int score;
@@ -265,24 +479,36 @@ public class Player extends FreeColGameObject implements Nameable {
     protected int gold;
 
     /**
-     * The number of immigration points. Immigration points are an
-     * abstract game concept. They are generated by but are not
+     * The number of immigration points.  Immigration points are an
+     * abstract game concept.  They are generated by but are not
      * identical to crosses.
      */
     protected int immigration;
 
     /**
-     * The number of liberty points. Liberty points are an
-     * abstract game concept. They are generated by but are not
+     * The amount of immigration needed until the next unit decides
+     * to migrate.  TODO: Magic Number!
+     */
+    protected int immigrationRequired = 12;
+
+    /**
+     * The number of liberty points.  Liberty points are an
+     * abstract game concept.  They are generated by but are not
      * identical to bells.
      */
     protected int liberty;
 
-    /**
-     * The number of liberty bells produced towards the intervention
-     * force.
-     */
+    /** SoL from last turn. */
+    protected int oldSoL = 0;
+
+    /** The number of liberty bells produced towards the intervention force. */
     protected int interventionBells;
+
+    /** The current tax rate for this player. */
+    protected int tax = 0;
+
+    /** The player starting location on the map. */
+    protected Location entryLocation;
 
     /** The market for Europe. */
     protected Market market;
@@ -293,22 +519,8 @@ public class Player extends FreeColGameObject implements Nameable {
     /** The monarch for this player. */
     protected Monarch monarch;
 
-    protected boolean ready;
-
-    /** True if this is an AI player. */
-    protected boolean ai;
-
-    /** True if player has been attacked by privateers. */
-    protected boolean attackedByPrivateers = false;
-
-    /** SoL from last turn. */
-    protected int oldSoL;
-
-    /** Is this player dead? */
-    protected boolean dead = false;
-
     /** The founding fathers in this Player's congress. */
-    final protected Set<FoundingFather> allFathers
+    final protected Set<FoundingFather> foundingFathers
         = new HashSet<FoundingFather>();
     /** Current founding father being recruited. */
     protected FoundingFather currentFather;
@@ -316,31 +528,32 @@ public class Player extends FreeColGameObject implements Nameable {
     final protected List<FoundingFather> offeredFathers
         = new ArrayList<FoundingFather>();
 
-    /** The current tax rate for this player. */
-    protected int tax = 0;
+    /**
+     * The tension levels, 0-1000, with 1000 being maximum hostility.
+     * Only used by AI.  TODO: move this to AIPlayer
+     */
+    protected java.util.Map<Player, Tension> tension
+        = new HashMap<Player, Tension>();
 
-    /** The type of player. */
-    public static enum PlayerType {
-        NATIVE, COLONIAL, REBEL, INDEPENDENT, ROYAL, UNDEAD, RETIRED
-    }
-    protected PlayerType playerType;
+    /**
+     * Stores the stance towards the other players. One of: WAR, CEASE_FIRE,
+     * PEACE and ALLIANCE.
+     */
+    protected java.util.Map<String, Stance> stance
+        = new HashMap<String, Stance>();
 
-    protected int immigrationRequired = 12;
-
-    protected Location entryLocation;
-
-    /** The Units this player owns. */
+    /** A map of the units this player owns indexed by object identifier. */
     protected final java.util.Map<String, Unit> units
         = new HashMap<String, Unit>();
 
-    /** The Settlements this player owns. */
+    /** The settlements this player owns. */
     protected final List<Settlement> settlements
         = new ArrayList<Settlement>();
 
-    /** Trade routes of this player. */
+    /** The trade routes defined by this player. */
     protected final List<TradeRoute> tradeRoutes = new ArrayList<TradeRoute>();
 
-    /** Model messages for this player. */
+    /** The current model messages for this player. */
     protected final List<ModelMessage> modelMessages
         = new ArrayList<ModelMessage>();
 
@@ -350,32 +563,28 @@ public class Player extends FreeColGameObject implements Nameable {
     /** The last-sale data. */
     protected HashMap<String, LastSale> lastSales = null;
 
-    /** Indices of largest used region name by type. */
+    /** A map of indices of the largest used region name by type. */
     protected final HashMap<String, Integer> nameIndex
         = new HashMap<String, Integer>();
 
-    // Temporary variables:
+    // Temporary/transient variables, do not serialize.
 
-    // Tiles the player can see.
-    // No access to canSeeTiles without taking canSeeLock.
+    /** The tiles the player can see. */
     private boolean[][] canSeeTiles = null;
+    /** Do not access canSeeTiles without taking canSeeLock. */
     private final Object canSeeLock = new Object();
 
-    /**
-     * Whether the player is bankrupt, i.e. unable to pay for the
-     * maintenance of all buildings.
-     */
-    private boolean bankrupt;
-
-    // Contains the abilities and modifiers of this type.
+    /** A container for the abilities and modifiers of this type. */
     protected final FeatureContainer featureContainer = new FeatureContainer();
 
-    // Maximum food consumption of unit types available to this player.
+    /** The maximum food consumption of unit types available to this player. */
     private int maximumFoodConsumption = -1;
 
+    /** An iterator for the player units that are still active this turn. */
     private final UnitIterator nextActiveUnitIterator
         = new UnitIterator(this, new ActivePredicate(this));
 
+    /** An iterator for the player units that have a destination to go to. */
     private final UnitIterator nextGoingToUnitIterator
         = new UnitIterator(this, new GoingToPredicate(this));
 
@@ -383,86 +592,42 @@ public class Player extends FreeColGameObject implements Nameable {
      * The HighSeas is a Location that enables Units to travel between
      * the New World and one or several European Ports.
      */
-    protected HighSeas highSeas;
+    protected HighSeas highSeas = null;
 
-    /**
-     * A cache of settlement names, a capital for natives, and a fallback
-     * settlement name prefix.
-     * Does not need to be serialized.
-     */
+    /** A cache of settlement names. */
     protected List<String> settlementNames = null;
+    /** The name of the national capital.  (Only used by natives ATM). */
     protected String capitalName = null;
 
-    /**
-     * A cache of ship names, including a fallback ship name prefix.
-     * Does not need to be serialized.
-     */
+    /** A cache of ship names. */
     protected List<String> shipNames = null;
+    /** A fallback ship name prefix. */
     protected String shipFallback = null;
 
 
-    public static final Comparator<Player> playerComparator = new Comparator<Player>() {
-        public int compare(Player player1, Player player2) {
-            int counter1 = 0;
-            int counter2 = 0;
-            if (player1.isAdmin()) {
-                counter1 += 8;
-            }
-            if (!player1.isAI()) {
-                counter1 += 4;
-            }
-            if (player1.isEuropean()) {
-                counter1 += 2;
-            }
-            if (player2.isAdmin()) {
-                counter2 += 8;
-            }
-            if (!player2.isAI()) {
-                counter2 += 4;
-            }
-            if (player2.isEuropean()) {
-                counter2 += 2;
-            }
-
-            return counter2 - counter1;
-        }
-    };
-
+    //
+    // Constructors
+    //
 
     /**
-     * Constructor for ServerPlayer.
+     * Deliberately empty constructor for ServerPlayer.
      */
-    protected Player() {
-        // empty
-    }
+    protected Player() {}
 
     /**
      * Constructor for ServerPlayer.
+     *
+     * @param game The enclosing <code>Game</code>.
      */
     protected Player(Game game) {
         super(game);
     }
 
     /**
-     *
      * Initiates a new <code>Player</code> from an <code>Element</code> and
      * registers this <code>Player</code> at the specified game.
      *
-     * @param game The <code>Game</code> this object belongs to.
-     * @param in The input stream containing the XML.
-     * @throws XMLStreamException if a problem was encountered during parsing.
-     */
-    public Player(Game game, XMLStreamReader in) throws XMLStreamException {
-        super(game, null);
-
-        readFromXML(in);
-    }
-
-    /**
-     * Initiates a new <code>Player</code> from an <code>Element</code> and
-     * registers this <code>Player</code> at the specified game.
-     *
-     * @param game The <code>Game</code> this object belongs to.
+     * @param game The enclosing <code>Game</code>.
      * @param e An XML-element that will be used to initialize this object.
      *
      */
@@ -473,203 +638,172 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Initiates a new <code>Player</code> with the given ID. The object
-     * should later be initialized by calling either {@link
-     * #readFromXML(XMLStreamReader)} or {@link #readFromXMLElement(Element)}.
+     * Creates a new <code>Player</code> with the given id.  The object
+     * should later be initialized by calling either
+     * {@link #readFromXML(XMLStreamReader)} or
+     * {@link #readFromXMLElement(Element)}.
      *
-     * @param game The <code>Game</code> in which this object belong.
-     * @param id The unique identifier for this object.
+     * @param game The <code>Game</code> this object belongs to.
+     * @param id The object identifier.
      */
     public Player(Game game, String id) {
         super(game, id);
     }
 
+
+    //
+    // Names and naming
+    //
+
     /**
-     * Get this settlement's feature container.
+     * Gets the name of this player.
      *
-     * @return The <code>FeatureContainer</code>.
+     * @return The name of this player.
      */
-    @Override
-    public final FeatureContainer getFeatureContainer() {
-        return featureContainer;
+    public String getName() {
+        return name;
+    }
+
+    // TODO: remove this again
+    public String getNameKey() {
+        return getName();
     }
 
     /**
-     * Adds a <code>ModelMessage</code> for this player.
+     * Is this player the unknown enemy?
      *
-     * @param modelMessage The <code>ModelMessage</code>.
+     * @return True if this player is the unknown enemy.
      */
-    public void addModelMessage(ModelMessage modelMessage) {
-        modelMessage.setOwnerId(getId());
-        modelMessages.add(modelMessage);
+    public boolean isUnknownEnemy() {
+        return UNKNOWN_ENEMY.equals(name);
     }
 
     /**
-     * Returns all ModelMessages for this player.
+     * Gets the name to display for this player.
      *
-     * @return all ModelMessages for this player.
-     */
-    public List<ModelMessage> getModelMessages() {
-        return modelMessages;
-    }
-
-    /**
-     * Returns all new ModelMessages for this player.
+     * TODO: This is a kludge that should be fixed.
      *
-     * @return all new ModelMessages for this player.
+     * @return The name to display for this player.
      */
-    public List<ModelMessage> getNewModelMessages() {
-
-        ArrayList<ModelMessage> out = new ArrayList<ModelMessage>();
-
-        for (ModelMessage message : modelMessages) {
-            if (message.hasBeenDisplayed()) {
-                continue;
-            } else {
-                out.add(message); // preserve message order
-            }
-        }
-
-        return out;
+    public String getDisplayName() {
+        return (getName().startsWith("model.nation."))
+            ? Messages.message(getName())
+            : getName();
     }
 
     /**
-     * Refilters the current model messages, removing the ones that
-     * are no longer valid.
+     * Set the player name.
      *
-     * @param options The <code>OptionGroup</code> for message display
-     *     to enforce.
+     * @param newName The new name value.
      */
-    public void refilterModelMessages(OptionGroup options) {
-        for (ModelMessage m : new ArrayList<ModelMessage>(modelMessages)) {
-            try {
-                String id = m.getMessageType().getOptionName();
-                if (!options.getBoolean(id)) modelMessages.remove(m);
-            } catch (Exception e) {};
-        }
+    public void setName(String newName) {
+        this.name = newName;
     }
 
     /**
-     * Removes all undisplayed model messages for this player.
-     */
-    public void removeModelMessages() {
-        Iterator<ModelMessage> messageIterator = modelMessages.iterator();
-        while (messageIterator.hasNext()) {
-            ModelMessage message = messageIterator.next();
-            if (message.hasBeenDisplayed()) {
-                messageIterator.remove();
-            }
-        }
-    }
-
-    /**
-     * Removes all the model messages for this player.
-     */
-    public void clearModelMessages() {
-        modelMessages.clear();
-    }
-
-    /**
-     * Sometimes an event causes the source (and display) fields in an
-     * accumulated model message to become invalid (e.g. Europe disappears
-     * on independence).  This routine is for cleaning up such cases.
+     * Get the new post-declaration player name.
      *
-     * @param source the source field that has become invalid
-     * @param newSource a new source field to replace the old with, or
-     *   if null then remove the message
+     * @return The post-declaration player name.
      */
-    public void divertModelMessages(FreeColGameObject source, FreeColGameObject newSource) {
-        // Since we are changing the list, we need to copy it to be able
-        // to iterate through it
-        List<ModelMessage> modelMessagesList = new ArrayList<ModelMessage>();
-        modelMessagesList.addAll(modelMessages);
-
-        for (ModelMessage modelMessage : modelMessagesList) {
-            if (modelMessage.getSourceId() == source.getId()) {
-                if (newSource == null) {
-                    modelMessages.remove(modelMessage);
-                } else {
-                    modelMessage.divert(newSource);
-                }
-            }
-        }
+    public final String getIndependentNationName() {
+        return independentNationName;
     }
 
     /**
-     * Standardized log of an instance of cheating by this player.
+     * Set the post-declaration player name.
      *
-     * @param what A description of the cheating.
+     * @param newIndependentNationName The new player name.
      */
-    public void logCheat(String what) {
-        logger.finest("CHEAT: " + getGame().getTurn().getNumber()
-            + " " + Utils.lastPart(getNationID(), ".")
-            + " " + what);
+    public final void setIndependentNationName(final String newIndependentNationName) {
+        this.independentNationName = newIndependentNationName;
     }
 
     /**
-     * Returns the maximum food consumption of any unit types
-     * available to this player.
+     * Gets the name this player has chosen for the new world.
      *
-     * @return an <code>int</code> value
+     * @return The name of the new world as chosen by the <code>Player</code>,
+     *     or null if none chosen yet.
      */
-    public int getMaximumFoodConsumption() {
-        if (maximumFoodConsumption < 0) {
-            for (UnitType unitType : getSpecification().getUnitTypeList()) {
-                if (unitType.isAvailableTo(this)) {
-                    int foodConsumption = 0;
-                    for (GoodsType foodType : getSpecification().getFoodGoodsTypeList()) {
-                        foodConsumption += unitType.getConsumptionOf(foodType);
-                    }
-                    if (foodConsumption > maximumFoodConsumption) {
-                        maximumFoodConsumption = foodConsumption;
-                    }
-                }
-            }
-        }
-        return maximumFoodConsumption;
+    public String getNewLandName() {
+        return newLandName;
     }
 
     /**
-     * Returns the current score of the player.
+     * Has the player already selected a name for the new world?
      *
-     * @return an <code>int</code> value
+     * @return True if the new world has been named by this player.
      */
-    public int getScore() {
-        return score;
+    public boolean isNewLandNamed() {
+        return newLandName != null;
     }
 
     /**
-     * Set the current score of the player.
+     * Sets the name this player uses for the new world.
      *
-     * @param newScore The new score.
+     * @param newLandName This <code>Player</code>'s name for the new world.
      */
-    public void setScore(int newScore) {
-        score = newScore;
+    public void setNewLandName(String newLandName) {
+        this.newLandName = newLandName;
     }
 
     /**
-     * Modifies the score of the player by the given value.
+     * Get a name key for the player Europe.
      *
-     * @param value an <code>int</code> value
+     * @return A name key, or null if Europe is null.
      */
-    public void modifyScore(int value) {
-        score += value;
+    public String getEuropeNameKey() {
+        return (europe == null) ? null : nationId + ".europe";
     }
 
     /**
-     * Returns this Player's Market.
+     * Gets a name key for the nation name.
      *
-     * @return This Player's Market.
+     * @return A nation name key.
      */
-    public Market getMarket() {
-        return market;
+    public String getNationNameKey() {
+        return nationId.substring(nationId.lastIndexOf('.')+1)
+            .toUpperCase(Locale.US);
     }
 
     /**
-     * Resets this Player's Market.
+     * Get a template for this players nation name.
+     *
+     * @return A template for this nation name.
      */
-    public void reinitialiseMarket() {
-        market = new Market(getGame(), this);
+    public StringTemplate getNationName() {
+        return (playerType == PlayerType.REBEL
+                || playerType == PlayerType.INDEPENDENT)
+            ? StringTemplate.name(independentNationName)
+            : StringTemplate.key(nationId + ".name");
+    }
+
+    /**
+     * Get a name key for the player nation ruler.
+     *
+     * @return The ruler name key.
+     */
+    public final String getRulerNameKey() {
+        return nationId + ".ruler";
+    }
+
+    /**
+     * Gets the name index for a given key.
+     *
+     * @param key The key to use.
+     */
+    public int getNameIndex(String key) {
+        Integer val = nameIndex.get(key);
+        return (val == null) ? 0 : val;
+    }
+
+    /**
+     * Sets the name index for a given key.
+     *
+     * @param key The key to use.
+     * @param value The new value.
+     */
+    public void setNameIndex(String key, int value) {
+        nameIndex.put(key, new Integer(value));
     }
 
     /**
@@ -677,231 +811,14 @@ public class Player extends FreeColGameObject implements Nameable {
      * Following a declaration of independence we are assumed to trade
      * broadly with any European market rather than a specific port.
      *
-     * @return A name for the player's market.
+     * @return A <code>StringTemplate</code> for the player market.
      */
     public StringTemplate getMarketName() {
-        return (getEurope() == null) ? StringTemplate.key("model.market.independent")
-            : StringTemplate.key(nationID + ".europe");
+        return (getEurope() == null)
+            ? StringTemplate.key("model.market.independent")
+            : StringTemplate.key(nationId + ".europe");
     }
 
-    /**
-     * Checks if this player owns the given <code>Settlement</code>.
-     *
-     * @param s The <code>Settlement</code>.
-     * @return <code>true</code> if this <code>Player</code> owns the given
-     *         <code>Settlement</code>.
-     */
-    public boolean hasSettlement(Settlement s) {
-        return settlements.contains(s);
-    }
-
-    /**
-     * Adds a given settlement to this player's list of settlements.
-     *
-     * @param settlement The <code>Settlement</code> to add.
-     */
-    public void addSettlement(Settlement settlement) {
-        if (!hasSettlement(settlement)) {
-            if (settlement.getOwner() != this) {
-                throw new IllegalStateException("Player does not own settlement.");
-            }
-            settlements.add(settlement);
-        }
-    }
-
-    /**
-     * Removes the given settlement from this player's list of settlements.
-     *
-     * @param settlement The <code>Settlement</code> to remove.
-     * @return True if the settlement was removed.
-     */
-    public boolean removeSettlement(Settlement settlement) {
-        return settlements.remove(settlement);
-    }
-
-    public boolean owns(Ownable ownable) {
-        if (ownable == null)
-            return false;
-        return this.equals(ownable.getOwner());
-    }
-
-
-
-    /**
-     * Returns a list of all Settlements this player owns.
-     *
-     * @return The settlements this player owns.
-     */
-    public List<Settlement> getSettlements() {
-        return settlements;
-    }
-
-    /**
-     * Get the number of settlements.
-     *
-     * @return The number of settlements this player has.
-     */
-    public int getNumberOfSettlements() {
-        return settlements.size();
-    }
-
-    /**
-     * Gets a fresh list of all colonies this player owns.
-     * It is an error to call this on non-European players.
-     *
-     * @return A fresh list of the colonies this player owns.
-     */
-    public List<Colony> getColonies() {
-        ArrayList<Colony> colonies = new ArrayList<Colony>();
-        for (Settlement s : settlements) {
-            if (s instanceof Colony) {
-                colonies.add((Colony) s);
-            } else {
-                throw new RuntimeException("getColonies can only be called for players whose settlements are colonies.");
-            }
-        }
-        return colonies;
-    }
-
-    /**
-     * Returns a sorted list of all Colonies this player owns.
-     *
-     * @param c A comparator to operate on the colony list.
-     * @return A fresh list of the colonies this player owns.
-     */
-    public List<Colony> getSortedColonies(Comparator<Colony> c) {
-        List<Colony> colonies = getColonies();
-        Collections.sort(colonies, c);
-        return colonies;
-    }
-
-    /**
-     * Returns the sum of units currently working in the colonies of
-     * this player.
-     *
-     * @return Sum of units currently working in the colonies.
-     */
-    public int getColoniesPopulation() {
-        int i = 0;
-        for (Colony c : getColonies()) {
-            i += c.getUnitCount();
-        }
-        return i;
-    }
-
-    /**
-     * Gets the score by which we decide the weakest and strongest AI
-     * players for the Spanish Succession event.
-     *
-     * @return A strength score.
-     */
-    public int getSpanishSuccessionScore() {
-        // TODO: try getColoniesPopulation.
-        return getScore();
-    }
-
-    /**
-     * Returns the <code>Colony</code> with the given name.
-     *
-     * @param name The name of the <code>Colony</code>.
-     * @return The <code>Colony</code> or <code>null</code> if this player
-     *         does not have a <code>Colony</code> with the specified name.
-     */
-    public Colony getColony(String name) {
-        for (Colony colony : getColonies()) {
-            if (colony.getName().equals(name)) {
-                return colony;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Gets a list of all the IndianSettlements this player owns.
-     * It is an error to call this on non-native players.
-     *
-     * @return The indian settlements this player owns.
-     */
-    public List<IndianSettlement> getIndianSettlements() {
-        List<IndianSettlement> indianSettlements
-            = new ArrayList<IndianSettlement>();
-        for (Settlement s : settlements) {
-            if (s instanceof IndianSettlement) {
-                indianSettlements.add((IndianSettlement) s);
-            } else {
-                throw new RuntimeException("getIndianSettlements found: " + s);
-            }
-        }
-        return indianSettlements;
-    }
-
-    /**
-     * Returns the <code>IndianSettlement</code> with the given name.
-     *
-     * @param name The name of the <code>IndianSettlement</code>.
-     * @return The <code>IndianSettlement</code> or <code>null</code> if this player
-     *         does not have a <code>IndianSettlement</code> with the specified name.
-     */
-    public IndianSettlement getIndianSettlement(String name) {
-        for (IndianSettlement settlement : getIndianSettlements()) {
-            if (settlement.getName().equals(name)) {
-                return settlement;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Returns a list of all IndianSettlements this player owns that have
-     * missions, optionally owned by a specific player.
-     *
-     * @param other If non-null, collect only missions established by
-     *     this <code>Player</code>
-     * @return The settlements this player owns with the specified
-     *     mission type.
-     */
-    public List<IndianSettlement> getIndianSettlementsWithMission(Player other) {
-        List<IndianSettlement> indianSettlements
-            = new ArrayList<IndianSettlement>();
-        for (Settlement s : settlements) {
-            Unit missionary;
-            if (s instanceof IndianSettlement
-                && (missionary = ((IndianSettlement)s).getMissionary()) != null
-                && (other == null || missionary.getOwner() == other)) {
-                indianSettlements.add((IndianSettlement) s);
-            }
-        }
-        return indianSettlements;
-    }
-
-    /**
-     * Find a <code>Settlement</code> by name.
-     *
-     * @param name The name of the <code>Settlement</code>.
-     * @return The <code>Settlement</code>, or <code>null</code> if not found.
-     **/
-    public Settlement getSettlement(String name) {
-        return (isIndian()) ? getIndianSettlement(name) : getColony(name);
-    }
-
-    /**
-     * Gets the port closest to Europe owned by this player.
-     *
-     * @return This players closest port.
-     */
-    public Settlement getClosestPortForEurope() {
-        int bestValue = INFINITY;
-        Settlement best = null;
-        for (Settlement settlement : getSettlements()) {
-            int value = settlement.getHighSeasCount();
-            if (bestValue > value) {
-                bestValue = value;
-                best = settlement;
-            }
-        }
-        return best;
-    }
-         
     /**
      * Installs suitable settlement names (and the capital if native)
      * into the player name cache.
@@ -990,6 +907,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Gets a new name for a unit.
+     *
      * Currently only names naval units, not specific to type.
      * TODO: specific names for types.
      *
@@ -997,7 +915,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param random A pseudo-random number source.
      * @return A name for the unit, or null if not available.
      */
-    public String getUnitName(UnitType type, Random random) {
+    public String getNameForUnit(UnitType type, Random random) {
         String name;
 
         if (!type.isNaval()) return null;
@@ -1028,8 +946,13 @@ public class Player extends FreeColGameObject implements Nameable {
         return null;
     }
 
+
+    //
+    // Player / nation types and the implications thereof
+    //
+
     /**
-     * Returns the type of this player.
+     * Get the type of this player.
      *
      * @return The player type.
      */
@@ -1048,29 +971,38 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Checks if this player is european. This includes the "Royal Expeditionay
-     * Force".
+     * Checks if this player is colonial, and thus can recruit units
+     * by producing immigration.
      *
-     * @return <i>true</i> if this player is european and <i>false</i>
-     *         otherwise.
+     * @return True if this player is colonial.
      */
-    public boolean isEuropean() {
-        return nationType != null && nationType.isEuropean();
+    public boolean isColonial() {
+        return playerType == PlayerType.COLONIAL;
     }
 
     /**
-     * Checks if this player is indian. This method returns the opposite of
-     * {@link #isEuropean()}.
+     * Checks if this player is European, with does include the REF.
      *
-     * @return <i>true</i> if this player is indian and <i>false</i>
-     *         otherwise.
+     * @return True if this player is European.
+     */
+    public boolean isEuropean() {
+        return playerType == PlayerType.COLONIAL
+            || playerType == PlayerType.REBEL
+            || playerType == PlayerType.INDEPENDENT
+            || playerType == PlayerType.ROYAL;
+    }
+
+    /**
+     * Is this a native player?
+     *
+     * @return True if this player is a native player.
      */
     public boolean isIndian() {
         return playerType == PlayerType.NATIVE;
     }
 
     /**
-     * Checks if this player is undead.
+     * Is this an undead player?
      *
      * @return True if this player is undead.
      */
@@ -1079,19 +1011,97 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Checks if this player is a "royal expeditionary force.
+     * Is this a REF player?
      *
-     * @return <code>true</code> is the given nation is a royal expeditionary
-     *         force and <code>false</code> otherwise.
+     * @return True if this is a REF player.
      */
     public boolean isREF() {
         return nationType != null && nationType.isREF();
     }
 
     /**
-     * Determines whether this player is an AI player.
+     * Get the nation type of this player.
      *
-     * @return Whether this player is an AI player.
+     * @return The <code>NationType</code> of this player.
+     */
+    public NationType getNationType() {
+        return nationType;
+    }
+
+    /**
+     * Sets the nation type of this player.
+     *
+     * @param newNationType The new <code>NationType</code>.
+     */
+    public void setNationType(NationType newNationType) {
+        if (nationType != null) removeFeatures(nationType);
+        nationType = newNationType;
+        if (newNationType != null) addFeatures(newNationType);
+    }
+
+    /**
+     * Can this player build colonies?
+     *
+     * @return True if this player can found colonies.
+     */
+    public boolean canBuildColonies() {
+        return nationType.hasAbility(Ability.FOUNDS_COLONIES);
+    }
+
+    /**
+     * Can this player recruit founding fathers?
+     *
+     * @return True if this player can recruit founding fathers.
+     */
+    public boolean canHaveFoundingFathers() {
+        return nationType.hasAbility("model.ability.electFoundingFather");
+    }
+
+    /**
+     * Get the identifier for this Player's nation.
+     *
+     * @return The nation identifier.
+     */
+    public String getNationId() {
+        return nationId;
+    }
+
+    /**
+     * Gets this Player's nation.
+     *
+     * @return The player <code>Nation</code>.
+     */
+    public Nation getNation() {
+        return getSpecification().getNation(nationId);
+    }
+
+    /**
+     * Sets the nation for this player.
+     *
+     * @param newNation The new <code>Nation</code>.
+     */
+    public void setNation(Nation newNation) {
+        Nation oldNation = getNation();
+        nationId = newNation.getId();
+        java.util.Map<Nation, NationState> nations
+            = getGame().getNationOptions().getNations();
+        nations.put(newNation, NationState.NOT_AVAILABLE);
+        nations.put(oldNation, NationState.AVAILABLE);
+    }
+
+    /**
+     * Is this player an admin.
+     *
+     * @return True if the player is an admin.
+     */
+    public boolean isAdmin() {
+        return admin;
+    }
+
+    /**
+     * Is this an AI player?
+     *
+     * @return True if this is an AI player.
      */
     public boolean isAI() {
         return ai;
@@ -1100,28 +1110,35 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Sets whether this player is an AI player.
      *
-     * @param ai <code>true</code> if this <code>Player</code> is controlled
-     *            by the computer.
+     * @param ai The AI player value.
      */
     public void setAI(boolean ai) {
         this.ai = ai;
     }
 
     /**
-     * Checks if this player is an admin.
+     * Is this player ready to start the game?
      *
-     * @return <i>true</i> if the player is an admin and <i>false</i>
-     *         otherwise.
+     * @return True if this <code>Player</code> is ready to start the game.
      */
-    public boolean isAdmin() {
-        return admin;
+    public boolean isReady() {
+        return ready;
     }
 
     /**
-     * Checks if this player is dead. A <code>Player</code> dies when it
+     * Sets this players readiness state.
+     *
+     * @param ready The new readiness state.
+     */
+    public void setReady(boolean ready) {
+        this.ready = ready;
+    }
+
+    /**
+     * Checks if this player is dead.  A <code>Player</code> dies when it
      * loses the game.
      *
-     * @return <code>true</code> if this <code>Player</code> is dead.
+     * @return True if this <code>Player</code> is dead.
      */
     public boolean isDead() {
         return dead;
@@ -1141,42 +1158,29 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Sets this player to be dead or not.
      *
-     * @param dead Should be set to <code>true</code> when this
-     *            <code>Player</code> dies.
-     * @see #isDead
+     * @param dead The new death state.
+     * @see #getDead
      */
     public void setDead(boolean dead) {
         this.dead = dead;
     }
 
     /**
-     * Get the <code>Bankrupt</code> value.
+     * Has player has been attacked by privateers?
      *
-     * @return a <code>boolean</code> value
+     * @return True if this player has been attacked by privateers.
      */
-    public final boolean isBankrupt() {
-        return bankrupt;
+    public boolean getAttackedByPrivateers() {
+        return attackedByPrivateers;
     }
 
     /**
-     * Set the <code>Bankrupt</code> value.
+     * Sets whether this player has been attacked by privateers.
      *
-     * @param newBankrupt The new Bankrupt value.
+     * @param attacked True if the player has been attacked by privateers.
      */
-    public final void setBankrupt(final boolean newBankrupt) {
-        this.bankrupt = newBankrupt;
-    }
-
-    /**
-     * Checks whether this player is at war with any other player.
-     *
-     * @return <i>true</i> if this player is at war with any other.
-     */
-    public boolean isAtWar() {
-        for (Player player : getGame().getPlayers()) {
-            if (atWarWith(player)) return true;
-        }
-        return false;
+    public void setAttackedByPrivateers(boolean attacked) {
+        attackedByPrivateers = attacked;
     }
 
     /**
@@ -1207,6 +1211,1756 @@ public class Player extends FreeColGameObject implements Nameable {
         return rebels;
     }
 
+    /**
+     * Gets the <code>Player</code> controlling the "Royal Expeditionary
+     * Force" for this player.
+     *
+     * @return The player, or <code>null</code> if this player does not have a
+     *         royal expeditionary force.
+     */
+    public Player getREFPlayer() {
+        Nation ref = getNation().getREFNation();
+        return (ref == null) ? null : getGame().getPlayer(ref.getId());
+    }
+
+
+    //
+    // Scoring and finance
+    //
+
+    /**
+     * Gets the current score of the player.
+     *
+     * @return The score.
+     */
+    public int getScore() {
+        return score;
+    }
+
+    /**
+     * Set the current score of the player.
+     *
+     * @param newScore The new score.
+     */
+    public void setScore(int newScore) {
+        score = newScore;
+    }
+
+    /**
+     * Modifies the score of the player by the given value.
+     *
+     * @param value The amount to change the score by.
+     */
+    public void modifyScore(int value) {
+        score += value;
+    }
+
+    /**
+     * Gets the score by which we decide the weakest and strongest AI
+     * players for the Spanish Succession event.
+     *
+     * @return A strength score.
+     */
+    public int getSpanishSuccessionScore() {
+        // TODO: try getColoniesPopulation.
+        return getScore();
+    }
+
+    /**
+     * Get the amount of gold that this player has.
+     *
+     * Some players do not account their gold.  These players return
+     * GOLD_NOT_ACCOUNTED.
+     *
+     * @return The amount of gold that this player has.
+     */
+    public int getGold() {
+        return gold;
+    }
+
+    /**
+     * Set the amount of gold that this player has.
+     *
+     * @param newGold The new player gold value.
+     */
+    public void setGold(int newGold) {
+        gold = newGold;
+    }
+
+    /**
+     * Checks if the player has enough gold to make a purchase.
+     * Use this rather than comparing with getGold(), as this handles
+     * players that do not account for gold.
+     *
+     * @param amount The purchase price to check.
+     * @return True if the player can afford the purchase.
+     */
+    public boolean checkGold(int amount) {
+        return this.gold == GOLD_NOT_ACCOUNTED || this.gold >= amount;
+    }
+
+    /**
+     * Modifies the amount of gold that this player has.  The argument can be
+     * both positive and negative.
+     *
+     * @param amount The amount of gold to be added to this player.
+     * @return The amount of gold post-modification.
+     */
+    public int modifyGold(int amount) {
+        if (this.gold != Player.GOLD_NOT_ACCOUNTED) {
+            if ((gold + amount) >= 0) {
+                modifyScore((gold + amount) / 1000 - gold / 1000);
+                gold += amount;
+            } else {
+                // This can happen if the server and the client get
+                // out of sync.  Perhaps it can also happen if the
+                // client tries to adjust gold for another player,
+                // where the balance is unknown. Just keep going and
+                // do the best thing possible, we don't want to crash
+                // the game here.
+                logger.warning("Cannot add " + amount + " gold for "
+                    + this + ": would be negative!");
+                gold = 0;
+            }
+        }
+        return gold;
+    }
+
+    /**
+     * Is this player bankrupt?
+     *
+     * @return True if this player is bankrupt.
+     */
+    public final boolean isBankrupt() {
+        return bankrupt;
+    }
+
+    /**
+     * Set the bankruptcy state.
+     *
+     * @param newBankrupt The new bankruptcy value.
+     */
+    public final void setBankrupt(final boolean newBankrupt) {
+        this.bankrupt = newBankrupt;
+    }
+
+
+    //
+    // Migration
+    //
+
+    /**
+     * Gets the amount of immigration this player possess.
+     *
+     * @return The immigration value.
+     * @see #reduceImmigration
+     */
+    public int getImmigration() {
+        return (isColonial()) ? immigration : 0;
+    }
+
+    /**
+     * Sets the amount of immigration this player possess.
+     *
+     * @param immigration The immigration value for this player.
+     */
+    public void setImmigration(int immigration) {
+        if (!isColonial()) return;
+        this.immigration = immigration;
+    }
+
+    /**
+     * Sets the number of immigration this player possess.
+     *
+     * @see #incrementImmigration(int)
+     */
+    public void reduceImmigration() {
+        if (!isColonial()) return;
+
+        int cost = getSpecification()
+            .getBoolean(GameOptions.SAVE_PRODUCTION_OVERFLOW)
+            ? immigrationRequired : immigration;
+        if (cost > immigration) {
+            immigration = 0;
+        } else {
+            immigration -= cost;
+        }
+    }
+
+    /**
+     * Modify the player immigration.
+     *
+     * @param amount The amount to modify the immigration by.
+     */
+    public void modifyImmigration(int amount) {
+        immigration = Math.max(0, immigration + amount);
+    }
+
+    /**
+     * Gets the amount of immigration required to cause a new colonist
+     * to emigrate.
+     *
+     * @return The immigration points required to trigger emigration.
+     */
+    public int getImmigrationRequired() {
+        return (isColonial()) ? immigrationRequired : 0;
+    }
+
+    /**
+     * Sets the number of immigration required to cause a new colonist
+     * to emigrate.
+     *
+     * @param immigrationRequired The new number of immigration points.
+     */
+    public void setImmigrationRequired(int immigrationRequired) {
+        if (!isColonial()) return;
+        this.immigrationRequired = immigrationRequired;
+    }
+
+    /**
+     * Updates the amount of immigration needed to emigrate a <code>Unit</code>
+     * from <code>Europe</code>.
+     */
+    public void updateImmigrationRequired() {
+        if (!isColonial()) return;
+
+        final Specification spec = getSpecification();
+        int base = spec.getInteger("model.option.crossesIncrement");
+        immigrationRequired += (int)applyModifier(base,
+            "model.modifier.religiousUnrestBonus");
+        // The book I have tells me the crosses needed is:
+        // [(colonist count in colonies + total colonist count) * 2] + 8.
+        // So every unit counts as 2 unless they're in a colony,
+        // wherein they count as 4.
+        /*
+         * int count = 8; Map map = getGame().getMap(); Iterator<Position>
+         * tileIterator = map.getWholeMapIterator(); while
+         * (tileIterator.hasNext()) { Tile t = map.getTile(tileIterator.next());
+         * if (t != null && t.getFirstUnit() != null &&
+         * t.getFirstUnit().getOwner().equals(this)) { Iterator<Unit>
+         * unitIterator = t.getUnitIterator(); while (unitIterator.hasNext()) {
+         * Unit u = unitIterator.next(); Iterator<Unit> childUnitIterator =
+         * u.getUnitIterator(); while (childUnitIterator.hasNext()) { // Unit
+         * childUnit = (Unit) childUnitIterator.next();
+         * childUnitIterator.next(); count += 2; } count += 2; } } if (t != null &&
+         * t.getColony() != null && t.getColony().getOwner() == this) { count +=
+         * t.getColony().getUnitCount() * 4; // Units in colonies // count
+         * doubly. // -sjm } } Iterator<Unit> europeUnitIterator =
+         * getEurope().getUnitIterator(); while (europeUnitIterator.hasNext()) {
+         * europeUnitIterator.next(); count += 2; } if (nation == ENGLISH) {
+         * count = (count * 2) / 3; } setCrossesRequired(count);
+         */
+    }
+
+    /**
+     * Should a new colonist emigrate?
+     *
+     * @return Whether a new colonist should emigrate.
+     */
+    public boolean checkEmigrate() {
+        return (isColonial()) ? getImmigrationRequired() <= immigration
+            : false;
+    }
+
+
+    //
+    // Liberty and founding fathers
+    //
+
+    /**
+     * Gets the current amount of liberty points this player has.
+     * Liberty is regularly reduced to pay for a founding father.
+     *
+     * @return The amount of liberty points.
+     */
+    public int getLiberty() {
+        return (canHaveFoundingFathers()) ? liberty : 0;
+    }
+
+    /**
+     * Sets the current amount of liberty this player has.
+     *
+     * @param liberty The new amount of liberty.
+     */
+    public void setLiberty(int liberty) {
+        if (!canHaveFoundingFathers()) return;
+        this.liberty = liberty;
+    }
+
+    /**
+     * Modifies the current amount of liberty this player has.
+     *
+     * @param amount The amount of liberty to add.
+     */
+    public void modifyLiberty(int amount) {
+        setLiberty(Math.max(0, getLiberty() + amount));
+        if (playerType == PlayerType.REBEL) interventionBells += amount;
+    }
+
+    /**
+     * Recalculate bells bonus when tax changes.
+     *
+     * @return True if a bells bonus was set.
+     */
+    protected boolean recalculateBellsBonus() {
+        Set<Modifier> libertyBonus = getModifierSet("model.goods.bells");
+        boolean ret = false;
+        for (Ability ability : getAbilitySet("model.ability.addTaxToBells")) {
+            FreeColObject source = ability.getSource();
+            if (source != null) {
+                for (Modifier modifier : libertyBonus) {
+                    if (source.equals(modifier.getSource())) {
+                        modifier.setValue(tax);
+                        ret = true;
+                    }
+                }
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * Gets how much liberty will be produced next turn if no colonies
+     * are lost and nothing unexpected happens.
+     *
+     * @return The total amount of liberty this <code>Player</code>'s
+     *     <code>Colony</code>s will make next turn.
+     * @see #incrementLiberty
+     */
+    public int getLibertyProductionNextTurn() {
+        int libertyNextTurn = 0;
+        for (Colony colony : getColonies()) {
+            for (GoodsType libertyGoods : getSpecification()
+                     .getLibertyGoodsTypeList()) {
+                libertyNextTurn += colony.getTotalProductionOf(libertyGoods);
+            }
+        }
+        return libertyNextTurn;
+    }
+
+    /**
+     * Gets the total percentage of rebels in all this player's colonies.
+     *
+     * @return The total percentage of rebels in all this player's colonies.
+     */
+    public int getSoL() {
+        int sum = 0;
+        int number = 0;
+        for (Colony c : getColonies()) {
+            sum += c.getSoL();
+            number++;
+        }
+        if (number > 0) {
+            return sum / number;
+        } else {
+            return 0;
+        }
+    }
+
+    /**
+     * Gets the founding fathers in this player's congress.
+     *
+     * @return A set of <code>FoundingFather</code>s in congress.
+     */
+    public Set<FoundingFather> getFathers() {
+        return foundingFathers;
+    }
+
+    /**
+     * Does this player have a certain Founding father.
+     *
+     * @param someFather The <code>FoundingFather</code> to check.
+     * @return Whether this player has this Founding father
+     * @see FoundingFather
+     */
+    public boolean hasFather(FoundingFather someFather) {
+        return foundingFathers.contains(someFather);
+    }
+
+    /**
+     * Gets the number of founding fathers in this players congress. 
+     * Used to calculate number of liberty needed to recruit new fathers.
+     *
+     * @return The number of founding fathers in this players congress
+     */
+    public int getFatherCount() {
+        return foundingFathers.size();
+    }
+
+    /**
+     * Add a founding father to the congress.
+     *
+     * @param father The <code>FoundingFather</code> to add.
+     */
+    public void addFather(FoundingFather father) {
+        foundingFathers.add(father);
+        addFeatures(father);
+        for (Colony colony : getColonies()) colony.invalidateCache();
+    }
+
+    /**
+     * Gets the {@link FoundingFather founding father} this player is working
+     * towards.
+     *
+     * @return The current <code>FoundingFather</code>, or null if
+     *     there is none.
+     * @see #setCurrentFather
+     * @see FoundingFather
+     */
+    public FoundingFather getCurrentFather() {
+        return currentFather;
+    }
+
+    /**
+     * Sets the current founding father to recruit.
+     *
+     * @param someFather The <code>FoundingFather</code> to recruit.
+     * @see FoundingFather
+     */
+    public void setCurrentFather(FoundingFather someFather) {
+        currentFather = someFather;
+    }
+
+    /**
+     * Gets the offered fathers for this player.
+     *
+     * @return A list of the current offered <code>FoundingFather</code>s.
+     */
+    public List<FoundingFather> getOfferedFathers() {
+        return offeredFathers;
+    }
+
+    /**
+     * Clear the set of offered fathers.
+     */
+    public void clearOfferedFathers() {
+        offeredFathers.clear();
+    }
+
+    /**
+     * Sets the set of offered fathers.
+     *
+     * @param fathers A list of <code>FoundingFather</code>s to offer.
+     */
+    public void setOfferedFathers(List<FoundingFather> fathers) {
+        clearOfferedFathers();
+        offeredFathers.addAll(fathers);
+    }
+
+    /**
+     * Gets the number of liberty points needed to recruit the next
+     * founding father.
+     *
+     * @return How many more liberty points the <code>Player</code>
+     *     needs in order to recruit the next <code>FoundingFather</code>.
+     * @see #incrementLiberty
+     */
+    public int getRemainingFoundingFatherCost() {
+        return getTotalFoundingFatherCost() - getLiberty();
+    }
+
+    /**
+     * How many liberty points in total are needed to earn the
+     * Founding Father we are trying to recruit.  The description of
+     * the algorithm was taken from
+     * http://t-a-w.blogspot.com/2007/05/colonization-tips.html
+     *
+     * @return Total number of liberty points the <code>Player</code>
+     *     needs to recruit the next <code>FoundingFather</code>.
+     * @see #incrementLiberty
+     */
+    public int getTotalFoundingFatherCost() {
+        final Specification spec = getSpecification();
+        int base = spec.getInteger("model.option.foundingFatherFactor");
+        int count = getFatherCount();
+        return ((count + 1) * (count + 2) - 1) * base + count;
+    }
+
+
+    //
+    // Taxation and trade
+    //
+
+    /**
+     * Get the current tax.
+     *
+     * @return The current tax.
+     */
+    public int getTax() {
+        return tax;
+    }
+
+    /**
+     * Sets the current tax
+     *
+     * @param amount The new tax amount.
+     */
+    public void setTax(int amount) {
+        tax = amount;
+        if (recalculateBellsBonus()) {
+            for (Colony colony : getColonies()) colony.invalidateCache();
+        }
+    }
+
+    /**
+     * Get this player's Market.
+     *
+     * @return The <code>Market</code>.
+     */
+    public Market getMarket() {
+        return market;
+    }
+
+    /**
+     * Resets this player's Market.
+     */
+    public void reinitialiseMarket() {
+        market = new Market(getGame(), this);
+    }
+
+    /**
+     * Gets the current sales data for a location and goods type.
+     *
+     * @param where The <code>Location</code> of the sale.
+     * @param what The <code>GoodsType</code> sold.
+     *
+     * @return An appropriate <code>LastSaleData</code> record, or
+     *     null if no appropriate sale can be found.
+     */
+    public LastSale getLastSale(Location where, GoodsType what) {
+        return (lastSales == null) ? null
+            : lastSales.get(LastSale.makeKey(where, what));
+    }
+
+    /**
+     * Saves a record of a sale.
+     *
+     * @param sale The <code>LastSale</code> to save.
+     */
+    public void addLastSale(LastSale sale) {
+        if (lastSales == null) lastSales = new HashMap<String, LastSale>();
+        lastSales.put(sale.getId(), sale);
+    }
+
+    /**
+     * Gets the last sale price for a location and goods type as a string.
+     *
+     * @param where The <code>Location</code> of the sale.
+     * @param what The <code>GoodsType</code> sold.
+     * @return An abbreviation for the sale price, or null if none found.
+     */
+    public String getLastSaleString(Location where, GoodsType what) {
+        LastSale data = getLastSale(where, what);
+        return (data == null) ? null : String.valueOf(data.getPrice());
+    }
+
+    /**
+     * Gets the arrears due for a type of goods.
+     *
+     * @param type The <code>GoodsType</code> to check.
+     * @return The arrears due for this type of goods.
+     */
+    public int getArrears(GoodsType type) {
+        return getMarket().getArrears(type);
+    }
+
+    /**
+     * Can a type of goods can be traded in Europe?
+     *
+     * @param type The <code>GoodsType</code> to check.
+     * @return True if there are no arrears due for this type of goods.
+     */
+    public boolean canTrade(GoodsType type) {
+        return canTrade(type, Market.Access.EUROPE);
+    }
+
+    /**
+     * Can a type of goods can be traded at a specified place?
+     *
+     * @param type The <code>GoodsType</code> to check.
+     * @param access The way the goods are traded (Europe OR Custom)
+     * @return True if type of goods can be traded.
+     */
+    public boolean canTrade(GoodsType type, Market.Access access) {
+        if (getMarket().getArrears(type) == 0) return true;
+
+        if (access == Market.Access.CUSTOM_HOUSE) {
+            if (getSpecification().getBoolean(GameOptions.CUSTOM_IGNORE_BOYCOTT)) {
+                return true;
+            }
+            if (hasAbility("model.ability.customHouseTradesWithForeignCountries")) {
+                for (Player otherPlayer : getGame().getLiveEuropeanPlayers()) {
+                    if (otherPlayer != this
+                        && (getStance(otherPlayer) == Stance.PEACE
+                            || getStance(otherPlayer) == Stance.ALLIANCE)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Get the current sales of a type of goods.
+     *
+     * @param goodsType The <code>GoodsType</code> to query.
+     * @return The current sales.
+     */
+    public int getSales(GoodsType goodsType) {
+        return getMarket().getSales(goodsType);
+    }
+
+    /**
+     * Modifies the current sales.
+     *
+     * @param goodsType The <code>GoodsType</code> to modify.
+     * @param amount The new sales.
+     */
+    public void modifySales(GoodsType goodsType, int amount) {
+        getMarket().modifySales(goodsType, amount);
+    }
+
+    /**
+     * Has a type of goods been traded?
+     *
+     * @param goodsType The <code>GoodsType</code> to check.
+     * @return Whether these goods have been traded.
+     */
+    public boolean hasTraded(GoodsType goodsType) {
+        return getMarket().hasBeenTraded(goodsType);
+    }
+
+    /**
+     * Get the most valuable goods available in one of the player's
+     * colonies for the purposes of choosing a threat-to-boycott.  The
+     * goods must not currently be boycotted, the player must have
+     * traded in it, and the amount to be discarded will not exceed
+     * GoodsContainer.CARGO_SIZE.
+     *
+     * @return A goods object, or null if nothing suitable found.
+     */
+    public Goods getMostValuableGoods() {
+        if (!isEuropean()) return null;
+
+        Goods goods = null;
+        int highValue = 0;
+        for (Colony colony : getColonies()) {
+            for (Goods g : colony.getCompactGoods()) {
+                if (getArrears(g.getType()) <= 0 && hasTraded(g.getType())) {
+                    int amount = Math.min(g.getAmount(),
+                                          GoodsContainer.CARGO_SIZE);
+                    int value = market.getSalePrice(g.getType(), amount);
+                    if (value > highValue) {
+                        highValue = value;
+                        goods = g;
+                    }
+                }
+            }
+        }
+        return goods;
+    }
+
+    /**
+     * Get the current incomeBeforeTaxes.
+     *
+     * @param goodsType The <code>GoodsType</code> to query.
+     * @return The current incomeBeforeTaxes.
+     */
+    public int getIncomeBeforeTaxes(GoodsType goodsType) {
+        return getMarket().getIncomeBeforeTaxes(goodsType);
+    }
+
+    /**
+     * Modifies the current incomeBeforeTaxes.
+     *
+     * @param goodsType The <code>GoodsType</code> to modify.
+     * @param amount The new incomeBeforeTaxes.
+     */
+    public void modifyIncomeBeforeTaxes(GoodsType goodsType, int amount) {
+        getMarket().modifyIncomeBeforeTaxes(goodsType, amount);
+    }
+
+    /**
+     * Get the current incomeAfterTaxes.
+     *
+     * @param goodsType The <code>GoodsType</code> to query.
+     * @return The current incomeAfterTaxes.
+     */
+    public int getIncomeAfterTaxes(GoodsType goodsType) {
+        return getMarket().getIncomeAfterTaxes(goodsType);
+    }
+
+    /**
+     * Modifies the current incomeAfterTaxes.
+     *
+     * @param goodsType The <code>GoodsType</code> to modify.
+     * @param amount The new incomeAfterTaxes.
+     */
+    public void modifyIncomeAfterTaxes(GoodsType goodsType, int amount) {
+        getMarket().modifyIncomeAfterTaxes(goodsType, amount);
+    }
+
+
+    //
+    // Europe
+    //
+
+    /**
+     * Gets this players Europe object.
+     *
+     * @return The Europe object, or null if the player is not
+     *     European or indpendent.
+     */
+    public Europe getEurope() {
+        return europe;
+    }
+
+    /**
+     * Set the Europe object for a player.
+     *
+     * @param europe The new <code>Europe</code> object.
+     */
+    public void setEurope(Europe europe) {
+        this.europe = europe;
+    }
+
+    /**
+     * Checks if this player can move units to Europe.
+     *
+     * @return True if this player has an instance of <code>Europe</code>.
+     */
+    public boolean canMoveToEurope() {
+        return getEurope() != null;
+    }
+
+    /**
+     * Gets the price for a recruit in Europe.
+     *
+     * @return The price of a single recruit in {@link Europe}.
+     */
+    public int getRecruitPrice() {
+        // return Math.max(0, (getCrossesRequired() - crosses) * 10);
+        return getEurope().getRecruitPrice();
+    }
+
+    /**
+     * Gets the price to this player to purchase a unit in Europe.
+     *
+     * @param au The proposed <code>AbstractUnit</code>.
+     * @return The price for the unit.
+     */
+    public int getPrice(AbstractUnit au) {
+        Specification spec = getSpecification();
+        UnitType unitType = au.getUnitType(spec);
+        if (unitType.hasPrice()) {
+            int price = getEurope().getUnitPrice(unitType);
+            for (EquipmentType equip : au.getEquipment(spec)) {
+                for (AbstractGoods goods : equip.getRequiredGoods()) {
+                    price += getMarket().getBidPrice(goods.getType(),
+                                                     goods.getAmount());
+                }
+            }
+            return price * au.getNumber();
+        } else {
+            return INFINITY;
+        }
+    }
+
+    /**
+     * Gets the monarch object this player has.
+     *
+     * @return The <code>Monarch</code> object this player has, or null
+     *     if there is no monarch.
+     */
+    public Monarch getMonarch() {
+        return monarch;
+    }
+
+    /**
+     * Sets the monarch object this player has.
+     *
+     * @param monarch The new <code>Monarch</code> object.
+     */
+    public void setMonarch(Monarch monarch) {
+        this.monarch = monarch;
+    }
+
+
+    //
+    // Units and trade routes
+    //
+
+    /**
+     * Get a copy of the players units.
+     *
+     * @return A list of the player <code>Unit</code>s.
+     */
+    public List<Unit> getUnits() {
+        return new ArrayList<Unit>(units.values());
+    }
+
+    /**
+     * Get an iterator containing all the units this player owns.
+     *
+     * @return An <code>Iterator</code> over the player <code>Unit</code>s.
+     * @see Unit
+     */
+    public Iterator<Unit> getUnitIterator() {
+        return units.values().iterator();
+    }
+
+    /**
+     * Get a unit by its identifier.
+     *
+     * @param id The identifier to check.
+     * @return The player <code>Unit</code> or null if the player does not
+     *     have the unit with the supplied identifier.
+     */
+    public final Unit getUnitById(String id) {
+        return units.get(id);
+    }
+
+    /**
+     * Add a unit to this player.
+     *
+     * @param newUnit The new <code>Unit</code> value.
+     */
+    public final void addUnit(final Unit newUnit) {
+        if (newUnit == null) throw new IllegalStateException("Null new unit.");
+
+        // Make sure the owner of the unit is set first, before adding
+        // it to the list
+        if (newUnit.getOwner() != null && !this.owns(newUnit)) {
+            throw new IllegalStateException(this + " adding another players unit=" + newUnit);
+        }
+
+        units.put(newUnit.getId(), newUnit);
+    }
+
+    /**
+     * Remove a unit from this player.
+     *
+     * @param oldUnit The <code>Unit</code> to remove.
+     */
+    public void removeUnit(final Unit oldUnit) {
+        if (oldUnit != null) {
+            units.remove(oldUnit.getId());
+            nextActiveUnitIterator.remove(oldUnit);
+            nextGoingToUnitIterator.remove(oldUnit);
+        }
+    }
+
+    /**
+     * Gets the carrier units that can carry the supplied unit, if one exists.
+     *
+     * @param unit The <code>Unit</code> to carry.
+     * @return A list of suitable carriers.
+     */
+    public List<Unit> getCarriersForUnit(Unit unit) {
+        List<Unit> units = new ArrayList<Unit>();
+        for (Unit u : getUnits()) {
+            if (u.couldCarry(unit)) units.add(u);
+        }
+        return units;
+    }
+
+    /**
+     * Gets the number of King's land units.
+     *
+     * @return The number of units
+     */
+    public int getNumberOfKingLandUnits() {
+        int n = 0;
+        for (Unit unit : getUnits()) {
+            if (unit.hasAbility("model.ability.refUnit") && !unit.isNaval()) {
+                n++;
+            }
+        }
+        return n;
+    }
+
+    /**
+     * Checks if this player has at least one Man-of-War.
+     *
+     * @return True if this player owns at least one Man-of-War.
+     */
+    public boolean hasManOfWar() {
+        Iterator<Unit> it = getUnitIterator();
+        while (it.hasNext()) {
+            Unit unit = it.next();
+            if ("model.unit.manOWar".equals(unit.getType().getId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Gets a new active unit.
+     *
+     * @return A <code>Unit</code> that can be made active.
+     */
+    public Unit getNextActiveUnit() {
+        return nextActiveUnitIterator.next();
+    }
+
+    /**
+     * Sets a new active unit.
+     *
+     * @param unit A <code>Unit</code> to make the next one to be active.
+     * @return True if the operation succeeded.
+     */
+    public boolean setNextActiveUnit(Unit unit) {
+        return nextActiveUnitIterator.setNext(unit);
+    }
+
+    /**
+     * Checks if a new active unit can be made active.
+     *
+     * @return True if there is a potential active unit.
+     */
+    public boolean hasNextActiveUnit() {
+        return nextActiveUnitIterator.hasNext();
+    }
+
+    /**
+     * Gets a new going-to unit.
+     *
+     * @return A <code>Unit</code> that can be made active.
+     */
+    public Unit getNextGoingToUnit() {
+        return nextGoingToUnitIterator.next();
+    }
+
+    /**
+     * Sets a new going-to unit.
+     *
+     * @param unit A <code>Unit</code> to make the next one to be active.
+     * @return True if the operation succeeded.
+     */
+    public boolean setNextGoingToUnit(Unit unit) {
+        return nextGoingToUnitIterator.setNext(unit);
+    }
+
+    /**
+     * Checks if there is a unit that has a destination.
+     *
+     * @return True if there is a unit with a destination.
+     */
+    public boolean hasNextGoingToUnit() {
+        return nextGoingToUnitIterator.hasNext();
+    }
+
+    /**
+     * Reset the player iterators ready for a new turn.
+     */
+    public void resetIterators() {
+        nextActiveUnitIterator.reset();
+        nextGoingToUnitIterator.reset();
+    }
+
+    /**
+     * Get the trade routes defined for this player.
+     *
+     * @return The list of <code>TradeRoute</code>s for this player.
+     */
+    public final List<TradeRoute> getTradeRoutes() {
+        return tradeRoutes;
+    }
+
+    /**
+     * Set the players trade routes.
+     *
+     * @param newTradeRoutes The new list of <code>TradeRoute</code>s.
+     */
+    public final void setTradeRoutes(final List<TradeRoute> newTradeRoutes) {
+        tradeRoutes.clear();
+        tradeRoutes.addAll(newTradeRoutes);
+    }
+
+
+    //
+    // Settlements
+    //
+
+    /**
+     * Gets a the settlements this player owns.
+     *
+     * @return The list of <code>Settlements</code> this player owns.
+     */
+    public List<Settlement> getSettlements() {
+        return settlements;
+    }
+
+    /**
+     * Get the number of settlements.
+     *
+     * @return The number of settlements this player has.
+     */
+    public int getNumberOfSettlements() {
+        return settlements.size();
+    }
+
+    /**
+     * Does this player own a given settlement.
+     *
+     * @param settlement The <code>Settlement</code> to check.
+     * @return True if this <code>Player</code> owns the given
+     *     <code>Settlement</code>.
+     */
+    public boolean hasSettlement(Settlement settlement) {
+        return settlements.contains(settlement);
+    }
+
+    /**
+     * Adds a given settlement to this player's list of settlements.
+     *
+     * @param settlement The <code>Settlement</code> to add.
+     */
+    public void addSettlement(Settlement settlement) {
+        if (settlement == null) {
+            throw new IllegalArgumentException("Null settlement.");
+        }
+        if (!hasSettlement(settlement)) {
+            if (!owns(settlement)) {
+                throw new IllegalStateException("Does not own: " + settlement);
+            }
+            settlements.add(settlement);
+        }
+    }
+
+    /**
+     * Removes the given settlement from this player's list of settlements.
+     *
+     * @param settlement The <code>Settlement</code> to remove.
+     * @return True if the settlement was removed.
+     */
+    public boolean removeSettlement(Settlement settlement) {
+        return settlements.remove(settlement);
+    }
+
+    /**
+     * Gets the sum of units currently working in the colonies of this
+     * player.
+     *
+     * @return The sum of the units currently working in the colonies.
+     */
+    public int getColoniesPopulation() {
+        int i = 0;
+        for (Colony c : getColonies()) i += c.getUnitCount();
+        return i;
+    }
+
+    /**
+     * Gets the <code>Colony</code> with the given name.
+     *
+     * @param name The name of the <code>Colony</code>.
+     * @return The <code>Colony</code> with the given name, or null if
+     *     not found.
+     */
+    public Colony getColonyByName(String name) {
+        for (Colony colony : getColonies()) {
+            if (colony.getName().equals(name)) return colony;
+        }
+        return null;
+    }
+
+    /**
+     * Gets the <code>IndianSettlement</code> with the given name.
+     *
+     * @param name The name of the <code>IndianSettlement</code>.
+     * @return The <code>IndianSettlement</code> with the given name,
+     *     or null if not found.
+     */
+    public IndianSettlement getIndianSettlementByName(String name) {
+        for (IndianSettlement settlement : getIndianSettlements()) {
+            if (settlement.getName().equals(name)) return settlement;
+        }
+        return null;
+    }
+
+    /**
+     * Gets a fresh list of all colonies this player owns.
+     * It is an error to call this on non-European players.
+     *
+     * @return A fresh list of the <code>Colony</code>s this player owns.
+     */
+    public List<Colony> getColonies() {
+        List<Colony> colonies = new ArrayList<Colony>();
+        for (Settlement s : getSettlements()) {
+            if (s instanceof Colony) {
+                colonies.add((Colony)s);
+            } else {
+                throw new RuntimeException("getColonies found: " + s);
+            }
+        }
+        return colonies;
+    }
+
+    /**
+     * Get a sorted list of all colonies this player owns.
+     *
+     * @param c A comparator to operate on the colony list.
+     * @return A fresh list of the <code>Colony</code>s this player owns.
+     */
+    public List<Colony> getSortedColonies(Comparator<Colony> c) {
+        List<Colony> colonies = getColonies();
+        Collections.sort(colonies, c);
+        return colonies;
+    }
+
+    /**
+     * Gets a list of all the IndianSettlements this player owns.
+     * It is an error to call this on non-native players.
+     *
+     * @return The indian settlements this player owns.
+     */
+    public List<IndianSettlement> getIndianSettlements() {
+        List<IndianSettlement> indianSettlements
+            = new ArrayList<IndianSettlement>();
+        for (Settlement s : getSettlements()) {
+            if (s instanceof IndianSettlement) {
+                indianSettlements.add((IndianSettlement)s);
+            } else {
+                throw new RuntimeException("getIndianSettlements found: " + s);
+            }
+        }
+        return indianSettlements;
+    }
+
+    /**
+     * Gets a list of all IndianSettlements this player owns that have
+     * missions, optionally owned by a specific player.
+     *
+     * @param other If non-null, collect only missions established by
+     *     the given <code>Player</code>.
+     * @return A list of suitable <code>IndianSettlement</code>s with
+     *     missions.
+     */
+    public List<IndianSettlement> getIndianSettlementsWithMission(Player other) {
+        List<IndianSettlement> indianSettlements
+            = new ArrayList<IndianSettlement>();
+        for (Settlement s : getSettlements()) {
+            Unit missionary;
+            if (s instanceof IndianSettlement
+                && (missionary = ((IndianSettlement)s).getMissionary()) != null
+                && (other == null || missionary.getOwner() == other)) {
+                indianSettlements.add((IndianSettlement) s);
+            }
+        }
+        return indianSettlements;
+    }
+
+    /**
+     * Find a <code>Settlement</code> by name.
+     *
+     * @param name The name of the <code>Settlement</code>.
+     * @return The <code>Settlement</code>, or <code>null</code> if not found.
+     **/
+    public Settlement getSettlementByName(String name) {
+        return (isIndian()) ? getIndianSettlementByName(name)
+            : getColonyByName(name);
+    }
+
+    /**
+     * Gets the port closest to Europe owned by this player.
+     *
+     * @return This players closest port.
+     */
+    public Settlement getClosestPortForEurope() {
+        int bestValue = INFINITY;
+        Settlement best = null;
+        for (Settlement settlement : getSettlements()) {
+            int value = settlement.getHighSeasCount();
+            if (bestValue > value) {
+                bestValue = value;
+                best = settlement;
+            }
+        }
+        return best;
+    }
+         
+
+    //
+    // Messages and history
+    //
+
+    /**
+     * Gets all the model messages for this player.
+     *
+     * @return all The <code>ModelMessage</code>s for this
+     *     <code>Player</code>.
+     */
+    public List<ModelMessage> getModelMessages() {
+        return modelMessages;
+    }
+
+    /**
+     * Gets all new messages for this player.
+     *
+     * @return all The new <code>ModelMessage</code>s for this
+     *     <code>Player</code>.
+     */
+    public List<ModelMessage> getNewModelMessages() {
+        List<ModelMessage> out = new ArrayList<ModelMessage>();
+        for (ModelMessage message : modelMessages) {
+            if (message.hasBeenDisplayed()) continue;
+            out.add(message); // preserve message order
+        }
+        return out;
+    }
+
+    /**
+     * Adds a message for this player.
+     *
+     * @param modelMessage The <code>ModelMessage</code> to add.
+     */
+    public void addModelMessage(ModelMessage modelMessage) {
+        modelMessage.setOwnerId(getId());
+        modelMessages.add(modelMessage);
+    }
+
+    /**
+     * Refilters the current model messages, removing the ones that
+     * are no longer valid.
+     *
+     * @param options The <code>OptionGroup</code> for message display
+     *     to enforce.
+     */
+    public void refilterModelMessages(OptionGroup options) {
+        Iterator<ModelMessage> messageIterator = modelMessages.iterator();
+        while (messageIterator.hasNext()) {
+            ModelMessage message = messageIterator.next();
+            String id = message.getMessageType().getOptionName();
+            if (!options.getBoolean(id)) messageIterator.remove();
+        }
+    }
+
+    /**
+     * Removes all undisplayed model messages for this player.
+     */
+    public void removeDisplayedModelMessages() {
+        Iterator<ModelMessage> messageIterator = modelMessages.iterator();
+        while (messageIterator.hasNext()) {
+            ModelMessage message = messageIterator.next();
+            if (message.hasBeenDisplayed()) messageIterator.remove();
+        }
+    }
+
+    /**
+     * Removes all the model messages for this player.
+     */
+    public void clearModelMessages() {
+        modelMessages.clear();
+    }
+
+    /**
+     * Sometimes an event causes the source (and display) fields in an
+     * accumulated model message to become invalid (e.g. Europe disappears
+     * on independence).  This routine is for cleaning up such cases.
+     *
+     * @param source The source field that has become invalid.
+     * @param newSource A new source field to replace the old with, or
+     *     if null then remove the message
+     */
+    public void divertModelMessages(FreeColGameObject source,
+                                    FreeColGameObject newSource) {
+        Iterator<ModelMessage> messageIterator = modelMessages.iterator();
+        while (messageIterator.hasNext()) {
+            ModelMessage message = messageIterator.next();
+            if (message.getSourceId() == source.getId()) {
+                if (newSource == null) {
+                    messageIterator.remove();
+                } else {
+                    message.divert(newSource);
+                }
+            }
+        }
+    }
+
+    /**
+     * Get the history events for this player.
+     *
+     * @return The list of <code>HistoryEvent</code>s for this player.
+     */
+    public final List<HistoryEvent> getHistory() {
+        return history;
+    }
+
+    /**
+     * Add a history event to this player.
+     *
+     * @param event The <code>HistoryEvent</code> to add.
+     */
+    public void addHistory(HistoryEvent event) {
+        history.add(event);
+    }
+
+
+    //
+    // The players view of the Map
+    //
+
+    /**
+     * Gets the default initial location where the units arriving from
+     * {@link Europe} appear on the map.
+     *
+     * @return The entry <code>Location</code>.
+     * @see Unit#getEntryLocation
+     */
+    public Location getEntryLocation() {
+        return entryLocation;
+    }
+
+    /**
+     * Sets the default initial location where the units arriving from
+     * {@link Europe} appear on the map.
+     *
+     * @param entryLocation The new entry <code>Location</code>.
+     * @see #getEntryLocation
+     */
+    public void setEntryLocation(Location entryLocation) {
+        this.entryLocation = entryLocation;
+    }
+
+    /**
+     * Get the players high seas.
+     *
+     * @return The <code>HighSeas</code> for this player.
+     */
+    public final HighSeas getHighSeas() {
+        return highSeas;
+    }
+
+    /**
+     * Initialize the highSeas.
+     * Needs to be public until the backward compatibility code in
+     * FreeColServer is gone.
+     */
+    public void initializeHighSeas() {
+        Game game = getGame();
+        highSeas = new HighSeas(game);
+        if (europe != null) highSeas.addDestination(europe);
+        if (game.getMap() != null ) highSeas.addDestination(game.getMap());
+    }
+
+    /**
+     * Can this player see a given tile.
+     *
+     * The tile can be seen if it is in a unit or settlement's line of sight.
+     *
+     * @param tile The <code>Tile</code> to check.
+     * @return True if this player can see the given <code>Tile</code>.
+     */
+    public boolean canSee(Tile tile) {
+        if (tile == null) return false;
+
+        do {
+            synchronized (canSeeLock) {
+                if (canSeeTiles != null) {
+                    return canSeeTiles[tile.getX()][tile.getY()];
+                }
+            }
+        } while (resetCanSeeTiles());
+        return false;
+    }
+
+    /**
+     * Forces an update of the <code>canSeeTiles</code>.
+     *
+     * This method should be used to invalidate the current
+     * <code>canSeeTiles</code> when something significant changes.
+     * The method {@link #resetCanSeeTiles} will be called whenever it
+     * is needed.
+     */
+    public void invalidateCanSeeTiles() {
+        synchronized (canSeeLock) {
+            canSeeTiles = null;
+        }
+    }
+
+    /**
+     * Resets this player's "can see"-tiles.  This is done by setting
+     * all the tiles within each {@link Unit} and {@link Settlement}s
+     * line of sight visible.  The other tiles are made invisible.
+     *
+     * Use {@link #invalidateCanSeeTiles} whenever possible.
+     *
+     * @return True if successful.
+     */
+    private boolean resetCanSeeTiles() {
+        Map map = getGame().getMap();
+        if (map == null) return false;
+
+        boolean[][] cST = makeCanSeeTiles(map);
+        synchronized (canSeeLock) {
+            canSeeTiles = cST;
+        }
+        return true;
+    }
+
+    /**
+     * Checks if this player has explored the given tile.
+     *
+     * @param tile The <code>Tile</code> to check.
+     * @return True if the <code>Tile</code> has been explored.
+     */
+    public boolean hasExplored(Tile tile) {
+        return tile.isExplored();
+    }
+
+    /**
+     * Sets the given tile to be explored by this player and updates the
+     * player's information about the tile.
+     *
+     * @param tile The <code>Tile</code> to set explored.
+     * @see Tile#updatePlayerExploredTile(Player, boolean)
+     */
+    public void setExplored(Tile tile) {
+        logger.warning("Implemented by ServerPlayer");
+    }
+
+    /**
+     * Sets the tiles within the given <code>Unit</code>'s line of sight to
+     * be explored by this player.
+     *
+     * @param unit The <code>Unit</code>.
+     * @see #setExplored(Tile)
+     * @see #hasExplored
+     */
+    public void setExplored(Unit unit) {
+        if (getGame() == null || getGame().getMap() == null || unit == null
+            || unit.getLocation() == null || unit.getTile() == null
+            || isIndian()) {
+            return;
+        }
+        invalidateCanSeeTiles();
+    }
+
+    /**
+     * Builds a canSeeTiles array.
+     *
+     * Note that tiles must be tested for null as they may be both
+     * valid tiles but yet null during a save game load.
+     *
+     * Note the use of copies of the unit and settlement lists to
+     * avoid nasty surprises due to asynchronous disappearance of
+     * members of either.  TODO: see if this can be relaxed.
+     *
+     * @param map The <code>Map</code> to use.
+     * @return A canSeeTiles array.
+     */
+    private boolean[][] makeCanSeeTiles(Map map) {
+        final Specification spec = getSpecification();
+        boolean[][] cST = new boolean[map.getWidth()][map.getHeight()];
+
+        if (!spec.getBoolean(GameOptions.FOG_OF_WAR)) {
+            for (Tile t : getGame().getMap().getAllTiles()) {
+                if (t != null) {
+                    cST[t.getX()][t.getY()] = hasExplored(t);
+                }
+            }
+        } else {
+            for (Unit unit : getUnits()) {
+                // Only consider units directly on the map, not those
+                // on a carrier or in Europe.
+                if (!(unit.getLocation() instanceof Tile)) continue;
+
+                Tile tile = (Tile) unit.getLocation();
+                cST[tile.getX()][tile.getY()] = true;
+                for (Tile t : tile.getSurroundingTiles(unit.getLineOfSight())) {
+                    if (t != null) {
+                        cST[t.getX()][t.getY()] = hasExplored(t);
+                    }
+                }
+            }
+            for (Settlement settlement : new ArrayList<Settlement>(getSettlements())) {
+                Tile tile = settlement.getTile();
+                cST[tile.getX()][tile.getY()] = true;
+                for (Tile t : tile.getSurroundingTiles(settlement.getLineOfSight())) {
+                    if (t != null) {
+                        cST[t.getX()][t.getY()] = hasExplored(t);
+                    }
+                }
+            }
+            if (isEuropean()
+                && spec.getBoolean(GameOptions.ENHANCED_MISSIONARIES)) {
+                for (Player other : getGame().getPlayers()) {
+                    if (this.equals(other) || !other.isIndian()) continue;
+                    for (Settlement settlement : other.getSettlements()) {
+                        IndianSettlement is = (IndianSettlement) settlement;
+                        if (is.getMissionary(this) == null) continue;
+                        for (Tile t : is.getTile().getSurroundingTiles(is.getLineOfSight())) {
+                            if (t != null) {
+                                cST[t.getX()][t.getY()] = hasExplored(t);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return cST;
+    }
+
+
+    //
+    // Foreign relations
+    //
+
+    /**
+     * Gets the hostility this player has against the given player.
+     *
+     * @param player The other <code>Player</code>.
+     * @return An object representing the tension level.
+     */
+    public Tension getTension(Player player) {
+        if (player == null) throw new IllegalStateException("Null player.");
+        Tension newTension = tension.get(player);
+        if (newTension == null) {
+            newTension = new Tension(Tension.TENSION_MIN);
+            tension.put(player, newTension);
+        }
+        return newTension;
+    }
+
+    /**
+     * Sets the tension with respect to a given player.
+     *
+     * @param player The other <code>Player</code>.
+     * @param newTension The new <code>Tension</code>.
+     */
+    public void setTension(Player player, Tension newTension) {
+        if (player == this || player == null) return;
+        tension.put(player, newTension);
+    }
+
+    /**
+     * Removes all tension with respect to a given player.  Used when a
+     * player leaves the game.
+     *
+     * @param player The <code>Player</code> to remove tension for.
+     */
+    public void removeTension(Player player) {
+        if (player != null) tension.remove(player);
+    }
+
+    /**
+     * Modifies the hostility against the given player.
+     *
+     * @param player The <code>Player</code>.
+     * @param addToTension The amount to add to the current tension level.
+     * @return A list of objects that may need updating due to the tension
+     *     change (such as native settlements).
+     */
+    public List<FreeColGameObject> modifyTension(Player player,
+                                                 int addToTension) {
+        return modifyTension(player, addToTension, null);
+    }
+
+    /**
+     * Modifies the hostility against the given player.
+     *
+     * @param player The <code>Player</code>.
+     * @param addToTension The amount to add to the current tension level.
+     * @param origin A <code>Settlement</code> where the alarming event
+     *     occurred.
+     * @return A list of objects that may need updating due to the tension
+     *     change (such as native settlements).
+     */
+    public List<FreeColGameObject> modifyTension(Player player,
+                                                 int addToTension,
+                                                 Settlement origin) {
+        if (player == null) {
+            throw new IllegalStateException("Null player");
+        } else if (player == this) {
+            throw new IllegalStateException("Self tension!");
+        } else if (origin != null && origin.getOwner() != this) {
+            throw new IllegalStateException("Bogus origin:"
+                                            + origin.getId());
+        }
+
+        List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
+        Tension.Level oldLevel = getTension(player).getLevel();
+        getTension(player).modify(addToTension);
+        if (oldLevel != getTension(player).getLevel()) {
+            objects.add(this);
+        }
+
+        // Propagate tension change as settlement alarm to all
+        // settlements except the one that originated it (if any).
+        for (Settlement settlement : getSettlements()) {
+            if (!settlement.equals(origin)) {
+                if (settlement.propagateAlarm(player, addToTension)) {
+                    objects.add(settlement);
+                }
+            }
+        }
+
+        return objects;
+    }
+
+    /**
+     * Gets the stance towards a given player.
+     *
+     * @param player The other <code>Player</code> to check.
+     * @return The stance.
+     */
+    public Stance getStance(Player player) {
+        return (player == null || stance.get(player.getId()) == null)
+            ? Stance.UNCONTACTED
+            : stance.get(player.getId());
+    }
+
+    /**
+     * Sets the stance towards a given player.
+     *
+     * @param player The <code>Player</code> to set the
+     *     <code>Stance</code> for.
+     * @param newStance The new <code>Stance</code>.
+     * @return True if the stance change was valid.
+     * @throws IllegalArgumentException if player is null or this.
+     */
+    public boolean setStance(Player player, Stance newStance) {
+        if (player == null) {
+            throw new IllegalArgumentException("Player must not be 'null'.");
+        }
+        if (player == this) {
+            throw new IllegalArgumentException("Cannot set the stance towards ourselves.");
+        }
+        if (newStance == null) {
+            stance.remove(player.getId());
+            return true;
+        }
+        Stance oldStance = stance.get(player.getId());
+        if (newStance.equals(oldStance)) return true;
+
+        boolean valid = true;;
+        if ((newStance == Stance.CEASE_FIRE && oldStance != Stance.WAR)
+            || newStance == Stance.UNCONTACTED) {
+            valid = false;
+        }
+        stance.put(player.getId(), newStance);
+        return valid;
+    }
+
+    /**
+     * Is this player at war with the specified one.
+     *
+     * @param player The other <code>Player</code> to check.
+     * @return True if the players are at war.
+     */
+    public boolean atWarWith(Player player) {
+        return getStance(player) == Stance.WAR;
+    }
+
+    /**
+     * Checks whether this player is at war with any other player.
+     *
+     * @return True if this player is at war with any other.
+     */
+    public boolean isAtWar() {
+        for (Player player : getGame().getPlayers()) {
+            if (atWarWith(player)) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Has this player met contacted the given one?
+     *
+     * @param player The other <code>Player</code> to check.
+     * @return True if this <code>Player</code> has contacted the other.
+     */
+    public boolean hasContacted(Player player) {
+        return getStance(player) != Stance.UNCONTACTED;
+    }
+
+    /**
+     * Has this player has met with any Europeans at all?
+     *
+     * @return True if this <code>Player</code> has contacted any Europeans.
+     */
+    public boolean hasContactedEuropeans() {
+        for (Player other : getGame().getLiveEuropeanPlayers()) {
+            if (other != this && hasContacted(other)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Has this player met any natives at all?
+     *
+     * @return True if this <code>Player</code> has contacted any natives.
+     */
+    public boolean hasContactedIndians() {
+        for (Player other : getGame().getPlayers()) {
+            if (other != this && !other.isDead() && other.isIndian()
+                && hasContacted(other)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Set this player as having made initial contact with another player.
+     * Always start with PEACE, which can go downhill fast.
+     *
+     * @param player1 One <code>Player</code> to check.
+     * @param player2 The other <code>Player</code> to check.
+     */
+    public static void makeContact(Player player1, Player player2) {
+        player1.stance.put(player2.getId(), Stance.PEACE);
+        player2.stance.put(player1.getId(), Stance.PEACE);
+        player1.setTension(player2, new Tension(Tension.TENSION_MIN));
+        player2.setTension(player1, new Tension(Tension.TENSION_MIN));
+    }
+
+    /**
+     * Gets the price of the given land.
+     *
+     * @param tile The <code>Tile</code> to get the price for.
+     * @return The price of the land if it is for sale, zero if it is
+     *     already ours, unclaimed or unwanted, negative if it is not
+     *     for sale.
+     */
+    public int getLandPrice(Tile tile) {
+        final Specification spec = getSpecification();
+        Player nationOwner = tile.getOwner();
+        int price = 0;
+
+        if (nationOwner == null || nationOwner == this) {
+            return 0; // Freely available
+        } else if (tile.getSettlement() != null) {
+            return -1; // Not for sale
+        } else if (nationOwner.isEuropean()) {
+            if (tile.getOwningSettlement() != null
+                && tile.getOwningSettlement().getOwner() == nationOwner) {
+                return -1; // Nailed down by a European colony
+            } else {
+                return 0; // Claim abandoned or only by tile improvement
+            }
+        } // Else, native ownership
+        for (GoodsType type : spec.getGoodsTypeList()) {
+            if (type == spec.getPrimaryFoodType()) {
+                // Only consider specific food types, not the aggregation.
+                continue;
+            }
+            price += tile.potential(type, null);
+        }
+        price *= spec.getInteger("model.option.landPriceFactor");
+        price += 100;
+        return (int) applyModifier(price, "model.modifier.landPaymentModifier",
+                                   null, getGame().getTurn());
+    }
+
+
+    //
+    // Claiming of tiles
+    //
 
     /**
      * A variety of reasons why a tile can not be claimed, either
@@ -1428,1198 +3182,10 @@ public class Player extends FreeColGameObject implements Nameable {
         return tiles;
     }
 
-    /**
-     * Get the <code>Unit</code> value.
-     *
-     * @return a <code>List<Unit></code> value
-     */
-    public final Unit getUnit(String id) {
-        return units.get(id);
-    }
 
-    /**
-     * Set the <code>Unit</code> value.
-     *
-     * @param newUnit The new Units value.
-     */
-    public final void setUnit(final Unit newUnit) {
-    	if (newUnit == null) {
-    		logger.warning("Unit to add is null");
-    		return;
-    	}
-
-    	// make sure the owner of the unit is set first, before adding it to the list
-    	if(newUnit.getOwner() != null && !this.owns(newUnit)){
-    		throw new IllegalStateException(this + " adding another players unit=" + newUnit);
-    	}
-
-    	units.put(newUnit.getId(), newUnit);
-    }
-
-    /**
-     * Remove Unit.
-     *
-     * @param oldUnit an <code>Unit</code> value
-     */
-    public void removeUnit(final Unit oldUnit) {
-        if (oldUnit != null) {
-            units.remove(oldUnit.getId());
-            nextActiveUnitIterator.remove(oldUnit);
-            nextGoingToUnitIterator.remove(oldUnit);
-        }
-    }
-
-    /**
-     * Try to fix integrity problems with units that have no owner.
-     *
-     * @return True if there were no problems, false if problems were found
-     *     and corrected.
-     */
-    public boolean fixIntegrity() {
-        boolean result = true;
-        for (Unit unit : getUnits()) {
-            if (unit.getOwner() == null) {
-                logger.warning("Fixing " + unit.getId() + ": owner missing");
-                unit.setOwner(this);
-                result = false;
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Gets the price to this player for a proposed unit.
-     *
-     * @param au The proposed <code>AbstractUnit</code>.
-     * @return The price for the unit.
-     */
-    public int getPrice(AbstractUnit au) {
-        Specification spec = getSpecification();
-        UnitType unitType = au.getUnitType(spec);
-        if (unitType.hasPrice()) {
-            int price = getEurope().getUnitPrice(unitType);
-            for (EquipmentType equip : au.getEquipment(spec)) {
-                for (AbstractGoods goods : equip.getRequiredGoods()) {
-                    price += getMarket().getBidPrice(goods.getType(),
-                                                     goods.getAmount());
-                }
-            }
-            return price * au.getNumber();
-        } else {
-            return INFINITY;
-        }
-    }
-
-    /**
-     * Gets the total percentage of rebels in all this player's colonies.
-     *
-     * @return The total percentage of rebels in all this player's colonies.
-     */
-    public int getSoL() {
-        int sum = 0;
-        int number = 0;
-        for (Colony c : getColonies()) {
-            sum += c.getSoL();
-            number++;
-        }
-        if (number > 0) {
-            return sum / number;
-        } else {
-            return 0;
-        }
-    }
-
-    /**
-     * Get the <code>IndependentNationName</code> value.
-     *
-     * @return a <code>String</code> value
-     */
-    public final String getIndependentNationName() {
-        return independentNationName;
-    }
-
-    /**
-     * Set the <code>IndependentNationName</code> value.
-     *
-     * @param newIndependentNationName The new IndependentNationName value.
-     */
-    public final void setIndependentNationName(final String newIndependentNationName) {
-        this.independentNationName = newIndependentNationName;
-    }
-
-    /**
-     * Gets the <code>Player</code> controlling the "Royal Expeditionary
-     * Force" for this player.
-     *
-     * @return The player, or <code>null</code> if this player does not have a
-     *         royal expeditionary force.
-     */
-    public Player getREFPlayer() {
-        Nation ref = getNation().getREFNation();
-        return (ref == null) ? null : getGame().getPlayer(ref.getId());
-    }
-
-    /**
-     * Gets the name this player has chosen for the new land.
-     *
-     * @return The name of the new world as chosen by the <code>Player</code>,
-     *         or null if none chosen yet.
-     */
-    public String getNewLandName() {
-        return newLandName;
-    }
-
-    /**
-     * Returns true if the player already selected a new name for the discovered
-     * land.
-     *
-     * @return true if the player already set a name for the newly discovered
-     *         land, otherwise false.
-     */
-    public boolean isNewLandNamed() {
-        return newLandName != null;
-    }
-
-    /**
-     * Sets the name this player uses for the new land.
-     *
-     * @param newLandName This <code>Player</code>'s name for the new world.
-     */
-    public void setNewLandName(String newLandName) {
-        this.newLandName = newLandName;
-    }
-
-    /**
-     * Returns the price of the given land.
-     *
-     * @param tile The <code>Tile</code> to get the price for.
-     * @return The price of the land if it is for sale, zero if it is already
-     *         ours, unclaimed or unwanted, negative if it is not for sale.
-     */
-    public int getLandPrice(Tile tile) {
-        final Specification spec = getSpecification();
-        Player nationOwner = tile.getOwner();
-        int price = 0;
-
-        if (nationOwner == null || nationOwner == this) {
-            return 0; // Freely available
-        } else if (tile.getSettlement() != null) {
-            return -1; // Not for sale
-        } else if (nationOwner.isEuropean()) {
-            if (tile.getOwningSettlement() != null
-                && tile.getOwningSettlement().getOwner() == nationOwner) {
-                return -1; // Nailed down by a European colony
-            } else {
-                return 0; // Claim abandoned or only by tile improvement
-            }
-        } // Else, native ownership
-        for (GoodsType type : spec.getGoodsTypeList()) {
-            if (type == spec.getPrimaryFoodType()) {
-                // Only consider specific food types, not the aggregation.
-                continue;
-            }
-            price += tile.potential(type, null);
-        }
-        price *= spec.getInteger("model.option.landPriceFactor");
-        price += 100;
-        return (int) applyModifier(price, "model.modifier.landPaymentModifier",
-                                   null, getGame().getTurn());
-    }
-
-    /**
-     * Returns whether this player has been attacked by privateers.
-     *
-     * @return <code>true</code> if this <code>Player</code> has been
-     *         attacked by privateers.
-     */
-    public boolean getAttackedByPrivateers() {
-        return attackedByPrivateers;
-    }
-
-    /**
-     * Sets whether this player has been attacked by privateers.
-     *
-     * @param attacked True if the player has been attacked by privateers.
-     */
-    public void setAttackedByPrivateers(boolean attacked) {
-        attackedByPrivateers = attacked;
-    }
-
-    /**
-     * Gets the default <code>Location</code> where the units arriving from
-     * {@link Europe} will be put.
-     *
-     * @return The <code>Location</code>.
-     * @see Unit#getEntryLocation
-     */
-    public Location getEntryLocation() {
-        return entryLocation;
-    }
-
-    /**
-     * Sets the <code>Location</code> where the units arriving from
-     * {@link Europe} will be put as a default.
-     *
-     * @param entryLocation The <code>Location</code>.
-     * @see #getEntryLocation
-     */
-    public void setEntryLocation(Location entryLocation) {
-        this.entryLocation = entryLocation;
-    }
-
-    /**
-     * Checks if this <code>Player</code> has explored the given
-     * <code>Tile</code>.
-     *
-     * @param tile The <code>Tile</code>.
-     * @return <i>true</i> if the <code>Tile</code> has been explored and
-     *         <i>false</i> otherwise.
-     */
-    public boolean hasExplored(Tile tile) {
-        return tile.isExplored();
-    }
-
-    /**
-     * Sets the given tile to be explored by this player and updates the
-     * player's information about the tile.
-     *
-     * @param tile The <code>Tile</code> to set explored.
-     * @see Tile#updatePlayerExploredTile(Player, boolean)
-     */
-    public void setExplored(Tile tile) {
-        logger.warning("Implemented by ServerPlayer");
-    }
-
-    /**
-     * Sets the tiles within the given <code>Unit</code>'s line of sight to
-     * be explored by this player.
-     *
-     * @param unit The <code>Unit</code>.
-     * @see #setExplored(Tile)
-     * @see #hasExplored
-     */
-    public void setExplored(Unit unit) {
-        if (getGame() == null || getGame().getMap() == null || unit == null
-            || unit.getLocation() == null || unit.getTile() == null
-            || isIndian()) {
-            return;
-        }
-        invalidateCanSeeTiles();
-    }
-
-    /**
-     * Forces an update of the <code>canSeeTiles</code>. This method should
-     * be used to invalidate the current <code>canSeeTiles</code>. The method
-     * {@link #resetCanSeeTiles} will be called whenever it is needed.
-     */
-    public void invalidateCanSeeTiles() {
-        synchronized (canSeeLock) {
-            canSeeTiles = null;
-        }
-    }
-
-    /**
-     * Checks if this <code>Player</code> can see the given <code>Tile</code>.
-     * The <code>Tile</code> can be seen if it is in a {@link Unit}'s line of
-     * sight.
-     *
-     * @param tile The given <code>Tile</code>.
-     * @return <i>true</i> if the <code>Player</code> can see the given
-     *         <code>Tile</code> and <i>false</i> otherwise.
-     */
-    public boolean canSee(Tile tile) {
-        if (tile == null) return false;
-
-        do {
-            synchronized (canSeeLock) {
-                if (canSeeTiles != null) {
-                    return canSeeTiles[tile.getX()][tile.getY()];
-                }
-            }
-        } while (resetCanSeeTiles());
-        return false;
-    }
-
-    /**
-     * Resets this player's "can see"-tiles. This is done by setting
-     * all the tiles within each {@link Unit} and {@link Settlement}s
-     * line of sight visible. The other tiles are made invisible.
-     *
-     * Use {@link #invalidateCanSeeTiles} whenever possible.
-     * @return <code>true</code> if successful <code>false</code> otherwise
-     */
-    private boolean resetCanSeeTiles() {
-        Map map = getGame().getMap();
-        if (map == null) return false;
-
-        boolean[][] cST = makeCanSeeTiles(map);
-        synchronized (canSeeLock) {
-            canSeeTiles = cST;
-        }
-        return true;
-    }
-
-    /**
-     * Builds a canSeeTiles array.
-     *
-     * Note that tiles must be tested for null as they may be both
-     * valid tiles but yet null during a save game load.
-     *
-     * Note the use of copies of the unit and settlement lists to
-     * avoid nasty surprises due to asynchronous disappearance of
-     * members of either.  TODO: see if this can be relaxed.
-     *
-     * @param map The <code>Map</code> to use.
-     * @return A canSeeTiles array.
-     */
-    private boolean[][] makeCanSeeTiles(Map map) {
-        final Specification spec = getSpecification();
-        boolean[][] cST = new boolean[map.getWidth()][map.getHeight()];
-
-        if (!spec.getBoolean(GameOptions.FOG_OF_WAR)) {
-            for (Tile t : getGame().getMap().getAllTiles()) {
-                if (t != null) {
-                    cST[t.getX()][t.getY()] = hasExplored(t);
-                }
-            }
-        } else {
-            for (Unit unit : getUnits()) {
-                // Only consider units directly on the map, not those
-                // on a carrier or in Europe.
-                if (!(unit.getLocation() instanceof Tile)) continue;
-
-                Tile tile = (Tile) unit.getLocation();
-                cST[tile.getX()][tile.getY()] = true;
-                for (Tile t : tile.getSurroundingTiles(unit.getLineOfSight())) {
-                    if (t != null) {
-                        cST[t.getX()][t.getY()] = hasExplored(t);
-                    }
-                }
-            }
-            for (Settlement settlement : new ArrayList<Settlement>(getSettlements())) {
-                Tile tile = settlement.getTile();
-                cST[tile.getX()][tile.getY()] = true;
-                for (Tile t : tile.getSurroundingTiles(settlement.getLineOfSight())) {
-                    if (t != null) {
-                        cST[t.getX()][t.getY()] = hasExplored(t);
-                    }
-                }
-            }
-            if (isEuropean()
-                && spec.getBoolean(GameOptions.ENHANCED_MISSIONARIES)) {
-                for (Player other : getGame().getPlayers()) {
-                    if (this.equals(other) || !other.isIndian()) continue;
-                    for (Settlement settlement : other.getSettlements()) {
-                        IndianSettlement is = (IndianSettlement) settlement;
-                        if (is.getMissionary(this) == null) continue;
-                        for (Tile t : is.getTile().getSurroundingTiles(is.getLineOfSight())) {
-                            if (t != null) {
-                                cST[t.getX()][t.getY()] = hasExplored(t);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return cST;
-    }
-
-    /**
-     * Checks if this <code>Player</code> can build colonies.
-     *
-     * @return <code>true</code> if this player is european, not the royal
-     *         expeditionary force and not currently fighting the war of
-     *         independence.
-     */
-    public boolean canBuildColonies() {
-        return nationType.hasAbility(Ability.FOUNDS_COLONIES);
-    }
-
-    /**
-     * Checks if this <code>Player</code> can get founding fathers.
-     *
-     * @return <code>true</code> if this player is european, not the royal
-     *         expeditionary force and not currently fighting the war of
-     *         independence.
-     */
-    public boolean canHaveFoundingFathers() {
-        return nationType.hasAbility("model.ability.electFoundingFather");
-    }
-
-    /**
-     * Determines whether this player has a certain Founding father.
-     *
-     * @param someFather a <code>FoundingFather</code> value
-     * @return Whether this player has this Founding father
-     * @see FoundingFather
-     */
-    public boolean hasFather(FoundingFather someFather) {
-        return allFathers.contains(someFather);
-    }
-
-    /**
-     * Returns the number of founding fathers in this players congress. Used to
-     * calculate number of liberty needed to recruit new fathers.
-     *
-     * @return The number of founding fathers in this players congress
-     */
-    public int getFatherCount() {
-        return allFathers.size();
-    }
-
-    /**
-     * Returns the founding fathers in this player's congress.
-     *
-     * @return the founding fathers in this player's congress.
-     */
-    public Set<FoundingFather> getFathers() {
-        return allFathers;
-    }
-
-    /**
-     * Add a founding father to the congress.
-     *
-     * @param father The <code>FoundingFather</code> to add.
-     */
-    public void addFather(FoundingFather father) {
-        allFathers.add(father);
-        addFeatures(father);
-        for (Colony colony : getColonies()) {
-            colony.invalidateCache();
-        }
-    }
-
-    /**
-     * Gets the {@link FoundingFather founding father} this player is working
-     * towards.
-     *
-     * @return The current FoundingFather or null if there is none
-     * @see #setCurrentFather
-     * @see FoundingFather
-     */
-    public FoundingFather getCurrentFather() {
-        return currentFather;
-    }
-
-    /**
-     * Sets this players liberty bell production to work towards recruiting
-     * <code>father</code> to its congress.
-     *
-     * @param someFather a <code>FoundingFather</code> value
-     * @see FoundingFather
-     */
-    public void setCurrentFather(FoundingFather someFather) {
-        currentFather = someFather;
-    }
-
-    /**
-     * Gets the set of offered fathers for this player.
-     *
-     * @return The current set of offered fathers.
-     */
-    public List<FoundingFather> getOfferedFathers() {
-        return offeredFathers;
-    }
-
-    /**
-     * Clear the set of offered fathers.
-     */
-    public void clearOfferedFathers() {
-        offeredFathers.clear();
-    }
-
-    /**
-     * Sets the set of offered fathers.
-     *
-     * @param fathers A list of <code>FoundingFather</code>s to offer.
-     */
-    public void setOfferedFathers(List<FoundingFather> fathers) {
-        clearOfferedFathers();
-        offeredFathers.addAll(fathers);
-    }
-
-    /**
-     * Gets the number of liberty points needed to recruit the next
-     * founding father.
-     *
-     * @return How many more liberty points the <code>Player</code>
-     *         needs in order to recruit the next founding father.
-     * @see #incrementLiberty
-     */
-    public int getRemainingFoundingFatherCost() {
-        return getTotalFoundingFatherCost() - getLiberty();
-    }
-
-    /**
-     * Returns how many liberty points in total are needed to earn the
-     * Founding Father we are trying to recruit. The description of the
-     * algorithm was taken from
-     * http://t-a-w.blogspot.com/2007/05/colonization-tips.html
-     *
-     * @return Total number of liberty points the <code>Player</code>
-     *         needs to recruit the next founding father.
-     * @see #incrementLiberty
-     */
-    public int getTotalFoundingFatherCost() {
-        final Specification spec = getSpecification();
-        int base = spec.getInteger("model.option.foundingFatherFactor");
-        int count = getFatherCount();
-        return ((count + 1) * (count + 2) - 1) * base + count;
-    }
-
-    /**
-     * Checks if this <code>Player</code> can move units to
-     * <code>Europe</code>.
-     *
-     * @return <code>true</code> if this <code>Player</code> has an instance
-     *         of <code>Europe</code>.
-     */
-    public boolean canMoveToEurope() {
-        return getEurope() != null;
-    }
-
-    /**
-     * Returns the europe object that this player has.
-     *
-     * @return The europe object that this player has or <code>null</code> if
-     *         this <code>Player</code> does not have an instance
-     *         <code>Europe</code>.
-     */
-    public Europe getEurope() {
-        return europe;
-    }
-
-    /**
-     * Set the europe object for a player.
-     *
-     * @param europe The new <code>Europe</code> object.
-     */
-    public void setEurope(Europe europe) {
-        this.europe = europe;
-    }
-
-    /**
-     * Describe <code>getEuropeName</code> method here.
-     *
-     * @return a <code>String</code> value
-     */
-    public String getEuropeNameKey() {
-        if (europe == null) {
-            return null;
-        } else {
-            return nationID + ".europe";
-        }
-    }
-
-    /**
-     * Returns the monarch object this player has.
-     *
-     * @return The monarch object this player has or <code>null</code> if this
-     *         <code>Player</code> does not have an instance
-     *         <code>Monarch</code>.
-     */
-    public Monarch getMonarch() {
-        return monarch;
-    }
-
-    /**
-     * Sets the monarch object this player has.
-     *
-     * @param monarch The monarch object this player should have.
-     */
-    public void setMonarch(Monarch monarch) {
-        this.monarch = monarch;
-    }
-
-    /**
-     * Get the <code>HighSeas</code> value.
-     *
-     * @return a <code>HighSeas</code> value
-     */
-    public final HighSeas getHighSeas() {
-        return highSeas;
-    }
-
-    /**
-     * Initialize the highSeas.
-     * Needs to be public until the backward compatibility code in
-     * FreeColServer is gone.
-     */
-    public void initializeHighSeas() {
-        Game game = getGame();
-        highSeas = new HighSeas(game);
-        if (europe != null) highSeas.addDestination(europe);
-        if (game.getMap() != null ) highSeas.addDestination(game.getMap());
-    }
-
-    /**
-     * Returns the amount of gold that this player has.
-     *
-     * @return The amount of gold that this player has.  May return
-     *     GOLD_NOT_ACCOUNTED for players whose gold is not accounted.
-     */
-    public int getGold() {
-        return gold;
-    }
-
-    /**
-     * Set the amount of gold that this player has.
-     *
-     * @param newGold The new player gold value.
-     */
-    public void setGold(int newGold) {
-        gold = newGold;
-    }
-
-    /**
-     * Checks if the player has enough gold to make a purchase.
-     * Use this rather than comparing with getGold(), as this handles
-     * players that do not account for gold.
-     *
-     * @param amount The purchase price to check.
-     * @return True if the player can afford the purchase.
-     */
-    public boolean checkGold(int amount) {
-        return this.gold == GOLD_NOT_ACCOUNTED || this.gold >= amount;
-    }
-
-    /**
-     * Modifies the amount of gold that this player has. The argument can be
-     * both positive and negative.
-     *
-     * @param amount The amount of gold to be added to this player.
-     * @return The amount of gold post-modification.
-     */
-    public int modifyGold(int amount) {
-        if (this.gold != Player.GOLD_NOT_ACCOUNTED) {
-            if ((gold + amount) >= 0) {
-                modifyScore((gold + amount) / 1000 - gold / 1000);
-                gold += amount;
-            } else {
-                // This can happen if the server and the client get
-                // out of sync.  Perhaps it can also happen if the
-                // client tries to adjust gold for another player,
-                // where the balance is unknown. Just keep going and
-                // do the best thing possible, we don't want to crash
-                // the game here.
-                logger.warning("Cannot add " + amount + " gold for "
-                               + this + ": would be negative!");
-                gold = 0;
-            }
-        }
-        return gold;
-    }
-
-    /**
-     * Gets an <code>Iterator</code> containing all the units this player
-     * owns.
-     *
-     * @return The <code>Iterator</code>.
-     * @see Unit
-     */
-    public Iterator<Unit> getUnitIterator() {
-        return units.values().iterator();
-    }
-
-    public List<Unit> getUnits() {
-        return new ArrayList<Unit>(units.values());
-    }
-
-    /**
-     * Gets the number of King's land units.
-     * @return The number of units
-     */
-    public int getNumberOfKingLandUnits() {
-        int n = 0;
-        for (Unit unit : getUnits()) {
-            if (unit.hasAbility("model.ability.refUnit") && !unit.isNaval()) {
-                n++;
-            }
-        }
-        return n;
-    }
-
-    /**
-     * Checks if this player has a single Man-of-War.
-     * @return <code>true</code> if this player owns
-     *      a single Man-of-War.
-     */
-    public boolean hasManOfWar() {
-        Iterator<Unit> it = getUnitIterator();
-        while (it.hasNext()) {
-            Unit unit = it.next();
-            if ("model.unit.manOWar".equals(unit.getType().getId())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Gets the carrier units that can carry the supplied unit, if one exists.
-     *
-     * @param unit The <code>Unit</code> to carry.
-     * @return A list of suitable carriers.
-     */
-    public List<Unit> getCarriersForUnit(Unit unit) {
-        List<Unit> units = new ArrayList<Unit>();
-        for (Unit u : getUnits()) {
-            if (u.couldCarry(unit)) units.add(u);
-        }
-        return units;
-    }
-
-    /**
-     * Gets a new active unit.
-     *
-     * @return A <code>Unit</code> that can be made active.
-     */
-    public Unit getNextActiveUnit() {
-        return nextActiveUnitIterator.next();
-    }
-
-    /**
-     * Sets a new active unit.
-     *
-     * @param unit A <code>Unit</code> to make the next one to be active.
-     * @return True if the operation succeeded.
-     */
-    public boolean setNextActiveUnit(Unit unit) {
-        return nextActiveUnitIterator.setNext(unit);
-    }
-
-    /**
-     * Checks if a new active unit can be made active.
-     *
-     * @return <i>true</i> if this is the case and <i>false</i> otherwise.
-     */
-    public boolean hasNextActiveUnit() {
-        return nextActiveUnitIterator.hasNext();
-    }
-
-    /**
-     * Gets a new going-to unit.
-     *
-     * @return A <code>Unit</code> that can be made active.
-     */
-    public Unit getNextGoingToUnit() {
-        return nextGoingToUnitIterator.next();
-    }
-
-    /**
-     * Sets a new going-to unit.
-     *
-     * @param unit A <code>Unit</code> to make the next one to be active.
-     * @return True if the operation succeeded.
-     */
-    public boolean setNextGoingToUnit(Unit unit) {
-        return nextGoingToUnitIterator.setNext(unit);
-    }
-
-    /**
-     * Checks if a new active unit can be made active.
-     *
-     * @return <i>true</i> if this is the case and <i>false</i> otherwise.
-     */
-    public boolean hasNextGoingToUnit() {
-        return nextGoingToUnitIterator.hasNext();
-    }
-
-    /**
-     * Returns the name of this player.
-     *
-     * @return The name of this player.
-     */
-    public String getName() {
-        return name;
-    }
-
-    // TODO: remove this again
-    public String getNameKey() {
-        return getName();
-    }
-
-    /**
-     * Gets the name to display for this player.
-     * TODO: This is a kludge that should be fixed.
-     *
-     * @return The name to display for this player.
-     */
-    public String getDisplayName() {
-        return (getName().startsWith("model.nation."))
-            ? Messages.message(getName())
-            : getName();
-    }
-
-    /**
-     * Is this player the unknown enemy?
-     */
-    public boolean isUnknownEnemy() {
-        return UNKNOWN_ENEMY.equals(name);
-    }
-
-    /**
-     * Set the <code>Name</code> value.
-     *
-     * @param newName The new Name value.
-     */
-    public void setName(String newName) {
-        this.name = newName;
-    }
-
-    /**
-     * Returns the nation type of this player.
-     *
-     * @return The nation type of this player.
-     */
-    public NationType getNationType() {
-        return nationType;
-    }
-
-    /**
-     * Sets the nation type of this player.
-     *
-     * @param newNationType a <code>NationType</code> value
-     */
-    public void setNationType(NationType newNationType) {
-        if (nationType != null) removeFeatures(nationType);
-        nationType = newNationType;
-        if (newNationType != null) addFeatures(newNationType);
-    }
-
-    /**
-     * Return this Player's nation.
-     *
-     * @return a <code>String</code> value
-     */
-    public Nation getNation() {
-        return getSpecification().getNation(nationID);
-    }
-
-    /**
-     * Sets the nation for this player.
-     *
-     * @param newNation The new nation for this player.
-     */
-    public void setNation(Nation newNation) {
-        Nation oldNation = getNation();
-        nationID = newNation.getId();
-        getGame().getNationOptions().getNations().put(newNation, NationState.NOT_AVAILABLE);
-        getGame().getNationOptions().getNations().put(oldNation, NationState.AVAILABLE);
-    }
-
-    /**
-     * Return the ID of this Player's nation.
-     *
-     * @return a <code>String</code> value
-     */
-    public String getNationID() {
-        return nationID;
-    }
-
-    /**
-     * Gets a nation name suitable for use in message IDs.
-     *
-     * @return a <code>String</code> value
-     */
-    public String getNationNameKey() {
-        return nationID.substring(nationID.lastIndexOf('.')+1)
-            .toUpperCase(Locale.US);
-    }
-
-    /**
-     * Returns the nation of this player as a String.
-     *
-     * @return The nation of this player as a String.
-     */
-    public StringTemplate getNationName() {
-        return (playerType == PlayerType.REBEL
-                || playerType == PlayerType.INDEPENDENT)
-            ? StringTemplate.name(independentNationName)
-            : StringTemplate.key(nationID + ".name");
-    }
-
-    /**
-     * Get the <code>RulerName</code> value.
-     *
-     * @return a <code>String</code> value
-     */
-    public final String getRulerNameKey() {
-        return nationID + ".ruler";
-    }
-
-    /**
-     * Checks if this <code>Player</code> is ready to start the game.
-     *
-     * @return <code>true</code> if this <code>Player</code> is ready to
-     *         start the game.
-     */
-    public boolean isReady() {
-        return ready;
-    }
-
-    /**
-     * Sets this <code>Player</code> to be ready/not ready for starting the
-     * game.
-     *
-     * @param ready This indicates if the player is ready to start the game.
-     */
-    public void setReady(boolean ready) {
-        this.ready = ready;
-    }
-
-    public void incrementImmigration(int amount) {
-        immigration = Math.max(0, immigration + amount);
-    }
-
-    /**
-     * Sets the number of immigration this player possess.
-     *
-     * @see #incrementImmigration(int)
-     */
-    public void reduceImmigration() {
-        if (!canRecruitUnits()) {
-            return;
-        }
-
-        int cost = getSpecification().getBoolean(GameOptions.SAVE_PRODUCTION_OVERFLOW)
-            ? immigrationRequired : immigration;
-
-        if (cost > immigration) {
-            immigration = 0;
-        } else {
-            immigration -= cost;
-        }
-    }
-
-    /**
-     * Gets the number of immigration this player possess.
-     *
-     * @return The number.
-     * @see #reduceImmigration
-     */
-    public int getImmigration() {
-        return (canRecruitUnits()) ? immigration : 0;
-    }
-
-    /**
-     * Sets the number of immigration this player possess.
-     *
-     * @param immigration The immigration value for this player.
-     */
-    public void setImmigration(int immigration) {
-        if (canRecruitUnits()) {
-            this.immigration = immigration;
-        }
-    }
-
-
-    /**
-     * Get the <code>TradeRoutes</code> value.
-     *
-     * @return a <code>List<TradeRoute></code> value
-     */
-    public final List<TradeRoute> getTradeRoutes() {
-        return tradeRoutes;
-    }
-
-    /**
-     * Set the players trade routes.
-     *
-     * @param newTradeRoutes The new list of <code>TradeRoute</code>s.
-     *
-     */
-    public final void setTradeRoutes(final List<TradeRoute> newTradeRoutes) {
-        tradeRoutes.clear();
-        tradeRoutes.addAll(newTradeRoutes);
-    }
-
-    /**
-     * Checks to see whether or not a colonist can emigrate, and does so if
-     * possible.
-     *
-     * @return Whether a new colonist should immigrate.
-     */
-    public boolean checkEmigrate() {
-        if (!canRecruitUnits()) {
-            return false;
-        }
-        return getImmigrationRequired() <= immigration;
-    }
-
-    /**
-     * Gets the number of immigration required to cause a new colonist to emigrate.
-     *
-     * @return The number of immigration required to cause a new colonist to
-     *         emigrate.
-     */
-    public int getImmigrationRequired() {
-        return (canRecruitUnits()) ? immigrationRequired : 0;
-    }
-
-    /**
-     * Sets the number of immigration required to cause a new colonist to emigrate.
-     *
-     * @param immigrationRequired The number of immigration required to cause a new
-     *            colonist to emigrate.
-     */
-    public void setImmigrationRequired(int immigrationRequired) {
-        if (canRecruitUnits()) {
-            this.immigrationRequired = immigrationRequired;
-        }
-    }
-
-    /**
-     * Updates the amount of immigration needed to emigrate a <code>Unit</code>
-     * from <code>Europe</code>.
-     */
-    public void updateImmigrationRequired() {
-        if (!canRecruitUnits()) return;
-
-        final Specification spec = getSpecification();
-        int base = spec.getInteger("model.option.crossesIncrement");
-        immigrationRequired += (int)applyModifier(base,
-            "model.modifier.religiousUnrestBonus");
-        // The book I have tells me the crosses needed is:
-        // [(colonist count in colonies + total colonist count) * 2] + 8.
-        // So every unit counts as 2 unless they're in a colony,
-        // wherein they count as 4.
-        /*
-         * int count = 8; Map map = getGame().getMap(); Iterator<Position>
-         * tileIterator = map.getWholeMapIterator(); while
-         * (tileIterator.hasNext()) { Tile t = map.getTile(tileIterator.next());
-         * if (t != null && t.getFirstUnit() != null &&
-         * t.getFirstUnit().getOwner().equals(this)) { Iterator<Unit>
-         * unitIterator = t.getUnitIterator(); while (unitIterator.hasNext()) {
-         * Unit u = unitIterator.next(); Iterator<Unit> childUnitIterator =
-         * u.getUnitIterator(); while (childUnitIterator.hasNext()) { // Unit
-         * childUnit = (Unit) childUnitIterator.next();
-         * childUnitIterator.next(); count += 2; } count += 2; } } if (t != null &&
-         * t.getColony() != null && t.getColony().getOwner() == this) { count +=
-         * t.getColony().getUnitCount() * 4; // Units in colonies // count
-         * doubly. // -sjm } } Iterator<Unit> europeUnitIterator =
-         * getEurope().getUnitIterator(); while (europeUnitIterator.hasNext()) {
-         * europeUnitIterator.next(); count += 2; } if (nation == ENGLISH) {
-         * count = (count * 2) / 3; } setCrossesRequired(count);
-         */
-    }
-
-    /**
-     * Checks if this <code>Player</code> can recruit units by producing
-     * immigration.
-     *
-     * @return <code>true</code> if units can be recruited by this
-     *         <code>Player</code>.
-     */
-    public boolean canRecruitUnits() {
-        return playerType == PlayerType.COLONIAL;
-    }
-
-    /**
-     * Modifies the hostility against the given player.
-     *
-     * @param player The <code>Player</code>.
-     * @param addToTension The amount to add to the current tension level.
-     * @return A list of objects that may need updating due to the tension
-     *     change (such as native settlements).
-     */
-    public List<FreeColGameObject> modifyTension(Player player,
-                                                 int addToTension) {
-        return modifyTension(player, addToTension, null);
-    }
-
-    /**
-     * Modifies the hostility against the given player.
-     *
-     * @param player The <code>Player</code>.
-     * @param addToTension The amount to add to the current tension level.
-     * @param origin A <code>Settlement</code> where the alarming event
-     *     occurred.
-     * @return A list of objects that may need updating due to the tension
-     *     change (such as native settlements).
-     */
-    public List<FreeColGameObject> modifyTension(Player player,
-                                                 int addToTension,
-                                                 Settlement origin) {
-        if (player == null) {
-            throw new IllegalStateException("Null player");
-        } else if (player == this) {
-            throw new IllegalStateException("Self tension!");
-        } else if (origin != null && origin.getOwner() != this) {
-            throw new IllegalStateException("Bogus origin:"
-                                            + origin.getId());
-        }
-
-        List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
-        Tension.Level oldLevel = getTension(player).getLevel();
-        getTension(player).modify(addToTension);
-        if (oldLevel != getTension(player).getLevel()) {
-            objects.add(this);
-        }
-
-        // Propagate tension change as settlement alarm to all
-        // settlements except the one that originated it (if any).
-        for (Settlement settlement : settlements) {
-            if (!settlement.equals(origin)) {
-                if (settlement.propagateAlarm(player, addToTension)) {
-                    objects.add(settlement);
-                }
-            }
-        }
-
-        return objects;
-    }
-
-    /**
-     * Sets the hostility against the given player.
-     *
-     * @param player The <code>Player</code>.
-     * @param newTension The <code>Tension</code>.
-     */
-    public void setTension(Player player, Tension newTension) {
-        if (player == this || player == null) {
-            return;
-        }
-        tension.put(player, newTension);
-    }
-
-    /**
-     * Gets the hostility this player has against the given player.
-     *
-     * @param player The <code>Player</code>.
-     * @return An object representing the tension level.
-     */
-    public Tension getTension(Player player) {
-        if (player == null) {
-            throw new IllegalStateException("Null player.");
-        } else {
-            Tension newTension = tension.get(player);
-            if (newTension == null) {
-                newTension = new Tension(Tension.TENSION_MIN);
-            }
-            tension.put(player, newTension);
-            return newTension;
-        }
-    }
-
-    /**
-     * Removes all tension with respect to a given player.  Used when a
-     * player leaves the game.
-     *
-     * @param player The <code>Player</code> to remove tension for.
-     */
-    public void removeTension(Player player) {
-        if (player != null) tension.remove(player);
-    }
-
-    /**
-     * Get the <code>History</code> value.
-     *
-     * @return a <code>List<HistoryEvent></code> value
-     */
-    public final List<HistoryEvent> getHistory() {
-        return history;
-    }
+    //
+    // AI helpers for evaluation settlement locations
+    //
 
     /**
      * Calculates the value of an outpost-type colony at this tile.
@@ -2910,426 +3476,100 @@ public class Player extends FreeColGameObject implements Nameable {
         return (int) (value * advantage);
     }
 
+
+    //
+    // Miscellaneous
+    //
+
     /**
-     * Returns the stance towards a given player. <BR>
-     * <BR>
-     * One of: WAR, CEASE_FIRE, PEACE and ALLIANCE.
+     * Get the feature container for this player.
      *
-     * @param player The <code>Player</code>.
-     * @return The stance.
+     * @return The <code>FeatureContainer</code>.
      */
-    public Stance getStance(Player player) {
-        return (player == null || stance.get(player.getId()) == null)
-            ? Stance.UNCONTACTED
-            : stance.get(player.getId());
+    @Override
+    public final FeatureContainer getFeatureContainer() {
+        return featureContainer;
     }
 
     /**
-     * Sets the stance towards a given player to one of
-     * WAR, CEASE_FIRE, PEACE and ALLIANCE.
+     * Standardized log of an instance of cheating by this player.
      *
-     * @param player The <code>Player</code>.
-     * @param newStance The new <code>Stance</code>.
-     * @return True if the stance change was valid.
-     * @throws IllegalArgumentException if player is null or this.
+     * @param what A description of the cheating.
      */
-    public boolean setStance(Player player, Stance newStance) {
-        if (player == null) {
-            throw new IllegalArgumentException("Player must not be 'null'.");
-        }
-        if (player == this) {
-            throw new IllegalArgumentException("Cannot set the stance towards ourselves.");
-        }
-        if (newStance == null) {
-            stance.remove(player.getId());
-            return true;
-        }
-        Stance oldStance = stance.get(player.getId());
-        if (newStance.equals(oldStance)) return true;
-
-        boolean valid = true;;
-        if ((newStance == Stance.CEASE_FIRE && oldStance != Stance.WAR)
-            || newStance == Stance.UNCONTACTED) {
-            valid = false;
-        }
-        stance.put(player.getId(), newStance);
-        return valid;
+    public void logCheat(String what) {
+        logger.finest("CHEAT: " + getGame().getTurn().getNumber()
+            + " " + Utils.lastPart(getNationId(), ".")
+            + " " + what);
     }
 
     /**
-     * Is this player at war with the specified one.
+     * Gets the maximum food consumption of any unit types
+     * available to this player.
      *
-     * @param player The <code>Player</code> to check.
-     * @return True if the players are at war.
+     * @return A maximum food consumption value.
      */
-    public boolean atWarWith(Player player) {
-        return getStance(player) == Stance.WAR;
-    }
-
-    /**
-     * Returns whether this player has met with the <code>Player</code> if the
-     * given <code>nation</code>.
-     *
-     * @param player The Player.
-     * @return <code>true</code> if this <code>Player</code> has contacted
-     *         the given nation.
-     */
-    public boolean hasContacted(Player player) {
-        return getStance(player) != Stance.UNCONTACTED;
-    }
-
-    /**
-     * Returns whether this player has met with any Europeans at all.
-     *
-     * @return <code>true</code> if this <code>Player</code> has contacted
-     *         any Europeans.
-     */
-    public boolean hasContactedEuropeans() {
-        for (Player other : getGame().getLiveEuropeanPlayers()) {
-            if (other != this && hasContacted(other)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    /**
-     * Returns whether this player has met with any natives at all.
-     *
-     * @return <code>true</code> if this <code>Player</code> has contacted
-     *         any natives.
-     */
-    public boolean hasContactedIndians() {
-        for (Player other : getGame().getPlayers()) {
-            if (other != this && !other.isDead() && other.isIndian()
-                && hasContacted(other)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Set this player as having made initial contact with another player.
-     * Always start with PEACE, which can go downhill fast.
-     *
-     * @param player1 a <code>Player</code> value
-     * @param player2 a <code>Player</code> value
-     */
-    public static void makeContact(Player player1, Player player2) {
-        player1.stance.put(player2.getId(), Stance.PEACE);
-        player2.stance.put(player1.getId(), Stance.PEACE);
-        player1.setTension(player2, new Tension(Tension.TENSION_MIN));
-        player2.setTension(player1, new Tension(Tension.TENSION_MIN));
-    }
-
-    /**
-     * Gets the price for a recruit in europe.
-     *
-     * @return The price of a single recruit in {@link Europe}.
-     */
-    public int getRecruitPrice() {
-        // return Math.max(0, (getCrossesRequired() - crosses) * 10);
-        return getEurope().getRecruitPrice();
-    }
-
-    /**
-     * Gets the current amount of liberty this <code>Player</code> has.
-     *
-     * @return This player's number of liberty earned towards the
-     *     current Founding Father.
-     */
-    public int getLiberty() {
-        return (canHaveFoundingFathers()) ? liberty : 0;
-    }
-
-    /**
-     * Sets the current amount of liberty this player has.
-     *
-     * @param liberty The new amount of liberty.
-     */
-    public void setLiberty(int liberty) {
-        this.liberty = liberty;
-    }
-
-    /**
-     * Adds to the current amount of liberty this player has.
-     *
-     * @param amount The additional amount of liberty.
-     */
-    public void incrementLiberty(int amount) {
-        setLiberty(Math.max(0, getLiberty() + amount));
-        if (playerType == PlayerType.REBEL) {
-            interventionBells += amount;
-        }
-    }
-
-    /**
-     * Returns how many total liberty will be produced if no colonies
-     * are lost and nothing unexpected happens.
-     *
-     * @return Total number of liberty this <code>Player</code>'s
-     *         <code>Colony</code>s will make.
-     * @see #incrementLiberty
-     */
-    public int getLibertyProductionNextTurn() {
-        int libertyNextTurn = 0;
-        for (Colony colony : getColonies()) {
-            for (GoodsType libertyGoods : getSpecification()
-                     .getLibertyGoodsTypeList()) {
-                libertyNextTurn += colony.getTotalProductionOf(libertyGoods);
-            }
-        }
-        return libertyNextTurn;
-    }
-
-    /**
-     * Reset the player iterators ready for a new turn.
-     */
-    public void resetIterators() {
-        nextActiveUnitIterator.reset();
-        nextGoingToUnitIterator.reset();
-    }
-
-    /**
-     * Returns the arrears due for a type of goods.
-     *
-     * @param type a <code>GoodsType</code> value
-     * @return The arrears due for this type of goods.
-     */
-    public int getArrears(GoodsType type) {
-        return getMarket().getArrears(type);
-    }
-
-    /**
-     * Returns the arrears due for a type of goods.
-     *
-     * @param goods The goods.
-     * @return The arrears due for this type of goods.
-     */
-    public int getArrears(Goods goods) {
-        return getArrears(goods.getType());
-    }
-
-    /**
-     * Returns true if type of goods can be traded in Europe.
-     *
-     * @param type The goods type.
-     * @return True if there are no arrears due for this type of goods.
-     */
-    public boolean canTrade(GoodsType type) {
-        return canTrade(type, Market.Access.EUROPE);
-    }
-
-    /**
-     * Returns true if type of goods can be traded at specified place.
-     *
-     * @param type The GoodsType.
-     * @param access The way the goods are traded (Europe OR Custom)
-     * @return <code>true</code> if type of goods can be traded.
-     */
-    public boolean canTrade(GoodsType type, Market.Access access) {
-        if (getMarket().getArrears(type) == 0) {
-            return true;
-        }
-        if (access == Market.Access.CUSTOM_HOUSE) {
-            if (getSpecification().getBoolean(GameOptions.CUSTOM_IGNORE_BOYCOTT)) {
-                return true;
-            }
-            if (hasAbility("model.ability.customHouseTradesWithForeignCountries")) {
-                for (Player otherPlayer : getGame().getLiveEuropeanPlayers()) {
-                    if (otherPlayer != this
-                        && (getStance(otherPlayer) == Stance.PEACE
-                            || getStance(otherPlayer) == Stance.ALLIANCE)) {
-                        return true;
+    public int getMaximumFoodConsumption() {
+        if (maximumFoodConsumption < 0) {
+            Specification spec = getSpecification();
+            for (UnitType unitType : spec.getUnitTypeList()) {
+                if (unitType.isAvailableTo(this)) {
+                    int foodConsumption = 0;
+                    for (GoodsType foodType : spec.getFoodGoodsTypeList()) {
+                        foodConsumption += unitType.getConsumptionOf(foodType);
+                    }
+                    if (foodConsumption > maximumFoodConsumption) {
+                        maximumFoodConsumption = foodConsumption;
                     }
                 }
             }
         }
-        return false;
+        return maximumFoodConsumption;
     }
 
     /**
-     * Returns true if type of goods can be traded at specified place
+     * Does this player own something?
      *
-     * @param goods The goods.
-     * @param access Place where the goods are traded (Europe OR Custom)
-     * @return True if type of goods can be traded.
+     * @param ownable The <code>Ownable</code> to check.
+     * @return True if the <code>Ownable</code> is ours.
      */
-    public boolean canTrade(Goods goods, Market.Access access) {
-        return canTrade(goods.getType(), access);
+    public boolean owns(Ownable ownable) {
+        return (ownable == null) ? false : this.equals(ownable.getOwner());
     }
 
     /**
-     * Returns true if type of goods can be traded in Europe.
+     * Get a <code>FreeColGameObject</code> with the specified
+     * identifier and class, owned by this player.
      *
-     * @param goods The goods.
-     * @return True if there are no arrears due for this type of goods.
-     */
-    public boolean canTrade(Goods goods) {
-        return canTrade(goods, Market.Access.EUROPE);
-    }
-
-    /**
-     * Returns the current tax.
+     * Used mainly in message decoding.
      *
-     * @return The current tax.
+     * @param id The identifier.
+     * @param returnClass The expected class of the object.
+     * @return The game object, or null if not found.
+     * @throws IllegalStateException on failure to validate the object
+     *     in any way.
      */
-    public int getTax() {
-        return tax;
-    }
-
-    /**
-     * Sets the current tax
-     *
-     * @param amount The new tax.
-     */
-    public void setTax(int amount) {
-        tax = amount;
-        if (recalculateBellsBonus()) {
-            for (Colony colony : getColonies()) {
-                colony.invalidateCache();
+    public <T extends FreeColGameObject> T getOurFreeColGameObject(String id,
+        Class<T> returnClass) throws IllegalStateException {
+        T t = getGame().getFreeColGameObject(id, returnClass);
+        if (t == null) {
+            throw new IllegalStateException("Not a " + returnClass.getName()
+                + ": " + id);
+        } else if (t instanceof Ownable) {
+            if (!owns((Ownable)t)) {
+                throw new IllegalStateException(returnClass.getName()
+                    + " not owned by " + getId() + ": " + id);
             }
+        } else {
+            throw new IllegalStateException("Not ownable: " + id);
         }
-    }
-
-    /**
-     * Recalculate bells bonus when tax changes.
-     *
-     * @return True if a bells bonus was set.
-     */
-    protected boolean recalculateBellsBonus() {
-        Set<Modifier> libertyBonus = getModifierSet("model.goods.bells");
-        boolean ret = false;
-        for (Ability ability : getAbilitySet("model.ability.addTaxToBells")) {
-            FreeColObject source = ability.getSource();
-            if (source != null) {
-                for (Modifier modifier : libertyBonus) {
-                    if (source.equals(modifier.getSource())) {
-                        modifier.setValue(tax);
-                        ret = true;
-                    }
-                }
-            }
-        }
-        return ret;
-    }
-
-    /**
-     * Returns the current sales.
-     *
-     * @param goodsType a <code>GoodsType</code> value
-     * @return The current sales.
-     */
-    public int getSales(GoodsType goodsType) {
-        return getMarket().getSales(goodsType);
-    }
-
-    /**
-     * Modifies the current sales.
-     *
-     * @param goodsType a <code>GoodsType</code> value
-     * @param amount The new sales.
-     */
-    public void modifySales(GoodsType goodsType, int amount) {
-        getMarket().modifySales(goodsType, amount);
-    }
-
-    /**
-     * Has a type of goods been traded?
-     *
-     * @param goodsType a <code>GoodsType</code> value
-     * @return Whether these goods have been traded.
-     */
-    public boolean hasTraded(GoodsType goodsType) {
-        return getMarket().hasBeenTraded(goodsType);
-    }
-
-    /**
-     * Returns the most valuable goods available in one of the
-     * player's colonies for the purposes of choosing a
-     * threat-to-boycott.  The goods must not currently be boycotted,
-     * the player must have traded in it, and the amount to be discarded
-     * will not exceed GoodsContainer.CARGO_SIZE.
-     *
-     * @return A goods object, or null.
-     */
-    public Goods getMostValuableGoods() {
-        if (!isEuropean()) return null;
-
-        Goods goods = null;
-        int highValue = 0;
-        for (Colony colony : getColonies()) {
-            for (Goods g : colony.getCompactGoods()) {
-                if (getArrears(g.getType()) <= 0 && hasTraded(g.getType())) {
-                    int amount = Math.min(g.getAmount(),
-                                          GoodsContainer.CARGO_SIZE);
-                    int value = market.getSalePrice(g.getType(), amount);
-                    if (value > highValue) {
-                        highValue = value;
-                        goods = g;
-                    }
-                }
-            }
-        }
-        return goods;
-    }
-
-    /**
-     * Returns the current incomeBeforeTaxes.
-     *
-     * @param goodsType The GoodsType.
-     * @return The current incomeBeforeTaxes.
-     */
-    public int getIncomeBeforeTaxes(GoodsType goodsType) {
-        return getMarket().getIncomeBeforeTaxes(goodsType);
-    }
-
-    /**
-     * Modifies the current incomeBeforeTaxes.
-     *
-     * @param goodsType The GoodsType.
-     * @param amount The new incomeBeforeTaxes.
-     */
-    public void modifyIncomeBeforeTaxes(GoodsType goodsType, int amount) {
-        getMarket().modifyIncomeBeforeTaxes(goodsType, amount);
-    }
-
-    /**
-     * Returns the current incomeAfterTaxes.
-     *
-     * @param goodsType The GoodsType.
-     * @return The current incomeAfterTaxes.
-     */
-    public int getIncomeAfterTaxes(GoodsType goodsType) {
-        return getMarket().getIncomeAfterTaxes(goodsType);
-    }
-
-    /**
-     * Modifies the current incomeAfterTaxes.
-     *
-     * @param goodsType The GoodsType.
-     * @param amount The new incomeAfterTaxes.
-     */
-    public void modifyIncomeAfterTaxes(GoodsType goodsType, int amount) {
-        getMarket().modifyIncomeAfterTaxes(goodsType, amount);
-    }
-
-    /**
-     * Add a HistoryEvent to this player.
-     *
-     * @param event The <code>HistoryEvent</code> to add.
-     */
-    public void addHistory(HistoryEvent event) {
-        history.add(event);
+        return t;
     }
 
     /**
      * Checks if the given <code>Player</code> equals this object.
      *
      * @param o The <code>Player</code> to compare against this object.
-     * @return <i>true</i> if the two <code>Player</code> are equal and none
-     *         of both have <code>nation == null</code> and <i>false</i>
-     *         otherwise.
+     * @return True if the players are the same.
      */
     public boolean equals(Player o) {
         if (o == null) {
@@ -3347,443 +3587,225 @@ public class Player extends FreeColGameObject implements Nameable {
         }
     }
 
-
     /**
-     * Gets the name index for a given key.
+     * Try to fix integrity problems with units that have no owner.
      *
-     * @param key The key to use.
+     * @return True if there were no problems, false if problems were found
+     *     and corrected.
      */
-    public int getNameIndex(String key) {
-        Integer val = nameIndex.get(key);
-        return (val == null) ? 0 : val;
-    }
-
-    /**
-     * Gets the name index for a given key.
-     *
-     * @param key The key to use.
-     */
-    public void setNameIndex(String key, int value) {
-        nameIndex.put(key, new Integer(value));
-    }
-
-    /**
-     * A predicate that can be applied to a unit.
-     */
-    public abstract class UnitPredicate {
-        public abstract boolean obtains(Unit unit);
-    }
-
-    /**
-     * A predicate for determining active units.
-     */
-    public class ActivePredicate extends UnitPredicate {
-
-        private final Player player;
-
-        /**
-         * Creates a new active predicate.
-         *
-         * @param player The owning <code>Player</code>.
-         */
-        public ActivePredicate(Player player) {
-            this.player = player;
-        }
-
-        /**
-         * Is the unit active and going nowhere, and thus available to
-         * be moved by the player?
-         *
-         * @return True if the unit can be moved.
-         */
-        public boolean obtains(Unit unit) {
-            return unit.couldMove();
-        }
-    }
-
-    /**
-     * A predicate for determining units going somewhere.
-     */
-    public class GoingToPredicate extends UnitPredicate {
-
-        private final Player player;
-
-        /**
-         * Creates a new going-to predicate.
-         *
-         * @param player The owning <code>Player</code>.
-         */
-        public GoingToPredicate(Player player) {
-            this.player = player;
-        }
-
-        /**
-         * Does this unit have orders to go somewhere?
-         *
-         * @return True if the unit has orders to go somewhere.
-         */
-        public boolean obtains(Unit unit) {
-            return !unit.isDisposed()
-                && unit.getOwner() == player
-                && unit.getState() != Unit.UnitState.SKIPPED
-                && unit.getMovesLeft() > 0
-                && (unit.getDestination() != null
-                    || unit.getTradeRoute() != null)
-                && !unit.isUnderRepair()
-                && !unit.isAtSea()
-                && !unit.isOnCarrier()
-                && !(unit.getLocation() instanceof WorkLocation);
-        }
-    }
-
-    /**
-     * Saves a LastSale record.
-     *
-     * @param sale The <code>LastSale</code> to save.
-     */
-    public void saveSale(LastSale sale) {
-        if (lastSales == null) lastSales = new HashMap<String, LastSale>();
-        lastSales.put(sale.getId(), sale);
-    }
-
-    /**
-     * Gets the current sales data for a location and goods type.
-     *
-     * @param where The <code>Location</code> of the sale.
-     * @param what The <code>GoodsType</code> sold.
-     *
-     * @return An appropriate <code>LastSaleData</code> record or null.
-     */
-    public LastSale getLastSale(Location where, GoodsType what) {
-        return (lastSales == null) ? null
-            : lastSales.get(LastSale.makeKey(where, what));
-    }
-
-    /**
-     * Gets the last sale price for a location and goods type as a string.
-     *
-     * @param where The <code>Location</code> of the sale.
-     * @param what The <code>GoodsType</code> sold.
-     * @return An abbreviation for the sale price, or null if none found.
-     */
-    public String getLastSaleString(Location where, GoodsType what) {
-        LastSale data = getLastSale(where, what);
-        return (data == null) ? null : String.valueOf(data.getPrice());
-    }
-
-    /**
-     * Get a <code>FreeColGameObject</code> with the specified id and
-     * class, owned by this player.
-     *
-     * @param id The id.
-     * @param returnClass The expected class of the object.
-     * @return The game object, or null if not found.
-     * @throws IllegalStateException on failure to validate the object
-     *     in any way.
-     */
-    public <T extends FreeColGameObject> T getOurFreeColGameObject(String id,
-        Class<T> returnClass) throws IllegalStateException {
-        T t = getGame().getFreeColGameObject(id, returnClass);
-        if (t == null) {
-            throw new IllegalStateException("Not a " + returnClass.getName()
-                + ": " + id);
-        } else if (t instanceof Ownable) {
-            if (this != ((Ownable)t).getOwner()) {
-                throw new IllegalStateException(returnClass.getName()
-                    + " not owned by " + getId() + ": " + id);
+    public boolean fixIntegrity() {
+        boolean result = true;
+        for (Unit unit : getUnits()) {
+            if (unit.getOwner() == null) {
+                logger.warning("Fixing " + unit.getId() + ": owner missing");
+                unit.setOwner(this);
+                result = false;
             }
-        } else {
-            throw new IllegalStateException("Not ownable: " + id);
         }
-        return t;
-    }
-
-    /**
-     * An <code>Iterator</code> of {@link Unit}s that can be made active.
-     */
-    public class UnitIterator implements Iterator<Unit> {
-
-        private Player owner;
-
-        private UnitPredicate predicate;
-
-        private List<Unit> units = null;
-
-        /**
-         * A comparator to compare units by position, top to bottom,
-         * left to right.
-         */
-        private final Comparator<Unit> xyComparator = new Comparator<Unit>() {
-            public int compare(Unit unit1, Unit unit2) {
-                Tile tile1 = unit1.getTile();
-                Tile tile2 = unit2.getTile();
-                int cmp = ((tile1 == null) ? 0 : tile1.getY())
-                    - ((tile2 == null) ? 0 : tile2.getY());
-                return (cmp != 0 || tile1 == null || tile2 == null) ? cmp
-                    : (tile1.getX() - tile2.getX());
-            }
-        };
-
-        /**
-         * Creates a new <code>UnitIterator</code>.
-         *
-         * @param owner The <code>Player</code> that needs an iterator of it's
-         *            units.
-         * @param predicate An object for deciding whether a <code>Unit</code>
-         *            should be included in the <code>Iterator</code> or not.
-         */
-        public UnitIterator(Player owner, UnitPredicate predicate) {
-            this.owner = owner;
-            this.predicate = predicate;
-            reset();
-        }
-
-        /**
-         * Reset the internal units list, initially only with units that
-         * satisfy the predicate.
-         */
-        public void reset() {
-            units = new ArrayList<Unit>();
-            for (Unit u : owner.getUnits()) {
-                if (predicate.obtains(u)) units.add(u);
-            }
-            Collections.sort(units, xyComparator);
-        }
-
-        /**
-         * Check if there is any more valid units.
-         * If there are, it will be at the head of the internal units list.
-         *
-         * @return True if there are any valid units left.
-         */
-        public boolean hasNext() {
-            // Try to find a unit that still satisfies the predicate.
-            while (!units.isEmpty()) {
-                if (predicate.obtains(units.get(0))) {
-                    return true; // Still valid
-                }
-                units.remove(0);
-            }
-            // Nothing left, so refill the units list.  If it is still
-            // empty then there is definitely nothing left.
-            reset();
-            return !units.isEmpty();
-        }
-
-        /**
-         * Get the next valid unit.
-         * Always call hasNext to enforce validity.
-         *
-         * @return The next valid unit, or null if none.
-         */
-        public Unit next() {
-            return (hasNext()) ? units.remove(0) : null;
-        }
-
-        /**
-         * Set the next valid unit.
-         *
-         * @param unit The <code>Unit</code> to put at the front of the list.
-         * @return True if the operation succeeds.
-         */
-        public boolean setNext(Unit unit) {
-            if (predicate.obtains(unit)) { // Of course, it has to be valid...
-                Unit first = (units.isEmpty()) ? null : units.get(0);
-                while (!units.isEmpty()) {
-                    if (units.get(0) == unit) return true;
-                    units.remove(0);
-                }
-                reset();
-                while (!units.isEmpty() && units.get(0) != first) {
-                    if (units.get(0) == unit) return true;
-                    units.remove(0);
-                }
-            }
-            return false;
-        }
-
-        /**
-         * Removes from the underlying collection the last element returned by
-         * the iterator (optional operation).
-         *
-         * @exception UnsupportedOperationException no matter what.
-         */
-        public void remove() {
-            throw new UnsupportedOperationException();
-        }
-
-        /**
-         * Removes a specific unit from this unit iterator.
-         *
-         * @param u The <code>Unit</code> to remove.
-         * @return True if the unit was removed.
-         */
-        public boolean remove(Unit u) {
-            return units.remove(u);
-        }
+        return result;
     }
 
 
     // Serialization
 
+    private static final String ADMIN_TAG = "admin";
+    private static final String AI_TAG = "ai";
+    private static final String ATTACKED_BY_PRIVATEERS_TAG = "attackedByPrivateers";
+    private static final String BANKRUPT_TAG = "bankrupt";
+    private static final String CURRENT_FATHER_TAG = "currentFather";
+    private static final String DEAD_TAG = "dead";
+    private static final String ENTRY_LOCATION_TAG = "entryLocation";
+    private static final String FOUNDING_FATHERS_TAG = "foundingFathers";
+    private static final String GOLD_TAG = "gold";
+    private static final String IMMIGRATION_TAG = "immigration";
+    private static final String IMMIGRATION_REQUIRED_TAG = "immigrationRequired";
+    private static final String LIBERTY_TAG = "liberty";
+    private static final String INDEPENDENT_NATION_NAME_TAG = "independentNationName";
+    private static final String INTERVENTION_BELLS_TAG = "interventionBells";
+    private static final String NATION_ID_TAG = "nationID";
+    private static final String NATION_TYPE_TAG = "nationType";
+    private static final String NEW_LAND_NAME_TAG = "newLandName";
+    private static final String NUMBER_OF_SETTLEMENTS_TAG = "numberOfSettlements";
+    private static final String OFFERED_FATHERS_TAG = "offeredFathers";
+    private static final String OLD_SOL_TAG = "oldSoL";
+    private static final String PLAYER_TAG = "player";
+    private static final String PLAYER_TYPE_TAG = "playerType";
+    private static final String READY_TAG = "ready";
+    private static final String SCORE_TAG = "score";
+    private static final String STANCE_TAG = "stance";
+    private static final String TAX_TAG = "tax";
+    private static final String TENSION_TAG = "tension";
+    private static final String USERNAME_TAG = "username";
+
+
     /**
-     * This method writes an XML-representation of this object to the given
-     * stream. <br>
-     * <br>
-     * Only attributes visible to the given <code>Player</code> will be added
-     * to that representation if <code>showAll</code> is set to
-     * <code>false</code>.
-     *
-     * @param out The target stream.
-     * @param player The <code>Player</code> this XML-representation should be
-     *            made for, or <code>null</code> if
-     *            <code>showAll == true</code>.
-     * @param showAll Only attributes visible to <code>player</code> will be
-     *            added to the representation if <code>showAll</code> is set
-     *            to <i>false</i>.
-     * @param toSavedGame If <code>true</code> then information that is only
-     *            needed when saving a game is added.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
+     * {@inheritDoc}
      */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out, Player player,
-                             boolean showAll, boolean toSavedGame)
-        throws XMLStreamException {
-        // Start element:
-        out.writeStartElement(getXMLElementTagName());
-
-        writeAttributes(out, player, showAll, toSavedGame);
-        writeChildren(out, player, showAll, toSavedGame);
-
-        out.writeEndElement();
+                             boolean showAll,
+                             boolean toSavedGame) throws XMLStreamException {
+        super.toXML(out, getXMLElementTagName(), player, showAll, toSavedGame);
     }
 
-
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void writeAttributes(XMLStreamWriter out, Player player,
-                                   boolean showAll, boolean toSavedGame)
-        throws XMLStreamException {
+                                   boolean showAll,
+                                   boolean toSavedGame) throws XMLStreamException {
+        super.writeAttributes(out);
 
-        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
-        out.writeAttribute("username", name);
-        out.writeAttribute("nationID", nationID);
+        writeAttribute(out, USERNAME_TAG, name);
+
+        writeAttribute(out, NATION_ID_TAG, nationId);
+
         if (nationType != null) {
-            out.writeAttribute("nationType", nationType.getId());
+            writeAttribute(out, NATION_TYPE_TAG, nationType);
         }
-        out.writeAttribute("admin", Boolean.toString(admin));
-        out.writeAttribute("ready", Boolean.toString(ready));
-        out.writeAttribute("dead", Boolean.toString(dead));
-        out.writeAttribute("bankrupt", Boolean.toString(bankrupt));
-        out.writeAttribute("playerType", playerType.toString());
-        out.writeAttribute("ai", Boolean.toString(ai));
-        out.writeAttribute("tax", Integer.toString(tax));
+
+        writeAttribute(out, ADMIN_TAG, admin);
+
+        writeAttribute(out, READY_TAG, ready);
+
+        writeAttribute(out, DEAD_TAG, dead);
+
+        writeAttribute(out, BANKRUPT_TAG, bankrupt);
+
+        writeAttribute(out, PLAYER_TYPE_TAG, playerType);
+
+        writeAttribute(out, AI_TAG, ai);
+
+        writeAttribute(out, TAX_TAG, tax);
 
         // @compat 0.9.x
-        out.writeAttribute("numberOfSettlements", Integer.toString(getNumberOfSettlements()));
+        writeAttribute(out, NUMBER_OF_SETTLEMENTS_TAG, getNumberOfSettlements());
         // end compatibility code
 
-        if (showAll || toSavedGame || equals(player)) {
-            out.writeAttribute("gold", Integer.toString(gold));
-            out.writeAttribute("immigration", Integer.toString(immigration));
-            out.writeAttribute("liberty", Integer.toString(liberty));
-            out.writeAttribute("interventionBells", Integer.toString(interventionBells));
+        if (showAll || toSavedGame || this == player) {
+            writeAttribute(out, GOLD_TAG, gold);
+
+            writeAttribute(out, IMMIGRATION_TAG, immigration);
+
+            writeAttribute(out, LIBERTY_TAG, liberty);
+
+            writeAttribute(out, INTERVENTION_BELLS_TAG, interventionBells);
+
             if (currentFather != null) {
-                out.writeAttribute("currentFather", currentFather.getId());
+                writeAttribute(out, CURRENT_FATHER_TAG, currentFather);
             }
-            out.writeAttribute("immigrationRequired", Integer.toString(immigrationRequired));
-            out.writeAttribute("attackedByPrivateers", Boolean.toString(attackedByPrivateers));
-            out.writeAttribute("oldSoL", Integer.toString(oldSoL));
-            out.writeAttribute("score", Integer.toString(score));
+
+            writeAttribute(out, IMMIGRATION_REQUIRED_TAG, immigrationRequired);
+
+            writeAttribute(out, ATTACKED_BY_PRIVATEERS_TAG, attackedByPrivateers);
+            writeAttribute(out, OLD_SOL_TAG, oldSoL);
+
+            writeAttribute(out, SCORE_TAG, score);
+
         } else {
-            out.writeAttribute("gold", Integer.toString(-1));
-            out.writeAttribute("immigration", Integer.toString(-1));
-            out.writeAttribute("liberty", Integer.toString(-1));
-            out.writeAttribute("immigrationRequired", Integer.toString(-1));
+            writeAttribute(out, GOLD_TAG, -1);
+
+            writeAttribute(out, IMMIGRATION_TAG, -1);
+
+            writeAttribute(out, LIBERTY_TAG, -1);
+
+            writeAttribute(out, IMMIGRATION_REQUIRED_TAG, -1);
         }
+
         if (newLandName != null) {
-            out.writeAttribute("newLandName", newLandName);
+            writeAttribute(out, NEW_LAND_NAME_TAG, newLandName);
         }
+
         if (independentNationName != null) {
-            out.writeAttribute("independentNationName", independentNationName);
+            writeAttribute(out, INDEPENDENT_NATION_NAME_TAG, independentNationName);
         }
+
         if (entryLocation != null) {
-            out.writeAttribute("entryLocation", entryLocation.getId());
+            writeLocationAttribute(out, ENTRY_LOCATION_TAG, entryLocation);
         }
+
         for (RegionType regionType : RegionType.values()) {
             String key = regionType.getNameIndexKey();
             int index = getNameIndex(key);
-            if (index > 0) out.writeAttribute(key, Integer.toString(index));
+            if (index > 0) writeAttribute(out, key, index);
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void writeChildren(XMLStreamWriter out, Player player,
-                                 boolean showAll, boolean toSavedGame)
-        throws XMLStreamException {
-
+                                 boolean showAll,
+                                 boolean toSavedGame) throws XMLStreamException {
         if (market != null) {
             market.toXML(out, player, showAll, toSavedGame);
         }
-        if (showAll || toSavedGame || equals(player)) {
-            for (Entry<Player, Tension> entry : tension.entrySet()) {
+
+        if (showAll || toSavedGame || this == player) {
+            for (Player p : getSortedCopy(tension.keySet())) {
                 out.writeStartElement(TENSION_TAG);
-                out.writeAttribute("player", entry.getKey().getId());
-                out.writeAttribute(VALUE_TAG, String.valueOf(entry.getValue().getValue()));
+
+                writeAttribute(out, PLAYER_TAG, p);
+
+                writeAttribute(out, VALUE_TAG, tension.get(p).getValue());
+
                 out.writeEndElement();
             }
 
-            for (Entry<String, Stance> entry : stance.entrySet()) {
+            List<String> playerIds = new ArrayList<String>(stance.keySet());
+            Collections.sort(playerIds);
+            for (String pid : playerIds) {
+                Stance s = stance.get(pid);
+                if (s == Stance.UNCONTACTED) continue;
+
                 out.writeStartElement(STANCE_TAG);
-                out.writeAttribute("player", entry.getKey());
-                out.writeAttribute(VALUE_TAG, entry.getValue().toString());
+
+                writeAttribute(out, PLAYER_TAG, pid);
+
+                writeAttribute(out, VALUE_TAG, stance.get(pid));
+
                 out.writeEndElement();
             }
 
-            for (HistoryEvent event : history) {
+            for (HistoryEvent event : history) { // Already in order
                 event.toXML(out);
             }
 
-            for (TradeRoute route : tradeRoutes) {
+            for (TradeRoute route : getSortedCopy(tradeRoutes)) {
                 route.toXML(out, this, false, false);
             }
 
             if (highSeas != null) {
+                // TODO: toXML!?!
                 highSeas.toXMLImpl(out, player, showAll, toSavedGame);
             }
+            
+            writeToListElement(out, FOUNDING_FATHERS_TAG, foundingFathers);
 
-            out.writeStartElement(FOUNDING_FATHER_TAG);
-            out.writeAttribute(ARRAY_SIZE_TAG, Integer.toString(allFathers.size()));
-            int index = 0;
-            for (FoundingFather father : allFathers) {
-                out.writeAttribute("x" + Integer.toString(index), father.getId());
-                index++;
-            }
-            out.writeEndElement();
-
-            out.writeStartElement(OFFERED_FATHER_TAG);
-            out.writeAttribute(ARRAY_SIZE_TAG, Integer.toString(offeredFathers.size()));
-            index = 0;
-            for (FoundingFather father : offeredFathers) {
-                out.writeAttribute("x" + Integer.toString(index), father.getId());
-                index++;
-            }
-            out.writeEndElement();
+            writeToListElement(out, OFFERED_FATHERS_TAG, offeredFathers);
 
             if (europe != null) {
                 europe.toXML(out, player, showAll, toSavedGame);
             }
+
             if (monarch != null) {
                 monarch.toXML(out, player, showAll, toSavedGame);
             }
-            if (!modelMessages.isEmpty()) {
-                for (ModelMessage m : modelMessages) {
-                    m.toXML(out);
-                }
+
+            for (ModelMessage m : getSortedCopy(modelMessages)) {
+                m.toXML(out);
             }
+
             if (lastSales != null) {
-                for (LastSale sale : lastSales.values()) sale.toXML(out);
+                for (LastSale sale : getSortedCopy(lastSales.values())) {
+                    sale.toXML(out);
+                }
             }
 
             Turn turn = getGame().getTurn();
-            for (Modifier modifier : getModifiers()) {
+            for (Modifier modifier : getSortedModifiers()) {
                 if (modifier.isTemporary() && !modifier.isOutOfDate(turn)) {
                     modifier.toXML(out);
                 }
@@ -3793,77 +3815,124 @@ public class Player extends FreeColGameObject implements Nameable {
             Tension t = getTension(player);
             if (t != null) {
                 out.writeStartElement(TENSION_TAG);
-                out.writeAttribute("player", player.getId());
-                out.writeAttribute(VALUE_TAG, String.valueOf(t.getValue()));
+
+                writeAttribute(out, PLAYER_TAG, player);
+
+                writeAttribute(out, VALUE_TAG, t.getValue());
+
                 out.writeEndElement();
             }
+
             Stance s = getStance(player);
-            if (s != null) {
+            if (s != null && s != Stance.UNCONTACTED) {
                 out.writeStartElement(STANCE_TAG);
-                out.writeAttribute("player", player.getId());
-                out.writeAttribute(VALUE_TAG, s.toString());
+                
+                writeAttribute(out, PLAYER_TAG, player);
+
+                writeAttribute(out, VALUE_TAG, s);
+
                 out.writeEndElement();
             }
         }
     }
 
     /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
+     * {@inheritDoc}
      */
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
-        name = in.getAttributeValue(null, "username");
-        nationID = in.getAttributeValue(null, "nationID");
-        if (!isUnknownEnemy()) {
-            nationType = getSpecification().getNationType(in.getAttributeValue(null, "nationType"));
-        }
-        admin = getAttribute(in, "admin", false);
-        gold = Integer.parseInt(in.getAttributeValue(null, "gold"));
-        immigration = getAttribute(in, "immigration", 0);
-        liberty = getAttribute(in, "liberty", 0);
-        interventionBells = getAttribute(in, "interventionBells", 0);
-        oldSoL = getAttribute(in, "oldSoL", 0);
-        score = getAttribute(in, "score", 0);
-        ready = getAttribute(in, "ready", false);
-        ai = getAttribute(in, "ai", false);
-        dead = getAttribute(in, "dead", false);
-        bankrupt = getAttribute(in, "bankrupt", false);
-        tax = Integer.parseInt(in.getAttributeValue(null, "tax"));
-        playerType = Enum.valueOf(PlayerType.class, in.getAttributeValue(null, "playerType"));
-        currentFather = getSpecification().getType(in, "currentFather", FoundingFather.class, null);
-        immigrationRequired = getAttribute(in, "immigrationRequired", 12);
-        newLandName = getAttribute(in, "newLandName", (String)null);
-        independentNationName = getAttribute(in, "independentNationName", (String)null);
+    @Override
+    protected void toXMLPartialImpl(XMLStreamWriter out,
+                                    String[] fields) throws XMLStreamException {
+        toXMLPartialByClass(out, getClass(), fields);
+    }
 
-        attackedByPrivateers = getAttribute(in, "attackedByPrivateers", false);
-        final String entryLocationStr = in.getAttributeValue(null, "entryLocation");
-        if (entryLocationStr != null) {
-            FreeColGameObject fcgo = getGame().getFreeColGameObject(entryLocationStr);
-            entryLocation = (fcgo instanceof Location) ? (Location)fcgo
-                : new Tile(getGame(), entryLocationStr);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void readFromXMLPartialImpl(XMLStreamReader in) throws XMLStreamException {
+        readFromXMLPartialByClass(in, getClass());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        final Specification spec = getSpecification();
+        final Game game = getGame();
+
+        super.readAttributes(in);
+
+        name = getAttribute(in, USERNAME_TAG, (String)null);
+
+        nationId = getAttribute(in, NATION_ID_TAG, (String)null);
+
+        if (isUnknownEnemy()) {
+            nationType = null;
+        } else {
+            nationType = spec.getType(in, NATION_TYPE_TAG,
+                                      NationType.class, (NationType)null);
+            if (nationType != null) addFeatures(nationType);
         }
+
+        admin = getAttribute(in, ADMIN_TAG, false);
+
+        gold = getAttribute(in, GOLD_TAG, 0);
+
+        immigration = getAttribute(in, IMMIGRATION_TAG, 0);
+
+        liberty = getAttribute(in, LIBERTY_TAG, 0);
+
+        interventionBells = getAttribute(in, INTERVENTION_BELLS_TAG, 0);
+
+        oldSoL = getAttribute(in, OLD_SOL_TAG, 0);
+
+        score = getAttribute(in, SCORE_TAG, 0);
+
+        ready = getAttribute(in, READY_TAG, false);
+
+        ai = getAttribute(in, AI_TAG, false);
+
+        dead = getAttribute(in, DEAD_TAG, false);
+
+        bankrupt = getAttribute(in, BANKRUPT_TAG, false);
+
+        tax = getAttribute(in, TAX_TAG, 0);
+
+        playerType = getAttribute(in, PLAYER_TYPE_TAG,
+                                  PlayerType.class, (PlayerType)null);
+
+        currentFather = spec.getType(in, CURRENT_FATHER_TAG,
+                                     FoundingFather.class, (FoundingFather)null);
+
+        immigrationRequired = getAttribute(in, IMMIGRATION_REQUIRED_TAG, 12);
+
+        newLandName = getAttribute(in, NEW_LAND_NAME_TAG, (String)null);
+
+        independentNationName = getAttribute(in, INDEPENDENT_NATION_NAME_TAG,
+                                             (String)null);
+
+        attackedByPrivateers = getAttribute(in, ATTACKED_BY_PRIVATEERS_TAG,
+                                            false);
+
+        entryLocation = makeLocationAttribute(in, ENTRY_LOCATION_TAG, game);
+
         for (RegionType regionType : RegionType.values()) {
             String key = regionType.getNameIndexKey();
             int index = getAttribute(in, key, -1);
             if (index > 0) setNameIndex(key, index);
         }
+    }
 
-        if (nationType != null) addFeatures(nationType);
-        switch (playerType) {
-        case REBEL:
-        case INDEPENDENT:
-            addAbility(new Ability("model.ability.independenceDeclared"));
-            break;
-        default:
-            // no special abilities for other playertypes, but silent warning about unused enum.
-            break;
-        }
-
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        // Clear containers.
         tension.clear();
         stance.clear();
-        allFathers.clear();
+        foundingFathers.clear();
         offeredFathers.clear();
         europe = null;
         monarch = null;
@@ -3872,105 +3941,97 @@ public class Player extends FreeColGameObject implements Nameable {
         modelMessages.clear();
         lastSales = null;
         highSeas = null;
-    }
 
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
-        final Specification spec = getSpecification();
+        super.readChildren(in);
 
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if (in.getLocalName().equals(TENSION_TAG)) {
-                Player player = makeFreeColGameObject(in, "player",
-                                                      Player.class);
-                tension.put(player, new Tension(getAttribute(in, VALUE_TAG, 0)));
-                closeTag(in, TENSION_TAG);
-            } else if (in.getLocalName().equals(FOUNDING_FATHER_TAG)) {
-                List<FoundingFather> ffs = readFromListElement(in, FOUNDING_FATHER_TAG, spec, FoundingFather.class);
-                allFathers.addAll(ffs);
-            } else if (in.getLocalName().equals(OFFERED_FATHER_TAG)) {
-                List<FoundingFather> ofs = readFromListElement(in, OFFERED_FATHER_TAG, spec, FoundingFather.class);
-                offeredFathers.addAll(ofs);
-            } else if (in.getLocalName().equals(STANCE_TAG)) {
-                String playerId = in.getAttributeValue(null, "player");
-                stance.put(playerId, Enum.valueOf(Stance.class, in.getAttributeValue(null, VALUE_TAG)));
-                closeTag(in, STANCE_TAG);
-            } else if (in.getLocalName().equals(HighSeas.getXMLElementTagName())) {
-                highSeas = readFreeColGameObject(in, HighSeas.class);
-            } else if (in.getLocalName().equals(Europe.getXMLElementTagName())) {
-                europe = readFreeColGameObject(in, Europe.class);
-            } else if (in.getLocalName().equals(Monarch.getXMLElementTagName())) {
-                monarch = readFreeColGameObject(in, Monarch.class);
-            } else if (in.getLocalName().equals(HistoryEvent.getXMLElementTagName())) {
-                HistoryEvent event = new HistoryEvent();
-                event.readFromXML(in);
-                getHistory().add(event);
-            } else if (in.getLocalName().equals(TradeRoute.getXMLElementTagName())) {
-                TradeRoute route = readFreeColGameObject(in, TradeRoute.class);
-                tradeRoutes.add(route);
-            } else if (in.getLocalName().equals(Market.getXMLElementTagName())) {
-                market = readFreeColGameObject(in, Market.class);
-            } else if (in.getLocalName().equals(ModelMessage.getXMLElementTagName())) {
-
-                ModelMessage message = new ModelMessage();
-                message.readFromXML(in);
-                addModelMessage(message);
-            } else if (in.getLocalName().equals(LastSale.getXMLElementTagName())) {
-                LastSale lastSale = new LastSale();
-                lastSale.readFromXML(in);
-                saveSale(lastSale);
-            } else if (Modifier.getXMLElementTagName().equals(in.getLocalName())) {
-                addModifier(new Modifier(in, getSpecification()));
-            } else {
-                logger.warning("Unknown tag: " + in.getLocalName() + " loading player");
-                in.nextTag();
-            }
-        }
-
-        // sanity check: we should be on the closing tag
-        if (!in.getLocalName().equals(Player.getXMLElementTagName())) {
-            logger.warning("Error parsing xml: expecting closing tag </" + Player.getXMLElementTagName() + "> "
-                           + "found instead: " + in.getLocalName());
-        }
-
-        // TODO: This should no longer happen.  Remove soon (early 2012)
-        // if further testing never triggers the following warning.
-        if (market == null) {
-            logger.warning("Null market for " + getName());
-            Thread.dumpStack();
-            market = new Market(getGame(), this);
+        // Dynamic abilities are not currently saved.  TODO: better?
+        switch (playerType) {
+        case REBEL: case INDEPENDENT:
+            addAbility(new Ability("model.ability.independenceDeclared"));
+            break;
+        default: // No other special abilities, just silence the warning.
+            break;
         }
 
         // Bells bonuses depend on tax
         recalculateBellsBonus();
 
         invalidateCanSeeTiles();
-
     }
 
     /**
-     * Partial writer for players, so that simple updates to fields such
-     * as gold can be brief.
-     *
-     * @param out The target stream.
-     * @param fields The fields to write.
-     * @throws XMLStreamException If there are problems writing the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void toXMLPartialImpl(XMLStreamWriter out, String[] fields)
-        throws XMLStreamException {
-        toXMLPartialByClass(out, getClass(), fields);
-    }
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+        final Specification spec = getSpecification();
+        final String tag = in.getLocalName();
 
-    /**
-     * Partial reader for players, so that simple updates to fields such
-     * as gold can be brief.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException If there are problems reading the stream.
-     */
-    @Override
-    public void readFromXMLPartialImpl(XMLStreamReader in)
-        throws XMLStreamException {
-        readFromXMLPartialByClass(in, getClass());
+        if (FOUNDING_FATHERS_TAG.equals(tag)) {
+            List<FoundingFather> ffs
+                = readFromListElement(in, FOUNDING_FATHERS_TAG,
+                                      spec, FoundingFather.class);
+            if (ffs != null) foundingFathers.addAll(ffs);
+        
+        } else if (OFFERED_FATHERS_TAG.equals(tag)) {
+            List<FoundingFather> ofs
+                = readFromListElement(in, OFFERED_FATHERS_TAG,
+                                      spec, FoundingFather.class);
+            if (ofs != null) offeredFathers.addAll(ofs);
+
+        } else if (STANCE_TAG.equals(tag)) {
+            String playerId = getAttribute(in, PLAYER_TAG, (String)null);
+            if (playerId != null) {
+                stance.put(playerId, getAttribute(in, VALUE_TAG,
+                        Stance.class, Stance.UNCONTACTED));
+            }
+            closeTag(in, STANCE_TAG);
+
+        } else if (TENSION_TAG.equals(tag)) {
+            Player p = makeFreeColGameObject(in, PLAYER_TAG, Player.class);
+            if (p != null) {
+                tension.put(p, new Tension(getAttribute(in, VALUE_TAG, 0)));
+            }
+            closeTag(in, TENSION_TAG);
+        
+        } else if (Europe.getXMLElementTagName().equals(tag)) {
+            europe = readFreeColGameObject(in, Europe.class);
+
+        } else if (HighSeas.getXMLElementTagName().equals(tag)) {
+            highSeas = readFreeColGameObject(in, HighSeas.class);
+
+        } else if (HistoryEvent.getXMLElementTagName().equals(tag)) {
+            HistoryEvent event = new HistoryEvent();
+            event.readFromXML(in);
+            getHistory().add(event);
+
+        } else if (LastSale.getXMLElementTagName().equals(tag)) {
+            LastSale lastSale = new LastSale();
+            lastSale.readFromXML(in);
+            addLastSale(lastSale);
+
+        } else if (Market.getXMLElementTagName().equals(tag)) {
+            market = readFreeColGameObject(in, Market.class);
+
+        } else if (ModelMessage.getXMLElementTagName().equals(tag)) {
+            ModelMessage message = new ModelMessage();
+            message.readFromXML(in);
+            addModelMessage(message);
+
+        } else if (Modifier.getXMLElementTagName().equals(tag)) {
+            Modifier m = new Modifier(in, spec); 
+            if (m != null) addModifier(m);
+
+        } else if (Monarch.getXMLElementTagName().equals(tag)) {
+            monarch = readFreeColGameObject(in, Monarch.class);
+
+        } else if (TradeRoute.getXMLElementTagName().equals(tag)) {
+            TradeRoute route = readFreeColGameObject(in, TradeRoute.class);
+            if (route != null) tradeRoutes.add(route);
+
+        } else {
+            super.readChild(in);
+        }
     }
 
     /**
@@ -3978,7 +4039,9 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     @Override
     public String toString() {
-        return getName() + " (" + nationID + ")";
+        StringBuilder sb = new StringBuilder(32);
+        sb.append(getName()).append(" (").append(nationId).append(")");
+        return sb.toString();
     }
 
     /**

@@ -110,7 +110,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         super(game);
         setLocation(location);
         setType(getSpecification().getUnitType(template.getType().getId()));
-        setOwner(((ServerGame) game).getPlayer(template.getOwner().getNationID()));
+        setOwner(((ServerGame) game).getPlayer(template.getOwner().getNationId()));
         setNationality(template.getNationality());
         setEthnicity(template.getEthnicity());
         visibleGoodsCount = -1;
@@ -132,7 +132,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         setRole();
         setStateUnchecked(template.getState());
 
-        owner.setUnit(this);
+        owner.addUnit(this);
         owner.invalidateCanSeeTiles();
         owner.modifyScore(unitType.getScoreValue());
     }
@@ -160,7 +160,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         unitType = (newType == null) ? type : newType;
         this.owner = owner;
         if (isPerson()) {
-            nationality = owner.getNationID();
+            nationality = owner.getNationId();
             ethnicity = nationality;
         }
         setLocation(location);
@@ -181,7 +181,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         setRole();
         setStateUnchecked(state);
 
-        owner.setUnit(this);
+        owner.addUnit(this);
         owner.invalidateCanSeeTiles();
         owner.modifyScore(unitType.getScoreValue());
     }

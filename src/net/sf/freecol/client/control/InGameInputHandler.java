@@ -499,9 +499,9 @@ public final class InGameInputHandler extends InputHandler {
         if (player == newPlayer) { // Prepare client for our player turn.
             try {
                 List<Settlement> settlements = player.getSettlements();
-                Tile defTile = ((settlements.size() > 0)
-                    ? settlements.get(0).getTile()
-                    : player.getEntryLocation().getTile()).getSafeTile(null, null);
+                Tile defTile = ((settlements.isEmpty())
+                    ? player.getEntryLocation().getTile()
+                    : settlements.get(0).getTile()).getSafeTile(null, null);
                 player.resetIterators();
                 fcc.getInGameController().nextActiveUnit(defTile);
             } catch (Exception e) {
@@ -957,7 +957,7 @@ public final class InGameInputHandler extends InputHandler {
             + " -> " + stance.toString());
         if (player == first && old == Stance.UNCONTACTED) {
             gui.playSound("sound.event.meet."
-                + second.getNationID());
+                + second.getNationId());
         }
         return null;
     }
@@ -1042,7 +1042,7 @@ public final class InGameInputHandler extends InputHandler {
             } else if (tag == LastSale.getXMLElementTagName()) {
                 LastSale s = new LastSale();
                 s.readFromXMLElement(e);
-                player.saveSale(s);
+                player.addLastSale(s);
             } else if (tag == ModelMessage.getXMLElementTagName()) {
                 ModelMessage m = new ModelMessage();
                 m.readFromXMLElement(e);

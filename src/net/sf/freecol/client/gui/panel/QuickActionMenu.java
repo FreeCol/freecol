@@ -675,7 +675,7 @@ public final class QuickActionMenu extends JPopupMenu {
         this.add(name);
 
         if (!(goods.getLocation() instanceof Colony)) {
-            if (freeColClient.getMyPlayer().canTrade(goods)) {
+            if (freeColClient.getMyPlayer().canTrade(goods.getType())) {
                 JMenuItem unload = new JMenuItem(Messages.message("unload"));
                 unload.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {

@@ -140,7 +140,7 @@ public class HighScore extends FreeColObject {
             }
         }
         playerName = player.getName();
-        nationID = player.getNationID();
+        nationID = player.getNationId();
         nationTypeID = player.getNationType().getId();
         colonies = player.getColonies().size();
         units = player.getUnits().size();

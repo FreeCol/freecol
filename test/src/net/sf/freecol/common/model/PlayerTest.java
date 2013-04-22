@@ -62,18 +62,18 @@ public class PlayerTest extends FreeColTestCase {
         }
         assertTrue(count == 4);
 
-        assertTrue(dutch.getUnit(unit1.getId()) == unit1);
-        assertTrue(dutch.getUnit(unit2.getId()) == unit2);
-        assertTrue(dutch.getUnit(unit3.getId()) == unit3);
-        assertTrue(dutch.getUnit(unit4.getId()) == unit4);
+        assertTrue(dutch.getUnitById(unit1.getId()) == unit1);
+        assertTrue(dutch.getUnitById(unit2.getId()) == unit2);
+        assertTrue(dutch.getUnitById(unit3.getId()) == unit3);
+        assertTrue(dutch.getUnitById(unit4.getId()) == unit4);
 
         String id = unit1.getId();
         unit1.dispose();
-        assertTrue(dutch.getUnit(id) == null);
+        assertTrue(dutch.getUnitById(id) == null);
 
         unit2.setOwner(french);
-        assertTrue(dutch.getUnit(unit2.getId()) == null);
-        assertTrue(french.getUnit(unit2.getId()) == unit2);
+        assertTrue(dutch.getUnitById(unit2.getId()) == null);
+        assertTrue(french.getUnitById(unit2.getId()) == unit2);
 
     }
 
@@ -81,8 +81,7 @@ public class PlayerTest extends FreeColTestCase {
         assertTrue(player.canBuildColonies());
         assertTrue(player.canHaveFoundingFathers());
         assertTrue(player.canMoveToEurope());
-        assertTrue(player.canRecruitUnits());
-        assertEquals(player.getPlayerType(), Player.PlayerType.COLONIAL);
+        assertTrue(player.isColonial());
         assertFalse(player.isDead());
         assertTrue(player.isEuropean());
         assertFalse(player.isIndian());
@@ -94,8 +93,7 @@ public class PlayerTest extends FreeColTestCase {
         assertFalse(player.canBuildColonies());
         assertFalse(player.canHaveFoundingFathers());
         assertFalse(player.canMoveToEurope());
-        assertFalse(player.canRecruitUnits());
-        assertEquals(player.getPlayerType(), Player.PlayerType.NATIVE);
+        assertFalse(player.isColonial());
         assertFalse(player.isDead());
         assertFalse(player.isEuropean());
         assertTrue(player.isIndian());
@@ -107,7 +105,7 @@ public class PlayerTest extends FreeColTestCase {
         assertFalse(player.canBuildColonies());
         assertFalse(player.canHaveFoundingFathers());
         assertTrue(player.canMoveToEurope());
-        assertFalse(player.canRecruitUnits());
+        assertFalse(player.isColonial());
         assertEquals(player.getPlayerType(), Player.PlayerType.ROYAL);
         assertFalse(player.isDead());
         assertTrue(player.isEuropean());
@@ -289,7 +287,7 @@ public class PlayerTest extends FreeColTestCase {
         assertEquals("Wrong number of units for dutch player",1,dutch.getUnits().size());
 
         try{
-            french.setUnit(colonist);
+            french.addUnit(colonist);
             fail("An IllegalStateException should have been raised");
         }
         catch(IllegalStateException e){

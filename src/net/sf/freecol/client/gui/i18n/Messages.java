@@ -715,7 +715,7 @@ public class Messages {
 
     public static String getNewLandName(Player player) {
         if (player.getNewLandName() == null) {
-            return message(player.getNationID() + ".newLandName");
+            return message(player.getNationId() + ".newLandName");
         } else {
             return player.getNewLandName();
         }
@@ -734,7 +734,7 @@ public class Messages {
         net.sf.freecol.common.model.Map map = player.getGame().getMap();
         int index = player.getNameIndex(regionType.getNameIndexKey());
         if (index < 1) index = 1;
-        String prefix = player.getNationID() + ".region."
+        String prefix = player.getNationId() + ".region."
             + regionType.toString().toLowerCase(Locale.US) + ".";
         String name;
         do {
@@ -782,11 +782,11 @@ public class Messages {
     public static List<String> getSettlementNames(Player player) {
         List<String> names = new ArrayList<String>();
 
-        collectNames(player.getNationID() + ".settlementName.", names);
+        collectNames(player.getNationId() + ".settlementName.", names);
 
         // Try the spec-qualified version.
         if (names.isEmpty()) {
-            collectNames(player.getNationID() + ".settlementName."
+            collectNames(player.getNationId() + ".settlementName."
                 + player.getSpecification().getId() + ".", names);
         }
 
@@ -800,7 +800,7 @@ public class Messages {
      * @return A list of ship names, with the first being the fallback prefix.
      */
     public static List<String> getShipNames(Player player) {
-        final String prefix = player.getNationID() + ".ship.";
+        final String prefix = player.getNationId() + ".ship.";
         List<String> names = new ArrayList<String>();
 
         // Fallback prefix first

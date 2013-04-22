@@ -308,8 +308,9 @@ public class Game extends FreeColGameObject {
      */
     public Location makeFreeColLocation(String id) {
         FreeColGameObject fcgo = getFreeColGameObject(id);
-        if (fcgo instanceof Location) return (Location)fcgo;
-        if (fcgo != null) {
+        if (fcgo instanceof Location) {
+            return (Location)fcgo;
+        } else if (fcgo != null) {
             logger.warning("Not a location: " + id);
             return null;
         }
@@ -433,7 +434,7 @@ public class Game extends FreeColGameObject {
      */
     public Player getPlayer(String nationId) {
         for (Player player : players) {
-            if (player.getNationID().equals(nationId)) return player;
+            if (player.getNationId().equals(nationId)) return player;
         }
         return null;
     }
@@ -514,7 +515,7 @@ public class Game extends FreeColGameObject {
     public boolean addPlayer(Player player) {
         if (player.isAI() || canAddNewPlayer()) {
             players.add(player);
-            Nation nation = getSpecification().getNation(player.getNationID());
+            Nation nation = getSpecification().getNation(player.getNationId());
             nationOptions.getNations().put(nation, NationState.NOT_AVAILABLE);
             if (currentPlayer == null) currentPlayer = player;
             return true;
@@ -536,7 +537,7 @@ public class Game extends FreeColGameObject {
 
         if (!players.remove(player)) return false;
 
-        Nation nation = getSpecification().getNation(player.getNationID());
+        Nation nation = getSpecification().getNation(player.getNationId());
         nationOptions.getNations().put(nation, NationState.AVAILABLE);
         player.dispose();
 
@@ -605,7 +606,7 @@ public class Game extends FreeColGameObject {
     public void setCurrentPlayer(Player newCurrentPlayer) {
         if (newCurrentPlayer != null) {
             if (currentPlayer != null) {
-                currentPlayer.removeModelMessages();
+                currentPlayer.removeDisplayedModelMessages();
                 currentPlayer.invalidateCanSeeTiles();
             }
         } else {

@@ -151,7 +151,7 @@ public class NativeAIPlayer extends AIPlayer {
     public void startWorking() {
         Turn turn = getGame().getTurn();
         logger.finest(getClass().getName() + " in " + turn
-            + ": " + getPlayer().getNationID());
+            + ": " + getPlayer().getNationId());
         sessionRegister.clear();
         clearAIUnits();
         determineStances();
@@ -433,7 +433,7 @@ public class NativeAIPlayer extends AIPlayer {
                 aiUnits.remove(i);
             }
         }
-        report = Utils.lastPart(getPlayer().getNationID(), ".")
+        report = Utils.lastPart(getPlayer().getNationId(), ".")
             + ".giveNormalMissions(turn=" + turnNumber
             + " all-units=" + allUnits + " free-land-units=" + aiUnits.size()
             + ")" + report;

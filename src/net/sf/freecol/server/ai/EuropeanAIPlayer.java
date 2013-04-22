@@ -1311,7 +1311,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             }
             aiUnits.remove(i);
         }
-        String report = Utils.lastPart(getPlayer().getNationID(), ".")
+        String report = Utils.lastPart(getPlayer().getNationId(), ".")
             + ".giveNormalMissions(turn=" + turnNumber
             + " colonies=" + getPlayer().getNumberOfSettlements()
             + " all-units=" + allUnits
@@ -1899,7 +1899,7 @@ public class EuropeanAIPlayer extends AIPlayer {
     public void startWorking() {
         Turn turn = getGame().getTurn();
         logger.finest(getClass().getName() + " in " + turn
-            + ": " + Utils.lastPart(getPlayer().getNationID(), "."));
+            + ": " + Utils.lastPart(getPlayer().getNationId(), "."));
         sessionRegister.clear();
         clearAIUnits();
         determineStances();

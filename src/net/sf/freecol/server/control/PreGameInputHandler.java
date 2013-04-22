@@ -214,7 +214,7 @@ public final class PreGameInputHandler extends InputHandler {
             NationType nationType = getGame().getSpecification()
                 .getNationType(element.getAttribute("value"));
             NationType fixedNationType = getGame().getSpecification()
-                .getNation(player.getNationID()).getType();
+                .getNation(player.getNationId()).getType();
             Advantages advantages = getFreeColServer().getGame()
                 .getNationOptions().getNationalAdvantages();
             if (advantages == Advantages.SELECTABLE
@@ -283,7 +283,7 @@ public final class PreGameInputHandler extends InputHandler {
         ArrayList<Nation> nations = new ArrayList<Nation>();
         for (Player player : freeColServer.getGame().getPlayers()) {
             final Nation nation = getGame().getSpecification()
-                .getNation(player.getNationID());
+                .getNation(player.getNationId());
             if (nations.contains(nation)) {
                 return DOMMessage.createError("server.invalidPlayerNations",
                     "All players need to pick a unique nation before the game can start.");

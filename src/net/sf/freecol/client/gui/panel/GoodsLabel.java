@@ -72,7 +72,7 @@ public final class GoodsLabel extends AbstractGoodsLabel
         }
         if (player == null
             || !goods.getType().isStorable()
-            || player.canTrade(goods)
+            || player.canTrade(goods.getType())
             || (location instanceof Colony
                 && player.getGame().getSpecification().getBoolean(GameOptions.CUSTOM_IGNORE_BOYCOTT)
                 && ((Colony) location).hasAbility(Ability.EXPORT))) {

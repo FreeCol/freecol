@@ -253,8 +253,8 @@ public class DebugUtils {
         } catch (NumberFormatException x) {
             return;
         }
-        player.incrementImmigration(crosses);
-        sPlayer.incrementImmigration(crosses);
+        player.modifyImmigration(crosses);
+        sPlayer.modifyImmigration(crosses);
     }
 
     /**

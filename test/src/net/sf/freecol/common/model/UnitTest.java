@@ -321,7 +321,7 @@ public class UnitTest extends FreeColTestCase {
         assertEquals("Brave was not added to camp", 2,
                      camp.getUnitCount());
         assertNotNull("Brave was not added to player unit list",
-                      indianPlayer.getUnit(brave.getId()));
+                      indianPlayer.getUnitById(brave.getId()));
 
         // unit dies
         brave.dispose();
@@ -330,7 +330,7 @@ public class UnitTest extends FreeColTestCase {
         assertEquals("Brave was not removed from camp", 1,
                      camp.getUnitCount());
         assertNull("Brave was not removed from player unit list",
-                   indianPlayer.getUnit(brave.getId()));
+                   indianPlayer.getUnitById(brave.getId()));
     }
 
 

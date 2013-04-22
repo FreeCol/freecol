@@ -109,6 +109,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     // How far to search for a colony to add an Indian convert to.
     public static final int MAX_CONVERT_DISTANCE = 10;
 
+    public static final int SCORE_SETTLEMENT_DESTROYED = -40;
 
     /** The network socket to the player's client. */
     private Socket socket;
@@ -151,7 +152,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         europe = null;
         if (nation != null && nation.getType() != null) {
             this.nationType = nation.getType();
-            this.nationID = nation.getId();
+            this.nationId = nation.getId();
             try {
                 addFeatures(nationType);
             } catch (Throwable error) {
@@ -180,7 +181,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         } else {
             // virtual "enemy privateer" player
             // or undead ?
-            this.nationID = Nation.UNKNOWN_NATION_ID;
+            this.nationId = Nation.UNKNOWN_NATION_ID;
             this.playerType = PlayerType.COLONIAL;
             gold = 0;
         }
@@ -1528,7 +1529,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     brave.clearEquipment();
                     brave.setOwner(other);
                     brave.setIndianSettlement(null);
-                    brave.setNationality(other.getNationID());
+                    brave.setNationality(other.getNationId());
                     brave.setType(Utils.getRandomMember(logger,
                                   "Choose convert type", converts, random));
                     brave.setLocation(colony.getTile());
@@ -1737,7 +1738,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 }
                 // Bonus bells from the FF do not count towards recruiting
                 // the next one!
-                incrementLiberty(-totalBells);
+                modifyLiberty(-totalBells);
 
             } else if (eventId.equals("model.event.newRecruits")
                        && europe != null) {
@@ -2923,7 +2924,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
 
         // This is an atrocity.
-        int atrocities = Player.SCORE_SETTLEMENT_DESTROYED;
+        int atrocities = SCORE_SETTLEMENT_DESTROYED;
         if (settlement.getType().getClaimableRadius() > 1) atrocities *= 2;
         if (capital) atrocities = (atrocities * 3) / 2;
         attackerPlayer.modifyScore(atrocities);

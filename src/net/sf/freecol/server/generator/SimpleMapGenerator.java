@@ -267,9 +267,9 @@ public class SimpleMapGenerator implements MapGenerator {
         boolean hasSettlements = false;
         for (Player player : importGame.getPlayers()) {
             if (player.isIndian()) {
-                Player indian = game.getPlayer(player.getNationID());
+                Player indian = game.getPlayer(player.getNationId());
                 if (indian == null) {
-                    Nation nation = game.getSpecification().getNation(player.getNationID());
+                    Nation nation = game.getSpecification().getNation(player.getNationId());
                     indian = new ServerPlayer(game, null, false, nation, null, null);
                     game.addPlayer(indian);
                 }
@@ -314,8 +314,8 @@ public class SimpleMapGenerator implements MapGenerator {
         if (hasSettlements) {
             for (Tile template : importGame.getMap().getAllTiles()) {
                 if (template.getOwner() != null) {
-                    String nationID = template.getOwner().getNationID();
-                    Player owner = game.getPlayer(nationID);
+                    String nationId = template.getOwner().getNationId();
+                    Player owner = game.getPlayer(nationId);
                     Tile tile = map.getTile(template.getPosition());
                     if (owner != null && tile != null) {
                         tile.setOwner(owner);
@@ -835,7 +835,7 @@ public class SimpleMapGenerator implements MapGenerator {
                 UnitType type = startingUnit.getUnitType(spec);
                 Unit newUnit = new ServerUnit(game, null, player, type,
                                               startingUnit.getEquipment(spec));
-                newUnit.setName(player.getUnitName(type, random));
+                newUnit.setName(player.getNameForUnit(type, random));
                 if (newUnit.isNaval()) {
                     if (newUnit.canCarryUnits()) {
                         newUnit.setState(Unit.UnitState.ACTIVE);

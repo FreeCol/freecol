@@ -347,7 +347,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                 GoodsType type = goods.getType();
                 ExportData data = getExportData(type);
                 if (data.isExported()
-                    && (owner.canTrade(goods, Market.Access.CUSTOM_HOUSE))) {
+                    && (owner.canTrade(goods.getType(), Market.Access.CUSTOM_HOUSE))) {
                     int amount = goods.getAmount() - data.getExportLevel();
                     if (amount > 0) {
                         owner.sell(container, type, amount, random);
@@ -544,7 +544,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                                            this, unit)
                           .addName("%colony%", getName()));
         } else {
-            unit.setName(owner.getUnitName(type, random));
+            unit.setName(owner.getNameForUnit(type, random));
             cs.addMessage(See.only((ServerPlayer) owner),
                           new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
                                            "model.colony.unitReady",
