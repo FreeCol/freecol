@@ -308,8 +308,7 @@ public class EquipmentType extends BuildableType {
         if (CAPTURE_EQUIPMENT_TAG.equals(tag)) {
             captureEquipmentId = readId(in);
             captureEquipmentByIndians = getAttribute(in, BY_INDIANS_TAG, false);
-
-            in.nextTag();
+            closeTag(in, CAPTURE_EQUIPMENT_TAG);
 
         } else if (COMPATIBLE_EQUIPMENT_TAG.equals(tag)) {
             String equipmentId = readId(in);
@@ -319,7 +318,7 @@ public class EquipmentType extends BuildableType {
                 }
                 compatibleEquipment.add(equipmentId);
             }
-            in.nextTag(); // close this element
+            closeTag(in, COMPATIBLE_EQUIPMENT_TAG);
 
         // @compat 0.10.0
         } else if (REQUIRED_LOCATION_ABILITY_TAG.equals(tag)) {
@@ -328,8 +327,8 @@ public class EquipmentType extends BuildableType {
             required.put(abilityId, getAttribute(in, VALUE_TAG, true));
             setRequiredAbilities(required);
             spec.addAbility(abilityId);
-            in.nextTag(); // close this element
-        // end compatibility code
+            closeTag(in, REQUIRED_LOCATION_ABILITY_TAG);
+        // end @compat
 
         } else {
             super.readChild(in);

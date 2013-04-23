@@ -273,7 +273,7 @@ public class EuropeanNationType extends NationType {
                 startingUnitMap.put(exTag, units);
             }
             units.put(id, unit);
-            in.nextTag();
+            closeTag(in, UNIT_TAG);
 
         } else {
             super.readChild(in);

@@ -199,7 +199,7 @@ public class StringOption extends AbstractOption<String> {
 
         if (CHOICE_TAG.equals(tag)) {
             choices.add(getAttribute(in, VALUE_TAG, (String)null));
-            in.nextTag();
+            closeTag(in, CHOICE_TAG);
 
         } else {
             super.readChild(in);

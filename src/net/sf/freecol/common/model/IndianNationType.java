@@ -289,8 +289,7 @@ public class IndianNationType extends NationType {
                 }
                 skills.add(new RandomChoice<UnitType>(unitType, probability));
             }
-
-            in.nextTag(); // close this element
+            closeTag(in, SKILL_TAG);
 
         } else if (Region.getXMLElementTagName().equals(tag)) {
             String id = getAttribute(in, ID_ATTRIBUTE_TAG, (String)null);
@@ -300,8 +299,7 @@ public class IndianNationType extends NationType {
                 }
                 regions.add(id);
             }
-
-            in.nextTag(); // close this element
+            closeTag(in, Region.getXMLElementTagName());
 
         } else {
             super.readChild(in);

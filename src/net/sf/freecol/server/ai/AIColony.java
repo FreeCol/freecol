@@ -1540,7 +1540,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                                       AIGoods.class, (AIGoods)null);
             if (ag == null) ag = new AIGoods(aiMain, readId(in));
             aiGoods.add(ag);
-            in.nextTag();
+            closeTag(in, AI_GOODS_LIST_TAG);
 
         } else if (GOODS_WISH_LIST_TAG.equals(tag)
             // @compat 0.10.3
@@ -1551,7 +1551,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                                         GoodsWish.class, (GoodsWish)null);
             if (gw == null) gw = new GoodsWish(aiMain, readId(in));
             wishes.add(gw);
-            in.nextTag();
+            closeTag(in, tag);// FIXME: tag -> GOODS_WISH_LIST_TAG
 
         } else if (TILE_IMPROVEMENT_PLAN_LIST_TAG.equals(tag)
             // @compat 0.10.3
@@ -1563,7 +1563,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 TileImprovementPlan.class, (TileImprovementPlan)null);
             if (ti == null) ti = new TileImprovementPlan(aiMain, readId(in));
             tileImprovementPlans.add(ti);
-            in.nextTag();
+            closeTag(in, tag);// FIXME: tag -> TILE_IMPROVEMENT_PLAN_LIST_TAG
 
         } else if (WORKER_WISH_LIST_TAG.equals(tag)
             // @compat 0.10.3
@@ -1574,7 +1574,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                                          WorkerWish.class, (WorkerWish)null);
             if (ww == null) ww = new WorkerWish(aiMain, readId(in));
             wishes.add(ww);
-            in.nextTag();
+            closeTag(in, tag);// FIXME: tag -> WORKER_WISH_LIST_TAG
 
         } else {
             super.readChild(in);

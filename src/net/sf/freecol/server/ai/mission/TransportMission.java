@@ -1862,12 +1862,12 @@ public class TransportMission extends Mission {
             
             tAdd(new Cargo((Transportable)aio, carrier, mode,
                            target, turns, tries, spaceLeft), -1);
-            in.nextTag(); // Consume closing tag
+            closeTag(in, CARGO_TAG);
 
         // @compat 0.10.5
         } else if (OLD_TRANSPORTABLE_TAG.equals(tag)) {
             // Ignore the old format, let checkCargoes sort it out
-            in.nextTag(); // Consume closing tag
+            closeTag(in, OLD_TRANSPORTABLE_TAG);
         // end @compat
 
         } else {

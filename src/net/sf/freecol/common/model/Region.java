@@ -555,7 +555,7 @@ public class Region extends FreeColGameObject implements Nameable {
                 }
             } else if (CHILD_TAG.equals(tag)) {
                 children.add(makeFreeColGameObject(in, ID_ATTRIBUTE_TAG, Region.class));
-                in.nextTag();
+                closeTag(in, CHILD_TAG);
             } else {
                 logger.warning("Bad Region tag: " + tag);
             }

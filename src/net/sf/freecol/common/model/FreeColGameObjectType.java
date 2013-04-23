@@ -333,7 +333,8 @@ public class FreeColGameObjectType extends FreeColObject {
         if (Ability.getXMLElementTagName().equals(tag)) {
             if (getAttribute(in, DELETE_TAG, false)) {
                 removeAbilities(readId(in));
-                in.nextTag();
+                closeTag(in, DELETE_TAG);
+
             } else {
                 Ability ability = new Ability(in, spec); // Closes the element
                 if (ability.getSource() == null) ability.setSource(this);
@@ -344,7 +345,8 @@ public class FreeColGameObjectType extends FreeColObject {
         } else if (Modifier.getXMLElementTagName().equals(tag)) {
             if (getAttribute(in, DELETE_TAG, false)) {
                 removeModifiers(readId(in));
-                in.nextTag();
+                closeTag(in, Modifier.getXMLElementTagName());
+
             } else {
                 Modifier modifier = new Modifier(in, spec);// Closes the element
                 if (modifier.getSource() == null) modifier.setSource(this);

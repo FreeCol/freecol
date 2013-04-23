@@ -3884,7 +3884,7 @@ public class Unit extends GoodsLocation
                 }
                 // end compatibility code
             } else if (in.getLocalName().equals(EQUIPMENT_TAG)) {
-                String xLength = in.getAttributeValue(null, ARRAY_SIZE);
+                String xLength = in.getAttributeValue(null, ARRAY_SIZE_TAG);
                 if (xLength == null) {
                     String equipmentId = readId(in);
                     int count = Integer.parseInt(in.getAttributeValue(null, "count"));

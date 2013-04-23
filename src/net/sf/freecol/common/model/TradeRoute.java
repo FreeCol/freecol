@@ -189,7 +189,7 @@ public class TradeRoute extends FreeColGameObject
                     // end @compat
                     } else {
                         cargo.add(spec.getGoodsType(id));
-                        in.nextTag();
+                        closeTag(in, CARGO_TAG);
                     }
                 } else {
                     logger.warning("Bogus Stop tag: " + tag);

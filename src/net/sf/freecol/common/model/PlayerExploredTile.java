@@ -333,7 +333,8 @@ public class PlayerExploredTile extends FreeColGameObject {
         if (in.getLocalName().equals(IndianSettlement.MISSIONARY_TAG_NAME)) {
             in.nextTag(); // advance to the Unit tag
             missionary = readFreeColGameObject(in, Unit.class);
-            in.nextTag(); // close <missionary> tag
+            closeTag(in, IndianSettlement.MISSIONARY_TAG_NAME);
+
         } else if (in.getLocalName().equals(Resource.getXMLElementTagName())) {
             Resource resource = game.getFreeColGameObject(readId(in),
                                                           Resource.class);

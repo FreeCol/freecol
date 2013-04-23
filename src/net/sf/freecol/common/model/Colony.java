@@ -2878,7 +2878,7 @@ public class Colony extends Settlement implements Nameable {
                 addModifier(m);
             } else if ("buildQueue".equals(in.getLocalName())) {
                 // TODO: remove support for old format, move serialization to BuildQueue
-                int size = getAttribute(in, ARRAY_SIZE, 0);
+                int size = getAttribute(in, ARRAY_SIZE_TAG, 0);
                 if (size > 0) {
                     for (int x = 0; x < size; x++) {
                         String typeId = in.getAttributeValue(null, "x" + Integer.toString(x));
@@ -2889,11 +2889,11 @@ public class Colony extends Settlement implements Nameable {
             } else if (BUILD_QUEUE_TAG.equals(in.getLocalName())) {
                 String id = readId(in);
                 buildQueue.add(getSpecification().getType(id, BuildableType.class));
-                in.nextTag();
+                closeTag(in, BUILD_QUEUE_TAG);
             } else if (POPULATION_QUEUE_TAG.equals(in.getLocalName())) {
                 String id = readId(in);
                 populationQueue.add(getSpecification().getType(id, UnitType.class));
-                in.nextTag();
+                closeTag(in, POPULATION_QUEUE_TAG);
             } else {
                 super.readChild(in);
             }

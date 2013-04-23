@@ -284,7 +284,7 @@ public abstract class BuildableType extends FreeColGameObjectType {
                 requiredAbilities.put(str, getAttribute(in, VALUE_TAG, true));
                 spec.addAbility(str);
             }
-            in.nextTag(); // close this element
+            closeTag(in, REQUIRED_ABILITY_TAG);
 
         } else if (REQUIRED_GOODS_TAG.equals(tag)) {
             GoodsType type = spec.getType(in, ID_ATTRIBUTE_TAG,
@@ -298,7 +298,7 @@ public abstract class BuildableType extends FreeColGameObjectType {
                 }
                 requiredGoods.add(ag);
             }
-            in.nextTag(); // close this element
+            closeTag(in, REQUIRED_GOODS_TAG);
 
         } else if (Limit.getXMLElementTagName().equals(tag)) {
             Limit limit = new Limit(spec);

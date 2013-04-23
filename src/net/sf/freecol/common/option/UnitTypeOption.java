@@ -311,7 +311,7 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
             UnitType type = spec.getType(in, VALUE_TAG,
                                          UnitType.class, (UnitType)null);
             if (type != null) choices.add(type);
-            in.nextTag();
+            closeTag(in, CHOICE_TAG);
 
         } else {
             super.readChild(in);

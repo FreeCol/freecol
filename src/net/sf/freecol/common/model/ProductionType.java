@@ -319,7 +319,7 @@ public class ProductionType extends FreeColObject {
                 if (inputs == null) inputs = new ArrayList<AbstractGoods>(1);
                 inputs.add(new AbstractGoods(type, amount));
             }
-            in.nextTag();
+            closeTag(in, INPUT_TAG);
 
         } else if (OUTPUT_TAG.equals(tag)) {
             GoodsType type = spec.getType(in, GOODS_TYPE_TAG,
@@ -339,7 +339,7 @@ public class ProductionType extends FreeColObject {
                 if (outputs == null) outputs = new ArrayList<AbstractGoods>(1);
                 outputs.add(new AbstractGoods(type, amount));
             }
-            in.nextTag();
+            closeTag(in, OUTPUT_TAG);
 
         } else {
             super.readChild(in);

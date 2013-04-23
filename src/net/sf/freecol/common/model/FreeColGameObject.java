@@ -575,7 +575,7 @@ abstract public class FreeColGameObject extends FreeColObject {
 
             writeAttribute(out, ID_ATTRIBUTE_TAG, getId());
 
-            writeAttribute(out, PARTIAL_ATTRIBUTE, String.valueOf(true));
+            writeAttribute(out, PARTIAL_ATTRIBUTE_TAG, true);
 
             for (int i = 0; i < fields.length; i++) {
                 Introspector intro = new Introspector(theClass, fields[i]);
@@ -616,7 +616,7 @@ abstract public class FreeColGameObject extends FreeColObject {
 
             if (name.equals(ID_ATTRIBUTE_TAG)
                 || name.equals(ID_ATTRIBUTE)
-                || name.equals(PARTIAL_ATTRIBUTE)) continue;
+                || name.equals(PARTIAL_ATTRIBUTE_TAG)) continue;
 
             try {
                 Introspector intro = new Introspector(theClass, name);

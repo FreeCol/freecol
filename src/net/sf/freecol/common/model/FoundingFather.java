@@ -349,7 +349,7 @@ public class FoundingFather extends FreeColGameObjectType {
                 }
                 upgrades.put(fromType, toType);
             }
-            in.nextTag();
+            closeTag(in, UPGRADE_TAG);
 
         } else if (UNIT_TAG.equals(tag)) {
             // AbstractUnit closes element

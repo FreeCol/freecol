@@ -1429,7 +1429,7 @@ public class IndianSettlement extends Settlement {
             setContacted(player); // Alarm used to imply contact
             // @end compatibility code
             alarm.put(player, new Tension(getAttribute(in, VALUE_TAG, 0)));
-            in.nextTag(); // close element
+            closeTag(in, ALARM_TAG_NAME);
 
         } else if (CONTACT_LEVEL_TAG_NAME.equals(tag)) {
             String levelString = in.getAttributeValue(null, "level");
@@ -1437,14 +1437,14 @@ public class IndianSettlement extends Settlement {
                 levelString.toUpperCase(Locale.US));
             Player player = makeFreeColGameObject(in, "player", Player.class);
             contactLevels.put(player, cl);
-            in.nextTag(); // close element
+            closeTag(in, CONTACT_LEVEL_TAG_NAME);
 
         // @compat 0.10.5
         } else if (IS_VISITED_TAG_NAME.equals(tag)) {
             Player player = makeFreeColGameObject(in, "player", Player.class);
             setScouted(player);
-            in.nextTag(); // close element
-        // @end compatibility code
+            closeTag(in, IS_VISITED_TAG_NAME);
+        // end @compat
 
         } else if (WANTED_GOODS_TAG_NAME.equals(tag)) {
             String[] wantedGoodsID
@@ -1461,7 +1461,7 @@ public class IndianSettlement extends Settlement {
             in.nextTag();
             missionary = readFreeColGameObject(in, Unit.class);
             missionary.setLocationNoUpdate(this);
-            in.nextTag(); // close element
+            closeTag(in, MISSIONARY_TAG_NAME);
 
         } else if (UNITS_TAG.equals(tag)) {
             while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
@@ -1486,7 +1486,7 @@ public class IndianSettlement extends Settlement {
                 ownedUnits.add(unit);
                 owner.setUnit(unit);
             }
-            in.nextTag(); // close element
+            closeTag(in, OWNED_UNITS_TAG_NAME);
 
         } else {
             super.readChild(in);

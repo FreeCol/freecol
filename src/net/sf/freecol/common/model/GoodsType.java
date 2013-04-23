@@ -540,7 +540,7 @@ public final class GoodsType extends FreeColGameObjectType {
 
             priceDiff = getAttribute(in, PRICE_DIFFERENCE_TAG, 1);
 
-            in.nextTag(); // close this element
+            closeTag(in, MARKET_TAG);
 
         } else {
             super.readChild(in);

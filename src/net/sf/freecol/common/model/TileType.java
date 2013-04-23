@@ -582,7 +582,7 @@ public final class TileType extends FreeColGameObjectType {
                 disasters = new ArrayList<RandomChoice<Disaster>>();
             }
             disasters.add(new RandomChoice<Disaster>(disaster, probability));
-            in.nextTag(); // close this element
+            closeTag(in, DISASTER_TAG);
 
         } else if (GEN_TAG.equals(tag)) {
             humidity[0] = getAttribute(in, HUMIDITY_MIN_TAG, 0);
@@ -591,7 +591,7 @@ public final class TileType extends FreeColGameObjectType {
             temperature[1] = getAttribute(in, TEMPERATURE_MAX_TAG, 40);
             altitude[0] = getAttribute(in, ALTITUDE_MIN_TAG, 0);
             altitude[1] = getAttribute(in, ALTITUDE_MAX_TAG, 0);
-            in.nextTag(); // close this element
+            closeTag(in, GEN_TAG);
 
         } else if (PRODUCTION_TAG.equals(tag)
             && getAttribute(in, GOODS_TYPE_TAG, (String)null) == null) {
@@ -632,7 +632,7 @@ public final class TileType extends FreeColGameObjectType {
                 productionTypes.add(new ProductionType(goods, false,
                                                        tileProduction));
             }
-            in.nextTag(); // close this element
+            closeTag(in, tag);
             // end @compat
 
         } else if (RESOURCE_TAG.equals(tag)) {
@@ -643,7 +643,7 @@ public final class TileType extends FreeColGameObjectType {
                 resourceTypes = new ArrayList<RandomChoice<ResourceType>>();
             }
             resourceTypes.add(new RandomChoice<ResourceType>(type, probability));
-            in.nextTag(); // close this element
+            closeTag(in, RESOURCE_TAG);
 
         } else {
             super.readChild(in);

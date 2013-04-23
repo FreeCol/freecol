@@ -878,12 +878,12 @@ public final class UnitType extends BuildableType
                 }
                 consumption.incrementCount(type, amount);
             }
-            in.nextTag(); // close this element
+            closeTag(in, CONSUMES_TAG);
 
         } else if (DEFAULT_EQUIPMENT_TAG.equals(tag)) {
             defaultEquipment = spec.getType(in, ID_ATTRIBUTE_TAG,
                 EquipmentType.class, (EquipmentType)null);
-            in.nextTag(); // close this element
+            closeTag(in, DEFAULT_EQUIPMENT_TAG);
 
         } else if (DOWNGRADE_TAG.equals(tag) || UPGRADE_TAG.equals(tag)) {
             if (getAttribute(in, DELETE_TAG, false)) {
@@ -897,7 +897,7 @@ public final class UnitType extends BuildableType
                         }
                     }
                 }
-                in.nextTag();
+                closeTag(in, tag);
 
             } else {
                 UnitTypeChange change = new UnitTypeChange(in, spec);

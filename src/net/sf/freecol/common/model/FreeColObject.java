@@ -71,33 +71,25 @@ public abstract class FreeColObject {
 
     public static final String NO_ID = "NO_ID";
 
-    public static final String ID_ATTRIBUTE = "ID";
-
-    /**
-     * XML tag name for value attribute.
-     */
-    protected static final String VALUE_TAG = "value";
-
-    /**
-     * XML tag name for ID attribute.
-     */
-    // this is what we use for the specification
-    // TODO: standardize on this spelling
+    /** XML tag name for identifier attribute. */
     public static final String ID_ATTRIBUTE_TAG = "id";
 
-    /**
-     * XML tag name for array elements.
-     */
-    protected static final String ARRAY_SIZE = "xLength";
+    // @compat 0.10.x
+    /** Obsolete identifier attribute. */
+    public static final String ID_ATTRIBUTE = "ID";
+    // end @compat
 
-    /**
-     * XML attribute tag to denote partial updates.
-     */
-    protected static final String PARTIAL_ATTRIBUTE = "PARTIAL";
+    /** XML tag name for array elements. */
+    protected static final String ARRAY_SIZE_TAG = "xLength";
 
-    /**
-     * Unique identifier of an object
-     */
+    /** XML attribute tag to denote partial updates. */
+    protected static final String PARTIAL_ATTRIBUTE_TAG = "PARTIAL";
+
+    /** XML tag name for value attributes. */
+    protected static final String VALUE_TAG = "value";
+
+
+    /** The unique identifier of an object. */
     private String id;
 
     /** The <code>Specification</code> this object uses, which may be null. */
@@ -108,9 +100,9 @@ public abstract class FreeColObject {
 
 
     /**
-     * Get the <code>Id</code> value.
+     * Get the object unique identifier.
      *
-     * @return a <code>String</code> value
+     * @return The identifier.
      */
     public String getId() {
         return id;
@@ -588,6 +580,30 @@ public abstract class FreeColObject {
     }
 
     /**
+     * Writes an XML-representation of a collection object to the given stream.
+     *
+     * @param out The stream to write to.
+     * @param tag The tag for the array <code>Element</code>.
+     * @param members The members of the array.
+     * @exception XMLStreamException if a problem was encountered
+     *      while writing.
+     */
+    protected <T extends FreeColObject> void writeToListElement(XMLStreamWriter out,
+        String tag, Collection<T> members) throws XMLStreamException {
+        out.writeStartElement(tag);
+
+        writeAttribute(out, ARRAY_SIZE_TAG, members.size());
+
+        int i = 0;
+        for (T t : members) {
+            writeAttribute(out, "x" + i, t);
+            i++;
+        }
+
+        out.writeEndElement();
+    }
+
+    /**
      * Initialize this object from an XML-representation of this object.
      * @param element An XML-element that will be used to initialize
      *      this object.
@@ -643,7 +659,6 @@ public abstract class FreeColObject {
         }
     }
 
-
     /**
      * Initializes this object from an XML-representation of this object,
      * unless the PARTIAL_ATTRIBUTE tag is present which indicates
@@ -654,12 +669,42 @@ public abstract class FreeColObject {
      *     the stream.
      */
     public void readFromXML(XMLStreamReader in) throws XMLStreamException {
-        if (in.getAttributeValue(null, PARTIAL_ATTRIBUTE) == null) {
+        if (in.getAttributeValue(null, PARTIAL_ATTRIBUTE_TAG) == null) {
             readAttributes(in);
             readChildren(in);
         } else {
             readFromXMLPartialImpl(in);
         }
+    }
+
+    /**
+     * Expect a particular tag.
+     *
+     * @param in The input stream with the XML.
+     * @param tag The expected tag name.
+     * @exception XMLStreamException if the expected tag is not found.
+     */
+    public void expectTag(XMLStreamReader in, String tag) throws XMLStreamException {
+        String endTag = in.getLocalName();
+        if (!tag.equals(endTag)) {
+            throw new XMLStreamException("Parse error, " + tag
+                + " expected, not: " + endTag);
+        }
+    }
+
+    /**
+     * Close the current tag, checking that it did indeed close correctly.
+     *
+     * @param in The input stream with the XML.
+     * @param tag The expected tag name.
+     * @exception XMLStreamException if a closing tag is not found.
+     */
+    public void closeTag(XMLStreamReader in, String tag) throws XMLStreamException {
+        if (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            throw new XMLStreamException("Parse error, END_ELEMENT expected,"
+                + " not: " + in.getLocalName());
+        }
+        expectTag(in, tag);
     }
 
     /**
@@ -673,51 +718,75 @@ public abstract class FreeColObject {
      * @exception XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    protected int[] readFromArrayElement(String tagName, XMLStreamReader in, int[] arrayType)
-        throws XMLStreamException {
-        if (!in.getLocalName().equals(tagName)) {
-            in.nextTag();
+    protected int[] readFromArrayElement(String tagName, XMLStreamReader in,
+                                         int[] arrayType) throws XMLStreamException {
+        expectTag(in, tagName);
+        
+        final int length = getAttribute(in, ARRAY_SIZE_TAG, -1);
+        if (length < 0) return new int[0];
+
+        int[] array = new int[length];
+        for (int x = 0; x < length; x++) {
+            array[x] = getAttribute(in, "x" + x, 0);
         }
 
-        int[] array = new int[Integer.parseInt(in.getAttributeValue(null, ARRAY_SIZE))];
+        closeTag(in, tagName);
+        return array;
+    }
 
-        for (int x=0; x<array.length; x++) {
-            array[x] = Integer.parseInt(in.getAttributeValue(null, "x" + Integer.toString(x)));
+    /**
+     * Reads an XML-representation of an array.
+     *
+     * @param tagName The tagname for the <code>Element</code>
+     *       representing the array.
+     * @param in The input stream with the XML.
+     * @param arrayType The type of array to be read.
+     * @return The array.
+     * @exception XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    protected String[] readFromArrayElement(String tagName, XMLStreamReader in,
+                                            String[] arrayType) throws XMLStreamException {
+        expectTag(in, tagName);
+
+        final int length = getAttribute(in, ARRAY_SIZE_TAG, -1);
+        if (length < 0) return new String[0];
+
+        String[] array = new String[length];
+        for (int x = 0; x < length; x++) {
+            array[x] = getAttribute(in, "x" + x, (String)null);
         }
 
-        in.nextTag();
+        closeTag(in, tagName);
         return array;
     }
 
     /**
      * Reads an XML-representation of a list.
      *
-     * @param tagName The tagname for the <code>Element</code>
-     *       representing the array.
      * @param in The input stream with the XML.
-     * @param type The type of the items to be added. This type
-     *      needs to have a constructor accepting a single
-     *      <code>String</code>.
+     * @param tag The tag for the list <code>Element</code>.
+     * @param type The type of the items to be added.  This type
+     *     needs to have a constructor accepting a single <code>String</code>.
      * @return The list.
      * @exception XMLStreamException if a problem was encountered
-     *      during parsing.
+     *     during parsing.
      */
-    protected <T> List<T> readFromListElement(String tagName, XMLStreamReader in, Class<T> type)
-        throws XMLStreamException {
-        if (!in.getLocalName().equals(tagName)) {
-            throw new XMLStreamException(tagName + " expected, not:" + in.getLocalName());
-        }
-        final int length = Integer.parseInt(in.getAttributeValue(null, ARRAY_SIZE));
+    protected <T> List<T> readFromListElement(XMLStreamReader in, String tag,
+                                              Class<T> type) throws XMLStreamException {
+        expectTag(in, tag);
+
+        final int length = getAttribute(in, ARRAY_SIZE_TAG, -1);
+        if (length < 0) return Collections.emptyList();
+
         List<T> list = new ArrayList<T>(length);
         for (int x = 0; x < length; x++) {
             try {
-                final String value = in.getAttributeValue(null, "x" + Integer.toString(x));
-                final T object;
+                final String value = getAttribute(in, "x" + x, (String)null);
+                T object = null;
                 if (value != null) {
                     Constructor<T> c = type.getConstructor(type);
                     object = c.newInstance(new Object[] {value});
-                } else {
-                    object = null;
                 }
                 list.add(object);
             } catch (InvocationTargetException e) {
@@ -730,35 +799,41 @@ public abstract class FreeColObject {
                 throw new RuntimeException(e);
             }
         }
-        if (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            throw new XMLStreamException(tagName + " end expected, not: " + in.getLocalName());
-        }
+
+        closeTag(in, tag);
         return list;
     }
 
     /**
-     * Reads an XML-representation of an array.
+     * Reads an XML-representation of a list of
+     * <code>FreeColGameObjectType</code>s.
      *
-     * @param tagName The tagname for the <code>Element</code>
-     *       representing the array.
      * @param in The input stream with the XML.
-     * @param arrayType The type of array to be read.
-     * @return The array.
+     * @param tag The tag for the list <code>Element</code>.
+     * @param spec The <code>Specification</code> to find items in.
+     * @param type The type of the items to be added.  The type must exist
+     *     in the supplied specification.
+     * @return The list.
      * @exception XMLStreamException if a problem was encountered
-     *      during parsing.
+     *     during parsing.
      */
-    protected String[] readFromArrayElement(String tagName, XMLStreamReader in, String[] arrayType)
-        throws XMLStreamException {
-        if (!in.getLocalName().equals(tagName)) {
-            in.nextTag();
-        }
-        String[] array = new String[Integer.parseInt(in.getAttributeValue(null, ARRAY_SIZE))];
-        for (int x=0; x<array.length; x++) {
-            array[x] = in.getAttributeValue(null, "x" + Integer.toString(x));
+    protected <T extends FreeColGameObjectType> List<T>
+        readFromListElement(XMLStreamReader in, String tag, Specification spec,
+                            Class<T> type) throws XMLStreamException {
+        expectTag(in, tag);
+
+        final int length = getAttribute(in, ARRAY_SIZE_TAG, -1);
+        if (length < 0) return Collections.emptyList();
+
+        List<T> list = new ArrayList<T>(length);
+        for (int x = 0; x < length; x++) {
+            T value = spec.getType(in, "x" + x, type, (T)null); 
+            if (value == null) logger.warning("Null list value(" + x + ")");
+            list.add(value);
         }
 
-        in.nextTag();
-        return array;
+        closeTag(in, tag);
+        return list;
     }
 
     /**
@@ -1095,9 +1170,14 @@ public abstract class FreeColObject {
      *     during parsing.
      */
     protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        final String tag = in.getLocalName();
+        if (tag == null) {
+            throw new XMLStreamException("Parse error, null opening tag.");
+        }
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             readChild(in);
         }
+        expectTag(in, tag);
     }
 
     /**

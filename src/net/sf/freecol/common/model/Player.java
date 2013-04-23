@@ -3750,7 +3750,7 @@ public class Player extends FreeColGameObject implements Nameable {
             }
 
             out.writeStartElement(FOUNDING_FATHER_TAG);
-            out.writeAttribute(ARRAY_SIZE, Integer.toString(allFathers.size()));
+            out.writeAttribute(ARRAY_SIZE_TAG, Integer.toString(allFathers.size()));
             int index = 0;
             for (FoundingFather father : allFathers) {
                 out.writeAttribute("x" + Integer.toString(index), father.getId());
@@ -3759,7 +3759,7 @@ public class Player extends FreeColGameObject implements Nameable {
             out.writeEndElement();
 
             out.writeStartElement(OFFERED_FATHER_TAG);
-            out.writeAttribute(ARRAY_SIZE, Integer.toString(offeredFathers.size()));
+            out.writeAttribute(ARRAY_SIZE_TAG, Integer.toString(offeredFathers.size()));
             index = 0;
             for (FoundingFather father : offeredFathers) {
                 out.writeAttribute("x" + Integer.toString(index), father.getId());
@@ -3875,32 +3875,24 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        final Specification spec = getSpecification();
+
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(TENSION_TAG)) {
                 Player player = makeFreeColGameObject(in, "player",
                                                       Player.class);
                 tension.put(player, new Tension(getAttribute(in, VALUE_TAG, 0)));
-                in.nextTag(); // close element
+                closeTag(in, TENSION_TAG);
             } else if (in.getLocalName().equals(FOUNDING_FATHER_TAG)) {
-                int length = Integer.parseInt(in.getAttributeValue(null, ARRAY_SIZE));
-                for (int index = 0; index < length; index++) {
-                    String fatherId = in.getAttributeValue(null, "x" + String.valueOf(index));
-                    FoundingFather father = getSpecification().getFoundingFather(fatherId);
-                    addFather(father);
-                }
-                in.nextTag();
+                List<FoundingFather> ffs = readFromListElement(in, FOUNDING_FATHER_TAG, spec, FoundingFather.class);
+                allFathers.addAll(ffs);
             } else if (in.getLocalName().equals(OFFERED_FATHER_TAG)) {
-                int length = Integer.parseInt(in.getAttributeValue(null, ARRAY_SIZE));
-                for (int index = 0; index < length; index++) {
-                    String fatherId = in.getAttributeValue(null, "x" + String.valueOf(index));
-                    FoundingFather father = getSpecification().getFoundingFather(fatherId);
-                    offeredFathers.add(father);
-                }
-                in.nextTag();
+                List<FoundingFather> ofs = readFromListElement(in, OFFERED_FATHER_TAG, spec, FoundingFather.class);
+                offeredFathers.addAll(ofs);
             } else if (in.getLocalName().equals(STANCE_TAG)) {
                 String playerId = in.getAttributeValue(null, "player");
                 stance.put(playerId, Enum.valueOf(Stance.class, in.getAttributeValue(null, VALUE_TAG)));
-                in.nextTag(); // close element
+                closeTag(in, STANCE_TAG);
             } else if (in.getLocalName().equals(HighSeas.getXMLElementTagName())) {
                 highSeas = readFreeColGameObject(in, HighSeas.class);
             } else if (in.getLocalName().equals(Europe.getXMLElementTagName())) {

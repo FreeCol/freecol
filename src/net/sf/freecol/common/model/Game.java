@@ -1141,11 +1141,11 @@ public class Game extends FreeColGameObject {
         if (CIBOLA_TAG.equals(tag)) {
             String id = readId(in);
             if (id != null) citiesOfCibola.add(id);
-            in.nextTag();
+            closeTag(in, CIBOLA_TAG);
 
         // @compat 0.9.x
         } else if (CITIES_OF_CIBOLA_TAG.equals(tag)) {
-            List<String> cities = readFromListElement(CITIES_OF_CIBOLA_TAG, in, 
+            List<String> cities = readFromListElement(in, CITIES_OF_CIBOLA_TAG, 
                                                       String.class);
             citiesOfCibola.clear();
             citiesOfCibola.addAll(cities);

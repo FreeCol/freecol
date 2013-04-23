@@ -585,7 +585,7 @@ public final class TileImprovementType extends FreeColGameObjectType {
                 disasters = new ArrayList<RandomChoice<Disaster>>();
             }
             disasters.add(new RandomChoice<Disaster>(disaster, probability));
-            in.nextTag(); // close this element
+            closeTag(in, DISASTER_TAG);
 
         } else if (WORKER_TAG.equals(tag)) {
             String id = readId(in);
@@ -595,7 +595,7 @@ public final class TileImprovementType extends FreeColGameObjectType {
                 }
                 allowedWorkers.add(id);
             }
-            in.nextTag(); // close this element
+            closeTag(in, WORKER_TAG);
 
         } else if (Scope.getXMLElementTagName().equals(tag)) {
             Scope scope = new Scope(in);

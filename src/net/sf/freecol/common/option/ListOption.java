@@ -239,7 +239,7 @@ public class ListOption<T> extends AbstractOption<List<AbstractOption<T>>> {
         } else if (TEMPLATE_TAG.equals(tag)) {
             in.nextTag();
             template = (AbstractOption<T>)readOption(in);
-            in.nextTag();
+            closeTag(in, TEMPLATE_TAG);
 
         } else {
             AbstractOption<T> option = (AbstractOption<T>)readOption(in);

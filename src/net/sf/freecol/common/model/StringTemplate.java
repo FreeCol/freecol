@@ -528,7 +528,7 @@ public class StringTemplate extends FreeColObject {
         if (KEY_TAG.equals(tag)) {
             requireKeys();
             keys.add(getAttribute(in, VALUE_TAG, (String)null));
-            in.nextTag(); // close key
+            closeTag(in, KEY_TAG);
 
         } else if (getXMLElementTagName().equals(tag)) {
             requireReplacements();
