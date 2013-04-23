@@ -570,7 +570,7 @@ public class TileItemContainer extends FreeColGameObject {
                 item.toXML(out, player, showAll, toSavedGame);
             }
         } else if (pet != null) {
-            List<TileItem> petItems = pet.getAllTileItems();
+            List<TileItem> petItems = pet.getTileItems();
             Collections.sort(petItems, tileItemComparator);
             for (TileItem item : petItems) {
                 item.toXML(out, player, showAll, toSavedGame);
