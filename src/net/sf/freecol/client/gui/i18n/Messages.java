@@ -838,8 +838,8 @@ public class Messages {
      * Public as this is needed for language option processing and the
      * initial locale setting.
      *
-     * @param languageID A string using the same format as {@link #getValue()}.
-     * @return The Locale.
+     * @param languageID An underscore separated language/country/variant tuple.
+     * @return The <code>Locale</code> for the specified language.
      */
     public static Locale getLocale(String languageID) {
         String language, country = "", variant = "";

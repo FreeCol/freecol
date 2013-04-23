@@ -1476,9 +1476,13 @@ public final class Specification {
     // Serialization
 
     /**
-     * {@inheritDoc}
+     * Write an XML-representation of this object to the given stream.
+     *
+     * @param out The output stream.
+     * @exception XMLStreamException if there are any problems writing
+     *      to the stream.
      */
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+    protected void toXML(XMLStreamWriter out) throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
@@ -1530,7 +1534,11 @@ public final class Specification {
     }
 
     /**
-     * {@inheritDoc}
+     * Initializes this object from its XML-representation.
+     *
+     * @param xsr The input stream with the XML.
+     * @exception XMLStreamException if there are any problems reading
+     *     the stream.
      */
     public void readFromXML(XMLStreamReader xsr) throws XMLStreamException {
         String newId = FreeColObject.readId(xsr);

@@ -33,7 +33,9 @@ import javax.xml.stream.XMLStreamWriter;
 public interface Option<T> extends Cloneable {
 
     /**
-     * {@inheritDoc}
+     * Clone this option.
+     *
+     * @return A clone of this option.
      */
     public Option<T> clone() throws CloneNotSupportedException;
 

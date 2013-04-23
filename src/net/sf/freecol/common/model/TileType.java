@@ -360,10 +360,10 @@ public final class TileType extends FreeColGameObjectType {
     }
 
     /**
-     * Is this tile type suitable for a given range type.
+     * Is this tile type suitable for a given range type value.
      *
      * @param rangeType The <code>RangeType</code> to test.
-     * @param A value that must be within the range boundaries.
+     * @param value The value to check.
      * @return True if the tile type meets the range limits.
      */
     public boolean withinRange(RangeType rangeType, int value) {

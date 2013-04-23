@@ -109,7 +109,7 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      *
      * @param newBuildingType The new <code>BuildingType</code>.
      * @see #upgrade
-     * @see #damage
+     * @see #downgrade
      */
     private void setType(final BuildingType newBuildingType) {
         // remove features from current type
@@ -184,7 +184,6 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      * Can this building can be damaged?
      *
      * @return True if this building can be damaged.
-     * @see #damage
      */
     public boolean canBeDamaged() {
         return !getType().isAutomaticBuild()

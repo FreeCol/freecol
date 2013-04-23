@@ -140,7 +140,11 @@ public class TradeRoute extends FreeColGameObject
 
 
         /**
-         * {@inheritDoc}
+         * Write an XML-representation of this object to the given stream.
+         *
+         * @param out The output stream.
+         * @exception XMLStreamException if there are any problems writing
+         *      to the stream.
          */
         protected void toXML(XMLStreamWriter out) throws XMLStreamException {
             out.writeStartElement(TRADE_ROUTE_STOP_TAG);
@@ -158,7 +162,11 @@ public class TradeRoute extends FreeColGameObject
         }
 
         /**
-         * {@inheritDoc}
+         * Initializes this object from its XML-representation.
+         *
+         * @param in The input stream with the XML.
+         * @exception XMLStreamException if there are any problems reading
+         *     the stream.
          */
         protected void readFromXML(XMLStreamReader in) throws XMLStreamException {
             final Specification spec = getSpecification();
@@ -304,8 +312,6 @@ public class TradeRoute extends FreeColGameObject
 
     /**
      * Clear the stops in this trade route.
-     *
-     * @param newStops The new Stops value.
      */
     public void clearStops() {
         stops.clear();

@@ -42,7 +42,6 @@ public class ContinueAction extends FreeColAction {
      * Creates a new <code>ContinueAction</code>.
      *
      * @param freeColClient The main controller object for the client.
-     * @param gui 
      */
     public ContinueAction(FreeColClient freeColClient) {
         super(freeColClient, freeColClient.getGUI(), id);

@@ -190,7 +190,7 @@ public class ProductionType extends FreeColObject {
     /**
      * Does this production apply to a given difficulty level.
      *
-     * @param The difficulty level key to check.
+     * @param level The difficulty level key to check.
      * @return True if this production applies.
      */
     public boolean appliesTo(String level) {

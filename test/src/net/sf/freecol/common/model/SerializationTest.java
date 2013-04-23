@@ -162,7 +162,7 @@ public class SerializationTest extends FreeColTestCase {
             FileWriter sw = new FileWriter(filename);
             XMLOutputFactory xif = XMLOutputFactory.newInstance();
             XMLStreamWriter out = xif.createXMLStreamWriter(sw);
-            spec().toXMLImpl(out);
+            spec().toXML(out);
             out.close();
             validator.validate(new StreamSource(new FileReader(filename)));
         } catch (SAXParseException e) {
@@ -183,7 +183,7 @@ public class SerializationTest extends FreeColTestCase {
             StringWriter sw = new StringWriter();
             XMLOutputFactory xif = XMLOutputFactory.newInstance();
             XMLStreamWriter out = xif.createXMLStreamWriter(sw);
-            spec1.toXMLImpl(out);
+            spec1.toXML(out);
             out.close();
             spec2 = new Specification(new ByteArrayInputStream(sw.toString().getBytes()));
         } catch(Exception e) {
@@ -217,7 +217,7 @@ public class SerializationTest extends FreeColTestCase {
             StringWriter sw = new StringWriter();
             XMLOutputFactory xif = XMLOutputFactory.newInstance();
             XMLStreamWriter out = xif.createXMLStreamWriter(sw);
-            spec1.toXMLImpl(out);
+            spec1.toXML(out);
             out.close();
             spec2 = new Specification(new ByteArrayInputStream(sw.toString().getBytes()));
         } catch (Exception e) {

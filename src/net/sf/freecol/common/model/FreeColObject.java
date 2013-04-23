@@ -650,8 +650,8 @@ public abstract class FreeColObject {
      * a partial update of an existing object.
      *
      * @param in The input stream with the XML.
-     * @exception XMLStreamException if there are any problems writing
-     *      to the stream.
+     * @exception XMLStreamException if there are any problems reading
+     *     the stream.
      */
     public void readFromXML(XMLStreamReader in) throws XMLStreamException {
         if (in.getAttributeValue(null, PARTIAL_ATTRIBUTE) == null) {

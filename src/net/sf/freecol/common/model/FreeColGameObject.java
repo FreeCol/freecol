@@ -315,7 +315,7 @@ abstract public class FreeColGameObject extends FreeColObject {
      * class, since the object we are about to "clone" is likely a
      * server object.
      *
-     * @param resultClass The class to clone.
+     * @param returnClass The class to clone.
      * @return The "clone" of the <code>FreeColGameObject</code>.
      */
     public <T extends FreeColGameObject> T cloneFreeColGameObject(Class<T> returnClass) {

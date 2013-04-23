@@ -1031,9 +1031,9 @@ public class Game extends FreeColGameObject {
                                  boolean toSavedGame) throws XMLStreamException {
         super.writeChildren(out);
 
-        specification.toXMLImpl(out);
+        specification.toXML(out);
 
-        for (String cityName : citiesOfCibola) {
+        for (String cityName : citiesOfCibola) { // Preserve existing order
             out.writeStartElement(CIBOLA_TAG);
 
             writeAttribute(out, ID_ATTRIBUTE_TAG, cityName);
