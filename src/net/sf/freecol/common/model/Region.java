@@ -40,7 +40,6 @@ public class Region extends FreeColGameObject implements Nameable {
     private static final Logger logger = Logger.getLogger(Region.class.getName());
 
     public static final String PACIFIC_NAME_KEY = "model.region.pacific";
-    public static final String CHILD_TAG = "child";
 
     public static enum RegionType {
         OCEAN,
@@ -61,47 +60,39 @@ public class Region extends FreeColGameObject implements Nameable {
         }
     }
 
-    /**
-     * The name of this Region.
-     */
+    /** The name of this Region. */
     protected String name;
 
-    /**
-     * Key used to retrieve description from Messages.
-     */
+    /** The type of region. */
+    protected RegionType type;
+
+    /** Key used to retrieve description from Messages. */
     protected String nameKey;
 
-    /**
-     * The parent Region of this Region.
-     */
+    /** The parent Region of this Region. */
     protected Region parent;
 
     /**
-     * Whether this Region is claimable. Ocean Regions and non-leaf
+     * Whether this Region is claimable.  Ocean Regions and non-leaf
      * Regions should not be claimable.
      */
     protected boolean claimable = false;
 
     /**
-     * Whether this Region is discoverable. The Eastern Ocean regions
-     * should not be discoverable. In general, non-leaf regions should
-     * not be discoverable. The Pacific Ocean is an exception, however.
+     * Whether this Region is discoverable.  The Eastern Ocean regions
+     * should not be discoverable.  In general, non-leaf regions should
+     * not be discoverable.  The Pacific Ocean is an exception however,
+     * unless players start there.
      */
     protected boolean discoverable = false;
 
-    /**
-     * Which Turn the Region was discovered in.
-     */
+    /** Which Turn the Region was discovered in. */
     protected Turn discoveredIn;
 
-    /**
-     * Which Player the Region was discovered by.
-     */
+    /** Which Player the Region was discovered by. */
     protected Player discoveredBy;
 
-    /**
-     * Whether the Region is already discovered when the game starts.
-     */
+    /** Whether the Region is already discovered when the game starts. */
     protected boolean prediscovered = false;
 
     /**
@@ -110,21 +101,14 @@ public class Region extends FreeColGameObject implements Nameable {
      */
     protected int scoreValue = 0;
 
-    /**
-     * Describe type here.
-     */
-    protected RegionType type;
-
-    /**
-     * The children Regions of this Region.
-     */
-    protected List<Region> children = new ArrayList<Region>();
+    /** The child Regions of this Region. */
+    protected List<Region> children = null;
 
 
     /**
      * Creates a new <code>Region</code> instance.
      *
-     * @param game a <code>Game</code> value
+     * @param game The enclosing <code>Game</code>.
      */
     public Region(Game game) {
         super(game);
@@ -133,25 +117,13 @@ public class Region extends FreeColGameObject implements Nameable {
     /**
      * Creates a new <code>Region</code> instance.
      *
-     * @param game a <code>Game</code> value
-     * @param id a <code>String</code> value
+     * @param game The enclosing <code>Game</code>.
+     * @param id The identifier.
      */
     public Region(Game game, String id) {
         super(game, id);
     }
 
-    /**
-     * Initiates a new <code>Region</code> from an XML representation.
-     *
-     * @param game The <code>Game</code> this object belongs to.
-     * @param in The input stream containing the XML.
-     * @throws XMLStreamException if an error occurred during parsing.
-     */
-    public Region(Game game, XMLStreamReader in) throws XMLStreamException {
-        super(game, null);
-
-        readFromXML(in);
-    }
 
     /**
      * Get the explicit region name.
@@ -190,9 +162,10 @@ public class Region extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Returns <code>true</code> if this Region is the Pacific
-     * Ocean. The Pacific Ocean is special in so far as it is the only
-     * Region that could be discovered in the original game.
+     * Is this region the Pacific Ocean?
+     *
+     * The Pacific Ocean is special in that it is the only Region that
+     * could be discovered in the original game.
      *
      * @return True if this region is the Pacific.
      */
@@ -207,7 +180,7 @@ public class Region extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Returns the name or default name of this Region.
+     * Gets the name or default name of this Region.
      *
      * @return The i18n-ready name for the region.
      */
@@ -222,6 +195,29 @@ public class Region extends FreeColGameObject implements Nameable {
         }
     }
 
+    /**
+     * Gets the type of the region.
+     *
+     * @return The region type.
+     */
+    public final RegionType getType() {
+        return type;
+    }
+
+    /**
+     * Sets the region type.
+     *
+     * @param newType The new type value.
+     */
+    public final void setType(final RegionType newType) {
+        this.type = newType;
+    }
+
+    /**
+     * Get a name key for the region type.
+     *
+     * @return A region type key.
+     */
     public String getTypeNameKey() {
         return "model.region." + type.toString().toLowerCase(Locale.US)
             + ".name";
@@ -270,7 +266,17 @@ public class Region extends FreeColGameObject implements Nameable {
      * @param child The child <code>Region</code> to add.
      */
     public void addChild(Region child) {
+        if (children == null) children = new ArrayList<Region>();
         children.add(child);
+    }
+
+    /**
+     * Is this a leaf region?
+     *
+     * @return True if the region has no children.
+     */
+    public boolean isLeaf() {
+        return children == null || children.isEmpty();
     }
 
     /**
@@ -313,9 +319,9 @@ public class Region extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Returns a discoverable Region or null. If this region is
-     * discoverable, it is returned. If not, a discoverable parent is
-     * returned, unless there is none. This is intended for
+     * Gets a discoverable Region or null.  If this region is
+     * discoverable, it is returned.  If not, a discoverable parent is
+     * returned, unless there is none.  This is intended for
      * discovering the Pacific Ocean when discovering one of its
      * sub-Regions.
      *
@@ -386,21 +392,22 @@ public class Region extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Mark the Region as discovered.
+     * Discover this region.
      *
      * @param player The discovering <code>Player</code>.
      * @param turn The discovery <code>Turn</code>.
      * @param newName The name of the region.
+     * @return A <code>HistoryEvent</code> documenting the discovery.
      */
     public HistoryEvent discover(Player player, Turn turn, String newName) {
         discoveredBy = player;
         discoveredIn = turn;
         name = newName;
-        discoverable = false;
-        if (getSpecification().getBoolean(GameOptions.EXPLORATION_POINTS)
-            || isPacific()) {
+        if (isDiscoverable()
+            && getSpecification().getBoolean(GameOptions.EXPLORATION_POINTS)) {
             player.modifyScore(getScoreValue());
         }
+        discoverable = false;
         for (Region r : getChildren()) r.setDiscoverable(false);
         return new HistoryEvent(turn, HistoryEvent.EventType.DISCOVER_REGION)
             .addStringTemplate("%nation%", player.getNationName())
@@ -425,143 +432,161 @@ public class Region extends FreeColGameObject implements Nameable {
         this.scoreValue = newScoreValue;
     }
 
-    /**
-     * Gets the type of the region.
-     *
-     * @return The region type.
-     */
-    public final RegionType getType() {
-        return type;
-    }
-
-    /**
-     * Sets the region type.
-     *
-     * @param newType The new type value.
-     */
-    public final void setType(final RegionType newType) {
-        this.type = newType;
-    }
-
-    /**
-     * Returns true if this is a leaf node.
-     *
-     * @return True if the region has no children.
-     */
-    public boolean isLeaf() {
-        return children == null;
-    }
-
 
     // Serialization
 
+    private static final String CHILD_TAG = "child";
+    private static final String CLAIMABLE_TAG = "claimable";
+    private static final String DISCOVERABLE_TAG = "discoverable";
+    private static final String DISCOVERED_BY_TAG = "discoveredBy";
+    private static final String DISCOVERED_IN_TAG = "discoveredIn";
+    private static final String NAME_TAG = "name";
+    private static final String NAME_KEY_TAG = "nameKey";
+    private static final String PARENT_TAG = "parent";
+    private static final String PREDISCOVERED_TAG = "prediscovered";
+    private static final String SCORE_VALUE_TAG = "scoreValue";
+    private static final String TYPE_TAG = "type";
+    // @compat 0.9.x
+    private static final String CHILDREN_TAG = "children";
+    // end @compat
+    
+
     /**
-     * This method writes an XML-representation of this object to the given
-     * stream.
-     *
-     * <br>
-     * <br>
-     *
-     * Only attributes visible to the given <code>Player</code> will be added
-     * to that representation if <code>showAll</code> is set to
-     * <code>false</code>.
-     *
-     * @param out The target stream.
-     * @param player The <code>Player</code> this XML-representation should be
-     *            made for, or <code>null</code> if
-     *            <code>showAll == true</code>.
-     * @param showAll Only attributes visible to <code>player</code> will be
-     *            added to the representation if <code>showAll</code> is set
-     *            to <i>false</i>.
-     * @param toSavedGame If <code>true</code> then information that is only
-     *            needed when saving a game is added.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
+     * {@inheritDoc}
      */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out, Player player,
-                             boolean showAll, boolean toSavedGame)
-        throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
-        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
-        out.writeAttribute("nameKey", nameKey);
-        writeAttribute(out, "type", type);
-        if (name != null) {
-            out.writeAttribute("name", name);
-        }
-        if (prediscovered) {
-            out.writeAttribute("prediscovered", Boolean.toString(prediscovered));
-        }
-        if (claimable) {
-            out.writeAttribute("claimable", Boolean.toString(claimable));
-        }
-        if (discoverable) {
-            out.writeAttribute("discoverable", Boolean.toString(discoverable));
-        }
-        if (parent != null) {
-            out.writeAttribute("parent", parent.getId());
-        }
-        if (discoveredIn != null) {
-            out.writeAttribute("discoveredIn", String.valueOf(discoveredIn.getNumber()));
-        }
-        if (discoveredBy != null) {
-            out.writeAttribute("discoveredBy", discoveredBy.getId());
-        }
-        if (scoreValue > 0) {
-            out.writeAttribute("scoreValue", String.valueOf(scoreValue));
-        }
-        if (children != null) {
-            for (Region child : children) {
-                out.writeStartElement(CHILD_TAG);
-                out.writeAttribute(ID_ATTRIBUTE_TAG, child.getId());
-                out.writeEndElement();
-            }
-        }
-        out.writeEndElement();
+                             boolean showAll,
+                             boolean toSavedGame) throws XMLStreamException {
+        super.toXML(out, getXMLElementTagName(), player, showAll, toSavedGame);
     }
 
     /**
-     * Initialize this object from an XML-representation of this object.
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
+     * {@inheritDoc}
      */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out, Player player,
+                                   boolean showAll,
+                                   boolean toSavedGame) throws XMLStreamException {
+        super.writeAttributes(out);
+
+        if (name != null) {
+            writeAttribute(out, NAME_TAG, name);
+        }
+
+        writeAttribute(out, NAME_KEY_TAG, nameKey);
+
+        writeAttribute(out, TYPE_TAG, type);
+
+        if (prediscovered) {
+            writeAttribute(out, PREDISCOVERED_TAG, prediscovered);
+        }
+
+        if (claimable) {
+            writeAttribute(out, CLAIMABLE_TAG, claimable);
+        }
+
+        if (discoverable) {
+            writeAttribute(out, DISCOVERABLE_TAG, discoverable);
+        }
+
+        if (parent != null) {
+            writeAttribute(out, PARENT_TAG, parent);
+        }
+
+        if (discoveredIn != null) {
+            writeAttribute(out, DISCOVERED_IN_TAG, discoveredIn.getNumber());
+        }
+
+        if (discoveredBy != null) {
+            writeAttribute(out, DISCOVERED_BY_TAG, discoveredBy);
+        }
+
+        if (scoreValue > 0) {
+            writeAttribute(out, SCORE_VALUE_TAG, scoreValue);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeChildren(XMLStreamWriter out, Player player,
+                                 boolean showAll,
+                                 boolean toSavedGame) throws XMLStreamException {
+        for (Region child : getChildren()) {
+            out.writeStartElement(CHILD_TAG);
+
+            writeAttribute(out, ID_ATTRIBUTE_TAG, child);
+
+            out.writeEndElement();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
-        nameKey = in.getAttributeValue(null, "nameKey");
-        name = in.getAttributeValue(null, "name");
-        claimable = getAttribute(in, "claimable", false);
-        discoverable = getAttribute(in, "discoverable", false);
-        prediscovered = getAttribute(in, "prediscovered", false);
-        scoreValue = getAttribute(in, "scoreValue", 0);
-        type = getAttribute(in, "type", RegionType.class, (RegionType)null);
-        int turn = getAttribute(in, "discoveredIn", -1);
-        if (turn > 0) {
-            discoveredIn = new Turn(turn);
-        }
 
-        discoveredBy = makeFreeColGameObject(in, "discoveredBy", Player.class);
-        parent = makeFreeColGameObject(in, "parent", Region.class);
+        name = getAttribute(in, NAME_TAG, (String)null);
+
+        nameKey = getAttribute(in, NAME_KEY_TAG, (String)null);
+
+        type = getAttribute(in, TYPE_TAG, RegionType.class, (RegionType)null);
+
+        claimable = getAttribute(in, CLAIMABLE_TAG, false);
+
+        discoverable = getAttribute(in, DISCOVERABLE_TAG, false);
+
+        prediscovered = getAttribute(in, PREDISCOVERED_TAG, false);
+
+        scoreValue = getAttribute(in, SCORE_VALUE_TAG, 0);
+
+        int turn = getAttribute(in, DISCOVERED_IN_TAG, -1);
+        if (turn > 0) discoveredIn = new Turn(turn);
+
+        discoveredBy = makeFreeColGameObject(in, DISCOVERED_BY_TAG,
+                                             Player.class);
+
+        parent = makeFreeColGameObject(in, PARENT_TAG, Region.class);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void readChildren(XMLStreamReader in) throws XMLStreamException {
-        children = new ArrayList<Region>();
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            final String tag = in.getLocalName();
-            if (tag.equals("children")) {
-                // TODO: remove support for old format
-                String[] childArray = readFromArrayElement("children", in, new String[0]);
-                for (String child : childArray) {
-                    children.add(getGame().getMap().getRegion(child));
-                }
-            } else if (CHILD_TAG.equals(tag)) {
-                children.add(makeFreeColGameObject(in, ID_ATTRIBUTE_TAG, Region.class));
-                closeTag(in, CHILD_TAG);
-            } else {
-                logger.warning("Bad Region tag: " + tag);
+        // Clear containers.
+        children = null;
+
+        super.readChildren(in);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void readChild(XMLStreamReader in) throws XMLStreamException {
+        final String tag = in.getLocalName();
+
+        // @compat 0.9.x
+        if (CHILDREN_TAG.equals(tag)) {
+            String[] childArray = readFromArrayElement(CHILDREN_TAG, in, new String[0]);
+            for (String child : childArray) {
+                children.add(getGame().getMap().getRegion(child));
             }
-        }
-        if (children.isEmpty()) {
-            children = null;
+        // end @compat
+
+        } else if (CHILD_TAG.equals(tag)) {
+            Region child = makeFreeColGameObject(in, ID_ATTRIBUTE_TAG,
+                                                 Region.class);
+            if (child != null) addChild(child);
+            closeTag(in, CHILD_TAG);
+        
+        } else {
+            super.readChild(in);
         }
     }
 
@@ -570,9 +595,12 @@ public class Region extends FreeColGameObject implements Nameable {
      */
     @Override
     public String toString() {
-        return "[Region " + getId()
-            + " " + ((name == null) ? "(null)" : name)
-            + " " + nameKey + " " + type + "]";
+        StringBuilder sb = new StringBuilder(32);
+        sb.append("[").append(getId())
+            .append(" ").append((name == null) ? "(null)" : name)
+            .append(" ").append(nameKey).append(" ").append(type)
+            .append("]");
+        return sb.toString();
     }
 
     /**
