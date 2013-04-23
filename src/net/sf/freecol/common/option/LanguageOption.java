@@ -182,7 +182,7 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
             throw new RuntimeException("No language files could be found"
                 + " in the <" + i18nDirectory + "> directory.");
         }
-        String prefix = Messages.FILE_PREFIX + "_";
+        String prefix = Messages.MESSAGE_FILE_PREFIX + "_";
         int prefixLength = prefix.length();
         for (File file : files) {
             if (file.getName() == null

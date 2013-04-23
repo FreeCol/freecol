@@ -38,6 +38,7 @@ import java.util.logging.Logger;
 import javax.swing.UIManager;
 
 import net.sf.freecol.common.io.FreeColDirectories;
+import net.sf.freecol.common.io.FreeColDataFile;
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.Mods;
 import net.sf.freecol.common.model.AbstractUnit;
@@ -91,9 +92,9 @@ public class Messages {
 
     private static final Logger logger = Logger.getLogger(Messages.class.getName());
 
-    public static final String FILE_PREFIX = "FreeColMessages";
+    public static final String MESSAGE_FILE_PREFIX = "FreeColMessages";
 
-    public static final String FILE_SUFFIX = ".properties";
+    public static final String MESSAGE_FILE_SUFFIX = ".properties";
 
     private static final String[] DESCRIPTION_KEYS = new String[] {
         ".description", ".shortDescription", ".name"
@@ -119,12 +120,11 @@ public class Messages {
     }
 
 
-
     /**
-     * Returns the Selector with the given tag.
+     * Gets the Selector with the given tag.
      *
-     * @param tag a <code>String</code> value
-     * @return a <code>Selector</code> value
+     * @param The tag to check.
+     * @return A suitable <code>Selector</code>.
      */
     private static Selector getSelector(String tag) {
         return tagMap.get(tag.toLowerCase(Locale.US));
@@ -137,6 +137,17 @@ public class Messages {
      */
     public static void setGrammaticalNumber(Number number) {
         tagMap.put("plural", number);
+    }
+
+    /**
+     * Get a list of candidate message file names for a given locale.
+     *
+     * @param locale The <code>Locale</code> to generate file names for.
+     * @return A list of message file names.
+     */
+    private static List<String> getMessageFileNames(Locale locale) {
+        return FreeColDataFile.getFileNames(MESSAGE_FILE_PREFIX,
+            MESSAGE_FILE_SUFFIX, locale);
     }
 
     /**
@@ -176,11 +187,7 @@ public class Messages {
         }
 
         setGrammaticalNumber(NumberRules.getNumberForLanguage(locale.getLanguage()));
-
-        List<String> filenames = FreeColModFile.getFileNames(FILE_PREFIX,
-            FILE_SUFFIX,
-            locale.getLanguage(), locale.getCountry(), locale.getVariant());
-        for (String name : filenames) {
+        for (String name : getMessageFileNames(locale)) {
             File file = new File(i18nDirectory, name);
             if (!file.exists()) continue; // Expected
             try {
@@ -244,10 +251,7 @@ public class Messages {
         allMods.addAll(Mods.getAllMods());
         allMods.addAll(Mods.getRuleSets());
 
-        List<String> filenames = FreeColModFile.getFileNames(FILE_PREFIX,
-            FILE_SUFFIX,
-            locale.getLanguage(), locale.getCountry(), locale.getVariant());
-
+        List<String> filenames = getMessageFileNames(locale);
         for (FreeColModFile fcmf : allMods) {
             for (String name : filenames) {
                 try {

@@ -52,12 +52,10 @@ public class FreeColDataFile {
 
     private static final Logger logger = Logger.getLogger(FreeColDataFile.class.getName());
 
-    private static final String FILE_PREFIX = "resources";
-    private static final String FILE_SUFFIX = ".properties";
+    private static final String RESOURCE_FILE_PREFIX = "resources";
+    private static final String RESOURCE_FILE_SUFFIX = ".properties";
 
-    /**
-       A fake URI scheme for resources delegating to other resources.
-    */
+    /** A fake URI scheme for resources delegating to other resources. */
     private static final String resourceScheme = "resource:";
 
     /** The file this object represents. */
@@ -86,14 +84,17 @@ public class FreeColDataFile {
                 }
             }
         }
-        if (!file.exists()) throw new IOException("File does not exist");
-
+        if (!file.exists()) {
+            throw new IOException("File " + file.getName() + " does not exist");
+        }
         this.file = file;
 
         if (file.isDirectory()) {
             this.jarDirectory = null;
         } else {
-            this.jarDirectory = findJarDirectory(file.getName().substring(0, file.getName().lastIndexOf('.')), file);
+            String jarName = file.getName().substring(0,
+                file.getName().lastIndexOf('.'));
+            this.jarDirectory = findJarDirectory(jarName, file);
         }
     }
 
@@ -128,18 +129,18 @@ public class FreeColDataFile {
     }
 
     /**
-     * Returns a list containing the names of all
-     * message files to load.
+     * Gets a list containing the names of all message files to load.
      *
-     * @param prefix a <code>String</code> value
-     * @param suffix a <code>String</code> value
-     * @param language a <code>String</code> value
-     * @param country a <code>String</code> value
-     * @param variant a <code>String</code> value
-     * @return a <code>List<String></code> value
+     * @param prefix The file name prefix.
+     * @param suffix The file name suffix.
+     * @param locale The <code>Locale</code> to generate file names for.
+     * @return A list of candidate file names.
      */
-    public static List<String> getFileNames(String prefix, String suffix, String language,
-                                            String country, String variant) {
+    public static List<String> getFileNames(String prefix, String suffix,
+                                            Locale locale) {
+        String language = locale.getLanguage();
+        String country = locale.getCountry();
+        String variant = locale.getVariant();
 
         List<String> result = new ArrayList<String>(4);
 
@@ -163,43 +164,61 @@ public class FreeColDataFile {
         return result;
     }
 
-
     /**
-     * Returns an input stream for the specified resource.
-     * @param filename The filename of a resource within this collection of
-     *      data. If this object represents a directory then the provided filename
-     *      should be relative towards the path of the directory. In case
-     *      of a compressed archive it should be the path within the
-     *      archive.
-     * @return an <code>InputStream</code> value
-     * @exception IOException if an error occurs
+     * Get a list of candidate resource file names for a given locale.
+     *
+     * @return A list of resource file names.
      */
-    public BufferedInputStream getInputStream(String filename) throws IOException {
-        final URLConnection connection = getURI(filename).toURL().openConnection();
-        connection.setDefaultUseCaches(false);
-        return new BufferedInputStream(connection.getInputStream());
+    public static List<String> getResourceFileNames() {
+        return getFileNames(RESOURCE_FILE_PREFIX, RESOURCE_FILE_SUFFIX,
+                            Locale.getDefault());
     }
 
-    protected URI getURI(String filename) {
+    /**
+     * Get a URI to access a resource through.
+     *
+     * @param name A name with special prefixes to convert to the URI.
+     * @return A <code>URI</code>, or null if none found.
+     */
+    protected URI getURI(String name) {
         try {
-            if (filename.startsWith("urn:")) {
+            if (name.startsWith("urn:")) {
                 try {
-                    return new URI(filename);
+                    return new URI(name);
                 } catch (URISyntaxException e) {
-                    logger.log(Level.WARNING, "Resource creation failure with |"
-                        + filename + "|", e);
+                    logger.log(Level.WARNING, "Resource creation failure with: "
+                        + name, e);
                     return null;
                 }
             } else if (file.isDirectory()) {
-                return new File(file, filename).toURI();
+                return new File(file, name).toURI();
             } else {
-                return new URI("jar:file", file + "!/" + jarDirectory + filename, null);
+                return new URI("jar:file", file + "!/" + jarDirectory + name,
+                               null);
             }
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Failed to lookup: " + filename
-                       + " in: " + file, e);
+            logger.log(Level.WARNING, "Failed to lookup: " + file + "/" + name,
+                       e);
             return null;
         }
+    }
+
+    /**
+     * Gets an input stream for the specified resource.
+     *
+     * @param filename The filename of a resource within this
+     *     collection of data.  If this object represents a directory
+     *     then the provided filename should be relative towards the
+     *     path of the directory.  In case of a compressed archive it
+     *     should be the path within the archive.
+     * @return An <code>InputStream</code> to read the resource with.
+     * @exception IOException if an error occurs
+     */
+    public BufferedInputStream getInputStream(String filename) throws IOException {
+        final URLConnection connection = getURI(filename).toURL()
+            .openConnection();
+        connection.setDefaultUseCaches(false);
+        return new BufferedInputStream(connection.getInputStream());
     }
 
     /**
@@ -207,29 +226,26 @@ public class FreeColDataFile {
      * resource files.
      *
      * @return A <code>ResourceMapping</code> or <code>null</code>
-     *      there is no resource mapping file.
+     *     there is no resource mapping file.
      */
     public ResourceMapping getResourceMapping() {
-
         final Properties properties = new Properties();
-        Locale locale = Locale.getDefault();
-        for (String fileName : getFileNames(FILE_PREFIX, FILE_SUFFIX, locale.getLanguage(),
-                                            locale.getCountry(), locale.getVariant())) {
+        for (String fileName : getResourceFileNames()) {
             try {
                 final InputStream is = getInputStream(fileName);
                 try {
                     properties.load(is);
-                    logger.info("Loaded ResourceMapping " + fileName + " from " + file + ".");
+                    logger.info("ResourceMapping loaded: " + file
+                        + "/" + fileName);
                 } finally {
-                    try {
-                        is.close();
-                    } catch (Exception e) {}
+                    try { is.close(); } catch (Exception e) {}
                 }
-            } catch (FileNotFoundException e) {
-                logger.log(Level.FINEST, "No ResourceMapping " + fileName
-                    + " in " + file + ".", e);
+            } catch (FileNotFoundException e) { // Expected failure
+                logger.finest("ResourceMapping not found: " + file
+                    + "/" + fileName);
             } catch (IOException e) {
-                logger.log(Level.WARNING, "Exception while reading ResourceMapping from: " + file, e);
+                logger.log(Level.WARNING, "ResourceMapping read exception: "
+                    + file + "/" + fileName, e);
                 return null;
             }
         }
@@ -276,7 +292,8 @@ public class FreeColDataFile {
     }
 
     /**
-     * Returns a <code>FileFilter</code>.
+     * Gets a <code>FileFilter</code> for the accepted file endings.
+     *
      * @return The <code>FileFilter</code>.
      */
     public FileFilter getFileFilter() {
@@ -295,6 +312,8 @@ public class FreeColDataFile {
 
     /**
      * File endings that are supported for this type of data file.
+     * Override in classes that accept other endings.
+     *
      * @return An array with a single element: ".zip".
      */
     protected String[] getFileEndings() {
