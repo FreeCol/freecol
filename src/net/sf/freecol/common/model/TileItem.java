@@ -30,16 +30,19 @@ public abstract class TileItem extends FreeColGameObject implements Locatable {
     public static final int RESOURCE_ZINDEX = 400;
     public static final int RUMOUR_ZINDEX = 500;
 
+    /** The tile where the tile item is. */
     protected Tile tile;
 
+
     /**
-    * Creates a new <code>TileItem</code>.
-    *
-    * @param game The <code>Game</code> in which this object belong.
-    * @param tile The location of the <code>Settlement</code>.
-    */
+     * Creates a new <code>TileItem</code>.
+     *
+     * @param game The enclosing <code>Game</code>.
+     * @param tile The location of this <code>TileItem</code>.
+     */
     public TileItem(Game game, Tile tile) {
         super(game);
+
         if (tile == null) {
             throw new IllegalArgumentException("Parameter 'tile' must not be 'null'.");
         }
@@ -47,94 +50,44 @@ public abstract class TileItem extends FreeColGameObject implements Locatable {
     }
 
     /**
-     * Initiates a new <code>TileItem</code> from an XML stream.
+     * Creates a new <code>TileItem</code> from an XML stream.
      *
-     * @param game The <code>Game</code> in which this object belong.
+     * @param game The enclosing <code>Game</code>.
      * @param in The input stream containing the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
+     * @exception XMLStreamException if a problem was encountered
+     *     during parsing.
      */
     public TileItem(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, null);
     }
 
     /**
-     * Initiates a new <code>TileItem</code>
-     * with the given ID. The object should later be
-     * initialized by calling either
-     * {@link #readFromXML(XMLStreamReader)}.
+     * Initiates a new <code>TileItem</code> with the given
+     * identifier.  The object should later be initialized by calling
+     * either {@link #readFromXML(XMLStreamReader)}.
      *
-     * @param game The <code>Game</code> in which this object belong.
+     * @param game The enclosing <code>Game</code>.
      * @param id The unique identifier for this object.
      */
     public TileItem(Game game, String id) {
         super(game, id);
     }
 
-    /**
-     * Sets the location for this <code>TileItem</code>.
-     * @param newLocation The new <code>Location</code> for the <code>TileItem</code>.
-     */
-    public void setLocation(Location newLocation) {
-        if (newLocation instanceof Tile) {
-            tile = ((Tile) newLocation);
-        } else {
-            throw new IllegalArgumentException("newLocation is not a Tile");
-        }
-    }
 
-    /**
-     * Gets the location of this <code>TileItem</code>.
-     * @return The location of this <code>TileItem</code>.
-     */
-    public Location getLocation() {
-        return tile;
-    }
-
-    /**
-     * Are these goods in Europe?  No.
-     *
-     * @return False.
-     */
-    public boolean isInEurope() {
-        return false;
-    }
-
-    /**
-     * Returns the <code>Tile</code> where this <code>TileItem</code> is located,
-     * or <code>null</code> if it's location is <code>Europe</code>.
-     *
-     * @return The Tile where this TileItem is located. Or null if
-     * its location is Europe.
-     */
-    public Tile getTile() {
-        return tile;
-    }
-
-    /**
-     * Tile items can not be loaded on carriers.
-     *
-     * @return Always 0.
-     */
-    public int getSpaceTaken() {
-        return 0;
-    }
-
+    // Routines to be implemented by subclasses.
 
     /**
      * Get the <code>ZIndex</code> value.
      *
-     * @return an <code>int</code> value
+     * @return The z-index.
      */
     public abstract int getZIndex();
 
-
     /**
-     * Returns true if the TileItem is compatible with the given
-     * <object>TileType</object>.
+     * Is a tile type compatible with this tile item?
      *
-     * @param tileType a <code>TileType</code> value
-     * @return a <code>boolean</code> value
+     * @param tileType The <code>TileType</code> to check.
+     * @return True if the tile type is compatible.
      */
     public abstract boolean isTileTypeAllowed(TileType tileType);
 
@@ -147,13 +100,55 @@ public abstract class TileItem extends FreeColGameObject implements Locatable {
      * @param potential The base potential production.
      * @return The production with resource bonuses.
      */
-    public abstract int applyBonus(GoodsType goodsType, UnitType unitType, int potential);
+    public abstract int applyBonus(GoodsType goodsType, UnitType unitType,
+                                   int potential);
 
     /**
-     * Returns <code>true</code> if this TileItem is natural.
+     * Is this a natural TileItem?
      *
-     * @return a <code>boolean</code> value
+     * @return True if this is a natural <code>TileItem</code>.
      */
     public abstract boolean isNatural();
 
+
+    // Interface Locatable
+
+    /**
+     * {@inheritDoc}
+     */
+    public Location getLocation() {
+        return tile;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setLocation(Location newLocation) {
+        if (newLocation instanceof Tile) {
+            tile = ((Tile) newLocation);
+        } else {
+            throw new IllegalArgumentException("newLocation is not a Tile");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isInEurope() {
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Tile getTile() {
+        return tile;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int getSpaceTaken() {
+        return 0;
+    }
 }

@@ -26,6 +26,13 @@ package net.sf.freecol.common.model;
 public interface Locatable {
 
     /**
+     * Gets the location of this <code>Locatable</code>.
+     *
+     * @return The location of this <code>Locatable</code>.
+     */
+    public Location getLocation();
+
+    /**
      * Sets the location for this <code>Locatable</code>.
      *
      * @param newLocation The new <code>Location</code> for the
@@ -34,29 +41,24 @@ public interface Locatable {
     public void setLocation(Location newLocation);
 
     /**
-     * Gets the location of this <code>Locatable</code>.
-     *
-     * @return The location of this <code>Locatable</code>.
-     */
-    public Location getLocation();
-
-    /**
      * Is this locatable in Europe.
+     *
+     * @return True if the <code>Locatable</code> is in <code>Europe</code>.
      */
     public boolean isInEurope();
 
     /**
-     * Returns the <code>Tile</code> where this <code>Locatable</code>
-     * is located, or <code>null</code> if it's location is
-     * <code>Europe</code>.
+     * Get the <code>Tile</code> where this <code>Locatable</code> is
+     * located, or <code>null</code> if it is in <code>Europe</code>.
      *
-     * @return The Tile where this Unit is located if any.
+     * @return The <code>Tile</code> where this <code>Locatable</code>
+     *     is located, if any.
      */
     public Tile getTile();
 
     /**
-     * Gets the number of cargo slots consumed when this <code>Locatable</code>
-     * if put onto a carrier.
+     * Gets the number of cargo slots consumed when this
+     * <code>Locatable</code> if put onto a carrier.
      *
      * @return The number of cargo slots required.
      */
