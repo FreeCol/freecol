@@ -128,10 +128,7 @@ public class FreeColDebugger {
      * @param optionValue The command line option.
      */
     public static boolean setDebugModes(String optionValue) {
-        if (optionValue == null || "".equals(optionValue)) {
-            enableDebugMode(DebugMode.MENUS);
-            return true;
-        }
+        if (optionValue == null) return false;
         // @compat 0.10.x
         try {
             int i = Integer.parseInt(optionValue);

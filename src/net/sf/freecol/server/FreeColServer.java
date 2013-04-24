@@ -904,8 +904,8 @@ public final class FreeColServer {
                 str = xsr.getAttributeValue(null, "randomState");
                 server.setServerRandom(Utils.restoreRandomState(str));
 
-                str = xsr.getAttributeValue(null, "debug");
-                FreeColDebugger.setDebugModes(str);
+                FreeColDebugger.setDebugModes(xsr.getAttributeValue(null,
+                                                                    "debug"));
 
                 active = xsr.getAttributeValue(null, "activeUnit");
             }

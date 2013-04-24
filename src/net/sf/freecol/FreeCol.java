@@ -520,8 +520,12 @@ public final class FreeCol {
 
             if (line.hasOption("debug")) {
                 // If the optional argument is supplied use limited mode.
-                if (!FreeColDebugger.setDebugModes(line.getOptionValue("debug"))) {
-                    // Not fatal.
+                String arg = line.getOptionValue("debug");
+                if (arg == null || "".equals(arg)) {
+                    // Let empty argument default to menus functionality.
+                    arg = FreeColDebugger.DebugMode.MENUS.toString();
+                }
+                if (!FreeColDebugger.setDebugModes(arg)) { // Not fatal.
                     System.err.println(Messages.message(StringTemplate.template("cli.error.debug")
                             .addName("%modes", FreeColDebugger.getDebugModes())));
                 }
