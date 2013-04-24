@@ -149,6 +149,27 @@ public abstract class FreeColObject {
     }
 
     /**
+     * Compare two FreeColObjects by their identifiers.
+     *
+     * @param fco1 The first <code>FreeColObject</code> to compare.
+     * @param fco2 The second <code>FreeColObject</code> to compare.
+     * @return The comparison result.
+     */
+    public static int compareIds(FreeColObject fco1, FreeColObject fco2) {
+        String id1 = fco1.getId();
+        String id2 = fco2.getId();
+        if (id1 == null) {
+            return (id2 == null) ? 0 : -1;
+        } else if (id2 == null) {
+            return 1;
+        }
+        int cmp = fco1.getIdType().compareTo(fco2.getIdType());
+        if (cmp == 0) cmp = fco1.getIdNumber() - fco2.getIdNumber();
+        if (cmp == 0) cmp = fco1.hashCode() - fco2.hashCode();
+        return cmp;
+    }
+
+    /**
      * Get a comparator by id for <code>FreeColObject</code>s.
      *
      * @return A new id comparator.
@@ -156,17 +177,7 @@ public abstract class FreeColObject {
     public static <T extends FreeColObject> Comparator<T> getIdComparator() {
         return new Comparator<T>() {
             public int compare(T fco1, T fco2) {
-                String id1 = fco1.getId();
-                String id2 = fco2.getId();
-                if (id1 == null) {
-                    return (id2 == null) ? 0 : -1;
-                } else if (id2 == null) {
-                    return 1;
-                }
-                int cmp = fco1.getIdType().compareTo(fco2.getIdType());
-                if (cmp == 0) cmp = fco1.getIdNumber() - fco2.getIdNumber();
-                if (cmp == 0) cmp = fco1.hashCode() - fco2.hashCode();
-                return cmp;
+                return compareIds((FreeColObject)fco1, (FreeColObject)fco2);
             }
         };
     }

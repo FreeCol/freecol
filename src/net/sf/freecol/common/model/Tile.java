@@ -38,6 +38,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Map.Layer;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.util.RandomChoice;
@@ -1396,11 +1397,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * Finds the TileImprovement of a given Type, or null if there is no match.
      */
     public TileImprovement findTileImprovementType(TileImprovementType type) {
-        if (tileItemContainer == null) {
-            return null;
-        } else {
-            return tileItemContainer.findTileImprovementType(type);
-        }
+        return (tileItemContainer == null) ? null
+            : tileItemContainer.getImprovement(type);
     }
 
     /**
@@ -2101,13 +2099,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             }
         // end @compat
         } else if (in.getLocalName().equals(TileItemContainer.getXMLElementTagName())) {
-            tileItemContainer = getGame().getFreeColGameObject(readId(in),
-                                                               TileItemContainer.class);
-            if (tileItemContainer != null) {
-                tileItemContainer.readFromXML(in);
-            } else {
-                tileItemContainer = new TileItemContainer(getGame(), this, in);
-            }
+            tileItemContainer = readFreeColGameObject(in,
+                TileItemContainer.class);
+
         } else if (in.getLocalName().equals(PlayerExploredTile.getXMLElementTagName())) {
             // Only from a saved game.
             Player player = findFreeColGameObject(in, "player",
