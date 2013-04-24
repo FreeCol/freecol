@@ -32,10 +32,15 @@ import javax.xml.stream.XMLStreamWriter;
 public class Resource extends TileItem {
 
     private static Logger logger = Logger.getLogger(Resource.class.getName());
+
     private static final int UNLIMITED = -1;
 
+    /** The type of resource. */
     private ResourceType type;
+
+    /** The amount of the resource present. */
     private int quantity;
+
 
     /**
      * Creates a standard <code>Resource</code>-instance.
@@ -45,10 +50,11 @@ public class Resource extends TileItem {
      * @param game The <code>Game</code> in which this object belongs.
      * @param tile The <code>Tile</code> on which this object sits.
      * @param type The <code>ResourceType</code> of this Resource.
-     * @param quantity an <code>int</code> value
+     * @param quantity The quantity of resource.
      */
     public Resource(Game game, Tile tile, ResourceType type, int quantity) {
         super(game, tile);
+
         if (type == null) {
             throw new IllegalArgumentException("Parameter 'type' must not be 'null'.");
         }
@@ -69,12 +75,6 @@ public class Resource extends TileItem {
         this(game, tile, type, type.getMaxValue());
     }
 
-
-    public Resource(Game game, XMLStreamReader in) throws XMLStreamException {
-        super(game, in);
-        readFromXML(in);
-    }
-
     /**
      * Creates new <code>Resource</code>.
      *
@@ -85,70 +85,70 @@ public class Resource extends TileItem {
         super(game, id);
     }
 
-
     /**
-     * Returns a textual representation of this object.
-     * @return A <code>String</code> of either:
-     * <ol>
-     * <li>QUANTITY RESOURCETYPE (eg. 250 Minerals) if there is a limited quantity
-     * <li>RESOURCETYPE (eg. Game) if it is an unlimited resource
-     * </ol>
+     * Get a name key for this resource.
+     *
+     * @return The name key.
      */
-    public String toString() {
-        if (quantity == UNLIMITED) {
-            return getType().getId();
-        } else {
-            return Integer.toString(quantity) + " " + getType().getId();
-        }
-    }
-
     public String getNameKey() {
         return getType().getNameKey();
     }
 
-
     /**
-     * Returns the <code>ResourceType</code> of this Resource.
+     * Get the type of this resource.
+     *
+     * @return The resource type.
      */
     public ResourceType getType() {
         return type;
     }
 
     /**
-     * Returns the current quantity.
+     * Get the resource quantity.
+     *
+     * @return The resource quantity.
      */
     public int getQuantity() {
         return quantity;
     }
 
     /**
-     * Returns the current quantity.
+     * Set the resource quantity.
+     *
+     * @param newQuantity The new resource quantity.
      */
     public void setQuantity(int newQuantity) {
         quantity = newQuantity;
     }
 
     /**
-     * Returns the best GoodsType
+     * Get the best goods type to produce here.
+     *
+     * @return The best goods type.
      */
     public GoodsType getBestGoodsType() {
         return type.getBestGoodsType();
     }
 
     /**
-     * Reduces the available quantity by the bonus output of <code>GoodsType</code>.
-     * @param goodsType The GoodsType to check
-     * @param unitType an <code>UnitType</code> value
-     * @param potential Potential of Tile + Improvements
-     * @return an <code>int</code> value
+     * Reduce the available quantity by the bonus output of
+     * <code>GoodsType</code>.
+     *
+     * @param goodsType The <code>GoodsType</code> to check.
+     * @param unitType The producing <code>UnitType</code>.
+     * @param potential The base potential of the tile.
+     * @return The new quantity of resource.
      */
-    public int useQuantity(GoodsType goodsType, UnitType unitType, int potential) {
+    public int useQuantity(GoodsType goodsType, UnitType unitType,
+                           int potential) {
         // Return UNLIMITED here if not limited resource?
-        return useQuantity(applyBonus(goodsType, unitType, potential) - potential);
+        return useQuantity(applyBonus(goodsType, unitType, potential)
+            - potential);
     }
 
     /**
-     * Reduces the value <code>quantity</code>.
+     * Reduces the available quantity.
+     *
      * @param usedQuantity The quantity that was used up.
      * @return The final value of quantity.
      */
@@ -165,12 +165,6 @@ public class Resource extends TileItem {
         return quantity;
     }
 
-    /* TODO: what was this for? Named resources, such as Lost Crazy Russian Gold Mine?
-       That actually sounds like a neat idea.
-    public void setName(String newName) {
-        // do nothing
-    }
-    */
 
     // Interface TileItem
 
@@ -191,84 +185,81 @@ public class Resource extends TileItem {
     /**
      * {@inheritDoc}
      */
-    public boolean isNatural() {
-        return true;
-    }
-
-    /**
-     * Gets the production (checking available stock) for next turn applying
-     * the bonuses from this resource.
-     *
-     * @param goodsType The <code>GoodsType</code> to produce.
-     * @param unitType The <code>UnitType</code> that is to work.
-     * @param potential The base potential production.
-     * @return The production with resource bonuses.
-     */
-    public int applyBonus(GoodsType goodsType, UnitType unitType, int potential) {
+    public int applyBonus(GoodsType goodsType, UnitType unitType,
+                          int potential) {
         Set<Modifier> bonus = type.getModifierSet(goodsType.getId(), unitType);
         int amount = (int)FeatureContainer.applyModifierSet(potential, null,
                                                             bonus) - potential;
         return potential
-            + ((quantity == UNLIMITED || quantity > amount) ? amount : quantity);
+            + ((quantity == UNLIMITED || quantity > amount) ? amount
+                : quantity);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isNatural() {
+        return true;
     }
 
 
+    // Serialization
+
+    private static final String QUANTITY_TAG = "quantity";
+    private static final String TILE_TAG = "tile";
+    private static final String TYPE_TAG = "type";
+
+
     /**
-     * This method writes an XML-representation of this object to the given
-     * stream.
-     *
-     * <br>
-     * <br>
-     *
-     * Only attributes visible to the given <code>Player</code> will be added
-     * to that representation if <code>showAll</code> is set to
-     * <code>false</code>.
-     *
-     * @param out The target stream.
-     * @param player The <code>Player</code> this XML-representation should be
-     *            made for, or <code>null</code> if
-     *            <code>showAll == true</code>.
-     * @param showAll Only attributes visible to <code>player</code> will be
-     *            added to the representation if <code>showAll</code> is set
-     *            to <i>false</i>.
-     * @param toSavedGame If <code>true</code> then information that is only
-     *            needed when saving a game is added.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
+     * {@inheritDoc}
      */
     @Override
     protected void toXMLImpl(XMLStreamWriter out, Player player,
-                             boolean showAll, boolean toSavedGame)
-        throws XMLStreamException {
-        // Start element:
-        out.writeStartElement(getXMLElementTagName());
-
-        // Add attributes:
-        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
-        out.writeAttribute("tile", getTile().getId());
-        out.writeAttribute("type", getType().getId());
-        out.writeAttribute("quantity", Integer.toString(quantity));
-
-        // End element:
-        out.writeEndElement();
+                             boolean showAll,
+                             boolean toSavedGame) throws XMLStreamException {
+        super.toXML(out, getXMLElementTagName(), player, showAll, toSavedGame);
     }
 
     /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered during parsing.
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out, Player player,
+                                   boolean showAll,
+                                   boolean toSavedGame) throws XMLStreamException {
+        super.writeAttributes(out);
+
+        writeAttribute(out, TILE_TAG, getTile());
+
+        writeAttribute(out, TYPE_TAG, getType());
+
+        writeAttribute(out, QUANTITY_TAG, quantity);
+    }
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        setId(readId(in));
+        final Specification spec = getSpecification();
 
-        tile = makeFreeColGameObject(in, "tile", Tile.class);
+        super.readAttributes(in);
 
-        type = getSpecification().getResourceType(in.getAttributeValue(null, "type"));
+        tile = makeFreeColGameObject(in, TILE_TAG, Tile.class);
 
-        quantity = Integer.parseInt(in.getAttributeValue(null, "quantity"));
+        type = spec.getType(in, TYPE_TAG,
+                            ResourceType.class, (ResourceType)null);
 
+        quantity = getAttribute(in, QUANTITY_TAG, 0);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return (quantity == UNLIMITED) ? getType().getId()
+            : Integer.toString(quantity) + " " + getType().getId();
     }
 
     /**
