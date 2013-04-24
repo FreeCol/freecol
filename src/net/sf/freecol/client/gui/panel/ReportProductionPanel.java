@@ -173,7 +173,7 @@ public final class ReportProductionPanel extends ReportPanel {
                         } else {
                             buildingCount.incrementCount(building.getType(), 1);
                             BuildingPanel buildingPanel =
-                                new BuildingPanel(getFreeColClient(), building, getGUI());
+                                new BuildingPanel(getFreeColClient(), building);
                             buildingPanel.setBorder(FreeColPanel.CELLBORDER);
                             reportPanel.add(buildingPanel);
                         }

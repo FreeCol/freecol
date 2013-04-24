@@ -63,22 +63,16 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
 
     private FreeColClient freeColClient;
 
-    private GUI gui;
-
 
     /**
      * Creates this BuildingPanel.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param building The building to display information from.
-     * @param gui The <code>GUI</code> to display on.
      */
-    public BuildingPanel(FreeColClient freeColClient, Building building,
-                         GUI gui) {
+    public BuildingPanel(FreeColClient freeColClient, Building building) {
         this.freeColClient = freeColClient;
-        this.gui = gui;
         this.building = building;
-
 
         setToolTipText(" ");
         setLayout(new MigLayout("", "[32][32][32]", "[32][44]"));
@@ -111,7 +105,7 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
                 }
                 AbstractGoods maximum = info.getMaximumProduction().isEmpty()
                     ? output : info.getMaximumProduction().get(0);
-                productionOutput = new ProductionLabel(freeColClient, gui, output, maximum);
+                productionOutput = new ProductionLabel(freeColClient, getGUI(), output, maximum);
             }
         }
         JLabel upkeep = null;
@@ -131,7 +125,7 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
         }
 
         for (Unit unit : building.getUnitList()) {
-            UnitLabel unitLabel = new UnitLabel(freeColClient, unit, gui, true);
+            UnitLabel unitLabel = new UnitLabel(freeColClient, unit, getGUI(), true);
             unitLabels.add(unitLabel);
             add(unitLabel);
         }
@@ -145,6 +139,10 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
         removePropertyChangeListeners();
     }
 
+    private GUI getGUI() {
+        return freeColClient.getGUI();
+    }
+
     /**
      * Paints this component.
      *
@@ -152,7 +150,7 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
      */
     @Override
     public void paintComponent(Graphics g) {
-        BufferedImage bgImage = fadeImage(gui.getImageLibrary().getBuildingImage(building), 0.6f, 192.0f);
+        BufferedImage bgImage = fadeImage(getGUI().getImageLibrary().getBuildingImage(building), 0.6f, 192.0f);
         g.drawImage(bgImage, 0, 0, this);
     }
 
@@ -187,7 +185,7 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
 
     @Override
     public JToolTip createToolTip() {
-        return new BuildingToolTip(freeColClient, building, gui);
+        return new BuildingToolTip(freeColClient, building, getGUI());
     }
 
     public void addPropertyChangeListeners() {
@@ -212,9 +210,9 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
         private final Image image;
 
         public UpkeepLabel(int number) {
-            super(gui.getImageLibrary().getMiscImageIcon("coin"));
-            image = gui.getImageLibrary()
-                .getStringImage(gui.getCanvas().getGraphics(),
+            super(getGUI().getImageLibrary().getMiscImageIcon("coin"));
+            image = getGUI().getImageLibrary()
+                .getStringImage(getGUI().getCanvas().getGraphics(),
                                 Integer.toString(number), getForeground(),
                                 ResourceManager.getFont("SimpleFont", Font.BOLD, 12f));
         }

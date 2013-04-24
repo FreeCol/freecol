@@ -57,7 +57,7 @@ public final class ReportEducationPanel extends ReportPanel {
                 if (building.canTeach()) {
                     int maxSkill = Unit.UNDEFINED;
                     reportPanel.add(createColonyButton(colony), "newline, split 2, flowy");
-                    reportPanel.add(new BuildingPanel(getFreeColClient(), building, getGUI()));
+                    reportPanel.add(new BuildingPanel(getFreeColClient(), building));
                     JPanel teacherPanel = getPanel("report.education.teachers");
                     for (Unit unit : colony.getUnitList()) {
                         if (building.canAdd(unit)) {

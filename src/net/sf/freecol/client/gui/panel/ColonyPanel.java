@@ -1323,13 +1323,6 @@ public final class ColonyPanel extends PortPanel
         /** The parent colony panel. */
         private final ColonyPanel colonyPanel;
 
-        private MouseAdapter mouseAdapter = new MouseAdapter() {
-                public void mousePressed(MouseEvent e) {
-                    getGUI().showBuildQueuePanel(getColony());
-                }
-            };
-
-
         /**
          * Creates this BuildingsPanel.
          */
@@ -1346,11 +1339,18 @@ public final class ColonyPanel extends PortPanel
             if (colony == null) return;
             cleanup();
 
+            MouseAdapter mouseAdapter = new MouseAdapter() {
+                    public void mousePressed(MouseEvent e) {
+                        getGUI().showBuildQueuePanel(getColony());
+                    }
+                };
+
             List<Building> buildings = colony.getBuildings();
             Collections.sort(buildings);
             for (Building building : buildings) {
                 ASingleBuildingPanel aSBP = new ASingleBuildingPanel(building);
                 aSBP.initialize();
+                aSBP.addMouseListener(mouseAdapter);
                 aSBP.setOpaque(false);
                 add(aSBP);
             }
@@ -1397,10 +1397,11 @@ public final class ColonyPanel extends PortPanel
             /**
              * Creates this ASingleBuildingPanel.
              *
-             * @param building The building to display information from.
+             * @param building The <code>Building</code> to display
+             *     information from.
              */
             public ASingleBuildingPanel(Building building) {
-                super(getFreeColClient(), building, getGUI());
+                super(getFreeColClient(), building);
             }
 
             @Override
@@ -1408,7 +1409,6 @@ public final class ColonyPanel extends PortPanel
                 if (colonyPanel.isEditable()) {
                     addMouseListener(releaseListener);
                     setTransferHandler(defaultTransferHandler);
-                    addMouseListener(mouseAdapter);
                     addPropertyChangeListeners();
                 }
             }

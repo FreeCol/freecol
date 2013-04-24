@@ -96,8 +96,8 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
             if (openBuildQueue)
             {
                 addMouseListener(new MouseAdapter() {
-                    public void mousePressed(MouseEvent e) {
-                        gui.showBuildQueuePanel(colony);
+                        public void mousePressed(MouseEvent e) {
+                            gui.showBuildQueuePanel(colony);
                         }
                     });
             }
