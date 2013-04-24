@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Specification;
 
 
 /**
@@ -63,7 +64,7 @@ public class TileImprovement extends TileItem implements Named {
 
     /**
      * Whether this is a virtual improvement granted by some structure
-     * on the tile (a Colony, for example). Virtual improvements will
+     * on the tile (a Colony, for example).  Virtual improvements will
      * be removed along with the structure that granted them.
      */
     private boolean virtual;
@@ -78,7 +79,7 @@ public class TileImprovement extends TileItem implements Named {
      * This constructor asserts that the game, tile and type are valid.
      * Does not set the style.
      *
-     * @param game The <code>Game</code> in which this object belongs.
+     * @param game The enclosing <code>Game</code>.
      * @param tile The <code>Tile</code> on which this object sits.
      * @param type The <code>TileImprovementType</code> of this TileImprovement.
      */
@@ -89,7 +90,8 @@ public class TileImprovement extends TileItem implements Named {
         }
         this.type = type;
         if (!type.isNatural()) {
-            this.turnsToComplete = tile.getType().getBasicWorkTurns() + type.getAddWorkTurns();
+            this.turnsToComplete = tile.getType().getBasicWorkTurns()
+                + type.getAddWorkTurns();
         }
         this.magnitude = type.getMagnitude();
         this.style = null;
@@ -97,25 +99,15 @@ public class TileImprovement extends TileItem implements Named {
     }
 
     /**
-     * Create an new TileImprovement from an input stream.
-     *
-     * @param game The <code>Game</code> in which this object belongs.
-     * @param in The <code>XMLStreamReader</code> to read from.
-     */
-    public TileImprovement(Game game, XMLStreamReader in) throws XMLStreamException {
-        super(game, in);
-        readFromXML(in);
-    }
-
-    /**
      * Create an new TileImprovement from an existing one.
      *
-     * @param game The <code>Game</code> in which this object belongs.
+     * @param game The enclosing <code>Game</code>.
      * @param tile The <code>Tile</code> where the improvement resides.
      * @param template The <code>TileImprovement</code> to copy.
      */
     public TileImprovement(Game game, Tile tile, TileImprovement template) {
         super(game, tile);
+
         this.type = template.type;
         this.turnsToComplete = template.turnsToComplete;
         this.magnitude = template.magnitude;
@@ -125,17 +117,18 @@ public class TileImprovement extends TileItem implements Named {
     }
 
     /**
-     * Instantiates a new <code>TileImprovement</code> with the given
-     * ID. The object should later be initialized by calling either
+     * Create a new <code>TileImprovement</code> with the given
+     * identifier.  The object should later be initialized by calling either
      * {@link #readFromXML(XMLStreamReader)} or
      * {@link #readFromXMLElement(Element)}.
      *
-     * @param game The <code>Game</code> in which this object belongs.
-     * @param id The unique identifier for this object.
+     * @param game The enclosing <code>Game</code>.
+     * @param id The object identifier.
      */
     public TileImprovement(Game game, String id) {
         super(game, id);
     }
+
 
     /**
      * Gets the type of this tile improvement.
@@ -147,7 +140,7 @@ public class TileImprovement extends TileItem implements Named {
     }
 
     /**
-     * Is this <code>TileImprovement</code> a river?
+     * Is this tile improvement a river?
      *
      * @return True if this is a river improvement.
      */
@@ -156,7 +149,7 @@ public class TileImprovement extends TileItem implements Named {
     }
 
     /**
-     * Is this <code>TileImprovement</code> a road?
+     * Is this tile improvement a road?
      *
      * @return True if this is a road improvement.
      */
@@ -263,8 +256,8 @@ public class TileImprovement extends TileItem implements Named {
     }
 
     /**
-     * Is this TileImprovement connected to a similar TileImprovement
-     * on a neighbouring tile?
+     * Is this tile improvement connected to a similar improvement on
+     * a neighbouring tile?
      *
      * @param direction The <code>Direction</code> to check.
      * @return True if this improvement is connected.
@@ -475,6 +468,7 @@ public class TileImprovement extends TileItem implements Named {
         return (style == null) ? null : style.getString();
     }
 
+
     // Interface TileItem
 
     /**
@@ -494,23 +488,14 @@ public class TileImprovement extends TileItem implements Named {
     /**
      * {@inheritDoc}
      */
-    public boolean isNatural() {
-        return type.isNatural();
-    }
+    public int applyBonus(GoodsType goodsType, UnitType unitType,
+                          int potential) {
+        // Applies the production bonuses of this tile improvement to
+        // the given base potential.  Currently, the unit type
+        // argument is ignored and is only provided for the sake of
+        // consistency.  The bonuses of future improvements might
+        // depend on the unit type, however.
 
-    /**
-     * Applies the production bonuses of this tile improvement to the
-     * given base potential. Currently, the unit type argument is
-     * ignored and is only provided for the sake of consistency. The
-     * bonuses of future improvements might depend on the unit type,
-     * however.
-     *
-     * @param goodsType The <code>GoodsType</code> to produce.
-     * @param unitType The <code>UnitType</code> that is to work.
-     * @param potential The base potential production.
-     * @return The production with resource bonuses.
-     */
-    public int applyBonus(GoodsType goodsType, UnitType unitType, int potential) {
         int result = potential;
         // do not apply any bonuses if the base tile does not produce
         // any goods, and don't apply bonuses for incomplete
@@ -522,74 +507,78 @@ public class TileImprovement extends TileItem implements Named {
     }
 
     /**
-     * This method writes an XML-representation of this object to the given
-     * stream.
-     *
-     * <br>
-     * <br>
-     *
-     * Only attributes visible to the given <code>Player</code> will be added
-     * to that representation if <code>showAll</code> is set to
-     * <code>false</code>.
-     *
-     * @param out The target stream.
-     * @param player The <code>Player</code> this XML-representation should be
-     *            made for, or <code>null</code> if
-     *            <code>showAll == true</code>.
-     * @param showAll Only attributes visible to <code>player</code> will be
-     *            added to the representation if <code>showAll</code> is set
-     *            to <i>false</i>.
-     * @param toSavedGame If <code>true</code> then information that is only
-     *            needed when saving a game is added.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
+     * {@inheritDoc}
+     */
+    public boolean isNatural() {
+        return type.isNatural();
+    }
+
+
+    // Serialization
+
+    private static final String MAGNITUDE_TAG = "magnitude";
+    private static final String STYLE_TAG = "style";
+    private static final String TILE_TAG = "tile";
+    private static final String TURNS_TAG = "turns";
+    private static final String TYPE_TAG = "type";
+    private static final String VIRTUAL_TAG = "virtual";
+
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     protected void toXMLImpl(XMLStreamWriter out, Player player,
-                             boolean showAll, boolean toSavedGame)
-        throws XMLStreamException {
-        // Start element:
-        out.writeStartElement(getXMLElementTagName());
-
-        // Add attributes:
-        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
-        out.writeAttribute("tile", getTile().getId());
-        out.writeAttribute("type", getType().getId());
-        out.writeAttribute("turns", Integer.toString(turnsToComplete));
-        out.writeAttribute("magnitude", Integer.toString(magnitude));
-        if (style != null) {
-            out.writeAttribute("style", style.toString());
-        }
-        if (virtual) {
-            out.writeAttribute("virtual", Boolean.toString(virtual));
-        }
-
-        // End element:
-        out.writeEndElement();
+                             boolean showAll,
+                             boolean toSavedGame) throws XMLStreamException {
+        super.toXML(out, getXMLElementTagName(), player, showAll, toSavedGame);
     }
 
     /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered during parsing.
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out, Player player,
+                                   boolean showAll,
+                                   boolean toSavedGame) throws XMLStreamException {
+        super.writeAttributes(out);
+
+        writeAttribute(out, TILE_TAG, getTile());
+
+        writeAttribute(out, TYPE_TAG, getType());
+
+        writeAttribute(out, TURNS_TAG, turnsToComplete);
+
+        writeAttribute(out, MAGNITUDE_TAG, magnitude);
+
+        if (style != null) {
+            writeAttribute(out, STYLE_TAG, style);
+        }
+        if (virtual) {
+            writeAttribute(out, VIRTUAL_TAG, virtual);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        Game game = getGame();
+        final Specification spec = getSpecification();
+        final Game game = getGame();
 
-        setId(readId(in));
+        super.readAttributes(in);
 
-        tile = makeFreeColGameObject(in, "tile", Tile.class);
+        tile = makeFreeColGameObject(in, TILE_TAG, Tile.class);
 
-        String str = in.getAttributeValue(null, "type");
-        type = getSpecification().getTileImprovementType(str);
+        type = spec.getType(in, TYPE_TAG, TileImprovementType.class,
+                            (TileImprovementType)null);
 
-        turnsToComplete = Integer.parseInt(in.getAttributeValue(null, "turns"));
+        turnsToComplete = getAttribute(in, TURNS_TAG, 0);
 
-        magnitude = Integer.parseInt(in.getAttributeValue(null, "magnitude"));
+        magnitude = getAttribute(in, MAGNITUDE_TAG, 0);
 
-        str = in.getAttributeValue(null, "style");
+        String str = getAttribute(in, STYLE_TAG, (String)null);
         Direction dirns[] = getConnectionDirections();
         if (dirns == null || str == null || "".equals(str)) {
             style = null;
@@ -619,7 +608,7 @@ public class TileImprovement extends TileItem implements Named {
         }
         connected = getConnectionsFromStyle();
 
-        virtual = getAttribute(in, "virtual", false);
+        virtual = getAttribute(in, VIRTUAL_TAG, false);
     }
 
     /**
