@@ -551,7 +551,8 @@ public class FreeColDialog<T> extends FreeColPanel {
         try {
             if (SwingUtilities.isEventDispatchThread()) {
                 EventQueue theQueue = getToolkit().getSystemEventQueue();
-
+                logger.warning("Entering buggy getResponse() in " + getClass()
+                    + " responseGiven=" + responseGiven);
                 while (!responseGiven) {
                     // This is essentially the body of EventDispatchThread
                     AWTEvent event = theQueue.getNextEvent();
@@ -574,6 +575,8 @@ public class FreeColDialog<T> extends FreeColPanel {
                         continue;
                     }
                 }
+                logger.warning("Exiting buggy getResponse() in " + getClass()
+                    + " response=" + response);
             } else {
                 while (!responseGiven) {
                     wait();

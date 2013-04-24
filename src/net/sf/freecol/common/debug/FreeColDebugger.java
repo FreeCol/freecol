@@ -154,8 +154,7 @@ public class FreeColDebugger {
                                               s.toUpperCase(Locale.US));
                 enableDebugMode(mode);
             } catch (Exception e) {
-                logger.log(Level.WARNING, "Unrecognized debug mode: "
-                    + optionValue, e);
+                logger.warning("Unrecognized debug mode: " + optionValue);
                 return false;
             }
         }
