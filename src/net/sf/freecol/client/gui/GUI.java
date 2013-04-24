@@ -379,6 +379,10 @@ public class GUI {
         }
     }
 
+    public void errorMessage(StringTemplate template) {
+        canvas.errorMessage(Messages.message(template));
+    }
+
     public void errorMessage(String messageId) {
         canvas.errorMessage(messageId);
     }

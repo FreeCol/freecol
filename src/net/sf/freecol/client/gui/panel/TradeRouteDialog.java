@@ -137,8 +137,6 @@ public final class TradeRouteDialog extends FreeColDialog<Boolean>
 
         final Map<TradeRoute, Integer> counts
             = new HashMap<TradeRoute, Integer>();
-        List<TradeRoute> theRoutes
-            = new ArrayList<TradeRoute>(player.getTradeRoutes());
         for (Unit u : player.getUnits()) {
             TradeRoute tradeRoute = u.getTradeRoute();
             if (tradeRoute != null) {
@@ -147,20 +145,18 @@ public final class TradeRouteDialog extends FreeColDialog<Boolean>
                 counts.put(tradeRoute, new Integer(value + 1));
             }
         }
-        Collections.sort(theRoutes, tradeRouteComparator);
-        for (TradeRoute route : theRoutes) {
+        List<TradeRoute> routes = new ArrayList<TradeRoute>(counts.keySet());
+        Collections.sort(routes, tradeRouteComparator);
+        for (TradeRoute route : routes) {
             listModel.addElement(route);
         }
 
         tradeRoutes.setCellRenderer(new DefaultListCellRenderer() {
                 public Component getListCellRendererComponent(JList list,
-                                                              Object value,
-                                                              int index,
-                                                              boolean selected,
-                                                              boolean focus) {
+                    Object value, int index, boolean selected, boolean focus) {
                     Component ret = super.getListCellRendererComponent(list,
                         value, index, selected, focus);
-                    TradeRoute tradeRoute = (TradeRoute) value;
+                    TradeRoute tradeRoute = (TradeRoute)value;
                     String name = tradeRoute.getName();
                     int n = counts.get(tradeRoute).intValue();
 
@@ -221,12 +217,12 @@ public final class TradeRouteDialog extends FreeColDialog<Boolean>
         if (route != null) {
             switch (action) {
             case OK:
-                ArrayList<TradeRoute> routes = new ArrayList<TradeRoute>();
+                List<TradeRoute> routes = new ArrayList<TradeRoute>();
                 for (int index = 0; index < listModel.getSize(); index++) {
-                    routes.add((TradeRoute) listModel.getElementAt(index));
+                    routes.add((TradeRoute)listModel.getElementAt(index));
+                    System.err.println(index + " : " + routes.get(index).getName());
                 }
                 getController().setTradeRoutes(routes);
-
                 if (unit != null) unit.setTradeRoute(route);
                 ret = true;
                 break;

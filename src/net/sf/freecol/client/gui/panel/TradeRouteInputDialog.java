@@ -117,10 +117,11 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
      * @param newRoute The <code>TradeRoute</code> to operate on.
      */
     @SuppressWarnings("unchecked") // FIXME in Java7
-        public TradeRouteInputDialog(FreeColClient freeColClient, GUI gui,
-                                     TradeRoute newRoute) {
+    public TradeRouteInputDialog(FreeColClient freeColClient, GUI gui,
+                                 TradeRoute newRoute) {
         super(freeColClient, gui);
-        originalRoute = newRoute;
+
+        this.originalRoute = newRoute;
 
         goodsPanel = new GoodsPanel();
         goodsPanel.setTransferHandler(cargoHandler);
@@ -300,10 +301,14 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
         Player player = getFreeColClient().getMyPlayer();
 
         // Check that the name is unique
+        String newName = tradeRouteName.getText();
         for (TradeRoute route : player.getTradeRoutes()) {
-            if (route.getId().equals(originalRoute.getId())) continue;
-            if (route.getName().equals(tradeRouteName.getText())) {
-                getGUI().errorMessage("traderouteDialog.duplicateName");
+            if (route.getName().equals(originalRoute.getName())) continue;
+            if (route.getName().equals(newName)) {
+                StringTemplate template
+                    = StringTemplate.template("traderouteDialog.duplicateName")
+                        .addName("%name%", newName);
+                getGUI().errorMessage(template);
                 return false;
             }
         }
@@ -318,6 +323,11 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
         for (int index = 0; index < stopListModel.getSize(); index++) {
             Stop stop = (Stop) stopListModel.get(index);
             if (!TradeRoute.isStopValid(player, stop)) {
+                String badStop = Messages.message(stop.getLocation().getLocationName());
+                StringTemplate template
+                    = StringTemplate.template("traderouteDialog.invalidStop")
+                        .addName("%name%", badStop);
+                getGUI().errorMessage(template);
                 return false;
             }
         }
@@ -334,17 +344,16 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         if (OK.equals(command)) {
-            if (verifyNewTradeRoute()) {
-                getGUI().removeFromCanvas(this);
-                originalRoute.setName(tradeRouteName.getText());
-                originalRoute.clearStops();
-                for (int index = 0; index < stopListModel.getSize(); index++) {
-                    originalRoute.addStop((Stop)stopListModel.get(index));
-                }
-                // TODO: update trade routes only if they have been modified
-                getController().updateTradeRoute(originalRoute);
-                setResponse(Boolean.TRUE);
+            if (!verifyNewTradeRoute()) return;
+            originalRoute.setName(tradeRouteName.getText());
+            originalRoute.clearStops();
+            for (int index = 0; index < stopListModel.getSize(); index++) {
+                originalRoute.addStop((Stop)stopListModel.get(index));
             }
+            // TODO: update trade routes only if they have been modified
+            getController().updateTradeRoute(originalRoute);
+            getGUI().removeFromCanvas(this);
+            setResponse(Boolean.TRUE);
         } else if (CANCEL.equals(command)) {
             getGUI().removeFromCanvas(this);
             setResponse(Boolean.FALSE);
