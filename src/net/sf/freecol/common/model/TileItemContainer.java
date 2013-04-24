@@ -606,7 +606,7 @@ public class TileItemContainer extends FreeColGameObject {
                 if (in.getLocalName().equals(Resource.getXMLElementTagName())) {
                     item = new Resource(game, in);
                 } else if (in.getLocalName().equals(LostCityRumour.getXMLElementTagName())) {
-                    item = new LostCityRumour(game, in);
+                    item = readFreeColGameObject(in, LostCityRumour.class);
                 } else if (in.getLocalName().equals(TileImprovement.getXMLElementTagName())) {
                     item = new TileImprovement(game, in);
                 }

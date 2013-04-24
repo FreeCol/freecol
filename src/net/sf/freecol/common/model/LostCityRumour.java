@@ -43,13 +43,13 @@ public class LostCityRumour extends TileItem {
     private static final Logger logger = Logger.getLogger(LostCityRumour.class.getName());
 
     /**
-     * The type of the rumour. A RumourType, or null if the type has
+     * The type of the rumour.  A RumourType, or null if the type has
      * not yet been determined.
      */
     private RumourType type = null;
 
     /**
-     * The name of this rumour, or null, if it has none. Rumours such
+     * The name of this rumour, or null, if it has none.  Rumours such
      * as the Seven Cities of Gold and Fountains of Youth may have
      * individual names.
      */
@@ -70,11 +70,12 @@ public class LostCityRumour extends TileItem {
         FOUNTAIN_OF_YOUTH
     }
 
+
     /**
      * Creates a new <code>LostCityRumour</code> instance.
      *
-     * @param game a <code>Game</code> value
-     * @param tile a <code>Tile</code> value
+     * @param game The enclosing <code>Game</code>.
+     * @param tile The <code>Tile</code> where the LCR is.
      */
     public LostCityRumour(Game game, Tile tile) {
         super(game, tile);
@@ -83,27 +84,15 @@ public class LostCityRumour extends TileItem {
     /**
      * Creates a new <code>LostCityRumour</code> instance.
      *
-     * @param game a <code>Game</code> value
-     * @param tile a <code>Tile</code> value
-     * @param type a <code>RumourType</code> value
-     * @param name a <code>String</code> value
+     * @param game The enclosing <code>Game</code>.
+     * @param tile The <code>Tile</code> where the LCR is.
+     * @param type The type of rumour.
+     * @param name The name of the rumour.
      */
     public LostCityRumour(Game game, Tile tile, RumourType type, String name) {
         super(game, tile);
         this.type = type;
         this.name = name;
-    }
-
-    /**
-     * Creates a new <code>LostCityRumour</code> instance.
-     *
-     * @param game a <code>Game</code> value
-     * @param in a <code>XMLStreamReader</code> value
-     * @exception XMLStreamException if an error occurs
-     */
-    public LostCityRumour(Game game, XMLStreamReader in) throws XMLStreamException {
-        super(game, in);
-        readFromXML(in);
     }
 
     /**
@@ -116,84 +105,38 @@ public class LostCityRumour extends TileItem {
         super(game, id);
     }
 
+
     /**
-     * Get the <code>Type</code> value.
+     * Get the type of rumour.
      *
-     * @return a <code>RumourType</code> value
+     * @return The <code>RumourType</code>.
      */
     public final RumourType getType() {
         return type;
     }
 
     /**
-     * Set the <code>Type</code> value.
+     * Set the type of rumour.
      *
-     * @param newType The new Type value.
+     * @param newType The new rumour type.
      */
     public final void setType(final RumourType newType) {
         this.type = newType;
     }
 
     /**
-     * Get the <code>Name</code> value.
+     * Get the name of this rumour.
      *
-     * @return a <code>String</code> value
+     * @return The name.
      */
     public final String getName() {
         return name;
     }
 
-    /**
-     * Set the <code>Name</code> value.
-     *
-     * @param newName The new Name value.
-     */
-    public final void setName(final String newName) {
-        this.name = newName;
-    }
-
-
-    // Interface TileItem
 
     /**
-     * {@inheritDoc}
-     */
-    public final int getZIndex() {
-        return RUMOUR_ZINDEX;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean isTileTypeAllowed(TileType tileType) {
-        return !tileType.isWater();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean isNatural() {
-        return false;
-    }
-
-    /**
-     * Returns the given potential, since lost cities do not provide
-     * any production bonuses. TODO: maybe we should return zero,
-     * since lost cities actually prevent production?
-     *
-     * @param goodsType The <code>GoodsType</code> to produce.
-     * @param unitType The <code>UnitType</code> that is to work.
-     * @param potential The base potential production.
-     * @return The production with resource bonuses.
-     */
-    public int applyBonus(GoodsType goodsType, UnitType unitType, int potential) {
-        return potential;
-    }
-
-
-    /**
-     * Chooses a type of Lost City Rumour. The type of rumour depends on the
-     * exploring unit, as well as player settings.
+     * Chooses a type of Lost City Rumour.  The type of rumour depends
+     * on the exploring unit, as well as player settings.
      *
      * @param unit The <code>Unit</code> exploring (optional).
      * @param difficulty The difficulty level.
@@ -306,72 +249,96 @@ public class LostCityRumour extends TileItem {
     }
 
 
+    // Interface TileItem
+
     /**
-     * This method writes an XML-representation of this object to the given
-     * stream.
-     *
-     * <br>
-     * <br>
-     *
-     * Only attributes visible to the given <code>Player</code> will be added
-     * to that representation if <code>showAll</code> is set to
-     * <code>false</code>.
-     *
-     * @param out The target stream.
-     * @param player The <code>Player</code> this XML-representation should be
-     *            made for, or <code>null</code> if
-     *            <code>showAll == true</code>.
-     * @param showAll Only attributes visible to <code>player</code> will be
-     *            added to the representation if <code>showAll</code> is set
-     *            to <i>false</i>.
-     * @param toSavedGame If <code>true</code> then information that is only
-     *            needed when saving a game is added.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
+     * {@inheritDoc}
+     */
+    public final int getZIndex() {
+        return RUMOUR_ZINDEX;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isTileTypeAllowed(TileType tileType) {
+        return !tileType.isWater();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int applyBonus(GoodsType goodsType, UnitType unitType, int potential) {
+        // Just return the given potential, since lost cities do not
+        // provide any production bonuses.  TODO: maybe we should
+        // return zero, since lost cities actually prevent production?
+        return potential;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isNatural() {
+        return false;
+    }
+
+
+    // Serialization
+
+    private static final String NAME_TAG = "name";
+    private static final String TILE_TAG = "tile";
+    private static final String TYPE_TAG = "type";
+
+    
+    /**
+     * {@inheritDoc}
      */
     @Override
     protected void toXMLImpl(XMLStreamWriter out, Player player,
-                             boolean showAll, boolean toSavedGame)
-        throws XMLStreamException {
-        // Start element:
-        out.writeStartElement(getXMLElementTagName());
-
-        // Add attributes:
-        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
-        out.writeAttribute("tile", getTile().getId());
-        if (type != null && (showAll || toSavedGame)) {
-            out.writeAttribute("type", getType().toString());
-        }
-        if (name != null && (showAll || toSavedGame)) {
-            out.writeAttribute("name", name);
-        }
-
-        // End element:
-        out.writeEndElement();
+                             boolean showAll,
+                             boolean toSavedGame) throws XMLStreamException {
+        super.toXML(out, getXMLElementTagName(), player, showAll, toSavedGame);
     }
 
     /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered during parsing.
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out, Player player,
+                                   boolean showAll,
+                                   boolean toSavedGame) throws XMLStreamException {
+        super.writeAttributes(out);
+
+        writeAttribute(out, TILE_TAG, getTile());
+
+        if (showAll || toSavedGame) {
+            if (type != null) {
+                writeAttribute(out, TYPE_TAG, getType());
+            }
+
+            if (name != null) {
+                writeAttribute(out, NAME_TAG, name);
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        setId(readId(in));
+        super.readAttributes(in);
+        
+        tile = makeFreeColGameObject(in, TILE_TAG, Tile.class);
 
-        tile = makeFreeColGameObject(in, "tile", Tile.class);
+        type = getAttribute(in, TYPE_TAG,
+                            RumourType.class, RumourType.NO_SUCH_RUMOUR);
 
-        String typeString = getAttribute(in, "type", (String)null);
-        if (typeString != null) {
-            type = Enum.valueOf(RumourType.class, typeString);
-        }
-
-        name = getAttribute(in, "name", (String)null);
+        name = getAttribute(in, NAME_TAG, (String)null);
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "lostCityRumour".
      */
