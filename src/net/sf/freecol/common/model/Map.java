@@ -1505,11 +1505,9 @@ public class Map extends FreeColGameObject implements Location {
                     break;
                 case DISEMBARK:
                     // If already embarked this turn the disembarking
-                    // unit should have zero moves left, otherwise its
-                    // full amount is available.
+                    // unit will have to wait another turn.
                     move = new MoveCandidate(unit, currentNode, moveTile,
-                        ((embarked) ? 0 : unit.getInitialMovesLeft()),
-                        currentTurns, false,
+                        0, ((embarked) ? currentTurns+1 : currentTurns), false,
                         ((costDecider != null) ? costDecider
                             : CostDeciders.defaultCostDeciderFor(unit)));
                     break;
