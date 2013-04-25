@@ -47,14 +47,15 @@ public abstract class GoodsLocation extends UnitLocation {
     private GoodsContainer goodsContainer = null;
 
 
-    protected GoodsLocation() {
-        // empty constructor
-    }
+    /**
+     * Deliberately empty constructor.
+     */
+    protected GoodsLocation() {}
 
     /**
      * Creates a new <code>GoodsLocation</code> instance.
      *
-     * @param game The <code>Game</code> to create within.
+     * @param game The enclosing <code>Game</code>.
      */
     public GoodsLocation(Game game) {
         super(game);
@@ -63,7 +64,7 @@ public abstract class GoodsLocation extends UnitLocation {
     /**
      * Initialize this object from an XML-representation of this object.
      *
-     * @param game The <code>Game</code> to create within.
+     * @param game The enclosing <code>Game</code>.
      * @param e An XML-element that will be used to initialize this object.
      */
     // Only Unit needs this
@@ -74,19 +75,22 @@ public abstract class GoodsLocation extends UnitLocation {
     /**
      * Creates a new <code>GoodsLocation</code> instance.
      *
-     * @param game The <code>Game</code> to create within.
-     * @param id a <code>String</code> value
+     * @param game The enclosing <code>Game</code>.
+     * @param id The object identifier.
      */
     public GoodsLocation(Game game, String id) {
         super(game, id);
     }
 
 
+    // Override FreeColObject
+
     /**
      * Removes all references to this object.
      *
      * @return A list of disposed objects.
      */
+    @Override
     public List<FreeColGameObject> disposeList() {
         List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
         if (goodsContainer != null) {
@@ -187,10 +191,17 @@ public abstract class GoodsLocation extends UnitLocation {
     }
 
 
-    // Interface Location
-    // Inheriting getId(), getTile(), getLocationName/For, canAdd,
-    // getUnitCount, getUnitList, getSettlement, getColony from
-    // UnitLocation.
+    // Interface Location (from UnitLocation)
+    // Inheriting
+    //    FreeColObject.getId()
+    //    UnitLocation.getTile()
+    //    UnitLocation.getLocationName
+    //    UnitLocation.getLocationNameFor
+    //    UnitLocation.canAdd
+    //    UnitLocation.getUnitCount
+    //    UnitLocation.getUnitList
+    //    UnitLocation.getSettlement
+    //    UnitLocation.getColony
 
     /**
      * {@inheritDoc}
@@ -205,6 +216,7 @@ public abstract class GoodsLocation extends UnitLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean remove(Locatable locatable) {
         return (locatable instanceof Goods)
             ? removeGoods((Goods)locatable) != null
@@ -214,6 +226,7 @@ public abstract class GoodsLocation extends UnitLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean contains(Locatable locatable) {
         return (locatable instanceof Goods)
             ? goodsContainer.contains((Goods)locatable)
@@ -222,20 +235,24 @@ public abstract class GoodsLocation extends UnitLocation {
 
     /**
      * {@inheritDoc}
-     *
-     * Marked final, as this is where the goods container is.
      */
+    @Override
     public final GoodsContainer getGoodsContainer() {
+        // Marked final, as this is where the goods container is.
         return goodsContainer;
     }
 
-    // Interface UnitLocation routines
-    // Inheriting getSpaceTaken, moveToFront, clearUnitList,
-    // getUnitCapacity from UnitLocation.
+    // Interface UnitLocation
+    // Inheriting
+    //   UnitLocation.getSpaceTaken
+    //   UnitLocation.moveToFront
+    //   UnitLocation.clearUnitList,
+    //   UnitLocation.getUnitCapacity
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public NoAddReason getNoAddReason(Locatable locatable) {
         if (locatable instanceof Goods) {
             Goods goods = (Goods)locatable;
@@ -247,7 +264,8 @@ public abstract class GoodsLocation extends UnitLocation {
         return super.getNoAddReason(locatable);
     }
 
-    // GoodsLocation routines.
+
+    // GoodsLocation routines to be implemented/overridden by subclasses
 
     /**
      * Gets the maximum number of <code>Goods</code> this Location
@@ -284,6 +302,7 @@ public abstract class GoodsLocation extends UnitLocation {
             : goodsContainer.removeGoods(type, amount);
     }
 
+
     // Serialization
 
     /**
@@ -316,9 +335,11 @@ public abstract class GoodsLocation extends UnitLocation {
      */
     @Override
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        if (GoodsContainer.getXMLElementTagName().equals(in.getLocalName())) {
+        final String tag = in.getLocalName();
+
+        if (GoodsContainer.getXMLElementTagName().equals(tag)) {
             goodsContainer = readFreeColGameObject(in, GoodsContainer.class);
-            goodsContainer.setLocation(this);
+            if (goodsContainer != null) goodsContainer.setLocation(this);
 
         } else {
             super.readChild(in);
