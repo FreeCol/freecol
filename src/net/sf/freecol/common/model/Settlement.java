@@ -51,85 +51,76 @@ abstract public class Settlement extends GoodsLocation
     /** The <code>Tile</code> where this <code>Settlement</code> is located. */
     protected Tile tile;
 
+    /** The type of settlement. */
+    private SettlementType type;
+
+    /** The tiles this settlement owns. */
+    private final List<Tile> ownedTiles = new ArrayList<Tile>();
+
     /** Contains the abilities and modifiers of this Settlement. */
     private final FeatureContainer featureContainer = new FeatureContainer();
 
-    /** The tiles this settlement owns. */
-    private List<Tile> ownedTiles = new ArrayList<Tile>();
 
     /**
-     * Describe type here.
+     * Deliberately empty constructor for ServerColony.
      */
-    private SettlementType type;
-
-
-    /**
-     * Empty constructor needed for Colony -> ServerColony.
-     */
-    protected Settlement() {
-        // empty constructor
-    }
+    protected Settlement() {}
 
     /**
-     * Creates a new <code>Settlement</code>.
+     * Create a new <code>Settlement</code>.
      *
-     * @param game The <code>Game</code> in which this object belong.
-     * @param owner The owner of this <code>Settlement</code>.
-     * @param name The name for this <code>Settlement</code>.
-     * @param tile The location of the <code>Settlement</code>.
+     * @param game The enclosing <code>Game</code>.
+     * @param owner The owning <code>Player</code>.
+     * @param name The settlement name.
+     * @param tile The containing <code>Tile</code>.
      */
     public Settlement(Game game, Player owner, String name, Tile tile) {
         super(game);
+
         this.owner = owner;
         this.name = name;
         this.tile = tile;
-
         setType(owner.getNationType().getSettlementType(false));
     }
 
     /**
-     * Initiates a new <code>Settlement</code>
-     * with the given ID. The object should later be
-     * initialized by calling either
+     * Initiates a new <code>Settlement</code> with the given identifier.
+     * The object should later be initialized by calling either
      * {@link #readFromXML(XMLStreamReader)} or
      * {@link #readFromXMLElement(Element)}.
      *
-     * @param game The <code>Game</code> in which this object belong.
-     * @param id The unique identifier for this object.
+     * @param game The enclosing <code>Game</code>.
+     * @param id The object identifier.
      */
     public Settlement(Game game, String id) {
         super(game, id);
     }
 
+
     /**
-     * Get the <code>Type</code> value.
+     * Get the type of this settlement.
      *
-     * @return a <code>SettlementType</code> value
+     * @return The settlement type.
      */
     public final SettlementType getType() {
         return type;
     }
 
     /**
-     * Set the <code>Type</code> value.
+     * Set the settlement type.
      *
-     * @param newType The new Type value.
+     * @param newType The new <code>SettlementType</code>.
      */
-    public final void setType(final SettlementType newType) {
+    private final void setType(final SettlementType newType) {
         if (type != null) removeFeatures(type);
         this.type = newType;
         if (newType != null) addFeatures(newType);
     }
 
-    // TODO: remove this again
-    public String getNameKey() {
-        return getName();
-    }
-
     /**
-     * Gets the name of this <code>Settlement</code>.
+     * Get the name of this <code>Settlement</code>.
      *
-     * @return The name as a <code>String</code>.
+     * @return The settlement name.
      */
     public String getName() {
         return name;
@@ -145,9 +136,9 @@ abstract public class Settlement extends GoodsLocation
     }
 
     /**
-     * Returns <code>true</code> if this is the Nation's capital.
+     * Is this a national capital?
      *
-     * @return <code>true</code> if this is the Nation's capital.
+     * @return True if this is a national capital.
      */
     public boolean isCapital() {
         return getType().isCapital();
@@ -156,28 +147,55 @@ abstract public class Settlement extends GoodsLocation
     /**
      * Sets the capital value.
      *
-     * @param isCapital a <code>boolean</code> value
+     * @param capital The new capital value.
      */
-    public void setCapital(boolean isCapital) {
-        if (isCapital() != isCapital) {
-            setType(owner.getNationType().getSettlementType(isCapital));
+    public void setCapital(boolean capital) {
+        if (isCapital() != capital) {
+            setType(owner.getNationType().getSettlementType(capital));
         }
     }
 
     /**
-     * Get this settlement's feature container.
+     * Get the tiles this settlement owns.
      *
-     * @return The <code>FeatureContainer</code>.
+     * @return A list of tiles.
      */
-    @Override
-    public FeatureContainer getFeatureContainer() {
-        return featureContainer;
+    public List<Tile> getOwnedTiles() {
+        return new ArrayList<Tile>(ownedTiles);
     }
 
     /**
-     * Gets this colony's line of sight.
-     * @return The line of sight offered by this
-     *       <code>Colony</code>.
+     * Adds a tile to this settlement.
+     *
+     * @param tile The <code>Tile</code> to add.
+     */
+    public void addTile(Tile tile) {
+        ownedTiles.add(tile);
+    }
+
+    /**
+     * Removes a tile from this settlement.
+     *
+     * @param tile The <code>Tile</code> to remove.
+     */
+    public void removeTile(Tile tile) {
+        ownedTiles.remove(tile);
+    }
+
+    /**
+     * Gets the radius of what the <code>Settlement</code> considers
+     * as it's own land.
+     *
+     * @return Settlement radius
+     */
+    public int getRadius() {
+        return getType().getClaimableRadius();
+    }
+
+    /**
+     * Gets this settlement's line of sight value.
+     *
+     * @return The line of sight value.
      * @see Player#canSee(Tile)
      */
     public int getLineOfSight() {
@@ -223,25 +241,6 @@ abstract public class Settlement extends GoodsLocation
     }
 
     /**
-     * Gets the owner of this <code>Settlement</code>.
-     *
-     * @return The owner of this <code>Settlement</code>.
-     * @see #setOwner
-     */
-    public Player getOwner() {
-        return owner;
-    }
-
-    /**
-     * Sets the owner of this <code>Settlement</code>.
-     *
-     * @param player The new owner of this <code>Settlement</code>.
-     */
-    public void setOwner(Player player) {
-        owner = player;
-    }
-
-    /**
      * Change the owner of this <code>Settlement</code>.
      *
      * @param newOwner The <code>Player</code> that shall own this
@@ -279,77 +278,6 @@ abstract public class Settlement extends GoodsLocation
         newOwner.invalidateCanSeeTiles();
 
         getGame().notifyOwnerChanged(this, oldOwner, newOwner);
-    }
-
-    /**
-     * Get the tiles this settlement owns.
-     *
-     * @return A list of tiles.
-     */
-    public List<Tile> getOwnedTiles() {
-        return new ArrayList<Tile>(ownedTiles);
-    }
-
-    /**
-     * Adds a tile to this settlement.
-     *
-     * @param tile The <code>Tile</code> to add.
-     */
-    public void addTile(Tile tile) {
-        ownedTiles.add(tile);
-    }
-
-    /**
-     * Removes a tile from this settlement.
-     *
-     * @param tile The <code>Tile</code> to remove.
-     */
-    public void removeTile(Tile tile) {
-        ownedTiles.remove(tile);
-    }
-
-    /**
-     * Dispose of this settlement.
-     *
-     * @return A list of disposed objects.
-     */
-    public List<FreeColGameObject> disposeList() {
-        List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
-        if (owner != null
-            && getTile() != null
-            && getTile().getSettlement() != null) {
-            // Defensive tests to handle transition from calling dispose()
-            // on both sides to when it is only called on server-side.
-
-            // Get off the map
-            Tile settlementTile = getTile();
-            List<Tile> lostTiles = getOwnedTiles();
-            for (Tile tile : lostTiles) {
-                tile.changeOwnership(null, null);
-            }
-            settlementTile.setSettlement(null);
-
-            // The owner forgets about the settlement.
-            owner.removeSettlement(this);
-            owner.invalidateCanSeeTiles();
-            // It is not safe to setOwner(null).  When a settlement is
-            // destroyed there is a race between this code and some
-            // display routines that still need to know who owned the
-            // dead settlement.
-        }
-
-        objects.addAll(super.disposeList());
-        return objects;
-    }
-
-    /**
-     * Gets the radius of what the <code>Settlement</code> considers
-     * as it's own land.
-     *
-     * @return Settlement radius
-     */
-    public int getRadius() {
-        return getType().getClaimableRadius();
     }
 
     /**
@@ -486,11 +414,88 @@ abstract public class Settlement extends GoodsLocation
     }
 
 
-    // Interface Location
+    // Override FreeColObject
 
-    // getId() inherited from FreeColGameObject
-    // canAdd, getUnitCount, getUnitList, getColony inherited from UnitLocation
-    // add, remove, contains inherited from GoodsLocation
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FeatureContainer getFeatureContainer() {
+        return featureContainer;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<FreeColGameObject> disposeList() {
+        List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
+        if (owner != null
+            && getTile() != null
+            && getTile().getSettlement() != null) {
+            // Defensive tests to handle transition from calling dispose()
+            // on both sides to when it is only called on server-side.
+
+            // Get off the map
+            Tile settlementTile = getTile();
+            List<Tile> lostTiles = getOwnedTiles();
+            for (Tile tile : lostTiles) {
+                tile.changeOwnership(null, null);
+            }
+            settlementTile.setSettlement(null);
+
+            // The owner forgets about the settlement.
+            owner.removeSettlement(this);
+            owner.invalidateCanSeeTiles();
+            // It is not safe to setOwner(null).  When a settlement is
+            // destroyed there is a race between this code and some
+            // display routines that still need to know who owned the
+            // dead settlement.
+        }
+
+        objects.addAll(super.disposeList());
+        return objects;
+    }
+
+
+    // Interface Named
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getNameKey() {
+        return getName();
+    }
+
+
+    // Interface Ownable
+
+    /**
+     * {@inheritDoc}
+     */
+    public Player getOwner() {
+        return owner;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setOwner(Player player) {
+        this.owner = player;
+    }
+
+
+    // Interface Location (from GoodsLocation via UnitLocation)
+    // Inherits
+    //   FreeColObject.getId
+    //   UnitLocation.getLocationNameFor
+    //   GoodsLocation.add
+    //   GoodsLocation.remove
+    //   GoodsLocation.contains
+    //   UnitLocation.canAdd
+    //   UnitLocation.getUnitCount
+    //   UnitLocation.getUnitList
+    //   UnitLocation.getColony
 
     /**
      * {@inheritDoc}
@@ -504,24 +509,29 @@ abstract public class Settlement extends GoodsLocation
      * {@inheritDoc}
      */
     @Override
-    public final Settlement getSettlement() {
-        return this;
+    public StringTemplate getLocationName() {
+        return StringTemplate.name(getName());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public StringTemplate getLocationName() {
-        return StringTemplate.name(getName());
+    public final Settlement getSettlement() {
+        return this;
     }
 
-    // UnitLocation routines
-    // getUnitCapacity inherited default from UnitLocation
+    // Interface UnitLocation
+    // Inherits
+    //   UnitLocation.getSpaceTaken
+    //   UnitLocation.moveToFront
+    //   UnitLocation.clearUnitList
+    //   UnitLocation.getUnitCapacity
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public NoAddReason getNoAddReason(Locatable locatable) {
         if (locatable instanceof Unit) {
             // Tighter ownership test now possible.
@@ -537,14 +547,20 @@ abstract public class Settlement extends GoodsLocation
         return super.getNoAddReason(locatable);
     }
   
-    // GoodsLocation routines
-    // No need to implement getGoodsCapacity here, yet.
+    // Interface GoodsLocation
+    // Inherits
+    //   GoodsLocation.addGoods
+    //   GoodsLocation.removeGoods
+
+    // No need to implement abstract getGoodsCapacity here, yet.
 
 
     // Settlement routines to be implemented by subclasses.
 
     /**
      * Gets an image key for this settlement.
+     *
+     * @return An image key
      */
     abstract public String getImageKey();
 
@@ -552,15 +568,16 @@ abstract public class Settlement extends GoodsLocation
      * Gets the <code>Unit</code> that is currently defending this
      * <code>Settlement</code>.
      *
-     * @param attacker The unit be attacking this <code>Settlement</code>.
+     * @param attacker The <code>Unit</code> that is attacking this
+     *     <code>Settlement</code>.
      * @return The <code>Unit</code> that has been chosen to defend
-     * this <code>Settlement</code>.
+     *     this <code>Settlement</code>.
      */
     abstract public Unit getDefendingUnit(Unit attacker);
 
     /**
-     * Gets a measure of the ratio between defence at this settlement,
-     * and the general settlement size.
+     * Get the ratio between defence at this settlement, and the
+     * general settlement size.
      *
      * @return A ratio of defence power to settlement size.
      */
@@ -577,14 +594,16 @@ abstract public class Settlement extends GoodsLocation
 
     /**
      * Gets the current Sons of Liberty in this settlement.
+     *
+     * @return The current SoL.
      */
     abstract public int getSoL();
 
     /**
-     * Returns the amount of money necessary to maintain all of the
+     * Get the amount of gold necessary to maintain all of the
      * settlement's buildings.
      *
-     * @return an <code>int</code> value
+     * @return The gold required for upkeep.
      */
     abstract public int getUpkeep();
 
@@ -611,52 +630,54 @@ abstract public class Settlement extends GoodsLocation
 
     // Serialization
 
+    private static final String NAME_TAG = "name";
+    private static final String OWNER_TAG = "owner";
+    private static final String SETTLEMENT_TYPE_TAG = "settlementType";
+    private static final String TILE_TAG = "tile";
+    // @compat 0.9.x
+    private static final String IS_CAPITAL_TAG = "isCapital";
+    // end @compat
+
+
     /**
-     * Write the attributes of this object to a stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *     to the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
-        out.writeAttribute("name", getName());
-        out.writeAttribute("owner", owner.getId());
-        out.writeAttribute("tile", tile.getId());
-        out.writeAttribute("settlementType", getType().getId());
-        // TODO: Not owner, it is subject to PlayerExploredTile handling.
+
+        writeAttribute(out, NAME_TAG, getName());
+
+        // TODO: Not owner, it is subject to PlayerExploredTile handling?
+        writeAttribute(out, OWNER_TAG, owner);
+
+        writeAttribute(out, TILE_TAG, tile);
+
+        writeAttribute(out, SETTLEMENT_TYPE_TAG, getType());
     }
 
     /**
-     * Reads the attributes of this object from an XML stream.
-     *
-     * @param in The XML input stream.
-     * @exception XMLStreamException if a problem was encountered
-     *     during parsing.
+     * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
 
-        setName(in.getAttributeValue(null, "name"));
+        name = getAttribute(in, NAME_TAG, (String)null);
 
-        owner = makeFreeColGameObject(in, "owner", Player.class);
+        owner = makeFreeColGameObject(in, OWNER_TAG, Player.class);
 
-        tile = makeFreeColGameObject(in, "tile", Tile.class);
+        tile = makeFreeColGameObject(in, TILE_TAG, Tile.class);
 
-        // @compat 0.9.x
-        String typeStr = in.getAttributeValue(null, "settlementType");
+        String str = getAttribute(in, SETTLEMENT_TYPE_TAG, (String)null);
         SettlementType settlementType;
-        if (typeStr == null) {
-            String capital = in.getAttributeValue(null, "isCapital");
-            settlementType = owner.getNationType()
-                .getSettlementType("true".equals(capital));
-        // end compatibility code
+        // @compat 0.9.x
+        if (str == null) {
+            boolean capital = getAttribute(in, IS_CAPITAL_TAG, false);
+            settlementType = owner.getNationType().getSettlementType(capital);
+        // end @compat
         } else {
-            settlementType = owner.getNationType().getSettlementType(typeStr);
+            settlementType = owner.getNationType().getSettlementType(str);
         }
         setType(settlementType);
     }
