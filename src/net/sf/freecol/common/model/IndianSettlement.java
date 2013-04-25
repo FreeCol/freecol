@@ -53,19 +53,56 @@ public class IndianSettlement extends Settlement {
 
     private static final Logger logger = Logger.getLogger(IndianSettlement.class.getName());
 
+    /** The level of contact between a player and this settlement. */
+    public static enum ContactLevel {
+        UNCONTACTED,     // Nothing known other than location?
+        CONTACTED,       // Name, wanted-goods now visible
+        VISITED,         // Skill now known
+        SCOUTED          // Scouting bonus consumed
+    };
+
+    // When choosing what goods to buy, sort goods types descending by price.
+    private final Comparator<GoodsType> wantedGoodsComparator
+        = new Comparator<GoodsType>() {
+            public int compare(GoodsType goodsType1, GoodsType goodsType2) {
+                return (getNormalGoodsPriceToBuy(goodsType2,
+                        GoodsContainer.CARGO_SIZE)
+                    - getNormalGoodsPriceToBuy(goodsType1,
+                        GoodsContainer.CARGO_SIZE));
+            }
+        };
+
+    // When choosing what goods to sell, sort goods with new world
+    // goods first, then by price, then amount.
+    private final Comparator<Goods> exportGoodsComparator
+        = new Comparator<Goods>() {
+            public int compare(Goods goods1, Goods goods2) {
+                int cmp;
+                GoodsType t1 = goods1.getType();
+                GoodsType t2 = goods2.getType();
+                cmp = (((t2.isNewWorldGoodsType()) ? 1 : 0)
+                    - ((t1.isNewWorldGoodsType()) ? 1 : 0));
+                if (cmp == 0) {
+                    int a1 = Math.min(goods2.getAmount(),
+                        GoodsContainer.CARGO_SIZE);
+                    int a2 = Math.min(goods1.getAmount(),
+                        GoodsContainer.CARGO_SIZE);
+                    cmp = getPriceToSell(t2, a2) - getPriceToSell(t1, a1);
+                    if (cmp == 0) {
+                        cmp = a2 - a1;
+                    }
+                }
+                return cmp;
+            }
+        };
+
+    /** Radius of native tales map reveal. */
     public static final int TALES_RADIUS = 6;
 
-    public static final String CONTACT_LEVEL_TAG_NAME = "contactLevel";
-    public static final String OWNED_UNITS_TAG_NAME = "ownedUnits";
-    public static final String IS_VISITED_TAG_NAME = "isVisited";
-    public static final String ALARM_TAG_NAME = "alarm";
-    public static final String MISSIONARY_TAG_NAME = "missionary";
-    public static final String WANTED_GOODS_TAG_NAME = "wantedGoods";
-
-    // Do not sell less than this amount of goods.
+    /** Do not sell less than this amount of goods. */
     public static final int TRADE_MINIMUM_SIZE = 20;
 
-    // Do not buy goods when the price is this low.
+    /** Do not buy goods when the price is this low. */
     public static final int TRADE_MINIMUM_PRICE = 3;
 
     public static final int GOODS_BASE_PRICE = 12;
@@ -104,16 +141,6 @@ public class IndianSettlement extends Settlement {
     protected GoodsType[] wantedGoods = new GoodsType[] { null, null, null };
 
     /**
-     * The level of contact between a player and this settlement.
-     */
-    public static enum ContactLevel {
-        UNCONTACTED,     // Nothing known other than location?
-        CONTACTED,       // Name, wanted-goods now visible
-        VISITED,         // Skill now known
-        SCOUTED          // Scouting bonus consumed
-    };
-        
-    /**
      * A map that tells if a player has spoken to the chief of this settlement.
      *
      * At the client side, only the information regarding the player
@@ -148,56 +175,19 @@ public class IndianSettlement extends Settlement {
     private final java.util.Map<Player, Tension> alarm
         = new HashMap<Player, Tension>();
 
-    // When choosing what goods to buy, sort goods types descending by price.
-    private final Comparator<GoodsType> wantedGoodsComparator
-        = new Comparator<GoodsType>() {
-            public int compare(GoodsType goodsType1, GoodsType goodsType2) {
-                return (getNormalGoodsPriceToBuy(goodsType2,
-                        GoodsContainer.CARGO_SIZE)
-                    - getNormalGoodsPriceToBuy(goodsType1,
-                        GoodsContainer.CARGO_SIZE));
-            }
-        };
-
-    // When choosing what goods to sell, sort goods with new world
-    // goods first, then by price, then amount.
-    private final Comparator<Goods> exportGoodsComparator
-        = new Comparator<Goods>() {
-            public int compare(Goods goods1, Goods goods2) {
-                int cmp;
-                GoodsType t1 = goods1.getType();
-                GoodsType t2 = goods2.getType();
-                cmp = (((t2.isNewWorldGoodsType()) ? 1 : 0)
-                    - ((t1.isNewWorldGoodsType()) ? 1 : 0));
-                if (cmp == 0) {
-                    int a1 = Math.min(goods2.getAmount(),
-                        GoodsContainer.CARGO_SIZE);
-                    int a2 = Math.min(goods1.getAmount(),
-                        GoodsContainer.CARGO_SIZE);
-                    cmp = getPriceToSell(t2, a2) - getPriceToSell(t1, a1);
-                    if (cmp == 0) {
-                        cmp = a2 - a1;
-                    }
-                }
-                return cmp;
-            }
-        };
-
 
     /**
-     * Constructor for ServerIndianSettlement.
+     * Deliberately empty constructor for ServerIndianSettlement.
      */
-    protected IndianSettlement() {
-        // empty constructor
-    }
+    protected IndianSettlement() {}
 
     /**
      * Constructor for ServerIndianSettlement.
      *
-     * @param game The <code>Game</code> in which this object belong.
+     * @param game The enclosing <code>Game</code>.
      * @param owner The <code>Player</code> owning this settlement.
      * @param name The name for this settlement.
-     * @param tile The location of the <code>IndianSettlement</code>.
+     * @param tile The containing <code>Tile</code>.
      */
     protected IndianSettlement(Game game, Player owner, String name,
                                Tile tile) {
@@ -205,8 +195,8 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
-     * Initiates a new <code>IndianSettlement</code> with the given
-     * ID. The object should later be initialized by calling either
+     * Creates a new <code>IndianSettlement</code> with the given
+     * identifier.  The object should later be initialized by calling either
      * {@link #readFromXML(XMLStreamReader)}.
      *
      * @param game The <code>Game</code> in which this object belong.
@@ -218,19 +208,56 @@ public class IndianSettlement extends Settlement {
 
 
     /**
-     * Dispose of this native settlement.
+     * Adds the given <code>Unit</code> to the list of units that
+     * belongs to this <code>IndianSettlement</code>.
      *
-     * @return A list of disposed objects.
+     * @param unit The <code>Unit</code> to be added.
      */
-    @Override
-    public List<FreeColGameObject> disposeList() {
-        // Orphan the units whose home settlement this is.
-        while (ownedUnits.size() > 0) {
-            ownedUnits.remove(0).setIndianSettlement(null);
+    public void addOwnedUnit(Unit unit) {
+        if (unit == null) {
+            throw new IllegalArgumentException("Parameter 'unit' must not be 'null'.");
         }
-        return super.disposeList();
+
+        if (!ownedUnits.contains(unit)) {
+            ownedUnits.add(unit);
+        }
     }
 
+    /**
+     * Gets a list of the units native to this settlement.
+     *
+     * @return The list of units native to this settlement.
+     */
+    public List<Unit> getOwnedUnits() {
+        return new ArrayList<Unit>(ownedUnits);
+    }
+
+    /**
+     * Gets an iterator over all the units this
+     * <code>IndianSettlement</code> is owning.
+     *
+     * @return The <code>Iterator</code>.
+     */
+    public Iterator<Unit> getOwnedUnitsIterator() {
+        return ownedUnits.iterator();
+    }
+
+    /**
+     * Removes the given <code>Unit</code> to the list of units that
+     * belongs to this <code>IndianSettlement</code>. Returns true if
+     * the Unit was removed.
+     *
+     * @param unit The <code>Unit</code> to be removed from the
+     *       list of the units this <code>IndianSettlement</code>
+     *       owns.
+     * @return a <code>boolean</code> value
+     */
+    public boolean removeOwnedUnit(Unit unit) {
+        if (unit == null) {
+            throw new IllegalArgumentException("Parameter 'unit' must not be 'null'.");
+        }
+        return ownedUnits.remove(unit);
+    }
 
     /**
      * Get the year of the last tribute.
@@ -344,7 +371,6 @@ public class IndianSettlement extends Settlement {
     public void setConvertProgress(int progress) {
         convertProgress = progress;
     }
-
 
     /**
      * Gets the goods wanted by this settlement.
@@ -621,78 +647,6 @@ public class IndianSettlement extends Settlement {
             || !unit.isNaval()
             || unit.hasGoodsCargo();
     }
-
-
-    /**
-     * Adds the given <code>Unit</code> to the list of units that
-     * belongs to this <code>IndianSettlement</code>.
-     *
-     * @param unit The <code>Unit</code> to be added.
-     */
-    public void addOwnedUnit(Unit unit) {
-        if (unit == null) {
-            throw new IllegalArgumentException("Parameter 'unit' must not be 'null'.");
-        }
-
-        if (!ownedUnits.contains(unit)) {
-            ownedUnits.add(unit);
-        }
-    }
-
-    /**
-     * Gets a list of the units native to this settlement.
-     *
-     * @return The list of units native to this settlement.
-     */
-    public List<Unit> getOwnedUnits() {
-        return new ArrayList<Unit>(ownedUnits);
-    }
-
-    /**
-     * Gets an iterator over all the units this
-     * <code>IndianSettlement</code> is owning.
-     *
-     * @return The <code>Iterator</code>.
-     */
-    public Iterator<Unit> getOwnedUnitsIterator() {
-        return ownedUnits.iterator();
-    }
-
-    /**
-     * Removes the given <code>Unit</code> to the list of units that
-     * belongs to this <code>IndianSettlement</code>. Returns true if
-     * the Unit was removed.
-     *
-     * @param unit The <code>Unit</code> to be removed from the
-     *       list of the units this <code>IndianSettlement</code>
-     *       owns.
-     * @return a <code>boolean</code> value
-     */
-    public boolean removeOwnedUnit(Unit unit) {
-        if (unit == null) {
-            throw new IllegalArgumentException("Parameter 'unit' must not be 'null'.");
-        }
-        return ownedUnits.remove(unit);
-    }
-
-
-    /**
-     * Adds a <code>Locatable</code> to this Location.
-     *
-     * @param locatable The <code>Locatable</code> to add to this Location.
-     */
-    public boolean add(Locatable locatable) {
-        boolean result = super.add(locatable);
-        if (result && locatable instanceof Unit) {
-            Unit indian = (Unit)locatable;
-            if (indian.getIndianSettlement() == null) {
-                // Adopt homeless Indians
-                indian.setIndianSettlement(this);
-            }
-        }
-        return result;
-    }
-
 
     /**
      * Gets the amount of gold this <code>IndianSettlment</code>
@@ -1087,11 +1041,32 @@ public class IndianSettlement extends Settlement {
     }
 
 
-    // Interface location
+    // Override FreeColGameObject
 
-    // getId() inherited from FreeColGameObject
-    // canAdd, getUnitCount, getUnitList inherited from UnitLocation
-    // add, remove, contains inherited from GoodsLocation
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<FreeColGameObject> disposeList() {
+        // Orphan the units whose home settlement this is.
+        while (!ownedUnits.isEmpty()) {
+            ownedUnits.remove(0).setIndianSettlement(null);
+        }
+        return super.disposeList();
+    }
+
+
+    // Interface Location (from Settlement via GoodsLocation via UnitLocation)
+    // Inherits
+    //   FreeColObject.getId()
+    //   Settlement.getTile
+    //   Settlement.getLocationName
+    //   GoodsLocation.remove
+    //   GoodsLocation.contains
+    //   UnitLocation.canAdd
+    //   UnitLocation.getUnitCount
+    //   UnitLocation.getUnitList
+    //   Settlement.getSettlement
 
     /**
      * {@inheritDoc}
@@ -1106,14 +1081,40 @@ public class IndianSettlement extends Settlement {
      * {@inheritDoc}
      */
     @Override
+    public boolean add(Locatable locatable) {
+        boolean result = super.add(locatable);
+        if (result && locatable instanceof Unit) {
+            Unit indian = (Unit)locatable;
+            if (indian.getIndianSettlement() == null) {
+                // Adopt homeless Indians
+                indian.setIndianSettlement(this);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public final Colony getColony() {
         return null; // A native settlement can never be a colony.
     }
 
-    // UnitLocation routines
-    // getNoAddReason in Settlement is adequate
 
-    // GoodsLocation routines
+    // UnitLocation
+    // Inherits
+    //   UnitLocation.getSpaceTaken
+    //   UnitLocation.moveToFront
+    //   UnitLocation.clearUnitList
+    //   Settlement.getNoAddReason
+    //   UnitLocation.getUnitCapacity
+
+
+    // GoodsLocation
+    // Inherits
+    //   GoodsLocation.addGoods
+    //   GoodsLocation.removeGoods
 
     /**
      * {@inheritDoc}
@@ -1123,7 +1124,7 @@ public class IndianSettlement extends Settlement {
     }
 
 
-    // Settlement routines
+    // Settlement
 
     /**
      * {@inheritDoc}
@@ -1169,20 +1170,18 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
-     * Native settlements do not generate SoL.
-     *
-     * @return 0.
+     * {@inheritDoc}
      */
     public int getSoL() {
+        // Native settlements do not generate SoL.
         return 0;
     }
 
     /**
-     * Native settlements do not require upkeep.
-     *
-     * @return 0
+     * {@inheritDoc}
      */
     public int getUpkeep() {
+        // Native settlements do not require upkeep.
         return 0;
     }
 
@@ -1232,134 +1231,155 @@ public class IndianSettlement extends Settlement {
 
     // Serialization
 
+    private static final String ALARM_TAG = "alarm";
+    private static final String CONTACT_LEVEL_TAG = "contactLevel";
+    private static final String CONVERT_PROGRESS_TAG = "convertProgress";
+    private static final String IS_VISITED_TAG = "isVisited";
+    private static final String LAST_TRIBUTE_TAG = "lastTribute";
+    private static final String LEARNABLE_SKILL_TAG = "learnableSkill";
+    private static final String LEVEL_TAG = "level";
+    private static final String MISSIONARY_TAG = "missionary";
+    private static final String MOST_HATED_TAG = "mostHated";
+    private static final String OWNED_UNITS_TAG = "ownedUnits";
+    private static final String PLAYER_TAG = "player";
+    private static final String WANTED_GOODS_TAG = "wantedGoods";
+
+
     /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *
-     * <br><br>
-     *
-     * Only attributes visible to the given <code>Player</code> will
-     * be added to that representation if <code>showAll</code> is
-     * set to <code>false</code>.
-     *
-     * @param out The target stream.
-     * @param player The <code>Player</code> this XML-representation
-     *      should be made for, or <code>null</code> if
-     *      <code>showAll == true</code>.
-     * @param showAll Only attributes visible to <code>player</code>
-     *      will be added to the representation if <code>showAll</code>
-     *      is set to <i>false</i>.
-     * @param toSavedGame If <code>true</code> then information that
-     *      is only needed when saving a game is added.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * {@inheritDoc}
      */
     @Override
     protected void toXMLImpl(XMLStreamWriter out, Player player,
-                             boolean showAll, boolean toSavedGame)
-        throws XMLStreamException {
+                             boolean showAll,
+                             boolean toSavedGame) throws XMLStreamException {
+        super.toXML(out, getXMLElementTagName(), player, showAll, toSavedGame);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out, Player player,
+                                   boolean showAll,
+                                   boolean toSavedGame) throws XMLStreamException {
         boolean full = showAll || toSavedGame || player == getOwner();
         PlayerExploredTile pet = (player == null) ? null
             : getTile().getPlayerExploredTile(player);
 
-        if (toSavedGame && !showAll) {
-            logger.warning("toSavedGame is true, but showAll is false");
-        }
-
-        // Start element:
-        out.writeStartElement(getXMLElementTagName());
         super.writeAttributes(out);
 
         if (full) {
-            out.writeAttribute("lastTribute", Integer.toString(lastTribute));
-            out.writeAttribute("convertProgress", Integer.toString(convertProgress));
-            writeAttribute(out, "learnableSkill", learnableSkill);
+            writeAttribute(out, LAST_TRIBUTE_TAG, lastTribute);
+
+            writeAttribute(out, CONVERT_PROGRESS_TAG, convertProgress);
+
+            writeAttribute(out, LEARNABLE_SKILL_TAG, learnableSkill);
+
             for (int i = 0; i < wantedGoods.length; i++) {
                 if (wantedGoods[i] != null) {
-                    String tag = "wantedGoods" + Integer.toString(i);
-                    out.writeAttribute(tag, wantedGoods[i].getId());
+                    writeAttribute(out, WANTED_GOODS_TAG + i, wantedGoods[i]);
                 }
             }
+
             Player hated = getMostHated();
             if (hated != null) {
-                out.writeAttribute("mostHated", hated.getId());
+                writeAttribute(out, MOST_HATED_TAG, hated);
             }
+
         } else if (pet != null) {
-            writeAttribute(out, "learnableSkill", pet.getSkill());
+            writeAttribute(out, LEARNABLE_SKILL_TAG, pet.getSkill());
+
             GoodsType[] wanted = pet.getWantedGoods();
             int i, j = 0;
             for (i = 0; i < wanted.length; i++) {
                 if (wanted[i] != null) {
-                    String tag = "wantedGoods" + Integer.toString(j);
-                    out.writeAttribute(tag, wanted[i].getId());
+                    writeAttribute(out, WANTED_GOODS_TAG + j, wanted[i]);
                     j++;
                 }
             }
+
             Player hated = pet.getMostHated();
             if (hated != null) {
-                out.writeAttribute("mostHated", hated.getId());
+                writeAttribute(out, MOST_HATED_TAG, hated);
             }
         }
-
-        writeChildren(out, player, showAll, toSavedGame);
-
-        out.writeEndElement();
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void writeChildren(XMLStreamWriter out, Player player,
-                                 boolean showAll, boolean toSavedGame)
-        throws XMLStreamException {
+                                 boolean showAll,
+                                 boolean toSavedGame) throws XMLStreamException {
         PlayerExploredTile pet;
 
+        super.writeChildren(out, player, showAll, toSavedGame);
+
         if (showAll || toSavedGame || player == getOwner()) {
-            for (Player p : contactLevels.keySet()) {
-                out.writeStartElement(CONTACT_LEVEL_TAG_NAME);
-                out.writeAttribute("level",
-                    contactLevels.get(p).toString().toLowerCase(Locale.US));
-                out.writeAttribute("player", p.getId());
+            for (Player p : getSortedCopy(contactLevels.keySet())) {
+                out.writeStartElement(CONTACT_LEVEL_TAG);
+
+                writeAttribute(out, LEVEL_TAG, contactLevels.get(p));
+
+                writeAttribute(out, PLAYER_TAG, p);
+
                 out.writeEndElement();
             }
-            for (Entry<Player, Tension> entry : alarm.entrySet()) {
-                out.writeStartElement(ALARM_TAG_NAME);
-                out.writeAttribute("player", entry.getKey().getId());
-                out.writeAttribute(VALUE_TAG,
-                    String.valueOf(entry.getValue().getValue()));
+
+            for (Player p : getSortedCopy(alarm.keySet())) {
+                out.writeStartElement(ALARM_TAG);
+
+                writeAttribute(out, PLAYER_TAG, p);
+
+                writeAttribute(out, VALUE_TAG, alarm.get(p).getValue());
+
                 out.writeEndElement();
             }
+
             if (missionary != null) {
-                out.writeStartElement(MISSIONARY_TAG_NAME);
+                out.writeStartElement(MISSIONARY_TAG);
+
                 missionary.toXML(out, player, showAll, toSavedGame);
+
                 out.writeEndElement();
             }
-            for (Unit unit : ownedUnits) {
-                out.writeStartElement(OWNED_UNITS_TAG_NAME);
-                out.writeAttribute(ID_ATTRIBUTE_TAG, unit.getId());
+
+            for (Unit unit : getSortedCopy(ownedUnits)) {
+                out.writeStartElement(OWNED_UNITS_TAG);
+
+                writeAttribute(out, ID_ATTRIBUTE_TAG, unit);
+
                 out.writeEndElement();
             }
-            super.writeChildren(out, player, showAll, toSavedGame);
 
         } else if ((pet = getTile().getPlayerExploredTile(player)) != null) {
             ContactLevel cl = contactLevels.get(player);
             if (cl != null) {
-                out.writeStartElement(CONTACT_LEVEL_TAG_NAME);
-                out.writeAttribute("level",
-                    cl.toString().toLowerCase(Locale.US));
-                out.writeAttribute("player", player.getId());
+                out.writeStartElement(CONTACT_LEVEL_TAG);
+
+                writeAttribute(out, LEVEL_TAG, cl);
+
+                writeAttribute(out, PLAYER_TAG, player);
+
                 out.writeEndElement();
             }
+
             if (getAlarm(player) != null) {
-                out.writeStartElement(ALARM_TAG_NAME);
-                out.writeAttribute("player", player.getId());
-                out.writeAttribute(VALUE_TAG,
-                    String.valueOf(getAlarm(player).getValue()));
+                out.writeStartElement(ALARM_TAG);
+
+                writeAttribute(out, PLAYER_TAG, player);
+
+                writeAttribute(out, VALUE_TAG, getAlarm(player).getValue());
+
                 out.writeEndElement();
             }
+
             if (pet.getMissionary() != null) {
-                out.writeStartElement(MISSIONARY_TAG_NAME);
+                out.writeStartElement(MISSIONARY_TAG);
+
                 pet.getMissionary().toXML(out, player, showAll, toSavedGame);
+
                 out.writeEndElement();
             }
         }
@@ -1369,137 +1389,16 @@ public class IndianSettlement extends Settlement {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
-        super.readAttributes(in);
-
-        owner.addSettlement(this);
-        ownedUnits.clear();
-
-        for (int i = 0; i < wantedGoods.length; i++) {
-            String tag = WANTED_GOODS_TAG_NAME + Integer.toString(i);
-            String wantedGoodsId = getAttribute(in, tag, (String)null);
-            wantedGoods[i] = (wantedGoodsId == null) ? null
-                : getSpecification().getGoodsType(wantedGoodsId);
-        }
-
-        convertProgress = getAttribute(in, "convertProgress", 0);
-        lastTribute = getAttribute(in, "lastTribute", 0);
-        learnableSkill = getSpecification().getType(in, "learnableSkill",
-                                                    UnitType.class, null);
-        mostHated = makeFreeColGameObject(in, "mostHated", Player.class);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
-        contactLevels.clear();
-        alarm.clear();
-        missionary = null;
-        ownedUnits.clear();
-        super.readChildren(in);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        final Game game = getGame();
-        final String tag = in.getLocalName();
-
-        if (ALARM_TAG_NAME.equals(tag)) {
-            Player player = makeFreeColGameObject(in, "player", Player.class);
-            // @compat 0.10.5
-            setContacted(player); // Alarm used to imply contact
-            // @end compatibility code
-            alarm.put(player, new Tension(getAttribute(in, VALUE_TAG, 0)));
-            closeTag(in, ALARM_TAG_NAME);
-
-        } else if (CONTACT_LEVEL_TAG_NAME.equals(tag)) {
-            String levelString = in.getAttributeValue(null, "level");
-            ContactLevel cl = Enum.valueOf(ContactLevel.class,
-                levelString.toUpperCase(Locale.US));
-            Player player = makeFreeColGameObject(in, "player", Player.class);
-            contactLevels.put(player, cl);
-            closeTag(in, CONTACT_LEVEL_TAG_NAME);
-
-        // @compat 0.10.5
-        } else if (IS_VISITED_TAG_NAME.equals(tag)) {
-            Player player = makeFreeColGameObject(in, "player", Player.class);
-            setScouted(player);
-            closeTag(in, IS_VISITED_TAG_NAME);
-        // end @compat
-
-        } else if (WANTED_GOODS_TAG_NAME.equals(tag)) {
-            String[] wantedGoodsID
-                = readFromArrayElement(WANTED_GOODS_TAG_NAME, in,
-                                       new String[0]);
-            for (int i = 0; i < wantedGoods.length; i++) {
-                String goodsId = (i < wantedGoodsID.length) ? wantedGoodsID[i]
-                    : null;
-                wantedGoods[i] = (goodsId == null || "".equals(goodsId)) ? null
-                    : getSpecification().getGoodsType(goodsId);
-            }
-
-        } else if (MISSIONARY_TAG_NAME.equals(tag)) {
-            in.nextTag();
-            missionary = readFreeColGameObject(in, Unit.class);
-            missionary.setLocationNoUpdate(this);
-            closeTag(in, MISSIONARY_TAG_NAME);
-
-        } else if (UNITS_TAG.equals(tag)) {
-            while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                if (in.getLocalName().equals(Unit.getXMLElementTagName())) {
-                    Unit unit = readFreeColGameObject(in, Unit.class);
-                    // @compat 0.10.1
-                    if (unit.getLocation() != this) {
-                        logger.warning("fixing unit location");
-                        unit.setLocation(this);
-                    }
-                    // end compatibility code
-                    add(unit);
-                }
-            }
-
-        } else if (OWNED_UNITS_TAG_NAME.equals(tag)) {
-            Unit unit = makeFreeColGameObject(in, ID_ATTRIBUTE_TAG, Unit.class);
-            if (unit.getOwner() != null && !owner.owns(unit)) {
-                logger.warning("Error in savegame: unit " + unit.getId()
-                               + " does not belong to settlement " + getId());
-            } else {
-                ownedUnits.add(unit);
-                owner.addUnit(unit);
-            }
-            closeTag(in, OWNED_UNITS_TAG_NAME);
-
-        } else {
-            super.readChild(in);
-        }
-    }
-
-    /**
-     * Partial writer, so that "remove" messages can be brief.
-     *
-     * @param out The target stream.
-     * @param fields The fields to write.
-     * @throws XMLStreamException If there are problems writing the stream.
-     */
-    @Override
-    protected void toXMLPartialImpl(XMLStreamWriter out, String[] fields)
-        throws XMLStreamException {
+    protected void toXMLPartialImpl(XMLStreamWriter out,
+                                    String[] fields) throws XMLStreamException {
         toXMLPartialByClass(out, getClass(), fields);
     }
 
     /**
-     * Partial reader, so that "remove" messages can be brief.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException If there are problems reading the stream.
+     * {@inheritDoc}
      */
     @Override
-    public void readFromXMLPartialImpl(XMLStreamReader in)
-        throws XMLStreamException {
+    public void readFromXMLPartialImpl(XMLStreamReader in) throws XMLStreamException {
         readFromXMLPartialByClass(in, getClass());
     }
 
@@ -1507,11 +1406,130 @@ public class IndianSettlement extends Settlement {
      * {@inheritDoc}
      */
     @Override
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        final Specification spec = getSpecification();
+
+        super.readAttributes(in);
+
+        lastTribute = getAttribute(in, LAST_TRIBUTE_TAG, 0);
+
+        convertProgress = getAttribute(in, CONVERT_PROGRESS_TAG, 0);
+
+        learnableSkill = spec.getType(in, LEARNABLE_SKILL_TAG,
+                                      UnitType.class, (UnitType)null);
+
+        mostHated = makeFreeColGameObject(in, MOST_HATED_TAG, Player.class);
+
+        for (int i = 0; i < wantedGoods.length; i++) {
+            wantedGoods[i] = spec.getType(in, WANTED_GOODS_TAG + i,
+                                           GoodsType.class, (GoodsType)null);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        // Clear containers.
+        contactLevels.clear();
+        alarm.clear();
+        missionary = null;
+        ownedUnits.clear();
+
+        super.readChildren(in);
+
+        owner.addSettlement(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+        final Specification spec = getSpecification();
+        final Game game = getGame();
+        final String tag = in.getLocalName();
+
+        if (ALARM_TAG.equals(tag)) {
+            Player player = makeFreeColGameObject(in, PLAYER_TAG, Player.class);
+            // @compat 0.10.5
+            setContacted(player); // Alarm used to imply contact
+            // end @compat
+            alarm.put(player, new Tension(getAttribute(in, VALUE_TAG, 0)));
+            closeTag(in, ALARM_TAG);
+
+        } else if (CONTACT_LEVEL_TAG.equals(tag)) {
+            ContactLevel cl = getAttribute(in, LEVEL_TAG,
+                ContactLevel.class, ContactLevel.UNCONTACTED);
+            Player player = makeFreeColGameObject(in, PLAYER_TAG, Player.class);
+            contactLevels.put(player, cl);
+            closeTag(in, CONTACT_LEVEL_TAG);
+
+        // @compat 0.10.5
+        } else if (IS_VISITED_TAG.equals(tag)) {
+            Player player = makeFreeColGameObject(in, PLAYER_TAG, Player.class);
+            setScouted(player);
+            closeTag(in, IS_VISITED_TAG);
+        // end @compat
+
+        // @compat ?
+        } else if (WANTED_GOODS_TAG.equals(tag)) {
+            String[] wantedGoodsID
+                = readFromArrayElement(WANTED_GOODS_TAG, in, new String[0]);
+            for (int i = 0; i < wantedGoods.length; i++) {
+                String goodsId = (i < wantedGoodsID.length) ? wantedGoodsID[i]
+                    : null;
+                wantedGoods[i] = (goodsId == null || "".equals(goodsId)) ? null
+                    : spec.getGoodsType(goodsId);
+            }
+        // end @compat
+
+        } else if (MISSIONARY_TAG.equals(tag)) {
+            in.nextTag();
+            missionary = readFreeColGameObject(in, Unit.class);
+            missionary.setLocationNoUpdate(this);
+            closeTag(in, MISSIONARY_TAG);
+
+        } else if (OWNED_UNITS_TAG.equals(tag)) {
+            Unit unit = makeFreeColGameObject(in, ID_ATTRIBUTE_TAG, Unit.class);
+            if (unit.getOwner() != null && !owner.owns(unit)) {
+                logger.warning("Error in savegame: unit " + unit.getId()
+                               + " does not belong to settlement " + getId());
+            } else {
+                addOwnedUnit(unit);
+                owner.addUnit(unit);
+            }
+            closeTag(in, OWNED_UNITS_TAG);
+
+        } else if (UNITS_TAG.equals(tag)) {
+            while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                if (in.getLocalName().equals(Unit.getXMLElementTagName())) {
+                    Unit unit = readFreeColGameObject(in, Unit.class);
+                    // @compat 0.10.1
+                    if (unit.getLocation() != this) {
+                        logger.warning("Fixing unit location");
+                        unit.setLocation(this);
+                    }
+                    // end @compat
+                    add(unit);
+                }
+            }
+
+        } else {
+            super.readChild(in);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String toString() {
-        StringBuilder s = new StringBuilder(getName());
-        s.append(" at (").append(tile.getX());
-        s.append(",").append(tile.getY()).append(")");
-        return s.toString();
+        StringBuilder sb = new StringBuilder(64);
+        sb.append(getName()).append(" at (").append(tile.getX())
+            .append(",").append(tile.getY()).append(")");
+        return sb.toString();
     }
 
     /**

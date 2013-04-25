@@ -264,14 +264,10 @@ public class NativeAIPlayer extends AIPlayer {
         // Collect native units and defenders
         List<Unit> units = new ArrayList<Unit>();
         List<Unit> defenders = new ArrayList<Unit>();
-        for (Unit u : is.getUnitList()) {
-            if (!u.isDisposed() && !units.contains(u)) units.add(u);
-        }
-        for (Unit u : is.getTile().getUnitList()) {
-            if (!u.isDisposed() && !units.contains(u)) units.add(u);
-        }
+        units.addAll(is.getUnitList());
+        units.addAll(is.getTile().getUnitList());
         for (Unit u : is.getOwnedUnits()) {
-            if (!u.isDisposed() && !units.contains(u)) units.add(u);
+            if (!units.contains(u)) units.add(u);
         }
 
         // Collect the current defenders
@@ -335,7 +331,7 @@ public class NativeAIPlayer extends AIPlayer {
                 if (value > 0.0f) threats.put(t, new Float(value));
             }
         }
-        
+
         // Sort the available units by proximity to the settlement.
         // Simulates favouring the first warriors found by outgoing messengers.
         // Also favour units native to the settlement.
