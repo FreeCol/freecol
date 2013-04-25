@@ -97,11 +97,20 @@ public class ServerEurope extends Europe implements ServerModelObject {
                         continue;
                     }
                 }
-                setRecruitable(index,
-                               RandomChoice.getWeightedRandom(null, null, random, recruits));
+                setRecruitable(index, RandomChoice.getWeightedRandom(null,
+                        null, random, recruits));
             }
             // end compatibility code
         }
+    }
+
+    /**
+     * Increases the base price and lower cap for recruits.
+     */
+    public void increaseRecruitmentDifficulty() {
+        final Specification spec = getSpecification();
+        recruitPrice += spec.getInteger("model.option.recruitPriceIncrease");
+        recruitLowerCap += spec.getInteger("model.option.lowerCapIncrease");
     }
 
     /**

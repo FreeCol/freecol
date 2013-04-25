@@ -192,6 +192,23 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
         return result;
     }
 
+    /**
+     * Checks if there is a useable carrier unit with a specified
+     * minimum amount of space available in this location.
+     *
+     * @param space The amount of space to require.
+     * @return True if there is a suitable unit present.
+     * @see Unit#isCarrier
+     */
+    public boolean hasCarrierWithSpace(int space) {
+        for (Unit u : getUnitList()) {
+            if (u.isCarrier()
+                && !u.isUnderRepair()
+                && u.getSpaceLeft() >= space) return true;
+        }
+        return false;
+    }
+
 
     // Override FreeColGameObject
 

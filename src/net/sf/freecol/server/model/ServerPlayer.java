@@ -1824,7 +1824,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                               Europe.RECRUIT_COUNT);
 
         // Create the recruit, move it to the docks.
-        Europe europe = getEurope();
+        ServerEurope europe = (ServerEurope)getEurope();
         UnitType recruitType = europe.getRecruitable(index);
         Game game = getGame();
         Unit unit = new ServerUnit(game, europe, this, recruitType);

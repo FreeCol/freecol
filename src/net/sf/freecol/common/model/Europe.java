@@ -30,34 +30,27 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Unit.UnitState;
 
+
 /**
- * Represents Europe in the game. Each <code>Player</code> has it's
+ * Represents Europe in the game.  Each <code>Player</code> has it's
  * own <code>Europe</code>.
  *
- * <br><br>
- *
- * <p>In Europe, you can recruit, train and purchase new units. You
- * can also equip units, as well as sell and buy goods.
+ * In Europe, you can recruit, train and purchase new units.  You can
+ * also equip units, as well as sell and buy goods.
  */
 public class Europe extends UnitLocation implements Ownable, Named {
 
     private static final Logger logger = Logger.getLogger(Europe.class.getName());
 
+    /** The initial recruit price. */
     private static final int RECRUIT_PRICE_INITIAL = 200;
 
+    /** The initial lower bound on recruitment price. */
     private static final int LOWER_CAP_INITIAL = 80;
 
     public static final String UNIT_CHANGE = "unitChange";
 
-    /**
-     * This array represents the types of the units that can be recruited in
-     * Europe. They correspond to the slots that can be seen in the gui and that
-     * can be used to communicate with the server/client. The array holds
-     * exactly 3 elements and element 0 corresponds to recruit slot 1.
-     */
-    private UnitType[] recruitables = { null, null, null };
-    public static final int RECRUIT_COUNT = 3;
-
+    /** Reasons to migrate. */
     public static enum MigrationType {
         NORMAL,     // Unit decided to migrate
         RECRUIT,    // Player is paying
@@ -65,126 +58,91 @@ public class Europe extends UnitLocation implements Ownable, Named {
         SURVIVAL    // Emergency autorecruit in server
     }
 
+    /** The number of recruitable units. */
+    public static final int RECRUIT_COUNT = 3;
 
+    /**
+     * This array represents the types of the units that can be recruited in
+     * Europe. They correspond to the slots that can be seen in the gui and that
+     * can be used to communicate with the server/client.  The array holds
+     * exactly 3 elements and element 0 corresponds to recruit `slot' 1.
+     */
+    private UnitType[] recruitables = { null, null, null };
+
+    /** Prices for trainable or purchasable units. */
     protected java.util.Map<UnitType, Integer> unitPrices
         = new HashMap<UnitType, Integer>();
 
-    private int recruitPrice;
+    /** Current price to recruit a unit. */
+    protected int recruitPrice;
 
-    private int recruitLowerCap;
+    /** The lower bound on recruitment price. */
+    protected int recruitLowerCap;
 
+    /** The owner of this instance of Europe. */
     private Player owner;
 
+    /** A feature container for this Europe's special features. */
     private final FeatureContainer featureContainer = new FeatureContainer();
 
 
     /**
-     * Constructor for ServerEurope.
+     * Deliberately empty constructor for ServerEurope.
      */
-    protected Europe() {
-        // empty constructor
-    }
+    protected Europe() {}
 
     /**
      * Constructor for ServerEurope.
      *
-     * @param game The <code>Game</code> in which this object belong.
-     * @param owner The <code>Player</code> that will be using this object of
-     *            <code>Europe</code>.
+     * @param game The enclosing <code>Game</code>.
+     * @param owner The owning <code>Player</code>.
      */
     protected Europe(Game game, Player owner) {
         super(game);
-        this.owner = owner;
 
-        recruitPrice = RECRUIT_PRICE_INITIAL;
-        recruitLowerCap = LOWER_CAP_INITIAL;
+        this.owner = owner;
+        this.recruitPrice = RECRUIT_PRICE_INITIAL;
+        this.recruitLowerCap = LOWER_CAP_INITIAL;
     }
 
     /**
-     * Initiates a new <code>Europe</code> with the given ID. The object
-     * should later be initialized by calling either
+     * Creates a new <code>Europe</code> with the given identifier.
+     * The object should later be initialized by calling either
      * {@link #readFromXML(XMLStreamReader)} or
      * {@link #readFromXMLElement(Element)}.
      *
-     * @param game The <code>Game</code> in which this object belong.
-     * @param id The unique identifier for this object.
+     * @param game The enclosing <code>Game</code>.
+     * @param id The object identifier.
      */
     public Europe(Game game, String id) {
         super(game, id);
     }
 
-    /**
-     * Gets the feature container for this Europe object.
-     *
-     * @return The <code>FeatureContainer</code>.
-     */
-    @Override
-    public FeatureContainer getFeatureContainer() {
-        return featureContainer;
-    }
 
     /**
-     * Checks if there is a useable carrier unit with a specified
-     * minimum amount of space available docked in this European port.
+     * Are any of the recruitables not of the same type?
      *
-     * @param space The amount of space to require.
-     * @return True if there is a suitable unit present.
-     * @see Unit#isCarrier
-     */
-    public boolean hasCarrierWithSpace(int space) {
-        for (Unit u : getUnitList()) {
-            if (u.isCarrier()
-                && !u.isUnderRepair()
-                && u.getSpaceLeft() >= space) return true;
-        }
-        return false;
-    }
-
-    /**
-     * Return true if this Europe could build at least one item of the
-     * given EquipmentType.
-     *
-     * @param equipmentType an <code>EquipmentType</code> value
-     * @return a <code>boolean</code> value
-     */
-    public boolean canBuildEquipment(EquipmentType equipmentType) {
-        Market market = getOwner().getMarket();
-        for (AbstractGoods ag : equipmentType.getRequiredGoods()) {
-            GoodsType goodsType = ag.getType();
-            if (!(getOwner().canTrade(goodsType)
-                  && getOwner().checkGold(market.getBidPrice(goodsType, ag.getAmount())))) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-
-    /**
-     * Returns true if not all recruitables are of the same type.
-     *
-     * @return a <code>boolean</code> value
+     * @return True if the recruitables are not all of the same type.
      */
     public boolean recruitablesDiffer() {
-        return !(recruitables[0].equals(recruitables[1]) && recruitables[0].equals(recruitables[2]));
+        return !(recruitables[0].equals(recruitables[1])
+            && recruitables[0].equals(recruitables[2]));
     }
 
     /**
      * Gets the type of the recruitable in Europe at the given slot.
      *
-     * @param slot The slot of the recruitable whose type needs to be returned.
-     *            Should be 0, 1 or 2. NOTE - used to be 1, 2 or 3 and was
-     *            called with 1-3 by some classes and 0-2 by others, the method
-     *            itself expected 0-2.
+     * @param slot The slot of the recruitable whose type needs to be
+     *     returned.  Should be 0, 1 or 2.  Note: this used to be 1, 2
+     *     or 3 and was called with 1-3 by some classes and 0-2 by
+     *     others, the method itself expected 0-2.
      * @return The type of the recruitable in Europe at the given slot.
      * @exception IllegalArgumentException if the given <code>slot</code> does
      *                not exist.
      */
     public UnitType getRecruitable(int slot) {
-        if ((slot >= 0) && (slot < RECRUIT_COUNT)) {
-            return recruitables[slot];
-        }
-        throw new IllegalArgumentException("Wrong recruitement slot: " + slot);
+        if (slot >= 0 && slot < RECRUIT_COUNT) return recruitables[slot];
+        throw new IllegalArgumentException("Invalid recruitment slot: " + slot);
     }
 
     /**
@@ -192,65 +150,27 @@ public class Europe extends UnitLocation implements Ownable, Named {
      * type.
      *
      * @param slot The slot of the recruitable whose type needs to be set.
-     *            Should be 0, 1 or 2. NOTE - changed in order to match
-     *            getRecruitable above!
-     * @param type The new type for the unit at the given slot in Europe. Should
-     *            be a valid unit type.
+     * @param type The new type for the unit at the given slot in Europe.
      */
     public void setRecruitable(int slot, UnitType type) {
-        // Note - changed in order to match getRecruitable
         if (slot >= 0 && slot < RECRUIT_COUNT) {
             recruitables[slot] = type;
         } else {
-            logger.warning("setRecruitable: invalid slot(" + slot + ") given.");
+            throw new IllegalArgumentException("Invalid recruitment slot: "
+                + slot);
         }
     }
 
     /**
-     * Adds a <code>Locatable</code> to this Location.
+     * Gets the price of a unit in Europe.
      *
-     * @param locatable The <code>Locatable</code> to add to this Location.
-     */
-    public boolean add(Locatable locatable) {
-        boolean result = super.add(locatable);
-        if (result && locatable instanceof Unit) {
-            Unit unit = (Unit) locatable;
-            unit.setState((unit.canCarryUnits()) ? UnitState.ACTIVE
-                : UnitState.SENTRY);
-        }
-        return result;
-    }
-
-    /**
-     * Checks whether or not the specified locatable may be added to this
-     * <code>Location</code>.
-     *
-     * @param locatable The <code>Locatable</code> to test the addabillity of.
-     * @return <i>true</i>.
-     */
-    public boolean canAdd(Locatable locatable) {
-        if (locatable instanceof Goods) {
-            return true;
-        } else {
-            return super.canAdd(locatable);
-        }
-    }
-
-    /**
-     * Returns the price of a unit in Europe.
-     *
-     * @param unitType The type of unit of which you need the price.
-     * @return The price of this unit when trained in Europe.
-     *         'UNDEFINED' is returned in case the unit cannot be
-     *         bought.
+     * @param unitType The <code>UnitType</code> to price.
+     * @return The price of this unit when trained/purchased in Europe,
+     *     or UNDEFINED on failure.
      */
     public int getUnitPrice(UnitType unitType) {
         Integer price = unitPrices.get(unitType);
-        if (price != null) {
-            return price.intValue();
-        } else {
-            return unitType.getPrice();
-        }
+        return (price != null) ? price.intValue() : unitType.getPrice();
     }
 
     /**
@@ -262,186 +182,274 @@ public class Europe extends UnitLocation implements Ownable, Named {
         int required = owner.getImmigrationRequired();
         int immigration = owner.getImmigration();
         int difference = Math.max(required - immigration, 0);
-        return Math.max((recruitPrice * difference) / required, recruitLowerCap);
+        return Math.max((recruitPrice * difference) / required,
+                        recruitLowerCap);
     }
 
     /**
-     * Increases the base price and lower cap for recruits.
-     * Only called from the server side.
-     */
-    public void increaseRecruitmentDifficulty() {
-        final Specification spec = getSpecification();
-        recruitPrice += spec.getInteger("model.option.recruitPriceIncrease");
-        recruitLowerCap += spec.getInteger("model.option.lowerCapIncrease");
-    }
-
-    /**
-     * Gets the <code>Player</code> using this <code>Europe</code>.
-     */
-    public Player getOwner() {
-        return owner;
-    }
-
-    /**
-     * Sets the owner of this <code>Ownable</code>.
+     * Can this Europe build at least one item of the given EquipmentType?
      *
-     * @param p The <code>Player</code> that should take ownership of this
-     *            {@link Ownable}.
-     * @exception UnsupportedOperationException is always thrown by this method.
+     * @param equipmentType The <code>EquipmentType</code> to check.
+     * @return True if the build could succeed.
      */
-    public void setOwner(Player p) {
-        throw new UnsupportedOperationException();
+    public boolean canBuildEquipment(EquipmentType equipmentType) {
+        Market m = getOwner().getMarket();
+        for (AbstractGoods ag : equipmentType.getRequiredGoods()) {
+            GoodsType goodsType = ag.getType();
+            if (!(getOwner().canTrade(goodsType)
+                  && getOwner().checkGold(m.getBidPrice(goodsType,
+                                                        ag.getAmount())))) {
+                return false;
+            }
+        }
+        return true;
     }
 
+
+    // Override FreeColObject
+
     /**
-     * Returns the name of this location.
+     * Gets the feature container for this Europe object.
      *
-     * @return The name of this location.
+     * @return The <code>FeatureContainer</code>.
      */
+    @Override
+    public FeatureContainer getFeatureContainer() {
+        return featureContainer;
+    }
+
+
+    // Interface Location (from UnitLocation)
+    // Inheriting:
+    //   FreeColObject.getId()
+    //   UnitLocation.getTile
+    //   UnitLocation.getLocationNameFor
+    //   UnitLocation.remove
+    //   UnitLocation.contains
+    //   UnitLocation.getUnitCount
+    //   UnitLocation.getUnitList
+    //   final UnitLocation.getUnitIterator
+    //   UnitLocation.getGoodsContainer
+    //   UnitLocation.getColony
+    //   UnitLocation.getSettlement
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public StringTemplate getLocationName() {
         return StringTemplate.key(getNameKey());
     }
 
     /**
-     * Returns the name of the owner's home port.
-     *
-     * @return The name of this location.
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean add(Locatable locatable) {
+        boolean result = super.add(locatable);
+        if (result && locatable instanceof Unit) {
+            Unit unit = (Unit) locatable;
+            unit.setState((unit.canCarryUnits()) ? UnitState.ACTIVE
+                : UnitState.SENTRY);
+        }
+        return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean canAdd(Locatable locatable) {
+        if (locatable instanceof Goods) return true; // Can always land goods.
+        return super.canAdd(locatable);
+    }
+
+
+    // Interface UnitLocation
+    // Inheriting
+    //   UnitLocation.getSpaceTaken
+    //   UnitLocation.moveToFront
+    //   UnitLocation.clearUnitList
+    //   UnitLocation.getNoAddReason
+    //   UnitLocation.getUnitCapacity
+
+
+    // Interface Named
+
+    /**
+     * {@inheritDoc}
      */
     public String getNameKey() {
         return getOwner().getEuropeNameKey();
     }
 
 
-    // Serialization
+    // Interface Ownable 
 
     /**
-     * This method writes an XML-representation of this object to the given
-     * stream.
-     *
-     * <br>
-     * <br>
-     *
-     * Only attributes visible to the given <code>Player</code> will be added
-     * to that representation if <code>showAll</code> is set to
-     * <code>false</code>.
-     *
-     * @param out The target stream.
-     * @param player The <code>Player</code> this XML-representation should be
-     *            made for, or <code>null</code> if
-     *            <code>showAll == true</code>.
-     * @param showAll Only attributes visible to <code>player</code> will be
-     *            added to the representation if <code>showAll</code> is set
-     *            to <i>false</i>.
-     * @param toSavedGame If <code>true</code> then information that is only
-     *            needed when saving a game is added.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
+     * {@inheritDoc}
      */
-    protected void toXMLImpl(XMLStreamWriter out, Player player,
-                             boolean showAll, boolean toSavedGame)
-            throws XMLStreamException {
-        // Start element:
-        out.writeStartElement(getXMLElementTagName());
-
-        super.writeAttributes(out);
-        for (int index = 0; index < recruitables.length; index++) {
-            if (recruitables[index] != null) {
-                out.writeAttribute("recruit" + index, recruitables[index].getId());
-            }
-        }
-        out.writeAttribute("recruitPrice", Integer.toString(recruitPrice));
-        out.writeAttribute("recruitLowerCap", Integer.toString(recruitLowerCap));
-        out.writeAttribute("owner", owner.getId());
-
-        for (Entry<UnitType, Integer> entry : unitPrices.entrySet()) {
-            out.writeStartElement("unitPrice");
-            out.writeAttribute("unitType", entry.getKey().getId());
-            out.writeAttribute("price", entry.getValue().toString());
-            out.writeEndElement();
-        }
-
-        super.writeChildren(out, player, showAll, toSavedGame);
-
-        out.writeEndElement();
+    public Player getOwner() {
+        return owner;
     }
 
     /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered during parsing.
+     * {@inheritDoc}
      */
-    public void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
-        setId(readId(in));
+    public void setOwner(Player p) {
+        throw new UnsupportedOperationException();
+    }
+
+
+    // Serialization
+
+    private static final String OWNER_TAG = "owner";
+    private static final String PRICE_TAG = "price";
+    private static final String RECRUIT_TAG = "recruit";
+    private static final String RECRUIT_LOWER_CAP_TAG = "recruitLowerCap";
+    private static final String RECRUIT_PRICE_TAG = "recruitPrice";
+    private static final String UNIT_PRICE_TAG = "unitPrice";
+    private static final String UNIT_TYPE_TAG = "unitType";
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void toXMLImpl(XMLStreamWriter out, Player player,
+                             boolean showAll,
+                             boolean toSavedGame) throws XMLStreamException {
+        super.toXML(out, getXMLElementTagName(), player, showAll, toSavedGame);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out, Player player,
+                                   boolean showAll,
+                                   boolean toSavedGame) throws XMLStreamException {
+        super.writeAttributes(out);
+
+        for (int index = 0; index < recruitables.length; index++) {
+            if (recruitables[index] != null) {
+                writeAttribute(out, RECRUIT_TAG + index, recruitables[index]);
+            }
+        }
+
+        writeAttribute(out, RECRUIT_PRICE_TAG, recruitPrice);
+
+        writeAttribute(out, RECRUIT_LOWER_CAP_TAG, recruitLowerCap);
+
+        writeAttribute(out, OWNER_TAG, owner);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeChildren(XMLStreamWriter out, Player player,
+                                 boolean showAll,
+                                 boolean toSavedGame) throws XMLStreamException {
+        super.writeChildren(out, player, showAll, toSavedGame);
+
+        for (UnitType unitType : getSortedCopy(unitPrices.keySet())) {
+            out.writeStartElement(UNIT_PRICE_TAG);
+
+            writeAttribute(out, UNIT_TYPE_TAG, unitType);
+
+            writeAttribute(out, PRICE_TAG, unitPrices.get(unitType).intValue());
+
+            out.writeEndElement();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void toXMLPartialImpl(XMLStreamWriter out,
+                                    String[] fields) throws XMLStreamException {
+        toXMLPartialByClass(out, getClass(), fields);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void readFromXMLPartialImpl(XMLStreamReader in) throws XMLStreamException {
+        readFromXMLPartialByClass(in, getClass());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        final Specification spec = getSpecification();
+
+        super.readAttributes(in);
 
         // @compat 0.10.0
         if (!hasAbility("model.ability.dressMissionary")) {
             addAbility(new Ability("model.ability.dressMissionary"));
         }
-        // end compatibility code
+        // end @compat
 
         for (int index = 0; index < recruitables.length; index++) {
-            String unitTypeId = in.getAttributeValue(null, "recruit" + index);
-            if (unitTypeId != null) {
-                recruitables[index] = getSpecification().getUnitType(unitTypeId);
-            }
+            UnitType unitType = spec.getType(in, RECRUIT_TAG + index,
+                                             UnitType.class, (UnitType)null);
+            if (unitType != null) recruitables[index] = unitType;
         }
 
-        owner = makeFreeColGameObject(in, "owner", Player.class);
+        owner = makeFreeColGameObject(in, OWNER_TAG, Player.class);
 
-        recruitPrice = getAttribute(in, "recruitPrice", RECRUIT_PRICE_INITIAL);
+        recruitPrice = getAttribute(in, RECRUIT_PRICE_TAG,
+                                    RECRUIT_PRICE_INITIAL);
 
-        recruitLowerCap = getAttribute(in, "recruitLowerCap", LOWER_CAP_INITIAL);
-
-        unitPrices.clear();
+        recruitLowerCap = getAttribute(in, RECRUIT_LOWER_CAP_TAG,
+                                       LOWER_CAP_INITIAL);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        // Clear containers.
+        unitPrices.clear();
+
+        super.readChildren(in);
+
+        // @compat 0.10.1
+        // Sometimes units in a Europe element have a missing
+        // location.  It should always be this Europe instance.
+        for (Unit u : getUnitList()) {
+            if (u.getLocation() == null) u.setLocationNoUpdate(this);
+        }
+        // end @compat
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        if (in.getLocalName().equals(UNITS_TAG)) {
-            while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                super.readChild(in);
+        final Specification spec = getSpecification();
+        final String tag = in.getLocalName();
+
+        if (UNIT_PRICE_TAG.equals(tag)) {
+            UnitType unitType = spec.getType(in, UNIT_TYPE_TAG,
+                                             UnitType.class, (UnitType)null);
+            int price = getAttribute(in, PRICE_TAG, -1);
+            if (unitType != null && price > 0) {
+                unitPrices.put(unitType, new Integer(price));
             }
-            // @compat 0.10.1
-            // Sometimes units in a Europe element have a missing
-            // location.  It should always be this Europe instance.
-            for (Unit u : getUnitList()) {
-                if (u.getLocation() == null) u.setLocationNoUpdate(this);
-            }
-            // end compatibility code
-        } else if (in.getLocalName().equals("unitPrice")) {
-            String unitTypeId = in.getAttributeValue(null, "unitType");
-            Integer price = new Integer(in.getAttributeValue(null, "price"));
-            unitPrices.put(getSpecification().getUnitType(unitTypeId), price);
-            in.nextTag(); // close "unitPrice" tag
+            closeTag(in, UNIT_PRICE_TAG);
+
         } else {
             super.readChild(in);
         }
-    }
-
-    /**
-     * Partial writer, so that "remove" messages can be brief.
-     *
-     * @param out The target stream.
-     * @param fields The fields to write.
-     * @throws XMLStreamException If there are problems writing the stream.
-     */
-    @Override
-    protected void toXMLPartialImpl(XMLStreamWriter out, String[] fields)
-        throws XMLStreamException {
-        toXMLPartialByClass(out, getClass(), fields);
-    }
-
-    /**
-     * Partial reader, so that "remove" messages can be brief.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException If there are problems reading the stream.
-     */
-    @Override
-    public void readFromXMLPartialImpl(XMLStreamReader in)
-        throws XMLStreamException {
-        readFromXMLPartialByClass(in, getClass());
     }
 
     /**
