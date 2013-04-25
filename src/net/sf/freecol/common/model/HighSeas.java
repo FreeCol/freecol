@@ -27,42 +27,44 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.UnitLocation;
 
 
+/**
+ * An object representing the high seas between continents.
+ */
 public class HighSeas extends UnitLocation {
 
     private static final Logger logger =  Logger.getLogger(HighSeas.class.getName());
 
+    /** The destinations this HighSeas object connects. */
+    private final List<Location> destinations = new ArrayList<Location>();
+
 
     /**
-     * The destinations this HighSeas object connects.
+     * Simple constructor.
+     *
+     * @param game The enclosing <code>Game</code>.
      */
-    private List<Location> destinations = new ArrayList<Location>();
-
-
-
     public HighSeas(Game game) {
         super(game);
     }
 
+    /**
+     * Create a new high seas.
+     *
+     * @param game The enclosing <code>Game</code>.
+     * @param id The object identifier.
+     */
     public HighSeas(Game game, String id) {
         super(game, id);
     }
 
-    /**
-     * Returns the name of this location.
-     *
-     * @return The name of this location.
-     */
-    @Override
-    public StringTemplate getLocationName() {
-        return StringTemplate.key("model.tile.highSeas.name");
-    }
 
     /**
-     * Get the <code>Destinations</code> value.
+     * Get the destinations connected by these seas.
      *
-     * @return a <code>List<Location></code> value
+     * @return A list of <code>Location</code>s.
      */
     public final List<Location> getDestinations() {
         return destinations;
@@ -71,14 +73,15 @@ public class HighSeas extends UnitLocation {
     /**
      * Add a single destination to this HighSeas instance.
      *
-     * @param destination a <code>Location</code> value
+     * @param destination A destination <code>Location</code>.
      */
     public void addDestination(Location destination) {
         if (destination != null) {
             if (!destinations.contains(destination)) {
                 destinations.add(destination);
             } else {
-                logger.warning(getId() + " already included destination " + destination.getId());
+                logger.warning(getId() + " already included destination "
+                    + destination.getId());
             }
         } else {
             logger.warning("Tried to add null destination to " + getId());
@@ -88,58 +91,84 @@ public class HighSeas extends UnitLocation {
     /**
      * Remove a single destination from this HighSeas instance.
      *
-     * @param destination a <code>Location</code> value
+     * @param destination A destination <code>Location</code>.
      */
     public void removeDestination(Location destination) {
         destinations.remove(destination);
     }
 
 
+    // Interface Location (from UnitLocation)
+    // Inherits
+    //   FreeColObject.getId
+    //   UnitLocation.getTile
+    //   UnitLocation.getLocationNameFor
+    //   UnitLocation.add
+    //   UnitLocation.remove
+    //   UnitLocation.contains
+    //   UnitLocation.canAdd
+    //   UnitLocation.getUnitCount
+    //   UnitLocation.getUnitList
+    //   UnitLocation.getGoodsContainer
+    //   UnitLocation.getSettlement
+    //   UnitLocation.getColony
+
     /**
      * {@inheritDoc}
      */
-    public boolean canAdd(Locatable locatable) {
-        if (locatable instanceof Unit) {
-            Unit unit = (Unit) locatable;
-            return unit.isNaval();
-        }
-        return false;
+    @Override
+    public StringTemplate getLocationName() {
+        return StringTemplate.key("model.tile.highSeas.name");
+    }
+
+    // UnitLocation
+    // Inherits
+    //   UnitLocation.getSpaceTaken
+    //   UnitLocation.moveToFront
+    //   UnitLocation.clearUnitList
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public NoAddReason getNoAddReason(Locatable locatable) {
+        return (locatable instanceof Unit && ((Unit)locatable).isNaval())
+            ? NoAddReason.NONE
+            : NoAddReason.WRONG_TYPE;
     }
 
 
+    // Serialization
+
+    private static final String DESTINATION_TAG = "destination";
+
+
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out, Player player,
-                             boolean showAll, boolean toSavedGame)
-            throws XMLStreamException {
-        // Start
-        out.writeStartElement(getXMLElementTagName());
-
-        // Attributes
-        super.writeAttributes(out);
-
-        // Children
-        writeChildren(out, player, showAll, toSavedGame);
-
-        // End
-        out.writeEndElement();
+                             boolean showAll,
+                             boolean toSavedGame) throws XMLStreamException {
+        super.toXML(out, getXMLElementTagName(), player, showAll, toSavedGame);
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void writeChildren(XMLStreamWriter out, Player player,
-                                 boolean showAll, boolean toSavedGame)
-        throws XMLStreamException {
+                                 boolean showAll,
+                                 boolean toSavedGame) throws XMLStreamException {
         super.writeChildren(out, player, showAll, toSavedGame);
+
         for (Location destination : destinations) {
-            if(destination != null) {
-                out.writeStartElement("destination");
-                out.writeAttribute(ID_ATTRIBUTE_TAG, destination.getId());
+            if (destination != null) {
+                out.writeStartElement(DESTINATION_TAG);
+
+                writeLocationAttribute(out, ID_ATTRIBUTE_TAG, destination);
+
                 out.writeEndElement();
-            } else {
-                logger.warning("Tried to write out null destination from " + getId());
             }
         }
     }
@@ -147,19 +176,27 @@ public class HighSeas extends UnitLocation {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        // Clear containers.
         destinations.clear();
+
         super.readChildren(in);
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        if ("destination".equals(in.getLocalName())) {
-            destinations.add(makeLocationAttribute(in, ID_ATTRIBUTE_TAG,
-                                                   getGame()));
-            in.nextTag();
+        final Game game = getGame();
+        final String tag = in.getLocalName();
+
+        if (DESTINATION_TAG.equals(tag)) {
+            Location loc = makeLocationAttribute(in, ID_ATTRIBUTE_TAG, game);
+            if (loc != null) addDestination(loc);
+            closeTag(in, DESTINATION_TAG);
+
         } else {
             super.readChild(in);
         }
@@ -174,7 +211,7 @@ public class HighSeas extends UnitLocation {
     }
 
     /**
-     * Returns the tag name of this Object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "highSeas"
      */
