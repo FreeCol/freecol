@@ -45,11 +45,6 @@ public class HighSeas extends UnitLocation {
         super(game);
     }
 
-    public HighSeas(Game game, XMLStreamReader in) throws XMLStreamException {
-        super(game, in);
-        readFromXML(in);
-    }
-
     public HighSeas(Game game, String id) {
         super(game, id);
     }

@@ -71,18 +71,6 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
     }
 
     /**
-     * Initiates a new <code>WorkLocation</code> from an XML representation.
-     *
-     * @param game The <code>Game</code> this object belongs to.
-     * @param in The input stream containing the XML.
-     * @throws XMLStreamException if a problem was encountered during parsing.
-     */
-    public WorkLocation(Game game, XMLStreamReader in)
-        throws XMLStreamException {
-        super(game, in);
-    }
-
-    /**
      * Initiates a new <code>WorkLocation</code> with the given ID. The object
      * should later be initialized by calling either
      * {@link #readFromXML(XMLStreamReader)} or

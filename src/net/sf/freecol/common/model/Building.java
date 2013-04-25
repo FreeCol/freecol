@@ -69,19 +69,6 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     }
 
     /**
-     * Initiates a new <code>Building</code> from an XML representation.
-     *
-     * @param game The <code>Game</code> this object belongs to.
-     * @param in The input stream containing the XML.
-     * @throws XMLStreamException if a problem was encountered during parsing.
-     */
-    public Building(Game game, XMLStreamReader in) throws XMLStreamException {
-        super(game, in);
-
-        readFromXML(in);
-    }
-
-    /**
      * Initiates a new <code>Building</code> with the given ID.  The
      * object should later be initialized by calling
      * {@link #readFromXML(XMLStreamReader)}.

@@ -31,9 +31,10 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Element;
 
+
 /**
  * The <code>UnitLocation</code> is a place where a <code>Unit</code>
- * can be put. The UnitLocation can not store any other Locatables,
+ * can be put.  The UnitLocation can not store any other Locatables,
  * such as {@link Goods}, or {@link TileItem}s.
  *
  * @see Locatable
@@ -97,20 +98,19 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
         CLAIM_REQUIRED,
     }
 
-    /**
-     * The Units present in this Location.
-     */
+    /** The Units present in this Location. */
     private final List<Unit> units = new ArrayList<Unit>();
 
 
-    protected UnitLocation() {
-        // empty constructor
-    }
+    /**
+     * Deliberately empty constructor.
+     */
+    protected UnitLocation() {}
 
     /**
      * Creates a new <code>UnitLocation</code> instance.
      *
-     * @param game a <code>Game</code> value
+     * @param game The enclosing <code>Game</code>.
      */
     public UnitLocation(Game game) {
         super(game);
@@ -119,19 +119,8 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     /**
      * Creates a new <code>UnitLocation</code> instance.
      *
-     * @param game a <code>Game</code> value
-     * @param in a <code>XMLStreamReader</code> value
-     * @exception XMLStreamException if an error occurs
-     */
-    public UnitLocation(Game game, XMLStreamReader in) throws XMLStreamException {
-        super(game, null);
-    }
-
-    /**
-     * Creates a new <code>UnitLocation</code> instance.
-     *
-     * @param game a <code>Game</code> value
-     * @param id a <code>String</code> value
+     * @param game The enclosing <code>Game</code>.
+     * @param id The identifier.
      */
     public UnitLocation(Game game, String id) {
         super(game, id);
@@ -140,20 +129,6 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     // Only Unit needs this
     public UnitLocation(Game game, Element e) {
         super(game, null);
-    }
-
-    /**
-     * Removes all references to this object.
-     *
-     * @return A list of disposed objects.
-     */
-    public List<FreeColGameObject> disposeList() {
-        List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
-        while (!units.isEmpty()) {
-            objects.addAll(units.remove(0).disposeList());
-        }
-        objects.addAll(super.disposeList());
-        return objects;
     }
 
 
@@ -215,6 +190,22 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
             result += unit.getUnitCount();
         }
         return result;
+    }
+
+
+    // Override FreeColGameObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<FreeColGameObject> disposeList() {
+        List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
+        while (!units.isEmpty()) {
+            objects.addAll(units.remove(0).disposeList());
+        }
+        objects.addAll(super.disposeList());
+        return objects;
     }
 
 
@@ -379,7 +370,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      * (e.g. if the unit changes type --- does it still have a
      * required skill?)
      *
-     * TODO: consider moving this up to Location.
+     * TODO: consider moving this up to Location?
      *
      * @param locatable The <code>Locatable</code> to test.
      * @return The reason why adding would fail.
@@ -415,24 +406,12 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     /**
      * {@inheritDoc}
      */
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
-        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
-    }
-
-    /**
-     * Serialize the children of this UnitLocation, that is the units
-     * themselves.
-     *
-     * @param out a <code>XMLStreamWriter</code> value
-     * @param player a <code>Player</code> value
-     * @param showAll a <code>boolean</code> value
-     * @param toSavedGame a <code>boolean</code> value
-     * @exception XMLStreamException if an error occurs
-     */
+    @Override
     protected void writeChildren(XMLStreamWriter out, Player player,
-                                 boolean showAll, boolean toSavedGame)
-        throws XMLStreamException {
+                                 boolean showAll,
+                                 boolean toSavedGame) throws XMLStreamException {
+        super.writeChildren(out);
+
         for (Unit unit : units) {
             unit.toXML(out, player, showAll, toSavedGame);
         }
@@ -441,24 +420,27 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        // Clear containers.
         units.clear();
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            readChild(in);
-        }
+
+        super.readChildren(in);
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        if (Unit.getXMLElementTagName().equals(in.getLocalName())) {
+        final String tag = in.getLocalName();
+
+        if (Unit.getXMLElementTagName().equals(tag)) {
             Unit unit = readFreeColGameObject(in, Unit.class);
-            if (!units.contains(unit)) units.add(unit);
+            if (unit != null && !units.contains(unit)) units.add(unit);
+
         } else {
-            logger.warning("Found unknown child element '" + in.getLocalName()
-                + "' of UnitLocation " + getId() + ".");
-            in.nextTag();
+            super.readChild(in);
         }
     }
 }

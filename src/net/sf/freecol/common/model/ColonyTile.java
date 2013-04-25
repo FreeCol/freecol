@@ -84,20 +84,6 @@ public class ColonyTile extends WorkLocation implements Ownable {
     }
 
     /**
-     * Initiates a new <code>ColonyTile</code> from an
-     * XML representation.
-     *
-     * @param game The <code>Game</code> this object belongs to.
-     * @param in The input stream containing the XML.
-     * @throws XMLStreamException if an error occured during parsing.
-     */
-    public ColonyTile(Game game, XMLStreamReader in) throws XMLStreamException {
-        super(game, in);
-
-        readFromXML(in);
-    }
-
-    /**
      * Initiates a new <code>ColonyTile</code> with the given ID.  The
      * object should later be initialized by calling either
      * {@link #readFromXML(XMLStreamReader)}.

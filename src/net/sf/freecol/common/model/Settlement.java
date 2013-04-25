@@ -87,20 +87,6 @@ abstract public class Settlement extends GoodsLocation
         setType(owner.getNationType().getSettlementType(false));
     }
 
-
-
-    /**
-     * Initiates a new <code>Settlement</code> from an <code>Element</code>.
-     *
-     * @param game The <code>Game</code> in which this object belong.
-     * @param in The input stream containing the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
-     */
-    public Settlement(Game game, XMLStreamReader in) throws XMLStreamException {
-        super(game, in);
-    }
-
     /**
      * Initiates a new <code>Settlement</code>
      * with the given ID. The object should later be

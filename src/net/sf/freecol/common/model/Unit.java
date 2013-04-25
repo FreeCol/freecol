@@ -369,19 +369,6 @@ public class Unit extends GoodsLocation
      *
      * @param game The <code>Game</code> in which this <code>Unit</code>
      *            belong.
-     * @param in The input stream containing the XML.
-     * @throws XMLStreamException if a problem was encountered during parsing.
-     */
-    public Unit(Game game, XMLStreamReader in) throws XMLStreamException {
-        super(game, in);
-        readFromXML(in);
-    }
-
-    /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param game The <code>Game</code> in which this <code>Unit</code>
-     *            belong.
      * @param e An XML-element that will be used to initialize this object.
      */
     public Unit(Game game, Element e) {

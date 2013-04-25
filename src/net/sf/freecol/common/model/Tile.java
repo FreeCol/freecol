@@ -178,24 +178,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param game The <code>Game</code> this <code>Tile</code> should be
-     *            created in.
-     * @param in The input stream containing the XML.
-     * @throws XMLStreamException if a problem was encountered during parsing.
-     */
-    public Tile(Game game, XMLStreamReader in) throws XMLStreamException {
-        super(game, in);
-
-        if (!game.isViewShared()) {
-            playerExploredTiles = new HashMap<Player, PlayerExploredTile>();
-        }
-
-        readFromXML(in);
-    }
-
-    /**
      * Initiates a new <code>Tile</code> with the given ID. The object should
      * later be initialized by calling either
      * {@link #readFromXML(XMLStreamReader)}.

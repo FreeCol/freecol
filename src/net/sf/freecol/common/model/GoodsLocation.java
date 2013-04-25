@@ -61,18 +61,6 @@ public abstract class GoodsLocation extends UnitLocation {
     }
 
     /**
-     * Creates a new <code>GoodsLocation</code> instance.
-     *
-     * @param game The <code>Game</code> to create within.
-     * @param in a <code>XMLStreamReader</code> value
-     * @exception XMLStreamException if an error occurs
-     */
-    public GoodsLocation(Game game, XMLStreamReader in)
-        throws XMLStreamException {
-        super(game, in);
-    }
-
-    /**
      * Initialize this object from an XML-representation of this object.
      *
      * @param game The <code>Game</code> to create within.

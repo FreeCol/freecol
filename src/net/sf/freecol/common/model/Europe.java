@@ -101,19 +101,6 @@ public class Europe extends UnitLocation implements Ownable, Named {
     }
 
     /**
-     * Initializes this object from an XML-representation of this object.
-     *
-     * @param game The <code>Game</code> in which this object belong.
-     * @param in The input stream containing the XML.
-     * @throws XMLStreamException if an error occurred during parsing.
-     */
-    public Europe(Game game, XMLStreamReader in) throws XMLStreamException {
-        super(game, in);
-
-        readFromXML(in);
-    }
-
-    /**
      * Initiates a new <code>Europe</code> with the given ID. The object
      * should later be initialized by calling either
      * {@link #readFromXML(XMLStreamReader)} or
