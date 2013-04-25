@@ -40,6 +40,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColTcFile;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.option.AbstractOption;
 import net.sf.freecol.common.option.AbstractUnitOption;
@@ -1464,9 +1465,14 @@ public final class Specification {
      */
     public <T extends FreeColGameObjectType> T getType(XMLStreamReader in, String attributeName,
                                                        Class<T> returnClass, T defaultValue) {
-        final String attributeString = in.getAttributeValue(null, attributeName);
-        if (attributeString != null) {
-            return getType(attributeString, returnClass);
+        final String attrib =
+        // @compat 0.10.7
+            (FreeColObject.ID_ATTRIBUTE_TAG.equals(attributeName))
+            ? FreeColObject.readId(in) :
+        // end @compat
+            in.getAttributeValue(null, attributeName);
+        if (attrib != null) {
+            return getType(attrib, returnClass);
         } else {
             return defaultValue;
         }

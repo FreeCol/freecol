@@ -118,7 +118,7 @@ public class LimitTest extends FreeColTestCase {
         assertEquals(new Integer(1800), yearLimit.getRightHandSide().getValue(dutch));
         assertTrue(yearLimit.evaluate(dutch));
 
-        colony.incrementLiberty(10000);
+        colony.modifyLiberty(10000);
         colony.updateSoL();
         assertTrue(rebelLimit.evaluate(dutch));
 
@@ -180,12 +180,9 @@ public class LimitTest extends FreeColTestCase {
         assertEquals(new Integer(1600), yearLimit.getRightHandSide().getValue());
         assertFalse(yearLimit.evaluate(game));
 
-        colony.incrementLiberty(10000);
+        colony.modifyLiberty(10000);
         colony.updateSoL();
         assertTrue(strongestPlayerLimit.evaluate(dutch));
         assertFalse(weakestPlayerLimit.evaluate(dutch));
-
     }
-
-
 }
