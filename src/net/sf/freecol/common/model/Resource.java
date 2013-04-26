@@ -76,6 +76,17 @@ public class Resource extends TileItem {
     }
 
     /**
+     * Creates new <code>Resource</code>.
+     *
+     * @param game The enclosing <code>Game</code>.
+     * @param id The object identifier.
+     */
+    public Resource(Game game, String id) {
+        super(game, id);
+    }
+
+
+    /**
      * Returns a textual representation of this object.
      * @return A <code>String</code> of either:
      * <ol>

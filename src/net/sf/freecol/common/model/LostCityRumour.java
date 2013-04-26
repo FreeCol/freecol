@@ -107,6 +107,16 @@ public class LostCityRumour extends TileItem {
     }
 
     /**
+     * Creates a new <code>LostCityRumour</code> instance.
+     *
+     * @param game The enclosing <code>Game</code>.
+     * @param id The object identifier.
+     */
+    public LostCityRumour(Game game, String id) {
+        super(game, id);
+    }
+
+    /**
      * Get the <code>Type</code> value.
      *
      * @return a <code>RumourType</code> value

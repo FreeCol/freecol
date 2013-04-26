@@ -83,7 +83,15 @@ public class TileItemContainer extends FreeColGameObject {
         this.tile = tile;
     }
 
-
+    /**
+     * Create a new <code>TileItemContainer</code>.
+     *
+     * @param game The enclosing <code>Game</code>.
+     * @param id The object identifier.
+     */
+    public TileItemContainer(Game game, String id) {
+        super(game, id);
+    }
 
     /**
      * Initiates a new <code>TileItemContainer</code> from an XML stream.
