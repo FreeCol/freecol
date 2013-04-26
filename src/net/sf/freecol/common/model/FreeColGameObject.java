@@ -165,21 +165,6 @@ abstract public class FreeColGameObject extends FreeColObject {
         setId(getRealXMLElementTagName() + ":" + game.getNextId());
     }
 
-    /**
-     * Get the actual tag name for this object.
-     *
-     * @return The real tag name.
-     */
-    private String getRealXMLElementTagName() {
-        String tagName = "";
-        try {
-            Method m = getClass().getMethod("getXMLElementTagName",
-                                            (Class[]) null);
-            tagName = (String) m.invoke((Object) null, (Object[]) null);
-        } catch (Exception e) {}
-        return tagName;
-    }
-
     // @compat 0.9.x
     /**
      * Gets the identifiers integer part.  The age of two

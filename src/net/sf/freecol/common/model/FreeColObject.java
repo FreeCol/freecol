@@ -31,6 +31,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -1193,7 +1194,8 @@ public abstract class FreeColObject {
      *     recognized all child elements.
      */
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        throw new XMLStreamException("Unexpected tag: " + currentTag(in));
+        throw new XMLStreamException("In " + getRealXMLElementTagName()
+            + ", unexpected tag: " + currentTag(in));
     }
 
     /**
@@ -1626,6 +1628,21 @@ public abstract class FreeColObject {
         FeatureContainer.removeFeatures(getFeatureContainer(), fco);
     }
 
+
+    /**
+     * Get the actual tag name for this object.
+     *
+     * @return The real tag name.
+     */
+    public String getRealXMLElementTagName() {
+        String tagName = "";
+        try {
+            Method m = getClass().getMethod("getXMLElementTagName",
+                                            (Class[]) null);
+            tagName = (String) m.invoke((Object) null, (Object[]) null);
+        } catch (Exception e) {}
+        return tagName;
+    }
 
     /**
      * Gets the tag name used to serialize this object, generally the
