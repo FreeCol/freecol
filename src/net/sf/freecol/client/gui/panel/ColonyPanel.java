@@ -626,7 +626,10 @@ public final class ColonyPanel extends PortPanel
     private void initialize(Colony colony) {
         removePropertyChangeListeners();
         setColony(colony);
-        editable = colony.getOwner() == getMyPlayer();
+        // Do not just use colony.getOwner() == getMyPlayer() because
+        // in debug mode we are in the *server* colony, and the equality
+        // will fail.
+        editable = colony.getOwner().getId().equals(getMyPlayer().getId());
         addPropertyChangeListeners();
 
         // Set listeners and transfer handlers
