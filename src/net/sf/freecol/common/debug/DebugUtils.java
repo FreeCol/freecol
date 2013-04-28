@@ -55,6 +55,7 @@ import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
@@ -322,7 +323,7 @@ public class DebugUtils {
      * @param tile The <code>Tile</code> to add to.
      */
     public static void addNewUnitToTile(final FreeColClient freeColClient,
-                                        final Tile tile) {
+                                        Tile tile) {
         final FreeColServer server = freeColClient.getFreeColServer();
         final Game sGame = server.getGame();
         final Game game = freeColClient.getGame();
@@ -357,33 +358,15 @@ public class DebugUtils {
         Location loc = (sCarrier != null) ? sCarrier : sTile;
         ServerUnit sUnit = new ServerUnit(sGame, loc, sPlayer, unitChoice);
         sUnit.setMovesLeft(sUnit.getInitialMovesLeft());
-
-        StringWriter sw = new StringWriter();
-        try {
-            XMLStreamWriter xsw = XMLOutputFactory.newInstance()
-                .createXMLStreamWriter(sw);
-            ((FreeColGameObject)loc).toXML(xsw, sPlayer, true, true);
-            xsw.close();
-
-            XMLStreamReader xsr = XMLInputFactory.newInstance()
-                .createXMLStreamReader(new StringReader(sw.toString()));
-            xsr.nextTag();
-            if (carrier == null) {
-                tile.readFreeColGameObject(xsr, Tile.class);
-            } else {
-                carrier.readFreeColGameObject(xsr, Unit.class);
-            }
-            xsr.close();
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Add unit fail: " + sw.toString(), e);
+        sPlayer.invalidateCanSeeTiles();
+        int los = sUnit.getLineOfSight();
+        for (Tile t : loc.getTile().getSurroundingTiles(los)) {
+            t.updatePlayerExploredTile(sPlayer, true);
         }
 
+        freeColClient.getConnectController().reconnect();
         Unit unit = game.getFreeColGameObject(sUnit.getId(), Unit.class);
-        if (unit != null) {
-            gui.setActiveUnit(unit);
-            player.invalidateCanSeeTiles();
-            gui.refresh();
-        }
+        if (unit != null) gui.setActiveUnit(unit);
     }
 
     /**
@@ -461,6 +444,7 @@ public class DebugUtils {
         if (player == settlement.getOwner()) return;
 
         sSettlement.changeOwner(playerChoice);
+        playerChoice.invalidateCanSeeTiles();
         freeColClient.getConnectController().reconnect();
     }
 
@@ -496,6 +480,7 @@ public class DebugUtils {
         for (Unit u : sUnit.getUnitList()) {
             u.setOwner(playerChoice);
         }
+        playerChoice.invalidateCanSeeTiles();
         freeColClient.getConnectController().reconnect();
     }
 
@@ -1042,30 +1027,6 @@ public class DebugUtils {
         sb.append("\nLast Tribute = " + sis.getLastTribute());
 
         freeColClient.getGUI().showInformationMessage(sb.toString());
-    }
-
-    /**
-     * Debug action to take ownership of a unit.
-     *
-     * Called from tile popup menu.
-     *
-     * @param freeColClient The <code>FreeColClient</code> in effect.
-     * @param unit The <code>Unit</code> to take ownership of.
-     */
-    public static void takeOwnership(final FreeColClient freeColClient,
-                                     final Unit unit) {
-        final FreeColServer server = freeColClient.getFreeColServer();
-        final Game sGame = server.getGame();
-        final Unit sUnit = sGame.getFreeColGameObject(unit.getId(), Unit.class);
-        final Player player = freeColClient.getMyPlayer();
-        final Player sPlayer = sGame.getFreeColGameObject(player.getId(),
-                                                          Player.class);
-
-        sUnit.setOwner(sPlayer);
-        for (Unit u : sUnit.getUnitList()) {
-            u.setOwner(sPlayer);
-        }
-        freeColClient.getConnectController().reconnect();
     }
 
     /**
