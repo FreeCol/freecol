@@ -230,8 +230,8 @@ public final class TilePopup extends JPopupMenu {
         boolean notEmpty = false;
         addSeparator();
 
-        JMenu takeOwnership = new JMenu("Take ownership");
-        takeOwnership.setOpaque(false);
+        JMenu changeOwnership = new JMenu("Change ownership");
+        changeOwnership.setOpaque(false);
         JMenu transportLists = new JMenu("Transport lists");
         transportLists.setOpaque(false);
 
@@ -239,10 +239,10 @@ public final class TilePopup extends JPopupMenu {
             JMenuItem toMenuItem = new JMenuItem(unit.toString());
             toMenuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent event) {
-                        DebugUtils.takeOwnership(freeColClient, unit);
+                        DebugUtils.changeOwnership(freeColClient, unit);
                     }
                 });
-            takeOwnership.add(toMenuItem);
+            changeOwnership.add(toMenuItem);
             notEmpty = true;
 
             if (unit.isCarrier()) {
@@ -258,15 +258,15 @@ public final class TilePopup extends JPopupMenu {
         if (transportLists.getItemCount() > 0) add(transportLists);
 
         if (tile.getColony() != null) {
-            if (!notEmpty) takeOwnership.addSeparator();
+            if (!notEmpty) changeOwnership.addSeparator();
             JMenuItem toMenuItem = new JMenuItem(tile.getColony().toString());
             final Colony colony = tile.getColony();
             toMenuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent event) {
-                        DebugUtils.takeOwnership(freeColClient, colony);
+                        DebugUtils.changeOwnership(freeColClient, colony);
                     }
                 });
-            takeOwnership.add(toMenuItem);
+            changeOwnership.add(toMenuItem);
             notEmpty = true;
 
             JMenuItem displayColonyPlan = new JMenuItem("Display Colony Plan");
@@ -287,7 +287,7 @@ public final class TilePopup extends JPopupMenu {
                 });
             add(displayGoods);
         }
-        if (notEmpty) add(takeOwnership);
+        if (notEmpty) add(changeOwnership);
 
         if (tile.hasLostCityRumour()) {
             JMenuItem rumourItem = new JMenuItem("Set Lost City Rumour type");

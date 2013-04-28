@@ -432,6 +432,74 @@ public class DebugUtils {
     }
 
     /**
+     * Debug action to change ownership of a settlement.
+     *
+     * Called from tile popup menu.
+     *
+     * @param freeColClient The <code>FreeColClient</code> in effect.
+     * @param settlement The <code>Settlement</code> to take ownership of.
+     */
+    public static void changeOwnership(final FreeColClient freeColClient,
+                                       final Settlement settlement) {
+        final FreeColServer server = freeColClient.getFreeColServer();
+        final Game sGame = server.getGame();
+        final Settlement sSettlement
+            = sGame.getFreeColGameObject(settlement.getId(), Settlement.class);
+        final GUI gui = freeColClient.getGUI();
+            
+        List<ChoiceItem<Player>> pcs = new ArrayList<ChoiceItem<Player>>();
+        for (Player sp : sGame.getPlayers()) {
+            String msg = Messages.message(sp.getNationName());
+            pcs.add(new ChoiceItem<Player>(msg, sp));
+        }
+        Player playerChoice = gui.showChoiceDialog(null, "Select owner",
+                                                   "Cancel", pcs);
+        if (playerChoice == null) return;
+        final Game game = freeColClient.getGame();
+        Player player = game.getFreeColGameObject(playerChoice.getId(),
+                                                  Player.class);
+        if (player == settlement.getOwner()) return;
+
+        sSettlement.changeOwner(playerChoice);
+        freeColClient.getConnectController().reconnect();
+    }
+
+    /**
+     * Debug action to change ownership of a unit.
+     *
+     * Called from tile popup menu.
+     *
+     * @param freeColClient The <code>FreeColClient</code> in effect.
+     * @param unit The <code>Unit</code> to take ownership of.
+     */
+    public static void changeOwnership(final FreeColClient freeColClient,
+                                       final Unit unit) {
+        final FreeColServer server = freeColClient.getFreeColServer();
+        final Game sGame = server.getGame();
+        final Unit sUnit = sGame.getFreeColGameObject(unit.getId(), Unit.class);
+        final GUI gui = freeColClient.getGUI();
+
+        List<ChoiceItem<Player>> pcs = new ArrayList<ChoiceItem<Player>>();
+        for (Player sp : sGame.getPlayers()) {
+            String msg = Messages.message(sp.getNationName());
+            pcs.add(new ChoiceItem<Player>(msg, sp));
+        }
+        Player playerChoice = gui.showChoiceDialog(null, "Select owner",
+                                                   "Cancel", pcs);
+        if (playerChoice == null) return;
+        final Game game = freeColClient.getGame();
+        Player player = game.getFreeColGameObject(playerChoice.getId(),
+                                                  Player.class);
+        if (player == unit.getOwner()) return;
+
+        sUnit.setOwner(playerChoice);
+        for (Unit u : sUnit.getUnitList()) {
+            u.setOwner(playerChoice);
+        }
+        freeColClient.getConnectController().reconnect();
+    }
+
+    /**
      * Debug action to check for client-server desynchronization.
      *
      * Called from the debug menu.
@@ -974,28 +1042,6 @@ public class DebugUtils {
         sb.append("\nLast Tribute = " + sis.getLastTribute());
 
         freeColClient.getGUI().showInformationMessage(sb.toString());
-    }
-
-    /**
-     * Debug action to take ownership of a settlement.
-     *
-     * Called from tile popup menu.
-     *
-     * @param freeColClient The <code>FreeColClient</code> in effect.
-     * @param settlement The <code>Settlement</code> to take ownership of.
-     */
-    public static void takeOwnership(final FreeColClient freeColClient,
-                                     final Settlement settlement) {
-        final FreeColServer server = freeColClient.getFreeColServer();
-        final Game sGame = server.getGame();
-        final Settlement sSettlement
-            = sGame.getFreeColGameObject(settlement.getId(), Settlement.class);
-        final Player player = freeColClient.getMyPlayer();
-        final Player sPlayer = sGame.getFreeColGameObject(player.getId(),
-                                                          Player.class);
-            
-        sSettlement.changeOwner(sPlayer);
-        freeColClient.getConnectController().reconnect();
     }
 
     /**
