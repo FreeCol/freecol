@@ -568,19 +568,6 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
      * {@inheritDoc}
      */
     @Override
-    public void readChildren(XMLStreamReader in) throws XMLStreamException {
-        super.readChildren(in);
-
-        // @compat 0.10.7
-        // Production types were introduced post-0.10.7
-        if (productionType == null) updateProductionType();
-        // end @compat
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void readChild(XMLStreamReader in) throws XMLStreamException {
         if (ProductionType.getXMLElementTagName().equals(in.getLocalName())) {
             productionType = new ProductionType(getSpecification());
