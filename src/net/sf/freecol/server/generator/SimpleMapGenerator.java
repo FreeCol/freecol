@@ -281,6 +281,7 @@ public class SimpleMapGenerator implements MapGenerator {
                             new ServerIndianSettlement(game, indian, template.getName(), tile,
                                                        template.isCapital(), skill, null);
                         tile.setSettlement(settlement);
+                        tile.changeOwningSettlement(settlement);
                         indian.addSettlement(settlement);
                         // TODO: the template settlement might have additional owned
                         // units elsewhere on the map

@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.Comparator;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -31,6 +33,14 @@ import javax.xml.stream.XMLStreamWriter;
  * something, or the amount of cargo to load at a certain Location.
  */
 public class AbstractGoods extends FreeColObject implements Named {
+
+    /** A comparator to sort by descending goods amount. */
+    public static final Comparator<AbstractGoods> goodsAmountComparator
+        = new Comparator<AbstractGoods>() {
+            public int compare(AbstractGoods o, AbstractGoods p) {
+                return p.getAmount() - o.getAmount();
+            }
+        };
 
     /** The type of goods. */
     private GoodsType type;

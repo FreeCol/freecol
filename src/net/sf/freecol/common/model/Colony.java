@@ -373,6 +373,7 @@ public class Colony extends Settlement implements Nameable {
             if (ct.isColonyCenterTile()) {
                 t = scratch.getTile();
                 t.setSettlement(scratch);
+                t.changeOwningSettlement(scratch);
             } else {
                 t = wt.getScratchTile();
             }

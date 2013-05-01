@@ -240,6 +240,7 @@ abstract public class Settlement extends GoodsLocation
         }
 
         tile.setSettlement(this);
+        tile.changeOwningSettlement(this);
         for (Tile t : tiles) {
             t.changeOwnership(owner, this);
         }
@@ -452,6 +453,7 @@ abstract public class Settlement extends GoodsLocation
                 tile.changeOwnership(null, null);
             }
             settlementTile.setSettlement(null);
+            settlementTile.setOwningSettlement(null);
 
             // The owner forgets about the settlement.
             owner.removeSettlement(this);

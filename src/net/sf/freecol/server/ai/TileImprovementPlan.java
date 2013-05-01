@@ -237,7 +237,7 @@ public class TileImprovementPlan extends ValuedAIObject {
      * @return True if the tile improvement has been completed.
      */
     public boolean isComplete() {
-        return target != null && target.hasImprovement(getType());
+        return target != null && target.hasTileImprovement(getType());
     }
 
     /**

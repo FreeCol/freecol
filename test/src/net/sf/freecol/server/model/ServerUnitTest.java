@@ -84,6 +84,23 @@ public class ServerUnitTest extends FreeColTestCase {
         = spec().getUnitType("model.unit.veteranSoldier");
 
 
+    /**
+     * Does a tile have a completed improvement of the given type?
+     *
+     * @param tile The <code>Tile</code> to check.
+     * @param type The <code>TileImprovementType</code> to check.
+     * @return True if this <code>Tile</code> has the improvement type and
+     *      it is complete.
+     */
+    private static boolean hasImprovement(Tile tile, TileImprovementType type) {
+        if (type.changeContainsTarget(tile.getType())) {
+            return true;
+        } else if (tile.getTileItemContainer() != null) {
+            return tile.getTileItemContainer().hasImprovement(type);
+        }
+        return false;
+    }
+
     public void testToggleHorses() {
         Map map = getTestMap(plains);
         Game game = ServerTestHelper.startServerGame(map);
@@ -128,7 +145,7 @@ public class ServerUnitTest extends FreeColTestCase {
                                                  pioneerType);
 
         // Before
-        assertFalse(plain.hasImprovement(plow));
+        assertFalse(hasImprovement(plain, plow));
         assertEquals(3, hardyPioneer.getMovesLeft());
         assertEquals(Unit.UnitState.ACTIVE, hardyPioneer.getState());
         assertEquals(-1, hardyPioneer.getWorkLeft());
@@ -139,7 +156,7 @@ public class ServerUnitTest extends FreeColTestCase {
         //plain.add(plowImprovement);
         igc.changeWorkImprovementType(dutch, hardyPioneer, plow);
 
-        assertFalse(plain.hasImprovement(plow));
+        assertFalse(hasImprovement(plain, plow));
         assertEquals(0, hardyPioneer.getMovesLeft());
         assertEquals(Unit.UnitState.IMPROVING, hardyPioneer.getState());
         assertEquals(5, hardyPioneer.getWorkLeft());
@@ -151,7 +168,7 @@ public class ServerUnitTest extends FreeColTestCase {
         }
 
         // Pioneer finished work
-        assertTrue(plain.hasImprovement(plow));
+        assertTrue(hasImprovement(plain, plow));
         assertEquals(0, hardyPioneer.getMovesLeft());
         assertEquals(Unit.UnitState.ACTIVE, hardyPioneer.getState());
         assertEquals(-1, hardyPioneer.getWorkLeft());
@@ -191,14 +208,14 @@ public class ServerUnitTest extends FreeColTestCase {
         assertEquals(0, colony.getGoodsCount(foodType));
         assertEquals(2, colony.getFoodConsumption());
         assertEquals(5 + 5, colony.getFoodProduction());
-        assertFalse(plain58.hasImprovement(plow));
+        assertFalse(hasImprovement(plain58, plow));
         assertEquals(0, colony.getProductionBonus());
         assertEquals("" + soldier.getLocation(), colony.getColonyTile(map.getTile(5, 8)), soldier.getLocation());
 
         // One turn to check production
         ServerTestHelper.newTurn();
 
-        assertFalse(plain58.hasImprovement(plow));
+        assertFalse(hasImprovement(plain58, plow));
         assertEquals(8, colony.getGoodsCount(foodType));
         assertEquals(2, colony.getFoodConsumption());
         assertEquals(0, colony.getProductionBonus());
@@ -217,7 +234,7 @@ public class ServerUnitTest extends FreeColTestCase {
         }
         colony.invalidateCache();
 
-        assertTrue(plain58.hasImprovement(plow));
+        assertTrue(hasImprovement(plain58, plow));
         // Production for next turn is updated
         assertEquals(5 + 6, colony.getFoodProduction());
         assertEquals(2, colony.getFoodConsumption());
@@ -229,7 +246,7 @@ public class ServerUnitTest extends FreeColTestCase {
         // Advance last turn
         ServerTestHelper.newTurn();
 
-        assertTrue(plain58.hasImprovement(plow));
+        assertTrue(hasImprovement(plain58, plow));
         assertEquals(5 + 6, colony.getFoodProduction());
         assertEquals(2, colony.getFoodConsumption());
         assertEquals(8 + n * 8 + 9, colony.getGoodsCount(foodType));

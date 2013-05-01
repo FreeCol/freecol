@@ -349,9 +349,7 @@ public class TileItemContainer extends FreeColGameObject {
                         return oldItem; // Found it, but not replacing.
                     }
                 } else if (oldItem.getZIndex() > item.getZIndex()) {
-                    tileItems.add(index, item);
-                    invalidateCache();
-                    return item;
+                    break;
                 }
             }
         }

@@ -269,20 +269,6 @@ public class TileTest extends FreeColTestCase {
         assertEquals(3, primaryProduction.getAmount());
         assertEquals(furs, secondaryProduction.getType());
         assertEquals(3, secondaryProduction.getAmount());
-
-        ti = tile.addRoad();
-        ti.setTurnsToComplete(0);
-        ti.updateRoadConnections(true);
-        colony.invalidateCache();
-
-        production = center.getProduction();
-        assertEquals(2, production.size());
-        primaryProduction = production.get(0);
-        secondaryProduction = production.get(1);
-        assertEquals(grain, primaryProduction.getType());
-        assertEquals(3, primaryProduction.getAmount());
-        assertEquals(furs, secondaryProduction.getType());
-        assertEquals(3, secondaryProduction.getAmount());
     }
 
     public void testPotential() {
@@ -419,11 +405,23 @@ public class TileTest extends FreeColTestCase {
 
         List<ColonyTile> colonyTiles = colony.getColonyTiles();
 
-        ColonyTile colonyTile1 = colonyTiles.get(0);
-        ColonyTile colonyTile2 = colonyTiles.get(1);
+        ColonyTile colonyTile1 = null;
+        ColonyTile colonyTile2 = null;
+        for (ColonyTile ct : colonyTiles) {
+            if (!ct.getWorkTile().hasRoad()) {
+                if (colonyTile1 == null) {
+                    colonyTile1 = ct;
+                } else if (colonyTile2 == null) {
+                    colonyTile2 = ct;
+                    break;
+                }
+            }
+        }
 
         Tile tile1 = colonyTile1.getWorkTile();
         Tile tile2 = colonyTile2.getWorkTile();
+        assertFalse(tile1.hasRoad());
+        assertFalse(tile2.hasRoad());
 
         TileImprovement road1 = tile1.addRoad();
         road1.setTurnsToComplete(0);

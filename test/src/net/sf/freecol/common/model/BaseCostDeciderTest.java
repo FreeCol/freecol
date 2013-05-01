@@ -153,7 +153,9 @@ public class BaseCostDeciderTest extends FreeColTestCase {
         //Setup
         Tile settlementTile = map.getTile(2,1);
         FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
-        settlementTile.setSettlement(builder.settlementTile(settlementTile).build());
+        Settlement settlement = builder.settlementTile(settlementTile).build();
+        settlementTile.setSettlement(settlement);
+        settlementTile.changeOwningSettlement(settlement);
 
         Tile unitTile = map.getTile(1, 1);
         Unit unit = new ServerUnit(game, unitTile, game.getCurrentPlayer(), pioneerType);
