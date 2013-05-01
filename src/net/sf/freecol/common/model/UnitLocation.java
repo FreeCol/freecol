@@ -201,6 +201,22 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
         return units.get(units.size()-1);
     }
 
+    /**
+     * Gets the total amount of Units at this Location, including
+     * units on a carrier.
+     *
+     * @return The total number of <code>Unit</code>s at this
+     *     <code>Location</code>.
+     */
+    public int getTotalUnitCount() {
+        int result = 0;
+        for (Unit unit : getUnitList()) {
+            result++;
+            result += unit.getUnitCount();
+        }
+        return result;
+    }
+
 
     // Interface Location
     // Inheriting
