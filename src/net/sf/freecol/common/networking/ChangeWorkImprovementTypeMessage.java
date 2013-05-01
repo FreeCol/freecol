@@ -111,7 +111,7 @@ public class ChangeWorkImprovementTypeMessage extends DOMMessage {
         } else if (!type.isTileTypeAllowed(tile.getType())) {
             return DOMMessage.clientError("ImprovementType not allowed on tile: "
                 + improvementId);
-        } else if ((improvement = tile.findTileImprovementType(type)) == null) {
+        } else if ((improvement = tile.getTileImprovement(type)) == null) {
             // TODO: This does not check if the tile (not TileType
             // accepts the improvement).
             if (!type.isWorkerAllowed(unit)) {

@@ -1396,7 +1396,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Finds the TileImprovement of a given Type, or null if there is no match.
      */
-    public TileImprovement findTileImprovementType(TileImprovementType type) {
+    public TileImprovement getTileImprovement(TileImprovementType type) {
         return (tileItemContainer == null) ? null
             : tileItemContainer.getImprovement(type);
     }

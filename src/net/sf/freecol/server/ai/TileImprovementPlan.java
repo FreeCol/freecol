@@ -206,7 +206,7 @@ public class TileImprovementPlan extends ValuedAIObject {
                 // of tools (e.g. plantForest), because PioneeringMission
                 // assumes this does not happen.
                 && impType.getExpendedAmount() <= 1
-                && tile.findTileImprovementType(impType) == null) {
+                && tile.getTileImprovement(impType) == null) {
                 int value = impType.getImprovementValue(tile, goodsType);
                 if (value > bestValue) {
                     bestValue = value;
@@ -238,7 +238,7 @@ public class TileImprovementPlan extends ValuedAIObject {
      * @return True if the tile improvement has been completed.
      */
     public boolean isComplete() {
-        return target != null && target.hasImprovement(getType());
+        return target != null && target.getTileImprovement(getType()) != null;
     }
 
     /**

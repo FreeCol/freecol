@@ -275,10 +275,10 @@ public final class TileImprovementType extends FreeColGameObjectType {
     public boolean isTileAllowed(Tile tile) {
         if (!isTileTypeAllowed(tile.getType())) return false;
         if (requiredImprovementType != null
-            && tile.findTileImprovementType(requiredImprovementType) == null) {
+            && tile.getTileImprovement(requiredImprovementType) == null) {
             return false;
         }
-        TileImprovement ti = tile.findTileImprovementType(this);
+        TileImprovement ti = tile.getTileImprovement(this);
         return ti == null || !ti.isComplete();
     }
 
