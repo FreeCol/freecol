@@ -528,7 +528,7 @@ public final class EuropePanel extends PortPanel {
         }
 
         public boolean accepts(Unit unit) {
-            return unit.isNaval() && !unit.isUnderRepair();
+            return unit.isNaval() && !unit.isDamaged();
         }
 
         public boolean accepts(Goods goods) {

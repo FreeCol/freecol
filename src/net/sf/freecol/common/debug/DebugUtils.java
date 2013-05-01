@@ -662,7 +662,7 @@ public class DebugUtils {
                     for (Unit u : list) {
                         sb.append('\n');
                         sb.append(Messages.message(Messages.getLabel(u)));
-                        if (u.isUnderRepair()) {
+                        if (u.isDamaged()) {
                             sb.append(" (Repairing)");
                         } else {
                             sb.append("    ");

@@ -57,9 +57,6 @@ import org.w3c.dom.Element;
  * Represents all pieces that can be moved on the map-board. This includes:
  * colonists, ships, wagon trains e.t.c.
  *
- * <br>
- * <br>
- *
  * Every <code>Unit</code> is owned by a {@link Player} and has a
  * {@link Location}.
  */
@@ -80,17 +77,10 @@ public class Unit extends GoodsLocation
         };
 
 
-    /**
-     * XML tag name for equipment list.
-     */
-    private static final String EQUIPMENT_TAG = "equipment";
-
     public static final String CARGO_CHANGE = "CARGO_CHANGE";
     public static final String EQUIPMENT_CHANGE = "EQUIPMENT_CHANGE";
 
-    /**
-     * A state a Unit can have.
-     */
+    /** A state a Unit can have. */
     public static enum UnitState {
         ACTIVE,
         FORTIFIED,
@@ -192,6 +182,1678 @@ public class Unit extends GoodsLocation
         }
     }
 
+    /** The individual name of this unit, not of the unit type. */
+    protected String name = null;
+
+    /** The owner player. */
+    protected Player owner;
+
+    /** The unit type. */
+    protected UnitType unitType;
+
+    /** Current unit state. */
+    protected UnitState state = UnitState.ACTIVE;
+
+    /** Current unit role. */
+    protected Role role = Role.DEFAULT;
+
+    /** The current unit location. */
+    protected Location location;
+
+    /** The last entry location used by this unit. */
+    protected Location entryLocation;
+
+    /** The number of moves this unit has left this turn. */
+    protected int movesLeft;
+
+    /** What type of goods this unit produces in its occupation. */
+    protected GoodsType workType;
+
+    /** What type of goods this unit last earned experience producing. */
+    private GoodsType experienceType;
+
+    /** The mount of experience a unit has earned. */
+    protected int experience = 0;
+
+    /**
+     * The number of turns until the work is finished (e.g. sailing,
+     * improving), or '-1' if a Unit can stay in its state forever.
+     */
+    protected int workLeft;
+
+    /**
+     * What is being improved (to be used only for PIONEERs - where
+     * they are working.
+     */
+    protected TileImprovement workImprovement;
+
+    /** The student of this Unit, if it has one. */
+    protected Unit student;
+
+    /** The teacher of this Unit, if it has one. */
+    protected Unit teacher;
+
+    /** Number of turns of training needed by this unit. */
+    protected int turnsOfTraining = 0;
+
+    /** The original nationality. */
+    protected String nationality = null;
+
+    /** The original ethnicity. */
+    protected String ethnicity = null;
+
+    /** The home settlement of a native unit. */
+    protected IndianSettlement indianSettlement = null;
+
+    /** For now; only used by ships when repairing. */
+    protected int hitPoints;
+
+    /** A destination for go-to moves. */
+    protected Location destination = null;
+
+    /** The trade route this unit has. */
+    protected TradeRoute tradeRoute = null;
+
+    /** Which stop in a trade route the unit is going to. */
+    protected int currentStop = -1;
+
+    /** To be used only for type == TREASURE_TRAIN */
+    protected int treasureAmount;
+
+    /**
+     * The attrition this unit has accumulated.  At the moment, this
+     * equals the number of turns it has spent in the open.
+     */
+    protected int attrition = 0;
+
+    /**
+     * The amount of goods carried by this unit.  This variable is
+     * only used by the clients.  A negative value signals that the
+     * variable is not in use.
+     *
+     * @see #getVisibleGoodsCount()
+     */
+    protected int visibleGoodsCount;
+
+    /** The equipment this Unit carries. */
+    protected final TypeCountMap<EquipmentType> equipment
+        = new TypeCountMap<EquipmentType>();
+
+
+    /**
+     * Deliberately empty constructor for ServerUnit.
+     */
+    protected Unit() {}
+
+    /**
+     * Constructor for ServerUnit.
+     *
+     * @param game The enclosing <code>Game</code>.
+     */
+    protected Unit(Game game) {
+        super(game);
+    }
+
+    /**
+     * Initialize this object from an XML-representation of this object.
+     *
+     * @param game The enclosing <code>Game</code>.
+     * @param e An XML-element that will be used to initialize this object.
+     */
+    public Unit(Game game, Element e) {
+        super(game, e);
+
+        readFromXMLElement(e);
+    }
+
+    /**
+     * Creates a new <code>Unit</code> with the given
+     * identifier.  The object should later be initialized by calling
+     * {@link #readFromXML(XMLStreamReader)}.
+     *
+     * @param game The enclosing <code>Game</code>.
+     * @param id The object identifier.
+     */
+    public Unit(Game game, String id) {
+        super(game, id);
+    }
+
+
+    /**
+     * Get the individual name of this unit.
+     *
+     * @return The individual name.
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Set the individual name of this unit.
+     *
+     * @param newName The new name.
+     */
+    public void setName(String newName) {
+        this.name = newName;
+    }
+
+    /**
+     * Get the name of the apparent owner of this Unit,
+     * (like getOwner().getNationAsString() but handles pirates).
+     *
+     * @return The name of the apparent owner of this <code>Unit</code>.
+     */
+    public StringTemplate getApparentOwnerName() {
+        Player own = (hasAbility(Ability.PIRACY)) ? getGame().getUnknownEnemy()
+            : owner;
+        return own.getNationName();
+    }
+
+    /**
+     * Get a description of this unit.
+     *
+     * @return A <code>StringTemplate</code> describing this <code>Unit</code>.
+     */
+    public StringTemplate getLabel() {
+        StringTemplate result = StringTemplate.label(" ")
+            .add(getType().getNameKey());
+        if (name != null) {
+            result.addName(name);
+        }
+        Role role = getRole();
+        if (role != Role.DEFAULT) {
+            result = StringTemplate.template("model.unit." + role.getId()
+                                             + ".name")
+                .addAmount("%number%", 1)
+                .add("%unit%", getType().getNameKey());
+        }
+        return result;
+    }
+
+    /**
+     * Get the <code>UnitType</code> value.
+     *
+     * @return The current <code>UnitType</code>.
+     */
+    public final UnitType getType() {
+        return unitType;
+    }
+
+    /**
+     * Sets the type of the unit.
+     *
+     * @param newUnitType The new type of the unit.
+     */
+    public void setType(UnitType newUnitType) {
+        if (newUnitType.isAvailableTo(owner)) {
+            if (unitType == null) {
+                owner.modifyScore(newUnitType.getScoreValue());
+            } else {
+                owner.modifyScore(newUnitType.getScoreValue()
+                    - unitType.getScoreValue());
+            }
+            this.unitType = newUnitType;
+            if (getMovesLeft() > getInitialMovesLeft()) {
+                setMovesLeft(getInitialMovesLeft());
+            }
+            hitPoints = unitType.getHitPoints();
+            if (getTeacher() != null && !canBeStudent(getTeacher())) {
+                getTeacher().setStudent(null);
+                setTeacher(null);
+            }
+        } else {
+            // ColonialRegulars for example are only available after
+            // independence is declared.
+            logger.warning("Units of type: " + newUnitType
+                           + " are not available to " + owner.getPlayerType()
+                           + " player " + owner.getName());
+        }
+    }
+
+    /**
+     * Checks if this <code>Unit</code> is naval.
+     *
+     * @return True if this is a naval <code>Unit</code>.
+     */
+    public boolean isNaval() {
+        return (unitType == null) ? false : unitType.isNaval();
+    }
+
+    /**
+     * Checks if this unit is an undead.
+     *
+     * @return True if the unit is undead.
+     */
+    public boolean isUndead() {
+        return hasAbility("model.ability.undead");
+    }
+
+    /**
+     * Can this unit carry treasure (like a treasure train)?
+     *
+     * @return True if this <code>Unit</code> can carry treasure.
+     */
+    public boolean canCarryTreasure() {
+        return getType().hasAbility(Ability.CARRY_TREASURE);
+    }
+
+    /**
+     * Can this unit capture enemy goods?
+     *
+     * @return True if this <code>Unit</code> is capable of capturing goods.
+     */
+    public boolean canCaptureGoods() {
+        return unitType.hasAbility(Ability.CAPTURE_GOODS);
+    }
+
+    /**
+     * Checks if this is a trading <code>Unit</code>, meaning that it
+     * can trade with settlements.
+     *
+     * @return True if this is a trading unit.
+     */
+    public boolean isTradingUnit() {
+        return canCarryGoods() && owner.isEuropean();
+    }
+
+    /**
+     * Checks if this <code>Unit</code> is a `colonist'.  A unit is a
+     * colonist if it is European and can build a new <code>Colony</code>.
+     *
+     * @return True if this unit is a colonist.
+     */
+    public boolean isColonist() {
+        return unitType.hasAbility(Ability.FOUND_COLONY)
+            && owner.hasAbility(Ability.FOUNDS_COLONIES);
+    }
+
+    /**
+     * Checks if this <code>Unit</code> is able to carry {@link Locatable}s.
+     *
+     * @return True if this unit can carry goods or other units.
+     */
+    public boolean isCarrier() {
+        return unitType.canCarryGoods() || unitType.canCarryUnits();
+    }
+
+    /**
+     * Checks if this unit is a person, that is not a ship or wagon.
+     * Surprisingly difficult without explicit enumeration because
+     * model.ability.person only arrived in 0.10.1.
+     *
+     * @return True if this unit is a person.
+     */
+    public boolean isPerson() {
+        return hasAbility("model.ability.person")
+            // @compat 0.10.0
+            || unitType.hasAbility(Ability.BORN_IN_COLONY)
+            || unitType.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
+            || unitType.hasAbility(Ability.FOUND_COLONY)
+            // Nick also had:
+            //     && (!hasAbility("model.ability.carryGoods")
+            //         && !hasAbility("model.ability.carryUnits")
+            //         && !hasAbility("model.ability.carryTreasure")
+            //         && !hasAbility("model.ability.bombard"))
+            // ...but that should be unnecessary.
+            // end compatibility code
+            ;
+    }
+
+    /**
+     * Gets the state of this <code>Unit</code>.
+     *
+     * @return The state of this <code>Unit</code>.
+     */
+    public UnitState getState() {
+        return state;
+    }
+
+    /**
+     * Checks if a <code>Unit</code> can get the given state set.
+     *
+     * @param s The new state for this Unit.  Should be one of
+     *     {UnitState.ACTIVE, FORTIFIED, ...}.
+     * @return True if the <code>Unit</code> state can be changed to
+     *     the new value.
+     */
+    public boolean checkSetState(UnitState s) {
+        switch (s) {
+        case ACTIVE: case SENTRY:
+            return true;
+        case IN_COLONY:
+            return !isNaval();
+        case FORTIFIED:
+            return getState() == UnitState.FORTIFYING;
+        case IMPROVING:
+            return location instanceof Tile
+                && getOwner().canAcquireForImprovement(location.getTile());
+        case SKIPPED:
+            if (getState() == UnitState.ACTIVE) return true;
+            // Fall through
+        case FORTIFYING:
+            return getMovesLeft() > 0;
+        default:
+            logger.warning("Invalid unit state: " + s);
+            return false;
+        }
+    }
+
+    /**
+     * Sets a new state for this unit and initializes the amount of
+     * work the unit has left.
+     *
+     * If the work needs turns to be completed (for instance when
+     * plowing), then the moves the unit has still left will be used
+     * up. Some work (basically building a road with a hardy pioneer)
+     * might actually be finished already in this method-call, in
+     * which case the state is set back to UnitState.ACTIVE.
+     *
+     * @param s The new state for this Unit.  Should be one of
+     *     {UnitState.ACTIVE, UnitState.FORTIFIED, ...}.
+     */
+    public void setState(UnitState s) {
+        if (state == s) {
+            // No need to do anything when the state is unchanged
+            return;
+        } else if (!checkSetState(s)) {
+            throw new IllegalStateException("Illegal UnitState transition: "
+                + state + " -> " + s);
+        } else {
+            setStateUnchecked(s);
+        }
+    }
+
+    /**
+     * Actually set the unit state.
+     *
+     * @param s The new <code>UnitState</code>.
+     */
+    protected void setStateUnchecked(UnitState s) {
+        // TODO: move to the server.
+        // Cleanup the old UnitState, for example destroy the
+        // TileImprovment being built by a pioneer.
+        switch (state) {
+        case IMPROVING:
+            if (workImprovement != null && getWorkLeft() > 0) {
+                if (!workImprovement.isComplete()
+                    && workImprovement.getTile() != null
+                    && workImprovement.getTile().getTileItemContainer() != null) {
+                    workImprovement.getTile().getTileItemContainer()
+                        .removeTileItem(workImprovement);
+                }
+                setWorkImprovement(null);
+            }
+            break;
+        default:
+            // do nothing
+            break;
+        }
+
+        // Now initiate the new UnitState
+        switch (s) {
+        case ACTIVE:
+            setWorkLeft(-1);
+            break;
+        case SENTRY:
+            setWorkLeft(-1);
+            break;
+        case FORTIFIED:
+            setWorkLeft(-1);
+            movesLeft = 0;
+            break;
+        case FORTIFYING:
+            setWorkLeft(1);
+            movesLeft = 0;
+            break;
+        case IMPROVING:
+            if (workImprovement == null) {
+                setWorkLeft(-1);
+            } else {
+                setWorkLeft(workImprovement.getTurnsToComplete()
+                    + ((getMovesLeft() > 0) ? 0 : 1));
+            }
+            movesLeft = 0;
+            break;
+        case SKIPPED: // do nothing
+            break;
+        default:
+            setWorkLeft(-1);
+        }
+        state = s;
+    }
+
+    /**
+     * Sets the given state to all the units that are carried.
+     *
+     * @param state The <code>UnitState</code> to set..
+     */
+    public void setStateToAllChildren(UnitState state) {
+        if (canCarryUnits()) {
+            for (Unit u : getUnitList()) u.setState(state);
+        }
+    }
+
+    /**
+     * Gets the unit role.
+     *
+     * @return The <code>Role</code> of this <code>Unit</code>.
+     */
+    public Role getRole() {
+        return role;
+    }
+ 
+    /**
+     * Sets the <code>Role</code> of this <code>Unit</code>.
+     *
+     * @param role The new <code>Role</code>.
+     */
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    /**
+     * Set the unit role based on its equipment.
+     */
+    protected void setRole() {
+        Role oldRole = role;
+        role = Role.DEFAULT;
+        for (EquipmentType type : equipment.keySet()) {
+            role = role.newRole(type.getRole());
+        }
+        if (getState() == UnitState.IMPROVING
+            && !hasAbility("model.ability.improveTerrain")) {
+            setStateUnchecked(UnitState.ACTIVE);
+            setMovesLeft(0);
+        }
+
+        // Check for role change for reseting the experience.
+        // Soldier and Dragoon are compatible, no loss of experience.
+        if (!role.isCompatibleWith(oldRole)) {
+            experience = 0;
+        }
+    }
+
+    /**
+     * Gets the location of this Unit.
+     *
+     * @return The location of this Unit.
+     */
+    public Location getLocation() {
+        return location;
+    }
+
+    /**
+     * Sets the units location without updating any other variables
+     *
+     * @param newLocation The new <code>Location</code>.
+     */
+    public void setLocationNoUpdate(Location newLocation) {
+        location = newLocation;
+    }
+
+    /**
+     * Sets the location of this Unit.
+     *
+     * @param newLocation The new <code>Location</code>.
+     */
+    public void setLocation(Location newLocation) {
+        // If either the add or remove involves a colony, call the
+        // colony-specific routine...
+        Colony oldColony = (location instanceof WorkLocation)
+            ? this.getColony() : null;
+        Colony newColony = (newLocation instanceof WorkLocation)
+            ? newLocation.getColony() : null;
+        // However if the unit is moving within the same colony,
+        // do not call the colony-specific routines.
+        if (oldColony == newColony) oldColony = newColony = null;
+
+        boolean result = true;
+        if (location != null) {
+            result = (oldColony != null)
+                ? oldColony.removeUnit(this)
+                : location.remove(this);
+        }
+        /*if (!result) return false;*/
+
+        location = newLocation;
+        // Explore the new location now to prevent dealing with tiles
+        // with null (unexplored) type.
+        getOwner().setExplored(this);
+
+        // It is possible to add a unit to a non-specific location
+        // within a colony by specifying the colony as the new
+        // location.
+        if (newLocation instanceof Colony) {
+            newColony = (Colony) newLocation;
+            location = newLocation = newColony.getWorkLocationFor(this);
+        }
+
+        if (newLocation != null) {
+            result = (newColony != null)
+                ? newColony.addUnit(this, (WorkLocation) newLocation)
+                : newLocation.add(this);
+        }
+
+        return /*result*/;
+    }
+
+    /**
+     * Verifies if the unit is aboard a carrier
+     *
+     * @return True if the unit is aboard a carrier.
+     */
+    public boolean isOnCarrier() {
+        return getLocation() instanceof Unit;
+    }
+
+    /**
+     * Gets the carrier this unit is aboard if any.
+     *
+     * @return The carrier this unit is aboard, or null if none.
+     */
+    public Unit getCarrier() {
+        return (isOnCarrier()) ? ((Unit)getLocation()) : null;
+    }
+
+    /**
+     * Checks if this <code>Unit</code> is located in Europe.  That
+     * is; either directly or onboard a carrier which is in Europe.
+     *
+     * @return True if in <code>Europe</code>.
+     */
+    public boolean isInEurope() {
+        return (location instanceof Unit) ? ((Unit)location).isInEurope()
+            : getLocation() instanceof Europe;
+    }
+
+    /**
+     * Checks whether this <code>Unit</code> is at sea off the map, or
+     * on board of a carrier that is.
+     *
+     * @return True if at sea.
+     */
+    public boolean isAtSea() {
+        return (location instanceof Unit) ? ((Unit)location).isAtSea()
+            : location instanceof HighSeas;
+    }
+
+    /**
+     * Checks if this unit is running a mission.
+     *
+     * @return True if this unit is running a mission.
+     */
+    public boolean isInMission() {
+        return hasAbility("model.ability.missionary")
+            && (getLocation() instanceof IndianSettlement
+                // TODO: remove this when PET missionary serialization is fixed
+                || getLocation() == null);
+    }
+
+    /**
+     * Gets the work location this unit is working in.
+     *
+     * @return The current <code>WorkLocation</code>, or null if none.
+     */
+    public WorkLocation getWorkLocation() {
+        if (getLocation() instanceof WorkLocation) {
+            return (WorkLocation) getLocation();
+        }
+        return null;
+    }
+
+    /**
+     * Gets the <code>Building</code> this unit is working in.
+     *
+     * @return The current <code>Building</code>, or null if none.
+     */
+    public Building getWorkBuilding() {
+        if (getLocation() instanceof Building) {
+            return ((Building) getLocation());
+        }
+        return null;
+    }
+
+    /**
+     * Gets the <code>ColonyTile</code> this unit is working in.
+     *
+     * @return The current <code>ColonyTile</code>, or null if none.
+     */
+    public ColonyTile getWorkTile() {
+        if (getLocation() instanceof ColonyTile) {
+            return ((ColonyTile) getLocation());
+        }
+        return null;
+    }
+
+    /**
+     * Gets the entry location for this unit to use when returning from
+     * {@link Europe}.
+     *
+     * @return The entry <code>Location</code>.
+     */
+    public Location getEntryLocation() {
+        if (entryLocation == null) {
+            entryLocation = owner.getEntryLocation();
+        }
+        return entryLocation;
+    }
+
+    /**
+     * Sets the entry location in which this unit will be put when
+     * returning from {@link Europe}.
+     *
+     * @param entryLocation The new entry <code>Location</code>.
+     * @see #getEntryLocation
+     */
+    public void setEntryLocation(Location entryLocation) {
+        this.entryLocation = entryLocation;
+        if (entryLocation != null) {
+            owner.setEntryLocation(entryLocation);
+        }
+    }
+
+    /**
+     * Gets the entry tile for this unit, or if null the default
+     * entry location for the owning player.
+     *
+     * @return The entry <code>Tile</code>.
+     */
+    public Tile getFullEntryLocation() {
+        return (entryLocation != null) ? (Tile) entryLocation
+            : (owner.getEntryLocation() == null) ? null
+            : owner.getEntryLocation().getTile();
+    }
+
+    /**
+     * Get the moves left this turn.
+     *
+     * @return The number of moves this <code>Unit</code> has left.
+     */
+    public int getMovesLeft() {
+        return movesLeft;
+    }
+
+    /**
+     * Sets the moves left this turn.
+     *
+     * @param moves The new amount of moves left this <code>Unit</code>
+     *     should have.
+     */
+    public void setMovesLeft(int moves) {
+        this.movesLeft = (moves < 0) ? 0 : moves;
+    }
+
+    /**
+     * Gets the type of goods this unit is producing in its current occupation.
+     *
+     * @return The type of goods this unit is producing.
+     */
+    public GoodsType getWorkType() {
+        return workType;
+    }
+
+    /**
+     * Sets the type of goods this unit is producing in its current occupation.
+     *
+     * @param type The <code>GoodsType</code> to produce.
+     */
+    public void setWorkType(GoodsType type) {
+        workType = type;
+        if (type != null) experienceType = type;
+        ColonyTile workTile = getWorkTile();
+        if (workTile != null) {
+            workTile.setProductionType(workTile.getBestProductionType(type));
+        }
+    }
+
+    /**
+     * Gets the type of goods this unit has accrued experience producing.
+     *
+     * @return The type of goods this unit would produce.
+     */
+    public GoodsType getExperienceType() {
+        return experienceType;
+    }
+
+    /**
+     * Gets the experience of this <code>Unit</code> at its current
+     * experienceType.
+     *
+     * @return The experience of this <code>Unit</code> at its current
+     *     experienceType.
+     * @see #modifyExperience
+     */
+    public int getExperience() {
+        return experience;
+    }
+
+    /**
+     * Sets the experience of this <code>Unit</code> at its current
+     * experienceType.
+     *
+     * @param experience The new experience of this <code>Unit</code>
+     *     at its current experienceType.
+     * @see #modifyExperience
+     */
+    public void setExperience(int experience) {
+        this.experience = Math.min(experience,
+                                   getType().getMaximumExperience());
+    }
+
+    /**
+     * Modifies the experience of this <code>Unit</code> at its current
+     * experienceType.
+     *
+     * @param value The value by which to modify the experience of this
+     *     <code>Unit</code>.
+     * @see #getExperience
+     */
+    public void modifyExperience(int value) {
+        experience += value;
+    }
+
+    /**
+     * Gets the amount of work left.
+     *
+     * @return The amount of work left.
+     */
+    public int getWorkLeft() {
+        return workLeft;
+    }
+
+    /**
+     * Sets the amount of work left.
+     *
+     * @param workLeft The new amount of work left.
+     */
+    public void setWorkLeft(int workLeft) {
+        this.workLeft = workLeft;
+    }
+
+    /**
+     * Get the number of turns of work left.
+     *
+     * @return The number of turns of work left.
+     */
+    public int getWorkTurnsLeft() {
+        return (state == UnitState.IMPROVING
+                && unitType.hasAbility(Ability.EXPERT_PIONEER))
+            ? (getWorkLeft() + 1) / 2
+            : getWorkLeft();
+    }
+
+    /**
+     * Gets the TileImprovement that this pioneer is contributing to.
+     *
+     * @return The <code>TileImprovement</code> the pioneer is working on.
+     */
+    public TileImprovement getWorkImprovement() {
+        return workImprovement;
+    }
+
+    /**
+     * Sets the TileImprovement that this pioneer is contributing to.
+     *
+     * @param imp The new <code>TileImprovement</code> the pioneer is to
+     *     work on.
+     */
+    public void setWorkImprovement(TileImprovement imp) {
+        workImprovement = imp;
+    }
+
+    /**
+     * Get the unit being taught.
+     *
+     * @return A student <code>Unit</code> if any.
+     */
+    public final Unit getStudent() {
+        return student;
+    }
+
+    /**
+     * Set the student unit.
+     *
+     * @param newStudent The new student <code>Unit</code>.
+     */
+    public final void setStudent(final Unit newStudent) {
+        Unit oldStudent = this.student;
+        if (oldStudent == newStudent) return;
+
+        if (newStudent == null) {
+            this.student = null;
+            if (oldStudent != null && oldStudent.getTeacher() == this) {
+                oldStudent.setTeacher(null);
+            }
+        } else if (newStudent.getColony() != null
+            && newStudent.getColony() == getColony()
+            && newStudent.canBeStudent(this)) {
+            if (oldStudent != null && oldStudent.getTeacher() == this) {
+                oldStudent.setTeacher(null);
+            }
+            this.student = newStudent;
+            newStudent.setTeacher(this);
+        } else {
+            throw new IllegalStateException("Unit can not be student: "
+                + newStudent);
+        }
+    }
+
+    /**
+     * Get the unit teaching this one.
+     *
+     * @return A teacher <code>Unit</code>.
+     */
+    public final Unit getTeacher() {
+        return teacher;
+    }
+
+    /**
+     * Set the teacher for this unit.
+     *
+     * @param newTeacher The new teacher <code>Unit</code>.
+     */
+    public final void setTeacher(final Unit newTeacher) {
+        Unit oldTeacher = this.teacher;
+        if (newTeacher == oldTeacher) return;
+
+        if (newTeacher == null) {
+            this.teacher = null;
+            if (oldTeacher != null && oldTeacher.getStudent() == this) {
+                oldTeacher.setStudent(null);
+            }
+        } else {
+            UnitType skillTaught = newTeacher.getType().getSkillTaught();
+            if (newTeacher.getColony() != null
+                && newTeacher.getColony() == getColony()
+                && getColony().canTrain(skillTaught)) {
+                if (oldTeacher != null && oldTeacher.getStudent() == this) {
+                    oldTeacher.setStudent(null);
+                }
+                this.teacher = newTeacher;
+                this.teacher.setStudent(this);
+            } else {
+                throw new IllegalStateException("Unit can not be teacher: "
+                    + newTeacher);
+            }
+        }
+    }
+
+    /**
+     * Gets the number of turns this unit has been training.
+     *
+     * @return The number of turns of training this <code>Unit</code> has
+     *     given.
+     * @see #setTurnsOfTraining
+     * @see #getNeededTurnsOfTraining
+     */
+    public int getTurnsOfTraining() {
+        return turnsOfTraining;
+    }
+
+    /**
+     * Sets the number of turns this unit has been training.
+     *
+     * @param turnsOfTraining The number of turns of training this
+     *     <code>Unit</code> has given.
+     * @see #getNeededTurnsOfTraining
+     */
+    public void setTurnsOfTraining(int turnsOfTraining) {
+        this.turnsOfTraining = turnsOfTraining;
+    }
+
+    /**
+     * Gets the number of turns this unit has to train to educate a student.
+     * This value is only meaningful for units that can be put in a school.
+     *
+     * @return The turns of training needed to teach its current type
+     *     to a free colonist or to promote an indentured servant or a
+     *     petty criminal.
+     * @see #getTurnsOfTraining
+     */
+    public int getNeededTurnsOfTraining() {
+        // number of turns is 4/6/8 for skill 1/2/3
+        int result = 0;
+        if (student != null) {
+            result = getNeededTurnsOfTraining(unitType, student.unitType);
+            if (getColony() != null) {
+                result -= getColony().getProductionBonus();
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Gets the number of turns this unit has to train to educate a student.
+     * This value is only meaningful for units that can be put in a school.
+     *
+     * @return The turns of training needed to teach its current type
+     *     to a free colonist or to promote an indentured servant or a
+     *     petty criminal.
+     * @see #getTurnsOfTraining
+     *
+     * @param typeTeacher The teacher <code>UnitType</code>.
+     * @param typeStudent the student <code>UnitType</code>.
+     * @return The number of turns.
+     */
+    public int getNeededTurnsOfTraining(UnitType typeTeacher, 
+                                        UnitType typeStudent) {
+        UnitType teaching = getUnitTypeTeaching(typeTeacher, typeStudent);
+        if (teaching != null) {
+            return typeStudent.getEducationTurns(teaching);
+        } else {
+            throw new IllegalStateException("typeTeacher=" + typeTeacher
+                + " typeStudent=" + typeStudent);
+        }
+    }
+
+    /**
+     * Gets the UnitType which a teacher is teaching to a student.
+     * This value is only meaningful for teachers that can be put in a
+     * school.
+     *
+     * @param typeTeacher The teacher <code>UnitType</code>.
+     * @param typeStudent The student <code>UnitType</code>.
+     * @return The <code>UnitType</code> taught.
+     * @see #getTurnsOfTraining
+     *
+     */
+    public static UnitType getUnitTypeTeaching(UnitType typeTeacher,
+                                               UnitType typeStudent) {
+        UnitType skillTaught = typeTeacher.getSkillTaught();
+        if (typeStudent.canBeUpgraded(skillTaught, ChangeType.EDUCATION)) {
+            return skillTaught;
+        } else {
+            return typeStudent.getEducationUnit(0);
+        }
+    }
+
+    /**
+     * Can this unit be a student?
+     *
+     * @param teacher The teacher <code>Unit</code> which is trying to
+     *     teach it.
+     * @return True if the unit can be taught by the teacher.
+     */
+    public boolean canBeStudent(Unit teacher) {
+        return teacher != this && canBeStudent(unitType, teacher.unitType);
+    }
+
+    /**
+     * Can a unit be a student?
+     *
+     * @param typeStudent The student <code>UnitType</code>.
+     * @param typeTeacher The teacher <code>UnitType</code>.
+     * @return True if the student can be taught by the teacher.
+     */
+    public boolean canBeStudent(UnitType typeStudent, UnitType typeTeacher) {
+        return getUnitTypeTeaching(typeTeacher, typeStudent) != null;
+    }
+
+    /**
+     * Gets the nationality of this Unit.
+     *
+     * Nationality represents a Unit's personal allegiance to a
+     * nation.  This may conflict with who currently issues orders to
+     * the Unit (the owner).
+     *
+     * @return The nationality of this Unit.
+     */
+    public String getNationality() {
+        return nationality;
+    }
+
+    /**
+     * Sets the nationality of this Unit.  A unit will change
+     * nationality when it switches owners willingly.  Currently only
+     * Converts do this, but it opens the possibility of
+     * naturalisation.
+     *
+     * @param newNationality The new nationality of this Unit.
+     */
+    public void setNationality(String newNationality) {
+        if (isPerson()) {
+            nationality = newNationality;
+        } else {
+            throw new UnsupportedOperationException("Can not set the nationality of a Unit which is not a person!");
+        }
+    }
+
+    /**
+     * Gets the ethnicity of this Unit.
+     *
+     * Ethnicity is inherited from the inhabitants of the place where
+     * the Unit was born.  Allows former converts to become
+     * native-looking colonists.
+     *
+     * @return The ethnicity of this Unit.
+     */
+    public String getEthnicity() {
+        return ethnicity;
+    }
+
+    /**
+     * Sets the ethnicity of this Unit.
+     *
+     * Ethnicity is something units are born with.  It cannot be
+     * subsequently changed.
+     *
+     * @param newEthnicity The new ethnicity of this Unit.
+     */
+    public void setEthnicity(String newEthnicity) {
+        throw new UnsupportedOperationException("Can not change a Unit's ethnicity!");
+    }
+
+    /**
+     * Identifies whether this unit came from a native tribe.
+     *
+     * @return Whether this unit looks native or not.
+     */
+    public boolean hasNativeEthnicity() {
+        try {
+            // FIXME: getNation() could fail, but getNationType()
+            // doesn't work as expected
+            return getGame().getSpecification().getNation(ethnicity)
+                .getType().isIndian();
+            // return getGame().getSpecification().getNationType(ethnicity).hasAbility("model.ability.native");
+            // return getGame().getSpecification().getIndianNationTypes().contains(getNationType(ethnicity));
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * Gets the <code>IndianSettlement</code> that owns this unit.
+     *
+     * @return The home <code>IndianSettlement</code> of this unit.
+     */
+    public IndianSettlement getIndianSettlement() {
+        return indianSettlement;
+    }
+
+    /**
+     * Sets the <code>IndianSettlement</code> that owns this unit.
+     *
+     * @param indianSettlement The <code>IndianSettlement</code> that should
+     *     now be owning this <code>Unit</code>.
+     */
+    public void setIndianSettlement(IndianSettlement indianSettlement) {
+        if (this.indianSettlement != null) {
+            this.indianSettlement.removeOwnedUnit(this);
+        }
+
+        this.indianSettlement = indianSettlement;
+
+        if (indianSettlement != null) {
+            indianSettlement.addOwnedUnit(this);
+        }
+    }
+
+    /**
+     * Gets the unit hit points.
+     *
+     * This is currently only used for damaged ships, but might get an
+     * extended use later.
+     *
+     * @return The hit points this <code>Unit</code> has.
+     * @see UnitType#getHitPoints
+     */
+    public int getHitPoints() {
+        return hitPoints;
+    }
+
+    /**
+     * Sets the hit points for this unit.
+     *
+     * @param hitPoints The new hit points for this unit.
+     */
+    public void setHitPoints(int hitPoints) {
+        this.hitPoints = hitPoints;
+    }
+
+    /**
+     * Checks if this unit is under repair.
+     *
+     * @return True if under repair.
+     */
+    public boolean isDamaged() {
+        return hitPoints < unitType.getHitPoints();
+    }
+
+    /**
+     * Get how many turns left to be repaired
+     *
+     * @return The number of turns left to be repaired.
+     */
+    public int getTurnsForRepair() {
+        return unitType.getHitPoints() - getHitPoints();
+    }
+
+    /**
+     * Get the destination of this unit.
+     *
+     * @return The destination <code>Location</code> of this <code>Unit</code>.
+     */
+    public Location getDestination() {
+        return destination;
+    }
+
+    /**
+     * Sets the destination of this unit.
+     *
+     * @param newDestination The new destination <code>Location</code>.
+     */
+    public void setDestination(Location newDestination) {
+        this.destination = newDestination;
+    }
+
+    /**
+     * Get the unit trade route, if any.
+     *
+     * @return The <code>TradeRoute</code>, or null if none.
+     */
+    public final TradeRoute getTradeRoute() {
+        return tradeRoute;
+    }
+
+    /**
+     * Set the unit trade route.
+     *
+     * @param newTradeRoute The new <code>TradeRoute</code> value.
+     */
+    public final void setTradeRoute(final TradeRoute newTradeRoute) {
+        this.tradeRoute = newTradeRoute;
+    }
+
+    /**
+     * Get the stop the unit is heading for or at.
+     *
+     * @return The target <code>Stop</code>.
+     */
+    public Stop getStop() {
+        return (validateCurrentStop() < 0) ? null
+            : getTradeRoute().getStops().get(currentStop);
+    }
+
+    /**
+     * Get the current trade route stop.
+     *
+     * @return The current stop index.
+     */
+    public int getCurrentStop() {
+        return currentStop;
+    }
+
+    /**
+     * Set the current stop.
+     *
+     * @param currentStop A new value for the currentStop.
+     */
+    public void setCurrentStop(int currentStop) {
+        this.currentStop = currentStop;
+    }
+
+    /**
+     * Validate and return the current stop.
+     *
+     * @return The current stop index, or negative on failure.
+     */
+    public int validateCurrentStop() {
+        if (tradeRoute == null) {
+            currentStop = -1;
+        } else {
+            List<Stop> stops = tradeRoute.getStops();
+            if (stops == null || stops.size() == 0) {
+                currentStop = -1;
+            } else {
+                if (currentStop < 0 || currentStop >= stops.size()) {
+                    // The current stop can become out of range if the trade
+                    // route is modified.
+                    currentStop = 0;
+                }
+            }
+        }
+        return currentStop;
+    }
+
+    /**
+     * Get the current amount of treasure in this unit.
+     *
+     * @return The amount of treasure.
+     * @exception IllegalStateException if this is not a treasure
+     *     carrying unit.
+     */
+    public int getTreasureAmount() {
+        if (!canCarryTreasure()) {
+            throw new IllegalStateException("Unit can not carry treasure");
+        }
+        return treasureAmount;
+    }
+
+    /**
+     * Set the amount of treasure in this unit.
+     *
+     * @param amount The new amount of treasure.
+     */
+    public void setTreasureAmount(int amount) {
+        if (!canCarryTreasure()) {
+            throw new IllegalStateException("Unit can not carry treasure");
+        }
+        this.treasureAmount = amount;
+    }
+
+    /**
+     * Gets the attrition of this unit.
+     *
+     * @return The attrition of this unit.
+     */
+    public int getAttrition() {
+        return attrition;
+    }
+
+    /**
+     * Sets the attrition of this unit.
+     *
+     * @param attrition The new attrition of this unit.
+     */
+    public void setAttrition(int attrition) {
+        this.attrition = attrition;
+    }
+
+    /**
+     * Get the visible amount of goods that is carried by this unit.
+     *
+     * @return The visible amount of goods carried by this <code>Unit</code>.
+     */
+    public int getVisibleGoodsCount() {
+        return (visibleGoodsCount >= 0) ? visibleGoodsCount
+            : getGoodsSpaceTaken();
+    }
+
+    /**
+     * Get the <code>Equipment</code> value.
+     *
+     * @return A counted map of the <code>EquipmentType</code>s
+     *     carried by this unit.
+     */
+    public final TypeCountMap<EquipmentType> getEquipment() {
+        return equipment;
+    }
+
+    /**
+     * Clears all <code>Equipment</code> held by this unit.
+     */
+    public void clearEquipment() {
+        equipment.clear();
+    }
+
+    /**
+     * Get the amount of an equipment type this unit has.
+     *
+     * @param equipmentType The <code>EquipmentType</code> to check.
+     * @return The amount of equipment.
+     */
+    public int getEquipmentCount(EquipmentType equipmentType) {
+        return equipment.getCount(equipmentType);
+    }
+
+
+
+    // More complex equipment manipulation.
+
+    /**
+     * Does the unit have arms?
+     *
+     * @return True if the unit has arms.
+     */
+    public boolean isArmed() {
+        if (musketsEq[0] == null) {
+            Specification spec = getSpecification();
+            musketsEq[0] = spec.getEquipmentType("model.equipment.muskets");
+            musketsEq[1] = spec.getEquipmentType("model.equipment.indian.muskets");
+        }
+        for (EquipmentType et : musketsEq) {
+            if (getEquipmentCount(et) > 0) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Does the unit have a mount?
+     *
+     * @return True if the unit have a mount.
+     */
+    public boolean isMounted() {
+        if (horsesEq[0] == null) {
+            Specification spec = getSpecification();
+            horsesEq[0] = spec.getEquipmentType("model.equipment.horses");
+            horsesEq[1] = spec.getEquipmentType("model.equipment.indian.horses");
+        }
+        for (EquipmentType et : horsesEq) {
+            if (getEquipmentCount(et) > 0) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Get a description of the unit's equipment.
+     *
+     * @return A <code>StringTemplate</code> summarizing the equipment.
+     */
+    public StringTemplate getEquipmentLabel() {
+        if (equipment.isEmpty()) return null;
+        StringTemplate result = StringTemplate.label("/");
+        for (java.util.Map.Entry<EquipmentType, Integer> entry
+                 : equipment.getValues().entrySet()) {
+            EquipmentType type = entry.getKey();
+            int amount = entry.getValue().intValue();
+            if (!type.needsGoodsToBuild()) {
+                result.addStringTemplate(StringTemplate.template("model.goods.goodsAmount")
+                    .add("%goods%", type.getNameKey())
+                    .addName("%amount%", Integer.toString(amount)));
+            } else {
+                for (AbstractGoods goods : type.getRequiredGoods()) {
+                    result.addStringTemplate(StringTemplate.template("model.goods.goodsAmount")
+                        .add("%goods%", goods.getType().getNameKey())
+                        .addName("%amount%", Integer.toString(amount * goods.getAmount())));
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * After winning a battle, can this unit the loser equipment?
+     *
+     * @param equip The <code>EquipmentType</code> to consider.
+     * @param loser The loser <code>Unit</code>.
+     * @return The <code>EquipmentType</code> to capture, which may
+     *     differ from the equip parameter due to transformations such
+     *     as to the native versions of horses and muskets.
+     *     Or return null if capture is not possible.
+     */
+    public EquipmentType canCaptureEquipment(EquipmentType equip, Unit loser) {
+        if (hasAbility("model.ability.captureEquipment")) {
+            if (getOwner().isIndian() != loser.getOwner().isIndian()) {
+                equip = equip.getCaptureEquipment(getOwner().isIndian());
+            }
+            return (canBeEquippedWith(equip)) ? equip : null;
+        }
+        return null;
+    }
+
+    /**
+     * Gets the available equipment that can be equipped automatically
+     * in case of an attack.
+     *
+     * @return The equipment that can be automatically equipped by
+     *     this unit, or null if none.
+     */
+    public TypeCountMap<EquipmentType> getAutomaticEquipment() {
+        // Paul Revere makes an unarmed colonist in a settlement pick up
+        // a stock-piled musket if attacked, so the bonus should be applied
+        // for unarmed colonists inside colonies where there are muskets
+        // available. Indians can also pick up equipment.
+        if (isArmed()) return null;
+
+        if (!getOwner().hasAbility("model.ability.automaticEquipment")) {
+            return null;
+        }
+
+        Settlement settlement = null;
+        if (getLocation() instanceof WorkLocation) {
+            settlement = getColony();
+        }
+        if (getLocation() instanceof IndianSettlement) {
+            settlement = (Settlement) getLocation();
+        }
+        if (settlement == null) return null;
+
+        TypeCountMap<EquipmentType> equipmentList = null;
+        // Check for necessary equipment in the settlement
+        Set<Ability> autoDefence = new HashSet<Ability>();
+        autoDefence.addAll(getOwner()
+            .getAbilitySet("model.ability.automaticEquipment"));
+
+        for (EquipmentType equipment : getSpecification().getEquipmentTypeList()) {
+            for (Ability ability : autoDefence) {
+                if (!ability.appliesTo(equipment)) continue;
+
+                if (!canBeEquippedWith(equipment)) continue;
+
+                boolean hasReqGoods = true;
+                for (AbstractGoods ag : equipment.getRequiredGoods()) {
+                    if (settlement.getGoodsCount(ag.getType()) < ag.getAmount()){
+                        hasReqGoods = false;
+                        break;
+                    }
+                }
+                if (hasReqGoods) {
+                    // lazy initialization, required
+                    if (equipmentList == null) {
+                        equipmentList = new TypeCountMap<EquipmentType>();
+                    }
+                    equipmentList.incrementCount(equipment, 1);
+                }
+            }
+        }
+        return equipmentList;
+    }
+
+    /**
+     * Does losing a piece of equipment mean the death of this unit?
+     *
+     * @param lose The <code>EquipmentType</code> to lose.
+     * @return True if the unit is doomed.
+     */
+    public boolean losingEquipmentKillsUnit(EquipmentType lose) {
+        if (hasAbility("model.ability.disposeOnAllEquipLost")) {
+            for (EquipmentType equip : getEquipment().keySet()) {
+                if (equip != lose) return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Does losing a piece of equipment mean the demotion of this unit?
+     *
+     * @param lose The <code>EquipmentType</code> to lose.
+     * @return True if the unit is to be demoted.
+     */
+    public boolean losingEquipmentDemotesUnit(EquipmentType lose) {
+        if (hasAbility("model.ability.demoteOnAllEquipLost")) {
+            for (EquipmentType equip : getEquipment().keySet()) {
+                if (equip != lose) return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Gets the best combat equipment type that this unit has.
+     *
+     * @param equipment The equipment to look through, such as returned by
+     *     @see Unit#getEquipment() and/or @see Unit#getAutomaticEquipment().
+     * @return The equipment type to lose, or null if none.
+     */
+    public EquipmentType getBestCombatEquipmentType(TypeCountMap<EquipmentType> equipment) {
+        EquipmentType lose = null;
+        if (equipment != null) {
+            int priority = -1;
+            for (EquipmentType equipmentType : equipment.keySet()) {
+                if (equipmentType.getCombatLossPriority() > priority) {
+                    lose = equipmentType;
+                    priority = equipmentType.getCombatLossPriority();
+                }
+            }
+        }
+        return lose;
+    }
+
+    /**
+     * Checks whether this unit can be equipped with the given
+     * <code>EquipmentType</code> at the current
+     * <code>Location</code>. This is the case if all requirements of
+     * the EquipmentType are met.
+     *
+     * @param equipmentType an <code>EquipmentType</code> value
+     * @return whether this unit can be equipped with the given
+     *         <code>EquipmentType</code> at the current location.
+     */
+    public boolean canBeEquippedWith(EquipmentType equipmentType) {
+        for (Entry<String, Boolean> entry : equipmentType.getRequiredAbilities().entrySet()) {
+            if (hasAbility(entry.getKey()) != entry.getValue()) {
+                return false;
+            }
+        }
+        if (equipment.getCount(equipmentType) >= equipmentType.getMaximumCount()) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Changes the equipment a unit has and returns a list of equipment
+     * it still has but needs to drop due to the changed equipment being
+     * incompatible.
+     *
+     * @param type The <code>EquipmentType</code> to change.
+     * @param amount The amount to change by (may be negative).
+     * @return A list of equipment types that the unit must now drop.
+     */
+    public List<EquipmentType> changeEquipment(EquipmentType type, int amount) {
+        List<EquipmentType> result = new ArrayList<EquipmentType>();
+        equipment.incrementCount(type, amount);
+        if (amount > 0) {
+            for (EquipmentType oldType
+                     : new HashSet<EquipmentType>(equipment.keySet())) {
+                if (!oldType.isCompatibleWith(type)) {
+                    result.add(oldType);
+                }
+            }
+        }
+        setRole();
+        return result;
+    }
+
+
+    // Combat routines
+
+    /**
+     * Is the unit a beached ship?
+     *
+     * @return True if the unit is a beached ship.
+     */
+    public boolean isBeached() {
+        return isBeached(getTile());
+    }
+
+    /**
+     * Would this unit be beached if it was on a particular tile?
+     *
+     * @param tile The <code>Tile</code> to check.
+     * @return True if the unit is a beached ship.
+     */
+    public boolean isBeached(Tile tile) {
+        return isNaval() && tile != null && tile.isLand()
+            && tile.getSettlement() == null;
+    }
+
+    /**
+     * Checks if this is an defensive unit. That is: a unit which can be used to
+     * defend a <code>Settlement</code>.
+     *
+     * Note! As this method is used by the AI it really means that the unit can
+     * defend as is. To be specific an unarmed colonist is not defensive yet,
+     * even if Paul Revere and stockpiled muskets are available. That check is
+     * only performed on an actual attack.
+     *
+     * A settlement is lost when there are no more defensive units.
+     *
+     * @return True if this is a defensive unit meaning it can be used
+     *     to defend a <code>Colony</code>.  This would normally mean
+     *     that a defensive unit also will be offensive.
+     */
+    public boolean isDefensiveUnit() {
+        return (unitType.isDefensive() || isArmed() || isMounted())
+            && !isNaval();
+    }
+
+    /**
+     * Checks if this is an offensive unit.  That is, one that can
+     * attack other units.
+     *
+     * @return True if this is an offensive unit.
+     */
+    public boolean isOffensiveUnit() {
+        return unitType.isOffensive() || isArmed() || isMounted();
+    }
+
+    /**
+     * Is an alternate unit a better defender than the current choice.
+     * Prefer if there is no current defender, or if the alternate
+     * unit is better armed, or provides greater defensive power and
+     * does not replace a defensive unit defender with a non-defensive
+     * unit.
+     *
+     * @param defender The current defender <code>Unit</code>.
+     * @param defenderPower Its defence power.
+     * @param other An alternate <code>Unit</code>.
+     * @param otherPower Its defence power.
+     * @return True if the other unit should be preferred.
+     */
+    public static boolean betterDefender(Unit defender, float defenderPower,
+                                         Unit other, float otherPower) {
+        if (defender == null) {
+            return true;
+        } else if (defender.isPerson() && other.isPerson()
+            && !defender.isArmed() && other.isArmed()) {
+            return true;
+        } else if (defender.isPerson() && other.isPerson()
+            && defender.isArmed() && !other.isArmed()) {
+            return false;
+        } else if (!defender.isDefensiveUnit() && other.isDefensiveUnit()) {
+            return true;
+        } else if (defender.isDefensiveUnit() && !other.isDefensiveUnit()) {
+            return false;
+        } else {
+            return defenderPower < otherPower;
+        }
+    }
+
+    /**
+     * Finds the closest <code>Location</code> to this tile where
+     * this ship can be repaired.
+     *
+     * @return The closest <code>Location</code> where a ship can be repaired.
+     */
+    public Location getRepairLocation() {
+        final Player player = getOwner();
+        final Tile tile = getTile();
+        Location bestLocation = null;
+        int bestTurns = INFINITY;
+        for (Colony colony : player.getColonies()) {
+            int turns;
+            if (colony != null && colony != tile.getColony()
+                && colony.hasAbility("model.ability.repairUnits")
+                && (turns = getTurnsToReach(colony)) >= 0
+                && turns < bestTurns) {
+                // Tile.getDistanceTo(Tile) doesn't care about
+                // connectivity, so we need to check for an available
+                // path to target colony instead
+                bestTurns = turns;
+                bestLocation = colony;
+            }
+        }
+        if (bestLocation == null) bestLocation = player.getEurope();
+        return bestLocation;
+    }
+
+
+    // Movement handling
+
     /**
      * A move type.
      *
@@ -265,880 +1927,572 @@ public class Unit extends GoodsLocation
         }
     }
 
-    protected UnitType unitType;
-
-    protected int movesLeft;
-
-    protected UnitState state = UnitState.ACTIVE;
-
-    protected Role role = Role.DEFAULT;
-
     /**
-     * The number of turns until the work is finished, or '-1' if a
-     * Unit can stay in its state forever.
-     */
-    protected int workLeft;
-
-    protected int hitpoints; // For now; only used by ships when repairing.
-
-    protected Player owner;
-
-    protected String nationality = null;
-
-    protected String ethnicity = null;
-
-    protected Location entryLocation;
-
-    protected Location location;
-
-    protected IndianSettlement indianSettlement = null; // only used by Brave and Convert
-
-    protected Location destination = null;
-
-    /** The trade route this unit has. */
-    protected TradeRoute tradeRoute = null;
-
-    /** Which stop in a trade route the unit is going to. */
-    protected int currentStop = -1;
-
-    /** To be used only for type == TREASURE_TRAIN */
-    protected int treasureAmount;
-
-    /**
-     * What is being improved (to be used only for PIONEERs - where
-     * they are working.
-     */
-    protected TileImprovement workImprovement;
-
-    /** What type of goods this unit produces in its occupation. */
-    protected GoodsType workType;
-
-    /** What type of goods this unit last earned experience producing. */
-    private GoodsType experienceType;
-
-    protected int experience = 0;
-
-    protected int turnsOfTraining = 0;
-
-    /**
-     * The attrition this unit has accumulated. At the moment, this
-     * equals the number of turns it has spent in the open.
-     */
-    protected int attrition = 0;
-
-    /** The individual name of this unit, not of the unit type. */
-    protected String name = null;
-
-    /**
-     * The amount of goods carried by this unit. This variable is only used by
-     * the clients. A negative value signals that the variable is not in use.
+     * Gets the cost of moving this <code>Unit</code> onto the given
+     * <code>Tile</code>. A call to {@link #getMoveType(Tile)} will return
+     * <code>MOVE_NO_MOVES</code>, if {@link #getMoveCost} returns a move cost
+     * larger than the {@link #getMovesLeft moves left}.
      *
-     * @see #getVisibleGoodsCount()
+     * @param target The <code>Tile</code> this <code>Unit</code> will move
+     *            onto.
+     * @return The cost of moving this unit onto the given <code>Tile</code>.
      */
-    protected int visibleGoodsCount;
-
-    /** The student of this Unit, if it has one. */
-    protected Unit student;
-
-    /** The teacher of this Unit, if it has one. */
-    protected Unit teacher;
-
-    /** The equipment this Unit carries. */
-    protected final TypeCountMap<EquipmentType> equipment
-        = new TypeCountMap<EquipmentType>();
-
-
-    /**
-     * Constructor for ServerUnit.
-     */
-    protected Unit() {
-        // empty constructor
+    public int getMoveCost(Tile target) {
+        return getMoveCost(getTile(), target, getMovesLeft());
     }
 
     /**
-     * Constructor for ServerUnit.
+     * Gets the cost of moving this <code>Unit</code> from the given
+     * <code>Tile</code> onto the given <code>Tile</code>. A call to
+     * {@link #getMoveType(Tile, Tile, int)} will return
+     * <code>MOVE_NO_MOVES</code>, if {@link #getMoveCost} returns a move cost
+     * larger than the {@link #getMovesLeft moves left}.
      *
-     * @param game The <code>Game</code> in which this unit belongs.
+     * @param from The <code>Tile</code> this <code>Unit</code> will move
+     *            from.
+     * @param target The <code>Tile</code> this <code>Unit</code> will move
+     *            onto.
+     * @param ml The amount of moves this Unit has left.
+     * @return The cost of moving this unit onto the given <code>Tile</code>.
      */
-    protected Unit(Game game) {
-        super(game);
-    }
+    public int getMoveCost(Tile from, Tile target, int ml) {
+        // Remember to also change map.findPath(...) if you change anything
+        // here.
 
-    /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param game The <code>Game</code> in which this <code>Unit</code>
-     *            belong.
-     * @param e An XML-element that will be used to initialize this object.
-     */
-    public Unit(Game game, Element e) {
-        super(game, e);
-        readFromXMLElement(e);
-    }
+        // TODO: also pass direction, so that we can check for rivers
+        // more easily
 
-    /**
-     * Initiates a new <code>Unit</code> with the given ID. The object should
-     * later be initialized by calling either
-     * {@link #readFromXML(XMLStreamReader)} or
-     * {@link #readFromXMLElement(Element)}.
-     *
-     * @param game The <code>Game</code> in which this object belong.
-     * @param id The unique identifier for this object.
-     */
-    public Unit(Game game, String id) {
-        super(game, id);
-    }
-
-    /**
-     * Returns a name for this unit, as a location.
-     *
-     * @return A name for this unit, as a location.
-     */
-    public StringTemplate getLocationName() {
-        return StringTemplate.template("onBoard")
-            .addStringTemplate("%unit%", getLabel());
-    }
-
-    /**
-     * Returns the name for this unit, as a location, for a particular player.
-     *
-     * @param player The <code>Player</code> to prepare the name for.
-     * @return A name for this unit, as a location.
-     */
-    public StringTemplate getLocationNameFor(Player player) {
-        return getLocationName();
-    }
-
-    /**
-     * Get the <code>UnitType</code> value.
-     *
-     * @return an <code>UnitType</code> value
-     */
-    public final UnitType getType() {
-        return unitType;
-    }
-
-    /**
-     * Returns true if this unit can carry treasure (like a treasure train)
-     *
-     * @return <code>true</code> if this <code>Unit</code> is capable of
-     *         carrying treasure.
-     */
-    public boolean canCarryTreasure() {
-        return unitType.hasAbility(Ability.CARRY_TREASURE);
-    }
-
-    /**
-     * Returns the current amount of treasure in this unit. Should be type of
-     * TREASURE_TRAIN.
-     *
-     * @return The amount of treasure.
-     */
-    public int getTreasureAmount() {
-        if (canCarryTreasure()) {
-            return treasureAmount;
+        int cost = target.getType().getBasicMoveCost();
+        if (target.isLand()) {
+            TileItemContainer container = target.getTileItemContainer();
+            if (container != null) {
+                cost = container.getMoveCost(from, target, cost);
+            }
         }
-        throw new IllegalStateException("Unit can't carry treasure");
-    }
 
-    /**
-     * The current amount of treasure in this unit. Should be type of
-     * TREASURE_TRAIN.
-     *
-     * @param amt The amount of treasure
-     */
-    public void setTreasureAmount(int amt) {
-        if (canCarryTreasure()) {
-            this.treasureAmount = amt;
-        } else {
-            throw new IllegalStateException("Unit can't carry treasure");
+        if (isBeached(from)) {
+            // Ship on land due to it was in a colony which was abandoned
+            cost = ml;
+        } else if (cost > ml) {
+            // Using +2 in order to make 1/3 and 2/3 move count as
+            // 3/3, only when getMovesLeft > 0
+            if ((ml + 2 >= getInitialMovesLeft() || cost <= ml + 2
+                 || target.getSettlement()!=null) && ml != 0) {
+                cost = ml;
+            }
         }
+        return cost;
     }
 
     /**
-     * Get the <code>Equipment</code> value.
+     * Gets the type of a move made in a specified direction.
      *
-     * @return a <code>List<EquipmentType></code> value
+     * @param direction The <code>Direction</code> of the move.
+     * @return The move type.
      */
-    public final TypeCountMap<EquipmentType> getEquipment() {
-        return equipment;
+    public MoveType getMoveType(Direction direction) {
+        Tile tile = getTile();
+        if (tile == null) return MoveType.MOVE_NO_TILE;
+        Tile target = tile.getNeighbourOrNull(direction);
+        if (target == null) return MoveType.MOVE_ILLEGAL;
+        return getMoveType(target);
     }
 
     /**
-     * Set the <code>Equipment</code> value.
+     * Gets the type of a move that is made when moving from one tile
+     * to another.
      *
-     * @param newEquipment The new Equipment value.
-    public final void setEquipment(final TypeCountMap<EquipmentType> newEquipment) {
-        this.equipment = newEquipment;
-    }
+     * @param target The target <code>Tile</code> of the move.
+     * @return The move type.
      */
-
-    /**
-     * Clears all <code>Equipment</code> held by this unit.
-     */
-    public void clearEquipment() {
-        equipment.clear();
+    public MoveType getMoveType(Tile target) {
+        Tile tile = getTile();
+        if (tile == null) return MoveType.MOVE_NO_TILE;
+        return getMoveType(tile, target, getMovesLeft());
     }
 
     /**
-     * Get the <code>TradeRoute</code> value.
+     * Gets the type of a move that is made when moving from one tile
+     * to another.
      *
-     * @return a <code>TradeRoute</code> value
+     * @param from The origin <code>Tile</code> of the move.
+     * @param target The target <code>Tile</code> of the move.
+     * @param ml The amount of moves this unit has left.
+     * @return The move type.
      */
-    public final TradeRoute getTradeRoute() {
-        return tradeRoute;
-    }
-
-    /**
-     * Set the <code>TradeRoute</code> value.
-     *
-     * @param newTradeRoute The new TradeRoute value.
-     */
-    public final void setTradeRoute(final TradeRoute newTradeRoute) {
-        this.tradeRoute = newTradeRoute;
-    }
-
-    /**
-     * Get the stop the unit is heading for or at.
-     *
-     * @return The target stop.
-     */
-    public Stop getStop() {
-        return (validateCurrentStop() < 0) ? null
-            : getTradeRoute().getStops().get(currentStop);
-    }
-
-    /**
-     * Get the current stop.
-     *
-     * @return The current stop (an index in stops).
-     */
-    public int getCurrentStop() {
-        return currentStop;
-    }
-
-    /**
-     * Set the current stop.
-     *
-     * @param currentStop A new value for the currentStop.
-     */
-    public void setCurrentStop(int currentStop) {
-        this.currentStop = currentStop;
-    }
-
-    /**
-     * Validate and return the current stop.
-     *
-     * @return The current stop (an index in stops).
-     */
-    public int validateCurrentStop() {
-        if (tradeRoute == null) {
-            currentStop = -1;
-        } else {
-            List<Stop> stops = tradeRoute.getStops();
-            if (stops == null || stops.size() == 0) {
-                currentStop = -1;
-            } else {
-                if (currentStop < 0 || currentStop >= stops.size()) {
-                    // The current stop can become out of range if the trade
-                    // route is modified.
-                    currentStop = 0;
+    public MoveType getMoveType(Tile from, Tile target, int ml) {
+        MoveType move = getSimpleMoveType(from, target);
+        if (move.isLegal()) {
+            switch (move) {
+            case ATTACK_UNIT: case ATTACK_SETTLEMENT:
+                // Needs only a single movement point, regardless of
+                // terrain, but suffers penalty.
+                if (ml <= 0) {
+                    move = MoveType.MOVE_NO_MOVES;
+                }
+                break;
+            default:
+                if (ml <= 0
+                    || (from != null && getMoveCost(from, target, ml) > ml)) {
+                    move = MoveType.MOVE_NO_MOVES;
                 }
             }
         }
-        return currentStop;
+        return move;
     }
 
     /**
-     * Checks if the treasure train can be cashed in at it's current
-     * <code>Location</code>.
+     * Gets the type of a move that is made when moving from one tile
+     * to another, without checking if the unit has moves left or
+     * logging errors.
      *
-     * @return <code>true</code> if the treasure train can be cashed in.
-     * @exception IllegalStateException if this unit is not a treasure train.
+     * @param from The origin <code>Tile</code> of the move.
+     * @param target The target <code>Tile</code> of the move.
+     * @return The move type, which will be one of the extended illegal move
+     *         types on failure.
      */
-    public boolean canCashInTreasureTrain() {
-        return canCashInTreasureTrain(getLocation());
+    public MoveType getSimpleMoveType(Tile from, Tile target) {
+        return (isNaval()) ? getNavalMoveType(from, target)
+            : getLandMoveType(from, target);
     }
 
     /**
-     * Checks if the treasure train can be cashed in at the given
-     * <code>Location</code>.
+     * Gets the type of a move that is made when moving from one tile
+     * to another, without checking if the unit has moves left or
+     * logging errors.
      *
-     * @param loc The <code>Location</code>.
-     * @return <code>true</code> if the treasure train can be cashed in.
-     * @exception IllegalStateException if this unit is not a treasure train.
+     * @param target The target <code>Tile</code> of the move.
+     * @return The move type, which will be one of the extended illegal move
+     *         types on failure.
      */
-    public boolean canCashInTreasureTrain(Location loc) {
-        if (!canCarryTreasure()) {
-            throw new IllegalStateException("Can't carry treasure");
-        }
-        if (loc == null) return false;
-
-        if (getOwner().getEurope() == null) {
-            // Any colony will do once independent, as the treasure stays
-            // in the New World.
-            return loc.getColony() != null;
-        }
-        if (loc.getColony() != null) {
-            // Cash in if at a colony which has connectivity to Europe
-            return loc.getColony().isConnectedPort();
-        }
-        // Otherwise, cash in if in Europe.
-        return loc instanceof Europe
-            || (loc instanceof Unit && ((Unit)loc).isInEurope());
+    public MoveType getSimpleMoveType(Tile target) {
+        Tile tile = getTile();
+        if (tile == null) return MoveType.MOVE_NO_TILE;
+        return getSimpleMoveType(tile, target);
     }
 
     /**
-     * Return the fee that would have to be paid to transport this
-     * treasure to Europe.
+     * Gets the type of a move made in a specified direction,
+     * without checking if the unit has moves left or logging errors.
      *
-     * @return an <code>int</code> value
+     * @param direction The direction of the move.
+     * @return The move type.
      */
-    public int getTransportFee() {
-        if (!isInEurope() && getOwner().getEurope() != null) {
-            float fee = (getSpecification().getInteger("model.option.treasureTransportFee")
-                         * getTreasureAmount()) / 100;
-            return (int) getOwner().applyModifier(fee,
-                "model.modifier.treasureTransportFee",
-                unitType, getGame().getTurn());
-        }
-        return 0;
+    public MoveType getSimpleMoveType(Direction direction) {
+        Tile tile = getTile();
+        if (tile == null) return MoveType.MOVE_NO_TILE;
+        Tile target = tile.getNeighbourOrNull(direction);
+        return getSimpleMoveType(tile, target);
     }
 
     /**
-     * Checks if this is a trading <code>Unit</code>, meaning that it
-     * can trade with settlements.
+     * Gets the type of a move that is made when moving a naval unit
+     * from one tile to another.
      *
-     * @return True if this is a trading unit.
+     * @param from The origin <code>Tile<code> of the move.
+     * @param target The target <code>Tile</code> of the move.
+     * @return The move type.
      */
-    public boolean isTradingUnit() {
-        return canCarryGoods() && owner.isEuropean();
-    }
-
-    /**
-     * Checks if this <code>Unit</code> is a `colonist'.  A unit is a
-     * colonist if it is European and can build a new <code>Colony</code>.
-     *
-     * @return <i>true</i> if this unit is a colonist and <i>false</i>
-     *         otherwise.
-     */
-    public boolean isColonist() {
-        return unitType.hasAbility(Ability.FOUND_COLONY)
-            && owner.hasAbility(Ability.FOUNDS_COLONIES);
-    }
-
-    /**
-     * Checks if this is an offensive unit.  That is, one that can
-     * attack other units.
-     *
-     * @return <code>true</code> if this is an offensive unit.
-     */
-    public boolean isOffensiveUnit() {
-        return unitType.isOffensive() || isArmed() || isMounted();
-    }
-
-    /**
-     * Gets the number of turns this unit has to train to educate a student.
-     * This value is only meaningful for units that can be put in a school.
-     *
-     * @return The turns of training needed to teach its current type to a free
-     *         colonist or to promote an indentured servant or a petty criminal.
-     * @see #getTurnsOfTraining
-     */
-    public int getNeededTurnsOfTraining() {
-        // number of turns is 4/6/8 for skill 1/2/3
-        int result = 0;
-        if (student != null) {
-            result = getNeededTurnsOfTraining(unitType, student.unitType);
-            if (getColony() != null) {
-                result -= getColony().getProductionBonus();
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Gets the number of turns this unit has to train to educate a student.
-     * This value is only meaningful for units that can be put in a school.
-     *
-     * @return The turns of training needed to teach its current type to a free
-     *         colonist or to promote an indentured servant or a petty criminal.
-     * @see #getTurnsOfTraining
-     *
-     * @param typeTeacher the unit type of the teacher
-     * @param typeStudent the unit type of the student
-     * @return an <code>int</code> value
-     */
-    public int getNeededTurnsOfTraining(UnitType typeTeacher, UnitType typeStudent) {
-        UnitType teaching = getUnitTypeTeaching(typeTeacher, typeStudent);
-        if (teaching != null) {
-            return typeStudent.getEducationTurns(teaching);
-        } else {
-            throw new IllegalStateException("typeTeacher=" + typeTeacher + " typeStudent=" + typeStudent);
-        }
-    }
-
-    /**
-     * Gets the UnitType which a teacher is teaching to a student.
-     * This value is only meaningful for teachers that can be put in a
-     * school.
-     *
-     * @param typeTeacher the unit type of the teacher
-     * @param typeStudent the unit type of the student
-     * @return an <code>UnitType</code> value
-     * @see #getTurnsOfTraining
-     *
-     */
-    public static UnitType getUnitTypeTeaching(UnitType typeTeacher, UnitType typeStudent) {
-        UnitType skillTaught = typeTeacher.getSkillTaught();
-        if (typeStudent.canBeUpgraded(skillTaught, ChangeType.EDUCATION)) {
-            return skillTaught;
-        } else {
-            return typeStudent.getEducationUnit(0);
-        }
-    }
-
-    /**
-     * Gets the skill level.
-     *
-     * @return The level of skill for this unit. A higher value signals a more
-     *         advanced type of units.
-     */
-    public int getSkillLevel() {
-        return getSkillLevel(unitType);
-    }
-
-    /**
-     * Gets the skill level of the given type of <code>Unit</code>.
-     *
-     * @param unitType The type of <code>Unit</code>.
-     * @return The level of skill for the given unit. A higher value signals a
-     *         more advanced type of units.
-     */
-    public static int getSkillLevel(UnitType unitType) {
-        if (unitType.hasSkill()) {
-            return unitType.getSkill();
+    private MoveType getNavalMoveType(Tile from, Tile target) {
+        if (target == null) {
+            return (getOwner().canMoveToEurope()) ? MoveType.MOVE_HIGH_SEAS
+                : MoveType.MOVE_NO_EUROPE;
+        } else if (isDamaged()) {
+            return MoveType.MOVE_NO_REPAIR;
         }
 
-        return 0;
-    }
-
-    /**
-     * Returns a Comparator that compares the skill levels of given
-     * units.
-     *
-     * @return skill Comparator
-     */
-    public static Comparator<Unit> getSkillLevelComparator() {
-        return skillLevelComp;
-    }
-
-    /**
-     * Gets the number of turns this unit has been training.
-     *
-     * @return The number of turns of training this <code>Unit</code> has
-     *         given.
-     * @see #setTurnsOfTraining
-     * @see #getNeededTurnsOfTraining
-     */
-    public int getTurnsOfTraining() {
-        return turnsOfTraining;
-    }
-
-    /**
-     * Sets the number of turns this unit has been training.
-     *
-     * @param turnsOfTraining The number of turns of training this
-     *            <code>Unit</code> has given.
-     * @see #getNeededTurnsOfTraining
-     */
-    public void setTurnsOfTraining(int turnsOfTraining) {
-        this.turnsOfTraining = turnsOfTraining;
-    }
-
-    /**
-     * Gets the experience of this <code>Unit</code> at its current
-     * experienceType.
-     *
-     * @return The experience of this <code>Unit</code> at its current
-     *         experienceType.
-     * @see #modifyExperience
-     */
-    public int getExperience() {
-        return experience;
-    }
-
-    /**
-     * Sets the experience of this <code>Unit</code> at its current
-     * experienceType.
-     *
-     * @param experience The new experience of this <code>Unit</code>
-     *         at its current experienceType.
-     * @see #modifyExperience
-     */
-    public void setExperience(int experience) {
-        this.experience = Math.min(experience, getType().getMaximumExperience());
-    }
-
-    /**
-     * Modifies the experience of this <code>Unit</code> at its current
-     * experienceType.
-     *
-     * @param value The value by which to modify the experience of this
-     *            <code>Unit</code>.
-     * @see #getExperience
-     */
-    public void modifyExperience(int value) {
-        experience += value;
-    }
-
-    /**
-     * Gets the attrition of this unit.
-     *
-     * @return The attrition of this unit.
-     */
-    public int getAttrition() {
-        return attrition;
-    }
-
-    /**
-     * Sets the attrition of this unit.
-     *
-     * @param attrition The new attrition of this unit.
-     */
-    public void setAttrition(int attrition) {
-        this.attrition = attrition;
-    }
-
-    /**
-     * Does this unit or its owner satisfy the ability set identified
-     * by <code>id</code>.
-     *
-     * @param id The id of the ability to test.
-     * @param fcgot An optional <code>FreeColGameObjectType</code> the
-     *     ability applies to.
-     * @param turn An optional applicable <code>Turn</code>.
-     * @return True if the ability is present.
-     */
-    public boolean hasAbility(String id, FreeColGameObjectType fcgot,
-                              Turn turn) {
-        if (turn == null) turn = getGame().getTurn();
-        Set<Ability> result = new HashSet<Ability>();
-        // UnitType abilities always apply
-        result.addAll(unitType.getAbilitySet(id));
-        // The player's abilities require more qualification.
-        result.addAll(getOwner().getAbilitySet(id, unitType, turn));
-        // EquipmentType abilities always apply.
-        for (EquipmentType equipmentType : equipment.keySet()) {
-            result.addAll(equipmentType.getAbilitySet(id));
-            // Player abilities may also apply to equipment (e.g. missionary).
-            result.addAll(getOwner().getAbilitySet(id, equipmentType, turn));
-        }
-        // Location abilities may apply.
-        // TODO: extend this to all locations? May simplify
-        // code. Units are also Locations, however, which complicates
-        // the issue. We do not want Units aboard other Units to share
-        // the abilities of the carriers.
-        if (getSettlement() != null) {
-            result.addAll(getSettlement().getAbilitySet(id, unitType, turn));
-        } else if (isInEurope()) {
-            result.addAll(getOwner().getEurope().getAbilitySet(id, unitType, turn));
-        }
-        return FeatureContainer.hasAbility(result);
-    }
-
-    /**
-     * Get the modifiers that apply to this Unit.
-     *
-     * @param id The id of the modifier to test.
-     * @param fcgot An optional <code>FreeColGameObjectType</code> the
-     *     modifier applies to.
-     * @param turn An optional applicable <code>Turn</code>.
-     * @return A set of modifiers.
-     */
-    public Set<Modifier> getModifierSet(String id, FreeColGameObjectType fcgot,
-                                        Turn turn) {
-        if (turn == null) turn = getGame().getTurn();
-        Set<Modifier> result = new HashSet<Modifier>();
-        // UnitType modifiers always apply
-        result.addAll(unitType.getModifierSet(id));
-        // the player's modifiers may not apply
-        result.addAll(getOwner().getModifierSet(id, unitType, turn));
-        // EquipmentType modifiers always apply
-        for (EquipmentType equipmentType : equipment.keySet()) {
-            result.addAll(equipmentType.getModifierSet(id));
-            // player modifiers may also apply to equipment (unused)
-            result.addAll(getOwner().getModifierSet(id, equipmentType, turn));
-        }
-        return result;
-    }
-
-    /**
-     * Get a modifier that applies to the given Ownable. This is used
-     * for the offenceAgainst and defenceAgainst modifiers.
-     *
-     * @param id a <code>String</code> value
-     * @param ownable a <code>Ownable</code> value
-     * @return a <code>Modifier</code> value
-     */
-    public Set<Modifier> getModifierSet(String id, Ownable ownable) {
-        Set<Modifier> result = new HashSet<Modifier>();
-        Turn turn = getGame().getTurn();
-        NationType nationType = ownable.getOwner().getNationType();
-        result.addAll(unitType.getModifierSet(id, nationType, turn));
-        result.addAll(getOwner().getModifierSet(id, nationType, turn));
-        for (EquipmentType equipmentType : equipment.keySet()) {
-            result.addAll(equipmentType.getModifierSet(id, nationType, turn));
-        }
-        return result;
-    }
-
-    /**
-     * Adds a feature to the Unit. This method always throws an
-     * <code>UnsupportedOperationException</code>, since features can
-     * not be added to Units directly.
-     *
-     * @param feature a <code>Feature</code> value
-     */
-    public void addFeature(Feature feature) {
-        throw new UnsupportedOperationException("Can not add Feature to Unit directly!");
-    }
-
-    /**
-     * Returns true if this unit can be a student.
-     *
-     * @param teacher the teacher which is trying to teach it
-     * @return a <code>boolean</code> value
-     */
-    public boolean canBeStudent(Unit teacher) {
-        return teacher != this && canBeStudent(unitType, teacher.unitType);
-    }
-
-    /**
-     * Returns true if this type of unit can be a student.
-     *
-     * @param typeStudent the unit type of the student
-     * @param typeTeacher the unit type of the teacher which is trying to teach it
-     * @return a <code>boolean</code> value
-     */
-    public boolean canBeStudent(UnitType typeStudent, UnitType typeTeacher) {
-        return getUnitTypeTeaching(typeTeacher, typeStudent) != null;
-    }
-
-    /**
-     * Get the <code>Student</code> value.
-     *
-     * @return an <code>Unit</code> value
-     */
-    public final Unit getStudent() {
-        return student;
-    }
-
-    /**
-     * Set the <code>Student</code> value.
-     *
-     * @param newStudent The new Student value.
-     */
-    public final void setStudent(final Unit newStudent) {
-        Unit oldStudent = this.student;
-        if(oldStudent == newStudent){
-            return;
-        }
-
-        if (newStudent == null) {
-            this.student = null;
-            if(oldStudent != null && oldStudent.getTeacher() == this){
-                oldStudent.setTeacher(null);
-            }
-        } else if (newStudent.getColony() != null &&
-                   newStudent.getColony() == getColony() &&
-                   newStudent.canBeStudent(this)) {
-            if(oldStudent != null && oldStudent.getTeacher() == this){
-                oldStudent.setTeacher(null);
-            }
-            this.student = newStudent;
-            newStudent.setTeacher(this);
-        } else {
-            throw new IllegalStateException("unit can not be student: " + newStudent);
-        }
-    }
-
-    /**
-     * Get the <code>Teacher</code> value.
-     *
-     * @return an <code>Unit</code> value
-     */
-    public final Unit getTeacher() {
-        return teacher;
-    }
-
-    /**
-     * Set the <code>Teacher</code> value.
-     *
-     * @param newTeacher The new Teacher value.
-     */
-    public final void setTeacher(final Unit newTeacher) {
-        Unit oldTeacher = this.teacher;
-        if(newTeacher == oldTeacher){
-            return;
-        }
-
-        if (newTeacher == null) {
-            this.teacher = null;
-            if(oldTeacher != null && oldTeacher.getStudent() == this){
-                oldTeacher.setStudent(null);
-            }
-        } else {
-            UnitType skillTaught = newTeacher.getType().getSkillTaught();
-            if (newTeacher.getColony() != null &&
-                newTeacher.getColony() == getColony() &&
-                getColony().canTrain(skillTaught)) {
-                if(oldTeacher != null && oldTeacher.getStudent() == this){
-                    oldTeacher.setStudent(null);
-                }
-                this.teacher = newTeacher;
-                this.teacher.setStudent(this);
+        if (target.isLand()) {
+            Settlement settlement = target.getSettlement();
+            if (settlement == null) {
+                return MoveType.MOVE_NO_ACCESS_LAND;
+            } else if (settlement.getOwner() == getOwner()) {
+                return MoveType.MOVE;
+            } else if (isTradingUnit()) {
+                return getTradeMoveType(settlement);
             } else {
-                throw new IllegalStateException("unit can not be teacher: " + newTeacher);
+                return MoveType.MOVE_NO_ACCESS_SETTLEMENT;
+            }
+        } else { // target at sea
+            Unit defender = target.getFirstUnit();
+            if (defender != null && !getOwner().owns(defender)) {
+                return (isOffensiveUnit())
+                    ? MoveType.ATTACK_UNIT
+                    : MoveType.MOVE_NO_ATTACK_CIVILIAN;
+            } else {
+                return (target.isDirectlyHighSeasConnected())
+                    ? MoveType.MOVE_HIGH_SEAS
+                    : MoveType.MOVE;
             }
         }
     }
 
     /**
-     * Gets a message to display if moving a unit would cause it to
-     * abandon its participation in education (if any).
+     * Gets the type of a move that is made when moving a land unit to
+     * from one tile to another.
      *
-     * @param leavingColony Should we check for student movements.
-     * @return A message to display, or null if education is not an issue.
+     * @param from The origin <code>Tile</code> of the move.
+     * @param target The target <code>Tile</code> of the move.
+     * @return The move type.
      */
-    public StringTemplate getAbandonEducationMessage(boolean leavingColony) {
-        if (!(getLocation() instanceof WorkLocation)) return null;
-        boolean teacher = getStudent() != null;
-        // if leaving the colony, the student loses learning spot, so
-        // check with player
-        boolean student = leavingColony && getTeacher() != null;
-        if (!teacher && !student) return null;
+    private MoveType getLandMoveType(Tile from, Tile target) {
+        if (target == null) return MoveType.MOVE_ILLEGAL;
 
-        Building school = (Building)((teacher) ? getLocation()
-            : getTeacher().getLocation());
- 
-        return (leavingColony)
-            ? StringTemplate.template("abandonEducation.text")
-                .addStringTemplate("%unit%", Messages.getLabel(this))
-                .addName("%colony%", getColony().getName())
-                .add("%building%", school.getNameKey())
-                .addName("%action%", (teacher)
-                    ? Messages.message("abandonEducation.action.teaching")
-                    : Messages.message("abandonEducation.action.studying"))
-            : (teacher)
-            ? StringTemplate.template("abandonTeaching.text")
-                .addStringTemplate("%unit%", Messages.getLabel(this))
-                .add("%building%", school.getNameKey())
-            : null;
-    }
+        Player owner = getOwner();
+        Unit defender = target.getFirstUnit();
 
-    /**
-     * Gets the <code>Location</code> this unit is working in.
-     *
-     * @return a <code>WorkLocation</code> value
-     */
-    public WorkLocation getWorkLocation() {
-        if (getLocation() instanceof WorkLocation) {
-            return (WorkLocation) getLocation();
-        }
-        return null;
-    }
-
-    /**
-     * Gets the <code>Building</code> this unit is working in.
-     */
-    public Building getWorkBuilding() {
-        if (getLocation() instanceof Building) {
-            return ((Building) getLocation());
-        }
-        return null;
-    }
-
-    /**
-     * Gets the <code>ColonyTile</code> this unit is working in.
-     */
-    public ColonyTile getWorkTile() {
-        if (getLocation() instanceof ColonyTile) {
-            return ((ColonyTile) getLocation());
-        }
-        return null;
-    }
-
-    /**
-     * Gets the type of goods this unit has accrued experience producing.
-     *
-     * @return The type of goods this unit would produce.
-     */
-    public GoodsType getExperienceType() {
-        return experienceType;
-    }
-
-    /**
-     * Gets the type of goods this unit is producing in its current occupation.
-     *
-     * @return The type of goods this unit is producing.
-     */
-    public GoodsType getWorkType() {
-        return workType;
-    }
-
-    /**
-     * Sets the type of goods this unit is producing in its current occupation.
-     *
-     * @param type The type of goods to attempt to produce.
-     */
-    public void setWorkType(GoodsType type) {
-        workType = type;
-        if (type != null) {
-            experienceType = type;
-        }
-        ColonyTile workTile = getWorkTile();
-        if (workTile != null) {
-            workTile.setProductionType(workTile.getBestProductionType(type));
+        if (target.isLand()) {
+            Settlement settlement = target.getSettlement();
+            if (settlement == null) {
+                if (defender != null && owner != defender.getOwner()) {
+                    if (defender.isNaval()) {
+                        return MoveType.ATTACK_UNIT;
+                    } else if (!isOffensiveUnit()) {
+                        return MoveType.MOVE_NO_ATTACK_CIVILIAN;
+                    } else {
+                        return (allowMoveFrom(from))
+                            ? MoveType.ATTACK_UNIT
+                            : MoveType.MOVE_NO_ATTACK_MARINE;
+                    }
+                } else if (target.hasLostCityRumour() && owner.isEuropean()) {
+                    // Natives do not explore rumours, see:
+                    // server/control/InGameInputHandler.java:move()
+                    return MoveType.EXPLORE_LOST_CITY_RUMOUR;
+                } else {
+                    return MoveType.MOVE;
+                }
+            } else if (owner == settlement.getOwner()) {
+                return MoveType.MOVE;
+            } else if (isTradingUnit()) {
+                return getTradeMoveType(settlement);
+            } else if (isColonist()) {
+                switch (getRole()) {
+                case DEFAULT: case PIONEER:
+                    return getLearnMoveType(from, settlement);
+                case MISSIONARY:
+                    return getMissionaryMoveType(from, settlement);
+                case SCOUT:
+                    return getScoutMoveType(from, settlement);
+                case SOLDIER: case DRAGOON:
+                    return (allowMoveFrom(from))
+                        ? MoveType.ATTACK_SETTLEMENT
+                        : MoveType.MOVE_NO_ATTACK_MARINE;
+                }
+                return MoveType.MOVE_ILLEGAL; // should not happen
+            } else if (isOffensiveUnit()) {
+                return (allowMoveFrom(from))
+                    ? MoveType.ATTACK_SETTLEMENT
+                    : MoveType.MOVE_NO_ATTACK_MARINE;
+            } else {
+                return MoveType.MOVE_NO_ACCESS_SETTLEMENT;
+            }
+        } else { // moving to sea, check for embarkation
+            if (defender == null || !getOwner().owns(defender)) {
+                return MoveType.MOVE_NO_ACCESS_EMBARK;
+            }
+            for (Unit u : target.getUnitList()) {
+                if (u.canAdd(this)) return MoveType.EMBARK;
+            }
+            return MoveType.MOVE_NO_ACCESS_FULL;
         }
     }
 
     /**
-     * Gets the TileImprovement that this pioneer is contributing to.
+     * Get the <code>MoveType</code> when moving a trading unit to a
+     * settlement.
      *
-     * @return The <code>TileImprovement</code> the pioneer is working on.
+     * @param settlement The <code>Settlement</code> to move to.
+     * @return The appropriate <code>MoveType</code>.
      */
-    public TileImprovement getWorkImprovement() {
-        return workImprovement;
+    private MoveType getTradeMoveType(Settlement settlement) {
+        if (settlement instanceof Colony) {
+            return (getOwner().atWarWith(settlement.getOwner()))
+                ? MoveType.MOVE_NO_ACCESS_WAR
+                : (!hasAbility("model.ability.tradeWithForeignColonies"))
+                ? MoveType.MOVE_NO_ACCESS_TRADE
+                : MoveType.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS;
+        } else if (settlement instanceof IndianSettlement) {
+            // Do not block for war, bringing gifts is allowed
+            return (!allowContact(settlement))
+                ? MoveType.MOVE_NO_ACCESS_CONTACT
+                : (hasGoodsCargo() || getSpecification()
+                    .getBoolean(GameOptions.EMPTY_TRADERS))
+                ? MoveType.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS
+                : MoveType.MOVE_NO_ACCESS_GOODS;
+        } else {
+            return MoveType.MOVE_ILLEGAL; // should not happen
+        }
     }
 
     /**
-     * Sets the TileImprovement that this pioneer is contributing to.
+     * Get the <code>MoveType</code> when moving a colonist to a settlement.
      *
-     * @param imp The new <code>TileImprovement</code> the pioneer is to
-     *     work on.
+     * @param from The <code>Tile</code> to move from.
+     * @param settlement The <code>Settlement</code> to move to.
+     * @return The appropriate <code>MoveType</code>.
      */
-    public void setWorkImprovement(TileImprovement imp) {
-        workImprovement = imp;
+    private MoveType getLearnMoveType(Tile from, Settlement settlement) {
+        if (settlement instanceof Colony) {
+            return MoveType.MOVE_NO_ACCESS_SETTLEMENT;
+        } else if (settlement instanceof IndianSettlement) {
+            UnitType scoutSkill = getSpecification()
+                .getUnitType("model.unit.seasonedScout");
+            return (!allowContact(settlement))
+                ? MoveType.MOVE_NO_ACCESS_CONTACT
+                : (!allowMoveFrom(from))
+                ? MoveType.MOVE_NO_ACCESS_WATER
+                : (!getType().canBeUpgraded(null, ChangeType.NATIVES))
+                ? MoveType.MOVE_NO_ACCESS_SKILL
+                : MoveType.ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST;
+        } else {
+            return MoveType.MOVE_ILLEGAL; // should not happen
+        }
     }
 
     /**
-     * Returns the destination of this unit.
+     * Get the <code>MoveType</code> when moving a missionary to a settlement.
      *
-     * @return The destination of this unit.
+     * @param from The <code>Tile</code> to move from.
+     * @param settlement The <code>Settlement</code> to move to.
+     * @return The appropriate <code>MoveType</code>.
      */
-    public Location getDestination() {
-        return destination;
+    private MoveType getMissionaryMoveType(Tile from, Settlement settlement) {
+        if (settlement instanceof Colony) {
+            return MoveType.MOVE_NO_ACCESS_SETTLEMENT;
+        } else if (settlement instanceof IndianSettlement) {
+            return (!allowContact(settlement))
+                ? MoveType.MOVE_NO_ACCESS_CONTACT
+                : (!allowMoveFrom(from))
+                ? MoveType.MOVE_NO_ACCESS_WATER
+                : MoveType.ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY;
+        } else {
+            return MoveType.MOVE_ILLEGAL; // should not happen
+        }
     }
 
     /**
-     * Sets the destination of this unit.
+     * Get the <code>MoveType</code> when moving a scout to a settlement.
      *
-     * @param newDestination The new destination of this unit.
+     * @param from The <code>Tile</code> to move from.
+     * @param settlement The <code>Settlement</code> to move to.
+     * @return The appropriate <code>MoveType</code>.
      */
-    public void setDestination(Location newDestination) {
-        this.destination = newDestination;
+    private MoveType getScoutMoveType(Tile from, Settlement settlement) {
+        if (settlement instanceof Colony) {
+            // No allowMoveFrom check for Colonies
+            return MoveType.ENTER_FOREIGN_COLONY_WITH_SCOUT;
+        } else if (settlement instanceof IndianSettlement) {
+            return (!allowMoveFrom(from))
+                ? MoveType.MOVE_NO_ACCESS_WATER
+                : MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT;
+        } else {
+            return MoveType.MOVE_ILLEGAL; // should not happen
+        }
     }
+
+    /**
+     * Is this unit allowed to move from a source tile?
+     * Implements the restrictions on moving from water.
+     *
+     * @param from The <code>Tile</code> to consider.
+     * @return True if the move is allowed.
+     */
+    private boolean allowMoveFrom(Tile from) {
+        return from.isLand()
+            || (!getOwner().isREF()
+                && getSpecification().getBoolean(GameOptions.AMPHIBIOUS_MOVES));
+    }
+
+    /**
+     * Is this unit allowed to contact a settlement?
+     *
+     * @param settlement The <code>Settlement</code> to consider.
+     * @return True if the contact is allowed.
+     */
+    private boolean allowContact(Settlement settlement) {
+        return getOwner().hasContacted(settlement.getOwner());
+    }
+
+    /**
+     * Does a basic check whether a unit can ever expect to move to a tile.
+     *
+     * @param tile The code <code>Tile</code> to check.
+     * @return True if some sort of legal move to the tile exists, including
+     *     special cases where there is an interaction but the unit does not
+     *     actually move, such as trade.
+     */
+    public boolean isTileAccessible(Tile tile) {
+        return (isNaval()) ? !tile.isLand() || (tile.getSettlement() != null
+            && getOwner() == tile.getSettlement().getOwner())
+            : tile.isLand();
+    }
+
+    /**
+     * Gets the amount of moves this unit has at the beginning of each turn.
+     *
+     * @return The amount of moves this unit has at the beginning of
+     *     each turn.
+     */
+    public int getInitialMovesLeft() {
+        return (int)FeatureContainer.applyModifierSet(unitType.getMovement(),
+            getGame().getTurn(),
+            getModifierSet("model.modifier.movementBonus"));
+    }
+
+    /**
+     * Make a label showing the unit moves left.
+     *
+     * @return A movement label.
+     */
+    public String getMovesAsString() {
+        StringBuilder sb = new StringBuilder(16);
+        int quotient = getMovesLeft() / 3;
+        int remainder = getMovesLeft() % 3;
+        if (remainder == 0 || quotient > 0) {
+            sb.append(quotient);
+        }
+        if (remainder > 0) {
+            if (sb.length() > 0) sb.append(" ");
+            sb.append("(").append(remainder).append("/3) ");
+        }
+
+        sb.append("/").append(getInitialMovesLeft() / 3);
+        return sb.toString();
+    }
+
+    /**
+     * Gets the number of turns this unit will need to sail to/from Europe.
+     *
+     * @return The number of turns to sail to/from Europe.
+     */
+    public int getSailTurns() {
+        float base = getSpecification().getInteger("model.option.turnsToSail");
+        return (int)getOwner().applyModifier(base,
+                                             "model.modifier.sailHighSeas",
+                                             unitType, getGame().getTurn());
+    }
+
+    /**
+     * Checks if this <code>Unit</code> can be moved to the high seas
+     * from its current location.
+     *
+     * @return True if this unit can move immediately to the high seas.
+     */
+    public boolean canMoveToHighSeas() {
+        if (isInEurope() || isAtSea()) return true;
+        if (!getOwner().canMoveToEurope()
+            || !getType().canMoveToHighSeas()) return false;
+        return getTile().isDirectlyHighSeasConnected();
+    }
+
+    /**
+     * Does this unit have a valid move to the high seas this turn.
+     *
+     * @return True if the unit can either move immediately to the high
+     *      seas or can make a move to a neighbouring high seas tile.
+     */
+    public boolean hasHighSeasMove() {
+        if (canMoveToHighSeas()) return true;
+        Tile tile = getTile();
+        if (tile != null && getMovesLeft() > 0) {
+            for (Tile t : tile.getSurroundingTiles(1)) {
+                if (t.isDirectlyHighSeasConnected()
+                    && getMoveType(t).isLegal()) return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Check if this unit can build a colony.  Does not consider whether
+     * the tile where the unit is located is suitable,
+     * @see Player#canClaimToFoundSettlement(Tile)
+     *
+     * @return <code>true</code> if this unit can build a colony.
+     */
+    public boolean canBuildColony() {
+        return unitType.canBuildColony() && getMovesLeft() > 0
+            && getTile() != null;
+    }
+
+    /**
+     * Is this unit at a specified location?
+     *
+     * @param loc The <code>Location</code> to test.
+     * @return True if the locations are the same, or on the same tile.
+     */
+    public boolean isAtLocation(Location loc) {
+        Location ourLoc = getLocation();
+        if (ourLoc instanceof Unit) ourLoc = ((Unit)ourLoc).getLocation();
+        return Map.isSameLocation(ourLoc, loc);
+    }
+
+    /**
+     * Gets the best (closest) entry location for this unit to reach a
+     * given tile.
+     *
+     * @param tile The target <code>Tile</code>.
+     * @return The best entry location tile to arrive on the map at, or null
+     *     if none found.
+     */
+    public Tile getBestEntryTile(Tile tile) {
+        return getGame().getMap().getBestEntryTile(this, tile, null, null);
+    }
+
+    /**
+     * Resolves a destination for a unit on the high seas.
+     * That is, the location where the unit will appear when it leaves
+     * the high seas, which will either be Europe or a tile.
+     *
+     * @return The location the unit should appear next after leaving
+     *      the high seas.
+     */
+    public Location resolveDestination() {
+        if (!isAtSea()) throw new IllegalArgumentException("Not at sea.");
+        Stop stop = getStop();
+        Location dst = (TradeRoute.isStopValid(this, stop)) ? stop.getLocation()
+            : getDestination();
+        Tile best;
+        return (dst == null) ? getFullEntryLocation()
+            : (dst instanceof Europe) ? dst
+            : (dst.getTile() != null
+                && (best = getBestEntryTile(dst.getTile())) != null) ? best
+            : getFullEntryLocation();
+    }
+
+    /**
+     * Set movesLeft to 0 if has some spent moves and it's in a colony
+     *
+     * @see #add(Locatable)
+     * @see #remove(Locatable)
+     */
+    private void spendAllMoves() {
+        if (getColony() != null && getMovesLeft() < getInitialMovesLeft()) {
+            setMovesLeft(0);
+        }
+    }
+
+    /**
+     * Is this unit a suitable `next active unit', that is, the unit
+     * needs to be currently movable by the player.
+     *
+     * @return True if this unit could still be moved by the player.
+     */
+    public boolean couldMove() {
+        return !isDisposed()
+            && getState() == UnitState.ACTIVE
+            && getMovesLeft() > 0
+            && destination == null // Can not reach next tile
+            && tradeRoute == null
+            && !isDamaged()
+            && !isAtSea()
+            && !isOnCarrier()
+            // this should never happen anyway, since these units
+            // should have state IN_COLONY, but better safe than sorry
+            && !(location instanceof WorkLocation);
+    }
+
+
+    // Map searching support routines
 
     /**
      * Gets a suitable tile to start path searches from for a unit.
@@ -1469,429 +2823,6 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Does a basic check whether a unit can ever expect to move to a tile.
-     *
-     * @param tile The code <code>Tile</code> to check.
-     * @return True if some sort of legal move to the tile exists, including
-     *     special cases where there is an interaction but the unit does not
-     *     actually move, such as trade.
-     */
-    public boolean isTileAccessible(Tile tile) {
-        return (isNaval()) ? !tile.isLand() || (tile.getSettlement() != null
-            && getOwner() == tile.getSettlement().getOwner())
-            : tile.isLand();
-    }
-
-    /**
-     * Gets the cost of moving this <code>Unit</code> onto the given
-     * <code>Tile</code>. A call to {@link #getMoveType(Tile)} will return
-     * <code>MOVE_NO_MOVES</code>, if {@link #getMoveCost} returns a move cost
-     * larger than the {@link #getMovesLeft moves left}.
-     *
-     * @param target The <code>Tile</code> this <code>Unit</code> will move
-     *            onto.
-     * @return The cost of moving this unit onto the given <code>Tile</code>.
-     */
-    public int getMoveCost(Tile target) {
-        return getMoveCost(getTile(), target, getMovesLeft());
-    }
-
-    /**
-     * Gets the cost of moving this <code>Unit</code> from the given
-     * <code>Tile</code> onto the given <code>Tile</code>. A call to
-     * {@link #getMoveType(Tile, Tile, int)} will return
-     * <code>MOVE_NO_MOVES</code>, if {@link #getMoveCost} returns a move cost
-     * larger than the {@link #getMovesLeft moves left}.
-     *
-     * @param from The <code>Tile</code> this <code>Unit</code> will move
-     *            from.
-     * @param target The <code>Tile</code> this <code>Unit</code> will move
-     *            onto.
-     * @param ml The amount of moves this Unit has left.
-     * @return The cost of moving this unit onto the given <code>Tile</code>.
-     */
-    public int getMoveCost(Tile from, Tile target, int ml) {
-        // Remember to also change map.findPath(...) if you change anything
-        // here.
-
-        // TODO: also pass direction, so that we can check for rivers
-        // more easily
-
-        int cost = target.getType().getBasicMoveCost();
-        if (target.isLand()) {
-            TileItemContainer container = target.getTileItemContainer();
-            if (container != null) {
-                cost = container.getMoveCost(from, target, cost);
-            }
-        }
-
-        if (isBeached(from)) {
-            // Ship on land due to it was in a colony which was abandoned
-            cost = ml;
-        } else if (cost > ml) {
-            // Using +2 in order to make 1/3 and 2/3 move count as
-            // 3/3, only when getMovesLeft > 0
-            if ((ml + 2 >= getInitialMovesLeft() || cost <= ml + 2
-                 || target.getSettlement()!=null) && ml != 0) {
-                cost = ml;
-            }
-        }
-        return cost;
-    }
-
-    /**
-     * Gets the type of a move made in a specified direction.
-     *
-     * @param direction The <code>Direction</code> of the move.
-     * @return The move type.
-     */
-    public MoveType getMoveType(Direction direction) {
-        Tile tile = getTile();
-        if (tile == null) return MoveType.MOVE_NO_TILE;
-        Tile target = tile.getNeighbourOrNull(direction);
-        if (target == null) return MoveType.MOVE_ILLEGAL;
-        return getMoveType(target);
-    }
-
-    /**
-     * Gets the type of a move that is made when moving from one tile
-     * to another.
-     *
-     * @param target The target <code>Tile</code> of the move.
-     * @return The move type.
-     */
-    public MoveType getMoveType(Tile target) {
-        Tile tile = getTile();
-        if (tile == null) return MoveType.MOVE_NO_TILE;
-        return getMoveType(tile, target, getMovesLeft());
-    }
-
-    /**
-     * Gets the type of a move that is made when moving from one tile
-     * to another.
-     *
-     * @param from The origin <code>Tile</code> of the move.
-     * @param target The target <code>Tile</code> of the move.
-     * @param ml The amount of moves this unit has left.
-     * @return The move type.
-     */
-    public MoveType getMoveType(Tile from, Tile target, int ml) {
-        MoveType move = getSimpleMoveType(from, target);
-        if (move.isLegal()) {
-            switch (move) {
-            case ATTACK_UNIT: case ATTACK_SETTLEMENT:
-                // Needs only a single movement point, regardless of
-                // terrain, but suffers penalty.
-                if (ml <= 0) {
-                    move = MoveType.MOVE_NO_MOVES;
-                }
-                break;
-            default:
-                if (ml <= 0
-                    || (from != null && getMoveCost(from, target, ml) > ml)) {
-                    move = MoveType.MOVE_NO_MOVES;
-                }
-            }
-        }
-        return move;
-    }
-
-    /**
-     * Gets the type of a move that is made when moving from one tile
-     * to another, without checking if the unit has moves left or
-     * logging errors.
-     *
-     * @param from The origin <code>Tile</code> of the move.
-     * @param target The target <code>Tile</code> of the move.
-     * @return The move type, which will be one of the extended illegal move
-     *         types on failure.
-     */
-    public MoveType getSimpleMoveType(Tile from, Tile target) {
-        return (isNaval()) ? getNavalMoveType(from, target)
-            : getLandMoveType(from, target);
-    }
-
-    /**
-     * Gets the type of a move that is made when moving from one tile
-     * to another, without checking if the unit has moves left or
-     * logging errors.
-     *
-     * @param target The target <code>Tile</code> of the move.
-     * @return The move type, which will be one of the extended illegal move
-     *         types on failure.
-     */
-    public MoveType getSimpleMoveType(Tile target) {
-        Tile tile = getTile();
-        if (tile == null) return MoveType.MOVE_NO_TILE;
-        return getSimpleMoveType(tile, target);
-    }
-
-    /**
-     * Gets the type of a move made in a specified direction,
-     * without checking if the unit has moves left or logging errors.
-     *
-     * @param direction The direction of the move.
-     * @return The move type.
-     */
-    public MoveType getSimpleMoveType(Direction direction) {
-        Tile tile = getTile();
-        if (tile == null) return MoveType.MOVE_NO_TILE;
-        Tile target = tile.getNeighbourOrNull(direction);
-        return getSimpleMoveType(tile, target);
-    }
-
-    /**
-     * Gets the type of a move that is made when moving a naval unit
-     * from one tile to another.
-     *
-     * @param from The origin <code>Tile<code> of the move.
-     * @param target The target <code>Tile</code> of the move.
-     * @return The move type.
-     */
-    private MoveType getNavalMoveType(Tile from, Tile target) {
-        if (target == null) {
-            return (getOwner().canMoveToEurope()) ? MoveType.MOVE_HIGH_SEAS
-                : MoveType.MOVE_NO_EUROPE;
-        } else if (isUnderRepair()) {
-            return MoveType.MOVE_NO_REPAIR;
-        }
-
-        if (target.isLand()) {
-            Settlement settlement = target.getSettlement();
-            if (settlement == null) {
-                return MoveType.MOVE_NO_ACCESS_LAND;
-            } else if (settlement.getOwner() == getOwner()) {
-                return MoveType.MOVE;
-            } else if (isTradingUnit()) {
-                return getTradeMoveType(settlement);
-            } else {
-                return MoveType.MOVE_NO_ACCESS_SETTLEMENT;
-            }
-        } else { // target at sea
-            Unit defender = target.getFirstUnit();
-            if (defender != null && !getOwner().owns(defender)) {
-                return (isOffensiveUnit())
-                    ? MoveType.ATTACK_UNIT
-                    : MoveType.MOVE_NO_ATTACK_CIVILIAN;
-            } else {
-                return (target.isDirectlyHighSeasConnected())
-                    ? MoveType.MOVE_HIGH_SEAS
-                    : MoveType.MOVE;
-            }
-        }
-    }
-
-    /**
-     * Gets the type of a move that is made when moving a land unit to
-     * from one tile to another.
-     *
-     * @param from The origin <code>Tile</code> of the move.
-     * @param target The target <code>Tile</code> of the move.
-     * @return The move type.
-     */
-    private MoveType getLandMoveType(Tile from, Tile target) {
-        if (target == null) return MoveType.MOVE_ILLEGAL;
-
-        Player owner = getOwner();
-        Unit defender = target.getFirstUnit();
-
-        if (target.isLand()) {
-            Settlement settlement = target.getSettlement();
-            if (settlement == null) {
-                if (defender != null && owner != defender.getOwner()) {
-                    if (defender.isNaval()) {
-                        return MoveType.ATTACK_UNIT;
-                    } else if (!isOffensiveUnit()) {
-                        return MoveType.MOVE_NO_ATTACK_CIVILIAN;
-                    } else {
-                        return (allowMoveFrom(from))
-                            ? MoveType.ATTACK_UNIT
-                            : MoveType.MOVE_NO_ATTACK_MARINE;
-                    }
-                } else if (target.hasLostCityRumour() && owner.isEuropean()) {
-                    // Natives do not explore rumours, see:
-                    // server/control/InGameInputHandler.java:move()
-                    return MoveType.EXPLORE_LOST_CITY_RUMOUR;
-                } else {
-                    return MoveType.MOVE;
-                }
-            } else if (owner == settlement.getOwner()) {
-                return MoveType.MOVE;
-            } else if (isTradingUnit()) {
-                return getTradeMoveType(settlement);
-            } else if (isColonist()) {
-                switch (getRole()) {
-                case DEFAULT: case PIONEER:
-                    return getLearnMoveType(from, settlement);
-                case MISSIONARY:
-                    return getMissionaryMoveType(from, settlement);
-                case SCOUT:
-                    return getScoutMoveType(from, settlement);
-                case SOLDIER: case DRAGOON:
-                    return (allowMoveFrom(from))
-                        ? MoveType.ATTACK_SETTLEMENT
-                        : MoveType.MOVE_NO_ATTACK_MARINE;
-                }
-                return MoveType.MOVE_ILLEGAL; // should not happen
-            } else if (isOffensiveUnit()) {
-                return (allowMoveFrom(from))
-                    ? MoveType.ATTACK_SETTLEMENT
-                    : MoveType.MOVE_NO_ATTACK_MARINE;
-            } else {
-                return MoveType.MOVE_NO_ACCESS_SETTLEMENT;
-            }
-        } else { // moving to sea, check for embarkation
-            if (defender == null || !getOwner().owns(defender)) {
-                return MoveType.MOVE_NO_ACCESS_EMBARK;
-            }
-            for (Unit u : target.getUnitList()) {
-                if (u.canAdd(this)) return MoveType.EMBARK;
-            }
-            return MoveType.MOVE_NO_ACCESS_FULL;
-        }
-    }
-
-    /**
-     * Get the <code>MoveType</code> when moving a trading unit to a
-     * settlement.
-     *
-     * @param settlement The <code>Settlement</code> to move to.
-     * @return The appropriate <code>MoveType</code>.
-     */
-    private MoveType getTradeMoveType(Settlement settlement) {
-        if (settlement instanceof Colony) {
-            return (getOwner().atWarWith(settlement.getOwner()))
-                ? MoveType.MOVE_NO_ACCESS_WAR
-                : (!hasAbility("model.ability.tradeWithForeignColonies"))
-                ? MoveType.MOVE_NO_ACCESS_TRADE
-                : MoveType.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS;
-        } else if (settlement instanceof IndianSettlement) {
-            // Do not block for war, bringing gifts is allowed
-            return (!allowContact(settlement))
-                ? MoveType.MOVE_NO_ACCESS_CONTACT
-                : (hasGoodsCargo() || getSpecification()
-                    .getBoolean(GameOptions.EMPTY_TRADERS))
-                ? MoveType.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS
-                : MoveType.MOVE_NO_ACCESS_GOODS;
-        } else {
-            return MoveType.MOVE_ILLEGAL; // should not happen
-        }
-    }
-
-    /**
-     * Get the <code>MoveType</code> when moving a colonist to a settlement.
-     *
-     * @param from The <code>Tile</code> to move from.
-     * @param settlement The <code>Settlement</code> to move to.
-     * @return The appropriate <code>MoveType</code>.
-     */
-    private MoveType getLearnMoveType(Tile from, Settlement settlement) {
-        if (settlement instanceof Colony) {
-            return MoveType.MOVE_NO_ACCESS_SETTLEMENT;
-        } else if (settlement instanceof IndianSettlement) {
-            UnitType scoutSkill = getSpecification()
-                .getUnitType("model.unit.seasonedScout");
-            return (!allowContact(settlement))
-                ? MoveType.MOVE_NO_ACCESS_CONTACT
-                : (!allowMoveFrom(from))
-                ? MoveType.MOVE_NO_ACCESS_WATER
-                : (!getType().canBeUpgraded(null, ChangeType.NATIVES))
-                ? MoveType.MOVE_NO_ACCESS_SKILL
-                : MoveType.ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST;
-        } else {
-            return MoveType.MOVE_ILLEGAL; // should not happen
-        }
-    }
-
-    /**
-     * Get the <code>MoveType</code> when moving a missionary to a settlement.
-     *
-     * @param from The <code>Tile</code> to move from.
-     * @param settlement The <code>Settlement</code> to move to.
-     * @return The appropriate <code>MoveType</code>.
-     */
-    private MoveType getMissionaryMoveType(Tile from, Settlement settlement) {
-        if (settlement instanceof Colony) {
-            return MoveType.MOVE_NO_ACCESS_SETTLEMENT;
-        } else if (settlement instanceof IndianSettlement) {
-            return (!allowContact(settlement))
-                ? MoveType.MOVE_NO_ACCESS_CONTACT
-                : (!allowMoveFrom(from))
-                ? MoveType.MOVE_NO_ACCESS_WATER
-                : MoveType.ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY;
-        } else {
-            return MoveType.MOVE_ILLEGAL; // should not happen
-        }
-    }
-
-    /**
-     * Get the <code>MoveType</code> when moving a scout to a settlement.
-     *
-     * @param from The <code>Tile</code> to move from.
-     * @param settlement The <code>Settlement</code> to move to.
-     * @return The appropriate <code>MoveType</code>.
-     */
-    private MoveType getScoutMoveType(Tile from, Settlement settlement) {
-        if (settlement instanceof Colony) {
-            // No allowMoveFrom check for Colonies
-            return MoveType.ENTER_FOREIGN_COLONY_WITH_SCOUT;
-        } else if (settlement instanceof IndianSettlement) {
-            return (!allowMoveFrom(from))
-                ? MoveType.MOVE_NO_ACCESS_WATER
-                : MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT;
-        } else {
-            return MoveType.MOVE_ILLEGAL; // should not happen
-        }
-    }
-
-    /**
-     * Is this unit allowed to move from a source tile?
-     * Implements the restrictions on moving from water.
-     *
-     * @param from The <code>Tile</code> to consider.
-     * @return True if the move is allowed.
-     */
-    private boolean allowMoveFrom(Tile from) {
-        return from.isLand()
-            || (!getOwner().isREF()
-                && getSpecification().getBoolean(GameOptions.AMPHIBIOUS_MOVES));
-    }
-
-    /**
-     * Is this unit allowed to contact a settlement?
-     *
-     * @param settlement The <code>Settlement</code> to consider.
-     * @return True if the contact is allowed.
-     */
-    private boolean allowContact(Settlement settlement) {
-        return getOwner().hasContacted(settlement.getOwner());
-    }
-
-    /**
-     * Returns the amount of moves this Unit has left.
-     *
-     * @return The amount of moves this Unit has left.
-     */
-    public int getMovesLeft() {
-        return movesLeft;
-    }
-
-    /**
-     * Sets the <code>movesLeft</code>.
-     *
-     * @param movesLeft The new amount of moves left this <code>Unit</code>
-     *            should have. If <code>movesLeft < 0</code> then
-     *            <code>movesLeft = 0</code>.
-     */
-    public void setMovesLeft(int movesLeft) {
-        if (movesLeft < 0) {
-            movesLeft = 0;
-        }
-
-        this.movesLeft = movesLeft;
-    }
-
-    /**
      * Gets the line of sight of this <code>Unit</code>. That is the distance
      * this <code>Unit</code> can spot new tiles, enemy unit e.t.c.
      *
@@ -1911,92 +2842,17 @@ public class Unit extends GoodsLocation
                               turn, modifierSet);
     }
 
-    /**
-     * Verifies if the unit is aboard a carrier
-     *
-     * @return True if the unit is aboard a carrier.
-     */
-    public boolean isOnCarrier() {
-        return getLocation() instanceof Unit;
-    }
+
+    // Goods handling
 
     /**
-     * Gets the carrier this unit is aboard if any.
+     * Get the goods carried by this unit.
      *
-     * @return The carrier this unit is aboard, or null if none.
+     * @return A list of <code>Goods</code>.
      */
-    public Unit getCarrier() {
-        return (isOnCarrier()) ? ((Unit)getLocation()) : null;
-    }
-
-    /**
-     * Sets the given state to all the units that si beeing carried.
-     *
-     * @param state The state.
-     */
-    public void setStateToAllChildren(UnitState state) {
-        if (canCarryUnits()) {
-            for (Unit u : getUnitList()) u.setState(state);
-        }
-    }
-
-    /**
-     * Set movesLeft to 0 if has some spent moves and it's in a colony
-     *
-     * @see #add(Locatable)
-     * @see #remove(Locatable)
-     */
-    private void spendAllMoves() {
-        if (getColony() != null && getMovesLeft() < getInitialMovesLeft())
-            setMovesLeft(0);
-    }
-
-    /**
-     * Is this unit a suitable `next active unit', that is, the unit
-     * needs to be currently movable by the player.
-     *
-     * @return True if this unit could still be moved by the player.
-     */
-    public boolean couldMove() {
-        return !isDisposed()
-            && getState() == UnitState.ACTIVE
-            && getMovesLeft() > 0
-            && destination == null // Can not reach next tile
-            && tradeRoute == null
-            && !isUnderRepair()
-            && !isAtSea()
-            && !isOnCarrier()
-            // this should never happen anyway, since these units
-            // should have state IN_COLONY, but better safe than sorry
-            && !(location instanceof WorkLocation);
-    }
-
-    /**
-     * Finds the closest <code>Location</code> to this tile where
-     * this ship can be repaired.
-     *
-     * @return The closest <code>Location</code> where a ship can be repaired.
-     */
-    public Location getRepairLocation() {
-        final Player player = getOwner();
-        final Tile tile = getTile();
-        Location bestLocation = null;
-        int bestTurns = INFINITY;
-        for (Colony colony : player.getColonies()) {
-            int turns;
-            if (colony != null && colony != tile.getColony()
-                && colony.hasAbility("model.ability.repairUnits")
-                && (turns = getTurnsToReach(colony)) >= 0
-                && turns < bestTurns) {
-                // Tile.getDistanceTo(Tile) doesn't care about
-                // connectivity, so we need to check for an available
-                // path to target colony instead
-                bestTurns = turns;
-                bestLocation = colony;
-            }
-        }
-        if (bestLocation == null) bestLocation = player.getEurope();
-        return bestLocation;
+    public List<Goods> getGoodsList() {
+        if (getGoodsContainer() == null) return Collections.emptyList();
+        return getGoodsContainer().getGoods();
     }
 
     /**
@@ -2057,19 +2913,6 @@ public class Unit extends GoodsLocation
      */
     public boolean hasSpaceLeft() {
         return getSpaceLeft() > 0;
-    }
-
-    /**
-     * Gets the number of space this <code>Unit</code> takes when put on a
-     * carrier.
-     *
-     * We do not have to consider what this unit is carrying because
-     * carriers can not be put onto carriers.  Yet.
-     *
-     * @return The space this <code>Unit</code> takes.
-     */
-    public int getSpaceTaken() {
-        return unitType.getSpaceTaken();
     }
 
     /**
@@ -2151,109 +2994,8 @@ public class Unit extends GoodsLocation
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public NoAddReason getNoAddReason(Locatable locatable) {
-        if (locatable == this) {
-            return NoAddReason.ALREADY_PRESENT;
-        } else if (locatable instanceof Unit) {
-            return (!canCarryUnits())
-                ? NoAddReason.WRONG_TYPE
-                : (((Unit)locatable).getSpaceTaken() > getSpaceLeft())
-                ? NoAddReason.CAPACITY_EXCEEDED
-                : super.getNoAddReason(locatable);
-        } else if (locatable instanceof Goods) {
-            Goods goods = (Goods)locatable;
-            return (!canCarryGoods())
-                ? NoAddReason.WRONG_TYPE
-                : (goods.getAmount() > getLoadableAmount(goods.getType()))
-                ? NoAddReason.CAPACITY_EXCEEDED
-                : NoAddReason.NONE;
-            // Do not call super.getNoAddReason for goods because
-            // the capacity test in GoodsLocation.getNoAddReason does not
-            // account for packing and is thus too conservative.
-        }
-        return super.getNoAddReason(locatable);
-    }
 
-    /**
-     * Adds a locatable to this <code>Unit</code>.
-     *
-     * @param locatable The <code>Locatable</code> to add to this
-     *            <code>Unit</code>.
-     */
-    public boolean add(Locatable locatable) {
-        if (!canAdd(locatable)) {
-            return false;
-        } else if (locatable instanceof Unit) {
-            Unit unit = (Unit)locatable;
-            if (super.add(locatable)) {
-                // TODO: there seems to be an inconsistency between
-                // units moving from an adjacent tile onto a ship and
-                // units boarding a ship in-colony.  The former does not
-                // appear to come through here (which it probably should)
-                // as the ship's moves do not get zeroed.
-                spendAllMoves();
-                ((Unit)locatable).setState(UnitState.SENTRY);
-                return true;
-            }
-        } else if (locatable instanceof Goods) {
-            Goods goods = (Goods)locatable;
-            if (super.addGoods(goods)) {
-                spendAllMoves();
-                return true;
-            }
-        } else {
-            throw new IllegalStateException("Can not be added to unit: "
-                + ((FreeColGameObject)locatable).toString());
-        }
-        return false;
-    }
-
-    /**
-     * Removes a <code>Locatable</code> from this <code>Unit</code>.
-     *
-     * @param locatable The <code>Locatable</code> to remove from this
-     *            <code>Unit</code>.
-     */
-    public boolean remove(Locatable locatable) {
-        if (locatable == null) {
-            throw new IllegalArgumentException("Locatable must not be 'null'.");
-        } else if (locatable instanceof Unit && canCarryUnits()) {
-            if (super.remove((Unit)locatable)) {
-                spendAllMoves();
-                return true;
-            }
-        } else if (locatable instanceof Goods && canCarryGoods()) {
-            if (super.removeGoods((Goods)locatable) != null) {
-                spendAllMoves();
-                return true;
-            }
-        } else {
-            logger.warning("Tried to remove from unit: "
-                + ((FreeColGameObject)locatable));
-        }
-        return false;
-    }
-
-    // Superclass contains() should work, as should canAdd() because
-    // getNoAddReason() was provided above.
-
-    /**
-     * {@inheritDoc}
-     */
-    public int getGoodsCapacity() {
-        throw new RuntimeException("Do not call this method, unless we implement spoilage.");
-    }
-
-    public List<Goods> getGoodsList() {
-        if (getGoodsContainer() == null) {
-            return new ArrayList<Goods>();
-        } else {
-            return getGoodsContainer().getGoods();
-        }
-    }
+    // Miscellaneous more complex functionality
 
     /**
      * Checks if this unit is visible to the given player.
@@ -2276,576 +3018,6 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Sets the units location without updating any other variables
-     *
-     * @param newLocation The new Location
-     */
-    public void setLocationNoUpdate(Location newLocation) {
-        location = newLocation;
-    }
-
-    /**
-     * Sets the location of this Unit.
-     *
-     * @param newLocation The new <code>Location</code>.
-     */
-    public void setLocation(Location newLocation) {
-
-        // If either the add or remove involves a colony, call the
-        // colony-specific routine...
-        Colony oldColony = (location instanceof WorkLocation)
-            ? this.getColony() : null;
-        Colony newColony = (newLocation instanceof WorkLocation)
-            ? newLocation.getColony() : null;
-        // However if the unit is moving within the same colony,
-        // do not call the colony-specific routines.
-        if (oldColony == newColony) oldColony = newColony = null;
-
-        boolean result = true;
-        if (location != null) {
-            result = (oldColony != null)
-                ? oldColony.removeUnit(this)
-                : location.remove(this);
-        }
-        /*if (!result) return false;*/
-
-        location = newLocation;
-        // Explore the new location now to prevent dealing with tiles
-        // with null (unexplored) type.
-        getOwner().setExplored(this);
-
-        // It is possible to add a unit to a non-specific location
-        // within a colony by specifying the colony as the new
-        // location.
-        if (newLocation instanceof Colony) {
-            newColony = (Colony) newLocation;
-            location = newLocation = newColony.getWorkLocationFor(this);
-        }
-
-        if (newLocation != null) {
-            result = (newColony != null)
-                ? newColony.addUnit(this, (WorkLocation) newLocation)
-                : newLocation.add(this);
-        }
-
-        return /*result*/;
-    }
-
-    /**
-     * Sets the <code>IndianSettlement</code> that owns this unit.
-     *
-     * @param indianSettlement The <code>IndianSettlement</code> that should
-     *            now be owning this <code>Unit</code>.
-     */
-    public void setIndianSettlement(IndianSettlement indianSettlement) {
-        if (this.indianSettlement != null) {
-            this.indianSettlement.removeOwnedUnit(this);
-        }
-
-        this.indianSettlement = indianSettlement;
-
-        if (indianSettlement != null) {
-            indianSettlement.addOwnedUnit(this);
-        }
-    }
-
-    /**
-     * Gets the <code>IndianSettlement</code> that owns this unit.
-     *
-     * @return The <code>IndianSettlement</code>.
-     */
-    public IndianSettlement getIndianSettlement() {
-        return indianSettlement;
-    }
-
-    /**
-     * Gets the location of this Unit.
-     *
-     * @return The location of this Unit.
-     */
-    public Location getLocation() {
-        return location;
-    }
-
-    /**
-     * Checks whether this unit can be equipped with the given
-     * <code>EquipmentType</code> at the current
-     * <code>Location</code>. This is the case if all requirements of
-     * the EquipmentType are met.
-     *
-     * @param equipmentType an <code>EquipmentType</code> value
-     * @return whether this unit can be equipped with the given
-     *         <code>EquipmentType</code> at the current location.
-     */
-    public boolean canBeEquippedWith(EquipmentType equipmentType) {
-        for (Entry<String, Boolean> entry : equipmentType.getRequiredAbilities().entrySet()) {
-            if (hasAbility(entry.getKey()) != entry.getValue()) {
-                return false;
-            }
-        }
-        if (equipment.getCount(equipmentType) >= equipmentType.getMaximumCount()) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Changes the equipment a unit has and returns a list of equipment
-     * it still has but needs to drop due to the changed equipment being
-     * incompatible.
-     *
-     * @param type The <code>EquipmentType</code> to change.
-     * @param amount The amount to change by (may be negative).
-     * @return A list of equipment types that the unit must now drop.
-     */
-    public List<EquipmentType> changeEquipment(EquipmentType type, int amount) {
-        List<EquipmentType> result = new ArrayList<EquipmentType>();
-        equipment.incrementCount(type, amount);
-        if (amount > 0) {
-            for (EquipmentType oldType
-                     : new HashSet<EquipmentType>(equipment.keySet())) {
-                if (!oldType.isCompatibleWith(type)) {
-                    result.add(oldType);
-                }
-            }
-        }
-        setRole();
-        return result;
-    }
-
-    /**
-     * Describe <code>getEquipmentCount</code> method here.
-     *
-     * @param equipmentType an <code>EquipmentType</code> value
-     * @return an <code>int</code> value
-     */
-    public int getEquipmentCount(EquipmentType equipmentType) {
-        return equipment.getCount(equipmentType);
-    }
-
-    /**
-     * Checks if this <code>Unit</code> is located in Europe. That is; either
-     * directly or onboard a carrier which is in Europe.
-     *
-     * @return The result.
-     */
-    public boolean isInEurope() {
-        if (location instanceof Unit) {
-            return ((Unit) location).isInEurope();
-        } else {
-            return getLocation() instanceof Europe;
-        }
-    }
-
-    /**
-     * Checks whether this <code>Unit</code> is at sea off the map, or
-     * on board of a carrier that is.
-     *
-     * @return The result.
-     */
-    public boolean isAtSea() {
-        if (location instanceof Unit) {
-            return ((Unit) location).isAtSea();
-        } else {
-            return location instanceof HighSeas;
-        }
-    }
-
-    /**
-     * Checks if this <code>Unit</code> is able to carry {@link Locatable}s.
-     *
-     * @return True if this unit can carry goods or other units.
-     */
-    public boolean isCarrier() {
-        return unitType.canCarryGoods() || unitType.canCarryUnits();
-    }
-
-    /**
-     * Checks if this unit is a person, that is not a ship or wagon.
-     * Surprisingly difficult without explicit enumeration because
-     * model.ability.person only arrived in 0.10.1.
-     *
-     * @return True if this unit is a person.
-     */
-    public boolean isPerson() {
-        return hasAbility("model.ability.person")
-            // @compat 0.10.0
-            || unitType.hasAbility(Ability.BORN_IN_COLONY)
-            || unitType.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
-            || unitType.hasAbility(Ability.FOUND_COLONY)
-            // Nick also had:
-            //     && (!hasAbility("model.ability.carryGoods")
-            //         && !hasAbility("model.ability.carryUnits")
-            //         && !hasAbility("model.ability.carryTreasure")
-            //         && !hasAbility("model.ability.bombard"))
-            // ...but that should be unnecessary.
-            // end compatibility code
-            ;
-    }
-
-    /**
-     * Gets the owner of this Unit.
-     *
-     * @return The owner of this Unit.
-     */
-    public Player getOwner() {
-        return owner;
-    }
-
-    /**
-     * Get the name of the apparent owner of this Unit,
-     * (like getOwner().getNationAsString() but handles pirates)
-     *
-     * @return The name of the owner of this Unit unless this is hidden.
-     */
-    public StringTemplate getApparentOwnerName() {
-        return ((hasAbility(Ability.PIRACY))
-                ? getGame().getUnknownEnemy()
-                : owner).getNationName();
-    }
-
-    /**
-     * Sets the owner of this Unit.
-     *
-     * @param owner The new owner of this Unit.
-     */
-    public void setOwner(Player owner) {
-        Player oldOwner = this.owner;
-
-        // safeguard
-        if (oldOwner == owner) {
-            return;
-        } else if (oldOwner == null) {
-            logger.warning("Unit " + getId() + " had no previous owner, when changing owner to " + owner.getId());
-        }
-
-        // Clear trade route and goto orders if changing owner.
-        if (getTradeRoute() != null) {
-            setTradeRoute(null);
-        }
-        if (getDestination() != null) {
-            setDestination(null);
-        }
-
-        // This need to be set right away
-        this.owner = owner;
-        // If its a carrier, we need to update the units it has loaded
-        //before finishing with it
-        for (Unit unit : getUnitList()) {
-            unit.setOwner(owner);
-        }
-
-        if(oldOwner != null) {
-            oldOwner.removeUnit(this);
-            oldOwner.modifyScore(-getType().getScoreValue());
-            // for speed optimizations
-            if(!isOnCarrier()){
-                oldOwner.invalidateCanSeeTiles();
-            }
-        }
-        owner.addUnit(this);
-        if(getType() != null) {     // can be null if setOwner() is called from fixIntegrity()
-            owner.modifyScore(getType().getScoreValue());
-        }
-
-        // for speed optimizations
-        if(!isOnCarrier()) {
-            getOwner().setExplored(this);
-        }
-
-        getGame().notifyOwnerChanged(this, oldOwner, owner);
-    }
-
-    /**
-     * Gets the nationality of this Unit.
-     * Nationality represents a Unit's personal allegiance to a nation.
-     * This may conflict with who currently issues orders to the Unit (the owner).
-     *
-     * @return The nationality of this Unit.
-     */
-    public String getNationality() {
-        return nationality;
-    }
-
-    /**
-     * Sets the nationality of this Unit.  A unit will change
-     * nationality when it switches owners willingly.  Currently only
-     * Converts do this, but it opens the possibility of
-     * naturalisation.
-     *
-     * @param newNationality The new nationality of this Unit.
-     */
-    public void setNationality(String newNationality) {
-        if (isPerson()) {
-            nationality = newNationality;
-        } else {
-            throw new UnsupportedOperationException("Can not set the nationality of a Unit which is not a person!");
-        }
-    }
-
-    /**
-     * Gets the ethnicity of this Unit.
-     * Ethnicity is inherited from the inhabitants of the place where the Unit was born.
-     * Allows former converts to become native-looking colonists.
-     *
-     * @return The ethnicity of this Unit.
-     */
-    public String getEthnicity() {
-        return ethnicity;
-    }
-
-    /**
-     * Sets the ethnicity of this Unit.
-     * Ethnicity is something units are born with. It cannot be subsequently changed.
-     *
-     * @param newEthnicity The new ethnicity of this Unit.
-     */
-    public void setEthnicity(String newEthnicity) {
-        throw new UnsupportedOperationException("Can not change a Unit's ethnicity!");
-    }
-
-    /**
-     * Identifies whether this unit came from a native tribe.
-     *
-     * @return Whether this unit looks native or not.
-     */
-    public boolean hasNativeEthnicity() {
-    	try {
-            // FIXME: getNation() could fail, but getNationType() doesn't work as expected
-            return getGame().getSpecification().getNation(ethnicity).getType().isIndian();
-//          return getGame().getSpecification().getNationType(ethnicity).hasAbility("model.ability.native");
-//          return getGame().getSpecification().getIndianNationTypes().contains(getNationType(ethnicity));
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    /**
-     * Sets the type of the unit.
-     *
-     * @param newUnitType The new type of the unit.
-     */
-    public void setType(UnitType newUnitType) {
-        if (newUnitType.isAvailableTo(owner)) {
-            if (unitType == null) {
-                owner.modifyScore(newUnitType.getScoreValue());
-            } else {
-                owner.modifyScore(newUnitType.getScoreValue() - unitType.getScoreValue());
-            }
-            this.unitType = newUnitType;
-            if (getMovesLeft() > getInitialMovesLeft()) {
-                setMovesLeft(getInitialMovesLeft());
-            }
-            hitpoints = unitType.getHitPoints();
-            if (getTeacher() != null && !canBeStudent(getTeacher())) {
-                getTeacher().setStudent(null);
-                setTeacher(null);
-            }
-        } else {
-            // ColonialRegulars only available after independence is declared
-            logger.warning("Units of type: " + newUnitType
-                           + " are not available to " + owner.getPlayerType()
-                           + " player " + owner.getName());
-        }
-    }
-
-    /**
-     * Does the unit have arms?
-     *
-     * @return True if the unit has arms.
-     */
-    public boolean isArmed() {
-        if (musketsEq[0] == null) {
-            Specification spec = getSpecification();
-            musketsEq[0] = spec.getEquipmentType("model.equipment.muskets");
-            musketsEq[1] = spec.getEquipmentType("model.equipment.indian.muskets");
-        }
-        for (EquipmentType et : musketsEq) {
-            if (getEquipmentCount(et) > 0) return true;
-        }
-        return false;
-    }
-
-    /**
-     * Does the unit have a mount?
-     *
-     * @return True if the unit have a mount.
-     */
-    public boolean isMounted() {
-        if (horsesEq[0] == null) {
-            Specification spec = getSpecification();
-            horsesEq[0] = spec.getEquipmentType("model.equipment.horses");
-            horsesEq[1] = spec.getEquipmentType("model.equipment.indian.horses");
-        }
-        for (EquipmentType et : horsesEq) {
-            if (getEquipmentCount(et) > 0) return true;
-        }
-        return false;
-    }
-
-    /**
-     * Describe <code>getName</code> method here.
-     *
-     * @return a <code>String</code> value
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Set the <code>Name</code> value.
-     *
-     * @param newName The new Name value.
-     */
-    public void setName(String newName) {
-        this.name = newName;
-    }
-
-    /**
-     * Describe <code>getLabel</code> method here.
-     *
-     * @return a <code>StringTemplate</code> value
-     */
-    public StringTemplate getLabel() {
-        StringTemplate result = StringTemplate.label(" ")
-            .add(getType().getNameKey());
-        if (name != null) {
-            result.addName(name);
-        }
-        Role role = getRole();
-        if (role != Role.DEFAULT) {
-            result = StringTemplate.template("model.unit." + role.getId()
-                                             + ".name")
-                .addAmount("%number%", 1)
-                .add("%unit%", getType().getNameKey());
-        }
-        return result;
-    }
-
-
-    /**
-     * Return a description of the unit's equipment.
-     *
-     * @return a <code>String</code> value
-     */
-    public StringTemplate getEquipmentLabel() {
-        if (equipment.isEmpty()) return null;
-        StringTemplate result = StringTemplate.label("/");
-        for (java.util.Map.Entry<EquipmentType, Integer> entry : equipment.getValues().entrySet()) {
-            EquipmentType type = entry.getKey();
-            int amount = entry.getValue().intValue();
-            if (!type.needsGoodsToBuild()) {
-                result.addStringTemplate(StringTemplate.template("model.goods.goodsAmount")
-                    .add("%goods%", type.getNameKey())
-                    .addName("%amount%", Integer.toString(amount)));
-            } else {
-                for (AbstractGoods goods : type.getRequiredGoods()) {
-                    result.addStringTemplate(StringTemplate.template("model.goods.goodsAmount")
-                        .add("%goods%", goods.getType().getNameKey())
-                        .addName("%amount%", Integer.toString(amount * goods.getAmount())));
-                }
-            }
-        }
-        return result;
-    }
-
-
-    /**
-     * Gets the amount of moves this unit has at the beginning of each turn.
-     *
-     * @return The amount of moves this unit has at the beginning of each turn.
-     */
-    public int getInitialMovesLeft() {
-        return (int) FeatureContainer.applyModifierSet(unitType.getMovement(), getGame().getTurn(),
-                                                       getModifierSet("model.modifier.movementBonus"));
-    }
-
-    /**
-     * Sets the hitpoints for this unit.
-     *
-     * @param hitpoints The hitpoints this unit has. This is currently only used
-     *            for damaged ships, but might get an extended use later.
-     * @see UnitType#getHitPoints
-     */
-    public void setHitpoints(int hitpoints) {
-        this.hitpoints = hitpoints;
-        if (hitpoints >= unitType.getHitPoints()) {
-            setState(UnitState.ACTIVE);
-        }
-    }
-
-    /**
-     * Returns the hitpoints.
-     *
-     * @return The hitpoints this unit has. This is currently only used for
-     *         damaged ships, but might get an extended use later.
-     * @see UnitType#getHitPoints
-     */
-    public int getHitpoints() {
-        return hitpoints;
-    }
-
-    /**
-     * Checks if this unit is under repair.
-     *
-     * @return <i>true</i> if under repair and <i>false</i> otherwise.
-     */
-    public boolean isUnderRepair() {
-        return (hitpoints < unitType.getHitPoints());
-    }
-
-    /**
-     * Checks if this unit is running a mission.
-     *
-     * @return True if this unit is running a mission.
-     */
-    public boolean isInMission() {
-        return hasAbility("model.ability.missionary")
-            && (getLocation() instanceof IndianSettlement
-                // TODO: remove this when PET missionary serialization is fixed
-                || getLocation() == null);
-    }
-
-    public String getMovesAsString() {
-        String moves = "";
-        int quotient = getMovesLeft() / 3;
-        int remainder = getMovesLeft() % 3;
-        if (remainder == 0 || quotient > 0) {
-            moves += Integer.toString(quotient);
-        }
-
-        if (remainder > 0) {
-            if (quotient > 0) {
-                moves += " ";
-            }
-
-            moves += "(" + Integer.toString(remainder) + "/3) ";
-        }
-
-        moves += "/" + Integer.toString(getInitialMovesLeft() / 3);
-        return moves;
-    }
-
-    /**
-     * Checks if this <code>Unit</code> is naval.
-     *
-     * @return <i>true</i> if this Unit is a naval Unit and <i>false</i>
-     *         otherwise.
-     */
-    public boolean isNaval() {
-        return (unitType == null) ? false : unitType.isNaval();
-    }
-
-    /**
-     * Gets the state of this <code>Unit</code>.
-     *
-     * @return The state of this <code>Unit</code>.
-     */
-    public UnitState getState() {
-        return state;
-    }
-
-    /**
      * Gets a key for the unit occupation.
      *
      * @param owner True if the key should be for the owner of the unit.
@@ -2853,7 +3025,7 @@ public class Unit extends GoodsLocation
      */
     public String getOccupationKey(boolean owner) {
         return (owner)
-            ? ((isUnderRepair())
+            ? ((isDamaged())
                 ? "model.unit.occupation.underRepair"
                 : (getTradeRoute() != null)
                 ? "model.unit.occupation.inTradeRoute"
@@ -2872,613 +3044,36 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Gets the <code>Role</code> of this <code>Unit</code>.
+     * Gets a message to display if moving a unit would cause it to
+     * abandon its participation in education (if any).
      *
-     * @return The <code>role</code> of this <code>Unit</code>.
+     * @param leavingColony Should we check for student movements.
+     * @return A message to display, or null if education is not an issue.
      */
-    public Role getRole() {
-        return role;
-    }
+    public StringTemplate getAbandonEducationMessage(boolean leavingColony) {
+        if (!(getLocation() instanceof WorkLocation)) return null;
+        boolean teacher = getStudent() != null;
+        // if leaving the colony, the student loses learning spot, so
+        // check with player
+        boolean student = leavingColony && getTeacher() != null;
+        if (!teacher && !student) return null;
 
-    /**
-     * Sets the <code>Role</code> of this <code>Unit</code>.
-     *
-     * @param role The new <code>Role</code>.
-     */
-    public void setRole(Role role) {
-        this.role = role;
-    }
-
-    /**
-     * Determine role based on equipment.
-     */
-    protected void setRole() {
-        Role oldRole = role;
-        role = Role.DEFAULT;
-        for (EquipmentType type : equipment.keySet()) {
-            role = role.newRole(type.getRole());
-        }
-        if (getState() == UnitState.IMPROVING
-            && !hasAbility("model.ability.improveTerrain")) {
-            setStateUnchecked(UnitState.ACTIVE);
-            setMovesLeft(0);
-        }
-
-        // Check for role change for reseting the experience.
-        // Soldier and Dragoon are compatible, no loss of experience.
-        if (!role.isCompatibleWith(oldRole)) {
-            experience = 0;
-        }
-    }
-
-    /**
-     * Checks if a <code>Unit</code> can get the given state set.
-     *
-     * @param s The new state for this Unit. Should be one of {UnitState.ACTIVE,
-     *            FORTIFIED, ...}.
-     * @return 'true' if the Unit's state can be changed to the new value,
-     *         'false' otherwise.
-     */
-    public boolean checkSetState(UnitState s) {
-        switch (s) {
-        case ACTIVE:
-        case SENTRY:
-            return true;
-        case IN_COLONY:
-            return !isNaval();
-        case FORTIFIED:
-            return getState() == UnitState.FORTIFYING;
-        case IMPROVING:
-            return location instanceof Tile
-                && getOwner().canAcquireForImprovement(location.getTile());
-        case SKIPPED:
-            if (getState() == UnitState.ACTIVE) return true;
-            // Fall through
-        case FORTIFYING:
-            return (getMovesLeft() > 0);
-        default:
-            logger.warning("Invalid unit state: " + s);
-            return false;
-        }
-    }
-
-    /**
-     * Gets the number of turns this unit will need to sail to/from Europe.
-     *
-     * @return The number of turns to sail to/from Europe.
-     */
-    public int getSailTurns() {
-        float base = getSpecification().getInteger("model.option.turnsToSail");
-        return (int)getOwner().applyModifier(base,
-                                             "model.modifier.sailHighSeas",
-                                             unitType, getGame().getTurn());
-    }
-
-
-    /**
-     * Sets a new state for this unit and initializes the amount of work the
-     * unit has left.
-     *
-     * If the work needs turns to be completed (for instance when plowing), then
-     * the moves the unit has still left will be used up. Some work (basically
-     * building a road with a hardy pioneer) might actually be finished already
-     * in this method-call, in which case the state is set back to UnitState.ACTIVE.
-     *
-     * @param s The new state for this Unit. Should be one of {UnitState.ACTIVE,
-     *            UnitState.FORTIFIED, ...}.
-     */
-    public void setState(UnitState s) {
-        if (state == s) {
-            // No need to do anything when the state is unchanged
-            return;
-        } else if (!checkSetState(s)) {
-            throw new IllegalStateException("Illegal UnitState transition: " + state + " -> " + s);
-        } else {
-            setStateUnchecked(s);
-        }
-    }
-
-    protected void setStateUnchecked(UnitState s) {
-        // TODO: move to the server.
-        // Cleanup the old UnitState, for example destroy the
-        // TileImprovment being built by a pioneer.
-
-        switch (state) {
-        case IMPROVING:
-            if (workImprovement != null && getWorkLeft() > 0) {
-                if (!workImprovement.isComplete()
-                    && workImprovement.getTile() != null
-                    && workImprovement.getTile().getTileItemContainer() != null) {
-                    workImprovement.getTile().getTileItemContainer().removeTileItem(workImprovement);
-                }
-                setWorkImprovement(null);
-            }
-            break;
-        default:
-            // do nothing
-            break;
-        }
-
-        // Now initiate the new UnitState
-        switch (s) {
-        case ACTIVE:
-            setWorkLeft(-1);
-            break;
-        case SENTRY:
-            setWorkLeft(-1);
-            break;
-        case FORTIFIED:
-            setWorkLeft(-1);
-            movesLeft = 0;
-            break;
-        case FORTIFYING:
-            setWorkLeft(1);
-            movesLeft = 0;
-            break;
-        case IMPROVING:
-            if (workImprovement == null) {
-                setWorkLeft(-1);
-            } else {
-                setWorkLeft(workImprovement.getTurnsToComplete()
-                    + ((getMovesLeft() > 0) ? 0 : 1));
-            }
-            movesLeft = 0;
-            break;
-        case SKIPPED: // do nothing
-            break;
-        default:
-            setWorkLeft(-1);
-        }
-        state = s;
-    }
-
-    /**
-     * Checks if this <code>Unit</code> can be moved to the high seas
-     * from its current location.
-     *
-     * @return True if this unit can move immediately to the high seas.
-     */
-    public boolean canMoveToHighSeas() {
-        if (isInEurope() || isAtSea()) return true;
-        if (!getOwner().canMoveToEurope()
-            || !getType().canMoveToHighSeas()) return false;
-        return getTile().isDirectlyHighSeasConnected();
-    }
-
-    /**
-     * Does this unit have a valid move to the high seas this turn.
-     *
-     * @return True if the unit can either move immediately to the high
-     *      seas or can make a move to a neighbouring high seas tile.
-     */
-    public boolean hasHighSeasMove() {
-        if (canMoveToHighSeas()) return true;
-        Tile tile = getTile();
-        if (tile != null && getMovesLeft() > 0) {
-            for (Tile t : tile.getSurroundingTiles(1)) {
-                if (t.isDirectlyHighSeasConnected()
-                    && getMoveType(t).isLegal()) return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Check if this unit can build a colony.  Does not consider whether
-     * the tile where the unit is located is suitable,
-     * @see Player#canClaimToFoundSettlement(Tile)
-     *
-     * @return <code>true</code> if this unit can build a colony.
-     */
-    public boolean canBuildColony() {
-        return unitType.canBuildColony() && getMovesLeft() > 0
-            && getTile() != null;
-    }
-
-    /**
-     * Gets the Tile where this Unit is located.
-     *
-     * @return The Tile where this Unit is located or null if not on the map.
-     */
-    public Tile getTile() {
-        return (location != null) ? location.getTile() : null;
-    }
-
-    /**
-     * Is this unit at a specified location?
-     *
-     * @param loc The <code>Location</code> to test.
-     * @return True if the locations are the same, or on the same tile.
-     */
-    public boolean isAtLocation(Location loc) {
-        Location ourLoc = getLocation();
-        if (ourLoc instanceof Unit) ourLoc = ((Unit)ourLoc).getLocation();
-        return Map.isSameLocation(ourLoc, loc);
-    }
-
-    /**
-     * Returns the amount of goods that is carried by this unit.
-     *
-     * @return The amount of goods carried by this <code>Unit</code>.
-     */
-    public int getVisibleGoodsCount() {
-        return (visibleGoodsCount >= 0) ? visibleGoodsCount
-            : getGoodsSpaceTaken();
-    }
-
-    /**
-     * Gets the amount of work left.
-     *
-     * @return The amount of work left.
-     */
-    public int getWorkLeft() {
-        return workLeft;
-    }
-
-    /**
-     * Sets the amount of work left.
-     *
-     * @param workLeft The new amount of work left.
-     */
-    public void setWorkLeft(int workLeft) {
-        this.workLeft = workLeft;
-    }
-
-    /**
-     * Get the number of turns of work left.
-     *
-     * @return The number of turns of work left.
-     */
-    public int getWorkTurnsLeft() {
-        return (state == UnitState.IMPROVING
-                && unitType.hasAbility(Ability.EXPERT_PIONEER))
-            ? (getWorkLeft() + 1) / 2
-            : getWorkLeft();
-    }
-
-    /**
-     * Sets the entry location in which this unit will be put when
-     * returning from {@link Europe}.
-     *
-     * @param entryLocation The entry location.
-     * @see #getEntryLocation
-     */
-    public void setEntryLocation(Location entryLocation) {
-        this.entryLocation = entryLocation;
-        if (entryLocation != null) {
-            owner.setEntryLocation(entryLocation);
-        }
-    }
-
-    /**
-     * Gets the entry location for this unit to use when returning from
-     * {@link Europe}.
-     *
-     * @return The entry location.
-     */
-    public Location getEntryLocation() {
-        if (entryLocation == null) {
-            entryLocation = owner.getEntryLocation();
-        }
-        return entryLocation;
-    }
-
-    /**
-     * Gets the entry tile for this unit, or if null the default
-     * entry location for the owning player.
-     *
-     * @return The entry tile.
-     */
-    public Tile getFullEntryLocation() {
-        return (entryLocation != null) ? (Tile) entryLocation
-            : (owner.getEntryLocation() == null) ? null
-            : owner.getEntryLocation().getTile();
-    }
-
-    /**
-     * Gets the best (closest) entry location for this unit to reach a
-     * given tile.
-     *
-     * @param tile The target <code>Tile</code>.
-     * @return The best entry location tile to arrive on the map at, or null
-     *     if none found.
-     */
-    public Tile getBestEntryTile(Tile tile) {
-        return getGame().getMap().getBestEntryTile(this, tile, null, null);
-    }
-
-    /**
-     * Resolves a destination for a unit on the high seas.
-     * That is, the location where the unit will appear when it leaves
-     * the high seas, which will either be Europe or a tile.
-     *
-     * @return The location the unit should appear next after leaving
-     *      the high seas.
-     */
-    public Location resolveDestination() {
-        if (!isAtSea()) throw new IllegalArgumentException("Not at sea.");
-        Stop stop = getStop();
-        Location dst = (TradeRoute.isStopValid(this, stop)) ? stop.getLocation()
-            : getDestination();
-        Tile best;
-        return (dst == null) ? getFullEntryLocation()
-            : (dst instanceof Europe) ? dst
-            : (dst.getTile() != null
-                && (best = getBestEntryTile(dst.getTile())) != null) ? best
-            : getFullEntryLocation();
-    }
-
-    /**
-     * Is the unit a beached ship?
-     *
-     * @return True if the unit is a beached ship.
-     */
-    public boolean isBeached() {
-        return isBeached(getTile());
-    }
-
-    /**
-     * Would this unit be beached if it was on a particular tile?
-     *
-     * @param tile The <code>Tile</code> to check.
-     * @return True if the unit is a beached ship.
-     */
-    public boolean isBeached(Tile tile) {
-        return isNaval() && tile != null && tile.isLand()
-            && tile.getSettlement() == null;
-    }
-
-    /**
-     * Checks if this is an defensive unit. That is: a unit which can be used to
-     * defend a <code>Settlement</code>.
-     *
-     * <br><br>
-     *
-     * Note! As this method is used by the AI it really means that the unit can
-     * defend as is. To be specific an unarmed colonist is not defensive yet,
-     * even if Paul Revere and stockpiled muskets are available. That check is
-     * only performed on an actual attack.
-     *
-     * <br><br>
-     *
-     * A settlement is lost when there are no more defensive units.
-     *
-     * @return <code>true</code> if this is a defensive unit meaning it can be
-     *         used to defend a <code>Colony</code>. This would normally mean
-     *         that a defensive unit also will be
-     *         {@link #isOffensiveUnit offensive}.
-     */
-    public boolean isDefensiveUnit() {
-        return (unitType.isDefensive() || isArmed() || isMounted())
-            && !isNaval();
-    }
-
-    /**
-     * Is an alternate unit a better defender than the current choice.
-     * Prefer if there is no current defender, or if the alternate
-     * unit is better armed, or provides greater defensive power and
-     * does not replace a defensive unit defender with a non-defensive
-     * unit.
-     *
-     * @param defender The current defender <code>Unit</code>.
-     * @param defenderPower Its defence power.
-     * @param other An alternate <code>Unit</code>.
-     * @param otherPower Its defence power.
-     * @return True if the other unit should be preferred.
-     */
-    public static boolean betterDefender(Unit defender, float defenderPower,
-                                         Unit other, float otherPower) {
-        if (defender == null) {
-            return true;
-        } else if (defender.isPerson() && other.isPerson()
-            && !defender.isArmed() && other.isArmed()) {
-            return true;
-        } else if (defender.isPerson() && other.isPerson()
-            && defender.isArmed() && !other.isArmed()) {
-            return false;
-        } else if (!defender.isDefensiveUnit() && other.isDefensiveUnit()) {
-            return true;
-        } else if (defender.isDefensiveUnit() && !other.isDefensiveUnit()) {
-            return false;
-        } else {
-            return defenderPower < otherPower;
-        }
-    }
-
-    /**
-     * Checks if this unit is an undead.
-     * @return return true if the unit is undead
-     */
-    public boolean isUndead() {
-        return hasAbility("model.ability.undead");
-    }
-
-    /**
-     * Returns true if this unit is a ship that can capture enemy goods.
-     *
-     * @return <code>true</code> if this <code>Unit</code> is capable of
-     *         capturing goods.
-     */
-    public boolean canCaptureGoods() {
-        return unitType.hasAbility(Ability.CAPTURE_GOODS);
-    }
-
-    /**
-     * After winning a battle, can this unit the loser equipment?
-     *
-     * @param equip The <code>EquipmentType</code> to consider.
-     * @param loser The loser <code>Unit</code>.
-     * @return The <code>EquipmentType</code> to capture, which may
-     *     differ from the equip parameter due to transformations such
-     *     as to the native versions of horses and muskets.
-     *     Or return null if capture is not possible.
-     */
-    public EquipmentType canCaptureEquipment(EquipmentType equip, Unit loser) {
-        if (hasAbility("model.ability.captureEquipment")) {
-            if (getOwner().isIndian() != loser.getOwner().isIndian()) {
-                equip = equip.getCaptureEquipment(getOwner().isIndian());
-            }
-            return (canBeEquippedWith(equip)) ? equip : null;
-        }
-        return null;
-    }
-
-
-    /**
-     * Gets the Settlement this unit is in.
-     *
-     * @return The Settlement this unit is in, or null if none.
-     */
-    public Settlement getSettlement() {
-        Location location = getLocation();
-        return (location != null) ? location.getSettlement() : null;
-    }
-
-    /**
-     * Gets the Colony this unit is in.
-     *
-     * @return The Colony this unit is in, or null if none.
-     */
-    public Colony getColony() {
-        Location location = getLocation();
-        return (location != null) ? location.getColony() : null;
-    }
-
-    /**
-     * Removes all references to this object.
-     *
-     * @return A list of disposed objects.
-     */
-    public List<FreeColGameObject> disposeList() {
-        List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
-
-        if (location != null) {
-            location.remove(this);
-        }
-
-        if (teacher != null) {
-            teacher.setStudent(null);
-            teacher = null;
-        }
-
-        if (student != null) {
-            student.setTeacher(null);
-            student = null;
-        }
-
-        setIndianSettlement(null);
-
-        getOwner().invalidateCanSeeTiles();
-        getOwner().removeUnit(this);
-
-        objects.addAll(super.disposeList());
-        return objects;
-    }
-
-    /**
-     * Return how many turns left to be repaired
-     *
-     * @return turns to be repaired
-     */
-    public int getTurnsForRepair() {
-        return unitType.getHitPoints() - getHitpoints();
-    }
-
-    /**
-     * Gets the available equipment that can be equipped automatically
-     * in case of an attack.
-     *
-     * @return The equipment that can be automatically equipped by
-     *     this unit, or null if none.
-     */
-    public TypeCountMap<EquipmentType> getAutomaticEquipment(){
-        // Paul Revere makes an unarmed colonist in a settlement pick up
-        // a stock-piled musket if attacked, so the bonus should be applied
-        // for unarmed colonists inside colonies where there are muskets
-        // available. Indians can also pick up equipment.
-        if(isArmed()){
-            return null;
-        }
-
-        if(!getOwner().hasAbility("model.ability.automaticEquipment")){
-            return null;
-        }
-
-        Settlement settlement = null;
-        if (getLocation() instanceof WorkLocation) {
-            settlement = getColony();
-        }
-        if (getLocation() instanceof IndianSettlement) {
-            settlement = (Settlement) getLocation();
-        }
-        if(settlement == null){
-            return null;
-        }
-
-        TypeCountMap<EquipmentType> equipmentList = null;
-
-        // Check for necessary equipment in the settlement
-        Set<Ability> autoDefence = new HashSet<Ability>();
-        autoDefence.addAll(getOwner().getAbilitySet("model.ability.automaticEquipment"));
-
-        for (EquipmentType equipment : getSpecification().getEquipmentTypeList()) {
-            for (Ability ability : autoDefence) {
-                if (!ability.appliesTo(equipment)){
-                    continue;
-                }
-                if (!canBeEquippedWith(equipment)) {
-                    continue;
-                }
-
-                boolean hasReqGoods = true;
-                for (AbstractGoods ag : equipment.getRequiredGoods()) {
-                    if (settlement.getGoodsCount(ag.getType()) < ag.getAmount()){
-                        hasReqGoods = false;
-                        break;
-                    }
-                }
-                if(hasReqGoods){
-                    // lazy initialization, required
-                    if(equipmentList == null){
-                        equipmentList = new TypeCountMap<EquipmentType>();
-                    }
-                    equipmentList.incrementCount(equipment, 1);
-                }
-            }
-        }
-        return equipmentList;
-    }
-
-    /**
-     * Does losing a piece of equipment mean the death of this unit?
-     *
-     * @param lose The <code>EquipmentType</code> to lose.
-     * @return True if the unit is doomed.
-     */
-    public boolean losingEquipmentKillsUnit(EquipmentType lose) {
-        if (hasAbility("model.ability.disposeOnAllEquipLost")) {
-            for (EquipmentType equip : getEquipment().keySet()) {
-                if (equip != lose) return false;
-            }
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Does losing a piece of equipment mean the demotion of this unit?
-     *
-     * @param lose The <code>EquipmentType</code> to lose.
-     * @return True if the unit is to be demoted.
-     */
-    public boolean losingEquipmentDemotesUnit(EquipmentType lose) {
-        if (hasAbility("model.ability.demoteOnAllEquipLost")) {
-            for (EquipmentType equip : getEquipment().keySet()) {
-                if (equip != lose) return false;
-            }
-            return true;
-        }
-        return false;
+        Building school = (Building)((teacher) ? getLocation()
+            : getTeacher().getLocation());
+ 
+        return (leavingColony)
+            ? StringTemplate.template("abandonEducation.text")
+            .addStringTemplate("%unit%", Messages.getLabel(this))
+            .addName("%colony%", getColony().getName())
+            .add("%building%", school.getNameKey())
+            .addName("%action%", (teacher)
+                ? Messages.message("abandonEducation.action.teaching")
+                : Messages.message("abandonEducation.action.studying"))
+            : (teacher)
+            ? StringTemplate.template("abandonTeaching.text")
+            .addStringTemplate("%unit%", Messages.getLabel(this))
+            .add("%building%", school.getNameKey())
+            : null;
     }
 
     /**
@@ -3520,27 +3115,187 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Gets the best combat equipment type that this unit has.
+     * Checks if the treasure train can be cashed in at it's current
+     * <code>Location</code>.
      *
-     * @param equipment The equipment to look through, such as returned by
-     *     @see Unit#getEquipment() and/or @see Unit#getAutomaticEquipment().
-     * @return The equipment type to lose, or null if none.
+     * @return <code>true</code> if the treasure train can be cashed in.
+     * @exception IllegalStateException if this unit is not a treasure train.
      */
-    public EquipmentType getBestCombatEquipmentType(TypeCountMap<EquipmentType> equipment) {
-        EquipmentType lose = null;
-        if (equipment != null) {
-            int priority = -1;
-            for (EquipmentType equipmentType : equipment.keySet()) {
-                if (equipmentType.getCombatLossPriority() > priority) {
-                    lose = equipmentType;
-                    priority = equipmentType.getCombatLossPriority();
-                }
-            }
-        }
-        return lose;
+    public boolean canCashInTreasureTrain() {
+        return canCashInTreasureTrain(getLocation());
     }
 
-    // Routines for message unpacking.
+    /**
+     * Checks if the treasure train can be cashed in at the given
+     * <code>Location</code>.
+     *
+     * @param loc The <code>Location</code>.
+     * @return <code>true</code> if the treasure train can be cashed in.
+     * @exception IllegalStateException if this unit is not a treasure train.
+     */
+    public boolean canCashInTreasureTrain(Location loc) {
+        if (!canCarryTreasure()) {
+            throw new IllegalStateException("Can't carry treasure");
+        }
+        if (loc == null) return false;
+
+        if (getOwner().getEurope() == null) {
+            // Any colony will do once independent, as the treasure stays
+            // in the New World.
+            return loc.getColony() != null;
+        }
+        if (loc.getColony() != null) {
+            // Cash in if at a colony which has connectivity to Europe
+            return loc.getColony().isConnectedPort();
+        }
+        // Otherwise, cash in if in Europe.
+        return loc instanceof Europe
+            || (loc instanceof Unit && ((Unit)loc).isInEurope());
+    }
+
+    /**
+     * Get the fee that would have to be paid to transport this
+     * treasure to Europe.
+     *
+     * @return The fee required for transport.
+     */
+    public int getTransportFee() {
+        if (!isInEurope() && getOwner().getEurope() != null) {
+            float fee = (getSpecification().getInteger("model.option.treasureTransportFee")
+                         * getTreasureAmount()) / 100;
+            return (int) getOwner().applyModifier(fee,
+                "model.modifier.treasureTransportFee",
+                unitType, getGame().getTurn());
+        }
+        return 0;
+    }
+
+    /**
+     * Gets the skill level.
+     *
+     * @return The level of skill for this unit.  A higher value
+     *     signals a more advanced type of units.
+     */
+    public int getSkillLevel() {
+        return getSkillLevel(unitType);
+    }
+
+    /**
+     * Gets the skill level of the given type of <code>Unit</code>.
+     *
+     * @param unitType The type of <code>Unit</code>.
+     * @return The level of skill for the given unit.  A higher value
+     *     signals a more advanced type of units.
+     */
+    public static int getSkillLevel(UnitType unitType) {
+        return (unitType.hasSkill()) ? unitType.getSkill() : 0;
+    }
+
+    /**
+     * Get a Comparator that compares the skill levels of given units.
+     *
+     * @return skill Comparator
+     */
+    public static Comparator<Unit> getSkillLevelComparator() {
+        return skillLevelComp;
+    }
+
+    /**
+     * Does this unit or its owner satisfy the ability set identified
+     * by <code>id</code>.
+     *
+     * @param id The id of the ability to test.
+     * @param fcgot An optional <code>FreeColGameObjectType</code> the
+     *     ability applies to.
+     * @param turn An optional applicable <code>Turn</code>.
+     * @return True if the ability is present.
+     */
+    public boolean hasAbility(String id, FreeColGameObjectType fcgot,
+                              Turn turn) {
+        if (turn == null) turn = getGame().getTurn();
+        Set<Ability> result = new HashSet<Ability>();
+        // UnitType abilities always apply
+        result.addAll(unitType.getAbilitySet(id));
+        // The player's abilities require more qualification.
+        result.addAll(getOwner().getAbilitySet(id, unitType, turn));
+        // EquipmentType abilities always apply.
+        for (EquipmentType equipmentType : equipment.keySet()) {
+            result.addAll(equipmentType.getAbilitySet(id));
+            // Player abilities may also apply to equipment (e.g. missionary).
+            result.addAll(getOwner().getAbilitySet(id, equipmentType, turn));
+        }
+        // Location abilities may apply.
+        // TODO: extend this to all locations? May simplify
+        // code. Units are also Locations, however, which complicates
+        // the issue. We do not want Units aboard other Units to share
+        // the abilities of the carriers.
+        if (getSettlement() != null) {
+            result.addAll(getSettlement().getAbilitySet(id, unitType, turn));
+        } else if (isInEurope()) {
+            result.addAll(getOwner().getEurope().getAbilitySet(id, unitType, turn));
+        }
+        return FeatureContainer.hasAbility(result);
+    }
+
+    /**
+     * Get the modifiers that apply to this Unit.
+     *
+     * @param id The id of the modifier to test.
+     * @param fcgot An optional <code>FreeColGameObjectType</code> the
+     *     modifier applies to.
+     * @param turn An optional applicable <code>Turn</code>.
+     * @return A set of modifiers.
+     */
+    public Set<Modifier> getModifierSet(String id, FreeColGameObjectType fcgot,
+                                        Turn turn) {
+        if (turn == null) turn = getGame().getTurn();
+        Set<Modifier> result = new HashSet<Modifier>();
+        // UnitType modifiers always apply
+        result.addAll(unitType.getModifierSet(id));
+        // the player's modifiers may not apply
+        result.addAll(getOwner().getModifierSet(id, unitType, turn));
+        // EquipmentType modifiers always apply
+        for (EquipmentType equipmentType : equipment.keySet()) {
+            result.addAll(equipmentType.getModifierSet(id));
+            // player modifiers may also apply to equipment (unused)
+            result.addAll(getOwner().getModifierSet(id, equipmentType, turn));
+        }
+        return result;
+    }
+
+    /**
+     * Get a modifier that applies to the given Ownable. This is used
+     * for the offenceAgainst and defenceAgainst modifiers.
+     *
+     * @param id a <code>String</code> value
+     * @param ownable a <code>Ownable</code> value
+     * @return a <code>Modifier</code> value
+     */
+    public Set<Modifier> getModifierSet(String id, Ownable ownable) {
+        Set<Modifier> result = new HashSet<Modifier>();
+        Turn turn = getGame().getTurn();
+        NationType nationType = ownable.getOwner().getNationType();
+        result.addAll(unitType.getModifierSet(id, nationType, turn));
+        result.addAll(getOwner().getModifierSet(id, nationType, turn));
+        for (EquipmentType equipmentType : equipment.keySet()) {
+            result.addAll(equipmentType.getModifierSet(id, nationType, turn));
+        }
+        return result;
+    }
+
+    /**
+     * Adds a feature to the Unit.  This method always throws an
+     * <code>UnsupportedOperationException</code>, since features can
+     * not be added to Units directly.
+     *
+     * @param feature The <code>Feature</code> to add.
+     */
+    public void addFeature(Feature feature) {
+        throw new UnsupportedOperationException("Can not add Feature to Unit directly!");
+    }
+
+
+    // Message unpacking support.
 
     /**
      * Gets the tile in a given direction.
@@ -3626,21 +3381,18 @@ public class Unit extends GoodsLocation
         return (IndianSettlement)settlement;
     }
 
+
     // Interface Consumer
 
     /**
-     * Returns a list of GoodsTypes this Consumer consumes.
-     *
-     * @return a <code>List</code> value
+     * {@inheritDoc}
      */
     public List<AbstractGoods> getConsumedGoods() {
         return unitType.getConsumedGoods();
     }
 
     /**
-     * Describe <code>getProductionInfo</code> method here.
-     *
-     * @return a <code>ProductionInfo</code> value
+     * {@inheritDoc}
      */
     public ProductionInfo getProductionInfo(List<AbstractGoods> input) {
         ProductionInfo result = new ProductionInfo();
@@ -3650,255 +3402,557 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * The priority of this Consumer. The higher the priority, the
-     * earlier will the Consumer be allowed to consume the goods it
-     * requires.
-     *
-     * @return an <code>int</code> value
+     * {@inheritDoc}
      */
     public int getPriority() {
         return unitType.getPriority();
     }
 
-    // Serialization
+
+    // Interface Ownable
 
     /**
-     * This method writes an XML-representation of this object to the given
-     * stream.
-     *
-     * <br>
-     * <br>
-     *
-     * Only attributes visible to the given <code>Player</code> will be added
-     * to that representation if <code>showAll</code> is set to
-     * <code>false</code>.
-     *
-     * @param out The target stream.
-     * @param player The <code>Player</code> this XML-representation should be
-     *            made for, or <code>null</code> if
-     *            <code>showAll == true</code>.
-     * @param showAll Only attributes visible to <code>player</code> will be
-     *            added to the representation if <code>showAll</code> is set
-     *            to <i>false</i>.
-     * @param toSavedGame If <code>true</code> then information that is only
-     *            needed when saving a game is added.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
+     * {@inheritDoc}
      */
+    public Player getOwner() {
+        return owner;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setOwner(Player owner) {
+        Player oldOwner = this.owner;
+
+        // safeguard
+        if (oldOwner == owner) {
+            return;
+        } else if (oldOwner == null) {
+            logger.warning("Unit " + getId() + " had no previous owner, when changing owner to " + owner.getId());
+        }
+
+        // Clear trade route and goto orders if changing owner.
+        if (getTradeRoute() != null) {
+            setTradeRoute(null);
+        }
+        if (getDestination() != null) {
+            setDestination(null);
+        }
+
+        // This need to be set right away
+        this.owner = owner;
+        // If its a carrier, we need to update the units it has loaded
+        //before finishing with it
+        for (Unit unit : getUnitList()) {
+            unit.setOwner(owner);
+        }
+
+        if(oldOwner != null) {
+            oldOwner.removeUnit(this);
+            oldOwner.modifyScore(-getType().getScoreValue());
+            // for speed optimizations
+            if(!isOnCarrier()){
+                oldOwner.invalidateCanSeeTiles();
+            }
+        }
+        owner.addUnit(this);
+        if(getType() != null) {     // can be null if setOwner() is called from fixIntegrity()
+            owner.modifyScore(getType().getScoreValue());
+        }
+
+        // for speed optimizations
+        if(!isOnCarrier()) {
+            getOwner().setExplored(this);
+        }
+
+        getGame().notifyOwnerChanged(this, oldOwner, owner);
+    }
+
+    // Interface Location (from GoodsLocation via UnitLocation)
+    // Inherits
+    //   FreeColObject.getId
+    //   UnitLocation.getLocationNameFor
+    //   UnitLocation.contains
+    //   UnitLocation.canAdd
+    //   UnitLocation.getUnitCount
+    //   UnitLocation.getUnitList
+    //   GoodsLocation.getGoodsContainer
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Tile getTile() {
+        return (location != null) ? location.getTile() : null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public StringTemplate getLocationName() {
+        return StringTemplate.template("onBoard")
+            .addStringTemplate("%unit%", getLabel());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean add(Locatable locatable) {
+        if (!canAdd(locatable)) {
+            return false;
+        } else if (locatable instanceof Unit) {
+            Unit unit = (Unit)locatable;
+            if (super.add(locatable)) {
+                // TODO: there seems to be an inconsistency between
+                // units moving from an adjacent tile onto a ship and
+                // units boarding a ship in-colony.  The former does not
+                // appear to come through here (which it probably should)
+                // as the ship's moves do not get zeroed.
+                spendAllMoves();
+                ((Unit)locatable).setState(UnitState.SENTRY);
+                return true;
+            }
+        } else if (locatable instanceof Goods) {
+            Goods goods = (Goods)locatable;
+            if (super.addGoods(goods)) {
+                spendAllMoves();
+                return true;
+            }
+        } else {
+            throw new IllegalStateException("Can not be added to unit: "
+                + ((FreeColGameObject)locatable).toString());
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean remove(Locatable locatable) {
+        if (locatable == null) {
+            throw new IllegalArgumentException("Locatable must not be 'null'.");
+        } else if (locatable instanceof Unit && canCarryUnits()) {
+            if (super.remove((Unit)locatable)) {
+                spendAllMoves();
+                return true;
+            }
+        } else if (locatable instanceof Goods && canCarryGoods()) {
+            if (super.removeGoods((Goods)locatable) != null) {
+                spendAllMoves();
+                return true;
+            }
+        } else {
+            logger.warning("Tried to remove from unit: "
+                + ((FreeColGameObject)locatable));
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Settlement getSettlement() {
+        Location location = getLocation();
+        return (location != null) ? location.getSettlement() : null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Colony getColony() {
+        Location location = getLocation();
+        return (location != null) ? location.getColony() : null;
+    }
+
+
+    // UnitLocation
+    // Inherits
+    //   UnitLocation.getSpaceTaken
+    //   UnitLocation.moveToFront
+    //   UnitLocation.clearUnitList
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getSpaceTaken() {
+        // We do not have to consider what this unit is carrying
+        // because carriers can not be put onto carriers.  Yet.
+        return unitType.getSpaceTaken();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public NoAddReason getNoAddReason(Locatable locatable) {
+        if (locatable == this) {
+            return NoAddReason.ALREADY_PRESENT;
+        } else if (locatable instanceof Unit) {
+            return (!canCarryUnits())
+                ? NoAddReason.WRONG_TYPE
+                : (((Unit)locatable).getSpaceTaken() > getSpaceLeft())
+                ? NoAddReason.CAPACITY_EXCEEDED
+                : super.getNoAddReason(locatable);
+        } else if (locatable instanceof Goods) {
+            Goods goods = (Goods)locatable;
+            return (!canCarryGoods())
+                ? NoAddReason.WRONG_TYPE
+                : (goods.getAmount() > getLoadableAmount(goods.getType()))
+                ? NoAddReason.CAPACITY_EXCEEDED
+                : NoAddReason.NONE;
+            // Do not call super.getNoAddReason for goods because
+            // the capacity test in GoodsLocation.getNoAddReason does not
+            // account for packing and is thus too conservative.
+        }
+        return super.getNoAddReason(locatable);
+    }
+
+
+    // GoodsLocation
+    // Inherits
+    //   GoodsLocation.addGoods
+    //   GoodsLocation.removeGoods
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getGoodsCapacity() {
+        return getCargoCapacity();
+    }
+
+
+    // Override FreeColGameObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<FreeColGameObject> disposeList() {
+        List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
+
+        if (location != null) {
+            location.remove(this);
+        }
+
+        if (teacher != null) {
+            teacher.setStudent(null);
+            teacher = null;
+        }
+
+        if (student != null) {
+            student.setTeacher(null);
+            student = null;
+        }
+
+        setIndianSettlement(null);
+
+        getOwner().invalidateCanSeeTiles();
+        getOwner().removeUnit(this);
+
+        objects.addAll(super.disposeList());
+        return objects;
+    }
+
+
+    // Serialization
+
+    private static final String ATTRITION_TAG = "attrition";
+    private static final String COUNT_TAG = "count";
+    private static final String CURRENT_STOP_TAG = "currentStop";
+    private static final String DESTINATION_TAG = "destination";
+    private static final String ENTRY_LOCATION_TAG = "entryLocation";
+    private static final String EQUIPMENT_TAG = "equipment";
+    private static final String ETHNICITY_TAG = "ethnicity";
+    private static final String EXPERIENCE_TAG = "experience";
+    private static final String EXPERIENCE_TYPE_TAG = "experienceType";
+    private static final String HIT_POINTS_TAG = "hitPoints";
+    private static final String INDIAN_SETTLEMENT_TAG = "indianSettlement";
+    private static final String LOCATION_TAG = "location";
+    private static final String MOVES_LEFT_TAG = "movesLeft";
+    private static final String NAME_TAG = "name";
+    private static final String NATIONALITY_TAG = "nationality";
+    private static final String OWNER_TAG = "owner";
+    private static final String ROLE_TAG = "role";
+    private static final String STATE_TAG = "state";
+    private static final String STUDENT_TAG = "student";
+    private static final String TRADE_ROUTE_TAG = "tradeRoute";
+    private static final String TEACHER_TAG = "teacher";
+    private static final String TREASURE_AMOUNT_TAG = "treasureAmount";
+    private static final String TURNS_OF_TRAINING_TAG = "turnsOfTraining";
+    private static final String UNIT_TYPE_TAG = "unitType";
+    private static final String VISIBLE_GOODS_COUNT_TAG = "visibleGoodsCount";
+    private static final String WORK_LEFT_TAG = "workLeft";
+    private static final String WORK_TYPE_TAG = "workType";
+    // @compat 0.10.7
+    private static final String OLD_HIT_POINTS_TAG = "hitpoints";
+    // end @compat
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out, Player player,
-                             boolean showAll, boolean toSavedGame)
-        throws XMLStreamException {
+                             boolean showAll,
+                             boolean toSavedGame) throws XMLStreamException {
+        super.toXML(out, getXMLElementTagName(), player, showAll, toSavedGame);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeAttributes(XMLStreamWriter out, Player player,
+                                   boolean showAll,
+                                   boolean toSavedGame) throws XMLStreamException {
         boolean full = showAll || toSavedGame || player == getOwner();
 
-        // Start element:
-        out.writeStartElement(getXMLElementTagName());
+        super.writeAttributes(out);
 
-        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
         if (name != null) {
-            out.writeAttribute("name", name);
+            writeAttribute(out, NAME_TAG, name);
         }
-        out.writeAttribute("unitType", unitType.getId());
-        out.writeAttribute("movesLeft", Integer.toString(movesLeft));
-        out.writeAttribute("state", state.toString());
-        out.writeAttribute("role", role.toString());
+
+        writeAttribute(out, UNIT_TYPE_TAG, unitType);
+
+        writeAttribute(out, MOVES_LEFT_TAG, movesLeft);
+
+        writeAttribute(out, STATE_TAG, state);
+
+        writeAttribute(out, ROLE_TAG, role);
+
+        if (location != null) {
+            if (full || !(location instanceof Building
+                    || location instanceof ColonyTile)) {
+                writeLocationAttribute(out, LOCATION_TAG, location);
+
+            } else {
+                writeLocationAttribute(out, LOCATION_TAG, getColony());
+            }
+        }
+
         if (!full && hasAbility(Ability.PIRACY)) {
             // Pirates do not disclose national characteristics.
-            out.writeAttribute("owner", getGame().getUnknownEnemy().getId());
+            writeAttribute(out, OWNER_TAG, getGame().getUnknownEnemy());
+
         } else {
-            out.writeAttribute("owner", getOwner().getId());
+            writeAttribute(out, OWNER_TAG, getOwner());
+
             if (isPerson()) {
                 // Do not write out nationality and ethnicity for non-persons.
-                out.writeAttribute("nationality",
+                writeAttribute(out, NATIONALITY_TAG,
                     (nationality != null) ? nationality
                     : getOwner().getNationId());
-                out.writeAttribute("ethnicity",
+
+                writeAttribute(out, ETHNICITY_TAG,
                     (ethnicity != null) ? ethnicity
                     : getOwner().getNationId());
             }
         }
-        out.writeAttribute("turnsOfTraining", Integer.toString(turnsOfTraining));
-        if (workType != null) out.writeAttribute("workType", workType.getId());
-        if (experienceType != null) out.writeAttribute("experienceType",
-                                                       experienceType.getId());
-        out.writeAttribute("experience", Integer.toString(experience));
-        out.writeAttribute("treasureAmount", Integer.toString(treasureAmount));
-        out.writeAttribute("hitpoints", Integer.toString(hitpoints));
-        out.writeAttribute("attrition", Integer.toString(attrition));
 
-        writeAttribute(out, "student", student);
-        writeAttribute(out, "teacher", teacher);
+
+
+        writeAttribute(out, TREASURE_AMOUNT_TAG, treasureAmount);
 
         if (full) {
-            writeAttribute(out, "indianSettlement", indianSettlement);
-            out.writeAttribute("workLeft", Integer.toString(workLeft));
-        } else {
-            out.writeAttribute("workLeft", Integer.toString(-1));
-        }
+            if (entryLocation != null) {
+                writeLocationAttribute(out, ENTRY_LOCATION_TAG, entryLocation);
+            }
 
-        if (entryLocation != null) {
-            out.writeAttribute("entryLocation", entryLocation.getId());
-        }
+            writeAttribute(out, TURNS_OF_TRAINING_TAG, turnsOfTraining);
 
-        if (location != null) {
-            if (full || !(location instanceof Building
-                          || location instanceof ColonyTile)) {
-                out.writeAttribute("location", location.getId());
-            } else {
-                out.writeAttribute("location", getColony().getId());
+            if (workType != null) writeAttribute(out, WORK_TYPE_TAG, workType);
+            
+            if (experienceType != null) {
+                writeAttribute(out, EXPERIENCE_TYPE_TAG, experienceType);
+            }
+
+            writeAttribute(out, EXPERIENCE_TAG, experience);
+
+            writeAttribute(out, INDIAN_SETTLEMENT_TAG, indianSettlement);
+
+            writeAttribute(out, WORK_LEFT_TAG, workLeft);
+
+            writeAttribute(out, HIT_POINTS_TAG, hitPoints);
+            
+            writeAttribute(out, ATTRITION_TAG, attrition);
+            
+            if (student != null) writeAttribute(out, STUDENT_TAG, student);
+            
+            if (teacher != null) writeAttribute(out, TEACHER_TAG, teacher);
+
+            if (destination != null) {
+                writeAttribute(out, DESTINATION_TAG, destination);
+            }
+
+            if (tradeRoute != null) {
+                writeAttribute(out, TRADE_ROUTE_TAG, tradeRoute);
+
+                writeAttribute(out, CURRENT_STOP_TAG, currentStop);
             }
         }
+    }
 
-        if (destination != null) {
-            out.writeAttribute("destination", destination.getId());
-        }
-        if (tradeRoute != null) {
-            out.writeAttribute("tradeRoute", tradeRoute.getId());
-            out.writeAttribute("currentStop", String.valueOf(currentStop));
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeChildren(XMLStreamWriter out, Player player,
+                                 boolean showAll,
+                                 boolean toSavedGame) throws XMLStreamException {
+        boolean full = showAll || toSavedGame || player == getOwner();
+
+        // Do not show enemy units hidden in a carrier:
+        if (full) {
+            super.writeChildren(out, player, showAll, toSavedGame);
+
+        } else if (getType().canCarryGoods()) {
+            writeAttribute(out, VISIBLE_GOODS_COUNT_TAG, getVisibleGoodsCount());
         }
 
         if (workImprovement != null) {
             workImprovement.toXML(out, player, showAll, toSavedGame);
         }
 
-        // Do not show enemy units hidden in a carrier:
-        if (full) {
-            super.writeChildren(out, player, showAll, toSavedGame);
-        } else if (getType().canCarryGoods()) {
-            out.writeAttribute("visibleGoodsCount", Integer.toString(getVisibleGoodsCount()));
-        }
+        for (EquipmentType et : getSortedCopy(equipment.keySet())) {
+            out.writeStartElement(EQUIPMENT_TAG);
+            
+            writeAttribute(out, ID_ATTRIBUTE_TAG, et);
 
-        if (!equipment.isEmpty()) {
-            for (Entry<EquipmentType, Integer> entry : equipment.getValues().entrySet()) {
-                out.writeStartElement(EQUIPMENT_TAG);
-                out.writeAttribute(ID_ATTRIBUTE_TAG, entry.getKey().getId());
-                out.writeAttribute("count", entry.getValue().toString());
-                out.writeEndElement();
-            }
-        }
+            writeAttribute(out, COUNT_TAG, equipment.getCount(et));
 
-        out.writeEndElement();
+            out.writeEndElement();
+        }
     }
 
     /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
-     * @throws javax.xml.stream.XMLStreamException is thrown if
-     *     something goes wrong.
+     * {@inheritDoc}
      */
+    @Override
+    protected void toXMLPartialImpl(XMLStreamWriter out,
+                                    String[] fields) throws XMLStreamException {
+        toXMLPartialByClass(out, getClass(), fields);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void readFromXMLPartialImpl(XMLStreamReader in) throws XMLStreamException {
+        readFromXMLPartialByClass(in, getClass());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        Game game = getGame();
+        final Specification spec = getSpecification();
+        final Game game = getGame();
+
         super.readAttributes(in);
-        setName(in.getAttributeValue(null, "name"));
+
+        name = getAttribute(in, NAME_TAG, (String)null);
+
+        owner = makeFreeColGameObject(in, OWNER_TAG, Player.class);
+
         UnitType oldUnitType = unitType;
-        unitType = getSpecification().getUnitType(in.getAttributeValue(null, "unitType"));
+        unitType = spec.getType(in, UNIT_TYPE_TAG,
+                                UnitType.class, (UnitType)null);
 
-        movesLeft = Integer.parseInt(in.getAttributeValue(null, "movesLeft"));
-        state = Enum.valueOf(UnitState.class, in.getAttributeValue(null, "state"));
-        role = Enum.valueOf(Role.class, in.getAttributeValue(null, "role"));
-        workLeft = Integer.parseInt(in.getAttributeValue(null, "workLeft"));
-        attrition = getAttribute(in, "attrition", 0);
+        state = getAttribute(in, STATE_TAG, UnitState.class, UnitState.ACTIVE);
 
-        owner = makeFreeColGameObject(in, "owner", Player.class);
+        role = getAttribute(in, ROLE_TAG, Role.class, Role.DEFAULT);
 
-        nationality = in.getAttributeValue(null, "nationality");
-        ethnicity = in.getAttributeValue(null, "ethnicity");
+        location = makeLocationAttribute(in, LOCATION_TAG, game);
 
+        entryLocation = makeLocationAttribute(in, ENTRY_LOCATION_TAG, game);
+
+        movesLeft = getAttribute(in, MOVES_LEFT_TAG, 0);
+
+        workLeft = getAttribute(in, WORK_LEFT_TAG, 0);
+
+        attrition = getAttribute(in, ATTRITION_TAG, 0);
+
+        nationality = getAttribute(in, NATIONALITY_TAG, (String)null);
+
+        ethnicity = getAttribute(in, ETHNICITY_TAG, (String)null);
+
+        // TODO: does this make sense?
         if (oldUnitType == null) {
             owner.modifyScore(unitType.getScoreValue());
         } else {
             owner.modifyScore(unitType.getScoreValue() - oldUnitType.getScoreValue());
         }
 
-        turnsOfTraining = Integer.parseInt(in.getAttributeValue(null, "turnsOfTraining"));
-        hitpoints = Integer.parseInt(in.getAttributeValue(null, "hitpoints"));
+        turnsOfTraining = getAttribute(in, TURNS_OF_TRAINING_TAG, 0);
 
-        teacher = makeFreeColGameObject(in, "teacher", Unit.class);
+        hitPoints = getAttribute(in, HIT_POINTS_TAG, -1);
+        // @compat 0.10.7
+        if (hitPoints < 0) hitPoints = getAttribute(in, OLD_HIT_POINTS_TAG, -1);
+        // end @compat
 
-        student = makeFreeColGameObject(in, "student", Unit.class);
+        teacher = makeFreeColGameObject(in, TEACHER_TAG, Unit.class);
 
-        setIndianSettlement(makeFreeColGameObject(in, "indianSettlement",
+        student = makeFreeColGameObject(in, STUDENT_TAG, Unit.class);
+
+        setIndianSettlement(makeFreeColGameObject(in, INDIAN_SETTLEMENT_TAG,
                                                   IndianSettlement.class));
 
-        treasureAmount = getAttribute(in, "treasureAmount", 0);
+        treasureAmount = getAttribute(in, TREASURE_AMOUNT_TAG, 0);
 
-        destination = makeLocationAttribute(in, "destination", game);
+        destination = makeLocationAttribute(in, DESTINATION_TAG, game);
 
-        currentStop = -1;
-
-        tradeRoute = findFreeColGameObject(in, "tradeRoute",
+        tradeRoute = findFreeColGameObject(in, TRADE_ROUTE_TAG,
                                            TradeRoute.class, (TradeRoute)null);
 
-        if (tradeRoute != null) {
-            final String currentStopStr = in.getAttributeValue(null, "currentStop");
-            if (currentStopStr != null) {
-                currentStop = Integer.parseInt(currentStopStr);
-            }
-        }
+        currentStop = (tradeRoute == null) ? -1
+            : getAttribute(in, CURRENT_STOP_TAG, 0);
 
-        workType = getSpecification().getType(in, "workType", GoodsType.class, null);
-        experienceType = getSpecification().getType(in, "experienceType", GoodsType.class, null);
+        workType = spec.getType(in, WORK_TYPE_TAG, GoodsType.class, null);
+
+        experienceType = spec.getType(in, EXPERIENCE_TYPE_TAG,
+                                      GoodsType.class, (GoodsType)null);
         if (experienceType == null && workType != null) {
             experienceType = workType;
         }
-
         // @compat 0.9.x
         try {
             // this is likely to cause an exception, as the
             // specification might not define grain
-            GoodsType grain = getSpecification().getGoodsType("model.goods.grain");
-            GoodsType food = getSpecification().getPrimaryFoodType();
-            if (food.equals(workType)) {
-                workType = grain;
-            }
-            if (food.equals(experienceType)) {
-                experienceType = grain;
-            }
+            GoodsType grain = spec.getGoodsType("model.goods.grain");
+            GoodsType food = spec.getPrimaryFoodType();
+            if (food.equals(workType)) workType = grain;
+            if (food.equals(experienceType)) experienceType = grain;
         } catch (Exception e) {
             logger.log(Level.FINEST, "Failed to update food to grain.", e);
         }
-        // end compatibility code
-        experience = getAttribute(in, "experience", 0);
-        visibleGoodsCount = getAttribute(in, "visibleGoodsCount", -1);
+        // end @compat
 
-        entryLocation = makeLocationAttribute(in, "entryLocation", game);
+        experience = getAttribute(in, EXPERIENCE_TAG, 0);
 
-        location = makeLocationAttribute(in, "location", game);
+        visibleGoodsCount = getAttribute(in, VISIBLE_GOODS_COUNT_TAG, -1);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        // Clear containers.
         clearUnitList();
         if (getGoodsContainer() != null) getGoodsContainer().removeAll();
         clearEquipment();
         setWorkImprovement(null);
-    }
 
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
-        Game game = getGame();
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if (in.getLocalName().equals(UNITS_TAG)) {
-                // @compat 0.10.5
-                while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                    super.readChild(in);
-                }
-                // end compatibility code
-            } else if (in.getLocalName().equals(EQUIPMENT_TAG)) {
-                String xLength = in.getAttributeValue(null, ARRAY_SIZE_TAG);
-                if (xLength == null) {
-                    String equipmentId = readId(in);
-                    int count = Integer.parseInt(in.getAttributeValue(null, "count"));
-                    equipment.incrementCount(getSpecification().getEquipmentType(equipmentId), count);
-                } else { // @compat 0.9.x
-                    int length = Integer.parseInt(xLength);
-                    for (int index = 0; index < length; index++) {
-                        String equipmentId = in.getAttributeValue(null, "x" + String.valueOf(index));
-                        equipment.incrementCount(getSpecification().getEquipmentType(equipmentId), 1);
-                    }
-                } // end compatibility code
-                in.nextTag();
-            } else if (in.getLocalName().equals(TileImprovement.getXMLElementTagName())) {
-                setWorkImprovement(readFreeColGameObject(in, TileImprovement.class));
-            } else {
-                super.readChild(in);
-            }
-        }
+        super.readChildren(in);
 
         setRole();
         getOwner().addUnit(this);
@@ -3906,28 +3960,46 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Partial writer for units, so that "remove" messages can be brief.
-     *
-     * @param out The target stream.
-     * @param fields The fields to write.
-     * @throws XMLStreamException If there are problems writing the stream.
+     * {@inheritDoc}
      */
     @Override
-    protected void toXMLPartialImpl(XMLStreamWriter out, String[] fields)
-        throws XMLStreamException {
-        toXMLPartialByClass(out, getClass(), fields);
-    }
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+        final Specification spec = getSpecification();
+        final Game game = getGame();
+        final String tag = in.getLocalName();
 
-    /**
-     * Partial reader for units, so that "remove" messages can be brief.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException If there are problems reading the stream.
-     */
-    @Override
-    public void readFromXMLPartialImpl(XMLStreamReader in)
-        throws XMLStreamException {
-        readFromXMLPartialByClass(in, getClass());
+        if (EQUIPMENT_TAG.equals(tag)) {
+            // @compat 0.9.x
+            int length = getAttribute(in, ARRAY_SIZE_TAG, 0);
+            if (length > 0) {
+                for (int index = 0; index < length; index++) {
+                    EquipmentType et = spec.getType(in, "x" + index,
+                        EquipmentType.class, (EquipmentType)null);
+                    if (et != null) {
+                        equipment.incrementCount(et, 1);
+                    }
+                }
+            // end @compat
+            } else {
+                equipment.incrementCount(spec.getEquipmentType(readId(in)),
+                    getAttribute(in, COUNT_TAG, 0));
+            }
+            closeTag(in, EQUIPMENT_TAG);
+
+        // @compat 0.10.5
+        } else if (UNITS_TAG.equals(tag)) {
+            while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                super.readChild(in);
+            }
+        // end @compat
+
+        } else if (TileImprovement.getXMLElementTagName().equals(tag)) {
+            TileImprovement ti = readFreeColGameObject(in, TileImprovement.class);
+            if (ti != null) setWorkImprovement(ti);
+
+        } else {
+            super.readChild(in);
+        }
     }
 
     /**
@@ -3937,13 +4009,22 @@ public class Unit extends GoodsLocation
      * @return A string representation of this <code>Unit</code>.
      */
     public String toString(String prefix) {
-        String rest = (isUninitialized()) ? "uninitialized"
-            : (isDisposed()) ? "disposed"
-            : (Utils.lastPart(owner.getNationId(), ".")
-                + " " + Utils.lastPart(getType().getId(), ".")
-                + ((getRole() == Role.DEFAULT) ? "" : "-" + getRole())
-                + " " + getMovesAsString());
-        return "[" + prefix + getId() + " " + rest + "]";
+        StringBuilder sb = new StringBuilder(64);
+        sb.append("[").append(prefix).append(getId());
+        if (isUninitialized()) {
+            sb.append(" uninitialized");
+        } else if (isDisposed()) {
+            sb.append(" disposed");
+        } else {
+            sb.append(" ").append(Utils.lastPart(owner.getNationId(), "."))
+                .append(" ").append(Utils.lastPart(getType().getId(), "."));
+            if (getRole() != Role.DEFAULT) {
+                sb.append("-").append(getRole());
+            }
+            sb.append(" ").append(getMovesAsString());
+        }
+        sb.append("]");
+        return sb.toString();
     }
 
     /**

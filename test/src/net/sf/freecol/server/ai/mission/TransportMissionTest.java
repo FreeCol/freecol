@@ -109,7 +109,7 @@ public class TransportMissionTest extends FreeColTestCase {
         // Verify that the outcome of the combat is a return to Europe
         // for repairs and also invalidation of the transport mission
         // as side effect.
-        assertTrue(galleon.isUnderRepair());
+        assertTrue(galleon.isDamaged());
         assertFalse(aiUnit.getMission().isValid());
 
         // This will call AIPlayer.abortInvalidMissions() and change

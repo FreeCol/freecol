@@ -123,7 +123,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         workType = getSpecification().getGoodsType(template.getWorkType().getId());
 
         this.movesLeft = template.getMovesLeft();
-        hitpoints = template.getType().getHitPoints();
+        hitPoints = template.getType().getHitPoints();
 
         for (EquipmentType equipmentType : template.getEquipment().keySet()) {
             EquipmentType myType = getSpecification().getEquipmentType(equipmentType.getId());
@@ -169,7 +169,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         workType = null;
 
         this.movesLeft = getInitialMovesLeft();
-        hitpoints = unitType.getHitPoints();
+        hitPoints = unitType.getHitPoints();
 
         for (EquipmentType equipmentType : initialEquipment) {
             if (EquipmentType.NO_EQUIPMENT.equals(equipmentType)) {
@@ -253,7 +253,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         if (isInMission()) {
             getLocation().getTile().updatePlayerExploredTile(owner, true);
             setMovesLeft(0);
-        } else if (isUnderRepair()) {
+        } else if (isDamaged()) {
             setMovesLeft(0);
         } else {
             setMovesLeft(getInitialMovesLeft());
@@ -482,8 +482,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
      */
     public void csRepairUnit(ChangeSet cs) {
         ServerPlayer owner = (ServerPlayer) getOwner();
-        setHitpoints(getHitpoints() + 1);
-        if (!isUnderRepair()) {
+        setHitPoints(getHitPoints() + 1);
+        if (!isDamaged()) {
             Location loc = getLocation();
             cs.addMessage(See.only(owner),
                 new ModelMessage("model.unit.unitRepaired",
@@ -491,8 +491,9 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 .addStringTemplate("%unit%", getLabel())
                 .addStringTemplate("%repairLocation%",
                     loc.getLocationNameFor(owner)));
+            setState(UnitState.ACTIVE);
         }
-        cs.addPartial(See.only(owner), this, "hitpoints");
+        cs.addPartial(See.only(owner), this, "hitPoints");
     }
 
     /**

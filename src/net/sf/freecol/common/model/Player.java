@@ -130,7 +130,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 && unit.getMovesLeft() > 0
                 && (unit.getDestination() != null
                     || unit.getTradeRoute() != null)
-                && !unit.isUnderRepair()
+                && !unit.isDamaged()
                 && !unit.isAtSea()
                 && !unit.isOnCarrier()
                 && !(unit.getLocation() instanceof WorkLocation);

@@ -185,7 +185,7 @@ public class ServerBuilding extends Building implements ServerModelObject {
 
     private void repairUnits(ChangeSet cs) {
         for (Unit unit : getTile().getUnitList()) {
-            if (unit.isUnderRepair()
+            if (unit.isDamaged()
                 && getType().hasAbility("model.ability.repairUnits",
                                         unit.getType())) {
                 ((ServerUnit) unit).csRepairUnit(cs);

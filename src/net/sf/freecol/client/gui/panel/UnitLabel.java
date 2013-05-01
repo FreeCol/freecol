@@ -287,7 +287,7 @@ public final class UnitLabel extends JLabel
             ImageLibrary lib = gui.getImageLibrary();
             g.drawImage(lib.getOccupationIndicatorChip(unit, text), 0, 0, null);
 
-            if (unit.isUnderRepair()) {
+            if (unit.isDamaged()) {
                 String underRepair = Messages.message(StringTemplate.template("underRepair")
                                                       .addAmount("%turns%", unit.getTurnsForRepair()));
                 String underRepair1 = underRepair.substring(0, underRepair.indexOf('(')).trim();

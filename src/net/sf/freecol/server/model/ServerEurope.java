@@ -143,7 +143,7 @@ public class ServerEurope extends Europe implements ServerModelObject {
         logger.finest("ServerEurope.csNewTurn, for " + toString());
 
         for (Unit unit : getUnitList()) {
-            if (unit.isNaval() && unit.isUnderRepair()) {
+            if (unit.isNaval() && unit.isDamaged()) {
                 ((ServerUnit) unit).csRepairUnit(cs);
             }
         }

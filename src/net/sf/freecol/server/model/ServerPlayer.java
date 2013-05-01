@@ -2780,7 +2780,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
 
         // Damage the ship and send it off for repair
-        ship.setHitpoints(1);
+        ship.setHitPoints(1);
         ship.setDestination(null);
         ship.setLocation((repair instanceof Colony) ? repair.getTile()
             : repair);

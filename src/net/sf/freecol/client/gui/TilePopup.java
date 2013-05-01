@@ -186,7 +186,7 @@ public final class TilePopup extends JPopupMenu {
             }
 
             lineCount += addUnit(currentMenu, currentUnit,
-                !currentUnit.isUnderRepair(), false);
+                !currentUnit.isDamaged(), false);
         }
 
         if (tile.getUnitCount() > 1) {
@@ -374,7 +374,7 @@ public final class TilePopup extends JPopupMenu {
 
         if (unit.getState() == Unit.UnitState.ACTIVE
             && unit.getMovesLeft() == 0) {
-            if (unit.isUnderRepair()) {
+            if (unit.isDamaged()) {
                 occ = StringTemplate.label(": ")
                     .add("model.unit.occupation.underRepair")
                     .add(Integer.toString(unit.getTurnsForRepair()));

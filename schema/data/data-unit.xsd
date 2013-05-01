@@ -26,7 +26,7 @@
   <xs:include schemaLocation="data-common.xsd">
     <xs:annotation>
       <xs:documentation>
-	Include common data model type definitions.
+	      Include common data model type definitions.
       </xs:documentation>
     </xs:annotation>
   </xs:include>
@@ -38,10 +38,10 @@
   <xs:element name="unit" type="unitElementType">
     <xs:annotation>
       <xs:documentation>
-	Represents all pieces that can be moved on the
-	map-board. This includes: colonists, ships, wagon trains e.t.c.
+	      Represents all pieces that can be moved on the
+	      map-board. This includes: colonists, ships, wagon trains e.t.c.
 
-	Every Unit is owned by a Player and has a Location.
+	      Every Unit is owned by a Player and has a Location.
       </xs:documentation>
     </xs:annotation>
 
@@ -99,7 +99,10 @@
     <xs:attribute name="experienceType" type="xs:string" use="optional"/>
     <xs:attribute name="experience" type="xs:int" use="required"/>
     <xs:attribute name="treasureAmount" type="xs:int" use="required"/>
-    <xs:attribute name="hitpoints" type="xs:int" use="required"/>
+    <xs:attribute name="hitPoints" type="xs:int" use="required"/>
+    <!-- @compat 0.10.7 -->
+    <xs:attribute name="hitpoints" type="xs:int" use="optional"/>
+    <!-- end @compat -->
     <xs:attribute name="attrition" type="xs:int" use="required"/>
     <xs:attribute name="student" type="UnitId" use="optional"/>
     <xs:attribute name="teacher" type="UnitId" use="optional"/>
@@ -123,6 +126,17 @@
 
   <xs:simpleType name="UnitState">
     <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="active" />
+      <xs:enumeration value="fortified" />
+      <xs:enumeration value="sentry" />
+      <xs:enumeration value="in_colony" />
+      <xs:enumeration value="improving" />
+      <xs:enumeration value="to_europe" />
+      <xs:enumeration value="in_europe" />
+      <xs:enumeration value="to_america" />
+      <xs:enumeration value="fortifying" />
+      <xs:enumeration value="skipped" />
+      <!-- @compat 0.10.x -->
       <xs:enumeration value="ACTIVE" />
       <xs:enumeration value="FORTIFIED" />
       <xs:enumeration value="SENTRY" />
@@ -133,6 +147,7 @@
       <xs:enumeration value="TO_AMERICA" />
       <xs:enumeration value="FORTIFYING" />
       <xs:enumeration value="SKIPPED" />
+      <!-- end @compat 0.10.x -->
     </xs:restriction>
   </xs:simpleType>
 

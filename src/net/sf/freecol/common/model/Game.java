@@ -314,7 +314,9 @@ public class Game extends FreeColGameObject {
             logger.warning("Not a location: " + id);
             return null;
         }
-        final String tag = id.substring(0, id.indexOf(':'));
+        int idx = id.indexOf(':');
+        final String tag = (idx >= 0) ? id.substring(0, id.indexOf(':'))
+            : id;
         if ("newWorld".equals(tag)) {
             // do nothing
         } else if (Building.getXMLElementTagName().equals(tag)) {
