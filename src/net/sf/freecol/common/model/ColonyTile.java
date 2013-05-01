@@ -48,9 +48,7 @@ public class ColonyTile extends WorkLocation implements Ownable {
 
     public static final String UNIT_CHANGE = "UNIT_CHANGE";
 
-    /**
-     * The maximum number of units a ColonyTile can hold.
-     */
+    /** The maximum number of units a ColonyTile can hold. */
     public static final int UNIT_CAPACITY = 1;
 
     /**
@@ -70,30 +68,31 @@ public class ColonyTile extends WorkLocation implements Ownable {
     /**
      * Constructor for ServerColonyTile.
      *
-     * @param game The <code>Game</code> this object belongs to.
+     * @param game The enclosing <code>Game</code>.
      * @param colony The <code>Colony</code> this object belongs to.
      * @param workTile The tile in which this <code>ColonyTile</code>
      *                 represents a <code>WorkLocation</code> for.
      */
     protected ColonyTile(Game game, Colony colony, Tile workTile) {
         super(game);
-
-        setColony(colony);
+        
+        this.colony = colony;
         this.workTile = workTile;
         updateProductionType();
     }
 
     /**
-     * Initiates a new <code>ColonyTile</code> with the given ID.  The
-     * object should later be initialized by calling either
+     * Create a new <code>ColonyTile</code> with the given identifier.
+     * The object should later be initialized by calling either
      * {@link #readFromXML(XMLStreamReader)}.
      *
-     * @param game The <code>Game</code> in which this object belong.
-     * @param id The unique identifier for this object.
+     * @param game The enclosing <code>Game</code>.
+     * @param id The object identifier.
      */
     public ColonyTile(Game game, String id) {
         super(game, id);
     }
+
 
     /**
      * Gets a description of the tile, with the name of the tile
@@ -526,21 +525,17 @@ public class ColonyTile extends WorkLocation implements Ownable {
     protected void toXMLImpl(XMLStreamWriter out, Player player,
                              boolean showAll,
                              boolean toSavedGame) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
-
-        writeAttributes(out);
-
-        super.writeChildren(out, player, showAll, toSavedGame);
-
-        out.writeEndElement();
+        super.toXML(out, getXMLElementTagName(), player, showAll, toSavedGame);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(XMLStreamWriter out, Player player,
+                                   boolean showAll,
+                                   boolean toSavedGame) throws XMLStreamException {
+        super.writeAttributes(out, player, showAll, toSavedGame);
 
         writeAttribute(out, WORK_TILE_TAG, workTile);
     }
@@ -549,7 +544,8 @@ public class ColonyTile extends WorkLocation implements Ownable {
      * {@inheritDoc}
      */
     @Override
-    protected void toXMLPartialImpl(XMLStreamWriter out, String[] fields) throws XMLStreamException {
+    protected void toXMLPartialImpl(XMLStreamWriter out,
+                                    String[] fields) throws XMLStreamException {
         toXMLPartialByClass(out, ColonyTile.class, fields);
     }
 

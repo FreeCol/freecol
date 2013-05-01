@@ -47,34 +47,33 @@ public class Building extends WorkLocation implements Named, Comparable<Building
 
 
     /**
-     * Constructor for ServerBuilding.
+     * Deliberately empty constructor for ServerBuilding.
      */
-    protected Building() {
-        // empty constructor
-    }
+    protected Building() {}
 
     /**
      * Constructor for ServerBuilding.
      *
-     * @param game The <code>Game</code> this object belongs to.
+     * @param game The enclosing <code>Game</code>.
      * @param colony The <code>Colony</code> in which this building is located.
      * @param type The <code>BuildingType</code> of building.
      */
     protected Building(Game game, Colony colony, BuildingType type) {
         super(game);
-        setColony(colony);
+
+        this.colony = colony;
         this.buildingType = type;
         // set production type to default value
         updateProductionType();
     }
 
     /**
-     * Initiates a new <code>Building</code> with the given ID.  The
-     * object should later be initialized by calling
+     * Create a new <code>Building</code> with the given identifier.
+     * The object should later be initialized by calling
      * {@link #readFromXML(XMLStreamReader)}.
      *
-     * @param game The <code>Game</code> in which this object belongs.
-     * @param id The unique identifier for this object.
+     * @param game The enclosing <code>Game</code>.
+     * @param id The object identifier.
      */
     public Building(Game game, String id) {
         super(game, id);
@@ -127,13 +126,6 @@ public class Building extends WorkLocation implements Named, Comparable<Building
                 unit.setLocation(colony.getTile());
             }
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getNameKey() {
-        return getType().getNameKey();
     }
 
     /**
@@ -262,11 +254,17 @@ public class Building extends WorkLocation implements Named, Comparable<Building
         return 0;
     }
 
+    /**
+     * Convenience function to extract a goods amount from a list of
+     * available goods.
+     *
+     * @param type The <code>GoodsType</code> to extract the amount for.
+     * @param available The list of available goods to query.
+     * @return The goods amount, or zero if none found.
+     */
     private int getAvailable(GoodsType type, List<AbstractGoods> available) {
         for (AbstractGoods goods : available) {
-            if (goods.getType() == type) {
-                return goods.getAmount();
-            }
+            if (goods.getType() == type) return goods.getAmount();
         }
         return 0;
     }
@@ -679,6 +677,16 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     }
 
 
+    // Interface Named
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getNameKey() {
+        return getType().getNameKey();
+    }
+
+
     // Serialization
 
     private static final String BUILDING_TYPE_TAG = "buildingType";
@@ -690,20 +698,17 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     protected void toXMLImpl(XMLStreamWriter out, Player player,
                              boolean showAll,
                              boolean toSavedGame) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
-
-        writeAttributes(out);
-        super.writeChildren(out, player, showAll, toSavedGame);
-
-        out.writeEndElement();
+        super.toXML(out, getXMLElementTagName(), player, showAll, toSavedGame);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(XMLStreamWriter out, Player player,
+                                   boolean showAll,
+                                   boolean toSavedGame) throws XMLStreamException {
+        super.writeAttributes(out, player, showAll, toSavedGame);
 
         writeAttribute(out, BUILDING_TYPE_TAG, buildingType);
     }
@@ -712,7 +717,8 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      * {@inheritDoc}
      */
     @Override
-    protected void toXMLPartialImpl(XMLStreamWriter out, String[] fields) throws XMLStreamException {
+    protected void toXMLPartialImpl(XMLStreamWriter out,
+                                    String[] fields) throws XMLStreamException {
         toXMLPartialByClass(out, Building.class, fields);
     }
 
@@ -729,9 +735,10 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      */
     @Override
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        final Specification spec = getSpecification();
+
         super.readAttributes(in);
 
-        final Specification spec = getSpecification();
         buildingType = spec.getType(in, BUILDING_TYPE_TAG,
                                     BuildingType.class, (BuildingType)null);
     }

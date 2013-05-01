@@ -43,41 +43,35 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
 
     public static final List<AbstractGoods> EMPTY_LIST = Collections.emptyList();
 
-    /**
-     * The colony that contains this work location.
-     */
-    private Colony colony;
+    /** The colony that contains this work location. */
+    protected Colony colony;
 
-    /**
-     * The production type of this WorkLocation.
-     */
+    /** The production type of this WorkLocation. */
     private ProductionType productionType;
 
 
     /**
-     * Constructor for ServerWorkLocation.
+     * Deliberately empty constructor for ServerWorkLocation.
      */
-    protected WorkLocation() {
-        // empty constructor
-    }
+    protected WorkLocation() {}
 
     /**
      * Constructor for ServerWorkLocation.
      *
-     * @param game The <code>Game</code> this object belongs to.
+     * @param game The enclosing <code>Game</code>.
      */
     protected WorkLocation(Game game) {
         super(game);
     }
 
     /**
-     * Initiates a new <code>WorkLocation</code> with the given ID. The object
-     * should later be initialized by calling either
+     * Creates a new <code>WorkLocation</code> with the given identifier.
+     * The object should later be initialized by calling either
      * {@link #readFromXML(XMLStreamReader)} or
      * {@link #readFromXMLElement(Element)}.
      *
-     * @param game The <code>Game</code> in which this object belong.
-     * @param id The unique identifier for this object.
+     * @param game The enclosing <code>Game</code>.
+     * @param id The object identifier.
      */
     public WorkLocation(Game game, String id) {
         super(game, id);
@@ -85,27 +79,27 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
 
 
     /**
-     * Set the <code>Colony</code> value.
+     * Gets the owning settlement for this work location.
      *
-     * @param newColony The new Colony value.
+     * @return The owning settlement for this work location.
      */
-    public final void setColony(final Colony newColony) {
-        this.colony = newColony;
+    public Settlement getOwningSettlement() {
+        return colony;
     }
 
     /**
-     * Get the <code>ProductionType</code> value.
+     * Get the production type.
      *
-     * @return a <code>ProductionType</code> value
+     * @return The <code>ProductionType</code> for this work location.
      */
     public final ProductionType getProductionType() {
         return productionType;
     }
 
     /**
-     * Set the <code>ProductionType</code> value.
+     * Set the prodution type.
      *
-     * @param newProductionType The new ProductionType value.
+     * @param newProductionType The new <code>ProductionType</code> value.
      */
     public final void setProductionType(final ProductionType newProductionType) {
         if (newProductionType != productionType) {
@@ -115,50 +109,46 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
     }
 
     /**
-     * Returns a list of <code>AbstractGoods</code> consumed by this
-     * WorkLocation.
+     * Get the <code>AbstractGoods</code> consumed by this work location.
      *
-     * @return a list of AbstractGoods
+     * @return A list of <code>AbstractGoods</code> consumed.
      */
     public List<AbstractGoods> getInputs() {
         if (productionType == null || productionType.getInputs() == null) {
             return EMPTY_LIST;
-        } else {
-            return productionType.getInputs();
         }
+        return productionType.getInputs();
     }
 
     /**
-     * Returns a list of <code>AbstractGoods</code> produced by this
-     * WorkLocation.
+     * Get the <code>AbstractGoods</code> produced by this work location.
      *
-     * @return a list of AbstractGoods
+     * @return A list of <code>AbstractGoods</code> produced.
      */
     public List<AbstractGoods> getOutputs() {
         if (productionType == null || productionType.getOutputs() == null) {
             return EMPTY_LIST;
-        } else {
-            return productionType.getOutputs();
         }
+        return productionType.getOutputs();
     }
 
     /**
-     * Returns whether this WorkLocation produces the given GoodsType.
+     * Does this work location produce a given type of goods?
      *
-     * @param goodsType the GoodsType
-     * @return  whether this WorkLocation produces the given GoodsType
+     * @param goodsType The <code>GoodsType</code> to check.
+     * @return True if this <code>WorkLocation</code> produces the
+     *     given <code>GoodsType</code>.
      */
     public boolean produces(GoodsType goodsType) {
         return getBaseProduction(goodsType) > 0;
     }
 
-
     /**
-     * Returns the base production of the given goods type without
+     * Gets the base production of the given goods type without
      * applying any modifiers.
      *
-     * @param goodsType a <code>GoodsType</code> value
-     * @return an <code>int</code> value
+     * @param goodsType The <code>GoodsType</code> to check.
+     * @return The base production.
      */
     public int getBaseProduction(GoodsType goodsType) {
         if (productionType != null) {
@@ -171,28 +161,26 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
         return 0;
     }
 
+    /**
+     * Does this work location have any inputs.
+     *
+     * @return True if there are any inputs.
+     */
     public boolean hasInputs() {
         return !(productionType == null
                  || productionType.getInputs() == null
                  || productionType.getInputs().isEmpty());
     }
 
+    /**
+     * Does this work location have any outputs.
+     *
+     * @return True if there are any outputs.
+     */
     public boolean hasOutputs() {
         return !(productionType == null
                  || productionType.getOutputs() == null
                  || productionType.getOutputs().isEmpty());
-    }
-
-    /**
-     * Gets the owning settlement for this work location.
-     *
-     * Usually the same as getColony() but overridden by ColonyTile
-     * to handle unclaimed tiles.
-     *
-     * @return The owning settlement for this work location.
-     */
-    public Settlement getOwningSettlement() {
-        return colony;
     }
 
     /**
@@ -355,7 +343,7 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
                 }
                 unit.setTurnsOfTraining(0);
             }
-            // Do not clear teacher like in add(), do that at the
+            // Do not clear teacher like in add().  Do that at the
             // colony level so that students can be moved from one
             // work location to another without disrupting teaching.
             return true;
@@ -512,14 +500,14 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
     }
 
     /**
-     * Sets the owner of this <code>Ownable</code>. Do not call this
-     * method, ever. Since the owner of this WorkLocation is the owner
+     * Sets the owner of this <code>Ownable</code>.  Do not call this
+     * method, ever.  The owner of this WorkLocation is the owner
      * of the Colony, you must set the owner of the Colony instead.
      *
      * @param p The <code>Player</code> that should take ownership
-     *      of this {@link Ownable}.
+     *     of this {@link Ownable}.
      * @exception UnsupportedOperationException is always thrown by
-     *      this method.
+     *     this method.
      */
     public void setOwner(Player p) {
         throw new UnsupportedOperationException();
@@ -535,10 +523,24 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(XMLStreamWriter out, Player player,
+                                   boolean showAll,
+                                   boolean toSavedGame) throws XMLStreamException {
+        super.writeAttributes(out, player, showAll, toSavedGame);
 
         writeAttribute(out, COLONY_TAG, colony);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeChildren(XMLStreamWriter out, Player player,
+                                 boolean showAll,
+                                 boolean toSavedGame) throws XMLStreamException {
+        super.writeChildren(out, player, showAll, toSavedGame);
+
+        if (productionType != null) productionType.toXML(out);
     }
 
     /**
@@ -557,24 +559,15 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
      */
     @Override
     public void readChild(XMLStreamReader in) throws XMLStreamException {
-        if (ProductionType.getXMLElementTagName().equals(in.getLocalName())) {
-            productionType = new ProductionType(getSpecification());
+        final Specification spec = getSpecification();
+        final String tag = in.getLocalName();
+
+        if (ProductionType.getXMLElementTagName().equals(tag)) {
+            productionType = new ProductionType(spec);
             productionType.readFromXML(in);
 
         } else {
             super.readChild(in);
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void writeChildren(XMLStreamWriter out, Player player,
-                                 boolean showAll,
-                                 boolean toSavedGame) throws XMLStreamException {
-        super.writeChildren(out, player, showAll, toSavedGame);
-
-        if (productionType != null) productionType.toXML(out);
     }
 }
