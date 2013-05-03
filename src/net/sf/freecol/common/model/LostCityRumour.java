@@ -331,8 +331,7 @@ public class LostCityRumour extends TileItem {
         
         tile = makeFreeColGameObject(in, TILE_TAG, Tile.class);
 
-        type = getAttribute(in, TYPE_TAG,
-                            RumourType.class, RumourType.NO_SUCH_RUMOUR);
+        type = getAttribute(in, TYPE_TAG, RumourType.class, (RumourType)null);
 
         name = getAttribute(in, NAME_TAG, (String)null);
     }
