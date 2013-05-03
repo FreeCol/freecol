@@ -264,10 +264,14 @@ public class NativeAIPlayer extends AIPlayer {
         // Collect native units and defenders
         List<Unit> units = new ArrayList<Unit>();
         List<Unit> defenders = new ArrayList<Unit>();
-        units.addAll(is.getUnitList());
-        units.addAll(is.getTile().getUnitList());
+        for (Unit u : is.getUnitList()) {
+            if (!u.isDisposed() && !units.contains(u)) units.add(u);
+        }
+        for (Unit u : is.getTile().getUnitList()) {
+            if (!u.isDisposed() && !units.contains(u)) units.add(u);
+        }
         for (Unit u : is.getOwnedUnits()) {
-            if (!units.contains(u)) units.add(u);
+            if (!u.isDisposed() && !units.contains(u)) units.add(u);
         }
 
         // Collect the current defenders
@@ -336,10 +340,13 @@ public class NativeAIPlayer extends AIPlayer {
         // Simulates favouring the first warriors found by outgoing messengers.
         // Also favour units native to the settlement.
         final int homeBonus = 3;
+        final Tile isTile = is.getTile();
         Collections.sort(units, new Comparator<Unit>() {
                 public int compare(Unit u1, Unit u2) {
-                    int s1 = u1.getTile().getDistanceTo(is.getTile());
-                    int s2 = u2.getTile().getDistanceTo(is.getTile());
+                    Tile t1 = u1.getTile(); 
+                    int s1 = t1.getDistanceTo(isTile);
+                    Tile t2 = u2.getTile();
+                    int s2 = t2.getDistanceTo(isTile);
                     if (u1.getIndianSettlement() == is) s1 -= homeBonus;
                     if (u2.getIndianSettlement() == is) s2 -= homeBonus;
                     return s1 - s2;
