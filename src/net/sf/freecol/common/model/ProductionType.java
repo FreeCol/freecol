@@ -51,7 +51,7 @@ public class ProductionType extends FreeColObject {
     /**
      * Simple constructor.
      *
-     * @param specification The enclosing <code>Specification</code>.
+     * @param specification The <code>Specification</code> to refer to.
      */
     public ProductionType(Specification specification) {
         setSpecification(specification);
@@ -115,9 +115,14 @@ public class ProductionType extends FreeColObject {
     /**
      * Creates a new <code>ProductionType</code> instance.
      *
+     * @param specification The <code>Specification</code> to refer to.
      * @param in The <code>XMLStreamReader</code> to read from.
+     * @exception XMLStreamException if there is a problem reading the stream.
      */
-    public ProductionType(XMLStreamReader in) throws XMLStreamException {
+    public ProductionType(XMLStreamReader in,
+                          Specification specification) throws XMLStreamException {
+        this(specification);
+
         readFromXML(in);
     }
 
