@@ -399,6 +399,7 @@ public class Building extends WorkLocation implements Named, Comparable<Building
 
 
     // Interface Comparable
+
     /**
      * {@inheritDoc}
      */
@@ -662,8 +663,8 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     }
 
     /**
-     * Gets the set of modifiers with the given Id from this Building.
-     * Delegate to the type.
+     * Gets the set of modifiers with the given identifier from this
+     * Building.  Delegate to the type.
      *
      * @param id The id of the modifier to retrieve.
      * @param fcgot A <code>FreeColGameObjectType</code> (ignored).
@@ -690,6 +691,7 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     // Serialization
 
     private static final String BUILDING_TYPE_TAG = "buildingType";
+
 
     /**
      * {@inheritDoc}

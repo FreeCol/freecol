@@ -36,25 +36,16 @@ import javax.xml.stream.XMLStreamWriter;
  */
 public abstract class Feature extends FreeColObject {
 
-    /**
-     * The source of this Feature, e.g. a UnitType.
-     */
+    /** The source of this Feature, e.g. a UnitType. */
     private FreeColObject source;
 
-    /**
-     * The first Turn in which this Feature applies.
-     */
+    /** The first Turn in which this Feature applies. */
     private Turn firstTurn;
 
-    /**
-     * The last Turn in which this Feature applies.
-     */
+    /** The last Turn in which this Feature applies. */
     private Turn lastTurn;
 
-    /**
-     * The duration of this Feature. By default, the duration is
-     * unlimited.
-     */
+    /** The duration of this Feature. By default, the duration is unlimited. */
     private int duration = 0;
 
     /**
@@ -66,7 +57,7 @@ public abstract class Feature extends FreeColObject {
 
     /**
      * A list of Scopes limiting the applicability of this Feature.
-	 * Allocated on demand.
+  	 * Allocated on demand.
      */
     private List<Scope> scopes = null;
 
@@ -161,6 +152,16 @@ public abstract class Feature extends FreeColObject {
      */
     public final void setScopes(List<Scope> scopes) {
         this.scopes = scopes;
+    }
+
+    /**
+     * Add a scope.
+     *
+     * @param scope The <code>Scope</code> to add.
+     */
+    private void addScope(Scope scope) {
+        if (scopes == null) scopes = new ArrayList<Scope>();
+        scopes.add(scope);
     }
 
     /**
@@ -268,6 +269,9 @@ public abstract class Feature extends FreeColObject {
             && turn.getNumber() > lastTurn.getNumber();
     }
 
+
+    // Override Object
+
     /**
      * {@inheritDoc}
      */
@@ -358,6 +362,7 @@ public abstract class Feature extends FreeColObject {
     private static final String LAST_TURN_TAG = "lastTurn";
     private static final String SOURCE_TAG = "source";
     private static final String TEMPORARY_TAG = "temporary";
+
 
     /**
      * {@inheritDoc}
@@ -459,11 +464,7 @@ public abstract class Feature extends FreeColObject {
         final String tag = in.getLocalName();
 
         if (Scope.getXMLElementTagName().equals(tag)) {
-            Scope scope = new Scope(in);
-            if (scope != null) {
-                if (scopes == null) scopes = new ArrayList<Scope>();
-                scopes.add(scope);
-            }
+            addScope(new Scope(in));
 
         } else {
             super.readChild(in);

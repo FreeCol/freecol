@@ -255,7 +255,7 @@ public class IndianDemandMission extends Mission {
         String reason = invalidAIUnitReason(aiUnit);
         return (reason != null)
             ? reason
-            : (aiUnit.getUnit().getIndianSettlement() == null)
+            : (aiUnit.getUnit().getHomeIndianSettlement() == null)
             ? "home-destroyed"
             : null;
     }
@@ -279,7 +279,7 @@ public class IndianDemandMission extends Mission {
         case UNCONTACTED: case PEACE: case ALLIANCE:
             return "bad-stance";
         case WAR: case CEASE_FIRE:
-            Tension tension = unit.getIndianSettlement()
+            Tension tension = unit.getHomeIndianSettlement()
                 .getAlarm(targetPlayer);
             if (tension != null && tension.getLevel()
                 .compareTo(Tension.Level.CONTENT) <= 0) return "happy";
@@ -339,7 +339,7 @@ public class IndianDemandMission extends Mission {
 
         final AIUnit aiUnit = getAIUnit();
         final Unit unit = getUnit();
-        final IndianSettlement is = unit.getIndianSettlement();
+        final IndianSettlement is = unit.getHomeIndianSettlement();
         while (!completed) {
             if (hasTribute()) {
                 Unit.MoveType mt = travelToTarget(tag, is,

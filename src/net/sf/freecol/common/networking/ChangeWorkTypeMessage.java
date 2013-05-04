@@ -35,7 +35,7 @@ import org.w3c.dom.Element;
 public class ChangeWorkTypeMessage extends DOMMessage {
 
     /**
-     * The id of the unit that is working.
+     * The identifier of the unit that is working.
      */
     private String unitId;
 

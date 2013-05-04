@@ -90,12 +90,12 @@ public class ServerGame extends Game implements ServerModelObject {
      * saved game.
      *
      * @param freeColGameObjectListener A listener that should be monitoring
-     *            this <code>Game</code>.
+     *     this <code>Game</code>.
      * @param in The input stream containing the XML.
-     * @param serverStrings A list of server object type,ID pairs to create.
-     *            in this <code>Game</code>.
+     * @param serverStrings A list of server object type,identifier
+     *     pairs to create.  in this <code>Game</code>.
      * @param specification The <code>Specification</code> to use in this game.
-     * @throws XMLStreamException if an error occurred during parsing.
+     * @exception XMLStreamException if an error occurred during parsing.
      * @see net.sf.freecol.server.FreeColServer#loadGame
      */
     public ServerGame(FreeColGameObjectListener freeColGameObjectListener,
@@ -132,10 +132,10 @@ public class ServerGame extends Game implements ServerModelObject {
 
     /**
      * Makes a trivial server object in this game given a server object tag
-     * and an id.
+     * and an identifier.
      *
      * @param type The server object tag.
-     * @param id The id.
+     * @param id The object identifier.
      * @return A trivial server object.
      */
     private Object makeServerObject(String type, String id)
@@ -151,9 +151,9 @@ public class ServerGame extends Game implements ServerModelObject {
 
 
     /**
-     * Get a unique id to identify a <code>FreeColGameObject</code>.
+     * Get a unique identifier to identify a <code>FreeColGameObject</code>.
      * 
-     * @return A unique id.
+     * @return A unique identifier.
      */
     public String getNextId() {
         String id = Integer.toString(nextId);

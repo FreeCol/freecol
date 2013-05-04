@@ -34,8 +34,7 @@ public class ModTest extends FreeColTestCase {
         assertFalse(Mods.getAllMods().isEmpty());
         // Check that all mod files can be loaded
         for (FreeColModFile mod : Mods.getAllMods()) {
-            assertNotNull("Id of mod " + mod + " should not be null",
-                          mod.getId());
+            assertNotNull("Null identifier for " + mod, mod.getId());
             assertEquals(mod, Mods.getModFile(mod.getId()));
         }
 
@@ -45,8 +44,7 @@ public class ModTest extends FreeColTestCase {
         // Check that all rule sets can be loaded
         Set<String> ids = new HashSet<String>();
         for (FreeColModFile mod : Mods.getRuleSets()) {
-            assertNotNull("Id of mod " + mod + " should not be null", 
-                          mod.getId());
+            assertNotNull("Null identifier for " + mod, mod.getId());
             ids.add(mod.getId());
         }
 

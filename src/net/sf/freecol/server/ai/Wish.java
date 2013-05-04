@@ -55,7 +55,7 @@ public abstract class Wish extends ValuedAIObject {
      * Creates a new uninitialized <code>Wish</code>.
      *
      * @param aiMain The main AI-object.
-     * @param id The unique ID of this object.
+     * @param id The object identifier.
      */
     public Wish(AIMain aiMain, String id) {
         super(aiMain, id);
@@ -189,7 +189,7 @@ public abstract class Wish extends ValuedAIObject {
     protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
-        // Write Id, Location will match Object
+        // Write identifier, Location will match Object
         if (destination != null) {
             writeAttribute(out, DESTINATION_TAG, destination.getId());
 

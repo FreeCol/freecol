@@ -33,13 +33,14 @@ import org.w3c.dom.Element;
  * The message sent when loading cargo onto a carrier.
  */
 public class LoadCargoMessage extends DOMMessage {
+
     /**
      * The goods to be loaded.
      */
     private Goods goods;
 
     /**
-     * The id of the carrier.
+     * The identifier of the carrier.
      */
     private String carrierId;
 

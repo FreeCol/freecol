@@ -90,8 +90,8 @@ public final class GoodsType extends FreeColGameObjectType {
     /**
      * Create a new goods type.
      *
-     * @param id The object id.
-     * @param specification The enclosing <code>Specification</code>.
+     * @param id The object identifier.
+     * @param specification The <code>Specification</code> to refer to.
      */
     public GoodsType(String id, Specification specification) {
         super(id, specification);

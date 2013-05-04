@@ -23,6 +23,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.w3c.dom.Element;
+
 
 public class HistoryEvent extends StringTemplate {
 
@@ -55,11 +57,6 @@ public class HistoryEvent extends StringTemplate {
 
 
     /**
-     * Empty constructor for serialization.
-     */
-    public HistoryEvent() {}
-
-    /**
      * Create a new history event of given turn and type.
      *
      * @param turn The <code>Turn</code> of the event.
@@ -69,6 +66,25 @@ public class HistoryEvent extends StringTemplate {
         super("model.history." + eventType.toString(), TemplateType.TEMPLATE);
         this.turn = turn;
         this.eventType = eventType;
+    }
+
+    /**
+     * Create a new history event by reading a stream.
+     *
+     * @param in The <code>XMLStreamReader</code> to read from.
+     * @exception XMLStreamException if there is a problem reading the stream.
+     */
+    public HistoryEvent(XMLStreamReader in) throws XMLStreamException {
+        readFromXML(in);
+    }
+
+    /**
+     * Create a new history event by reading a element.
+     *
+     * @param element The <code>Element</code> to read from.
+     */
+    public HistoryEvent(Element element) {
+        readFromXMLElement(element);
     }
 
 

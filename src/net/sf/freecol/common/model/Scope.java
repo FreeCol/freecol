@@ -32,24 +32,19 @@ import javax.xml.stream.XMLStreamWriter;
  */
 public class Scope extends FreeColObject implements Cloneable {
 
-    /**
-     * The ID of a <code>FreeColGameObjectType</code>, or <code>Option</code>.
+    /** 
+     * The identifier of a <code>FreeColGameObjectType</code>, or
+     * <code>Option</code>.
      */
     private String type;
 
-    /**
-     * The ID of an <code>Ability</code>.
-     */
-    private String abilityID;
+    /** The object identifier of an <code>Ability</code>. */
+    private String abilityId;
 
-    /**
-     * The value of an <code>Ability</code>.
-     */
+    /** The value of an <code>Ability</code>. */
     private boolean abilityValue = true;
 
-    /**
-     * The name of an <code>Method</code>.
-     */
+    /** The name of an <code>Method</code>. */
     private String methodName;
 
     /**
@@ -58,32 +53,28 @@ public class Scope extends FreeColObject implements Cloneable {
      */
     private String methodValue;
 
-    /**
-     * True if the scope applies to a null object.
-     */
+    /** True if the scope applies to a null object. */
     private boolean matchesNull = true;
 
-    /**
-     * Whether the match is negated.
-     */
+    /** Whether the match is negated. */
     private boolean matchNegated = false;
 
 
     /**
-     * Creates a new <code>Scope</code> instance.
-     *
+     * Deliberately empty constructor.
      */
     public Scope() {}
 
     /**
-     * Creates a new <code>Scope</code> instance.
+     * Creates a new <code>Scope</code> instance from a stream.
      *
-     * @param in a <code>XMLStreamReader</code> value
-     * @exception XMLStreamException if an error occurs
+     * @param in The <code>XMLStreamReader</code> to read from.
+     * @exception XMLStreamException if there is an error reading the stream.
      */
     public Scope(XMLStreamReader in) throws XMLStreamException {
         readFromXML(in);
     }
+
 
     /**
      * Does this scope match null?
@@ -140,21 +131,21 @@ public class Scope extends FreeColObject implements Cloneable {
     }
 
     /**
-     * Gets the ability id.
+     * Gets the ability identifier.
      *
      * @return The ability id.
      */
-    public String getAbilityID() {
-        return abilityID;
+    public String getAbilityId() {
+        return abilityId;
     }
 
     /**
-     * Sets the ability id.
+     * Sets the ability identifier.
      *
-     * @param newAbilityID The new ability id.
+     * @param newAbilityId The new ability id.
      */
-    public void setAbilityID(final String newAbilityID) {
-        this.abilityID = newAbilityID;
+    public void setAbilityId(final String newAbilityId) {
+        this.abilityId = newAbilityId;
     }
 
     /**
@@ -246,7 +237,7 @@ public class Scope extends FreeColObject implements Cloneable {
                 return matchNegated;
             }
         }
-        if (abilityID != null && object.hasAbility(abilityID) != abilityValue) {
+        if (abilityId != null && object.hasAbility(abilityId) != abilityValue) {
             return matchNegated;
         }
         if (methodName != null) {
@@ -264,6 +255,8 @@ public class Scope extends FreeColObject implements Cloneable {
     }
 
 
+    // Override Object
+
     /**
      * {@inheritDoc}
      */
@@ -271,7 +264,7 @@ public class Scope extends FreeColObject implements Cloneable {
     public int hashCode() {
         int hash = 7;
         hash += 31 * hash + (type == null ? 0 : type.hashCode());
-        hash += 31 * hash + (abilityID == null ? 0 : abilityID.hashCode());
+        hash += 31 * hash + (abilityId == null ? 0 : abilityId.hashCode());
         hash += 31 * hash + (abilityValue ? 1 : 0);
         hash += 31 * hash + (methodName == null ? 0 : methodName.hashCode());
         hash += 31 * hash + (methodValue == null ? 0 : methodValue.hashCode());
@@ -302,11 +295,11 @@ public class Scope extends FreeColObject implements Cloneable {
             } else if (!type.equals(otherScope.getType())) {
                 return false;
             }
-            if (abilityID == null) {
-                if (otherScope.getAbilityID() != abilityID) {
+            if (abilityId == null) {
+                if (otherScope.getAbilityId() != abilityId) {
                     return false;
                 }
-            } else if (!abilityID.equals(otherScope.getAbilityID())) {
+            } else if (!abilityId.equals(otherScope.getAbilityId())) {
                 return false;
             }
             if (abilityValue != otherScope.getAbilityValue()) {
@@ -343,16 +336,13 @@ public class Scope extends FreeColObject implements Cloneable {
     private static final String METHOD_VALUE_TAG = "method-value";
     private static final String TYPE_TAG = "type";
 
+
     /**
      * {@inheritDoc}
      */
     @Override
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
-
-        writeAttributes(out);
-
-        out.writeEndElement();
+        super.toXML(out, getXMLElementTagName());
     }
 
     /**
@@ -368,8 +358,8 @@ public class Scope extends FreeColObject implements Cloneable {
             writeAttribute(out, TYPE_TAG, type);
         }
 
-        if (abilityID != null) {
-            writeAttribute(out, ABILITY_ID_TAG, abilityID);
+        if (abilityId != null) {
+            writeAttribute(out, ABILITY_ID_TAG, abilityId);
             writeAttribute(out, ABILITY_VALUE_TAG, abilityValue);
         }
 
@@ -393,7 +383,7 @@ public class Scope extends FreeColObject implements Cloneable {
 
         type = getAttribute(in, TYPE_TAG, (String)null);
 
-        abilityID = getAttribute(in, ABILITY_ID_TAG, (String)null);
+        abilityId = getAttribute(in, ABILITY_ID_TAG, (String)null);
 
         abilityValue = getAttribute(in, ABILITY_VALUE_TAG, true);
 
@@ -409,8 +399,8 @@ public class Scope extends FreeColObject implements Cloneable {
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
         sb.append("[Scope ").append(type);
-        if (abilityID != null) {
-            sb.append(" ").append(abilityID).append("=").append(abilityValue);
+        if (abilityId != null) {
+            sb.append(" ").append(abilityId).append("=").append(abilityValue);
         }
         if (methodName != null) {
             sb.append(" ").append(methodName).append("=").append(methodValue);

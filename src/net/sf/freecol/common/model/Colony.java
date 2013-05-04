@@ -55,9 +55,6 @@ public class Colony extends Settlement implements Nameable {
 
     public static final Ability HAS_PORT = new Ability("model.ability.hasPort");
 
-    public static final FreeColGameObjectType SOL_MODIFIER_SOURCE
-        = new FreeColGameObjectType("model.source.solModifier");
-
     public static enum ColonyChangeEvent {
         POPULATION_CHANGE,
         PRODUCTION_CHANGE,
@@ -2064,8 +2061,7 @@ public class Colony extends Settlement implements Nameable {
     }
 
     /**
-     * Returns true if the Colony, or its owner has the ability
-     * identified by <code>id</code>.
+     * Does the Colony or its owner have a given ability?
      *
      * @param id The id of the ability to test.
      * @param type An optional <code>FreeColGameObjectType</code> the
@@ -2089,7 +2085,8 @@ public class Colony extends Settlement implements Nameable {
      * @return a <code>Modifier</code> value
      */
     public Modifier getProductionModifier(GoodsType goodsType) {
-        Modifier result = new Modifier(goodsType.getId(), SOL_MODIFIER_SOURCE,
+        Modifier result = new Modifier(goodsType.getId(), 
+                                       Specification.SOL_MODIFIER_SOURCE,
                                        productionBonus, Modifier.Type.ADDITIVE);
         result.setIndex(Modifier.COLONY_PRODUCTION_INDEX);
         return result;
@@ -2451,14 +2448,6 @@ public class Colony extends Settlement implements Nameable {
             units.addAll(wl.getUnitList());
         }
         return units;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public final Colony getColony() {
-        return this;
     }
 
 
@@ -2879,14 +2868,14 @@ public class Colony extends Settlement implements Nameable {
         final String tag = in.getLocalName();
 
         if (BUILD_QUEUE_TAG.equals(tag)) {
-            BuildableType bt = spec.getType(in, ID_ATTRIBUTE_TAG,
-                BuildableType.class, (BuildableType)null);
-            if (bt != null) buildQueue.add(bt);
+            buildQueue.add(spec.getType(in, ID_ATTRIBUTE_TAG,
+                                        BuildableType.class, (BuildableType)null));
             closeTag(in, BUILD_QUEUE_TAG);
 
         // @compat ?
         } else if (OLD_BUILD_QUEUE_TAG.equals(tag)) {
-            // TODO: remove support for old format, move serialization to BuildQueue
+            // TODO: remove support for old format, move serialization
+            // to BuildQueue
             int size = getAttribute(in, ARRAY_SIZE_TAG, 0);
             if (size > 0) {
                 for (int x = 0; x < size; x++) {
@@ -2898,27 +2887,22 @@ public class Colony extends Settlement implements Nameable {
         // end @compat
 
         } else if (POPULATION_QUEUE_TAG.equals(in.getLocalName())) {
-            UnitType ut = spec.getType(in, ID_ATTRIBUTE_TAG,
-                                       UnitType.class, (UnitType)null);
-            if (ut != null) populationQueue.add(ut);
+            populationQueue.add(spec.getType(in, ID_ATTRIBUTE_TAG,
+                                             UnitType.class, (UnitType)null));;
             closeTag(in, POPULATION_QUEUE_TAG);
 
         } else if (Building.getXMLElementTagName().equals(tag)) {
-            Building building = readFreeColGameObject(in, Building.class);
-            if (building != null) addBuilding(building);
+            addBuilding(readFreeColGameObject(in, Building.class));
 
         } else if (ColonyTile.getXMLElementTagName().equals(tag)) {
-            ColonyTile ct = readFreeColGameObject(in, ColonyTile.class);
-            if (ct != null) colonyTiles.add(ct);
+            colonyTiles.add(readFreeColGameObject(in, ColonyTile.class));
 
         } else if (ExportData.getXMLElementTagName().equals(tag)) {
-            ExportData data = new ExportData();
-            data.readFromXML(in);
-            exportData.put(data.getId(), data);
+            ExportData data = new ExportData(in);
+            if (data != null) exportData.put(data.getId(), data);
         
         } else if (Modifier.getXMLElementTagName().equals(tag)) {
-            Modifier m = new Modifier(in, spec);
-            if (m != null) addModifier(m);
+            addModifier(new Modifier(in, spec));
 
         } else {
             super.readChild(in);

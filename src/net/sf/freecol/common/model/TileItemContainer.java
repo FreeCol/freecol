@@ -614,17 +614,13 @@ public class TileItemContainer extends FreeColGameObject {
         final String tag = in.getLocalName();
 
         if (LostCityRumour.getXMLElementTagName().equals(tag)) {
-            LostCityRumour t = readFreeColGameObject(in, LostCityRumour.class);
-            if (t != null) tileItems.add(t);
+            tileItems.add(readFreeColGameObject(in, LostCityRumour.class));
 
         } else if (Resource.getXMLElementTagName().equals(tag)) {
-            Resource t = readFreeColGameObject(in, Resource.class);
-            if (t != null) tileItems.add(t);
+            tileItems.add(readFreeColGameObject(in, Resource.class));
 
         } else if (TileImprovement.getXMLElementTagName().equals(tag)) {
-            TileImprovement t = readFreeColGameObject(in,
-                                                      TileImprovement.class);
-            if (t != null) tileItems.add(t);
+            tileItems.add(readFreeColGameObject(in, TileImprovement.class));
 
         } else {
             super.readChild(in);

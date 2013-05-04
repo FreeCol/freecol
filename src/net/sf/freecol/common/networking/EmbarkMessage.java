@@ -38,12 +38,12 @@ import org.w3c.dom.Element;
 public class EmbarkMessage extends DOMMessage {
 
     /**
-     * The id of the unit embarking.
+     * The identifier of the unit embarking.
      */
     private String unitId;
 
     /**
-     * The id of the carrier to embark onto.
+     * The identifier of the carrier to embark onto.
      */
     private String carrierId;
 

@@ -75,15 +75,28 @@ public class SettlementType extends FreeColGameObjectType {
     private List<RandomRange> gifts = null;
 
 
+    /**
+     * Creates a new settlement type.
+     *
+     * @param id The object identifier.
+     * @param specification The <code>Specification</code> to refer to.
+     */
+    public SettlementType(String id, Specification specification) {
+        super(id, specification);
+    }
 
     /**
      * Creates a new settlement type.
      *
-     * @param id The object id.
-     * @param specification The enclosing <code>Specification</code>.
+     * @param in The <code>XMLStreamReader</code> to read from.
+     * @param specification The <code>Specification</code> to refer to.
+     * @exception XMLStreamException if there is problem reading the stream.
      */
-    public SettlementType(String id, Specification specification) {
-        super(id, specification);
+    public SettlementType(XMLStreamReader in,
+                          Specification specification) throws XMLStreamException {
+        super(specification);
+
+        readFromXML(in);
     }
 
 
@@ -267,6 +280,26 @@ public class SettlementType extends FreeColGameObjectType {
     }
     // end @compat
 
+    /**
+     * Add a gift.
+     *
+     * @param gift The gift to add.
+     */
+    private void addGift(RandomRange gift) {
+        if (gifts == null) gifts = new ArrayList<RandomRange>();
+        gifts.add(gift);
+    }
+
+    /**
+     * Add a plunder.
+     *
+     * @param range The plunder to add.
+     */
+    private void addPlunder(RandomRange range) {
+        if (plunder == null) plunder = new ArrayList<RandomRange>();
+        plunder.add(range);
+    }
+
 
     // Serialization
 
@@ -394,14 +427,10 @@ public class SettlementType extends FreeColGameObjectType {
         final String tag = in.getLocalName();
 
         if (GIFTS_TAG.equals(tag)) {
-            RandomRange range = new RandomRange(in);
-            if (gifts == null) gifts = new ArrayList<RandomRange>();
-            gifts.add(range);
+            addGift(new RandomRange(in));
 
         } else if (PLUNDER_TAG.equals(tag)) {
-            RandomRange range = new RandomRange(in);
-            if (plunder == null) plunder = new ArrayList<RandomRange>();
-            plunder.add(range);
+            addPlunder(new RandomRange(in));
 
         } else {
             super.readChild(in);

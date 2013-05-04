@@ -35,7 +35,7 @@ import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 
 /**
- * Stores all <code>FreeColActions</code> and retrieves them by ID.
+ * Stores all <code>FreeColActions</code> and retrieves them by identifier.
  */
 public class ActionManager extends OptionGroup {
 
@@ -153,7 +153,7 @@ public class ActionManager extends OptionGroup {
      * <code>Specification</code>. At the moment, this includes only
      * <code>TileImprovements</code>.
      *
-     * @param specification a <code>Specification</code> value
+     * @param specification The <code>Specification</code> to refer to.
      */
     public void addSpecificationActions(Specification specification) {
         // Initialize ImprovementActions
@@ -166,9 +166,9 @@ public class ActionManager extends OptionGroup {
 
     /**
      * Gets the <code>FreeColAction</code> specified by the given
-     * <code>id</code>.
+     * identifier.
      *
-     * @param id The string identifying the action.
+     * @param id The object identifier.
      * @return The <code>FreeColAction</code>.
      */
     public FreeColAction getFreeColAction(String id) {

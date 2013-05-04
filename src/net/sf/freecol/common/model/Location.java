@@ -31,9 +31,9 @@ import java.util.List;
 public interface Location {
 
     /**
-     * Gets the id of this <code>Location</code>.
+     * Gets the identifier of this <code>Location</code>.
      *
-     * @return The id.
+     * @return The object identifier.
      * @see FreeColGameObject#getId
      */
     public String getId();
@@ -135,10 +135,18 @@ public interface Location {
     public Settlement getSettlement();
 
     /**
-     * Gets the <code>Colony</code> this <code>Location</code> is
-     * located in.
+     * Get the colony at this location.
      *
-     * @return The associated <code>Colony</code>, or null if none.
+     * @return A <code>Colony</code> at this location if any, or null
+     *     if none found.
      */
     public Colony getColony();
+
+    /**
+     * Gets the native settlement at this location.
+     *
+     * @return The <code>IndianSettlement</code> at this location if
+     *     any, or null if none found.
+     */
+    public IndianSettlement getIndianSettlement();
 }

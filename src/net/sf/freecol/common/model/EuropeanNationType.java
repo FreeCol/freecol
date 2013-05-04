@@ -41,14 +41,10 @@ import net.sf.freecol.common.option.OptionGroup;
  */
 public class EuropeanNationType extends NationType {
 
-    /**
-     * Whether this is an REF Nation.
-     */
+    /** Whether this is an REF Nation. */
     private boolean ref = false;
 
-    /**
-     * Stores the starting units of this Nation.
-     */
+    /** Stores the starting units of this Nation. */
     private List<AbstractUnit> startingUnits = null;
 
     /**
@@ -58,21 +54,20 @@ public class EuropeanNationType extends NationType {
     private Map<String, Map<String, AbstractUnit>> startingUnitMap
         = new HashMap<String, Map<String, AbstractUnit>>();
 
-    /**
-     * Always using expert starting units.
-     */
+    /** Always using expert starting units. */
     private final boolean expert = true;
 
 
     /**
      * Create a new European nation type.
      *
-     * @param id The nation type identifier.
-     * @param specification The containing <code>Specification</code>.
+     * @param id The object identifier.
+     * @param specification The <code>Specification</code> to refer to.
      */
     public EuropeanNationType(String id, Specification specification) {
         super(id, specification);
     }
+
 
     /**
      * Is this a REF nation type?
@@ -151,6 +146,7 @@ public class EuropeanNationType extends NationType {
     private static final String TYPE_TAG = "type";
     private static final String UNIT_TAG = "unit";
 
+
     /**
      * {@inheritDoc}
      */
@@ -194,8 +190,8 @@ public class EuropeanNationType extends NationType {
     }
 
     private void writeUnit(XMLStreamWriter out, String id,
-                           AbstractUnit unit, boolean expert)
-        throws XMLStreamException {
+                           AbstractUnit unit,
+                           boolean expert) throws XMLStreamException {
         out.writeStartElement(UNIT_TAG);
 
         writeAttribute(out, ID_ATTRIBUTE_TAG, id);
@@ -230,8 +226,8 @@ public class EuropeanNationType extends NationType {
      */
     @Override
     protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        // Clear containers.
         if (readShouldClearContainers(in)) {
-            // Clear containers.
             startingUnitMap.clear();
         }
 

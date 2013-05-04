@@ -36,7 +36,7 @@ import org.w3c.dom.Element;
  */
 public class SpySettlementMessage extends DOMMessage {
     /**
-     * The id of the object doing the spying.
+     * The identifier of the object doing the spying.
      */
     private String unitId;
 

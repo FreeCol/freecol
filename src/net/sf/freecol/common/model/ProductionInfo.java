@@ -25,24 +25,16 @@ import java.util.List;
 
 public class ProductionInfo {
 
-    /**
-     * The maximum production possible given unlimited input.
-     */
+    /** The maximum production possible given unlimited input. */
     private List<AbstractGoods> maximumProduction = new ArrayList<AbstractGoods>();
 
-    /**
-     * The actual production.
-     */
+    /** The actual production. */
     private List<AbstractGoods> production = new ArrayList<AbstractGoods>();
 
-    /**
-     * The maximum consumption possible given unlimited input.
-     */
+    /** The maximum consumption possible given unlimited input. */
     private List<AbstractGoods> maximumConsumption = new ArrayList<AbstractGoods>();
 
-    /**
-     * The actual consumption.
-     */
+    /** The actual consumption. */
     private List<AbstractGoods> consumption = new ArrayList<AbstractGoods>();
 
 

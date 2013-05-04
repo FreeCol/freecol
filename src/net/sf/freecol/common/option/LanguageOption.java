@@ -162,7 +162,7 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
     /**
      * Creates a new <code>LanguageOption</code>.
      *
-     * @param specification The enclosing <code>Specification</code>.
+     * @param specification The <code>Specification</code> to refer to.
      */
     public LanguageOption(Specification specification) {
         super(specification);

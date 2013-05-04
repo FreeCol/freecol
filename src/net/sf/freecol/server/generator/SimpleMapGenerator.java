@@ -100,7 +100,7 @@ public class SimpleMapGenerator implements MapGenerator {
      * Creates a <code>MapGenerator</code>
      *
      * @param random The <code>Random</code> number source to use.
-     * @param specification a <code>Specification</code> value
+     * @param specification The <code>Specification</code> to refer to.
      * @see #createMap
      */
     public SimpleMapGenerator(Random random, Specification specification) {
@@ -732,7 +732,7 @@ public class SimpleMapGenerator implements MapGenerator {
             UnitType unitType = map.getSpecification().getUnitType("model.unit.brave");
             Unit unit = new ServerUnit(map.getGame(), settlement, player,
                 unitType, unitType.getDefaultEquipment());
-            unit.setIndianSettlement(settlement);
+            unit.setHomeIndianSettlement(settlement);
 
             if (i == 0) {
                 unit.setLocation(tile);

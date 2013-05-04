@@ -71,6 +71,19 @@ public class TradeRoute extends FreeColGameObject
             this.setCargo(other.cargo);
         }
 
+        /**
+         * Create a stop by reading a stream.
+         *
+         * @param in The <code>XMLStreamReader</code> to read from.
+         * @exception XMLStreamException if there is a problem reading the
+         *     stream.
+         */
+        public Stop(XMLStreamReader in) throws XMLStreamException {
+            this((Location)null);
+
+            readFromXML(in);
+        }
+
 
         /**
          * Get the location of this stop.
@@ -239,18 +252,17 @@ public class TradeRoute extends FreeColGameObject
      * Creates a new <code>TradeRoute</code> instance.
      *
      * @param game The enclosing <code>Game</code>.
-     * @param id The identifier.
-     * @exception XMLStreamException if an error occurs.
+     * @param id The object identifier.
      */
-    public TradeRoute(Game game, String id) throws XMLStreamException {
+    public TradeRoute(Game game, String id) {
         super(game, id);
     }
 
     /**
      * Creates a new <code>TradeRoute</code> instance.
      *
-     * @param game a <code>Game</code> value
-     * @param e an <code>Element</code> value
+     * @param game The enclosing <code>Game</code>.
+     * @param e An <code>Element</code> to read from.
      */
     public TradeRoute(Game game, Element e) {
         super(game, null);
@@ -339,7 +351,7 @@ public class TradeRoute extends FreeColGameObject
      * <p>
      * The copied trade route has no reference back to the original and can
      * safely be used as a temporary copy.  It is NOT registered with the game,
-     * but will have the same unique id as the original.
+     * but will have the same unique identifier as the original.
      *
      * @return deep copy of trade route.
      */
@@ -471,11 +483,8 @@ public class TradeRoute extends FreeColGameObject
         final String tag = in.getLocalName();
 
         if (Stop.TRADE_ROUTE_STOP_TAG.equals(tag)) {
-            Stop stop = new Stop((Location)null);
-            stop.readFromXML(in);
-            // Do not test stop.isValid(), the location may not exist yet.
-            if (stop != null) stops.add(stop);
-
+            stops.add(new Stop(in));
+            
         } else {
             super.readChild(in);
         }

@@ -1013,7 +1013,7 @@ public class ChangeSet {
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
             Element element = doc.createElement("featureChange");
             element.setAttribute("add", Boolean.toString(add));
-            element.setAttribute("id", object.getId());
+            element.setAttribute(FreeColObject.ID_ATTRIBUTE_TAG, object.getId());
             Element child = feature.toXMLElement(doc);
             element.appendChild(child);
             return element;

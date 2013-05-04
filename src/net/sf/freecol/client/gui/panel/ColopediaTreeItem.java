@@ -37,7 +37,7 @@ class ColopediaTreeItem {
      * corresponds to a leaf node.
      *
      * @param panelType a <code>ColopediaDetailPanel</code> value
-     * @param id a <code>String</code> value
+     * @param id The object identifier.
      * @param text a <code>String</code> value
      * @param icon an <code>ImageIcon</code> value
      */

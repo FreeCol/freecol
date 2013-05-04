@@ -35,7 +35,7 @@ import org.w3c.dom.Element;
 public class ChangeStateMessage extends DOMMessage {
 
     /**
-     * The id of the unit to change.
+     * The identifier of the unit to change.
      */
     private String unitId;
 

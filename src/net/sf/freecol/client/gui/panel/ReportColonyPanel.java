@@ -290,8 +290,9 @@ public final class ReportColonyPanel extends ReportPanel
 
     /**
      * Implement the action listener, checking for BUILDQUEUE events,
-     * generally displaying the colony panel if given a colony id, but
-     * otherwise delegating to the ReportPanel handler.
+     * generally displaying the colony panel if given a colony
+     * identifier, but otherwise delegating to the ReportPanel
+     * handler.
      *
      * @param event The incoming event.
      */

@@ -32,10 +32,10 @@ import net.sf.freecol.common.model.Specification;
 /**
  * The super class of all options.  GUI components making use of this
  * class can refer to its name and shortDescription properties.  The
- * complete keys of these properties consist of the id of the option
- * group (if any), followed by a "."  unless the option group is null,
- * followed by the id of the option object, followed by a ".",
- * followed by "name" or "shortDescription".
+ * complete keys of these properties consist of the identifier of the
+ * option group (if any), followed by a "."  unless the option group
+ * is null, followed by the identifier of the option object, followed
+ * by a ".", followed by "name" or "shortDescription".
  */
 abstract public class AbstractOption<T> extends FreeColObject
     implements Option<T> {
@@ -55,8 +55,7 @@ abstract public class AbstractOption<T> extends FreeColObject
     /**
      * Creates a new <code>AbstractOption</code>.
      *
-     * @param id The identifier for this option.  This is used when
-     *     the object should be found in an {@link OptionGroup}.
+     * @param id The object identifier.
      */
     public AbstractOption(String id) {
         this(id, null);
@@ -65,7 +64,7 @@ abstract public class AbstractOption<T> extends FreeColObject
     /**
      * Creates a new <code>AbstractOption</code>.
      *
-     * @param specification The enclosing <code>Specification</code>.
+     * @param specification The <code>Specification</code> to refer to.
      */
     public AbstractOption(Specification specification) {
         this(null, specification);
@@ -74,9 +73,8 @@ abstract public class AbstractOption<T> extends FreeColObject
     /**
      * Creates a new <code>AbstractOption</code>.
      *
-     * @param id The identifier for this option.  This is used when
-     *     the object should be found in an {@link OptionGroup}.
-     * @param specification The enclosing <code>Specification</code>.
+     * @param id The object identifier.
+     * @param specification The <code>Specification</code> to refer to.
      */
     public AbstractOption(String id, Specification specification) {
         setId(id);
@@ -205,7 +203,7 @@ abstract public class AbstractOption<T> extends FreeColObject
     }
 
     // Note: writeAttributes() is not needed/present.
-    // - The id is correctly written by the super class.
+    // - The identifier is correctly written by the super class.
     // - The default value does not need to be written in general.
     // - The value *must* be written by the implementing subclass.
 

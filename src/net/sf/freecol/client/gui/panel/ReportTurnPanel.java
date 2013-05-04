@@ -201,7 +201,8 @@ public final class ReportTurnPanel extends ReportPanel {
                 ignore = true;
             }
             
-            // So that we can iterate through rows in ActionListeners by message ID.
+            // So that we can iterate through rows in ActionListeners
+            // by message identifier.
             if (!textPanesByMessage.containsKey(message.getId())) {
                 textPanesByMessage.put(message.getId(), new Vector<JComponent>());
             }

@@ -50,7 +50,7 @@ final class TextFormatter extends Formatter {
         result.append("\n\t").append(record.getLevel().getName()).append(": ").append(
                 record.getMessage().replaceAll("\n", "\n\t"));
         result.append("\n\t").append(new Date(record.getMillis()).toString());
-        result.append("\n\tThread ID: ").append(record.getThreadID()).append('\n');
+        result.append("\n\tThread: ").append(record.getThreadID()).append('\n');
         if (record.getThrown() != null) {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);

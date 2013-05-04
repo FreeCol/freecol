@@ -200,7 +200,7 @@ public class IndianSettlement extends Settlement {
      * {@link #readFromXML(XMLStreamReader)}.
      *
      * @param game The <code>Game</code> in which this object belong.
-     * @param id The unique identifier for this object.
+     * @param id The object identifier.
      */
     public IndianSettlement(Game game, String id) {
         super(game, id);
@@ -1050,7 +1050,7 @@ public class IndianSettlement extends Settlement {
     public List<FreeColGameObject> disposeList() {
         // Orphan the units whose home settlement this is.
         while (!ownedUnits.isEmpty()) {
-            ownedUnits.remove(0).setIndianSettlement(null);
+            ownedUnits.remove(0).setHomeIndianSettlement(null);
         }
         return super.disposeList();
     }
@@ -1085,20 +1085,12 @@ public class IndianSettlement extends Settlement {
         boolean result = super.add(locatable);
         if (result && locatable instanceof Unit) {
             Unit indian = (Unit)locatable;
-            if (indian.getIndianSettlement() == null) {
+            if (indian.getHomeIndianSettlement() == null) {
                 // Adopt homeless Indians
-                indian.setIndianSettlement(this);
+                indian.setHomeIndianSettlement(this);
             }
         }
         return result;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public final Colony getColony() {
-        return null; // A native settlement can never be a colony.
     }
 
 

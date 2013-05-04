@@ -56,8 +56,7 @@ public class NationOptions extends FreeColObject {
     /** The default number of European nations. */
     public static final int DEFAULT_NO_OF_EUROPEANS = 4;
 
-
-    /** The enclosing specification. */
+    /** The specification to refer to. */
     private Specification specification;
 
     /** The type of European national advantages. */
@@ -71,7 +70,7 @@ public class NationOptions extends FreeColObject {
     /**
      * Creates a new <code>NationOptions</code> instance.
      *
-     * @param specification The enclosing <code>Specification</code>.
+     * @param specification The <code>Specification</code> to refer to.
      */
     public NationOptions(Specification specification) {
         this.specification = specification;
@@ -95,6 +94,21 @@ public class NationOptions extends FreeColObject {
             }
         }
     }
+
+    /**
+     * Creates a new <code>NationOptions</code> instance by reading a stream.
+     *
+     * @param in The <code>XMLStreamReader</code> to read from.
+     * @param specification The <code>Specification</code> to refer to.
+     * @exception XMLStreamException if there is a problem reading the stream.
+     */
+    public NationOptions(XMLStreamReader in,
+                         Specification specification) throws XMLStreamException {
+        this(specification);
+        
+        readFromXML(in);
+    }
+
 
     /**
      * Get the nations in the game.
@@ -239,11 +253,11 @@ public class NationOptions extends FreeColObject {
                     if (nation != null && state != null) {
                         nations.put(nation, state);
                     }
+                    closeTag(in, NATION_TAG);
 
                 } else {
                     logger.warning("Invalid " + NATION_TAG + " tag: " + tag);
                 }
-                in.nextTag();
             }
 
         } else {

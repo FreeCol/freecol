@@ -37,6 +37,7 @@ import net.sf.freecol.common.io.Mods;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
@@ -642,7 +643,7 @@ public class ClientOptions extends OptionGroup {
                      eventid = in.getEventType()) {
                     //TODO: Is checking for XMLEvent.ATTRIBUTE needed?
                     if (eventid == XMLEvent.START_ELEMENT
-                        && LANGUAGE.equals(in.getAttributeValue(null, "id"))) {
+                        && LANGUAGE.equals(in.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG))) {
                         return in.getAttributeValue(null, "value");
                     }
                     in.nextTag();

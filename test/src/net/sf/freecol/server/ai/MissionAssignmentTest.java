@@ -203,7 +203,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
         // so that he may defend the settlement
         Unit braveOutside = new ServerUnit(game, settlementTile, inca, 
                                            braveType);
-        braveOutside.setIndianSettlement(camp);
+        braveOutside.setHomeIndianSettlement(camp);
 
         // Setup enemy units
         int enemyUnits = camp.getUnitCount() + 1;

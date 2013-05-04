@@ -1528,7 +1528,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                         random);
                     brave.clearEquipment();
                     brave.setOwner(other);
-                    brave.setIndianSettlement(null);
+                    brave.setHomeIndianSettlement(null);
                     brave.setNationality(other.getNationId());
                     brave.setType(Utils.getRandomMember(logger,
                                   "Choose convert type", converts, random));
@@ -2386,7 +2386,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 return Tension.TENSION_ADD_NORMAL;
             }
         } else { // attack in the open
-            return (loser.getIndianSettlement() != null)
+            return (loser.getHomeIndianSettlement() != null)
                 ? Tension.TENSION_ADD_UNIT_DESTROYED
                 : Tension.TENSION_ADD_MINOR;
         }
@@ -2619,7 +2619,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 // back to a potentially remote settlement is pretty
                 // dubious.  Apparently Col1 did it.  Better would be
                 // to give the capturing unit a go-home-with-plunder mission.
-                IndianSettlement settlement = winner.getIndianSettlement();
+                IndianSettlement settlement = winner.getHomeIndianSettlement();
                 if (settlement != null) {
                     for (AbstractGoods goods : equip.getRequiredGoods()) {
                         settlement.addGoods(goods);
@@ -2910,7 +2910,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         // Remaining units lose their home.
         for (Unit u : settlement.getOwnedUnits()) {
-            u.setIndianSettlement(null);
+            u.setHomeIndianSettlement(null);
             cs.add(See.only(nativePlayer), u);
         }
                 
@@ -3741,12 +3741,16 @@ public class ServerPlayer extends Player implements ServerModelObject {
      */
     @Override
     public String toString() {
-        return "ServerPlayer[name=" + getName() + ",ID=" + getId()
-            + ",conn=" + connection + "]";
+        StringBuilder sb = new StringBuilder(64);
+        sb.append("[ServerPlayer ").append(getId())
+            .append(" ").append(getName())
+            .append(" ").append(connection)
+            .append("]");
+        return sb.toString();
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "serverPlayer"
      */

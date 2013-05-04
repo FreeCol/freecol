@@ -31,19 +31,13 @@ public class Turn {
      */
     public static enum Season { YEAR, SPRING, AUTUMN }
 
-    /**
-     * The numerical value of the Turn, never less than one.
-     */
+    /** The numerical value of the Turn, never less than one. */
     private int turn = 1;
 
-    /**
-     * The year in which the game starts.
-     */
+    /** The year in which the game starts. */
     private static int startingYear = 1492;
 
-    /**
-     * The first year in which there are two seasons.
-     */
+    /** The first year in which there are two seasons. */
     private static int seasonYear = 1600;
 
     /**
@@ -69,6 +63,7 @@ public class Turn {
     public Turn(int turn) {
         this.turn = turn;
     }
+
 
     /**
      * Converts an integer year to a turn-integer-value.

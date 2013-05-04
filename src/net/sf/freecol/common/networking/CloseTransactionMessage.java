@@ -34,12 +34,12 @@ import org.w3c.dom.Element;
  */
 public class CloseTransactionMessage extends DOMMessage {
     /**
-     * The ID of the unit performing the transaction.
+     * The object identifier of the unit performing the transaction.
      */
     private String unitId;
 
     /**
-     * The ID of the settlement at which the transaction occurs.
+     * The object identifier of the settlement at which the transaction occurs.
      */
     private String settlementId;
 

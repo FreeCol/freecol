@@ -39,9 +39,7 @@ import org.w3c.dom.Element;
  */
 public class DiplomaticTrade extends FreeColObject {
 
-    /**
-     * A type for the trade status.
-     */
+    /** A type for the trade status. */
     public static enum TradeStatus {
         PROPOSE_TRADE,
         ACCEPT_TRADE,
@@ -68,7 +66,7 @@ public class DiplomaticTrade extends FreeColObject {
     /**
      * Creates a new <code>DiplomaticTrade</code> instance.
      *
-     * @param game The current <code>Game</code>.
+     * @param game The enclosing <code>Game</code>.
      * @param sender The sending <code>Player</code>.
      * @param recipient The recipient <code>Player</code>.
      */
@@ -79,7 +77,7 @@ public class DiplomaticTrade extends FreeColObject {
     /**
      * Creates a new <code>DiplomaticTrade</code> instance.
      *
-     * @param game The <code>Game</code> containing the trade.
+     * @param game The enclosing <code>Game</code>.
      * @param sender The sending <code>Player</code>.
      * @param recipient The recipient <code>Player</code>.
      * @param items A list of items to trade.
@@ -98,7 +96,7 @@ public class DiplomaticTrade extends FreeColObject {
     /**
      * Creates a new <code>DiplomaticTrade</code> instance.
      *
-     * @param game The <code>Game</code> containing the trade.
+     * @param game The enclosing <code>Game</code>.
      * @param element an <code>Element</code> value
      */
     public DiplomaticTrade(Game game, Element element) {
@@ -288,6 +286,7 @@ public class DiplomaticTrade extends FreeColObject {
     private static final String RECIPIENT_TAG = "recipient";
     private static final String SENDER_TAG = "sender";
     private static final String STATUS_TAG = "status";
+
 
     /**
      * {@inheritDoc}

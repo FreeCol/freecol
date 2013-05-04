@@ -35,12 +35,12 @@ import org.w3c.dom.Element;
 public class MoveToMessage extends DOMMessage {
 
     /**
-     * The id of the object to be moved.
+     * The identifier of the object to be moved.
      */
     private String unitId;
 
     /**
-     * The id of the destination to be moved to.
+     * The identifier of the destination to be moved to.
      */
     private String destinationId;
 

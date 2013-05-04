@@ -33,7 +33,7 @@ public class GoldTradeItem extends TradeItem {
     /**
      * Creates a new <code>GoldTradeItem</code> instance.
      *
-     * @param game The <code>Game</code> the trade occurs in.
+     * @param game The enclosing <code>Game</code>.
      * @param source The source <code>Player</code>.
      * @param destination The destination <code>Player</code>.
      * @param gold The amount of gold.
@@ -47,14 +47,16 @@ public class GoldTradeItem extends TradeItem {
     /**
      * Creates a new <code>GoldTradeItem</code> instance.
      *
-     * @param game The <code>Game</code> the trade occurs in.
+     * @param game The enclosing <code>Game</code>.
      * @param in The <code>XMLStreamReader</code> to read from.
+     * @exception XMLStreamException if there is an error reading the stream.
      */
     public GoldTradeItem(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
 
         readFromXML(in);
     }
+
 
     // Interface TradeItem
 

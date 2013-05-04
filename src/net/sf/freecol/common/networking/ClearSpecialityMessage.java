@@ -34,7 +34,7 @@ import org.w3c.dom.Element;
 public class ClearSpecialityMessage extends DOMMessage {
 
     /**
-     * The id of the unit to be cleared.
+     * The identifier of the unit to be cleared.
      */
     private String unitId;
 

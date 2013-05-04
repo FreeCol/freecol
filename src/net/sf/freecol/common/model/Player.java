@@ -3551,7 +3551,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * Used mainly in message decoding.
      *
-     * @param id The identifier.
+     * @param id The object identifier.
      * @param returnClass The expected class of the object.
      * @return The game object, or null if not found.
      * @throws IllegalStateException on failure to validate the object
@@ -3587,7 +3587,7 @@ public class Player extends FreeColGameObject implements Nameable {
             // This only happens in the client code with the virtual "enemy
             // privateer" player
             // This special player is not properly associated to the Game and
-            // therefore has no ID
+            // therefore has no identifier.
             // TODO: remove this hack when the virtual "enemy privateer" player
             // is better implemented
             return false;
@@ -3631,7 +3631,7 @@ public class Player extends FreeColGameObject implements Nameable {
     private static final String LIBERTY_TAG = "liberty";
     private static final String INDEPENDENT_NATION_NAME_TAG = "independentNationName";
     private static final String INTERVENTION_BELLS_TAG = "interventionBells";
-    private static final String NATION_ID_TAG = "nationID";
+    private static final String NATION_ID_TAG = "nationId";
     private static final String NATION_TYPE_TAG = "nationType";
     private static final String NEW_LAND_NAME_TAG = "newLandName";
     private static final String NUMBER_OF_SETTLEMENTS_TAG = "numberOfSettlements";
@@ -3645,6 +3645,9 @@ public class Player extends FreeColGameObject implements Nameable {
     private static final String TAX_TAG = "tax";
     private static final String TENSION_TAG = "tension";
     private static final String USERNAME_TAG = "username";
+    // @compat 0.10.7
+    private static final String OLD_NATION_ID_TAG = "nationID";
+    // end @compat
 
 
     /**
@@ -3874,7 +3877,11 @@ public class Player extends FreeColGameObject implements Nameable {
 
         name = getAttribute(in, USERNAME_TAG, (String)null);
 
-        nationId = getAttribute(in, NATION_ID_TAG, (String)null);
+        nationId = getAttribute(in, NATION_ID_TAG,
+            // @compat 0.10.7
+            getAttribute(in, OLD_NATION_ID_TAG,
+            // end @compat 0.10.7
+                (String)null));
 
         if (isUnknownEnemy()) {
             nationType = null;
@@ -3986,10 +3993,8 @@ public class Player extends FreeColGameObject implements Nameable {
             }
         
         } else if (OFFERED_FATHERS_TAG.equals(tag)) {
-            List<FoundingFather> ofs
-                = readFromListElement(in, OFFERED_FATHERS_TAG,
-                                      spec, FoundingFather.class);
-            if (ofs != null) offeredFathers.addAll(ofs);
+            offeredFathers.addAll(readFromListElement(in, OFFERED_FATHERS_TAG,
+                                                      spec, FoundingFather.class));
 
         } else if (STANCE_TAG.equals(tag)) {
             String playerId = getAttribute(in, PLAYER_TAG, (String)null);
@@ -4000,10 +4005,8 @@ public class Player extends FreeColGameObject implements Nameable {
             closeTag(in, STANCE_TAG);
 
         } else if (TENSION_TAG.equals(tag)) {
-            Player p = makeFreeColGameObject(in, PLAYER_TAG, Player.class);
-            if (p != null) {
-                tension.put(p, new Tension(getAttribute(in, VALUE_TAG, 0)));
-            }
+            tension.put(makeFreeColGameObject(in, PLAYER_TAG, Player.class),
+                        new Tension(getAttribute(in, VALUE_TAG, 0)));
             closeTag(in, TENSION_TAG);
         
         } else if (Europe.getXMLElementTagName().equals(tag)) {
@@ -4013,33 +4016,25 @@ public class Player extends FreeColGameObject implements Nameable {
             highSeas = readFreeColGameObject(in, HighSeas.class);
 
         } else if (HistoryEvent.getXMLElementTagName().equals(tag)) {
-            HistoryEvent event = new HistoryEvent();
-            event.readFromXML(in);
-            getHistory().add(event);
+            getHistory().add(new HistoryEvent(in));
 
         } else if (LastSale.getXMLElementTagName().equals(tag)) {
-            LastSale lastSale = new LastSale();
-            lastSale.readFromXML(in);
-            addLastSale(lastSale);
+            addLastSale(new LastSale(in));
 
         } else if (Market.getXMLElementTagName().equals(tag)) {
             market = readFreeColGameObject(in, Market.class);
 
         } else if (ModelMessage.getXMLElementTagName().equals(tag)) {
-            ModelMessage message = new ModelMessage();
-            message.readFromXML(in);
-            addModelMessage(message);
+            addModelMessage(new ModelMessage(in));
 
         } else if (Modifier.getXMLElementTagName().equals(tag)) {
-            Modifier m = new Modifier(in, spec); 
-            if (m != null) addModifier(m);
+            addModifier(new Modifier(in, spec));
 
         } else if (Monarch.getXMLElementTagName().equals(tag)) {
             monarch = readFreeColGameObject(in, Monarch.class);
 
         } else if (TradeRoute.getXMLElementTagName().equals(tag)) {
-            TradeRoute route = readFreeColGameObject(in, TradeRoute.class);
-            if (route != null) tradeRoutes.add(route);
+            tradeRoutes.add(readFreeColGameObject(in, TradeRoute.class));
 
         } else {
             super.readChild(in);

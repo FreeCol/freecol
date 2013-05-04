@@ -32,8 +32,8 @@ import net.sf.freecol.common.model.Specification;
  * Represents an option where the valid choice is an integer and the
  * choices are represented by strings. In general, these strings are
  * localized by looking up the key of the choice, which consists of
- * the id of the AbstractObject followed by a "." followed by the
- * value of the option string.
+ * the identifier of the AbstractObject followed by a "." followed by
+ * the value of the option string.
  *
  * RangeOption differs from SelectOption, as the value being selected
  * represents a numeric measurement, defined by a bounded range of
@@ -50,7 +50,7 @@ public class RangeOption extends SelectOption {
     /**
      * Creates a new <code>RangeOption</code>.
      *
-     * @param specification The enclosing <code>Specification</code>.
+     * @param specification The <code>Specification</code> to refer to.
      */
     public RangeOption(Specification specification) {
         super(specification);

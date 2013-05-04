@@ -53,7 +53,7 @@ public class GoodsWish extends Wish {
      * Creates a new uninitialized <code>GoodsWish</code>.
      *
      * @param aiMain The main AI-object.
-     * @param id The unique ID of this object.
+     * @param id The object identifier.
      */
     public GoodsWish(AIMain aiMain, String id) {
         super(aiMain, id);

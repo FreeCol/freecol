@@ -145,7 +145,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * Creates a new uninitialized <code>AIColony</code>.
      *
      * @param aiMain The main AI-object.
-     * @param id The identifier of this colony.
+     * @param id The object identifier.
      */
     public AIColony(AIMain aiMain, String id) {
         super(aiMain, id);
@@ -1410,7 +1410,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         }
         for (AIObject o : disposeList) o.dispose();
         colonyPlan = null;
-        // Do not clear this.colony, the id is still required.
+        // Do not clear this.colony, the identifier is still required.
         super.dispose();
     }
 

@@ -49,8 +49,7 @@ public class StringOption extends AbstractOption<String> {
     /**
      * Creates a new <code>StringOption</code>.
      *
-     * @param id The identifier for this option.  This is used when
-     *     the object should be found in an {@link OptionGroup}.
+     * @param id The object identifier.
      */
     public StringOption(String id) {
         super(id);
@@ -59,7 +58,7 @@ public class StringOption extends AbstractOption<String> {
     /**
      * Creates a new <code>StringOption</code>.
      *
-     * @param specification The enclosing <code>Specification</code>.
+     * @param specification The <code>Specification</code> to refer to.
      */
     public StringOption(Specification specification) {
         super(specification);
@@ -68,9 +67,8 @@ public class StringOption extends AbstractOption<String> {
     /**
      * Creates a new <code>StringOption</code>.
      *
-     * @param id The identifier for this option.  This is used when
-     *     the object should be found in an {@link OptionGroup}.
-     * @param specification The enclosing <code>Specification</code>.
+     * @param id The object identifier.
+     * @param specification The <code>Specification</code> to refer to.
      */
     public StringOption(String id, Specification specification) {
         super(id, specification);

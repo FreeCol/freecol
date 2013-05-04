@@ -84,10 +84,10 @@ public class HighScore extends FreeColObject {
     private String playerName;
 
     /** The nation that retired. */
-    private String nationID;
+    private String nationId;
 
     /** The nation type that retired. */
-    private String nationTypeID;
+    private String nationTypeId;
 
     /** The high score. */
     private int score;
@@ -118,11 +118,6 @@ public class HighScore extends FreeColObject {
 
 
     /**
-     * Empty constructor for I/O.
-     */
-    public HighScore() {}
-
-    /**
      * Create a new high score record.
      *
      * @param player The <code>Player</code> the score is for.
@@ -140,8 +135,8 @@ public class HighScore extends FreeColObject {
             }
         }
         playerName = player.getName();
-        nationID = player.getNationId();
-        nationTypeID = player.getNationType().getId();
+        nationId = player.getNationId();
+        nationTypeId = player.getNationType().getId();
         colonies = player.getColonies().size();
         units = player.getUnits().size();
         if (player.getPlayerType() == Player.PlayerType.INDEPENDENT) {
@@ -153,6 +148,25 @@ public class HighScore extends FreeColObject {
         // TODO: how difficult is a custom difficulty?
         difficulty = game.getSpecification().getDifficultyLevel().getId();
         newLandName = player.getNewLandName();
+    }
+
+    /**
+     * Create a new <code>HighScore</code> by reading a stream.
+     *
+     * @param in The <code>XMLStreamReader</code> to read.
+     * @exception XMLStreamException if there is a problem reading the stream.
+     */
+    public HighScore(XMLStreamReader in) throws XMLStreamException {
+        readFromXML(in);
+    }
+
+    /**
+     * Create a new <code>HighScore</code> by reading an element.
+     *
+     * @param element The <code>Element</code> to read.
+     */
+    public HighScore(Element element) {
+        readFromXMLElement(element);
     }
 
 
@@ -184,30 +198,21 @@ public class HighScore extends FreeColObject {
     }
 
     /**
-     * Get the nation id.
+     * Get the nation identifier.
      *
-     * @return The nation id.
+     * @return The nation identifier.
      */
-    public final String getNationID() {
-        return nationID;
+    public final String getNationId() {
+        return nationId;
     }
 
     /**
-     * Set the <code>NationID</code> value.
+     * Get the nation type identifier.
      *
-     * @param newNationID The new NationID value.
-    public final void setNationID(final String newNationID) {
-        this.nationID = newNationID;
-    }
+     * @return The nation type identifier.
      */
-
-    /**
-     * Get the nation type id.
-     *
-     * @return The nation type id.
-     */
-    public final String getNationTypeID() {
-        return nationTypeID;
+    public final String getNationTypeId() {
+        return nationTypeId;
     }
 
     /**
@@ -234,7 +239,7 @@ public class HighScore extends FreeColObject {
      * @return The old name key.
      */
     public final String getOldNationNameKey() {
-        return nationID + ".name";
+        return nationId + ".name";
     }
 
     /**
@@ -298,14 +303,18 @@ public class HighScore extends FreeColObject {
     private static final String DIFFICULTY_TAG = "difficulty";
     private static final String INDEPENDENCE_TURN_TAG = "independenceTurn";
     private static final String LEVEL_TAG = "level";
-    private static final String NATION_ID_TAG = "nationID";
+    private static final String NATION_ID_TAG = "nationId";
     private static final String NATION_NAME_TAG = "nationName";
-    private static final String NATION_TYPE_ID_TAG = "nationTypeID";
+    private static final String NATION_TYPE_ID_TAG = "nationTypeId";
     private static final String NEW_LAND_NAME_TAG = "newLandName";
     private static final String PLAYER_NAME_TAG = "playerName";
     private static final String RETIREMENT_TURN_TAG = "retirementTurn";
     private static final String SCORE_TAG = "score";
     private static final String UNITS_TAG = "units";
+    // @compat 0.10.7
+    private static final String OLD_NATION_ID_TAG = "nationID";
+    private static final String OLD_NATION_TYPE_ID_TAG = "nationTypeID";
+    // end @compat
 
 
     /**
@@ -331,9 +340,9 @@ public class HighScore extends FreeColObject {
 
         writeAttribute(out, PLAYER_NAME_TAG, playerName);
 
-        writeAttribute(out, NATION_ID_TAG, nationID);
+        writeAttribute(out, NATION_ID_TAG, nationId);
 
-        writeAttribute(out, NATION_TYPE_ID_TAG, nationTypeID);
+        writeAttribute(out, NATION_TYPE_ID_TAG, nationTypeId);
 
         writeAttribute(out, SCORE_TAG, score);
 
@@ -373,10 +382,17 @@ public class HighScore extends FreeColObject {
 
         playerName = getAttribute(in, PLAYER_NAME_TAG, "anonymous");
 
-        nationID = getAttribute(in, NATION_ID_TAG, "model.nation.dutch");
+        nationId = getAttribute(in, NATION_ID_TAG,
+            // @compat 0.10.7
+            getAttribute(in, OLD_NATION_ID_TAG,
+            // end @compat
+                "model.nation.dutch"));
 
-        nationTypeID = getAttribute(in, NATION_TYPE_ID_TAG,
-                                    "model.nationType.trade");
+        nationTypeId = getAttribute(in, NATION_TYPE_ID_TAG,
+            // @compat 0.10.7
+            getAttribute(in, OLD_NATION_TYPE_ID_TAG,
+            // end @compat
+                "model.nationType.trade"));
 
         score = getAttribute(in, SCORE_TAG, 0);
 

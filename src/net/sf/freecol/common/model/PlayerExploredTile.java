@@ -387,18 +387,13 @@ public class PlayerExploredTile extends FreeColGameObject {
             closeTag(in, MISSIONARY_TAG);
 
         } else if (Resource.getXMLElementTagName().equals(tag)) {
-            Resource resource = readFreeColGameObject(in, Resource.class);
-            if (resource != null) addTileItem(resource);
+            addTileItem(readFreeColGameObject(in, Resource.class));
 
         } else if (LostCityRumour.getXMLElementTagName().equals(tag)) {
-            LostCityRumour lostCityRumour
-                = readFreeColGameObject(in, LostCityRumour.class);
-            if (lostCityRumour != null) addTileItem(lostCityRumour);
+            addTileItem(readFreeColGameObject(in, LostCityRumour.class));
 
         } else if (TileImprovement.getXMLElementTagName().equals(tag)) {
-            TileImprovement ti
-                = readFreeColGameObject(in, TileImprovement.class);
-            if (ti != null) addTileItem(ti);
+            addTileItem(readFreeColGameObject(in, TileImprovement.class));
 
         } else {
             super.readChild(in);

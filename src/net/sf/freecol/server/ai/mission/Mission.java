@@ -894,10 +894,11 @@ public abstract class Mission extends AIObject {
      */
     @Override
     protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        // This routine might look redundant, but if you let its
+        // This routine might look redundant, but if you let it
         // default out up the tree, you reach
         // FreeColObject.writeAttributes, which complains about
-        // objects without an id.  Missions do not have ids.
+        // objects without an identifier.  Missions do not have
+        // identifiers.
     }
 
     /**
@@ -905,7 +906,7 @@ public abstract class Mission extends AIObject {
      */
     @Override
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        // This routine might look redundant, but if you let its
+        // This routine might look redundant, but if you let it
         // default out up the tree, you reach
         // FreeColObject.readAttributes, which expects to find an id
         // attribute.  Missions do not have ids.

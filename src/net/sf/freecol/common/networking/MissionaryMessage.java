@@ -36,8 +36,9 @@ import org.w3c.dom.Element;
  * The message sent when a missionary establishes/denounces a mission.
  */
 public class MissionaryMessage extends DOMMessage {
+
     /**
-     * The id of the missionary.
+     * The identifier of the missionary.
      */
     private String unitId;
 

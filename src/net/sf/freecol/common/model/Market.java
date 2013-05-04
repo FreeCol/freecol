@@ -94,17 +94,18 @@ public final class Market extends FreeColGameObject implements Ownable {
     }
 
     /**
-     * Initiates a new <code>Market</code> with the given ID.
+     * Creates a new <code>Market</code> with the given identifier.
      * The object should later be initialized by calling either
      * {@link #readFromXML(XMLStreamReader)} or
      * {@link #readFromXMLElement(Element)}.
      *
-     * @param game The <code>Game</code> in which this object belong.
-     * @param id The unique identifier for this object.
+     * @param game The enclosing <code>Game</code>.
+     * @param id The object identifier.
      */
     public Market(Game game, String id) {
         super(game, id);
     }
+
 
     /**
      * Describe <code>putMarketData</code> method here.
@@ -540,9 +541,7 @@ public final class Market extends FreeColGameObject implements Ownable {
 
         if (MarketData.getXMLElementTagName().equals(tag)) {
             MarketData data = readFreeColGameObject(in, MarketData.class);
-            if (data != null) {
-                putMarketData(data.getGoodsType(), data);
-            }
+            if (data != null) putMarketData(data.getGoodsType(), data);
 
         } else {
             super.readChild(in);

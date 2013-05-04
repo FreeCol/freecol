@@ -35,12 +35,12 @@ import org.w3c.dom.Element;
 public class AssignTeacherMessage extends DOMMessage {
 
     /**
-     * The id of the student.
+     * The identifier of the student.
      */
     private String studentId;
 
     /**
-     * The id of the teacher.
+     * The identifier of the teacher.
      */
     private String teacherId;
 

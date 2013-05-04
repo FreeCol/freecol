@@ -228,9 +228,7 @@ public class Europe extends UnitLocation implements Ownable, Named {
     //   UnitLocation.contains
     //   UnitLocation.getUnitCount
     //   UnitLocation.getUnitList
-    //   final UnitLocation.getUnitIterator
     //   UnitLocation.getGoodsContainer
-    //   UnitLocation.getColony
     //   UnitLocation.getSettlement
 
     /**

@@ -35,12 +35,12 @@ import org.w3c.dom.Element;
  */
 public class DeliverGiftMessage extends DOMMessage {
     /**
-     * The ID of the unit that is delivering the gift.
+     * The object identifier of the unit that is delivering the gift.
      */
     private String unitId;
 
     /**
-     * The ID of the settlement the gift is going to.
+     * The object identifier of the settlement the gift is going to.
      */
     private String settlementId;
 

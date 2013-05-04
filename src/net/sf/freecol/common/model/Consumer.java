@@ -81,13 +81,13 @@ public interface Consumer {
 
     /**
      * Returns whether the consumer has the ability with the given
-     * id. The ability most relevant to consumers is
+     * identifier.  The ability most relevant to consumers is
      * "consumeAllOrNothing", which implies that the consumer will not
      * consume any goods if its requirements can not be met and is
      * used by BuildQueues.
      *
-     * @param id a <code>String</code> value
-     * @return a <code>boolean</code> value
+     * @param id The object identifier.
+     * @return True if the ability is present.
      */
     public boolean hasAbility(String id);
 
@@ -98,8 +98,8 @@ public interface Consumer {
      * implies that the consumer does not consume stored goods (used
      * by the country and stables).
      *
-     * @param id a <code>String</code> value
-     * @return a <code>boolean</code> value
+     * @param id The object identifier.
+     * @return The set of <code>Modifier</code>s found.
      */
     public Set<Modifier> getModifierSet(String id);
 

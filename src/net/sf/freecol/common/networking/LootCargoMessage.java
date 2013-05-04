@@ -38,13 +38,14 @@ import org.w3c.dom.NodeList;
  * The message sent when looting cargo.
  */
 public class LootCargoMessage extends DOMMessage {
+
     /**
-     * The ID of the unit that is looting.
+     * The object identifier of the unit that is looting.
      */
     private String winnerId;
 
     /**
-     * The ID of the unit that is looted.
+     * The object identifier of the unit that is looted.
      */
     private String loserId;
 
@@ -57,7 +58,7 @@ public class LootCargoMessage extends DOMMessage {
      * Create a new <code>LootCargoMessage</code>.
      *
      * @param winner The <code>Unit</code> that is looting.
-     * @param loserId The id of the <code>Unit</code> that is looted.
+     * @param loserId The identifier of the <code>Unit</code> that is looted.
      * @param goods The <code>AbstractGoods</code> to loot.
      */
     public LootCargoMessage(Unit winner, String loserId, List<Goods> goods) {
@@ -99,7 +100,7 @@ public class LootCargoMessage extends DOMMessage {
     /**
      * Public accessor to help the client igc.
      *
-     * @return The defender Id.
+     * @return The defender Object Identifier.
      */
     public String getDefenderId() {
         return loserId;

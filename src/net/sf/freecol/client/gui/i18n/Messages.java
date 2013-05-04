@@ -263,16 +263,17 @@ public class Messages {
 
 
     /**
-     * Returns the text mapping for a particular ID in the default locale message bundle.
-     * Returns the key as the value if there is no mapping found!
+     * Get the text mapping for a particular identifier in the
+     * default locale message bundle.  Returns the key as the value if
+     * there is no mapping found!
      *
-     * @param messageId The key of the message to find
+     * @param messageId The key of the message to find.
      * @return String text mapping or the key
      */
     public static String message(String messageId) {
         // Check that all the values are correct.
         if (messageId == null) {
-            throw new NullPointerException("Message ID must not be null!");
+            throw new NullPointerException("Message id must not be null!");
         }
 
         // return key as value if there is no mapping found
@@ -294,9 +295,10 @@ public class Messages {
      * a tag, followed by a colon, followed by an optional selector,
      * followed by a pipe character, followed by one or several
      * choices separated by pipe characters. If there is only one
-     * choice, it must be a message id or a variable. Otherwise, each
-     * choice consists of a key and a value separated by an assignment
-     * character. Example: "{{tag:selector|key1=val1|key2=val2}}".
+     * choice, it must be a message identifier or a
+     * variable. Otherwise, each choice consists of a key and a value
+     * separated by an assignment character. Example:
+     * "{{tag:selector|key1=val1|key2=val2}}".
      *
      * @param input a <code>String</code> value
      * @param template a <code>StringTemplate</code> value

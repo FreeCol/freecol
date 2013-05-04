@@ -53,8 +53,7 @@ public class ListOption<T> extends AbstractOption<List<AbstractOption<T>>> {
     /**
      * Creates a new <code>ListOption</code>.
      *
-     * @param id The identifier for this option.  This is used when
-     *     the object should be found in an {@link OptionGroup}.
+     * @param id The object identifier.
      */
     public ListOption(String id) {
         super(id);
@@ -63,7 +62,7 @@ public class ListOption<T> extends AbstractOption<List<AbstractOption<T>>> {
     /**
      * Creates a new <code>ListOption</code>.
      *
-     * @param specification The enclosing <code>Specification</code>.
+     * @param specification The <code>Specification</code> to refer to.
      */
     public ListOption(Specification specification) {
         super(specification);

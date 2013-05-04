@@ -506,7 +506,6 @@ abstract public class Settlement extends GoodsLocation
     //   UnitLocation.canAdd
     //   UnitLocation.getUnitCount
     //   UnitLocation.getUnitList
-    //   UnitLocation.getColony
 
     /**
      * {@inheritDoc}

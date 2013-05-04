@@ -57,29 +57,20 @@ public class Operand extends Scope {
         SETTLEMENT, PLAYER, GAME, NONE
     }
 
-    /**
-     * The type of object the operand really represents.
-     */
+    /** The type of object the operand really represents. */
     private OperandType operandType = OperandType.NONE;
 
-    /**
-     * How broadly to apply the operand.
-     */
+    /** How broadly to apply the operand. */
     private ScopeLevel scopeLevel = ScopeLevel.NONE;
 
-    /**
-     * The operand amount.
-     */
+    /** The operand amount. */
     private Integer value = null;
 
 
     /**
-     * Creates a new <code>Operand</code> instance.
-     *
+     * Deliberately empty constructor.
      */
-    public Operand() {
-        // empty constructor
-    }
+    public Operand() {}
 
     /**
      * Creates a new <code>Operand</code> instance.
@@ -100,6 +91,17 @@ public class Operand extends Scope {
         this.operandType = operandType;
         this.scopeLevel = scopeLevel;
     }
+
+    /**
+     * Create a new operand by reading a stream.
+     *
+     * @param in The <code>XMLStreamReader</code> to read.
+     * @exception XMLStreamException if there is a problem reading the stream.
+     */
+    protected Operand(XMLStreamReader in) throws XMLStreamException {
+        readFromXML(in);
+    }
+
 
     /**
      * Gets the operand type.
@@ -356,7 +358,9 @@ public class Operand extends Scope {
         super.writeAttributes(out);
 
         writeAttribute(out, OPERAND_TYPE_TAG, operandType.toString());
+
         writeAttribute(out, SCOPE_LEVEL_TAG, scopeLevel.toString());
+
         if (value != null) {
             writeAttribute(out, VALUE_TAG, value);
         }

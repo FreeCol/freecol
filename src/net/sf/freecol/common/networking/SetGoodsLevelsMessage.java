@@ -35,7 +35,7 @@ import org.w3c.dom.Element;
 public class SetGoodsLevelsMessage extends DOMMessage {
 
     /**
-     * The id of the colony where the goods levels are set.
+     * The identifier of the colony where the goods levels are set.
      */
     private String colonyId;
 
@@ -65,8 +65,7 @@ public class SetGoodsLevelsMessage extends DOMMessage {
      */
     public SetGoodsLevelsMessage(Game game, Element element) {
         colonyId = element.getAttribute("colony");
-        data = new ExportData();
-        data.readFromXMLElement((Element) element.getChildNodes().item(0));
+        data = new ExportData((Element)element.getChildNodes().item(0));
     }
 
     /**

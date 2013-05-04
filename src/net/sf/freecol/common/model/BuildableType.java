@@ -36,9 +36,7 @@ import javax.xml.stream.XMLStreamWriter;
  */
 public abstract class BuildableType extends FreeColGameObjectType {
 
-    /**
-     * The required population for an ordinary buildable.
-     */
+    /** The required population for an ordinary buildable. */
     private static final int DEFAULT_REQUIRED_POPULATION = 1;
 
     /**
@@ -47,27 +45,21 @@ public abstract class BuildableType extends FreeColGameObjectType {
      */
     private int requiredPopulation = DEFAULT_REQUIRED_POPULATION;
 
-    /**
-     * Stores the abilities required by this Type.
-     */
+    /** Stores the abilities required by this Type. */
     private Map<String, Boolean> requiredAbilities = null;
 
-    /**
-     * A list of AbstractGoods required to build this type.
-     */
+    /** A list of AbstractGoods required to build this type. */
     private List<AbstractGoods> requiredGoods = null;
 
-    /**
-     * Limits on the production of this type.
-     */
+    /** Limits on the production of this type. */
     private List<Limit> limits = null;
 
 
     /**
      * Creates a new buildable type.
      *
-     * @param id The id of the buildable.
-     * @param specification A <code>Specification</code> to operate within.
+     * @param id The object identifier.
+     * @param specification The <code>Specification</code> to refer to.
      */
     public BuildableType(String id, Specification specification) {
         super(id, specification);
@@ -109,6 +101,19 @@ public abstract class BuildableType extends FreeColGameObjectType {
      */
     public void setRequiredAbilities(Map<String, Boolean> abilities) {
         requiredAbilities = abilities;
+    }
+
+    /**
+     * Add a new required ability.
+     *
+     * @param tag The ablilty name.
+     * @param value The ability value.
+     */
+    private void addRequiredAbility(String tag, boolean value) {
+        if (requiredAbilities == null) {
+            requiredAbilities = new HashMap<String, Boolean>();
+        }
+        requiredAbilities.put(tag, value);
     }
 
     /**
@@ -162,6 +167,18 @@ public abstract class BuildableType extends FreeColGameObjectType {
     }
 
     /**
+     * Add a new goods requirement.
+     *
+     * @param ag The required <code>AbstractGoods</code> to add.
+     */
+    private void addRequiredGoods(AbstractGoods ag) {
+        if (requiredGoods == null) {
+            requiredGoods = new ArrayList<AbstractGoods>();
+        }
+        requiredGoods.add(ag);
+    }
+
+    /**
      * Does this buildable need goods to build?
      *
      * @return True if goods are required to build this buildable.
@@ -189,6 +206,16 @@ public abstract class BuildableType extends FreeColGameObjectType {
         limits = newLimits;
     }
 
+    /**
+     * Add a new limit.
+     *
+     * @param limit The <code>Limit</code> to add.
+     */
+    private void addLimit(Limit limit) {
+        if (limits == null) limits = new ArrayList<Limit>();
+        limits.add(limit);
+    }
+
 
     // Serialization
 
@@ -197,7 +224,8 @@ public abstract class BuildableType extends FreeColGameObjectType {
     // Subclasses need to check this.
     public static final String REQUIRED_POPULATION_TAG = "required-population";
 
-    /**
+ 
+   /**
      * {@inheritDoc}
      */
     @Override
@@ -276,13 +304,10 @@ public abstract class BuildableType extends FreeColGameObjectType {
         final String tag = in.getLocalName();
 
         if (REQUIRED_ABILITY_TAG.equals(tag)) {
-            String str = readId(in);
-            if (str != null) {
-                if (requiredAbilities == null) {
-                    requiredAbilities = new HashMap<String, Boolean>();
-                }
-                requiredAbilities.put(str, getAttribute(in, VALUE_TAG, true));
-                spec.addAbility(str);
+            String id = readId(in);
+            if (id != null) {
+                addRequiredAbility(id, getAttribute(in, VALUE_TAG, true));
+                spec.addAbility(id);
             }
             closeTag(in, REQUIRED_ABILITY_TAG);
 
@@ -291,25 +316,17 @@ public abstract class BuildableType extends FreeColGameObjectType {
                                           GoodsType.class, (GoodsType)null);
             int amount = getAttribute(in, VALUE_TAG, 0);
             if (type != null && amount > 0) {
-                AbstractGoods ag = new AbstractGoods(type, amount);
                 type.setBuildingMaterial(true);
-                if (requiredGoods == null) {
-                    requiredGoods = new ArrayList<AbstractGoods>();
-                }
-                requiredGoods.add(ag);
+                addRequiredGoods(new AbstractGoods(type, amount));
             }
             closeTag(in, REQUIRED_GOODS_TAG);
 
         } else if (Limit.getXMLElementTagName().equals(tag)) {
-            Limit limit = new Limit(spec);
-            limit.readFromXML(in);
+            Limit limit = new Limit(in, spec);
             if (limit.getLeftHandSide().getType() == null) {
                 limit.getLeftHandSide().setType(getId());
             }
-            if (limits == null) {
-                limits = new ArrayList<Limit>();
-            }
-            limits.add(limit);
+            addLimit(limit);
 
         } else {
             super.readChild(in);

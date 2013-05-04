@@ -43,7 +43,7 @@ public class FileOption extends AbstractOption<File> {
     /**
      * Creates a new <code>FileOption</code>.
      *
-     * @param specification The enclosing <code>Specification</code>.
+     * @param specification The <code>Specification</code> to refer to.
      */
     public FileOption(Specification specification) {
         super(specification);

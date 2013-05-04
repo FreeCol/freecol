@@ -42,7 +42,7 @@ public class FreeColTcFile extends FreeColModFile {
     /**
      * Opens the file with the given name for reading.
      *
-     * @param id The id of the TC to load.
+     * @param id The identifier of the TC to load.
      * @throws IOException if thrown while opening the file.
      */
     public FreeColTcFile(final String id) throws IOException {

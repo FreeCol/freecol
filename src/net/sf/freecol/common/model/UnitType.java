@@ -34,14 +34,10 @@ import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 public final class UnitType extends BuildableType
     implements Comparable<UnitType>, Consumer {
 
-    /**
-     * The default offence value.
-     */
+    /** The default offence value. */
     public static final int DEFAULT_OFFENCE = 0;
 
-    /**
-     * The default offence value.
-     */
+    /** The default offence value. */
     public static final int DEFAULT_DEFENCE = 1;
 
     /**
@@ -50,14 +46,10 @@ public final class UnitType extends BuildableType
      */
     private int offence = DEFAULT_OFFENCE;
 
-    /**
-     * The defence of this UnitType.
-     */
+    /** The defence of this UnitType. */
     private int defence = DEFAULT_DEFENCE;
 
-    /**
-     * The capacity of this UnitType.
-     */
+    /** The capacity of this UnitType. */
     private int space = 0;
 
     /**
@@ -67,49 +59,31 @@ public final class UnitType extends BuildableType
      */
     private int hitPoints = 0;
 
-    /**
-     * The space taken by this UnitType.
-     */
+    /** The space taken by this UnitType. */
     private int spaceTaken = 1;
 
-    /**
-     * The skill level of this UnitType.
-     */
+    /** The skill level of this UnitType. */
     private int skill = UNDEFINED;
 
-    /**
-     * The price of this UnitType.
-     */
+    /** The price of this UnitType. */
     private int price = UNDEFINED;
 
-    /**
-     * The initial moves of this UnitType.
-     */
+    /** The initial moves of this UnitType. */
     private int movement = 3;
 
-    /**
-     * The maximum distance of tiles this UnitType can observe.
-     */
+    /** The maximum distance of tiles this UnitType can observe. */
     private int lineOfSight = 1;
 
-    /**
-     * The probability of recruiting a Unit of this type in Europe.
-     */
+    /** The probability of recruiting a Unit of this type in Europe. */
     private int recruitProbability = 0;
 
-    /**
-     * The expert production of this UnitType.
-     */
+    /** The expert production of this UnitType. */
     private GoodsType expertProduction = null;
 
-    /**
-     * How much a Unit of this type contributes to the Player's score.
-     */
+    /** How much a Unit of this type contributes to the Player's score. */
     private int scoreValue = 0;
 
-    /**
-     * The maximum experience a unit of this type can accumulate.
-     */
+    /** The maximum experience a unit of this type can accumulate. */
     private int maximumExperience = 0;
 
     /**
@@ -118,39 +92,31 @@ public final class UnitType extends BuildableType
      */
     private int maximumAttrition = INFINITY;
 
-    /**
-     * The skill this UnitType teaches, mostly its own.
-     */
+    /** The skill this UnitType teaches, mostly its own. */
     private UnitType skillTaught = null;
 
-    /**
-     * The default equipment for a unit of this type.
-     */
+    /** The default equipment for a unit of this type. */
     private EquipmentType defaultEquipment = null;
 
-    /**
-     * The possible type changes for this unit type.
-     */
+    /** The possible type changes for this unit type. */
     private List<UnitTypeChange> typeChanges = null;
 
-    /**
-     * The goods consumed per turn when in a settlement.
-     */
+    /** The goods consumed per turn when in a settlement. */
     private TypeCountMap<GoodsType> consumption = null;
 
 
     /**
      * Creates a new <code>UnitType</code> instance.
      *
-     * @param id The unit type id.
-     * @param specification The <code>Specification</code> in which to create
-     *     this unit type.
+     * @param id The object identifier.
+     * @param specification The <code>Specification</code> to refer to.
      */
     public UnitType(String id, Specification specification) {
         super(id, specification);
 
         setModifierIndex(Modifier.EXPERT_PRODUCTION_INDEX);
     }
+
 
     /**
      * Get a key for the working as this unit type message.
@@ -422,6 +388,18 @@ public final class UnitType extends BuildableType
     }
 
     /**
+     * Add a unit type change.
+     *
+     * @param change The <code>UnitTypeChange</code> to add.
+     */
+    private void addTypeChange(UnitTypeChange change) {
+        if (typeChanges == null) {
+            typeChanges = new ArrayList<UnitTypeChange>();
+        }
+        typeChanges.add(change);
+    }
+
+    /**
      * Gets a unit type resulting from a given change type and player.
      *
      * @param changeType A <code>ChangeType</code> to match.
@@ -593,6 +571,20 @@ public final class UnitType extends BuildableType
         return (consumption == null) ? 0 : consumption.getCount(goodsType);
     }
 
+    /**
+     * Add consumption.
+     *
+     * @param type The <code>GoodsType</code> to consume.
+     * @param amount The amount of goods to consume.
+     */
+    private void addConsumption(GoodsType type, int amount) {
+        if (consumption == null) {
+            consumption = new TypeCountMap<GoodsType>();
+        }
+        consumption.incrementCount(type, amount);
+    }
+
+
     // Interface Comparable
 
     /**
@@ -666,6 +658,7 @@ public final class UnitType extends BuildableType
     private static final String DOWNGRADE_TAG = "downgrade";
     private static final String UNIT_TAG = "unit";
     private static final String UPGRADE_TAG = "upgrade";
+
 
     /**
      * {@inheritDoc}
@@ -869,20 +862,14 @@ public final class UnitType extends BuildableType
         final String tag = in.getLocalName();
 
         if (CONSUMES_TAG.equals(tag)) {
-            GoodsType type = spec.getType(in, ID_ATTRIBUTE_TAG,
-                                          GoodsType.class, (GoodsType)null);
-            int amount = getAttribute(in, VALUE_TAG, UNDEFINED);
-            if (type != null && amount != UNDEFINED) {
-                if (consumption == null) {
-                    consumption = new TypeCountMap<GoodsType>();
-                }
-                consumption.incrementCount(type, amount);
-            }
+            addConsumption(spec.getType(in, ID_ATTRIBUTE_TAG,
+                                        GoodsType.class, (GoodsType)null),
+                           getAttribute(in, VALUE_TAG, UNDEFINED));
             closeTag(in, CONSUMES_TAG);
 
         } else if (DEFAULT_EQUIPMENT_TAG.equals(tag)) {
             defaultEquipment = spec.getType(in, ID_ATTRIBUTE_TAG,
-                EquipmentType.class, (EquipmentType)null);
+                                            EquipmentType.class, (EquipmentType)null);
             closeTag(in, DEFAULT_EQUIPMENT_TAG);
 
         } else if (DOWNGRADE_TAG.equals(tag) || UPGRADE_TAG.equals(tag)) {
@@ -906,10 +893,7 @@ public final class UnitType extends BuildableType
                     // add default downgrade type
                     change.getChangeTypes().put(ChangeType.CLEAR_SKILL, 100);
                 }
-                if (typeChanges == null) {
-                    typeChanges = new ArrayList<UnitTypeChange>();
-                }
-                typeChanges.add(change);
+                addTypeChange(change);
             }
 
         } else {

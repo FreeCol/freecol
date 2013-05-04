@@ -394,7 +394,7 @@ public class Connection {
     public void handleAndSendReply(final BufferedInputStream in) 
         throws IOException {
 
-        // Peek at the reply id and tag.
+        // Peek at the reply identifier and tag.
         in.mark(200);
         final XMLInputFactory xif = XMLInputFactory.newInstance();
 

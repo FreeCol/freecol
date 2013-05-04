@@ -70,9 +70,10 @@ public class ResourcesDetailPanel extends ColopediaGameObjectTypePanel<ResourceT
     }
 
     /**
-     * Builds the details panel for the ResourceType with the given ID.
+     * Builds the details panel for the ResourceType with the given
+     * identifier.
      *
-     * @param id the ID of a ResourceType
+     * @param id The object identifier.
      * @param panel the detail panel to build
      */
     public void buildDetail(String id, JPanel panel) {

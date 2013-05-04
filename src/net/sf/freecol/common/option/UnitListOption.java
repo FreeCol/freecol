@@ -35,8 +35,7 @@ public class UnitListOption extends ListOption<AbstractUnit> {
     /**
      * Creates a new <code>UnitListOption</code>.
      *
-     * @param id The identifier for this option.  This is used when
-     *     the object should be found in an {@link OptionGroup}.
+     * @param id The object identifier.
      */
     public UnitListOption(String id) {
         super(id);
@@ -45,7 +44,7 @@ public class UnitListOption extends ListOption<AbstractUnit> {
     /**
      * Creates a new <code>UnitListOption</code>.
      *
-     * @param specification The enclosing <code>Specification</code>.
+     * @param specification The <code>Specification</code> to refer to.
      */
     public UnitListOption(Specification specification) {
         super(specification);

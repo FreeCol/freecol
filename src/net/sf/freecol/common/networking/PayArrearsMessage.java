@@ -34,7 +34,7 @@ import org.w3c.dom.Element;
 public class PayArrearsMessage extends DOMMessage {
 
     /**
-     * The id of the GoodsType to pay arrears for.
+     * The identifier of the GoodsType to pay arrears for.
      */
     private String goodsTypeId;
 

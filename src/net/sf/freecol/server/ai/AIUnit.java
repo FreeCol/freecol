@@ -104,7 +104,7 @@ public class AIUnit extends AIObject implements Transportable {
      * Creates a new uninitialized <code>AIUnit</code>.
      *
      * @param aiMain The main AI-object.
-     * @param id The identifier for the uninitialized unit.
+     * @param id The object identifier.
      */
     public AIUnit(AIMain aiMain, String id) {
         super(aiMain, id);

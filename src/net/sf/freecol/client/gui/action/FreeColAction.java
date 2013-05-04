@@ -36,6 +36,7 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.resources.ResourceManager;
 
@@ -66,7 +67,7 @@ public abstract class FreeColAction extends AbstractAction implements Option<Fre
      * Creates a new <code>FreeColAction</code>.
      *
      * @param freeColClient The main controller object for the client.
-     * @param id a <code>String</code> value
+     * @param id The object identifier for this action.
      */
     protected FreeColAction(FreeColClient freeColClient, GUI gui, String id) {
         super(Messages.message(id + ".name"));
@@ -136,7 +137,7 @@ public abstract class FreeColAction extends AbstractAction implements Option<Fre
     /**
      * Adds icons for the order buttons.
      *
-     * @param key The id of the action.
+     * @param key The identifier of the action.
      */
     protected void addImageIcons(String key) {
         Image normal = ResourceManager.getImage("orderButton.normal." + key);
@@ -213,15 +214,7 @@ public abstract class FreeColAction extends AbstractAction implements Option<Fre
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String toString() {
-        return getName();
-    }
-
-    /**
-     * Returns the id of this <code>Option</code>.
+     * Get the identifier of this <code>Option</code>.
      *
      * @return An unique identifier for this action.
      */
@@ -249,12 +242,8 @@ public abstract class FreeColAction extends AbstractAction implements Option<Fre
      *         <code>getAWTKeyStroke(String)</code>.
      */
     public static String getKeyStrokeText(KeyStroke keyStroke) {
-        if (keyStroke == null) {
-            return "";
-        } else
-            return keyStroke.toString();
+        return (keyStroke == null) ? "" : keyStroke.toString();
     }
-
 
     /**
      * Returns the action itself. TODO: at the moment, this is only
@@ -276,73 +265,11 @@ public abstract class FreeColAction extends AbstractAction implements Option<Fre
         logger.warning("Calling unsupported method setValue.");
     }
 
-    /**
-     * This method writes an XML-representation of this object to the given
-     * stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
-     */
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        // Start element:
-        out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute("id", getId());
-        out.writeAttribute("accelerator", getKeyStrokeText(getAccelerator()));
-
-        out.writeEndElement();
-   }
-
-    /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered during parsing.
-     */
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        String id = in.getAttributeValue(null, "id");
-        String acc = in.getAttributeValue(null, "accelerator");
-
-        if (id == null){
-            // Old syntax
-            id = in.getLocalName();
-        }
-
-        if (!acc.equals("")) {
-            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(acc));
-        } else {
-            putValue(ACCELERATOR_KEY, null);
-        }
-    }
-
-    /**
-     * This method writes an XML-representation of this object to the given
-     * stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
-     */
-    public void toXML(XMLStreamWriter out) throws XMLStreamException {
-        toXMLImpl(out);
-    }
-
-    /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered during parsing.
-     */
-    public void readFromXML(XMLStreamReader in) throws XMLStreamException {
-        readAttributes(in);
-        in.nextTag();
-    }
 
     public MenuKeyListener getMenuKeyListener() {
         return new InnerMenuKeyListener();
     }
-
 
     /**
      * A class used by Actions which have a mnemonic. Those Actions should
@@ -382,12 +309,85 @@ public abstract class FreeColAction extends AbstractAction implements Option<Fre
 
     }
 
+
+    // Serialization
+    
+    private static final String ACCELERATOR_TAG = "accelerator";
+
+
+    /**
+     * This method writes an XML-representation of this object to the given
+     * stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to the
+     *             stream.
+     */
+    public void toXML(XMLStreamWriter out) throws XMLStreamException {
+        toXMLImpl(out);
+    }
+
+    /**
+     * This method writes an XML-representation of this object to the given
+     * stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to the
+     *             stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        out.writeStartElement(getXMLElementTagName());
+
+        out.writeAttribute(FreeColObject.ID_ATTRIBUTE_TAG, getId());
+
+        out.writeAttribute(ACCELERATOR_TAG, getKeyStrokeText(getAccelerator()));
+
+        out.writeEndElement();
+    }
+
+    /**
+     * Initialize this object from an XML-representation of this object.
+     *
+     * @param in The input stream with the XML.
+     * @throws XMLStreamException if a problem was encountered during parsing.
+     */
+    public void readFromXML(XMLStreamReader in) throws XMLStreamException {
+        readAttributes(in);
+        in.nextTag();
+    }
+
+    /**
+     * Initialize this object from an XML-representation of this object.
+     *
+     * @param in The input stream with the XML.
+     * @throws XMLStreamException if a problem was encountered during parsing.
+     */
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        String id = in.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG);
+        if (id == null) id = in.getLocalName(); // Old syntax
+
+        String acc = in.getAttributeValue(null, ACCELERATOR_TAG);
+        if (!acc.equals("")) {
+            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(acc));
+        } else {
+            putValue(ACCELERATOR_KEY, null);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return getName();
+    }
+
     /**
      * Gets the tag name of the root element representing this object.
-     * @return "integerOption".
+     *
+     * @return "action".
      */
-     public static String getXMLElementTagName() {
-         return "action";
-     }
-
+    public static String getXMLElementTagName() {
+        return "action";
+    }
 }

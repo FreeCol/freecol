@@ -46,6 +46,7 @@ import net.sf.freecol.common.option.AbstractOption;
 import net.sf.freecol.common.option.AbstractUnitOption;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.IntegerOption;
+import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.RangeOption;
@@ -257,6 +258,7 @@ public final class Specification {
                 CARGO_PENALTY_SOURCE,
                 AMBUSH_BONUS_SOURCE,
                 COLONY_GOODS_PARTY_SOURCE,
+                SHIP_TRADE_PENALTY_SOURCE,
                 SOL_MODIFIER_SOURCE
             }) {
             allTypes.put(source.getId(), source);
@@ -613,6 +615,8 @@ public final class Specification {
 
                 } else {
                     T object = getType(id, type);
+                    allTypes.put(id, object);
+
                     // If this an existing object (with id) and the
                     // PRESERVE tag is present, then leave the
                     // attributes intact and only read the child
@@ -1369,7 +1373,7 @@ public final class Specification {
     }
 
     public OptionGroup getMapGeneratorOptions() {
-        return getOptionGroup("mapGeneratorOptions");
+        return getOptionGroup(MapGeneratorOptions.getXMLElementTagName());
     }
 
 

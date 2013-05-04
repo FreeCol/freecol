@@ -67,7 +67,7 @@ public abstract class TileItem extends FreeColGameObject implements Locatable {
      * either {@link #readFromXML(XMLStreamReader)}.
      *
      * @param game The enclosing <code>Game</code>.
-     * @param id The unique identifier for this object.
+     * @param id The object identifier.
      */
     public TileItem(Game game, String id) {
         super(game, id);

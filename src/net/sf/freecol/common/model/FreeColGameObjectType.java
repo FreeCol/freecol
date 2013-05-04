@@ -34,30 +34,24 @@ import net.sf.freecol.common.option.OptionGroup;
  * specification, such as the "artillery in the open" penalty.
  *
  * In general, a FreeColGameObjectType does not need a reference to
- * the specification. However, if it has attributes or children that
+ * the specification.  However, if it has attributes or children that
  * are themselves FreeColGameObjectTypes, then the specification must
- * be set before the type is de-serialized, otherwise the IDs can not
- * be resolved.
+ * be set before the type is de-serialized, otherwise the identifiers
+ * can not be resolved.
  *
  * FreeColGameObjectTypes can be abstract.  Abstract types can be used
  * to derive other types, but can not be instantiated.  They will be
  * removed from the Specification after it has loaded completely.
  */
-public class FreeColGameObjectType extends FreeColObject {
+public class FreeColGameObjectType extends FreeColObject implements Named {
 
-    /**
-     * XML attribute tag to denote a deletion of a child element.
-     */
+    /** XML attribute tag to denote a deletion of a child element. */
     protected static final String DELETE_TAG = "delete";
 
-    /**
-     * XML attribute tag to denote that this type extends another.
-     */
+    /** XML attribute tag to denote that this type extends another. */
     protected static final String EXTENDS_TAG = "extends";
 
-    /**
-     * XML attribute tag to denote preservation of attributes and children.
-     */
+    /** XML attribute tag to denote preservation of attributes and children. */
     public static final String PRESERVE_TAG = "preserve";
 
     /**
@@ -71,14 +65,10 @@ public class FreeColGameObjectType extends FreeColObject {
      */
     private int index = -1;
 
-    /**
-     * The default index of Modifiers provided by this type.
-     */
+    /** The default index of Modifiers provided by this type. */
     private int modifierIndex = 100;
 
-    /**
-     * Whether the type is abstract or can be instantiated.
-     */
+    /** Whether the type is abstract or can be instantiated. */
     private boolean abstractType;
 
     /**
@@ -89,12 +79,12 @@ public class FreeColGameObjectType extends FreeColObject {
 
     
     /**
-     * Empty constructor.
+     * Deliberately empty constructor.
      */
     protected FreeColGameObjectType() {}
 
     /**
-     * Create a simple FreeColGameObjectType without a Specification.
+     * Create a simple FreeColGameObjectType without a specification.
      *
      * @param id The object identifier.
      */
@@ -103,19 +93,21 @@ public class FreeColGameObjectType extends FreeColObject {
     }
 
     /**
-     * Create a FreeColGameObjectType with a given Specification but no id.
+     * Create a FreeColGameObjectType with a given specification but
+     * no object identifier.
      *
-     * @param specification The <code>Specification</code> for this game object.
+     * @param specification The <code>Specification</code> to refer to.
      */
     public FreeColGameObjectType(Specification specification) {
         this(null, specification);
     }
 
     /**
-     * Create a FreeColGameObjectType with a given id and Specification.
+     * Create a FreeColGameObjectType with a given identifier and
+     * specification.
      *
      * @param id The object identifier.
-     * @param specification The <code>Specification</code> for this game object.
+     * @param specification The <code>Specification</code> to refer to.
      */
     public FreeColGameObjectType(String id, Specification specification) {
         setId(id);
@@ -159,16 +151,6 @@ public class FreeColGameObjectType extends FreeColObject {
     }
 
     /**
-     * Gets a string suitable for looking up the name of this
-     * object in {@link net.sf.freecol.client.gui.i18n.Messages}.
-     *
-     * @return A message key.
-     */
-    public final String getNameKey() {
-        return getId() + ".name";
-    }
-
-    /**
      * Gets a string suitable for looking up the description of
      * this object in {@link net.sf.freecol.client.gui.i18n.Messages}.
      *
@@ -179,9 +161,9 @@ public class FreeColGameObjectType extends FreeColObject {
     }
 
     /**
-     * Gets the id of this object with the given prefix removed if
-     * the id of the object starts with the prefix, and the entire id
-     * otherwise.
+     * Gets the identifier of this object with the given prefix
+     * removed if the id of the object starts with the prefix, and the
+     * entire id otherwise.
      *
      * @param prefix The prefix to test.
      * @return An identifier.
@@ -245,6 +227,19 @@ public class FreeColGameObjectType extends FreeColObject {
     }
 
 
+    // Interface Named
+
+    /**
+     * Gets a string suitable for looking up the name of this
+     * object in {@link net.sf.freecol.client.gui.i18n.Messages}.
+     *
+     * @return A message key.
+     */
+    public final String getNameKey() {
+        return getId() + ".name";
+    }
+
+
     // Serialization
 
     // We do not serialize index, so no INDEX_TAG.
@@ -254,6 +249,7 @@ public class FreeColGameObjectType extends FreeColObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         // This routine only exists so that Specification can build
         // some FCGOT objects to act as dummy sources.  Otherwise we
@@ -263,6 +259,7 @@ public class FreeColGameObjectType extends FreeColObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 

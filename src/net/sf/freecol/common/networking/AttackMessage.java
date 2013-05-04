@@ -37,7 +37,7 @@ import org.w3c.dom.Element;
 public class AttackMessage extends DOMMessage {
 
     /**
-     * The id of the attacker.
+     * The identifier of the attacker.
      */
     private String unitId;
 

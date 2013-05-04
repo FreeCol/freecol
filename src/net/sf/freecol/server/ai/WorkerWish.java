@@ -53,7 +53,7 @@ public class WorkerWish extends Wish {
      * XML-representation.
      *
      * @param aiMain The main AI-object.
-     * @param id The unique ID of this object.
+     * @param id The object identifier.
      */
     public WorkerWish(AIMain aiMain, String id) {
         super(aiMain, id);

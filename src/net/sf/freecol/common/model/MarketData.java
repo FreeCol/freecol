@@ -101,13 +101,13 @@ public class MarketData extends FreeColGameObject {
     }
 
     /**
-     * Instantiates a new <code>MarketData</code> with the given
-     * identifier. The object should later be initialized by calling
-     * either {@link #readFromXML(XMLStreamReader)} or {@link
-     * #readFromXMLElement(Element)}.
+     * Creates a new <code>MarketData</code> with the given
+     * identifier.  The object should later be initialized by calling
+     * either {@link #readFromXML(XMLStreamReader)} or
+     * {@link #readFromXMLElement(Element)}.
      *
-     * @param game The <code>Game</code> in which this object belong.
-     * @param id The unique identifier for this object.
+     * @param game The enclosing <code>Game</code>.
+     * @param id The object identifier.
      */
     public MarketData(Game game, String id) {
         super(game, id);

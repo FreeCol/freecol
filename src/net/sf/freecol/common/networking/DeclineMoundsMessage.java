@@ -37,7 +37,7 @@ import org.w3c.dom.Element;
 public class DeclineMoundsMessage extends DOMMessage {
 
     /**
-     * The id of the unit that is exploring.
+     * The identifier of the unit that is exploring.
      */
     private String unitId;
 

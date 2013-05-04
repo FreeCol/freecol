@@ -34,12 +34,12 @@ import org.w3c.dom.Element;
 public class EquipUnitMessage extends DOMMessage {
 
     /**
-     * The id of the unit.
+     * The identifier of the unit.
      */
     private String unitId;
 
     /**
-     * The id of the equipment type.
+     * The identifier of the equipment type.
      */
     private String typeId;
 

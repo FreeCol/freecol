@@ -36,8 +36,9 @@ import org.w3c.dom.Element;
  * The message sent when scouting a native settlement.
  */
 public class ScoutIndianSettlementMessage extends DOMMessage {
+
     /**
-     * The id of the unit that is learning.
+     * The identifier of the unit that is learning.
      */
     private String unitId;
 

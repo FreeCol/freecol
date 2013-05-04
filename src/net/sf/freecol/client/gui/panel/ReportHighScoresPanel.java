@@ -109,7 +109,7 @@ public final class ReportHighScoresPanel extends ReportPanel {
             }
 
             reportPanel.add(new JLabel(Messages.message("report.highScores.nationType")), "skip");
-            reportPanel.add(new JLabel(Messages.message(highScore.getNationTypeID() + ".name")));
+            reportPanel.add(new JLabel(Messages.message(highScore.getNationTypeId() + ".name")));
 
             reportPanel.add(new JLabel(Messages.message("report.highScores.units")), "skip");
             reportPanel.add(new JLabel(String.valueOf(highScore.getUnits())));

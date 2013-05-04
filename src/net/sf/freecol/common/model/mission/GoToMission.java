@@ -80,7 +80,7 @@ public class GoToMission extends AbstractMission {
      * Creates a new <code>GoToMission</code> instance.
      *
      * @param game a <code>Game</code> value
-     * @param id a <code>String</code> value
+     * @param id The object identifier.
      */
     public GoToMission(Game game, String id) {
         super(game, id);

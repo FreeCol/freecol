@@ -123,9 +123,10 @@ public class BuildingDetailPanel extends ColopediaGameObjectTypePanel<BuildingTy
     }
 
     /**
-     * Builds the details panel for the BuildingType with the given ID.
+     * Builds the details panel for the BuildingType with the given
+     * identifier.
      *
-     * @param id the ID of a BuildingType
+     * @param id The object identifier.
      * @param panel the detail panel to build
      */
     public void buildDetail(String id, JPanel panel) {

@@ -32,8 +32,9 @@ import org.w3c.dom.Element;
  * The message sent when disembarking.
  */
 public class DisembarkMessage extends DOMMessage {
+
     /**
-     * The id of the object disembarking.
+     * The identifier of the object disembarking.
      */
     private String unitId;
 

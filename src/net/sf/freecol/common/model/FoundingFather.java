@@ -77,11 +77,12 @@ public class FoundingFather extends FreeColGameObjectType {
     /**
      * Create a new founding father.
      *
-     * @param id The object id.
-     * @param specification The enclosing <code>Specification</code>.
+     * @param id The object identifier.
+     * @param specification The <code>Specification</code> to refer to.
      */
     public FoundingFather(String id, Specification specification) {
         super(id, specification);
+
         setModifierIndex(Modifier.FATHER_PRODUCTION_INDEX);
     }
 
@@ -158,6 +159,16 @@ public class FoundingFather extends FreeColGameObjectType {
     }
 
     /**
+     * Add an event.
+     *
+     * @param event The <code>Event</code> to add.
+     */
+    private void addEvent(Event event) {
+        if (events == null) events = new ArrayList<Event>();
+        events.add(event);
+    }
+
+    /**
      * Get any scopes on the election of this father.
      *
      * @return A list of <code>Scope</code>s.
@@ -176,6 +187,16 @@ public class FoundingFather extends FreeColGameObjectType {
      */
     public final void setScopes(final List<Scope> newScopes) {
         this.scopes = newScopes;
+    }
+
+    /**
+     * Add a scope.
+     *
+     * @param scope The <code>Scope</code> to add.
+     */
+    private void addScope(Scope scope) {
+        if (scopes == null) scopes = new ArrayList<Scope>();
+        scopes.add(scope);
     }
 
     /**
@@ -200,6 +221,19 @@ public class FoundingFather extends FreeColGameObjectType {
     }
 
     /**
+     * Add an upgrade.
+     *
+     * @param fromType The initial <code>UnitType</code>.
+     * @param toType The upgraded <code>UnitType</code>.
+     */
+    private void addUpgrade(UnitType fromType, UnitType toType) {
+        if (upgrades == null) {
+            upgrades = new HashMap<UnitType, UnitType>();
+        }
+        upgrades.put(fromType, toType);
+    }
+
+    /**
      * Get the units this father supplies.
      *
      * @return A list of <code>AbstractUnit</code>s.
@@ -220,6 +254,15 @@ public class FoundingFather extends FreeColGameObjectType {
         this.units = newUnits;
     }
 
+    /**
+     * Add a unit.
+     *
+     * @param unit The <code>AbstractUnit</code> to add.
+     */
+    private void addUnit(AbstractUnit unit) {
+        if (units == null) units = new ArrayList<AbstractUnit>();
+        units.add(unit);
+    }
 
     /**
      * Is this founding father available to the given player?
@@ -293,8 +336,11 @@ public class FoundingFather extends FreeColGameObjectType {
         if (upgrades != null) {
             for (Map.Entry<UnitType, UnitType> entry : upgrades.entrySet()) {
                 out.writeStartElement(UPGRADE_TAG);
+
                 writeAttribute(out, FROM_ID_TAG, entry.getKey().getId());
+
                 writeAttribute(out, TO_ID_TAG, entry.getValue().getId());
+
                 out.writeEndElement();
             }
         }
@@ -320,6 +366,7 @@ public class FoundingFather extends FreeColGameObjectType {
      */
     @Override
     protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        // Clear containers.
         if (readShouldClearContainers(in)) {
             events = null;
             scopes = null;
@@ -344,33 +391,18 @@ public class FoundingFather extends FreeColGameObjectType {
             UnitType toType = spec.getType(in, TO_ID_TAG, UnitType.class,
                                            (UnitType)null);
             if (fromType != null && toType != null) {
-                if (upgrades == null) {
-                    upgrades = new HashMap<UnitType, UnitType>();
-                }
-                upgrades.put(fromType, toType);
+                addUpgrade(fromType, toType);
             }
             closeTag(in, UPGRADE_TAG);
 
         } else if (UNIT_TAG.equals(tag)) {
-            // AbstractUnit closes element
-            AbstractUnit unit = new AbstractUnit(in);
-            if (unit != null) {
-                if (units == null) units = new ArrayList<AbstractUnit>();
-                units.add(unit);
-            }
+            addUnit(new AbstractUnit(in));
 
         } else if (Event.getXMLElementTagName().equals(tag)) {
-            Event event = new Event(null, spec);
-            event.readFromXML(in);
-            if (events == null) events = new ArrayList<Event>();
-            events.add(event);
+            addEvent(new Event(in, spec));
 
         } else if (Scope.getXMLElementTagName().equals(tag)) {
-            Scope scope = new Scope(in);
-            if (scope != null) {
-                if (scopes == null) scopes = new ArrayList<Scope>();
-                scopes.add(scope);
-            }
+            addScope(new Scope(in));
 
         } else {
             super.readChild(in);

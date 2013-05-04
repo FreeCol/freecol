@@ -73,9 +73,9 @@ public class TerrainDetailPanel extends ColopediaGameObjectTypePanel<TileType> {
     }
 
     /**
-     * Builds the details panel for the TileType with the given ID.
+     * Builds the details panel for the TileType with the given identifier.
      *
-     * @param id the ID of a TileType
+     * @param id The object identifier.
      * @param panel the detail panel to build
      */
     public void buildDetail(String id, JPanel panel) {

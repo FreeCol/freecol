@@ -65,38 +65,30 @@ public class UnitTypeChange extends FreeColObject {
         tags.put(ChangeType.UNDEAD, "undead");
     }
 
-    /**
-     * The new unit type to change to.
-     */
+    /** The new unit type to change to. */
     private UnitType newUnitType = null;
 
-    /**
-     * The number of turns the changes takes, if applicable.
-     */
+    /** The number of turns the changes takes, if applicable. */
     protected int turnsToLearn = 0;
 
-    /**
-     * A map of change type to probability.
-     */
+    /** A map of change type to probability. */
     protected Map<ChangeType, Integer> changeTypes
         = new EnumMap<ChangeType, Integer>(ChangeType.class);
 
-    /**
-     * A list of Scopes limiting the applicability of this Feature.
-     */
+    /** A list of Scopes limiting the applicability of this Feature. */
     private List<Scope> scopes = null;
 
 
     /**
-     * Empty constructor.
+     * Delibaretely empty constructor.
      */
     public UnitTypeChange() {}
 
     /**
      * Creates a new <code>UnitTypeChange</code> instance.
      *
-     * @param in a <code>XMLStreamReader</code> value
-     * @param specification a <code>Specification</code> value
+     * @param in An <code>XMLStreamReader</code> to read from.
+     * @param specification The <code>Specification</code> to refer to.
      * @exception XMLStreamException if an error occurs
      */
     public UnitTypeChange(XMLStreamReader in, Specification specification)
@@ -105,6 +97,7 @@ public class UnitTypeChange extends FreeColObject {
         setSpecification(specification);
         readFromXML(in);
     }
+
 
     /**
      * Gets the unit type to change to.
@@ -206,6 +199,18 @@ public class UnitTypeChange extends FreeColObject {
     }
 
     /**
+     * Add a scope.
+     *
+     * @param scope The <code>Scope</code> to add.
+     */
+    private void addScope(Scope scope) {
+        if (scopes == null) {
+            scopes = new ArrayList<Scope>();
+        }
+        scopes.add(scope);
+    }
+
+    /**
      * Does this change type apply to a given player?
      *
      * @param player The <code>Player</code> to test.
@@ -223,6 +228,7 @@ public class UnitTypeChange extends FreeColObject {
 
     private static final String TURNS_TO_LEARN_TAG = "turnsToLearn";
     private static final String UNIT_TAG = "unit";
+
 
     /**
      * {@inheritDoc}
@@ -298,11 +304,7 @@ public class UnitTypeChange extends FreeColObject {
         final String tag = in.getLocalName();
 
         if (Scope.getXMLElementTagName().equals(tag)) {
-            Scope scope = new Scope(in);
-            if (scope != null) {
-                if (scopes == null) scopes = new ArrayList<Scope>();
-                scopes.add(scope);
-            }
+            addScope(new Scope(in));
 
         } else {
             super.readChild(in);

@@ -111,7 +111,6 @@ public class HighSeas extends UnitLocation {
     //   UnitLocation.getUnitList
     //   UnitLocation.getGoodsContainer
     //   UnitLocation.getSettlement
-    //   UnitLocation.getColony
 
     /**
      * {@inheritDoc}
@@ -193,8 +192,7 @@ public class HighSeas extends UnitLocation {
         final String tag = in.getLocalName();
 
         if (DESTINATION_TAG.equals(tag)) {
-            Location loc = makeLocationAttribute(in, ID_ATTRIBUTE_TAG, game);
-            if (loc != null) addDestination(loc);
+            addDestination(makeLocationAttribute(in, ID_ATTRIBUTE_TAG, game));
             closeTag(in, DESTINATION_TAG);
 
         } else {

@@ -70,7 +70,7 @@ public class ScopeTest extends FreeColTestCase {
 
         Scope testScope = new Scope();
 
-        testScope.setAbilityID(Ability.NAVAL_UNIT);
+        testScope.setAbilityId(Ability.NAVAL_UNIT);
         assertEquals(frigate.hasAbility(Ability.NAVAL_UNIT),
                      testScope.appliesTo(frigate));
         assertEquals(carpenter.hasAbility(Ability.NAVAL_UNIT),
@@ -96,7 +96,7 @@ public class ScopeTest extends FreeColTestCase {
         Scope testScope = new Scope();
 
         testScope.setType("model.unit.frigate");
-        testScope.setAbilityID(Ability.NAVAL_UNIT);
+        testScope.setAbilityId(Ability.NAVAL_UNIT);
         testScope.setMethodName("getLineOfSight");
         testScope.setMethodValue("2");
         assertTrue(testScope.appliesTo(frigate));
@@ -105,7 +105,7 @@ public class ScopeTest extends FreeColTestCase {
         assertFalse(testScope.appliesTo(frigate));
 
         testScope.setMethodValue("2");
-        testScope.setAbilityID(Ability.FOUND_COLONY);
+        testScope.setAbilityId(Ability.FOUND_COLONY);
         assertFalse(testScope.appliesTo(frigate));
     }
 
@@ -126,7 +126,7 @@ public class ScopeTest extends FreeColTestCase {
 
         Scope testScope1 = new Scope();
         testScope1.setType("model.unit.frigate");
-        testScope1.setAbilityID(Ability.NAVAL_UNIT);
+        testScope1.setAbilityId(Ability.NAVAL_UNIT);
         testScope1.setMethodName("getLineOfSight");
         testScope1.setMethodValue("2");
         testScope1.setMatchesNull(true);
@@ -135,7 +135,7 @@ public class ScopeTest extends FreeColTestCase {
 
         Scope testScope2 = new Scope();
         testScope2.setType("model.unit.frigate");
-        testScope2.setAbilityID(Ability.NAVAL_UNIT);
+        testScope2.setAbilityId(Ability.NAVAL_UNIT);
         testScope2.setMethodName("getLineOfSight");
         testScope2.setMethodValue("2");
         testScope2.setMatchesNull(true);
@@ -151,12 +151,12 @@ public class ScopeTest extends FreeColTestCase {
         assertFalse(testScope2.equals(testScope1));
 
         testScope1.setType("model.unit.frigate");
-        testScope1.setAbilityID(Ability.FOUND_COLONY);
+        testScope1.setAbilityId(Ability.FOUND_COLONY);
 
         assertFalse(testScope1.equals(testScope2));
         assertFalse(testScope2.equals(testScope1));
 
-        testScope1.setAbilityID(Ability.NAVAL_UNIT);
+        testScope1.setAbilityId(Ability.NAVAL_UNIT);
         testScope1.setAbilityValue(false);
 
         assertFalse(testScope1.equals(testScope2));
@@ -213,7 +213,7 @@ public class ScopeTest extends FreeColTestCase {
         Unit unit = new ServerUnit(game, unitTile, dutch, colonistType);
 
         Scope scope = new Scope();
-        scope.setAbilityID(Ability.FOUND_COLONY);
+        scope.setAbilityId(Ability.FOUND_COLONY);
         assertTrue(scope.appliesTo(unit));
         scope.setType("model.unit.freeColonist");
         assertTrue(scope.appliesTo(unit));

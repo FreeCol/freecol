@@ -59,7 +59,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
      * that the location (if given) can store goods. The goods will not
      * be added to the location (use Location.add for this).
      *
-     * @param game The <code>Game</code> in which this object belongs.
+     * @param game The enclosing <code>Game</code>.
      * @param location The <code>Location</code> of the goods (may be null).
      * @param type The type of the goods.
      * @param amount The amount of the goods.
@@ -88,7 +88,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
     /**
      * Creates a new <code>Goods</code> instance.
      *
-     * @param game The <code>Game</code> in which this object belongs.
+     * @param game The enclosing <code>Game</code>.
      * @param in The <code>XMLStreamReader</code> to read from.
      * @exception XMLStreamException if an error occurs
      */
@@ -101,7 +101,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
     /**
      * Creates a new <code>Goods</code> instance.
      *
-     * @param game The <code>Game</code> in which this object belongs.
+     * @param game The enclosing <code>Game</code>.
      * @param e an <code>Element</code> value
      */
     public Goods(Game game, Element e) {
@@ -144,34 +144,6 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
             int maxAmount = gc.getGoodsCount(getType());
             if (getAmount() > maxAmount) setAmount(maxAmount);
         }
-    }
-
-
-    // Object overrides
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object other) {
-        if (other instanceof Goods) {
-            Goods g = (Goods)other;
-            return location == g.location && super.equals(g);
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        int value = 19;
-        value = 303 * value + ((location == null) ? 1
-            : location.getId().hashCode());
-        value = 303 * value + getType().hashCode();
-        value = 303 * value + getAmount();
-        return value;
     }
 
 
@@ -229,6 +201,34 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
      */
     public void setOwner(Player p) {
         throw new UnsupportedOperationException();
+    }
+
+
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof Goods) {
+            Goods g = (Goods)other;
+            return location == g.location && super.equals(g);
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int value = 19;
+        value = 303 * value + ((location == null) ? 1
+            : location.getId().hashCode());
+        value = 303 * value + getType().hashCode();
+        value = 303 * value + getAmount();
+        return value;
     }
 
 

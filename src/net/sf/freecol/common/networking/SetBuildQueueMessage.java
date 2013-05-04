@@ -40,7 +40,7 @@ import org.w3c.dom.Element;
 public class SetBuildQueueMessage extends DOMMessage {
 
     /**
-     * The id of the colony containing the queue.
+     * The identifier of the colony containing the queue.
      */
     private String colonyId;
 
@@ -121,7 +121,7 @@ public class SetBuildQueueMessage extends DOMMessage {
             if (type instanceof BuildableType) {
                 buildQueue.add(i, (BuildableType) type);
             } else {
-                return DOMMessage.clientError("Not a buildable type id: "
+                return DOMMessage.clientError("Not a buildable type: "
                     + queue[i]);
             }
         }

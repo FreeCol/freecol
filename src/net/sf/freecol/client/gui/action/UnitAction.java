@@ -31,7 +31,7 @@ public abstract class UnitAction extends MapboardAction {
     /**
      * Creates a new <code>UnitAction</code>.
      * @param freeColClient The main controller object for the client
-     * @param id The id of this action
+     * @param id The object identifier.
      */
     protected UnitAction(FreeColClient freeColClient, GUI gui, String id) {
         super(freeColClient, gui, id);

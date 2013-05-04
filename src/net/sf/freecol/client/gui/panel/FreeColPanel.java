@@ -699,7 +699,7 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
     /**
      * Save an <code>int</code> value to the saved ClientOptions,
      * using the name of the panel's class plus the given key as and
-     * ID.
+     * identifier.
      *
      * @param key a <code>String</code> value
      * @param value an <code>int</code> value

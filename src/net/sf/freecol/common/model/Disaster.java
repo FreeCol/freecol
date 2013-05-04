@@ -55,12 +55,11 @@ public class Disaster extends FreeColGameObjectType {
     private List<RandomChoice<Effect>> effects = null;
 
 
-
     /**
      * Create a new disaster.
      *
      * @param id The object identifier.
-     * @param specification The enclosing <code>Specification</code>.
+     * @param specification The <code>Specification</code> to refer to.
      */
     public Disaster(String id, Specification specification) {
         super(id, specification);
@@ -93,6 +92,19 @@ public class Disaster extends FreeColGameObjectType {
     public final List<RandomChoice<Effect>> getEffects() {
         if (effects == null) return Collections.emptyList();
         return effects;
+    }
+
+    /**
+     * Add an effect.
+     *
+     * @param effect The <code>Effect</code> to add.
+     */
+    private void addEffect(Effect effect) {
+        if (effects == null) {
+            effects = new ArrayList<RandomChoice<Effect>>();
+        }
+        effects.add(new RandomChoice<Effect>(effect,
+                                             effect.getProbability()));
     }
 
 
@@ -173,8 +185,7 @@ public class Disaster extends FreeColGameObjectType {
             for (RandomChoice<Effect> choice : parent.getEffects()) {
                 Effect effect = new Effect(choice.getObject());
                 effect.getFeatureContainer().replaceSource(parent, this);
-                effects.add(new RandomChoice<Effect>(effect,
-                                                     effect.getProbability()));
+                addEffect(effect);
             }
         }
 
@@ -191,14 +202,8 @@ public class Disaster extends FreeColGameObjectType {
 
         if (EFFECT_TAG.equals(tag)) {
             Effect effect = new Effect(in, spec);
-            if (effect != null) {
-                effect.getFeatureContainer().replaceSource(null, this);
-                if (effects == null) {
-                    effects = new ArrayList<RandomChoice<Effect>>();
-                }
-                effects.add(new RandomChoice<Effect>(effect,
-                                                     effect.getProbability()));
-            }
+            effect.getFeatureContainer().replaceSource(null, this);
+            addEffect(effect);
 
         } else {
             super.readChild(in);

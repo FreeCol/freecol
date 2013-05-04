@@ -54,7 +54,7 @@ public class LoginMessage extends DOMMessage {
     /** Is the client the current player. */
     private boolean currentPlayer;
 
-    /** The optional id of the active unit. */
+    /** The optional identifier of the active unit. */
     private String activeUnitId;
 
     /** The game. */

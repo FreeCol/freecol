@@ -35,8 +35,8 @@ public final class ResourceType extends FreeColGameObjectType {
     /**
      * Creates a new resource type.
      *
-     * @param id The object id.
-     * @param specification The enclosing <code>Specification</code>.
+     * @param id The object identifier.
+     * @param specification The <code>Specification</code> to refer to.
      */
     public ResourceType(String id, Specification specification) {
         super(id, specification);

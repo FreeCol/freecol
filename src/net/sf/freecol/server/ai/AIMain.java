@@ -195,9 +195,10 @@ public class AIMain extends FreeColObject
     }
 
     /**
-     * Gets the <code>AIObject</code> identified by the given ID.
+     * Gets the <code>AIObject</code> identified by the given object
+     * identifier.
      *
-     * @param id The ID of the <code>AIObject</code>.
+     * @param id The object identifier.
      * @see #getAIObject(FreeColGameObject)
      * @return The <code>AIObject</code>.
      */
@@ -206,9 +207,10 @@ public class AIMain extends FreeColObject
     }
 
     /**
-     * Gets the <code>AIObject</code> with the specified id and class.
+     * Gets the <code>AIObject</code> with the specified object
+     * identifier and class.
      *
-     * @param id The id.
+     * @param id The object identifier.
      * @param returnClass The expected class of the object.
      * @return The <code>AIObject</code> found, or null if not.
      */
@@ -254,11 +256,11 @@ public class AIMain extends FreeColObject
     /**
      * Adds a reference to the given <code>AIObject</code>.
      *
-     * @param id The ID of the <code>AIObject</code>.
+     * @param id The object identifier.
      * @param aiObject The <code>AIObject</code> to store a reference
      *        for.
      * @exception IllegalStateException if an <code>AIObject</code> with
-     *       the same <code>id</code> has already been created.
+     *       the same object identifier has already been created.
      */
     public void addAIObject(String id, AIObject aiObject) {
         if (aiObjects.containsKey(id)) {
@@ -273,7 +275,7 @@ public class AIMain extends FreeColObject
     /**
      * Removes a reference to the given <code>AIObject</code>.
      *
-     * @param id The ID of the <code>AIObject</code>.
+     * @param id The object identifier.
      */
     public void removeAIObject(String id) {
         aiObjects.remove(id);
@@ -302,7 +304,7 @@ public class AIMain extends FreeColObject
      * <code>FreeColGameObject</code>. This method gets called
      * whenever a new object gets added to the {@link Game}.
      *
-     * @param id The ID of the <code>FreeColGameObject</code> to add.
+     * @param id The object identifier.
      * @param fcgo The <code>FreeColGameObject</code> to add.
      * @see AIObject
      * @see FreeColGameObject
@@ -330,10 +332,10 @@ public class AIMain extends FreeColObject
     }
 
     /**
-     * Removes the <code>AIObject</code> for a given AI id.
+     * Removes the <code>AIObject</code> for a given AI identifier.
      * Needed for interface FreeColGameObjectListener.
      *
-     * @param id The AI object identifier.
+     * @param id The object identifier.
      */
     public void removeFreeColGameObject(String id) {
         AIObject o = getAIObject(id);
@@ -459,7 +461,8 @@ public class AIMain extends FreeColObject
      */
     @Override
     protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        // Does not have an id, so no need for super.writeAttributes()
+        // Does not have an identifier, so no need for
+        // super.writeAttributes()
 
         writeAttribute(out, NEXT_ID_TAG, nextId);
     }
@@ -563,8 +566,7 @@ public class AIMain extends FreeColObject
                     } else if (p.isEuropean()) {
                         new EuropeanAIPlayer(this, in);
                     } else {
-                        logger.warning("Bogus AIPlayer: " + p);
-                        in.nextTag();
+                        throw new RuntimeException("Bogus AIPlayer: " + p);
                     }
                 }
 

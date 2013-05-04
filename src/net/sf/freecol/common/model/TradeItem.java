@@ -44,8 +44,8 @@ public abstract class TradeItem extends FreeColObject {
     /**
      * Creates a new <code>TradeItem</code> instance.
      *
-     * @param game The <code>Game</code> the trade occurs in.
-     * @param id An id for this item.
+     * @param game The enclosing <code>Game</code>.
+     * @param id The object identifier.
      * @param source The source <code>Player</code>.
      * @param destination The destination <code>Player</code>.
      */
@@ -59,12 +59,14 @@ public abstract class TradeItem extends FreeColObject {
     /**
      * Creates a new <code>TradeItem</code> instance.
      *
-     * @param game The <code>Game</code> the trade occurs in.
+     * @param game The enclosing <code>Game</code>.
      * @param in The <code>XMLStreamReader</code> to read from.
+     * @exception XMLStreamException if there is a problem reading the stream.
      */
     public TradeItem(Game game, XMLStreamReader in) throws XMLStreamException {
         this.game = game;
     }
+
 
     /**
      * Gets the game.  The subclasses need this.
@@ -204,6 +206,7 @@ public abstract class TradeItem extends FreeColObject {
 
     private static final String DESTINATION_TAG = "destination";
     private static final String SOURCE_TAG = "source";
+
 
     /**
      * {@inheritDoc}

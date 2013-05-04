@@ -32,7 +32,7 @@ import java.util.Map;
  */
 public class ResourceMapping {
 
-    /** Mappings between an ID and a resource. */
+    /** Mappings between an object identifier and a resource. */
     protected Map<String, Resource> resources;
 
 
@@ -45,11 +45,12 @@ public class ResourceMapping {
 
 
     /**
-     * Adds a mapping between the given ID and a <code>Resource</code>.
+     * Adds a mapping between the given object identifier and a
+     * <code>Resource</code>.
      *
-     * @param id The ID identifying the given resource in the mapping.
-     * @param value The <code>Resource</code> identified by the ID
-     *      in the mapping,.
+     * @param id The identifier for the given resource in the mapping.
+     * @param value The <code>Resource</code> identified by the
+     *     identifier in the mapping,.
      */
     public void add(String id, Resource value) {
         resources.put(id, value);
@@ -82,10 +83,9 @@ public class ResourceMapping {
     }
 
     /**
-     * Gets the <code>Resource</code> identified by the
-     * given id.
+     * Gets the <code>Resource</code> by identifier.
      *
-     * @param id The ID.
+     * @param id The resource identifier.
      * @return The <code>Resource</code>.
      */
     public Resource get(String id) {

@@ -86,10 +86,7 @@ public final class Ability extends Feature {
      */
     public static final String CAN_BE_EQUIPPED = "model.ability.canBeEquipped";
 
-    /**
-     * The ability of some buildings (e.g. the schoolhouse) to teach
-     * skills.
-     */
+    /** The ability of some buildings (e.g. the schoolhouse) to teach skills. */
     public static final String CAN_TEACH = "model.ability.teach";
 
     /**
@@ -98,20 +95,13 @@ public final class Ability extends Feature {
      */
     public static final String CAPTURE_GOODS = "model.ability.captureGoods";
 
-    /**
-     * The ability of certain armed units to capture another player's
-     * units.
-     */
+    /** The ability of certain armed units to capture another player's units.*/
     public static final String CAPTURE_UNITS = "model.ability.captureUnits";
 
-    /**
-     * The ability of certain units (e.g. wagon trains) to carry goods.
-     */
+    /** The ability of certain units (e.g. wagon trains) to carry goods. */
     public static final String CARRY_GOODS = "model.ability.carryGoods";
 
-    /**
-     * The ability of certain units (e.g. ships) to carry other units.
-     */
+    /** The ability of certain units (e.g. ships) to carry other units. */
     public static final String CARRY_UNITS = "model.ability.carryUnits";
 
     /**
@@ -126,24 +116,16 @@ public final class Ability extends Feature {
      */
     public static final String CONSUME_ALL_OR_NOTHING = "model.ability.consumeAllOrNothing";
 
-    /**
-     * The ability of certain units to work as missionaries more effectively.
-     */
+    /** The ability of certain units to work as missionaries more effectively. */
     public static final String EXPERT_MISSIONARY = "model.ability.expertMissionary";
 
-    /**
-     * The ability of certain units to build TileImprovements faster.
-     */
+    /** The ability of certain units to build TileImprovements faster. */
     public static final String EXPERT_PIONEER = "model.ability.expertPioneer";
 
-    /**
-     * The ability of certain units to work as scouts more effectively.
-     */
+    /** The ability of certain units to work as scouts more effectively. */
     public static final String EXPERT_SCOUT = "model.ability.expertScout";
 
-    /**
-     * The ability of certain units to work as soldiers more effectively.
-     */
+    /** The ability of certain units to work as soldiers more effectively. */
     public static final String EXPERT_SOLDIER = "model.ability.expertSoldier";
 
     /**
@@ -154,24 +136,16 @@ public final class Ability extends Feature {
      */
     public static final String EXPERTS_USE_CONNECTIONS = "model.ability.expertsUseConnections";
 
-    /**
-     * The ability to export goods to Europe directly.
-     */
+    /** The ability to export goods to Europe directly. */
     public static final String EXPORT = "model.ability.export";
 
-    /**
-     * The ability of a unit to found a colony.
-     */
+    /** The ability of a unit to found a colony. */
     public static final String FOUND_COLONY = "model.ability.foundColony";
 
-    /**
-     * The ability of a player to found colonies.
-     */
+    /** The ability of a player to found colonies. */
     public static final String FOUNDS_COLONIES = "model.ability.foundsColonies";
 
-    /**
-     * The ability of ships to move across water tiles.
-     */
+    /** The ability of ships to move across water tiles. */
     public static final String NAVAL_UNIT = "model.ability.navalUnit";
 
     /**
@@ -180,26 +154,20 @@ public final class Ability extends Feature {
      */
     public static final String PIRACY = "model.ability.piracy";
 
-    /**
-     * The ability to produce goods (e.g. fish) on water tiles.
-     */
+    /** The ability to produce goods (e.g. fish) on water tiles. */
     public static final String PRODUCE_IN_WATER = "model.ability.produceInWater";
 
-    /**
-     * The ability to repair certain units.
-     */
+    /** The ability to repair certain units. */
     public static final String REPAIR_UNITS = "model.ability.repairUnits";
 
-    /**
-     * The ability value.
-     */
+    /** The ability value. */
     private boolean value = true;
 
 
     /**
      * Creates a new <code>Ability</code> instance.
      *
-     * @param id The ability id.
+     * @param id The object identifier.
      */
     public Ability(String id) {
         this(id, null, true);
@@ -208,7 +176,7 @@ public final class Ability extends Feature {
     /**
      * Creates a new <code>Ability</code> instance.
      *
-     * @param id The ability id.
+     * @param id The object identifier.
      * @param value The ability value.
      */
     public Ability(String id, boolean value) {
@@ -218,7 +186,7 @@ public final class Ability extends Feature {
     /**
      * Creates a new <code>Ability</code> instance.
      *
-     * @param id The ability id.
+     * @param id The object identifier.
      * @param source The source <code>FreeColGameObjectType</code>.
      * @param value The ability value.
      */
@@ -269,6 +237,9 @@ public final class Ability extends Feature {
     public void setValue(final boolean newValue) {
         this.value = newValue;
     }
+
+
+    // Override Object
 
     /**
      * {@inheritDoc}

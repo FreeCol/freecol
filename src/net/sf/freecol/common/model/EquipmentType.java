@@ -35,9 +35,7 @@ public class EquipmentType extends BuildableType {
 
     public static final EquipmentType[] NO_EQUIPMENT = new EquipmentType[0];
 
-    /**
-     * The maximum number of equipment items that can be combined.
-     */
+    /** The maximum number of equipment items that can be combined. */
     private int maximumCount = 1;
 
     /**
@@ -54,18 +52,15 @@ public class EquipmentType extends BuildableType {
     private String captureEquipmentId = null;
     private boolean captureEquipmentByIndians = false;
 
-    /**
-     * The default Role of the Unit carrying this type of Equipment.
-     */
+    /** The default Role of the Unit carrying this type of Equipment. */
     private Role role = Role.DEFAULT;
 
-    /**
-     * Is this military equipment?
-     */
+    /** Is this military equipment? */
     private boolean militaryEquipment = false;
 
     /**
-     * A list containing the ids of equipment types compatible with this one.
+     * A list containing the object identifiers of equipment types
+     * compatible with this one.
      */
     private List<String> compatibleEquipment = null;
 
@@ -74,11 +69,12 @@ public class EquipmentType extends BuildableType {
      * Simple constructor.
      *
      * @param id The object identifier.
-     * @param specification The containing <code>Specification</code>.
+     * @param specification The <code>Specification</code> to refer to.
      */
     public EquipmentType(String id, Specification specification) {
         super(id, specification);
     }
+
 
     /**
      * Get the maximum combinable amount of this equipment type.
@@ -139,6 +135,18 @@ public class EquipmentType extends BuildableType {
     }
 
     /**
+     * Add a compatible equipment identifier.
+     *
+     * @param equipmentId The equipment identifier.
+     */
+    private void addCompatibleEquipment(String equipmentId) {
+        if (compatibleEquipment == null) {
+            compatibleEquipment = new ArrayList<String>();
+        }
+        compatibleEquipment.add(equipmentId);
+    }
+
+    /**
      * Get the role for this equipment type.
      *
      * @return The equipment related role.
@@ -156,6 +164,9 @@ public class EquipmentType extends BuildableType {
     public final boolean isMilitaryEquipment() {
         return militaryEquipment;
     }
+
+
+    // Override Object
 
     /**
      * {@inheritDoc}
@@ -205,8 +216,11 @@ public class EquipmentType extends BuildableType {
     private static final String COMBAT_LOSS_PRIORITY_TAG = "combat-loss-priority";
     private static final String COMPATIBLE_EQUIPMENT_TAG = "compatible-equipment";
     private static final String MAXIMUM_COUNT_TAG = "maximum-count";
-    private static final String REQUIRED_LOCATION_ABILITY_TAG = "required-location-ability";
     private static final String ROLE_TAG = "role";
+    // @compat 0.10.0
+    private static final String REQUIRED_LOCATION_ABILITY_TAG = "required-location-ability";
+    // end @compat
+
 
     /**
      * {@inheritDoc}
@@ -277,6 +291,7 @@ public class EquipmentType extends BuildableType {
      */
     @Override
     protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        // Clear containers.
         if (readShouldClearContainers(in)) {
             captureEquipmentId = null;
             captureEquipmentByIndians = false;
@@ -311,13 +326,7 @@ public class EquipmentType extends BuildableType {
             closeTag(in, CAPTURE_EQUIPMENT_TAG);
 
         } else if (COMPATIBLE_EQUIPMENT_TAG.equals(tag)) {
-            String equipmentId = readId(in);
-            if (equipmentId != null) {
-                if (compatibleEquipment == null) {
-                    compatibleEquipment = new ArrayList<String>();
-                }
-                compatibleEquipment.add(equipmentId);
-            }
+            addCompatibleEquipment(readId(in));
             closeTag(in, COMPATIBLE_EQUIPMENT_TAG);
 
         // @compat 0.10.0

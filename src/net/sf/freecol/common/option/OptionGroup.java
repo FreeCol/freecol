@@ -59,8 +59,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     /**
      * Creates a new <code>OptionGroup</code>.
      *
-     * @param id The identifier for this option.  This is used when
-     *     the object should be found in an {@link OptionGroup}.
+     * @param id The object identifier.
      */
     public OptionGroup(String id) {
         super(id);
@@ -69,7 +68,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     /**
      * Creates a new <code>OptionGroup</code>.
      *
-     * @param specification The enclosing <code>Specification</code>.
+     * @param specification The <code>Specification</code> to refer to.
      */
     public OptionGroup(Specification specification) {
         super(specification);
@@ -78,12 +77,25 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     /**
      * Creates a new <code>OptionGroup</code>.
      *
-     * @param id The identifier for this option.  This is used when
-     *     the object should be found in an {@link OptionGroup}.
-     * @param specification The enclosing <code>Specification</code>.
+     * @param id The object identifier.
+     * @param specification The <code>Specification</code> to refer to.
      */
     public OptionGroup(String id, Specification specification) {
         super(id, specification);
+    }
+
+    /**
+     * Creates a new <code>OptionGroup</code>.
+     *
+     * @param in The <code>XMLStreamReader</code> to read from.
+     * @param specification The <code>Specification</code> to refer to.
+     * @exception XMLStreamException if there is a problem reading the stream.
+     */
+    public OptionGroup(XMLStreamReader in,
+                       Specification specification) throws XMLStreamException {
+        super(specification);
+
+        readFromXML(in);
     }
 
 
@@ -134,9 +146,9 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     }
 
     /**
-     * Get an option in this group (or descendents) by id.
+     * Get an option in this group (or descendents) by object identifier.
      *
-     * @param id The id to look for.
+     * @param id The object identifier.
      * @return The option, or null if not found.
      */
     public Option getOption(String id) {
@@ -220,7 +232,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     /**
      * Gets the value of an option as an option group.
      *
-     * @param id The id of the option.
+     * @param id The object identifier.
      * @return The <code>OptionGroup</code> value.
      * @exception IllegalArgumentException If there is no option group
      *     value associated with the specified option.
@@ -238,7 +250,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     /**
      * Gets the integer value of an option.
      *
-     * @param id The id of the option.
+     * @param id The object identifier.
      * @return The integer value.
      * @exception IllegalArgumentException If there is no integer
      *     value associated with the specified option.
@@ -256,7 +268,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     /**
      * Sets the integer value of an option.
      *
-     * @param id The id of the option.
+     * @param id The object identifier.
      * @param value The new integer value of the option.
      * @exception IllegalArgumentException If there is no integer
      *     value associated with the specified option.
@@ -274,7 +286,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     /**
      * Gets the boolean value of an option.
      *
-     * @param id The id of the option.
+     * @param id The object identifier.
      * @return The boolean value.
      * @exception IllegalArgumentException If there is no boolean
      *     value associated with the specified option.
@@ -292,7 +304,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     /**
      * Sets the boolean value of an option.
      *
-     * @param id The id of the option.
+     * @param id The object identifier.
      * @param value The new boolean value of the option.
      * @exception IllegalArgumentException If there is no boolean
      *     value associated with the specified option.
@@ -310,7 +322,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     /**
      * Gets the string value of an option.
      *
-     * @param id The id of the option.
+     * @param id The object identifier.
      * @return The string value.
      * @exception IllegalArgumentException If there is no string value
      *     associated with the specified option.
@@ -328,7 +340,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     /**
      * Sets the string value of an option.
      *
-     * @param id The id of the option.
+     * @param id The object identifier.
      * @param value The new string value.
      * @exception IllegalArgumentException If there is no string value
      *     associated with the specified option.

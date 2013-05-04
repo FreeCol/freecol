@@ -25,6 +25,7 @@ import java.util.Random;
 import java.util.Vector;
 
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
@@ -258,7 +259,8 @@ public class MapGeneratorTest extends FreeColTestCase {
         assertEquals(pacific, southPacific.getParent());
         assertEquals(pacific, southPacific.getDiscoverableRegion());
 
-        pacific.discover(new Player(game, "id"), new Turn(1), "someName");
+        pacific.discover(new Player(game, FreeColObject.ID_ATTRIBUTE_TAG),
+            new Turn(1), "someName");
 
         assertFalse(pacific.isDiscoverable());
         assertNull(pacific.getDiscoverableRegion());

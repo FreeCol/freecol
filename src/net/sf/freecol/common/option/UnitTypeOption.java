@@ -63,8 +63,7 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
     /**
      * Creates a new <code>UnitTypeOption</code>.
      *
-     * @param id The identifier for this option.  This is used when
-     *     the object should be found in an {@link OptionGroup}.
+     * @param id The object identifier.
      */
     public UnitTypeOption(String id) {
         super(id);
@@ -73,7 +72,7 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
     /**
      * Creates a new <code>UnitTypeOption</code>.
      *
-     * @param specification The enclosing <code>Specification</code>.
+     * @param specification The <code>Specification</code> to refer to.
      */
     public UnitTypeOption(Specification specification) {
         super(specification);
@@ -82,9 +81,8 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
     /**
      * Creates a new <code>UnitTypeOption</code>.
      *
-     * @param id The identifier for this option.  This is used when
-     *     the object should be found in an {@link OptionGroup}.
-     * @param specification The enclosing <code>Specification</code>.
+     * @param id The object identifier.
+     * @param specification The <code>Specification</code> to refer to.
      */
     public UnitTypeOption(String id, Specification specification) {
         super(id, specification);
@@ -308,9 +306,8 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
         final String tag = in.getLocalName();
 
         if (CHOICE_TAG.equals(tag)) {
-            UnitType type = spec.getType(in, VALUE_TAG,
-                                         UnitType.class, (UnitType)null);
-            if (type != null) choices.add(type);
+            choices.add(spec.getType(in, VALUE_TAG,
+                                     UnitType.class, (UnitType)null));
             closeTag(in, CHOICE_TAG);
 
         } else {

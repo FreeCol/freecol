@@ -41,7 +41,7 @@ public abstract class SelectableAction extends MapboardAction {
     /**
      * Creates this action.
      * @param freeColClient The main controller object for the client
-     * @param id a <code>String</code> value
+     * @param id The object identifier.
      * @param optionId the id of a boolean client option
      */
     protected SelectableAction(FreeColClient freeColClient, GUI gui, String id, String optionId) {

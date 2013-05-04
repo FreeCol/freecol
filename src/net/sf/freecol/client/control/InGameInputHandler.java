@@ -259,7 +259,7 @@ public final class InGameInputHandler extends InputHandler {
             String idString = FreeColObject.readId(element);
             FreeColGameObject fcgo = game.getFreeColGameObject(idString);
             if (fcgo == null) {
-                logger.warning("Could not find FreeColGameObject with ID: "
+                logger.warning("Could not find FreeColGameObject: "
                                + idString);
             } else {
                 if (divert != null) {
@@ -287,17 +287,18 @@ public final class InGameInputHandler extends InputHandler {
 
 
     /**
-     * Select a child element with the given FreeCol ID from a parent element.
+     * Select a child element with the given object identifier from a
+     * parent element.
      *
      * @param parent The parent <code>Element</code>.
-     * @param id The id to search for.
-     * @return An <code>Element</code> with matching id, or null if none found.
+     * @param key The key to search for.
+     * @return An <code>Element</code> with matching key, or null if none found.
      */
-    private static Element selectElement(Element parent, String id) {
+    private static Element selectElement(Element parent, String key) {
         NodeList nodes = parent.getChildNodes();
         for (int i = 0; i < nodes.getLength(); i++) {
             Element e = (Element)nodes.item(i);
-            if (id.equals(FreeColObject.readId(e))) return e;
+            if (key.equals(FreeColObject.readId(e))) return e;
         }
         return null;
     }
@@ -309,7 +310,7 @@ public final class InGameInputHandler extends InputHandler {
      *
      * @param game The <code>Game</code> to add the unit to.
      * @param element The <code>Element</code> to find a unit in.
-     * @param id The id of the unit to find.
+     * @param id The object identifier of the unit to find.
      * @return A unit or null if none found.
      */
     private static Unit selectUnitFromElement(Game game, Element element,
@@ -1032,21 +1033,15 @@ public final class InGameInputHandler extends InputHandler {
             if (tag == null) {
                 logger.warning("addObject null tag");
             } else if (tag == FoundingFather.getXMLElementTagName()) {
-                String id = e.getAttribute("id");
+                String id = e.getAttribute(FreeColObject.ID_ATTRIBUTE_TAG);
                 FoundingFather father = spec.getFoundingFather(id);
                 if (father != null) player.addFather(father);
             } else if (tag == HistoryEvent.getXMLElementTagName()) {
-                HistoryEvent h = new HistoryEvent();
-                h.readFromXMLElement(e);
-                player.getHistory().add(h);
+                player.getHistory().add(new HistoryEvent(e));
             } else if (tag == LastSale.getXMLElementTagName()) {
-                LastSale s = new LastSale();
-                s.readFromXMLElement(e);
-                player.addLastSale(s);
+                player.addLastSale(new LastSale(e));
             } else if (tag == ModelMessage.getXMLElementTagName()) {
-                ModelMessage m = new ModelMessage();
-                m.readFromXMLElement(e);
-                player.addModelMessage(m);
+                player.addModelMessage(new ModelMessage(e));
             } else if (tag == TradeRoute.getXMLElementTagName()) {
                 TradeRoute t = new TradeRoute(game, e);
                 player.getTradeRoutes().add(t);
@@ -1067,7 +1062,7 @@ public final class InGameInputHandler extends InputHandler {
         Game game = getGame();
         Specification spec = game.getSpecification();
         boolean add = "add".equalsIgnoreCase(element.getAttribute("add"));
-        FreeColGameObject object = game.getFreeColGameObject(element.getAttribute("id"));
+        FreeColGameObject object = game.getFreeColGameObject(element.getAttribute(FreeColObject.ID_ATTRIBUTE_TAG));
         NodeList nodes = element.getChildNodes();
         for (int i = 0; i < nodes.getLength(); i++) {
             Element e = (Element) nodes.item(i);

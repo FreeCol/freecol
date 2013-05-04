@@ -3210,12 +3210,13 @@ public final class InGameController extends Controller {
     /**
      * Loot cargo.
      *
-     * Note loser is passed by id, as by the time we get here the unit
-     * may have been sunk.
+     * Note loser is passed by identifier, as by the time we get here
+     * the unit may have been sunk.
      *
      * @param serverPlayer The <code>ServerPlayer</code> that owns the winner.
      * @param winner The <code>Unit</code> that looting.
-     * @param loserId The id of the <code>Unit</code> that is looted.
+     * @param loserId The object identifier of the <code>Unit</code>
+     *     that is looted.
      * @param loot The <code>Goods</code> to loot.
      * @return An <code>Element</code> encapsulating this action.
      */

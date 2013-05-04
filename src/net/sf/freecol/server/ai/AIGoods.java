@@ -65,7 +65,7 @@ public class AIGoods extends AIObject implements Transportable {
      * Creates a new uninitialized <code>AIGoods</code>.
      *
      * @param aiMain The main AI-object.
-     * @param id The unique ID of this object.
+     * @param id The object identifier.
      */
     public AIGoods(AIMain aiMain, String id) {
         super(aiMain, id);

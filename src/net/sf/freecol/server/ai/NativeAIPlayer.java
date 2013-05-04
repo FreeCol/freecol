@@ -343,8 +343,8 @@ public class NativeAIPlayer extends AIPlayer {
                     int s1 = t1.getDistanceTo(isTile);
                     Tile t2 = u2.getTile();
                     int s2 = t2.getDistanceTo(isTile);
-                    if (u1.getIndianSettlement() == is) s1 -= homeBonus;
-                    if (u2.getIndianSettlement() == is) s2 -= homeBonus;
+                    if (u1.getHomeIndianSettlement() == is) s1 -= homeBonus;
+                    if (u2.getHomeIndianSettlement() == is) s2 -= homeBonus;
                     return s1 - s2;
                 }
             });
@@ -447,7 +447,7 @@ public class NativeAIPlayer extends AIPlayer {
             final Unit unit = aiUnit.getUnit();
             Mission m;
             Settlement settlement = unit.getSettlement();
-            IndianSettlement is = unit.getIndianSettlement();
+            IndianSettlement is = unit.getHomeIndianSettlement();
 
             // First see to local settlement defence
             if ((settlement != null && (settlement.getUnitCount()
@@ -703,7 +703,7 @@ public class NativeAIPlayer extends AIPlayer {
             Player targetPlayer = (target instanceof Ownable)
                 ? ((Ownable)target).getOwner()
                 : null;
-            IndianSettlement is = aiUnit.getUnit().getIndianSettlement();
+            IndianSettlement is = aiUnit.getUnit().getHomeIndianSettlement();
             if (targetPlayer != null
                 && is != null && is.getAlarm(targetPlayer) != null) {
                 value += is.getAlarm(targetPlayer).getValue()

@@ -23,6 +23,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.w3c.dom.Element;
+
 
 /**
  * Contains a message about a change in the model.
@@ -73,14 +75,9 @@ public class ModelMessage extends StringTemplate {
 
 
     /**
-     * Empty constructor for serialization.
-     */
-    public ModelMessage() {}
-
-    /**
      * Creates a new <code>ModelMessage</code>.
      *
-     * @param id The ID of the message to display.
+     * @param id The object identifier.
      * @param source The source of the message. This is what the
      *               message should be associated with.
      * @param display The <code>FreeColObject</code> to display.
@@ -94,7 +91,7 @@ public class ModelMessage extends StringTemplate {
      * Creates a new <code>ModelMessage</code>.
      *
      * @param messageType The type of this model message.
-     * @param id The ID of the message to display.
+     * @param id The object identifier.
      * @param source The source of the message. This is what the
      *               message should be associated with.
      */
@@ -106,7 +103,7 @@ public class ModelMessage extends StringTemplate {
     /**
      * Creates a new <code>ModelMessage</code>.
      *
-     * @param id The ID of the message to display.
+     * @param id The object identifier.
      * @param source The source of the message. This is what the
      *               message should be associated with.
      */
@@ -119,7 +116,7 @@ public class ModelMessage extends StringTemplate {
      * Creates a new <code>ModelMessage</code>.
      *
      * @param messageType The type of this model message.
-     * @param id The ID of the message to display.
+     * @param id The object identifier.
      * @param source The source of the message. This is what the
      *               message should be associated with.
      * @param display The <code>FreeColObject</code> to display.
@@ -133,38 +130,58 @@ public class ModelMessage extends StringTemplate {
         this.ownerId = null;
     }
 
+    /**
+     * Creates a new model message by reading a stream.
+     *
+     * @param in The <code>XMLStreamReader</code> to read from.
+     * @exception XMLStreamException if there is a problem reading the stream.
+     */
+    public ModelMessage(XMLStreamReader in) throws XMLStreamException {
+
+        readFromXML(in);
+    }
 
     /**
-     * Gets the ID of the source of the message.
+     * Create a new model message by reading a element.
      *
-     * @return The source of the message.
+     * @param element The <code>Element</code> to read from.
+     */
+    public ModelMessage(Element element) {
+        readFromXMLElement(element);
+    }
+
+
+    /**
+     * Gets the source of the message.
+     *
+     * @return The identifier for the source of the message.
      */
     public String getSourceId() {
         return sourceId;
     }
 
     /**
-     * Sets the ID of the source object.
+     * Sets the source object.
      *
-     * @param sourceId A new source ID.
+     * @param sourceId A new source object identifier.
      */
     public void setSourceId(String sourceId) {
         this.sourceId = sourceId;
     }
 
     /**
-     * Gets the ID of the object to display.
+     * Gets the object to display.
      *
-     * @return The ID of the object to display.
+     * @return The identifier of the object to display.
      */
     public String getDisplayId() {
         return displayId;
     }
 
     /**
-     * Sets the ID of the object to display.
+     * Sets the object to display.
      *
-     * @param displayId A new display ID.
+     * @param displayId A new display object identifier.
      */
     public void setDisplayId(String displayId) {
         this.displayId = displayId;
@@ -358,7 +375,7 @@ public class ModelMessage extends StringTemplate {
     }
 
 
-    // Interface Object
+    // Override Object
 
     /**
      * {@inheritDoc}

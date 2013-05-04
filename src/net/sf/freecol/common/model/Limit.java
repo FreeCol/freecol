@@ -36,30 +36,25 @@ import net.sf.freecol.common.model.Operand.OperandType;
  */
 public final class Limit extends FreeColGameObjectType {
 
+    /** The basic operation used in evaluating this limit. */
     public static enum Operator {
         EQ, LT, GT, LE, GE
     }
 
-    /**
-     * The operator to apply when evaluating the limit expression.
-     */
+    /** The operator to apply when evaluating the limit expression. */
     private Operator operator;
 
-    /**
-     * The left hand side term of the limit expression.
-     */
+    /** The left hand side term of the limit expression. */
     private Operand leftHandSide;
 
-    /**
-     * The right hand side term of the limit expression.
-     */
+    /** The right hand side term of the limit expression. */
     private Operand rightHandSide;
 
 
     /**
      * Create a new limit.
      *
-     * @param specification The containing <code>Specification</code>.
+     * @param specification The <code>Specification</code> to refer to.
      */
     public Limit(Specification specification) {
         super(specification);
@@ -68,7 +63,20 @@ public final class Limit extends FreeColGameObjectType {
     /**
      * Create a new limit.
      *
-     * @param id The identifier for this <code>FreeColObject</code>.
+     * @param in The <code>XMLStreamReader</code> to read from.
+     * @param specification The <code>Specification</code> to refer to.
+     * @exception XMLStreamException if there is a problem reading.
+     */
+    public Limit(XMLStreamReader in, Specification specification) throws XMLStreamException {
+        super(specification);
+
+        readFromXML(in);
+    }
+
+    /**
+     * Create a new limit.
+     *
+     * @param id The object identifier.
      * @param lhs The left hand side <code>Operand</code>.
      * @param op The <code>Operator</code> to apply.
      * @param rhs The right hand side <code>Operand</code>.
@@ -79,6 +87,7 @@ public final class Limit extends FreeColGameObjectType {
         rightHandSide = rhs;
         operator = op;
     }
+
 
     /**
      * Get the <code>Operator</code> value.
@@ -293,6 +302,7 @@ public final class Limit extends FreeColGameObjectType {
     private static final String OPERATOR_TAG = "operator";
     private static final String RIGHT_HAND_SIDE_TAG = "rightHandSide";
 
+
     /**
      * {@inheritDoc}
      */
@@ -321,6 +331,7 @@ public final class Limit extends FreeColGameObjectType {
         super.writeChildren(out);
 
         leftHandSide.toXML(out, LEFT_HAND_SIDE_TAG);
+
         rightHandSide.toXML(out, RIGHT_HAND_SIDE_TAG);
     }
 
@@ -343,12 +354,10 @@ public final class Limit extends FreeColGameObjectType {
         final String tag = in.getLocalName();
 
         if (LEFT_HAND_SIDE_TAG.equals(tag)) {
-            leftHandSide = new Operand();
-            leftHandSide.readFromXML(in);
+            leftHandSide = new Operand(in);
 
         } else if (RIGHT_HAND_SIDE_TAG.equals(tag)) {
-            rightHandSide = new Operand();
-            rightHandSide.readFromXML(in);
+            rightHandSide = new Operand(in);
 
         } else {
             super.readChild(in);

@@ -66,16 +66,17 @@ abstract public class FreeColGameObject extends FreeColObject {
      * Empty constructor for subclasses.
      */
     protected FreeColGameObject() {
-        logger.info("FreeColGameObject with null id.");
+        logger.info("FreeColGameObject with null identifier.");
 
         uninitialized = false;
     }
 
     /**
      * Creates a new <code>FreeColGameObject</code>.  Automatically
-     * assign an id and register this object at the specified
-     * <code>Game</code>, unless this object is a <code>Game</code>
-     * in which case it is given the zero id.
+     * assign an object identifier and register this object at the
+     * specified <code>Game</code>, unless this object is a
+     * <code>Game</code> in which case it is given an identifier of
+     * zero.
      *
      * @param game The <code>Game</code> in which this object belongs.
      */
@@ -96,15 +97,14 @@ abstract public class FreeColGameObject extends FreeColObject {
 
     /**
      * Initiates a new <code>FreeColGameObject</code>.
-     * If an id is supplied, use that, otherwise leave the id undefined.
+     * If an identifier is supplied, use that, otherwise leave it undefined.
      *
      * This routine should be used when we intend later to call one of:
-     *
      * - {@link #readFromXML(XMLStreamReader)}
      * - {@link #readFromXMLElement(Element)}
      *
      * @param game The <code>Game</code> in which this object belongs.
-     * @param id An optional identifier for this object.
+     * @param id The object identifier.
      */
     public FreeColGameObject(Game game, String id) {
         this.game = game;
@@ -156,8 +156,9 @@ abstract public class FreeColGameObject extends FreeColObject {
     }
 
     /**
-     * Sets the id from the real type and the next id in the server.
-     * Split out only to help out a backward compatibility reader.
+     * Sets the identifier from the real type and the next identifier
+     * in the server.  Split out only to help out a backward
+     * compatibility reader.
      *
      * @param game The <code>Game</code> this object is in.
      */
@@ -345,7 +346,7 @@ abstract public class FreeColGameObject extends FreeColObject {
 
     /**
      * FreeColGameObjects are equal if the two fcgos are in the same
-     * game and have the same id. 
+     * game and have the same identifier.
      *
      * @param o The <code>FreeColGameObject</code> to compare against
      *     this object.
@@ -361,11 +362,11 @@ abstract public class FreeColGameObject extends FreeColObject {
     // Override FreeColObject
 
     /**
-     * Sets the unique id of this object.  When setting a new id to
-     * this object, it it automatically registered at the
-     * corresponding <code>Game</code> with the new id.
+     * Sets the unique identifier of this object.  When setting a new
+     * identifier, the object is automatically registered at the
+     * corresponding <code>Game</code> with that identifier.
      *
-     * @param newId The unique id of this object.
+     * @param newId The unique identifier of this object.
      */
     @Override
     public final void setId(String newId) {
@@ -426,8 +427,8 @@ abstract public class FreeColGameObject extends FreeColObject {
      */
     @Override
     public final void toXML(XMLStreamWriter out, Player player,
-                            boolean showAll, boolean toSavedGame)
-        throws XMLStreamException {
+                            boolean showAll,
+                            boolean toSavedGame) throws XMLStreamException {
         if (!showAll && toSavedGame) {
             throw new IllegalArgumentException("'showAll' should be true when saving a game.");
         }
@@ -464,11 +465,14 @@ abstract public class FreeColGameObject extends FreeColObject {
      *     to the stream.
      */
     public void toXML(XMLStreamWriter out, String tag, Player player,
-                      boolean showAll, boolean toSavedGame) 
-        throws XMLStreamException {
+                      boolean showAll,
+                      boolean toSavedGame) throws XMLStreamException {
         out.writeStartElement(tag);
+
         writeAttributes(out, player, showAll, toSavedGame);
+
         writeChildren(out, player, showAll, toSavedGame);
+
         out.writeEndElement();
     }
 
@@ -488,8 +492,8 @@ abstract public class FreeColGameObject extends FreeColObject {
      *     to the stream.
      */
     protected void writeAttributes(XMLStreamWriter out, Player player,
-                                   boolean showAll, boolean toSavedGame)
-        throws XMLStreamException {
+                                   boolean showAll,
+                                   boolean toSavedGame) throws XMLStreamException {
         super.writeAttributes(out);
     }
 
@@ -508,8 +512,8 @@ abstract public class FreeColGameObject extends FreeColObject {
      *     to the stream.
      */
     protected void writeChildren(XMLStreamWriter out, Player player,
-                                 boolean showAll, boolean toSavedGame)
-        throws XMLStreamException {
+                                 boolean showAll,
+                                 boolean toSavedGame) throws XMLStreamException {
         super.writeChildren(out);
     }
 
@@ -532,8 +536,8 @@ abstract public class FreeColGameObject extends FreeColObject {
      *      to the stream.
      */
     abstract protected void toXMLImpl(XMLStreamWriter out, Player player,
-                                      boolean showAll, boolean toSavedGame)
-        throws XMLStreamException;
+                                      boolean showAll,
+                                      boolean toSavedGame) throws XMLStreamException;
 
     /**
      * Common routine for FreeColGameObject descendants to write a

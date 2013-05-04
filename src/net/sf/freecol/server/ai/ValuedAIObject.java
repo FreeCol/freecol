@@ -52,7 +52,7 @@ public abstract class ValuedAIObject extends AIObject
      * Creates a new uninitialized <code>ValuedAIObject</code> instance.
      *
      * @param aiMain an <code>AIMain</code> value
-     * @param id a <code>String</code> value
+     * @param id The object identifier.
      */
     public ValuedAIObject(AIMain aiMain, String id) {
         super(aiMain, id);

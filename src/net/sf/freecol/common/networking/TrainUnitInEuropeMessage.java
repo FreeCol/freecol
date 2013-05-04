@@ -34,7 +34,7 @@ import org.w3c.dom.Element;
 public class TrainUnitInEuropeMessage extends DOMMessage {
 
     /**
-     * The id of the unit type.
+     * The identifier of the unit type.
      */
     private String typeId;
 

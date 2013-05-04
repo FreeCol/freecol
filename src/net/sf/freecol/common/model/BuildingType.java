@@ -36,19 +36,30 @@ import javax.xml.stream.XMLStreamWriter;
 public final class BuildingType extends BuildableType
     implements Comparable<BuildingType> {
 
+    /** The level of building. */
     private int level = 1;
+
+    /** The number of work places a unit can work in buildings of this type. */
     private int workPlaces = 3;
+
+    /** The minimum unit skill to work in buildings of this type. */
     private int minSkill = UNDEFINED;
+    /** The maximum unit skill to work in buildings of this type. */
     private int maxSkill = INFINITY;
+
+    /** Upkeep per turn for buildings ot this type. */
     private int upkeep = 0;
+
+    /** Consumption order. */
     private int priority = Consumer.BUILDING_PRIORITY;
 
+    /** The building type this upgrades from. */
     private BuildingType upgradesFrom = null;
+
+    /** The building type this upgrades to. */
     private BuildingType upgradesTo = null;
 
-    /**
-     * The possible production types of this building type.
-     */
+    /** The possible production types of this building type. */
     private final List<ProductionType> productionTypes
         = new ArrayList<ProductionType>();
 
@@ -57,7 +68,7 @@ public final class BuildingType extends BuildableType
      * Creates a new <code>BuildingType</code> instance.
      *
      * @param id The object identifier.
-     * @param specification a <code>Specification</code> value
+     * @param specification The <code>Specification</code> to refer to.
      */
     public BuildingType(String id, Specification specification) {
         super(id, specification);
@@ -179,12 +190,12 @@ public final class BuildingType extends BuildableType
     }
 
     /**
-     * Get the production types available for the given production
-     * level.  If the production level is null, all production levels
+     * Return the production types available for the given production
+     * level. If the production level is null, all production levels
      * will be returned.
      *
-     * @param level The production level.
-     * @return A list of applicable <code>ProductionType</code>s.
+     * @param level the production level
+     * @return a <code>List<ProductionType></code> value
      */
     public List<ProductionType> getProductionTypes(String level) {
         List<ProductionType> result = new ArrayList<ProductionType>();
@@ -268,19 +279,16 @@ public final class BuildingType extends BuildableType
 
     // Serialization
 
+    private static final String BASIC_PRODUCTION_TAG = "basicProduction";
+    private static final String CONSUMES_TAG = "consumes";
     private static final String MAX_SKILL_TAG = "maxSkill";
     private static final String MIN_SKILL_TAG = "minSkill";
     private static final String PRIORITY_TAG = "priority";
+    private static final String PRODUCES_TAG = "produces";
     private static final String PRODUCTION_TAG = "production";
     private static final String UPGRADES_FROM_TAG = "upgradesFrom";
     private static final String UPKEEP_TAG = "upkeep";
     private static final String WORKPLACES_TAG = "workplaces";
-    // @compat 0.10.6
-    private static final String BASIC_PRODUCTION_TAG = "basicProduction";
-    private static final String CONSUMES_TAG = "consumes";
-    private static final String PRODUCES_TAG = "produces";
-    // end @compat
-
 
     /**
      * {@inheritDoc}
@@ -318,18 +326,7 @@ public final class BuildingType extends BuildableType
         if (priority != Consumer.BUILDING_PRIORITY) {
             writeAttribute(out, PRIORITY_TAG, priority);
         }
-    }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        super.writeChildren(out);
-
-        for (ProductionType productionType : productionTypes) {
-            productionType.toXML(out);
-        }
     }
 
     /**
@@ -363,6 +360,17 @@ public final class BuildingType extends BuildableType
 
         priority = getAttribute(in, PRIORITY_TAG, parent.priority);
 
+        // @compat 0.10.6
+        int basicProduction = getAttribute(in, BASIC_PRODUCTION_TAG, -1);
+        if (basicProduction > 0) {
+            GoodsType consumes = spec.getType(in, CONSUMES_TAG, GoodsType.class,
+                                              parent.getConsumedGoodsType());
+            GoodsType produces = spec.getType(in, PRODUCES_TAG, GoodsType.class,
+                                              parent.getProducedGoodsType());
+            productionTypes.add(new ProductionType(consumes, produces, basicProduction));
+        }
+        // end @compat
+
         if (parent != this) { // Handle "extends" for super-type fields
             if (!hasAttribute(in, REQUIRED_POPULATION_TAG)) {
                 setRequiredPopulation(parent.getRequiredPopulation());
@@ -375,32 +383,6 @@ public final class BuildingType extends BuildableType
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
-        if (readShouldClearContainers(in)) {
-            productionTypes.clear();
-        }
-
-        // @compat 0.10.6
-        final Specification spec = getSpecification();
-        BuildingType parent = spec.getType(in, EXTENDS_TAG,
-                                           BuildingType.class, this);
-        int basicProduction = getAttribute(in, BASIC_PRODUCTION_TAG, -1);
-        if (basicProduction > 0) {
-            GoodsType consumes = spec.getType(in, CONSUMES_TAG, GoodsType.class,
-                                              parent.getConsumedGoodsType());
-            GoodsType produces = spec.getType(in, PRODUCES_TAG, GoodsType.class,
-                                              parent.getProducedGoodsType());
-            productionTypes.add(new ProductionType(consumes, produces, 
-                                                   basicProduction));
-        }
-        // end @compat
-
-        super.readChildren(in);
-    }
 
     /**
      * {@inheritDoc}
@@ -417,6 +399,19 @@ public final class BuildingType extends BuildableType
             super.readChild(in);
         }
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
+        super.writeChildren(out);
+
+        for (ProductionType productionType : productionTypes) {
+            productionType.toXML(out);
+        }
+    }
+
 
     // @compat 0.9.x
     /**

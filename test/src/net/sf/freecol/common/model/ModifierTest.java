@@ -123,7 +123,7 @@ public class ModifierTest extends FreeColTestCase {
         scope1.setType("model.unit.frigate");
         // applies to carpenter
         Scope scope2 = new Scope();
-        scope2.setAbilityID(Ability.NAVAL_UNIT);
+        scope2.setAbilityId(Ability.NAVAL_UNIT);
         scope2.setAbilityValue(false);
         // applies to frigate
         Scope scope3 = new Scope();
@@ -233,15 +233,15 @@ public class ModifierTest extends FreeColTestCase {
 
         Scope scope1 = new Scope();
         scope1.setType("model.unit.frigate");
-        scope1.setAbilityID("whatever");
+        scope1.setAbilityId("whatever");
 
         Scope scope2 = new Scope();
         scope2.setType("model.unit.frigate");
-        scope2.setAbilityID("whatever");
+        scope2.setAbilityId("whatever");
 
         Scope scope3 = new Scope();
         scope3.setType("model.unit.frigate");
-        scope3.setAbilityID("whatever");
+        scope3.setAbilityId("whatever");
         scope3.setAbilityValue(false);
 
         assertEquals(scope1, scope1);

@@ -41,12 +41,18 @@ import javax.xml.stream.XMLStreamWriter;
  */
 public class Effect extends FreeColGameObjectType {
 
-    public static final String DAMAGED_UNIT = "model.disaster.effect.damageUnit";
-    public static final String LOSS_OF_UNIT = "model.disaster.effect.lossOfUnit";
-    public static final String LOSS_OF_MONEY = "model.disaster.effect.lossOfMoney";
-    public static final String LOSS_OF_GOODS = "model.disaster.effect.lossOfGoods";
-    public static final String LOSS_OF_TILE_PRODUCTION = "model.disaster.effect.lossOfTileProduction";
-    public static final String LOSS_OF_BUILDING_PRODUCTION = "model.disaster.effect.lossOfBuildingProduction";
+    public static final String DAMAGED_UNIT
+        = "model.disaster.effect.damageUnit";
+    public static final String LOSS_OF_UNIT
+        = "model.disaster.effect.lossOfUnit";
+    public static final String LOSS_OF_MONEY
+        = "model.disaster.effect.lossOfMoney";
+    public static final String LOSS_OF_GOODS
+        = "model.disaster.effect.lossOfGoods";
+    public static final String LOSS_OF_TILE_PRODUCTION
+        = "model.disaster.effect.lossOfTileProduction";
+    public static final String LOSS_OF_BUILDING_PRODUCTION
+        = "model.disaster.effect.lossOfBuildingProduction";
 
     /** The probability of this effect. */
     private int probability;
@@ -55,16 +61,16 @@ public class Effect extends FreeColGameObjectType {
     private List<Scope> scopes = null;
 
 
-
-    protected Effect() {
-        // empty constructor
-    }
+    /**
+     * Deliberately empty constructor.
+     */
+    protected Effect() {}
 
     /**
      * Creates a new <code>Effect</code> instance.
      *
-     * @param in a <code>XMLStreamReader</code> value
-     * @param specification a <code>Specification</code> value
+     * @param in The <code>XMLStreamReader</code> to read from.
+     * @param specification The <code>Specification</code> to refer to.
      * @exception XMLStreamException if an error occurs
      */
     public Effect(XMLStreamReader in, Specification specification) throws XMLStreamException {
@@ -105,6 +111,15 @@ public class Effect extends FreeColGameObjectType {
         return scopes;
     }
 
+    /**
+     * Add a scope.
+     *
+     * @param scope The <code>Scope</code> to add.
+     */
+    private void addScope(Scope scope) {
+        if (scopes == null) scopes = new ArrayList<Scope>();
+        scopes.add(scope);
+    }
 
     /**
      * Does at least one of this effect's scopes apply to an object.
@@ -168,6 +183,7 @@ public class Effect extends FreeColGameObjectType {
      */
     @Override
     protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        // Clear containers.
         if (readShouldClearContainers(in)) {
             scopes = null;
         }
@@ -183,11 +199,7 @@ public class Effect extends FreeColGameObjectType {
         final String tag = in.getLocalName();
 
         if (Scope.getXMLElementTagName().equals(tag)) {
-            Scope scope = new Scope(in);
-            if (scope != null) {
-                if (scopes == null) scopes = new ArrayList<Scope>();
-                scopes.add(scope);
-            }
+            addScope(new Scope(in));
 
         } else {
             super.readChild(in);

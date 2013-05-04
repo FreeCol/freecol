@@ -50,8 +50,7 @@ public class IntegerOption extends AbstractOption<Integer> {
     /**
      * Creates a new <code>IntegerOption</code>.
      *
-     * @param id The identifier for this option.  This is used when
-     *     the object should be found in an {@link OptionGroup}.
+     * @param id The object identifier.
      */
     public IntegerOption(String id) {
         super(id);
@@ -60,7 +59,7 @@ public class IntegerOption extends AbstractOption<Integer> {
     /**
      * Creates a new <code>IntegerOption</code>.
      *
-     * @param specification The enclosing <code>Specification</code>.
+     * @param specification The <code>Specification</code> to refer to.
      */
     public IntegerOption(Specification specification) {
         super(specification);
@@ -69,9 +68,8 @@ public class IntegerOption extends AbstractOption<Integer> {
     /**
      * Creates a new <code>IntegerOption</code>.
      *
-     * @param id The identifier for this option.  This is used when
-     *     the object should be found in an {@link OptionGroup}.
-     * @param specification The enclosing <code>Specification</code>.
+     * @param id The object identifier.
+     * @param specification The <code>Specification</code> to refer to.
      */
     public IntegerOption(String id, Specification specification) {
         super(id, specification);

@@ -35,8 +35,9 @@ import org.w3c.dom.Element;
  * The message sent when moving a unit.
  */
 public class MoveMessage extends DOMMessage {
+
     /**
-     * The id of the object to be moved.
+     * The identifier of the object to be moved.
      */
     private String unitId;
 

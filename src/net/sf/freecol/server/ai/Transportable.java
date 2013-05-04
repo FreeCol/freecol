@@ -177,11 +177,11 @@ public interface Transportable {
     public void abortWish(Wish w);
 
     /**
-     * Returns the ID of the <code>AIObject</code> implementing
+     * Get the identfier of the <code>AIObject</code> implementing
      * this interface.
      *
-     * @return The ID of the <code>AIObject</code>. This is normally
-     *     the ID of the
+     * @return The object identifier of the
+     *     <code>AIObject</code>.  This is normally that of the
      *     {@link net.sf.freecol.common.model.FreeColGameObject} that
      *     object represents.
      */

@@ -40,8 +40,9 @@ import org.w3c.dom.NodeList;
 public class DiplomacyMessage extends DOMMessage {
 
     /**
-     * The unit doing the trading.  Can not use just an id as the unit
-     * might be invisible to the settlement due to being aboard a carrier.
+     * The unit doing the trading.  Can not use just an identifier as
+     * the unit might be invisible to the settlement due to being
+     * aboard a carrier.
      */
     private Unit unit;
 

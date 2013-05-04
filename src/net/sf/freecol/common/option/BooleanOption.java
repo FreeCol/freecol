@@ -43,8 +43,7 @@ public class BooleanOption extends AbstractOption<Boolean> {
     /**
      * Creates a new <code>BooleanOption</code>.
      *
-     * @param id The identifier for this option.  This is used when
-     *     the object should be found in an {@link OptionGroup}.
+     * @param id The object identifier.
      */
     public BooleanOption(String id) {
         super(id);
@@ -53,7 +52,7 @@ public class BooleanOption extends AbstractOption<Boolean> {
     /**
      * Creates a new <code>BooleanOption</code>.
      *
-     * @param specification The enclosing <code>Specification</code>.
+     * @param specification The <code>Specification</code> to refer to.
      */
     public BooleanOption(Specification specification) {
         super(specification);

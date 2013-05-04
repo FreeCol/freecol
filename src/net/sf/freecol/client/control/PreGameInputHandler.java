@@ -173,13 +173,13 @@ public final class PreGameInputHandler extends InputHandler {
     private Element logout(Element element) {
         Game game = getFreeColClient().getGame();
 
-        String playerID = element.getAttribute("player");
+        String playerId = element.getAttribute("player");
         String reason = element.getAttribute("reason");
         if (reason != null && !"".equals(reason)) {
             logger.info("Client logging out: " + reason);
         }
 
-        Player player = game.getFreeColGameObject(playerID, Player.class);
+        Player player = game.getFreeColGameObject(playerId, Player.class);
         game.removePlayer(player);
         gui.refreshPlayersTable();
 

@@ -54,7 +54,7 @@ public class UnitTypeChangeTest extends FreeColTestCase {
         UnitType gardener = new UnitType("gardener", spec());
 
         Scope scope = new Scope();
-        scope.setAbilityID("model.ability.native");
+        scope.setAbilityId("model.ability.native");
 
         UnitTypeChange.ChangeType education = UnitTypeChange.ChangeType.EDUCATION;
         UnitTypeChange change = new UnitTypeChange();

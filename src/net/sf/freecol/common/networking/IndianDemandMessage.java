@@ -36,10 +36,10 @@ import org.w3c.dom.Element;
  */
 public class IndianDemandMessage extends DOMMessage {
 
-    // The id of the unit that is demanding.
+    // The identifier of the unit that is demanding.
     private String unitId;
 
-    // The id of the colony being demanded of.
+    // The identifier of the colony being demanded of.
     private String colonyId;
 
     // The goods being demanded.

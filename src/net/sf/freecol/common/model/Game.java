@@ -59,7 +59,7 @@ public class Game extends FreeColGameObject {
     private Specification specification = null;
 
     /**
-     * The next available id, that can be given to a new
+     * The next available identifier that can be given to a new
      * <code>FreeColGameObject</code>.
      */
     protected int nextId = 1;
@@ -194,9 +194,9 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Gets the <code>FreeColGameObject</code> with the given id.
+     * Gets the <code>FreeColGameObject</code> with the given identifier.
      *
-     * @param id The id, which may be null or invalid.
+     * @param id The object identifier.
      * @return The game object, or null if not found.
      */
     public FreeColGameObject getFreeColGameObject(String id) {
@@ -216,7 +216,7 @@ public class Game extends FreeColGameObject {
      * Gets the <code>FreeColGameObject</code> with the specified
      * identifier and class.
      *
-     * @param id The identifier.
+     * @param id The object identifier.
      * @param returnClass The expected class of the object.
      * @return The game object, or null if not found.
      */
@@ -234,10 +234,11 @@ public class Game extends FreeColGameObject {
      * Registers a new <code>FreeColGameObject</code> with a given
      * identifier.
      *
-     * @param id The unique identifier of the <code>FreeColGameObject</code>.
+     * @param id The object identifier.
      * @param fcgo The <code>FreeColGameObject</code> to add to this
      *     <code>Game</code>.
-     * @exception IllegalArgumentException If either the id or object are null.
+     * @exception IllegalArgumentException If either the identifier or
+     *     object are null.
      */
     public void setFreeColGameObject(String id, FreeColGameObject fcgo) {
         if (id == null || id.length() == 0) {
@@ -263,14 +264,13 @@ public class Game extends FreeColGameObject {
      * Removes the <code>FreeColGameObject</code> with the specified
      * identifier.
      *
-     * @param id The identifier of the <code>FreeColGameObject</code>
-     *     to remove from this <code>Game</code>.
+     * @param id The object identifier.
      * @return The <code>FreeColGameObject</code> that has been removed.
      * @exception IllegalArgumentException If the identifier is null or empty.
      */
     public FreeColGameObject removeFreeColGameObject(String id) {
         if (id == null || id.length() == 0) {
-            throw new IllegalArgumentException("Null/empty id.");
+            throw new IllegalArgumentException("Null/empty identifier.");
         }
 
         final FreeColGameObject o = getFreeColGameObject(id);
@@ -283,11 +283,11 @@ public class Game extends FreeColGameObject {
     /**
      * Convenience wrapper to find a location (which is an interface,
      * precluding using the typed version of getFreeColGameObject())
-     * by id.
+     * by identifier.
      *
      * Use this routine when the object should already be present in the game.
      *
-     * @param id The identifier.
+     * @param id The object identifier.
      * @return The <code>Location</code> if any.
      */
     public Location findFreeColLocation(String id) {
@@ -298,12 +298,12 @@ public class Game extends FreeColGameObject {
     /**
      * Convenience wrapper to find or make a location (which is an
      * interface, precluding using the typed version of
-     * getFreeColGameObject()) by id.
+     * getFreeColGameObject()) by identifier.
      *
      * Use this routine when the object may not necessarily already be
      * present in the game, but is expected to be defined eventually.
      *
-     * @param id The id.
+     * @param id The object identifier.
      * @return The <code>Location</code> if any.
      */
     public Location makeFreeColLocation(String id) {
@@ -428,9 +428,9 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Get a <code>Player</code> identified by its nation id.
+     * Get a <code>Player</code> identified by its nation identifier.
      *
-     * @param nationId The nation id to search for.
+     * @param nationId The nation identifier to search for.
      * @return The <code>Player</code> of the given nation, or null if
      *     not found.
      */
@@ -779,7 +779,7 @@ public class Game extends FreeColGameObject {
     /**
      * Notify a listener (if any) of a new game object.
      *
-     * @param id The identifier of the new object.
+     * @param id The object identifier.
      * @param fcgo The new <code>FreeColGameObject</code>.
      */
     public void notifySetFreeColGameObject(String id, FreeColGameObject fcgo) {
@@ -791,7 +791,7 @@ public class Game extends FreeColGameObject {
     /**
      * Notify a listener (if any) of that a game object has gone.
      *
-     * @param id The identifier of the removed object.
+     * @param id The object identifier.
      */
     public void notifyRemoveFreeColGameObject(String id) {
         if (freeColGameObjectListener != null) {
@@ -963,7 +963,7 @@ public class Game extends FreeColGameObject {
     public boolean equals(Object o) {
         // We need to override the behavior of equals inherited from
         // FreeColGameObject, since two games are not the same if they
-        // have the same id.
+        // have the same identifier.
         return this == o;
     }
 
@@ -1117,12 +1117,6 @@ public class Game extends FreeColGameObject {
         currentPlayer = (current == null) ? null
             : getFreeColGameObject(current, Player.class);
 
-        if (!Game.getXMLElementTagName().equals(in.getLocalName())) {
-            logger.warning("Error parsing xml, expecting closing tag </"
-                + Game.getXMLElementTagName() + ">, "
-                + " found instead: " + in.getLocalName());
-        }
-
         // @compat 0.9.x
         if (gameOptions != null) {
             addOldOptions(gameOptions);
@@ -1142,8 +1136,7 @@ public class Game extends FreeColGameObject {
         logger.finest("Found game tag " + tag + " id=" + readId(in));
 
         if (CIBOLA_TAG.equals(tag)) {
-            String id = readId(in);
-            if (id != null) citiesOfCibola.add(id);
+            citiesOfCibola.add(readId(in));
             closeTag(in, CIBOLA_TAG);
 
         // @compat 0.9.x
@@ -1157,8 +1150,7 @@ public class Game extends FreeColGameObject {
         // @compat 0.9.x
         } else if (GAME_OPTIONS_1_TAG.equals(tag) 
             || GAME_OPTIONS_2_TAG.equals(tag)) {
-            gameOptions = new OptionGroup(specification);
-            gameOptions.readFromXML(in);
+            gameOptions = new OptionGroup(in, specification);
         // end @compat
 
         } else if (Map.getXMLElementTagName().equals(tag)) {
@@ -1166,14 +1158,12 @@ public class Game extends FreeColGameObject {
 
         // @compat 0.9.x
         } else if (MapGeneratorOptions.getXMLElementTagName().equals(tag)) {
-            mapGeneratorOptions = new OptionGroup(specification);
-            mapGeneratorOptions.readFromXML(in);
+            mapGeneratorOptions = new OptionGroup(in, specification);
         // end @compat
 
         // @compat 0.9.x
         } else if (ModelMessage.getXMLElementTagName().equals(tag)) {
-            ModelMessage m = new ModelMessage();
-            m.readFromXML(in);
+            ModelMessage m = new ModelMessage(in);
             // When this goes, remove getOwnerId().
             String owner = m.getOwnerId();
             if (owner != null) {
@@ -1183,18 +1173,14 @@ public class Game extends FreeColGameObject {
         // end @compat
 
         } else if (NationOptions.getXMLElementTagName().equals(tag)) {
-            if (nationOptions == null) {
-                nationOptions = new NationOptions(specification);
-            }
-            nationOptions.readFromXML(in);
+            nationOptions = new NationOptions(in, specification);
 
         } else if (OptionGroup.getXMLElementTagName().equals(tag)
             // @compat 0.9.x
             || DIFFICULTY_LEVEL_TAG.equals(tag)
             // end @compat
             ) {
-            OptionGroup difficultyLevel = new OptionGroup(specification);
-            difficultyLevel.readFromXML(in);
+            specification.applyDifficultyLevel(new OptionGroup(in, specification));
 
         } else if (Player.getXMLElementTagName().equals(tag)) {
             Player player = readFreeColGameObject(in, Player.class);

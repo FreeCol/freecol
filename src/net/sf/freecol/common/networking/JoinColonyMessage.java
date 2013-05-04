@@ -35,7 +35,7 @@ import org.w3c.dom.Element;
 public class JoinColonyMessage extends DOMMessage {
 
     /**
-     * The id of the colony.
+     * The identifier of the colony.
      **/
     String colonyId;
 

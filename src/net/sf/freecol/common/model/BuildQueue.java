@@ -58,25 +58,31 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
     /** A list of Buildable items. */
     private List<T> buildQueue = new ArrayList<T>();
 
-    /**
-     * What to do when an item has been completed.
-     */
+    /** What to do when an item has been completed. */
     private CompletionAction completionAction = CompletionAction.REMOVE;
 
     private int priority = COLONY_PRIORITY;
 
+    /** The colony to queue buildables for. */
     private Colony colony;
 
 
-
+    /**
+     * Create a new build queue.
+     *
+     * @param colony The <code>Colony</code> to build for.
+     * @param completionAction The action on build completion.
+     * @param priority The build priority.
+     */
     public BuildQueue(Colony colony, CompletionAction action, int priority) {
         this.colony = colony;
         this.completionAction = action;
         this.priority = priority;
     }
 
+
     /**
-     * Returns the type of building currently being built.
+     * Get the type of building currently being built.
      *
      * @return The type of building currently being built.
      */
@@ -147,10 +153,7 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
     // Interface Consumer
 
     /**
-     * Returns true if this Consumer consumes the given GoodsType.
-     *
-     * @param goodsType a <code>GoodsType</code> value
-     * @return a <code>boolean</code> value
+     * {@inheritDoc}
      */
     public boolean consumes(GoodsType goodsType) {
         return getCurrentlyBuilding() != null
@@ -158,9 +161,7 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
     }
 
     /**
-     * Returns a list of GoodsTypes this Consumer consumes.
-     *
-     * @return a <code>List</code> value
+     * {@inheritDoc}
      */
     public List<AbstractGoods> getConsumedGoods() {
         T current = getCurrentlyBuilding();
@@ -220,15 +221,16 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
 
 
    /**
-    * Returns whether the consumer has the ability with the given
-    * id. The two abilities most relevant to consumers are
+    * Does the consumer have the ability with the given identifier?
+    *
+    * The two abilities most relevant to consumers are
     * "consumeAllOrNothing", which implies that the consumer will not
     * consume any goods if its requirements can not be met (used by
     * the Colony when building), as well as
     * "consumeOnlySurplusProduction", which implies that the consumer
     * does not consume stored goods (used by the country and stables).
     *
-    * @param id a <code>String</code> value
+    * @param id The object identifier.
     * @return a <code>boolean</code> value
     */
     public boolean hasAbility(String id) {

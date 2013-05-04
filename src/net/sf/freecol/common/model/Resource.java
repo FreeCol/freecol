@@ -47,7 +47,7 @@ public class Resource extends TileItem {
      *
      * This constructor asserts that the game, tile and type are valid.
      *
-     * @param game The <code>Game</code> in which this object belongs.
+     * @param game The enclosing <code>Game</code>.
      * @param tile The <code>Tile</code> on which this object sits.
      * @param type The <code>ResourceType</code> of this Resource.
      * @param quantity The quantity of resource.
@@ -67,7 +67,7 @@ public class Resource extends TileItem {
      *
      * This constructor asserts that the game, tile and type are valid.
      *
-     * @param game The <code>Game</code> in which this object belongs.
+     * @param game The enclosing <code>Game</code>.
      * @param tile The <code>Tile</code> on which this object sits.
      * @param type The <code>ResourceType</code> of this Resource.
      */
@@ -84,6 +84,7 @@ public class Resource extends TileItem {
     public Resource(Game game, String id) {
         super(game, id);
     }
+
 
     /**
      * Get a name key for this resource.

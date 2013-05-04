@@ -139,8 +139,8 @@ public abstract class TransactionSession {
      * may have already been disposed of while the session is still valid.
      *
      * @param type The class of session.
-     * @param s1 The id of the first object in the session.
-     * @param s2 The id of the second object in the session.
+     * @param s1 The identifier of the first object in the session.
+     * @param s2 The identifier of the second object in the session.
      * @return A session of the specified type, or null if not found.
      */
     public static <T extends TransactionSession> T lookup(Class<T> type,

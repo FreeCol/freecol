@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
 public class ChatMessage extends DOMMessage {
 
     /**
-     * The ID of the sender player.
+     * The object identifier of the sender player.
      */
     private String sender;
 

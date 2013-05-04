@@ -49,9 +49,7 @@ public class Role extends BuildableType {
      */
     private UnitType expertUnit = null;
 
-    /**
-     * Sorts roles by defensive power, descendingly.
-     */
+    /** Sorts roles by defensive power, descendingly. */
     public static final Comparator<Role> defensiveComparator = new Comparator<Role>() {
         public int compare(Role role1, Role role2) {
             float defence1 = role1.getDefence();
@@ -66,9 +64,7 @@ public class Role extends BuildableType {
         }
     };
 
-    /**
-     * Sorts roles by offensive power, descendingly.
-     */
+    /** Sorts roles by offensive power, descendingly. */
     public static final Comparator<Role> offensiveComparator = new Comparator<Role>() {
         public int compare(Role role1, Role role2) {
             float offence1 = role1.getOffence();
@@ -88,12 +84,13 @@ public class Role extends BuildableType {
     /**
      * Creates a new <code>Role</code> instance.
      *
-     * @param id a <code>String</code> value
-     * @param specification a <code>Specification</code> value
+     * @param id The object identifier.
+     * @param specification The <code>Specification</code> to refer to.
      */
     public Role(String id, Specification specification) {
         super(id, specification);
     }
+
 
     /**
      * Get the downgraded role from this one.
@@ -237,6 +234,15 @@ public class Role extends BuildableType {
     private static final String DOWNGRADE_TAG = "downgrade";
     private static final String EXPERT_UNIT_TAG = "expertUnit";
     private static final String MAXIMUM_COUNT_TAG = "maximumCount";
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        super.toXML(out, getXMLElementTagName());
+    }
 
     /**
      * {@inheritDoc}

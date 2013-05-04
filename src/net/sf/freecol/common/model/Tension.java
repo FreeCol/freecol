@@ -86,15 +86,21 @@ public class Tension {
 
 
     /**
-     * Constructor.
+     * Create the default tension.
      */
     public Tension() {
         setValue(Level.HAPPY.getLimit());
     }
 
+    /**
+     * Create tension at a specified level.
+     *
+     * @param newTension The level of tension.
+     */
     public Tension(int newTension) {
         setValue(newTension);
     }
+
 
     /**
      * Get the current tension value.

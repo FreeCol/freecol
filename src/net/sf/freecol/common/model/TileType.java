@@ -94,12 +94,11 @@ public final class TileType extends FreeColGameObjectType {
     private String productionLevel = null;
 
 
-
     /**
      * Create a new tile type.
      *
      * @param id The object identifier.
-     * @param specification The enclosing <code>Specification</code>.
+     * @param specification The <code>Specification</code> to refer to.
      */
     public TileType(String id, Specification specification) {
         super(id, specification);
@@ -111,8 +110,8 @@ public final class TileType extends FreeColGameObjectType {
      * and <code>WATER</code>, which are intended to simplify map
      * loading.
      *
-     * @param id a <code>String</code> value
-     * @param water a <code>boolean</code> value
+     * @param id The object identifier.
+     * @param water True if this is a water tile.
      */
     private TileType(String id, boolean water) {
         super(id, null);
@@ -214,14 +213,17 @@ public final class TileType extends FreeColGameObjectType {
     }
 
     /**
-     * Set the <code>Disasters</code> value.
+     * Add a disaster.
      *
-     * @param newDisasters The new Disasters value.
+     * @param disaster The <code>Disaster</code> to add.
+     * @param probability The probability of the disaster.
      */
-    public void setXDisasters(final List<RandomChoice<Disaster>> newDisasters) {
-        this.disasters = newDisasters;
+    private void addDisaster(Disaster disaster, int probability) {
+        if (disasters == null) {
+            disasters = new ArrayList<RandomChoice<Disaster>>();
+        }
+        disasters.add(new RandomChoice<Disaster>(disaster, probability));
     }
-
 
     /**
      * Gets the resource types that can be found on this tile type.
@@ -236,6 +238,20 @@ public final class TileType extends FreeColGameObjectType {
             }
         }
         return result;
+    }
+
+    /**
+     * Add a resource type.
+     *
+     * @param type The <code>ResourceType</code> to add.
+     * @param probability The percentage probability of the resource
+     *     being present.
+     */
+    private void addResourceType(ResourceType type, int probability) {
+        if (resourceTypes == null) {
+            resourceTypes = new ArrayList<RandomChoice<ResourceType>>();
+        }
+        resourceTypes.add(new RandomChoice<ResourceType>(type, probability));
     }
 
     /**
@@ -285,10 +301,14 @@ public final class TileType extends FreeColGameObjectType {
         return productionTypes;
     }
 
+    /**
+     * Evaluate the TILE_PRODUCTION option.
+     *
+     * @return The TILE_PRODUCTION option value.
+     */
     public String getTileProduction() {
         return getSpecification().getString(TILE_PRODUCTION);
     }
-
 
     /**
      * Gets the production types available at the current difficulty
@@ -310,7 +330,8 @@ public final class TileType extends FreeColGameObjectType {
      * @param level The production level.
      * @return A list of <code>ProductionType</code>s.
      */
-    public List<ProductionType> getProductionTypes(boolean center, String level) {
+    public List<ProductionType> getProductionTypes(boolean center,
+                                                   String level) {
         List<ProductionType> result = new ArrayList<ProductionType>();
         if (productionTypes != null) {
             for (ProductionType productionType : productionTypes) {
@@ -331,13 +352,26 @@ public final class TileType extends FreeColGameObjectType {
      */
     public List<AbstractGoods> getProduction() {
         List<AbstractGoods> production = new ArrayList<AbstractGoods>();
-        for (ProductionType productionType : getProductionTypes(false, productionLevel)) {
+        for (ProductionType productionType
+                 : getProductionTypes(false, productionLevel)) {
             List<AbstractGoods> outputs = productionType.getOutputs();
             if (outputs != null && !outputs.isEmpty()) {
                 production.addAll(outputs);
             }
         }
         return production;
+    }
+
+    /**
+     * Add a production type.
+     *
+     * @param productionType The <code>ProductionType</code> to add.
+     */
+    private void addProductionType(ProductionType productionType) {
+        if (productionTypes == null) {
+            productionTypes = new ArrayList<ProductionType>();
+        }
+        productionTypes.add(productionType);
     }
 
     /**
@@ -420,8 +454,8 @@ public final class TileType extends FreeColGameObjectType {
     }
 
 
-
     // Serialization
+
     private static final String ALTITUDE_MIN_TAG = "altitudeMin";
     private static final String ALTITUDE_MAX_TAG = "altitudeMax";
     private static final String BASIC_MOVE_COST_TAG = "basic-move-cost";
@@ -575,13 +609,9 @@ public final class TileType extends FreeColGameObjectType {
         final String tag = in.getLocalName();
 
         if (DISASTER_TAG.equals(tag)) {
-            Disaster disaster = spec.getType(in, ID_ATTRIBUTE_TAG,
-                                             Disaster.class, (Disaster)null);
-            int probability = getAttribute(in, PROBABILITY_TAG, 100);
-            if (disasters == null) {
-                disasters = new ArrayList<RandomChoice<Disaster>>();
-            }
-            disasters.add(new RandomChoice<Disaster>(disaster, probability));
+            addDisaster(spec.getType(in, ID_ATTRIBUTE_TAG,
+                                     Disaster.class, (Disaster)null),
+                        getAttribute(in, PROBABILITY_TAG, 100));
             closeTag(in, DISASTER_TAG);
 
         } else if (GEN_TAG.equals(tag)) {
@@ -596,12 +626,7 @@ public final class TileType extends FreeColGameObjectType {
         } else if (PRODUCTION_TAG.equals(tag)
             && getAttribute(in, GOODS_TYPE_TAG, (String)null) == null) {
             // new production style
-            ProductionType productionType = new ProductionType(spec);
-            productionType.readFromXML(in);
-            if (productionTypes == null) {
-                productionTypes = new ArrayList<ProductionType>();
-            }
-            productionTypes.add(productionType);
+            addProductionType(new ProductionType(in, spec));
 
         } else if (PRODUCTION_TAG.equals(tag)
             || PRIMARY_PRODUCTION_TAG.equals(tag)
@@ -615,11 +640,8 @@ public final class TileType extends FreeColGameObjectType {
                                                  (String)null);
             // CAUTION: this only works if the primary production is
             // defined before the secondary production
-            if (productionTypes == null) {
-                productionTypes = new ArrayList<ProductionType>();
-            }
             if (PRIMARY_PRODUCTION_TAG.equals(tag)) {
-                productionTypes.add(new ProductionType(goods, true, tileProduction));
+                addProductionType(new ProductionType(goods, true, tileProduction));
             } else if (SECONDARY_PRODUCTION_TAG.equals(tag)) {
                 for (ProductionType productionType : getProductionTypes()) {
                     if (productionType.isColonyCenterTile()
@@ -629,20 +651,16 @@ public final class TileType extends FreeColGameObjectType {
                     }
                 }
             } else {
-                productionTypes.add(new ProductionType(goods, false,
-                                                       tileProduction));
+                addProductionType(new ProductionType(goods, false,
+                                                     tileProduction));
             }
             closeTag(in, tag);
             // end @compat
 
         } else if (RESOURCE_TAG.equals(tag)) {
-            ResourceType type = spec.getType(in, TYPE_TAG, ResourceType.class,
-                                             (ResourceType)null);
-            int probability = getAttribute(in, PROBABILITY_TAG, 100);
-            if (resourceTypes == null) {
-                resourceTypes = new ArrayList<RandomChoice<ResourceType>>();
-            }
-            resourceTypes.add(new RandomChoice<ResourceType>(type, probability));
+            addResourceType(spec.getType(in, TYPE_TAG, ResourceType.class,
+                                         (ResourceType)null),
+                            getAttribute(in, PROBABILITY_TAG, 100));
             closeTag(in, RESOURCE_TAG);
 
         } else {

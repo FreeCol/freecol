@@ -36,12 +36,12 @@ import org.w3c.dom.Element;
 public class SellGoodsMessage extends DOMMessage {
 
     /**
-     * The id of the carrier to unload to goods from.
+     * The identifier of the carrier to unload to goods from.
      */
     private String carrierId;
 
     /**
-     * The id of the type of goods to sell.
+     * The identifier of the type of goods to sell.
      */
     private String goodsTypeId;
 

@@ -1262,21 +1262,21 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Gets the <code>IndianSettlement</code> that owns this unit.
+     * Gets the <code>IndianSettlement</code> home for this unit.
      *
      * @return The home <code>IndianSettlement</code> of this unit.
      */
-    public IndianSettlement getIndianSettlement() {
+    public IndianSettlement getHomeIndianSettlement() {
         return indianSettlement;
     }
 
     /**
-     * Sets the <code>IndianSettlement</code> that owns this unit.
+     * Sets the home <code>IndianSettlement</code> for this unit.
      *
      * @param indianSettlement The <code>IndianSettlement</code> that should
-     *     now be owning this <code>Unit</code>.
+     *     now own this <code>Unit</code>.
      */
-    public void setIndianSettlement(IndianSettlement indianSettlement) {
+    public void setHomeIndianSettlement(IndianSettlement indianSettlement) {
         if (this.indianSettlement != null) {
             this.indianSettlement.removeOwnedUnit(this);
         }
@@ -3212,7 +3212,7 @@ public class Unit extends GoodsLocation
 
     /**
      * Does this unit or its owner satisfy the ability set identified
-     * by <code>id</code>.
+     * by the object identifier.
      *
      * @param id The id of the ability to test.
      * @param fcgot An optional <code>FreeColGameObjectType</code> the
@@ -3277,7 +3277,7 @@ public class Unit extends GoodsLocation
      * Get a modifier that applies to the given Ownable. This is used
      * for the offenceAgainst and defenceAgainst modifiers.
      *
-     * @param id a <code>String</code> value
+     * @param id The object identifier to test.
      * @param ownable a <code>Ownable</code> value
      * @return a <code>Modifier</code> value
      */
@@ -3330,10 +3330,12 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Get a settlement by id, validating as much as possible.
-     * Designed for message unpacking where the id should not be trusted.
+     * Get a settlement by identifier, validating as much as possible.
+     * Designed for message unpacking where the identifier should not
+     * be trusted.
      *
-     * @param settlementId The id of the <code>Settlement</code> to be found.
+     * @param settlementId The identifier of the
+     *     <code>Settlement</code> to be found.
      * @return The settlement corresponding to the settlementId argument.
      * @throws IllegalStateException on failure to validate the settlementId
      *     in any way.
@@ -3368,12 +3370,13 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Get an adjacent Indian settlement by id, validating as much as
-     * possible, including checking whether the nation involved has
-     * been contacted.  Designed for message unpacking where the id
-     * should not be trusted.
+     * Get an adjacent Indian settlement by identifier, validating as
+     * much as possible, including checking whether the nation
+     * involved has been contacted.  Designed for message unpacking
+     * where the identifier should not be trusted.
      *
-     * @param id The id of the <code>IndianSettlement</code> to be found.
+     * @param id The identifier of the <code>IndianSettlement</code>
+     *     to be found.
      * @return The settlement corresponding to the settlementId argument.
      * @throws IllegalStateException on failure to validate the settlementId
      *     in any way.
@@ -3570,15 +3573,6 @@ public class Unit extends GoodsLocation
         return (location != null) ? location.getSettlement() : null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Colony getColony() {
-        Location location = getLocation();
-        return (location != null) ? location.getColony() : null;
-    }
-
 
     // UnitLocation
     // Inherits
@@ -3661,7 +3655,7 @@ public class Unit extends GoodsLocation
             student = null;
         }
 
-        setIndianSettlement(null);
+        setHomeIndianSettlement(null);
 
         getOwner().invalidateCanSeeTiles();
         getOwner().removeUnit(this);
@@ -3913,8 +3907,8 @@ public class Unit extends GoodsLocation
 
         student = makeFreeColGameObject(in, STUDENT_TAG, Unit.class);
 
-        setIndianSettlement(makeFreeColGameObject(in, INDIAN_SETTLEMENT_TAG,
-                                                  IndianSettlement.class));
+        setHomeIndianSettlement(makeFreeColGameObject(in, INDIAN_SETTLEMENT_TAG,
+                                                      IndianSettlement.class));
 
         treasureAmount = getAttribute(in, TREASURE_AMOUNT_TAG, 0);
 
@@ -4004,8 +3998,7 @@ public class Unit extends GoodsLocation
         // end @compat
 
         } else if (TileImprovement.getXMLElementTagName().equals(tag)) {
-            TileImprovement ti = readFreeColGameObject(in, TileImprovement.class);
-            if (ti != null) setWorkImprovement(ti);
+            setWorkImprovement(readFreeColGameObject(in, TileImprovement.class));
 
         } else {
             super.readChild(in);

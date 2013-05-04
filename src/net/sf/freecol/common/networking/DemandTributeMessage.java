@@ -38,7 +38,7 @@ import org.w3c.dom.Element;
 public class DemandTributeMessage extends DOMMessage {
 
     /**
-     * The id of the object demanding.
+     * The identifier of the object demanding.
      */
     private String unitId;
 

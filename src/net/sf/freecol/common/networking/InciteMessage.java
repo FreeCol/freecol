@@ -36,8 +36,9 @@ import org.w3c.dom.Element;
  * The message sent when inciting a native settlement.
  */
 public class InciteMessage extends DOMMessage {
+
     /**
-     * The id of the unit inciting.
+     * The identifier of the unit inciting.
      */
     private String unitId;
 
@@ -47,7 +48,7 @@ public class InciteMessage extends DOMMessage {
     private String directionString;
 
     /**
-     * The id of the enemy to incite against.
+     * The identifier of the enemy to incite against.
      */
     private String enemyId;
 

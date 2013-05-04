@@ -37,12 +37,12 @@ import org.w3c.dom.Element;
 public class ChangeWorkImprovementTypeMessage extends DOMMessage {
 
     /**
-     * The id of the unit that is working.
+     * The identifier of the unit that is working.
      */
     private String unitId;
 
     /**
-     * The id of the improvement type.
+     * The identifier of the improvement type.
      */
     private String improvementId;
 

@@ -150,7 +150,7 @@ public class IndianBringGiftMission extends Mission {
         String reason = invalidAIUnitReason(aiUnit);
         return (reason != null)
             ? reason
-            : (aiUnit.getUnit().getIndianSettlement() == null)
+            : (aiUnit.getUnit().getHomeIndianSettlement() == null)
             ? "home-destroyed"
             : null;
     }
@@ -174,7 +174,7 @@ public class IndianBringGiftMission extends Mission {
         case UNCONTACTED: case WAR: case CEASE_FIRE:
             return "bad-stance";
         case PEACE: case ALLIANCE:
-            Tension tension = unit.getIndianSettlement()
+            Tension tension = unit.getHomeIndianSettlement()
                 .getAlarm(targetPlayer);
             if (tension != null && tension.getLevel()
                 .compareTo(Tension.Level.HAPPY) > 0) return "unhappy";
@@ -232,7 +232,7 @@ public class IndianBringGiftMission extends Mission {
 
         final AIUnit aiUnit = getAIUnit();
         final Unit unit = getUnit();
-        final IndianSettlement is = unit.getIndianSettlement();
+        final IndianSettlement is = unit.getHomeIndianSettlement();
         if (!hasGift()) {
             Unit.MoveType mt = travelToTarget(tag, is, null);
             switch (mt) {

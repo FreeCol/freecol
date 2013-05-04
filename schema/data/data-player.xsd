@@ -95,43 +95,37 @@
       <xs:attribute name="ID" type="PlayerId" use="optional"/>
       <!-- end @compat -->
       <xs:attribute name="username" type="xs:string" use="required"/>
-      <xs:attribute name="nationID" type="NationId" use="required"/>
+      <xs:attribute name="nationId" type="NationId" use="required"/>
+      <!-- @compat 0.10.x -->
+      <xs:attribute name="nationID" type="NationId" use="optional"/>
+      <!-- end @compat -->
       <xs:attribute name="nationType" type="NationTypeId" use="optional"/>
-
       <xs:attribute name="admin" type="xs:boolean" use="optional"
-		    default="false"/>
+                    default="false"/>
       <xs:attribute name="gold" type="xs:int" use="required"/>
       <xs:attribute name="immigration" type="xs:int" use="required"/>
       <xs:attribute name="liberty" type="xs:int" use="required"/>
       <xs:attribute name="interventionBells" type="xs:int" use="optional"/>
-      <xs:attribute name="oldSoL" type="xs:int" use="optional"
-		    default="0"/>
-      <xs:attribute name="score" type="xs:int" use="optional"
-		    default="0"/>
-
+      <xs:attribute name="oldSoL" type="xs:int" use="optional" default="0"/>
+      <xs:attribute name="score" type="xs:int" use="optional" default="0"/>
       <xs:attribute name="ready" type="xs:boolean" use="optional"
-		    default="false"/>
-      <xs:attribute name="ai" type="xs:boolean" use="optional"
-		    default="false"/>
+                    default="false"/>
+      <xs:attribute name="ai" type="xs:boolean" use="optional" default="false"/>
       <xs:attribute name="dead" type="xs:boolean" use="optional"
-		    default="false"/>
+                    default="false"/>
       <xs:attribute name="bankrupt" type="xs:boolean" use="optional"
-		    default="false"/>
-
+                    default="false"/>
       <xs:attribute name="tax" type="xs:int" use="required"/>
       <!-- TODO: remove this some time -->
-      <xs:attribute name="numberOfSettlements" type="xs:int"
-		    use="optional" default="0"/>
+      <xs:attribute name="numberOfSettlements" type="xs:int" use="optional"
+                    default="0"/>
       <xs:attribute name="playerType" type="PlayerType" use="required"/>
-
       <xs:attribute name="immigrationRequired" type="xs:int" use="optional" />
-
       <xs:attribute name="newLandName" type="xs:string" use="optional"/>
       <xs:attribute name="independentNationName" type="xs:string"
-		    use="optional"/>
-
+		                use="optional"/>
       <xs:attribute name="attackedByPrivateers" type="xs:boolean"
-		    use="optional" default="false"/>
+		                use="optional" default="false"/>
       <xs:attribute name="entryLocation" type="xs:string" use="optional"/>
       <xs:attribute name="currentFather" type="xs:string" use="optional"/>
 

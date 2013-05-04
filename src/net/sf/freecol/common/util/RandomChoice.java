@@ -20,13 +20,15 @@
 package net.sf.freecol.common.util;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.util.Utils;
 
 
-public class RandomChoice<T> {
+public class RandomChoice<T> implements Comparable<RandomChoice<T>> {
 
     private final int probability;
     private final T object;
@@ -42,6 +44,12 @@ public class RandomChoice<T> {
 
     public T getObject() {
         return object;
+    }
+
+    // Interface Comparable<RandomChoice<T>>
+
+    public int compareTo(RandomChoice<T> other) {
+        return other.getProbability() - getProbability();
     }
 
 

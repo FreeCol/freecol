@@ -229,12 +229,12 @@ final class ReceivingThread extends Thread {
 
     /**
      * Creates and registers a new <code>NetworkReplyObject</code> with the
-     * specified ID.
+     * specified object identifier.
      * 
-     * @param networkReplyId The id of the message the calling thread should
-     *            wait for.
+     * @param networkReplyId The identifier of the message the calling
+     *     thread should wait for.
      * @return The <code>NetworkReplyObject</code> containing the network
-     *         message.
+     *     message.
      */
     public NetworkReplyObject waitForNetworkReply(int networkReplyId) {
         NetworkReplyObject nro = new NetworkReplyObject(networkReplyId);

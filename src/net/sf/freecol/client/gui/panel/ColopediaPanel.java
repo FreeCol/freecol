@@ -42,6 +42,7 @@ import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.FreeColObject;
 
 
 /**
@@ -69,7 +70,7 @@ public final class ColopediaPanel extends FreeColPanel
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param gui The <code>GUI</code> to display on.
-     * @param id An identifier for the initial item to select.
+     * @param id The object identifier of the item to select.
      */
     public ColopediaPanel(FreeColClient freeColClient, GUI gui, String id) {
         super(freeColClient, gui);
@@ -228,7 +229,7 @@ public final class ColopediaPanel extends FreeColPanel
         HyperlinkEvent.EventType type = e.getEventType();
         if (type == HyperlinkEvent.EventType.ACTIVATED) {
             String[] path = e.getURL().getPath().split("/");
-            if ("id".equals(path[1])) {
+            if (FreeColObject.ID_ATTRIBUTE_TAG.equals(path[1])) {
                 select(path[2]);
             } else if ("action".equals(path[1])) {
                 getFreeColClient().getActionManager().getFreeColAction(path[2])

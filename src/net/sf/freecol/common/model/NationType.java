@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
@@ -37,27 +38,21 @@ public abstract class NationType extends FreeColGameObjectType {
     public static enum AggressionLevel { LOW, AVERAGE, HIGH }
 
 
-    /**
-     * The number of settlements this Nation has.
-     */
+    /** The number of settlements this Nation has. */
     private SettlementNumber numberOfSettlements = SettlementNumber.AVERAGE;
 
-    /**
-     * The aggression of this Nation.
-     */
+    /** The aggression of this Nation. */
     private AggressionLevel aggression = AggressionLevel.AVERAGE;
 
-    /**
-     * The types of settlement this Nation has.
-     */
+    /** The types of settlement this Nation has. */
     private List<SettlementType> settlementTypes = null;
 
 
     /**
      * Default nation type constructor.
      *
-     * @param id The nation type identifier.
-     * @param specification The containing <code>Specification</code>.
+     * @param id The object identifier.
+     * @param specification The <code>Specification</code> to refer to.
      */
     public NationType(String id, Specification specification) {
         super(id, specification);
@@ -65,14 +60,39 @@ public abstract class NationType extends FreeColGameObjectType {
         setModifierIndex(Modifier.NATION_PRODUCTION_INDEX);
     }
 
+
     /**
      * Get the settlement types.
      *
      * @return A list of <code>SettlementType</code>s.
      */
     public final List<SettlementType> getSettlementTypes() {
-        return (settlementTypes == null) ? new ArrayList<SettlementType>()
-            : settlementTypes;
+        if (settlementTypes == null) return Collections.emptyList();
+        return settlementTypes;
+    }
+
+    /**
+     * Add a settlement type.
+     *
+     * @param settlementType The <code>SettlementType</code> to add.
+     */
+    private void addSettlementType(SettlementType settlementType) {
+        if (settlementTypes == null) {
+            settlementTypes = new ArrayList<SettlementType>();
+        }
+        settlementTypes.add(settlementType);
+    }
+
+    /**
+     * Add settlement types.
+     *
+     * @param types A list of <code>SettlementType</code>s to add.
+     */
+    private void addSettlementTypes(List<SettlementType> types) {
+        if (settlementTypes == null) {
+            settlementTypes = new ArrayList<SettlementType>();
+        }
+        settlementTypes.addAll(types);
     }
 
     /**
@@ -115,16 +135,14 @@ public abstract class NationType extends FreeColGameObjectType {
     }
 
     /**
-     * Get a settlement type by id.
+     * Get a settlement type by identifier.
      *
-     * @param id The id to check.
+     * @param id The object identifier.
      * @return The settlement type.
      */
     public SettlementType getSettlementType(String id) {
         for (SettlementType settlementType : getSettlementTypes()) {
-            if (id.equals(settlementType.getId())) {
-                return settlementType;
-            }
+            if (id.equals(settlementType.getId())) return settlementType;
         }
         return null;
     }
@@ -174,6 +192,7 @@ public abstract class NationType extends FreeColGameObjectType {
     private static final String AGGRESSION_TAG = "aggression";
     private static final String NUMBER_OF_SETTLEMENTS_TAG = "number-of-settlements";
     private static final String SETTLEMENT_TAG = "settlement";
+
 
     /**
      * {@inheritDoc}
@@ -235,10 +254,7 @@ public abstract class NationType extends FreeColGameObjectType {
 
         if (parent != this) {
             if (parent.settlementTypes != null) {
-                if (settlementTypes == null) {
-                    settlementTypes = new ArrayList<SettlementType>();
-                }
-                settlementTypes.addAll(parent.settlementTypes);
+                addSettlementTypes(parent.settlementTypes);
             }
 
             addFeatures(parent);
@@ -257,13 +273,7 @@ public abstract class NationType extends FreeColGameObjectType {
         final String tag = in.getLocalName();
 
         if (SETTLEMENT_TAG.equals(tag)) {
-            String id = readId(in);
-            SettlementType settlementType = new SettlementType(id, spec);
-            settlementType.readFromXML(in);
-            if (settlementTypes == null) {
-                settlementTypes = new ArrayList<SettlementType>();
-            }
-            settlementTypes.add(settlementType);
+            addSettlementType(new SettlementType(in, spec));
 
         } else {
             super.readChild(in);

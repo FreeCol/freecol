@@ -62,7 +62,7 @@ public class TileImprovementPlan extends ValuedAIObject {
      * from the given XML-representation.
      *
      * @param aiMain The main AI-object.
-     * @param id The ID.
+     * @param id The object identifier.
      * @throws XMLStreamException if a problem was encountered
      *     during parsing.
      */

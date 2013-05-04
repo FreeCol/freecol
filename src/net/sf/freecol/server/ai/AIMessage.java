@@ -508,7 +508,7 @@ public class AIMessage {
      * An AI unit loots some cargo.
      *
      * @param aiUnit The <code>AIUnit</code> that is looting.
-     * @param defenderId The id of the defending unit.
+     * @param defenderId The object identifier of the defending unit.
      * @param goods A list of <code>Goods</code> to loot.
      * @return True if the message was sent, and a non-error reply returned.
      */

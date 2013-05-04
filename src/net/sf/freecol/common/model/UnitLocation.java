@@ -120,13 +120,19 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      * Creates a new <code>UnitLocation</code> instance.
      *
      * @param game The enclosing <code>Game</code>.
-     * @param id The identifier.
+     * @param id The object identifier.
      */
     public UnitLocation(Game game, String id) {
         super(game, id);
     }
 
-    // Only Unit needs this
+    /**
+     * Creates a new <code>UnitLocation</code> instance.
+     * Only Unit needs this.  TODO: make it go away, its a noop.
+     *
+     * @param game The enclosing <code>Game</code>.
+     * @param e The <code>Element</code> to read from.
+     */
     public UnitLocation(Game game, Element e) {
         super(game, null);
     }
@@ -134,7 +140,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
 
     // Some useful utilities, marked final as they will work as long
     // as working implementations of getUnitList(), getUnitCount(),
-    // and getUnitCapacity() are provided.
+    // getUnitCapacity() and getSettlement() are provided.
 
     /**
      * Is this unit location empty?
@@ -265,12 +271,12 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
         } else if (locatable instanceof Goods) {
             // dumping goods is a valid action
             locatable.setLocation(null);
-            logger.finest("Dumped " + locatable + " in UnitLocation with ID "
+            logger.finest("Dumped " + locatable + " in UnitLocation with id "
                           + getId());
             return true;
         } else {
             logger.warning("Tried to add Locatable " + locatable
-                           + " to UnitLocation with ID " + getId() + ".");
+                           + " to UnitLocation with id " + getId() + ".");
         }
         return false;
     }
@@ -342,8 +348,20 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     /**
      * {@inheritDoc}
      */
-    public Colony getColony() {
-        return null;
+    public final Colony getColony() {
+        // Final as this will always work if getSettlement() does.
+        Settlement settlement = getSettlement();
+        return (settlement instanceof Colony) ? (Colony)settlement : null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public final IndianSettlement getIndianSettlement() {
+        // Final as this will always work if getSettlement() does.
+        Settlement settlement = getSettlement();
+        return (settlement instanceof IndianSettlement)
+            ? (IndianSettlement)settlement : null;
     }
 
 

@@ -34,7 +34,7 @@ import org.w3c.dom.Element;
 public class PutOutsideColonyMessage extends DOMMessage {
 
     /**
-     * The id of the unit to be put out.
+     * The identifier of the unit to be put out.
      */
     private String unitId;
 

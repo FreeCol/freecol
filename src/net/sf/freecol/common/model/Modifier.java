@@ -34,8 +34,10 @@ public class Modifier extends Feature implements Comparable<Modifier> {
 
     public static final String OFFENCE = "model.modifier.offence";
     public static final String DEFENCE = "model.modifier.defence";
-    public static final String OFFENCE_AGAINST = "model.modifier.offenceAgainst";
-    public static final String DEFENCE_AGAINST = "model.modifier.defenceAgainst";
+    public static final String OFFENCE_AGAINST
+        = "model.modifier.offenceAgainst";
+    public static final String DEFENCE_AGAINST
+        = "model.modifier.defenceAgainst";
     public static final String TILE_TYPE_CHANGE_PRODUCTION
         = "model.modifier.tileTypeChangeProduction";
 
@@ -61,19 +63,13 @@ public class Modifier extends Feature implements Comparable<Modifier> {
      */
     private float increment;
 
-    /**
-     * The type of this Modifier
-     */
+    /** The type of this Modifier */
     private Type type;
 
-    /**
-     * The type of increment.
-     */
+    /** The type of increment. */
     private Type incrementType;
 
-    /**
-     * The sorting index.
-     */
+    /** The sorting index. */
     private int index = -1;
 
 
@@ -87,7 +83,7 @@ public class Modifier extends Feature implements Comparable<Modifier> {
     /**
      * Use this only for reading from DOM Elements.
      *
-     * @param specification The <code>Specification</code> to read within.
+     * @param specification The <code>Specification</code> to refer to.
      */
     public Modifier(Specification specification) {
         setSpecification(specification);
@@ -96,9 +92,9 @@ public class Modifier extends Feature implements Comparable<Modifier> {
     /**
      * Creates a new <code>Modifier</code> instance.
      *
-     * @param id a <code>String</code> value
-     * @param value an <code>float</code> value
-     * @param type the Type of the modifier
+     * @param id The object identifier.
+     * @param value The modifier value.
+     * @param type The type of the modifier.
      */
     public Modifier(String id, float value, Type type) {
         setId(id);
@@ -109,10 +105,10 @@ public class Modifier extends Feature implements Comparable<Modifier> {
     /**
      * Creates a new <code>Modifier</code> instance.
      *
-     * @param id a <code>String</code> value
-     * @param source a <code>FreeColObject</code> value
-     * @param value an <code>float</code> value
-     * @param type the Type of the modifier
+     * @param id The object identifier.
+     * @param source The source <code>FreeColObject</code>.
+     * @param value The modifier value.
+     * @param type The type of the modifier.
      */
     public Modifier(String id, FreeColObject source, float value, Type type) {
         setId(id);
@@ -122,9 +118,9 @@ public class Modifier extends Feature implements Comparable<Modifier> {
     }
 
     /**
-     * Creates a new <code>Modifier</code> instance.
+     * Creates a new <code>Modifier</code> instance from another.
      *
-     * @param template a <code>Modifier</code> value
+     * @param template A <code>Modifier</code> to copy.
      */
     public Modifier(Modifier template) {
         super.copy(template);
@@ -139,19 +135,21 @@ public class Modifier extends Feature implements Comparable<Modifier> {
     /**
      * Creates a new <code>Modifier</code> instance.
      *
-     * @param in a <code>XMLStreamReader</code> value
-     * @param specification a <code>Specification</code> value
-     * @exception XMLStreamException if an error occurs
+     * @param in The <code>XMLStreamReader</code> to read from.
+     * @param specification The <code>Specification</code> to refer to.
+     * @exception XMLStreamException if there is an error reading the stream.
      */
     public Modifier(XMLStreamReader in, Specification specification) throws XMLStreamException {
         setSpecification(specification);
         readFromXML(in);
     }
 
+
     /**
      * Makes a timed modifier (one with start/end turn and increment)
-     * with the specified id from a template modifier (containing the increment
-     * and value) and given start turn.
+     * with the specified identifier from a template modifier
+     * (containing the increment and value) and given start turn.
+     *
      * Currently the only suitable template is model.modifier.colonyGoodsParty.
      *
      * @param id The id for the new modifier.
@@ -362,6 +360,9 @@ public class Modifier extends Feature implements Comparable<Modifier> {
             return apply(number, getValue(turn), type);
         }
     }
+
+
+    // Override Object
 
     /**
      * {@inheritDoc}

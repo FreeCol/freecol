@@ -39,9 +39,7 @@ public class TileImprovement extends TileItem implements Named {
 
     private static Logger logger = Logger.getLogger(TileImprovement.class.getName());
 
-    /**
-     * River magnitudes
-     */
+    /** River magnitudes */
     public static final int NO_RIVER = 0;
     public static final int SMALL_RIVER = 1;
     public static final int LARGE_RIVER = 2;

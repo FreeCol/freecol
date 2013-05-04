@@ -195,7 +195,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
     public abstract String getDefaultFileName();
 
     /**
-     * Returns the ID of the <code>OptionGroup</code>.
+     * Returns the identifier of the <code>OptionGroup</code>.
      * @return String
      */
     public abstract String getOptionGroupId();
@@ -261,7 +261,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
             logger.info("Loaded custom options from file " + file.getPath());
         } catch(Exception e) {
             e.printStackTrace();
-            logger.warning("Failed to load OptionGroup with ID " + getOptionGroupId()
+            logger.warning("Failed to load OptionGroup " + getOptionGroupId()
                            + " from " + file.getName() + ": " + e.toString());
         }
     }

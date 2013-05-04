@@ -35,7 +35,7 @@ import org.w3c.dom.Element;
 public class NewRegionNameMessage extends DOMMessage {
 
     /**
-     * The ID of the region being discovered.
+     * The object identifier of the region being discovered.
      */
     private String regionId;
 

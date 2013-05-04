@@ -62,6 +62,10 @@ public class SimpleCombatModel extends CombatModel {
     public static final Modifier UNKNOWN_DEFENCE_MODIFIER
         = new Modifier("bogus", Modifier.UNKNOWN, Modifier.Type.ADDITIVE);
 
+
+    /**
+     * Deliberately empty constructor.
+     */
     public SimpleCombatModel() {}
 
 

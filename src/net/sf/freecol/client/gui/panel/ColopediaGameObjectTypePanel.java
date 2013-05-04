@@ -106,7 +106,7 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
      * Builds a subtree including all the given objects.
      *
      * @param root a <code>DefaultMutableTreeNode</code>
-     * @param id the ID of the new branch node
+     * @param id The object identifier of the new branch node.
      * @param types a List of FreeColGameObjectTypes
      */
     public void addSubTrees(DefaultMutableTreeNode root, String id, List<T> types) {
@@ -203,8 +203,8 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
                 String key = null;
                 if (scope.getType() != null) {
                     key = scope.getType();
-                } else if (scope.getAbilityID() != null) {
-                    key = scope.getAbilityID();
+                } else if (scope.getAbilityId() != null) {
+                    key = scope.getAbilityId();
                 } else if (scope.getMethodName() != null) {
                     key = "model.scope." + scope.getMethodName();
                 }

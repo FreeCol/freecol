@@ -81,7 +81,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * Create a new <code>GoodsContainer</code>.
      *
      * @param game The enclosing <code>Game</code>.
-     * @param id The identifier string.
+     * @param id The object identifier.
      */
     public GoodsContainer(Game game, String id) {
         super(game, id);
@@ -561,7 +561,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
             } else {
                 logger.warning("Ignoring bogus GoodsContainer tag: " + tag);
             }
-            in.nextTag();
+            closeTag(in, tag);
         }
     }
 

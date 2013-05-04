@@ -63,10 +63,10 @@ public abstract class AIObject extends FreeColObject {
 
     /**
      * Creates a new uninitialized <code>AIObject</code> with a registerable
-     * AI id.
+     * AI identifier.
      *
      * @param aiMain The main AI-object.
-     * @param id The unique identifier.
+     * @param id The object identifier.
      * @see AIMain#addAIObject(String, AIObject)
      */
     public AIObject(AIMain aiMain, String id) {
@@ -167,7 +167,7 @@ public abstract class AIObject extends FreeColObject {
     }
 
     /**
-     * Adds this object to the AI main if it has a non-null id.
+     * Adds this object to the AI main if it has a non-null identifier.
      */
     protected void addAIObjectWithId() {
         if (getId() != null) aiMain.addAIObject(getId(), this);

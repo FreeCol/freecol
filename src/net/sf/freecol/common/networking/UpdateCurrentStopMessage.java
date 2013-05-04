@@ -31,8 +31,9 @@ import org.w3c.dom.Element;
  * The message sent updating a unit's current stop.
  */
 public class UpdateCurrentStopMessage extends DOMMessage {
+
     /**
-     * The id of the unit whose stop is to be updated.
+     * The identifier of the unit whose stop is to be updated.
      */
     private String unitId;
 

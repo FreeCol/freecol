@@ -246,14 +246,10 @@ public class Map extends FreeColGameObject implements Location {
         }
     }
 
-    /**
-     * A position on the Map.
-     */
+    /** A position on the Map. */
     public static final class Position {
         
-        /**
-         * The coordinates of the position.
-         */
+        /** The coordinates of the position. */
         public final int x, y;
 
 
@@ -377,14 +373,10 @@ public class Map extends FreeColGameObject implements Location {
     }
 
 
-    /**
-     * The tiles that this map contains.
-     */
+    /** The tiles that this map contains. */
     private Tile[][] tiles;
 
-    /**
-     * The highest map layer included.
-     */
+    /** The highest map layer included. */
     private Layer layer;
 
     /**
@@ -401,28 +393,21 @@ public class Map extends FreeColGameObject implements Location {
      */
     private int maximumLatitude = 90;
 
-    /**
-     * Variable used to convert rows to latitude.
-     */
+    /** Variable used to convert rows to latitude. */
     private float latitudePerRow;
 
-    /**
-     * The regions, indexed by id.
-     */
+    /** The regions, indexed by object identifier. */
     private final java.util.Map<String, Region> regions
         = new HashMap<String, Region>();
 
-    /**
-     * The search tracing status.
-     * Do not serialize.
-     */
+    /** The search tracing status.  Do not serialize. */
     private boolean traceSearch = false;
 
 
     /**
      * Create a new <code>Map</code> from a collection of tiles.
      *
-     * @param game The <code>Game</code> this map belongs to.
+     * @param game The enclosing <code>Game</code>.
      * @param tiles The 2D array of tiles to contain.
      */
     public Map(Game game, Tile[][] tiles) {
@@ -437,7 +422,7 @@ public class Map extends FreeColGameObject implements Location {
      * Create a new <code>Map</code> from an <code>Element</code> in a
      * DOM-parsed XML-tree.
      *
-     * @param game The <code>Game</code> this map belongs to.
+     * @param game The enclosing <code>Game</code>.
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
@@ -448,13 +433,13 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Initiates a new <code>Map</code> with the given ID. The object should
-     * later be initialized by calling either
-     * {@link #readFromXML(XMLStreamReader)} or
+     * Creates a new <code>Map</code> with the given object
+     * identifier.  The object should later be initialized by calling
+     * either {@link #readFromXML(XMLStreamReader)} or
      * {@link #readFromXMLElement(Element)}.
      *
-     * @param game The <code>Game</code> in which this object belong.
-     * @param id The unique identifier for this object.
+     * @param game The enclosing <code>Game</code>.
+     * @param id The object identifier.
      */
     public Map(Game game, String id) {
         super(game, id);
@@ -2170,31 +2155,31 @@ public class Map extends FreeColGameObject implements Location {
     }
 
     /**
-     * Gets the GoodsContainer for this Location.  Obviously
-     * irrelevant for a Map.
-     *
-     * @return Null.
+     * {@inheritDoc}
      */
     public GoodsContainer getGoodsContainer() {
         return null;
     }
 
     /**
-     * Gets the Settlement for this Location.  Obviously irrelevant
-     * for a Map.
-     *
-     * @return Null.
+     * {@inheritDoc}
      */
     public Settlement getSettlement() {
+        // Obviously irrelevant for a Map.
         return null;
     }
 
     /**
-     * Gets the Colony for this Location.  Obviously irrelevant for a Map.
-     *
-     * @return Null.
+     * {@inheritDoc}
      */
     public Colony getColony() {
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public IndianSettlement getIndianSettlement() {
         return null;
     }
 
@@ -2313,8 +2298,7 @@ public class Map extends FreeColGameObject implements Location {
         final String tag = in.getLocalName();
 
         if (Region.getXMLElementTagName().equals(tag)) {
-            Region region = readFreeColGameObject(in, Region.class);
-            if (region != null) putRegion(region);
+            putRegion(readFreeColGameObject(in, Region.class));
 
         } else if (Tile.getXMLElementTagName().equals(tag)) {
             Tile t = readFreeColGameObject(in, Tile.class);

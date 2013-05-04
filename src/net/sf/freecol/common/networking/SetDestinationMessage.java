@@ -34,12 +34,12 @@ import org.w3c.dom.Element;
 public class SetDestinationMessage extends DOMMessage {
 
     /**
-     * The ID of the unit whose destination is to be set.
+     * The object identifier of the unit whose destination is to be set.
      **/
     String unitId;
 
     /**
-     * The ID of the unit destination or null.
+     * The object identifier of the unit destination or null.
      */
     String destinationId;
 

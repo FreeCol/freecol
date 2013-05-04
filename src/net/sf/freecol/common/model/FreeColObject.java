@@ -89,7 +89,6 @@ public abstract class FreeColObject {
     /** XML tag name for value attributes. */
     protected static final String VALUE_TAG = "value";
 
-
     /** The unique identifier of an object. */
     private String id;
 
@@ -110,9 +109,9 @@ public abstract class FreeColObject {
     }
 
     /**
-     * Set the <code>Id</code> value.
+     * Set the object identifier.
      *
-     * @param newId The new Id value.
+     * @param newId The new object identifier.
      */
     protected void setId(final String newId) {
         this.id = newId;
@@ -170,9 +169,9 @@ public abstract class FreeColObject {
     }
 
     /**
-     * Get a comparator by id for <code>FreeColObject</code>s.
+     * Get a comparator by object identifier for <code>FreeColObject</code>s.
      *
-     * @return A new id comparator.
+     * @return A new object identifier comparator.
      */
     public static <T extends FreeColObject> Comparator<T> getIdComparator() {
         return new Comparator<T>() {
@@ -207,7 +206,7 @@ public abstract class FreeColObject {
      * Sets the specification for this object. This method should only
      * ever be used by the object's constructor.
      *
-     * @param specification a <code>Specification</code> value
+     * @param specification The <code>Specification</code> to use.
      */
     protected void setSpecification(Specification specification) {
         this.specification = specification;
@@ -512,7 +511,8 @@ public abstract class FreeColObject {
      */
     protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         if (getId() == null) {
-            logger.warning("FreeColObject with null id: " + toString());
+            logger.warning("FreeColObject with null identifier: "
+                + toString());
         } else {
             writeAttribute(out, ID_ATTRIBUTE_TAG, getId());
         }
@@ -646,7 +646,7 @@ public abstract class FreeColObject {
      * Initialize this object from an XML-representation of this object.
      * @param element An XML-element that will be used to initialize
      *      this object.
-     * @param specification a <code>Specification</code> value
+     * @param specification The <code>Specification</code> to refer to.
      */
     public void readFromXMLElement(Element element, Specification specification) {
         setSpecification(specification);
@@ -1096,11 +1096,11 @@ public abstract class FreeColObject {
     }
 
     /**
-     * Write the id attribute of a non-null FreeColObject to a stream.
+     * Write the identifier attribute of a non-null FreeColObject to a stream.
      *
      * @param out The <code>XMLStreamWriter</code> to write to.
      * @param attributeName The attribute name.
-     * @param value The <code>FreeColObject</code> to write the id of.
+     * @param value The <code>FreeColObject</code> to write the identifier of.
      * @exception XMLStreamException if an error occurs
      */
     public void writeAttribute(XMLStreamWriter out, String attributeName,
@@ -1111,11 +1111,11 @@ public abstract class FreeColObject {
     }
 
     /**
-     * Write the id attribute of a non-null Location to a stream.
+     * Write the identifier attribute of a non-null Location to a stream.
      *
      * @param out The <code>XMLStreamWriter</code> to write to.
      * @param attributeName The attribute name.
-     * @param value The <code>Location</code> to write the id of.
+     * @param value The <code>Location</code> to write the identifier of.
      * @exception XMLStreamException if an error occurs
      */
     public void writeLocationAttribute(XMLStreamWriter out, String attributeName,
@@ -1128,17 +1128,17 @@ public abstract class FreeColObject {
 
     // @compat 0.10.x
     /**
-     * Reads the id attribute.
+     * Reads the identifier attribute.
      *
      * Normally a simple getAttribute() would be sufficient, but
      * while we are allowing both the obsolete ID_ATTRIBUTE and the correct
      * ID_ATTRIBUTE_TAG, this routine is useful.
      *
      * When 0.10.x is obsolete, remove this routine and replace its uses
-     * with getAttribute(in, ID_ATTRIBUTE_TAG, -1) or equivalent.
+     * with getAttribute(in, ID_ATTRIBUTE_TAG, (String)null) or equivalent.
      *
      * @param in The <code>XMLStreamReader</code> to read from.
-     * @return The id found, or null if none present.
+     * @return The identifier found, or null if none present.
      */
     public static String readId(XMLStreamReader in) {
         String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
@@ -1153,7 +1153,7 @@ public abstract class FreeColObject {
      *   element.getAttribute(FreeColObject.ID_ATTRIBUTE_TAG);
      *
      * @param element An element to read the id attribute from.
-     * @return The id attribute value.
+     * @return The identifier attribute value.
      */
     public static String readId(Element element) {
         String id = element.getAttribute(ID_ATTRIBUTE_TAG);
@@ -1350,7 +1350,7 @@ public abstract class FreeColObject {
     /**
      * Is an ability present in this object?
      *
-     * @param id The id of the ability to test.
+     * @param id The object identifier.
      * @return True if the ability is present.
      */
     public final boolean hasAbility(String id) {
@@ -1360,7 +1360,7 @@ public abstract class FreeColObject {
     /**
      * Is an ability present in this object?
      *
-     * @param id The id of the ability to test.
+     * @param id The object identifier.
      * @param fcgot An optional <code>FreeColGameObjectType</code> the
      *     ability applies to.
      * @return True if the ability is present.
@@ -1374,7 +1374,7 @@ public abstract class FreeColObject {
      * Subclasses with complex ability handling should override this
      * routine.
      *
-     * @param id The id of the ability to test.
+     * @param id The object identifier.
      * @param fcgot An optional <code>FreeColGameObjectType</code> the
      *     ability applies to.
      * @param turn An optional applicable <code>Turn</code>.
@@ -1407,9 +1407,9 @@ public abstract class FreeColObject {
     }
 
     /**
-     * Gets the set of abilities with the given Id from this object.
+     * Gets the set of abilities with the given identifier from this object.
      *
-     * @param id The id of the ability to test.
+     * @param id The object identifier.
      * @return A set of abilities.
      */
     public final Set<Ability> getAbilitySet(String id) {
@@ -1417,9 +1417,9 @@ public abstract class FreeColObject {
     }
 
     /**
-     * Gets the set of abilities with the given Id from this object.
+     * Gets the set of abilities with the given identifier from this object.
      *
-     * @param id The id of the ability to test.
+     * @param id The object identifier.
      * @param fcgot An optional <code>FreeColGameObjectType</code> the
      *     ability applies to.
      * @return A set of abilities.
@@ -1430,11 +1430,11 @@ public abstract class FreeColObject {
     }
 
     /**
-     * Gets the set of abilities with the given Id from this object.
-     * Subclasses with complex ability handling should override this
-     * routine.
+     * Gets the set of abilities with the given identifier from this
+     * object.  Subclasses with complex ability handling should
+     * override this routine.
      *
-     * @param id The id of the ability to test.
+     * @param id The object identifier.
      * @param fcgot An optional <code>FreeColGameObjectType</code> the
      *     ability applies to.
      * @param turn An optional applicable <code>Turn</code>.
@@ -1468,9 +1468,9 @@ public abstract class FreeColObject {
     }
 
     /**
-     * Remove all abilities with a given Id.
+     * Remove all abilities with a given identifier.
      *
-     * @param id The id of the abilities to remove.
+     * @param id The object identifier.
      */
     public void removeAbilities(String id) {
         FeatureContainer.removeAbilities(getFeatureContainer(), id);
@@ -1510,9 +1510,9 @@ public abstract class FreeColObject {
     }
 
     /**
-     * Gets the set of modifiers with the given Id from this object.
+     * Gets the set of modifiers with the given identifier from this object.
      *
-     * @param id The id of the modifier to test.
+     * @param id The object identifier.
      * @return A set of modifiers.
      */
     public final Set<Modifier> getModifierSet(String id) {
@@ -1520,9 +1520,9 @@ public abstract class FreeColObject {
     }
 
     /**
-     * Gets the set of modifiers with the given Id from this object.
+     * Gets the set of modifiers with the given identifier from this object.
      *
-     * @param id The id of the modifier to test.
+     * @param id The object identifier.
      * @param fcgot An optional <code>FreeColGameObjectType</code> the
      *     modifier applies to.
      * @return A set of modifiers.
@@ -1533,12 +1533,12 @@ public abstract class FreeColObject {
     }
 
     /**
-     * Gets the set of modifiers with the given Id from this object.
+     * Gets the set of modifiers with the given identifier from this object.
      *
      * Subclasses with complex modifier handling may override this
      * routine.
      *
-     * @param id The id of the modifier to test.
+     * @param id The object identifier.
      * @param fcgot An optional <code>FreeColGameObjectType</code> the
      *     modifier applies to.
      * @param turn An optional applicable <code>Turn</code>.
@@ -1552,10 +1552,11 @@ public abstract class FreeColObject {
     }
 
     /**
-     * Applies this objects modifiers with the given Id to the given number.
+     * Applies this objects modifiers with the given identifier to the
+     * given number.
      *
      * @param number The number to modify.
-     * @param id The id of the modifiers to apply.
+     * @param id The object identifier.
      * @return The modified number.
      */
     public final float applyModifier(float number, String id) {
@@ -1563,10 +1564,11 @@ public abstract class FreeColObject {
     }
 
     /**
-     * Applies this objects modifiers with the given Id to the given number.
+     * Applies this objects modifiers with the given identifier to the
+     * given number.
      *
      * @param number The number to modify.
-     * @param id The id of the modifiers to apply.
+     * @param id The object identifier.
      * @param fcgot An optional <code>FreeColGameObjectType</code> the
      *     modifier applies to.
      * @return The modified number.
@@ -1577,10 +1579,11 @@ public abstract class FreeColObject {
     }
 
     /**
-     * Applies this objects modifiers with the given Id to the given number.
+     * Applies this objects modifiers with the given identifier to the
+     * given number.
      *
      * @param number The number to modify.
-     * @param id The id of the modifiers to apply.
+     * @param id The object identifier.
      * @param fcgot An optional <code>FreeColGameObjectType</code> the
      *     modifier applies to.
      * @return The modified number.
@@ -1612,9 +1615,9 @@ public abstract class FreeColObject {
     }
 
     /**
-     * Remove all abilities with a given Id.
+     * Remove all abilities with a given identifier.
      *
-     * @param id The id of the abilities to remove.
+     * @param id The object identifier.
      */
     public void removeModifiers(String id) {
         FeatureContainer.removeModifiers(getFeatureContainer(), id);

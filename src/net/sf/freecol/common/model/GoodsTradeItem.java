@@ -38,7 +38,7 @@ public class GoodsTradeItem extends TradeItem {
     /**
      * Creates a new <code>GoodsTradeItem</code> instance.
      *
-     * @param game The <code>Game</code> the trade occurs in.
+     * @param game The enclosing <code>Game</code>.
      * @param source The source <code>Player</code>.
      * @param destination The destination <code>Player</code>.
      * @param goods The <code>Goods</code> to trade.
@@ -55,7 +55,7 @@ public class GoodsTradeItem extends TradeItem {
     /**
      * Creates a new <code>GoodsTradeItem</code> instance.
      *
-     * @param game The <code>Game</code> the trade occurs in.
+     * @param game The enclosing <code>Game</code>.
      * @param in The <code>XMLStreamReader</code> to read from.
      */
     public GoodsTradeItem(Game game, XMLStreamReader in) throws XMLStreamException {
@@ -63,6 +63,7 @@ public class GoodsTradeItem extends TradeItem {
 
         readFromXML(in);
     }
+
 
     /**
      * Get the <code>Settlement</code> value.

@@ -36,12 +36,12 @@ import org.w3c.dom.Element;
  */
 public class BuyMessage extends DOMMessage {
     /**
-     * The ID of the unit that is buying.
+     * The object identifier of the unit that is buying.
      */
     private String unitId;
 
     /**
-     * The ID of the settlement that is selling.
+     * The object identifier of the settlement that is selling.
      */
     private String settlementId;
 

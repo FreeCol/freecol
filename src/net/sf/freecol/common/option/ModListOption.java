@@ -36,8 +36,7 @@ public class ModListOption extends ListOption<FreeColModFile> {
     /**
      * Creates a new <code>ModListOption</code>.
      *
-     * @param id The identifier for this option.  This is used when
-     *     the object should be found in an {@link OptionGroup}.
+     * @param id The object identifier.
      */
     public ModListOption(String id) {
         super(id);
@@ -46,7 +45,7 @@ public class ModListOption extends ListOption<FreeColModFile> {
     /**
      * Creates a new <code>ModListOption</code>.
      *
-     * @param specification The enclosing <code>Specification</code>.
+     * @param specification The <code>Specification</code> to refer to.
      */
     public ModListOption(Specification specification) {
         super(specification);

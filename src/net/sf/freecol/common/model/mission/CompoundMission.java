@@ -82,7 +82,7 @@ public class CompoundMission extends AbstractMission {
      * Creates a new <code>CompoundMission</code> instance.
      *
      * @param game a <code>Game</code> value
-     * @param id a <code>String</code> value
+     * @param id The object identifier.
      */
     public CompoundMission(Game game, String id) {
         super(game, id);

@@ -83,25 +83,6 @@ public abstract class GoodsLocation extends UnitLocation {
     }
 
 
-    // Override FreeColObject
-
-    /**
-     * Removes all references to this object.
-     *
-     * @return A list of disposed objects.
-     */
-    @Override
-    public List<FreeColGameObject> disposeList() {
-        List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
-        if (goodsContainer != null) {
-            objects.addAll(goodsContainer.disposeList());
-            goodsContainer = null;
-        }
-        objects.addAll(super.disposeList());
-
-        return objects;
-    }
-
     // getGoodsContainer() is part of the Location interface.
 
     /**
@@ -201,7 +182,6 @@ public abstract class GoodsLocation extends UnitLocation {
     //    UnitLocation.getUnitCount
     //    UnitLocation.getUnitList
     //    UnitLocation.getSettlement
-    //    UnitLocation.getColony
 
     /**
      * {@inheritDoc}
@@ -300,6 +280,26 @@ public abstract class GoodsLocation extends UnitLocation {
     public Goods removeGoods(GoodsType type, int amount) {
         return (goodsContainer == null) ? null
             : goodsContainer.removeGoods(type, amount);
+    }
+
+
+    // Override FreeColObject
+
+    /**
+     * Removes all references to this object.
+     *
+     * @return A list of disposed objects.
+     */
+    @Override
+    public List<FreeColGameObject> disposeList() {
+        List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
+        if (goodsContainer != null) {
+            objects.addAll(goodsContainer.disposeList());
+            goodsContainer = null;
+        }
+        objects.addAll(super.disposeList());
+
+        return objects;
     }
 
 

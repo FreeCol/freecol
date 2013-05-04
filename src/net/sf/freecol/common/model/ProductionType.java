@@ -115,8 +115,8 @@ public class ProductionType extends FreeColObject {
     /**
      * Creates a new <code>ProductionType</code> instance.
      *
-     * @param specification The <code>Specification</code> to refer to.
      * @param in The <code>XMLStreamReader</code> to read from.
+     * @param specification The <code>Specification</code> to refer to.
      * @exception XMLStreamException if there is a problem reading the stream.
      */
     public ProductionType(XMLStreamReader in,
@@ -125,6 +125,7 @@ public class ProductionType extends FreeColObject {
 
         readFromXML(in);
     }
+
 
     /**
      * Get the input goods.
@@ -142,6 +143,17 @@ public class ProductionType extends FreeColObject {
      */
     public final void setInputs(final List<AbstractGoods> newInputs) {
         this.inputs = newInputs;
+    }
+
+    /**
+     * Add a new input.
+     *
+     * @param type The <code>GoodsType</code> to add.
+     * @param amount The amount of goods.
+     */
+    private void addInput(GoodsType type, int amount) {
+        if (inputs == null) inputs = new ArrayList<AbstractGoods>(1);
+        inputs.add(new AbstractGoods(type, amount));
     }
 
     /**
@@ -171,6 +183,17 @@ public class ProductionType extends FreeColObject {
             }
         }
         return null;
+    }
+
+    /**
+     * Add a new output.
+     *
+     * @param type The <code>GoodsType</code> to add.
+     * @param amount The amount of goods.
+     */
+    private void addOutput(GoodsType type, int amount) {
+        if (outputs == null) outputs = new ArrayList<AbstractGoods>(1);
+        outputs.add(new AbstractGoods(type, amount));
     }
 
     /**
@@ -279,7 +302,7 @@ public class ProductionType extends FreeColObject {
         // ProductionType does not need an id.
         // No need for: super.readAttributes(in);
         // TODO: as soon as we allow the user to select a production type,
-        // we will need an ID
+        // we will need an id
 
         unattended = getAttribute(in, UNATTENDED_TAG, false);
 
@@ -309,40 +332,32 @@ public class ProductionType extends FreeColObject {
         if (INPUT_TAG.equals(tag)) {
             GoodsType type = spec.getType(in, GOODS_TYPE_TAG,
                                           GoodsType.class, (GoodsType)null);
+            int amount = getAttribute(in, VALUE_TAG, -1);
+
             if (type == null) {
                 logger.warning("Invalid goods type: "
                     + in.getAttributeValue(null, GOODS_TYPE_TAG));
-            }
-
-            int amount = getAttribute(in, VALUE_TAG, -1);
-            if (amount < 0) {
+            } else if (amount < 0) {
                 logger.warning("Invalid amount: "
                     + in.getAttributeValue(null, VALUE_TAG));
-            }
-
-            if (type != null && amount >= 0) {
-                if (inputs == null) inputs = new ArrayList<AbstractGoods>(1);
-                inputs.add(new AbstractGoods(type, amount));
+            } else {
+                addInput(type, amount);
             }
             closeTag(in, INPUT_TAG);
 
         } else if (OUTPUT_TAG.equals(tag)) {
             GoodsType type = spec.getType(in, GOODS_TYPE_TAG,
                                           GoodsType.class, (GoodsType)null);
+            int amount = getAttribute(in, VALUE_TAG, -1);
+
             if (type == null) {
                 logger.warning("Invalid goods type: "
                     + in.getAttributeValue(null, GOODS_TYPE_TAG));
-            }
-
-            int amount = getAttribute(in, VALUE_TAG, -1);
-            if (amount < 0) {
+            } else if (amount < 0) {
                 logger.warning("Invalid amount: "
                     + in.getAttributeValue(null, VALUE_TAG));
-            }
-
-            if (type != null && amount >= 00) {
-                if (outputs == null) outputs = new ArrayList<AbstractGoods>(1);
-                outputs.add(new AbstractGoods(type, amount));
+            } else {
+                addOutput(type, amount);
             }
             closeTag(in, OUTPUT_TAG);
 
@@ -356,8 +371,8 @@ public class ProductionType extends FreeColObject {
      */
     @Override
     public String toString() {
-        StringBuilder result = new StringBuilder("[");
-        result.append(getXMLElementTagName()).append(": ");
+        StringBuilder result = new StringBuilder(64);
+        result.append("[").append(getId()).append(": ");
         if (productionLevel != null) {
             result.append(productionLevel);
         }

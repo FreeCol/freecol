@@ -92,9 +92,9 @@ public class Mods {
     }
 
     /**
-     * Gets the mod with the given ID.
+     * Gets the mod with the given object identifier.
      *
-     * @param id The id of the mod to search for.
+     * @param id The identifier of the mod to search for.
      * @return The <code>FreeColModFile</code> for the mod, or null if
      *     not found.
      */

@@ -814,9 +814,7 @@ public abstract class ServerAPI {
         List<HighScore> result = new ArrayList<HighScore>();
         NodeList childElements = reply.getChildNodes();
         for (int i = 0; i < childElements.getLength(); i++) {
-            HighScore hs = new HighScore();
-            hs.readFromXMLElement((Element)childElements.item(i));
-            result.add(hs);
+            result.add(new HighScore((Element)childElements.item(i)));
         }
         return result;
     }
@@ -965,7 +963,7 @@ public abstract class ServerAPI {
      * the actual looting.
      *
      * @param winner The <code>Unit</code> that is looting.
-     * @param defenderId The id of the defender unit (it may have sunk).
+     * @param defenderId The identifier of the defender unit (it may have sunk).
      * @param goods A list of <code>Goods</code>, if empty this is a query
      *     as to what is to be looted which is filled into the list,
      *     if non-empty, then the list of goods to loot.

@@ -40,7 +40,7 @@ public interface Option<T> extends Cloneable {
     public Option<T> clone() throws CloneNotSupportedException;
 
     /**
-     * Gets the id of this option.
+     * Gets the identifier of this option.
      *
      * @return The unique identifier as provided in the constructor.
      */

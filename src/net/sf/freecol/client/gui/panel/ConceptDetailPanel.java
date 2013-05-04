@@ -103,9 +103,9 @@ public class ConceptDetailPanel extends FreeColPanel
     }
 
     /**
-     * Builds the details panel for the given ID.
+     * Builds the details panel for the given identifier.
      *
-     * @param id the ID of the object to display
+     * @param id The object identifier to display.
      * @param panel the detail panel to build
      */
     public void buildDetail(String id, JPanel panel) {

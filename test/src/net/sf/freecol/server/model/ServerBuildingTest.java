@@ -225,7 +225,7 @@ public class ServerBuildingTest extends FreeColTestCase {
      * After some turns (2 or 3 I don't know) a new LumberJack is ready.
      * Removing the teacher LumberJack replaced by an Ore Miner.
      *
-     * Next turn, a new BlackSmith id ready. Removing the teacher BlackSmith
+     * Next turn, a new BlackSmith is ready. Removing the teacher BlackSmith
      * replaced by a Veteran Soldier. There is still 2 Free Colonists as Farmers
      * in the Colony.
      *

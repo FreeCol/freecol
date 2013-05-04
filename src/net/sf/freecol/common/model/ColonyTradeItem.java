@@ -26,7 +26,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 public class ColonyTradeItem extends TradeItem {
 
-    /** The id of the colony to change hands. */
+    /** The identifier of the colony to change hands. */
     private String colonyId;
 
     /** The colony to change hands. */
@@ -39,7 +39,7 @@ public class ColonyTradeItem extends TradeItem {
     /**
      * Creates a new <code>ColonyTradeItem</code> instance.
      *
-     * @param game The <code>Game</code> the trade occurs in.
+     * @param game The enclosing <code>Game</code>.
      * @param source The source <code>Player</code>.
      * @param destination The destination <code>Player</code>.
      * @param colony The <code>Colony</code> to trade.
@@ -55,7 +55,7 @@ public class ColonyTradeItem extends TradeItem {
     /**
      * Creates a new <code>ColonyTradeItem</code> instance.
      *
-     * @param game The <code>Game</code> the trade occurs in.
+     * @param game The enclosing <code>Game</code>.
      * @param in The <code>XMLStreamReader</code> to read from.
      */
     public ColonyTradeItem(Game game, XMLStreamReader in) throws XMLStreamException {
@@ -63,6 +63,7 @@ public class ColonyTradeItem extends TradeItem {
 
         readFromXML(in);
     }
+
 
     /**
      * Extract the colony name.  Necessary as the colony may not actually be
@@ -112,6 +113,7 @@ public class ColonyTradeItem extends TradeItem {
 
     private static final String COLONY_TAG = "colony";
     private static final String COLONY_NAME_TAG = "colonyName";
+
 
     /**
      * {@inheritDoc}

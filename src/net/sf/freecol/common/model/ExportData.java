@@ -23,6 +23,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.w3c.dom.Element;
+
 
 /**
  * Objects of this class hold the export data for a particular type of
@@ -48,18 +50,31 @@ public class ExportData extends FreeColObject {
 
 
     /**
-     * Package constructor: This class is only supposed to be
-     * constructed by {@link Colony}.
-     */
-    public ExportData() {}
-
-    /**
      * Creates a new <code>ExportData</code> instance with default settings.
      *
      * @param goodsType The <code>GoodsType</code> this data refers to.
      */
     public ExportData(GoodsType goodsType) {
         setId(goodsType.getId());
+    }
+
+    /**
+     * Create a new <code>ExportData</code> by reading a stream.
+     *
+     * @param in The <code>XMLStreamReader</code> to read.
+     * @exception XMLStreamException if there is a problem reading the stream.
+     */
+    public ExportData(XMLStreamReader in) throws XMLStreamException {
+        readFromXML(in);
+    }
+
+    /**
+     * Create a new <code>ExportData</code> by reading an element.
+     *
+     * @param element The <code>Element</code> to read.
+     */
+    public ExportData(Element element) {
+        readFromXMLElement(element);
     }
 
 

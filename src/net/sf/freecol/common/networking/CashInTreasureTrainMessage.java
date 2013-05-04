@@ -32,8 +32,9 @@ import org.w3c.dom.Element;
  * The message sent when cashing in a treasure train.
  */
 public class CashInTreasureTrainMessage extends DOMMessage {
+
     /**
-     * The id of the object to be cashed in.
+     * The identifier of the object to be cashed in.
      */
     private String unitId;
 

@@ -305,36 +305,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
-     * Gets the colony located on this tile.  Only a convenience
-     * method for {@link #getSettlement} that makes sure that the
-     * settlement is a colony.
-     *
-     * @return The <code>Colony</code> that is located on this
-     *     <code>Tile</code>, or null if none is present.
-     * @see #getSettlement
-     */
-    public Colony getColony() {
-        return (settlement != null && settlement instanceof Colony)
-            ? (Colony)settlement
-            : null;
-    }
-
-    /**
-     * Gets the native settlement located on this tile.  Only a
-     * convenience method for {@link #getSettlement} that makes sure
-     * that the settlement is a native settlement.
-     *
-     * @return The <code>IndianSettlement</code> that is located on this
-     *     <code>Tile</code>, or null if none is present.
-     * @see #getSettlement
-     */
-    public IndianSettlement getIndianSettlement() {
-        return (settlement != null && settlement instanceof IndianSettlement)
-            ? (IndianSettlement)settlement
-            : null;
-    }
-
-    /**
      * Gets the owning settlement for this tile.
      *
      * @return The <code>Settlement</code> that owns this <code>Tile</code>.
@@ -2100,8 +2070,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             if (player != null) playerExploredTiles.put(player, pet);
 
         } else if (TileItemContainer.getXMLElementTagName().equals(tag)) {
-            tileItemContainer = readFreeColGameObject(in,
-                TileItemContainer.class);
+            tileItemContainer = readFreeColGameObject(in, TileItemContainer.class);
 
         } else {
             super.readChild(in);

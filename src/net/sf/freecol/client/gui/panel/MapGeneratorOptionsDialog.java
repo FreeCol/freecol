@@ -58,7 +58,7 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog implements Ac
 
     private static final Logger logger = Logger.getLogger(MapGeneratorOptionsDialog.class.getName());
 
-    public static final String OPTION_GROUP_ID = "mapGeneratorOptions";
+    public static final String OPTION_GROUP_ID = MapGeneratorOptions.getXMLElementTagName();
 
     private JScrollPane scrollPane = null;
 

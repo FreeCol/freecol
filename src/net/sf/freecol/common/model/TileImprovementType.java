@@ -98,8 +98,8 @@ public final class TileImprovementType extends FreeColGameObjectType {
     /**
      * Create a new tile improvement type.
      *
-     * @param id The object id.
-     * @param specification The enclosing <code>Specification</code>.
+     * @param id The object identifier.
+     * @param specification The <code>Specification</code> to refer to.
      */
     public TileImprovementType(String id, Specification specification) {
         super(id, specification);
@@ -184,6 +184,18 @@ public final class TileImprovementType extends FreeColGameObjectType {
     }
 
     /**
+     * Add a scope.
+     *
+     * @param scope The <code>Scope</code> to add.
+     */
+    private void addScope(Scope scope) {
+        if (scopes == null) {
+            scopes = new ArrayList<Scope>();
+        }
+        scopes.add(scope);
+    }
+
+    /**
      * Get a weighted list of natural disasters than can strike this
      * tile improvement type.
      *
@@ -192,6 +204,19 @@ public final class TileImprovementType extends FreeColGameObjectType {
     public List<RandomChoice<Disaster>> getDisasters() {
         if (disasters == null) return Collections.emptyList();
         return disasters;
+    }
+
+    /**
+     * Add a disaster.
+     *
+     * @param disaster The <code>Disaster</code> to add.
+     * @param probability The probability of the disaster.
+     */
+    private void addDisaster(Disaster disaster, int probability) {
+        if (disasters == null) {
+            disasters = new ArrayList<RandomChoice<Disaster>>();
+        }
+        disasters.add(new RandomChoice<Disaster>(disaster, probability));
     }
 
     /**
@@ -221,6 +246,18 @@ public final class TileImprovementType extends FreeColGameObjectType {
     public String getShortId() {
         int index = getId().lastIndexOf('.') + 1;
         return getId().substring(index);
+    }
+
+    /**
+     * Add an allowed worker identifier.
+     *
+     * @param id The worker identifier to add.
+     */
+    private void addAllowedWorker(String id) {
+        if (allowedWorkers == null) {
+            allowedWorkers = new HashSet<String>();
+        }
+        allowedWorkers.add(id);
     }
 
     /**
@@ -351,6 +388,18 @@ public final class TileImprovementType extends FreeColGameObjectType {
             if (change.getTo() == tileType) return true;
         }
         return false;
+    }
+
+    /**
+     * Add a tile type change.
+     *
+     * @param change The <code>TileTypeChange</code> to add.
+     */
+    private void addChange(TileTypeChange change) {
+        if (tileTypeChanges == null) {
+            tileTypeChanges = new HashMap<TileType, TileTypeChange>();
+        }
+        tileTypeChanges.put(change.getFrom(), change);
     }
 
     /**
@@ -572,37 +621,23 @@ public final class TileImprovementType extends FreeColGameObjectType {
                 in.nextTag(); // close this element
                 // end @compat
             }
-            if (tileTypeChanges == null) {
-                tileTypeChanges = new HashMap<TileType, TileTypeChange>();
-            }
-            tileTypeChanges.put(change.getFrom(), change);
+            addChange(change);
 
         } else if (DISASTER_TAG.equals(tag)) {
             Disaster disaster = spec.getType(in, ID_ATTRIBUTE_TAG,
                                              Disaster.class, (Disaster)null);
             int probability = getAttribute(in, PROBABILITY_TAG, 100);
-            if (disasters == null) {
-                disasters = new ArrayList<RandomChoice<Disaster>>();
+            if (disaster != null && probability > 0) {
+                addDisaster(disaster, probability);
             }
-            disasters.add(new RandomChoice<Disaster>(disaster, probability));
             closeTag(in, DISASTER_TAG);
 
         } else if (WORKER_TAG.equals(tag)) {
-            String id = readId(in);
-            if (id != null) {
-                if (allowedWorkers == null) {
-                    allowedWorkers = new HashSet<String>();
-                }
-                allowedWorkers.add(id);
-            }
+            addAllowedWorker(readId(in));
             closeTag(in, WORKER_TAG);
 
         } else if (Scope.getXMLElementTagName().equals(tag)) {
-            Scope scope = new Scope(in);
-            if (scope != null) {
-                if (scopes == null) scopes = new ArrayList<Scope>();
-                scopes.add(scope);
-            }
+            addScope(new Scope(in));
 
         } else {
             super.readChild(in);

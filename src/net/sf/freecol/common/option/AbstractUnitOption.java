@@ -59,8 +59,7 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
     /**
      * Creates a new <code>AbstractUnitOption</code>.
      *
-     * @param id The identifier for this option.  This is used when
-     *     the object should be found in an {@link OptionGroup}.
+     * @param id The object identifier.
      */
     public AbstractUnitOption(String id) {
         super(id);
@@ -69,7 +68,7 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
     /**
      * Creates a new <code>AbstractUnitOption</code>.
      *
-     * @param specification The enclosing <code>Specification</code>.
+     * @param specification The <code>Specification</code> to refer to.
      */
     public AbstractUnitOption(Specification specification) {
         super(specification);
@@ -78,9 +77,8 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
     /**
      * Creates a new <code>AbstractUnitOption</code>.
      *
-     * @param id The identifier for this option.  This is used when
-     *     the object should be found in an {@link OptionGroup}.
-     * @param specification The enclosing <code>Specification</code>.
+     * @param id The object identifier.
+     * @param specification The <code>Specification</code> to refer to.
      */
     public AbstractUnitOption(String id, Specification specification) {
         super(id, specification);

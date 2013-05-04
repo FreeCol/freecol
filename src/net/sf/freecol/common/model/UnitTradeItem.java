@@ -33,7 +33,7 @@ public class UnitTradeItem extends TradeItem {
     /**
      * Creates a new <code>UnitTradeItem</code> instance.
      *
-     * @param game The <code>Game</code> the trade occurs in.
+     * @param game The enclosing <code>Game</code>.
      * @param source The source <code>Player</code>.
      * @param destination The destination <code>Player</code>.
      * @param unit The <code>Unit</code> to trade.
@@ -48,14 +48,16 @@ public class UnitTradeItem extends TradeItem {
     /**
      * Creates a new <code>UnitTradeItem</code> instance.
      *
-     * @param game The <code>Game</code> the trade occurs in.
+     * @param game The enclosing <code>Game</code>.
      * @param in The <code>XMLStreamReader</code> to read from.
+     * @exception XMLStreamException if there is a problem reading the stream.
      */
     public UnitTradeItem(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
 
         readFromXML(in);
     }
+
 
     // Interface TradeItem
 
@@ -94,6 +96,7 @@ public class UnitTradeItem extends TradeItem {
     // Serialization
 
     private static final String UNIT_TAG = "unit";
+
 
     /**
      * {@inheritDoc}

@@ -653,9 +653,9 @@ public final class ImageLibrary {
     }
 
     /**
-     * Returns the image with the given id.
+     * Returns the image with the given identifier.
      *
-     * @param id The id of the image to return.
+     * @param id The object identifier.
      * @return The image.
      */
     public Image getMiscImage(String id) {
@@ -667,9 +667,9 @@ public final class ImageLibrary {
     }
 
     /**
-     * Returns the image with the given id.
+     * Returns the image with the given identifier.
      *
-     * @param id The id of the image to return.
+     * @param id The object identifier.
      * @return The image.
      */
     public ImageIcon getMiscImageIcon(String id) {

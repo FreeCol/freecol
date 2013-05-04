@@ -42,12 +42,12 @@ import org.w3c.dom.NodeList;
 public class GoodsForSaleMessage extends DOMMessage {
 
     /**
-     * The id of the unit that is trading.
+     * The identifier of the unit that is trading.
      */
     private String unitId;
 
     /**
-     * The id of the settlement that is trading.
+     * The identifier of the settlement that is trading.
      */
     private String settlementId;
 

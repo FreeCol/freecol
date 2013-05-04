@@ -36,8 +36,9 @@ import org.w3c.dom.Element;
  * The message sent when asking for the skill taught at a settlement.
  */
 public class AskSkillMessage extends DOMMessage {
+
     /**
-     * The id of the unit that is asking.
+     * The identifier of the unit that is asking.
      */
     private String unitId;
 

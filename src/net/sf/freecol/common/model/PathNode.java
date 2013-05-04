@@ -34,9 +34,7 @@ import  net.sf.freecol.common.model.Tile;
  */
 public class PathNode {
 
-    /**
-     * The location this node refers to.  Usually a Tile.
-     */
+    /** The location this node refers to.  Usually a Tile. */
     private Location location;
 
     /**
@@ -51,19 +49,13 @@ public class PathNode {
      */
     private int turns;
 
-    /**
-     * Whether the unit traversing this path is on a carrier at this node.
-     */
+    /** Whether the unit traversing this path is on a carrier at this node. */
     private boolean onCarrier = false;
 
-    /**
-     * The next node in the path.
-     */
+    /** The next node in the path. */
     public PathNode next = null;
 
-    /**
-     * The previous node in the path.
-     */
+    /** The previous node in the path. */
     public PathNode previous = null;
 
 
@@ -90,6 +82,7 @@ public class PathNode {
         this.previous = previous;
         this.next = next;
     }
+
 
     /**
      * Gets the location of this path.

@@ -59,8 +59,8 @@ public class Nation extends FreeColGameObjectType {
     /**
      * Create a new nation.
      *
-     * @param id The object id.
-     * @param specification The enclosing <code>Specification</code>.
+     * @param id The object identifier.
+     * @param specification The <code>Specification</code> to refer to.
      */
     public Nation(String id, Specification specification) {
         super(id, specification);

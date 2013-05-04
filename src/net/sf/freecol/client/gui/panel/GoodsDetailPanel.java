@@ -75,9 +75,9 @@ public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
     }
 
     /**
-     * Builds the details panel for the GoodsType with the given ID.
+     * Builds the details panel for the GoodsType with the given identifier.
      *
-     * @param id the ID of a GoodsType
+     * @param id The object identifier.
      * @param panel the detail panel to build
      */
     public void buildDetail(String id, JPanel panel) {

@@ -1332,7 +1332,7 @@ public class InGameControllerTest extends FreeColTestCase {
         IndianSettlement settlement2 = builder.build();
         Unit dragoon = new ServerUnit(game, tile1, dutch, colonistType, horses, muskets);
         Unit brave = new ServerUnit(game, tile2, inca, braveType);
-        brave.setIndianSettlement(settlement1);
+        brave.setHomeIndianSettlement(settlement1);
 
         // Dragoon loses and brave captures its horses
         crs = fakeAttackResult(CombatResult.LOSE, dragoon, brave);

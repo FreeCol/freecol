@@ -92,9 +92,9 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
     }
 
     /**
-     * Builds the details panel for the UnitType with the given ID.
+     * Builds the details panel for the UnitType with the given identifier.
      *
-     * @param id the ID of a UnitType
+     * @param id The object identifier.
      * @param panel the detail panel to build
      */
     public void buildDetail(String id, JPanel panel) {

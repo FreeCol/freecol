@@ -35,7 +35,7 @@ import org.w3c.dom.NodeList;
 public class GetNationSummaryMessage extends DOMMessage {
 
     /**
-     * The id of the player to summarize.
+     * The identifier of the player to summarize.
      */
     private String playerId;
 

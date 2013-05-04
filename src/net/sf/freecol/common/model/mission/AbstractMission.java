@@ -100,7 +100,7 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
      * Creates a new <code>AbstractMission</code> instance.
      *
      * @param game a <code>Game</code> value
-     * @param id a <code>String</code> value
+     * @param id The object identifier.
      */
     public AbstractMission(Game game, String id) {
         super(game, id);

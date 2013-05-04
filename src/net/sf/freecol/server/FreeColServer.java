@@ -973,7 +973,7 @@ public final class FreeColServer {
      * Loads a game.
      *
      * @param fis The file where the game data is located.
-     * @param specification a <code>Specification</code> value
+     * @param specification The <code>Specification</code> to refer to.
      * @param server The server to connect the AI players to.
      * @return The new game.
      * @exception FreeColException if the savegame contains incompatible data.
@@ -1249,7 +1249,8 @@ public final class FreeColServer {
      * objects in pre-v11 games that should now be in serverObjects,
      * and put them in.
      *
-     * @param serverStrings A list of server object {type, id} pairs to add to.
+     * @param serverStrings A list of server object {type, identifier}
+     *     pairs to add to.
      * @param fis The savegame to scan.
      */
     private static void v11FixServerObjects(List<String> serverStrings,
@@ -1599,9 +1600,7 @@ public final class FreeColServer {
             xsr.nextTag();
             while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 if (xsr.getLocalName().equals("highScore")) {
-                    HighScore hs = new HighScore();
-                    hs.readFromXML(xsr);
-                    highScores.add(hs);
+                    highScores.add(new HighScore(xsr));
                 }
             }
             xsr.close();

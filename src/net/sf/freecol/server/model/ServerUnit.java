@@ -885,7 +885,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
             // Claim land for tribe?
             if (newTile.getOwner() == null
                 && serverPlayer.isIndian()
-                && (settlement = getIndianSettlement()) != null
+                && (settlement = getHomeIndianSettlement()) != null
                 && ((d = newTile.getPosition()
                         .getDistance(settlement.getTile().getPosition()))
                     < (settlement.getRadius()
@@ -936,11 +936,11 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     : null;
                 if (is != null
                     || (unit != null
-                        && (is = unit.getIndianSettlement()) != null)
+                        && (is = unit.getHomeIndianSettlement()) != null)
                     || (unit != null
                         && (contactPlayer = (ServerPlayer)unit.getOwner())
                             .isEuropean()
-                        && (is = getIndianSettlement()) != null)) {
+                        && (is = getHomeIndianSettlement()) != null)) {
                     if (contactPlayer.hasExplored(is.getTile())
                         && is.setContacted(contactPlayer)) {
                         cs.add(See.only(contactPlayer), is);

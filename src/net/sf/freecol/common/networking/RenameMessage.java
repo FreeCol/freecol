@@ -35,7 +35,7 @@ import org.w3c.dom.Element;
 public class RenameMessage extends DOMMessage {
 
     /**
-     * The id of the object to be renamed.
+     * The identifier of the object to be renamed.
      */
     private String id;
 

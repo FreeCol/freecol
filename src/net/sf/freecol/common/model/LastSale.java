@@ -23,6 +23,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.w3c.dom.Element;
+
 
 /**
  * This class contains the last sale a player has made, by Settlement
@@ -36,11 +38,6 @@ public final class LastSale extends FreeColObject {
     /** The price per unit returned from the sale. */
     private int price;
 
-
-    /**
-     * Empty constructor for Player.
-     */
-    public LastSale() {}
 
     /**
      * Make a new LastSale record.
@@ -58,7 +55,7 @@ public final class LastSale extends FreeColObject {
     /**
      * Make a new LastSale record.
      *
-     * @param id The identifier (encoding Settlement and GoodsType).
+     * @param id The object identifier.
      * @param when In which <code>Turn</code> the sale occurred.
      * @param price The per-unit price of the sale.
      */
@@ -67,6 +64,26 @@ public final class LastSale extends FreeColObject {
         this.when = when;
         this.price = price;
     }
+
+    /**
+     * Create a new last sale by reading a stream.
+     *
+     * @param in The <code>XMLStreamReader</code> to read from.
+     * @exception XMLStreamException if there is a problem reading the stream.
+     */
+    public LastSale(XMLStreamReader in) throws XMLStreamException {
+        readFromXML(in);
+    }
+
+    /**
+     * Create a new last sale by reading an element.
+     *
+     * @param element The <code>Element</code> to read from.
+     */
+    public LastSale(Element element) {
+        readFromXMLElement(element);
+    }
+
 
     /**
      * Get the <code>Turn</code> when the sale was made.

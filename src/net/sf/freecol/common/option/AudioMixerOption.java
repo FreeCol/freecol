@@ -132,7 +132,7 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
     /**
      * Creates a new <code>AudioMixerOption</code>.
      *
-     * @param specification The enclosing <code>Specification</code>.
+     * @param specification The <code>Specification</code> to refer to.
      */
     public AudioMixerOption(Specification specification) {
         super(specification);

@@ -36,8 +36,9 @@ import org.w3c.dom.Element;
  * The message sent when learning for the skill taught at a settlement.
  */
 public class LearnSkillMessage extends DOMMessage {
+
     /**
-     * The id of the unit that is learning.
+     * The identifier of the unit that is learning.
      */
     private String unitId;
 

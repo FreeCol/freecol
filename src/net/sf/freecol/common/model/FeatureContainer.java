@@ -68,7 +68,7 @@ public final class FeatureContainer {
      * Is an ability present in this container?
      * All applicable abilities must be true, and there must be at least one.
      *
-     * @param id The id of the ability to test.
+     * @param id The object identifier.
      * @param fcgot An optional <code>FreeColGameObjectType</code> the
      *     ability applies to.
      * @param turn An optional applicable <code>Turn</code>.
@@ -132,10 +132,11 @@ public final class FeatureContainer {
     }
 
     /**
-     * Gets the set of abilities with the given Id from a container.
+     * Gets the set of abilities with the given identifier from a
+     * container.
      *
      * @param fc The <code>FeatureContainer</code> to query.
-     * @param id The id of the ability to test.
+     * @param id The object identifier.
      * @param fcgot An optional <code>FreeColGameObjectType</code> the
      *     ability applies to.
      * @param turn An optional applicable <code>Turn</code>.
@@ -188,10 +189,10 @@ public final class FeatureContainer {
     }
 
     /**
-     * Remove all abilities with a given Id.
+     * Remove all abilities with a given identifier.
      *
      * @param fc The <code>FeatureContainer</code> to remove abilities from.
-     * @param id The id of the abilities to remove.
+     * @param id The object identifier.
      */
     public static void removeAbilities(FeatureContainer fc, String id) {
         if (fc != null && fc.abilities != null) fc.abilities.remove(id);
@@ -215,10 +216,11 @@ public final class FeatureContainer {
     }
 
     /**
-     * Gets the set of modifiers with the given Id from a container.
+     * Gets the set of modifiers with the given identifier from a
+     * container.
      *
      * @param fc The <code>FeatureContainer</code> to get modifiers from.
-     * @param id The id of the modifier to test.
+     * @param id The object identifier.
      * @param fcgot An optional <code>FreeColGameObjectType</code> the
      *     modifier applies to.
      * @param turn An optional applicable <code>Turn</code>.
@@ -232,9 +234,10 @@ public final class FeatureContainer {
     }
 
     /**
-     * Gets the set of modifiers with the given Id from this container.
+     * Gets the set of modifiers with the given identifier from this
+     * container.
      *
-     * @param id The id of the modifier to test.
+     * @param id The object identifier.
      * @param fcgot An optional <code>FreeColGameObjectType</code> the
      *     modifier applies to.
      * @param turn An optional applicable <code>Turn</code>.
@@ -254,11 +257,11 @@ public final class FeatureContainer {
     }
 
     /**
-     * Applies the modifiers with the given Id to the given number.
+     * Applies the modifiers with the given identifier to the given number.
      *
      * @param fc The <code>FeatureContainer</code> to query.
      * @param number The number to modify.
-     * @param id The id of the modifiers to apply.
+     * @param id The object identifier.
      * @param fcgot An optional <code>FreeColGameObjectType</code> the
      *     modifier applies to.
      * @param turn An optional applicable <code>Turn</code>.
@@ -272,10 +275,10 @@ public final class FeatureContainer {
     }
 
     /**
-     * Applies the modifiers with the given Id to the given number.
+     * Applies the modifiers with the given identifier to the given number.
      *
      * @param number The number to modify.
-     * @param id The id of the modifiers to apply.
+     * @param id The object identifier.
      * @param fcgot An optional <code>FreeColGameObjectType</code> the
      *     modifier applies to.
      * @param turn An optional applicable <code>Turn</code>.
@@ -393,10 +396,10 @@ public final class FeatureContainer {
     }
 
     /**
-     * Removes all modifiers with a given Id.
+     * Removes all modifiers with a given identifier.
      *
      * @param fc The <code>FeatureContainer</code> to remove from.
-     * @param id The Id of the modifiers to remove.
+     * @param id The object identifier.
      */
     public static void removeModifiers(FeatureContainer fc, String id) {
         if (fc == null) {

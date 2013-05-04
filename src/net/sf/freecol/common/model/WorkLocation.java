@@ -358,13 +358,6 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
         return colony;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public final Colony getColony() {
-        return colony;
-    }
-
 
     // Interface UnitLocation
     // Inherits:
@@ -563,8 +556,7 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
         final String tag = in.getLocalName();
 
         if (ProductionType.getXMLElementTagName().equals(tag)) {
-            productionType = new ProductionType(spec);
-            productionType.readFromXML(in);
+            productionType = new ProductionType(in, spec);
 
         } else {
             super.readChild(in);

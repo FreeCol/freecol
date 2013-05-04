@@ -118,7 +118,7 @@ public class Region extends FreeColGameObject implements Nameable {
      * Creates a new <code>Region</code> instance.
      *
      * @param game The enclosing <code>Game</code>.
-     * @param id The identifier.
+     * @param id The object identifier.
      */
     public Region(Game game, String id) {
         super(game, id);
@@ -580,9 +580,7 @@ public class Region extends FreeColGameObject implements Nameable {
         // end @compat
 
         } else if (CHILD_TAG.equals(tag)) {
-            Region child = makeFreeColGameObject(in, ID_ATTRIBUTE_TAG,
-                                                 Region.class);
-            if (child != null) addChild(child);
+            addChild(makeFreeColGameObject(in, ID_ATTRIBUTE_TAG, Region.class));
             closeTag(in, CHILD_TAG);
         
         } else {

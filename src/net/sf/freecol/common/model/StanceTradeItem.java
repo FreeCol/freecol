@@ -35,7 +35,7 @@ public class StanceTradeItem extends TradeItem {
     /**
      * Creates a new <code>StanceTradeItem</code> instance.
      *
-     * @param game The <code>Game</code> the trade occurs in.
+     * @param game The enclosing <code>Game</code>.
      * @param source The source <code>Player</code>.
      * @param destination The destination <code>Player</code>.
      * @param stance The <code>Stance</code> to trade.
@@ -50,14 +50,16 @@ public class StanceTradeItem extends TradeItem {
     /**
      * Creates a new <code>StanceTradeItem</code> instance.
      *
-     * @param game The <code>Game</code> the trade occurs in.
+     * @param game The enclosing <code>Game</code>.
      * @param in A <code>XMLStreamReader</code> to read from.
+     * @exception XMLStreamException if there is an error reading the stream.
      */
     public StanceTradeItem(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
 
         readFromXML(in);
     }
+
 
     // Interface TradeItem
 

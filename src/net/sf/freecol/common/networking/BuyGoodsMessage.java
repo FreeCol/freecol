@@ -33,13 +33,14 @@ import org.w3c.dom.Element;
  * The message sent when buying goods in Europe.
  */
 public class BuyGoodsMessage extends DOMMessage {
+
     /**
-     * The id of the carrier to load to goods onto.
+     * The identifier of the carrier to load to goods onto.
      */
     private String carrierId;
 
     /**
-     * The id of the type of goods to buy.
+     * The identifier of the type of goods to buy.
      */
     private String goodsTypeId;
 

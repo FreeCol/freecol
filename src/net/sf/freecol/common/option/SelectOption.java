@@ -31,15 +31,16 @@ import net.sf.freecol.common.model.Specification;
 
 
 /**
- * Represents an option where the valid choice is an integer and the choices are
- * represented by strings. In general, these strings are localized by looking up
- * the key of the choice, which consists of the id of the AbstractObject
- * followed by a "." followed by the value of the option string. The automatic
- * localization can be suppressed with the doNotLocalize parameter, however.
- * There are two reasons to do this: either the option strings should not be
- * localized at all (because they are language names, for example), or the
- * option strings have already been localized (because they do not use the
- * default keys, for example).
+ * Represents an option where the valid choice is an integer and the
+ * choices are represented by strings.  In general, these strings are
+ * localized by looking up the key of the choice, which consists of
+ * the identifier of the AbstractObject followed by a "." followed by
+ * the value of the option string.  The automatic localization can be
+ * suppressed with the doNotLocalize parameter, however.  There are
+ * two reasons to do this: either the option strings should not be
+ * localized at all (because they are language names, for example), or
+ * the option strings have already been localized (because they do not
+ * use the default keys, for example).
  */
 public class SelectOption extends IntegerOption {
 
@@ -57,7 +58,7 @@ public class SelectOption extends IntegerOption {
     /**
      * Creates a new <code>SelectOption</code>.
      *
-     * @param specification The enclosing <code>Specification</code>.
+     * @param specification The <code>Specification</code> to refer to.
      */
     public SelectOption(Specification specification) {
         super(specification);
@@ -164,16 +165,9 @@ public class SelectOption extends IntegerOption {
         final String tag = in.getLocalName();
 
         if (getXMLItemElementTagName().equals(tag)) {
-            String label = getAttribute(in, LABEL_TAG, (String)null);
-            int value = getAttribute(in, VALUE_TAG, INFINITY);
-            if (label == null) {
-                logger.warning("Missing " + LABEL_TAG + " for " + tag);
-            } else if (value == INFINITY) {
-                logger.warning("Missing " + VALUE_TAG + " for " + tag);
-            } else {
-                itemValues.put(value, label);
-            }
-            in.nextTag();
+            itemValues.put(getAttribute(in, VALUE_TAG, INFINITY),
+                           getAttribute(in, LABEL_TAG, (String)null));
+            closeTag(in, tag);
 
         } else {
             super.readChild(in);

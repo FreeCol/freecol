@@ -34,7 +34,7 @@ import org.w3c.dom.Element;
 public class PayForBuildingMessage extends DOMMessage {
 
     /**
-     * The id of the colony that is building.
+     * The identifier of the colony that is building.
      */
     private String colonyId;
 

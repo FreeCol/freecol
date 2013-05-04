@@ -115,7 +115,17 @@ public class AbstractGoods extends FreeColObject implements Named {
     }
 
 
-    // Object overrides
+    // Interface Named
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getNameKey() {
+        return getType().getNameKey();
+    }
+
+
+    // Override Object
 
     /**
      * {@inheritDoc}
@@ -127,18 +137,6 @@ public class AbstractGoods extends FreeColObject implements Named {
             return type == ag.type && amount == ag.amount;
         }
         return false;
-    }
-
-
-    // Interface Named
-
-    /**
-     * Gets a key for message routines.
-     *
-     * @return The name key.
-     */
-    public String getNameKey() {
-        return getType().getNameKey();
     }
 
 

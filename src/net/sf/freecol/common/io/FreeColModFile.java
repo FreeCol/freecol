@@ -27,6 +27,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Specification;
 
 
@@ -89,7 +90,7 @@ public class FreeColModFile extends FreeColDataFile {
         try {
             in = xif.createXMLStreamReader(getModDescriptorInputStream());
             in.nextTag();
-            id = in.getAttributeValue(null, "id");
+            id = in.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG);
             parent = in.getAttributeValue(null, "parent");
         } catch (XMLStreamException e) {
             final IOException e2 = new IOException("XMLStreamException.");
@@ -124,9 +125,9 @@ public class FreeColModFile extends FreeColDataFile {
     }
 
     /**
-     * Gets the ID of this mod.
+     * Gets the object identifier of this mod.
      *
-     * @return The ID of the mod.
+     * @return The object identifier of the mod.
      */
     public String getId() {
         return id;

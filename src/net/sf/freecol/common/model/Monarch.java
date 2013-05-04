@@ -140,7 +140,7 @@ public final class Monarch extends FreeColGameObject implements Named {
      * {@link #readFromXML(XMLStreamReader)}.
      *
      * @param game The enclosing <code>Game</code>.
-     * @param id The unique identifier for this object.
+     * @param id The object identifier.
      */
     public Monarch(Game game, String id) {
         super(game, id);

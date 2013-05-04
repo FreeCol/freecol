@@ -77,7 +77,7 @@ public class TensionTest extends FreeColTestCase {
         for (int i = 0; i < unitCount; i++) {
             UnitType unitType = spec().getUnitType("model.unit.brave");
             Unit unit = new ServerUnit(game, settlement, indian, unitType);
-            unit.setIndianSettlement(settlement);
+            unit.setHomeIndianSettlement(settlement);
             if (i == 0) {
                 unit.setLocation(tile);
             } else {

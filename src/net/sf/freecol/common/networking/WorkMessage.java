@@ -36,12 +36,12 @@ import org.w3c.dom.Element;
 public class WorkMessage extends DOMMessage {
 
     /**
-     * The id of the unit.
+     * The identifier of the unit.
      */
     private String unitId;
 
     /**
-     * The id of the work location.
+     * The identifier of the work location.
      */
     private String workLocationId;
 

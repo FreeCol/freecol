@@ -86,9 +86,9 @@ public class NationTypeDetailPanel extends ColopediaGameObjectTypePanel<NationTy
     }
 
     /**
-     * Builds the details panel for the NationType with the given ID.
+     * Builds the details panel for the NationType with the given identifier.
      *
-     * @param id the ID of the NationType to display
+     * @param id The object identifier to display.
      * @param panel the detail panel to build
      */
     public void buildDetail(String id, JPanel panel) {

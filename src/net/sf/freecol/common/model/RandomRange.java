@@ -57,8 +57,8 @@ public class RandomRange {
      * Creates a new <code>RandomRange</code> instance.
      *
      * @param probability The probability of this result.
-     * @param minimum an <code>int</code> value
-     * @param maximum an <code>int</code> value
+     * @param minimum The range inclusive minimum.
+     * @param maximum The range inclusive maximum.
      * @param factor The result multiplier.
      */
     public RandomRange(int probability, int minimum, int maximum, int factor) {
@@ -134,6 +134,16 @@ public class RandomRange {
         return scopes;
     }
 
+    /**
+     * Add a scope.
+     *
+     * @param scope The <code>Scope</code> to add.
+     */
+    private void addScope(Scope scope) {
+        if (scopes == null) scopes = new ArrayList<Scope>();
+        scopes.add(scope);
+    }
+
 
     /**
      * Gets a random value from this range.
@@ -186,6 +196,30 @@ public class RandomRange {
 
 
     /**
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     *
+     * @param out The target stream.
+     * @exception XMLStreamException if there are any problems writing
+     *     to the stream.
+     */
+    public void toXML(XMLStreamWriter out, String tag) throws XMLStreamException {
+        out.writeStartElement(tag);
+
+        out.writeAttribute(PROBABILITY_TAG, Integer.toString(probability));
+
+        out.writeAttribute(MINIMUM_TAG, Integer.toString(minimum));
+
+        out.writeAttribute(MAXIMUM_TAG, Integer.toString(maximum));
+
+        out.writeAttribute(FACTOR_TAG, Integer.toString(factor));
+
+        for (Scope scope : getScopes()) scope.toXML(out);
+
+        out.writeEndElement();
+    }
+
+    /**
      * Initializes this object from an XML-representation of this object.
      *
      * @param in The input stream with the XML.
@@ -217,39 +251,11 @@ public class RandomRange {
             final String tag = in.getLocalName();
 
             if (SCOPE_TAG.equals(tag)) {
-                Scope scope = new Scope(in);
-                if (scope != null) {
-                    if (scopes == null) scopes = new ArrayList<Scope>();
-                    scopes.add(scope);
-                }
+                addScope(new Scope(in));
 
             } else {
                 logger.warning("Bad RandomRange tag: " + tag);
             }
         }
-    }
-
-    /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *
-     * @param out The target stream.
-     * @exception XMLStreamException if there are any problems writing
-     *     to the stream.
-     */
-    public void toXML(XMLStreamWriter out, String tag) throws XMLStreamException {
-        out.writeStartElement(tag);
-
-        out.writeAttribute(PROBABILITY_TAG, Integer.toString(probability));
-
-        out.writeAttribute(MINIMUM_TAG, Integer.toString(minimum));
-
-        out.writeAttribute(MAXIMUM_TAG, Integer.toString(maximum));
-
-        out.writeAttribute(FACTOR_TAG, Integer.toString(factor));
-
-        for (Scope scope : getScopes()) scope.toXML(out);
-
-        out.writeEndElement();
     }
 }

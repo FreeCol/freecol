@@ -30,7 +30,7 @@ public interface FreeColGameObjectListener {
     /**
      * Notify a listener (if any) of a new object.
      *
-     * @param id The identifier of the new object.
+     * @param id The object identifier.
      * @param fcgo The new <code>FreeColGameObject</code>.
      */
     public void setFreeColGameObject(String id, FreeColGameObject fcgo);
@@ -38,7 +38,7 @@ public interface FreeColGameObjectListener {
     /**
      * Notify a listener (if any) of that an object has gone.
      *
-     * @param id The identifier of the removed object.
+     * @param id The object identifier.
      */
     public void removeFreeColGameObject(String id);
 

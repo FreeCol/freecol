@@ -34,30 +34,27 @@ import net.sf.freecol.common.util.RandomChoice;
 
 
 /**
- * Represents one of the Indian nations present in the game.
+ * Represents one of the native nations present in the game.
  */
 public class IndianNationType extends NationType {
 
-    /**
-     * Stores the ids of the skills taught by this Nation.
-     */
+    /** Stores the ids of the skills taught by this Nation. */
     private List<RandomChoice<UnitType>> skills = null;
 
-    /**
-     * Identifiers for the regions that can be settled by this Nation.
-     */
+    /** Identifiers for the regions that can be settled by this Nation. */
     private List<String> regions = null;
 
 
     /**
      * Create a new native nation type.
      *
-     * @param id The nation type identifier.
-     * @param specification The containing <code>Specification</code>.
+     * @param id The object identifier.
+     * @param specification The <code>Specification</code> to refer to.
      */
     public IndianNationType(String id, Specification specification) {
         super(id, specification);
     }
+
 
     /**
      * Is this a European nation type?
@@ -102,8 +99,18 @@ public class IndianNationType extends NationType {
      * @return A list of regions identifiers.
      */
     public List<String> getRegionNames() {
-        return (regions == null) ? new ArrayList<String>()
-            : regions;
+        if (regions == null) return Collections.emptyList();
+        return regions;
+    }
+
+    /**
+     * Add a region identifier.
+     *
+     * @param id The object identifier.
+     */
+    private void addRegion(String id) {
+        if (regions == null) regions = new ArrayList<String>();
+        regions.add(id);
     }
 
     /**
@@ -152,6 +159,19 @@ public class IndianNationType extends NationType {
     }
 
     /**
+     * Add a skill.
+     *
+     * @param unitType The <code>UnitType</code> skill taught.
+     * @param probability The probability of the skill.
+     */
+    private void addSkill(UnitType unitType, int probability) {
+        if (skills == null) {
+            skills = new ArrayList<RandomChoice<UnitType>>();
+        }
+        skills.add(new RandomChoice<UnitType>(unitType, probability));
+    }
+
+    /**
      * Generates choices for skill that could be taught from a settlement on
      * a given Tile.
      *
@@ -190,6 +210,7 @@ public class IndianNationType extends NationType {
 
     private static final String PROBABILITY_TAG = "probability";
     private static final String SKILL_TAG = "skill";
+
 
     /**
      * {@inheritDoc}
@@ -258,15 +279,7 @@ public class IndianNationType extends NationType {
             }
         }
 
-        if (skills != null) {
-            // sort skill according to probability
-            Collections.sort(skills, new Comparator<RandomChoice<UnitType>>() {
-                    public int compare(RandomChoice<UnitType> c1,
-                                       RandomChoice<UnitType> c2) {
-                        return c2.getProbability() - c1.getProbability();
-                    }
-                });
-        }
+        if (skills != null) Collections.sort(skills);
     }
 
     /**
@@ -278,27 +291,13 @@ public class IndianNationType extends NationType {
         final String tag = in.getLocalName();
 
         if (SKILL_TAG.equals(tag)) {
-            UnitType unitType = spec.getType(in, ID_ATTRIBUTE_TAG,
-                                             UnitType.class, (UnitType)null);
-
-            int probability = getAttribute(in, PROBABILITY_TAG, 0);
-
-            if (unitType != null && probability > 0) {
-                if (skills == null) {
-                    skills = new ArrayList<RandomChoice<UnitType>>();
-                }
-                skills.add(new RandomChoice<UnitType>(unitType, probability));
-            }
+            addSkill(spec.getType(in, ID_ATTRIBUTE_TAG,
+                                  UnitType.class, (UnitType)null),
+                     getAttribute(in, PROBABILITY_TAG, 0));
             closeTag(in, SKILL_TAG);
 
         } else if (Region.getXMLElementTagName().equals(tag)) {
-            String id = getAttribute(in, ID_ATTRIBUTE_TAG, (String)null);
-            if (id != null) {
-                if (regions == null) {
-                    regions = new ArrayList<String>();
-                }
-                regions.add(id);
-            }
+            addRegion(readId(in));
             closeTag(in, Region.getXMLElementTagName());
 
         } else {

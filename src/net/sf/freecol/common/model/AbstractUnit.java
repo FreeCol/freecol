@@ -34,26 +34,22 @@ import net.sf.freecol.common.model.Unit.Role;
  */
 public class AbstractUnit extends FreeColObject {
 
-    /**
-     * The role of this AbstractUnit.
-     */
+    /** The role of this AbstractUnit. */
     private Role role = Role.DEFAULT;
 
-    /**
-     * The number of units.
-     */
+    /** The number of units. */
     private int number = 1;
 
 
     /**
-     * Empty constructor.
+     * Deliberately empty constructor.
      */
     public AbstractUnit() {}
 
     /**
      * Create a new AbstractUnit.
      *
-     * @param id The unit id.
+     * @param id The object identifier.
      * @param someRole The unit <code>Role</code>.
      * @param someNumber The number of units.
      */
@@ -77,7 +73,7 @@ public class AbstractUnit extends FreeColObject {
     /**
      * Creates a new <code>AbstractUnit</code> instance.
      *
-     * @param in a <code>XMLStreamReader</code> value
+     * @param in The <code>XMLStreamReader</code> to read from.
      * @exception XMLStreamException if an error occurs
      */
     public AbstractUnit(XMLStreamReader in) throws XMLStreamException {
@@ -85,6 +81,11 @@ public class AbstractUnit extends FreeColObject {
     }
 
 
+    /**
+     * Create a copy of this abstract unit.
+     *
+     * @return The copy.
+     */
     public AbstractUnit clone() {
         return new AbstractUnit(getId(), getRole(), getNumber());
     }
@@ -93,7 +94,7 @@ public class AbstractUnit extends FreeColObject {
     /**
      * Get the <code>UnitType</code> value.
      *
-     * @param specification A <code>Specification</code> to search in.
+     * @param specification The <code>Specification</code> to refer to.
      * @return The unit type.
      */
     public final UnitType getUnitType(Specification specification) {

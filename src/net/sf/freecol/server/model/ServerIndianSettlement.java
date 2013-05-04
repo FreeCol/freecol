@@ -173,9 +173,9 @@ public class ServerIndianSettlement extends IndianSettlement
             consumeGoods(rumType, FOOD_PER_COLONIST/4);
             // New units quickly go out of their city and start annoying.
             addOwnedUnit(unit);
-            unit.setIndianSettlement(this);
+            unit.setHomeIndianSettlement(this);
             logger.info("New native created in " + getName()
-                        + " with ID=" + unit.getId());
+                        + ": " + unit.getId());
         }
 
         // Try to breed horses
