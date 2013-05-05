@@ -1798,6 +1798,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
                        owner.modifyTension(this, Tension.TENSION_ADD_LAND_TAKEN, is));
             }
         }
+        logger.finest(this.getDisplayName() + " claimed " + tile
+            + " from " + owner.getDisplayName()
+            + ", price: " + ((price == 0) ? "free" : (price < 0) ? "stolen"
+                : price));
     }
 
 
