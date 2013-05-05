@@ -42,7 +42,6 @@ import org.w3c.dom.Element;
  */
 public class TileImprovementPlan extends ValuedAIObject {
 
-    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(TileImprovementPlan.class.getName());
 
     /** The type of improvement, from TileImprovementTypes. */
@@ -238,7 +237,7 @@ public class TileImprovementPlan extends ValuedAIObject {
      * @return True if the tile improvement has been completed.
      */
     public boolean isComplete() {
-        return target != null && target.getTileImprovement(getType()) != null;
+        return target != null && target.hasImprovement(getType());
     }
 
     /**
