@@ -1799,7 +1799,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             }
         }
         logger.finest(this.getDisplayName() + " claimed " + tile
-            + " from " + owner.getDisplayName()
+            + " from " + ((owner == null) ? "no-one" : owner.getDisplayName())
             + ", price: " + ((price == 0) ? "free" : (price < 0) ? "stolen"
                 : price));
     }
