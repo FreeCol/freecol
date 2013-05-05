@@ -891,17 +891,6 @@ public class Colony extends Settlement implements Nameable {
     }
 
     /**
-     * Sets the apparent number of units inside the colony.
-     * Used in client enemy colonies
-     *
-     * @param displayUnitCount The apparent number of <code>Unit</code>s
-     *     inside the colony.
-     */
-    public void setDisplayUnitCount(int displayUnitCount) {
-        this.displayUnitCount = displayUnitCount;
-    }
-
-    /**
      * Returns true if this colony has a schoolhouse and the unit type is a
      * skilled unit type with a skill level not exceeding the level of the
      * schoolhouse. @see Building#canAdd
@@ -2445,7 +2434,11 @@ public class Colony extends Settlement implements Nameable {
      */
     @Override
     public int getUnitCount() {
-        return (unitCount >= 0) ? unitCount : getUnitList().size();
+        int n = 0;
+        for (WorkLocation wl : getCurrentWorkLocations()) {
+            n += wl.getUnitCount();
+        }
+        return n;
     }
 
     /**
@@ -2834,7 +2827,7 @@ public class Colony extends Settlement implements Nameable {
         landLocked = getAttribute(in, LAND_LOCKED_TAG, true);
         if (!landLocked) addAbility(HAS_PORT);
 
-        unitCount = getAttribute(in, UNIT_COUNT_TAG, -1);
+        displayUnitCount = getAttribute(in, UNIT_COUNT_TAG, -1);
 
         stockadeKey = getAttribute(in, STOCKADE_KEY_TAG, (String)null);
     }
