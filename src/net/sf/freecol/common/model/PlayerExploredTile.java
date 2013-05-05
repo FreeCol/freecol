@@ -123,7 +123,7 @@ public class PlayerExploredTile extends FreeColGameObject {
             colonyUnitCount = -1;
             colonyStockadeKey = null;
         } else {
-            colonyUnitCount = colony.getUnitCount();
+            colonyUnitCount = colony.getDisplayUnitCount();
             colonyStockadeKey = colony.getTrueStockadeKey();
         }
         IndianSettlement is = tile.getIndianSettlement();

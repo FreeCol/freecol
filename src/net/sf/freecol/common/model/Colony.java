@@ -147,7 +147,6 @@ public class Colony extends Settlement implements Nameable {
                                  Consumer.POPULATION_PRIORITY);
 
     // Will only be used on enemy colonies:
-    protected int unitCount = -1;
     protected int displayUnitCount = -1;
     protected String stockadeKey = null;
 
@@ -400,7 +399,7 @@ public class Colony extends Settlement implements Nameable {
         scratch.landLocked = landLocked;
         scratch.buildQueue.clear();
         scratch.populationQueue = populationQueue;
-        // ignore unitCount and stockadeKey
+        // ignore displayUnitCount and stockadeKey
         // leave productionCache as is
         return scratch;
     }
@@ -2542,6 +2541,11 @@ public class Colony extends Settlement implements Nameable {
      * {@inheritDoc}
      */
     public Unit getDefendingUnit(Unit attacker) {
+        if (displayUnitCount > 0) {
+            // There are units, but we don't see them
+            return null;
+        }
+
         // Note that this function will only return a unit working
         // inside the colony.  Typically, colonies are also defended
         // by units outside the colony on the same tile.  To consider
@@ -2552,11 +2556,6 @@ public class Colony extends Settlement implements Nameable {
         // is present as founding father, in which case the unit can
         // be armed as well.
         List<Unit> unitList = getUnitList();
-
-        if (unitCount >= 0 && unitList.isEmpty()) {
-            // There are units, but we don't see them
-            return null;
-        }
 
         Unit defender = null;
         float defencePower = -1.0f;
@@ -2827,7 +2826,7 @@ public class Colony extends Settlement implements Nameable {
         landLocked = getAttribute(in, LAND_LOCKED_TAG, true);
         if (!landLocked) addAbility(HAS_PORT);
 
-        displayUnitCount = getAttribute(in, UNIT_COUNT_TAG, -1);
+        displayUnitCount = getAttribute(in, UNIT_COUNT_TAG, 0);
 
         stockadeKey = getAttribute(in, STOCKADE_KEY_TAG, (String)null);
     }
