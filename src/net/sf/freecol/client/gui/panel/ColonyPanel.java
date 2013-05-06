@@ -1174,8 +1174,40 @@ public final class ColonyPanel extends PortPanel
             }
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public boolean accepts(Unit unit) {
             return unit.isCarrier();
+        }
+
+        @Override
+        public void selectLabel() {
+            removePropertyChangeListeners();
+            super.selectLabel();
+            addPropertyChangeListeners();
+        }
+
+        /**
+         * Add the property change listeners to this panel.
+         */
+        @Override
+        public void addPropertyChangeListeners() {
+            Unit selected = getSelectedUnit();
+            if (selected != null) {
+                selected.addPropertyChangeListener(Unit.CARGO_CHANGE, this);
+            }
+        }
+
+        /**
+         * Remove the property change listeners from this panel.
+         */
+        @Override
+        protected void removePropertyChangeListeners() {
+            Unit selected = getSelectedUnit();
+            if (selected != null) {
+                selected.removePropertyChangeListener(Unit.CARGO_CHANGE, this);
+            }
         }
     }
 

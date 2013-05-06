@@ -52,6 +52,7 @@ import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
@@ -176,9 +177,7 @@ public final class QuickActionMenu extends JPopupMenu {
                 JMenuItem menuItem = new JMenuItem(Messages.message(template));
                 menuItem.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
-                            //if (igc.putOutsideColony(tempUnit)) {
-                                igc.boardShip(tempUnit, funit);
-                                //}
+                            igc.boardShip(tempUnit, funit);
                         }
                     });
                 this.add(menuItem);
@@ -187,7 +186,31 @@ public final class QuickActionMenu extends JPopupMenu {
         }
         return added;
     }
-        
+
+    private boolean addLoadItems(final GoodsLabel goodsLabel, Location loc) {
+        final InGameController igc = freeColClient.getInGameController();
+        final Goods goods = goodsLabel.getGoods();
+
+        boolean added = false;
+        for (Unit unit : loc.getUnitList()) {
+            if (unit.isCarrier() && unit.canCarryGoods()
+                && unit.canAdd(goods)) {
+                final Unit funit = unit;
+                StringTemplate template = StringTemplate.template("loadOnTo")
+                    .addStringTemplate("%unit%", unit.getLabel());
+                JMenuItem menuItem = new JMenuItem(Messages.message(template));
+                menuItem.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            igc.loadCargo(goods, funit);
+                        }
+                    });
+                this.add(menuItem);
+                added = true;
+            }
+        }
+        return added;
+    }
+
     private boolean addCarrierItems(final UnitLabel unitLabel) {
         final Unit tempUnit = unitLabel.getUnit();
 
@@ -660,8 +683,9 @@ public final class QuickActionMenu extends JPopupMenu {
      * Creates a menu for a good.
      */
     public void createGoodsMenu(final GoodsLabel goodsLabel) {
+        final InGameController igc = freeColClient.getInGameController();
+        final Player player = freeColClient.getMyPlayer();
         final Goods goods = goodsLabel.getGoods();
-        final InGameController inGameController = freeColClient.getInGameController();
         ImageLibrary imageLibrary = parentPanel.getLibrary();
         this.setLabel("Cargo");
         JMenuItem name = new JMenuItem(Messages.message(goods.getNameKey()) + " (" +
@@ -674,32 +698,34 @@ public final class QuickActionMenu extends JPopupMenu {
             });
         this.add(name);
 
-        if (!(goods.getLocation() instanceof Colony)) {
-            if (freeColClient.getMyPlayer().canTrade(goods.getType())) {
+        if (goods.getLocation() instanceof Colony) {
+            Colony colony = (Colony)goods.getLocation();
+            addLoadItems(goodsLabel, colony.getTile());
+
+        } else if (goods.getLocation() instanceof Europe) {
+            ; // add purchase items?
+
+        } else if (goods.getLocation() instanceof Unit) {
+            Unit carrier = (Unit)goods.getLocation();
+
+            if (carrier.getLocation().getColony() != null
+                || (carrier.isInEurope()
+                    && player.canTrade(goods.getType()))) {
                 JMenuItem unload = new JMenuItem(Messages.message("unload"));
                 unload.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
-                            inGameController.unloadCargo(goods, false);
-                            if (parentPanel instanceof CargoPanel) {
-                                CargoPanel cargoPanel = (CargoPanel) parentPanel;
-                                cargoPanel.initialize();
-                                /*
-                                  if (cargoPanel.getParentPanel() instanceof ColonyPanel) {
-                                  ((ColonyPanel) cargoPanel.getParentPanel()).updateWarehouse();
-                                  }
-                                */
-                            }
-                            parentPanel.revalidate();
+                            igc.unloadCargo(goods, false);
                         }
                     });
                 this.add(unload);
             } else {
-                if (goods.getLocation() instanceof Unit
-                    && ((Unit)goods.getLocation()).isInEurope()) {
+                if (carrier.isInEurope()
+                    && !player.canTrade(goods.getType())) {
                     JMenuItem pay = new JMenuItem(Messages.message("boycottedGoods.payArrears"));
                     pay.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent e) {
-                                inGameController.payArrears(goods.getType());
+                                igc.payArrears(goods.getType());
+                                // TODO fix pcls so this hackery can go away
                                 if (parentPanel instanceof CargoPanel) {
                                     CargoPanel cargoPanel = (CargoPanel) parentPanel;
                                     cargoPanel.initialize();
@@ -709,18 +735,19 @@ public final class QuickActionMenu extends JPopupMenu {
                         });
                     this.add(pay);
                 }
+                JMenuItem dump = new JMenuItem(Messages.message("dumpCargo"));
+                dump.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            igc.unloadCargo(goods, true);
+                            // TODO fix pcls so this hackery can go away
+                            if (parentPanel instanceof CargoPanel) {
+                                ((CargoPanel) parentPanel).initialize();
+                            }
+                            parentPanel.revalidate();
+                        }
+                    });
+                this.add(dump);
             }
-            JMenuItem dump = new JMenuItem(Messages.message("dumpCargo"));
-            dump.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    inGameController.unloadCargo(goods, true);
-                    if (parentPanel instanceof CargoPanel) {
-                        ((CargoPanel) parentPanel).initialize();
-                    }
-                    parentPanel.revalidate();
-                }
-            });
-            this.add(dump);
         }
     }
 }
