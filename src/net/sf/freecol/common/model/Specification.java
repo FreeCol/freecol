@@ -52,40 +52,72 @@ import net.sf.freecol.common.option.RangeOption;
 import net.sf.freecol.common.option.StringOption;
 import net.sf.freecol.common.option.UnitListOption;
 
+
 /**
- * This class encapsulates any parts of the "specification" for FreeCol that are
- * expressed best using XML. The XML is loaded through the class loader from the
- * resource named "specification.xml" in the same package as this class.
+ * This class encapsulates any parts of the "specification" for
+ * FreeCol that are expressed best using XML.  The XML is loaded
+ * through the class loader from the resource named
+ * "specification.xml" in the same package as this class.
  */
 public final class Specification {
 
-    public static final FreeColGameObjectType MOVEMENT_PENALTY_SOURCE =
-        new FreeColGameObjectType("model.source.movementPenalty");
-    public static final FreeColGameObjectType ARTILLERY_PENALTY_SOURCE =
-        new FreeColGameObjectType("model.source.artilleryInTheOpen");
-    public static final FreeColGameObjectType ATTACK_BONUS_SOURCE =
-        new FreeColGameObjectType("model.source.attackBonus");
-    public static final FreeColGameObjectType FORTIFICATION_BONUS_SOURCE =
-        new FreeColGameObjectType("model.source.fortified");
-    public static final FreeColGameObjectType INDIAN_RAID_BONUS_SOURCE =
-        new FreeColGameObjectType("model.source.artilleryAgainstRaid");
-    public static final FreeColGameObjectType AMPHIBIOUS_ATTACK_PENALTY_SOURCE =
-        new FreeColGameObjectType("model.source.amphibiousAttack");
-    public static final FreeColGameObjectType BASE_OFFENCE_SOURCE =
-        new FreeColGameObjectType("model.source.baseOffence");
-    public static final FreeColGameObjectType BASE_DEFENCE_SOURCE =
-        new FreeColGameObjectType("model.source.baseDefence");
-    public static final FreeColGameObjectType CARGO_PENALTY_SOURCE =
-        new FreeColGameObjectType("model.source.cargoPenalty");
-    public static final FreeColGameObjectType AMBUSH_BONUS_SOURCE =
-        new FreeColGameObjectType("model.source.ambushBonus");
-    public static final FreeColGameObjectType COLONY_GOODS_PARTY_SOURCE =
-        new FreeColGameObjectType("model.source.colonyGoodsParty");
-    public static final FreeColGameObjectType SHIP_TRADE_PENALTY_SOURCE =
-        new FreeColGameObjectType("model.source.shipTradePenalty");
-
-
     private static final Logger logger = Logger.getLogger(Specification.class.getName());
+
+    public static class Source extends FreeColGameObjectType {
+
+        /**
+         * Trivial constructor.
+         *
+         * @param id The object identifier.
+         */
+        public Source(String id) {
+            super(id);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void toXMLImpl(XMLStreamWriter out) {
+            throw new RuntimeException("Can not happen");
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String toString() {
+            return getId();
+        }
+    };
+
+    public static final Source MOVEMENT_PENALTY_SOURCE
+        = new Source("model.source.movementPenalty");
+    public static final Source ARTILLERY_PENALTY_SOURCE
+        = new Source("model.source.artilleryInTheOpen");
+    public static final Source ATTACK_BONUS_SOURCE
+        = new Source("model.source.attackBonus");
+    public static final Source FORTIFICATION_BONUS_SOURCE
+        = new Source("model.source.fortified");
+    public static final Source INDIAN_RAID_BONUS_SOURCE
+        = new Source("model.source.artilleryAgainstRaid");
+    public static final Source AMPHIBIOUS_ATTACK_PENALTY_SOURCE
+        = new Source("model.source.amphibiousAttack");
+    public static final Source BASE_OFFENCE_SOURCE
+        = new Source("model.source.baseOffence");
+    public static final Source BASE_DEFENCE_SOURCE
+        = new Source("model.source.baseDefence");
+    public static final Source CARGO_PENALTY_SOURCE
+        = new Source("model.source.cargoPenalty");
+    public static final Source AMBUSH_BONUS_SOURCE
+        = new Source("model.source.ambushBonus");
+    public static final Source COLONY_GOODS_PARTY_SOURCE
+        = new Source("model.source.colonyGoodsParty");
+    public static final Source SHIP_TRADE_PENALTY_SOURCE
+        = new Source("model.source.shipTradePenalty");
+    public static final Source SOL_MODIFIER_SOURCE
+        = new Source("model.source.solModifier");
+
 
     /** A map from specification element to a reader for that element. */
     private final Map<String, ChildReader> readerMap
@@ -198,12 +230,14 @@ public final class Specification {
 
     private boolean initialized = false;
 
+    /** The specification identifier. */
     private String id;
 
-    private String difficultyLevel;
-
+    /** The specification version. */
     private String version;
 
+    /** The name of the difficulty level option group. */
+    private String difficultyLevel;
 
 
     /**
@@ -211,7 +245,7 @@ public final class Specification {
      */
     public Specification() {
         logger.fine("Initializing Specification");
-        for (FreeColGameObjectType source : new FreeColGameObjectType[] {
+        for (Source source : new Source[] {
                 MOVEMENT_PENALTY_SOURCE,
                 ARTILLERY_PENALTY_SOURCE,
                 ATTACK_BONUS_SOURCE,
@@ -222,42 +256,43 @@ public final class Specification {
                 BASE_DEFENCE_SOURCE,
                 CARGO_PENALTY_SOURCE,
                 AMBUSH_BONUS_SOURCE,
-                COLONY_GOODS_PARTY_SOURCE
+                COLONY_GOODS_PARTY_SOURCE,
+                SOL_MODIFIER_SOURCE
             }) {
             allTypes.put(source.getId(), source);
         }
 
-        readerMap.put("building-types",
+        readerMap.put(BUILDING_TYPES_TAG,
                       new TypeReader<BuildingType>(BuildingType.class, buildingTypeList));
-        readerMap.put("disasters",
+        readerMap.put(DISASTERS_TAG,
                       new TypeReader<Disaster>(Disaster.class, disasters));
-        readerMap.put("equipment-types",
+        readerMap.put(EQUIPMENT_TYPES_TAG,
                       new TypeReader<EquipmentType>(EquipmentType.class, equipmentTypes));
-        readerMap.put("european-nation-types",
+        readerMap.put(EUROPEAN_NATION_TYPES_TAG,
                       new TypeReader<EuropeanNationType>(EuropeanNationType.class, europeanNationTypes));
-        readerMap.put("events",
+        readerMap.put(EVENTS_TAG,
                       new TypeReader<Event>(Event.class, events));
-        readerMap.put("founding-fathers",
+        readerMap.put(FOUNDING_FATHERS_TAG,
                       new TypeReader<FoundingFather>(FoundingFather.class, foundingFathers));
-        readerMap.put("goods-types",
+        readerMap.put(GOODS_TYPES_TAG,
                       new TypeReader<GoodsType>(GoodsType.class, goodsTypeList));
-        readerMap.put("indian-nation-types",
+        readerMap.put(INDIAN_NATION_TYPES_TAG,
                       new TypeReader<IndianNationType>(IndianNationType.class, indianNationTypes));
-        readerMap.put("nations",
+        readerMap.put(NATIONS_TAG,
                       new TypeReader<Nation>(Nation.class, nations));
-        readerMap.put("resource-types",
+        readerMap.put(RESOURCE_TYPES_TAG,
                       new TypeReader<ResourceType>(ResourceType.class, resourceTypeList));
-        readerMap.put("roles",
+        readerMap.put(ROLES_TAG,
                       new TypeReader<Role>(Role.class, roles));
-        readerMap.put("tile-types",
+        readerMap.put(TILE_TYPES_TAG,
                       new TypeReader<TileType>(TileType.class, tileTypeList));
-        readerMap.put("tileimprovement-types",
+        readerMap.put(TILEIMPROVEMENT_TYPES_TAG,
                       new TypeReader<TileImprovementType>(TileImprovementType.class, tileImprovementTypeList));
-        readerMap.put("unit-types",
+        readerMap.put(UNIT_TYPES_TAG,
                       new TypeReader<UnitType>(UnitType.class, unitTypeList));
 
-        readerMap.put("modifiers", new ModifierReader());
-        readerMap.put("options", new OptionReader());
+        readerMap.put(MODIFIERS_TAG, new ModifierReader());
+        readerMap.put(OPTIONS_TAG, new OptionReader());
     }
 
     /**
@@ -274,6 +309,11 @@ public final class Specification {
         initialized = true;
     }
 
+    /**
+     * Load a specification from a stream.
+     *
+     * @param xsr The <code>XMLStreamReader</code> to read from.
+     */
     private void load(XMLStreamReader xsr) {
         try {
             readFromXML(xsr);
@@ -298,6 +338,11 @@ public final class Specification {
         initialized = true;
     }
 
+    /**
+     * Load a specification from a stream.
+     *
+     * @param in The <code>InputStream</code> to read from.
+     */
     private void load(InputStream in) {
         try {
             XMLStreamReader xsr
@@ -557,16 +602,17 @@ public final class Specification {
 
         public void readChildren(XMLStreamReader xsr) throws XMLStreamException {
             while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                final String tag = xsr.getLocalName();
                 String id = FreeColObject.readId(xsr);
                 if (id == null) {
-                    logger.warning("ID is 'null', element name is " + xsr.getLocalName());
-                } else if ("delete".equals(xsr.getLocalName())) {
+                    logger.warning("Null identifier, tag: " + tag);
+
+                } else if (FreeColGameObjectType.DELETE_TAG.equals(tag)) {
                     FreeColGameObjectType object = allTypes.remove(id);
-                    if (object != null) {
-                        result.remove(object);
-                    }
+                    if (object != null) result.remove(object);
+
                 } else {
-                    T object = getType(FreeColObject.readId(xsr), type);
+                    T object = getType(id, type);
                     // If this an existing object (with id) and the
                     // PRESERVE tag is present, then leave the
                     // attributes intact and only read the child
@@ -633,18 +679,18 @@ public final class Specification {
     // methods
 
     /**
-     * Describe <code>getId</code> method here.
+     * Get the specification identifier.
      *
-     * @return a <code>String</code> value
+     * @return The specification identifier.
      */
     public String getId() {
         return id;
     }
 
     /**
-     * Get the <code>Version</code> value.
+     * Get the specification version.
      *
-     * @return a <code>String</code> value
+     * @return The specification version.
      */
     public String getVersion() {
         return version;
@@ -662,11 +708,11 @@ public final class Specification {
     }
 
     /**
-     * Registers an Ability's id as defined. This is useful for
+     * Registers an Ability's id as defined.  This is useful for
      * abilities that are required rather than provided by
      * FreeColGameObjectTypes.
      *
-     * @param id a <code>String</code> value
+     * @param id The object identifier.
      */
     public void addAbility(String id) {
         if (!allAbilities.containsKey(id)) {
@@ -675,36 +721,18 @@ public final class Specification {
     }
 
     /**
-     * Return a list of all Abilities with the given id.
+     * Get all the Abilities with the given identifier.
      *
-     * @param id the ability id
+     * @param id The object identifier to look for.
      */
     public List<Ability> getAbilities(String id) {
         return allAbilities.get(id);
     }
 
     /**
-     * Return a list of FreeColGameObjectTypes that provide the required ability.
-     *
-     * @param id the ability id
-     * @param value the ability value
-     * @return a list of FreeColGameObjectTypes that provide the required ability.
-     */
-    public List<FreeColGameObjectType> getTypesProviding(String id, boolean value) {
-        List<FreeColGameObjectType> result = new ArrayList<FreeColGameObjectType>();
-        for (Ability ability : getAbilities(id)) {
-            if (ability.getValue() == value
-                && ability.getSource() instanceof FreeColGameObjectType) {
-                result.add((FreeColGameObjectType) ability.getSource());
-            }
-        }
-        return result;
-    }
-
-    /**
      * Add a modifier.
      *
-     * @param modifier a <code>Modifier</code> value
+     * @param modifier The <code>Modifier</code> to add.
      */
     public void addModifier(Modifier modifier) {
         String id = modifier.getId();
@@ -715,160 +743,62 @@ public final class Specification {
     }
 
     /**
-     * Return a list of all Modifiers with the given id.
+     * Get all the Modifiers with the given identifier.
      *
-     * @param id the modifier id
+     * @param id The object identifier to look for.
      */
     public List<Modifier> getModifiers(String id) {
         return allModifiers.get(id);
     }
 
+    // Option routines
+
     /**
-     * Returns the <code>FreeColGameObjectType</code> with the given
-     * ID.  Throws an IllegalArgumentException if the ID is
-     * null. Throws and IllegalArgumentException if no such Type
-     * can be retrieved and initialization is complete.
+     * Is option with this identifier present?  This is helpful when
+     * options are optionally(!) present, for example
+     * model.option.priceIncrease.artillery exists but
+     * model.option.priceIncrease.frigate does not.
      *
-     * @param Id a <code>String</code> value
-     * @param type a <code>Class</code> value
-     * @return a <code>FreeColGameObjectType</code> value
-     * @exception IllegalArgumentException if an error occurs
+     * @param id The object identifier to test.
+     * @return True/false on presence of option id.
      */
-    public <T extends FreeColGameObjectType> T getType(String Id, Class<T> type)
-        throws IllegalArgumentException {
-        if (Id == null) {
-            throw new IllegalArgumentException("Trying to retrieve FreeColGameObjectType" + " with ID 'null'.");
-        } else if (allTypes.containsKey(Id)) {
-            try {
-                return type.cast(allTypes.get(Id));
-            } catch(ClassCastException cce) {
-                logger.log(Level.WARNING, Id + " caused ClassCastException!", cce);
-                throw(cce);
-            }
-        } else if (allTypes.containsKey(mangle(Id))) {
-            // @compat 0.9.x
-            return type.cast(allTypes.get(mangle(Id)));
-            // end compatibility code
-        } else if (initialized) {
-            throw new IllegalArgumentException("Undefined FreeColGameObjectType" + " with ID '" + Id + "'.");
+    public boolean hasOption(String id) {
+        return id != null && allOptions.containsKey(id);
+    }
+
+    /**
+     * Get the <code>AbstractOption</code> with the given identifier.
+     *
+     * @param id The object identifier.
+     * @return The <code>AbstractOption</code> found.
+     * @exception IllegalArgumentException if the identifier is null
+     *     or not present.
+     */
+    public AbstractOption getOption(String id) throws IllegalArgumentException {
+        if (id == null) {
+            throw new IllegalArgumentException("AbstractOption with null id.");
+        } else if (!allOptions.containsKey(id)) {
+            throw new IllegalArgumentException("Missing AbstractOption: " + id);
         } else {
-            // forward declaration of new type
-            try {
-                Constructor<T> c = type.getConstructor(String.class, Specification.class);
-                T result = c.newInstance(Id, this);
-                allTypes.put(Id, result);
-                return result;
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Could not construct: " + Id, e);
-                return null;
-            }
+            return allOptions.get(id);
         }
     }
 
-    // @compat 0.9.x
-    private String mangle(String id) {
-        int index = id.lastIndexOf('.');
-        if (index == -1) {
-            return id;
+    /**
+     * Get the <code>OptionGroup</code> with the given identifier.
+     *
+     * @param id The object identifier.
+     * @return The <code>OptionGroup</code> found.
+     * @exception IllegalArgumentException if the identifier is null
+     *     or not present.
+     */
+    public OptionGroup getOptionGroup(String id) throws IllegalArgumentException {
+        if (id == null) {
+            throw new IllegalArgumentException("OptionGroup with null id.");
+        } else if (!allOptionGroups.containsKey(id)) {
+            throw new IllegalArgumentException("Missing OptionGroup: " + id);
         } else {
-            return id.substring(0, index + 1) + id.substring(index + 1, index + 2).toLowerCase(Locale.US)
-                + id.substring(index + 2);
-        }
-    }
-    // end compatibility code
-
-    public FreeColGameObjectType getType(String Id) throws IllegalArgumentException {
-        return getType(Id, FreeColGameObjectType.class);
-    }
-
-
-    /**
-     * Return all types which have any of the given abilities.
-     *
-     * @param abilities The abilities for the search
-     * @return a <code>List</code> of <code>UnitType</code>
-     */
-    public <T extends FreeColGameObjectType> List<T>
-                      getTypesWithAbility(Class<T> resultType, String... abilities) {
-        ArrayList<T> result = new ArrayList<T>();
-        for (FreeColGameObjectType type : allTypes.values()) {
-            if (resultType.isInstance(type)) {
-                for (String ability : abilities) {
-                    if (type.hasAbility(ability)) {
-                        result.add(resultType.cast(type));
-                        break;
-                    }
-                }
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Return all types which have none of the given abilities.
-     *
-     * @param abilities The abilities for the search
-     * @return a <code>List</code> of <code>UnitType</code>
-     */
-    public <T extends FreeColGameObjectType> List<T>
-                      getTypesWithoutAbility(Class<T> resultType, String... abilities) {
-        ArrayList<T> result = new ArrayList<T>();
-        type: for (FreeColGameObjectType type : allTypes.values()) {
-            if (resultType.isInstance(type)) {
-                for (String ability : abilities) {
-                    if (type.hasAbility(ability)) continue type;
-                }
-                result.add(resultType.cast(type));
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Is option with this ID present?  This is helpful when options are
-     * optionally(!) present, for example model.option.priceIncrease.artillery
-     * exists but model.option.priceIncrease.frigate does not.
-     *
-     * @param Id a <code>String</code> value
-     * @return True/false on presence of option Id
-     */
-    public boolean hasOption(String Id) {
-        return Id != null && allOptions.containsKey(Id);
-    }
-
-    /**
-     * Returns the <code>AbstractOption</code> with the given ID. Throws an
-     * IllegalArgumentException if the ID is null or unknown.
-     *
-     * @param Id a <code>String</code> value
-     * @return an <code>AbstractOption</code> value
-     */
-    public AbstractOption getOption(String Id) throws IllegalArgumentException {
-        if (Id == null) {
-            throw new IllegalArgumentException("Trying to retrieve AbstractOption" + " with ID 'null'.");
-        } else if (!allOptions.containsKey(Id)) {
-            throw new IllegalArgumentException("Trying to retrieve AbstractOption" + " with ID '" + Id
-                    + "' returned 'null'.");
-        } else {
-            return allOptions.get(Id);
-        }
-    }
-
-    /**
-     * Returns the <code>OptionGroup</code> with the given ID. Throws an
-     * IllegalArgumentException if the ID is null or unknown.
-     *
-     * @param Id a <code>String</code> value
-     * @return an <code>OptionGroup</code> value
-     */
-    public OptionGroup getOptionGroup(String Id) throws IllegalArgumentException {
-        if (Id == null) {
-            throw new IllegalArgumentException("Trying to retrieve OptionGroup" + " with ID 'null'.");
-        } else if (!allOptionGroups.containsKey(Id)) {
-            throw new IllegalArgumentException("Trying to retrieve OptionGroup" + " with ID '" + Id
-                    + "' returned 'null'.");
-        } else {
-            return allOptionGroups.get(Id);
+            return allOptionGroups.get(id);
         }
     }
 
@@ -901,10 +831,10 @@ public final class Specification {
     }
 
     /**
-     * Adds an <code>OptionGroup</code> to the specification
+     * Adds an <code>OptionGroup</code> to this specification.
      *
-     * @param optionGroup <code>OptionGroup</code> to add
-     * @param recursive a <code>boolean</code> value
+     * @param optionGroup The <code>OptionGroup</code> to add.
+     * @param recursive If true, add recursively to subgroups.
      */
     public void addOptionGroup(OptionGroup optionGroup, boolean recursive) {
         // Add the options of the group
@@ -924,68 +854,59 @@ public final class Specification {
     }
 
     /**
-     * Adds an <code>AbstractOption</code> to the specification
+     * Adds an <code>AbstractOption</code> to this specification.
      *
-     * @param abstractOption <code>AbstractOption</code> to add
+     * @param abstractOption The <code>AbstractOption</code> to add.
      */
     public void addAbstractOption(AbstractOption abstractOption) {
         // Add the option
         allOptions.put(abstractOption.getId(), abstractOption);
     }
 
-
     /**
-     * Returns the <code>IntegerOption</code> with the given ID. Throws an
-     * IllegalArgumentException if the ID is null, or if no such Type can be
-     * retrieved.
+     * Get the <code>IntegerOption</code> with the given identifier.
      *
-     * @param Id a <code>String</code> value
-     * @return an <code>IntegerOption</code> value
+     * @param id The object identifier.
+     * @return The <code>IntegerOption</code> found.
      */
-    public IntegerOption getIntegerOption(String Id) {
-        return (IntegerOption) getOption(Id);
+    public IntegerOption getIntegerOption(String id) {
+        return (IntegerOption)getOption(id);
     }
 
     /**
-     * Returns the <code>RangeOption</code> with the given ID. Throws an
-     * IllegalArgumentException if the ID is null, or if no such Type can be
-     * retrieved.
+     * Get the <code>RangeOption</code> with the given identifier.
      *
-     * @param Id a <code>String</code> value
-     * @return an <code>RangeOption</code> value
+     * @param id The object identifier.
+     * @return The <code>RangeOption</code> found.
      */
-    public RangeOption getRangeOption(String Id) {
-        return (RangeOption) getOption(Id);
+    public RangeOption getRangeOption(String id) {
+        return (RangeOption)getOption(id);
     }
 
     /**
-     * Returns the <code>BooleanOption</code> with the given ID. Throws an
-     * IllegalArgumentException if the ID is null, or if no such Type can be
-     * retrieved.
+     * Get the <code>BooleanOption</code> with the given identifier.
      *
-     * @param Id a <code>String</code> value
-     * @return an <code>BooleanOption</code> value
+     * @param id The object identifier.
+     * @return The <code>BooleanOption</code> found.
      */
-    public BooleanOption getBooleanOption(String Id) {
-        return (BooleanOption) getOption(Id);
+    public BooleanOption getBooleanOption(String id) {
+        return (BooleanOption)getOption(id);
     }
 
     /**
-     * Returns the <code>StringOption</code> with the given ID. Throws an
-     * IllegalArgumentException if the ID is null, or if no such Type can be
-     * retrieved.
+     * Get the <code>StringOption</code> with the given identifier.
      *
-     * @param Id a <code>String</code> value
-     * @return an <code>StringOption</code> value
+     * @param id The object identifier.
+     * @return The <code>StringOption</code> found.
      */
-    public StringOption getStringOption(String Id) {
-        return (StringOption) getOption(Id);
+    public StringOption getStringOption(String id) {
+        return (StringOption) getOption(id);
     }
 
     /**
      * Gets the boolean value of an option.
      *
-     * @param id The id of the option.
+     * @param id The object identifier.
      * @return The value.
      * @exception IllegalArgumentException If there is no boolean
      *     value associated with the specified option.
@@ -994,16 +915,16 @@ public final class Specification {
      */
     public boolean getBoolean(String id) {
         try {
-            return ((BooleanOption) getOption(id)).getValue();
+            return getBooleanOption(id).getValue();
         } catch (ClassCastException e) {
-            throw new IllegalArgumentException("No boolean value associated with the specified option.");
+            throw new IllegalArgumentException("Not a boolean option: " + id);
         }
     }
 
     /**
      * Gets the integer value of an option.
      *
-     * @param id The id of the option.
+     * @param id The object identifier.
      * @return The value.
      * @exception IllegalArgumentException If there is no integer
      *     value associated with the specified option.
@@ -1012,16 +933,16 @@ public final class Specification {
      */
     public int getInteger(String id) {
         try {
-            return ((IntegerOption) getOption(id)).getValue();
+            return getIntegerOption(id).getValue();
         } catch (ClassCastException e) {
-            throw new IllegalArgumentException("No integer value associated with the specified option.");
+            throw new IllegalArgumentException("Not an integer option: " + id);
         }
     }
 
     /**
      * Gets the string value of an option.
      *
-     * @param id The id of the option.
+     * @param id The object identifier.
      * @return The value.
      * @exception IllegalArgumentException If there is no string
      *     value associated with the specified option.
@@ -1030,57 +951,33 @@ public final class Specification {
      */
     public String getString(String id) {
         try {
-            return ((StringOption) getOption(id)).getValue();
+            return getStringOption(id).getValue();
         } catch (ClassCastException e) {
-            throw new IllegalArgumentException("No string value associated with the specified option.");
+            throw new IllegalArgumentException("Not a string option: " + id);
         }
     }
 
 
     // -- Buildings --
+
     public List<BuildingType> getBuildingTypeList() {
         return buildingTypeList;
     }
 
     /**
-     * Describe <code>numberOfBuildingTypes</code> method here.
+     * Get a building type by identifier.
      *
-     * @return an <code>int</code> value
+     * @param id The object identifier.
+     * @return The <code>BuildingType</code> found.
      */
-    public int numberOfBuildingTypes() {
-        return buildingTypeList.size();
-    }
-
-    /**
-     * Describe <code>getBuildingType</code> method here.
-     *
-     * @param buildingTypeIndex an <code>int</code> value
-     * @return a <code>BuildingType</code> value
-     */
-    public BuildingType getBuildingType(int buildingTypeIndex) {
-        return buildingTypeList.get(buildingTypeIndex);
-    }
-
     public BuildingType getBuildingType(String id) {
         return getType(id, BuildingType.class);
     }
 
     // -- Goods --
+
     public List<GoodsType> getGoodsTypeList() {
         return goodsTypeList;
-    }
-
-    /**
-     * Describe <code>numberOfGoodsTypes</code> method here.
-     *
-     * @return an <code>int</code> value
-     */
-    public int numberOfGoodsTypes() {
-        return goodsTypeList.size();
-    }
-
-    public int numberOfStoredGoodsTypes() {
-        return storableTypes;
     }
 
     public List<GoodsType> getFarmedGoodsTypeList() {
@@ -1103,22 +1000,8 @@ public final class Specification {
         return foodGoodsTypeList;
     }
 
-    public int numberOfFarmedGoodsTypes() {
-        return farmedGoodsTypeList.size();
-    }
-
     public final List<GoodsType> getRawBuildingGoodsTypeList() {
         return rawBuildingGoodsTypeList;
-    }
-
-    /**
-     * Describe <code>getGoodsType</code> method here.
-     *
-     * @param id a <code>String</code> value
-     * @return a <code>GoodsType</code> value
-     */
-    public GoodsType getGoodsType(String id) {
-        return getType(id, GoodsType.class);
     }
 
     /**
@@ -1133,69 +1016,83 @@ public final class Specification {
     }
 
     /**
-     * Returns the initial <em>minimum</em> price of the given goods
+     * Get the initial <em>minimum</em> price of the given goods
      * type. The initial price in a particular Market may be higher.
      *
-     * @param goodsType a <code>GoodsType</code> value
-     * @return an <code>int</code> value
+     * @param goodsType The <code>GoodsType</code> to check.
+     * @return The minimum price.
      */
     public int getInitialPrice(GoodsType goodsType) {
         String suffix = goodsType.getSuffix("model.goods.");
-        if (hasOption("model.option." + suffix + ".minimumPrice")
-            && hasOption("model.option." + suffix + ".maximumPrice")) {
-            return Math.min(getInteger("model.option." + suffix + ".maximumPrice"),
-                            getInteger("model.option." + suffix + ".minimumPrice"));
-        } else {
-            return goodsType.getInitialSellPrice();
-        }
+        String minPrice = "model.option." + suffix + ".minimumPrice";
+        String maxPrice = "model.option." + suffix + ".maximumPrice";
+        return (hasOption(minPrice) && hasOption(maxPrice))
+            ? Math.min(getInteger(minPrice), getInteger(maxPrice))
+            : goodsType.getInitialSellPrice();
+    }
+
+    /**
+     * Get a goods type by identifier.
+     *
+     * @param id The object identifier.
+     * @return The <code>GoodsType</code> found.
+     */
+    public GoodsType getGoodsType(String id) {
+        return getType(id, GoodsType.class);
     }
 
     // -- Resources --
+
     public List<ResourceType> getResourceTypeList() {
         return resourceTypeList;
     }
 
-    public int numberOfResourceTypes() {
-        return resourceTypeList.size();
-    }
-
+    /**
+     * Get a resource type by identifier.
+     *
+     * @param id The object identifier.
+     * @return The <code>ResourceType</code> found.
+     */
     public ResourceType getResourceType(String id) {
         return getType(id, ResourceType.class);
     }
 
     // -- Tiles --
+
     public List<TileType> getTileTypeList() {
         return tileTypeList;
     }
 
-    public int numberOfTileTypes() {
-        return tileTypeList.size();
-    }
-
+    /**
+     * Get a tile type by identifier.
+     *
+     * @param id The object identifier.
+     * @return The <code>TileType</code> found.
+     */
     public TileType getTileType(String id) {
         return getType(id, TileType.class);
     }
 
     // -- Improvements --
+
     public List<TileImprovementType> getTileImprovementTypeList() {
         return tileImprovementTypeList;
     }
 
+    /**
+     * Get a tile improvement type by identifier.
+     *
+     * @param id The object identifier.
+     * @return The <code>TileImprovementType</code> found.
+     */
     public TileImprovementType getTileImprovementType(String id) {
         return getType(id, TileImprovementType.class);
     }
 
     // -- Units --
+
     public List<UnitType> getUnitTypeList() {
         return unitTypeList;
-    }
-
-    public int numberOfUnitTypes() {
-        return unitTypeList.size();
-    }
-
-    public UnitType getUnitType(String id) {
-        return getType(id, UnitType.class);
     }
 
     /**
@@ -1210,39 +1107,49 @@ public final class Specification {
         return getUnitType("model.unit.freeColonist");
     }
 
+    /**
+     * Get the unit type that is the expert for producing a type of goods.
+     *
+     * @param goodsType The <code>GoodsType</code> to check.
+     * @return The expert <code>UnitType</code>, or null if none.
+     */
     public UnitType getExpertForProducing(GoodsType goodsType) {
         return experts.get(goodsType);
     }
 
     /**
-     * Return the unit types which have any of the given abilities
+     * Get the unit types which have any of the given abilities
      *
      * @param abilities The abilities for the search
-     * @return a <code>List</code> of <code>UnitType</code>
+     * @return A list of <code>UnitType</code>s with the abilities.
      */
     public List<UnitType> getUnitTypesWithAbility(String... abilities) {
         return getTypesWithAbility(UnitType.class, abilities);
     }
 
     /**
-     * Return the unit types which have none of the given abilities
+     * Get the unit types which have none of the given abilities
      *
      * @param abilities The abilities for the search
-     * @return a <code>List</code> of <code>UnitType</code>
+     * @return A list of <code>UnitType</code>s without the abilities.
      */
     public List<UnitType> getUnitTypesWithoutAbility(String... abilities) {
         return getTypesWithoutAbility(UnitType.class, abilities);
     }
 
     /**
-     * Returns the unit types that can be trained in Europe.
+     * Gets the unit types that can be trained in Europe.
+     *
+     * @return A list of Europe-trainable <code>UnitType</code>s.
      */
     public List<UnitType> getUnitTypesTrainedInEurope() {
         return unitTypesTrainedInEurope;
     }
 
     /**
-     * Returns the unit types that can be purchased in Europe.
+     * Get the unit types that can be purchased in Europe.
+     *
+     * @return A list of Europe-purchasable <code>UnitType</code>s.
      */
     public List<UnitType> getUnitTypesPurchasedInEurope() {
         return unitTypesPurchasedInEurope;
@@ -1279,16 +1186,28 @@ public final class Specification {
         return types;
     }
 
+    /**
+     * Get a unit type by identifier.
+     *
+     * @param id The object identifier.
+     * @return The <code>UnitType</code> found.
+     */
+    public UnitType getUnitType(String id) {
+        return getType(id, UnitType.class);
+    }
+
     // -- Founding Fathers --
 
     public List<FoundingFather> getFoundingFathers() {
         return foundingFathers;
     }
 
-    public int numberOfFoundingFathers() {
-        return foundingFathers.size();
-    }
-
+    /**
+     * Get a founding father type by identifier.
+     *
+     * @param id The object identifier.
+     * @return The <code>FoundingFather</code> found.
+     */
     public FoundingFather getFoundingFather(String id) {
         return getType(id, FoundingFather.class);
     }
@@ -1311,10 +1230,12 @@ public final class Specification {
         return indianNationTypes;
     }
 
-    public int numberOfNationTypes() {
-        return nationTypes.size();
-    }
-
+    /**
+     * Get a nation type by identifier.
+     *
+     * @param id The object identifier.
+     * @return The <code>NationType</code> found.
+     */
     public NationType getNationType(String id) {
         return getType(id, NationType.class);
     }
@@ -1323,10 +1244,6 @@ public final class Specification {
 
     public List<Nation> getNations() {
         return nations;
-    }
-
-    public Nation getNation(String id) {
-        return getType(id, Nation.class);
     }
 
     public List<Nation> getEuropeanNations() {
@@ -1341,20 +1258,44 @@ public final class Specification {
         return REFNations;
     }
 
+    /**
+     * Get a nation by identifier.
+     *
+     * @param id The object identifier.
+     * @return The <code>Nation</code> found.
+     */
+    public Nation getNation(String id) {
+        return getType(id, Nation.class);
+    }
+
     // -- Roles --
+
     public List<Role> getRoles() {
         return roles;
     }
 
+    /**
+     * Get a role by identifier.
+     *
+     * @param id The object identifier.
+     * @return The <code>Role</code> found.
+     */
     public Role getRole(String id) {
         return getType(id, Role.class);
     }
 
     // -- EquipmentTypes --
+
     public List<EquipmentType> getEquipmentTypeList() {
         return equipmentTypes;
     }
 
+    /**
+     * Get an equipment type by identifier.
+     *
+     * @param id The object identifier.
+     * @return The <code>EquipmentType</code> found.
+     */
     public EquipmentType getEquipmentType(String id) {
         return getType(id, EquipmentType.class);
     }
@@ -1433,53 +1374,207 @@ public final class Specification {
 
 
     // -- Events --
+
     public List<Event> getEvents() {
         return events;
     }
 
+    /**
+     * Get an event by identifier.
+     *
+     * @param id The object identifier.
+     * @return The <code>Event</code> found.
+     */
     public Event getEvent(String id) {
         return getType(id, Event.class);
     }
 
     // -- Disasters --
+
     public List<Disaster> getDisasters() {
         return disasters;
     }
 
+    /**
+     * Get a disaster by identifier.
+     *
+     * @param id The object identifier.
+     * @return The <code>Disaster</code> found.
+     */
     public Disaster getDisaster(String id) {
         return getType(id, Disaster.class);
     }
 
+    // General type retrieval
+
     /**
-     * Returns the FreeColGameObjectType identified by the
-     * attributeName, or the default value if there is no such
-     * attribute.
+     * Get the <code>FreeColGameObjectType</code> with the given identifier.
      *
-     * @param in the XMLStreamReader
-     * @param attributeName the name of the attribute identifying the
-     * FreeColGameObjectType
-     * @param returnClass the class of the return value
-     * @param defaultValue the value to return if there is no
-     * attribute named attributeName
-     * @return a FreeColGameObjectType value
+     * @param id The object identifier to look for.
+     * @param type The expected <code>Class</code>.
+     * @return The <code>FreeColGameObjectType</code> found.
+     * @exception IllegalArgumentException if an error occurs
      */
-    public <T extends FreeColGameObjectType> T getType(XMLStreamReader in, String attributeName,
-                                                       Class<T> returnClass, T defaultValue) {
+    public <T extends FreeColGameObjectType> T getType(String id, Class<T> type)
+        throws IllegalArgumentException {
+        if (id == null) {
+            throw new IllegalArgumentException("Null id");
+        } else if (allTypes.containsKey(id)) {
+            try {
+                return type.cast(allTypes.get(id));
+            } catch(ClassCastException cce) {
+                logger.log(Level.WARNING, id + " caused ClassCastException!",
+                    cce);
+                throw(cce);
+            }
+
+        // @compat 0.9.x
+        } else if (allTypes.containsKey(mangle(id))) {
+            return type.cast(allTypes.get(mangle(id)));
+        // end @compat
+
+        } else if (initialized) {
+            throw new IllegalArgumentException("Undefined FCGOT: " + id);
+
+        } else { // forward declaration of new type
+            try {
+                Constructor<T> c = type.getConstructor(String.class,
+                                                       Specification.class);
+                T result = c.newInstance(id, this);
+                allTypes.put(id, result);
+                return result;
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Could not construct: " + id, e);
+                return null;
+            }
+        }
+    }
+
+    // @compat 0.9.x
+    private String mangle(String id) {
+        int index = id.lastIndexOf('.');
+        return (index == -1) ? id
+            : id.substring(0, index + 1) + id.substring(index + 1,
+                index + 2).toLowerCase(Locale.US) + id.substring(index + 2);
+    }
+    // end @compat
+
+    public FreeColGameObjectType getType(String id) throws IllegalArgumentException {
+        return getType(id, FreeColGameObjectType.class);
+    }
+
+    /**
+     * Get the FreeColGameObjectTypes that provide the required ability.
+     *
+     * @param id The object identifier.
+     * @param value The ability value to check.
+     * @return A list of <code>FreeColGameObjectType</code>s that
+     *     provide the required ability.
+     */
+    public List<FreeColGameObjectType> getTypesProviding(String id,
+                                                         boolean value) {
+        List<FreeColGameObjectType> result
+            = new ArrayList<FreeColGameObjectType>();
+        for (Ability ability : getAbilities(id)) {
+            if (ability.getValue() == value
+                && ability.getSource() instanceof FreeColGameObjectType) {
+                result.add((FreeColGameObjectType) ability.getSource());
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Get all types which have any of the given abilities.
+     *
+     * @param abilities The abilities for the search
+     * @return A list of <code>FreeColGameObjectType</code>s with at
+     *     least one of the given abilities.
+     */
+    public <T extends FreeColGameObjectType> List<T>
+                      getTypesWithAbility(Class<T> resultType,
+                                          String... abilities) {
+        List<T> result = new ArrayList<T>();
+        for (FreeColGameObjectType type : allTypes.values()) {
+            if (resultType.isInstance(type)) {
+                for (String ability : abilities) {
+                    if (type.hasAbility(ability)) {
+                        result.add(resultType.cast(type));
+                        break;
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Get all types which have none of the given abilities.
+     *
+     * @param abilities The abilities for the search
+     * @return A list of <code>FreeColGameObjectType</code>s without the
+     *     given abilities.
+     */
+    public <T extends FreeColGameObjectType> List<T>
+                      getTypesWithoutAbility(Class<T> resultType,
+                                             String... abilities) {
+        List<T> result = new ArrayList<T>();
+        type: for (FreeColGameObjectType type : allTypes.values()) {
+            if (resultType.isInstance(type)) {
+                for (String ability : abilities) {
+                    if (type.hasAbility(ability)) continue type;
+                }
+                result.add(resultType.cast(type));
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Get the FreeColGameObjectType by identifier from a stream.
+     *
+     * @param in The <code>XMLStreamReader</code> to read from.
+     * @param attributeName the name of the attribute identifying the
+     *     <code>FreeColGameObjectType</code>.
+     * @param returnClass The expected class of the return value.
+     * @param defaultValue A default value to return if the attributeName 
+     *     attribute is not present.
+     * @return The <code>FreeColGameObjectType</code> found, or the
+     *     <code>defaultValue</code>.
+     */
+    public <T extends FreeColGameObjectType> T getType(XMLStreamReader in,
+        String attributeName, Class<T> returnClass, T defaultValue) {
         final String attrib =
         // @compat 0.10.7
             (FreeColObject.ID_ATTRIBUTE_TAG.equals(attributeName))
             ? FreeColObject.readId(in) :
         // end @compat
             in.getAttributeValue(null, attributeName);
-        if (attrib != null) {
-            return getType(attrib, returnClass);
-        } else {
-            return defaultValue;
-        }
+        return (attrib == null) ? defaultValue : getType(attrib, returnClass);
     }
 
 
     // Serialization
+
+    private static final String BUILDING_TYPES_TAG = "building-types";
+    private static final String DIFFICULTY_LEVEL_TAG = "difficultyLevel";
+    private static final String DISASTERS_TAG = "disasters";
+    private static final String EQUIPMENT_TYPES_TAG = "equipment-types";
+    private static final String EUROPEAN_NATION_TYPES_TAG = "european-nation-types";
+    private static final String EVENTS_TAG = "events";
+    private static final String FOUNDING_FATHERS_TAG = "founding-fathers";
+    private static final String GOODS_TYPES_TAG = "goods-types";
+    private static final String INDIAN_NATION_TYPES_TAG = "indian-nation-types";
+    private static final String MODIFIERS_TAG = "modifiers";
+    private static final String NATIONS_TAG = "nations";
+    private static final String OPTIONS_TAG = "options";
+    private static final String RESOURCE_TYPES_TAG = "resource-types";
+    private static final String ROLES_TAG = "roles";
+    private static final String TILE_TYPES_TAG = "tile-types";
+    private static final String TILEIMPROVEMENT_TYPES_TAG = "tileimprovement-types";
+    private static final String UNIT_TYPES_TAG = "unit-types";
+    private static final String VERSION_TAG = "version";
+
 
     /**
      * Write an XML-representation of this object to the given stream.
@@ -1495,31 +1590,31 @@ public final class Specification {
         // Add attributes:
         out.writeAttribute(FreeColObject.ID_ATTRIBUTE_TAG, getId());
         if (difficultyLevel != null) {
-            out.writeAttribute("difficultyLevel", difficultyLevel);
+            out.writeAttribute(DIFFICULTY_LEVEL_TAG, difficultyLevel);
         }
         if (version != null) {
-            out.writeAttribute("version", version);
+            out.writeAttribute(VERSION_TAG, version);
         }
 
         // copy the order of section in specification.xml
-        writeSection(out, "modifiers", specialModifiers);
-        writeSection(out, "events", events);
-        writeSection(out, "disasters", disasters);
-        writeSection(out, "goods-types", goodsTypeList);
-        writeSection(out, "resource-types", resourceTypeList);
-        writeSection(out, "tile-types", tileTypeList);
-        writeSection(out, "roles", roles);
-        writeSection(out, "equipment-types", equipmentTypes);
-        writeSection(out, "tileimprovement-types", tileImprovementTypeList);
-        writeSection(out, "unit-types", unitTypeList);
-        writeSection(out, "building-types", buildingTypeList);
-        writeSection(out, "founding-fathers", foundingFathers);
-        writeSection(out, "european-nation-types", europeanNationTypes);
-        writeSection(out, "european-nation-types", REFNationTypes);
-        writeSection(out, "indian-nation-types", indianNationTypes);
-        writeSection(out, "nations", nations);
+        writeSection(out, MODIFIERS_TAG, specialModifiers);
+        writeSection(out, EVENTS_TAG, events);
+        writeSection(out, DISASTERS_TAG, disasters);
+        writeSection(out, GOODS_TYPES_TAG, goodsTypeList);
+        writeSection(out, RESOURCE_TYPES_TAG, resourceTypeList);
+        writeSection(out, TILE_TYPES_TAG, tileTypeList);
+        writeSection(out, ROLES_TAG, roles);
+        writeSection(out, EQUIPMENT_TYPES_TAG, equipmentTypes);
+        writeSection(out, TILEIMPROVEMENT_TYPES_TAG, tileImprovementTypeList);
+        writeSection(out, UNIT_TYPES_TAG, unitTypeList);
+        writeSection(out, BUILDING_TYPES_TAG, buildingTypeList);
+        writeSection(out, FOUNDING_FATHERS_TAG, foundingFathers);
+        writeSection(out, EUROPEAN_NATION_TYPES_TAG, europeanNationTypes);
+        writeSection(out, EUROPEAN_NATION_TYPES_TAG, REFNationTypes);
+        writeSection(out, INDIAN_NATION_TYPES_TAG, indianNationTypes);
+        writeSection(out, NATIONS_TAG, nations);
         // option tree has been flattened
-        out.writeStartElement("options");
+        out.writeStartElement(OPTIONS_TAG);
         for (OptionGroup item : allOptionGroups.values()) {
             if ("".equals(item.getGroup())) {
                 item.toXML(out);
@@ -1549,13 +1644,11 @@ public final class Specification {
     public void readFromXML(XMLStreamReader xsr) throws XMLStreamException {
         String newId = FreeColObject.readId(xsr);
         if (difficultyLevel == null) {
-            difficultyLevel = xsr.getAttributeValue(null, "difficultyLevel");
+            difficultyLevel = xsr.getAttributeValue(null, DIFFICULTY_LEVEL_TAG);
         }
         logger.fine("Difficulty level is " + difficultyLevel);
-        if (id == null) {
-            // don't overwrite id with parent id!
-            id = newId;
-        }
+        if (id == null) id = newId; // don't overwrite id with parent id!
+
         logger.fine("Reading specification " + newId);
         String parentId = xsr.getAttributeValue(null, FreeColGameObjectType.EXTENDS_TAG);
         if (parentId != null) {
@@ -1563,7 +1656,7 @@ public final class Specification {
                 FreeColTcFile parent = new FreeColTcFile(parentId);
                 load(parent.getSpecificationInputStream());
                 initialized = false;
-            } catch(IOException e) {
+            } catch (IOException e) {
                 throw new XMLStreamException("Failed to open parent specification: " + e);
             }
         }
@@ -1580,10 +1673,10 @@ public final class Specification {
                             xsr.nextTag();
                         }
                     }
+                // end @compat
                 } else {
                     throw new RuntimeException("unexpected: " + childName);
                 }
-                // end compatibility code
             } else {
                 reader.readChildren(xsr);
             }
@@ -1598,7 +1691,7 @@ public final class Specification {
                 ff.fixup09x();
             }
         }
-        // end compatibility code
+        // end @compat
 
         // @compat 0.10.1
         String[] years = new String[] {
@@ -1614,7 +1707,7 @@ public final class Specification {
                 allOptions.put(id, option);
             }
         }
-        // end compatibility code
+        // end @compat
 
         // @compat 0.10.5
         String id = "model.option.interventionBells";
@@ -1632,34 +1725,50 @@ public final class Specification {
         id = "model.option.interventionForce";
         if (allOptions.get(id) == null) {
             UnitListOption interventionForce = new UnitListOption(id);
-            AbstractUnitOption regulars = new AbstractUnitOption(id + ".regulars");
-            regulars.setValue(new AbstractUnit("model.unit.colonialRegular", Unit.Role.SOLDIER, 2));
+            AbstractUnitOption regulars
+                = new AbstractUnitOption(id + ".regulars");
+            regulars.setValue(new AbstractUnit("model.unit.colonialRegular",
+                                               Unit.Role.SOLDIER, 2));
             interventionForce.getValue().add(regulars);
-            AbstractUnitOption dragoons = new AbstractUnitOption(id + ".dragoons");
-            dragoons.setValue(new AbstractUnit("model.unit.colonialRegular", Unit.Role.DRAGOON, 2));
+            AbstractUnitOption dragoons
+                = new AbstractUnitOption(id + ".dragoons");
+            dragoons.setValue(new AbstractUnit("model.unit.colonialRegular",
+                                               Unit.Role.DRAGOON, 2));
             interventionForce.getValue().add(dragoons);
-            AbstractUnitOption artillery = new AbstractUnitOption(id + ".artillery");
-            artillery.setValue(new AbstractUnit("model.unit.artillery", Unit.Role.DEFAULT, 2));
+            AbstractUnitOption artillery
+                = new AbstractUnitOption(id + ".artillery");
+            artillery.setValue(new AbstractUnit("model.unit.artillery",
+                                                Unit.Role.DEFAULT, 2));
             interventionForce.getValue().add(artillery);
-            AbstractUnitOption menOfWar = new AbstractUnitOption(id + ".menOfWar");
-            menOfWar.setValue(new AbstractUnit("model.unit.manOWar", Unit.Role.DEFAULT, 2));
+            AbstractUnitOption menOfWar
+                = new AbstractUnitOption(id + ".menOfWar");
+            menOfWar.setValue(new AbstractUnit("model.unit.manOWar",
+                                               Unit.Role.DEFAULT, 2));
             interventionForce.getValue().add(menOfWar);
             allOptions.put(id, interventionForce);
         }
         id = "model.option.mercenaryForce";
         if (allOptions.get(id) == null) {
             UnitListOption mercenaryForce = new UnitListOption(id);
-            AbstractUnitOption regulars = new AbstractUnitOption(id + ".regulars");
-            regulars.setValue(new AbstractUnit("model.unit.veteranSoldier", Unit.Role.SOLDIER, 2));
+            AbstractUnitOption regulars
+                = new AbstractUnitOption(id + ".regulars");
+            regulars.setValue(new AbstractUnit("model.unit.veteranSoldier",
+                                               Unit.Role.SOLDIER, 2));
             mercenaryForce.getValue().add(regulars);
-            AbstractUnitOption dragoons = new AbstractUnitOption(id + ".dragoons");
-            dragoons.setValue(new AbstractUnit("model.unit.veteranSoldier", Unit.Role.DRAGOON, 2));
+            AbstractUnitOption dragoons
+                = new AbstractUnitOption(id + ".dragoons");
+            dragoons.setValue(new AbstractUnit("model.unit.veteranSoldier",
+                                               Unit.Role.DRAGOON, 2));
             mercenaryForce.getValue().add(dragoons);
-            AbstractUnitOption artillery = new AbstractUnitOption(id + ".artillery");
-            artillery.setValue(new AbstractUnit("model.unit.artillery", Unit.Role.DEFAULT, 2));
+            AbstractUnitOption artillery
+                = new AbstractUnitOption(id + ".artillery");
+            artillery.setValue(new AbstractUnit("model.unit.artillery",
+                                                Unit.Role.DEFAULT, 2));
             mercenaryForce.getValue().add(artillery);
-            AbstractUnitOption menOfWar = new AbstractUnitOption(id + ".menOfWar");
-            menOfWar.setValue(new AbstractUnit("model.unit.manOWar", Unit.Role.DEFAULT, 2));
+            AbstractUnitOption menOfWar
+                = new AbstractUnitOption(id + ".menOfWar");
+            menOfWar.setValue(new AbstractUnit("model.unit.manOWar",
+                                               Unit.Role.DEFAULT, 2));
             mercenaryForce.getValue().add(menOfWar);
             allOptions.put(id, mercenaryForce);
         }
@@ -1687,7 +1796,7 @@ public final class Specification {
                 }
             }
         }
-        // end compatibility code
+        // end @compat
 
         // @compat 0.10.7
         for (EuropeanNationType ent : europeanNationTypes) {
@@ -1696,7 +1805,7 @@ public final class Specification {
                 ent.addAbility(new Ability(Ability.FOUNDS_COLONIES, ent, true));
             }
         }
-        // end compatibility code
+        // end @compat
 
         if (getREFUnitTypes(true).isEmpty()) {
             logger.warning("No naval REF units, REF will not function.");

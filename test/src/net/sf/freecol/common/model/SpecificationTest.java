@@ -284,12 +284,13 @@ public final class SpecificationTest extends FreeColTestCase {
     public void testLoadMods() {
         try {
             Specification specification = new Specification(new FreeColTcFile("freecol").getSpecificationInputStream());
-            int numberOfUnitTypes = specification.numberOfUnitTypes();
+            int numberOfUnitTypes = specification.getUnitTypeList().size();
             List<FreeColModFile> mods = new ArrayList<FreeColModFile>();
             mods.add(new FreeColModFile(new File("data/mods/example")));
             specification.loadMods(mods);
             UnitType milkmaid = specification.getUnitType("model.unit.milkmaid");
-            assertEquals(numberOfUnitTypes + 1, specification.numberOfUnitTypes());
+            assertEquals(numberOfUnitTypes + 1, 
+                specification.getUnitTypeList().size());
         } catch(Exception e) {
             fail(e.getMessage());
         }
