@@ -31,14 +31,16 @@ import javax.swing.TransferHandler;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.panel.ColonyPanel.TilesPanel.ASingleTilePanel;
+import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Unit;
 
 
 /**
  * A DragListener should be attached to Swing components that have a
- * TransferHandler attached. The DragListener will make sure that the Swing
- * component to which it is attached is draggable (moveable to be precise).
+ * TransferHandler attached.  The DragListener will make sure that the
+ * Swing component to which it is attached is draggable (moveable to
+ * be precise).
  */
 public final class DragListener extends MouseAdapter {
 
@@ -49,6 +51,7 @@ public final class DragListener extends MouseAdapter {
     private FreeColClient freeColClient;
 
     private GUI gui;
+
 
     /**
      * The constructor to use.
@@ -73,29 +76,30 @@ public final class DragListener extends MouseAdapter {
         JComponent comp = (JComponent) e.getSource();
         // Does not work on some platforms:
         // if (e.isPopupTrigger() && (comp instanceof UnitLabel)) {
-        if ((e.getButton() == MouseEvent.BUTTON3 || e.isPopupTrigger())) {
+
+        if (e.getButton() == MouseEvent.BUTTON3 || e.isPopupTrigger()) {
             // Popup mustn't be shown when panel is not editable
             if (parentPanel.isEditable()) {
                 QuickActionMenu menu = null;
                 if (comp instanceof UnitLabel) {
-                    menu = new QuickActionMenu(freeColClient, gui, parentPanel);
+                    menu = new QuickActionMenu(freeColClient, parentPanel);
                     menu.createUnitMenu((UnitLabel) comp);
                 } else if (comp instanceof GoodsLabel) {
-                    menu = new QuickActionMenu(freeColClient, gui, parentPanel);
-                    menu.createGoodsMenu((GoodsLabel) comp);
+                    menu = new QuickActionMenu(freeColClient, parentPanel);
+                    menu.createGoodsMenu((GoodsLabel)comp);
                 } else if (comp instanceof MarketLabel
                            && parentPanel instanceof EuropePanel) {
-                    GoodsType goodsType = ((MarketLabel) comp).getType();
-                    if (freeColClient.getInGameController()
-                        .payArrears(goodsType)) {
-                        ((EuropePanel) parentPanel).revalidate();
-                        ((EuropePanel) parentPanel).refresh();
-                    }
-                } else if (comp instanceof ASingleTilePanel
-                        || (comp.getParent() != null && comp.getParent() instanceof ASingleTilePanel)) {
-                    menu = new QuickActionMenu(freeColClient, gui, parentPanel);
-                    // Also check the parent to show the popup in the center of the colony panel tile
-                    menu.createTileMenu((ASingleTilePanel)(comp instanceof ASingleTilePanel ? comp : comp.getParent()));
+                    Europe europe = freeColClient.getMyPlayer().getEurope();
+                    menu = new QuickActionMenu(freeColClient, parentPanel);
+                    menu.createMarketMenu((MarketLabel)comp, europe);
+                } else if (comp instanceof ASingleTilePanel) {
+                    menu = new QuickActionMenu(freeColClient, parentPanel);
+                    menu.createTileMenu((ASingleTilePanel)comp);
+                } else if (comp.getParent() instanceof ASingleTilePanel) {
+                    // Also check the parent to show the popup in the
+                    // center of the colony panel tile.
+                    menu = new QuickActionMenu(freeColClient, parentPanel);
+                    menu.createTileMenu((ASingleTilePanel)(comp.getParent()));
                 }
                 if (menu != null) {
                     int elements = menu.getSubElements().length;
@@ -104,18 +108,20 @@ public final class DragListener extends MouseAdapter {
                         if (menu.getComponent(lastIndex) instanceof JPopupMenu.Separator) {
                             menu.remove(lastIndex);
                         }
-                        if (gui.isWindowed() && System.getProperty("os.name").startsWith("Windows")) {
-                            // work-around: JRE on Windows is unable
+                        boolean windows = System.getProperty("os.name")
+                            .startsWith("Windows");
+                        boolean small = Toolkit.getDefaultToolkit()
+                            .getScreenSize().getHeight() < 768;
+                        if (gui.isWindowed() && windows) {
+                            // Work-around: JRE on Windows is unable
                             // to display popup menus that extend
                             // beyond the canvas
                             menu.show(gui.getCanvas(), menu.getLocation().x, 0);
-                        } else if(!gui.isWindowed()
-                                  && Toolkit.getDefaultToolkit()
-                                  .getScreenSize().getHeight() < 768) {
+                        } else if (!gui.isWindowed() && small) {
                             /*
                              * Move popup up when in full screen mode
                              * and when the screen size is too small
-                             * to fit. Similar to above workaround,
+                             * to fit.  Similar to above workaround,
                              * but targeted for users with smaller
                              * screens such as netbooks
                              */
@@ -131,7 +137,7 @@ public final class DragListener extends MouseAdapter {
                 AbstractGoodsLabel label = (AbstractGoodsLabel) comp;
                 if (e.isShiftDown()) {
                     label.setPartialChosen(true);
-                } else if(e.isAltDown()){
+                } else if (e.isAltDown()) {
                     label.toEquip(true);
                 } else {
                     label.setPartialChosen(false);
@@ -152,6 +158,4 @@ public final class DragListener extends MouseAdapter {
             }
         }
     }
-
-
 }

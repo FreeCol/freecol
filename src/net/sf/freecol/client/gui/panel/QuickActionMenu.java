@@ -50,6 +50,7 @@ import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Player;
@@ -78,15 +79,15 @@ public final class QuickActionMenu extends JPopupMenu {
 
     private FreeColClient freeColClient;
 
-    private GUI gui;
+    private final GUI gui;
 
     /**
      * Creates a standard empty menu
      */
-    public QuickActionMenu(FreeColClient freeColClient, GUI gui, FreeColPanel freeColPanel)
+    public QuickActionMenu(FreeColClient freeColClient, FreeColPanel freeColPanel)
     {
         this.freeColClient = freeColClient;
-        this.gui = gui;
+        this.gui = freeColClient.getGUI();
         this.parentPanel = freeColPanel;
     }
 
@@ -162,6 +163,7 @@ public final class QuickActionMenu extends JPopupMenu {
     }
 
     private boolean addBoardItems(final UnitLabel unitLabel, Location loc) {
+        final InGameController igc = freeColClient.getInGameController();
         final Unit tempUnit = unitLabel.getUnit();
 
         if (tempUnit.isCarrier()) return false;
@@ -171,7 +173,6 @@ public final class QuickActionMenu extends JPopupMenu {
                 && unit.canAdd(tempUnit)
                 && tempUnit.getLocation() != unit) {
                 final Unit funit = unit;
-                final InGameController igc = freeColClient.getInGameController();
                 StringTemplate template = StringTemplate.template("board")
                     .addStringTemplate("%unit%", unit.getLabel());
                 JMenuItem menuItem = new JMenuItem(Messages.message(template));
@@ -187,9 +188,8 @@ public final class QuickActionMenu extends JPopupMenu {
         return added;
     }
 
-    private boolean addLoadItems(final GoodsLabel goodsLabel, Location loc) {
+    private boolean addLoadItems(final Goods goods, Location loc) {
         final InGameController igc = freeColClient.getInGameController();
-        final Goods goods = goodsLabel.getGoods();
 
         boolean added = false;
         for (Unit unit : loc.getUnitList()) {
@@ -201,7 +201,44 @@ public final class QuickActionMenu extends JPopupMenu {
                 JMenuItem menuItem = new JMenuItem(Messages.message(template));
                 menuItem.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
+                            if ((e.getModifiers() & ActionEvent.SHIFT_MASK) != 0) {
+                                promptForAmount(goods);
+                            }
                             igc.loadCargo(goods, funit);
+                        }
+                    });
+                this.add(menuItem);
+                added = true;
+            }
+        }
+        return added;
+    }
+
+    private void promptForAmount(AbstractGoods ag) {
+        int ret = gui.showSelectAmountDialog(ag.getType(), 
+                                             GoodsContainer.CARGO_SIZE,
+                                             ag.getAmount(), true);
+        if (ret > 0) ag.setAmount(ret);
+    }
+
+    private boolean addMarketItems(final AbstractGoods ag, Europe europe) {
+        final InGameController igc = freeColClient.getInGameController();
+        final Goods goods = new Goods(europe.getGame(), null,
+                                      ag.getType(), ag.getAmount());
+        boolean added = false;
+        for (Unit unit : europe.getUnitList()) {
+            if (unit.isCarrier() && unit.canCarryGoods()
+                && unit.canAdd(goods)) {
+                final Unit funit = unit;
+                StringTemplate template = StringTemplate.template("loadOnTo")
+                    .addStringTemplate("%unit%", unit.getLabel());
+                JMenuItem menuItem = new JMenuItem(Messages.message(template));
+                menuItem.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            if ((e.getModifiers() & ActionEvent.SHIFT_MASK) != 0) {
+                                promptForAmount(ag);
+                            }
+                            igc.buyGoods(ag.getType(), ag.getAmount(), funit);
                         }
                     });
                 this.add(menuItem);
@@ -679,18 +716,37 @@ public final class QuickActionMenu extends JPopupMenu {
         }
     }
 
+    private void addPayArrears(final GoodsType goodsType) {
+        final InGameController igc = freeColClient.getInGameController();
+
+        JMenuItem pay = new JMenuItem(Messages.message("boycottedGoods.payArrears"));
+        pay.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    igc.payArrears(goodsType);
+                    // TODO fix pcls so this hackery can go away
+                    if (parentPanel instanceof CargoPanel) {
+                        CargoPanel cargoPanel = (CargoPanel) parentPanel;
+                        cargoPanel.initialize();
+                    }
+                    parentPanel.revalidate();
+                }
+            });
+        this.add(pay);
+    }
+
     /**
-     * Creates a menu for a good.
+     * Creates a menu for some goods.
      */
     public void createGoodsMenu(final GoodsLabel goodsLabel) {
         final InGameController igc = freeColClient.getInGameController();
         final Player player = freeColClient.getMyPlayer();
         final Goods goods = goodsLabel.getGoods();
         ImageLibrary imageLibrary = parentPanel.getLibrary();
-        this.setLabel("Cargo");
-        JMenuItem name = new JMenuItem(Messages.message(goods.getNameKey()) + " (" +
-                                       Messages.message("menuBar.colopedia") + ")",
-                                       imageLibrary.getScaledGoodsImageIcon(goods.getType(), 0.66f));
+
+        this.setLabel(Messages.message("cargo"));
+        JMenuItem name = new JMenuItem(Messages.message(goods.getNameKey())
+            + " (" + Messages.message("menuBar.colopedia") + ")",
+            imageLibrary.getScaledGoodsImageIcon(goods.getType(), 0.66f));
         name.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     gui.showColopediaPanel(goods.getType().getId());
@@ -700,10 +756,14 @@ public final class QuickActionMenu extends JPopupMenu {
 
         if (goods.getLocation() instanceof Colony) {
             Colony colony = (Colony)goods.getLocation();
-            addLoadItems(goodsLabel, colony.getTile());
+            addLoadItems(goods, colony.getTile());
 
         } else if (goods.getLocation() instanceof Europe) {
-            ; // add purchase items?
+            Europe europe = (Europe)goods.getLocation();
+            addLoadItems(goods, europe);
+            if (!player.canTrade(goods.getType())) {
+                addPayArrears(goods.getType());
+            }
 
         } else if (goods.getLocation() instanceof Unit) {
             Unit carrier = (Unit)goods.getLocation();
@@ -714,6 +774,9 @@ public final class QuickActionMenu extends JPopupMenu {
                 JMenuItem unload = new JMenuItem(Messages.message("unload"));
                 unload.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
+                            if ((e.getModifiers() & ActionEvent.SHIFT_MASK) != 0) {
+                                promptForAmount(goods);
+                            }
                             igc.unloadCargo(goods, false);
                         }
                     });
@@ -721,23 +784,15 @@ public final class QuickActionMenu extends JPopupMenu {
             } else {
                 if (carrier.isInEurope()
                     && !player.canTrade(goods.getType())) {
-                    JMenuItem pay = new JMenuItem(Messages.message("boycottedGoods.payArrears"));
-                    pay.addActionListener(new ActionListener() {
-                            public void actionPerformed(ActionEvent e) {
-                                igc.payArrears(goods.getType());
-                                // TODO fix pcls so this hackery can go away
-                                if (parentPanel instanceof CargoPanel) {
-                                    CargoPanel cargoPanel = (CargoPanel) parentPanel;
-                                    cargoPanel.initialize();
-                                }
-                                parentPanel.revalidate();
-                            }
-                        });
-                    this.add(pay);
+                    addPayArrears(goods.getType());
                 }
+
                 JMenuItem dump = new JMenuItem(Messages.message("dumpCargo"));
                 dump.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
+                            if ((e.getModifiers() & ActionEvent.SHIFT_MASK) != 0) {
+                                promptForAmount(goods);
+                            }
                             igc.unloadCargo(goods, true);
                             // TODO fix pcls so this hackery can go away
                             if (parentPanel instanceof CargoPanel) {
@@ -748,6 +803,37 @@ public final class QuickActionMenu extends JPopupMenu {
                     });
                 this.add(dump);
             }
+        }
+    }
+
+    /**
+     * Creates a menu for some goods in a market.
+     *
+     * @param marketLabel The <code>MarketLabel</code> to create for.
+     * @param europe The <code>Europe</code> containing the label.
+     */
+    public void createMarketMenu(final MarketLabel marketLabel,
+                                 final Europe europe) {
+        final InGameController igc = freeColClient.getInGameController();
+        final Player player = freeColClient.getMyPlayer();
+        final AbstractGoods ag = marketLabel.getGoods();
+        ImageLibrary imageLibrary = parentPanel.getLibrary();
+
+        this.setLabel(Messages.message("cargo"));
+        JMenuItem name = new JMenuItem(Messages.message(ag.getNameKey())
+            + " (" + Messages.message("menuBar.colopedia") + ")",
+            imageLibrary.getScaledGoodsImageIcon(ag.getType(), 0.66f));
+        name.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    gui.showColopediaPanel(ag.getType().getId());
+                }
+            });
+        this.add(name);
+
+        addMarketItems(ag, europe);
+
+        if (!player.canTrade(ag.getType())) {
+            addPayArrears(ag.getType());
         }
     }
 }

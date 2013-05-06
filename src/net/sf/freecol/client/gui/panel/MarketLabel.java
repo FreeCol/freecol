@@ -37,34 +37,34 @@ import net.sf.freecol.common.model.Player;
 /**
  * This label represents a cargo type on the European market.
  */
-public final class MarketLabel extends AbstractGoodsLabel implements Draggable {
+public final class MarketLabel extends AbstractGoodsLabel
+    implements Draggable {
 
     private static Logger logger = Logger.getLogger(MarketLabel.class.getName());
 
+    /** The enclosing market. */
     private final Market market;
 
 
     /**
      * Initializes this JLabel with the given goods type.
      *
-     * @param type The Goods type that this JLabel will visually represent.
-     * @param market The <code>Market</code> being used to buy
-     *     and sell <code>Goods</code>.
+     * @param type The <code>GoodsType</code> to represent.
+     * @param market The <code>Market</code> in which to trade the goods.
      * @param gui The <code>GUI</code> to display on.
      */
     public MarketLabel(GoodsType type, Market market, GUI gui) {
         super(new AbstractGoods(type, GoodsContainer.CARGO_SIZE), gui);
-        if (market == null) {
-            throw new NullPointerException();
-        }
 
+        if (market == null) throw new IllegalArgumentException("Null market");
         this.market = market;
     }
 
 
     /**
-     * Returns this MarketLabel's market.
-     * @return This MarketLabel's market.
+     * Get this MarketLabel's market.
+     *
+     * @return The enclosing <code>Market</code>.
      */
     public Market getMarket() {
         return market;
@@ -72,6 +72,7 @@ public final class MarketLabel extends AbstractGoodsLabel implements Draggable {
 
     /**
      * Sets this MarketLabel's goods amount.
+     *
      * @param amount The amount of goods.
      */
     public void setAmount(int amount) {
@@ -86,38 +87,38 @@ public final class MarketLabel extends AbstractGoodsLabel implements Draggable {
         setAmount(GoodsContainer.CARGO_SIZE);
     }
 
-
     /**
-     * Returns <code>false</code>, since a MarketLabel can not be
-     * loaded onto a carrier.
+     * Is this label on a carrier?  No, it is in a market!
      *
-     * @return a <code>boolean</code> value
+     * @return False.
      */
     public boolean isOnCarrier() {
         return false;
     }
 
     /**
-     * Paints this MarketLabel.
+     * Paint this MarketLabel.
+     *
      * @param g The graphics context in which to do the painting.
      */
     @Override
     public void paintComponent(Graphics g) {
         Player player = market.getOwner();
-        String toolTipText = Messages.message(getType().getNameKey());
-        if (player == null || player.canTrade(getType())) {
+        GoodsType type = getType();
+        String toolTipText = Messages.message(type.getNameKey());
+        if (player == null || player.canTrade(type)) {
             setEnabled(true);
         } else {
-            toolTipText = Messages.message(getType().getLabel());
+            toolTipText = Messages.message(type.getLabel());
             setEnabled(false);
         }
         if (FreeColDebugger.isInDebugMode(FreeColDebugger.DebugMode.MENUS)) {
-            toolTipText += " " + market.getAmountInMarket(getType());
+            toolTipText += " " + market.getAmountInMarket(type);
         }
         setToolTipText(toolTipText);
 
-        super.setText(Integer.toString(market.getPaidForSale(getType()))
-                      + "/" + Integer.toString(market.getCostToBuy(getType())));
+        super.setText(market.getPaidForSale(type)
+                      + "/" + market.getCostToBuy(type));
         super.paintComponent(g);
     }
 }

@@ -57,61 +57,72 @@ public class AbstractGoodsLabel extends JLabel {
 
 
     /**
-     * Return true if not the entire amount has been selected.
+     * Get the label gui.
      *
-     * @return a <code>boolean</code> value
+     * @return The label gui.
+     */
+    protected GUI getGUI() {
+        return gui;
+    }
+
+    /**
+     * Has a partial amount been selected?
+     *
+     * @return True if a partial amount has been selected.
      */
     public boolean isPartialChosen() {
         return partialChosen;
     }
 
     /**
-     * Set whether only a partial amount is to be selected.
+     * Set the partial amount state.
      *
-     * @param partialChosen a <code>boolean</code> value
+     * @param partialChosen The new partial amount state.
      */
     public void setPartialChosen(boolean partialChosen) {
         this.partialChosen = partialChosen;
     }
 
     /**
-     * Returns
+     * Has unit equipping been selected?
      *
-     * @return a <code>boolean</code> value
+     * @return True if a unit equipping operation has been selected.
      */
     public boolean isToEquip() {
         return toEquip;
     }
 
     /**
-     * Set whether the goods will be used to equip a Unit.
+     * Set the unit equipping state.
      *
-     * @param toEquip a <code>boolean</code> value
+     * @param toEquip The new unit equipping state.
      */
     public void toEquip(boolean toEquip) {
         this.toEquip = toEquip;
     }
 
     /**
-     * Returns this GoodsLabel's goods data.
+     * Get the goods data.
      *
-     * @return This GoodsLabel's goods data.
+     * @return The goods data for this label.
      */
     public AbstractGoods getGoods() {
         return goods;
     }
 
     /**
-     * Returns this label's goods type.
-     * @return This label's goods type.
+     * Get the goods type.
+     *
+     * @return The goods type for this label.
      */
     public GoodsType getType() {
         return goods.getType();
     }
 
     /**
-     * Returns this label's goods amount.
-     * @return This label's goods amount.
+     * Get the goods amount.
+     *
+     * @return The goods amount.
      */
     public int getAmount() {
         return goods.getAmount();
@@ -119,15 +130,10 @@ public class AbstractGoodsLabel extends JLabel {
 
     /**
      * Sets the amount of the goods wrapped by this Label to a default
-     * value. By default, do nothing. Override this method if
+     * value.  By default, do nothing.  Override this method if
      * necessary.
      */
     public void setDefaultAmount() {
         // do nothing
     }
-
-    protected GUI getGUI() {
-        return gui;
-    }
-
 }

@@ -738,8 +738,8 @@ public final class ColonyPanel extends PortPanel
         JPopupMenu colonyUnitsMenu
             = new JPopupMenu(Messages.message("colonyPanel.colonyUnits"));
         ImageIcon unitIcon = null;
-        final QuickActionMenu unitMenu = new QuickActionMenu(freeColClient,
-                                                             getGUI(), this);
+        final QuickActionMenu unitMenu
+            = new QuickActionMenu(freeColClient, this);
         Tile colonyTile = colony.getTile();
         int unitNumber = 0;
         JMenuItem subMenu = null;
