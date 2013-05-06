@@ -53,6 +53,7 @@ import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
@@ -432,8 +433,10 @@ public class DebugUtils {
             
         List<ChoiceItem<Player>> pcs = new ArrayList<ChoiceItem<Player>>();
         for (Player sp : sGame.getPlayers()) {
-            String msg = Messages.message(sp.getNationName());
-            pcs.add(new ChoiceItem<Player>(msg, sp));
+            if ((settlement instanceof Colony) == sp.isEuropean()) {
+                String msg = Messages.message(sp.getNationName());
+                pcs.add(new ChoiceItem<Player>(msg, sp));
+            }
         }
         Player playerChoice = gui.showChoiceDialog(null, "Select owner",
                                                    "Cancel", pcs);
@@ -465,8 +468,10 @@ public class DebugUtils {
 
         List<ChoiceItem<Player>> pcs = new ArrayList<ChoiceItem<Player>>();
         for (Player sp : sGame.getPlayers()) {
-            String msg = Messages.message(sp.getNationName());
-            pcs.add(new ChoiceItem<Player>(msg, sp));
+            if (unit.getType().isAvailableTo(sp)) {
+                String msg = Messages.message(sp.getNationName());
+                pcs.add(new ChoiceItem<Player>(msg, sp));
+            }
         }
         Player playerChoice = gui.showChoiceDialog(null, "Select owner",
                                                    "Cancel", pcs);
@@ -481,6 +486,39 @@ public class DebugUtils {
             u.setOwner(playerChoice);
         }
         playerChoice.invalidateCanSeeTiles();
+        freeColClient.getConnectController().reconnect();
+    }
+
+    /**
+     * Debug action to change the roles of a unit.
+     *
+     * Called from tile popup menu.
+     *
+     * @param freeColClient The <code>FreeColClient</code> in effect.
+     * @param unit The <code>Unit</code> to change the role of.
+     */
+    public static void changeRole(final FreeColClient freeColClient,
+                                  final Unit unit) {
+        final FreeColServer server = freeColClient.getFreeColServer();
+        final Game sGame = server.getGame();
+        final Unit sUnit = sGame.getFreeColGameObject(unit.getId(), Unit.class);
+        final GUI gui = freeColClient.getGUI();
+
+        List<ChoiceItem<Unit.Role>> rcs = new ArrayList<ChoiceItem<Unit.Role>>();
+        for (Unit.Role role : Unit.Role.values()) {
+            rcs.add(new ChoiceItem<Unit.Role>(role.toString(), role));
+        }
+        Unit.Role roleChoice = gui.showChoiceDialog(null, "Select role",
+                                                    "Cancel", rcs);
+        if (roleChoice == null) return;
+
+        sUnit.clearEquipment();
+        sUnit.setRole(Unit.Role.DEFAULT);
+        final Specification sSpec = server.getSpecification();
+        for (EquipmentType et : roleChoice.getRoleEquipment(sSpec)) {
+            sUnit.changeEquipment(et, 1);
+        }
+        sUnit.setRole(roleChoice);
         freeColClient.getConnectController().reconnect();
     }
 

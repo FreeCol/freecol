@@ -2881,6 +2881,15 @@ public class Unit extends GoodsLocation
     }
 
     /**
+     * Sets the <code>Role</code> of this <code>Unit</code>.
+     *
+     * @param role The new <code>Role</code>.
+     */
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    /**
      * Determine role based on equipment.
      */
     protected void setRole() {

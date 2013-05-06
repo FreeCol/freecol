@@ -227,13 +227,14 @@ public final class TilePopup extends JPopupMenu {
      */
     public void addDebugItems(final FreeColClient freeColClient, 
                               final Tile tile) {
-        boolean notEmpty = false;
         addSeparator();
 
         JMenu changeOwnership = new JMenu("Change ownership");
         changeOwnership.setOpaque(false);
         JMenu transportLists = new JMenu("Transport lists");
         transportLists.setOpaque(false);
+        JMenu changeRole = new JMenu("Change role");
+        changeRole.setOpaque(false);
 
         for (final Unit unit : tile.getUnitList()) {
             JMenuItem toMenuItem = new JMenuItem(unit.toString());
@@ -243,7 +244,6 @@ public final class TilePopup extends JPopupMenu {
                     }
                 });
             changeOwnership.add(toMenuItem);
-            notEmpty = true;
 
             if (unit.isCarrier()) {
                 JMenuItem menuItem = new JMenuItem(unit.toString());
@@ -254,11 +254,23 @@ public final class TilePopup extends JPopupMenu {
                     });
                 transportLists.add(menuItem);
             }
+
+            if (unit.isPerson()) {
+                JMenuItem roleMenuItem = new JMenuItem(unit.toString());
+                roleMenuItem.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent event) {
+                            DebugUtils.changeRole(freeColClient, unit);
+                        }
+                    });
+                changeRole.add(roleMenuItem);
+            }
         }
         if (transportLists.getItemCount() > 0) add(transportLists);
 
         if (tile.getColony() != null) {
-            if (!notEmpty) changeOwnership.addSeparator();
+            if (changeOwnership.getItemCount() > 0) {
+                changeOwnership.addSeparator();
+            }
             JMenuItem toMenuItem = new JMenuItem(tile.getColony().toString());
             final Colony colony = tile.getColony();
             toMenuItem.addActionListener(new ActionListener() {
@@ -267,7 +279,6 @@ public final class TilePopup extends JPopupMenu {
                     }
                 });
             changeOwnership.add(toMenuItem);
-            notEmpty = true;
 
             JMenuItem displayColonyPlan = new JMenuItem("Display Colony Plan");
             displayColonyPlan.addActionListener(new ActionListener() {
@@ -287,7 +298,8 @@ public final class TilePopup extends JPopupMenu {
                 });
             add(displayGoods);
         }
-        if (notEmpty) add(changeOwnership);
+        if (changeOwnership.getItemCount() > 0) add(changeOwnership);
+        if (changeRole.getItemCount() > 0) add(changeRole);
 
         if (tile.hasLostCityRumour()) {
             JMenuItem rumourItem = new JMenuItem("Set Lost City Rumour type");
