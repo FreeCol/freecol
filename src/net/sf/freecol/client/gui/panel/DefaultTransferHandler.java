@@ -56,6 +56,7 @@ import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
+import net.sf.freecol.common.model.GoodsLocation;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Unit;
 
@@ -238,18 +239,15 @@ public final class DefaultTransferHandler extends TransferHandler {
                 // Import the data.
                 if (label.isPartialChosen()) {
                     int defaultAmount = goods.getAmount();
-                    // Disable the following until Unit.getGoodsCapacity
-                    // works properly.
-                    //if (goods.getLocation() instanceof GoodsLocation) {
-                    //    GoodsLocation loc = (GoodsLocation)goods.getLocation();
-                    //   if (goods.getAmount() > loc.getGoodsCapacity()) {
-                    //        // If over capacity, favour the amount that would
-                    //        // correct the problem.
-                    //        defaultAmount = Math.min(goods.getAmount()
-                    //            - loc.getGoodsCapacity(),
-                    //            GoodsContainer.CARGO_SIZE);
-                    //    }
-                    //}
+                    if (goods.getLocation() instanceof GoodsLocation) {
+                        GoodsLocation loc = (GoodsLocation)goods.getLocation();
+                        if (goods.getAmount() > loc.getGoodsCapacity()) {
+                            // If over capacity, favour the amount that would
+                            // correct the problem.
+                            defaultAmount = Math.min(GoodsContainer.CARGO_SIZE,
+                                goods.getAmount() - loc.getGoodsCapacity());
+                        }
+                    }
                     int amount = getAmount(goods.getType(), goods.getAmount(),
                                            defaultAmount, false);
                     if (amount <= 0) return false;
