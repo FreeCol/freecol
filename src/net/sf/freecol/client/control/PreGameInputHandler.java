@@ -390,7 +390,7 @@ public final class PreGameInputHandler extends InputHandler {
         NationType nationType = getGame().getSpecification()
             .getNationType(element.getAttribute("value"));
 
-        player.setNationType(nationType);
+        player.changeNationType(nationType);
         gui.refreshPlayersTable();
 
         return null;

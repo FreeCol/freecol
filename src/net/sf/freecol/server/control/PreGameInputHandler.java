@@ -220,7 +220,7 @@ public final class PreGameInputHandler extends InputHandler {
             if (advantages == Advantages.SELECTABLE
                 || (advantages == Advantages.FIXED
                     && nationType.equals(fixedNationType))) {
-                player.setNationType(nationType);
+                player.changeNationType(nationType);
                 getFreeColServer().getServer()
                     .sendToAll(DOMMessage.createMessage("updateNationType",
                             "player", player.getId(),

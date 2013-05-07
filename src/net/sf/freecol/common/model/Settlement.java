@@ -52,7 +52,7 @@ abstract public class Settlement extends GoodsLocation
     protected Tile tile;
 
     /** The type of settlement. */
-    private SettlementType type;
+    private SettlementType type = null;
 
     /** The tiles this settlement owns. */
     private final List<Tile> ownedTiles = new ArrayList<Tile>();
@@ -80,7 +80,7 @@ abstract public class Settlement extends GoodsLocation
         this.owner = owner;
         this.name = name;
         this.tile = tile;
-        setType(owner.getNationType().getSettlementType(false));
+        changeType(owner.getNationType().getSettlementType(false));
     }
 
     /**
@@ -112,8 +112,17 @@ abstract public class Settlement extends GoodsLocation
      * @param newType The new <code>SettlementType</code>.
      */
     private final void setType(final SettlementType newType) {
-        if (type != null) removeFeatures(type);
         this.type = newType;
+    }
+
+    /**
+     * Change the settlement type, setting the consequent features.
+     *
+     * @param newType The new <code>SettlementType</code>.
+     */
+    private final void changeType(final SettlementType newType) {
+        if (type != null) removeFeatures(type);
+        setType(newType);
         if (newType != null) addFeatures(newType);
     }
 
@@ -151,7 +160,7 @@ abstract public class Settlement extends GoodsLocation
      */
     public void setCapital(boolean capital) {
         if (isCapital() != capital) {
-            setType(owner.getNationType().getSettlementType(capital));
+            changeType(owner.getNationType().getSettlementType(capital));
         }
     }
 
@@ -679,6 +688,6 @@ abstract public class Settlement extends GoodsLocation
         } else {
             settlementType = owner.getNationType().getSettlementType(str);
         }
-        setType(settlementType);
+        changeType(settlementType);
     }
 }

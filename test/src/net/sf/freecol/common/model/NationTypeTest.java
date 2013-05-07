@@ -144,7 +144,7 @@ public class NationTypeTest extends FreeColTestCase {
         game.setMap(getTestMap(true));
 
         Colony colony = getStandardColony();
-        colony.getOwner().setNationType(spec().getNationType("model.nationType.building"));
+        colony.getOwner().changeNationType(spec().getNationType("model.nationType.building"));
 
         List<Modifier> modifiers = new ArrayList<Modifier>(colony.getOwner().getModifierSet("model.goods.hammers"));
         assertEquals(1, modifiers.size());
@@ -157,7 +157,7 @@ public class NationTypeTest extends FreeColTestCase {
                        modifiers.get(0).appliesTo(unit.getType()));
         }
 
-        colony.getOwner().setNationType(spec().getNationType("model.nationType.furTrapping"));
+        colony.getOwner().changeNationType(spec().getNationType("model.nationType.furTrapping"));
 
         modifiers = new ArrayList<Modifier>(colony.getOwner().getModifierSet("model.goods.coats"));
         assertEquals(1, modifiers.size());

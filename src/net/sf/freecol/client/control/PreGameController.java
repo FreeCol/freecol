@@ -98,7 +98,7 @@ public final class PreGameController {
      * @param nationType Which nation type this player wishes to set.
      */
     public void setNationType(NationType nationType) {
-        freeColClient.getMyPlayer().setNationType(nationType);
+        freeColClient.getMyPlayer().changeNationType(nationType);
 
         freeColClient.askServer().setNationType(nationType);
 

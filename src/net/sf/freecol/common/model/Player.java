@@ -1034,8 +1034,17 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param newNationType The new <code>NationType</code>.
      */
     public void setNationType(NationType newNationType) {
-        if (nationType != null) removeFeatures(nationType);
         nationType = newNationType;
+    }
+
+    /**
+     * Changes the nation type of this player, handling the features.
+     *
+     * @param newNationType The new <code>NationType</code>.
+     */
+    public void changeNationType(NationType newNationType) {
+        if (nationType != null) removeFeatures(nationType);
+        setNationType(newNationType);
         if (newNationType != null) addFeatures(newNationType);
     }
 
@@ -3655,7 +3664,7 @@ public class Player extends FreeColGameObject implements Nameable {
     protected void writeAttributes(XMLStreamWriter out, Player player,
                                    boolean showAll,
                                    boolean toSavedGame) throws XMLStreamException {
-        super.writeAttributes(out);
+        super.writeAttributes(out, player, showAll, toSavedGame);
 
         writeAttribute(out, USERNAME_TAG, name);
 
@@ -3870,9 +3879,8 @@ public class Player extends FreeColGameObject implements Nameable {
         if (isUnknownEnemy()) {
             nationType = null;
         } else {
-            nationType = spec.getType(in, NATION_TYPE_TAG,
-                                      NationType.class, (NationType)null);
-            if (nationType != null) addFeatures(nationType);
+            changeNationType(spec.getType(in, NATION_TYPE_TAG,
+                                          NationType.class, (NationType)null));;
         }
 
         admin = getAttribute(in, ADMIN_TAG, false);
@@ -3971,7 +3979,11 @@ public class Player extends FreeColGameObject implements Nameable {
             List<FoundingFather> ffs
                 = readFromListElement(in, FOUNDING_FATHERS_TAG,
                                       spec, FoundingFather.class);
-            if (ffs != null) foundingFathers.addAll(ffs);
+            if (ffs != null) {
+                for (FoundingFather ff : ffs) {
+                    addFather(ff); // addFather adds the features
+                }
+            }
         
         } else if (OFFERED_FATHERS_TAG.equals(tag)) {
             List<FoundingFather> ofs
