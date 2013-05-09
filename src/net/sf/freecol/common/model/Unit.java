@@ -2856,6 +2856,16 @@ public class Unit extends GoodsLocation
     }
 
     /**
+     * Get a compact version of the goods carried by this unit.
+     *
+     * @return A compact list of <code>Goods</code>.
+     */
+    public List<Goods> getCompactGoodsList() {
+        if (getGoodsContainer() == null) return Collections.emptyList();
+        return getGoodsContainer().getCompactGoods();
+    }
+
+    /**
      * Can this unit carry other units?
      *
      * @return True if the unit can carry units.

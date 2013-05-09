@@ -3127,8 +3127,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
      */
     private void csLootShip(Unit winner, Unit loser, ChangeSet cs) {
         ServerPlayer winnerPlayer = (ServerPlayer) winner.getOwner();
-        if (loser.getGoodsList().size() > 0 && winner.hasSpaceLeft()) {
-            List<Goods> capture = new ArrayList<Goods>(loser.getGoodsList());
+        List<Goods> capture = loser.getGoodsList();
+        if (!capture.isEmpty() && winner.hasSpaceLeft()) {
             for (Goods g : capture) g.setLocation(null);
             LootSession session = new LootSession(winner, loser);
             session.setCapture(capture);

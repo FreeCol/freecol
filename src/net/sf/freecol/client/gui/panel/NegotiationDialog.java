@@ -267,7 +267,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade>
         if (unit.isCarrier()) {
             List<Goods> goodsAvail = new ArrayList<Goods>();
             if (unit.getOwner() == player) {
-                goodsAvail.addAll(unit.getGoodsList());
+                goodsAvail.addAll(unit.getCompactGoodsList());
             } else {
                 goodsAvail.addAll(settlement.getCompactGoods());
             }

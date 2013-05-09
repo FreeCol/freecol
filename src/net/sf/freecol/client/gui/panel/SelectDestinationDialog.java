@@ -110,7 +110,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
 
         // Collect the goods the unit is carrying.
         final List<GoodsType> goodsTypes = new ArrayList<GoodsType>();
-        for (Goods goods : unit.getGoodsList()) {
+        for (Goods goods : unit.getCompactGoodsList()) {
             if (!goodsTypes.contains(goods.getType())) {
                 goodsTypes.add(goods.getType());
             }

@@ -556,7 +556,7 @@ public final class ColonyPanel extends PortPanel
             Unit unit = selectedUnitLabel.getUnit();
             if (unit != null && unit.isCarrier() && unit.hasCargo()) {
                 unloadButton.setEnabled(true);
-                for (Goods goods : unit.getGoodsList()) {
+                for (Goods goods : unit.getCompactGoodsList()) {
                     if (colony.getGoodsCount(goods.getType()) > 0) {
                         fillButton.setEnabled(true);
                         break;

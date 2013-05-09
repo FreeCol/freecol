@@ -1047,33 +1047,35 @@ public class ServerUnit extends Unit implements ServerModelObject {
      * @return True if the unit should load or unload cargo at the stop.
      */
     public boolean hasWorkAtStop(Stop stop) {
+        Location loc = stop.getLocation();
+
+        // Look for goods to load.
         List<GoodsType> stopGoods = stop.getCargo();
-        int cargoSize = stopGoods.size();
-        for (Goods goods : getGoodsList()) {
-            GoodsType type = goods.getType();
-            if (stopGoods.contains(type)) {
-                if (getLoadableAmount(type) > 0) {
-                    // There is space on the unit to load some more
-                    // of this goods type, so return true if there is
-                    // some available at the stop.
-                    Location loc = stop.getLocation();
-                    if (loc instanceof Colony) {
-                        if (((Colony) loc).getExportAmount(type) > 0) {
-                            return true;
-                        }
-                    } else if (loc instanceof Europe) {
-                        return true;
-                    }
-                } else {
-                    cargoSize--; // No room for more of this type.
-                }
-            } else {
-                return true; // This type should be unloaded here.
+        for (GoodsType type : stopGoods) {
+            if (getLoadableAmount(type) <= 0) continue;
+            // There is space on the unit to load some more
+            // of this goods type, so return true if there is
+            // some available at the stop.
+            if (loc instanceof Colony) {
+                if (((Colony)loc).getExportAmount(type) > 0) return true;
+            } else if (loc instanceof Europe) {
+                return true;
             }
         }
 
-        // Return true if there is space left, and something to load.
-        return hasSpaceLeft() && cargoSize > 0;
+        // Look for goods to unload.
+        for (Goods goods : getCompactGoodsList()) {
+            GoodsType type = goods.getType();
+            if (stopGoods.contains(type)) continue;
+            // There are goods on board this unit that need to be unloaded.
+            if (loc instanceof Colony) {
+                if (((Colony)loc).getImportAmount(type) > 0) return true;
+            } else if (loc instanceof Europe) {
+                return true;
+            }
+        }
+            
+        return false;
     }
 
 
