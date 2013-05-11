@@ -1063,6 +1063,7 @@ public final class FreeColServer {
             logger.info("AI integrity test failed, but fixed.");
         } else {
             aiMain = new AIMain(this);
+            aiMain.findNewObjects(true);
             logger.warning("AI integrity test failed, replaced AIMain.");
         }
         game.setFreeColGameObjectListener(aiMain);
@@ -1313,7 +1314,7 @@ public final class FreeColServer {
     public Game buildGame() throws FreeColException {
         Game game = getGame();
 
-        initializeAI(true);
+        AIMain aiMain = initializeAI(true);
 
         // Save the old GameOptions as possibly set by clients..
         // TODO: This might not be the best way to do it, the
@@ -1355,6 +1356,9 @@ public final class FreeColServer {
         gameOptions.setEditable(false);
         spec.getOptionGroup("difficultyLevels").setEditable(false);
 
+        // Let the AIMain scan for objects it should be managing.
+        aiMain.findNewObjects(true);
+
         return game;
     }
 
@@ -1363,8 +1367,9 @@ public final class FreeColServer {
      *
      * @param allNations If true, add all missing nations.
      *     If false, just the natives as required by the map generator.
+     * @return The AI.
      */
-    public void initializeAI(boolean allNations) {
+    public AIMain initializeAI(boolean allNations) {
         Game game = getGame();
 
         AIMain aiMain = new AIMain(this);
@@ -1389,6 +1394,7 @@ public final class FreeColServer {
             }
         }
         Collections.sort(game.getPlayers(), Player.playerComparator);
+        return aiMain;
     }
 
     /**

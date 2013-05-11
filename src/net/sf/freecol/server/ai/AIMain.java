@@ -75,36 +75,20 @@ public class AIMain extends FreeColObject
      */
     public AIMain(FreeColServer freeColServer) {
         this.freeColServer = freeColServer;
-        findNewObjects();
     }
 
     /**
      * Creates a new <code>AIMain</code> and reads the given element.
      *
      * @param freeColServer The main controller object for the
-     *       server.
-     * @param element The <code>Element</code> (in a DOM-parsed XML-tree)
-     *       that describes this object.
-     * @see #readFromXMLElement
-     */
-    public AIMain(FreeColServer freeColServer, Element element) {
-        this(freeColServer);
-
-        readFromXMLElement(element);
-    }
-
-    /**
-     * Creates a new <code>AIMain</code> and reads the given element.
-     *
-     * @param freeColServer The main controller object for the
-     *       server.
+     *     server.
      * @param in The input stream containing the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
+     * @exception XMLStreamException if a problem was encountered
+     *     during parsing.
      * @see #readFromXML
      */
-    public AIMain(FreeColServer freeColServer, XMLStreamReader in)
-        throws XMLStreamException {
+    public AIMain(FreeColServer freeColServer,
+                  XMLStreamReader in) throws XMLStreamException {
         this(freeColServer);
 
         readFromXML(in);
@@ -153,14 +137,23 @@ public class AIMain extends FreeColObject
     }
 
     /**
-     * Searches for new {@link FreeColGameObject
-     * FreeColGameObjects}. An AI-object is created for each object.
+     * Should a <code>FreeColGameObject</code> have a corresponding AI
+     * object?
      *
-     * Note: Any existing <code>AIObject</code>s will be overwritten.
-     * @see #findNewObjects(boolean)
+     * Strictly true only for AI players and their units and colonies
+     * (not (yet) for native settlements).  However object
+     * initialization is not necessarily complete when we arrive here,
+     * which means we can not yet use the Colony or Unit owner fields.
+     * So the actual test implemented here is somewhat sloppy.
+     *
+     * @param fcgo The <code>FreeColGameObject</code> to test.
+     * @return True if a corresponding AI object is needed.
      */
-    private void findNewObjects() {
-        findNewObjects(true);
+    private boolean shouldHaveAIObject(FreeColGameObject fcgo) {
+        return (fcgo instanceof Colony) ? true
+            : (fcgo instanceof Player)  ? ((Player)fcgo).isAI()
+            : (fcgo instanceof Unit)    ? true
+            : false;
     }
 
     /**
@@ -168,13 +161,14 @@ public class AIMain extends FreeColObject
      * An AI-object is created for each new object.
      *
      * @param overwrite Determines wether any old <code>AIObject</code>
-     *       should be overwritten or not.
+     *     should be overwritten or not.
      */
     public void findNewObjects(boolean overwrite) {
         Iterator<FreeColGameObject> i
             = freeColServer.getGame().getFreeColGameObjectIterator();
         while (i.hasNext()) {
             FreeColGameObject fcgo = i.next();
+            if (!shouldHaveAIObject(fcgo)) continue;
             if (overwrite || getAIObject(fcgo) == null) {
                 setFreeColGameObject(fcgo.getId(), fcgo);
             }
@@ -185,8 +179,8 @@ public class AIMain extends FreeColObject
      * Gets the <code>AIObject</code> for the given
      * <code>FreeColGameObject</code>.
      *
-     * @param fcgo The <code>FreeColGameObject</code> to find
-     *        the <code>AIObject</code> for.
+     * @param fcgo The <code>FreeColGameObject</code> to find the
+     *     <code>AIObject</code> for.
      * @see #getAIObject(String)
      * @return The <code>AIObject</code>.
      */
@@ -195,8 +189,7 @@ public class AIMain extends FreeColObject
     }
 
     /**
-     * Gets the <code>AIObject</code> identified by the given object
-     * identifier.
+     * Gets the <code>AIObject</code> for a given object identifier.
      *
      * @param id The object identifier.
      * @see #getAIObject(FreeColGameObject)
@@ -282,68 +275,6 @@ public class AIMain extends FreeColObject
     }
 
     /**
-     * Replaces the AI object when ownership changes.
-     *
-     * @param source The <code>FreeColGameObject</code> that has changed.
-     * @param oldOwner The old owning <code>Player</code>.
-     * @param newOwner The new owning <code>Player</code>.
-     */
-    public void ownerChanged(FreeColGameObject source, Player oldOwner,
-                             Player newOwner) {
-        AIObject ao = getAIObject(source);
-        logger.finest("Owner changed for " + source.getId()
-            + " with AI object: " + ao);
-        if (ao != null) {
-            ao.dispose();
-            setFreeColGameObject(source.getId(), source);
-        }
-    }
-
-    /**
-     * Creates a new <code>AIObject</code> for a given
-     * <code>FreeColGameObject</code>. This method gets called
-     * whenever a new object gets added to the {@link Game}.
-     *
-     * @param id The object identifier.
-     * @param fcgo The <code>FreeColGameObject</code> to add.
-     * @see AIObject
-     * @see FreeColGameObject
-     * @see FreeColGameObject#getId
-     */
-    public void setFreeColGameObject(String id, FreeColGameObject fcgo) {
-        if (aiObjects.containsKey(id)) return;
-        if (!id.equals(fcgo.getId())) {
-            throw new IllegalArgumentException("!id.equals(fcgo.getId())");
-        }
-        if (fcgo instanceof Colony) {
-            new AIColony(this, (Colony)fcgo);
-        } else if (fcgo instanceof ServerPlayer) {
-            ServerPlayer p = (ServerPlayer)fcgo;
-            if (p.isIndian()) {
-                new NativeAIPlayer(this, p);
-            } else if (p.isREF()) {
-                new REFAIPlayer(this, p);
-            } else if (p.isEuropean()) {
-                new EuropeanAIPlayer(this, p);
-            }
-        } else if (fcgo instanceof Unit) {
-            new AIUnit(this, (Unit)fcgo);
-        }
-    }
-
-    /**
-     * Removes the <code>AIObject</code> for a given AI identifier.
-     * Needed for interface FreeColGameObjectListener.
-     *
-     * @param id The object identifier.
-     */
-    public void removeFreeColGameObject(String id) {
-        AIObject o = getAIObject(id);
-        if (o != null) o.dispose();
-        removeAIObject(id);
-    }
-
-    /**
      * Computes how many objects of each class have been created, to
      * track memory leaks over time
      */
@@ -393,10 +324,7 @@ public class AIMain extends FreeColObject
             = getGame().getFreeColGameObjectIterator();
         while (fit.hasNext()) {
             FreeColGameObject f = fit.next();
-            if ((f instanceof Unit
-                 || f instanceof Colony
-                 || (f instanceof Player && !((Player)f).isUnknownEnemy()))
-                && !aiObjects.containsKey(f.getId())) {
+            if (shouldHaveAIObject(f) && !aiObjects.containsKey(f.getId())) {
                 logger.warning("Missing AIObject for: " + f.getId());
                 ok = false;
             }
@@ -422,16 +350,78 @@ public class AIMain extends FreeColObject
             = getGame().getFreeColGameObjectIterator();
         while (fit.hasNext()) {
             FreeColGameObject f = fit.next();
-            if ((f instanceof Unit
-                 || f instanceof Colony
-                 || (f instanceof Player && !((Player)f).isUnknownEnemy()))
-                && !aiObjects.containsKey(f.getId())) {
+            if (shouldHaveAIObject(f) && !aiObjects.containsKey(f.getId())) {
                 logger.warning("Added missing AIObject for: " + f.getId());
                 setFreeColGameObject(f.getId(), f);
             }
         }
 
         return checkIntegrity();
+    }
+
+
+    // Interface FreeColGameObjectListener
+
+    /**
+     * Creates a new <code>AIObject</code> for a given
+     * <code>FreeColGameObject</code>. This method gets called
+     * whenever a new object gets added to the {@link Game}.
+     *
+     * @param id The object identifier.
+     * @param fcgo The <code>FreeColGameObject</code> to add.
+     * @see AIObject
+     * @see FreeColGameObject
+     * @see FreeColGameObject#getId
+     */
+    public void setFreeColGameObject(String id, FreeColGameObject fcgo) {
+        if (aiObjects.containsKey(id) || !shouldHaveAIObject(fcgo)) return;
+        if (!id.equals(fcgo.getId())) {
+            throw new IllegalArgumentException("!id.equals(fcgo.getId())");
+        }
+        if (fcgo instanceof Colony) {
+            new AIColony(this, (Colony)fcgo);
+        } else if (fcgo instanceof ServerPlayer) {
+            ServerPlayer p = (ServerPlayer)fcgo;
+            if (p.isIndian()) {
+                new NativeAIPlayer(this, p);
+            } else if (p.isREF()) {
+                new REFAIPlayer(this, p);
+            } else if (p.isEuropean()) {
+                new EuropeanAIPlayer(this, p);
+            }
+        } else if (fcgo instanceof Unit) {
+            new AIUnit(this, (Unit)fcgo);
+        }
+    }
+
+    /**
+     * Removes the <code>AIObject</code> for a given AI identifier.
+     * Needed for interface FreeColGameObjectListener.
+     *
+     * @param id The object identifier.
+     */
+    public void removeFreeColGameObject(String id) {
+        AIObject o = getAIObject(id);
+        if (o != null) o.dispose();
+        removeAIObject(id);
+    }
+
+    /**
+     * Replaces the AI object when ownership changes.
+     *
+     * @param source The <code>FreeColGameObject</code> that has changed.
+     * @param oldOwner The old owning <code>Player</code>.
+     * @param newOwner The new owning <code>Player</code>.
+     */
+    public void ownerChanged(FreeColGameObject source, Player oldOwner,
+                             Player newOwner) {
+        AIObject ao = getAIObject(source);
+        logger.finest("Owner changed for " + source.getId()
+            + " with AI object: " + ao);
+        if (ao != null) {
+            ao.dispose();
+            setFreeColGameObject(source.getId(), source);
+        }
     }
 
 
@@ -474,12 +464,18 @@ public class AIMain extends FreeColObject
     protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
         super.writeChildren(out);
 
-        // Wrap an integrity check around the output.  We should not need to do
-        // this, but for now, we do.
-        // Using a copy of the objects defensively against races.
-        for (AIObject aio : new ArrayList<AIObject>(aiObjects.values())) {
+        for (AIObject aio : FreeColObject.getSortedCopy(aiObjects.values())) {
             if (!aio.checkIntegrity()) {
-                logger.warning("Integrity failure: " + aio);
+                // We expect to see integrity failure when AIGoods are
+                // aboard a unit that gets destroyed or if its
+                // destination is destroyed, and probably more.  These
+                // are hard to catch because AIGoods ids are not
+                // linked to the Goods ids (Goods ids are just the
+                // type ids) so we do not get notification of the
+                // Goods being destroyed.
+                boolean expected = aio instanceof AIGoods;
+                if (!expected) logger.warning("Integrity failure: " + aio);
+                aio.dispose();
                 continue;
             }
             if (aio instanceof Wish) {
@@ -521,9 +517,6 @@ public class AIMain extends FreeColObject
         aiObjects.clear();
 
         super.readChildren(in);
-
-        // TODO: This should not be necessary.  Try dropping it.
-        findNewObjects(false);
     }
 
     /**

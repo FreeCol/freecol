@@ -467,8 +467,8 @@ public class AIUnit extends AIObject implements Transportable {
     }
 
     /**
-     * Sets the priority of getting the goods to the {@link
-     * #getTransportDestination}.
+     * Sets the priority of getting the goods to the
+     * {@link #getTransportDestination}.
      *
      * @param transportPriority The priority.
      */
@@ -620,7 +620,12 @@ public class AIUnit extends AIObject implements Transportable {
     @Override
     public void dispose() {
         AIPlayer aiOwner = getAIOwner();
-        if (aiOwner != null) aiOwner.removeAIUnit(this);
+        if (aiOwner != null) {
+            aiOwner.removeAIUnit(this);
+        } else {
+            logger.warning("Disposing of " + getId() + " but owner is null!\n"
+                + net.sf.freecol.common.debug.FreeColDebugger.stackTraceToString());
+        }
         abortMission("AIUnit-disposed");
         setTransport(null, "disposing");
         super.dispose();

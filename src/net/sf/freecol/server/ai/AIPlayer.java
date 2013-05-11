@@ -445,7 +445,8 @@ public abstract class AIPlayer extends AIObject {
     public boolean checkIntegrity() {
         return super.checkIntegrity()
             && player != null
-            && !player.isDisposed();
+            && !player.isDisposed()
+            && player.isAI();
     }
 
 
