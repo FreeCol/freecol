@@ -54,8 +54,8 @@ public class RandomChoice<T> implements Comparable<RandomChoice<T>> {
 
 
     public static <T> T getWeightedRandom(Logger logger, String logMe,
-                                          Random random,
-                                          Collection<RandomChoice<T>> input) {
+                                          Collection<RandomChoice<T>> input,
+                                          Random random) {
         int n;
         if (input == null || input.isEmpty()
             || (n = getTotalProbability(input)) <= 0) {

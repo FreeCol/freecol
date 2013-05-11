@@ -69,6 +69,7 @@ import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.util.RandomChoice;
+import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerBuilding;
 import net.sf.freecol.server.model.ServerColony;
@@ -431,7 +432,8 @@ public class SimpleMapGenerator implements MapGenerator {
                 settlementTiles.add(tile);
             }
         }
-        Collections.shuffle(settlementTiles, random);
+        Utils.randomShuffle(logger, "Settlement tiles",
+                            settlementTiles, random);
 
         // Check number of settlements.
         int settlementsToPlace = settlementTiles.size();
@@ -530,7 +532,7 @@ public class SimpleMapGenerator implements MapGenerator {
         // Also collect the skills provided
         HashMap<UnitType, List<IndianSettlement>> skills
             = new HashMap<UnitType, List<IndianSettlement>>();
-        Collections.shuffle(settlements, random);
+        Utils.randomShuffle(logger, "Settlements", settlements, random);
         for (IndianSettlement is : settlements) {
             List<Tile> tiles = new ArrayList<Tile>();
             for (Tile tile : is.getOwnedTiles()) {
@@ -541,11 +543,12 @@ public class SimpleMapGenerator implements MapGenerator {
                     }
                 }
             }
-            Collections.shuffle(tiles, random);
+            Utils.randomShuffle(logger, "Settlement tiles", tiles, random);
             int minGrow = is.getType().getMinimumGrowth();
             int maxGrow = is.getType().getMaximumGrowth();
             if (maxGrow > minGrow) {
-                for (int i = random.nextInt(maxGrow - minGrow) + minGrow;
+                for (int i = Utils.randomInt(logger, "Gdiff", random,
+                                             maxGrow - minGrow) + minGrow;
                      i > 0; i--) {
                     Tile tile = findFreeNeighbouringTile(is, tiles, random);
                     if (tile == null) break;
@@ -611,8 +614,8 @@ public class SimpleMapGenerator implements MapGenerator {
             if (!choices.isEmpty()) {
                 // ...and pick one that could do the missing job.
                 IndianSettlement chose
-                    = RandomChoice.getWeightedRandom(logger, "expert", random,
-                                                     choices);
+                    = RandomChoice.getWeightedRandom(logger, "expert", choices,
+                                                     random);
                 logger.finest("At " + chose.getName()
                               + " replaced " + extraSkill
                               + " (one of " + extras.size() + ")"
@@ -727,7 +730,8 @@ public class SimpleMapGenerator implements MapGenerator {
 
         int low = settlement.getType().getMinimumSize();
         int high = settlement.getType().getMaximumSize();
-        int unitCount = low + random.nextInt(high - low);
+        int unitCount = low + Utils.randomInt(logger, "S-units", random,
+                                              high - low);
         for (int i = 0; i < unitCount; i++) {
             UnitType unitType = map.getSpecification().getUnitType("model.unit.brave");
             Unit unit = new ServerUnit(map.getGame(), settlement, player,
@@ -771,18 +775,20 @@ public class SimpleMapGenerator implements MapGenerator {
             }
         }
 
-        List<RandomChoice<UnitType>> scaledSkills = new ArrayList<RandomChoice<UnitType>>();
+        List<RandomChoice<UnitType>> scaledSkills
+            = new ArrayList<RandomChoice<UnitType>>();
         for (RandomChoice<UnitType> skill : skills) {
             UnitType unitType = skill.getObject();
             int scaleValue = scale.get(unitType.getExpertProduction()).intValue();
-            scaledSkills.add(new RandomChoice<UnitType>(unitType, skill.getProbability() * scaleValue));
+            scaledSkills.add(new RandomChoice<UnitType>(unitType,
+                    skill.getProbability() * scaleValue));
         }
         UnitType skill = RandomChoice.getWeightedRandom(null, null,
-                                                        random, scaledSkills);
+                                                        scaledSkills, random);
         if (skill == null) {
             // Seasoned Scout
             List<UnitType> unitList = map.getSpecification().getUnitTypesWithAbility(Ability.EXPERT_SCOUT);
-            return unitList.get(random.nextInt(unitList.size()));
+            return Utils.getRandomMember(logger, "Scout", unitList, random);
         } else {
             return skill;
         }
@@ -810,7 +816,8 @@ public class SimpleMapGenerator implements MapGenerator {
                 // eastern edge of the map
                 int x = width - 2;
                 // random latitude, not too close to the pole
-                int y = random.nextInt(height - 2*poleDistance) + poleDistance;
+                int y = Utils.randomInt(logger, "Pole", random,
+                                        height - 2*poleDistance) + poleDistance;
                 player.setEntryLocation(map.getTile(x, y));
                 continue;
             }
@@ -1086,7 +1093,8 @@ public class SimpleMapGenerator implements MapGenerator {
                     positions.add(new Position(east, row));
                     row += distance;
                 }
-                Collections.shuffle(positions);
+                Utils.randomShuffle(logger, "Classic starting positions",
+                                    positions, random);
                 break;
             case GameOptions.STARTING_POSITIONS_RANDOM:
                 distance = 2 * map.getHeight() / number;
@@ -1099,7 +1107,8 @@ public class SimpleMapGenerator implements MapGenerator {
                         row += distance;
                     }
                 }
-                Collections.shuffle(positions);
+                Utils.randomShuffle(logger, "Random starting positions",
+                                    positions, random);
                 break;
             case GameOptions.STARTING_POSITIONS_HISTORICAL:
                 for (Player player : players) {

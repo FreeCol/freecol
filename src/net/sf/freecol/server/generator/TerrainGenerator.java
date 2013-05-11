@@ -47,6 +47,7 @@ import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.util.RandomChoice;
+import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.model.ServerRegion;
 
 
@@ -249,7 +250,8 @@ public class TerrainGenerator {
         int localeTemperature = poleTemperature + (90 - Math.abs(latitude))
             * temperatureRange/90;
         int temperatureDeviation = 7; // +/- 7 degrees randomization
-        localeTemperature += random.nextInt(temperatureDeviation * 2)
+        localeTemperature += Utils.randomInt(logger, "Temperature", random,
+                                             temperatureDeviation * 2)
             - temperatureDeviation;
         localeTemperature = limitToRange(localeTemperature, -20, 40);
 
@@ -257,7 +259,8 @@ public class TerrainGenerator {
         int localeHumidity = spec.getRangeOption(MapGeneratorOptions.HUMIDITY)
             .getValue();
         int humidityDeviation = 20; // +/- 20% randomization
-        localeHumidity += random.nextInt(humidityDeviation * 2)
+        localeHumidity += Utils.randomInt(logger, "Humidity", random,
+                                          humidityDeviation * 2)
             - humidityDeviation;
         localeHumidity = limitToRange(localeHumidity, 0, 100);
 
@@ -311,7 +314,7 @@ public class TerrainGenerator {
         }
 
         // Filter the candidates by forest presence.
-        boolean forested = random.nextInt(100) < forestChance;
+        boolean forested = Utils.randomInt(logger, "Forest", random, 100) < forestChance;
         i = 0;
         while (i < candidateTileTypes.size()) {
             TileType type = candidateTileTypes.get(i);
@@ -330,7 +333,8 @@ public class TerrainGenerator {
         case 1:
             return candidateTileTypes.get(0);
         default:
-            return candidateTileTypes.get(random.nextInt(i));
+            return candidateTileTypes.get(Utils.randomInt(logger, "Forest tile",
+                                                          random, i));
         }
     }
 
@@ -342,10 +346,12 @@ public class TerrainGenerator {
      * @return A random land tile, or null if none found.
      */
     public Tile getRandomLandTile(Map map, Random random) {
-        int x = (map.getWidth() < 10) ? random.nextInt(map.getWidth())
-            : random.nextInt(map.getWidth() - 10) + 5;
-        int y = (map.getHeight() < 10) ? random.nextInt(map.getHeight())
-            : random.nextInt(map.getHeight() - 10) + 5;
+        int x = (map.getWidth() < 10)
+            ? Utils.randomInt(logger, "W1", random, map.getWidth())
+            : Utils.randomInt(logger, "W2", random, map.getWidth() - 10) + 5;
+        int y = (map.getHeight() < 10)
+            ? Utils.randomInt(logger, "H1", random, map.getHeight())
+            : Utils.randomInt(logger, "H2", random, map.getHeight() - 10) + 5;
         for (Tile t : map.getCircleTiles(map.getTile(x, y), true,
                                          FreeColObject.INFINITY)) {
             if (t.isLand()) return t;
@@ -1186,7 +1192,8 @@ public class TerrainGenerator {
                 map.putRegion(mountainRegion);
                 Direction direction = Direction.getRandomDirection("getLand",
                                                                    random);
-                int length = maximumLength - random.nextInt(maximumLength/2);
+                int length = maximumLength
+                    - Utils.randomInt(logger, "MLen", random, maximumLength/2);
                 for (int index = 0; index < length; index++) {
                     Tile nextTile = startTile.getNeighbourOrNull(direction);
                     if (nextTile == null || !nextTile.isLand()) continue;
@@ -1196,7 +1203,7 @@ public class TerrainGenerator {
                     for (Tile neighbour : nextTile.getSurroundingTiles(1)) {
                         if (!neighbour.isLand()
                             || neighbour.getType() == mountains) continue;
-                        int r = random.nextInt(8);
+                        int r = Utils.randomInt(logger, "MSiz", random, 8);
                         if (r == 0) {
                             neighbour.setType(mountains);
                             mountainRegion.addTile(neighbour);
@@ -1244,7 +1251,8 @@ public class TerrainGenerator {
                 }
 
                 // 25% mountains, 75% hills
-                t.setType((random.nextInt(4) == 0) ? mountains : hills);
+                boolean m = Utils.randomInt(logger, "MorH", random, 4) == 0;
+                t.setType((m) ? mountains : hills);
                 counter++;
             }
         }
@@ -1392,7 +1400,8 @@ public class TerrainGenerator {
         final int bonusNumber
             = mapOptions.getInteger("model.option.bonusNumber");
         if (t.isLand()) {
-            if (generateBonus && random.nextInt(100) < bonusNumber) {
+            if (generateBonus
+                && Utils.randomInt(logger, "Land Resource", random, 100) < bonusNumber) {
                 // Create random Bonus Resource
                 t.addResource(createResource(t));
             }
@@ -1425,11 +1434,13 @@ public class TerrainGenerator {
 
             if (t.getType().isHighSeasConnected()) {
                 if (generateBonus && adjacentLand > 1
-                    && random.nextInt(10 - adjacentLand) == 0) {
+                    && Utils.randomInt(logger, "Sea resource", random,
+                                       10 - adjacentLand) == 0) {
                     t.addResource(createResource(t));
                 }
             } else {
-                if (random.nextInt(100) < bonusNumber) {
+                if (Utils.randomInt(logger, "Water resource", random,
+                                    100) < bonusNumber) {
                     // Create random Bonus Resource
                     t.addResource(createResource(t));
                 }
@@ -1446,12 +1457,13 @@ public class TerrainGenerator {
     private Resource createResource(Tile tile) {
         if (tile == null) return null;
         ResourceType resourceType = RandomChoice.getWeightedRandom(null, null,
-            random, tile.getType().getWeightedResources());
+            tile.getType().getWeightedResources(), random);
         if (resourceType == null) return null;
         int minValue = resourceType.getMinValue();
         int maxValue = resourceType.getMaxValue();
         int quantity = (minValue == maxValue) ? maxValue
-            : (minValue + random.nextInt(maxValue - minValue + 1));
+            : (minValue + Utils.randomInt(logger, "Rsiz", random, 
+                                          maxValue - minValue + 1));
         return new Resource(tile.getGame(), tile, resourceType, quantity);
     }
 

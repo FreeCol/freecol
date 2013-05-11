@@ -30,6 +30,7 @@ import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -137,7 +138,8 @@ public class LandGenerator {
                 addPolarRegions();
                 //create one landmass of 75%, start it somewhere near the center
                 int contsize = (minimumNumberOfTiles*75)/100;
-                addLandmass(contsize,contsize, width/2, random.nextInt(height/2)+height/4);
+                addLandmass(contsize,contsize, width/2, 
+                    Utils.randomInt(logger, "Landmass", random, height/2)+height/4);
                 //then create small islands to fill up
                 while (numberOfLandTiles < minimumNumberOfTiles) {
                     addLandmass(15,25);
@@ -156,7 +158,7 @@ public class LandGenerator {
                 addPolarRegions();
                 //creates only islands of 25..75 tiles
                 while (numberOfLandTiles < minimumNumberOfTiles) {
-                    int s=random.nextInt(50) + 25;
+                    int s = Utils.randomInt(logger, "Island", random, 50) + 25;
                     addLandmass(20,s);
                 }
                 cleanMap();
@@ -174,8 +176,8 @@ public class LandGenerator {
         while (numberOfLandTiles < minimumNumberOfTiles) {
             int failCounter=0;
             do {
-                x=(random.nextInt(width-preferredDistanceToEdge*4)) + preferredDistanceToEdge*2;
-                y=(random.nextInt(height-preferredDistanceToEdge*4)) + preferredDistanceToEdge*2;
+                x = (Utils.randomInt(logger, "ClassicW", random, width-preferredDistanceToEdge*4)) + preferredDistanceToEdge*2;
+                y = (Utils.randomInt(logger, "ClassicH", random, height-preferredDistanceToEdge*4)) + preferredDistanceToEdge*2;
                 failCounter++;
                 //if landmass% is set to high, this loop may fail to find a free tile.
                 //decrease necessary minimum over time, so that this process
@@ -211,8 +213,8 @@ public class LandGenerator {
         //pick a starting position that is sea without neighbouring land
         if (x<0 || y<0) {
             do {
-                x=(random.nextInt(width-preferredDistanceToEdge*2)) + preferredDistanceToEdge;
-                y=(random.nextInt(height-preferredDistanceToEdge*2)) + preferredDistanceToEdge;
+                x = (Utils.randomInt(logger, "LandW", random, width-preferredDistanceToEdge*2)) + preferredDistanceToEdge;
+                y = (Utils.randomInt(logger, "LandH", random, height-preferredDistanceToEdge*2)) + preferredDistanceToEdge;
             } while (map[x][y] || !isSingleTile(x,y));
         }
 
@@ -235,7 +237,7 @@ public class LandGenerator {
         //set it to land,
         //add its valid neighbours to the list
         while (size < maxsize && l.size()>0) {
-            int i=random.nextInt(l.size());
+            int i = Utils.randomInt(logger, "Lsiz", random, l.size());
             p = l.remove(i);
 
             if (!newland[p.getX()][p.getY()]) {
@@ -370,7 +372,7 @@ public class LandGenerator {
         //This value is part random, part based on position, that is:
         //-1 in the center of the map, and growing to
         //preferredDistanceToEdge (*2 for pole ends) at the maps edges.
-        int r = random.nextInt(8)
+        int r = Utils.randomInt(logger, "Grow", random, 8)
                 + Math.max(-1,
                           (1+Math.max(preferredDistanceToEdge-Math.min(i,width-i),
                                     2*preferredDistanceToEdge-Math.min(j, height-j))));

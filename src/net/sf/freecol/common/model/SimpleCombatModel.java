@@ -421,7 +421,7 @@ public class SimpleCombatModel extends CombatModel {
         FreeColGameObject attacker, FreeColGameObject defender) {
         ArrayList<CombatResult> crs = new ArrayList<CombatResult>();
         CombatOdds odds = calculateCombatOdds(attacker, defender);
-        float r = random.nextFloat();
+        float r = Utils.randomFloat(logger, "AttackResult", random);
         boolean great = false; // Great win or loss?
         String action;
 
@@ -510,10 +510,8 @@ public class SimpleCombatModel extends CombatModel {
         List<String> results = new ArrayList<String>();
         for (CombatResult cr : crs) results.add(cr.toString());
         logger.info(attacker.toString() + " " + action
-                    + " " + defender.toString()
-                    + ": victory=" + Float.toString(odds.win)
-                    + " random(1.0)=" + Float.toString(r)
-                    + " great=" + Boolean.toString(great)
+                    + " " + defender.toString() + ": victory=" + odds.win
+                    + " random(1.0)=" + r + " great=" + great
                     + " => " + Utils.join(" ", results));
         return crs;
     }

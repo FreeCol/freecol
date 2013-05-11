@@ -26,6 +26,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -236,6 +237,23 @@ public class Utils {
      * @param random A pseudo-<code>Random</code> number source.
      * @return A pseudo-random double r, 0 <= r < 1.0.
      */
+    public static float randomFloat(Logger logger, String logMe,
+                                    Random random) {
+        float ret = random.nextFloat();
+        if (logger != null && logger.isLoggable(Level.FINEST)) {
+            logger.finest(logMe + " random(1.0f) = " + ret);
+        }
+        return ret;
+    }
+
+    /**
+     * Convenience to aid logging uses of Randoms.
+     *
+     * @param logger The <code>Logger</code> to log to.
+     * @param logMe A string to log with the result.
+     * @param random A pseudo-<code>Random</code> number source.
+     * @return A pseudo-random double r, 0 <= r < 1.0.
+     */
     public static double randomDouble(Logger logger, String logMe,
                                       Random random) {
         double ret = random.nextDouble();
@@ -256,7 +274,32 @@ public class Utils {
      */
     public static <T> T getRandomMember(Logger logger, String logMe,
                                         List<T> list, Random random) {
+        switch (list.size()) {
+        case 0:
+            return (T)null;
+        case 1:
+            return list.get(0);
+        default:
+            break;
+        }
         return list.get(randomInt(logger, logMe, random, list.size()));
+    }
+
+    /**
+     * Shuffle a list.
+     *
+     * @param logger The <code>Logger</code> to log to.
+     * @param logMe A string to log with the result.
+     * @param list The list.
+     * @param random A random number source.
+     * @return A random member from the list.
+     */
+    public static void randomShuffle(Logger logger, String logMe,
+                                     List<?> list, Random random) {
+        if (logger != null && logger.isLoggable(Level.FINEST)) {
+            logger.finest(logMe + " shuffle.");
+        }
+        Collections.shuffle(list, random);
     }
 
     /**

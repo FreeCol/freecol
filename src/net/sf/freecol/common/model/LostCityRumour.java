@@ -238,14 +238,16 @@ public class LostCityRumour extends TileItem {
         events.put(RumourType.FOUNTAIN_OF_YOUTH, 3 * percentGood);
 
         // Add all possible events to a RandomChoice List
-        List<RandomChoice<RumourType>> choices = new ArrayList<RandomChoice<RumourType>>();
+        List<RandomChoice<RumourType>> choices
+            = new ArrayList<RandomChoice<RumourType>>();
         for (Entry<RumourType, Integer> entry : events.entrySet()) {
             if (entry.getValue() > 0) {
-                choices.add(new RandomChoice<RumourType>(entry.getKey(), entry.getValue()));
+                choices.add(new RandomChoice<RumourType>(entry.getKey(),
+                                                         entry.getValue()));
             }
         }
         return RandomChoice.getWeightedRandom(logger,
-            "Choose rumour", random, choices);
+            "Choose rumour", choices, random);
     }
 
 

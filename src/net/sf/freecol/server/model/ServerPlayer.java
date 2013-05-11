@@ -647,7 +647,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             List<RandomChoice<FoundingFather>> rc = choices.get(type);
             if (rc != null) {
                 FoundingFather f = RandomChoice.getWeightedRandom(logger,
-                    "Choose founding father", random, rc);
+                    "Choose founding father", rc, random);
                 if (f != null) {
                     randomFathers.add(f);
                     logMessage += ":" + f.getNameKey();
@@ -803,16 +803,16 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * whole fleet at full strength. Returns a list of units that
      * could not be placed on ships.
      *
-     * @param landUnits the land units to put on ships
-     * @param navalUnits the ships to put land units on
-     * @param random a PRNG
+     * @param landUnits A list of land units to put on ships.
+     * @param navalUnits A list of ships to put land units on.
+     * @param random A pseudo-random number source.
      * @return a list of units left over
      */
     public List<Unit> loadShips(List<Unit> landUnits, List<Unit> navalUnits,
                                 Random random) {
         List<Unit> leftOver = new ArrayList<Unit>();
-        Collections.shuffle(navalUnits, random);
-        Collections.shuffle(landUnits, random);
+        Utils.randomShuffle(logger, "Naval load", navalUnits, random);
+        Utils.randomShuffle(logger, "Land load", landUnits, random);
         landUnit: for (Unit unit : landUnits) {
             for (Unit carrier : navalUnits) {
                 if (carrier.canAdd(unit)) {
@@ -1183,7 +1183,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 List<RandomChoice<Disaster>> disasters = colony.getDisasters();
                 if (!disasters.isEmpty()) {
                     Disaster disaster = RandomChoice
-                        .getWeightedRandom(logger, "select disaster", random, disasters);
+                        .getWeightedRandom(logger, "select disaster", disasters,
+                                           random);
                     List<ModelMessage> messages = csApplyDisaster(random, cs, colony, disaster);
                     if (!messages.isEmpty()) {
                         cs.addMessage(See.only(this),
@@ -1221,7 +1222,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
         switch(disaster.getNumberOfEffects()) {
         case ONE:
             effects.add(RandomChoice.getWeightedRandom(logger, "Get effects of disaster",
-                                                      random, disaster.getEffects()));
+                                                       disaster.getEffects(),
+                                                       random));
             break;
         case SEVERAL:
             for (RandomChoice<Effect> effect : disaster.getEffects()) {
@@ -1749,7 +1751,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                                     europe.getRecruitable(i))) {
                         UnitType newType = RandomChoice
                             .getWeightedRandom(logger,
-                                "Replace recruit", random, recruits);
+                                "Replace recruit", recruits, random);
                         europe.setRecruitable(i, newType);
                         europeDirty = true;
                     }
@@ -1859,8 +1861,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
         List<RandomChoice<UnitType>> recruits = generateRecruitablesList();
         europe.setRecruitable(Europe.RECRUIT_COUNT-1,
-            RandomChoice.getWeightedRandom(logger,
-                "Replace recruit", random, recruits));
+            RandomChoice.getWeightedRandom(logger, "Replace recruit", recruits,
+                                           random));
         cs.add(See.only(this), europe);
 
         // Add an informative message if this was a survival recruitment,
@@ -2922,7 +2924,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             List<UnitType> unitTypes = game.getSpecification()
                 .getUnitTypesWithAbility(Ability.CARRY_TREASURE);
             UnitType type = Utils.getRandomMember(logger, "Choose train",
-                unitTypes, random);
+                                                  unitTypes, random);
             Unit train = new ServerUnit(game, tile, attackerPlayer, type);
             train.setTreasureAmount(plunder);
         }

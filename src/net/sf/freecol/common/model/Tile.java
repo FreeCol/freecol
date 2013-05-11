@@ -1039,7 +1039,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
         for (int r = 1; true; r++) {
             List<Tile> tiles = getSurroundingTiles(r, r);
-            if (random != null) Collections.shuffle(tiles, random);
+            if (random != null) {
+                Utils.randomShuffle(logger, "Safe tile", tiles, random);
+            }
             for (Tile t : tiles) {
                 if ((t.getFirstUnit() == null
                         || t.getFirstUnit().getOwner() == player)

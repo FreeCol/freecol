@@ -83,7 +83,8 @@ public class ServerEurope extends Europe implements ServerModelObject {
             for (int index = 0; index < Europe.RECRUIT_COUNT; index++) {
                 UnitType immigrant = (index < immigrants.size())
                     ? immigrants.get(index).getUnitType(getSpecification())
-                    : RandomChoice.getWeightedRandom(null, null, random, recruits);
+                    : RandomChoice.getWeightedRandom(logger, "Initial recruits",
+                                                     recruits, random);
                 setRecruitable(index, immigrant);
             }
         } else {
@@ -97,8 +98,8 @@ public class ServerEurope extends Europe implements ServerModelObject {
                         continue;
                     }
                 }
-                setRecruitable(index, RandomChoice.getWeightedRandom(null,
-                        null, random, recruits));
+                setRecruitable(index, RandomChoice.getWeightedRandom(logger,
+                        "Old initial recruits", recruits, random));
             }
             // end compatibility code
         }

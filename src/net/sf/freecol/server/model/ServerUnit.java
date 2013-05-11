@@ -432,15 +432,17 @@ public class ServerUnit extends Unit implements ServerModelObject {
         if (exposeResource > 0 && !tile.hasResource()) {
             if (Utils.randomInt(logger, "Expose resource", random, 100)
                 < exposeResource) {
-                ResourceType resType = RandomChoice.getWeightedRandom(logger,
-                                                                      "Resource type", random,
-                                                                      tile.getType().getWeightedResources());
+                ResourceType resType = RandomChoice
+                    .getWeightedRandom(logger, "Resource type",
+                                       tile.getType().getWeightedResources(),
+                                       random);
                 int minValue = resType.getMinValue();
                 int maxValue = resType.getMaxValue();
                 int value = minValue + ((minValue == maxValue) ? 0
-                                        : Utils.randomInt(logger, "Resource quantity",
-                                                          random, maxValue - minValue + 1));
-                tile.addResource(new Resource(getGame(), tile, resType, value));
+                    : Utils.randomInt(logger, "Resource quantity",
+                                      random, maxValue - minValue + 1));
+                tile.addResource(new Resource(getGame(), tile, 
+                                              resType, value));
             }
         }
 
@@ -669,16 +671,15 @@ public class ServerUnit extends Unit implements ServerModelObject {
             }
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                    "lostCityRumour.nothing."
-                    + Integer.toString(Utils.randomInt(logger,
-                            "Nothing rumour", random, rumourNothing)),
+                    "lostCityRumour.nothing." + Utils.randomInt(logger,
+                        "Nothing rumour", random, rumourNothing),
                     serverPlayer, this));
             break;
         case LEARN:
             StringTemplate oldName = getLabel();
             List<UnitType> learnTypes = getType().getUnitTypesLearntInLostCity();
             unitType = Utils.getRandomMember(logger, "Choose learn",
-                learnTypes, random);
+                                             learnTypes, random);
             setType(unitType);
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
@@ -701,7 +702,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         case COLONIST:
             List<UnitType> foundTypes = spec.getUnitTypesWithAbility("model.ability.foundInLostCity");
             unitType = Utils.getRandomMember(logger, "Choose found",
-                foundTypes, random);
+                                             foundTypes, random);
             newUnit = new ServerUnit(game, tile, serverPlayer, unitType);
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
@@ -713,7 +714,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 int treasureAmount = Utils.randomInt(logger,
                     "Base treasure amount", random, dx * 600) + dx * 300;
                 unitType = Utils.getRandomMember(logger, "Choose train",
-                    treasureUnitTypes, random);
+                                                 treasureUnitTypes, random);
                 newUnit = new ServerUnit(game, tile, serverPlayer, unitType);
                 newUnit.setTreasureAmount(treasureAmount);
                 cs.addMessage(See.only(serverPlayer),
@@ -770,7 +771,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                         = serverPlayer.generateRecruitablesList();
                     for (int k = 0; k < dx; k++) {
                         UnitType type = RandomChoice.getWeightedRandom(logger,
-                            "Choose FoY", random, recruitables);
+                            "Choose FoY", recruitables, random);
                         new ServerUnit(game, europe, serverPlayer, type);
                     }
                     cs.add(See.only(serverPlayer), europe);
@@ -891,7 +892,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     < (settlement.getRadius()
                         + settlement.getType().getExtraClaimableRadius()))
                 && Utils.randomInt(logger, "Claim tribal land", random,
-                    d + 1) == 0) {
+                                   d + 1) == 0) {
                 newTile.setOwner(serverPlayer);
                 newTile.changeOwningSettlement(settlement);
             }

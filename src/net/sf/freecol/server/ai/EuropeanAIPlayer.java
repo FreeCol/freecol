@@ -1224,11 +1224,11 @@ public class EuropeanAIPlayer extends AIPlayer {
     private void cheatUnit(List<RandomChoice<UnitType>> rc) {
         final Player player = getPlayer();
         final Europe europe = player.getEurope();
-        final Random air = getAIRandom();
+        final Random random = getAIRandom();
 
         UnitType unitToPurchase
             = RandomChoice.getWeightedRandom(logger, "Cheat which unit",
-                                             air, rc);
+                                             rc, random);
         int cost = europe.getUnitPrice(unitToPurchase);
         if (cost > 0 && !player.checkGold(cost)) player.modifyGold(cost);
         AIUnit aiUnit = trainAIUnitInEurope(unitToPurchase);

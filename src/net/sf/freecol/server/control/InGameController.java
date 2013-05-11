@@ -805,8 +805,8 @@ public final class InGameController extends Controller {
                     logger.finest("Debug monarch action: " + action);
                 } else {
                     action = RandomChoice.getWeightedRandom(logger,
-                            "Choose monarch action", random,
-                            monarch.getActionChoices());
+                            "Choose monarch action",
+                        monarch.getActionChoices(), random);
                 }
                 if (action != null) {
                     if (monarch.actionIsValid(action)) {
@@ -1076,7 +1076,7 @@ public final class InGameController extends Controller {
             List<Player> friends = monarch.collectPotentialFriends();
             if (friends.isEmpty()) break;
             Player friend = Utils.getRandomMember(logger, "Choose friend",
-                friends, random);
+                                                  friends, random);
             serverPlayer.csChangeStance(Stance.PEACE, friend, true, cs);
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
                 new MonarchActionMessage(action,
@@ -1087,7 +1087,7 @@ public final class InGameController extends Controller {
             List<Player> enemies = monarch.collectPotentialEnemies();
             if (enemies.isEmpty()) break;
             Player enemy = Utils.getRandomMember(logger, "Choose enemy",
-                enemies, random);
+                                                 enemies, random);
             serverPlayer.csChangeStance(Stance.WAR, enemy, true, cs);
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
                 new MonarchActionMessage(action,
@@ -2820,9 +2820,10 @@ public final class InGameController extends Controller {
         } else {
             IndianNationType nationType
                 = (IndianNationType) serverPlayer.getNationType();
-            UnitType skill = RandomChoice.getWeightedRandom(logger,
-                    "Choose skill", random,
-                    nationType.generateSkillsForTile(tile));
+            UnitType skill = RandomChoice
+                .getWeightedRandom(logger, "Choose skill",
+                                   nationType.generateSkillsForTile(tile),
+                                   random);
             if (skill == null) { // Seasoned Scout
                 List<UnitType> scouts = getGame().getSpecification()
                     .getUnitTypesWithAbility(Ability.EXPERT_SCOUT);

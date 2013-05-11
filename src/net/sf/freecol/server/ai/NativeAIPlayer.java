@@ -575,7 +575,7 @@ public class NativeAIPlayer extends AIPlayer {
                 continue;
             }
             Colony target = RandomChoice.getWeightedRandom(logger,
-                "Choose gift colony", getAIRandom(), nearbyColonies);
+                "Choose gift colony", nearbyColonies, getAIRandom());
             if (target == null) {
                 throw new IllegalStateException("No gift target!?!");
             }
@@ -671,7 +671,7 @@ public class NativeAIPlayer extends AIPlayer {
                 continue;
             }
             Colony target = RandomChoice.getWeightedRandom(logger,
-                "Choose demand colony", getAIRandom(), nearbyColonies);
+                "Choose demand colony", nearbyColonies, getAIRandom());
             if (target == null) {
                 throw new IllegalStateException("No demand target!?!");
             }

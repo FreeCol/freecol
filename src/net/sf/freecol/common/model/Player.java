@@ -832,7 +832,8 @@ public class Player extends FreeColGameObject implements Nameable {
             if (isIndian()) {
                 capitalName = settlementNames.remove(0);
                 if (random != null) {
-                    Collections.shuffle(settlementNames, random);
+                    Utils.randomShuffle(logger, "Settlement names",
+                                        settlementNames, random);
                 }
             } else {
                 capitalName = null;
@@ -897,7 +898,7 @@ public class Player extends FreeColGameObject implements Nameable {
             String startingShip = (shipNames.isEmpty()) ? null
                 : shipNames.remove(0);
             if (random != null) {
-                Collections.shuffle(shipNames, random);
+                Utils.randomShuffle(logger, "Ship names", shipNames, random);
             }
             if (startingShip != null) shipNames.add(0, startingShip);
             logger.info("Installed " + shipNames.size()

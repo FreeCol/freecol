@@ -52,6 +52,7 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.ChangePriority;
 import net.sf.freecol.server.control.ChangeSet.See;
@@ -373,13 +374,15 @@ public class ServerGame extends Game implements ServerModelObject {
 
     /**
      * Initialize the list of cities of Cibola.
+     *
+     * @param random A pseudo-random number source.
      */
-    public void initializeCitiesOfCibola() {
+    public void initializeCitiesOfCibola(Random random) {
         citiesOfCibola.clear();
         for (int index = 0; index < CIBOLA_COUNT; index++) {
             citiesOfCibola.add("lostCityRumour.cityName." + index);
         }
-        Collections.shuffle(citiesOfCibola);
+        Utils.randomShuffle(logger, "Cibola", citiesOfCibola, random);
     }
 
     /**

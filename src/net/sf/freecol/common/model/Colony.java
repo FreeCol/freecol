@@ -704,11 +704,11 @@ public class Colony extends Settlement implements Nameable {
 
 
     /**
-     * Returns a weighted list of natural disasters than can strike
-     * this colony. This list comprises all natural disasters that can
+     * Get a weighted list of natural disasters than can strike this
+     * colony.  This list comprises all natural disasters that can
      * strike the colony's tiles.
      *
-     * @return a <code>List<RandomChoice<Disaster>></code> value
+     * @return A weighted list of <code>Disaster</code>s.
      */
     public List<RandomChoice<Disaster>> getDisasters() {
         List<RandomChoice<Disaster>> disasters

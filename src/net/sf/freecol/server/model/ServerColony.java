@@ -320,7 +320,8 @@ public class ServerColony extends Colony implements ServerModelObject {
                 switch (queue.getCompletionAction()) {
                 case SHUFFLE:
                     if (queue.size() > 1) {
-                        Collections.shuffle(queue.getValues(), random);
+                        Utils.randomShuffle(logger, "Build queue",
+                                            queue.getValues(), random);
                     }
                     break;
                 case REMOVE_EXCEPT_LAST:
