@@ -343,6 +343,25 @@ public class TransportMission extends Mission {
                 if (goods.getLocation() == carrier) {
                     path = carrier.findPath(dst);
                     if (path == null) {
+                        Tile dstTile = dst.getTile();
+                        Tile srcTile = carrier.getTile();
+                        // OK, this is expected if the carrier is a
+                        // wagon and the destination is Europe or on
+                        // another landmass, or if the carrier is a
+                        // ship and the destination is inland.  Try to
+                        // find an intermediate port.
+                        if (carrier.isNaval()) {
+                            if (dstTile != null) {
+                                path = carrier.findIntermediatePort(dstTile);
+                            }
+                        } else {
+                            if (dstTile == null
+                                || dstTile.getContiguity() != dstTile.getContiguity()) {
+                                path = carrier.findOurNearestPort();
+                            }
+                        }
+                    }
+                    if (path == null) {
                         return "no-deliver for " + carrier + " -> " + dst;
                     } else {
                         this.mode = CargoMode.UNLOAD;

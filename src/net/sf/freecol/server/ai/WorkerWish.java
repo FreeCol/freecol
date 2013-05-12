@@ -227,8 +227,9 @@ public class WorkerWish extends Wish {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(32);
+        StringBuilder sb = new StringBuilder(64);
         sb.append("[").append(getId())
+            .append(" for ").append(destination)
             .append(" ").append((unitType == null) ? "null" : unitType.getNameKey())
             .append(" (").append(getValue())
             .append((expertNeeded) ? ", expert" : "")

@@ -2700,6 +2700,34 @@ public class Unit extends GoodsLocation
     }
 
     /**
+     * Find a path to a port nearest to a destination.
+     * Used by ships to find where to deliver goods to inland colonies.
+     *
+     * The absolute best port is not necessarily found as that depends
+     * on the movement characteristics of the unit that makes the
+     * final delivery, which is as yet unknown.  We just pick the
+     * closest in basic tile count.
+     *
+     * @param dst The destination <code>Tile</code>.
+     * @return A path to the port, or null if none found.
+     */
+    public PathNode findIntermediatePort(Tile dst) {
+        int dstCont = dst.getContiguity();
+        Settlement best = null;
+        int bestValue = INFINITY;
+        int value;
+        for (Settlement s : getOwner().getSettlements()) {
+            if (s.getTile().getContiguity() == dstCont
+                && s.isConnectedPort()
+                && bestValue > (value = dst.getDistanceTo(s.getTile()))) {
+                bestValue = value;
+                best = s;
+            }
+        }
+        return (best == null) ? null : findPath(best.getTile());
+    }
+ 
+    /**
      * Find a path for this unit to the nearest settlement with the
      * same owner that is reachable without a carrier, excepting any
      * on the current tile.
