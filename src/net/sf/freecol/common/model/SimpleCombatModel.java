@@ -213,6 +213,9 @@ public class SimpleCombatModel extends CombatModel {
                                     -12.5f * count,
                                     Modifier.Type.PERCENTAGE));
         }
+
+        Specification spec = attacker.getSpecification();
+        result.addAll(spec.getModifiers(ATTACK_BONUS));
     }
 
     /**

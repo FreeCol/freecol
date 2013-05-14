@@ -176,8 +176,13 @@ public class CombatTest extends FreeColTestCase {
          * Only base modifiers should apply.
          */
         Set<Modifier> offenceModifiers = combatModel.getOffensiveModifiers(privateer, galleon);
-        assertEquals(1, offenceModifiers.size());
-        assertEquals(Specification.BASE_OFFENCE_SOURCE, offenceModifiers.iterator().next().getSource());
+        assertEquals(2, offenceModifiers.size());
+        int n = 0;
+        for (Modifier m : offenceModifiers) {
+            if (m.getSource() == Specification.ATTACK_BONUS_SOURCE) n += 1;
+            if (m.getSource() == Specification.BASE_OFFENCE_SOURCE) n += 2;
+        }
+        assertEquals(n, 3);
 
         Set<Modifier> defenceModifiers = combatModel.getDefensiveModifiers(privateer, galleon);
         assertEquals(1, defenceModifiers.size());
@@ -199,11 +204,13 @@ public class CombatTest extends FreeColTestCase {
         privateer.add(goods1);
         offenceModifiers = combatModel.getOffensiveModifiers(privateer, galleon);
         Iterator<Modifier> privIt = offenceModifiers.iterator();
-        assertEquals(2, offenceModifiers.size());
+        assertEquals(3, offenceModifiers.size());
         assertEquals(Specification.BASE_OFFENCE_SOURCE, privIt.next().getSource());
         Modifier goodsPenalty1 = privIt.next();
         assertEquals(Specification.CARGO_PENALTY_SOURCE, goodsPenalty1.getSource());
         assertEquals(-12.5f, goodsPenalty1.getValue());
+        Modifier attackPenalty2 = privIt.next();
+        assertEquals(Specification.ATTACK_BONUS_SOURCE, attackPenalty2.getSource());
 
         Goods goods2 = new Goods(game, null, lumberType, 150);
         galleon.add(goods2);
@@ -231,7 +238,7 @@ public class CombatTest extends FreeColTestCase {
 
         offenceModifiers = combatModel.getOffensiveModifiers(privateer, galleon);
         privIt = offenceModifiers.iterator();
-        assertEquals(3, offenceModifiers.size());
+        assertEquals(4, offenceModifiers.size());
         assertEquals(Specification.BASE_OFFENCE_SOURCE, privIt.next().getSource());
         Modifier newDrakeModifier = privIt.next();
         assertEquals(drakeModifier, newDrakeModifier);
