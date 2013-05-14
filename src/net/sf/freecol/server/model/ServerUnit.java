@@ -884,7 +884,9 @@ public class ServerUnit extends Unit implements ServerModelObject {
             Unit unit = null;
             int d;
             // Claim land for tribe?
-            if (newTile.getOwner() == null
+            if ((newTile.getOwner() == null
+                    || (newTile.getOwner().isEuropean()
+                        && newTile.getOwningSettlement() == null))
                 && serverPlayer.isIndian()
                 && (settlement = getHomeIndianSettlement()) != null
                 && ((d = newTile.getPosition()
