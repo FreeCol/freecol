@@ -39,10 +39,6 @@ public class ModOption extends AbstractOption<FreeColModFile> {
     @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(ModOption.class.getName());
 
-    /** A list of mod files to provide to the UI. */
-    private List<FreeColModFile> choices
-        = new ArrayList<FreeColModFile>(Mods.getAllMods());
-
     /** The value of this option. */
     private FreeColModFile value = null;
 
@@ -82,7 +78,7 @@ public class ModOption extends AbstractOption<FreeColModFile> {
      * @return a <code>List<FreeColModFile></code> value
      */
     public final List<FreeColModFile> getChoices() {
-        return choices;
+        return new ArrayList<FreeColModFile>(Mods.getAllMods());
     }
 
 
@@ -94,7 +90,6 @@ public class ModOption extends AbstractOption<FreeColModFile> {
     public ModOption clone() {
         ModOption result = new ModOption(getId());
         result.setValues(this);
-        result.choices = new ArrayList<FreeColModFile>(choices);
         return result;
     }
 
@@ -143,6 +138,23 @@ public class ModOption extends AbstractOption<FreeColModFile> {
     }
 
 
+    // Override Object
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof ModOption) {
+            ModOption mod = (ModOption)other;
+            return (value == null) ? mod.getValue() == null
+                : (mod.getValue() == null) ? false
+                : value.getId().equals(mod.getValue().getId());
+        }
+        return false;
+    }
+
+
     // Serialization
 
     /**
@@ -172,14 +184,8 @@ public class ModOption extends AbstractOption<FreeColModFile> {
     public String toString() {
         StringBuilder sb = new StringBuilder(32);
         sb.append("[").append(getId())
-            .append(" value=").append(value)
-            .append(" choices=[");
-        if (choices != null) {
-            for (FreeColModFile choice : choices) {
-                sb.append(" ").append(choice.getId());
-            }
-        }
-        sb.append(" ]]");
+            .append(" value=").append(value.getId())
+            .append("]");
         return sb.toString();
     }
 

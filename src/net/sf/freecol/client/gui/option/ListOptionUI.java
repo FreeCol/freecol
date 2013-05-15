@@ -105,6 +105,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
             if (ui != null && ui.getListCellRenderer() != null) {
                 list.setCellRenderer(ui.getListCellRenderer());
             }
+            list.setSelectedIndex(0);
         }
         list.setVisibleRowCount(4);
         JScrollPane pane = new JScrollPane(list);
@@ -117,15 +118,15 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
 
         addButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Option oldValue = (Option) list.getSelectedValue();
-                if (oldValue == null) {
-                    oldValue = getOption().getTemplate();
-                }
+                AbstractOption<T> oldValue
+                    = (AbstractOption<T>)list.getSelectedValue();
+                if (oldValue == null) oldValue = option.getTemplate();
                 try {
-                    Option value = oldValue.clone();
-                    if (gui.showEditOptionDialog(value)) {
-                        model.addElement(value);
-                        list.setSelectedValue(value, true);
+                    AbstractOption<T> newValue = oldValue.clone();
+                    if (gui.showEditOptionDialog(newValue)) {
+                        if (!option.canAdd(newValue)) return;
+                        model.addElement(newValue);
+                        list.setSelectedValue(newValue, true);
                         list.repaint();
                     }
                 } catch (CloneNotSupportedException ex) {
@@ -150,9 +151,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
         });
         upButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (list.getSelectedIndex() == 0) {
-                    return;
-                }
+                if (list.getSelectedIndex() == 0) return;
                 final int index = list.getSelectedIndex();
                 final Object temp = model.getElementAt(index);
                 model.setElementAt(model.getElementAt(index-1), index);
@@ -162,9 +161,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
         });
         downButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (list.getSelectedIndex() == model.getSize() - 1) {
-                    return;
-                }
+                if (list.getSelectedIndex() == model.getSize() - 1) return;
                 final int index = list.getSelectedIndex();
                 final Object temp = model.getElementAt(index);
                 model.setElementAt(model.getElementAt(index+1), index);
@@ -186,7 +183,7 @@ public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
      * Returns <code>null</code>, since this OptionUI does not require
      * an external label.
      *
-     * @return null
+     * @return Null.
      */
     @Override
     public final JLabel getLabel() {

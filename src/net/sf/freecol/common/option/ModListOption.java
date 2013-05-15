@@ -40,6 +40,8 @@ public class ModListOption extends ListOption<FreeColModFile> {
      */
     public ModListOption(String id) {
         super(id);
+
+        setAllowDuplicates(false);
     }
 
     /**
@@ -49,6 +51,8 @@ public class ModListOption extends ListOption<FreeColModFile> {
      */
     public ModListOption(Specification specification) {
         super(specification);
+
+        setAllowDuplicates(false);
     }
 
 

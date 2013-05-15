@@ -47,7 +47,14 @@ public class ListOption<T> extends AbstractOption<List<AbstractOption<T>>> {
     private int maximumNumber = Integer.MAX_VALUE;
 
     /** The list of options. */
-    private List<AbstractOption<T>> value = new ArrayList<AbstractOption<T>>();
+    private final List<AbstractOption<T>> value
+        = new ArrayList<AbstractOption<T>>();
+
+    /**
+     * Whether the list can include duplicates.  This was always true before
+     * adding this variable so the default should remain == true.
+     */
+    protected boolean allowDuplicates = true;
 
 
     /**
@@ -100,6 +107,48 @@ public class ListOption<T> extends AbstractOption<List<AbstractOption<T>>> {
         return result;
     }
 
+    /**
+     * Add a member to the values list.
+     *
+     * @param ao The new <code>AbstractOption</code> member to add.
+     */
+    private void addMember(AbstractOption<T> ao) {
+        if (canAdd(ao)) this.value.add(ao);
+    }
+
+    /**
+     * Does this list allow duplicates?
+     *
+     * @return True if duplicates are allowed.
+     */
+    public boolean allowsDuplicates() {
+        return allowDuplicates;
+    }
+
+    /**
+     * Set the deduplicatation flag.
+     *
+     * @param allowDuplicates The new deduplication flag;
+     */
+    public void setAllowDuplicates(boolean allowDuplicates) {
+        this.allowDuplicates = allowDuplicates;
+    }
+
+    /**
+     * Can an option be added to this list?
+     *
+     * @param ao The option to check.
+     * @return True if the option can be added.
+     */
+    public boolean canAdd(AbstractOption<T> ao) {
+        if (!allowDuplicates) {
+            for (AbstractOption<T> o : value) {
+                if (o.equals(ao)) return false;
+            }
+        }
+        return true;
+    }
+
 
     // Interface Option
 
@@ -127,11 +176,12 @@ public class ListOption<T> extends AbstractOption<List<AbstractOption<T>>> {
      */
     public void setValue(List<AbstractOption<T>> value) {
         // Fail fast: the list value may be empty, but it must not be null.
-        if (value == null) {
-            throw new IllegalArgumentException("Null ListOption");
-        }
-        final List<AbstractOption<T>> oldValue = this.value;
-        this.value = value;
+        if (value==null) throw new IllegalArgumentException("Null ListOption");
+
+        List<AbstractOption<T>> oldValue
+            = new ArrayList<AbstractOption<T>>(this.value);
+        this.value.clear();
+        for (AbstractOption<T> op : value) addMember(op);
 
         if (isDefined && !value.equals(oldValue)) {
             firePropertyChange(VALUE_TAG, oldValue, value);
@@ -230,7 +280,7 @@ public class ListOption<T> extends AbstractOption<List<AbstractOption<T>>> {
                 if (fcmf != null) {
                     ModOption modOption = new ModOption(modId);
                     modOption.setValue(fcmf);
-                    value.add((AbstractOption<T>)modOption);
+                    addMember((AbstractOption<T>)modOption);
                 }
             }
         // end @compat
@@ -241,9 +291,26 @@ public class ListOption<T> extends AbstractOption<List<AbstractOption<T>>> {
             closeTag(in, TEMPLATE_TAG);
 
         } else {
-            AbstractOption<T> option = (AbstractOption<T>)readOption(in);
-            if (option != null) value.add(option);
+            addMember((AbstractOption<T>)readOption(in));
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer(64);
+        sb.append("[").append(getId());
+        if (value != null) {
+            sb.append(" [");
+            for (AbstractOption<T> ao : value) {
+                sb.append(" ").append(ao);
+            }
+            sb.append(" ]");
+        }
+        sb.append("]");
+        return sb.toString();
     }
 
     /**
