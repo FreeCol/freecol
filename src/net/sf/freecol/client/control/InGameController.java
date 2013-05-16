@@ -1128,6 +1128,8 @@ public final class InGameController implements NetworkConstants {
      * @return True if the game was saved.
      */
     public boolean saveGame() {
+        if (!freeColClient.canSaveCurrentGame()) return false;
+
         Player player = freeColClient.getMyPlayer();
         Game game = freeColClient.getGame();
         if (game == null) return false; // Keyboard handling can race init
@@ -1137,13 +1139,18 @@ public final class InGameController implements NetworkConstants {
             + getSaveGameString(game.getTurn());
         fileName = fileName.replaceAll(" ", "_");
 
-        if (freeColClient.canSaveCurrentGame()) {
-            final File file
-                = gui.showSaveDialog(FreeColDirectories.getSaveDirectory(), fileName);
-            if (file != null) {
-                FreeColDirectories.setSaveDirectory(file.getParentFile());
-                return saveGame(file);
-            }
+        File file = gui.showSaveDialog(FreeColDirectories.getSaveDirectory(),
+                                       fileName);
+        if (file == null) return false;
+        
+        final boolean confirm = freeColClient.getClientOptions()
+            .getBoolean(ClientOptions.CONFIRM_SAVE_OVERWRITE);
+        if (!confirm 
+            || !file.exists()
+            || gui.showConfirmDialog("saveConfirmationDialog.areYouSure.text",
+                                     "yes", "no")) {
+            FreeColDirectories.setSaveDirectory(file.getParentFile());
+            return saveGame(file);
         }
         return false;
     }
