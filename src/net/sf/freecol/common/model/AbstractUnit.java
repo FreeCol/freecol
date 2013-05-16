@@ -144,9 +144,15 @@ public class AbstractUnit extends FreeColObject {
      * @return A label.
      */
     public StringTemplate getLabel(Specification spec) {
-        return StringTemplate.template("abstractUnit")
-            .addAmount("%number%", getNumber())
-            .add("%unit%", getUnitType(spec).getNameKey());
+        StringTemplate result = StringTemplate.template("abstractUnit")
+            .addAmount("%number%", getNumber());
+        if (role == Role.DEFAULT) {
+            result.add("%unit%", getUnitType(spec).getNameKey());
+        } else {
+            result.addStringTemplate("%unit%",
+                Unit.getLabel(null, getUnitType(spec), role, getNumber()));
+        }
+        return result;
     }
 
     /**

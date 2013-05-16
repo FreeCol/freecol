@@ -582,44 +582,37 @@ public final class Monarch extends FreeColGameObject implements Named {
 
         int mercPrice = spec.getInteger("model.option.mercenaryPrice");
         List<AbstractUnit> mercs = new ArrayList<AbstractUnit>();
+        // FIXME: magic numbers for 2-4 mercs
+        int count = Utils.randomInt(logger, "Mercenary count", random, 2) + 2;
         int price = 0;
-        int limit = unitTypes.size();
         UnitType unitType = null;
-        AbstractUnit au;
-        for (int count = 0; count < limit; count++) {
+        while (!unitTypes.isEmpty() && count > 0) {
             unitType = Utils.getRandomMember(logger, "Choose unit", unitTypes,
                                              random);
-            if (unitType.hasAbility(Ability.CAN_BE_EQUIPPED)) {
-                for (int number = 3; number > 0; number--) {
-                    au = new AbstractUnit(unitType, Role.DRAGOON, number);
-                    int newPrice = player.getPrice(au) * mercPrice / 100;
-                    if (player.checkGold(price + newPrice)) {
-                        mercs.add(au);
-                        price += newPrice;
-                        break;
-                    }
-                }
-                for (int number = 3; number > 0; number--) {
-                    au = new AbstractUnit(unitType, Role.SOLDIER, number);
-                    int newPrice = player.getPrice(au) * mercPrice / 100;
-                    if (player.checkGold(price + newPrice)) {
-                        mercs.add(au);
-                        price += newPrice;
-                        break;
-                    }
-                }
-            } else {
-                for (int number = 3; number > 0; number--) {
-                    au = new AbstractUnit(unitType, Role.DEFAULT, number);
-                    int newPrice = player.getPrice(au) * mercPrice / 100;;
-                    if (player.checkGold(price + newPrice)) {
-                        mercs.add(au);
-                        price += newPrice;
-                        break;
-                    }
-                }
-            }
             unitTypes.remove(unitType);
+
+            Role[] roles = (unitType.hasAbility(Ability.CAN_BE_EQUIPPED))
+                ? ((Utils.randomInt(logger, "Swap role", random, 2) == 0)
+                    ? new Role[] { Role.DRAGOON, Role.SOLDIER }
+                    : new Role[] { Role.SOLDIER, Role.DRAGOON })
+                : new Role[] { Role.DEFAULT };
+            for (int r = 0; r < roles.length; r++) {
+                int n = Utils.randomInt(logger, "Choose number " + unitType,
+                                        random, Math.min(count, 2)) + 1;
+                AbstractUnit au = new AbstractUnit(unitType, roles[r], n);
+                for (;;) {
+                    int newPrice = player.getPrice(au) * mercPrice / 100;
+                    if (player.checkGold(price + newPrice)) {
+                        mercs.add(au);
+                        price += newPrice;
+                        count -= n;
+                        break;
+                    }
+                    if (--n <= 0) break;
+                    au.setNumber(n);
+                }
+                if (count <= 0) break;
+            }
         }
 
         /* Try to always return something, even if it is not affordable */

@@ -350,24 +350,37 @@ public class Unit extends GoodsLocation
     }
 
     /**
+     * Get a description of a unit by name, type, role and number.
+     *
+     * @param name The unit name, if any.
+     * @param type The <code>UnitType</code>.
+     * @param role The <code>Role</code>.
+     * @param number A unit count.
+     * @return A <code>StringTemplate</code> describing a <code>Unit</code>.
+     */
+    public static StringTemplate getLabel(String name, UnitType type,
+                                          Role role, int number) {
+        StringTemplate result = StringTemplate.label(" ")
+            .add(type.getNameKey());
+        if (name != null) {
+            result.addName(name);
+        }
+        if (role != Role.DEFAULT) {
+            result = StringTemplate.template("model.unit." + role.getId()
+                                             + ".name")
+                .addAmount("%number%", number)
+                .add("%unit%", type.getNameKey());
+        }
+        return result;
+    }
+
+    /**
      * Get a description of this unit.
      *
      * @return A <code>StringTemplate</code> describing this <code>Unit</code>.
      */
     public StringTemplate getLabel() {
-        StringTemplate result = StringTemplate.label(" ")
-            .add(getType().getNameKey());
-        if (name != null) {
-            result.addName(name);
-        }
-        Role role = getRole();
-        if (role != Role.DEFAULT) {
-            result = StringTemplate.template("model.unit." + role.getId()
-                                             + ".name")
-                .addAmount("%number%", 1)
-                .add("%unit%", getType().getNameKey());
-        }
-        return result;
+        return getLabel(name, getType(), getRole(), 1);
     }
 
     /**
