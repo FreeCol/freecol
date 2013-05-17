@@ -3821,7 +3821,7 @@ public class Unit extends GoodsLocation
             if (teacher != null) writeAttribute(out, TEACHER_TAG, teacher);
 
             if (destination != null) {
-                writeAttribute(out, DESTINATION_TAG, destination);
+                writeLocationAttribute(out, DESTINATION_TAG, destination);
             }
 
             if (tradeRoute != null) {
