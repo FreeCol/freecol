@@ -311,7 +311,7 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
                     unit.setStudent(student);
                     student.setTeacher(unit);
                 }
-                unit.setWorkType(null);
+                unit.changeWorkType(null);
             } else {
                 Unit teacher = unit.getTeacher();
                 if (teacher == null

@@ -324,7 +324,7 @@ public class ColonyPlanTest extends FreeColTestCase {
         // otherwise it will lose to the inexperienced colonist.
         Unit colonist2 = new ServerUnit(getGame(), colony.getTile(), dutch, colonistType);
         units.add(colonist2);
-        colonist2.setWorkType(sugarType);
+        colonist2.changeWorkType(sugarType);
         colonist2.modifyExperience(100);
         assertEquals(colonist2, ColonyPlan.getBestWorker(colonyTile, sugarType, units));
         assertEquals(colonist1, ColonyPlan.getBestWorker(colonyTile, grainType, units));
@@ -333,7 +333,7 @@ public class ColonyPlanTest extends FreeColTestCase {
         // colonist1 still has *less* experience to waste.  Experience
         // now causes a preference when production is zero, but only for
         // singletons.
-        colonist1.setWorkType(lumberType);
+        colonist1.changeWorkType(lumberType);
         colonist1.modifyExperience(80);
         assertNull(ColonyPlan.getBestWorker(colonyTile, lumberType, units));
         assertEquals(colonist2, ColonyPlan.getBestWorker(colonyTile, sugarType, units));

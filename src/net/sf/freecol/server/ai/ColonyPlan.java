@@ -1105,9 +1105,9 @@ public class ColonyPlan {
                 Location l2 = other.getLocation();
                 other.setLocation(colony.getTile());
                 expert.setLocation(l2);
-                expert.setWorkType(work);
+                expert.changeWorkType(work);
                 other.setLocation(l1);
-                if (oldWork != null) other.setWorkType(oldWork);
+                if (oldWork != null) other.changeWorkType(oldWork);
                 TypeCountMap<EquipmentType> equipment = expert.getEquipment();
                 for (EquipmentType e : new ArrayList<EquipmentType>(equipment.keySet())) {
                     int n = equipment.getCount(e);
@@ -1170,10 +1170,10 @@ public class ColonyPlan {
             Location oldLoc = u.getLocation();
             GoodsType oldWork = u.getWorkType();
             u.setLocation(wl);
-            u.setWorkType(goodsType);
+            u.changeWorkType(goodsType);
             int production = wl.getProductionOf(u, goodsType);
             u.setLocation(oldLoc);
-            u.setWorkType(oldWork);
+            u.changeWorkType(oldWork);
             return (production > 0) ? u : null;
         }
 
@@ -1188,7 +1188,7 @@ public class ColonyPlan {
             Location oldLoc = u.getLocation();
             GoodsType oldWork = u.getWorkType();
             u.setLocation(wl);
-            u.setWorkType(goodsType);
+            u.changeWorkType(goodsType);
 
             int value = colony.getAdjustedNetProductionOf(outputType);
             if (value > bestValue) {
@@ -1206,7 +1206,7 @@ public class ColonyPlan {
             }
 
             u.setLocation(oldLoc);
-            u.setWorkType(oldWork);
+            u.changeWorkType(oldWork);
         }
 
         switch (best.size()) {
@@ -1476,7 +1476,7 @@ public class ColonyPlan {
                     // list for later reuse, remove the worker from
                     // the workers pool, but leave the successful plan
                     // on its list.
-                    best.setWorkType(goodsType);
+                    best.changeWorkType(goodsType);
                     workers.remove(best);
                     report += best.getId() + "("
                         + best.getType().toString().substring(11) + ")\n";
@@ -1534,7 +1534,7 @@ locations:      for (WorkLocation wl : scratch.getAvailableWorkLocations()) {
                                 && wl.getPotentialProduction(type,
                                     u.getType()) > 0) {
                                 u.setLocation(wl);
-                                u.setWorkType(type);
+                                u.changeWorkType(type);
                                 break locations;
                             }
                         }
@@ -1547,14 +1547,14 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
                     for (Unit u : new ArrayList<Unit>(workers)) {
                         GoodsType oldWork = u.getWorkType();
                         u.setLocation(wl);
-                        u.setWorkType(goodsType);
+                        u.changeWorkType(goodsType);
                         if (scratch.getAdjustedNetProductionOf(foodType) >= 0) {
                             report += "Subsist with " + u + "\n";
                             workers.remove(u);
                             break plans;
                         }
                         u.setLocation(tile);
-                        u.setWorkType(oldWork);
+                        u.changeWorkType(oldWork);
                     }
                 }
             }

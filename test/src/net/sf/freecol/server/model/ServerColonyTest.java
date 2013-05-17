@@ -54,6 +54,8 @@ public class ServerColonyTest extends FreeColTestCase {
 
     private static final GoodsType bellsType
         = spec().getGoodsType("model.goods.bells");
+    private static final GoodsType grainType
+        = spec().getGoodsType("model.goods.grain");
     private static final GoodsType hammerGoodsType
         = spec().getGoodsType("model.goods.hammers");
     private static final GoodsType lumberGoodsType
@@ -68,6 +70,8 @@ public class ServerColonyTest extends FreeColTestCase {
 
     private static final UnitType colonistType
         = spec().getUnitType("model.unit.freeColonist");
+    private static final UnitType pioneerType
+        = spec().getUnitType("model.unit.hardyPioneer");
 
 
     public void testFoodConsumption() {
@@ -119,9 +123,6 @@ public class ServerColonyTest extends FreeColTestCase {
             }
         }
 
-        UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
-        GoodsType bellsType = spec().getGoodsType("model.goods.bells");
-
         new ServerUnit(game, colony.getBuildingForProducing(bellsType), dutch,
                        colonistType);
 
@@ -144,71 +145,57 @@ public class ServerColonyTest extends FreeColTestCase {
         Map map = getTestMap(spec().getTileType("model.tile.marsh"));
         game.setMap(map);
 
-        ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
+        int consumption, production, unitsBeforeNewTurn = 3;
+        Colony colony = getStandardColony(unitsBeforeNewTurn);
+        ServerPlayer player = (ServerPlayer) colony.getOwner();
 
-        ServerColony colony = new ServerColony(game, dutch, "New Amsterdam", map.getTile(5, 8));
-        dutch.addSettlement(colony);
-
-        UnitType pioneerType = spec().getUnitType("model.unit.hardyPioneer");
-        GoodsType bellsType = spec().getGoodsType("model.goods.bells");
-
-        int unitsBeforeNewTurn = 3;
-
-        for(int i=0; i<unitsBeforeNewTurn;i++){
-            new ServerUnit(game, colony.getBuildingForProducing(bellsType),
-                           dutch, pioneerType);
-        };
-
-        int consumption = colony.getFoodConsumption();
-        int production = colony.getFoodProduction();
-        String errMsg = "Food consumption (" + String.valueOf(consumption)
-            + ") should be higher than food production ("
-            + String.valueOf(production) + ")";
-        assertTrue( errMsg, consumption  > production);
-
-        int foodStored = colony.getGoodsCount(foodType);
+        Building townHall = colony.getBuildingForProducing(bellsType);
+        for (Unit u : colony.getUnitList()) {
+            u.setLocation(townHall);
+        }
         colony.removeGoods(foodGoodsType);
-        errMsg = "No food should be stored, colony has (" + String.valueOf(foodStored) + ")";
-
-        assertTrue(errMsg,foodStored == 0);
-
-        assertEquals("Wrong number of units in colony",unitsBeforeNewTurn,colony.getUnitCount());
-
-        ServerTestHelper.newTurn();
-
-        assertEquals("Wrong number of units in colony",unitsBeforeNewTurn-1,colony.getUnitCount());
+        colony.invalidateCache();
 
         consumption = colony.getFoodConsumption();
         production = colony.getFoodProduction();
-        errMsg = "Food consumption (" + String.valueOf(consumption)
-            + ") should be higher than food production ("
-            + String.valueOf(production) + ")";
-        assertTrue( errMsg, consumption  > production);
+        assertTrue("Food consumption (" + consumption
+            + ") should be higher than production (" + production + ")",
+            consumption > production);
+        assertEquals("No food stored in colony", 0,
+            colony.getGoodsCount(foodType));
+        assertEquals("Wrong number of units in colony", unitsBeforeNewTurn,
+            colony.getUnitCount());
 
-        foodStored = colony.getGoodsCount(foodGoodsType);
-        errMsg = "No food should be stored, colony has (" + String.valueOf(foodStored) + ")";
-        assertTrue(errMsg,foodStored == 0);
+        ServerTestHelper.newTurn();
+
+        consumption = colony.getFoodConsumption();
+        production = colony.getFoodProduction();
+        assertTrue("Food consumption (" + consumption
+            + ") should be higher than production (" + production + ")",
+            consumption > production);
+        assertEquals("No food stored in colony", 0,
+            colony.getGoodsCount(foodType));
+        assertEquals("Wrong number of units in colony", unitsBeforeNewTurn-1,
+            colony.getUnitCount());
     }
-
 
     public void testAvoidStarvation() {
         Game game = ServerTestHelper.startServerGame(getTestMap());
         Map map = getTestMap(spec().getTileType("model.tile.marsh"));
         game.setMap(map);
 
-        ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
-
-        ServerColony colony = new ServerColony(game, dutch, "New Amsterdam", map.getTile(5, 8));
-        dutch.addSettlement(colony);
-
-        UnitType pioneerType = spec().getUnitType("model.unit.hardyPioneer");
-        GoodsType bellsType = spec().getGoodsType("model.goods.bells");
-        GoodsType grainType = spec().getGoodsType("model.goods.grain");
+        int unitsBeforeNewTurn = 3;
+        Colony colony = getStandardColony(unitsBeforeNewTurn);
+        ServerPlayer player = (ServerPlayer) colony.getOwner();
+        assertEquals("Wrong number of units in colony", unitsBeforeNewTurn,
+            colony.getUnitCount());
         Building townHall = colony.getBuildingForProducing(bellsType);
 
-        Unit unit1 = new ServerUnit(game, townHall, dutch, pioneerType);
-        Unit unit2 = new ServerUnit(game, townHall, dutch, pioneerType);
-        Unit unit3 = new ServerUnit(game, townHall, dutch, pioneerType);
+        for (Unit u : colony.getUnitList()) {
+            u.setLocation(townHall);
+        }
+        colony.removeGoods(foodGoodsType);
+        colony.invalidateCache();
 
         int consumption = colony.getFoodConsumption();
         int production = colony.getTile().getType().getProductionOf(grainType, null);
@@ -223,18 +210,11 @@ public class ServerColonyTest extends FreeColTestCase {
         assertEquals(199, colony.getGoodsCount(foodType));
         assertEquals(0, colony.getTile().getUnitCount());
         assertEquals(3, colony.getUnitCount());
-        assertEquals(unit1.getId(), colony.getUnitList().get(0).getId());
-        assertEquals(unit2.getId(), colony.getUnitList().get(1).getId());
-        assertEquals(unit3.getId(), colony.getUnitList().get(2).getId());
 
         colony.addGoods(foodType, 15);
         ServerTestHelper.newTurn();
         assertEquals(11, colony.getGoodsCount(foodType));
         assertEquals(1, colony.getTile().getUnitCount());
-        assertEquals(unit1.getId(), colony.getUnitList().get(0).getId());
-        assertEquals(unit2.getId(), colony.getUnitList().get(1).getId());
-        assertEquals(unit3.getId(), colony.getUnitList().get(2).getId());
-
     }
 
     /**

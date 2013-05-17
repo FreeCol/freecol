@@ -198,7 +198,7 @@ public class ServerUnitTest extends FreeColTestCase {
                                                soldier.getTile());
         dutch.addSettlement(colony);
 
-        soldier.setWorkType(foodType);
+        soldier.changeWorkType(foodType);
         nonServerBuildColony(soldier, colony);
         soldier.setLocation(colony.getColonyTile(plain58));
         ServerUnit hardyPioneer = new ServerUnit(game, plain58, dutch,
@@ -376,7 +376,7 @@ public class ServerUnitTest extends FreeColTestCase {
         }
         assertTrue(colonyTile.canBeWorked());
         colonist.setLocation(colonyTile);
-        colonist.setWorkType(grainType);
+        colonist.changeWorkType(grainType);
         assertEquals("Wrong work allocation",
                      grainType, colonist.getWorkType());
         assertEquals(colonyTile.getUnitList().get(0), colonist);

@@ -906,17 +906,27 @@ public class Unit extends GoodsLocation
     }
 
     /**
-     * Sets the type of goods this unit is producing in its current occupation.
+     * Set the type of goods this unit is producing in its current
+     * occupation.
      *
      * @param type The <code>GoodsType</code> to produce.
      */
     public void setWorkType(GoodsType type) {
-        workType = type;
+        this.workType = type;
+    }
+
+    /**
+     * Change the type of goods this unit is producing in its current
+     * occupation.  Updates the work location production and the unit
+     * experience type if necessary.
+     *
+     * @param type The <code>GoodsType</code> to produce.
+     */
+    public void changeWorkType(GoodsType type) {
+        setWorkType(type);
         if (type != null) experienceType = type;
-        ColonyTile workTile = getWorkTile();
-        if (workTile != null) {
-            workTile.setProductionType(workTile.getBestProductionType(type));
-        }
+        WorkLocation wl = getWorkLocation();
+        if (wl != null) wl.updateProductionType();
     }
 
     /**
@@ -3510,7 +3520,7 @@ public class Unit extends GoodsLocation
             }
         }
         owner.addUnit(this);
-        if(getType() != null) {     // can be null if setOwner() is called from fixIntegrity()
+        if (getType() != null) { // can be null when fixing integrity
             owner.modifyScore(getType().getScoreValue());
         }
 
@@ -3961,13 +3971,12 @@ public class Unit extends GoodsLocation
         currentStop = (tradeRoute == null) ? -1
             : getAttribute(in, CURRENT_STOP_TAG, 0);
 
-        workType = spec.getType(in, WORK_TYPE_TAG, GoodsType.class, null);
-
         experienceType = spec.getType(in, EXPERIENCE_TYPE_TAG,
                                       GoodsType.class, (GoodsType)null);
         if (experienceType == null && workType != null) {
             experienceType = workType;
         }
+
         // @compat 0.9.x
         try {
             // this is likely to cause an exception, as the
@@ -3984,6 +3993,9 @@ public class Unit extends GoodsLocation
         experience = getAttribute(in, EXPERIENCE_TAG, 0);
 
         visibleGoodsCount = getAttribute(in, VISIBLE_GOODS_COUNT_TAG, -1);
+
+        // Make sure you do this after experience and location stuff.
+        changeWorkType(spec.getType(in, WORK_TYPE_TAG, GoodsType.class, null));
     }
 
     /**

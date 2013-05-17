@@ -178,7 +178,7 @@ public class ServerBuilding extends Building implements ServerModelObject {
             return false;
         }
         teacher.setStudent(student);
-        teacher.setWorkType(null);
+        teacher.changeWorkType(null);
         student.setTeacher(teacher);
         return true;
     }

@@ -448,7 +448,7 @@ public class Building extends WorkLocation implements Named, Comparable<Building
             unit.setState(Unit.UnitState.IN_COLONY);
             List<AbstractGoods> outputs = getOutputs();
             if (outputs.size() == 1) {
-                unit.setWorkType(outputs.get(0).getType());
+                unit.changeWorkType(outputs.get(0).getType());
             }
             getColony().invalidateCache();
             return true;

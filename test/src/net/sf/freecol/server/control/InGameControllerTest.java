@@ -1912,7 +1912,7 @@ public class InGameControllerTest extends FreeColTestCase {
         Unit unit = new ServerUnit(getGame(), colony.getTile(), player,
                                    colonistType);
         // set the unit to work making bells
-        unit.setWorkType(bellsType);
+        unit.changeWorkType(bellsType);
         unit.setLocation(colony.getBuildingsForProducing(bellsType).get(0));
         ServerTestHelper.newTurn();
 
@@ -1951,7 +1951,7 @@ public class InGameControllerTest extends FreeColTestCase {
         Colony colony = getStandardColony(1);
         Unit colonist = new ServerUnit(game, map.getTile(6, 8), dutch,
                                        colonistType);
-        colonist.setWorkType(grainType);
+        colonist.changeWorkType(grainType);
         ColonyTile ct = colony.getVacantColonyTileFor(colonist, true, grainType);
         assertNotNull(ct);
         colonist.setLocation(ct);

@@ -1037,7 +1037,8 @@ public class SimpleMapGenerator implements MapGenerator {
                     break;
                 }
             }
-            lumberjack.setWorkType(lumberjack.getType().getExpertProduction());
+            lumberjack.changeWorkType(lumberjack.getType()
+                .getExpertProduction());
         }
 
         unitType = spec.getUnitType("model.unit.seasonedScout");

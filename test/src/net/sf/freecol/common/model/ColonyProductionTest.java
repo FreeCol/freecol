@@ -72,7 +72,7 @@ public class ColonyProductionTest extends FreeColTestCase {
         Colony colony = new ServerColony(game, dutch, "New Amsterdam", soldier.getTile());
         dutch.addSettlement(colony);
         GoodsType foodType = grainType;
-        soldier.setWorkType(foodType);
+        soldier.changeWorkType(foodType);
         nonServerBuildColony(soldier, colony);
 
         // Test the colony
@@ -126,7 +126,7 @@ public class ColonyProductionTest extends FreeColTestCase {
 
         Colony colony = new ServerColony(game, dutch, "New Amsterdam", pioneer.getTile());
         dutch.addSettlement(colony);
-        pioneer.setWorkType(foodType);
+        pioneer.changeWorkType(foodType);
         nonServerBuildColony(pioneer, colony);
 
         // Test the colony
@@ -379,7 +379,7 @@ public class ColonyProductionTest extends FreeColTestCase {
         assertEquals(14, colony.getNetProductionOf(foodType));
 
         colony.addGoods(horsesType, 50);
-        colony.getUnitList().get(0).setWorkType(cottonType);
+        colony.getUnitList().get(0).changeWorkType(cottonType);
         Building weaverHouse = colony.getBuilding(spec().getBuildingType("model.building.weaverHouse"));
         colony.getUnitList().get(1).setLocation(weaverHouse);
 

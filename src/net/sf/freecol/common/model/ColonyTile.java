@@ -267,7 +267,7 @@ public class ColonyTile extends WorkLocation implements Ownable {
                     setProductionType(best);
                     // TODO: unit work type needs to be a production
                     // type rather than a goods type
-                    unit.setWorkType(best.getOutputs().get(0).getType());
+                    unit.changeWorkType(best.getOutputs().get(0).getType());
                 }
             } else {
                 setProductionType(getBestProductionType(unit.getWorkType()));

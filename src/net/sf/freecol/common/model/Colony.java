@@ -783,7 +783,7 @@ public class Colony extends Settlement implements Nameable {
             return null;
         }
         if (occupation.workType != null) {
-            unit.setWorkType(occupation.workType);
+            unit.changeWorkType(occupation.workType);
         }
         return occupation.workLocation;
     }

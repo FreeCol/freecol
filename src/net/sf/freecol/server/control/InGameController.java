@@ -3602,7 +3602,7 @@ public final class InGameController extends Controller {
                                   GoodsType type) {
         if (unit.getWorkType() != type) {
             unit.setExperience(0);
-            unit.setWorkType(type);
+            unit.changeWorkType(type);
         }
 
         // Private update of the colony.
@@ -3699,7 +3699,7 @@ public final class InGameController extends Controller {
             cs.add(See.only(serverPlayer), oldStudent);
         }
         teacher.setStudent(student);
-        teacher.setWorkType(null);
+        teacher.changeWorkType(null);
         student.setTeacher(teacher);
         cs.add(See.only(serverPlayer), student, teacher);
         return cs.build(serverPlayer);

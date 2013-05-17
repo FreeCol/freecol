@@ -474,7 +474,7 @@ public class BuildingTest extends FreeColTestCase {
         assertEquals(-1, colony.getNetProductionOf(cottonType));
         assertEquals(3, colony.getNetProductionOf(clothType));
 
-        colonist.setWorkType(cottonType);
+        colonist.changeWorkType(cottonType);
         colony.invalidateCache();
 
         assertEquals(4, colony.getTotalProductionOf(cottonType));

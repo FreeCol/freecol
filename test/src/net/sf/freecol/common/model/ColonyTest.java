@@ -151,7 +151,7 @@ public class ColonyTest extends FreeColTestCase {
         // colonist with experience in producing farmed goods will
         // produce that type of goods
         colonist.setLocation(colony.getTile());
-        colonist.setWorkType(cottonGoodsType);
+        colonist.changeWorkType(cottonGoodsType);
         colonist.modifyExperience(100);
         nonServerJoinColony(colonist, colony);
         assertTrue(colonist.getLocation() instanceof ColonyTile);
@@ -236,7 +236,7 @@ public class ColonyTest extends FreeColTestCase {
         assertEquals(bellsGoodsType, colonist.getWorkType());
 
         colonist.setLocation(colony.getTile());
-        colonist.setWorkType(cottonGoodsType);
+        colonist.changeWorkType(cottonGoodsType);
         colonist.modifyExperience(100);
         nonServerJoinColony(colonist, colony);
         assertEquals(townHallType, colony.getBuildingFor(colonist).getType());
@@ -279,7 +279,7 @@ public class ColonyTest extends FreeColTestCase {
             if (workedTile.isInUse()) {
                 break;
             } else if (workedTile.getType() == plainsTileType) {
-                colonist.setWorkType(spec().getPrimaryFoodType());
+                colonist.changeWorkType(spec().getPrimaryFoodType());
                 ct.add(colonist);
                 break;
             }

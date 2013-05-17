@@ -103,7 +103,7 @@ public class UnitWas implements Comparable<UnitWas> {
             unit.setLocation(loc);
         }
         if (unit.getWorkType() != work) {
-            unit.setWorkType(work);
+            unit.changeWorkType(work);
         }
 
         if (unit.getRole() != role) { // Try to restore role equipment.

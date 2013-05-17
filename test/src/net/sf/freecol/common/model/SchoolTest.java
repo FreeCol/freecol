@@ -140,8 +140,8 @@ public class SchoolTest extends FreeColTestCase {
         assertTrue(spec().getBoolean(GameOptions.ALLOW_STUDENT_SELECTION));
         lumberJack.setLocation(school);
 
-        colonist1.setWorkType(cotton);
-        colonist2.setWorkType(lumber);
+        colonist1.changeWorkType(cotton);
+        colonist2.changeWorkType(lumber);
         assertEquals(cotton, colonist1.getWorkType());
         assertEquals(expertLumberJackType.getExpertProduction(), colonist2.getWorkType());
         assertEquals(null, colony.findStudent(lumberJack));
@@ -150,8 +150,8 @@ public class SchoolTest extends FreeColTestCase {
         colonist2.setTeacher(null);
 
         spec().getBooleanOption(GameOptions.ALLOW_STUDENT_SELECTION).setValue(false);
-        criminal1.setWorkType(cotton);
-        criminal2.setWorkType(lumber);
+        criminal1.changeWorkType(cotton);
+        criminal2.changeWorkType(lumber);
         assertEquals(criminal2, colony.findStudent(lumberJack));
 
     }
