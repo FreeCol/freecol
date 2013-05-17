@@ -207,8 +207,8 @@ public final class FreeColServer {
     /** The private provider for random numbers. */
     private Random random = null;
 
-    /** Did the integrity check succeed */
-    private boolean integrity = false;
+    /** The game integrity state. */
+    private int integrity = 1;
 
     /** An active unit specified in a saved game. */
     private Unit activeUnit = null;
@@ -541,7 +541,7 @@ public final class FreeColServer {
      *
      * @return The integrity check result.
      */
-    public boolean getIntegrity() {
+    public int getIntegrity() {
         return integrity;
     }
 
@@ -986,7 +986,7 @@ public final class FreeColServer {
 
         ServerGame game = readGame(fis, specification, this);
         gameState = GameState.IN_GAME;
-        integrity = game.checkIntegrity();
+        integrity = game.checkIntegrity(true);
 
         int savegameVersion = getSavegameVersion(fis);
         // @compat 0.10.x
@@ -1057,14 +1057,14 @@ public final class FreeColServer {
 
         // AI initialization.
         AIMain aiMain = getAIMain();
-        if (aiMain.checkIntegrity()) {
-            logger.info("AI integrity test succeeded.");
-        } else if (aiMain.fixIntegrity()) {
-            logger.info("AI integrity test failed, but fixed.");
-        } else {
+        int aiIntegrity = aiMain.checkIntegrity(true);
+        if (aiIntegrity < 0) {
             aiMain = new AIMain(this);
             aiMain.findNewObjects(true);
             logger.warning("AI integrity test failed, replaced AIMain.");
+        } else {
+            logger.info("AI integrity test "
+                + ((aiIntegrity > 0) ? "succeeded" : "failed, but fixed"));
         }
         game.setFreeColGameObjectListener(aiMain);
 

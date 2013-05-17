@@ -175,13 +175,15 @@ public class GoodsWish extends Wish {
     /**
      * Checks the integrity of this AI object.
      *
-     * @return True if this <code>GoodsWish</code> is valid.
+     * @param fix Fix problems if possible.
+     * @return Negative if there are problems remaining, zero if
+     *     problems were fixed, positive if no problems found at all.
      */
     @Override
-    public boolean checkIntegrity() {
-        return super.checkIntegrity()
-            && goodsType != null
-            && amountRequested > 0;
+    public int checkIntegrity(boolean fix) {
+        int result = super.checkIntegrity(fix);
+        if (goodsType == null || amountRequested <= 0) result = -1;
+        return result;
     }
 
 

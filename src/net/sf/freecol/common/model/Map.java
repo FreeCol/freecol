@@ -2054,18 +2054,6 @@ public class Map extends FreeColGameObject implements Location {
         }
     }
 
-    /**
-     * Fix any map integrity problems.
-     *
-     * @return True if there were no problems.
-     */
-    public boolean fixIntegrity() {
-        boolean result = true;
-        for (Tile t : getAllTiles()) {
-            result &= t.fixIntegrity();
-        }
-        return result;
-    }
 
     // Location interface.
     // getId() inherited.

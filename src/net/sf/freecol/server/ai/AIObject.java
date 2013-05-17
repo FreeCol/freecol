@@ -193,18 +193,12 @@ public abstract class AIObject extends FreeColObject {
      * Checks the integrity of this AI object.
      * Subclasses should extend.
      *
-     * @return True if the object is valid.
+     * @param fix Fix problems if possible.
+     * @return Negative if there are problems remaining, zero if
+     *     problems were fixed, positive if no problems found at all.
      */
-    public boolean checkIntegrity() {
-        return !isUninitialized();
-    }
-
-    /**
-     * Fixes integrity problems with this AI object.
-     * This simplest solution is just to dispose of the object.
-     */
-    public void fixIntegrity() {
-        dispose();
+    public int checkIntegrity(boolean fix) {
+        return (isUninitialized()) ? -1 : 1;
     }
 
 

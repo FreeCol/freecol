@@ -634,12 +634,17 @@ public class AIUnit extends AIObject implements Transportable {
     /**
      * Checks the integrity of this AIUnit.
      *
-     * @return True if the unit is intact.
+     * @param fix Fix problems if possible.
+     * @return Negative if there are problems remaining, zero if
+     *     problems were fixed, positive if no problems found at all.
      */
     @Override
-    public boolean checkIntegrity() {
-        return super.checkIntegrity()
-            && unit != null && !unit.isDisposed();
+    public int checkIntegrity(boolean fix) {
+        int result = super.checkIntegrity(fix);
+        if (unit == null || unit.isDisposed()) {
+            result = -1;
+        }
+        return result;
     }
 
 

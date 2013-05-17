@@ -425,23 +425,27 @@ public class AIGoods extends AIObject implements Transportable {
     /**
      * Checks the integrity of a this AIGoods.
      *
-     * @return True if the goods are valid.
+     * @param fix Fix problems if possible.
+     * @return Negative if there are problems remaining, zero if
+     *     problems were fixed, positive if no problems found at all.
      */
     @Override
-    public boolean checkIntegrity() {
-        String why = (!super.checkIntegrity()) ? "super"
+    public int checkIntegrity(boolean fix) {
+        int result = super.checkIntegrity(fix);
+        String why = (result < 0) ? "super"
             : (goods == null) ? "null-goods"
             : (goods.getType() == null) ? "null-goods-type"
             : (goods.getAmount() <= 0) ? "non-positive-goods-amount"
             : (goods.getLocation() == null) ? "null-location"
             : (((FreeColGameObject)goods.getLocation()).isDisposed()) ? "disposed-location"
             //: (destination == null) ? "null-destination"
-            : (destination != null && ((FreeColGameObject)destination).isDisposed()) ? "disposed-destination"
+            : (destination != null
+                && ((FreeColGameObject)destination).isDisposed()) ? "disposed-destination"
             : null;
         if (why != null) {
             logger.finest("checkIntegrity(" + this.toString() + ") = " + why);
         }
-        return why == null;
+        return result;
     }
 
 

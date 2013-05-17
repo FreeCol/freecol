@@ -164,15 +164,22 @@ public abstract class Wish extends ValuedAIObject {
      * The destination must be neither null nor disposed, the transportable
      * may be null but must otherwise be intact.
      *
-     * @return True if the wish is valid.
+     * @param fix Fix problems if possible.
+     * @return Negative if there are problems remaining, zero if
+     *     problems were fixed, positive if no problems found at all.
      */
     @Override
-    public boolean checkIntegrity() {
-        return super.checkIntegrity()
-            && (destination != null
-                && !((FreeColGameObject)destination).isDisposed())
-            && (transportable == null
-                || ((AIObject)transportable).checkIntegrity());
+    public int checkIntegrity(boolean fix) {
+        int result = super.checkIntegrity(fix);
+        if (transportable != null) {
+            result = Math.min(result, 
+                              ((AIObject)transportable).checkIntegrity(fix));
+        }
+        if (destination == null
+            || ((FreeColGameObject)destination).isDisposed()) {
+            result = -1;
+        }
+        return result;
     }
 
 

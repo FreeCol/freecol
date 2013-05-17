@@ -305,45 +305,22 @@ public class AIMain extends FreeColObject
      * Checks the integrity of this <code>AIMain</code> by checking if
      * there are any invalid objects.
      *
-     * Detected problems are logged.
-     *
-     * @return <code>true</code> if the <code>Game</code> has
-     *      been loaded properly.
+     * @param fix Fix problems if possible.
+     * @return Negative if there are problems remaining, zero if
+     *     problems were fixed, positive if no problems found at all.
      */
-    public boolean checkIntegrity() {
-        boolean ok = true;
-        for (AIObject ao : aiObjects.values()) {
-            if (!ao.checkIntegrity()) {
-                logger.warning("Invalid AIObject: " + ao.getId()
-                    + " (" + ao.getClass() + ")");
-                ok = false;
-            }
-        }
-
-        Iterator<FreeColGameObject> fit
-            = getGame().getFreeColGameObjectIterator();
-        while (fit.hasNext()) {
-            FreeColGameObject f = fit.next();
-            if (shouldHaveAIObject(f) && !aiObjects.containsKey(f.getId())) {
-                logger.warning("Missing AIObject for: " + f.getId());
-                ok = false;
-            }
-        }
-        return ok;
-    }
-
-    /**
-     * Fixes some integrity problems of this <code>AIMain</code>.
-     *
-     * @return True if the integrity problems are fixed.
-     */
-    public boolean fixIntegrity() {
+    public int checkIntegrity(boolean fix) {
+        int result = 1;
         for (AIObject ao : new ArrayList<AIObject>(aiObjects.values())) {
-            if (!ao.checkIntegrity()) {
-                logger.warning("Dropping invalid AIObject: " + ao.getId()
-                    + " (" + ao.getClass() + ")");
-                ao.fixIntegrity();
+            int integ = ao.checkIntegrity(fix);
+            if (integ < 0 && fix) {
+                logger.warning("Invalid AIObject: " + ao.getId()
+                    + " (" + Utils.lastPart(ao.getClass().getName(), ".")
+                    + "), dropping.");
+                ao.dispose();
+                integ = 0;
             }
+            result = Math.min(result, integ);
         }
 
         Iterator<FreeColGameObject> fit
@@ -351,12 +328,17 @@ public class AIMain extends FreeColObject
         while (fit.hasNext()) {
             FreeColGameObject f = fit.next();
             if (shouldHaveAIObject(f) && !aiObjects.containsKey(f.getId())) {
-                logger.warning("Added missing AIObject for: " + f.getId());
-                setFreeColGameObject(f.getId(), f);
+                if (fix) {
+                    logger.warning("Added missing AIObject for: " + f.getId());
+                    setFreeColGameObject(f.getId(), f);
+                    result = 0;
+                } else {
+                    logger.warning("Missing AIObject for: " + f.getId());
+                    result = -1;
+                }
             }
         }
-
-        return checkIntegrity();
+        return result;
     }
 
 
@@ -465,7 +447,7 @@ public class AIMain extends FreeColObject
         super.writeChildren(out);
 
         for (AIObject aio : FreeColObject.getSortedCopy(aiObjects.values())) {
-            if (!aio.checkIntegrity()) {
+            if (aio.checkIntegrity(false) < 0) {
                 // We expect to see integrity failure when AIGoods are
                 // aboard a unit that gets destroyed or if its
                 // destination is destroyed, and probably more.  These
@@ -473,14 +455,11 @@ public class AIMain extends FreeColObject
                 // linked to the Goods ids (Goods ids are just the
                 // type ids) so we do not get notification of the
                 // Goods being destroyed.
-                boolean expected = aio instanceof AIGoods;
-                if (!expected) logger.warning("Integrity failure: " + aio);
                 aio.dispose();
                 continue;
             }
             if (aio instanceof Wish) {
-                Wish wish = (Wish)aio;
-                if (!wish.shouldBeStored()) continue;
+                if (!((Wish)aio).shouldBeStored()) continue;
             }
 
             try {

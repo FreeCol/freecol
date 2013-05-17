@@ -39,6 +39,7 @@ import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.MapGeneratorOptions;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Element;
 
@@ -314,6 +315,7 @@ public class Game extends FreeColGameObject {
             logger.warning("Not a location: " + id);
             return null;
         }
+
         int idx = id.indexOf(':');
         final String tag = (idx >= 0) ? id.substring(0, id.indexOf(':'))
             : id;
@@ -360,21 +362,23 @@ public class Game extends FreeColGameObject {
             final Iterator<Entry<String, WeakReference<FreeColGameObject>>> it
                 = freeColGameObjects.entrySet().iterator();
             FreeColGameObject nextValue = null;
+            String lastId = null;
 
             public boolean hasNext() {
                 while (nextValue == null) {
-                    if (!it.hasNext()) {
-                        return false;
-                    }
+                    if (!it.hasNext()) return false;
+
                     final Entry<String, WeakReference<FreeColGameObject>> entry
                         = it.next();
-                    final WeakReference<FreeColGameObject> wr = entry.getValue();
+                    final WeakReference<FreeColGameObject> wr
+                        = entry.getValue();
                     final FreeColGameObject o = wr.get();
                     if (o == null) {
-                        final String id = entry.getKey();
-                        notifyRemoveFreeColGameObject(id);
+                        lastId = null;
+                        notifyRemoveFreeColGameObject(entry.getKey());
                         it.remove();
                     } else {
+                        lastId = o.getId();
                         nextValue = o;
                     }
                 }
@@ -390,7 +394,8 @@ public class Game extends FreeColGameObject {
             }
 
             public void remove() {
-                throw new UnsupportedOperationException();
+                if (lastId != null) notifyRemoveFreeColGameObject(lastId);
+                it.remove();
             }
         };
     }
@@ -923,34 +928,45 @@ public class Game extends FreeColGameObject {
      * Checks the integrity of this <code>Game</code>.
      * 
      * - Detects {@link FreeColGameObject#isUninitialized() uninitialized}
-     *   <code>FreeColGameObject</code>s.
-     * - Detects and fixes map inconsistencies
-     * - Detects and fixes player inconsistencies
+     *   <code>FreeColGameObject</code>s
+     * - Detects map inconsistencies
+     * - Detects player inconsistencies
      *
-     * @return True if there were no problems found.
+     * @param fix Fix problems if possible.
+     * @return Negative if there are problems remaining, zero if
+     *     problems were fixed, positive if no problems found at all.
      */
-    public boolean checkIntegrity() {
-        boolean ok = true;
+    public int checkIntegrity(boolean fix) {
+        int result = 1;
         Iterator<FreeColGameObject> iterator = getFreeColGameObjectIterator();
         while (iterator.hasNext()) {
-            FreeColGameObject fgo = iterator.next();
-            if (fgo.isUninitialized()) {
-                logger.warning("Uninitialized object: " + fgo.getId()
-                    + " (" + fgo.getClass() + ")");
-                ok = false;
+            FreeColGameObject fcgo = iterator.next();
+            if (fcgo.isUninitialized()) {
+                if (fix) {
+                    logger.warning("Uninitialized object: " + fcgo.getId()
+                        + " (" + Utils.lastPart(fcgo.getClass().getName(), ".")
+                        + "), dropping.");
+                    iterator.remove();
+                    result = 0;
+                } else {
+                    logger.warning("Uninitialized object: " + fcgo.getId()
+                        + " (" + Utils.lastPart(fcgo.getClass().getName(), ".")
+                        + ").");
+                    result = -1;
+                }
             }
         }
+        
         Map map = getMap();
-        if (map != null) ok &= map.fixIntegrity();
+        if (map != null) {
+            for (Tile t : map.getAllTiles()) {
+                result = Math.min(result, t.checkIntegrity(fix));
+            }
+        }
         for (Player player : getPlayers()) {
-            ok &= player.fixIntegrity();
+            result = Math.min(result, player.checkIntegrity(fix));
         }
-        if (ok) {
-            logger.info("Game integrity ok.");
-        } else {
-            logger.warning("Game integrity test failed.");
-        }
-        return ok;
+        return result;
     }
 
 

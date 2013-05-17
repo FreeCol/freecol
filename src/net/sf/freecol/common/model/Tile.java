@@ -1768,15 +1768,18 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     //
 
     /**
-     * Fix any tile integrity problems.
+     * Check for any tile integrity problems.
      *
-     * @return True if there were no problems.
+     * @param fix Fix problems if possible.
+     * @return Negative if there are problems remaining, zero if
+     *     problems were fixed, positive if no problems found at all.
      */
-    public boolean fixIntegrity() {
-        boolean result = true;
+    public int checkIntegrity(boolean fix) {
+        int result = 1;
         for (TileImprovement ti : getTileImprovements()) {
-            result &= ti.fixIntegrity();
+            result = Math.min(result, ti.checkIntegrity(fix));
         }
+        if (type == null) result = -1;
         return result;
     }
 

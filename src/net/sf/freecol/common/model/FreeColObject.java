@@ -1004,7 +1004,7 @@ public abstract class FreeColObject {
             (ID_ATTRIBUTE_TAG.equals(attributeName)) ? readId(in) :
         // end @compat
             in.getAttributeValue(null, attributeName);
-        
+
         return (attrib == null) ? null : game.findFreeColLocation(attrib);
     }
 
@@ -1025,7 +1025,7 @@ public abstract class FreeColObject {
             (ID_ATTRIBUTE_TAG.equals(attributeName)) ? readId(in) :
         // end @compat
             in.getAttributeValue(null, attributeName);
-        
+
         return (attrib == null) ? null : game.makeFreeColLocation(attrib);
     }
         

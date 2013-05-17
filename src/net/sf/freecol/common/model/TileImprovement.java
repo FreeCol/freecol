@@ -362,33 +362,6 @@ public class TileImprovement extends TileItem implements Named {
     }
 
     /**
-     * Fixes any tile improvement style discontinuities.
-     *
-     * We check only if this improvement is not connected to a neighbour
-     * that *is* connected to this one, and connect this one.
-     *
-     * TODO: drop this one day when we never have style discontinuities.
-     * This alas is not the case in 0.10.x.
-     *
-     * @return True if the style was coherent, false if a problem was
-     *     found and corrected.
-     */
-    public boolean fixIntegrity() {
-        String curr = (style == null) ? null : style.getString();
-        String found = (isRiver()) ? updateRiverConnections(curr)
-            : (isRoad() && isComplete()) ? updateRoadConnections(true)
-            : null;
-        if ((found == null && curr == null)
-            || (found != null && curr != null && found.equals(curr))) {
-            return true;
-        }
-        logger.warning("At " + getTile() + " fixing improvement style from "
-            + curr + " to " + found);
-        this.style = TileImprovementStyle.getInstance(found);
-        return false;
-    }
-
-    /**
      * Updates the connections from the current style.
      *
      * Public for the test suite.
@@ -464,6 +437,41 @@ public class TileImprovement extends TileItem implements Named {
             }
         }
         return (style == null) ? null : style.getString();
+    }
+
+    /**
+     * Fixes any tile improvement style discontinuities.
+     *
+     * We check only if this improvement is not connected to a neighbour
+     * that *is* connected to this one, and connect this one.
+     *
+     * TODO: drop this one day when we never have style discontinuities.
+     * This alas is not the case in 0.10.x.
+     *
+     * @param fix Fix problems if possible.
+     * @return Negative if there are problems remaining, zero if
+     *     problems were fixed, positive if no problems found at all.
+     */
+    public int checkIntegrity(boolean fix) {
+        String curr = (style == null) ? null : style.getString();
+        String found = (isRiver()) ? updateRiverConnections(curr)
+            : (isRoad() && isComplete()) ? updateRoadConnections(true)
+            : null;
+        int result;
+        if ((found == null && curr == null)
+            || (found != null && curr != null && found.equals(curr))) {
+            result = 1;
+        } else if (fix) {
+            logger.warning("At " + getTile() + " fixing improvement style from "
+                + curr + " to " + found);
+            this.style = TileImprovementStyle.getInstance(found);
+            result = 0;
+        } else {
+            logger.warning("At " + getTile() + " broken improvement style "
+                + curr + " should be " + found);
+            result = -1;
+        }
+        return result;
     }
 
 
@@ -589,7 +597,8 @@ public class TileImprovement extends TileItem implements Named {
         } else {
             style = TileImprovementStyle.getInstance(str);
             if (style == null) {
-                logger.warning("Ignoring bogus TileImprovementStyle: " + str);
+                logger.warning("At " + tile
+                    + " ignored bogus TileImprovementStyle: " + str);
             }
         }
         if (style != null) {

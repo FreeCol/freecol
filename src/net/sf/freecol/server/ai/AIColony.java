@@ -763,7 +763,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             AIGoods ag = aiGoods.get(i);
             if (ag == null) {
                 aiGoods.remove(i);
-            } else if (!ag.checkIntegrity()) {
+            } else if (ag.checkIntegrity(false) < 0) {
                 goodsLog(ag, "reaps");
                 dropGoods(ag);
             } else if (ag.getGoods().getLocation() != colony) {
@@ -1417,13 +1417,15 @@ public class AIColony extends AIObject implements PropertyChangeListener {
     /**
      * Checks the integrity of a this AIColony
      *
-     * @return True if the colony is intact.
+     * @param fix Fix problems if possible.
+     * @return Negative if there are problems remaining, zero if
+     *     problems were fixed, positive if no problems found at all.
      */
     @Override
-    public boolean checkIntegrity() {
-        return super.checkIntegrity()
-            && colony != null
-            && !colony.isDisposed();
+    public int checkIntegrity(boolean fix) {
+        int result = super.checkIntegrity(fix);
+        if (colony == null || colony.isDisposed()) result = -1;
+        return result;
     }
 
 
@@ -1463,7 +1465,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         super.writeChildren(out);
 
         for (AIGoods ag : aiGoods) {
-            if (!ag.checkIntegrity()) continue;
+            if (ag.checkIntegrity(false) < 0) continue;
             out.writeStartElement(AI_GOODS_LIST_TAG);
 
             writeAttribute(out, ID_ATTRIBUTE_TAG, ag);
@@ -1472,7 +1474,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         }
 
         for (TileImprovementPlan tip : tileImprovementPlans) {
-            if (!tip.checkIntegrity()) continue;
+            if (tip.checkIntegrity(false) < 0) continue;
 
             out.writeStartElement(TILE_IMPROVEMENT_PLAN_LIST_TAG);
 
@@ -1485,7 +1487,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             String tag = (w instanceof GoodsWish) ? GOODS_WISH_LIST_TAG
                 : (w instanceof WorkerWish) ? WORKER_WISH_LIST_TAG
                 : null;
-            if (!w.checkIntegrity() || !w.shouldBeStored()
+            if (w.checkIntegrity(false) < 0 || !w.shouldBeStored()
                 || tag == null) continue;
 
             out.writeStartElement(tag);
@@ -1507,9 +1509,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
 
         colony = getAttribute(in, ID_ATTRIBUTE_TAG, aiMain.getGame(),
                               Colony.class, (Colony)null);
-        if (colony == null) {
-            throw new IllegalStateException("Not a Colony: " + currentTag(in));
-        }
     }
 
     /**

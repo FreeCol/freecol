@@ -3600,16 +3600,22 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Try to fix integrity problems with units that have no owner.
      *
-     * @return True if there were no problems, false if problems were found
-     *     and corrected.
+     * @param fix Fix problems if possible.
+     * @return Negative if there are problems remaining, zero if
+     *     problems were fixed, positive if no problems found at all.
      */
-    public boolean fixIntegrity() {
-        boolean result = true;
+    public int checkIntegrity(boolean fix) {
+        int result = 1;
         for (Unit unit : getUnits()) {
             if (unit.getOwner() == null) {
-                logger.warning("Fixing " + unit.getId() + ": owner missing");
-                unit.setOwner(this);
-                result = false;
+                if (fix) {
+                    unit.setOwner(this);
+                    logger.warning("Fixed missing owner for: " + unit.getId());
+                    result = 0;
+                } else {
+                    logger.warning("Missing owner for: " + unit.getId());
+                    result = -1;
+                }
             }
         }
         return result;

@@ -985,7 +985,7 @@ public final class FreeCol {
                 freeColServer = new FreeColServer(fis, (Specification)null,
                                                   serverPort, serverName);
                 if (checkIntegrity) {
-                    boolean integrityOK = freeColServer.getIntegrity();
+                    boolean integrityOK = freeColServer.getIntegrity() > 0;
                     System.err.println(Messages.message((integrityOK)
                             ? "cli.check-savegame.success"
                             : "cli.check-savegame.failure"));

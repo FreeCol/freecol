@@ -162,12 +162,15 @@ public class WorkerWish extends Wish {
     /**
      * Checks the integrity of this AI object.
      *
-     * @return True if the <code>WorkerWish</code> is valid.
+     * @param fix Fix problems if possible.
+     * @return Negative if there are problems remaining, zero if
+     *     problems were fixed, positive if no problems found at all.
      */
     @Override
-    public boolean checkIntegrity() {
-        return super.checkIntegrity()
-            && unitType != null;
+    public int checkIntegrity(boolean fix) {
+        int result = super.checkIntegrity(fix);
+        if (unitType == null) result = -1;
+        return result;
     }
 
 

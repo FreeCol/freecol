@@ -287,14 +287,18 @@ public class TileImprovementPlan extends ValuedAIObject {
     /**
      * Checks the integrity of a this TileImprovementPlan.
      *
-     * @return True if the plan is valid.
+     * @param fix Fix problems if possible.
+     * @return Negative if there are problems remaining, zero if
+     *     problems were fixed, positive if no problems found at all.
      */
     @Override
-    public boolean checkIntegrity() {
-        return super.checkIntegrity()
-            && type != null
-            && target != null
-            && (pioneer == null || pioneer.checkIntegrity());
+    public int checkIntegrity(boolean fix) {
+        int result = super.checkIntegrity(fix);
+        if (pioneer != null) {
+            result = Math.min(result, pioneer.checkIntegrity(fix));
+        }
+        if (type == null || target == null) result = -1;
+        return result;
     }
 
 
@@ -326,7 +330,7 @@ public class TileImprovementPlan extends ValuedAIObject {
 
         writeAttribute(out, TARGET_TAG, target);
 
-        if (pioneer != null && pioneer.checkIntegrity()) {
+        if (pioneer != null && pioneer.checkIntegrity(false) > 0) {
             writeAttribute(out, PIONEER_TAG, pioneer);
         }
     }
