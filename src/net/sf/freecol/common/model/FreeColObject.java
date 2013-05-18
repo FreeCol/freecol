@@ -70,24 +70,6 @@ public abstract class FreeColObject {
     public static final int INFINITY = Integer.MAX_VALUE;
     public static final int UNDEFINED = Integer.MIN_VALUE;
 
-    public static final String NO_ID = "NO_ID";
-
-    /** XML tag name for identifier attribute. */
-    public static final String ID_ATTRIBUTE_TAG = "id";
-
-    // @compat 0.10.x
-    /** Obsolete identifier attribute. */
-    public static final String ID_ATTRIBUTE = "ID";
-    // end @compat
-
-    /** XML tag name for array elements. */
-    protected static final String ARRAY_SIZE_TAG = "xLength";
-
-    /** XML attribute tag to denote partial updates. */
-    protected static final String PARTIAL_ATTRIBUTE_TAG = "PARTIAL";
-
-    /** XML tag name for value attributes. */
-    protected static final String VALUE_TAG = "value";
 
     /** The unique identifier of an object. */
     private String id;
@@ -212,6 +194,431 @@ public abstract class FreeColObject {
         this.specification = specification;
     }
 
+    // Property change support
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        if (pcs == null) {
+            pcs = new PropertyChangeSupport(this);
+        }
+        pcs.addPropertyChangeListener(listener);
+    }
+
+    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        if (pcs == null) {
+            pcs = new PropertyChangeSupport(this);
+        }
+        pcs.addPropertyChangeListener(propertyName, listener);
+    }
+
+    public void fireIndexedPropertyChange(String propertyName, int index, boolean oldValue, boolean newValue) {
+        if (pcs != null) {
+            pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
+        }
+    }
+
+    public void fireIndexedPropertyChange(String propertyName, int index, int oldValue, int newValue) {
+        if (pcs != null) {
+            pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
+        }
+    }
+
+    public void fireIndexedPropertyChange(String propertyName, int index, Object oldValue, Object newValue) {
+        if (pcs != null) {
+            pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
+        }
+    }
+
+    public void firePropertyChange(PropertyChangeEvent event) {
+        if (pcs != null) {
+            pcs.firePropertyChange(event);
+        }
+    }
+
+    public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {
+        if (pcs != null) {
+            pcs.firePropertyChange(propertyName, oldValue, newValue);
+        }
+    }
+
+    public void firePropertyChange(String propertyName, int oldValue, int newValue) {
+        if (pcs != null) {
+            pcs.firePropertyChange(propertyName, oldValue, newValue);
+        }
+    }
+
+    public void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
+        if (pcs != null) {
+            pcs.firePropertyChange(propertyName, oldValue, newValue);
+        }
+    }
+
+    public PropertyChangeListener[] getPropertyChangeListeners() {
+        if (pcs == null) {
+            return new PropertyChangeListener[0];
+        } else {
+            return pcs.getPropertyChangeListeners();
+        }
+    }
+
+    public PropertyChangeListener[] getPropertyChangeListeners(String propertyName) {
+        if (pcs == null) {
+            return new PropertyChangeListener[0];
+        } else {
+            return pcs.getPropertyChangeListeners(propertyName);
+        }
+    }
+
+    public boolean hasListeners(String propertyName) {
+        if (pcs == null) {
+            return false;
+        } else {
+            return pcs.hasListeners(propertyName);
+        }
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        if (pcs != null) {
+            pcs.removePropertyChangeListener(listener);
+        }
+    }
+
+    public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        if (pcs != null) {
+            pcs.removePropertyChangeListener(propertyName, listener);
+        }
+    }
+
+    // Feature container handling.
+
+    /**
+     * Gets the feature container for this object, if any.
+     * None is provided here, but select subclasses will override.
+     *
+     * @return Null.
+     */
+    public FeatureContainer getFeatureContainer() {
+        return null;
+    }
+
+    /**
+     * Is an ability present in this object?
+     *
+     * @param id The object identifier.
+     * @return True if the ability is present.
+     */
+    public final boolean hasAbility(String id) {
+        return hasAbility(id, null);
+    }
+
+    /**
+     * Is an ability present in this object?
+     *
+     * @param id The object identifier.
+     * @param fcgot An optional <code>FreeColGameObjectType</code> the
+     *     ability applies to.
+     * @return True if the ability is present.
+     */
+    public final boolean hasAbility(String id, FreeColGameObjectType fcgot) {
+        return hasAbility(id, fcgot, null);
+    }
+
+    /**
+     * Is an ability present in this object?
+     * Subclasses with complex ability handling should override this
+     * routine.
+     *
+     * @param id The object identifier.
+     * @param fcgot An optional <code>FreeColGameObjectType</code> the
+     *     ability applies to.
+     * @param turn An optional applicable <code>Turn</code>.
+     * @return True if the ability is present.
+     */
+    public boolean hasAbility(String id, FreeColGameObjectType fcgot,
+                              Turn turn) {
+        return FeatureContainer.hasAbility(getFeatureContainer(),
+                                           id, fcgot, turn);
+    }
+
+    /**
+     * Checks if this object contains a given ability key.
+     *
+     * @param key The key to check.
+     * @return True if the key is present.
+     */
+    public boolean containsAbilityKey(String key) {
+        return FeatureContainer.containsAbilityKey(getFeatureContainer(),
+                                                   key);
+    }
+
+    /**
+     * Gets a copy of the abilities of this object.
+     *
+     * @return A set of abilities.
+     */
+    public Set<Ability> getAbilities() {
+        return FeatureContainer.getAbilities(getFeatureContainer());
+    }
+
+    /**
+     * Gets the set of abilities with the given identifier from this object.
+     *
+     * @param id The object identifier.
+     * @return A set of abilities.
+     */
+    public final Set<Ability> getAbilitySet(String id) {
+        return getAbilitySet(id, null);
+    }
+
+    /**
+     * Gets the set of abilities with the given identifier from this object.
+     *
+     * @param id The object identifier.
+     * @param fcgot An optional <code>FreeColGameObjectType</code> the
+     *     ability applies to.
+     * @return A set of abilities.
+     */
+    public final Set<Ability> getAbilitySet(String id,
+                                            FreeColGameObjectType fcgot) {
+        return getAbilitySet(id, fcgot, null);
+    }
+
+    /**
+     * Gets the set of abilities with the given identifier from this
+     * object.  Subclasses with complex ability handling should
+     * override this routine.
+     *
+     * @param id The object identifier.
+     * @param fcgot An optional <code>FreeColGameObjectType</code> the
+     *     ability applies to.
+     * @param turn An optional applicable <code>Turn</code>.
+     * @return A set of abilities.
+     */
+    public Set<Ability> getAbilitySet(String id,
+                                      FreeColGameObjectType fcgot,
+                                      Turn turn) {
+        return FeatureContainer.getAbilitySet(getFeatureContainer(),
+                                              id, fcgot, turn);
+    }
+
+    /**
+     * Add the given ability to this object.
+     *
+     * @param ability An <code>Ability</code> to add.
+     * @return True if the ability was added.
+     */
+    public boolean addAbility(Ability ability) {
+        return FeatureContainer.addAbility(getFeatureContainer(), ability);
+    }
+
+    /**
+     * Remove the given ability from this object.
+     *
+     * @param ability An <code>Ability</code> to remove.
+     * @return The ability removed.
+     */
+    public Ability removeAbility(Ability ability) {
+        return FeatureContainer.removeAbility(getFeatureContainer(), ability);
+    }
+
+    /**
+     * Remove all abilities with a given identifier.
+     *
+     * @param id The object identifier.
+     */
+    public void removeAbilities(String id) {
+        FeatureContainer.removeAbilities(getFeatureContainer(), id);
+    }
+
+
+    /**
+     * Checks if this object contains a given modifier key.
+     *
+     * @param key The key to check.
+     * @return True if the key is present.
+     */
+    public final boolean containsModifierKey(String key) {
+        Set<Modifier> set = getModifierSet(key);
+        return (set == null) ? false : !set.isEmpty();
+    }
+
+    /**
+     * Gets a copy of the modifiers of this object.
+     *
+     * @return A set of modifiers.
+     */
+    public final Set<Modifier> getModifiers() {
+        return FeatureContainer.getModifiers(getFeatureContainer());
+    }
+
+    /**
+     * Gets a sorted copy of the modifiers of this object.
+     *
+     * @return A list of modifiers.
+     */
+    public List<Modifier> getSortedModifiers() {
+        List<Modifier> modifiers = new ArrayList<Modifier>();
+        modifiers.addAll(getModifiers());
+        Collections.sort(modifiers);
+        return modifiers;
+    }
+
+    /**
+     * Gets the set of modifiers with the given identifier from this object.
+     *
+     * @param id The object identifier.
+     * @return A set of modifiers.
+     */
+    public final Set<Modifier> getModifierSet(String id) {
+        return getModifierSet(id, null);
+    }
+
+    /**
+     * Gets the set of modifiers with the given identifier from this object.
+     *
+     * @param id The object identifier.
+     * @param fcgot An optional <code>FreeColGameObjectType</code> the
+     *     modifier applies to.
+     * @return A set of modifiers.
+     */
+    public final Set<Modifier> getModifierSet(String id,
+                                              FreeColGameObjectType fcgot) {
+        return getModifierSet(id, fcgot, null);
+    }
+
+    /**
+     * Gets the set of modifiers with the given identifier from this object.
+     *
+     * Subclasses with complex modifier handling may override this
+     * routine.
+     *
+     * @param id The object identifier.
+     * @param fcgot An optional <code>FreeColGameObjectType</code> the
+     *     modifier applies to.
+     * @param turn An optional applicable <code>Turn</code>.
+     * @return A set of modifiers.
+     */
+    public Set<Modifier> getModifierSet(String id,
+                                        FreeColGameObjectType fcgot,
+                                        Turn turn) {
+        return FeatureContainer.getModifierSet(getFeatureContainer(), 
+                                               id, fcgot, turn);
+    }
+
+    /**
+     * Applies this objects modifiers with the given identifier to the
+     * given number.
+     *
+     * @param number The number to modify.
+     * @param id The object identifier.
+     * @return The modified number.
+     */
+    public final float applyModifier(float number, String id) {
+        return applyModifier(number, id, null);
+    }
+
+    /**
+     * Applies this objects modifiers with the given identifier to the
+     * given number.
+     *
+     * @param number The number to modify.
+     * @param id The object identifier.
+     * @param fcgot An optional <code>FreeColGameObjectType</code> the
+     *     modifier applies to.
+     * @return The modified number.
+     */
+    public final float applyModifier(float number, String id,
+                                     FreeColGameObjectType fcgot) {
+        return applyModifier(number, id, fcgot, null);
+    }
+
+    /**
+     * Applies this objects modifiers with the given identifier to the
+     * given number.
+     *
+     * @param number The number to modify.
+     * @param id The object identifier.
+     * @param fcgot An optional <code>FreeColGameObjectType</code> the
+     *     modifier applies to.
+     * @return The modified number.
+     */
+    public final float applyModifier(float number, String id,
+                                     FreeColGameObjectType fcgot, Turn turn) {
+        return FeatureContainer.applyModifierSet(number, turn,
+                                                 getModifierSet(id, fcgot, turn));
+    }
+
+    /**
+     * Add the given modifier to this object.
+     *
+     * @param modifier An <code>Modifier</code> to add.
+     * @return True if the modifier was added.
+     */
+    public boolean addModifier(Modifier modifier) {
+        return FeatureContainer.addModifier(getFeatureContainer(), modifier);
+    }
+
+    /**
+     * Remove the given modifier from this object.
+     *
+     * @param modifier An <code>Modifier</code> to remove.
+     * @return The modifier removed.
+     */
+    public Modifier removeModifier(Modifier modifier) {
+        return FeatureContainer.removeModifier(getFeatureContainer(), modifier);
+    }
+
+    /**
+     * Remove all abilities with a given identifier.
+     *
+     * @param id The object identifier.
+     */
+    public void removeModifiers(String id) {
+        FeatureContainer.removeModifiers(getFeatureContainer(), id);
+    }
+
+
+    /**
+     * Adds all the features in an object to this object.
+     *
+     * @param fco The <code>FreeColObject</code> to add features from.
+     */
+    public void addFeatures(FreeColObject fco) {
+        FeatureContainer.addFeatures(getFeatureContainer(), fco);
+    }
+
+    /**
+     * Removes all the features in an object from this object.
+     *
+     * @param fco The <code>FreeColObject</code> to find features to remove in.
+     */
+    public void removeFeatures(FreeColObject fco) {
+        FeatureContainer.removeFeatures(getFeatureContainer(), fco);
+    }
+
+
+    // Serialization
+
+    /** XML tag name for identifier attribute. */
+    public static final String ID_ATTRIBUTE_TAG = "id";
+
+    // @compat 0.10.x
+    /** Obsolete identifier attribute. */
+    public static final String ID_ATTRIBUTE = "ID";
+    // end @compat
+
+    /** XML tag name for array elements. */
+    protected static final String ARRAY_SIZE_TAG = "xLength";
+
+    /** XML attribute tag to denote partial updates. */
+    protected static final String PARTIAL_ATTRIBUTE_TAG = "partial";
+    // @compat 0.10.x
+    protected static final String OLD_PARTIAL_ATTRIBUTE_TAG = "PARTIAL";
+    // end @compat
+
+    /** XML tag name for value attributes, used in many places. */
+    protected static final String VALUE_TAG = "value";
+
+
     /**
      * Debugging tool, dump object XML to System.err.
      */
@@ -222,7 +629,7 @@ public abstract class FreeColObject {
     /**
      * Writes the object to the given file.
      *
-     * @param file the save file
+     * @param file The save file to write to.
      * @exception FileNotFoundException
      */
     public void save(File file) throws FileNotFoundException {
@@ -232,7 +639,7 @@ public abstract class FreeColObject {
     /**
      * Writes the object to the given output stream
      *
-     * @param out the OutputStream
+     * @param out The <code>OutputStream</code> to write to.
      */
     public void save(OutputStream out) {
         XMLOutputFactory xof = XMLOutputFactory.newInstance();
@@ -337,8 +744,6 @@ public abstract class FreeColObject {
      * This method writes an XML-representation of this object to
      * the given stream.
      *
-     * <br><br>
-     *
      * Only attributes visible to the given <code>Player</code> will
      * be added to that representation if <code>showAll</code> is
      * set to <code>false</code>.
@@ -356,8 +761,6 @@ public abstract class FreeColObject {
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
-     *
-     * <br><br>
      *
      * Only attributes visible to the given <code>Player</code> will
      * be added to that representation if <code>showAll</code> is
@@ -394,8 +797,6 @@ public abstract class FreeColObject {
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
-     *
-     * <br><br>
      *
      * Only attributes visible to the given <code>Player</code> will
      * be added to that representation if <code>showAll</code> is
@@ -511,8 +912,7 @@ public abstract class FreeColObject {
      */
     protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         if (getId() == null) {
-            logger.warning("FreeColObject with null identifier: "
-                + toString());
+            logger.warning("FreeColObject with null identifier: " + toString());
         } else {
             writeAttribute(out, ID_ATTRIBUTE_TAG, getId());
         }
@@ -586,8 +986,8 @@ public abstract class FreeColObject {
      * @exception XMLStreamException if there are any problems writing
      *      to the stream.
      */
-    protected void toXMLPartialImpl(XMLStreamWriter out, String[] fields)
-        throws XMLStreamException {
+    protected void toXMLPartialImpl(XMLStreamWriter out,
+                                    String[] fields) throws XMLStreamException {
         throw new UnsupportedOperationException("Partial update of unsupported type.");
     }
 
@@ -644,30 +1044,29 @@ public abstract class FreeColObject {
 
     /**
      * Initialize this object from an XML-representation of this object.
+     *
      * @param element An XML-element that will be used to initialize
      *      this object.
      * @param specification The <code>Specification</code> to refer to.
      */
-    public void readFromXMLElement(Element element, Specification specification) {
+    public void readFromXMLElement(Element element,
+        Specification specification) throws XMLStreamException {
         setSpecification(specification);
         XMLInputFactory xif = XMLInputFactory.newInstance();
         try {
-            try {
-                TransformerFactory factory = TransformerFactory.newInstance();
-                Transformer xmlTransformer = factory.newTransformer();
-                StringWriter stringWriter = new StringWriter();
-                xmlTransformer.transform(new DOMSource(element), new StreamResult(stringWriter));
-                String xml = stringWriter.toString();
-                XMLStreamReader xsr = xif.createXMLStreamReader(new StringReader(xml));
-                xsr.nextTag();
-                readFromXML(xsr);
-            } catch (TransformerException e) {
-                logger.log(Level.WARNING, "TransformerException", e);
-                throw new IllegalStateException("TransformerException");
-            }
-        } catch (XMLStreamException e) {
-            logger.log(Level.WARNING, "XMLStreamException", e);
-            throw new IllegalStateException("XMLStreamException");
+            TransformerFactory factory = TransformerFactory.newInstance();
+            Transformer xmlTransformer = factory.newTransformer();
+            StringWriter stringWriter = new StringWriter();
+            xmlTransformer.transform(new DOMSource(element),
+                                     new StreamResult(stringWriter));
+            String xml = stringWriter.toString();
+            XMLStreamReader xsr
+                = xif.createXMLStreamReader(new StringReader(xml));
+            xsr.nextTag();
+            readFromXML(xsr);
+        } catch (TransformerException e) {
+            logger.log(Level.WARNING, "TransformerException", e);
+            throw new IllegalStateException("TransformerException");
         }
     }
 
@@ -681,11 +1080,15 @@ public abstract class FreeColObject {
      *     the stream.
      */
     public void readFromXML(XMLStreamReader in) throws XMLStreamException {
-        if (in.getAttributeValue(null, PARTIAL_ATTRIBUTE_TAG) == null) {
+        if (hasAttribute(in, PARTIAL_ATTRIBUTE_TAG)
+            // @compat 0.10.x
+            || hasAttribute(in, OLD_PARTIAL_ATTRIBUTE_TAG)
+            // end @compat
+            ) {
+            readFromXMLPartialImpl(in);
+        } else {
             readAttributes(in);
             readChildren(in);
-        } else {
-            readFromXMLPartialImpl(in);
         }
     }
 
@@ -719,6 +1122,7 @@ public abstract class FreeColObject {
         expectTag(in, tag);
     }
 
+    // @compat 0.9.x
     /**
      * Reads an XML-representation of an array.
      *
@@ -772,6 +1176,7 @@ public abstract class FreeColObject {
         closeTag(in, tagName);
         return array;
     }
+    // end @compat
 
     /**
      * Reads an XML-representation of a list.
@@ -1241,408 +1646,6 @@ public abstract class FreeColObject {
         return sb.toString();
     }
 
-    //  ---------- PROPERTY CHANGE SUPPORT DELEGATES ----------
-
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-        if (pcs == null) {
-            pcs = new PropertyChangeSupport(this);
-        }
-        pcs.addPropertyChangeListener(listener);
-    }
-
-    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-        if (pcs == null) {
-            pcs = new PropertyChangeSupport(this);
-        }
-        pcs.addPropertyChangeListener(propertyName, listener);
-    }
-
-    public void fireIndexedPropertyChange(String propertyName, int index, boolean oldValue, boolean newValue) {
-        if (pcs != null) {
-            pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
-        }
-    }
-
-    public void fireIndexedPropertyChange(String propertyName, int index, int oldValue, int newValue) {
-        if (pcs != null) {
-            pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
-        }
-    }
-
-    public void fireIndexedPropertyChange(String propertyName, int index, Object oldValue, Object newValue) {
-        if (pcs != null) {
-            pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
-        }
-    }
-
-    public void firePropertyChange(PropertyChangeEvent event) {
-        if (pcs != null) {
-            pcs.firePropertyChange(event);
-        }
-    }
-
-    public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {
-        if (pcs != null) {
-            pcs.firePropertyChange(propertyName, oldValue, newValue);
-        }
-    }
-
-    public void firePropertyChange(String propertyName, int oldValue, int newValue) {
-        if (pcs != null) {
-            pcs.firePropertyChange(propertyName, oldValue, newValue);
-        }
-    }
-
-    public void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
-        if (pcs != null) {
-            pcs.firePropertyChange(propertyName, oldValue, newValue);
-        }
-    }
-
-    public PropertyChangeListener[] getPropertyChangeListeners() {
-        if (pcs == null) {
-            return new PropertyChangeListener[0];
-        } else {
-            return pcs.getPropertyChangeListeners();
-        }
-    }
-
-    public PropertyChangeListener[] getPropertyChangeListeners(String propertyName) {
-        if (pcs == null) {
-            return new PropertyChangeListener[0];
-        } else {
-            return pcs.getPropertyChangeListeners(propertyName);
-        }
-    }
-
-    public boolean hasListeners(String propertyName) {
-        if (pcs == null) {
-            return false;
-        } else {
-            return pcs.hasListeners(propertyName);
-        }
-    }
-
-    public void removePropertyChangeListener(PropertyChangeListener listener) {
-        if (pcs != null) {
-            pcs.removePropertyChangeListener(listener);
-        }
-    }
-
-    public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-        if (pcs != null) {
-            pcs.removePropertyChangeListener(propertyName, listener);
-        }
-    }
-
-    // Feature container handling.
-
-    /**
-     * Gets the feature container for this object, if any.
-     * None is provided here, but select subclasses will override.
-     *
-     * @return Null.
-     */
-    public FeatureContainer getFeatureContainer() {
-        return null;
-    }
-
-    /**
-     * Is an ability present in this object?
-     *
-     * @param id The object identifier.
-     * @return True if the ability is present.
-     */
-    public final boolean hasAbility(String id) {
-        return hasAbility(id, null);
-    }
-
-    /**
-     * Is an ability present in this object?
-     *
-     * @param id The object identifier.
-     * @param fcgot An optional <code>FreeColGameObjectType</code> the
-     *     ability applies to.
-     * @return True if the ability is present.
-     */
-    public final boolean hasAbility(String id, FreeColGameObjectType fcgot) {
-        return hasAbility(id, fcgot, null);
-    }
-
-    /**
-     * Is an ability present in this object?
-     * Subclasses with complex ability handling should override this
-     * routine.
-     *
-     * @param id The object identifier.
-     * @param fcgot An optional <code>FreeColGameObjectType</code> the
-     *     ability applies to.
-     * @param turn An optional applicable <code>Turn</code>.
-     * @return True if the ability is present.
-     */
-    public boolean hasAbility(String id, FreeColGameObjectType fcgot,
-                              Turn turn) {
-        return FeatureContainer.hasAbility(getFeatureContainer(),
-                                           id, fcgot, turn);
-    }
-
-    /**
-     * Checks if this object contains a given ability key.
-     *
-     * @param key The key to check.
-     * @return True if the key is present.
-     */
-    public boolean containsAbilityKey(String key) {
-        return FeatureContainer.containsAbilityKey(getFeatureContainer(),
-                                                   key);
-    }
-
-    /**
-     * Gets a copy of the abilities of this object.
-     *
-     * @return A set of abilities.
-     */
-    public Set<Ability> getAbilities() {
-        return FeatureContainer.getAbilities(getFeatureContainer());
-    }
-
-    /**
-     * Gets the set of abilities with the given identifier from this object.
-     *
-     * @param id The object identifier.
-     * @return A set of abilities.
-     */
-    public final Set<Ability> getAbilitySet(String id) {
-        return getAbilitySet(id, null);
-    }
-
-    /**
-     * Gets the set of abilities with the given identifier from this object.
-     *
-     * @param id The object identifier.
-     * @param fcgot An optional <code>FreeColGameObjectType</code> the
-     *     ability applies to.
-     * @return A set of abilities.
-     */
-    public final Set<Ability> getAbilitySet(String id,
-                                            FreeColGameObjectType fcgot) {
-        return getAbilitySet(id, fcgot, null);
-    }
-
-    /**
-     * Gets the set of abilities with the given identifier from this
-     * object.  Subclasses with complex ability handling should
-     * override this routine.
-     *
-     * @param id The object identifier.
-     * @param fcgot An optional <code>FreeColGameObjectType</code> the
-     *     ability applies to.
-     * @param turn An optional applicable <code>Turn</code>.
-     * @return A set of abilities.
-     */
-    public Set<Ability> getAbilitySet(String id,
-                                      FreeColGameObjectType fcgot,
-                                      Turn turn) {
-        return FeatureContainer.getAbilitySet(getFeatureContainer(),
-                                              id, fcgot, turn);
-    }
-
-    /**
-     * Add the given ability to this object.
-     *
-     * @param ability An <code>Ability</code> to add.
-     * @return True if the ability was added.
-     */
-    public boolean addAbility(Ability ability) {
-        return FeatureContainer.addAbility(getFeatureContainer(), ability);
-    }
-
-    /**
-     * Remove the given ability from this object.
-     *
-     * @param ability An <code>Ability</code> to remove.
-     * @return The ability removed.
-     */
-    public Ability removeAbility(Ability ability) {
-        return FeatureContainer.removeAbility(getFeatureContainer(), ability);
-    }
-
-    /**
-     * Remove all abilities with a given identifier.
-     *
-     * @param id The object identifier.
-     */
-    public void removeAbilities(String id) {
-        FeatureContainer.removeAbilities(getFeatureContainer(), id);
-    }
-
-
-    /**
-     * Checks if this object contains a given modifier key.
-     *
-     * @param key The key to check.
-     * @return True if the key is present.
-     */
-    public final boolean containsModifierKey(String key) {
-        Set<Modifier> set = getModifierSet(key);
-        return (set == null) ? false : !set.isEmpty();
-    }
-
-    /**
-     * Gets a copy of the modifiers of this object.
-     *
-     * @return A set of modifiers.
-     */
-    public final Set<Modifier> getModifiers() {
-        return FeatureContainer.getModifiers(getFeatureContainer());
-    }
-
-    /**
-     * Gets a sorted copy of the modifiers of this object.
-     *
-     * @return A list of modifiers.
-     */
-    public List<Modifier> getSortedModifiers() {
-        List<Modifier> modifiers = new ArrayList<Modifier>();
-        modifiers.addAll(getModifiers());
-        Collections.sort(modifiers);
-        return modifiers;
-    }
-
-    /**
-     * Gets the set of modifiers with the given identifier from this object.
-     *
-     * @param id The object identifier.
-     * @return A set of modifiers.
-     */
-    public final Set<Modifier> getModifierSet(String id) {
-        return getModifierSet(id, null);
-    }
-
-    /**
-     * Gets the set of modifiers with the given identifier from this object.
-     *
-     * @param id The object identifier.
-     * @param fcgot An optional <code>FreeColGameObjectType</code> the
-     *     modifier applies to.
-     * @return A set of modifiers.
-     */
-    public final Set<Modifier> getModifierSet(String id,
-                                              FreeColGameObjectType fcgot) {
-        return getModifierSet(id, fcgot, null);
-    }
-
-    /**
-     * Gets the set of modifiers with the given identifier from this object.
-     *
-     * Subclasses with complex modifier handling may override this
-     * routine.
-     *
-     * @param id The object identifier.
-     * @param fcgot An optional <code>FreeColGameObjectType</code> the
-     *     modifier applies to.
-     * @param turn An optional applicable <code>Turn</code>.
-     * @return A set of modifiers.
-     */
-    public Set<Modifier> getModifierSet(String id,
-                                        FreeColGameObjectType fcgot,
-                                        Turn turn) {
-        return FeatureContainer.getModifierSet(getFeatureContainer(), 
-                                               id, fcgot, turn);
-    }
-
-    /**
-     * Applies this objects modifiers with the given identifier to the
-     * given number.
-     *
-     * @param number The number to modify.
-     * @param id The object identifier.
-     * @return The modified number.
-     */
-    public final float applyModifier(float number, String id) {
-        return applyModifier(number, id, null);
-    }
-
-    /**
-     * Applies this objects modifiers with the given identifier to the
-     * given number.
-     *
-     * @param number The number to modify.
-     * @param id The object identifier.
-     * @param fcgot An optional <code>FreeColGameObjectType</code> the
-     *     modifier applies to.
-     * @return The modified number.
-     */
-    public final float applyModifier(float number, String id,
-                                     FreeColGameObjectType fcgot) {
-        return applyModifier(number, id, fcgot, null);
-    }
-
-    /**
-     * Applies this objects modifiers with the given identifier to the
-     * given number.
-     *
-     * @param number The number to modify.
-     * @param id The object identifier.
-     * @param fcgot An optional <code>FreeColGameObjectType</code> the
-     *     modifier applies to.
-     * @return The modified number.
-     */
-    public final float applyModifier(float number, String id,
-                                     FreeColGameObjectType fcgot, Turn turn) {
-        return FeatureContainer.applyModifierSet(number, turn,
-                                                 getModifierSet(id, fcgot, turn));
-    }
-
-    /**
-     * Add the given modifier to this object.
-     *
-     * @param modifier An <code>Modifier</code> to add.
-     * @return True if the modifier was added.
-     */
-    public boolean addModifier(Modifier modifier) {
-        return FeatureContainer.addModifier(getFeatureContainer(), modifier);
-    }
-
-    /**
-     * Remove the given modifier from this object.
-     *
-     * @param modifier An <code>Modifier</code> to remove.
-     * @return The modifier removed.
-     */
-    public Modifier removeModifier(Modifier modifier) {
-        return FeatureContainer.removeModifier(getFeatureContainer(), modifier);
-    }
-
-    /**
-     * Remove all abilities with a given identifier.
-     *
-     * @param id The object identifier.
-     */
-    public void removeModifiers(String id) {
-        FeatureContainer.removeModifiers(getFeatureContainer(), id);
-    }
-
-
-    /**
-     * Adds all the features in an object to this object.
-     *
-     * @param fco The <code>FreeColObject</code> to add features from.
-     */
-    public void addFeatures(FreeColObject fco) {
-        FeatureContainer.addFeatures(getFeatureContainer(), fco);
-    }
-
-    /**
-     * Removes all the features in an object from this object.
-     *
-     * @param fco The <code>FreeColObject</code> to find features to remove in.
-     */
-    public void removeFeatures(FreeColObject fco) {
-        FeatureContainer.removeFeatures(getFeatureContainer(), fco);
-    }
-
-
     /**
      * Get the actual tag name for this object.
      *
@@ -1652,8 +1655,8 @@ public abstract class FreeColObject {
         String tagName = "";
         try {
             Method m = getClass().getMethod("getXMLElementTagName",
-                                            (Class[]) null);
-            tagName = (String) m.invoke((Object) null, (Object[]) null);
+                                            (Class[])null);
+            tagName = (String) m.invoke((Object)null, (Object[])null);
         } catch (Exception e) {}
         return tagName;
     }

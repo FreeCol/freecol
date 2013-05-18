@@ -23,6 +23,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.w3c.dom.Element;
+
 
 /**
  * The <code>Modifier</code> class encapsulates a bonus or penalty
@@ -142,6 +144,17 @@ public class Modifier extends Feature implements Comparable<Modifier> {
     public Modifier(XMLStreamReader in, Specification specification) throws XMLStreamException {
         setSpecification(specification);
         readFromXML(in);
+    }
+
+    /**
+     * Creates a new <code>Modifier</code> instance.
+     *
+     * @param e The <code>Element</code> to read from.
+     * @param specification The <code>Specification</code> to refer to.
+     */
+    public Modifier(Element e, Specification specification) {
+        setSpecification(specification);
+        readFromXMLElement(e);
     }
 
 

@@ -39,7 +39,7 @@ public class ChangeWindowedModeAction extends SelectableAction {
      * @param gui 
      */
     ChangeWindowedModeAction(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui, id, "NO_ID");
+        super(freeColClient, gui, id, null);
     }
 
     /**

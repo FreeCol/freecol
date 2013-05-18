@@ -1025,26 +1025,27 @@ public final class InGameInputHandler extends InputHandler {
             String owner = e.getAttribute("owner");
             Player player = game.getFreeColGameObject(owner, Player.class);
             if (player == null) {
-                logger.warning("addObject with broken owner: "
-                               + ((owner == null) ? "(null)" : owner));
+                logger.warning("addObject with broken owner: " + owner);
                 continue;
             }
-            String tag = e.getTagName();
-            if (tag == null) {
-                logger.warning("addObject null tag");
-            } else if (tag == FoundingFather.getXMLElementTagName()) {
-                String id = e.getAttribute(FreeColObject.ID_ATTRIBUTE_TAG);
-                FoundingFather father = spec.getFoundingFather(id);
+
+            final String tag = e.getTagName();
+            if (FoundingFather.getXMLElementTagName() == tag) {
+                FoundingFather father = spec.getFoundingFather(FreeColObject.readId(e));
                 if (father != null) player.addFather(father);
-            } else if (tag == HistoryEvent.getXMLElementTagName()) {
+                
+            } else if (HistoryEvent.getXMLElementTagName() == tag) {
                 player.getHistory().add(new HistoryEvent(e));
-            } else if (tag == LastSale.getXMLElementTagName()) {
+
+            } else if (LastSale.getXMLElementTagName() == tag) {
                 player.addLastSale(new LastSale(e));
-            } else if (tag == ModelMessage.getXMLElementTagName()) {
+
+            } else if (ModelMessage.getXMLElementTagName() == tag) {
                 player.addModelMessage(new ModelMessage(e));
-            } else if (tag == TradeRoute.getXMLElementTagName()) {
-                TradeRoute t = new TradeRoute(game, e);
-                player.getTradeRoutes().add(t);
+
+            } else if (TradeRoute.getXMLElementTagName() == tag) {
+                player.getTradeRoutes().add(new TradeRoute(game, e));
+
             } else {
                 logger.warning("addObject unrecognized: " + tag);
             }
@@ -1062,29 +1063,32 @@ public final class InGameInputHandler extends InputHandler {
         Game game = getGame();
         Specification spec = game.getSpecification();
         boolean add = "add".equalsIgnoreCase(element.getAttribute("add"));
-        FreeColGameObject object = game.getFreeColGameObject(element.getAttribute(FreeColObject.ID_ATTRIBUTE_TAG));
+        String id = FreeColObject.readId(element);
+        FreeColGameObject object = game.getFreeColGameObject(id);
+        if (object == null) {
+            logger.warning("featureChange with null object");
+            return null;
+        }
+
         NodeList nodes = element.getChildNodes();
         for (int i = 0; i < nodes.getLength(); i++) {
             Element e = (Element) nodes.item(i);
-            String tag = e.getTagName();
-            if (tag == null) {
-                logger.warning("featureChange null tag");
-            } else if (tag == Modifier.getXMLElementTagName()) {
-                Modifier m = new Modifier(spec);
-                m.readFromXMLElement(e, spec);
+
+            final String tag = e.getTagName();
+            if (Ability.getXMLElementTagName() == tag) {
                 if (add) {
-                    object.addModifier(m);
+                    object.addAbility(new Ability(e, spec));
                 } else {
-                    object.removeModifier(m);
+                    object.removeAbility(new Ability(e, spec));
                 }
-            } else if (tag == Ability.getXMLElementTagName()) {
-                Ability a = new Ability("");
-                a.readFromXMLElement(e, spec);
+
+            } else if (Modifier.getXMLElementTagName() == tag) {
                 if (add) {
-                    object.addAbility(a);
+                    object.addModifier(new Modifier(e, spec));
                 } else {
-                    object.removeAbility(a);
+                    object.removeModifier(new Modifier(e, spec));
                 }
+
             } else {
                 logger.warning("featureChange unrecognized: " + tag);
             }

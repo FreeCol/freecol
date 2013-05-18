@@ -2872,7 +2872,7 @@ public class Colony extends Settlement implements Nameable {
                                         BuildableType.class, (BuildableType)null));
             closeTag(in, BUILD_QUEUE_TAG);
 
-        // @compat ?
+        // @compat 0.9.x
         } else if (OLD_BUILD_QUEUE_TAG.equals(tag)) {
             // TODO: remove support for old format, move serialization
             // to BuildQueue

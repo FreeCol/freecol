@@ -23,6 +23,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.w3c.dom.Element;
+
 
 /**
  * The <code>Ability</code> class encapsulates a bonus or penalty
@@ -217,6 +219,17 @@ public final class Ability extends Feature {
         throws XMLStreamException {
         setSpecification(specification);
         readFromXML(in);
+    }
+
+    /**
+     * Creates a new <code>Ability</code> instance.
+     *
+     * @param e The <code>Element</code> to read from.
+     * @param specification A <code>Specification</code> to refer to.
+     */
+    public Ability(Element e, Specification specification) {
+        setSpecification(specification);
+        readFromXMLElement(e);
     }
 
 

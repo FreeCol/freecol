@@ -184,7 +184,7 @@ public final class OptionGroupUI extends JPanel
         if (group.isEditable()) {
             optionUpdaters.add((OptionUpdater) ui);
         }
-        if (!option.getId().equals(FreeColObject.NO_ID)) {
+        if (option.getId() != null) {
             optionUIs.put(option.getId(), ui);
         }
     }
