@@ -269,8 +269,7 @@ abstract public class AbstractOption<T> extends FreeColObject
             option = new UnitTypeOption(spec);
 
         } else {
-            logger.finest("Parsing of option type '" + tag
-                + "' is not implemented yet.");
+            logger.warning("Not an option type: " + tag);
             in.nextTag();
         }
 

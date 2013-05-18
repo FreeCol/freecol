@@ -1557,7 +1557,6 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             || OLD_TILE_IMPROVEMENT_PLAN_TAG.equals(tag)
             // end @compat
                    ) {
-            String str = readId(in);
             TileImprovementPlan ti = getAttribute(in, ID_ATTRIBUTE_TAG,
                 TileImprovementPlan.class, (TileImprovementPlan)null);
             if (ti == null) ti = new TileImprovementPlan(aiMain, readId(in));

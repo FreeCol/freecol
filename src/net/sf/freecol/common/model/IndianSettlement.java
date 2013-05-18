@@ -1432,6 +1432,15 @@ public class IndianSettlement extends Settlement {
         super.readChildren(in);
 
         owner.addSettlement(this);
+
+        // @compat 0.10.1
+        for (Unit u : getUnitList()) {
+            if (u.getLocation() != this) {
+                logger.warning("Fixing unit location");
+                u.setLocation(this);
+            }
+        }
+        // end @compat
     }
 
     /**
@@ -1465,12 +1474,12 @@ public class IndianSettlement extends Settlement {
             closeTag(in, IS_VISITED_TAG);
         // end @compat
 
-        // @compat ?
+        // @compat 0.9.x
         } else if (WANTED_GOODS_TAG.equals(tag)) {
-            String[] wantedGoodsID
+            String[] wantedGoodsId
                 = readFromArrayElement(WANTED_GOODS_TAG, in, new String[0]);
             for (int i = 0; i < wantedGoods.length; i++) {
-                String goodsId = (i < wantedGoodsID.length) ? wantedGoodsID[i]
+                String goodsId = (i < wantedGoodsId.length) ? wantedGoodsId[i]
                     : null;
                 wantedGoods[i] = (goodsId == null || "".equals(goodsId)) ? null
                     : spec.getGoodsType(goodsId);
@@ -1493,20 +1502,6 @@ public class IndianSettlement extends Settlement {
                 owner.addUnit(unit);
             }
             closeTag(in, OWNED_UNITS_TAG);
-
-        } else if (UNITS_TAG.equals(tag)) {
-            while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                if (in.getLocalName().equals(Unit.getXMLElementTagName())) {
-                    Unit unit = readFreeColGameObject(in, Unit.class);
-                    // @compat 0.10.1
-                    if (unit.getLocation() != this) {
-                        logger.warning("Fixing unit location");
-                        unit.setLocation(this);
-                    }
-                    // end @compat
-                    add(unit);
-                }
-            }
 
         } else {
             super.readChild(in);

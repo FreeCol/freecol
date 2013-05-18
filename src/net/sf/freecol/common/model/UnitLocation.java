@@ -472,7 +472,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
 
         if (Unit.getXMLElementTagName().equals(tag)) {
             Unit unit = readFreeColGameObject(in, Unit.class);
-            if (unit != null && !units.contains(unit)) units.add(unit);
+            if (!units.contains(unit)) units.add(unit);
 
         } else {
             super.readChild(in);

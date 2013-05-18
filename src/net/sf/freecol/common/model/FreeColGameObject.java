@@ -278,20 +278,12 @@ abstract public class FreeColGameObject extends FreeColObject {
      * @param returnClass The class to expect.
      * @return The <code>FreeColGameObject</code> found, or null there
      *     was no ID_ATTRIBUTE_TAG present.
+     * @exception XMLStreamException if there is problem reading the stream.
      */
     public <T extends FreeColGameObject> T readFreeColGameObject(XMLStreamReader in,
-        Class<T> returnClass) {
+        Class<T> returnClass) throws XMLStreamException {
         T ret = makeFreeColGameObject(in, ID_ATTRIBUTE_TAG, returnClass);
-        if (ret != null) {
-            try {
-                ret.readFromXML(in);
-
-            } catch (XMLStreamException xse) {
-                logger.log(Level.WARNING, "Failed to update " + ret.getId()
-                    + " from stream.", xse);
-                return null;
-            }
-        }
+        if (ret != null) ret.readFromXML(in);
         return ret;
     }
 

@@ -339,7 +339,7 @@ public abstract class GoodsLocation extends UnitLocation {
 
         if (GoodsContainer.getXMLElementTagName().equals(tag)) {
             goodsContainer = readFreeColGameObject(in, GoodsContainer.class);
-            if (goodsContainer != null) goodsContainer.setLocation(this);
+            goodsContainer.setLocation(this);
 
         } else {
             super.readChild(in);

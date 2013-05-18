@@ -496,7 +496,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
         for (Option o : getOptions()) {
             sb.append(" ").append(o.toString());
         }
-        sb.append(" >]\n");
+        sb.append(" >]");
         return sb.toString();
     }
 
