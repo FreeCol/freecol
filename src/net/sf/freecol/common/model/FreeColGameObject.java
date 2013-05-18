@@ -558,9 +558,7 @@ abstract public class FreeColGameObject extends FreeColObject {
     protected void toXMLPartialByClass(XMLStreamWriter out, Class<?> theClass, 
                                        String[] fields) throws XMLStreamException {
         try {
-            Introspector tag = new Introspector(theClass, "XMLElementTagName");
-
-            out.writeStartElement(tag.getter(this));
+            out.writeStartElement(getRealXMLElementTagName());
 
             writeAttribute(out, ID_ATTRIBUTE_TAG, getId());
 
