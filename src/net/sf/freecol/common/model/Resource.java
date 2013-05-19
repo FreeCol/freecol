@@ -29,7 +29,9 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 /**
- * Represents a locatable goods of a specified type and quantity.
+ * Represents a production resource, such as prime tobacco, or an ore
+ * vein, located on a Tile. A resource may be exhausted. In the
+ * original game, only resources that produced silver were exhausted.
  */
 public class Resource extends TileItem {
 
