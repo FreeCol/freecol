@@ -280,6 +280,14 @@ public class LostCityRumour extends TileItem {
     /**
      * {@inheritDoc}
      */
+    public List<Modifier> getProductionModifiers(GoodsType goodsType,
+                                                 UnitType unitType) {
+        return new ArrayList<Modifier>();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public boolean isNatural() {
         return false;
     }
@@ -291,7 +299,7 @@ public class LostCityRumour extends TileItem {
     private static final String TILE_TAG = "tile";
     private static final String TYPE_TAG = "type";
 
-    
+
     /**
      * {@inheritDoc}
      */
@@ -330,7 +338,7 @@ public class LostCityRumour extends TileItem {
     @Override
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
-        
+
         tile = makeFreeColGameObject(in, TILE_TAG, Tile.class);
 
         type = getAttribute(in, TYPE_TAG, RumourType.class, (RumourType)null);

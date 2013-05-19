@@ -19,8 +19,10 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -509,6 +511,17 @@ public class TileImprovement extends TileItem implements Named {
         if (potential > 0 && isComplete()) {
             result += type.getBonus(goodsType);
         }
+        return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public List<Modifier> getProductionModifiers(GoodsType goodsType,
+                                                 UnitType unitType) {
+        List<Modifier> result = new ArrayList<Modifier>();
+        Modifier modifier = getProductionModifier(goodsType);
+        if (modifier != null) result.add(modifier);
         return result;
     }
 

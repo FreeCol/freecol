@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -195,6 +197,15 @@ public class Resource extends TileItem {
             + ((quantity == UNLIMITED || quantity > amount) ? amount
                 : quantity);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public List<Modifier> getProductionModifiers(GoodsType goodsType,
+                                                 UnitType unitType) {
+        return new ArrayList<Modifier>(getType().getModifierSet(goodsType.getId(), unitType));
+    }
+
 
     /**
      * {@inheritDoc}
