@@ -334,15 +334,7 @@ public class ProductionType extends FreeColObject {
                                           GoodsType.class, (GoodsType)null);
             int amount = getAttribute(in, VALUE_TAG, -1);
 
-            if (type == null) {
-                logger.warning("Invalid goods type: "
-                    + in.getAttributeValue(null, GOODS_TYPE_TAG));
-            } else if (amount < 0) {
-                logger.warning("Invalid amount: "
-                    + in.getAttributeValue(null, VALUE_TAG));
-            } else {
-                addInput(type, amount);
-            }
+            if (type != null && amount >= 0) addInput(type, amount);
             closeTag(in, INPUT_TAG);
 
         } else if (OUTPUT_TAG.equals(tag)) {
@@ -350,15 +342,7 @@ public class ProductionType extends FreeColObject {
                                           GoodsType.class, (GoodsType)null);
             int amount = getAttribute(in, VALUE_TAG, -1);
 
-            if (type == null) {
-                logger.warning("Invalid goods type: "
-                    + in.getAttributeValue(null, GOODS_TYPE_TAG));
-            } else if (amount < 0) {
-                logger.warning("Invalid amount: "
-                    + in.getAttributeValue(null, VALUE_TAG));
-            } else {
-                addOutput(type, amount);
-            }
+            if (type != null && amount >= 0) addOutput(type, amount);
             closeTag(in, OUTPUT_TAG);
 
         } else {

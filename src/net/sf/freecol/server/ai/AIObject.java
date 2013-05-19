@@ -217,7 +217,7 @@ public abstract class AIObject extends FreeColObject {
         // @compat 0.10.7
             (ID_ATTRIBUTE_TAG.equals(attributeName)) ? readId(in) :
         // end @compat
-            in.getAttributeValue(null, attributeName);
+            getAttribute(in, attributeName, (String)null);
 
         return (attrib == null) ? defaultValue
             : aiMain.getAIObject(attrib, returnType);

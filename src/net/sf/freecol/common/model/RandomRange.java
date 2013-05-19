@@ -227,22 +227,13 @@ public class RandomRange {
      *     from the stream.
      */
     public void readFromXML(XMLStreamReader in) throws XMLStreamException {
-        String str = null;
-        try {
-            str = in.getAttributeValue(null, PROBABILITY_TAG);
-            probability = Integer.parseInt(str);
+        probability = FreeColObject.getAttribute(in, PROBABILITY_TAG, 0);
 
-            str = in.getAttributeValue(null, MINIMUM_TAG);
-            minimum = Integer.parseInt(str);
+        minimum = FreeColObject.getAttribute(in, MINIMUM_TAG, 0);
 
-            str = in.getAttributeValue(null, MAXIMUM_TAG);
-            maximum = Integer.parseInt(str);
+        maximum = FreeColObject.getAttribute(in, MAXIMUM_TAG, 0);
 
-            str = in.getAttributeValue(null, FACTOR_TAG);
-            factor = Integer.parseInt(str);
-        } catch (NumberFormatException nfe) {
-            throw new XMLStreamException("Integer expected: " + str);
-        }
+        factor = FreeColObject.getAttribute(in, FACTOR_TAG, 0);
 
         // Clear containers
         if (scopes != null) scopes.clear();

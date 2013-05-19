@@ -1260,7 +1260,8 @@ public abstract class FreeColObject {
      * @param attributeName An attribute name
      * @return True if the attribute is present.
      */
-    public boolean hasAttribute(XMLStreamReader in, String attributeName) {
+    public static boolean hasAttribute(XMLStreamReader in,
+                                       String attributeName) {
         final String attrib = in.getAttributeValue(null, attributeName);
         return attrib != null;
     }
@@ -1273,8 +1274,9 @@ public abstract class FreeColObject {
      * @param defaultValue The default value.
      * @return The boolean attribute value, or the default value if none found.
      */
-    public boolean getAttribute(XMLStreamReader in, String attributeName,
-                                boolean defaultValue) {
+    public static boolean getAttribute(XMLStreamReader in,
+                                       String attributeName,
+                                       boolean defaultValue) {
         final String attrib = in.getAttributeValue(null, attributeName);
 
         return (attrib == null) ? defaultValue
@@ -1289,8 +1291,8 @@ public abstract class FreeColObject {
      * @param defaultValue The default value.
      * @return The float attribute value, or the default value if none found.
      */
-    public float getAttribute(XMLStreamReader in, String attributeName,
-                              float defaultValue) {
+    public static float getAttribute(XMLStreamReader in, String attributeName,
+                                     float defaultValue) {
         final String attrib = in.getAttributeValue(null, attributeName);
 
         float result = defaultValue;
@@ -1312,8 +1314,8 @@ public abstract class FreeColObject {
      * @param defaultValue The default value.
      * @return The int attribute value, or the default value if none found.
      */
-    public int getAttribute(XMLStreamReader in, String attributeName,
-                            int defaultValue) {
+    public static int getAttribute(XMLStreamReader in, String attributeName,
+                                   int defaultValue) {
         final String attrib = in.getAttributeValue(null, attributeName);
 
         int result = defaultValue;
@@ -1335,8 +1337,8 @@ public abstract class FreeColObject {
      * @param defaultValue The default value.
      * @return The string attribute value, or the default value if none found.
      */
-    public String getAttribute(XMLStreamReader in, String attributeName,
-                               String defaultValue) {
+    public static String getAttribute(XMLStreamReader in, String attributeName,
+                                      String defaultValue) {
         final String attrib = in.getAttributeValue(null, attributeName);
 
         return (attrib == null) ? defaultValue
@@ -1352,7 +1354,7 @@ public abstract class FreeColObject {
      * @param defaultValue The default value.
      * @return The enum attribute value, or the default value if none found.
      */
-    public <T extends Enum<T>> T getAttribute(XMLStreamReader in,
+    public static <T extends Enum<T>> T getAttribute(XMLStreamReader in,
         String attributeName, Class<T> returnType, T defaultValue) {
         final String attrib = in.getAttributeValue(null, attributeName);
 
@@ -1380,7 +1382,7 @@ public abstract class FreeColObject {
      * @return The <code>FreeColObject</code> found, or the default
      *     value if not.
      */
-    public <T extends FreeColGameObject> T getAttribute(XMLStreamReader in,
+    public static <T extends FreeColGameObject> T getAttribute(XMLStreamReader in,
         String attributeName, Game game, Class<T> returnType, T defaultValue) {
         final String attrib =
         // @compat 0.10.7

@@ -90,8 +90,8 @@ public class FreeColModFile extends FreeColDataFile {
         try {
             in = xif.createXMLStreamReader(getModDescriptorInputStream());
             in.nextTag();
-            id = in.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG);
-            parent = in.getAttributeValue(null, "parent");
+            id = FreeColObject.readId(in);
+            parent = FreeColObject.getAttribute(in, "parent", (String)null);
         } catch (XMLStreamException e) {
             final IOException e2 = new IOException("XMLStreamException.");
             e2.initCause(e);

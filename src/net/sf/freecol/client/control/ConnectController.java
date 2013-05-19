@@ -44,6 +44,7 @@ import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColSavegameFile;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
@@ -288,14 +289,12 @@ public final class ConnectController {
             xs = fis.getXMLStream();
             final XMLStreamReader in = xs.getXMLStreamReader();
             in.nextTag();
-            String str = in.getAttributeValue(null, "owner");
+            String str = FreeColObject.getAttribute(in, "owner", (String)null);
             if (str != null) FreeCol.setName(str);
-            str = in.getAttributeValue(null, "singleplayer");
-            final boolean defaultSinglePlayer = str != null
-                && Boolean.valueOf(str).booleanValue();
-            str = in.getAttributeValue(null, "publicServer");
-            final boolean defaultPublicServer = str != null
-                && Boolean.valueOf(str).booleanValue();
+            final boolean defaultSinglePlayer
+                = FreeColObject.getAttribute(in, "singleplayer", false);
+            final boolean defaultPublicServer
+                = FreeColObject.getAttribute(in, "publicServer", false);
             xs.close();
             xs = null;
 

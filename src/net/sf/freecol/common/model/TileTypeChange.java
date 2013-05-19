@@ -173,11 +173,7 @@ public class TileTypeChange implements Comparable<TileTypeChange> {
                 GoodsType type = spec.getType(in, GOODS_TYPE_TAG,
                                               GoodsType.class, (GoodsType)null);
 
-                String str = in.getAttributeValue(null, VALUE_TAG);
-                int amount = 0;
-                try {
-                    amount = Integer.parseInt(str);
-                } catch (NumberFormatException e) {}
+                int amount = FreeColObject.getAttribute(in, VALUE_TAG, 0);
 
                 production = new AbstractGoods(type, amount);
 

@@ -363,15 +363,13 @@ public abstract class FreeColAction extends AbstractAction implements Option<Fre
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        String id = in.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG);
+        String id = FreeColObject.readId(in);
         if (id == null) id = in.getLocalName(); // Old syntax
 
-        String acc = in.getAttributeValue(null, ACCELERATOR_TAG);
-        if (!acc.equals("")) {
-            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(acc));
-        } else {
-            putValue(ACCELERATOR_KEY, null);
-        }
+        String acc = FreeColObject.getAttribute(in, ACCELERATOR_TAG,
+                                                (String)null);
+        putValue(ACCELERATOR_KEY, (acc != null) ? KeyStroke.getKeyStroke(acc)
+            : null);
     }
 
     /**
