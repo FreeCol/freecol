@@ -421,7 +421,7 @@ abstract public class FreeColGameObject extends FreeColObject {
         if (!showAll && toSavedGame) {
             throw new IllegalArgumentException("'showAll' should be true when saving a game.");
         }
-        toXMLImpl(out, player, showAll, toSavedGame);
+        toXML(out, getRealXMLElementTagName(), player, showAll, toSavedGame);
     }
 
     /**
