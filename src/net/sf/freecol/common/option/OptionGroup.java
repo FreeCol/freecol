@@ -482,6 +482,7 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
                 abstractOption.setGroup(this.getId());
             }
         } else {
+            // FreeColActions are read here.
             option.readFromXML(in);
         }
     }

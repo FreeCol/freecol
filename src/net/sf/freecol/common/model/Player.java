@@ -3797,8 +3797,7 @@ public class Player extends FreeColGameObject implements Nameable {
             }
 
             if (highSeas != null) {
-                // TODO: toXML!?!
-                highSeas.toXMLImpl(out, player, showAll, toSavedGame);
+                highSeas.toXML(out, player, showAll, toSavedGame);
             }
             
             writeToListElement(out, FOUNDING_FATHERS_TAG, foundingFathers);

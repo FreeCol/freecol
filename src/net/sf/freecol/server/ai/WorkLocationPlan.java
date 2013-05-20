@@ -27,14 +27,15 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.WorkLocation;
+import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 
 /**
- * Objects of this class contains AI-information for a single {@link
- * net.sf.freecol.common.model.WorkLocation}.
+ * Objects of this class contains AI-information for a single
+ * {@link net.sf.freecol.common.model.WorkLocation}.
  */
 public class WorkLocationPlan extends AIObject {
 
@@ -114,8 +115,7 @@ public class WorkLocationPlan extends AIObject {
 
 
     // Serialization
-
-    private static final String GOODS_TYPE_TAG = "goodsType";
+    // WorkLocationPlans are not currently saved so this is a no-op.
 
 
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
@@ -123,38 +123,20 @@ public class WorkLocationPlan extends AIObject {
     }
 
     /**
-     * Creates an XML-representation of this object.
-     * @param document The <code>Document</code> in which
-     *      the XML-representation should be created.
-     * @return The XML-representation.
+     * {@inheritDoc}
      */
-    public Element toXMLElement(Document document) {
-        Element element = document.createElement(getXMLElementTagName());
-
-        element.setAttribute(ID_ATTRIBUTE_TAG, workLocation.getId());
-
-        element.setAttribute(GOODS_TYPE_TAG, goodsType.getId());
-
-        return element;
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(32);
+        sb.append("[").append(getId())
+            .append(" ").append(Utils.lastPart(goodsType.getId(), "."))
+            .append(" at ").append(workLocation.getId())
+            .append("]");
+        return sb.toString();
     }
 
     /**
-     * Updates this object from an XML-representation of
-     * a <code>WorkLocationPlan</code>.
-     *
-     * @param element The XML-representation.
-     */
-    public void readFromXMLElement(Element element) {
-        final Specification spec = getSpecification();
-        String str = readId(element);
-        workLocation = getAIMain().getGame()
-            .getFreeColGameObject(str, WorkLocation.class);
-
-        goodsType = spec.getGoodsType(element.getAttribute(GOODS_TYPE_TAG));
-    }
-
-    /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "workLocationPlan"
      */

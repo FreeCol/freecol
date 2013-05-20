@@ -311,6 +311,8 @@ public abstract class FreeColAction extends AbstractAction implements Option<Fre
 
 
     // Serialization
+    // This is not actually a FreeColObject, so the serialization is
+    // less elaborate.
     
     private static final String ACCELERATOR_TAG = "accelerator";
 
@@ -324,18 +326,6 @@ public abstract class FreeColAction extends AbstractAction implements Option<Fre
      *             stream.
      */
     public void toXML(XMLStreamWriter out) throws XMLStreamException {
-        toXMLImpl(out);
-    }
-
-    /**
-     * This method writes an XML-representation of this object to the given
-     * stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
-     */
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
 
         out.writeAttribute(FreeColObject.ID_ATTRIBUTE_TAG, getId());
@@ -352,24 +342,12 @@ public abstract class FreeColAction extends AbstractAction implements Option<Fre
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
     public void readFromXML(XMLStreamReader in) throws XMLStreamException {
-        readAttributes(in);
+        // id is hard-wired
+        String acc = FreeColObject.getAttribute(in, ACCELERATOR_TAG, "");
+        putValue(ACCELERATOR_KEY, ("".equals(acc)) ? null
+            : KeyStroke.getKeyStroke(acc));
+
         in.nextTag();
-    }
-
-    /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered during parsing.
-     */
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        String id = FreeColObject.readId(in);
-        if (id == null) id = in.getLocalName(); // Old syntax
-
-        String acc = FreeColObject.getAttribute(in, ACCELERATOR_TAG,
-                                                (String)null);
-        putValue(ACCELERATOR_KEY, (acc != null) ? KeyStroke.getKeyStroke(acc)
-            : null);
     }
 
     /**
