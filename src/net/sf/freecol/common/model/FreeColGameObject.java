@@ -410,9 +410,6 @@ abstract public class FreeColGameObject extends FreeColObject {
     // Serialization
     // FreeColGameObjects use the 4-arg toXMLImpl
 
-    // Several classes use this for lists of units.
-    public static final String UNITS_TAG = "units";
-
 
     /**
      * {@inheritDoc}

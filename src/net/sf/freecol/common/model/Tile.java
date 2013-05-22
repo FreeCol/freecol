@@ -1797,6 +1797,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     private static final String TYPE_TAG = "type";
     private static final String X_TAG = "x";
     private static final String Y_TAG = "y";
+    // @compat 0.10.1
+    public static final String OLD_UNITS_TAG = "units";
+    // end @compat
 
 
     /**
@@ -2054,7 +2057,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         final String tag = in.getLocalName();
 
         // @compat 0.10.1
-        if (UNITS_TAG.equals(tag)) {
+        if (OLD_UNITS_TAG.equals(tag)) {
             while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 super.readChild(in);
             }

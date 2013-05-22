@@ -3745,6 +3745,9 @@ public class Unit extends GoodsLocation
     private static final String VISIBLE_GOODS_COUNT_TAG = "visibleGoodsCount";
     private static final String WORK_LEFT_TAG = "workLeft";
     private static final String WORK_TYPE_TAG = "workType";
+    // @compat 0.10.5
+    private static final String OLD_UNITS_TAG = "units";
+    // end @compat
     // @compat 0.10.7
     private static final String OLD_HIT_POINTS_TAG = "hitpoints";
     // end @compat
@@ -4044,7 +4047,7 @@ public class Unit extends GoodsLocation
             closeTag(in, EQUIPMENT_TAG);
 
         // @compat 0.10.5
-        } else if (UNITS_TAG.equals(tag)) {
+        } else if (OLD_UNITS_TAG.equals(tag)) {
             while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 super.readChild(in);
             }
