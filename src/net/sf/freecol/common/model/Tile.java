@@ -2071,11 +2071,11 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
         } else if (PlayerExploredTile.getXMLElementTagName().equals(tag)) {
             // Only from a saved game.
-            Player player = findFreeColGameObject(in, PLAYER_TAG,
-                                                  Player.class, (Player)null);
+            Player player = requireFreeColGameObject(in, PLAYER_TAG,
+                                                     Player.class);
             PlayerExploredTile pet = readFreeColGameObject(in,
                 PlayerExploredTile.class);
-            if (player != null) playerExploredTiles.put(player, pet);
+            playerExploredTiles.put(player, pet);
 
         } else if (TileItemContainer.getXMLElementTagName().equals(tag)) {
             tileItemContainer = readFreeColGameObject(in, TileItemContainer.class);

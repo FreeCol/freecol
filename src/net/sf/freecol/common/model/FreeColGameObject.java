@@ -214,7 +214,8 @@ abstract public class FreeColGameObject extends FreeColObject {
      * Find a <code>FreeColGameObject</code> of a given class
      * from a stream attribute.
      *
-     * Use this routine when the object should already be present in the game.
+     * Use this routine when the object is optionally already be
+     * present in the game.
      *
      * @param in The <code>XMLStreamReader</code> to read from.
      * @param attributeName The attribute name.
@@ -227,6 +228,30 @@ abstract public class FreeColGameObject extends FreeColObject {
         String attributeName, Class<T> returnClass, T defaultValue) {
         return getAttribute(in, attributeName, getGame(), returnClass,
                             defaultValue);
+    }
+
+    /**
+     * Require a <code>FreeColGameObject</code> of a given class to be present
+     * in a stream attribute.
+     *
+     * Use this routine when the object should already be present in the game.
+     *
+     * @param in The <code>XMLStreamReader</code> to read from.
+     * @param attributeName The attribute name.
+     * @param returnClass The class to expect.
+     * @return The <code>FreeColGameObject</code> found, or the default
+     *     value if not found.
+     * @exception XMLStreamException if the attribute is missing.
+     */
+    public <T extends FreeColGameObject> T requireFreeColGameObject(XMLStreamReader in,
+        String attributeName, Class<T> returnClass) throws XMLStreamException {
+        T ret = getAttribute(in, attributeName, getGame(),
+                             returnClass, (T)null);
+        if (ret == (T)null) {
+            throw new XMLStreamException(getRealXMLElementTagName()
+                + " missing " + attributeName + ": " + currentTag(in));
+        }
+        return ret;
     }
 
     /**
