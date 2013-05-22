@@ -152,11 +152,6 @@ public class Colony extends Settlement implements Nameable {
 
 
     /**
-     * Deliberately empty constructor for ServerColony.
-     */
-    protected Colony() {}
-
-    /**
      * Constructor for ServerColony.
      *
      * @param game The enclosing <code>Game</code>.

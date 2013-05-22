@@ -87,11 +87,6 @@ public class Europe extends UnitLocation implements Ownable, Named {
 
 
     /**
-     * Deliberately empty constructor for ServerEurope.
-     */
-    protected Europe() {}
-
-    /**
      * Constructor for ServerEurope.
      *
      * @param game The enclosing <code>Game</code>.

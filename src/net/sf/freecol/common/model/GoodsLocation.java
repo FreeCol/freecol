@@ -48,11 +48,6 @@ public abstract class GoodsLocation extends UnitLocation {
 
 
     /**
-     * Deliberately empty constructor.
-     */
-    protected GoodsLocation() {}
-
-    /**
      * Creates a new <code>GoodsLocation</code> instance.
      *
      * @param game The enclosing <code>Game</code>.

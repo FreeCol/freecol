@@ -281,11 +281,6 @@ public class Unit extends GoodsLocation
 
 
     /**
-     * Deliberately empty constructor for ServerUnit.
-     */
-    protected Unit() {}
-
-    /**
      * Constructor for ServerUnit.
      *
      * @param game The enclosing <code>Game</code>.

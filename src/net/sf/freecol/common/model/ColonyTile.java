@@ -61,11 +61,6 @@ public class ColonyTile extends WorkLocation implements Ownable {
 
 
     /**
-     * Constructor for ServerColonyTile, deliberately empty.
-     */
-    protected ColonyTile() {}
-
-    /**
      * Constructor for ServerColonyTile.
      *
      * @param game The enclosing <code>Game</code>.

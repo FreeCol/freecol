@@ -47,11 +47,6 @@ public class Building extends WorkLocation implements Named, Comparable<Building
 
 
     /**
-     * Deliberately empty constructor for ServerBuilding.
-     */
-    protected Building() {}
-
-    /**
      * Constructor for ServerBuilding.
      *
      * @param game The enclosing <code>Game</code>.

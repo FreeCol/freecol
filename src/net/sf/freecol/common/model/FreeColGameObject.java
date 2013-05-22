@@ -63,15 +63,6 @@ abstract public class FreeColGameObject extends FreeColObject {
 
 
     /**
-     * Empty constructor for subclasses.
-     */
-    protected FreeColGameObject() {
-        logger.info("FreeColGameObject with null identifier.");
-
-        uninitialized = false;
-    }
-
-    /**
      * Creates a new <code>FreeColGameObject</code>.  Automatically
      * assign an object identifier and register this object at the
      * specified <code>Game</code>, unless this object is a
@@ -81,22 +72,20 @@ abstract public class FreeColGameObject extends FreeColObject {
      * @param game The <code>Game</code> in which this object belongs.
      */
     public FreeColGameObject(Game game) {
-        if (game != null && game instanceof Game) {
+        if (game != null) {
             this.game = game;
             setDefaultId(game);
         } else if (this instanceof Game) {
             this.game = (Game)this;
             setId("0");
         } else {
-            this.game = null;
-            logger.warning("FreeColGameObject with null game: " + getId());
+            throw new IllegalArgumentException("FCGO with null game.");
         }
-
-        uninitialized = getId() == null;
+        this.uninitialized = getId() == null;
     }
 
     /**
-     * Initiates a new <code>FreeColGameObject</code>.
+     * Creates a new <code>FreeColGameObject</code>.
      * If an identifier is supplied, use that, otherwise leave it undefined.
      *
      * This routine should be used when we intend later to call one of:
@@ -107,14 +96,14 @@ abstract public class FreeColGameObject extends FreeColObject {
      * @param id The object identifier.
      */
     public FreeColGameObject(Game game, String id) {
-        this.game = game;
-        if (game == null && !(this instanceof Game)) {
-            logger.warning("FreeColGameObject with null game: " + this
-                           + "/" + id);
+        if (game == null) {
+            throw new IllegalArgumentException("FCGO(id=" + id
+                + ") with null game");
         }
 
+        this.game = game;
         if (id != null) setId(id);
-        uninitialized = true;
+        this.uninitialized = true;
     }
 
 

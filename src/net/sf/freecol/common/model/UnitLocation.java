@@ -103,11 +103,6 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
 
 
     /**
-     * Deliberately empty constructor.
-     */
-    protected UnitLocation() {}
-
-    /**
      * Creates a new <code>UnitLocation</code> instance.
      *
      * @param game The enclosing <code>Game</code>.

@@ -610,11 +610,6 @@ public class Player extends FreeColGameObject implements Nameable {
     //
 
     /**
-     * Deliberately empty constructor for ServerPlayer.
-     */
-    protected Player() {}
-
-    /**
      * Constructor for ServerPlayer.
      *
      * @param game The enclosing <code>Game</code>.

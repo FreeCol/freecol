@@ -62,11 +62,6 @@ abstract public class Settlement extends GoodsLocation
 
 
     /**
-     * Deliberately empty constructor for ServerColony.
-     */
-    protected Settlement() {}
-
-    /**
      * Create a new <code>Settlement</code>.
      *
      * @param game The enclosing <code>Game</code>.

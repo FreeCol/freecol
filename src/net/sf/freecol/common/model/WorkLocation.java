@@ -51,11 +51,6 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
 
 
     /**
-     * Deliberately empty constructor for ServerWorkLocation.
-     */
-    protected WorkLocation() {}
-
-    /**
      * Constructor for ServerWorkLocation.
      *
      * @param game The enclosing <code>Game</code>.

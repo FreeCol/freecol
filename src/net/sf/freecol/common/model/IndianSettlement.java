@@ -177,11 +177,6 @@ public class IndianSettlement extends Settlement {
 
 
     /**
-     * Deliberately empty constructor for ServerIndianSettlement.
-     */
-    protected IndianSettlement() {}
-
-    /**
      * Constructor for ServerIndianSettlement.
      *
      * @param game The enclosing <code>Game</code>.
