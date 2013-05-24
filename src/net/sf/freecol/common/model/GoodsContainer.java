@@ -439,16 +439,6 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * {@inheritDoc}
      */
     @Override
-    protected void toXMLImpl(XMLStreamWriter out, Player player,
-                             boolean showAll,
-                             boolean toSavedGame) throws XMLStreamException {
-        super.toXML(out, getXMLElementTagName(), player, showAll, toSavedGame);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected void writeChildren(XMLStreamWriter out, Player player,
                                  boolean showAll,
                                  boolean toSavedGame) throws XMLStreamException {

@@ -435,6 +435,23 @@ abstract public class FreeColGameObject extends FreeColObject {
      * {@inheritDoc}
      */
     @Override
+    protected final void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        toXML(out, null, false, false);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected final void toXMLImpl(XMLStreamWriter out, Player player,
+                                   boolean showAll,
+                                   boolean toSavedGame) throws XMLStreamException {
+        toXML(out, player, showAll, toSavedGame);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public final void toXML(XMLStreamWriter out, Player player,
                             boolean showAll,
                             boolean toSavedGame) throws XMLStreamException {
@@ -442,14 +459,6 @@ abstract public class FreeColGameObject extends FreeColObject {
             throw new IllegalArgumentException("'showAll' should be true when saving a game.");
         }
         toXML(out, getRealXMLElementTagName(), player, showAll, toSavedGame);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        toXMLImpl(out, null, false, false);
     }
 
     /**
@@ -527,28 +536,6 @@ abstract public class FreeColGameObject extends FreeColObject {
     }
 
     /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *
-     * Only attributes visible to the given <code>Player</code> will
-     * be added to that representation if <code>showAll</code> is
-     * set to <code>false</code>.
-     *
-     * Implement this in the subclasses.
-     *
-     * @param out The output <code>XMLStreamWriter</code>.
-     * @param player The <code>Player</code> this XML-representation
-     *      should be made for, or null if <code>showAll == true</code>.
-     * @param showAll Show all attributes.
-     * @param toSavedGame Also show some extra attributes when saving the game.
-     * @exception XMLStreamException if there are any problems writing
-     *      to the stream.
-     */
-    abstract protected void toXMLImpl(XMLStreamWriter out, Player player,
-                                      boolean showAll,
-                                      boolean toSavedGame) throws XMLStreamException;
-
-    /**
      * Common routine for FreeColGameObject descendants to write a
      * partial XML-representation of this object to the given stream,
      * including only the mandatory and specified fields.
@@ -611,7 +598,9 @@ abstract public class FreeColGameObject extends FreeColObject {
             String name = in.getAttributeLocalName(i);
 
             if (name.equals(ID_ATTRIBUTE_TAG)
+                // @compat 0.10.x
                 || name.equals(ID_ATTRIBUTE)
+                // end @compat
                 || name.equals(PARTIAL_ATTRIBUTE_TAG)) continue;
 
             try {

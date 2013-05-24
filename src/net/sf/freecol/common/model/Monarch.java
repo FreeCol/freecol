@@ -845,16 +845,6 @@ public final class Monarch extends FreeColGameObject implements Named {
     /**
      * {@inheritDoc}
      */
-    @Override
-    protected void toXMLImpl(XMLStreamWriter out, Player player,
-                             boolean showAll,
-                             boolean toSavedGame) throws XMLStreamException {
-        super.toXML(out, getXMLElementTagName(), player, showAll, toSavedGame);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     protected void writeAttributes(XMLStreamWriter out, Player player,
                                    boolean showAll,
                                    boolean toSavedGame) throws XMLStreamException {

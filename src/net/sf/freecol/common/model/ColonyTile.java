@@ -513,15 +513,6 @@ public class ColonyTile extends WorkLocation implements Ownable {
 
     private static final String WORK_TILE_TAG = "workTile";
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void toXMLImpl(XMLStreamWriter out, Player player,
-                             boolean showAll,
-                             boolean toSavedGame) throws XMLStreamException {
-        super.toXML(out, getXMLElementTagName(), player, showAll, toSavedGame);
-    }
 
     /**
      * {@inheritDoc}

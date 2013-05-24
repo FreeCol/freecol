@@ -426,15 +426,6 @@ public class TradeRoute extends FreeColGameObject
     private static final String NAME_TAG = "name";
     private static final String OWNER_TAG = "owner";
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void toXMLImpl(XMLStreamWriter out, Player player,
-                             boolean showAll,
-                             boolean toSavedGame) throws XMLStreamException {
-        super.toXML(out, getXMLElementTagName(), player, showAll, toSavedGame);
-    }
 
     /**
      * {@inheritDoc}

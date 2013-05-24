@@ -1837,16 +1837,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * {@inheritDoc}
      */
     @Override
-    protected void toXMLImpl(XMLStreamWriter out, Player player,
-                             boolean showAll,
-                             boolean toSavedGame) throws XMLStreamException {
-        super.toXML(out, getXMLElementTagName(), player, showAll, toSavedGame);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected void writeAttributes(XMLStreamWriter out, Player player,
                                    boolean showAll,
                                    boolean toSavedGame) throws XMLStreamException {

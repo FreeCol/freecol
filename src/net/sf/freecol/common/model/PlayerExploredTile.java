@@ -276,16 +276,6 @@ public class PlayerExploredTile extends FreeColGameObject {
      * {@inheritDoc}
      */
     @Override
-    public void toXMLImpl(XMLStreamWriter out, Player player,
-                          boolean showAll,
-                          boolean toSavedGame) throws XMLStreamException {
-        super.toXML(out, getXMLElementTagName(), player, showAll, toSavedGame);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void writeAttributes(XMLStreamWriter out, Player player,
                                 boolean showAll,
                                 boolean toSavedGame) throws XMLStreamException {

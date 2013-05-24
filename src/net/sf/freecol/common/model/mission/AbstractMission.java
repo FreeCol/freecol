@@ -176,20 +176,15 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    protected void toXMLImpl(XMLStreamWriter out, Player player,
-                             boolean showAll, boolean toSavedGame)
-        throws XMLStreamException {
-        toXML(out, getXMLElementTagName());
-    }
+
+    // Serialization
+
 
     /**
      * {@inheritDoc}
      */
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
+    @Override
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
         out.writeAttribute("unit", unit.getId());
         out.writeAttribute("turnCount", Integer.toString(turnCount));
@@ -200,6 +195,7 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void readAttributes(XMLStreamReader in)
         throws XMLStreamException {
         super.readAttributes(in);
