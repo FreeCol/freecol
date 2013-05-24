@@ -265,7 +265,7 @@ public class Resource extends TileItem {
 
         super.readAttributes(in);
 
-        tile = makeFreeColGameObject(in, TILE_TAG, Tile.class);
+        tile = makeFreeColGameObject(in, TILE_TAG, Tile.class, true);
 
         type = spec.getType(in, TYPE_TAG,
                             ResourceType.class, (ResourceType)null);

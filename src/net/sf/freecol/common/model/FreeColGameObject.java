@@ -210,35 +210,23 @@ abstract public class FreeColGameObject extends FreeColObject {
      * @param attributeName The attribute name.
      * @param returnClass The class to expect.
      * @param defaultValue A default value to return if not found.
-     * @return The <code>FreeColGameObject</code> found, or the default
-     *     value if not found.
-     */
-    public <T extends FreeColGameObject> T findFreeColGameObject(XMLStreamReader in,
-        String attributeName, Class<T> returnClass, T defaultValue) {
-        return getAttribute(in, attributeName, getGame(), returnClass,
-                            defaultValue);
-    }
-
-    /**
-     * Require a <code>FreeColGameObject</code> of a given class to be present
-     * in a stream attribute.
-     *
-     * Use this routine when the object should already be present in the game.
-     *
-     * @param in The <code>XMLStreamReader</code> to read from.
-     * @param attributeName The attribute name.
-     * @param returnClass The class to expect.
+     * @param required If true a null result should throw an exception.
      * @return The <code>FreeColGameObject</code> found, or the default
      *     value if not found.
      * @exception XMLStreamException if the attribute is missing.
      */
-    public <T extends FreeColGameObject> T requireFreeColGameObject(XMLStreamReader in,
-        String attributeName, Class<T> returnClass) throws XMLStreamException {
+    public <T extends FreeColGameObject> T findFreeColGameObject(XMLStreamReader in,
+        String attributeName, Class<T> returnClass, T defaultValue,
+        boolean required) throws XMLStreamException {
         T ret = getAttribute(in, attributeName, getGame(),
                              returnClass, (T)null);
         if (ret == (T)null) {
-            throw new XMLStreamException(getRealXMLElementTagName()
-                + " missing " + attributeName + ": " + currentTag(in));
+            if (required) {
+                throw new XMLStreamException(getRealXMLElementTagName()
+                    + " missing " + attributeName + ": " + currentTag(in));
+            } else {
+                ret = defaultValue;
+            }
         }
         return ret;
     }
@@ -253,28 +241,46 @@ abstract public class FreeColGameObject extends FreeColObject {
      * @param in The <code>XMLStreamReader</code> to read from.
      * @param attributeName The required attribute name.
      * @param returnClass The class of object.
+     * @param required If true a null result should throw an exception.
      * @return The <code>FreeColGameObject</code> found or made, or null
      *     if the attribute was not present.
+     * @exception XMLStreamError if there was a problem reading the stream.
      */
     public <T extends FreeColGameObject> T makeFreeColGameObject(XMLStreamReader in,
-        String attributeName, Class<T> returnClass) {
+        String attributeName, Class<T> returnClass,
+        boolean required) throws XMLStreamException {
         final String id =
             // @compat 0.10.7
             (ID_ATTRIBUTE_TAG.equals(attributeName)) ? readId(in) :
             // end @compat
             in.getAttributeValue(null, attributeName);
-        if (id == null) return null;
+        T ret = null;
 
-        T ret = getGame().getFreeColGameObject(id, returnClass);
-        if (ret == null) {
-            try {
-                Constructor<T> c = returnClass.getConstructor(Game.class,
-                                                              String.class);
-                ret = returnClass.cast(c.newInstance(game, id));
-
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Failed to create FCGO with id: "
-                    + id, e);
+        if (id == null) {
+            if (required) {
+                throw new XMLStreamException(getRealXMLElementTagName()
+                    + " missing " + attributeName + ": " + currentTag(in));
+            }
+        } else {
+            ret = getGame().getFreeColGameObject(id, returnClass);
+            if (ret == null) {
+                try {
+                    Constructor<T> c = returnClass.getConstructor(Game.class,
+                                                                  String.class);
+                    ret = returnClass.cast(c.newInstance(game, id));
+                    if (required && ret == null) {
+                        throw new XMLStreamException(getRealXMLElementTagName()
+                            + " constructed null " + returnClass.getName()
+                            + " for " + id + ": " + currentTag(in));
+                    }
+                } catch (Exception e) {
+                    if (required) {
+                        throw new XMLStreamException(e.getCause());
+                    } else {
+                        logger.log(Level.WARNING, "Failed to create FCGO: "
+                            + id, e);
+                    }
+                }
             }
         }
         return ret;
@@ -296,7 +302,7 @@ abstract public class FreeColGameObject extends FreeColObject {
      */
     public <T extends FreeColGameObject> T readFreeColGameObject(XMLStreamReader in,
         Class<T> returnClass) throws XMLStreamException {
-        T ret = makeFreeColGameObject(in, ID_ATTRIBUTE_TAG, returnClass);
+        T ret = makeFreeColGameObject(in, ID_ATTRIBUTE_TAG, returnClass, false);
         if (ret != null) ret.readFromXML(in);
         return ret;
     }

@@ -594,7 +594,7 @@ public class TileImprovement extends TileItem implements Named {
 
         super.readAttributes(in);
 
-        tile = makeFreeColGameObject(in, TILE_TAG, Tile.class);
+        tile = makeFreeColGameObject(in, TILE_TAG, Tile.class, true);
 
         type = spec.getType(in, TYPE_TAG, TileImprovementType.class,
                             (TileImprovementType)null);

@@ -204,7 +204,7 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
         throws XMLStreamException {
         super.readAttributes(in);
 
-        unit = makeFreeColGameObject(in, "unit", Unit.class);
+        unit = makeFreeColGameObject(in, "unit", Unit.class, true);
 
         turnCount = getAttribute(in, "turnCount", 0);
 

@@ -163,7 +163,7 @@ public class ImprovementMission extends AbstractMission {
         super.readAttributes(in);
 
         improvement = makeFreeColGameObject(in, "improvement",
-                                            TileImprovement.class);
+                                            TileImprovement.class, true);
     }
 
     /**

@@ -517,7 +517,8 @@ public final class Market extends FreeColGameObject implements Ownable {
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
 
-        owner = requireFreeColGameObject(in, OWNER_TAG, Player.class);
+        owner = findFreeColGameObject(in, OWNER_TAG, Player.class, (Player)null,
+                                      true);
     }
 
     /**

@@ -548,9 +548,9 @@ public class Region extends FreeColGameObject implements Nameable {
         if (turn > 0) discoveredIn = new Turn(turn);
 
         discoveredBy = makeFreeColGameObject(in, DISCOVERED_BY_TAG,
-                                             Player.class);
+                                             Player.class, false);
 
-        parent = makeFreeColGameObject(in, PARENT_TAG, Region.class);
+        parent = makeFreeColGameObject(in, PARENT_TAG, Region.class, false);
     }
 
     /**
@@ -580,7 +580,8 @@ public class Region extends FreeColGameObject implements Nameable {
         // end @compat
 
         } else if (CHILD_TAG.equals(tag)) {
-            addChild(makeFreeColGameObject(in, ID_ATTRIBUTE_TAG, Region.class));
+            addChild(makeFreeColGameObject(in, ID_ATTRIBUTE_TAG,
+                                           Region.class, true));
             closeTag(in, CHILD_TAG);
         
         } else {

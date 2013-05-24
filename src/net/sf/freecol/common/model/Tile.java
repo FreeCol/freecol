@@ -1821,6 +1821,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
         writeAttribute(out, Y_TAG, this.y);
 
+        writeAttribute(out, REGION_TAG, region);
+
         writeAttribute(out, STYLE_TAG, style);
 
         if (moveToEurope != null) {
@@ -1992,9 +1994,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             }
         }
 
-        owner = makeFreeColGameObject(in, OWNER_TAG, Player.class);
+        owner = makeFreeColGameObject(in, OWNER_TAG, Player.class, false);
 
-        region = makeFreeColGameObject(in, REGION_TAG, Region.class);
+        region = makeFreeColGameObject(in, REGION_TAG, Region.class, true);
 
         moveToEurope = (hasAttribute(in, MOVE_TO_EUROPE_TAG))
             ? new Boolean(getAttribute(in, MOVE_TO_EUROPE_TAG, false))
@@ -2074,8 +2076,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
         } else if (PlayerExploredTile.getXMLElementTagName().equals(tag)) {
             // Only from a saved game.
-            Player player = requireFreeColGameObject(in, PLAYER_TAG,
-                                                     Player.class);
+            Player player = findFreeColGameObject(in, PLAYER_TAG, Player.class,
+                                                  (Player)null, true);
             PlayerExploredTile pet = readFreeColGameObject(in,
                 PlayerExploredTile.class);
             playerExploredTiles.put(player, pet);

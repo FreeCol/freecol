@@ -911,7 +911,8 @@ public final class Monarch extends FreeColGameObject implements Named {
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
 
-        player = requireFreeColGameObject(in, PLAYER_TAG, Player.class);
+        player = findFreeColGameObject(in, PLAYER_TAG,
+                                       Player.class, (Player)null, true);
 
         name = getAttribute(in, NAME_TAG,
                             player.getNation().getRulerNameKey());

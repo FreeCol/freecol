@@ -1405,7 +1405,8 @@ public class IndianSettlement extends Settlement {
         learnableSkill = spec.getType(in, LEARNABLE_SKILL_TAG,
                                       UnitType.class, (UnitType)null);
 
-        mostHated = makeFreeColGameObject(in, MOST_HATED_TAG, Player.class);
+        mostHated = makeFreeColGameObject(in, MOST_HATED_TAG, Player.class,
+                                          false);
 
         for (int i = 0; i < wantedGoods.length; i++) {
             wantedGoods[i] = spec.getType(in, WANTED_GOODS_TAG + i,
@@ -1448,7 +1449,8 @@ public class IndianSettlement extends Settlement {
         final String tag = in.getLocalName();
 
         if (ALARM_TAG.equals(tag)) {
-            Player player = makeFreeColGameObject(in, PLAYER_TAG, Player.class);
+            Player player = makeFreeColGameObject(in, PLAYER_TAG,
+                                                  Player.class, true);
             // @compat 0.10.5
             setContacted(player); // Alarm used to imply contact
             // end @compat
@@ -1458,13 +1460,15 @@ public class IndianSettlement extends Settlement {
         } else if (CONTACT_LEVEL_TAG.equals(tag)) {
             ContactLevel cl = getAttribute(in, LEVEL_TAG,
                 ContactLevel.class, ContactLevel.UNCONTACTED);
-            Player player = makeFreeColGameObject(in, PLAYER_TAG, Player.class);
+            Player player = makeFreeColGameObject(in, PLAYER_TAG,
+                                                  Player.class, true);
             contactLevels.put(player, cl);
             closeTag(in, CONTACT_LEVEL_TAG);
 
         // @compat 0.10.5
         } else if (IS_VISITED_TAG.equals(tag)) {
-            Player player = makeFreeColGameObject(in, PLAYER_TAG, Player.class);
+            Player player = makeFreeColGameObject(in, PLAYER_TAG,
+                                                  Player.class, true);
             setScouted(player);
             closeTag(in, IS_VISITED_TAG);
         // end @compat
@@ -1488,7 +1492,8 @@ public class IndianSettlement extends Settlement {
             closeTag(in, MISSIONARY_TAG);
 
         } else if (OWNED_UNITS_TAG.equals(tag)) {
-            Unit unit = makeFreeColGameObject(in, ID_ATTRIBUTE_TAG, Unit.class);
+            Unit unit = makeFreeColGameObject(in, ID_ATTRIBUTE_TAG,
+                                              Unit.class, true);
             if (unit.getOwner() != null && !owner.owns(unit)) {
                 logger.warning("Error in savegame: unit " + unit.getId()
                                + " does not belong to settlement " + getId());

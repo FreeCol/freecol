@@ -3914,7 +3914,7 @@ public class Unit extends GoodsLocation
 
         name = getAttribute(in, NAME_TAG, (String)null);
 
-        owner = makeFreeColGameObject(in, OWNER_TAG, Player.class);
+        owner = makeFreeColGameObject(in, OWNER_TAG, Player.class, true);
 
         UnitType oldUnitType = unitType;
         unitType = spec.getType(in, UNIT_TYPE_TAG,
@@ -3952,19 +3952,19 @@ public class Unit extends GoodsLocation
         if (hitPoints < 0) hitPoints = getAttribute(in, OLD_HIT_POINTS_TAG, -1);
         // end @compat
 
-        teacher = makeFreeColGameObject(in, TEACHER_TAG, Unit.class);
+        teacher = makeFreeColGameObject(in, TEACHER_TAG, Unit.class, false);
 
-        student = makeFreeColGameObject(in, STUDENT_TAG, Unit.class);
+        student = makeFreeColGameObject(in, STUDENT_TAG, Unit.class, false);
 
         setHomeIndianSettlement(makeFreeColGameObject(in, INDIAN_SETTLEMENT_TAG,
-                                                      IndianSettlement.class));
+                IndianSettlement.class, false));
 
         treasureAmount = getAttribute(in, TREASURE_AMOUNT_TAG, 0);
 
         destination = makeLocationAttribute(in, DESTINATION_TAG, game);
 
         tradeRoute = findFreeColGameObject(in, TRADE_ROUTE_TAG,
-                                           TradeRoute.class, (TradeRoute)null);
+            TradeRoute.class, (TradeRoute)null, false);
 
         currentStop = (tradeRoute == null) ? -1
             : getAttribute(in, CURRENT_STOP_TAG, 0);

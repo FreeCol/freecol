@@ -618,7 +618,7 @@ public class TileItemContainer extends FreeColGameObject {
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
 
-        tile = makeFreeColGameObject(in, TILE_TAG, Tile.class);
+        tile = makeFreeColGameObject(in, TILE_TAG, Tile.class, true);
     }
 
     /**

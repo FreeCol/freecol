@@ -670,9 +670,9 @@ abstract public class Settlement extends GoodsLocation
 
         name = getAttribute(in, NAME_TAG, (String)null);
 
-        owner = makeFreeColGameObject(in, OWNER_TAG, Player.class);
+        owner = makeFreeColGameObject(in, OWNER_TAG, Player.class, true);
 
-        tile = makeFreeColGameObject(in, TILE_TAG, Tile.class);
+        tile = makeFreeColGameObject(in, TILE_TAG, Tile.class, true);
 
         String str = getAttribute(in, SETTLEMENT_TYPE_TAG, (String)null);
         SettlementType settlementType;

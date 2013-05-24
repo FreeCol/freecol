@@ -4006,7 +4006,8 @@ public class Player extends FreeColGameObject implements Nameable {
             closeTag(in, STANCE_TAG);
 
         } else if (TENSION_TAG.equals(tag)) {
-            tension.put(makeFreeColGameObject(in, PLAYER_TAG, Player.class),
+            tension.put(makeFreeColGameObject(in, PLAYER_TAG,
+                                              Player.class, true),
                         new Tension(getAttribute(in, VALUE_TAG, 0)));
             closeTag(in, TENSION_TAG);
         

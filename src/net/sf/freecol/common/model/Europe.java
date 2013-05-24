@@ -395,7 +395,7 @@ public class Europe extends UnitLocation implements Ownable, Named {
             if (unitType != null) recruitables[index] = unitType;
         }
 
-        owner = makeFreeColGameObject(in, OWNER_TAG, Player.class);
+        owner = makeFreeColGameObject(in, OWNER_TAG, Player.class, true);
 
         recruitPrice = getAttribute(in, RECRUIT_PRICE_TAG,
                                     RECRUIT_PRICE_INITIAL);

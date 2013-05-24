@@ -358,11 +358,11 @@ public class PlayerExploredTile extends FreeColGameObject {
 
         super.readAttributes(in);
 
-        player = makeFreeColGameObject(in, PLAYER_TAG, Player.class);
+        player = makeFreeColGameObject(in, PLAYER_TAG, Player.class, true);
 
-        tile = makeFreeColGameObject(in, TILE_TAG, Tile.class);
+        tile = makeFreeColGameObject(in, TILE_TAG, Tile.class, true);
 
-        owner = makeFreeColGameObject(in, OWNER_TAG, Player.class);
+        owner = makeFreeColGameObject(in, OWNER_TAG, Player.class, false);
 
         // TODO: makeFreeColGameObject is more logical, but will fail ATM
         // if the settlement has been destroyed while this pet-player can
@@ -370,7 +370,7 @@ public class PlayerExploredTile extends FreeColGameObject {
         // a ServerObject for existing settlements so findFreeColGameObject
         // will do the right thing for now.
         owningSettlement = findFreeColGameObject(in, OWNING_SETTLEMENT_TAG,
-            Settlement.class, (Settlement)null);
+            Settlement.class, (Settlement)null, false);
 
         colonyUnitCount = getAttribute(in, COLONY_UNIT_COUNT_TAG, 0);
 
@@ -385,7 +385,8 @@ public class PlayerExploredTile extends FreeColGameObject {
                                           GoodsType.class, (GoodsType)null);
         }
 
-        mostHated = makeFreeColGameObject(in, MOST_HATED_TAG, Player.class);
+        mostHated = makeFreeColGameObject(in, MOST_HATED_TAG,
+                                          Player.class, false);
     }
 
     /**
