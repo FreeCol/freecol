@@ -208,12 +208,18 @@ public class Resource extends TileItem {
         return new ArrayList<Modifier>(getType().getModifierSet(goodsType.getId(), unitType));
     }
 
-
     /**
      * {@inheritDoc}
      */
     public boolean isNatural() {
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int checkIntegrity(boolean fix) {
+        return (type == null) ? -1 : 1;
     }
 
 

@@ -2499,17 +2499,18 @@ public final class MapViewer {
         } else if (item instanceof LostCityRumour) {
             centerImage(g, lib.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR));
         } else {
-
-            TileImprovement improvement = (TileImprovement) item;
-            if (improvement.isComplete()) {
-                String key = improvement.getType().getId() + ".image";
+            TileImprovement ti = (TileImprovement)item;
+            if (ti.isComplete()) {
+                String key = ti.getType().getId() + ".image";
                 if (ResourceManager.hasResource(key)) {
                     // Has its own Overlay Image in Misc, use it
-                    Image overlay = ResourceManager.getImage(key, lib.getScalingFactor());
+                    Image overlay = ResourceManager.getImage(key,
+                        lib.getScalingFactor());
                     g.drawImage(overlay, 0, 0, null);
-                } else if (improvement.isRiver() && improvement.getMagnitude() < TileImprovement.FJORD_RIVER) {
-                    g.drawImage(lib.getRiverImage(improvement.getStyle()), 0, 0, null);
-                } else if (improvement.isRoad()) {
+                } else if (ti.isRiver()
+                    && ti.getMagnitude() < TileImprovement.FJORD_RIVER) {
+                    g.drawImage(lib.getRiverImage(ti.getStyle()), 0, 0, null);
+                } else if (ti.isRoad()) {
                     drawRoad(g, tile);
                 }
             }

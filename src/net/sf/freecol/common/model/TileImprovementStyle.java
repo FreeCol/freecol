@@ -141,14 +141,13 @@ public class TileImprovementStyle {
      * @return The corresponding <code>TileImprovementStyle</code>.
      */
     public static TileImprovementStyle getInstance(String key) {
-        if (key == null || "".equals(key) || "0".equals(key)
-            || "0000".equals(key) || "00000000".equals(key)) return null;
+        if (key == null || "".equals(key) || "0".equals(key)) return null;
 
         TileImprovementStyle result = cache.get(key);
         if (result == null) {
             result = new TileImprovementStyle(key);
             cache.put(key, result);
-            if (result.getString() != key) {
+            if (!result.getString().equals(key)) {
                 cache.put(result.getString(), result);
             }
         }

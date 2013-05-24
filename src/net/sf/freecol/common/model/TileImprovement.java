@@ -464,13 +464,19 @@ public class TileImprovement extends TileItem implements Named {
             || (found != null && curr != null && found.equals(curr))) {
             result = 1;
         } else if (fix) {
-            logger.warning("At " + getTile() + " fixing improvement style from "
-                + curr + " to " + found);
             this.style = TileImprovementStyle.getInstance(found);
-            result = 0;
+            if ((this.style != null)
+                != (isRiver() || (isRoad() && isComplete()))) {
+                logger.warning("Bad style for improvement: " + this);
+                result = -1;
+            } else {
+                logger.warning("Fixing improvement style from "
+                    + curr + " to " + found + " at " + tile);
+                result = 0;
+            }
         } else {
-            logger.warning("At " + getTile() + " broken improvement style "
-                + curr + " should be " + found);
+            logger.warning("Broken improvement style " + curr
+                + " should be " + found + " at " + tile);
             result = -1;
         }
         return result;
@@ -597,6 +603,8 @@ public class TileImprovement extends TileItem implements Named {
 
         magnitude = getAttribute(in, MAGNITUDE_TAG, 0);
 
+        virtual = getAttribute(in, VIRTUAL_TAG, false);
+
         String str = getAttribute(in, STYLE_TAG, (String)null);
         Direction dirns[] = getConnectionDirections();
         if (dirns == null || str == null || "".equals(str)) {
@@ -614,21 +622,20 @@ public class TileImprovement extends TileItem implements Named {
                     + " ignored bogus TileImprovementStyle: " + str);
             }
         }
-        if (style != null) {
-            if (style.toString().length() != dirns.length) {
-                throw new XMLStreamException("For " + type
-                    + ", bogus style: " + str + " -> " + style
-                    + " at " + tile);
-            }
-            if (!isRiver() && !isRoad()) {
-                throw new XMLStreamException("For " + type
-                    + ", bogus non-null style: " + str + " -> " + style
-                    + " at " + tile);
+        if (style != null && style.toString().length() != dirns.length) {
+            // @compat 0.10.5
+            if ("0000".equals(style.getString())) {
+                // Old virtual roads and fish bonuses have this style!?!
+                style = null;
+            } else {
+            // end @compat
+
+                throw new XMLStreamException("For " + type 
+                    + ", bogus style: " + str + " -> /" + style
+                    + "/ at " + tile);
             }
         }
         connected = getConnectionsFromStyle();
-
-        virtual = getAttribute(in, VIRTUAL_TAG, false);
     }
 
     /**

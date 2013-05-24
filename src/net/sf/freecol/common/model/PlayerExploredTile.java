@@ -222,6 +222,42 @@ public class PlayerExploredTile extends FreeColGameObject {
     // end @compat
 
 
+    /**
+     * Check for any integrity problems.
+     *
+     * @param fix Fix problems if possible.
+     * @return Negative if there are problems remaining, zero if
+     *     problems were fixed, positive if no problems found at all.
+     */
+    public int checkIntegrity(boolean fix) {
+        int result = 1;
+        if (tileItems != null) {
+            for (TileItem ti : new ArrayList<TileItem>(tileItems)) {
+                int integ = ti.checkIntegrity(fix);
+                if (fix) {
+                    // @compat 0.10.5
+                    // Somewhere around 0.10.5 there were maps with LCRs
+                    // that reference the wrong tile.
+                    if (ti.getTile() != tile) {
+                        logger.warning("Fixing improvement tile at: " + tile
+                                       + " / " + ti.getId());
+                        ti.setLocation(tile);
+                        integ = Math.min(integ, 0);
+                    }
+                    // end @compat
+                    if (integ < 0) {
+                        logger.warning("Removing broken improvement at: "
+                                       + tile);
+                        tileItems.remove(ti);
+                    }
+                }
+                result = Math.min(result, integ);
+            }
+        }
+        return result;
+    }
+
+
     // Serialization
     
     private static final String COLONY_UNIT_COUNT_TAG = "colonyUnitCount";

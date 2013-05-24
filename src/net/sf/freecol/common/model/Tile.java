@@ -1775,9 +1775,12 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *     problems were fixed, positive if no problems found at all.
      */
     public int checkIntegrity(boolean fix) {
-        int result = 1;
-        for (TileImprovement ti : getTileImprovements()) {
-            result = Math.min(result, ti.checkIntegrity(fix));
+        int result = (tileItemContainer == null) ? 1
+            : tileItemContainer.checkIntegrity(fix);
+        if (playerExploredTiles != null) {
+            for (PlayerExploredTile pet : playerExploredTiles.values()) {
+                result = Math.min(result, pet.checkIntegrity(fix));
+            }
         }
         if (type == null) result = -1;
         return result;

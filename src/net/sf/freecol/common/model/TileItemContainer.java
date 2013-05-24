@@ -515,12 +515,49 @@ public class TileItemContainer extends FreeColGameObject {
         return tileItems.contains(t);
     }
 
+
+    // Low level
+
     /**
      * Removes all references to this object.
      */
     public void dispose() {
         tileItems.clear();
         super.dispose();
+    }
+
+    /**
+     * Check for any integrity problems.
+     *
+     * @param fix Fix problems if possible.
+     * @return Negative if there are problems remaining, zero if
+     *     problems were fixed, positive if no problems found at all.
+     */
+    public int checkIntegrity(boolean fix) {
+        int result = 1;
+        for (TileItem ti : new ArrayList<TileItem>(tileItems)) {
+            int integ = ti.checkIntegrity(fix);
+            if (fix) {
+                // @compat 0.10.5
+                // Somewhere around 0.10.5 there were maps with LCRs
+                // that reference the wrong tile.
+                if (ti.getTile() != tile) {
+                    logger.warning("Fixing improvement tile at: " + tile
+                                   + " / " + ti.getId());
+                    ti.setLocation(tile);
+                    integ = Math.min(integ, 0);
+                }
+                // end @compat
+                if (integ < 0) {
+                    logger.warning("Removing broken improvement at: " + tile
+                                   + " / " + ti.getId());
+                    tileItems.remove(ti);
+                    integ = 0;
+                }
+            }
+            result = Math.min(result, integ);
+        }
+        return result;
     }
 
 

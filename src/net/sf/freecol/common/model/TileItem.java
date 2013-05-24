@@ -123,6 +123,15 @@ public abstract class TileItem extends FreeColGameObject implements Locatable {
      */
     public abstract boolean isNatural();
 
+    /**
+     * Check for any integrity problems.
+     *
+     * @param fix Fix problems if possible.
+     * @return Negative if there are problems remaining, zero if
+     *     problems were fixed, positive if no problems found at all.
+     */
+    public abstract int checkIntegrity(boolean fix);
+
 
     // Interface Locatable
 
