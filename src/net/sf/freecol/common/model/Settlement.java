@@ -639,9 +639,6 @@ public abstract class Settlement extends GoodsLocation
     private static final String OWNER_TAG = "owner";
     private static final String SETTLEMENT_TYPE_TAG = "settlementType";
     private static final String TILE_TAG = "tile";
-    // @compat 0.9.x
-    private static final String IS_CAPITAL_TAG = "isCapital";
-    // end @compat
 
 
     /**
@@ -676,16 +673,7 @@ public abstract class Settlement extends GoodsLocation
 
         tile = xr.makeFreeColGameObject(game, TILE_TAG, Tile.class, true);
 
-        String str = xr.getAttribute(SETTLEMENT_TYPE_TAG, (String)null);
-        SettlementType settlementType;
-        // @compat 0.9.x
-        if (str == null) {
-            boolean capital = xr.getAttribute(IS_CAPITAL_TAG, false);
-            settlementType = owner.getNationType().getSettlementType(capital);
-        // end @compat
-        } else {
-            settlementType = owner.getNationType().getSettlementType(str);
-        }
-        changeType(settlementType);
+        String type = xr.getAttribute(SETTLEMENT_TYPE_TAG, (String)null);
+        changeType(owner.getNationType().getSettlementType(type));
     }
 }

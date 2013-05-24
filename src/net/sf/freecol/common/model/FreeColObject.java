@@ -1143,62 +1143,6 @@ public abstract class FreeColObject {
             + ", at: " + xr.currentTag());
     }
 
-    // @compat 0.9.x
-    /**
-     * Reads an XML-representation of an array.
-     *
-     * @param tagName The tagname for the <code>Element</code>
-     *       representing the array.
-     * @param xr The input stream with the XML.
-     * @param arrayType The type of array to be read.
-     * @return The array.
-     * @exception XMLStreamException if a problem was encountered
-     *      during parsing.
-     */
-    protected int[] readFromArrayElement(String tagName, FreeColXMLReader xr,
-                                         int[] arrayType) throws XMLStreamException {
-        xr.expectTag(tagName);
-        
-        final int length = xr.getAttribute(ARRAY_SIZE_TAG, -1);
-        if (length < 0) return new int[0];
-
-        int[] array = new int[length];
-        for (int x = 0; x < length; x++) {
-            array[x] = xr.getAttribute("x" + x, 0);
-        }
-
-        xr.closeTag(tagName);
-        return array;
-    }
-
-    /**
-     * Reads an XML-representation of an array.
-     *
-     * @param tagName The tagname for the <code>Element</code>
-     *       representing the array.
-     * @param xr The input stream with the XML.
-     * @param arrayType The type of array to be read.
-     * @return The array.
-     * @exception XMLStreamException if a problem was encountered
-     *      during parsing.
-     */
-    protected String[] readFromArrayElement(String tagName, FreeColXMLReader xr,
-                                            String[] arrayType) throws XMLStreamException {
-        xr.expectTag(tagName);
-
-        final int length = xr.getAttribute(ARRAY_SIZE_TAG, -1);
-        if (length < 0) return new String[0];
-
-        String[] array = new String[length];
-        for (int x = 0; x < length; x++) {
-            array[x] = xr.getAttribute("x" + x, (String)null);
-        }
-
-        xr.closeTag(tagName);
-        return array;
-    }
-    // end @compat
-
     /**
      * Updates this object from an XML-representation of this object.
      *

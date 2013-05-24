@@ -1446,15 +1446,6 @@ public final class Specification {
         return null;
     }
 
-    // @compat 0.9.x
-    private String mangle(String id) {
-        int index = id.lastIndexOf('.');
-        return (index == -1) ? id
-            : id.substring(0, index + 1) + id.substring(index + 1,
-                index + 2).toLowerCase(Locale.US) + id.substring(index + 2);
-    }
-    // end @compat
-
     /**
      * Find a <code>FreeColGameObjectType</code> by id.
      *
@@ -1467,11 +1458,6 @@ public final class Specification {
 
         } else if (allTypes.containsKey(id)) {
             return allTypes.get(id);
-
-        // @compat 0.9.x
-        } else if (allTypes.containsKey(mangle(id))) {
-            return allTypes.get(mangle(id));
-        // end @compat
 
         } else {
             return null;
@@ -1668,33 +1654,11 @@ public final class Specification {
             logger.finest("Found child named " + childName);
             ChildReader reader = readerMap.get(childName);
             if (reader == null) {
-                // @compat 0.9.x
-                if ("improvementaction-types".equals(childName)) {
-                    while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        // skip children
-                        while ("action".equals(xr.getLocalName())) {
-                            xr.nextTag();
-                        }
-                    }
-                // end @compat
-                } else {
-                    throw new RuntimeException("unexpected: " + childName);
-                }
-            } else {
-                reader.readChildren(xr);
-            }
+				logger.warning("No reader found for: " + childName);
+            } else {  
+				reader.readChildren(xr);
+			}
         }
-
-        // @compat 0.9.x
-        for (BuildingType bt : getBuildingTypeList()) {
-            bt.fixup09x();
-        }
-        if (getModifiers("model.modifier.nativeTreasureModifier") != null) {
-            for (FoundingFather ff : getFoundingFathers()) {
-                ff.fixup09x();
-            }
-        }
-        // end @compat
 
         // @compat 0.10.1
         String[] years = new String[] {

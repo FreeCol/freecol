@@ -2449,7 +2449,6 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param modelMessage The <code>ModelMessage</code> to add.
      */
     public void addModelMessage(ModelMessage modelMessage) {
-        modelMessage.setOwnerId(getId());
         modelMessages.add(modelMessage);
     }
 
@@ -3709,10 +3708,6 @@ public class Player extends FreeColGameObject implements Nameable {
         xw.writeAttribute(AI_TAG, ai);
 
         xw.writeAttribute(TAX_TAG, tax);
-
-        // @compat 0.9.x
-        xw.writeAttribute(NUMBER_OF_SETTLEMENTS_TAG, getNumberOfSettlements());
-        // end compatibility code
 
         if (showAll || toSavedGame || this == player) {
             xw.writeAttribute(GOLD_TAG, gold);

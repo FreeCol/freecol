@@ -101,7 +101,7 @@ public class ServerEurope extends Europe implements ServerModelObject {
                 setRecruitable(index, RandomChoice.getWeightedRandom(logger,
                         "Old initial recruits", recruits, random));
             }
-            // end compatibility code
+            // end @compat
         }
     }
 

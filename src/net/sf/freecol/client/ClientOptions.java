@@ -485,12 +485,8 @@ public class ClientOptions extends OptionGroup {
     private static Comparator<Colony> colonyAgeComparator
         = new Comparator<Colony>() {
             public int compare(Colony s1, Colony s2) {
-                if (s1.getEstablished().getNumber() > 0
-                    && s2.getEstablished().getNumber() > 0) {
-                    return s1.getEstablished().getNumber() - s2.getEstablished().getNumber();
-                } else { // @compat 0.9.x
-                    return s1.getIntegerId().compareTo(s2.getIntegerId());
-                } // end compatibility code
+                return s1.getEstablished().getNumber()
+                    - s2.getEstablished().getNumber();
             }
         };
 
@@ -503,8 +499,8 @@ public class ClientOptions extends OptionGroup {
 
     private static Comparator<Colony> colonySizeComparator
         = new Comparator<Colony>() {
-            // sort size descending, then SoL descending
             public int compare(Colony s1, Colony s2) {
+                // sort size descending, then SoL descending
                 int dsize = s2.getUnitCount() - s1.getUnitCount();
                 if (dsize == 0) {
                     return s2.getSoL() - s1.getSoL();
@@ -516,8 +512,8 @@ public class ClientOptions extends OptionGroup {
 
     private static Comparator<Colony> colonySoLComparator
         = new Comparator<Colony>() {
-            // sort SoL descending, then size descending
             public int compare(Colony s1, Colony s2) {
+                // sort SoL descending, then size descending
                 int dsol = s2.getSoL() - s1.getSoL();
                 if (dsol == 0) {
                     return s2.getUnitCount() - s1.getUnitCount();
@@ -529,8 +525,8 @@ public class ClientOptions extends OptionGroup {
 
     private static Comparator<Colony> colonyPositionComparator
         = new Comparator<Colony>() {
-            // sort north to south, then west to east
             public int compare(Colony s1, Colony s2) {
+                // sort north to south, then west to east
                 int dy = s1.getTile().getY() - s2.getTile().getY();
                 if (dy == 0) {
                     return s1.getTile().getX() - s2.getTile().getX();
@@ -538,7 +534,7 @@ public class ClientOptions extends OptionGroup {
                     return dy;
                 }
             }
-        };
+       };
     
    
     private class MessageSourceComparator implements Comparator<ModelMessage> {
@@ -822,25 +818,18 @@ public class ClientOptions extends OptionGroup {
      * can clean these up as they become standard.
      */
     public void fixClientOptions() {
-        // @compat 0.9.x
-        addBooleanOption("model.option.guiShowDemands",
-            "clientOptions.messages", true);
-        addBooleanOption("model.option.guiShowGifts",
-            "clientOptions.messages", true);
-        addBooleanOption("model.option.guiShowGoodsMovement",
-            "clientOptions.messages", true);
         // @compat 0.10.1
         addIntegerOption(COLONY_REPORT,
             "clientOptions.messages", 0);
         addBooleanOption(USE_PIXMAPS,
             "clientOptions.gui", true);
+        // end @compat 0.10.1
         // @compat 0.10.7
         addBooleanOption(CONFIRM_SAVE_OVERWRITE,
             "clientOptions.savegames", false);
         addBooleanOption(DISABLE_GRAY_LAYER,
             "clientOptions.gui", false);
-
-        // end @compat
+        // end @compat 0.10.7
     }
 
     private void addBooleanOption(String id, String gr, boolean val) {

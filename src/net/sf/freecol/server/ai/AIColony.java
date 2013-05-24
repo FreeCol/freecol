@@ -1552,7 +1552,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         } else if (WORKER_WISH_LIST_TAG.equals(tag)
             // @compat 0.10.3
             || OLD_WORKER_WISH_TAG.equals(tag)
-            // end compatibility code
+            // end @compat
                    ) {
             wishes.add(xr.makeAIObject(aiMain, ID_ATTRIBUTE_TAG,
                                        WorkerWish.class, (WorkerWish)null, true));

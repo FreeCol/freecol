@@ -620,10 +620,6 @@ public class TileItemContainer extends FreeColGameObject {
         tileItems.clear();
 
         super.readChildren(xr);
-
-        // @compat 0.9.x
-        Collections.sort(tileItems, tileItemComparator);
-        // @end compat
     }
 
     /**

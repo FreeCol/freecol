@@ -315,9 +315,6 @@ public class IndianBringGiftMission extends Mission {
 
     private static final String COMPLETED_TAG = "completed";
     private static final String TARGET_TAG = "target";
-    // @compat 0.9.x
-    private static final String OLD_GIFT_DELIVERED_TAG = "giftDelivered";
-    // end @compat
 
 
     /**
@@ -345,11 +342,6 @@ public class IndianBringGiftMission extends Mission {
                                  Colony.class, (Colony)null);
 
         completed = xr.getAttribute(COMPLETED_TAG, false);
-        // @compat 0.9.x
-        if (xr.hasAttribute(OLD_GIFT_DELIVERED_TAG)) {
-            completed = xr.getAttribute(OLD_GIFT_DELIVERED_TAG, false);
-        }
-        // end @compat
     }
 
     /**

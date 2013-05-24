@@ -90,7 +90,7 @@ public class Unit extends GoodsLocation
         // @compat 0.10.0
         TO_EUROPE,
         TO_AMERICA,
-        // end compatibility code
+        // end @compat
         FORTIFYING,
         SKIPPED
     }
@@ -503,7 +503,7 @@ public class Unit extends GoodsLocation
             //         && !hasAbility("model.ability.carryTreasure")
             //         && !hasAbility("model.ability.bombard"))
             // ...but that should be unnecessary.
-            // end compatibility code
+            // end @compat
             ;
     }
 
@@ -3949,19 +3949,6 @@ public class Unit extends GoodsLocation
             experienceType = workType;
         }
 
-        // @compat 0.9.x
-        try {
-            // this is likely to cause an exception, as the
-            // specification might not define grain
-            GoodsType grain = spec.getGoodsType("model.goods.grain");
-            GoodsType food = spec.getPrimaryFoodType();
-            if (food.equals(workType)) workType = grain;
-            if (food.equals(experienceType)) experienceType = grain;
-        } catch (Exception e) {
-            logger.log(Level.FINEST, "Failed to update food to grain.", e);
-        }
-        // end @compat
-
         experience = xr.getAttribute(EXPERIENCE_TAG, 0);
 
         visibleGoodsCount = xr.getAttribute(VISIBLE_GOODS_COUNT_TAG, -1);
@@ -3998,21 +3985,8 @@ public class Unit extends GoodsLocation
         final String tag = xr.getLocalName();
 
         if (EQUIPMENT_TAG.equals(tag)) {
-            // @compat 0.9.x
-            int length = xr.getAttribute(ARRAY_SIZE_TAG, 0);
-            if (length > 0) {
-                for (int index = 0; index < length; index++) {
-                    EquipmentType et = xr.getType(spec, "x" + index,
-                        EquipmentType.class, (EquipmentType)null);
-                    if (et != null) {
-                        equipment.incrementCount(et, 1);
-                    }
-                }
-            // end @compat
-            } else {
-                equipment.incrementCount(spec.getEquipmentType(xr.readId()),
-                                         xr.getAttribute(COUNT_TAG, 0));
-            }
+            equipment.incrementCount(spec.getEquipmentType(xr.readId()),
+                                     xr.getAttribute(COUNT_TAG, 0));
             xr.closeTag(EQUIPMENT_TAG);
 
         // @compat 0.10.5
@@ -4023,8 +3997,7 @@ public class Unit extends GoodsLocation
         // end @compat
 
         } else if (TileImprovement.getXMLElementTagName().equals(tag)) {
-            setWorkImprovement(xr.readFreeColGameObject(game,
-                    TileImprovement.class));
+            setWorkImprovement(xr.readFreeColGameObject(game, TileImprovement.class));
 
         } else {
             super.readChild(xr);

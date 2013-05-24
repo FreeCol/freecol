@@ -430,13 +430,6 @@ public class MarketData extends FreeColGameObject {
 
         goodsType = xr.getType(spec, GOODS_TYPE_TAG, GoodsType.class,
                                (GoodsType)null);
-        // @compat 0.9.x
-        if (goodsType == null) {
-            setDefaultId(getGame());
-            goodsType = xr.getType(spec, ID_ATTRIBUTE_TAG, GoodsType.class,
-                                   (GoodsType)null);
-        }
-        // end compatibility code
 
         amountInMarket = xr.getAttribute(AMOUNT_TAG, 0);
 

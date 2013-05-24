@@ -177,6 +177,8 @@ public class SchoolTest extends FreeColTestCase {
                    teacher2.getStudent());
 
         // add first teacher
+        spec().getBooleanOption(GameOptions.ALLOW_STUDENT_SELECTION)
+            .setValue(false);
         school.add(teacher1);
         assertEquals("Teacher1 should now have a student",
                      teacher1.getStudent(), student);
@@ -200,5 +202,8 @@ public class SchoolTest extends FreeColTestCase {
                      teacher2.getStudent(), student);
         assertEquals("Student should have assigned teacher2",
                      student.getTeacher(), teacher2);
+
+        spec().getBooleanOption(GameOptions.ALLOW_STUDENT_SELECTION)
+            .setValue(true);
     }
 }

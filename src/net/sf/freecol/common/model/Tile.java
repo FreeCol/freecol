@@ -2092,50 +2092,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
-     * Fixes visible pets where there is a settlement present but the
-     * tile is not owned correctly as ownership was not implemented in
-     * 0.9.x.
-     * Need to do this after reading the game so that canSee() is valid.
-     * TODO: remove when 0.9.x is not supported.
-     */
-    public void fixup09x() {
-        if (playerExploredTiles == null) return;
-        for (Entry<Player, PlayerExploredTile> e
-                 : playerExploredTiles.entrySet()) {
-            Player p = e.getKey();
-            PlayerExploredTile pet = e.getValue();
-            if (settlement != null) {
-                if (pet.getOwner() == null
-                    || pet.getOwningSettlement() == null) {
-                    if (p.canSee(this)) {
-                        // Correct with an ordinary update
-                        pet.update(false);
-                    } else if (settlement instanceof Colony) {
-                        if (pet.getColonyUnitCount() > 0) {
-                            // Have seen the colony, update the ownership
-                            // and the stockade level but not the unit count
-                            // as that is the one that was seen.
-                            pet.setOwner(settlement.getOwner());
-                            pet.setOwningSettlement(settlement);
-                            pet.setColonyStockadeKey(((Colony) settlement)
-                                .getStockadeKey());
-                        }
-                    } else if (settlement instanceof IndianSettlement) {
-                        // Unclear what has been seen, update just the ownership
-                        pet.setOwner(settlement.getOwner());
-                        pet.setOwningSettlement(settlement);
-                    }
-                }
-            } else {
-                if (pet.getOwningSettlement() != null
-                    && pet.getOwner() == null) {
-                    pet.setOwner(pet.getOwningSettlement().getOwner());
-                }
-            }
-        }
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override

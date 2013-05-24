@@ -402,21 +402,6 @@ public class FoundingFather extends FreeColGameObjectType {
     }
 
     /**
-     * Compatibility hack, called from the specification when it is
-     * finishing up.
-     */
-    public void fixup09x() {
-        // @compat 0.9.x
-        try { // Cortes has changed
-            if (!getModifierSet("model.modifier.nativeTreasureModifier")
-                .isEmpty()) {
-                addAbility(new Ability("model.ability.plunderNatives"));
-            }
-        } catch (Exception e) {} // we don't care
-        // end @compat
-    }
-
-    /**
      * {@inheritDoc}
      */
     public String getXMLTagName() { return getXMLElementTagName(); }

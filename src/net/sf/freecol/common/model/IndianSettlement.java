@@ -1445,18 +1445,6 @@ public class IndianSettlement extends Settlement {
             xr.closeTag(IS_VISITED_TAG);
         // end @compat
 
-        // @compat 0.9.x
-        } else if (WANTED_GOODS_TAG.equals(tag)) {
-            String[] wantedGoodsId
-                = readFromArrayElement(WANTED_GOODS_TAG, xr, new String[0]);
-            for (int i = 0; i < wantedGoods.length; i++) {
-                String goodsId = (i < wantedGoodsId.length) ? wantedGoodsId[i]
-                    : null;
-                wantedGoods[i] = (goodsId == null || "".equals(goodsId)) ? null
-                    : spec.getGoodsType(goodsId);
-            }
-        // end @compat
-
         } else if (MISSIONARY_TAG.equals(tag)) {
             xr.nextTag();
             missionary = xr.readFreeColGameObject(game, Unit.class);

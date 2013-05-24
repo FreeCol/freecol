@@ -253,37 +253,6 @@ public class SettlementType extends FreeColGameObjectType {
         return GoodsContainer.CARGO_SIZE * getClaimableRadius();
     }
 
-    // @compat 0.9.x
-    /**
-     * Set the capital value.
-     *
-     * @param newCapital The new capital value.
-     */
-    public final void setCapital(final boolean newCapital) {
-        this.capital = newCapital;
-    }
-
-    /**
-     * Set the <code>Plunder</code> value.
-     *
-     * @param newPlunder The new Plunder value.
-     */
-    public final void setPlunder(final RandomRange newPlunder) {
-        if (plunder == null) plunder = new ArrayList<RandomRange>();
-        plunder.add(newPlunder);
-    }
-
-    /**
-     * Set the <code>Gifts</code> value.
-     *
-     * @param newGifts The new Gifts value.
-     */
-    public final void setGifts(final RandomRange newGifts) {
-        if (gifts == null) gifts = new ArrayList<RandomRange>();
-        gifts.add(newGifts);
-    }
-    // end @compat
-
     /**
      * Add a gift.
      *

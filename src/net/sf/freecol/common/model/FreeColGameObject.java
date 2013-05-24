@@ -151,20 +151,6 @@ public abstract class FreeColGameObject extends FreeColObject {
         setId(getXMLTagName() + ":" + game.getNextId());
     }
 
-    // @compat 0.9.x
-    /**
-     * Gets the identifiers integer part.  The age of two
-     * FreeColGameObjects can be compared by comparing their integer
-     * identifiers.
-     *
-     * @return The integer identifier.
-     */
-    public Integer getIntegerId() {
-        String stringPart = getXMLTagName() + ":";
-        return new Integer(getId().substring(stringPart.length()));
-    }
-    // end @compat
-
     /**
      * Low level base dispose.
      */

@@ -413,33 +413,17 @@ public abstract class Feature extends FreeColObject {
         final Specification spec = getSpecification();
 
         String str = xr.getAttribute(SOURCE_TAG, (String)null);
-        // @compat 0.9.x
-        if (!xr.hasAttribute(ID_ATTRIBUTE_TAG)
-            && "model.colony.colonyGoodsParty".equals(str)) {
-            setId("model.modifier.colonyGoodsParty");
-            setSource(spec.findType("model.source.colonyGoodsParty"));
-        // @end compatibility code
-        } else {
-            if (str == null) {
-                setSource(null);
-            // @compat 0.9.x
-            } else if ("model.monarch.colonyGoodsParty".equals(str)) {
-                setSource(spec.findType("model.source.colonyGoodsParty"));
-            // @end compatibility code
-            } else if (spec != null) {
-                setSource(spec.findType(str));
-            }
+        if (str == null) {
+            setSource(null);
+        } else if (spec != null) {
+            setSource(spec.findType(str));
         }
 
         int firstTurn = xr.getAttribute(FIRST_TURN_TAG, UNDEFINED);
-        if (firstTurn != UNDEFINED) {
-            setFirstTurn(new Turn(firstTurn));
-        }
+        if (firstTurn != UNDEFINED) setFirstTurn(new Turn(firstTurn));
 
         int lastTurn = xr.getAttribute(LAST_TURN_TAG, UNDEFINED);
-        if (lastTurn != UNDEFINED) {
-            setLastTurn(new Turn(lastTurn));
-        }
+        if (lastTurn != UNDEFINED) setLastTurn(new Turn(lastTurn));
 
         duration = xr.getAttribute(DURATION_TAG, 0);
 

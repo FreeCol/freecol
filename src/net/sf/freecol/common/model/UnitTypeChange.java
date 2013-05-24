@@ -274,21 +274,12 @@ public class UnitTypeChange extends FreeColObject {
                 changeTypes.put(ChangeType.EDUCATION, 100);
             }
 
-            // @compat 0.9.x
             for (ChangeType type : ChangeType.values()) {
-                String value = xr.getAttribute(tags.get(type), (String)null);
-                if (value != null) {
-                    if (value.equalsIgnoreCase("false")) {
-                        changeTypes.put(type, 0);
-                    } else if (value.equalsIgnoreCase("true")) {
-                        changeTypes.put(type, 100);
-                    } else {
-                        changeTypes.put(type, Math.max(0,
-                                        Math.min(100, new Integer(value))));
-                    }
+                int value = xr.getAttribute(tags.get(type), -1);
+                if (value >= 0) {
+                    changeTypes.put(type, Math.min(100, value));
                 }
             }
-            // end compatibility code
         }
     }
 

@@ -408,43 +408,6 @@ public final class BuildingType extends BuildableType
         }
     }
 
-
-    // @compat 0.9.x
-    /**
-     * Compatibility hack, called from the specification reader when
-     * it is finishing up.
-     */
-    public void fixup09x() {
-        try {
-            if (hasAbility(Ability.AUTO_PRODUCTION)) {
-                if (!hasAbility(Ability.AVOID_EXCESS_PRODUCTION)) {
-                    // old-style auto-production
-                    Ability ability = new Ability(Ability.AVOID_EXCESS_PRODUCTION);
-                    addAbility(ability);
-                    removeModifiers("model.goods.horses");
-                    float value = ("model.building.country".equals(getId()))
-                        ? 50 : 25;
-                    Modifier modifier = new Modifier("model.modifier.breedingDivisor",
-                                                     this, value,
-                                                     Modifier.Type.ADDITIVE);
-                    addModifier(modifier);
-                    getSpecification().addModifier(modifier);
-                    modifier = new Modifier("model.modifier.breedingFactor",
-                                            this, 2, Modifier.Type.ADDITIVE);
-                    addModifier(modifier);
-                    getSpecification().addModifier(modifier);
-                }
-                if (getModifierSet("model.modifier.consumeOnlySurplusProduction").isEmpty()) {
-                    Modifier modifier = new Modifier("model.modifier.consumeOnlySurplusProduction",
-                                                     this, 0.5f, Modifier.Type.MULTIPLICATIVE);
-                    addModifier(modifier);
-                    getSpecification().addModifier(modifier);
-                }
-            }
-        } catch (Exception e) {} // no such ability, we don't care
-    }
-    // @end compatibility code
-
     /**
      * {@inheritDoc}
      */

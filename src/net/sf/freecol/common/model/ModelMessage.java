@@ -70,9 +70,6 @@ public class ModelMessage extends StringTemplate {
     private String displayId;
     private MessageType messageType;
     private boolean beenDisplayed = false;
-    // @compat 0.9.x
-    private String ownerId;
-    // end @compat
 
 
     /**
@@ -128,7 +125,6 @@ public class ModelMessage extends StringTemplate {
         this.messageType = messageType;
         this.sourceId = source.getId();
         this.displayId = (display != null) ? display.getId() : source.getId();
-        this.ownerId = null;
     }
 
     /**
@@ -242,20 +238,6 @@ public class ModelMessage extends StringTemplate {
      */
     public void setBeenDisplayed(boolean beenDisplayed) {
         this.beenDisplayed = beenDisplayed;
-    }
-
-    /**
-     * Compatibility hack.  Do not use.
-     */
-    public String getOwnerId() {
-        return ownerId;
-    }
-
-    /**
-     * Compatibility hack.  Do not use.
-     */
-    public void setOwnerId(String ownerId) {
-        this.ownerId = ownerId;
     }
 
 
@@ -414,9 +396,6 @@ public class ModelMessage extends StringTemplate {
     private static final String HAS_BEEN_DISPLAYED_TAG = "hasBeenDisplayed";
     private static final String MESSAGE_TYPE_TAG = "messageType";
     private static final String SOURCE_TAG = "source";
-    // @compat 0.9.x
-    private static final String OWNER_TAG = "owner";
-    // end @compat
 
 
     /**
@@ -433,12 +412,6 @@ public class ModelMessage extends StringTemplate {
         xw.writeAttribute(MESSAGE_TYPE_TAG, messageType);
 
         xw.writeAttribute(HAS_BEEN_DISPLAYED_TAG, beenDisplayed);
-
-        // @compat 0.9.x
-        if (ownerId != null) {
-            xw.writeAttribute(OWNER_TAG, ownerId);
-        }
-        // end @compat
     }
 
     /**
@@ -456,10 +429,6 @@ public class ModelMessage extends StringTemplate {
                                       MessageType.class, MessageType.DEFAULT);
 
         beenDisplayed = xr.getAttribute(HAS_BEEN_DISPLAYED_TAG, false);
-
-        // @compat 0.9.x
-        ownerId = xr.getAttribute(OWNER_TAG, (String)null);
-        // end @compat
     }
 
     /**

@@ -142,10 +142,11 @@ public final class FreeColServer {
      * Version 11 made a lot of changes and was introduced for the 0.10.0
      *     series.
      * Version 12 was introduced with HighSeas post-0.10.1.
+     * Version 13 coincides with the start of the 0.11.x series.
      *
      * Please add to this comment if you increase the version.
      */
-    public static final int SAVEGAME_VERSION = 12;
+    public static final int SAVEGAME_VERSION = 13;
 
     /**
      * The oldest save game format that can still be loaded.
@@ -154,7 +155,7 @@ public final class FreeColServer {
      * TODO: revisit the numbering scheme and save compatibility promise
      * when 1.0 is released.
      */
-    public static final int MINIMUM_SAVEGAME_VERSION = 7;
+    public static final int MINIMUM_SAVEGAME_VERSION = 11;
 
     /**
      * The ruleset to use when loading old format games where a spec
@@ -171,7 +172,7 @@ public final class FreeColServer {
     };
 
     /** Games are either starting, ending or being played. */
-    public static enum GameState {STARTING_GAME, IN_GAME, ENDING_GAME}
+    public static enum GameState { STARTING_GAME, IN_GAME, ENDING_GAME }
 
 
     // Instantiation-time parameters.
@@ -259,9 +260,9 @@ public final class FreeColServer {
         game = new ServerGame(specification);
         game.setNationOptions(new NationOptions(specification));
         game.initializeCitiesOfCibola(random);
-        // @compat 0.9.x, 0.10.x
+        // @compat 0.10.x
         fixGameOptions();
-        // end compatibility code
+        // end @compat
 
         if (publicServer) {
             updateMetaServer(true); // Throws NoRouteToServerException
@@ -810,11 +811,11 @@ public final class FreeColServer {
             // Add the attributes:
             xw.writeAttribute(OWNER_TAG, FreeCol.getName());
 
-            xw.writeAttribute(PUBLIC_SERVER_TAG, Boolean.toString(publicServer));
+            xw.writeAttribute(PUBLIC_SERVER_TAG, publicServer);
 
-            xw.writeAttribute(SINGLE_PLAYER_TAG, Boolean.toString(singlePlayer));
+            xw.writeAttribute(SINGLE_PLAYER_TAG, singlePlayer);
 
-            xw.writeAttribute(VERSION_TAG, Integer.toString(SAVEGAME_VERSION));
+            xw.writeAttribute(VERSION_TAG, SAVEGAME_VERSION);
 
             xw.writeAttribute(RANDOM_STATE_TAG, Utils.getRandomState(random));
 
@@ -826,17 +827,22 @@ public final class FreeColServer {
             
             // Add server side model information:
             xw.writeStartElement(SERVER_OBJECTS_TAG);
+
             for (ServerModelObject smo : game.getServerModelObjects()) {
                 xw.writeStartElement(smo.getServerXMLElementTagName());
+
                 xw.writeAttribute(FreeColObject.ID_ATTRIBUTE_TAG,
                     ((FreeColGameObject)smo).getId());
+
                 xw.writeEndElement();
             }
+
             xw.writeEndElement();
-            // Add the game
-            game.toXML(xw, null, true, true);
-            // Add the AIObjects
-            if (aiMain != null) aiMain.toXML(xw);
+
+            game.toXML(xw, null, true, true); // Add the game
+
+            if (aiMain != null) aiMain.toXML(xw); // Add the AIObjects
+
             xw.writeEndElement();
             xw.writeEndDocument();
             xw.flush();
@@ -928,34 +934,13 @@ public final class FreeColServer {
                         serverStrings.add(xr.readId());
                         xr.nextTag();
                     }
-                    // @compat 0.9.x
-                    if (savegameVersion < 11) {
-                        v11FixServerObjects(serverStrings, fis);
-                    }
-                    // @end compatibility code
 
                 } else if (Game.getXMLElementTagName().equals(tag)) {
-                    // @compat 0.9.x
-                    if (savegameVersion < 9 && specification == null) {
-                        specification = new FreeColTcFile(DEFAULT_SPEC)
-                            .getSpecification();
-                        logger.info("Reading old format game"
-                            + " (version: " + savegameVersion
-                            + "), using " + DEFAULT_SPEC + " specification.");
-                    }
-                    // @end compatibility code
                     // Read the game
                     game = new ServerGame(null, xr, serverStrings,
                                           specification);
                     game.setCurrentPlayer(null);
                     if (server != null) server.setGame(game);
-                    // @compat 0.9.x
-                    if (savegameVersion < 9
-                        && specification.getDifficultyLevel() == null) {
-                        specification.applyDifficultyLevel("model.difficulty.medium");
-                        logger.info("Applying default difficulty of medium.");
-                    }
-                    // @end compatibility code
 
                 } else if (AIMain.getXMLElementTagName().equals(tag)) {
                     if (server == null) break;
@@ -1007,7 +992,7 @@ public final class FreeColServer {
                         is.updateMostHated();
                     }
                 }
-                // end compatibility code
+                // end @compat 0.10.5
 
                 if (!p.isIndian() && p.getEurope() != null) {
                     p.initializeHighSeas();
@@ -1037,21 +1022,15 @@ public final class FreeColServer {
                 TerrainGenerator.encodeStyle(tile);
             }
         }
-        // end compatibility code
+        // end @compat 0.10.x
 
-        // @compat 0.9.x, 0.10.x
+        // @compat 0.10.x
         fixGameOptions();
-        // end compatibility code
-
-        // @compat 0.9.x
-        if (savegameVersion < 11) {
-            for (Tile t : game.getMap().getAllTiles()) t.fixup09x();
-        }
-        // end compatibility code
+        // end @compat
 
         // @compat 0.10.x
         game.getMap().resetContiguity();
-        // end compatibility code
+        // end @compat
 
         // Ensure that critical option groups can not be edited.
         try {
@@ -1126,27 +1105,6 @@ public final class FreeColServer {
     private void fixGameOptions() {
         Specification spec = game.getSpecification();
 
-        // @compat 0.9.x
-        // Introduced: SAVEGAME_VERSION == 11
-        addIntegerOption("model.option.monarchSupport",
-            "model.difficulty.monarch", 2, true);
-        // Introduced: SAVEGAME_VERSION == 11
-        addStringOption("model.option.buildOnNativeLand",
-            "model.difficulty.natives",
-            "model.option.buildOnNativeLand.never", true);
-        // Introduced: SAVEGAME_VERSION == 11
-        if (!spec.hasOption("model.option.amphibiousMoves")) {
-            addBooleanOption("model.option.amphibiousMoves",
-                "gameOptions.map", false, false);
-            spec.addModifier(new Modifier("model.modifier.amphibiousAttack",
-                    Specification.AMPHIBIOUS_ATTACK_PENALTY_SOURCE,
-                    -75.0f,
-                    Modifier.Type.PERCENTAGE));
-        }
-        // Introduced: SAVEGAME_VERSION == 11
-        addBooleanOption("model.option.settlementActionsContactChief",
-            "gameOptions.map", false, false);
-
         // @compat 0.10.x
         // Introduced: SAVEGAME_VERSION == 12
         addBooleanOption(GameOptions.ENHANCED_MISSIONARIES,
@@ -1196,6 +1154,7 @@ public final class FreeColServer {
         // Introduced: SAVEGAME_VERSION == 12
         addBooleanOption(GameOptions.EMPTY_TRADERS,
             "gameOptions.map", false, false);
+        // end @compat
     }
 
     private void addOptionGroup(String id, boolean difficulty) {
@@ -1248,65 +1207,6 @@ public final class FreeColServer {
             }
         }
     }
-
-
-    // @compat 0.9.x
-    /**
-     * At savegame version 11 (new in 0.10.0) several classes were
-     * added to serverObjects.  Evil hack here to scan the game for
-     * objects in pre-v11 games that should now be in serverObjects,
-     * and put them in.
-     *
-     * @param serverStrings A list of server object {type, identifier}
-     *     pairs to add to.
-     * @param fis The savegame to scan.
-     */
-    private static void v11FixServerObjects(List<String> serverStrings,
-                                            final FreeColSavegameFile fis) {
-        FreeColXMLReader xs = null;
-        try {
-            xs = fis.getFreeColXMLReader();
-            xs.nextTag();
-
-            while (xs.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                final String tag = xs.getLocalName();
-                if (Game.getXMLElementTagName().equals(tag)) {
-                    Game game = new ServerGame(null, xs,
-                            new ArrayList<String>(serverStrings),
-                            new FreeColTcFile("freecol").getSpecification());
-                    Iterator<FreeColGameObject> objs
-                        = game.getFreeColGameObjectIterator();
-                    while (objs.hasNext()) {
-                        FreeColGameObject fcgo = objs.next();
-                        if (serverStrings.contains(fcgo.getId())) {
-                            continue;
-                        } else if (fcgo instanceof Europe) {
-                            serverStrings.add("serverEurope");
-                        } else if (fcgo instanceof Colony) {
-                            serverStrings.add("serverColony");
-                        } else if (fcgo instanceof Building) {
-                            serverStrings.add("serverBuilding");
-                        } else if (fcgo instanceof ColonyTile) {
-                            serverStrings.add("serverColonyTile");
-                        } else if (fcgo instanceof IndianSettlement) {
-                            serverStrings.add("serverIndianSettlement");
-                        } else if (fcgo instanceof Unit) {
-                            serverStrings.add("serverUnit");
-                        } else {
-                            continue;
-                        }
-                        serverStrings.add(fcgo.getId());
-                    }
-                }
-                break;
-            }
-        } catch (Exception e) {
-            ; // Do nothing.
-        } finally {
-            if (xs != null) xs.close();
-        }
-    }
-    // end @compat 0.9.x
 
     /**
      * Builds a new game using the parameters that exist in the game

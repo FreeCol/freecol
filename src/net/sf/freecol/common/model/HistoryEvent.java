@@ -148,9 +148,6 @@ public class HistoryEvent extends StringTemplate {
 
     private static final String EVENT_TYPE_TAG = "eventType";
     private static final String TURN_TAG = "turn";
-    // @compat 0.9.x
-    private static final String TYPE_TAG = "type";
-    // end @compat
 
 
     /**
@@ -176,15 +173,6 @@ public class HistoryEvent extends StringTemplate {
 
         eventType = xr.getAttribute(EVENT_TYPE_TAG,
                                     EventType.class, (EventType)null);
-        // @compat 0.9.x
-        if (eventType == null) {
-            eventType = xr.getAttribute(TYPE_TAG,
-                                     EventType.class, (EventType)null);
-            if ("".equals(getId())) {
-                setId("model.history." + eventType.toString());
-            }
-        }
-        // end @compat
     }
 
     /**

@@ -2661,9 +2661,6 @@ public class Colony extends Settlement implements Nameable {
     private static final String STOCKADE_KEY_TAG = "stockadeKey";
     private static final String TORIES_TAG = "tories";
     private static final String UNIT_COUNT_TAG = "unitCount";
-    // @compat ?
-    private static final String OLD_BUILD_QUEUE_TAG = "buildQueue";
-    // end @compat
 
 
     /**
@@ -2804,27 +2801,6 @@ public class Colony extends Settlement implements Nameable {
 
         owner.addSettlement(this);
 
-        // @compat 0.9.x
-        if (populationQueue.isEmpty()) {
-            for (UnitType unitType : getSpecification().getUnitTypesWithAbility(Ability.BORN_IN_COLONY)) {
-                GoodsType food = getSpecification().getGoodsType("model.goods.food");
-                List<AbstractGoods> required = unitType.getRequiredGoods();
-                boolean found = false;
-                for (AbstractGoods goods : required) {
-                    if (goods.getType() == food) {
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    required.add(new AbstractGoods(food, FOOD_PER_COLONIST));
-                    unitType.setRequiredGoods(required);
-                }
-                populationQueue.add(unitType);
-            }
-        }
-        // end compatibility code
-
         invalidateCache();
     }
 
@@ -2842,19 +2818,6 @@ public class Colony extends Settlement implements Nameable {
                     BuildableType.class, (BuildableType)null));
             xr.closeTag(BUILD_QUEUE_TAG);
 
-        // @compat 0.9.x
-        } else if (OLD_BUILD_QUEUE_TAG.equals(tag)) {
-            // TODO: remove support for old format, move serialization
-            // to BuildQueue
-            int size = xr.getAttribute(ARRAY_SIZE_TAG, 0);
-            if (size > 0) {
-                for (int x = 0; x < size; x++) {
-                    String typeId = xr.getAttributeValue(null, "x" + Integer.toString(x));
-                    buildQueue.add(getSpecification().getType(typeId, BuildableType.class));
-                }
-            }
-            xr.nextTag();
-        // end @compat
 
         } else if (POPULATION_QUEUE_TAG.equals(xr.getLocalName())) {
             populationQueue.add(xr.getType(spec, ID_ATTRIBUTE_TAG,

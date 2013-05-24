@@ -390,6 +390,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
     protected void clearUnitList() {
         units.clear();
     }
+    // end @compat
 
     /**
      * Gets the reason why a given <code>Locatable</code> can not be

@@ -3586,15 +3586,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             Turn turn = getGame().getTurn();
             List<Modifier> modifiers
                 = spec.getModifiers("model.modifier.colonyGoodsParty");
-            Modifier template;
-            if (modifiers != null && !modifiers.isEmpty()) {
-                template = modifiers.get(0);
-            } else { // @compat 0.9.x
-                template = new Modifier("model.modifier.colonyGoodsParty",
-                    Specification.COLONY_GOODS_PARTY_SOURCE,
-                    50, Modifier.Type.PERCENTAGE);
-                template.setIncrement(-2, Modifier.Type.ADDITIVE, turn, turn);
-            } // end compatibility code
+            Modifier template = modifiers.get(0);
             Modifier modifier = Modifier.makeTimedModifier("model.goods.bells",
                                                            template, turn);
             cs.addFeatureChange(this, colony, modifier, true);

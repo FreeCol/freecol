@@ -205,27 +205,11 @@ public class PlayerExploredTile extends FreeColGameObject {
         return mostHated;
     }
 
-    // @compat 0.9.x
-    public void setOwner(Player owner) {
-        this.owner = owner;
-    }
-
-    public void setOwningSettlement(Settlement owningSettlement) {
-        this.owningSettlement = owningSettlement;
-    }
-
-    public void setColonyUnitCount(int colonyUnitCount) {
-        this.colonyUnitCount = colonyUnitCount;
-    }
-
-    public void setColonyStockadeKey(String colonyStockadeKey) {
-        this.colonyStockadeKey = colonyStockadeKey;
-    }
+    // Temporary hack
 
     public void setMissionary(Unit missionary) {
         this.missionary = missionary;
     }
-    // end @compat
 
 
     /**

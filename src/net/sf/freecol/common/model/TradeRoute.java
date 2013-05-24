@@ -195,17 +195,8 @@ public class TradeRoute extends FreeColGameObject
 
                 if (tag.equals(CARGO_TAG)) {
                     String id = xr.readId();
-                    // @compat 0.9.x
-                    if (id == null) {
-                        List<GoodsType> goodsList = spec.getGoodsTypeList();
-                        for (int cargoIndex : readFromArrayElement(CARGO_TAG, xr, new int[0])) {
-                            cargo.add(goodsList.get(cargoIndex));
-                        }
-                    // end @compat
-                    } else {
-                        cargo.add(spec.getGoodsType(id));
-                        xr.closeTag(CARGO_TAG);
-                    }
+                    cargo.add(spec.getGoodsType(id));
+                    xr.closeTag(CARGO_TAG);
                 } else {
                     logger.warning("Bogus Stop tag: " + tag);
                 }

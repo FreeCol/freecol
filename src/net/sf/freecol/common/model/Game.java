@@ -1008,20 +1008,8 @@ public class Game extends FreeColGameObject {
     private static final String SPANISH_SUCCESSION_TAG = "spanishSuccession";
     private static final String TURN_TAG = "turn";
     private static final String UUID_TAG = "UUID";
-    // @compat 0.9.x
-    private static final String CITIES_OF_CIBOLA_TAG = "citiesOfCibola";
-    private static final String DIFFICULTY_LEVEL_TAG = "difficultyLevel";
-    private static final String GAME_OPTIONS_1_TAG = "gameOptions";
-    private static final String GAME_OPTIONS_2_TAG = "game-options";
-    // end @compat
     // @compat 0.10.x
     private static final String OLD_NEXT_ID_TAG = "nextID";
-    // end @compat
-
-    // @compat 0.9.x
-    // Nasty hacks for I/O.
-    private OptionGroup gameOptions = null;
-    private OptionGroup mapGeneratorOptions = null;
     // end @compat
 
 
@@ -1107,10 +1095,6 @@ public class Game extends FreeColGameObject {
         citiesOfCibola.clear();
         players.clear();
         unknownEnemy = null;
-        // @compat 0.9.x
-        gameOptions = null;
-        mapGeneratorOptions = null;
-        // end @compat
 
         // Special case for the current player.  Defer lookup of the
         // current player tag until we read the children, because that
@@ -1121,15 +1105,6 @@ public class Game extends FreeColGameObject {
 
         currentPlayer = (current == null) ? null
             : getFreeColGameObject(current, Player.class);
-
-        // @compat 0.9.x
-        if (gameOptions != null) {
-            addOldOptions(gameOptions);
-        }
-        if (mapGeneratorOptions != null) {
-            addOldOptions(mapGeneratorOptions);
-        }
-        // end @compat
     }
 
     /**
@@ -1145,47 +1120,13 @@ public class Game extends FreeColGameObject {
             citiesOfCibola.add(xr.readId());
             xr.closeTag(CIBOLA_TAG);
 
-        // @compat 0.9.x
-        } else if (CITIES_OF_CIBOLA_TAG.equals(tag)) {
-            List<String> cities = xr.readFromListElement(CITIES_OF_CIBOLA_TAG, 
-                                                         String.class);
-            citiesOfCibola.clear();
-            citiesOfCibola.addAll(cities);
-        // end @compat
-
-        // @compat 0.9.x
-        } else if (GAME_OPTIONS_1_TAG.equals(tag) 
-            || GAME_OPTIONS_2_TAG.equals(tag)) {
-            gameOptions = new OptionGroup(xr, specification);
-        // end @compat
-
         } else if (Map.getXMLElementTagName().equals(tag)) {
             map = xr.readFreeColGameObject(game, Map.class);
-
-        // @compat 0.9.x
-        } else if (MapGeneratorOptions.getXMLElementTagName().equals(tag)) {
-            mapGeneratorOptions = new OptionGroup(xr, specification);
-        // end @compat
-
-        // @compat 0.9.x
-        } else if (ModelMessage.getXMLElementTagName().equals(tag)) {
-            ModelMessage m = new ModelMessage(xr);
-            // When this goes, remove getOwnerId().
-            String owner = m.getOwnerId();
-            if (owner != null) {
-                Player player = getFreeColGameObject(owner, Player.class);
-                player.addModelMessage(m);
-            }
-        // end @compat
 
         } else if (NationOptions.getXMLElementTagName().equals(tag)) {
             nationOptions = new NationOptions(xr, specification);
 
-        } else if (OptionGroup.getXMLElementTagName().equals(tag)
-            // @compat 0.9.x
-            || DIFFICULTY_LEVEL_TAG.equals(tag)
-            // end @compat
-            ) {
+        } else if (OptionGroup.getXMLElementTagName().equals(tag)) {
             specification.applyDifficultyLevel(new OptionGroup(xr, specification));
 
         } else if (Player.getXMLElementTagName().equals(tag)) {
@@ -1205,32 +1146,6 @@ public class Game extends FreeColGameObject {
             super.readChild(xr);
         }
     }
-
-    // @compat 0.9.x
-    private void addOldOptions(OptionGroup group) {
-        Iterator<Option> iterator = group.iterator();
-        while (iterator.hasNext()) {
-            Option opt = iterator.next();
-            if (opt instanceof IntegerOption) {
-                IntegerOption option = (IntegerOption) opt;
-                if (specification.hasOption(option.getId())) {
-                    specification.getIntegerOption(option.getId())
-                        .setValue(option.getValue());
-                } else {
-                    specification.addAbstractOption(option);
-                }
-            } else if (opt instanceof BooleanOption) {
-                BooleanOption option = (BooleanOption) opt;
-                if (specification.hasOption(option.getId())) {
-                specification.getBooleanOption(option.getId())
-                    .setValue(option.getValue());
-                } else {
-                    specification.addAbstractOption(option);
-                }
-            }
-        }
-    }
-    // end @compat
 
     /**
      * {@inheritDoc}

@@ -447,9 +447,6 @@ public class Region extends FreeColGameObject implements Nameable {
     private static final String PREDISCOVERED_TAG = "prediscovered";
     private static final String SCORE_VALUE_TAG = "scoreValue";
     private static final String TYPE_TAG = "type";
-    // @compat 0.9.x
-    private static final String CHILDREN_TAG = "children";
-    // end @compat
     
 
     /**
@@ -567,14 +564,6 @@ public class Region extends FreeColGameObject implements Nameable {
             addChild(xr.makeFreeColGameObject(getGame(), ID_ATTRIBUTE_TAG,
                                               Region.class, true));
             xr.closeTag(CHILD_TAG);
-
-        // @compat 0.9.x
-        } else if (CHILDREN_TAG.equals(tag)) {
-            String[] childArray = readFromArrayElement(CHILDREN_TAG, xr, new String[0]);
-            for (String child : childArray) {
-                children.add(getGame().getMap().getRegion(child));
-            }
-        // end @compat
         
         } else {
             super.readChild(xr);

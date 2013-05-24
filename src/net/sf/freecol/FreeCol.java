@@ -83,7 +83,7 @@ public final class FreeCol {
     public static final String  META_SERVER_ADDRESS = "meta.freecol.org";
     public static final int     META_SERVER_PORT = 3540;
 
-    private static final String FREECOL_VERSION = "0.10.x-trunk";
+    private static final String FREECOL_VERSION = "0.11.x-trunk";
     private static String       FREECOL_REVISION;
 
     // Cli defaults.

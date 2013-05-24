@@ -461,10 +461,6 @@ public class StringTemplate extends FreeColObject {
     private static final String DEFAULT_ID_TAG = "defaultId";
     private static final String KEY_TAG = "key";
     private static final String TEMPLATE_TYPE_TAG = "templateType";
-    // @compat 0.9.x
-    private static final String DATA_TAG = "data";
-    private static final String STRINGS_TAG = "strings";
-    // end @compat
 
 
     /**
@@ -544,31 +540,10 @@ public class StringTemplate extends FreeColObject {
         } else if (StringTemplate.getXMLElementTagName().equals(tag)) {
             addReplacement(new StringTemplate(xr));
         
-        // @compat 0.9.x
-        } else if (DATA_TAG.equals(tag)) {
-            readOldFormat(readFromArrayElement(DATA_TAG, xr, new String[0]));
-        // end @compat
-
-        // @compat 0.9.x
-        } else if (STRINGS_TAG.equals(tag)) {
-            // TODO: remove compatibility code for HistoryEvent
-            readOldFormat(readFromArrayElement(STRINGS_TAG, xr, new String[0]));
-        // end @compat
-
         } else {
             super.readChild(xr);
         }
     }
-
-    // @compat 0.9.x
-    private void readOldFormat(String[] data) {
-        for (int index = 0; index < data.length; index += 2) {
-            addKey(data[index]);
-            addReplacement(new StringTemplate(data[index + 1],
-                                              TemplateType.NAME));
-        }
-    }
-    // end @compat
 
     /**
      * {@inheritDoc}
