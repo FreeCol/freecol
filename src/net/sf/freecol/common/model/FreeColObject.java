@@ -895,8 +895,11 @@ public abstract class FreeColObject {
      */
     public void toXML(XMLStreamWriter out, String tag) throws XMLStreamException {
         out.writeStartElement(tag);
+
         writeAttributes(out);
+
         writeChildren(out);
+
         out.writeEndElement();
     }
 
@@ -952,15 +955,14 @@ public abstract class FreeColObject {
      * @exception XMLStreamException if there are any problems writing
      *      to the stream.
      */
-    public void toXML(XMLStreamWriter out, Player player,
-                      boolean showAll, boolean toSavedGame)
-        throws XMLStreamException {
+    public void toXML(XMLStreamWriter out, Player player, boolean showAll,
+                      boolean toSavedGame) throws XMLStreamException {
         // FreeColObjects are not to contain data that varies with
         // the observer, so the extra arguments are moot here.
         // However, this method is overridden in FreeColGameObject
         // where they are meaningful, and we need a version here for
         // toXMLElement() to call.
-        toXMLImpl(out);
+        toXML(out);
     }
 
     /**
@@ -1016,6 +1018,171 @@ public abstract class FreeColObject {
     }
 
     /**
+     * Write a boolean attribute to a stream.
+     *
+     * @param out The <code>XMLStreamWriter</code> to write to.
+     * @param attributeName The attribute name.
+     * @param value A boolean to write.
+     * @exception XMLStreamException if a write error occurs.
+     */
+    public static void writeAttribute(XMLStreamWriter out, String attributeName,
+                                      boolean value) throws XMLStreamException {
+        out.writeAttribute(attributeName, String.valueOf(value));
+    }
+
+    /**
+     * Write a float attribute to a stream.
+     *
+     * @param out The <code>XMLStreamWriter</code> to write to.
+     * @param attributeName The attribute name.
+     * @param value A float to write.
+     * @exception XMLStreamException if a write error occurs.
+     */
+    public static void writeAttribute(XMLStreamWriter out, String attributeName,
+                                      float value) throws XMLStreamException {
+        out.writeAttribute(attributeName, String.valueOf(value));
+    }
+
+    /**
+     * Write an integer attribute to a stream.
+     *
+     * @param out The <code>XMLStreamWriter</code> to write to.
+     * @param attributeName The attribute name.
+     * @param value An integer to write.
+     * @exception XMLStreamException if a write error occurs.
+     */
+    public static void writeAttribute(XMLStreamWriter out, String attributeName,
+                                      int value) throws XMLStreamException {
+        out.writeAttribute(attributeName, String.valueOf(value));
+    }
+
+    /**
+     * Write an enum attribute to a stream.
+     *
+     * @param out The <code>XMLStreamWriter</code> to write to.
+     * @param attributeName The attribute name.
+     * @param value The <code>Enum</code> to write.
+     * @exception XMLStreamException if a write error occurs.
+     */
+    public static void writeAttribute(XMLStreamWriter out, String attributeName,
+                                      Enum<?> value) throws XMLStreamException {
+        out.writeAttribute(attributeName,
+                           value.toString().toLowerCase(Locale.US));
+    }
+
+    /**
+     * Write an Object attribute to a stream.
+     *
+     * @param out The <code>XMLStreamWriter</code> to write to.
+     * @param attributeName The attribute name.
+     * @param value The <code>Object</code> to write.
+     * @exception XMLStreamException if a write error occurs.
+     */
+    public static void writeAttribute(XMLStreamWriter out, String attributeName,
+                                      Object value) throws XMLStreamException {
+        out.writeAttribute(attributeName, String.valueOf(value));
+    }
+
+    /**
+     * Write the identifier attribute of a non-null FreeColObject to a stream.
+     *
+     * @param out The <code>XMLStreamWriter</code> to write to.
+     * @param attributeName The attribute name.
+     * @param value The <code>FreeColObject</code> to write the identifier of.
+     * @exception XMLStreamException if a write error occurs.
+     */
+    public static void writeAttribute(XMLStreamWriter out, String attributeName,
+                                      FreeColObject value) throws XMLStreamException {
+        if (value != null) {
+            out.writeAttribute(attributeName, value.getId());
+        }
+    }
+
+    /**
+     * Write the identifier attribute of a non-null Location to a stream.
+     *
+     * @param out The <code>XMLStreamWriter</code> to write to.
+     * @param attributeName The attribute name.
+     * @param value The <code>Location</code> to write the identifier of.
+     * @exception XMLStreamException if a write error occurs.
+     */
+    public static void writeLocationAttribute(XMLStreamWriter out,
+                                              String attributeName,
+                                              Location value) throws XMLStreamException {
+        writeAttribute(out, attributeName, (FreeColGameObject)value);
+    }
+
+
+    /**
+     * Initializes this object from an XML-representation of this object,
+     * unless the PARTIAL_ATTRIBUTE tag is present which indicates
+     * a partial update of an existing object.
+     *
+     * @param in The input stream with the XML.
+     * @exception XMLStreamException if there are any problems reading
+     *     the stream.
+     */
+    public void readFromXML(XMLStreamReader in) throws XMLStreamException {
+        if (hasAttribute(in, PARTIAL_ATTRIBUTE_TAG)
+            // @compat 0.10.x
+            || hasAttribute(in, OLD_PARTIAL_ATTRIBUTE_TAG)
+            // end @compat
+            ) {
+            readFromXMLPartialImpl(in);
+        } else {
+            readAttributes(in);
+            readChildren(in);
+        }
+    }
+
+    /**
+     * Reads the attributes of this object from an XML stream.
+     *
+     * @param in The XML input stream.
+     * @exception XMLStreamException if a problem was encountered
+     *     during parsing.
+     */
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        String newId = readId(in);
+        setId(newId);
+    }
+
+    /**
+     * Reads the children of this object from an XML stream.
+     *
+     * @param in The XML input stream.
+     * @exception XMLStreamException if a problem was encountered
+     *     during parsing.
+     */
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        final String tag = in.getLocalName();
+        if (tag == null) {
+            throw new XMLStreamException("Parse error, null opening tag.");
+        }
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            readChild(in);
+        }
+        expectTag(in, tag);
+    }
+
+    /**
+     * Reads a single child object.  Subclasses must override to read
+     * their enclosed elements.  This particular instance of the
+     * routine always throws XMLStreamException because we should
+     * never arrive here.  However it is very useful to always call
+     * super.readChild() when an unexpected tag is encountered, as the
+     * exception thrown here provides some useful debugging context.
+     *
+     * @param in The XML input stream.
+     * @exception XMLStreamException because subclasses should have
+     *     recognized all child elements.
+     */
+    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+        throw new XMLStreamException("In " + getRealXMLElementTagName()
+            + ", unexpected tag: " + currentTag(in));
+    }
+
+    /**
      * Initialize this object from an XML-representation of this object.
      * @param element An XML-element that will be used to initialize
      *      this object.
@@ -1068,58 +1235,6 @@ public abstract class FreeColObject {
             logger.log(Level.WARNING, "TransformerException", e);
             throw new IllegalStateException("TransformerException");
         }
-    }
-
-    /**
-     * Initializes this object from an XML-representation of this object,
-     * unless the PARTIAL_ATTRIBUTE tag is present which indicates
-     * a partial update of an existing object.
-     *
-     * @param in The input stream with the XML.
-     * @exception XMLStreamException if there are any problems reading
-     *     the stream.
-     */
-    public void readFromXML(XMLStreamReader in) throws XMLStreamException {
-        if (hasAttribute(in, PARTIAL_ATTRIBUTE_TAG)
-            // @compat 0.10.x
-            || hasAttribute(in, OLD_PARTIAL_ATTRIBUTE_TAG)
-            // end @compat
-            ) {
-            readFromXMLPartialImpl(in);
-        } else {
-            readAttributes(in);
-            readChildren(in);
-        }
-    }
-
-    /**
-     * Expect a particular tag.
-     *
-     * @param in The input stream with the XML.
-     * @param tag The expected tag name.
-     * @exception XMLStreamException if the expected tag is not found.
-     */
-    public void expectTag(XMLStreamReader in, String tag) throws XMLStreamException {
-        String endTag = in.getLocalName();
-        if (!tag.equals(endTag)) {
-            throw new XMLStreamException("Parse error, " + tag
-                + " expected, not: " + endTag);
-        }
-    }
-
-    /**
-     * Close the current tag, checking that it did indeed close correctly.
-     *
-     * @param in The input stream with the XML.
-     * @param tag The expected tag name.
-     * @exception XMLStreamException if a closing tag is not found.
-     */
-    public void closeTag(XMLStreamReader in, String tag) throws XMLStreamException {
-        if (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            throw new XMLStreamException("Parse error, END_ELEMENT expected,"
-                + " not: " + in.getLocalName());
-        }
-        expectTag(in, tag);
     }
 
     // @compat 0.9.x
@@ -1252,6 +1367,108 @@ public abstract class FreeColObject {
         closeTag(in, tag);
         return list;
     }
+
+    /**
+     * Updates this object from an XML-representation of this object.
+     * Ideally this would be abstract, but as not all FreeColObject-subtypes
+     * need partial updates we provide a non-operating stub here which is
+     * to be overridden where needed.
+     *
+     * @param in The input stream with the XML.
+     * @exception XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    public void readFromXMLPartialImpl(XMLStreamReader in) throws XMLStreamException {
+        throw new XMLStreamException("Partial update of unsupported type: "
+            + currentTag(in));
+    }
+
+
+    /**
+     * Extract the current tag and its attributes from an input stream.
+     * Useful for error messages.
+     *
+     * @param in The XML input stream.
+     */
+    public static String currentTag(XMLStreamReader in) {
+        StringBuilder sb = new StringBuilder(in.getLocalName());
+        sb.append(", attributes:");
+        int n = in.getAttributeCount();
+        for (int i = 0; i < n; i++) {
+            sb.append(" ").append(in.getAttributeLocalName(i))
+                .append("=\"").append(in.getAttributeValue(i)).append("\"");
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Expect a particular tag.
+     *
+     * @param in The input stream with the XML.
+     * @param tag The expected tag name.
+     * @exception XMLStreamException if the expected tag is not found.
+     */
+    public static void expectTag(XMLStreamReader in,
+                                 String tag) throws XMLStreamException {
+        String endTag = in.getLocalName();
+        if (!tag.equals(endTag)) {
+            throw new XMLStreamException("Parse error, " + tag
+                + " expected, not: " + endTag);
+        }
+    }
+
+    /**
+     * Close the current tag, checking that it did indeed close correctly.
+     *
+     * @param in The input stream with the XML.
+     * @param tag The expected tag name.
+     * @exception XMLStreamException if a closing tag is not found.
+     */
+    public static void closeTag(XMLStreamReader in,
+                                String tag) throws XMLStreamException {
+        if (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            throw new XMLStreamException("Parse error, END_ELEMENT expected,"
+                + " not: " + in.getLocalName());
+        }
+        expectTag(in, tag);
+    }
+
+    // @compat 0.10.x
+    /**
+     * Reads the identifier attribute.
+     *
+     * Normally a simple getAttribute() would be sufficient, but
+     * while we are allowing both the obsolete ID_ATTRIBUTE and the correct
+     * ID_ATTRIBUTE_TAG, this routine is useful.
+     *
+     * When 0.10.x is obsolete, remove this routine and replace its
+     * uses with just getAttribute(in, ID_ATTRIBUTE_TAG, (String)null)
+     * or equivalent.
+     *
+     * @param in The <code>XMLStreamReader</code> to read from.
+     * @return The identifier found, or null if none present.
+     */
+    public static String readId(XMLStreamReader in) {
+        String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
+        if (id == null) id = in.getAttributeValue(null, ID_ATTRIBUTE);
+        return id;
+    }
+
+    /**
+     * Version of readId(XMLStreamReader) that reads from an element.
+     *
+     * To be replaced with just:
+     *   element.getAttribute(FreeColObject.ID_ATTRIBUTE_TAG);
+     *
+     * @param element An element to read the id attribute from.
+     * @return The identifier attribute value.
+     */
+    public static String readId(Element element) {
+        String id = element.getAttribute(ID_ATTRIBUTE_TAG);
+        if (id == null) id = element.getAttribute(ID_ATTRIBUTE);
+        return id;
+    }
+    // end @compat
 
     /**
      * Is there an attribute present in a stream?
@@ -1402,8 +1619,9 @@ public abstract class FreeColObject {
      * @param game The <code>Game</code> to look in.
      * @return The <code>Location</code> found.
      */
-    protected Location findLocationAttribute(XMLStreamReader in,
-                                             String attributeName, Game game) {
+    public static Location findLocationAttribute(XMLStreamReader in,
+                                                 String attributeName,
+                                                 Game game) {
         if (attributeName == null) return null;
 
         final String attrib =
@@ -1423,8 +1641,9 @@ public abstract class FreeColObject {
      * @param game The <code>Game</code> to look in.
      * @return The <code>Location</code>, or null if none found.
      */
-    public Location makeLocationAttribute(XMLStreamReader in,
-                                          String attributeName, Game game) {
+    public static Location makeLocationAttribute(XMLStreamReader in,
+                                                 String attributeName,
+                                                 Game game) {
         if (attributeName == null) return null;
 
         final String attrib =
@@ -1435,218 +1654,7 @@ public abstract class FreeColObject {
 
         return (attrib == null) ? null : game.makeFreeColLocation(attrib);
     }
-        
-    /**
-     * Write a boolean attribute to a stream.
-     *
-     * @param out The <code>XMLStreamWriter</code> to write to.
-     * @param attributeName The attribute name.
-     * @param value A boolean to write.
-     * @exception XMLStreamException if an error occurs
-     */
-    public void writeAttribute(XMLStreamWriter out, String attributeName,
-                               boolean value) throws XMLStreamException {
-        out.writeAttribute(attributeName, String.valueOf(value));
-    }
 
-    /**
-     * Write a float attribute to a stream.
-     *
-     * @param out The <code>XMLStreamWriter</code> to write to.
-     * @param attributeName The attribute name.
-     * @param value A float to write.
-     * @exception XMLStreamException if an error occurs
-     */
-    public void writeAttribute(XMLStreamWriter out, String attributeName,
-                               float value) throws XMLStreamException {
-        out.writeAttribute(attributeName, String.valueOf(value));
-    }
-
-    /**
-     * Write an integer attribute to a stream.
-     *
-     * @param out The <code>XMLStreamWriter</code> to write to.
-     * @param attributeName The attribute name.
-     * @param value An integer to write.
-     * @exception XMLStreamException if an error occurs
-     */
-    public void writeAttribute(XMLStreamWriter out, String attributeName,
-                               int value) throws XMLStreamException {
-        out.writeAttribute(attributeName, String.valueOf(value));
-    }
-
-    /**
-     * Write an enum attribute to a stream.
-     *
-     * @param out The <code>XMLStreamWriter</code> to write to.
-     * @param attributeName The attribute name.
-     * @param value The <code>Enum</code> to write.
-     * @exception XMLStreamException if an error occurs
-     */
-    public void writeAttribute(XMLStreamWriter out, String attributeName,
-                               Enum<?> value) throws XMLStreamException {
-        out.writeAttribute(attributeName,
-                           value.toString().toLowerCase(Locale.US));
-    }
-
-    /**
-     * Write an Object attribute to a stream.
-     *
-     * @param out The <code>XMLStreamWriter</code> to write to.
-     * @param attributeName The attribute name.
-     * @param value The <code>Object</code> to write.
-     * @exception XMLStreamException if an error occurs
-     */
-    public void writeAttribute(XMLStreamWriter out, String attributeName,
-                               Object value) throws XMLStreamException {
-        out.writeAttribute(attributeName, String.valueOf(value));
-    }
-
-    /**
-     * Write the identifier attribute of a non-null FreeColObject to a stream.
-     *
-     * @param out The <code>XMLStreamWriter</code> to write to.
-     * @param attributeName The attribute name.
-     * @param value The <code>FreeColObject</code> to write the identifier of.
-     * @exception XMLStreamException if an error occurs
-     */
-    public void writeAttribute(XMLStreamWriter out, String attributeName,
-                               FreeColObject value) throws XMLStreamException {
-        if (value != null) {
-            out.writeAttribute(attributeName, value.getId());
-        }
-    }
-
-    /**
-     * Write the identifier attribute of a non-null Location to a stream.
-     *
-     * @param out The <code>XMLStreamWriter</code> to write to.
-     * @param attributeName The attribute name.
-     * @param value The <code>Location</code> to write the identifier of.
-     * @exception XMLStreamException if an error occurs
-     */
-    public void writeLocationAttribute(XMLStreamWriter out, String attributeName,
-                                       Location value) throws XMLStreamException {
-        if (value != null) {
-            out.writeAttribute(attributeName,
-                               ((FreeColGameObject)value).getId());
-        }
-    }
-
-    // @compat 0.10.x
-    /**
-     * Reads the identifier attribute.
-     *
-     * Normally a simple getAttribute() would be sufficient, but
-     * while we are allowing both the obsolete ID_ATTRIBUTE and the correct
-     * ID_ATTRIBUTE_TAG, this routine is useful.
-     *
-     * When 0.10.x is obsolete, remove this routine and replace its uses
-     * with getAttribute(in, ID_ATTRIBUTE_TAG, (String)null) or equivalent.
-     *
-     * @param in The <code>XMLStreamReader</code> to read from.
-     * @return The identifier found, or null if none present.
-     */
-    public static String readId(XMLStreamReader in) {
-        String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-        if (id == null) id = in.getAttributeValue(null, ID_ATTRIBUTE);
-        return id;
-    }
-
-    /**
-     * Version of readId(XMLStreamReader) that reads from an element.
-     *
-     * To be replaced with just:
-     *   element.getAttribute(FreeColObject.ID_ATTRIBUTE_TAG);
-     *
-     * @param element An element to read the id attribute from.
-     * @return The identifier attribute value.
-     */
-    public static String readId(Element element) {
-        String id = element.getAttribute(ID_ATTRIBUTE_TAG);
-        if (id == null) id = element.getAttribute(ID_ATTRIBUTE);
-        return id;
-    }
-    // end @compat
-
-    /**
-     * Reads the attributes of this object from an XML stream.
-     *
-     * @param in The XML input stream.
-     * @exception XMLStreamException if a problem was encountered
-     *     during parsing.
-     */
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        String newId = readId(in);
-        setId(newId);
-    }
-
-    /**
-     * Reads the children of this object from an XML stream.
-     *
-     * @param in The XML input stream.
-     * @exception XMLStreamException if a problem was encountered
-     *     during parsing.
-     */
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
-        final String tag = in.getLocalName();
-        if (tag == null) {
-            throw new XMLStreamException("Parse error, null opening tag.");
-        }
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            readChild(in);
-        }
-        expectTag(in, tag);
-    }
-
-    /**
-     * Reads a single child object.  Subclasses must override to read
-     * their enclosed elements.  This particular instance of the
-     * routine always throws XMLStreamException because we should
-     * never arrive here.  However it is very useful to always call
-     * super.readChild() when an unexpected tag is encountered, as the
-     * exception thrown here provides some useful debugging context.
-     *
-     * @param in The XML input stream.
-     * @exception XMLStreamException because subclasses should have
-     *     recognized all child elements.
-     */
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        throw new XMLStreamException("In " + getRealXMLElementTagName()
-            + ", unexpected tag: " + currentTag(in));
-    }
-
-    /**
-     * Updates this object from an XML-representation of this object.
-     * Ideally this would be abstract, but as not all FreeColObject-subtypes
-     * need partial updates we provide a non-operating stub here which is
-     * to be overridden where needed.
-     *
-     * @param in The input stream with the XML.
-     * @exception XMLStreamException if a problem was encountered
-     *      during parsing.
-     */
-    public void readFromXMLPartialImpl(XMLStreamReader in) throws XMLStreamException {
-        throw new UnsupportedOperationException("Partial update of unsupported type: "
-            + currentTag(in));
-    }
-
-    /**
-     * Extract the current tag and its attributes from an input stream.
-     * Useful for error messages.
-     *
-     * @param in The XML input stream.
-     */
-    public String currentTag(XMLStreamReader in) {
-        StringBuilder sb = new StringBuilder(in.getLocalName());
-        sb.append(", attributes:");
-        int n = in.getAttributeCount();
-        for (int i = 0; i < n; i++) {
-            sb.append(" ").append(in.getAttributeLocalName(i))
-                .append("=\"").append(in.getAttributeValue(i)).append("\"");
-        }
-        return sb.toString();
-    }
 
     /**
      * Get the actual tag name for this object.
@@ -1665,7 +1673,7 @@ public abstract class FreeColObject {
 
     /**
      * Gets the tag name used to serialize this object, generally the
-     * class name starting with a lower case letter. This method
+     * class name starting with a lower case letter.  This method
      * should be overridden by all subclasses that need to be
      * serialized.
      *

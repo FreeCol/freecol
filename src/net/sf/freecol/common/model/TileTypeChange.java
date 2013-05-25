@@ -134,16 +134,18 @@ public class TileTypeChange implements Comparable<TileTypeChange> {
     public void toXML(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute(FROM_TAG, from.getId());
+        FreeColObject.writeAttribute(out, FROM_TAG, from);
 
-        out.writeAttribute(TO_TAG, to.getId());
+        FreeColObject.writeAttribute(out, TO_TAG, to);
 
         if (production != null) {
             out.writeStartElement(PRODUCTION_TAG);
 
-            out.writeAttribute(GOODS_TYPE_TAG, production.getType().getId());
+            FreeColObject.writeAttribute(out, GOODS_TYPE_TAG,
+                                         production.getType());
 
-            out.writeAttribute(VALUE_TAG, Integer.toString(production.getAmount()));
+            FreeColObject.writeAttribute(out, VALUE_TAG,
+                                         production.getAmount());
 
             out.writeEndElement();
         }
