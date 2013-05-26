@@ -28,11 +28,10 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.util.XMLStream;
 
 import org.xml.sax.SAXException;
 
@@ -285,8 +284,7 @@ final class ReceivingThread extends Thread {
      * @throws SAXException if a problem occured during parsing.
      * @throws XMLStreamException if a problem occured during parsing.
      */
-    private void listen() throws IOException, SAXException,
-                                 XMLStreamException {
+    private void listen() throws IOException, SAXException, XMLStreamException {
         if (!shouldRun()) return;
         in.enable();
 
@@ -294,24 +292,23 @@ final class ReceivingThread extends Thread {
         BufferedInputStream bis = new BufferedInputStream(in, LOOK_AHEAD);
         bis.mark(LOOK_AHEAD);
 
-        XMLInputFactory xif = XMLInputFactory.newInstance();
-        XMLStreamReader xmlIn = xif.createXMLStreamReader(bis);
-        xmlIn.nextTag();
+        XMLStream xs = new XMLStream(bis);
+        xs.nextTag();
+        final String tag = xs.getLocalName();
 
-        String tag = xmlIn.getLocalName();
-        if ("disconnect".equals(tag)) {
+        if (Connection.DISCONNECT_TAG.equals(tag)) {
             askToStop();
-        } else if ("reply".equals(tag)) {
-            String id = xmlIn.getAttributeValue(null, "networkReplyId");
-            NetworkReplyObject nro
-                = waitingThreads.remove(Integer.valueOf(id));
+
+        } else if (Connection.REPLY_TAG.equals(tag)) {
+            int id = xs.getAttribute(Connection.NETWORK_REPLY_ID_TAG, -1);
+            NetworkReplyObject nro = waitingThreads.remove(id);
             if (nro == null) {
-                // while (xmlIn.hasNext()) xmlIn.next();
                 logger.warning("Could not find networkReplyId: " + id);
             } else {
                 bis.reset();
                 nro.setResponse(new DOMMessage(bis));
             }
+        
         } else {
             try {
                 bis.reset();
@@ -321,7 +318,7 @@ final class ReceivingThread extends Thread {
             }
         }
 
-        xmlIn.close();
+        if (xs != null) xs.close();
     }
 
     /**

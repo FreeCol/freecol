@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Locale;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -50,14 +51,21 @@ public class XMLStream implements Closeable {
      * Creates a new <code>XMLStream</code>.
      *
      * @param inputStream The <code>InputStream</code> to create
-     *      a <code>XMLStreamReader</code> for.
+     *     an <code>XMLStreamReader</code> for.
      * @throws IOException if thrown while creating the
-     *      <code>XMLStreamReader</code>.
+     *     <code>XMLStreamReader</code>.
      */
     public XMLStream(InputStream inputStream) throws IOException {
         this.inputStream = inputStream;
-        this.xmlStreamReader = createXMLStreamReader(inputStream);
+        try {
+            XMLInputFactory xif = XMLInputFactory.newInstance();
+            this.xmlStreamReader = xif.createXMLStreamReader(inputStream,
+                                                             "UTF-8");
+        } catch (XMLStreamException e) {
+            throw new IOException(e.getCause());
+        }
     }
+
 
     /**
      * Get the <code>XMLStreamReader</code>.
@@ -75,29 +83,151 @@ public class XMLStream implements Closeable {
      * the underlying stream.
      */
     public void close() {
-        try {
-            xmlStreamReader.close();
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (xmlStreamReader != null) {
+            try {
+                xmlStreamReader.close();
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Error closing XMLStreamReader", e);
+            }
+            xmlStreamReader = null;
         }
 
-        try {
-            inputStream.close();
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Close input stream fail", e);
+        if (inputStream != null) {
+            try {
+                inputStream.close();
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Error closing InputStream", e);
+            }
+            inputStream = null;
         }
     }
 
-    private XMLStreamReader createXMLStreamReader(InputStream inputStream)
-        throws IOException{
-        try {
-            XMLInputFactory xif = XMLInputFactory.newInstance();
-            return xif.createXMLStreamReader(inputStream, "UTF-8");
-        } catch (XMLStreamException e) {
-            throw new IOException("XMLStreamException: " + e.getMessage());
-        } catch (NullPointerException e) {
-            throw new NullPointerException("NullPointerException: "
-                + e.getMessage());
+    /**
+     * Advance the underlying stream to the next tag.
+     *
+     * @exception XMLStreamException if there is a problem with the stream.
+     */
+    public void nextTag() throws XMLStreamException {
+        xmlStreamReader.nextTag();
+    }
+
+    /**
+     * Get the tag name from the underlying stream.
+     *
+     * @return The current tag.
+     */
+    public String getLocalName() {
+        return xmlStreamReader.getLocalName();
+    }
+
+    /**
+     * Is there an attribute present in the stream?
+     *
+     * @param attributeName An attribute name
+     * @return True if the attribute is present.
+     */
+    public boolean hasAttribute(String attributeName) {
+        return xmlStreamReader.getAttributeValue(null, attributeName) != null;
+    }
+
+    /**
+     * Gets a boolean from an attribute in a stream.
+     *
+     * @param attributeName The attribute name.
+     * @param defaultValue The default value.
+     * @return The boolean attribute value, or the default value if none found.
+     */
+    public boolean getAttribute(String attributeName, boolean defaultValue) {
+        final String attrib = xmlStreamReader.getAttributeValue(null,
+                                                                attributeName);
+
+        return (attrib == null) ? defaultValue
+            : Boolean.parseBoolean(attrib);
+    }
+
+    /**
+     * Gets a float from an attribute in a stream.
+     *
+     * @param attributeName The attribute name.
+     * @param defaultValue The default value.
+     * @return The float attribute value, or the default value if none found.
+     */
+    public float getAttribute(String attributeName, float defaultValue) {
+        final String attrib = xmlStreamReader.getAttributeValue(null,
+                                                                attributeName);
+
+        float result = defaultValue;
+        if (attrib != null) {
+            try {
+                result = Float.parseFloat(attrib);
+            } catch (NumberFormatException e) {
+                logger.warning(attributeName + " is not a float: " + attrib);
+            }
         }
+        return result;
+    }
+
+    /**
+     * Gets an int from an attribute in a stream.
+     *
+     * @param attributeName The attribute name.
+     * @param defaultValue The default value.
+     * @return The int attribute value, or the default value if none found.
+     */
+    public int getAttribute(String attributeName, int defaultValue) {
+        final String attrib = xmlStreamReader.getAttributeValue(null,
+                                                                attributeName);
+
+        int result = defaultValue;
+        if (attrib != null) {
+            try {
+                result = Integer.parseInt(attrib);
+            } catch (NumberFormatException e) {
+                logger.warning(attributeName + " is not an integer: " + attrib);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Gets a string from an attribute in a stream.
+     *
+     * @param attributeName The attribute name.
+     * @param defaultValue The default value.
+     * @return The string attribute value, or the default value if none found.
+     */
+    public String getAttribute(String attributeName, String defaultValue) {
+        final String attrib = xmlStreamReader.getAttributeValue(null,
+                                                                attributeName);
+
+        return (attrib == null) ? defaultValue
+            : attrib;
+    }
+
+    /**
+     * Gets an enum from an attribute in a stream.
+     *
+     * @param attributeName The attribute name.
+     * @param returnType The type of the return value.
+     * @param defaultValue The default value.
+     * @return The enum attribute value, or the default value if none found.
+     */
+    public <T extends Enum<T>> T getAttribute(String attributeName,
+                                              Class<T> returnType,
+                                              T defaultValue) {
+        final String attrib = xmlStreamReader.getAttributeValue(null,
+                                                                attributeName);
+
+        T result = defaultValue;
+        if (attrib != null) {
+            try {
+                result = Enum.valueOf(returnType,
+                                      attrib.toUpperCase(Locale.US));
+            } catch (Exception e) {
+                logger.warning(attributeName + " is not a "
+                    + defaultValue.getClass().getName() + ": " + attrib);
+            }
+        }
+        return result;
     }
 }

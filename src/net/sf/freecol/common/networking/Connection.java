@@ -29,10 +29,8 @@ import java.net.SocketAddress;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -41,6 +39,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import net.sf.freecol.common.debug.FreeColDebugger;
+import net.sf.freecol.common.util.XMLStream;
 
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -57,6 +56,11 @@ import org.xml.sax.SAXException;
 public class Connection {
 
     private static final Logger logger = Logger.getLogger(Connection.class.getName());
+
+    public static final String DISCONNECT_TAG = "disconnect";
+    public static final String NETWORK_REPLY_ID_TAG = "networkReplyId";
+    public static final String QUESTION_TAG = "question";
+    public static final String REPLY_TAG = "reply";
 
     private static final int TIMEOUT = 5000;
 
@@ -102,7 +106,7 @@ public class Connection {
      * @param host The host to connect to.
      * @param port The port to connect to.
      * @param messageHandler The MessageHandler to call for each message
-     *            received.
+     *     received.
      * @throws IOException
      */
     public Connection(String host, int port, MessageHandler messageHandler,
@@ -116,7 +120,7 @@ public class Connection {
      *
      * @param socket The socket to the client.
      * @param messageHandler The MessageHandler to call for each message
-     *            received.
+     *     received.
      * @throws IOException
      */
     public Connection(Socket socket, MessageHandler messageHandler,
@@ -203,7 +207,7 @@ public class Connection {
      */
     public void close() {
         try {
-            sendDumping(DOMMessage.createMessage("disconnect"));
+            sendDumping(DOMMessage.createMessage(DISCONNECT_TAG));
             reallyClose();
         } catch (IOException e) {
             logger.log(Level.WARNING, "Error closing " + this.toString(), e);
@@ -325,8 +329,8 @@ public class Connection {
         }
 
         Element question = element.getOwnerDocument()
-            .createElement("question");
-        question.setAttribute("networkReplyId",
+            .createElement(QUESTION_TAG);
+        question.setAttribute(NETWORK_REPLY_ID_TAG,
                               Integer.toString(networkReplyId));
         question.appendChild(element);
 
@@ -394,18 +398,17 @@ public class Connection {
     public void handleAndSendReply(final BufferedInputStream in) 
         throws IOException {
 
-        // Peek at the reply identifier and tag.
-        in.mark(200);
-        final XMLInputFactory xif = XMLInputFactory.newInstance();
+        in.mark(200); // Peek at the reply identifier and tag.
 
+        // Extract the reply id and check if this is a question.
         final String networkReplyId;
         final boolean question;
+        XMLStream xs = null;
         try {
-            final XMLStreamReader xmlIn = xif.createXMLStreamReader(in);
-            xmlIn.nextTag();
-            networkReplyId = xmlIn.getAttributeValue(null, "networkReplyId");
-            question = xmlIn.getLocalName().equals("question");
-            xmlIn.close();
+            xs = new XMLStream(in);
+            xs.nextTag();
+            question = QUESTION_TAG.equals(xs.getLocalName());
+            networkReplyId = xs.getAttribute(NETWORK_REPLY_ID_TAG, (String)null);
         } catch (XMLStreamException xme) {
             logger.log(Level.WARNING, "XML stream failure", xme);
             return;
@@ -419,6 +422,8 @@ public class Connection {
         } catch (SAXException e) {
             logger.log(Level.WARNING, "Unable to read message.", e);
             return;
+        } finally {
+            if (xs != null) xs.close();
         }
 
         // Process the message in its own thread.
@@ -433,13 +438,13 @@ public class Connection {
                             reply = messageHandler.handle(conn,
                                 (Element)element.getFirstChild());
                             if (reply == null) {
-                                reply = DOMMessage.createMessage("reply",
-                                    "networkReplyId", networkReplyId);
+                                reply = DOMMessage.createMessage(REPLY_TAG,
+                                    NETWORK_REPLY_ID_TAG, networkReplyId);
                             } else {
                                 Element header = reply.getOwnerDocument()
-                                    .createElement("reply");
-                                header.setAttribute("networkReplyId",
-                                    networkReplyId);
+                                    .createElement(REPLY_TAG);
+                                header.setAttribute(NETWORK_REPLY_ID_TAG,
+                                                    networkReplyId);
                                 header.appendChild(reply);
                                 reply = header;
                             }

@@ -54,7 +54,6 @@ import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.option.LanguageOption;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
-import net.sf.freecol.common.util.XMLStream;
 import net.sf.freecol.server.FreeColServer;
 
 import org.apache.commons.cli.CommandLine;
@@ -973,15 +972,11 @@ public final class FreeCol {
     private static void startServer() {
         logger.info("Starting stand-alone server.");
         final FreeColServer freeColServer;
-        if (FreeColDirectories.getSavegameFile() != null) {
-            XMLStream xs = null;
+        File saveGame = FreeColDirectories.getSavegameFile();
+        if (saveGame != null) {
             try {
                 final FreeColSavegameFile fis
-                    = new FreeColSavegameFile(FreeColDirectories.getSavegameFile());
-                xs = fis.getXMLStream();
-                final XMLStreamReader in = xs.getXMLStreamReader();
-                in.nextTag();
-
+                    = new FreeColSavegameFile(saveGame);
                 freeColServer = new FreeColServer(fis, (Specification)null,
                                                   serverPort, serverName);
                 if (checkIntegrity) {
@@ -993,13 +988,12 @@ public final class FreeCol {
                 }
             } catch (Exception e) {
                 if (checkIntegrity) {
-                    System.err.println(Messages.message("cli.check-savegame.failure"));
+                    String msg = Messages.message("cli.check-savegame.failure");
+                    System.err.println(msg);
                 }
                 fatal(Messages.message("server.load")
                     + ": " + e.getMessage());
                 return;
-            } finally {
-                if (xs != null) xs.close();
             }
         } else {
             FreeColTcFile tcf = FreeCol.getTCFile();

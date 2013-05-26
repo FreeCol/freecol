@@ -1100,10 +1100,8 @@ public final class FreeColServer {
         XMLStream xs = null;
         try {
             xs = fis.getXMLStream();
-            final XMLStreamReader xsr = xs.getXMLStreamReader();
-            xsr.nextTag();
-
-            v = Integer.parseInt(xsr.getAttributeValue(null, "version"));
+            xs.nextTag();
+            v = xs.getAttribute("version", -1);
         } catch (Exception e) {
             ; // Just fail
         } finally {

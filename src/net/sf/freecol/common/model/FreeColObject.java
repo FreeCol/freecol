@@ -1179,11 +1179,13 @@ public abstract class FreeColObject {
      */
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
         throw new XMLStreamException("In " + getRealXMLElementTagName()
-            + ", unexpected tag: " + currentTag(in));
+            + ", unexpected tag " + in.getLocalName()
+            + ", at: " + currentTag(in));
     }
 
     /**
      * Initialize this object from an XML-representation of this object.
+     *
      * @param element An XML-element that will be used to initialize
      *      this object.
      */
@@ -1213,11 +1215,12 @@ public abstract class FreeColObject {
      * Initialize this object from an XML-representation of this object.
      *
      * @param element An XML-element that will be used to initialize
-     *      this object.
+     *     this object.
      * @param specification The <code>Specification</code> to refer to.
+     * @exception XMLStreamException if there is a problem reading the stream.
      */
     public void readFromXMLElement(Element element,
-        Specification specification) throws XMLStreamException {
+                                   Specification specification) throws XMLStreamException {
         setSpecification(specification);
         XMLInputFactory xif = XMLInputFactory.newInstance();
         try {
