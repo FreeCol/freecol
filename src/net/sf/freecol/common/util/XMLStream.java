@@ -105,10 +105,11 @@ public class XMLStream implements Closeable {
     /**
      * Advance the underlying stream to the next tag.
      *
+     * @return The next tag.
      * @exception XMLStreamException if there is a problem with the stream.
      */
-    public void nextTag() throws XMLStreamException {
-        xmlStreamReader.nextTag();
+    public int nextTag() throws XMLStreamException {
+        return xmlStreamReader.nextTag();
     }
 
     /**
@@ -229,5 +230,16 @@ public class XMLStream implements Closeable {
             }
         }
         return result;
+    }
+
+    /**
+     * Read the identifier attribute.
+     *
+     * @return The identifier attribute.
+     */
+    public String readId() {
+        String id = getAttribute("ID", (String)null);
+        if (id == null) id = getAttribute("id", (String)null);
+        return id;
     }
 }

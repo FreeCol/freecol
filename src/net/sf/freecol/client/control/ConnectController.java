@@ -261,8 +261,6 @@ public final class ConnectController {
      * @return True if the game starts successully.
      */
     public boolean startSavedGame(File file) {
-        final File theFile = file;
-
         freeColClient.setMapEditor(false);
 
         class ErrorJob implements Runnable {
@@ -278,65 +276,35 @@ public final class ConnectController {
             }
         }
 
-        final boolean singlePlayer;
-        final String name;
-        final int port;
+        final boolean defaultSinglePlayer;
+        final boolean defaultPublicServer;
+        final FreeColSavegameFile fis;
         XMLStream xs = null;
         try {
             // Get suggestions for "singlePlayer" and "publicServer"
             // settings from the file
-            final FreeColSavegameFile fis = new FreeColSavegameFile(theFile);
+            fis = new FreeColSavegameFile(file);
             xs = fis.getXMLStream();
-            final XMLStreamReader in = xs.getXMLStreamReader();
-            in.nextTag();
-            String str = FreeColObject.getAttribute(in, "owner", (String)null);
+            xs.nextTag();
+
+            String str = xs.getAttribute(FreeColServer.OWNER_TAG,
+                                         (String)null);
             if (str != null) FreeCol.setName(str);
-            final boolean defaultSinglePlayer
-                = FreeColObject.getAttribute(in, "singleplayer", false);
-            final boolean defaultPublicServer
-                = FreeColObject.getAttribute(in, "publicServer", false);
-            xs.close();
-            xs = null;
 
-            // Reload the client options saved with this game.
-            try {
-                ClientOptions options = freeColClient.getClientOptions();
-                options.updateOptions(fis.getInputStream(FreeColSavegameFile.CLIENT_OPTIONS));
-                options.fixClientOptions();
-            } catch (FileNotFoundException e) {
-                // no client options, we don't care
-            }
+            defaultSinglePlayer
+                = xs.getAttribute(FreeColServer.SINGLE_PLAYER_TAG, false);
+            defaultPublicServer
+                = xs.getAttribute(FreeColServer.PUBLIC_SERVER_TAG, false);
 
-            final int sgo = freeColClient.getClientOptions()
-                .getInteger(ClientOptions.SHOW_SAVEGAME_SETTINGS);
-            boolean show = sgo == ClientOptions.SHOW_SAVEGAME_SETTINGS_ALWAYS
-                || (!defaultSinglePlayer
-                    && sgo == ClientOptions.SHOW_SAVEGAME_SETTINGS_MULTIPLAYER);
-            if (show) {
-                if (!gui.showLoadingSavegameDialog(defaultPublicServer,
-                        defaultSinglePlayer)) return false;
-                LoadingSavegameDialog lsd = gui.getLoadingSavegameDialog();
-                singlePlayer = lsd.isSinglePlayer();
-                name = lsd.getName();
-                port = lsd.getPort();
-            } else {
-                singlePlayer = defaultSinglePlayer;
-                name = null;
-                port = -1;
-            }
         } catch (FileNotFoundException e) {
             SwingUtilities.invokeLater(new ErrorJob("fileNotFound"));
             logger.log(Level.WARNING, "Can not find file: " + file.getName(),
                 e);
             return false;
-        } catch (IOException e) {
-            SwingUtilities.invokeLater(new ErrorJob("server.couldNotStart"));
-            logger.log(Level.WARNING, "Could not start server.", e);
-            return false;
         } catch (XMLStreamException e) {
             logger.log(Level.WARNING, "Error reading game from: "
                 + file.getName(), e);
-            SwingUtilities.invokeLater( new ErrorJob("server.couldNotStart") );
+            SwingUtilities.invokeLater(new ErrorJob("server.couldNotStart") );
             return false;
         } catch (Exception e) {
             SwingUtilities.invokeLater(new ErrorJob("couldNotLoadGame"));
@@ -347,9 +315,44 @@ public final class ConnectController {
             if (xs != null) xs.close();
         }
 
+        // Reload the client options saved with this game.
+        try {
+            ClientOptions options = freeColClient.getClientOptions();
+            options.updateOptions(fis.getInputStream(FreeColSavegameFile.CLIENT_OPTIONS));
+            options.fixClientOptions();
+        } catch (FileNotFoundException e) {
+            ; // Do not care if there are no client options
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "Error getting client option stream.",
+                       ioe);
+        }
+
+        final boolean singlePlayer;
+        final String name;
+        final int port;
+        final int sgo = freeColClient.getClientOptions()
+            .getInteger(ClientOptions.SHOW_SAVEGAME_SETTINGS);
+        boolean show = sgo == ClientOptions.SHOW_SAVEGAME_SETTINGS_ALWAYS
+            || (!defaultSinglePlayer
+                && sgo == ClientOptions.SHOW_SAVEGAME_SETTINGS_MULTIPLAYER);
+        if (show) {
+            if (!gui.showLoadingSavegameDialog(defaultPublicServer,
+                                               defaultSinglePlayer))
+                return false;
+            LoadingSavegameDialog lsd = gui.getLoadingSavegameDialog();
+            singlePlayer = lsd.isSinglePlayer();
+            name = lsd.getName();
+            port = lsd.getPort();
+        } else {
+            singlePlayer = defaultSinglePlayer;
+            name = null;
+            port = -1;
+        }
+
         if (!unblockServer(port)) return false;
         gui.showStatusPanel(Messages.message("status.loadingGame"));
 
+        final File theFile = file;
         Runnable loadGameJob = new Runnable() {
             public void run() {
                 FreeColServer freeColServer = null;
@@ -360,10 +363,11 @@ public final class ConnectController {
                     freeColServer = new FreeColServer(saveGame,
                         (Specification)null, port, name);
                     freeColClient.setFreeColServer(freeColServer);
-                    final int port = freeColServer.getPort();
+                    // Server might have bounced to another port.
+                    final int serverPort = freeColServer.getPort();
                     freeColClient.setSinglePlayer(singlePlayer);
                     freeColClient.getInGameController().setGameConnected();
-                    if (login("127.0.0.1", port)) {
+                    if (login("127.0.0.1", serverPort)) {
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 ResourceManager.setScenarioMapping(saveGame.getResourceMapping());
