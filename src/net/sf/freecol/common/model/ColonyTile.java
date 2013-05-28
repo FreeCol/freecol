@@ -530,8 +530,8 @@ public class ColonyTile extends WorkLocation implements Ownable {
      * {@inheritDoc}
      */
     @Override
-    protected void toXMLPartialImpl(XMLStreamWriter out,
-                                    String[] fields) throws XMLStreamException {
+    protected void toXMLPartial(XMLStreamWriter out,
+                                String[] fields) throws XMLStreamException {
         toXMLPartialByClass(out, ColonyTile.class, fields);
     }
 
@@ -539,7 +539,7 @@ public class ColonyTile extends WorkLocation implements Ownable {
      * {@inheritDoc}
      */
     @Override
-    public void readFromXMLPartialImpl(XMLStreamReader in) throws XMLStreamException {
+    public void readFromXMLPartial(XMLStreamReader in) throws XMLStreamException {
         readFromXMLPartialByClass(in, ColonyTile.class);
     }
 

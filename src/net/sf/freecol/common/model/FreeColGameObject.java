@@ -36,7 +36,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.common.util.Introspector;
 import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Element;
@@ -482,9 +481,9 @@ abstract public class FreeColGameObject extends FreeColObject {
      * @exception XMLStreamException if there are any problems writing
      *     to the stream.
      */
-    public void toXML(XMLStreamWriter out, String tag, Player player,
-                      boolean showAll,
-                      boolean toSavedGame) throws XMLStreamException {
+    protected void toXML(XMLStreamWriter out, String tag, Player player,
+                         boolean showAll,
+                         boolean toSavedGame) throws XMLStreamException {
         out.writeStartElement(tag);
 
         writeAttributes(out, player, showAll, toSavedGame);
@@ -533,86 +532,6 @@ abstract public class FreeColGameObject extends FreeColObject {
                                  boolean showAll,
                                  boolean toSavedGame) throws XMLStreamException {
         super.writeChildren(out);
-    }
-
-    /**
-     * Common routine for FreeColGameObject descendants to write a
-     * partial XML-representation of this object to the given stream,
-     * including only the mandatory and specified fields.
-     *
-     * All attributes are considered visible as this is
-     * server-to-owner-client functionality, but it depends ultimately
-     * on the presence of a getFieldName() method that returns a type
-     * compatible with String.valueOf.
-     *
-     * @param out The output <code>XMLStreamWriter</code>.
-     * @param theClass The real class of this object, required by the
-     *     <code>Introspector</code>.
-     * @param fields The fields to write.
-     * @exception XMLStreamException if there are problems writing the stream.
-     */
-    protected void toXMLPartialByClass(XMLStreamWriter out, Class<?> theClass, 
-                                       String[] fields) throws XMLStreamException {
-        try {
-            out.writeStartElement(getRealXMLElementTagName());
-
-            writeAttribute(out, ID_ATTRIBUTE_TAG, getId());
-
-            writeAttribute(out, PARTIAL_ATTRIBUTE_TAG, true);
-
-            for (int i = 0; i < fields.length; i++) {
-                Introspector intro = new Introspector(theClass, fields[i]);
-                writeAttribute(out, fields[i], intro.getter(this));
-            }
-
-            out.writeEndElement();
-
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Partial write failed for "
-                + theClass.getName(), e);
-        }
-    }
-
-    /**
-     * Common routine for FreeColGameObject descendants to update an
-     * object from a partial XML-representation which includes only
-     * mandatory and server-supplied fields.
-     *
-     * All attributes are considered visible as this is
-     * server-to-owner-client functionality.  It depends ultimately on
-     * the presence of a setFieldName() method that takes a parameter
-     * type T where T.valueOf(String) exists.
-     *
-     * @param in The input <code>XMLStreamReader</code>.
-     * @param theClass The real class of this object, required by the
-     *     <code>Introspector</code>.
-     * @exception XMLStreamException If there are problems reading the stream.
-     */
-    public void readFromXMLPartialByClass(XMLStreamReader in,
-                                          Class<?> theClass) throws XMLStreamException {
-        int n = in.getAttributeCount();
-
-        setId(readId(in));
-
-        for (int i = 0; i < n; i++) {
-            String name = in.getAttributeLocalName(i);
-
-            if (name.equals(ID_ATTRIBUTE_TAG)
-                // @compat 0.10.x
-                || name.equals(ID_ATTRIBUTE)
-                // end @compat
-                || name.equals(PARTIAL_ATTRIBUTE_TAG)) continue;
-
-            try {
-                Introspector intro = new Introspector(theClass, name);
-                intro.setter(this, in.getAttributeValue(i));
-
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Could not set field " + name, e);
-            }
-        }
-
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT);
     }
 
     /**

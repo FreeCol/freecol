@@ -57,6 +57,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import net.sf.freecol.common.util.Introspector;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
@@ -825,7 +827,7 @@ public abstract class FreeColObject {
             if (fields == null) {
                 toXML(xsw, player, showAll, toSavedGame);
             } else {
-                toXMLPartialImpl(xsw, fields);
+                toXMLPartial(xsw, fields);
             }
             xsw.close();
 
@@ -988,9 +990,47 @@ public abstract class FreeColObject {
      * @exception XMLStreamException if there are any problems writing
      *      to the stream.
      */
-    protected void toXMLPartialImpl(XMLStreamWriter out,
-                                    String[] fields) throws XMLStreamException {
+    protected void toXMLPartial(XMLStreamWriter out,
+                                String[] fields) throws XMLStreamException {
         throw new UnsupportedOperationException("Partial update of unsupported type.");
+    }
+
+    /**
+     * Common routine for FreeColObject descendants to write a partial
+     * XML-representation of this object to the given stream,
+     * including only the mandatory and specified fields.
+     *
+     * All attributes are considered visible as this is
+     * server-to-owner-client functionality, but it depends ultimately
+     * on the presence of a getFieldName() method that returns a type
+     * compatible with String.valueOf.
+     *
+     * @param out The output <code>XMLStreamWriter</code>.
+     * @param theClass The real class of this object, required by the
+     *     <code>Introspector</code>.
+     * @param fields The fields to write.
+     * @exception XMLStreamException if there are problems writing the stream.
+     */
+    protected void toXMLPartialByClass(XMLStreamWriter out, Class<?> theClass, 
+                                       String[] fields) throws XMLStreamException {
+        try {
+            out.writeStartElement(getRealXMLElementTagName());
+
+            writeAttribute(out, ID_ATTRIBUTE_TAG, getId());
+
+            writeAttribute(out, PARTIAL_ATTRIBUTE_TAG, true);
+
+            for (int i = 0; i < fields.length; i++) {
+                Introspector intro = new Introspector(theClass, fields[i]);
+                writeAttribute(out, fields[i], intro.getter(this));
+            }
+
+            out.writeEndElement();
+
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Partial write failed for "
+                + theClass.getName(), e);
+        }
     }
 
     /**
@@ -1128,7 +1168,7 @@ public abstract class FreeColObject {
             || hasAttribute(in, OLD_PARTIAL_ATTRIBUTE_TAG)
             // end @compat
             ) {
-            readFromXMLPartialImpl(in);
+            readFromXMLPartial(in);
         } else {
             readAttributes(in);
             readChildren(in);
@@ -1381,11 +1421,52 @@ public abstract class FreeColObject {
      * @exception XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    public void readFromXMLPartialImpl(XMLStreamReader in) throws XMLStreamException {
+    public void readFromXMLPartial(XMLStreamReader in) throws XMLStreamException {
         throw new XMLStreamException("Partial update of unsupported type: "
             + currentTag(in));
     }
 
+    /**
+     * Common routine for FreeColObject descendants to update an
+     * object from a partial XML-representation which includes only
+     * mandatory and server-supplied fields.
+     *
+     * All attributes are considered visible as this is
+     * server-to-owner-client functionality.  It depends ultimately on
+     * the presence of a setFieldName() method that takes a parameter
+     * type T where T.valueOf(String) exists.
+     *
+     * @param in The input <code>XMLStreamReader</code>.
+     * @param theClass The real class of this object, required by the
+     *     <code>Introspector</code>.
+     * @exception XMLStreamException If there are problems reading the stream.
+     */
+    protected void readFromXMLPartialByClass(XMLStreamReader in,
+                                             Class<?> theClass) throws XMLStreamException {
+        int n = in.getAttributeCount();
+
+        setId(readId(in));
+
+        for (int i = 0; i < n; i++) {
+            String name = in.getAttributeLocalName(i);
+
+            if (name.equals(ID_ATTRIBUTE_TAG)
+                // @compat 0.10.x
+                || name.equals(ID_ATTRIBUTE)
+                // end @compat
+                || name.equals(PARTIAL_ATTRIBUTE_TAG)) continue;
+
+            try {
+                Introspector intro = new Introspector(theClass, name);
+                intro.setter(this, in.getAttributeValue(i));
+
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Could not set field " + name, e);
+            }
+        }
+
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT);
+    }
 
     /**
      * Extract the current tag and its attributes from an input stream.
@@ -1669,7 +1750,7 @@ public abstract class FreeColObject {
         try {
             Method m = getClass().getMethod("getXMLElementTagName",
                                             (Class[])null);
-            tagName = (String) m.invoke((Object)null, (Object[])null);
+            tagName = (String)m.invoke((Object)null, (Object[])null);
         } catch (Exception e) {}
         return tagName;
     }

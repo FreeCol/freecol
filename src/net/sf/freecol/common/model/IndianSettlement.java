@@ -1366,8 +1366,8 @@ public class IndianSettlement extends Settlement {
      * {@inheritDoc}
      */
     @Override
-    protected void toXMLPartialImpl(XMLStreamWriter out,
-                                    String[] fields) throws XMLStreamException {
+    protected void toXMLPartial(XMLStreamWriter out,
+                                String[] fields) throws XMLStreamException {
         toXMLPartialByClass(out, getClass(), fields);
     }
 
@@ -1375,7 +1375,7 @@ public class IndianSettlement extends Settlement {
      * {@inheritDoc}
      */
     @Override
-    public void readFromXMLPartialImpl(XMLStreamReader in) throws XMLStreamException {
+    public void readFromXMLPartial(XMLStreamReader in) throws XMLStreamException {
         readFromXMLPartialByClass(in, getClass());
     }
 
