@@ -32,7 +32,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -52,6 +51,7 @@ import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.RangeOption;
 import net.sf.freecol.common.option.StringOption;
 import net.sf.freecol.common.option.UnitListOption;
+import net.sf.freecol.common.util.XMLStream;
 
 
 /**
@@ -346,15 +346,17 @@ public final class Specification {
      * @param in The <code>InputStream</code> to read from.
      */
     private void load(InputStream in) {
+        XMLStream xr = null;
         try {
-            XMLStreamReader xsr
-                = XMLInputFactory.newInstance().createXMLStreamReader(in);
-            xsr.nextTag();
-            load(xsr);
-        } catch (XMLStreamException xse) {
-            logger.log(Level.WARNING, "Load stream exception", xse);
+            xr = new XMLStream(in);
+            xr.nextTag();
+            load(xr.getXMLStreamReader());
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Load stream exception", e);
             throw new RuntimeException("Error parsing specification: "
-                + xse.getMessage());
+                + e.getMessage());
+        } finally {
+            if (xr != null) xr.close();
         }
     }
 

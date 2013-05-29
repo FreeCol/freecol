@@ -32,7 +32,6 @@ import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Transformer;
@@ -434,7 +433,6 @@ public class DOMMessage {
      * @return The <code>String</code> representation of an element.
      */
     public static String elementToString(Element element) {
-        XMLInputFactory xif = XMLInputFactory.newInstance();
         try {
             TransformerFactory factory = TransformerFactory.newInstance();
             Transformer xt = factory.newTransformer();

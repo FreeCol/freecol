@@ -23,12 +23,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.util.XMLStream;
 
 
 /**
@@ -85,21 +85,18 @@ public class FreeColModFile extends FreeColDataFile {
      * @exception IOException if thrown while reading the "mod.xml" file.
      */
     protected void readModDescriptor() throws IOException {
-        XMLInputFactory xif = XMLInputFactory.newInstance();
-        XMLStreamReader in = null;
+        XMLStream xr = null;
         try {
-            in = xif.createXMLStreamReader(getModDescriptorInputStream());
-            in.nextTag();
-            id = FreeColObject.readId(in);
-            parent = FreeColObject.getAttribute(in, "parent", (String)null);
+            xr = new XMLStream(getModDescriptorInputStream());
+            xr.nextTag();
+            id = xr.readId();
+            parent = xr.getAttribute("parent", (String)null);
         } catch (XMLStreamException e) {
             final IOException e2 = new IOException("XMLStreamException.");
             e2.initCause(e);
             throw e2;
         } finally {
-            try {
-                if (in != null) in.close();
-            } catch (Exception e) {}
+            if (xr != null) xr.close();
         }
     }
 

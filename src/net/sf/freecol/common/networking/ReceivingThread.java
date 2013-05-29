@@ -292,15 +292,15 @@ final class ReceivingThread extends Thread {
         BufferedInputStream bis = new BufferedInputStream(in, LOOK_AHEAD);
         bis.mark(LOOK_AHEAD);
 
-        XMLStream xs = new XMLStream(bis);
-        xs.nextTag();
-        final String tag = xs.getLocalName();
+        XMLStream xr = new XMLStream(bis);
+        xr.nextTag();
+        final String tag = xr.getLocalName();
 
         if (Connection.DISCONNECT_TAG.equals(tag)) {
             askToStop();
 
         } else if (Connection.REPLY_TAG.equals(tag)) {
-            int id = xs.getAttribute(Connection.NETWORK_REPLY_ID_TAG, -1);
+            int id = xr.getAttribute(Connection.NETWORK_REPLY_ID_TAG, -1);
             NetworkReplyObject nro = waitingThreads.remove(id);
             if (nro == null) {
                 logger.warning("Could not find networkReplyId: " + id);
@@ -318,7 +318,7 @@ final class ReceivingThread extends Thread {
             }
         }
 
-        if (xs != null) xs.close();
+        if (xr != null) xr.close();
     }
 
     /**

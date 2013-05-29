@@ -403,12 +403,13 @@ public class Connection {
         // Extract the reply id and check if this is a question.
         final String networkReplyId;
         final boolean question;
-        XMLStream xs = null;
+        XMLStream xr = null;
         try {
-            xs = new XMLStream(in);
-            xs.nextTag();
-            question = QUESTION_TAG.equals(xs.getLocalName());
-            networkReplyId = xs.getAttribute(NETWORK_REPLY_ID_TAG, (String)null);
+            xr = new XMLStream(in);
+            xr.nextTag();
+            question = QUESTION_TAG.equals(xr.getLocalName());
+            networkReplyId = xr.getAttribute(NETWORK_REPLY_ID_TAG,
+                                             (String)null);
         } catch (XMLStreamException xme) {
             logger.log(Level.WARNING, "XML stream failure", xme);
             return;
@@ -423,7 +424,7 @@ public class Connection {
             logger.log(Level.WARNING, "Unable to read message.", e);
             return;
         } finally {
-            if (xs != null) xs.close();
+            if (xr != null) xr.close(); // Will close in
         }
 
         // Process the message in its own thread.

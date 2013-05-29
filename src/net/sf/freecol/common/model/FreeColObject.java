@@ -45,7 +45,6 @@ import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -58,6 +57,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import net.sf.freecol.common.util.Introspector;
+import net.sf.freecol.common.util.XMLStream;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -710,10 +710,6 @@ public abstract class FreeColObject {
      */
     public static <T extends FreeColObject> T unserialize(String xml,
         Game game, Class<T> returnClass) throws XMLStreamException {
-        XMLInputFactory xif = XMLInputFactory.newInstance();
-        XMLStreamReader in = xif.createXMLStreamReader(new StringReader(xml));
-        in.nextTag();
-
         T ret = null;
         try {
             Constructor<T> c = returnClass.getConstructor(Game.class,
@@ -726,7 +722,15 @@ public abstract class FreeColObject {
             logger.log(Level.WARNING, "Failed to instantiate "
                 + returnClass.getName(), e);
         }
-        if (ret != null) ret.readFromXML(in);
+        if (ret != null) {
+            try {
+                XMLStream xr = new XMLStream(new StringReader(xml));
+                xr.nextTag();
+                ret.readFromXML(xr.getXMLStreamReader());
+            } catch (IOException ioe) {
+                logger.log(Level.WARNING, "Exception creating XMLStream.", ioe);
+            }
+        }
         return ret;
     }
 
@@ -1230,24 +1234,27 @@ public abstract class FreeColObject {
      *      this object.
      */
     public void readFromXMLElement(Element element) {
-        XMLInputFactory xif = XMLInputFactory.newInstance();
+        XMLStream xr = null;
         try {
-            try {
-                TransformerFactory factory = TransformerFactory.newInstance();
-                Transformer xmlTransformer = factory.newTransformer();
-                StringWriter stringWriter = new StringWriter();
-                xmlTransformer.transform(new DOMSource(element), new StreamResult(stringWriter));
-                String xml = stringWriter.toString();
-                XMLStreamReader xsr = xif.createXMLStreamReader(new StringReader(xml));
-                xsr.nextTag();
-                readFromXML(xsr);
-            } catch (TransformerException e) {
-                logger.log(Level.WARNING, "TransformerException", e);
-                throw new IllegalStateException("TransformerException");
-            }
-        } catch (XMLStreamException e) {
-            logger.log(Level.WARNING, "XMLStreamException", e);
+            TransformerFactory factory = TransformerFactory.newInstance();
+            Transformer xmlTransformer = factory.newTransformer();
+            StringWriter stringWriter = new StringWriter();
+            xmlTransformer.transform(new DOMSource(element), new StreamResult(stringWriter));
+            String xml = stringWriter.toString();
+            xr = new XMLStream(new StringReader(xml));
+            xr.nextTag();
+            readFromXML(xr.getXMLStreamReader());
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "IOException", ioe);
+            throw new IllegalStateException("IOException");
+        } catch (TransformerException te) {
+            logger.log(Level.WARNING, "TransformerException", te);
+            throw new IllegalStateException("TransformerException");
+        } catch (XMLStreamException xe) {
+            logger.log(Level.WARNING, "XMLStreamException", xe);
             throw new IllegalStateException("XMLStreamException");
+        } finally {
+            if (xr != null) xr.close();
         }
     }
 
@@ -1262,7 +1269,7 @@ public abstract class FreeColObject {
     public void readFromXMLElement(Element element,
                                    Specification specification) throws XMLStreamException {
         setSpecification(specification);
-        XMLInputFactory xif = XMLInputFactory.newInstance();
+        XMLStream xr = null;
         try {
             TransformerFactory factory = TransformerFactory.newInstance();
             Transformer xmlTransformer = factory.newTransformer();
@@ -1270,13 +1277,17 @@ public abstract class FreeColObject {
             xmlTransformer.transform(new DOMSource(element),
                                      new StreamResult(stringWriter));
             String xml = stringWriter.toString();
-            XMLStreamReader xsr
-                = xif.createXMLStreamReader(new StringReader(xml));
-            xsr.nextTag();
-            readFromXML(xsr);
-        } catch (TransformerException e) {
-            logger.log(Level.WARNING, "TransformerException", e);
+            xr = new XMLStream(new StringReader(xml));
+            xr.nextTag();
+            readFromXML(xr.getXMLStreamReader());
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "Error making XMLStream", ioe);
             throw new IllegalStateException("TransformerException");
+        } catch (TransformerException tfe) {
+            logger.log(Level.WARNING, "TransformerException", tfe);
+            throw new IllegalStateException("TransformerException");
+        } finally {
+            if (xr != null) xr.close();
         }
     }
 

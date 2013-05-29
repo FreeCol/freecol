@@ -35,7 +35,6 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.filechooser.FileFilter;
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
 import net.miginfocom.swing.MigLayout;
@@ -46,6 +45,7 @@ import net.sf.freecol.client.gui.option.OptionGroupUI;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.common.util.XMLStream;
 
 
 /**
@@ -249,20 +249,20 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
      * @param file a <code>File</code> value
      */
     protected void load(File file) {
+        XMLStream xr = null;
         try {
-            FileInputStream in = new FileInputStream(file);
-            XMLStreamReader xsr = XMLInputFactory.newInstance().createXMLStreamReader(in);
-            xsr.nextTag();
+            xr = new XMLStream(new FileInputStream(file));
+            xr.nextTag();
             // TODO: read into group rather than specification
             OptionGroup group = new OptionGroup(getSpecification());
-            group.readFromXML(xsr);
+            group.readFromXML(xr.getXMLStreamReader());
             getSpecification().getOptionGroup(getOptionGroupId()).setValue(group);
-            in.close();
             logger.info("Loaded custom options from file " + file.getPath());
-        } catch(Exception e) {
-            e.printStackTrace();
-            logger.warning("Failed to load OptionGroup " + getOptionGroupId()
-                           + " from " + file.getName() + ": " + e.toString());
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Failed to load OptionGroup "
+                + getOptionGroupId() + " from " + file.getName(), e);
+        } finally {
+            if (xr != null) xr.close();
         }
     }
 

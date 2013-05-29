@@ -45,7 +45,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -900,37 +899,37 @@ public final class FreeColServer {
         logger.info("Found savegame version " + savegameVersion);
 
         List<String> serverStrings = null;
-        XMLStream xs = null;
+        XMLStream xr = null;
         ServerGame game = null;
         try {
             String active = null;
-            xs = fis.getXMLStream();
-            xs.nextTag();
+            xr = fis.getXMLStream();
+            xr.nextTag();
 
             if (server != null) {
-                server.setSinglePlayer(xs.getAttribute(SINGLE_PLAYER_TAG,
+                server.setSinglePlayer(xr.getAttribute(SINGLE_PLAYER_TAG,
                                                        true));
 
-                server.setPublicServer(xs.getAttribute(PUBLIC_SERVER_TAG,
+                server.setPublicServer(xr.getAttribute(PUBLIC_SERVER_TAG,
                                                        false));
 
-                String r = xs.getAttribute(RANDOM_STATE_TAG, (String)null);
+                String r = xr.getAttribute(RANDOM_STATE_TAG, (String)null);
                 server.setServerRandom(Utils.restoreRandomState(r));
                     
-                FreeColDebugger.setDebugModes(xs.getAttribute(DEBUG_TAG,
+                FreeColDebugger.setDebugModes(xr.getAttribute(DEBUG_TAG,
                                                               (String)null));
 
-                active = xs.getAttribute(ACTIVE_UNIT_TAG, (String)null);
+                active = xr.getAttribute(ACTIVE_UNIT_TAG, (String)null);
             }
 
-            while (xs.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                final String tag = xs.getLocalName();
+            while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                final String tag = xr.getLocalName();
                 if (SERVER_OBJECTS_TAG.equals(tag)) {
                     serverStrings = new ArrayList<String>();
-                    while (xs.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        serverStrings.add(xs.getLocalName());
-                        serverStrings.add(xs.readId());
-                        xs.nextTag();
+                    while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                        serverStrings.add(xr.getLocalName());
+                        serverStrings.add(xr.readId());
+                        xr.nextTag();
                     }
                     // @compat 0.9.x
                     if (savegameVersion < 11) {
@@ -949,7 +948,7 @@ public final class FreeColServer {
                     }
                     // @end compatibility code
                     // Read the game
-                    game = new ServerGame(null, xs.getXMLStreamReader(),
+                    game = new ServerGame(null, xr.getXMLStreamReader(),
                                           serverStrings, specification);
                     game.setCurrentPlayer(null);
                     if (server != null) server.setGame(game);
@@ -964,7 +963,7 @@ public final class FreeColServer {
                 } else if (AIMain.getXMLElementTagName().equals(tag)) {
                     if (server == null) break;
                     server.setAIMain(new AIMain(server,
-                                                xs.getXMLStreamReader()));
+                                                xr.getXMLStreamReader()));
 
                 } else {
                     throw new XMLStreamException("Unknown tag"
@@ -978,7 +977,7 @@ public final class FreeColServer {
                 server.setActiveUnit(u);
             }
         } finally {
-            if (xs != null) xs.close();
+            if (xr != null) xr.close();
         }
         return game;
     }
@@ -1110,15 +1109,15 @@ public final class FreeColServer {
      * @return The saved game version.
      */
     private static int getSavegameVersion(final FreeColSavegameFile fis) {
-        XMLStream xs = null;
+        XMLStream xr = null;
         try {
-            xs = fis.getXMLStream();
-            xs.nextTag();
-            return xs.getAttribute(VERSION_TAG, -1);
+            xr = fis.getXMLStream();
+            xr.nextTag();
+            return xr.getAttribute(VERSION_TAG, -1);
         } catch (Exception e) {
             ; // Just fail
         } finally {
-            if (xs != null) xs.close();
+            if (xr != null) xr.close();
         }
         return -1;
     }
@@ -1600,22 +1599,22 @@ public final class FreeColServer {
         highScores = new ArrayList<HighScore>();
         File hsf = FreeColDirectories.getHighScoreFile();
         if (!hsf.exists()) return;
-        XMLStream xs = null;
+        XMLStream xr = null;
         try {
-            xs = new XMLStream(new FileInputStream(hsf));
-            xs.nextTag();
+            xr = new XMLStream(new FileInputStream(hsf));
+            xr.nextTag();
 
-            while (xs.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                final String tag = xs.getLocalName();
+            while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                final String tag = xr.getLocalName();
                 if (HighScore.getXMLElementTagName().equals(tag)) {
-                    highScores.add(new HighScore(xs.getXMLStreamReader()));
+                    highScores.add(new HighScore(xr.getXMLStreamReader()));
                 }
             }
 
         } catch (Exception e) { // Do not crash on high score fail.
             logger.log(Level.WARNING, "Error loading high scores.", e);
         } finally {
-            if (xs != null) xs.close();
+            if (xr != null) xr.close();
         }
         Collections.sort(highScores, highScoreComparator);
     }

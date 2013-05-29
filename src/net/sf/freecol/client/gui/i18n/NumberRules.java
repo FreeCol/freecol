@@ -26,12 +26,12 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.client.gui.i18n.Number.Category;
+import net.sf.freecol.common.util.XMLStream;
 
 
 /**
@@ -110,13 +110,15 @@ public class NumberRules {
      * @param in an <code>InputStream</code> value
      */
     public static void load(InputStream in) {
+        XMLStream xr = null;
         try {
-            XMLStreamReader xsr = XMLInputFactory.newInstance()
-                .createXMLStreamReader(in);
-            readFromXML(xsr);
+            xr = new XMLStream(in);
+            readFromXML(xr.getXMLStreamReader());
         } catch (Exception e) {
             logger.log(Level.WARNING, "Load parse", e);
             throw new RuntimeException("Error parsing number rules.");
+        } finally {
+            if (xr != null) xr.close();
         }
     }
 

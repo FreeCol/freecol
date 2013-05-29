@@ -279,22 +279,22 @@ public final class ConnectController {
         final boolean defaultSinglePlayer;
         final boolean defaultPublicServer;
         final FreeColSavegameFile fis;
-        XMLStream xs = null;
+        XMLStream xr = null;
         try {
             // Get suggestions for "singlePlayer" and "publicServer"
             // settings from the file
             fis = new FreeColSavegameFile(file);
-            xs = fis.getXMLStream();
-            xs.nextTag();
+            xr = fis.getXMLStream();
+            xr.nextTag();
 
-            String str = xs.getAttribute(FreeColServer.OWNER_TAG,
+            String str = xr.getAttribute(FreeColServer.OWNER_TAG,
                                          (String)null);
             if (str != null) FreeCol.setName(str);
 
             defaultSinglePlayer
-                = xs.getAttribute(FreeColServer.SINGLE_PLAYER_TAG, false);
+                = xr.getAttribute(FreeColServer.SINGLE_PLAYER_TAG, false);
             defaultPublicServer
-                = xs.getAttribute(FreeColServer.PUBLIC_SERVER_TAG, false);
+                = xr.getAttribute(FreeColServer.PUBLIC_SERVER_TAG, false);
 
         } catch (FileNotFoundException e) {
             SwingUtilities.invokeLater(new ErrorJob("fileNotFound"));
@@ -312,7 +312,7 @@ public final class ConnectController {
                 + file.getName(), e);
             return false;
         } finally {
-            if (xs != null) xs.close();
+            if (xr != null) xr.close();
         }
 
         // Reload the client options saved with this game.

@@ -22,6 +22,7 @@ package net.sf.freecol.common.util;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Locale;
@@ -44,6 +45,7 @@ public class XMLStream implements Closeable {
     private static final Logger logger = Logger.getLogger(XMLStream.class.getName());
 
     private InputStream inputStream;
+    private Reader reader;
     private XMLStreamReader xmlStreamReader;
 
 
@@ -57,10 +59,30 @@ public class XMLStream implements Closeable {
      */
     public XMLStream(InputStream inputStream) throws IOException {
         this.inputStream = inputStream;
+        this.reader = null;
         try {
             XMLInputFactory xif = XMLInputFactory.newInstance();
             this.xmlStreamReader = xif.createXMLStreamReader(inputStream,
                                                              "UTF-8");
+        } catch (XMLStreamException e) {
+            throw new IOException(e.getCause());
+        }
+    }
+
+    /**
+     * Creates a new <code>XMLStream</code>.
+     *
+     * @param reader A <code>Reader</code> to create
+     *     an <code>XMLStreamReader</code> for.
+     * @throws IOException if thrown while creating the
+     *     <code>XMLStreamReader</code>.
+     */
+    public XMLStream(Reader reader) throws IOException {
+        this.inputStream = null;
+        this.reader = reader;
+        try {
+            XMLInputFactory xif = XMLInputFactory.newInstance();
+            this.xmlStreamReader = xif.createXMLStreamReader(reader);
         } catch (XMLStreamException e) {
             throw new IOException(e.getCause());
         }

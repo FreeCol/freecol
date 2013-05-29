@@ -48,8 +48,8 @@ import net.sf.freecol.common.option.ListOption;
 import net.sf.freecol.common.option.ModListOption;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.SelectOption;
+import net.sf.freecol.common.util.XMLStream;
 
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
 
@@ -571,19 +571,15 @@ public class ClientOptions extends OptionGroup {
      */
     public void loadOptions(InputStream in) {
         if (in == null) return;
+        XMLStream xr = null;
         try {
-            XMLStreamReader xsr = XMLInputFactory.newInstance()
-                .createXMLStreamReader(in, "UTF-8");
-            xsr.nextTag();
-            readFromXML(xsr);
+            xr = new XMLStream(in);
+            xr.nextTag();
+            readFromXML(xr.getXMLStreamReader());
         } catch (Exception e) {
             logger.log(Level.WARNING, "Exception when loading options.", e);
         } finally {
-            try {
-                in.close();
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Exception when closing stream.", e);
-            }
+            if (xr != null) xr.close();
         }
     }
 
@@ -607,19 +603,15 @@ public class ClientOptions extends OptionGroup {
      * @param in The <code>InputStream</code> to read the options from.
      */
     public void updateOptions(InputStream in) {
+        XMLStream xr = null;
         try {
-            XMLStreamReader xsr = XMLInputFactory.newInstance()
-                .createXMLStreamReader(in, "UTF-8");
-            xsr.nextTag();
-            readFromXML(xsr);
+            xr = new XMLStream(in);
+            xr.nextTag();
+            readFromXML(xr.getXMLStreamReader());
         } catch (Exception e) {
             logger.log(Level.WARNING, "Exception when loading options.", e);
         } finally {
-            try {
-                if (in != null) in.close();
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Exception when closing stream.", e);
-            }
+            if (xr != null) xr.close();
         }
     }
 
@@ -631,12 +623,11 @@ public class ClientOptions extends OptionGroup {
     public static String getLanguageOption() {
         File options = FreeColDirectories.getClientOptionsFile();
         if (options.canRead()) {
-            XMLStreamReader in = null;
+            XMLStream xr = null;
             try {
-                in = XMLInputFactory.newInstance()
-                    .createXMLStreamReader(new FileInputStream(options),
-                                           "UTF-8");
-                in.nextTag();
+                xr = new XMLStream(new FileInputStream(options));
+                xr.nextTag();
+                XMLStreamReader in = xr.getXMLStreamReader();
                 /**
                  * The following code was contributed by armcode to fix
                  * bug #[ 2045521 ] "Exception in Freecol.log on starting
@@ -658,9 +649,7 @@ public class ClientOptions extends OptionGroup {
             } catch (Exception e) {
                 logger.log(Level.WARNING, "Failure getting language.", e);
             } finally {
-                try {
-                    if (in != null) in.close();
-                } catch (Exception e) {}
+                if (xr != null) xr.close();
             }
         }
         return null;

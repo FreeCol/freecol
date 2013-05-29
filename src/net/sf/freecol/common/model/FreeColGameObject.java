@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -336,24 +335,6 @@ abstract public class FreeColGameObject extends FreeColObject {
         }
         return null;
     }
-
-
-
-    /**
-     * Gets a <code>FreeColGameObject</code> value or the default value.
-     *
-     * @param in The <code>XMLStreamReader</code> to read from.
-     * @param attributeName The attribute name.
-     * @param returnType The <code>FreeColObject</code> type to expect.
-     * @param defaultValue The default value.
-     * @return The <code>FreeColGameObject</code> found, or the
-     *     default value if not.
-    public <T extends FreeColGameObject> T getAttribute(XMLStreamReader in,
-        String attributeName, Class<T> returnType, T defaultValue) {
-        return getAttribute(in, attributeName, getGame(),
-                            returnType, defaultValue);
-    }
-     */
 
     /**
      * FreeColGameObjects are equal if the two fcgos are in the same
