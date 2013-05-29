@@ -56,18 +56,11 @@ public class Game extends FreeColGameObject {
 
     private static final Logger logger = Logger.getLogger(Game.class.getName());
 
-    /** The Specification this game uses. */
-    private Specification specification = null;
-
     /**
      * The next available identifier that can be given to a new
      * <code>FreeColGameObject</code>.
      */
     protected int nextId = 1;
-
-    /** References to all objects created in this game. */
-    protected HashMap<String, WeakReference<FreeColGameObject>> freeColGameObjects
-        = new HashMap<String, WeakReference<FreeColGameObject>>(10000);
 
     /** Game UUID, persistent in savegame files */
     private UUID uuid = UUID.randomUUID();
@@ -77,12 +70,6 @@ public class Game extends FreeColGameObject {
 
     /** A virtual player to use for enemy privateers. */
     private Player unknownEnemy;
-
-    /**
-     * The owner of this view of the game, or <code>null</code> if this game
-     * has all the information.
-     */
-    protected Player viewOwner = null;
 
     /** The player whose turn it is. */
     protected Player currentPlayer = null;
@@ -99,6 +86,31 @@ public class Game extends FreeColGameObject {
     /** The current turn. */
     private Turn turn = new Turn(1);
 
+    /** Whether the War of Spanish Succession has already taken place. */
+    private boolean spanishSuccession = false;
+
+    /** The cities of Cibola remaining in this game. */
+    protected final List<String> citiesOfCibola = new ArrayList<String>();
+
+    // Serialization not required below.
+
+    /** The Specification this game uses. */
+    private Specification specification = null;
+
+    /**
+     * References to all objects created in this game.
+     * Serialization is not needed directly as these must be completely
+     * within { players, unknownEnemy, map } which are directly serialized.
+     */
+    protected HashMap<String, WeakReference<FreeColGameObject>> freeColGameObjects
+        = new HashMap<String, WeakReference<FreeColGameObject>>(10000);
+
+    /**
+     * The owner of this view of the game, or <code>null</code> if this game
+     * has all the information.
+     */
+    protected Player viewOwner = null;
+
     /**
      * The combat model this game uses. At the moment, the only combat
      * model available is the SimpleCombatModel, which strives to
@@ -109,24 +121,22 @@ public class Game extends FreeColGameObject {
      */
     protected CombatModel combatModel = null;
 
-    /** Whether the War of Spanish Succession has already taken place. */
-    private boolean spanishSuccession = false;
+    /** The number of removed FCGOs that should trigger a cache clean. */
+    private static final int REMOVE_GC_THRESHOLD = 64;
 
-    /** The cities of Cibola remaining in this game. */
-    protected final List<String> citiesOfCibola = new ArrayList<String>();
+    /** The number of FCGOs removed since last cache clean. */
+    private int removeCount = 0;
 
     /**
      * A FreeColGameObjectListener to watch the objects in the game.
      * Usually this is the AIMain instance.
      * TODO: is this better done with a property change listener?
-     * Does not need serialization.
      */
     protected FreeColGameObjectListener freeColGameObjectListener = null;
 
 
     /**
-     * This constructor is used by the Server to create a new Game
-     * with the given Specification.
+     * Constructor used by the ServerGame constructor.
      *
      * @param specification The <code>Specification</code> for this game.
      */
@@ -266,19 +276,23 @@ public class Game extends FreeColGameObject {
      * identifier.
      *
      * @param id The object identifier.
-     * @return The <code>FreeColGameObject</code> that has been removed.
      * @exception IllegalArgumentException If the identifier is null or empty.
      */
-    public FreeColGameObject removeFreeColGameObject(String id) {
+    public void removeFreeColGameObject(String id) {
         if (id == null || id.length() == 0) {
             throw new IllegalArgumentException("Null/empty identifier.");
         }
 
-        final FreeColGameObject o = getFreeColGameObject(id);
-        notifyRemoveFreeColGameObject(id);
-        
         freeColGameObjects.remove(id);
-        return o;
+        notifyRemoveFreeColGameObject(id);
+
+        // Garbage collect the FCGOs if enough have been removed.
+        if (++removeCount > REMOVE_GC_THRESHOLD) {
+            Iterator<FreeColGameObject> i = getFreeColGameObjectIterator();
+            while (i.hasNext()) i.next();
+            removeCount = 0;
+            System.gc(); // Probably a good opportunity.
+        }
     }
 
     /**
@@ -349,9 +363,11 @@ public class Game extends FreeColGameObject {
      * Gets an <code>Iterator</code> over every registered
      * <code>FreeColGameObject</code>.
      *
-     * This <code>Iterator</code> should be iterated at least once
-     * in a while since it cleans the <code>FreeColGameObject</code>
-     * cache.  TODO: formalize this better.
+     * This <code>Iterator</code> should be iterated at least once in
+     * a while since it cleans the <code>FreeColGameObject</code>
+     * cache.  Very few routines call this any more, so there is a
+     * thresholded call in removeFreeColGameObject to ensure the cache
+     * is still cleaned.  Reconsider this if the situation changes.
      *
      * @return An <code>Iterator</code> containing every registered
      *     <code>FreeColGameObject</code>.

@@ -71,7 +71,6 @@ public class AIMain extends FreeColObject
      * game for <code>FreeColGameObject</code>s.
      *
      * @param freeColServer The main controller object for the server.
-     * @see #findNewObjects()
      */
     public AIMain(FreeColServer freeColServer) {
         this.freeColServer = freeColServer;
