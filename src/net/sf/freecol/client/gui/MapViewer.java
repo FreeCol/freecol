@@ -2087,7 +2087,7 @@ public final class MapViewer {
             && freeColClient.getGame() != null
             && !freeColClient.currentPlayerIsMyPlayer()) {
 
-            if (greyLayer == null) greyLayer = new GrayLayer(lib);
+            if (greyLayer == null) greyLayer = new GrayLayer(lib, freeColClient);
             if (greyLayer.getParent() == null) { // Not added to the canvas yet.
                 canvas.addToCanvas(greyLayer, JLayeredPane.DEFAULT_LAYER);
                 canvas.moveToFront(greyLayer);
@@ -2101,7 +2101,7 @@ public final class MapViewer {
                 canvas.removeFromCanvas(greyLayer);
             }
         }
-
+        
         /*
         PART 6
         ======

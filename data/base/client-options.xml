@@ -58,6 +58,8 @@
       </stringOption>
       <!-- If selected: Enables smooth rendering of the minimap when zoomed out. -->
       <booleanOption id="model.option.smoothRendering" defaultValue="false"/>
+      <!-- Option to disable end turn grey background. -->
+      <booleanOption id="model.option.disableGrayLayer" defaultValue="false"/>
       <!-- The color to fill in around the actual map on the minimap. -->
       <selectOption id="model.option.color.background" defaultValue="0" localizedLabels="true">
         <selectValue label="clientOptions.minimap.color.background.black" value="0"/>

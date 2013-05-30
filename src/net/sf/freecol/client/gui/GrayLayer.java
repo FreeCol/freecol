@@ -10,6 +10,8 @@ import java.awt.Rectangle;
 
 import javax.swing.ImageIcon;
 
+import net.sf.freecol.client.ClientOptions;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.InfoPanel;
 import net.sf.freecol.common.model.Player;
@@ -39,9 +41,12 @@ public class GrayLayer extends Component {
     private ImageLibrary imageLibrary;
     /** Player object or <code>null</code> */
     private Player player;
+    /** The client for this FreeCol game */
+    private FreeColClient freeColClient;
 
-    public GrayLayer(ImageLibrary imageLibrary) {
+    public GrayLayer(ImageLibrary imageLibrary, FreeColClient freeColClient) {
         this.imageLibrary = imageLibrary;
+        this.freeColClient = freeColClient;
     }
 
     /**
@@ -60,8 +65,11 @@ public class GrayLayer extends Component {
             // we are done - the picture is OK
             return;
         }
-        g.setColor(MASK_COLOR);
-        g.fillRect(clipArea.x, clipArea.y, clipArea.width, clipArea.height);
+        
+        if (!freeColClient.getClientOptions().getBoolean(ClientOptions.DISABLE_GRAY_LAYER)) {
+            g.setColor(MASK_COLOR);
+            g.fillRect(clipArea.x, clipArea.y, clipArea.width, clipArea.height);
+        }
 
         if (player == null) {
             // we are done, no player information
