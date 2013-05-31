@@ -197,13 +197,6 @@ public class AbstractUnit extends FreeColObject {
     private static final String ROLE_TAG = "role";
     private static final String NUMBER_TAG = "number";
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXML(out, getXMLElementTagName());
-    }
 
     /**
      * {@inheritDoc}

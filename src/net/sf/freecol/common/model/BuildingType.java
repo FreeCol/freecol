@@ -290,13 +290,6 @@ public final class BuildingType extends BuildableType
     private static final String UPKEEP_TAG = "upkeep";
     private static final String WORKPLACES_TAG = "workplaces";
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXML(out, getXMLElementTagName());
-    }
 
     /**
      * {@inheritDoc}

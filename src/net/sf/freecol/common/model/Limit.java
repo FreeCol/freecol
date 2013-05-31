@@ -307,14 +307,6 @@ public final class Limit extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXML(out, getXMLElementTagName());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 

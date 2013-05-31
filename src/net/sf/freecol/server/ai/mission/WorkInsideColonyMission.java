@@ -181,7 +181,7 @@ public class WorkInsideColonyMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+    public void toXML(XMLStreamWriter out) throws XMLStreamException {
         if (isValid()) {
             super.toXML(out, getXMLElementTagName());
         }

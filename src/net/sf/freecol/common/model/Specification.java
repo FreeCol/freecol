@@ -79,7 +79,7 @@ public final class Specification {
          * {@inheritDoc}
          */
         @Override
-        public void toXMLImpl(XMLStreamWriter out) {
+        public void toXML(XMLStreamWriter out) {
             throw new RuntimeException("Can not happen");
         }
 

@@ -313,7 +313,7 @@ public class TileImprovementPlan extends ValuedAIObject {
      * {@inheritDoc}
      */
     @Override
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+    public void toXML(XMLStreamWriter out) throws XMLStreamException {
         if (validate()) {
             toXML(out, getXMLElementTagName());
         }

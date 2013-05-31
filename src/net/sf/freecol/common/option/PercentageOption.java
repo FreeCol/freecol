@@ -52,12 +52,6 @@ public class PercentageOption extends IntegerOption {
 
     // Serialization
 
-    /**
-     * {@inheritDoc}
-     */
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXML(out, getXMLElementTagName());
-    }
 
     /**
      * Gets the tag name of the root element representing this object.

@@ -98,13 +98,6 @@ public class StanceTradeItem extends TradeItem {
 
     private static final String STANCE_TAG = "stance";
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXML(out, getXMLElementTagName());
-    }
 
     /**
      * {@inheritDoc}

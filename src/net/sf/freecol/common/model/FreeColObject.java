@@ -880,7 +880,7 @@ public abstract class FreeColObject {
      * @see #toXML(XMLStreamWriter, Player, boolean, boolean)
      */
     public void toXML(XMLStreamWriter out) throws XMLStreamException {
-        toXMLImpl(out);
+        toXML(out, getRealXMLElementTagName());
     }
 
     /**
@@ -970,17 +970,6 @@ public abstract class FreeColObject {
         // toXMLElement() to call.
         toXML(out);
     }
-
-    /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *
-     * @param out The target stream.
-     * @exception XMLStreamException if there are any problems writing
-     *      to the stream.
-     */
-    abstract protected void toXMLImpl(XMLStreamWriter out)
-        throws XMLStreamException;
 
     /**
      * This method writes a partial XML-representation of this object to

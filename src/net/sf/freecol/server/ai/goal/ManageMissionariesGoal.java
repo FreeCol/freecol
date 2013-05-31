@@ -180,12 +180,11 @@ public class ManageMissionariesGoal extends Goal {
     }
 
 
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+    public void toXML(XMLStreamWriter out) throws XMLStreamException {
         //TODO
     }
 
-    protected void readFromXMLImpl(XMLStreamReader in)
-        throws XMLStreamException {
+    public void readFromXML(XMLStreamReader in) throws XMLStreamException {
         //TODO
     }
 }

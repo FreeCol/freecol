@@ -109,13 +109,6 @@ public class FileOption extends AbstractOption<File> {
 
     // Serialization
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXML(out, getXMLElementTagName());
-    }
 
     /**
      * {@inheritDoc}

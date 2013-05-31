@@ -241,14 +241,6 @@ public class ProductionType extends FreeColObject {
      * {@inheritDoc}
      */
     @Override
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXML(out, getXMLElementTagName());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         // ProductionType does not need an id.
         // No need for: super.writeAttributes(out);

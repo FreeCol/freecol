@@ -618,7 +618,7 @@ public abstract class Goal extends AIObject implements GoalConstants {
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
      */
-    protected abstract void toXMLImpl(XMLStreamWriter out) throws XMLStreamException;
+    //protected abstract void toXML(XMLStreamWriter out) throws XMLStreamException;
 
     /**
      * Reads information for this object from an XML stream.
@@ -627,7 +627,7 @@ public abstract class Goal extends AIObject implements GoalConstants {
      * @throws XMLStreamException if there are any problems reading from the
      *             stream.
      */
-    protected abstract void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException;
+    //protected abstract void readFromXML(XMLStreamReader in) throws XMLStreamException;
 
 
 

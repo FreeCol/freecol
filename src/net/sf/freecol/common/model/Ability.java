@@ -281,13 +281,6 @@ public final class Ability extends Feature {
 
     // Serialization
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXML(out, getXMLElementTagName());
-    }
 
     /**
      * {@inheritDoc}

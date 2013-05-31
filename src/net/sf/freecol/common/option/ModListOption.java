@@ -59,14 +59,6 @@ public class ModListOption extends ListOption<FreeColModFile> {
     // Serialization
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXML(out, getXMLElementTagName());
-    }
-
-    /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "modListOption".

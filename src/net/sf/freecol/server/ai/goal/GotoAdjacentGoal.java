@@ -124,9 +124,9 @@ public class GotoAdjacentGoal extends Goal {
     }
     
 
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+    public void toXML(XMLStreamWriter out) throws XMLStreamException {
     }
     
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+    public void readFromXML(XMLStreamReader in) throws XMLStreamException {
     }
 }

@@ -163,14 +163,6 @@ public class NationOptions extends FreeColObject {
      * {@inheritDoc}
      */
     @Override
-    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXML(out, getXMLElementTagName());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         // The nation options do not use the FreeColObject attributes, so
         // no: super.writeAttributes(out);

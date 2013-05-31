@@ -106,13 +106,6 @@ public class BooleanOption extends AbstractOption<Boolean> {
 
     // Serialization
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXML(out, getXMLElementTagName());
-    }
 
     /**
      * {@inheritDoc}

@@ -95,12 +95,6 @@ public class GoldTradeItem extends TradeItem {
 
     private static final String GOLD_TAG = "gold";
 
-    /**
-     * {@inheritDoc}
-     */
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXML(out, getXMLElementTagName());
-    }
 
     /**
      * {@inheritDoc}

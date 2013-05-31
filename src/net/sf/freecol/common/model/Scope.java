@@ -341,14 +341,6 @@ public class Scope extends FreeColObject implements Cloneable {
      * {@inheritDoc}
      */
     @Override
-    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXML(out, getXMLElementTagName());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         writeAttribute(out, MATCH_NEGATED_TAG, matchNegated);
 

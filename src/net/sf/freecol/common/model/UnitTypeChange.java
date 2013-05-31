@@ -234,14 +234,6 @@ public class UnitTypeChange extends FreeColObject {
      * {@inheritDoc}
      */
     @Override
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXML(out, getXMLElementTagName());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         if (newUnitType != null) {
             writeAttribute(out, UNIT_TAG, newUnitType);

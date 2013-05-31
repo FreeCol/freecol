@@ -118,10 +118,6 @@ public class WorkLocationPlan extends AIObject {
     // WorkLocationPlans are not currently saved so this is a no-op.
 
 
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        // do nothing
-    }
-
     /**
      * {@inheritDoc}
      */

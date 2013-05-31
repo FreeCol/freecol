@@ -408,24 +408,15 @@ public abstract class FreeColGameObject extends FreeColObject {
 
 
     // Serialization
-    // FreeColGameObjects use the 4-arg toXMLImpl
+    // FreeColGameObjects use the 4-arg toXML
 
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected final void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+    public final void toXML(XMLStreamWriter out) throws XMLStreamException {
         toXML(out, null, false, false);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected final void toXMLImpl(XMLStreamWriter out, Player player,
-                                   boolean showAll,
-                                   boolean toSavedGame) throws XMLStreamException {
-        toXML(out, player, showAll, toSavedGame);
     }
 
     /**
@@ -462,9 +453,9 @@ public abstract class FreeColGameObject extends FreeColObject {
      * @exception XMLStreamException if there are any problems writing
      *     to the stream.
      */
-    protected void toXML(XMLStreamWriter out, String tag, Player player,
-                         boolean showAll,
-                         boolean toSavedGame) throws XMLStreamException {
+    protected final void toXML(XMLStreamWriter out, String tag, Player player,
+                               boolean showAll,
+                               boolean toSavedGame) throws XMLStreamException {
         out.writeStartElement(tag);
 
         writeAttributes(out, player, showAll, toSavedGame);

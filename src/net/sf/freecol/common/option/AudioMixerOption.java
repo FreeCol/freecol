@@ -214,12 +214,6 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
 
     // Serialization
 
-    /**
-     * {@inheritDoc}
-     */
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXML(out, getXMLElementTagName());
-    }
 
     /**
      * {@inheritDoc}

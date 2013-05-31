@@ -240,14 +240,8 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
     /**
      * {@inheritDoc}
      */
-    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXML(out, getXMLElementTagName());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+    @Override
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
 
         if (location != null) {

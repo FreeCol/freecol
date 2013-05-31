@@ -54,14 +54,6 @@ public class UnitListOption extends ListOption<AbstractUnit> {
     // Serialization
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXML(out, getXMLElementTagName());
-    }
-
-    /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "unitListOption".

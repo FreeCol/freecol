@@ -454,13 +454,6 @@ public class Modifier extends Feature implements Comparable<Modifier> {
     private static final String INDEX_TAG = "index";
     private static final String TYPE_TAG = "type";
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXML(out, getXMLElementTagName());
-    }
 
     /**
      * {@inheritDoc}

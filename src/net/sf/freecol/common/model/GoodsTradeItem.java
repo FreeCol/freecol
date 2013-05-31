@@ -125,13 +125,6 @@ public class GoodsTradeItem extends TradeItem {
 
     private static final String SETTLEMENT_TAG = "settlement";
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        super.toXML(out, getXMLElementTagName());
-    }
 
     /**
      * {@inheritDoc}

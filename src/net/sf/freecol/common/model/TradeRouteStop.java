@@ -136,7 +136,7 @@ public class TradeRouteStop {
         this.location = newLocation;
     }
 
-    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+    public void toXML(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
         out.writeAttribute("location", this.location.getId());
         if (goodsToUnload != null) {
