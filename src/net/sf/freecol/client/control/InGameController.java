@@ -36,6 +36,7 @@ import javax.swing.SwingUtilities;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.Canvas.TradeAction;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
@@ -3154,24 +3155,32 @@ public final class InGameController implements NetworkConstants {
      * @param settlement The <code>Settlement</code> that failed to trade.
      * @param goods The <code>Goods</code> that failed to trade.
      */
-    private void showTradeFail(int fail, Settlement settlement, Goods goods) {
-        switch (fail) {
-        case NO_TRADE_GOODS:
-            gui.showInformationMessage(settlement,
-                StringTemplate.template("trade.noTradeGoods")
-                .add("%goods%", goods.getNameKey()));
-            return;
-        case NO_TRADE_HAGGLE:
-            gui.showInformationMessage(settlement, "trade.noTradeHaggle");
-            break;
-        case NO_TRADE_HOSTILE:
-            gui.showInformationMessage(settlement, "trade.noTradeHostile");
-            break;
-        case NO_TRADE: // Proposal was refused
-        default:
-            gui.showInformationMessage(settlement, "trade.noTrade");
-            break;
-        }
+    private void showTradeFail(final int fail, final Settlement settlement,
+                               final Goods goods) {
+        SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    switch (fail) {
+                    case NO_TRADE_GOODS:
+                        gui.showInformationMessage(settlement,
+                            StringTemplate.template("trade.noTradeGoods")
+                            .add("%goods%", goods.getNameKey()));
+                        return;
+                    case NO_TRADE_HAGGLE:
+                        gui.showInformationMessage(settlement,
+                                                   "trade.noTradeHaggle");
+                        break;
+                    case NO_TRADE_HOSTILE:
+                        gui.showInformationMessage(settlement,
+                                                   "trade.noTradeHostile");
+                        break;
+                    case NO_TRADE: // Proposal was refused
+                    default:
+                        gui.showInformationMessage(settlement,
+                                                   "trade.noTrade");
+                        break;
+                    }
+                }
+            });
     }
 
     /**
@@ -3180,7 +3189,7 @@ public final class InGameController implements NetworkConstants {
      * @param unit The <code>Unit</code> that is trading.
      * @param settlement The <code>Settlement</code> that is trading.
      */
-    private void attemptBuyFromSettlement(Unit unit, Settlement settlement) {
+    private void attemptBuyFromSettlement(Unit unit, final Settlement settlement) {
         Player player = freeColClient.getMyPlayer();
         Goods goods = null;
 
@@ -3190,8 +3199,12 @@ public final class InGameController implements NetworkConstants {
         for (;;) {
             if (forSale.isEmpty()) {
                 // There is nothing to sell to the player
-                gui.showInformationMessage(settlement,
-                    "trade.nothingToSell");
+                SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            gui.showInformationMessage(settlement,
+                                                       "trade.nothingToSell");
+                        }
+                    });
                 return;
             }
 
