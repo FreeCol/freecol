@@ -923,11 +923,11 @@ public final class FreeColServer {
             }
 
             while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                final String tag = xr.getLocalName();
+                final String tag = xr.getTagName();
                 if (SERVER_OBJECTS_TAG.equals(tag)) {
                     serverStrings = new ArrayList<String>();
                     while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        serverStrings.add(xr.getLocalName());
+                        serverStrings.add(xr.getTagName());
                         serverStrings.add(xr.readId());
                         xr.nextTag();
                     }
@@ -1273,7 +1273,7 @@ public final class FreeColServer {
             xs.nextTag();
 
             while (xs.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                final String tag = xs.getLocalName();
+                final String tag = xs.getTagName();
                 if (Game.getXMLElementTagName().equals(tag)) {
                     Game game = new ServerGame(null, xs.getXMLStreamReader(),
                             new ArrayList<String>(serverStrings),
@@ -1605,7 +1605,7 @@ public final class FreeColServer {
             xr.nextTag();
 
             while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                final String tag = xr.getLocalName();
+                final String tag = xr.getTagName();
                 if (HighScore.getXMLElementTagName().equals(tag)) {
                     highScores.add(new HighScore(xr.getXMLStreamReader()));
                 }

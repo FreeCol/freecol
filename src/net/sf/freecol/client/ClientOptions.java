@@ -632,22 +632,13 @@ public class ClientOptions extends OptionGroup {
             try {
                 xr = new XMLStream(new FileInputStream(options));
                 xr.nextTag();
-                XMLStreamReader in = xr.getXMLStreamReader();
-                /**
-                 * The following code was contributed by armcode to fix
-                 * bug #[ 2045521 ] "Exception in Freecol.log on starting
-                 * game". I was never able to reproduce the bug, but the
-                 * patch did no harm either.
-                 */
-                for (int eventid = in.getEventType();
-                     eventid != XMLEvent.END_DOCUMENT;
-                     eventid = in.getEventType()) {
-                    //TODO: Is checking for XMLEvent.ATTRIBUTE needed?
-                    if (eventid == XMLEvent.START_ELEMENT
-                        && LANGUAGE.equals(in.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG))) {
-                        return in.getAttributeValue(null, "value");
+                for (int type = xr.getTagType();
+                     type != XMLEvent.END_DOCUMENT; type = xr.getTagType()) {
+                    if (type == XMLEvent.START_ELEMENT
+                        && LANGUAGE.equals(xr.readId())) {
+                        return xr.getAttribute("value", (String)null);
                     }
-                    in.nextTag();
+                    xr.nextTag();
                 }
                 // We don't have a language option in our file, it is
                 // either not there or the file is corrupt
@@ -661,7 +652,7 @@ public class ClientOptions extends OptionGroup {
     }
 
     /**
-     * Return the client's preferred tile text type.
+     * Get the client's preferred tile text type.
      *
      * @return A <code>DISPLAY_TILE_TEXT_</code> value
      */

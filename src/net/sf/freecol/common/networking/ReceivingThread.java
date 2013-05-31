@@ -294,7 +294,7 @@ final class ReceivingThread extends Thread {
 
         XMLStream xr = new XMLStream(bis);
         xr.nextTag();
-        final String tag = xr.getLocalName();
+        final String tag = xr.getTagName();
 
         if (Connection.DISCONNECT_TAG.equals(tag)) {
             askToStop();

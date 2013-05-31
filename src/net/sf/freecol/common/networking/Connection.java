@@ -407,7 +407,7 @@ public class Connection {
         try {
             xr = new XMLStream(in);
             xr.nextTag();
-            question = QUESTION_TAG.equals(xr.getLocalName());
+            question = QUESTION_TAG.equals(xr.getTagName());
             networkReplyId = xr.getAttribute(NETWORK_REPLY_ID_TAG,
                                              (String)null);
         } catch (XMLStreamException xme) {

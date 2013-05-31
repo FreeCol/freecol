@@ -139,9 +139,19 @@ public class XMLStream implements Closeable {
      *
      * @return The current tag.
      */
-    public String getLocalName() {
+    public String getTagName() {
         return xmlStreamReader.getLocalName();
     }
+
+    /**
+     * Get the tag type from the underlying stream.
+     *
+     * @return The current type.
+     */
+    public int getTagType() {
+        return xmlStreamReader.getEventType();
+    }
+
 
     /**
      * Is there an attribute present in the stream?
