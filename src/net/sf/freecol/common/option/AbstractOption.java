@@ -183,10 +183,7 @@ abstract public class AbstractOption<T> extends FreeColObject
      */
     @Override
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        // TODO: super.readAttributes(in); is inadequate.
-        String id = readId(in);
-        if (id == null) id = getId();
-        setId(id);
+        super.readAttributes(in);
         
         String defaultValue = getAttribute(in, DEFAULT_VALUE_TAG, (String)null);
 

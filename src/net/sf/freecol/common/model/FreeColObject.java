@@ -1188,7 +1188,7 @@ public abstract class FreeColObject {
      */
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         String newId = readId(in);
-        setId(newId);
+        if (newId != null) setId(newId);
     }
 
     /**
