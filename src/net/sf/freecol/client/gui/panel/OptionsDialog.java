@@ -213,6 +213,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
             getGUI().removeFromCanvas(this);
             setResponse(group);
         } else if (CANCEL.equals(command)) {
+            ui.reset();
             getGUI().removeFromCanvas(this);
             setResponse(null);
         } else if (RESET.equals(command)) {
