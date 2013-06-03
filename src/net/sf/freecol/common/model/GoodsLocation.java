@@ -300,6 +300,7 @@ public abstract class GoodsLocation extends UnitLocation {
 
     // Serialization
 
+
     /**
      * {@inheritDoc}
      */

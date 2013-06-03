@@ -495,7 +495,7 @@ public final class Market extends FreeColGameObject implements Ownable {
 
         if (showAll || toSavedGame || (player != null && player == owner)) {
             for (MarketData data : getSortedCopy(marketData.values())) {
-                data.toXML(out);
+                data.toXML(out, player, showAll, toSavedGame);
             }
         }
     }

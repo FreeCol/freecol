@@ -433,6 +433,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
 
     // Serialization
 
+
     /**
      * {@inheritDoc}
      */

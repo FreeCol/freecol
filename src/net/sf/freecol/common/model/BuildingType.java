@@ -333,6 +333,19 @@ public final class BuildingType extends BuildableType
      * {@inheritDoc}
      */
     @Override
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
+        super.writeChildren(out);
+
+        for (ProductionType productionType : productionTypes) {
+            productionType.toXML(out);
+        }
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
         final Specification spec = getSpecification();
 
@@ -397,18 +410,6 @@ public final class BuildingType extends BuildableType
 
         } else {
             super.readChild(in);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        super.writeChildren(out);
-
-        for (ProductionType productionType : productionTypes) {
-            productionType.toXML(out);
         }
     }
 
