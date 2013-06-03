@@ -416,17 +416,17 @@ public abstract class Feature extends FreeColObject {
         if (!hasAttribute(in, ID_ATTRIBUTE_TAG)
             && "model.colony.colonyGoodsParty".equals(str)) {
             setId("model.modifier.colonyGoodsParty");
-            setSource(spec.getType("model.source.colonyGoodsParty"));
+            setSource(spec.findType("model.source.colonyGoodsParty"));
         // @end compatibility code
         } else {
             if (str == null) {
                 setSource(null);
             // @compat 0.9.x
             } else if ("model.monarch.colonyGoodsParty".equals(str)) {
-                setSource(spec.getType("model.source.colonyGoodsParty"));
+                setSource(spec.findType("model.source.colonyGoodsParty"));
             // @end compatibility code
             } else if (spec != null) {
-                setSource(spec.getType(str));
+                setSource(spec.findType(str));
             }
         }
 

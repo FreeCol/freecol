@@ -69,7 +69,7 @@ public class InGameControllerTest extends FreeColTestCase {
     private static BuildingType press
         = spec().getBuildingType("model.building.printingPress");
     private static final BuildingType schoolHouseType
-        = spec().getBuildingType("model.building.Schoolhouse");
+        = spec().getBuildingType("model.building.schoolhouse");
     private static final BuildingType stockadeType
         = spec().getBuildingType("model.building.stockade");
 

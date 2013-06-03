@@ -117,10 +117,9 @@ public class SetBuildQueueMessage extends DOMMessage {
         }
         List<BuildableType> buildQueue = new ArrayList<BuildableType>();
         for (int i = 0; i < queue.length; i++) {
-            FreeColGameObjectType type = spec.getType(queue[i]);
-            if (type instanceof BuildableType) {
-                buildQueue.add(i, (BuildableType) type);
-            } else {
+            try {
+                buildQueue.add(i, spec.getType(queue[i], BuildableType.class));
+            } catch (Exception cce) {
                 return DOMMessage.clientError("Not a buildable type: "
                     + queue[i]);
             }

@@ -43,32 +43,13 @@ import net.sf.freecol.common.option.OptionGroup;
  * to derive other types, but can not be instantiated.  They will be
  * removed from the Specification after it has loaded completely.
  */
-public class FreeColGameObjectType extends FreeColObject implements Named {
-
-    /** XML attribute tag to denote a deletion of a child element. */
-    protected static final String DELETE_TAG = "delete";
-
-    /** XML attribute tag to denote that this type extends another. */
-    protected static final String EXTENDS_TAG = "extends";
-
-    /** XML attribute tag to denote preservation of attributes and children. */
-    public static final String PRESERVE_TAG = "preserve";
-
-    /**
-     * The index imposes a total ordering consistent with equals on
-     * each class extending FreeColGameObjectType, but this ordering
-     * is nothing but the order in which the objects of the respective
-     * class were defined.  It is guaranteed to remain stable only for
-     * a particular revision of a particular specification.
-     *
-     * Do not serialize.
-     */
-    private int index = -1;
+public abstract class FreeColGameObjectType extends FreeColObject
+    implements Named {
 
     /** The default index of Modifiers provided by this type. */
     private int modifierIndex = 100;
 
-    /** Whether the type is abstract or can be instantiated. */
+    /** Whether the type is abstract, or can be instantiated. */
     private boolean abstractType;
 
     /**
@@ -77,7 +58,18 @@ public class FreeColGameObjectType extends FreeColObject implements Named {
      */
     private FeatureContainer featureContainer = null;
 
+    // Do not serialize below.
+
+    /**
+     * The index imposes a total ordering consistent with equals on
+     * each class extending FreeColGameObjectType, but this ordering
+     * is nothing but the order in which the objects of the respective
+     * class were defined.  It is guaranteed to remain stable only for
+     * a particular revision of a particular specification.
+     */
+    private int index = -1;
     
+
     /**
      * Deliberately empty constructor.
      */
@@ -243,31 +235,17 @@ public class FreeColGameObjectType extends FreeColObject implements Named {
     // Serialization
 
     // We do not serialize index, so no INDEX_TAG.
+    // We do not need to write the abstractType attribute, as once
+    // the spec is read, all cases of abstractType==true are removed.
     private static final String ABSTRACT_TAG = "abstract";
+    // Denotes deletion of a child element.
+    protected static final String DELETE_TAG = "delete";
+    // Denotes that this type extends another.
+    protected static final String EXTENDS_TAG = "extends";
+    // Denotes preservation of attributes and children.
+    protected static final String PRESERVE_TAG = "preserve";
 
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        // This routine only exists so that Specification can build
-        // some FCGOT objects to act as dummy sources.  Otherwise we
-        // would just not implement this and make the class abstract.
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
-
-        // We do not need to write the abstractType attribute, as once
-        // the spec is read, all cases of abstractType==true are
-        // removed.
-    }
-    
     /**
      * {@inheritDoc}
      */

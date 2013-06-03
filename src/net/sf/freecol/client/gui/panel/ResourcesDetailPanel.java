@@ -97,9 +97,9 @@ public class ResourcesDetailPanel extends ColopediaGameObjectTypePanel<ResourceT
                 List<String> scopeStrings = new ArrayList<String>();
                 for (Scope scope : modifier.getScopes()) {
                     if (scope.getType() != null) {
-                        FreeColGameObjectType objectType = getSpecification()
-                            .getType(scope.getType());
-                        scopeStrings.add(Messages.message(objectType.getNameKey()));
+                        FreeColGameObjectType fcgot = getSpecification()
+                            .findType(scope.getType());
+                        scopeStrings.add(Messages.message(fcgot.getNameKey()));
                     }
                 }
                 if (!scopeStrings.isEmpty()) {

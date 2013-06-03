@@ -889,7 +889,7 @@ public class Game extends FreeColGameObject {
         FreeColObject o = getFreeColGameObject(id);
         if (o == null) {
             try {
-                o = getSpecification().getType(id);
+                o = getSpecification().findType(id);
             } catch (Exception e) {
                 o = null; // Ignore
             }

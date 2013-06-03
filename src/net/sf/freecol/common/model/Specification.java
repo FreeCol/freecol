@@ -1419,25 +1419,11 @@ public final class Specification {
      * @param id The object identifier to look for.
      * @param type The expected <code>Class</code>.
      * @return The <code>FreeColGameObjectType</code> found.
-     * @exception IllegalArgumentException if an error occurs
      */
-    public <T extends FreeColGameObjectType> T getType(String id, Class<T> type)
-        throws IllegalArgumentException {
-        if (id == null) {
-            throw new IllegalArgumentException("Null id");
-        } else if (allTypes.containsKey(id)) {
-            try {
-                return type.cast(allTypes.get(id));
-            } catch(ClassCastException cce) {
-                logger.log(Level.WARNING, id + " caused ClassCastException!",
-                    cce);
-                throw(cce);
-            }
-
-        // @compat 0.9.x
-        } else if (allTypes.containsKey(mangle(id))) {
-            return type.cast(allTypes.get(mangle(id)));
-        // end @compat
+    public <T extends FreeColGameObjectType> T getType(String id, Class<T> type) {
+        FreeColGameObjectType o = findType(id);
+        if (o != null) {
+            return type.cast(allTypes.get(id));
 
         } else if (initialized) {
             throw new IllegalArgumentException("Undefined FCGOT: " + id);
@@ -1451,9 +1437,9 @@ public final class Specification {
                 return result;
             } catch (Exception e) {
                 logger.log(Level.WARNING, "Could not construct: " + id, e);
-                return null;
             }
         }
+        return null;
     }
 
     // @compat 0.9.x
@@ -1465,8 +1451,27 @@ public final class Specification {
     }
     // end @compat
 
-    public FreeColGameObjectType getType(String id) throws IllegalArgumentException {
-        return getType(id, FreeColGameObjectType.class);
+    /**
+     * Find a <code>FreeColGameObjectType</code> by id.
+     *
+     * @param id The identifier to look for, which must not be null.
+     * @return The <code>FreeColGameObjectType</code> found if any.
+     */
+    public FreeColGameObjectType findType(String id) throws IllegalArgumentException {
+        if (id == null) {
+            throw new IllegalArgumentException("Null id");
+
+        } else if (allTypes.containsKey(id)) {
+            return allTypes.get(id);
+
+        // @compat 0.9.x
+        } else if (allTypes.containsKey(mangle(id))) {
+            return allTypes.get(mangle(id));
+        // end @compat
+
+        } else {
+            return null;
+        }
     }
 
     /**
