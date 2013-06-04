@@ -512,7 +512,7 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * The any panel this <code>Canvas</code> is displaying.
+     * Get any panel this <code>Canvas</code> is displaying.
      *
      * @return A <code>Component</code> the <code>Canvas</code> is
      *         displaying, or null if none found.
@@ -2181,24 +2181,49 @@ public final class Canvas extends JDesktopPane {
             }
         }
         if (p == null) {
+            int x, y;
             switch (popupPosition) {
             case CENTERED:
-                f.setLocation((getWidth() - f.getWidth()) / 2,
-                              (getHeight() - f.getHeight()) / 2);
+                x = (getWidth() - f.getWidth()) / 2;
+                y = (getHeight() - f.getHeight()) / 2;
                 break;
             case CENTERED_LEFT:
-                f.setLocation((getWidth() - f.getWidth()) / 4,
-                              (getHeight() - f.getHeight()) / 2);
+                x = (getWidth() - f.getWidth()) / 4;
+                y = (getHeight() - f.getHeight()) / 2;
                 break;
             case CENTERED_RIGHT:
-                f.setLocation(((getWidth() - f.getWidth()) * 3) / 4,
-                              (getHeight() - f.getHeight()) / 2);
+                x = ((getWidth() - f.getWidth()) * 3) / 4;
+                y = (getHeight() - f.getHeight()) / 2;
                 break;
             case ORIGIN:
             default:
-                f.setLocation(0, 0);
+                x = y = 0;
                 break;
             }
+            // Try to move out of the way of an existing component
+            Component c = getComponentAt(x, y);
+            int tries = 3, x0 = x, y0 = y;
+            while (c != this) {
+                int xn = c.getX() + c.getWidth() + 1;
+                if (getComponentAt(xn, y0) == this) {
+                    x0 = xn;
+                    break;
+                }
+                int yn = c.getY() + c.getHeight() + 1;
+                if (getComponentAt(x0, yn) == this) {
+                    y0 = yn;
+                    break;
+                }
+                x0 = xn;
+                y0 = yn;
+                c = getComponentAt(x, y);
+                if (--tries <= 0) { // Give up and use the original x,y
+                    x0 = x;
+                    y0 = y;
+                    break;
+                }
+            }
+            f.setLocation(x0, y0);
         } else {
             f.setLocation(p);
         }
