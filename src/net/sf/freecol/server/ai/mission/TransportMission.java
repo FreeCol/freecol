@@ -301,8 +301,13 @@ public class TransportMission extends Mission {
                     drop = path.getTransportDropNode();
                     if (upLoc(drop.getLocation()) instanceof Tile) {
                         this.mode = CargoMode.DROPOFF;
-                        this.turns = drop.previous.getTotalTurns();
-                        this.target = upLoc(drop.previous.getLocation());
+                        if (drop.previous == null) {
+                            this.turns = 0;
+                            this.target = drop.getLocation();
+                        } else {
+                            this.turns = drop.previous.getTotalTurns();
+                            this.target = upLoc(drop.previous.getLocation());
+                        }
                     } else {
                         this.mode = CargoMode.UNLOAD;
                         this.turns = drop.getTotalTurns();
