@@ -45,7 +45,6 @@ public class XMLStream implements Closeable {
     private static final Logger logger = Logger.getLogger(XMLStream.class.getName());
 
     private InputStream inputStream;
-    private Reader reader;
     private XMLStreamReader xmlStreamReader;
 
 
@@ -59,7 +58,6 @@ public class XMLStream implements Closeable {
      */
     public XMLStream(InputStream inputStream) throws IOException {
         this.inputStream = inputStream;
-        this.reader = null;
         try {
             XMLInputFactory xif = XMLInputFactory.newInstance();
             this.xmlStreamReader = xif.createXMLStreamReader(inputStream,
@@ -79,7 +77,6 @@ public class XMLStream implements Closeable {
      */
     public XMLStream(Reader reader) throws IOException {
         this.inputStream = null;
-        this.reader = reader;
         try {
             XMLInputFactory xif = XMLInputFactory.newInstance();
             this.xmlStreamReader = xif.createXMLStreamReader(reader);
