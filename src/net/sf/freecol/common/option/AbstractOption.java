@@ -37,7 +37,7 @@ import net.sf.freecol.common.model.Specification;
  * is null, followed by the identifier of the option object, followed
  * by a ".", followed by "name" or "shortDescription".
  */
-abstract public class AbstractOption<T> extends FreeColObject
+public abstract class AbstractOption<T> extends FreeColObject
     implements Option<T> {
 
     private static Logger logger = Logger.getLogger(AbstractOption.class.getName());

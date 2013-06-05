@@ -1233,7 +1233,7 @@ public final class InGameInputHandler extends InputHandler {
      * This utility class is the base class for tasks that need to run in the
      * event dispatch thread.
      */
-    abstract static class SwingTask implements Runnable {
+    static abstract class SwingTask implements Runnable {
         private static final Logger taskLogger = Logger.getLogger(SwingTask.class.getName());
 
 
@@ -1385,8 +1385,7 @@ public final class InGameInputHandler extends InputHandler {
             return null;
         }
 
-        abstract void doNoResultWork();
-
+        protected abstract void doNoResultWork();
     }
 
     /**
@@ -1556,7 +1555,7 @@ public final class InGameInputHandler extends InputHandler {
             _newTile = newTile;
         }
 
-        void doNoResultWork() {
+        protected void doNoResultWork() {
             gui.refreshTile(_oldTile);
             gui.refreshTile(_newTile);
         }

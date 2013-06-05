@@ -147,7 +147,7 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
      *     DOM-parsed XML tree) that holds all the information.
      * @return The reply.
      */
-    abstract protected Element logout(Connection connection, Element element);
+    protected abstract Element logout(Connection connection, Element element);
 
 
     /**
@@ -171,7 +171,8 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
      * other than that of the currently active player. If no game is active or
      * if the player is unknown the same error is returned.
      */
-    abstract class CurrentPlayerNetworkRequestHandler implements NetworkRequestHandler {
+    abstract class CurrentPlayerNetworkRequestHandler
+        implements NetworkRequestHandler {
         public final Element handle(Connection conn, Element element) {
             ServerPlayer player = getFreeColServer().getPlayer(conn);
             if (isCurrentPlayer(player)) {

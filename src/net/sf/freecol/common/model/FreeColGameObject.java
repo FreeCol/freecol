@@ -46,7 +46,7 @@ import org.w3c.dom.Element;
  * All FreeColGameObjects need to be able to refer to the game they belong
  * to.  Therefore, the game attribute must not be null.
  */
-abstract public class FreeColGameObject extends FreeColObject {
+public abstract class FreeColGameObject extends FreeColObject {
 
     private static final Logger logger = Logger.getLogger(FreeColGameObject.class.getName());
 

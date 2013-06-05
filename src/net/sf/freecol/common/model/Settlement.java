@@ -35,7 +35,7 @@ import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
  * The super class of all settlements on the map (that is colonies and
  * indian settlements).
  */
-abstract public class Settlement extends GoodsLocation
+public abstract class Settlement extends GoodsLocation
     implements Named, Ownable {
 
     private static final Logger logger = Logger.getLogger(Settlement.class.getName());
@@ -567,7 +567,7 @@ abstract public class Settlement extends GoodsLocation
      *
      * @return An image key
      */
-    abstract public String getImageKey();
+    public abstract String getImageKey();
 
     /**
      * Gets the <code>Unit</code> that is currently defending this
@@ -578,7 +578,7 @@ abstract public class Settlement extends GoodsLocation
      * @return The <code>Unit</code> that has been chosen to defend
      *     this <code>Settlement</code>.
      */
-    abstract public Unit getDefendingUnit(Unit attacker);
+    public abstract Unit getDefendingUnit(Unit attacker);
 
     /**
      * Get the ratio between defence at this settlement, and the
@@ -586,7 +586,7 @@ abstract public class Settlement extends GoodsLocation
      *
      * @return A ratio of defence power to settlement size.
      */
-    abstract public float getDefenceRatio();
+    public abstract float getDefenceRatio();
 
     /**
      * Gets the range of gold plunderable when this settlement is captured.
@@ -595,14 +595,14 @@ abstract public class Settlement extends GoodsLocation
      * @return A <code>RandomRange</code> encapsulating the range of plunder
      *     available.
      */
-    abstract public RandomRange getPlunderRange(Unit attacker);
+    public abstract RandomRange getPlunderRange(Unit attacker);
 
     /**
      * Gets the current Sons of Liberty in this settlement.
      *
      * @return The current SoL.
      */
-    abstract public int getSoL();
+    public abstract int getSoL();
 
     /**
      * Get the amount of gold necessary to maintain all of the
@@ -610,7 +610,7 @@ abstract public class Settlement extends GoodsLocation
      *
      * @return The gold required for upkeep.
      */
-    abstract public int getUpkeep();
+    public abstract int getUpkeep();
 
     /**
      * Propagates a global change in tension down to a settlement.
@@ -622,7 +622,7 @@ abstract public class Settlement extends GoodsLocation
      * @return True if the settlement alarm level changes as a result
      *     of this change.
      */
-    abstract public boolean propagateAlarm(Player player, int addToAlarm);
+    public abstract boolean propagateAlarm(Player player, int addToAlarm);
 
     /**
      * Gets the total production of the given type of goods in this settlement.
@@ -630,7 +630,7 @@ abstract public class Settlement extends GoodsLocation
      * @param goodsType The type of goods to get the production for.
      * @return The total production of the given type of goods.
      */
-    abstract public int getTotalProductionOf(GoodsType goodsType);
+    public abstract int getTotalProductionOf(GoodsType goodsType);
 
 
     // Serialization

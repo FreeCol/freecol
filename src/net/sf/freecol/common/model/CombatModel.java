@@ -24,7 +24,7 @@ import java.util.Random;
 import java.util.Set;
 
 
-abstract public class CombatModel {
+public abstract class CombatModel {
 
     public static enum CombatResult {
         // Special results that set the sense of the result.
@@ -167,7 +167,7 @@ abstract public class CombatModel {
      * @param defender The defender.
      * @return The <code>CombatOdds</code>.
      */
-    abstract public CombatOdds calculateCombatOdds(FreeColGameObject attacker,
+    public abstract CombatOdds calculateCombatOdds(FreeColGameObject attacker,
                                                    FreeColGameObject defender);
 
     /**
@@ -180,7 +180,7 @@ abstract public class CombatModel {
      * @param defender The defender.
      * @return The offensive power.
      */
-    abstract public float getOffencePower(FreeColGameObject attacker,
+    public abstract float getOffencePower(FreeColGameObject attacker,
                                           FreeColGameObject defender);
 
     /**
@@ -190,7 +190,7 @@ abstract public class CombatModel {
      * @param defender The defender.
      * @return The defensive power.
      */
-    abstract public float getDefencePower(FreeColGameObject attacker,
+    public abstract float getDefencePower(FreeColGameObject attacker,
                                           FreeColGameObject defender);
 
     /**
@@ -203,7 +203,7 @@ abstract public class CombatModel {
      * @param defender The defender.
      * @return All the applicable offensive modifiers.
      */
-    abstract public Set<Modifier> getOffensiveModifiers(FreeColGameObject attacker,
+    public abstract Set<Modifier> getOffensiveModifiers(FreeColGameObject attacker,
                                                         FreeColGameObject defender);
 
     /**
@@ -214,7 +214,7 @@ abstract public class CombatModel {
      * @param defender The defender.
      * @return All the applicable defensive modifiers.
      */
-    abstract public Set<Modifier> getDefensiveModifiers(FreeColGameObject attacker,
+    public abstract Set<Modifier> getDefensiveModifiers(FreeColGameObject attacker,
                                                         FreeColGameObject defender);
 
     /**
@@ -228,7 +228,7 @@ abstract public class CombatModel {
      * @param defender The defender.
      * @return The results of the combat.
      */
-    abstract public List<CombatResult> generateAttackResult(Random random,
+    public abstract List<CombatResult> generateAttackResult(Random random,
                                                             FreeColGameObject attacker,
                                                             FreeColGameObject defender);
 
