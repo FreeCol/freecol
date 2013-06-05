@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.TradeRouteStop;
 
 import org.w3c.dom.Element;
 
@@ -40,180 +41,6 @@ public class TradeRoute extends FreeColGameObject
 
     private static final Logger logger = Logger.getLogger(TradeRoute.class.getName());
 
-    /**
-     * A stop along a trade route.
-     */
-    public class Stop {
-
-        /** Where to stop. */
-        private Location location;
-
-        /** The cargo expected to be on board on leaving the stop. */
-        private final List<GoodsType> cargo = new ArrayList<GoodsType>();
-
-
-        /**
-         * Create a stop for the given location from a stream.
-         *
-         * @param loc The <code>Location</code> of this stop.
-         */
-        public Stop(Location loc) {
-            this.location = loc;
-            this.cargo.clear();
-        }
-
-        /**
-         * Copy constructor.  Creates a stop based on the given one.
-         *
-         * @param other The other <code>Stop</code>.
-         */
-        public Stop(Stop other) {
-            this.location = other.location;
-            this.setCargo(other.cargo);
-        }
-
-        /**
-         * Create a stop by reading a stream.
-         *
-         * @param xr The <code>FreeColXMLReader</code> to read from.
-         * @exception XMLStreamException if there is a problem reading the
-         *     stream.
-         */
-        public Stop(FreeColXMLReader xr) throws XMLStreamException {
-            this((Location)null);
-
-            readFromXML(xr);
-        }
-
-
-        /**
-         * Get the location of this stop.
-         *
-         * @return The stop location.
-         */
-        public final Location getLocation() {
-            return location;
-        }
-
-        /**
-         * Is this stop valid?
-         *
-         * @return True if the stop is valid.
-         */
-        public boolean isValid() {
-            return isValid(getOwner());
-        }
-
-        /**
-         * Is this stop valid?
-         *
-         * @return True if the stop is valid.
-         */
-        public boolean isValid(Player player) {
-            return location != null
-                && !((FreeColGameObject)location).isDisposed()
-                && !((location instanceof Ownable)
-                    && (!player.owns((Ownable)location)));
-        }
-
-        /**
-         * Get the current cargo for this stop.
-         *
-         * @return A list of cargo <code>GoodsType</code>s.
-         */
-        public final List<GoodsType> getCargo() {
-            return cargo;
-        }
-        
-        /**
-         * Set the cargo value.
-         *
-         * @param newCargo A list of <code>GoodsType</code> defining the cargo.
-         */
-        public final void setCargo(List<GoodsType> newCargo) {
-            cargo.clear();
-            cargo.addAll(newCargo);
-        }
-
-        /**
-         * Add cargo to this stop.
-         *
-         * @param newCargo The <code>GoodsType</code> to add.
-         */
-        public void addCargo(GoodsType newCargo) {
-            cargo.add(newCargo);
-        }
-
-
-        // Serialization
-
-        private static final String CARGO_TAG = "cargo";
-        private static final String LOCATION_TAG = "location";
-        // Public as required in TradeRoute.readChild().
-        public static final String TRADE_ROUTE_STOP_TAG = "tradeRouteStop";
-
-
-        /**
-         * Write an XML-representation of this object to the given stream.
-         *
-         * @param xw The <code>FreeColXMLWriter</code> to write to.
-         * @exception XMLStreamException if there are any problems writing
-         *      to the stream.
-         */
-        protected void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-            xw.writeStartElement(TRADE_ROUTE_STOP_TAG);
-
-            xw.writeAttribute(LOCATION_TAG, (FreeColGameObject)location);
-
-            for (GoodsType cargoType : cargo) {
-                xw.writeStartElement(CARGO_TAG);
-
-                xw.writeAttribute(ID_ATTRIBUTE_TAG, cargoType.getId());
-
-                xw.writeEndElement();
-            }
-
-            xw.writeEndElement();
-        }
-
-        /**
-         * Initializes this object from its XML-representation.
-         *
-         * @param xr The input stream with the XML.
-         * @exception XMLStreamException if there are any problems reading
-         *     the stream.
-         */
-        protected void readFromXML(FreeColXMLReader xr) throws XMLStreamException {
-            final Specification spec = getSpecification();
-            final Game game = getGame();
-
-            location = xr.getLocationAttribute(game, LOCATION_TAG, true);
-
-            cargo.clear();
-            while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                final String tag = xr.getLocalName();
-
-                if (tag.equals(CARGO_TAG)) {
-                    String id = xr.readId();
-                    cargo.add(spec.getGoodsType(id));
-                    xr.closeTag(CARGO_TAG);
-                } else {
-                    logger.warning("Bogus Stop tag: " + tag);
-                }
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String toString() {
-            return (isValid()) ? getLocation().toString()
-                : "invalid stop";
-        }
-    };
-
-
     /** The name of this trade route. */
     private String name;
 
@@ -225,7 +52,7 @@ public class TradeRoute extends FreeColGameObject
     private Player owner;
 
     /** A list of stops. */
-    private final List<Stop> stops = new ArrayList<Stop>();
+    private final List<TradeRouteStop> stops = new ArrayList<TradeRouteStop>();
 
 
     /**
@@ -274,8 +101,8 @@ public class TradeRoute extends FreeColGameObject
     public synchronized void updateFrom(TradeRoute other) {
         setName(other.getName());
         stops.clear();
-        for (Stop otherStop : other.getStops()) {
-            addStop(new Stop(otherStop));
+        for (TradeRouteStop otherStop : other.getStops()) {
+            addStop(new TradeRouteStop(otherStop));
         }
     }
 
@@ -300,18 +127,18 @@ public class TradeRoute extends FreeColGameObject
     /**
      * Get the stops in this trade route.
      *
-     * @return A list of <code>Stop</code>s.
+     * @return A list of <code>TradeRouteStop</code>s.
      */
-    public final List<Stop> getStops() {
+    public final List<TradeRouteStop> getStops() {
         return stops;
     }
 
     /**
-     * Add a new <code>Stop</code> to this trade route.
+     * Add a new <code>TradeRouteStop</code> to this trade route.
      *
-     * @param stop The <code>Stop</code> to add.
+     * @param stop The <code>TradeRouteStop</code> to add.
      */
-    public void addStop(Stop stop) {
+    public void addStop(TradeRouteStop stop) {
         stops.add(stop);
     }
 
@@ -332,10 +159,10 @@ public class TradeRoute extends FreeColGameObject
      * @param otherStops The list of new <code>Stop</code>s to use.
      * @see #clone()
      */
-    private void replaceStops(List<Stop> otherStops) {
+    private void replaceStops(List<TradeRouteStop> otherStops) {
         clearStops();
-        for (Stop otherStop : otherStops) {
-            addStop(new Stop(otherStop));
+        for (TradeRouteStop otherStop : otherStops) {
+            addStop(new TradeRouteStop(otherStop));
         }
     }
 
@@ -375,10 +202,10 @@ public class TradeRoute extends FreeColGameObject
      * Is a stop valid for a given unit?
      *
      * @param unit The <code>Unit</code> to check.
-     * @param stop The <code>Stop</code> to check.
+     * @param stop The <code>TradeRouteStop</code> to check.
      * @return True if the stop is valid.
      */
-    public static boolean isStopValid(Unit unit, Stop stop) {
+    public static boolean isStopValid(Unit unit, TradeRouteStop stop) {
         return TradeRoute.isStopValid(unit.getOwner(), stop);
     }
 
@@ -386,10 +213,10 @@ public class TradeRoute extends FreeColGameObject
      * Is a stop valid for a given player?
      *
      * @param player The <code>Player</code> to check.
-     * @param stop The <code>Stop</code> to check.
+     * @param stop The <code>TradeRouteStop</code> to check.
      * @return True if the stop is valid.
      */
-    public static boolean isStopValid(Player player, Stop stop) {
+    public static boolean isStopValid(Player player, TradeRouteStop stop) {
         return (stop == null) ? false : stop.isValid(player);
     }
 
@@ -439,7 +266,7 @@ public class TradeRoute extends FreeColGameObject
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeChildren(xw);
 
-        for (Stop stop : stops) stop.toXML(xw);
+        for (TradeRouteStop stop : stops) stop.toXML(xw);
     }
 
     /**
@@ -473,8 +300,8 @@ public class TradeRoute extends FreeColGameObject
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
 
-        if (Stop.TRADE_ROUTE_STOP_TAG.equals(tag)) {
-            stops.add(new Stop(xr));
+        if (TradeRouteStop.getXMLElementTagName().equals(tag)) {
+            stops.add(new TradeRouteStop(getGame(), xr));
             
         } else {
             super.readChild(xr);

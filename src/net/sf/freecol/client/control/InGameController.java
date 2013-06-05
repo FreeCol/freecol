@@ -86,7 +86,7 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TradeRoute;
-import net.sf.freecol.common.model.TradeRoute.Stop;
+import net.sf.freecol.common.model.TradeRouteStop;
 import net.sf.freecol.common.model.TransactionListener;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
@@ -418,11 +418,11 @@ public final class InGameController implements NetworkConstants {
      * Create a message about a trade route stop.
      *
      * @param key A message key.
-     * @param stop The <code>Stop</code> to mention.
+     * @param stop The <code>TradeRouteStop</code> to mention.
      * @param player The <code>Player</code> who will see the message.
      * @return A message incorporating the stop.
      */
-    private String stopMessage(String key, Stop stop, Player player) {
+    private String stopMessage(String key, TradeRouteStop stop, Player player) {
         return Messages.message(StringTemplate.template(key)
             .addStringTemplate("%location%",
                 stop.getLocation().getLocationNameFor(player)));
@@ -444,8 +444,8 @@ public final class InGameController implements NetworkConstants {
         TradeRoute tr = unit.getTradeRoute();
         boolean detailed = freeColClient.getClientOptions()
             .getBoolean(ClientOptions.SHOW_GOODS_MOVEMENT);
-        final List<Stop> stops = tr.getStops();
-        Stop stop;
+        final List<TradeRouteStop> stops = tr.getStops();
+        TradeRouteStop stop;
         boolean result = false, more = true;
 
         // Accumulate a summary of all the activity of this unit on
@@ -582,7 +582,7 @@ public final class InGameController implements NetworkConstants {
      */
     private boolean loadUnitAtStop(Unit unit, StringBuffer sb) {
         // Copy the list of goods types to load at this stop.
-        Stop stop = unit.getStop();
+        TradeRouteStop stop = unit.getStop();
         List<GoodsType> goodsTypesToLoad
             = new ArrayList<GoodsType>(stop.getCargo());
         boolean ret = false;
@@ -712,7 +712,7 @@ public final class InGameController implements NetworkConstants {
      */
     private boolean unloadUnitAtStop(Unit unit, StringBuffer sb) {
         Colony colony = unit.getColony();
-        Stop stop = unit.getStop();
+        TradeRouteStop stop = unit.getStop();
         final List<GoodsType> goodsTypesToLoad = stop.getCargo();
         boolean ret = false;
 
@@ -2750,7 +2750,7 @@ public final class InGameController implements NetworkConstants {
             || (!oldTile.isDirectlyHighSeasConnected()
                 && newTile.isDirectlyHighSeasConnected())) {
             if (unit.getTradeRoute() != null) {
-                Stop stop = unit.getStop();
+                TradeRouteStop stop = unit.getStop();
                 if (stop != null && TradeRoute.isStopValid(unit, stop)
                     && stop.getLocation() instanceof Europe) {
                     moveTo(unit, stop.getLocation());

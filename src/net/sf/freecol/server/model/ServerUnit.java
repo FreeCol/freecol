@@ -60,7 +60,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileType;
-import net.sf.freecol.common.model.TradeRoute.Stop;
+import net.sf.freecol.common.model.TradeRouteStop;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
@@ -1055,10 +1055,10 @@ public class ServerUnit extends Unit implements ServerModelObject {
     /**
      * Is there work for a unit to do at a stop?
      *
-     * @param stop The <code>Stop</code> to test.
+     * @param stop The <code>TradeRouteStop</code> to test.
      * @return True if the unit should load or unload cargo at the stop.
      */
-    public boolean hasWorkAtStop(Stop stop) {
+    public boolean hasWorkAtStop(TradeRouteStop stop) {
         Location loc = stop.getLocation();
 
         // Look for goods to load.

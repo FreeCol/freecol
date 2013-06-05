@@ -88,7 +88,7 @@ import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TradeItem;
 import net.sf.freecol.common.model.TradeRoute;
-import net.sf.freecol.common.model.TradeRoute.Stop;
+import net.sf.freecol.common.model.TradeRouteStop;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.Role;
@@ -2458,12 +2458,12 @@ public final class InGameController extends Controller {
                 .build(serverPlayer);
         }
 
-        List<Stop> stops = unit.getTradeRoute().getStops();
+        List<TradeRouteStop> stops = unit.getTradeRoute().getStops();
         int next = current;
         for (;;) {
             if (++next >= stops.size()) next = 0;
             if (next == current) return null; // No work at any stop, stay put.
-            Stop nextStop = stops.get(next);
+            TradeRouteStop nextStop = stops.get(next);
             boolean work = ((ServerUnit)unit).hasWorkAtStop(nextStop);
             logger.finest("Unit " + unit
                 + " in trade route " + unit.getTradeRoute().getName()
@@ -3766,7 +3766,7 @@ public final class InGameController extends Controller {
         unit.setTradeRoute(tradeRoute);
         unit.setDestination(null);
         if (tradeRoute != null) {
-            List<Stop> stops = tradeRoute.getStops();
+            List<TradeRouteStop> stops = tradeRoute.getStops();
             int found = -1;
             for (int i = 0; i < stops.size(); i++) {
                 if (unit.getLocation() == stops.get(i).getLocation()) {

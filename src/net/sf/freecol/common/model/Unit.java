@@ -45,7 +45,7 @@ import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
-import net.sf.freecol.common.model.TradeRoute.Stop;
+import net.sf.freecol.common.model.TradeRouteStop;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.util.EmptyIterator;
 import net.sf.freecol.common.util.Utils;
@@ -1453,7 +1453,7 @@ public class Unit extends GoodsLocation
      *
      * @return The target <code>Stop</code>.
      */
-    public Stop getStop() {
+    public TradeRouteStop getStop() {
         return (validateCurrentStop() < 0) ? null
             : getTradeRoute().getStops().get(currentStop);
     }
@@ -1485,7 +1485,7 @@ public class Unit extends GoodsLocation
         if (tradeRoute == null) {
             currentStop = -1;
         } else {
-            List<Stop> stops = tradeRoute.getStops();
+            List<TradeRouteStop> stops = tradeRoute.getStops();
             if (stops == null || stops.size() == 0) {
                 currentStop = -1;
             } else {
@@ -2534,7 +2534,7 @@ public class Unit extends GoodsLocation
      */
     public Location resolveDestination() {
         if (!isAtSea()) throw new IllegalArgumentException("Not at sea.");
-        Stop stop = getStop();
+        TradeRouteStop stop = getStop();
         Location dst = (TradeRoute.isStopValid(this, stop)) ? stop.getLocation()
             : getDestination();
         Tile best;

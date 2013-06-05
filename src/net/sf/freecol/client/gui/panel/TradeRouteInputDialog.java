@@ -59,13 +59,14 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.plaf.FreeColSelectedPanelUI;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TradeRoute;
-import net.sf.freecol.common.model.TradeRoute.Stop;
+import net.sf.freecol.common.model.TradeRouteStop;
 
 
 /**
@@ -76,7 +77,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
     private static final Logger logger = Logger.getLogger(TradeRouteInputDialog.class.getName());
 
     public static final DataFlavor STOP_FLAVOR
-        = new DataFlavor(Stop.class, "Stop");
+        = new DataFlavor(TradeRouteStop.class, "Stop");
 
     private TradeRoute originalRoute;
 
@@ -181,8 +182,10 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
                         cargo.add(label.getType());
                     }
                     int maxIndex = stopList.getMaxSelectionIndex();
+                    Game game = originalRoute.getGame();
                     for (int i = startIndex; i <= endIndex; i++) {
-                        Stop stop = originalRoute.new Stop((Location) destinationSelector.getItemAt(i));
+                        TradeRouteStop stop = new TradeRouteStop(game,
+                            (Location) destinationSelector.getItemAt(i));
                         stop.setCargo(cargo);
                         if (maxIndex < 0) {
                             stopListModel.addElement(stop);
@@ -208,7 +211,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
                     if (!e.getValueIsAdjusting()) {
                         int[] indices = stopList.getSelectedIndices();
                         if (indices.length > 0) {
-                            cargoPanel.initialize((Stop) stopListModel.get(indices[0]));
+                            cargoPanel.initialize((TradeRouteStop) stopListModel.get(indices[0]));
                         }
                     }
                 }
@@ -246,14 +249,14 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
         }
 
         // add stops if any
-        for (Stop stop : tradeRoute.getStops()) {
+        for (TradeRouteStop stop : tradeRoute.getStops()) {
             stopListModel.addElement(stop);
         }
 
         // update cargo panel if stop is selected
         if (stopListModel.getSize() > 0) {
             stopList.setSelectedIndex(0);
-            Stop selectedStop = (Stop) stopListModel.firstElement();
+            TradeRouteStop selectedStop = (TradeRouteStop)stopListModel.firstElement();
             cargoPanel.initialize(selectedStop);
         }
 
@@ -327,7 +330,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
 
         // Check that all stops are valid
         for (int index = 0; index < stopListModel.getSize(); index++) {
-            Stop stop = (Stop) stopListModel.get(index);
+            TradeRouteStop stop = (TradeRouteStop)stopListModel.get(index);
             if (!TradeRoute.isStopValid(player, stop)) {
                 String badStop = Messages.message(stop.getLocation().getLocationName());
                 StringTemplate template
@@ -354,7 +357,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
             originalRoute.setName(tradeRouteName.getText());
             originalRoute.clearStops();
             for (int index = 0; index < stopListModel.getSize(); index++) {
-                originalRoute.addStop((Stop)stopListModel.get(index));
+                originalRoute.addStop((TradeRouteStop)stopListModel.get(index));
             }
             // TODO: update trade routes only if they have been modified
             getController().updateTradeRoute(originalRoute);
@@ -429,7 +432,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
             addMouseListener(dropListener);
         }
 
-        public void initialize(Stop newStop) {
+        public void initialize(TradeRouteStop newStop) {
             removeAll();
             if (newStop != null) {
                 // stop = newStop;
@@ -468,7 +471,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
                         cargoPanel.revalidate();
                         int[] indices = stopList.getSelectedIndices();
                         for (int index : indices) {
-                            Stop stop = (Stop) stopListModel.get(index);
+                            TradeRouteStop stop = (TradeRouteStop)stopListModel.get(index);
                             stop.addCargo(label.getType());
                         }
                         stopList.revalidate();
@@ -492,7 +495,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
                     cargoPanel.remove(label);
                     int[] indices = stopList.getSelectedIndices();
                     for (int stopIndex : indices) {
-                        Stop stop = (Stop) stopListModel.get(stopIndex);
+                        TradeRouteStop stop = (TradeRouteStop)stopListModel.get(stopIndex);
                         ArrayList<GoodsType> cargo = new ArrayList<GoodsType>(stop.getCargo());
                         for (int index = 0; index < cargo.size(); index++) {
                             if (cargo.get(index) == label.getType()) {
@@ -526,9 +529,9 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
 
     public class StopTransferable implements Transferable {
 
-        private List<Stop> stops;
+        private List<TradeRouteStop> stops;
 
-        public StopTransferable(List<Stop> stops) {
+        public StopTransferable(List<TradeRouteStop> stops) {
             this.stops = stops;
         }
 
@@ -553,9 +556,9 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
         protected Transferable createTransferable(JComponent c) {
             JList list = (JList) c;
             DefaultListModel model = (DefaultListModel) list.getModel();
-            List<Stop> stops = new ArrayList<Stop>();
+            List<TradeRouteStop> stops = new ArrayList<TradeRouteStop>();
             for (int index : list.getSelectedIndices()) {
-                stops.add((Stop) model.get(index));
+                stops.add((TradeRouteStop)model.get(index));
             }
             return new StopTransferable(stops);
         }
@@ -574,7 +577,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
                         DefaultListModel model = (DefaultListModel) list.getModel();
                         int index = list.getMaxSelectionIndex();
                         for (Object o : stops) {
-                            Stop stop = originalRoute.new Stop((Stop) o);
+                            TradeRouteStop stop = new TradeRouteStop((TradeRouteStop)o);
                             if (index < 0) {
                                 model.addElement(stop);
                             } else {
@@ -648,7 +651,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
             panel.removeAll();
             panel.setForeground(list.getForeground());
             panel.setFont(list.getFont());
-            Stop stop = (Stop) value;
+            TradeRouteStop stop = (TradeRouteStop)value;
             Location location = stop.getLocation();
             JLabel icon, name;
             if (location instanceof Europe) {

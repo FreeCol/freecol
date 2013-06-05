@@ -28,51 +28,138 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.FreeColObject;
+import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.Location;
 
 
 /**
  * A stop along a trade route.
  */
-public class TradeRouteStop {
+public class TradeRouteStop extends FreeColObject {
 
     private static final Logger logger = Logger.getLogger(TradeRouteStop.class.getName());
 
-    /**
-     * The location of the stop.
-     */
+    /** The game in play. */
+    private final Game game;
+
+    /** The location of the stop. */
     private Location location;
 
+    /** The cargo expected to be on board on leaving the stop. */
+    private final List<GoodsType> cargo = new ArrayList<GoodsType>();
+
+
+    /**
+     * Create a stop for the given location from a stream.
+     *
+     * @param loc The <code>Location</code> of this stop.
+     */
+    public TradeRouteStop(Game game, Location loc) {
+        setId("");
+        setSpecification(game.getSpecification());
+
+        this.game = game;
+        this.location = loc;
+        this.cargo.clear();
+    }
+
+    /**
+     * Copy constructor.  Creates a stop based on the given one.
+     *
+     * @param other The other <code>TradeRouteStop</code>.
+     */
+    public TradeRouteStop(TradeRouteStop other) {
+        this(other.game, other.location);
+        this.setCargo(other.cargo);
+    }
+
+    /**
+     * Create a new <code>TradeRouteStop</code> from a stream.
+     *
+     * @param game The enclosing <code>Game</code>.
+     * @param xr The <code>FreeColXMLReader</code> to read from.
+     * @exception XMLStreamException if there is a problem reading the stream.
+     */
+    public TradeRouteStop(Game game, FreeColXMLReader xr) throws XMLStreamException {
+        this(game, (Location)null);
+
+        readFromXML(xr);
+    }
+
+
+    /**
+     * Get the location of this stop.
+     *
+     * @return The stop location.
+     */
+    public final Location getLocation() {
+        return location;
+    }
+
+    /**
+     * Is this stop valid?
+     *
+     * @return True if the stop is valid.
+     */
+    public boolean isValid(Player player) {
+        return location != null
+            && !((FreeColGameObject)location).isDisposed()
+            && !((location instanceof Ownable)
+                && !player.owns((Ownable)location));
+    }
+
+    /**
+     * Get the current cargo for this stop.
+     *
+     * @return A list of cargo <code>GoodsType</code>s.
+     */
+    public final List<GoodsType> getCargo() {
+        return cargo;
+    }
+
+    /**
+     * Set the cargo value.
+     *
+     * @param newCargo A list of <code>GoodsType</code> defining the cargo.
+     */
+    public final void setCargo(List<GoodsType> newCargo) {
+        cargo.clear();
+        cargo.addAll(newCargo);
+    }
+
+    /**
+     * Add cargo to this stop.
+     *
+     * @param newCargo The <code>GoodsType</code> to add.
+     */
+    public void addCargo(GoodsType newCargo) {
+        cargo.add(newCargo);
+    }
+
+
+    // Disabled routines for a proposed functionality extension.
     /**
      * Whether the stop has been modified. This is of interest only to the
      * client and can be ignored for XML serialization.
-     */
+     *
     private boolean modified = false;
 
     /**
      * The AbstractGoods to unload in this Location.
-     */
+     *
     private List<AbstractGoods> goodsToUnload;
 
     /**
      * The AbstractGoods to load in this Location.
-     */
-    private List<AbstractGoods> goodsToLoad;
-
-
-    /**
-     * Creates a new <code>TradeRouteStop</code> instance.
      *
-     * @param location a <code>Location</code> value
-     */
-    public TradeRouteStop(Location location) {
-        this.location = location;
-    }
+    private List<AbstractGoods> goodsToLoad;
 
     /**
      * Get the <code>GoodsToLoad</code> value.
      *
      * @return a <code>List<AbstractGoods></code> value
-     */
+     *
     public final List<AbstractGoods> getGoodsToLoad() {
         return goodsToLoad;
     }
@@ -81,7 +168,7 @@ public class TradeRouteStop {
      * Set the <code>GoodsToLoad</code> value.
      *
      * @param newGoodsToLoad The new GoodsToLoad value.
-     */
+     *
     public final void setGoodsToLoad(final List<AbstractGoods> newGoodsToLoad) {
         this.goodsToLoad = newGoodsToLoad;
     }
@@ -90,7 +177,7 @@ public class TradeRouteStop {
      * Get the <code>GoodsToUnload</code> value.
      *
      * @return a <code>List<AbstractGoods></code> value
-     */
+     *
     public final List<AbstractGoods> getGoodsToUnload() {
         return goodsToUnload;
     }
@@ -99,7 +186,7 @@ public class TradeRouteStop {
      * Set the <code>GoodsToUnload</code> value.
      *
      * @param newGoodsToUnload The new GoodsToUnload value.
-     */
+     *
     public final void setGoodsToUnload(final List<AbstractGoods> newGoodsToUnload) {
         this.goodsToUnload = newGoodsToUnload;
     }
@@ -108,7 +195,7 @@ public class TradeRouteStop {
      * Get the <code>Modified</code> value.
      * 
      * @return a <code>boolean</code> value
-     */
+     *
     public final boolean isModified() {
         return modified;
     }
@@ -117,93 +204,73 @@ public class TradeRouteStop {
      * Set the <code>Modified</code> value.
      * 
      * @param newModified The new Modified value.
-     */
+     *
     public final void setModified(final boolean newModified) {
         this.modified = newModified;
     }
+    */
+
+    // Serialization
+
+    private static final String CARGO_TAG = "cargo";
+    private static final String LOCATION_TAG = "location";
+
 
     /**
-     * Get the <code>Location</code> value.
-     * 
-     * @return a <code>Location</code> value
+     * {@inheritDoc}
      */
-    public final Location getLocation() {
-        return location;
-    }
-
-    /**
-     * Set the <code>Location</code> value.
-     *
-     * @param newLocation a <code>Location</code> value
-     */
-    public void setLocation(Location newLocation) {
-        this.location = newLocation;
-    }
-
+    @Override
     public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
         xw.writeStartElement(getXMLElementTagName());
-        xw.writeAttribute("location", this.location.getId());
-        if (goodsToUnload != null) {
-            xw.writeStartElement("goodsToUnload");
-            for (AbstractGoods goods : goodsToUnload) {
-                goods.toXML(xw);
-            }
+
+        xw.writeLocationAttribute(LOCATION_TAG, location);
+
+        for (GoodsType cargoType : cargo) {
+            xw.writeStartElement(CARGO_TAG);
+            
+            xw.writeAttribute(FreeColObject.ID_ATTRIBUTE_TAG, cargoType);
+
             xw.writeEndElement();
         }
-        if (goodsToLoad != null) {
-            xw.writeStartElement("goodsToLoad");
-            for (AbstractGoods goods : goodsToLoad) {
-                goods.toXML(xw);
-            }
-            xw.writeEndElement();
-        }
+
         xw.writeEndElement();
     }
 
     /**
-     * Initialize this object from an XML-representation of this object.
-     * 
-     * @param xr The input stream with the XML.
-     * @throws XMLStreamException is thrown if something goes wrong.
+     * {@inheritDoc}
      */
-    public void readFromXML(FreeColXMLReader xr) throws XMLStreamException {
-        readFromXML(xr, null);
+    @Override
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        location = xr.getLocationAttribute(game, LOCATION_TAG, true);
     }
 
     /**
-     * Initialize this object from an XML-representation of this object.
-     * 
-     * @param xr The input stream with the XML.
-     * @param game The enclosing <code>Game</code>.
-     * @throws XMLStreamException is thrown if something goes wrong.
+     * {@inheritDoc}
      */
-    public void readFromXML(FreeColXMLReader xr,
-                            Game game) throws XMLStreamException {
-        if (game != null) {
-            String str = xr.getAttributeValue(null, "location");
-            location = game.makeFreeColLocation(str);
-        }
+    @Override
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
+        // Clear containers.
+        cargo.clear();
 
-        while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if (xr.getLocalName().equals("goodsToUnload")) {
-                goodsToUnload = new ArrayList<AbstractGoods>();
-                while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                    if (xr.getLocalName().equals(AbstractGoods.getXMLElementTagName())) {
-                        AbstractGoods goods = new AbstractGoods();
-                        goods.readFromXML(xr);
-                        goodsToUnload.add(goods);
-                    }
-                }
-            } else if (xr.getLocalName().equals("goodsToLoad")) {
-                goodsToLoad = new ArrayList<AbstractGoods>();
-                while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                    if (xr.getLocalName().equals(AbstractGoods.getXMLElementTagName())) {
-                        AbstractGoods goods = new AbstractGoods();
-                        goods.readFromXML(xr);
-                        goodsToLoad.add(goods);
-                    }
-                }
-            }
+        super.readChildren(xr);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
+        final Specification spec = getSpecification();
+        final String tag = xr.getLocalName();
+
+        if (CARGO_TAG.equals(tag)) {
+            cargo.add(xr.getType(spec, ID_ATTRIBUTE_TAG,
+                                 GoodsType.class, (GoodsType)null));
+
+            xr.closeTag(CARGO_TAG);
+
+        } else {
+            super.readChild(xr);
         }
     }
 
@@ -213,7 +280,14 @@ public class TradeRouteStop {
      */
     @Override
     public String toString() {
-        return (location == null) ? "" : location.getLocationName().getId();
+        StringBuilder sb = new StringBuilder(64);
+        sb.append("[").append(getXMLTagName())
+            .append(" ").append(getLocation().toString());
+        for (GoodsType goodsType : getCargo()) {
+            sb.append(" ").append(goodsType.toString());
+        }
+        sb.append("]");
+        return sb.toString();            
     }
 
     /**
@@ -226,7 +300,7 @@ public class TradeRouteStop {
     /**
      * Gets the tag name of the root element representing this object.
      * 
-     * @return "tradeRoute".
+     * @return "tradeRouteStop".
      */
     public static String getXMLElementTagName() {
         return "tradeRouteStop";
