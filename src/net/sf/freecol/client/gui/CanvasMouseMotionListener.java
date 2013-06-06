@@ -36,6 +36,9 @@ public final class CanvasMouseMotionListener extends AbstractCanvasListener impl
 
     private static final Logger logger = Logger.getLogger(CanvasMouseMotionListener.class.getName());
 
+    // Number of pixels that must be moved before a goto is enabled.
+    private static final int DRAG_THRESHOLD = 16;
+
     // Temporary variable for checking if we need to recalculate the path when
     // dragging units.
     private Tile lastTile;
@@ -112,7 +115,12 @@ public final class CanvasMouseMotionListener extends AbstractCanvasListener impl
                     }
                 }
             } else {
-                mapViewer.startGoto();
+                // Only start a goto if the drag is 16 pixels or more
+                int deltaX = Math.abs(e.getX() - mapViewer.getDragPoint().x);
+                int deltaY = Math.abs(e.getY() - mapViewer.getDragPoint().y);
+                if (deltaX >= DRAG_THRESHOLD || deltaY >= DRAG_THRESHOLD) {
+                    mapViewer.startGoto();
+                }
             }
         }
     }

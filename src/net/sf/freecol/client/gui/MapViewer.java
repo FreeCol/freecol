@@ -136,6 +136,7 @@ public final class MapViewer {
 
     private PathNode gotoPath = null;
     private boolean gotoStarted = false;
+    private Point gotoDragPoint;
     // Helper variables for displaying the map.
     private int tileHeight, tileWidth, halfHeight, halfWidth,
     topSpace,
@@ -907,11 +908,11 @@ public final class MapViewer {
 
 
     /**
-    * Gets the active unit.
-    *
-    * @return The <code>Unit</code>.
-    * @see #setActiveUnit
-    */
+     * Gets the active unit.
+     *
+     * @return The <code>Unit</code>.
+     * @see #setActiveUnit
+     */
     public Unit getActiveUnit() {
         return activeUnit;
     }
@@ -927,22 +928,31 @@ public final class MapViewer {
     }
 
     /**
-    * Gets the focus of the map. That is the center tile of the displayed
-    * map.
-    *
-    * @return The center tile of the
-    *         displayed map
-    * @see #setFocus(Tile)
-    */
+     * Gets the point at which the map was clicked for a drag.
+     *
+     * @return The Point where the mouse was initially clicked.
+     */
+    public Point getDragPoint() {
+        return gotoDragPoint;
+    }
+
+    /**
+     * Gets the focus of the map. That is the center tile of the displayed
+     * map.
+     *
+     * @return The center tile of the
+     *         displayed map
+     * @see #setFocus(Tile)
+     */
     public Tile getFocus() {
         return focus;
     }
 
     /**
-    * Gets the path to be drawn on the map.
-    * @return The path that should be drawn on the map
-    *        or <code>null</code> if no path should be drawn.
-    */
+     * Gets the path to be drawn on the map.
+     * @return The path that should be drawn on the map
+     *        or <code>null</code> if no path should be drawn.
+     */
     public PathNode getGotoPath() {
         return gotoPath;
     }
@@ -1172,6 +1182,16 @@ public final class MapViewer {
             }
         }
         return false;
+    }
+
+    /**
+    * Sets the point at which the map was clicked for a drag.
+    *
+    * @param x The mouse's x position.
+    * @param y The mouse's y position.
+    */
+    public void setDragPoint(int x, int y) {
+        gotoDragPoint = new Point(x, y);
     }
 
     /**

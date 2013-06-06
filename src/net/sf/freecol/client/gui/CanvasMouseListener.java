@@ -136,6 +136,8 @@ public final class CanvasMouseListener implements ActionListener, MouseListener 
                     }
                 }
             } else if (e.getButton() == MouseEvent.BUTTON1) {
+                // Record initial click point for purposes of dragging
+                mapViewer.setDragPoint(e.getX(), e.getY());
                 if (mapViewer.isGotoStarted()) {
                     PathNode path = mapViewer.getGotoPath();
                     if (path != null) {
