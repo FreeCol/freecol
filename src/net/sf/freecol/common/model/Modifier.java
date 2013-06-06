@@ -514,6 +514,11 @@ public class Modifier extends Feature implements Comparable<Modifier> {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public String getXMLTagName() { return getXMLElementTagName(); }
+
+    /**
      * Gets the XML tag name for this element.
      *
      * @return "modifier".

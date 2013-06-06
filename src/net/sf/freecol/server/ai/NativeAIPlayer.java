@@ -995,4 +995,9 @@ public class NativeAIPlayer extends AIPlayer {
 
     // Use default acceptTax, acceptMercenaries, determineStances,
     // selectFoundingFather.
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getXMLTagName() { return getXMLElementTagName(); }
 }

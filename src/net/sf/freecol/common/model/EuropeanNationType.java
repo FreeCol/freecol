@@ -269,6 +269,11 @@ public class EuropeanNationType extends NationType {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public String getXMLTagName() { return getXMLElementTagName(); }
+
+    /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "european-nation-type".

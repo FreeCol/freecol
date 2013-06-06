@@ -2271,4 +2271,9 @@ public class EuropeanAIPlayer extends AIPlayer {
         }
         return bestFather;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getXMLTagName() { return getXMLElementTagName(); }
 }

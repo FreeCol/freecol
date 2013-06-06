@@ -190,4 +190,9 @@ public class CreateMissionAtSettlementGoal extends Goal {
     public void readFromXML(XMLStreamReader in) throws XMLStreamException {
         //TODO
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getXMLTagName() { return getXMLElementTagName(); }
 }

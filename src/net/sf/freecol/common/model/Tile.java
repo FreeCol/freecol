@@ -2149,6 +2149,11 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public String getXMLTagName() { return getXMLElementTagName(); }
+
+    /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "tile".

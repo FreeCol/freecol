@@ -213,6 +213,11 @@ public class Effect extends FreeColGameObjectType {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public String getXMLTagName() { return getXMLElementTagName(); }
+
+    /**
      * Gets the XML tag name for this element.
      *
      * @return "effect".

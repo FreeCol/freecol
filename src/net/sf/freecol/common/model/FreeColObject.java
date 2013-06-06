@@ -1007,7 +1007,7 @@ public abstract class FreeColObject {
     protected void toXMLPartialByClass(XMLStreamWriter out, Class<?> theClass, 
                                        String[] fields) throws XMLStreamException {
         try {
-            out.writeStartElement(getRealXMLElementTagName());
+            out.writeStartElement(getXMLTagName());
 
             writeAttribute(out, ID_ATTRIBUTE_TAG, getId());
 
@@ -1211,7 +1211,7 @@ public abstract class FreeColObject {
      *     recognized all child elements.
      */
     protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        throw new XMLStreamException("In " + getRealXMLElementTagName()
+        throw new XMLStreamException("In " + getXMLTagName()
             + ", unexpected tag " + in.getLocalName()
             + ", at: " + currentTag(in));
     }
@@ -1755,6 +1755,14 @@ public abstract class FreeColObject {
         return tagName;
     }
 
+    /**
+     * Gets the tag name used to serialize this object, generally the
+     * class name starting with a lower case letter.
+     *
+     * @return The tag name for this object.
+     */
+    public abstract String getXMLTagName();
+        
     /**
      * Gets the tag name used to serialize this object, generally the
      * class name starting with a lower case letter.  This method

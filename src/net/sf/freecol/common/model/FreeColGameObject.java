@@ -150,7 +150,7 @@ public abstract class FreeColGameObject extends FreeColObject {
      * @param game The <code>Game</code> this object is in.
      */
     protected void setDefaultId(Game game) {
-        setId(getRealXMLElementTagName() + ":" + game.getNextId());
+        setId(getXMLTagName() + ":" + game.getNextId());
     }
 
     // @compat 0.9.x
@@ -162,7 +162,7 @@ public abstract class FreeColGameObject extends FreeColObject {
      * @return The integer identifier.
      */
     public Integer getIntegerId() {
-        String stringPart = getRealXMLElementTagName() + ":";
+        String stringPart = getXMLTagName() + ":";
         return new Integer(getId().substring(stringPart.length()));
     }
     // end @compat
@@ -220,7 +220,7 @@ public abstract class FreeColGameObject extends FreeColObject {
                              returnClass, (T)null);
         if (ret == (T)null) {
             if (required) {
-                throw new XMLStreamException(getRealXMLElementTagName()
+                throw new XMLStreamException(getXMLTagName()
                     + " missing " + attributeName + ": " + currentTag(in));
             } else {
                 ret = defaultValue;
@@ -256,7 +256,7 @@ public abstract class FreeColGameObject extends FreeColObject {
 
         if (id == null) {
             if (required) {
-                throw new XMLStreamException(getRealXMLElementTagName()
+                throw new XMLStreamException(getXMLTagName()
                     + " missing " + attributeName + ": " + currentTag(in));
             }
         } else {
@@ -267,7 +267,7 @@ public abstract class FreeColGameObject extends FreeColObject {
                                                                   String.class);
                     ret = returnClass.cast(c.newInstance(game, id));
                     if (required && ret == null) {
-                        throw new XMLStreamException(getRealXMLElementTagName()
+                        throw new XMLStreamException(getXMLTagName()
                             + " constructed null " + returnClass.getName()
                             + " for " + id + ": " + currentTag(in));
                     }
@@ -429,7 +429,7 @@ public abstract class FreeColGameObject extends FreeColObject {
         if (!showAll && toSavedGame) {
             throw new IllegalArgumentException("'showAll' should be true when saving a game.");
         }
-        toXML(out, getRealXMLElementTagName(), player, showAll, toSavedGame);
+        toXML(out, getXMLTagName(), player, showAll, toSavedGame);
     }
 
     /**

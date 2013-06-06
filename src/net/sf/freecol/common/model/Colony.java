@@ -2903,6 +2903,11 @@ public class Colony extends Settlement implements Nameable {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public String getXMLTagName() { return getXMLElementTagName(); }
+
+    /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "colony".

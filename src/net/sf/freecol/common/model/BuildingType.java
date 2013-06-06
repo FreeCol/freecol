@@ -444,6 +444,11 @@ public final class BuildingType extends BuildableType
     // @end compatibility code
 
     /**
+     * {@inheritDoc}
+     */
+    public String getXMLTagName() { return getXMLElementTagName(); }
+
+    /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "building-type".

@@ -205,4 +205,8 @@ public class CompoundMission extends AbstractMission {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public String getXMLTagName() { return "TODO!"; }
 }

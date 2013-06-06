@@ -306,6 +306,11 @@ public class ListOption<T> extends AbstractOption<List<AbstractOption<T>>> {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public String getXMLTagName() { return getXMLElementTagName(); }
+
+    /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "listOption".

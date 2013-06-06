@@ -337,6 +337,11 @@ public class EquipmentType extends BuildableType {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public String getXMLTagName() { return getXMLElementTagName(); }
+
+    /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "equipment-type".

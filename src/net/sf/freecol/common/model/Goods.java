@@ -260,6 +260,11 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public String getXMLTagName() { return getXMLElementTagName(); }
+
+    /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "goods".

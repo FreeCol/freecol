@@ -743,6 +743,11 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public String getXMLTagName() { return getXMLElementTagName(); }
+
+    /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "building".

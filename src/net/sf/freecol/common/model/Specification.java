@@ -90,6 +90,11 @@ public final class Specification {
         public String toString() {
             return getId();
         }
+
+        /**
+         * {@inheritDoc}
+         */
+        public String getXMLTagName() { return "source"; }
     };
 
     public static final Source MOVEMENT_PENALTY_SOURCE

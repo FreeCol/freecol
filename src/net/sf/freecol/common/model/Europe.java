@@ -444,6 +444,11 @@ public class Europe extends UnitLocation implements Ownable, Named {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public String getXMLTagName() { return getXMLElementTagName(); }
+
+    /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "europe".

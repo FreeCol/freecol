@@ -430,6 +430,11 @@ public class SettlementType extends FreeColGameObjectType {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public String getXMLTagName() { return getXMLElementTagName(); }
+
+    /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "settlementType".

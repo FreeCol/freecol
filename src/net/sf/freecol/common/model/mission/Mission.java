@@ -91,5 +91,4 @@ public interface Mission {
      *      to the stream.
      */
     public void toXML(XMLStreamWriter out) throws XMLStreamException;
-
 }

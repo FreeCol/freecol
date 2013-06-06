@@ -189,6 +189,11 @@ public class TileTypeChange implements Comparable<TileTypeChange> {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public String getXMLTagName() { return getXMLElementTagName(); }
+
+    /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "change".

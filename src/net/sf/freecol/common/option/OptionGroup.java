@@ -494,6 +494,11 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public String getXMLTagName() { return getXMLElementTagName(); }
+
+    /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "optionGroup".
