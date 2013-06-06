@@ -32,6 +32,8 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Specification;
+
 
 /**
  * This panel displays the Religious Report.
@@ -46,27 +48,30 @@ public final class ReportReligiousPanel extends ReportPanel {
      */
     public ReportReligiousPanel(FreeColClient freeColClient, GUI gui) {
         super(freeColClient, gui, Messages.message("reportReligionAction.name"));
-
         reportPanel.setLayout(new MigLayout("wrap 5, gap 20 20", "", ""));
-        Player player = getMyPlayer();
-
         reportPanel.add(new JLabel(Messages.message("crosses")));
-        GoodsType crosses = getSpecification().getGoodsType("model.goods.crosses");
-        FreeColProgressBar progressBar = new FreeColProgressBar(getGUI(), crosses);
+
+        final Player player = getMyPlayer();
+        final Specification spec = getSpecification();
+        final GoodsType crosses = spec.getGoodsType("model.goods.crosses");
+
+        FreeColProgressBar progressBar
+            = new FreeColProgressBar(getGUI(), crosses);
         reportPanel.add(progressBar, "span");
 
         List<Colony> colonies = getSortedColonies();
         int production = 0;
         for (Colony colony : colonies) {
             Building building = colony.getBuildingForProducing(crosses);
-            reportPanel.add(createColonyButton(colony), "split 2, flowy, align center");
+            if (building == null) continue;
+            reportPanel.add(createColonyButton(colony),
+                            "split 2, flowy, align center");
             reportPanel.add(new BuildingPanel(getFreeColClient(), building));
             production += colony.getNetProductionOf(crosses);
         }
 
-        progressBar.update(0, player.getImmigrationRequired(), player.getImmigration(), production);
-
+        progressBar.update(0, player.getImmigrationRequired(),
+                           player.getImmigration(), production);
     }
-
 }
 
