@@ -644,6 +644,9 @@ public class ServerColony extends Colony implements ServerModelObject {
                         .add("%building%", buildable.getNameKey()));
                 break;
             default: // Are there other warnings to send?
+                logger.warning("Unexpected build failure at " + getName()
+                    + " for " + buildable
+                    + ": " + getNoBuildReason(buildable));
                 cs.addMessage(See.only(owner),
                     new ModelMessage(ModelMessage.MessageType.WARNING,
                                      "colonyPanel.unbuildable",
