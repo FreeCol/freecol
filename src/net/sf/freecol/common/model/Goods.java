@@ -22,8 +22,9 @@ package net.sf.freecol.common.model;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 import org.w3c.dom.Element;
 
@@ -89,13 +90,13 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
      * Creates a new <code>Goods</code> instance.
      *
      * @param game The enclosing <code>Game</code>.
-     * @param in The <code>XMLStreamReader</code> to read from.
+     * @param xr The <code>FreeColXMLReader</code> to read from.
      * @exception XMLStreamException if an error occurs
      */
-    public Goods(Game game, XMLStreamReader in) throws XMLStreamException {
+    public Goods(Game game, FreeColXMLReader xr) throws XMLStreamException {
         this.game = game;
         setSpecification(game.getSpecification());
-        readFromXML(in);
+        readFromXML(xr);
     }
 
     /**
@@ -253,10 +254,10 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        location = makeLocationAttribute(in, LOCATION_TAG, game);
+        location = xr.makeLocationAttribute(LOCATION_TAG, game);
     }
 
     /**

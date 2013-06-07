@@ -23,9 +23,9 @@ import java.util.List;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 
 import org.w3c.dom.Element;
@@ -61,11 +61,11 @@ public class CompoundMission extends AbstractMission {
      * Creates a new <code>CompoundMission</code> instance.
      *
      * @param game a <code>Game</code> value
-     * @param in a <code>XMLStreamReader</code> value
+     * @param xr a <code>FreeColXMLReader</code> value
      * @exception XMLStreamException if an error occurs
      */
-    public CompoundMission(Game game, XMLStreamReader in) throws XMLStreamException {
-        super(game, in);
+    public CompoundMission(Game game, FreeColXMLReader xr) throws XMLStreamException {
+        super(game, xr);
     }
 
     /**
@@ -185,21 +185,21 @@ public class CompoundMission extends AbstractMission {
     /**
      * {@inheritDoc}
      */
-    protected void readAttributes(XMLStreamReader in)
+    protected void readAttributes(FreeColXMLReader xr)
         throws XMLStreamException {
-        super.readAttributes(in);
-        index = getAttribute(in, "index", 0);
+        super.readAttributes(xr);
+        index = xr.getAttribute("index", 0);
     }
 
 
     /**
      * {@inheritDoc}
      */
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         missions.clear();
         Mission mission;
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            mission = MissionManager.getMission(getGame(), in);
+        while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            mission = MissionManager.getMission(getGame(), xr);
             if (mission != null) {
                 missions.add(mission);
             }

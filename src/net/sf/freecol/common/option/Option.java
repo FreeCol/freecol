@@ -21,8 +21,9 @@
 package net.sf.freecol.common.option;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 
 /**
@@ -63,10 +64,10 @@ public interface Option<T> extends Cloneable {
     /**
      * Initializes this object from an XML-representation of this object.
      *
-     * @param in The input stream with the XML.
+     * @param xr The input stream with the XML.
      * @throws XMLStreamException if there are any problems reading the stream.
      */
-    public void readFromXML(XMLStreamReader in) throws XMLStreamException;
+    public void readFromXML(FreeColXMLReader xr) throws XMLStreamException;
 
     /**
      * Makes an XML-representation of this object.

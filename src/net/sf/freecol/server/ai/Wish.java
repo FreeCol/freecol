@@ -23,9 +23,9 @@ package net.sf.freecol.server.ai;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Location;
@@ -81,12 +81,12 @@ public abstract class Wish extends ValuedAIObject {
      * XML-representation.
      *
      * @param aiMain The main AI-object.
-     * @param in The input stream containing the XML.
+     * @param xr The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    public Wish(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
-        super(aiMain, in);
+    public Wish(AIMain aiMain, FreeColXMLReader xr) throws XMLStreamException {
+        super(aiMain, xr);
     }
 
 
@@ -210,20 +210,19 @@ public abstract class Wish extends ValuedAIObject {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
         final AIMain aiMain = getAIMain();
 
-        destination = findLocationAttribute(in, DESTINATION_TAG,
-                                            aiMain.getGame());
+        destination = xr.findLocationAttribute(aiMain.getGame(), DESTINATION_TAG);
 
-        if (hasAttribute(in, TRANSPORTABLE_TAG)) {
-            transportable = getAttribute(in, TRANSPORTABLE_TAG,
+        if (xr.hasAttribute(TRANSPORTABLE_TAG)) {
+            transportable = getAttribute(xr, TRANSPORTABLE_TAG,
                                          AIUnit.class, (AIUnit)null);
             if (transportable == null) {
                 transportable = new AIUnit(getAIMain(),
-                    getAttribute(in, TRANSPORTABLE_TAG, (String)null));
+                    xr.getAttribute(TRANSPORTABLE_TAG, (String)null));
             }
         } else {            
             transportable = null;

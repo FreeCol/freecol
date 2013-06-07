@@ -24,8 +24,9 @@ import java.util.List;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 
 /**
@@ -339,16 +340,16 @@ public final class BuildingType extends BuildableType
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
 
-        super.readAttributes(in);
+        super.readAttributes(xr);
 
-        BuildingType parent = spec.getType(in, EXTENDS_TAG,
-                                           BuildingType.class, this);
+        BuildingType parent = xr.getType(spec, EXTENDS_TAG,
+                                         BuildingType.class, this);
 
-        upgradesFrom = spec.getType(in, UPGRADES_FROM_TAG,
-                                    BuildingType.class, (BuildingType)null);
+        upgradesFrom = xr.getType(spec, UPGRADES_FROM_TAG,
+                                  BuildingType.class, (BuildingType)null);
         if (upgradesFrom == null) {
             level = 1;
         } else {
@@ -356,29 +357,29 @@ public final class BuildingType extends BuildableType
             level = upgradesFrom.level + 1;
         }
 
-        workPlaces = getAttribute(in, WORKPLACES_TAG, parent.workPlaces);
+        workPlaces = xr.getAttribute(WORKPLACES_TAG, parent.workPlaces);
 
-        minSkill = getAttribute(in, MIN_SKILL_TAG, parent.minSkill);
+        minSkill = xr.getAttribute(MIN_SKILL_TAG, parent.minSkill);
 
-        maxSkill = getAttribute(in, MAX_SKILL_TAG, parent.maxSkill);
+        maxSkill = xr.getAttribute(MAX_SKILL_TAG, parent.maxSkill);
 
-        upkeep = getAttribute(in, UPKEEP_TAG, parent.upkeep);
+        upkeep = xr.getAttribute(UPKEEP_TAG, parent.upkeep);
 
-        priority = getAttribute(in, PRIORITY_TAG, parent.priority);
+        priority = xr.getAttribute(PRIORITY_TAG, parent.priority);
 
         // @compat 0.10.6
-        int basicProduction = getAttribute(in, BASIC_PRODUCTION_TAG, -1);
+        int basicProduction = xr.getAttribute(BASIC_PRODUCTION_TAG, -1);
         if (basicProduction > 0) {
-            GoodsType consumes = spec.getType(in, CONSUMES_TAG, GoodsType.class,
-                                              parent.getConsumedGoodsType());
-            GoodsType produces = spec.getType(in, PRODUCES_TAG, GoodsType.class,
-                                              parent.getProducedGoodsType());
+            GoodsType consumes = xr.getType(spec, CONSUMES_TAG, GoodsType.class,
+                                            parent.getConsumedGoodsType());
+            GoodsType produces = xr.getType(spec, PRODUCES_TAG, GoodsType.class,
+                                            parent.getProducedGoodsType());
             productionTypes.add(new ProductionType(consumes, produces, basicProduction));
         }
         // end @compat
 
         if (parent != this) { // Handle "extends" for super-type fields
-            if (!hasAttribute(in, REQUIRED_POPULATION_TAG)) {
+            if (!xr.hasAttribute(REQUIRED_POPULATION_TAG)) {
                 setRequiredPopulation(parent.getRequiredPopulation());
             }
 
@@ -394,15 +395,15 @@ public final class BuildingType extends BuildableType
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
-        final String tag = in.getLocalName();
+        final String tag = xr.getLocalName();
 
         if (PRODUCTION_TAG.equals(tag)) {
-            productionTypes.add(new ProductionType(in, spec));
+            productionTypes.add(new ProductionType(xr, spec));
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 

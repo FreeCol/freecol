@@ -22,8 +22,9 @@ package net.sf.freecol.common.model;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 
 /**
@@ -59,12 +60,12 @@ public class GoodsTradeItem extends TradeItem {
      * Creates a new <code>GoodsTradeItem</code> instance.
      *
      * @param game The enclosing <code>Game</code>.
-     * @param in The <code>XMLStreamReader</code> to read from.
+     * @param xr The <code>FreeColXMLReader</code> to read from.
      */
-    public GoodsTradeItem(Game game, XMLStreamReader in) throws XMLStreamException {
-        super(game, in);
+    public GoodsTradeItem(Game game, FreeColXMLReader xr) throws XMLStreamException {
+        super(game, xr);
 
-        readFromXML(in);
+        readFromXML(xr);
     }
 
 
@@ -153,37 +154,37 @@ public class GoodsTradeItem extends TradeItem {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        settlement = getAttribute(in, SETTLEMENT_TAG, getGame(),
-                                  Settlement.class, (Settlement)null);
+        settlement = xr.getAttribute(getGame(), SETTLEMENT_TAG,
+                                     Settlement.class, (Settlement)null);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers
         goods = null;
 
-        super.readChildren(in);
+        super.readChildren(xr);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Game game = settlement.getGame();
-        final String tag = in.getLocalName();
+        final String tag = xr.getLocalName();
 
         if (Goods.getXMLElementTagName().equals(tag)) {
-            goods = new Goods(game, in);
+            goods = new Goods(game, xr);
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 

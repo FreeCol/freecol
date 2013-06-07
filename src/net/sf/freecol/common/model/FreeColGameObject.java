@@ -23,7 +23,6 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -32,9 +31,9 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Element;
@@ -87,7 +86,7 @@ public abstract class FreeColGameObject extends FreeColObject {
      * If an identifier is supplied, use that, otherwise leave it undefined.
      *
      * This routine should be used when we intend later to call one of:
-     * - {@link #readFromXML(XMLStreamReader)}
+     * - {@link #readFromXML(FreeColXMLReader)}
      * - {@link #readFromXMLElement(Element)}
      *
      * @param game The <code>Game</code> in which this object belongs.
@@ -195,114 +194,6 @@ public abstract class FreeColGameObject extends FreeColObject {
      */
     public void dispose() {
         disposeList();
-    }
-
-    /**
-     * Find a <code>FreeColGameObject</code> of a given class
-     * from a stream attribute.
-     *
-     * Use this routine when the object is optionally already be
-     * present in the game.
-     *
-     * @param in The <code>XMLStreamReader</code> to read from.
-     * @param attributeName The attribute name.
-     * @param returnClass The class to expect.
-     * @param defaultValue A default value to return if not found.
-     * @param required If true a null result should throw an exception.
-     * @return The <code>FreeColGameObject</code> found, or the default
-     *     value if not found.
-     * @exception XMLStreamException if the attribute is missing.
-     */
-    public <T extends FreeColGameObject> T findFreeColGameObject(XMLStreamReader in,
-        String attributeName, Class<T> returnClass, T defaultValue,
-        boolean required) throws XMLStreamException {
-        T ret = getAttribute(in, attributeName, getGame(),
-                             returnClass, (T)null);
-        if (ret == (T)null) {
-            if (required) {
-                throw new XMLStreamException(getXMLTagName()
-                    + " missing " + attributeName + ": " + currentTag(in));
-            } else {
-                ret = defaultValue;
-            }
-        }
-        return ret;
-    }
-
-    /**
-     * Either get an existing <code>FreeColGameObject</code> from a stream
-     * attribute or create it if it does not exist.
-     *
-     * Use this routine when the object may not necessarily already be
-     * present in the game, but is expected to be defined eventually.
-     *
-     * @param in The <code>XMLStreamReader</code> to read from.
-     * @param attributeName The required attribute name.
-     * @param returnClass The class of object.
-     * @param required If true a null result should throw an exception.
-     * @return The <code>FreeColGameObject</code> found or made, or null
-     *     if the attribute was not present.
-     * @exception XMLStreamError if there was a problem reading the stream.
-     */
-    public <T extends FreeColGameObject> T makeFreeColGameObject(XMLStreamReader in,
-        String attributeName, Class<T> returnClass,
-        boolean required) throws XMLStreamException {
-        final String id =
-            // @compat 0.10.7
-            (ID_ATTRIBUTE_TAG.equals(attributeName)) ? readId(in) :
-            // end @compat
-            in.getAttributeValue(null, attributeName);
-        T ret = null;
-
-        if (id == null) {
-            if (required) {
-                throw new XMLStreamException(getXMLTagName()
-                    + " missing " + attributeName + ": " + currentTag(in));
-            }
-        } else {
-            ret = getGame().getFreeColGameObject(id, returnClass);
-            if (ret == null) {
-                try {
-                    Constructor<T> c = returnClass.getConstructor(Game.class,
-                                                                  String.class);
-                    ret = returnClass.cast(c.newInstance(game, id));
-                    if (required && ret == null) {
-                        throw new XMLStreamException(getXMLTagName()
-                            + " constructed null " + returnClass.getName()
-                            + " for " + id + ": " + currentTag(in));
-                    }
-                } catch (Exception e) {
-                    if (required) {
-                        throw new XMLStreamException(e.getCause());
-                    } else {
-                        logger.log(Level.WARNING, "Failed to create FCGO: "
-                            + id, e);
-                    }
-                }
-            }
-        }
-        return ret;
-    }
-
-    /**
-     * Reads a <code>FreeColGameObject</code> from a stream.
-     * Expects the object to be identified by the standard ID_ATTRIBUTE_TAG.
-     *
-     * Use this routine when the object may or may not have been
-     * referenced and created-by-id in this game, but this is the
-     * point where it is authoritatively defined.
-     *
-     * @param in The <code>XMLStreamReader</code> to read from.
-     * @param returnClass The class to expect.
-     * @return The <code>FreeColGameObject</code> found, or null there
-     *     was no ID_ATTRIBUTE_TAG present.
-     * @exception XMLStreamException if there is problem reading the stream.
-     */
-    public <T extends FreeColGameObject> T readFreeColGameObject(XMLStreamReader in,
-        Class<T> returnClass) throws XMLStreamException {
-        T ret = makeFreeColGameObject(in, ID_ATTRIBUTE_TAG, returnClass, false);
-        if (ret != null) ret.readFromXML(in);
-        return ret;
     }
 
     /**
@@ -509,13 +400,13 @@ public abstract class FreeColGameObject extends FreeColObject {
     /**
      * Initialize this object from an XML-representation of this object.
      *
-     * @param in The input <code>XMLStreamReader</code>.
+     * @param xr The input <code>FreeColXMLReader</code>.
      * @exception XMLStreamException if there problems reading the stream.
      */
     @Override
-    public final void readFromXML(XMLStreamReader in) throws XMLStreamException {
+    public final void readFromXML(FreeColXMLReader xr) throws XMLStreamException {
         uninitialized = false;
-        super.readFromXML(in);
+        super.readFromXML(xr);
     }
 
     /**

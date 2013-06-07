@@ -25,8 +25,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 import org.w3c.dom.Element;
 
@@ -156,11 +157,11 @@ public class HighScore extends FreeColObject {
     /**
      * Create a new <code>HighScore</code> by reading a stream.
      *
-     * @param in The <code>XMLStreamReader</code> to read.
+     * @param xr The <code>FreeColXMLReader</code> to read.
      * @exception XMLStreamException if there is a problem reading the stream.
      */
-    public HighScore(XMLStreamReader in) throws XMLStreamException {
-        readFromXML(in);
+    public HighScore(FreeColXMLReader xr) throws XMLStreamException {
+        readFromXML(xr);
     }
 
     /**
@@ -362,8 +363,8 @@ public class HighScore extends FreeColObject {
      * {@inheritDoc}
      */
     @Override
-    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        String str = getAttribute(in, DATE_TAG, "2008-01-01 00:00:00+0000");
+    public void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        String str = xr.getAttribute(DATE_TAG, "2008-01-01 00:00:00+0000");
         try {
             date = dateFormat.parse(str);
         } catch (Exception e) {
@@ -371,38 +372,38 @@ public class HighScore extends FreeColObject {
             date = new Date();
         }
 
-        retirementTurn = getAttribute(in, RETIREMENT_TURN_TAG, 0);
+        retirementTurn = xr.getAttribute(RETIREMENT_TURN_TAG, 0);
 
-        independenceTurn = getAttribute(in, INDEPENDENCE_TURN_TAG, 0);
+        independenceTurn = xr.getAttribute(INDEPENDENCE_TURN_TAG, 0);
 
-        playerName = getAttribute(in, PLAYER_NAME_TAG, "anonymous");
+        playerName = xr.getAttribute(PLAYER_NAME_TAG, "anonymous");
 
-        nationId = getAttribute(in, NATION_ID_TAG,
+        nationId = xr.getAttribute(NATION_ID_TAG,
             // @compat 0.10.7
-            getAttribute(in, OLD_NATION_ID_TAG,
+            xr.getAttribute(OLD_NATION_ID_TAG,
             // end @compat
                 "model.nation.dutch"));
 
-        nationTypeId = getAttribute(in, NATION_TYPE_ID_TAG,
+        nationTypeId = xr.getAttribute(NATION_TYPE_ID_TAG,
             // @compat 0.10.7
-            getAttribute(in, OLD_NATION_TYPE_ID_TAG,
+            xr.getAttribute(OLD_NATION_TYPE_ID_TAG,
             // end @compat
                 "model.nationType.trade"));
 
-        score = getAttribute(in, SCORE_TAG, 0);
+        score = xr.getAttribute(SCORE_TAG, 0);
 
-        level = getAttribute(in, LEVEL_TAG, ScoreLevel.class,
+        level = xr.getAttribute(LEVEL_TAG, ScoreLevel.class,
                              ScoreLevel.PARASITIC_WORM);
 
-        nationName = getAttribute(in, NATION_NAME_TAG, "Freedonia");
+        nationName = xr.getAttribute(NATION_NAME_TAG, "Freedonia");
 
-        newLandName = getAttribute(in, NEW_LAND_NAME_TAG, "New World");
+        newLandName = xr.getAttribute(NEW_LAND_NAME_TAG, "New World");
         
-        difficulty = getAttribute(in, DIFFICULTY_TAG, "model.difficulty.medium");
+        difficulty = xr.getAttribute(DIFFICULTY_TAG, "model.difficulty.medium");
 
-        units = getAttribute(in, UNITS_TAG, 0);
+        units = xr.getAttribute(UNITS_TAG, 0);
 
-        colonies = getAttribute(in, COLONIES_TAG, 0);
+        colonies = xr.getAttribute(COLONIES_TAG, 0);
     }
 
     /**

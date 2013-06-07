@@ -28,9 +28,9 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.util.RandomChoice;
 
 
@@ -543,99 +543,99 @@ public final class TileImprovementType extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
 
-        super.readAttributes(in);
+        super.readAttributes(xr);
 
-        natural = getAttribute(in, NATURAL_TAG, false);
+        natural = xr.getAttribute(NATURAL_TAG, false);
 
-        magnitude = getAttribute(in, MAGNITUDE_TAG, 1);
+        magnitude = xr.getAttribute(MAGNITUDE_TAG, 1);
 
-        addWorkTurns = getAttribute(in, ADD_WORK_TURNS_TAG, 0);
+        addWorkTurns = xr.getAttribute(ADD_WORK_TURNS_TAG, 0);
 
-        requiredImprovementType = spec.getType(in, REQUIRED_IMPROVEMENT_TAG,
+        requiredImprovementType = xr.getType(spec, REQUIRED_IMPROVEMENT_TAG,
             TileImprovementType.class, (TileImprovementType)null);
 
-        expendedEquipmentType = spec.getType(in, EXPENDED_EQUIPMENT_TYPE_TAG,
+        expendedEquipmentType = xr.getType(spec, EXPENDED_EQUIPMENT_TYPE_TAG,
             EquipmentType.class, (EquipmentType)null);
 
-        expendedAmount = getAttribute(in, EXPENDED_AMOUNT_TAG, 0);
+        expendedAmount = xr.getAttribute(EXPENDED_AMOUNT_TAG, 0);
 
         // @compat 0.10.4
-        deliverGoodsType = spec.getType(in, DELIVER_GOODS_TYPE_TAG,
+        deliverGoodsType = xr.getType(spec, DELIVER_GOODS_TYPE_TAG,
             GoodsType.class, (GoodsType)null);
 
-        deliverAmount = getAttribute(in, DELIVER_AMOUNT_TAG, 0);
+        deliverAmount = xr.getAttribute(DELIVER_AMOUNT_TAG, 0);
         // end @compat
 
-        movementCost = getAttribute(in, MOVEMENT_COST_TAG, 0);
+        movementCost = xr.getAttribute(MOVEMENT_COST_TAG, 0);
 
-        zIndex = getAttribute(in, ZINDEX_TAG, 0);
+        zIndex = xr.getAttribute(ZINDEX_TAG, 0);
 
-        exposeResourcePercent = getAttribute(in, EXPOSE_RESOURCE_PERCENT_TAG, 0);
+        exposeResourcePercent = xr.getAttribute(EXPOSE_RESOURCE_PERCENT_TAG, 0);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
-        if (readShouldClearContainers(in)) {
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
+        if (xr.shouldClearContainers()) {
             scopes = null;
             allowedWorkers = null;
             tileTypeChanges = null;
             disasters = null;
         }
 
-        super.readChildren(in);
+        super.readChildren(xr);
     }
     
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
-        final String tag = in.getLocalName();
+        final String tag = xr.getLocalName();
 
         if (CHANGE_TAG.equals(tag)) {
             TileTypeChange change = new TileTypeChange();
             if (deliverGoodsType == null) {
-                change.readFromXML(in, spec);
+                change.readFromXML(xr, spec);
             } else {
                 // @compat 0.10.4
-                TileType from = spec.getType(in, FROM_TAG,
-                                             TileType.class, (TileType)null);
-                TileType to = spec.getType(in, TO_TAG,
+                TileType from = xr.getType(spec, FROM_TAG,
                                            TileType.class, (TileType)null);
+                TileType to = xr.getType(spec, TO_TAG,
+                                         TileType.class, (TileType)null);
                 change.setFrom(from);
                 change.setTo(to);
                 change.setProduction(new AbstractGoods(deliverGoodsType,
                                                        deliverAmount));
-                in.nextTag(); // close this element
+                xr.nextTag(); // close this element
                 // end @compat
             }
             addChange(change);
 
         } else if (DISASTER_TAG.equals(tag)) {
-            Disaster disaster = spec.getType(in, ID_ATTRIBUTE_TAG,
-                                             Disaster.class, (Disaster)null);
-            int probability = getAttribute(in, PROBABILITY_TAG, 100);
+            Disaster disaster = xr.getType(spec, ID_ATTRIBUTE_TAG,
+                                           Disaster.class, (Disaster)null);
+            int probability = xr.getAttribute(PROBABILITY_TAG, 100);
             if (disaster != null && probability > 0) {
                 addDisaster(disaster, probability);
             }
-            closeTag(in, DISASTER_TAG);
+            xr.closeTag(DISASTER_TAG);
 
         } else if (WORKER_TAG.equals(tag)) {
-            addAllowedWorker(readId(in));
-            closeTag(in, WORKER_TAG);
+            addAllowedWorker(xr.readId());
+            xr.closeTag(WORKER_TAG);
 
         } else if (Scope.getXMLElementTagName().equals(tag)) {
-            addScope(new Scope(in));
+            addScope(new Scope(xr));
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 

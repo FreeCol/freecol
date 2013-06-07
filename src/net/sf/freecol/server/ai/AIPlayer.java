@@ -27,9 +27,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.FoundingFather;
@@ -104,12 +104,12 @@ public abstract class AIPlayer extends AIObject {
      * XML-representation.
      *
      * @param aiMain The main AI-object.
-     * @param in The input stream containing the XML.
+     * @param xr The input stream containing the XML.
      * @exception XMLStreamException if a problem was encountered
      *     during parsing.
      */
-    public AIPlayer(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
-        super(aiMain, in);
+    public AIPlayer(AIMain aiMain, FreeColXMLReader xr) throws XMLStreamException {
+        super(aiMain, xr);
         
         uninitialized = player == null;
     }
@@ -603,19 +603,20 @@ public abstract class AIPlayer extends AIObject {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
         final AIMain aiMain = getAIMain();
 
-        ServerPlayer p = getAttribute(in, ID_ATTRIBUTE_TAG, aiMain.getGame(),
-                                      ServerPlayer.class, (ServerPlayer)null);
+        ServerPlayer p = xr.getAttribute(aiMain.getGame(), ID_ATTRIBUTE_TAG,
+                                         ServerPlayer.class, (ServerPlayer)null);
         if (p == null) {
-            throw new IllegalStateException("Not a Player: " + currentTag(in));
+            throw new IllegalStateException("Not a Player: "
+                                            + xr.currentTag());
         }
         player = p;
 
-        Random rnd = Utils.restoreRandomState(getAttribute(in, RANDOM_STATE_TAG,
+        Random rnd = Utils.restoreRandomState(xr.getAttribute(RANDOM_STATE_TAG,
                                               (String)null));
         aiRandom = (rnd != null) ? rnd
             : new Random(aiMain.getRandomSeed("Seed for " + getId()));
@@ -625,8 +626,8 @@ public abstract class AIPlayer extends AIObject {
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
-        super.readChildren(in);
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
+        super.readChildren(xr);
 
         if (getPlayer() != null) uninitialized = false;
     }

@@ -28,10 +28,10 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Specification;
 
 
@@ -87,15 +87,15 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     /**
      * Creates a new <code>OptionGroup</code>.
      *
-     * @param in The <code>XMLStreamReader</code> to read from.
+     * @param xr The <code>FreeColXMLReader</code> to read from.
      * @param specification The <code>Specification</code> to refer to.
      * @exception XMLStreamException if there is a problem reading the stream.
      */
-    public OptionGroup(XMLStreamReader in,
+    public OptionGroup(FreeColXMLReader xr,
                        Specification specification) throws XMLStreamException {
         super(specification);
 
-        readFromXML(in);
+        readFromXML(xr);
     }
 
 
@@ -443,39 +443,39 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
      * {@inheritDoc}
      */
     @Override
-    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    public void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        editable = getAttribute(in, EDITABLE_TAG, true);
+        editable = xr.getAttribute(EDITABLE_TAG, true);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void readChildren(XMLStreamReader in) throws XMLStreamException {
+    public void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Do *not* clear containers.
         // ATM OptionGroups are purely additive/overwriting.
 
-        super.readChildren(in);
+        super.readChildren(xr);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void readChild(XMLStreamReader in) throws XMLStreamException {
-        String optionId = readId(in);
+    public void readChild(FreeColXMLReader xr) throws XMLStreamException {
+        String optionId = xr.readId();
         Option option = getOption(optionId);
         if (option == null) {
-            AbstractOption abstractOption = readOption(in);
+            AbstractOption abstractOption = readOption(xr);
             if (abstractOption != null) {
                 add(abstractOption);
                 abstractOption.setGroup(this.getId());
             }
         } else {
             // FreeColActions are read here.
-            option.readFromXML(in);
+            option.readFromXML(xr);
         }
     }
 

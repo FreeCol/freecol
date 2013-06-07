@@ -22,9 +22,9 @@ package net.sf.freecol.server.ai.mission;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -92,16 +92,16 @@ public class IndianBringGiftMission extends Mission {
      *
      * @param aiMain The main AI-object.
      * @param aiUnit The <code>AIUnit</code> this mission is created for.
-     * @param in The input stream containing the XML.
+     * @param xr The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
      * @see net.sf.freecol.server.ai.AIObject#readFromXML
      */
     public IndianBringGiftMission(AIMain aiMain, AIUnit aiUnit,
-                                  XMLStreamReader in)
+                                  FreeColXMLReader xr)
         throws XMLStreamException {
         super(aiMain, aiUnit);
 
-        readFromXML(in);
+        readFromXML(xr);
         uninitialized = getAIUnit() == null;
     }
 
@@ -349,16 +349,16 @@ public class IndianBringGiftMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        target = getAttribute(in, TARGET_TAG, getGame(), 
-                              Colony.class, (Colony)null);
+        target = xr.getAttribute(getGame(), TARGET_TAG,
+                                 Colony.class, (Colony)null);
 
-        completed = getAttribute(in, COMPLETED_TAG, false);
+        completed = xr.getAttribute(COMPLETED_TAG, false);
         // @compat 0.9.x
-        if (hasAttribute(in, OLD_GIFT_DELIVERED_TAG)) {
-            completed = getAttribute(in, OLD_GIFT_DELIVERED_TAG, false);
+        if (xr.hasAttribute(OLD_GIFT_DELIVERED_TAG)) {
+            completed = xr.getAttribute(OLD_GIFT_DELIVERED_TAG, false);
         }
         // end @compat
     }

@@ -28,8 +28,9 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 
 /**
@@ -517,65 +518,66 @@ public class Region extends FreeColGameObject implements Nameable {
      * {@inheritDoc}
      */
     @Override
-    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    public void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        name = getAttribute(in, NAME_TAG, (String)null);
+        name = xr.getAttribute(NAME_TAG, (String)null);
 
-        nameKey = getAttribute(in, NAME_KEY_TAG, (String)null);
+        nameKey = xr.getAttribute(NAME_KEY_TAG, (String)null);
 
-        type = getAttribute(in, TYPE_TAG, RegionType.class, (RegionType)null);
+        type = xr.getAttribute(TYPE_TAG, RegionType.class, (RegionType)null);
 
-        claimable = getAttribute(in, CLAIMABLE_TAG, false);
+        claimable = xr.getAttribute(CLAIMABLE_TAG, false);
 
-        discoverable = getAttribute(in, DISCOVERABLE_TAG, false);
+        discoverable = xr.getAttribute(DISCOVERABLE_TAG, false);
 
-        prediscovered = getAttribute(in, PREDISCOVERED_TAG, false);
+        prediscovered = xr.getAttribute(PREDISCOVERED_TAG, false);
 
-        scoreValue = getAttribute(in, SCORE_VALUE_TAG, 0);
+        scoreValue = xr.getAttribute(SCORE_VALUE_TAG, 0);
 
-        int turn = getAttribute(in, DISCOVERED_IN_TAG, -1);
+        int turn = xr.getAttribute(DISCOVERED_IN_TAG, -1);
         if (turn > 0) discoveredIn = new Turn(turn);
 
-        discoveredBy = makeFreeColGameObject(in, DISCOVERED_BY_TAG,
-                                             Player.class, false);
+        discoveredBy = xr.makeFreeColGameObject(getGame(), DISCOVERED_BY_TAG,
+                                                Player.class, false);
 
-        parent = makeFreeColGameObject(in, PARENT_TAG, Region.class, false);
+        parent = xr.makeFreeColGameObject(getGame(), PARENT_TAG,
+                                          Region.class, false);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void readChildren(XMLStreamReader in) throws XMLStreamException {
+    public void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
         children = null;
 
-        super.readChildren(in);
+        super.readChildren(xr);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void readChild(XMLStreamReader in) throws XMLStreamException {
-        final String tag = in.getLocalName();
+    public void readChild(FreeColXMLReader xr) throws XMLStreamException {
+        final String tag = xr.getLocalName();
 
         // @compat 0.9.x
         if (CHILDREN_TAG.equals(tag)) {
-            String[] childArray = readFromArrayElement(CHILDREN_TAG, in, new String[0]);
+            String[] childArray = readFromArrayElement(CHILDREN_TAG, xr, new String[0]);
             for (String child : childArray) {
                 children.add(getGame().getMap().getRegion(child));
             }
         // end @compat
 
         } else if (CHILD_TAG.equals(tag)) {
-            addChild(makeFreeColGameObject(in, ID_ATTRIBUTE_TAG,
-                                           Region.class, true));
-            closeTag(in, CHILD_TAG);
+            addChild(xr.makeFreeColGameObject(getGame(), ID_ATTRIBUTE_TAG,
+                                              Region.class, true));
+            xr.closeTag(CHILD_TAG);
         
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 

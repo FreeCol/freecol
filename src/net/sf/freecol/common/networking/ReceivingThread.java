@@ -31,7 +31,7 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.util.XMLStream;
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 import org.xml.sax.SAXException;
 
@@ -292,9 +292,9 @@ final class ReceivingThread extends Thread {
         BufferedInputStream bis = new BufferedInputStream(in, LOOK_AHEAD);
         bis.mark(LOOK_AHEAD);
 
-        XMLStream xr = new XMLStream(bis);
+        FreeColXMLReader xr = new FreeColXMLReader(bis);
         xr.nextTag();
-        final String tag = xr.getTagName();
+        final String tag = xr.getLocalName();
 
         if (Connection.DISCONNECT_TAG.equals(tag)) {
             askToStop();

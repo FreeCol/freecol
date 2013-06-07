@@ -24,9 +24,9 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.UnitType;
@@ -269,41 +269,41 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
     /**
      * {@inheritDoc}
      */
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in); // value is read here
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr); // value is read here
 
-        generateChoices = getAttribute(in, GENERATE_TAG,
+        generateChoices = xr.getAttribute(GENERATE_TAG,
                                        TypeSelector.class, (TypeSelector)null);
 
-        addNone = getAttribute(in, ADD_NONE_TAG, false);
+        addNone = xr.getAttribute(ADD_NONE_TAG, false);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear container.
         choices.clear();
 
-        super.readChildren(in);
+        super.readChildren(xr);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
-        final String tag = in.getLocalName();
+        final String tag = xr.getLocalName();
 
         if (CHOICE_TAG.equals(tag)) {
-            choices.add(spec.getType(in, VALUE_TAG,
-                                     UnitType.class, (UnitType)null));
-            closeTag(in, CHOICE_TAG);
+            choices.add(xr.getType(spec, VALUE_TAG,
+                                   UnitType.class, (UnitType)null));
+            xr.closeTag(CHOICE_TAG);
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 

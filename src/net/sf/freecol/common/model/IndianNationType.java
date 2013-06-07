@@ -27,9 +27,9 @@ import java.util.List;
 import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.util.RandomChoice;
 
 
@@ -242,18 +242,18 @@ public class IndianNationType extends NationType {
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
-        if (readShouldClearContainers(in)) {
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
+        if (xr.shouldClearContainers()) {
             // Clear containers.
             skills = null;
             regions = null;
         }
 
         final Specification spec = getSpecification();
-        IndianNationType parent = spec.getType(in, EXTENDS_TAG,
-                                               IndianNationType.class, this);
+        IndianNationType parent = xr.getType(spec, EXTENDS_TAG,
+                                             IndianNationType.class, this);
 
-        super.readChildren(in);
+        super.readChildren(xr);
 
         if (parent != this) {
             if (parent.skills != null && !parent.skills.isEmpty()) {
@@ -278,22 +278,22 @@ public class IndianNationType extends NationType {
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
-        final String tag = in.getLocalName();
+        final String tag = xr.getLocalName();
 
         if (SKILL_TAG.equals(tag)) {
-            addSkill(spec.getType(in, ID_ATTRIBUTE_TAG,
-                                  UnitType.class, (UnitType)null),
-                     getAttribute(in, PROBABILITY_TAG, 0));
-            closeTag(in, SKILL_TAG);
+            addSkill(xr.getType(spec, ID_ATTRIBUTE_TAG,
+                                UnitType.class, (UnitType)null),
+                     xr.getAttribute(PROBABILITY_TAG, 0));
+            xr.closeTag(SKILL_TAG);
 
         } else if (Region.getXMLElementTagName().equals(tag)) {
-            addRegion(readId(in));
-            closeTag(in, Region.getXMLElementTagName());
+            addRegion(xr.readId());
+            xr.closeTag(Region.getXMLElementTagName());
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 

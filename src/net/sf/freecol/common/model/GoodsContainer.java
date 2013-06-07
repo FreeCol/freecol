@@ -31,8 +31,9 @@ import net.sf.freecol.common.model.Ownable;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 import org.w3c.dom.Element;
 
@@ -491,67 +492,67 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * {@inheritDoc}
      */
     @Override
-    public void readFromXMLPartial(XMLStreamReader in) throws XMLStreamException {
-        readFromXMLPartialByClass(in, getClass());
+    public void readFromXMLPartial(FreeColXMLReader xr) throws XMLStreamException {
+        readFromXMLPartialByClass(xr, getClass());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
         storedGoods.clear();
         oldStoredGoods.clear();
 
-        super.readChildren(in);
+        super.readChildren(xr);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        final String tag = in.getLocalName();
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
+        final String tag = xr.getLocalName();
 
         if (OLD_STORED_GOODS_TAG.equals(tag)) {
-            readStorage(in, oldStoredGoods);
+            readStorage(xr, oldStoredGoods);
 
         } else if (STORED_GOODS_TAG.equals(tag)) {
-            readStorage(in, storedGoods);
+            readStorage(xr, storedGoods);
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 
     /**
      * Read a storage container from a stream.
      *
-     * @param out The <code>XMLStreamReader</code> to read from.
+     * @param out The <code>FreeColXMLReader</code> to read from.
      * @param storage The storage container.
      * @exception XMLStreamException if there is a problem reading from
      *     the stream.
      */
-    private void readStorage(XMLStreamReader in,
+    private void readStorage(FreeColXMLReader xr,
         Map<GoodsType, Integer> storage) throws XMLStreamException {
         final Specification spec = getGame().getSpecification();
 
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            String tag = in.getLocalName();
+        while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            String tag = xr.getLocalName();
 
             if (Goods.getXMLElementTagName().equals(tag)) {
-                GoodsType goodsType = spec.getType(in, TYPE_TAG,
+                GoodsType goodsType = xr.getType(spec, TYPE_TAG,
                     GoodsType.class, (GoodsType)null);
 
-                Integer amount = new Integer(getAttribute(in, AMOUNT_TAG, 0));
+                Integer amount = new Integer(xr.getAttribute(AMOUNT_TAG, 0));
 
                 storage.put(goodsType, amount);
 
             } else {
                 logger.warning("Ignoring bogus GoodsContainer tag: " + tag);
             }
-            closeTag(in, tag);
+            xr.closeTag(tag);
         }
     }
 

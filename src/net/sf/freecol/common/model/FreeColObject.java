@@ -31,6 +31,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -47,7 +48,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -55,8 +55,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.util.Introspector;
-import net.sf.freecol.common.util.XMLStream;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -618,7 +618,7 @@ public abstract class FreeColObject {
     // end @compat
 
     /** XML tag name for array elements. */
-    protected static final String ARRAY_SIZE_TAG = "xLength";
+    public static final String ARRAY_SIZE_TAG = "xLength";
 
     /** XML attribute tag to denote partial updates. */
     protected static final String PARTIAL_ATTRIBUTE_TAG = "partial";
@@ -726,18 +726,19 @@ public abstract class FreeColObject {
             ret = c.newInstance(game, (String)null);
         } catch (NoSuchMethodException nsme) { // Specific to getConstructor
             logger.log(Level.WARNING, "No constructor for "
-                + returnClass.getName(), nsme);
+                       + returnClass.getName(), nsme);
         } catch (Exception e) { // Handles multiple fails from newInstance
             logger.log(Level.WARNING, "Failed to instantiate "
-                + returnClass.getName(), e);
+                       + returnClass.getName(), e);
         }
         if (ret != null) {
             try {
-                XMLStream xr = new XMLStream(new StringReader(xml));
+                FreeColXMLReader xr
+                    = new FreeColXMLReader(new StringReader(xml));
                 xr.nextTag();
-                ret.readFromXML(xr.getXMLStreamReader());
+                ret.readFromXML(xr);
             } catch (IOException ioe) {
-                logger.log(Level.WARNING, "Exception creating XMLStream.", ioe);
+                logger.log(Level.WARNING, "Exception creating stream.", ioe);
             }
         }
         return ret;
@@ -1160,51 +1161,49 @@ public abstract class FreeColObject {
      * unless the PARTIAL_ATTRIBUTE tag is present which indicates
      * a partial update of an existing object.
      *
-     * @param in The input stream with the XML.
+     * @param xr The input stream with the XML.
      * @exception XMLStreamException if there are any problems reading
      *     the stream.
      */
-    public void readFromXML(XMLStreamReader in) throws XMLStreamException {
-        if (hasAttribute(in, PARTIAL_ATTRIBUTE_TAG)
+    public void readFromXML(FreeColXMLReader xr) throws XMLStreamException {
+        if (xr.hasAttribute(PARTIAL_ATTRIBUTE_TAG)
             // @compat 0.10.x
-            || hasAttribute(in, OLD_PARTIAL_ATTRIBUTE_TAG)
+            || xr.hasAttribute(OLD_PARTIAL_ATTRIBUTE_TAG)
             // end @compat
             ) {
-            readFromXMLPartial(in);
+            readFromXMLPartial(xr);
         } else {
-            readAttributes(in);
-            readChildren(in);
+            readAttributes(xr);
+            readChildren(xr);
         }
     }
 
     /**
      * Reads the attributes of this object from an XML stream.
      *
-     * @param in The XML input stream.
-     * @exception XMLStreamException if a problem was encountered
-     *     during parsing.
+     * @param xr The <code>FreeColXMLReader</code> to read from.
+     * @exception XMLStreamException if there is a problem reading the stream.
      */
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        String newId = readId(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        String newId = xr.readId();
         if (newId != null) setId(newId);
     }
 
     /**
      * Reads the children of this object from an XML stream.
      *
-     * @param in The XML input stream.
-     * @exception XMLStreamException if a problem was encountered
-     *     during parsing.
+     * @param xr The <code>FreeColXMLReader</code> to read from.
+     * @exception XMLStreamException if there is a problem reading the stream.
      */
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
-        final String tag = in.getLocalName();
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
+        final String tag = xr.getLocalName();
         if (tag == null) {
             throw new XMLStreamException("Parse error, null opening tag.");
         }
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            readChild(in);
+        while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            readChild(xr);
         }
-        expectTag(in, tag);
+        xr.expectTag(tag);
     }
 
     /**
@@ -1215,15 +1214,31 @@ public abstract class FreeColObject {
      * super.readChild() when an unexpected tag is encountered, as the
      * exception thrown here provides some useful debugging context.
      *
-     * @param in The XML input stream.
-     * @exception XMLStreamException because subclasses should have
-     *     recognized all child elements.
+     * @param xr The <code>FreeColXMLReader</code> to read from.
+     * @exception XMLStreamException if there is a problem reading the stream.
      */
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         throw new XMLStreamException("In " + getXMLTagName()
-            + ", unexpected tag " + in.getLocalName()
-            + ", at: " + currentTag(in));
+            + ", unexpected tag " + xr.getLocalName()
+            + ", at: " + xr.currentTag());
     }
+
+    // @compat 0.10.x
+    /**
+     * Version of readId(FreeColXMLReader) that reads from an element.
+     *
+     * To be replaced with just:
+     *   element.getAttribute(FreeColObject.ID_ATTRIBUTE_TAG);
+     *
+     * @param element An element to read the id attribute from.
+     * @return The identifier attribute value.
+     */
+    public static String readId(Element element) {
+        String id = element.getAttribute(ID_ATTRIBUTE_TAG);
+        if (id == null) id = element.getAttribute(ID_ATTRIBUTE);
+        return id;
+    }
+    // end @compat
 
     /**
      * Initialize this object from an XML-representation of this object.
@@ -1232,16 +1247,16 @@ public abstract class FreeColObject {
      *      this object.
      */
     public void readFromXMLElement(Element element) {
-        XMLStream xr = null;
+        FreeColXMLReader xr = null;
         try {
             TransformerFactory factory = TransformerFactory.newInstance();
             Transformer xmlTransformer = factory.newTransformer();
             StringWriter stringWriter = new StringWriter();
             xmlTransformer.transform(new DOMSource(element), new StreamResult(stringWriter));
             String xml = stringWriter.toString();
-            xr = new XMLStream(new StringReader(xml));
+            xr = new FreeColXMLReader(new StringReader(xml));
             xr.nextTag();
-            readFromXML(xr.getXMLStreamReader());
+            readFromXML(xr);
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "IOException", ioe);
             throw new IllegalStateException("IOException");
@@ -1267,7 +1282,7 @@ public abstract class FreeColObject {
     public void readFromXMLElement(Element element,
                                    Specification specification) throws XMLStreamException {
         setSpecification(specification);
-        XMLStream xr = null;
+        FreeColXMLReader xr = null;
         try {
             TransformerFactory factory = TransformerFactory.newInstance();
             Transformer xmlTransformer = factory.newTransformer();
@@ -1275,11 +1290,11 @@ public abstract class FreeColObject {
             xmlTransformer.transform(new DOMSource(element),
                                      new StreamResult(stringWriter));
             String xml = stringWriter.toString();
-            xr = new XMLStream(new StringReader(xml));
+            xr = new FreeColXMLReader(new StringReader(xml));
             xr.nextTag();
-            readFromXML(xr.getXMLStreamReader());
+            readFromXML(xr);
         } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Error making XMLStream", ioe);
+            logger.log(Level.WARNING, "Error making stream", ioe);
             throw new IllegalStateException("TransformerException");
         } catch (TransformerException tfe) {
             logger.log(Level.WARNING, "TransformerException", tfe);
@@ -1295,25 +1310,25 @@ public abstract class FreeColObject {
      *
      * @param tagName The tagname for the <code>Element</code>
      *       representing the array.
-     * @param in The input stream with the XML.
+     * @param xr The input stream with the XML.
      * @param arrayType The type of array to be read.
      * @return The array.
      * @exception XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    protected int[] readFromArrayElement(String tagName, XMLStreamReader in,
+    protected int[] readFromArrayElement(String tagName, FreeColXMLReader xr,
                                          int[] arrayType) throws XMLStreamException {
-        expectTag(in, tagName);
+        xr.expectTag(tagName);
         
-        final int length = getAttribute(in, ARRAY_SIZE_TAG, -1);
+        final int length = xr.getAttribute(ARRAY_SIZE_TAG, -1);
         if (length < 0) return new int[0];
 
         int[] array = new int[length];
         for (int x = 0; x < length; x++) {
-            array[x] = getAttribute(in, "x" + x, 0);
+            array[x] = xr.getAttribute("x" + x, 0);
         }
 
-        closeTag(in, tagName);
+        xr.closeTag(tagName);
         return array;
     }
 
@@ -1322,103 +1337,28 @@ public abstract class FreeColObject {
      *
      * @param tagName The tagname for the <code>Element</code>
      *       representing the array.
-     * @param in The input stream with the XML.
+     * @param xr The input stream with the XML.
      * @param arrayType The type of array to be read.
      * @return The array.
      * @exception XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    protected String[] readFromArrayElement(String tagName, XMLStreamReader in,
+    protected String[] readFromArrayElement(String tagName, FreeColXMLReader xr,
                                             String[] arrayType) throws XMLStreamException {
-        expectTag(in, tagName);
+        xr.expectTag(tagName);
 
-        final int length = getAttribute(in, ARRAY_SIZE_TAG, -1);
+        final int length = xr.getAttribute(ARRAY_SIZE_TAG, -1);
         if (length < 0) return new String[0];
 
         String[] array = new String[length];
         for (int x = 0; x < length; x++) {
-            array[x] = getAttribute(in, "x" + x, (String)null);
+            array[x] = xr.getAttribute("x" + x, (String)null);
         }
 
-        closeTag(in, tagName);
+        xr.closeTag(tagName);
         return array;
     }
     // end @compat
-
-    /**
-     * Reads an XML-representation of a list.
-     *
-     * @param in The input stream with the XML.
-     * @param tag The tag for the list <code>Element</code>.
-     * @param type The type of the items to be added.  This type
-     *     needs to have a constructor accepting a single <code>String</code>.
-     * @return The list.
-     * @exception XMLStreamException if a problem was encountered
-     *     during parsing.
-     */
-    protected <T> List<T> readFromListElement(XMLStreamReader in, String tag,
-                                              Class<T> type) throws XMLStreamException {
-        expectTag(in, tag);
-
-        final int length = getAttribute(in, ARRAY_SIZE_TAG, -1);
-        if (length < 0) return Collections.emptyList();
-
-        List<T> list = new ArrayList<T>(length);
-        for (int x = 0; x < length; x++) {
-            try {
-                final String value = getAttribute(in, "x" + x, (String)null);
-                T object = null;
-                if (value != null) {
-                    Constructor<T> c = type.getConstructor(type);
-                    object = c.newInstance(new Object[] {value});
-                }
-                list.add(object);
-            } catch (InvocationTargetException e) {
-                throw new RuntimeException(e);
-            } catch (NoSuchMethodException e) {
-                throw new RuntimeException(e);
-            } catch (InstantiationException e) {
-                throw new RuntimeException(e);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        closeTag(in, tag);
-        return list;
-    }
-
-    /**
-     * Reads an XML-representation of a list of
-     * <code>FreeColGameObjectType</code>s.
-     *
-     * @param in The input stream with the XML.
-     * @param tag The tag for the list <code>Element</code>.
-     * @param spec The <code>Specification</code> to find items in.
-     * @param type The type of the items to be added.  The type must exist
-     *     in the supplied specification.
-     * @return The list.
-     * @exception XMLStreamException if a problem was encountered
-     *     during parsing.
-     */
-    protected <T extends FreeColGameObjectType> List<T>
-        readFromListElement(XMLStreamReader in, String tag, Specification spec,
-                            Class<T> type) throws XMLStreamException {
-        expectTag(in, tag);
-
-        final int length = getAttribute(in, ARRAY_SIZE_TAG, -1);
-        if (length < 0) return Collections.emptyList();
-
-        List<T> list = new ArrayList<T>(length);
-        for (int x = 0; x < length; x++) {
-            T value = spec.getType(in, "x" + x, type, (T)null); 
-            if (value == null) logger.warning("Null list value(" + x + ")");
-            list.add(value);
-        }
-
-        closeTag(in, tag);
-        return list;
-    }
 
     /**
      * Updates this object from an XML-representation of this object.
@@ -1426,13 +1366,13 @@ public abstract class FreeColObject {
      * need partial updates we provide a non-operating stub here which is
      * to be overridden where needed.
      *
-     * @param in The input stream with the XML.
+     * @param xr The input stream with the XML.
      * @exception XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    public void readFromXMLPartial(XMLStreamReader in) throws XMLStreamException {
+    public void readFromXMLPartial(FreeColXMLReader xr) throws XMLStreamException {
         throw new XMLStreamException("Partial update of unsupported type: "
-            + currentTag(in));
+            + xr.currentTag());
     }
 
     /**
@@ -1445,19 +1385,19 @@ public abstract class FreeColObject {
      * the presence of a setFieldName() method that takes a parameter
      * type T where T.valueOf(String) exists.
      *
-     * @param in The input <code>XMLStreamReader</code>.
+     * @param xr The input <code>FreeColXMLReader</code>.
      * @param theClass The real class of this object, required by the
      *     <code>Introspector</code>.
      * @exception XMLStreamException If there are problems reading the stream.
      */
-    protected void readFromXMLPartialByClass(XMLStreamReader in,
+    protected void readFromXMLPartialByClass(FreeColXMLReader xr,
                                              Class<?> theClass) throws XMLStreamException {
-        int n = in.getAttributeCount();
+        int n = xr.getAttributeCount();
 
-        setId(readId(in));
+        setId(xr.readId());
 
         for (int i = 0; i < n; i++) {
-            String name = in.getAttributeLocalName(i);
+            String name = xr.getAttributeLocalName(i);
 
             if (name.equals(ID_ATTRIBUTE_TAG)
                 // @compat 0.10.x
@@ -1467,285 +1407,14 @@ public abstract class FreeColObject {
 
             try {
                 Introspector intro = new Introspector(theClass, name);
-                intro.setter(this, in.getAttributeValue(i));
+                intro.setter(this, xr.getAttributeValue(i));
 
             } catch (Exception e) {
                 logger.log(Level.WARNING, "Could not set field " + name, e);
             }
         }
 
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT);
-    }
-
-    /**
-     * Extract the current tag and its attributes from an input stream.
-     * Useful for error messages.
-     *
-     * @param in The XML input stream.
-     */
-    public static String currentTag(XMLStreamReader in) {
-        StringBuilder sb = new StringBuilder(in.getLocalName());
-        sb.append(", attributes:");
-        int n = in.getAttributeCount();
-        for (int i = 0; i < n; i++) {
-            sb.append(" ").append(in.getAttributeLocalName(i))
-                .append("=\"").append(in.getAttributeValue(i)).append("\"");
-        }
-        return sb.toString();
-    }
-
-    /**
-     * Expect a particular tag.
-     *
-     * @param in The input stream with the XML.
-     * @param tag The expected tag name.
-     * @exception XMLStreamException if the expected tag is not found.
-     */
-    public static void expectTag(XMLStreamReader in,
-                                 String tag) throws XMLStreamException {
-        String endTag = in.getLocalName();
-        if (!tag.equals(endTag)) {
-            throw new XMLStreamException("Parse error, " + tag
-                + " expected, not: " + endTag);
-        }
-    }
-
-    /**
-     * Close the current tag, checking that it did indeed close correctly.
-     *
-     * @param in The input stream with the XML.
-     * @param tag The expected tag name.
-     * @exception XMLStreamException if a closing tag is not found.
-     */
-    public static void closeTag(XMLStreamReader in,
-                                String tag) throws XMLStreamException {
-        if (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            throw new XMLStreamException("Parse error, END_ELEMENT expected,"
-                + " not: " + in.getLocalName());
-        }
-        expectTag(in, tag);
-    }
-
-    // @compat 0.10.x
-    /**
-     * Reads the identifier attribute.
-     *
-     * Normally a simple getAttribute() would be sufficient, but
-     * while we are allowing both the obsolete ID_ATTRIBUTE and the correct
-     * ID_ATTRIBUTE_TAG, this routine is useful.
-     *
-     * When 0.10.x is obsolete, remove this routine and replace its
-     * uses with just getAttribute(in, ID_ATTRIBUTE_TAG, (String)null)
-     * or equivalent.
-     *
-     * @param in The <code>XMLStreamReader</code> to read from.
-     * @return The identifier found, or null if none present.
-     */
-    public static String readId(XMLStreamReader in) {
-        String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-        if (id == null) id = in.getAttributeValue(null, ID_ATTRIBUTE);
-        return id;
-    }
-
-    /**
-     * Version of readId(XMLStreamReader) that reads from an element.
-     *
-     * To be replaced with just:
-     *   element.getAttribute(FreeColObject.ID_ATTRIBUTE_TAG);
-     *
-     * @param element An element to read the id attribute from.
-     * @return The identifier attribute value.
-     */
-    public static String readId(Element element) {
-        String id = element.getAttribute(ID_ATTRIBUTE_TAG);
-        if (id == null) id = element.getAttribute(ID_ATTRIBUTE);
-        return id;
-    }
-    // end @compat
-
-    /**
-     * Is there an attribute present in a stream?
-     *
-     * @param in The <code>XMLStreamReader</code> to read from.
-     * @param attributeName An attribute name
-     * @return True if the attribute is present.
-     */
-    public static boolean hasAttribute(XMLStreamReader in,
-                                       String attributeName) {
-        final String attrib = in.getAttributeValue(null, attributeName);
-        return attrib != null;
-    }
-
-    /**
-     * Gets a boolean from an attribute in a stream.
-     *
-     * @param in The <code>XMLStreamReader</code> to read from.
-     * @param attributeName The attribute name.
-     * @param defaultValue The default value.
-     * @return The boolean attribute value, or the default value if none found.
-     */
-    public static boolean getAttribute(XMLStreamReader in,
-                                       String attributeName,
-                                       boolean defaultValue) {
-        final String attrib = in.getAttributeValue(null, attributeName);
-
-        return (attrib == null) ? defaultValue
-            : Boolean.parseBoolean(attrib);
-    }
-
-    /**
-     * Gets a float from an attribute in a stream.
-     *
-     * @param in The <code>XMLStreamReader</code> to read from.
-     * @param attributeName The attribute name.
-     * @param defaultValue The default value.
-     * @return The float attribute value, or the default value if none found.
-     */
-    public static float getAttribute(XMLStreamReader in, String attributeName,
-                                     float defaultValue) {
-        final String attrib = in.getAttributeValue(null, attributeName);
-
-        float result = defaultValue;
-        if (attrib != null) {
-            try {
-                result = Float.parseFloat(attrib);
-            } catch (NumberFormatException e) {
-                logger.warning(attributeName + " is not a float: " + attrib);
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Gets an int from an attribute in a stream.
-     *
-     * @param in The <code>XMLStreamReader</code> to read from.
-     * @param attributeName The attribute name.
-     * @param defaultValue The default value.
-     * @return The int attribute value, or the default value if none found.
-     */
-    public static int getAttribute(XMLStreamReader in, String attributeName,
-                                   int defaultValue) {
-        final String attrib = in.getAttributeValue(null, attributeName);
-
-        int result = defaultValue;
-        if (attrib != null) {
-            try {
-                result = Integer.parseInt(attrib);
-            } catch (NumberFormatException e) {
-                logger.warning(attributeName + " is not an integer: " + attrib);
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Gets a string from an attribute in a stream.
-     *
-     * @param in The <code>XMLStreamReader</code> to read from.
-     * @param attributeName The attribute name.
-     * @param defaultValue The default value.
-     * @return The string attribute value, or the default value if none found.
-     */
-    public static String getAttribute(XMLStreamReader in, String attributeName,
-                                      String defaultValue) {
-        final String attrib = in.getAttributeValue(null, attributeName);
-
-        return (attrib == null) ? defaultValue
-            : attrib;
-    }
-
-    /**
-     * Gets an enum from an attribute in a stream.
-     *
-     * @param in The <code>XMLStreamReader</code> to read from.
-     * @param attributeName The attribute name.
-     * @param returnType The type of the return value.
-     * @param defaultValue The default value.
-     * @return The enum attribute value, or the default value if none found.
-     */
-    public static <T extends Enum<T>> T getAttribute(XMLStreamReader in,
-        String attributeName, Class<T> returnType, T defaultValue) {
-        final String attrib = in.getAttributeValue(null, attributeName);
-
-        T result = defaultValue;
-        if (attrib != null) {
-            try {
-                result = Enum.valueOf(returnType,
-                                      attrib.toUpperCase(Locale.US));
-            } catch (Exception e) {
-                logger.warning(attributeName + " is not a "
-                    + defaultValue.getClass().getName() + ": " + attrib);
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Gets a FreeCol object from an attribute in a stream.
-     *
-     * @param in The <code>XMLStreamReader</code> to read from.
-     * @param attributeName The attribute name.
-     * @param game The <code>Game</code> to look in.
-     * @param returnType The <code>FreeColObject</code> type to expect.
-     * @param defaultValue The default value.
-     * @return The <code>FreeColObject</code> found, or the default
-     *     value if not.
-     */
-    public static <T extends FreeColGameObject> T getAttribute(XMLStreamReader in,
-        String attributeName, Game game, Class<T> returnType, T defaultValue) {
-        final String attrib =
-        // @compat 0.10.7
-            (ID_ATTRIBUTE_TAG.equals(attributeName)) ? readId(in) :
-        // end @compat
-            in.getAttributeValue(null, attributeName);
-
-        return (attrib == null) ? defaultValue
-            : game.getFreeColGameObject(attrib, returnType);
-    }
-
-    /**
-     * Find a new location from a stream attribute.
-     *
-     * @param in The input <code>XMLStreamReader</code>.
-     * @param attributeName The attribute to check.
-     * @param game The <code>Game</code> to look in.
-     * @return The <code>Location</code> found.
-     */
-    public static Location findLocationAttribute(XMLStreamReader in,
-                                                 String attributeName,
-                                                 Game game) {
-        if (attributeName == null) return null;
-
-        final String attrib =
-        // @compat 0.10.7
-            (ID_ATTRIBUTE_TAG.equals(attributeName)) ? readId(in) :
-        // end @compat
-            in.getAttributeValue(null, attributeName);
-
-        return (attrib == null) ? null : game.findFreeColLocation(attrib);
-    }
-
-    /**
-     * Makes a FreeCol location from an attribute in a stream.
-     *
-     * @param in The <code>XMLStreamReader</code> to read from.
-     * @param attributeName The attribute name.
-     * @param game The <code>Game</code> to look in.
-     * @return The <code>Location</code>, or null if none found.
-     */
-    public static Location makeLocationAttribute(XMLStreamReader in,
-                                                 String attributeName,
-                                                 Game game) {
-        if (attributeName == null) return null;
-
-        final String attrib =
-        // @compat 0.10.7
-            (ID_ATTRIBUTE_TAG.equals(attributeName)) ? readId(in) :
-        // end @compat
-            in.getAttributeValue(null, attributeName);
-
-        return (attrib == null) ? null : game.makeFreeColLocation(attrib);
+        while (xr.nextTag() != XMLStreamConstants.END_ELEMENT);
     }
 
 

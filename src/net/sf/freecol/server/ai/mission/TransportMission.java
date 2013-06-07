@@ -24,9 +24,9 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.Europe;
@@ -460,15 +460,15 @@ public class TransportMission extends Mission {
      *
      * @param aiMain The main AI-object.
      * @param aiUnit The <code>AIUnit</code> this mission is created for.
-     * @param in The input stream containing the XML.
+     * @param xr The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
      * @see net.sf.freecol.server.ai.AIObject#readFromXML
      */
-    public TransportMission(AIMain aiMain, AIUnit aiUnit, XMLStreamReader in)
+    public TransportMission(AIMain aiMain, AIUnit aiUnit, FreeColXMLReader xr)
         throws XMLStreamException {
         super(aiMain, aiUnit);
 
-        readFromXML(in);
+        readFromXML(xr);
         uninitialized = getAIUnit() == null;
     }
 
@@ -1829,33 +1829,33 @@ public class TransportMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        target = findLocationAttribute(in, TARGET_TAG, getGame());
+        target = xr.findLocationAttribute(getGame(), TARGET_TAG);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers
         tClear();
 
-        super.readChildren(in);
+        super.readChildren(xr);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Game game = getGame();
-        final String tag = in.getLocalName();
+        final String tag = xr.getLocalName();
 
         if (CARGO_TAG.equals(tag)) {
-            String tid = readId(in);
+            String tid = xr.readId();
             AIObject aio = null;
             if (tid != null) {
                 if ((aio = getAIMain().getAIObject(tid)) == null) {
@@ -1870,32 +1870,32 @@ public class TransportMission extends Mission {
                 throw new XMLStreamException("Transportable expected: " + tid);
             }
 
-            Unit carrier = getAttribute(in, CARRIER_TAG, getGame(),
-                                        Unit.class, (Unit)null);
+            Unit carrier = xr.getAttribute(game, CARRIER_TAG,
+                                           Unit.class, (Unit)null);
 
-            CargoMode mode = getAttribute(in, MODE_TAG, 
-                                          CargoMode.class, CargoMode.DUMP);
+            CargoMode mode = xr.getAttribute(MODE_TAG, 
+                                             CargoMode.class, CargoMode.DUMP);
             
-            Location target = findLocationAttribute(in, TARGET_TAG, game);
+            Location target = xr.findLocationAttribute(game, TARGET_TAG);
             
-            int turns = getAttribute(in, TURNS_TAG, -1);
+            int turns = xr.getAttribute(TURNS_TAG, -1);
             
-            int tries = getAttribute(in, TRIES_TAG, 0);
+            int tries = xr.getAttribute(TRIES_TAG, 0);
             
-            int spaceLeft = getAttribute(in, SPACELEFT_TAG, -1);
+            int spaceLeft = xr.getAttribute(SPACELEFT_TAG, -1);
             
             tAdd(new Cargo((Transportable)aio, carrier, mode,
                            target, turns, tries, spaceLeft), -1);
-            closeTag(in, CARGO_TAG);
+            xr.closeTag(CARGO_TAG);
 
         // @compat 0.10.5
         } else if (OLD_TRANSPORTABLE_TAG.equals(tag)) {
             // Ignore the old format, let checkCargoes sort it out
-            closeTag(in, OLD_TRANSPORTABLE_TAG);
+            xr.closeTag(OLD_TRANSPORTABLE_TAG);
         // end @compat
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 

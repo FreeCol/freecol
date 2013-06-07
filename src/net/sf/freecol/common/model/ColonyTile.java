@@ -28,9 +28,9 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Player.NoClaimReason;
 
 
@@ -79,7 +79,7 @@ public class ColonyTile extends WorkLocation implements Ownable {
     /**
      * Create a new <code>ColonyTile</code> with the given identifier.
      * The object should later be initialized by calling either
-     * {@link #readFromXML(XMLStreamReader)}.
+     * {@link #readFromXML(FreeColXMLReader)}.
      *
      * @param game The enclosing <code>Game</code>.
      * @param id The object identifier.
@@ -539,18 +539,19 @@ public class ColonyTile extends WorkLocation implements Ownable {
      * {@inheritDoc}
      */
     @Override
-    public void readFromXMLPartial(XMLStreamReader in) throws XMLStreamException {
-        readFromXMLPartialByClass(in, ColonyTile.class);
+    public void readFromXMLPartial(FreeColXMLReader xr) throws XMLStreamException {
+        readFromXMLPartialByClass(xr, ColonyTile.class);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        workTile = makeFreeColGameObject(in, WORK_TILE_TAG, Tile.class, true);
+        workTile = xr.makeFreeColGameObject(getGame(), WORK_TILE_TAG,
+                                            Tile.class, true);
     }
 
     /**

@@ -25,10 +25,10 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColModFile;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.Mods;
 import net.sf.freecol.common.model.Specification;
 
@@ -232,32 +232,32 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
      * {@inheritDoc}
      */
     @Override
-    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    public void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        maximumNumber = getAttribute(in, MAXIMUM_NUMBER_TAG, 1);
+        maximumNumber = xr.getAttribute(MAXIMUM_NUMBER_TAG, 1);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void readChildren(XMLStreamReader in) throws XMLStreamException {
+    public void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         value.clear(); // Clear containers.
 
-        super.readChildren(in);
+        super.readChildren(xr);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override @SuppressWarnings("unchecked")
-    public void readChild(XMLStreamReader in) throws XMLStreamException {
-        final String tag = in.getLocalName();
+    public void readChild(FreeColXMLReader xr) throws XMLStreamException {
+        final String tag = xr.getLocalName();
 
         // @compat 0.10.4
         if (OPTION_VALUE_TAG.equals(tag)) {
-            String modId = readId(in);
+            String modId = xr.readId();
             logger.finest("Found old-style mod value: " + modId);
             if (modId != null) {
                 FreeColModFile fcmf = Mods.getModFile(modId);
@@ -270,12 +270,12 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
         // end @compat
 
         } else if (TEMPLATE_TAG.equals(tag)) {
-            in.nextTag();
-            template = (AbstractOption<T>)readOption(in);
-            closeTag(in, TEMPLATE_TAG);
+            xr.nextTag();
+            template = (AbstractOption<T>)readOption(xr);
+            xr.closeTag(TEMPLATE_TAG);
 
         } else {
-            addMember((AbstractOption<T>)readOption(in));
+            addMember((AbstractOption<T>)readOption(xr));
         }
     }
 

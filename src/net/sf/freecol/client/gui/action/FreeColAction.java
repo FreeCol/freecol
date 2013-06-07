@@ -30,12 +30,12 @@ import javax.swing.KeyStroke;
 import javax.swing.event.MenuKeyEvent;
 import javax.swing.event.MenuKeyListener;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -341,13 +341,13 @@ public abstract class FreeColAction extends AbstractAction implements Option<Fre
      * @param in The input stream with the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
-    public void readFromXML(XMLStreamReader in) throws XMLStreamException {
+    public void readFromXML(FreeColXMLReader xr) throws XMLStreamException {
         // id is hard-wired
-        String acc = FreeColObject.getAttribute(in, ACCELERATOR_TAG, "");
+        String acc = xr.getAttribute(ACCELERATOR_TAG, "");
         putValue(ACCELERATOR_KEY, ("".equals(acc)) ? null
             : KeyStroke.getKeyStroke(acc));
 
-        in.nextTag();
+        xr.nextTag();
     }
 
     /**

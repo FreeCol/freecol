@@ -23,9 +23,9 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -84,17 +84,17 @@ public class DefendSettlementMission extends Mission {
      *
      * @param aiMain The main AI-object.
      * @param aiUnit The <code>AIUnit</code> this mission is created for.
-     * @param in The input stream containing the XML.
+     * @param xr The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      * @see net.sf.freecol.server.ai.AIObject#readFromXML
      */
     public DefendSettlementMission(AIMain aiMain, AIUnit aiUnit,
-                                   XMLStreamReader in)
+                                   FreeColXMLReader xr)
         throws XMLStreamException {
         super(aiMain, aiUnit);
 
-        readFromXML(in);
+        readFromXML(xr);
         uninitialized = getAIUnit() == null;
     }
 
@@ -451,11 +451,11 @@ public class DefendSettlementMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        target = getAttribute(in, SETTLEMENT_TAG, getGame(),
-                              Settlement.class, (Settlement)null);
+        target = xr.getAttribute(getGame(), SETTLEMENT_TAG,
+                                 Settlement.class, (Settlement)null);
     }
 
     /**

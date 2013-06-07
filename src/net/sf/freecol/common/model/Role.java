@@ -24,8 +24,9 @@ import java.util.Comparator;
 import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 
 /**
@@ -263,18 +264,18 @@ public class Role extends BuildableType {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
 
-        super.readAttributes(in);
+        super.readAttributes(xr);
 
-        downgrade = spec.getType(in, DOWNGRADE_TAG,
-                                 Role.class, (Role)null);
+        downgrade = xr.getType(spec, DOWNGRADE_TAG,
+                               Role.class, (Role)null);
 
-        expertUnit = spec.getType(in, EXPERT_UNIT_TAG,
-                                  UnitType.class, (UnitType)null);
+        expertUnit = xr.getType(spec, EXPERT_UNIT_TAG,
+                                UnitType.class, (UnitType)null);
 
-        maximumCount = getAttribute(in, MAXIMUM_COUNT_TAG, 1);
+        maximumCount = xr.getAttribute(MAXIMUM_COUNT_TAG, 1);
     }
 
     /**

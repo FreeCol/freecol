@@ -24,9 +24,9 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.util.RandomChoice;
 
 
@@ -143,16 +143,16 @@ public class Disaster extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
 
-        super.readAttributes(in);
+        super.readAttributes(xr);
 
-        Disaster parent = spec.getType(in, EXTENDS_TAG, Disaster.class, this);
+        Disaster parent = xr.getType(spec, EXTENDS_TAG, Disaster.class, this);
 
-        natural = getAttribute(in, NATURAL_TAG, parent.natural);
+        natural = xr.getAttribute(NATURAL_TAG, parent.natural);
 
-        String str = getAttribute(in, EFFECTS_TAG, (String)null);
+        String str = xr.getAttribute(EFFECTS_TAG, (String)null);
         numberOfEffects = (str == null) ? parent.numberOfEffects
             : Effects.valueOf(str);
     }
@@ -161,14 +161,14 @@ public class Disaster extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
-        if (readShouldClearContainers(in)) {
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
+        if (xr.shouldClearContainers()) {
             effects = null;
         }
 
         final Specification spec = getSpecification();
 
-        Disaster parent = spec.getType(in, EXTENDS_TAG, Disaster.class, this);
+        Disaster parent = xr.getType(spec, EXTENDS_TAG, Disaster.class, this);
 
         if (parent != this && !parent.getEffects().isEmpty()) {
             if (effects == null) {
@@ -181,24 +181,24 @@ public class Disaster extends FreeColGameObjectType {
             }
         }
 
-        super.readChildren(in);
+        super.readChildren(xr);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
-        final String tag = in.getLocalName();
+        final String tag = xr.getLocalName();
 
         if (EFFECT_TAG.equals(tag)) {
-            Effect effect = new Effect(in, spec);
+            Effect effect = new Effect(xr, spec);
             effect.getFeatureContainer().replaceSource(null, this);
             addEffect(effect);
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 

@@ -25,9 +25,9 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit.Role;
@@ -197,8 +197,8 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
      * {@inheritDoc}
      */
     @Override
-    public void readChildren(XMLStreamReader in) throws XMLStreamException {
-        super.readChildren(in);
+    public void readChildren(FreeColXMLReader xr) throws XMLStreamException {
+        super.readChildren(xr);
 
         AbstractUnit au = null;
         if (unitType != null && role != null && number != null) {
@@ -213,24 +213,24 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
      * {@inheritDoc}
      */
     @Override
-    public void readChild(XMLStreamReader in) throws XMLStreamException {
+    public void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
-        final String tag = in.getLocalName();
+        final String tag = xr.getLocalName();
 
         if (NUMBER_TAG.equals(tag)) {
             number = new IntegerOption(getId() + ".number", spec);
-            number.readFromXML(in);
+            number.readFromXML(xr);
 
         } else if (ROLE_TAG.equals(tag)) {
             role = new StringOption(getId() + ".role", spec);
-            role.readFromXML(in);
+            role.readFromXML(xr);
 
         } else if (UNIT_TYPE_TAG.equals(tag)) {
             unitType = new UnitTypeOption(getId() + ".unitType", spec);
-            unitType.readFromXML(in);
+            unitType.readFromXML(xr);
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 

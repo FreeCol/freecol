@@ -25,9 +25,9 @@ import java.util.Random;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 
 
@@ -81,7 +81,7 @@ public abstract class Settlement extends GoodsLocation
     /**
      * Initiates a new <code>Settlement</code> with the given identifier.
      * The object should later be initialized by calling either
-     * {@link #readFromXML(XMLStreamReader)} or
+     * {@link #readFromXML(FreeColXMLReader)} or
      * {@link #readFromXMLElement(Element)}.
      *
      * @param game The enclosing <code>Game</code>.
@@ -665,20 +665,20 @@ public abstract class Settlement extends GoodsLocation
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        name = getAttribute(in, NAME_TAG, (String)null);
+        name = xr.getAttribute(NAME_TAG, (String)null);
 
-        owner = makeFreeColGameObject(in, OWNER_TAG, Player.class, true);
+        owner = xr.makeFreeColGameObject(getGame(), OWNER_TAG, Player.class, true);
 
-        tile = makeFreeColGameObject(in, TILE_TAG, Tile.class, true);
+        tile = xr.makeFreeColGameObject(getGame(), TILE_TAG, Tile.class, true);
 
-        String str = getAttribute(in, SETTLEMENT_TYPE_TAG, (String)null);
+        String str = xr.getAttribute(SETTLEMENT_TYPE_TAG, (String)null);
         SettlementType settlementType;
         // @compat 0.9.x
         if (str == null) {
-            boolean capital = getAttribute(in, IS_CAPITAL_TAG, false);
+            boolean capital = xr.getAttribute(IS_CAPITAL_TAG, false);
             settlementType = owner.getNationType().getSettlementType(capital);
         // end @compat
         } else {

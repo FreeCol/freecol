@@ -25,9 +25,9 @@ import java.util.List;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Player.Stance;
 
 import org.w3c.dom.Element;
@@ -316,55 +316,55 @@ public class DiplomaticTrade extends FreeColObject {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        sender = getAttribute(in, SENDER_TAG, game,
-                              Player.class, (Player)null);
-
-        recipient = getAttribute(in, RECIPIENT_TAG, game,
+        sender = xr.getAttribute(game, SENDER_TAG,
                                  Player.class, (Player)null);
 
-        status = getAttribute(in, STATUS_TAG, TradeStatus.class,
-                              TradeStatus.REJECT_TRADE);
+        recipient = xr.getAttribute(game, RECIPIENT_TAG,
+                                    Player.class, (Player)null);
+
+        status = xr.getAttribute(STATUS_TAG, TradeStatus.class,
+                                 TradeStatus.REJECT_TRADE);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers
         items.clear();
 
-        super.readChildren(in);
+        super.readChildren(xr);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        final String tag = in.getLocalName();
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
+        final String tag = xr.getLocalName();
         TradeItem item = null;
 
         if (ColonyTradeItem.getXMLElementTagName().equals(tag)) {
-            item = new ColonyTradeItem(game, in);
+            item = new ColonyTradeItem(game, xr);
 
         } else if (GoldTradeItem.getXMLElementTagName().equals(tag)) {
-            item = new GoldTradeItem(game, in);
+            item = new GoldTradeItem(game, xr);
 
         } else if (GoodsTradeItem.getXMLElementTagName().equals(tag)) {
-            item = new GoodsTradeItem(game, in);
+            item = new GoodsTradeItem(game, xr);
 
         } else if (StanceTradeItem.getXMLElementTagName().equals(tag)) {
-            item = new StanceTradeItem(game, in);
+            item = new StanceTradeItem(game, xr);
 
         } else if (UnitTradeItem.getXMLElementTagName().equals(tag)) {
-            item = new UnitTradeItem(game, in);
+            item = new UnitTradeItem(game, xr);
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
 
         if (item != null) items.add(item);

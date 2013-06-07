@@ -25,9 +25,9 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Unit.UnitState;
 
 
@@ -103,7 +103,7 @@ public class Europe extends UnitLocation implements Ownable, Named {
     /**
      * Creates a new <code>Europe</code> with the given identifier.
      * The object should later be initialized by calling either
-     * {@link #readFromXML(XMLStreamReader)} or
+     * {@link #readFromXML(FreeColXMLReader)} or
      * {@link #readFromXMLElement(Element)}.
      *
      * @param game The enclosing <code>Game</code>.
@@ -360,18 +360,18 @@ public class Europe extends UnitLocation implements Ownable, Named {
      * {@inheritDoc}
      */
     @Override
-    public void readFromXMLPartial(XMLStreamReader in) throws XMLStreamException {
-        readFromXMLPartialByClass(in, getClass());
+    public void readFromXMLPartial(FreeColXMLReader xr) throws XMLStreamException {
+        readFromXMLPartialByClass(xr, getClass());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    public void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
 
-        super.readAttributes(in);
+        super.readAttributes(xr);
 
         // @compat 0.10.0
         if (!hasAbility("model.ability.dressMissionary")) {
@@ -380,17 +380,17 @@ public class Europe extends UnitLocation implements Ownable, Named {
         // end @compat
 
         for (int index = 0; index < recruitables.length; index++) {
-            UnitType unitType = spec.getType(in, RECRUIT_TAG + index,
-                                             UnitType.class, (UnitType)null);
+            UnitType unitType = xr.getType(spec, RECRUIT_TAG + index,
+                                           UnitType.class, (UnitType)null);
             if (unitType != null) recruitables[index] = unitType;
         }
 
-        owner = makeFreeColGameObject(in, OWNER_TAG, Player.class, true);
+        owner = xr.makeFreeColGameObject(getGame(), OWNER_TAG, Player.class, true);
 
-        recruitPrice = getAttribute(in, RECRUIT_PRICE_TAG,
+        recruitPrice = xr.getAttribute(RECRUIT_PRICE_TAG,
                                     RECRUIT_PRICE_INITIAL);
 
-        recruitLowerCap = getAttribute(in, RECRUIT_LOWER_CAP_TAG,
+        recruitLowerCap = xr.getAttribute(RECRUIT_LOWER_CAP_TAG,
                                        LOWER_CAP_INITIAL);
     }
 
@@ -398,11 +398,11 @@ public class Europe extends UnitLocation implements Ownable, Named {
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
         unitPrices.clear();
 
-        super.readChildren(in);
+        super.readChildren(xr);
 
         // @compat 0.10.1
         // Sometimes units in a Europe element have a missing
@@ -417,21 +417,21 @@ public class Europe extends UnitLocation implements Ownable, Named {
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
-        final String tag = in.getLocalName();
+        final String tag = xr.getLocalName();
 
         if (UNIT_PRICE_TAG.equals(tag)) {
-            UnitType unitType = spec.getType(in, UNIT_TYPE_TAG,
-                                             UnitType.class, (UnitType)null);
-            int price = getAttribute(in, PRICE_TAG, -1);
+            UnitType unitType = xr.getType(spec, UNIT_TYPE_TAG,
+                                           UnitType.class, (UnitType)null);
+            int price = xr.getAttribute(PRICE_TAG, -1);
             if (unitType != null && price > 0) {
                 unitPrices.put(unitType, new Integer(price));
             }
-            closeTag(in, UNIT_PRICE_TAG);
+            xr.closeTag(UNIT_PRICE_TAG);
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 

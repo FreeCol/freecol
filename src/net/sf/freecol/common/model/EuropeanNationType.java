@@ -27,9 +27,9 @@ import java.util.Locale;
 import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.OptionGroup;
@@ -203,29 +203,29 @@ public class EuropeanNationType extends NationType {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
         final Specification spec = getSpecification();
-        EuropeanNationType parent = spec.getType(in, EXTENDS_TAG,
-                                                 EuropeanNationType.class, this);
+        EuropeanNationType parent = xr.getType(spec, EXTENDS_TAG,
+                                               EuropeanNationType.class, this);
         
-        ref = getAttribute(in, REF_TAG, parent.ref);
+        ref = xr.getAttribute(REF_TAG, parent.ref);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
-        if (readShouldClearContainers(in)) {
+        if (xr.shouldClearContainers()) {
             startingUnitMap.clear();
         }
 
         final Specification spec = getSpecification();
-        EuropeanNationType parent = spec.getType(in, EXTENDS_TAG,
-                                                 EuropeanNationType.class, this);
+        EuropeanNationType parent = xr.getType(spec, EXTENDS_TAG,
+                                               EuropeanNationType.class, this);
         if (parent != this) {
             for (Map.Entry<String, Map<String, AbstractUnit>> entry
                      : parent.startingUnitMap.entrySet()) {
@@ -234,24 +234,24 @@ public class EuropeanNationType extends NationType {
             }
         }
 
-        super.readChildren(in);
+        super.readChildren(xr);
     }
     
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        final String tag = in.getLocalName();
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
+        final String tag = xr.getLocalName();
 
         if (UNIT_TAG.equals(tag)) {
-            String id = readId(in);
+            String id = xr.readId();
 
-            String type = getAttribute(in, TYPE_TAG, (String)null);
+            String type = xr.getAttribute(TYPE_TAG, (String)null);
 
-            Role role = getAttribute(in, ROLE_TAG, Role.class, Role.DEFAULT);
+            Role role = xr.getAttribute(ROLE_TAG, Role.class, Role.DEFAULT);
             
-            boolean ex = getAttribute(in, EXPERT_STARTING_UNITS_TAG, false);
+            boolean ex = xr.getAttribute(EXPERT_STARTING_UNITS_TAG, false);
             String exTag = (ex) ? Boolean.TRUE.toString() : null;
 
             AbstractUnit unit = new AbstractUnit(type, role, 1);
@@ -261,10 +261,10 @@ public class EuropeanNationType extends NationType {
                 startingUnitMap.put(exTag, units);
             }
             units.put(id, unit);
-            closeTag(in, UNIT_TAG);
+            xr.closeTag(UNIT_TAG);
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 

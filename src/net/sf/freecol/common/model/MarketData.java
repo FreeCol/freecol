@@ -22,8 +22,9 @@ package net.sf.freecol.common.model;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 import org.w3c.dom.Element;
 
@@ -103,7 +104,7 @@ public class MarketData extends FreeColGameObject {
     /**
      * Creates a new <code>MarketData</code> with the given
      * identifier.  The object should later be initialized by calling
-     * either {@link #readFromXML(XMLStreamReader)} or
+     * either {@link #readFromXML(FreeColXMLReader)} or
      * {@link #readFromXMLElement(Element)}.
      *
      * @param game The enclosing <code>Game</code>.
@@ -422,34 +423,34 @@ public class MarketData extends FreeColGameObject {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
 
-        super.readAttributes(in);
+        super.readAttributes(xr);
 
-        goodsType = spec.getType(in, GOODS_TYPE_TAG, GoodsType.class,
-                                 (GoodsType)null);
+        goodsType = xr.getType(spec, GOODS_TYPE_TAG, GoodsType.class,
+                               (GoodsType)null);
         // @compat 0.9.x
         if (goodsType == null) {
             setDefaultId(getGame());
-            goodsType = spec.getType(in, ID_ATTRIBUTE_TAG, GoodsType.class,
-                                     (GoodsType)null);
+            goodsType = xr.getType(spec, ID_ATTRIBUTE_TAG, GoodsType.class,
+                                   (GoodsType)null);
         }
         // end compatibility code
 
-        amountInMarket = getAttribute(in, AMOUNT_TAG, 0);
+        amountInMarket = xr.getAttribute(AMOUNT_TAG, 0);
 
-        initialPrice = getAttribute(in, INITIAL_PRICE_TAG, -1);
+        initialPrice = xr.getAttribute(INITIAL_PRICE_TAG, -1);
 
-        arrears = getAttribute(in, ARREARS_TAG, 0);
+        arrears = xr.getAttribute(ARREARS_TAG, 0);
 
-        sales = getAttribute(in, SALES_TAG, 0);
+        sales = xr.getAttribute(SALES_TAG, 0);
 
-        incomeBeforeTaxes = getAttribute(in, INCOME_BEFORE_TAXES_TAG, 0);
+        incomeBeforeTaxes = xr.getAttribute(INCOME_BEFORE_TAXES_TAG, 0);
 
-        incomeAfterTaxes = getAttribute(in, INCOME_AFTER_TAXES_TAG, 0);
+        incomeAfterTaxes = xr.getAttribute(INCOME_AFTER_TAXES_TAG, 0);
 
-        traded = getAttribute(in, TRADED_TAG, sales != 0);
+        traded = xr.getAttribute(TRADED_TAG, sales != 0);
 
         update();
         oldPrice = costToBuy;

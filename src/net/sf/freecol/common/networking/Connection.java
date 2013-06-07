@@ -39,7 +39,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import net.sf.freecol.common.debug.FreeColDebugger;
-import net.sf.freecol.common.util.XMLStream;
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -403,11 +403,11 @@ public class Connection {
         // Extract the reply id and check if this is a question.
         final String networkReplyId;
         final boolean question;
-        XMLStream xr = null;
+        FreeColXMLReader xr = null;
         try {
-            xr = new XMLStream(in);
+            xr = new FreeColXMLReader(in);
             xr.nextTag();
-            question = QUESTION_TAG.equals(xr.getTagName());
+            question = QUESTION_TAG.equals(xr.getLocalName());
             networkReplyId = xr.getAttribute(NETWORK_REPLY_ID_TAG,
                                              (String)null);
         } catch (XMLStreamException xme) {

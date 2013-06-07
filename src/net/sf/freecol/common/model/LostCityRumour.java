@@ -28,11 +28,11 @@ import java.util.Random;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.common.util.RandomChoice;
+import net.sf.freecol.common.io.FreeColXMLReader;
 
+import net.sf.freecol.common.util.RandomChoice;
 
 /**
  * Represents a lost city rumour.
@@ -332,14 +332,14 @@ public class LostCityRumour extends TileItem {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        tile = makeFreeColGameObject(in, TILE_TAG, Tile.class, true);
+        tile = xr.makeFreeColGameObject(getGame(), TILE_TAG, Tile.class, true);
 
-        type = getAttribute(in, TYPE_TAG, RumourType.class, (RumourType)null);
+        type = xr.getAttribute(TYPE_TAG, RumourType.class, (RumourType)null);
 
-        name = getAttribute(in, NAME_TAG, (String)null);
+        name = xr.getAttribute(NAME_TAG, (String)null);
     }
 
     /**

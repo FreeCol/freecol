@@ -24,8 +24,9 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 
 /**
@@ -69,13 +70,13 @@ public class Effect extends FreeColGameObjectType {
     /**
      * Creates a new <code>Effect</code> instance.
      *
-     * @param in The <code>XMLStreamReader</code> to read from.
+     * @param xr The <code>FreeColXMLReader</code> to read from.
      * @param specification The <code>Specification</code> to refer to.
      * @exception XMLStreamException if an error occurs
      */
-    public Effect(XMLStreamReader in, Specification specification) throws XMLStreamException {
+    public Effect(FreeColXMLReader xr, Specification specification) throws XMLStreamException {
         setSpecification(specification);
-        readFromXML(in);
+        readFromXML(xr);
     }
 
     /**
@@ -165,37 +166,37 @@ public class Effect extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        probability = getAttribute(in, PROBABILITY_TAG, 0);
+        probability = xr.getAttribute(PROBABILITY_TAG, 0);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
-        if (readShouldClearContainers(in)) {
+        if (xr.shouldClearContainers()) {
             scopes = null;
         }
 
-        super.readChildren(in);
+        super.readChildren(xr);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        final String tag = in.getLocalName();
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
+        final String tag = xr.getLocalName();
 
         if (Scope.getXMLElementTagName().equals(tag)) {
-            addScope(new Scope(in));
+            addScope(new Scope(xr));
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 

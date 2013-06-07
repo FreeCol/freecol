@@ -25,9 +25,9 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Specification;
 
 
@@ -174,25 +174,25 @@ public class StringOption extends AbstractOption<String> {
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         choices.clear(); // Clear containers
 
-        super.readChildren(in);
+        super.readChildren(xr);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        final String tag = in.getLocalName();
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
+        final String tag = xr.getLocalName();
 
         if (CHOICE_TAG.equals(tag)) {
-            choices.add(getAttribute(in, VALUE_TAG, (String)null));
-            closeTag(in, CHOICE_TAG);
+            choices.add(xr.getAttribute(VALUE_TAG, (String)null));
+            xr.closeTag(CHOICE_TAG);
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 

@@ -29,9 +29,9 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Element;
@@ -96,7 +96,7 @@ public final class Market extends FreeColGameObject implements Ownable {
     /**
      * Creates a new <code>Market</code> with the given identifier.
      * The object should later be initialized by calling either
-     * {@link #readFromXML(XMLStreamReader)} or
+     * {@link #readFromXML(FreeColXMLReader)} or
      * {@link #readFromXMLElement(Element)}.
      *
      * @param game The enclosing <code>Game</code>.
@@ -504,37 +504,37 @@ public final class Market extends FreeColGameObject implements Ownable {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        owner = findFreeColGameObject(in, OWNER_TAG, Player.class, (Player)null,
-                                      true);
+        owner = xr.findFreeColGameObject(getGame(), OWNER_TAG,
+                                         Player.class, (Player)null, true);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
         marketData.clear();
 
-        super.readChildren(in);
+        super.readChildren(xr);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        final String tag = in.getLocalName();
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
+        final String tag = xr.getLocalName();
 
         if (MarketData.getXMLElementTagName().equals(tag)) {
-            MarketData data = readFreeColGameObject(in, MarketData.class);
+            MarketData data = xr.readFreeColGameObject(getGame(), MarketData.class);
             putMarketData(data.getGoodsType(), data);
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 

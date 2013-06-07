@@ -34,10 +34,10 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.NationOptions.NationState;
@@ -635,7 +635,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Creates a new <code>Player</code> with the given id.  The object
      * should later be initialized by calling either
-     * {@link #readFromXML(XMLStreamReader)} or
+     * {@link #readFromXML(FreeColXMLReader)} or
      * {@link #readFromXMLElement(Element)}.
      *
      * @param game The <code>Game</code> this object belongs to.
@@ -3852,80 +3852,80 @@ public class Player extends FreeColGameObject implements Nameable {
      * {@inheritDoc}
      */
     @Override
-    public void readFromXMLPartial(XMLStreamReader in) throws XMLStreamException {
-        readFromXMLPartialByClass(in, getClass());
+    public void readFromXMLPartial(FreeColXMLReader xr) throws XMLStreamException {
+        readFromXMLPartialByClass(xr, getClass());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
         final Game game = getGame();
 
-        super.readAttributes(in);
+        super.readAttributes(xr);
 
-        name = getAttribute(in, USERNAME_TAG, (String)null);
+        name = xr.getAttribute(USERNAME_TAG, (String)null);
 
-        nationId = getAttribute(in, NATION_ID_TAG,
+        nationId = xr.getAttribute(NATION_ID_TAG,
             // @compat 0.10.7
-            getAttribute(in, OLD_NATION_ID_TAG,
+            xr.getAttribute(OLD_NATION_ID_TAG,
             // end @compat 0.10.7
                 (String)null));
 
         if (isUnknownEnemy()) {
             nationType = null;
         } else {
-            changeNationType(spec.getType(in, NATION_TYPE_TAG,
-                                          NationType.class, (NationType)null));;
+            changeNationType(xr.getType(spec, NATION_TYPE_TAG,
+                                        NationType.class, (NationType)null));;
         }
 
-        admin = getAttribute(in, ADMIN_TAG, false);
+        admin = xr.getAttribute(ADMIN_TAG, false);
 
-        gold = getAttribute(in, GOLD_TAG, 0);
+        gold = xr.getAttribute(GOLD_TAG, 0);
 
-        immigration = getAttribute(in, IMMIGRATION_TAG, 0);
+        immigration = xr.getAttribute(IMMIGRATION_TAG, 0);
 
-        liberty = getAttribute(in, LIBERTY_TAG, 0);
+        liberty = xr.getAttribute(LIBERTY_TAG, 0);
 
-        interventionBells = getAttribute(in, INTERVENTION_BELLS_TAG, 0);
+        interventionBells = xr.getAttribute(INTERVENTION_BELLS_TAG, 0);
 
-        oldSoL = getAttribute(in, OLD_SOL_TAG, 0);
+        oldSoL = xr.getAttribute(OLD_SOL_TAG, 0);
 
-        score = getAttribute(in, SCORE_TAG, 0);
+        score = xr.getAttribute(SCORE_TAG, 0);
 
-        ready = getAttribute(in, READY_TAG, false);
+        ready = xr.getAttribute(READY_TAG, false);
 
-        ai = getAttribute(in, AI_TAG, false);
+        ai = xr.getAttribute(AI_TAG, false);
 
-        dead = getAttribute(in, DEAD_TAG, false);
+        dead = xr.getAttribute(DEAD_TAG, false);
 
-        bankrupt = getAttribute(in, BANKRUPT_TAG, false);
+        bankrupt = xr.getAttribute(BANKRUPT_TAG, false);
 
-        tax = getAttribute(in, TAX_TAG, 0);
+        tax = xr.getAttribute(TAX_TAG, 0);
 
-        playerType = getAttribute(in, PLAYER_TYPE_TAG,
+        playerType = xr.getAttribute(PLAYER_TYPE_TAG,
                                   PlayerType.class, (PlayerType)null);
 
-        currentFather = spec.getType(in, CURRENT_FATHER_TAG,
-                                     FoundingFather.class, (FoundingFather)null);
+        currentFather = xr.getType(spec, CURRENT_FATHER_TAG,
+                                   FoundingFather.class, (FoundingFather)null);
 
-        immigrationRequired = getAttribute(in, IMMIGRATION_REQUIRED_TAG, 12);
+        immigrationRequired = xr.getAttribute(IMMIGRATION_REQUIRED_TAG, 12);
 
-        newLandName = getAttribute(in, NEW_LAND_NAME_TAG, (String)null);
+        newLandName = xr.getAttribute(NEW_LAND_NAME_TAG, (String)null);
 
-        independentNationName = getAttribute(in, INDEPENDENT_NATION_NAME_TAG,
+        independentNationName = xr.getAttribute(INDEPENDENT_NATION_NAME_TAG,
                                              (String)null);
 
-        attackedByPrivateers = getAttribute(in, ATTACKED_BY_PRIVATEERS_TAG,
+        attackedByPrivateers = xr.getAttribute(ATTACKED_BY_PRIVATEERS_TAG,
                                             false);
 
-        entryLocation = makeLocationAttribute(in, ENTRY_LOCATION_TAG, game);
+        entryLocation = xr.makeLocationAttribute(ENTRY_LOCATION_TAG, game);
 
         for (RegionType regionType : RegionType.values()) {
             String key = regionType.getNameIndexKey();
-            int index = getAttribute(in, key, -1);
+            int index = xr.getAttribute(key, -1);
             if (index > 0) setNameIndex(key, index);
         }
     }
@@ -3934,7 +3934,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
         tension.clear();
         stance.clear();
@@ -3948,7 +3948,7 @@ public class Player extends FreeColGameObject implements Nameable {
         lastSales = null;
         highSeas = null;
 
-        super.readChildren(in);
+        super.readChildren(xr);
 
         // Dynamic abilities are not currently saved.  TODO: better?
         switch (playerType) {
@@ -3969,14 +3969,15 @@ public class Player extends FreeColGameObject implements Nameable {
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
-        final String tag = in.getLocalName();
+        final Game game = getGame();
+        final String tag = xr.getLocalName();
 
         if (FOUNDING_FATHERS_TAG.equals(tag)) {
             List<FoundingFather> ffs
-                = readFromListElement(in, FOUNDING_FATHERS_TAG,
-                                      spec, FoundingFather.class);
+                = xr.readFromListElement(spec, FOUNDING_FATHERS_TAG,
+                                         FoundingFather.class);
             if (ffs != null) {
                 for (FoundingFather ff : ffs) {
                     addFather(ff); // addFather adds the features
@@ -3984,52 +3985,54 @@ public class Player extends FreeColGameObject implements Nameable {
             }
         
         } else if (OFFERED_FATHERS_TAG.equals(tag)) {
-            offeredFathers.addAll(readFromListElement(in, OFFERED_FATHERS_TAG,
-                                                      spec, FoundingFather.class));
+            List<FoundingFather> ofs = 
+                xr.readFromListElement(spec, OFFERED_FATHERS_TAG,
+                                       FoundingFather.class);
+            offeredFathers.addAll(ofs);
 
         } else if (STANCE_TAG.equals(tag)) {
-            String playerId = getAttribute(in, PLAYER_TAG, (String)null);
+            String playerId = xr.getAttribute(PLAYER_TAG, (String)null);
             if (playerId != null) {
-                stance.put(playerId, getAttribute(in, VALUE_TAG,
+                stance.put(playerId, xr.getAttribute(VALUE_TAG,
                         Stance.class, Stance.UNCONTACTED));
             }
-            closeTag(in, STANCE_TAG);
+            xr.closeTag(STANCE_TAG);
 
         } else if (TENSION_TAG.equals(tag)) {
-            tension.put(makeFreeColGameObject(in, PLAYER_TAG,
-                                              Player.class, true),
-                        new Tension(getAttribute(in, VALUE_TAG, 0)));
-            closeTag(in, TENSION_TAG);
+            tension.put(xr.makeFreeColGameObject(game, PLAYER_TAG,
+                                                 Player.class, true),
+                        new Tension(xr.getAttribute(VALUE_TAG, 0)));
+            xr.closeTag(TENSION_TAG);
         
         } else if (Europe.getXMLElementTagName().equals(tag)) {
-            europe = readFreeColGameObject(in, Europe.class);
+            europe = xr.readFreeColGameObject(game, Europe.class);
 
         } else if (HighSeas.getXMLElementTagName().equals(tag)) {
-            highSeas = readFreeColGameObject(in, HighSeas.class);
+            highSeas = xr.readFreeColGameObject(game, HighSeas.class);
 
         } else if (HistoryEvent.getXMLElementTagName().equals(tag)) {
-            getHistory().add(new HistoryEvent(in));
+            getHistory().add(new HistoryEvent(xr));
 
         } else if (LastSale.getXMLElementTagName().equals(tag)) {
-            addLastSale(new LastSale(in));
+            addLastSale(new LastSale(xr));
 
         } else if (Market.getXMLElementTagName().equals(tag)) {
-            market = readFreeColGameObject(in, Market.class);
+            market = xr.readFreeColGameObject(game, Market.class);
 
         } else if (ModelMessage.getXMLElementTagName().equals(tag)) {
-            addModelMessage(new ModelMessage(in));
+            addModelMessage(new ModelMessage(xr));
 
         } else if (Modifier.getXMLElementTagName().equals(tag)) {
-            addModifier(new Modifier(in, spec));
+            addModifier(new Modifier(xr, spec));
 
         } else if (Monarch.getXMLElementTagName().equals(tag)) {
-            monarch = readFreeColGameObject(in, Monarch.class);
+            monarch = xr.readFreeColGameObject(game, Monarch.class);
 
         } else if (TradeRoute.getXMLElementTagName().equals(tag)) {
-            tradeRoutes.add(readFreeColGameObject(in, TradeRoute.class));
+            tradeRoutes.add(xr.readFreeColGameObject(game, TradeRoute.class));
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 

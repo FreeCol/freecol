@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.GoodsType;
@@ -623,11 +622,11 @@ public abstract class Goal extends AIObject implements GoalConstants {
     /**
      * Reads information for this object from an XML stream.
      *
-     * @param in The input stream with the XML.
+     * @param xr The input stream with the XML.
      * @throws XMLStreamException if there are any problems reading from the
      *             stream.
      */
-    //protected abstract void readFromXML(XMLStreamReader in) throws XMLStreamException;
+    //protected abstract void readFromXML(FreeColXMLReader xr) throws XMLStreamException;
 
 
 

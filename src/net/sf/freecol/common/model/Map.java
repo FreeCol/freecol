@@ -35,9 +35,9 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
@@ -423,19 +423,19 @@ public class Map extends FreeColGameObject implements Location {
      * DOM-parsed XML-tree.
      *
      * @param game The enclosing <code>Game</code>.
-     * @param in The input stream containing the XML.
+     * @param xr The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
-    public Map(Game game, XMLStreamReader in) throws XMLStreamException {
+    public Map(Game game, FreeColXMLReader xr) throws XMLStreamException {
         super(game, null);
 
-        readFromXML(in);
+        readFromXML(xr);
     }
 
     /**
      * Creates a new <code>Map</code> with the given object
      * identifier.  The object should later be initialized by calling
-     * either {@link #readFromXML(XMLStreamReader)} or
+     * either {@link #readFromXML(FreeColXMLReader)} or
      * {@link #readFromXMLElement(Element)}.
      *
      * @param game The enclosing <code>Game</code>.
@@ -2227,24 +2227,24 @@ public class Map extends FreeColGameObject implements Location {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        setLayer(getAttribute(in, LAYER_TAG, Layer.class, Layer.ALL));
+        setLayer(xr.getAttribute(LAYER_TAG, Layer.class, Layer.ALL));
 
         if (tiles == null) {
-            int width = getAttribute(in, WIDTH_TAG, -1);
+            int width = xr.getAttribute(WIDTH_TAG, -1);
 
-            int height = getAttribute(in, HEIGHT_TAG, -1);
+            int height = xr.getAttribute(HEIGHT_TAG, -1);
 
             if (width > 0 && height > 0) {
                 tiles = new Tile[width][height];
             }
         }
 
-        minimumLatitude = getAttribute(in, MINIMUM_LATITUDE_TAG, -90);
+        minimumLatitude = xr.getAttribute(MINIMUM_LATITUDE_TAG, -90);
 
-        maximumLatitude = getAttribute(in, MAXIMUM_LATITUDE_TAG, 90);
+        maximumLatitude = xr.getAttribute(MAXIMUM_LATITUDE_TAG, 90);
 
         calculateLatitudePerRow();
     }
@@ -2253,7 +2253,7 @@ public class Map extends FreeColGameObject implements Location {
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // The tiles structure is large, and individually
         // overwriteable, so we do not clear it unlike most other containers.
 
@@ -2261,7 +2261,7 @@ public class Map extends FreeColGameObject implements Location {
         fixupHighSeas = false;
         // end @compat
 
-        super.readChildren(in);
+        super.readChildren(xr);
 
         // @compat 0.10.5
         if (fixupHighSeas) resetHighSeasCount();
@@ -2272,14 +2272,15 @@ public class Map extends FreeColGameObject implements Location {
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        final String tag = in.getLocalName();
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
+        final Game game = getGame();
+        final String tag = xr.getLocalName();
 
         if (Region.getXMLElementTagName().equals(tag)) {
-            putRegion(readFreeColGameObject(in, Region.class));
+            putRegion(xr.readFreeColGameObject(game, Region.class));
 
         } else if (Tile.getXMLElementTagName().equals(tag)) {
-            Tile t = readFreeColGameObject(in, Tile.class);
+            Tile t = xr.readFreeColGameObject(game, Tile.class);
             if (t != null) {
                 setTile(t, t.getX(), t.getY());
 
@@ -2291,7 +2292,7 @@ public class Map extends FreeColGameObject implements Location {
             }
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 

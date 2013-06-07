@@ -24,9 +24,9 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.UnitLocation;
 
 
@@ -166,27 +166,27 @@ public class HighSeas extends UnitLocation {
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
         destinations.clear();
 
-        super.readChildren(in);
+        super.readChildren(xr);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Game game = getGame();
-        final String tag = in.getLocalName();
+        final String tag = xr.getLocalName();
 
         if (DESTINATION_TAG.equals(tag)) {
-            addDestination(makeLocationAttribute(in, ID_ATTRIBUTE_TAG, game));
-            closeTag(in, DESTINATION_TAG);
+            addDestination(xr.makeLocationAttribute(ID_ATTRIBUTE_TAG, game));
+            xr.closeTag(DESTINATION_TAG);
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 

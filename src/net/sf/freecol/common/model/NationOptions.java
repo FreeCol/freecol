@@ -28,10 +28,10 @@ import java.util.Map;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 
 /**
@@ -101,15 +101,15 @@ public class NationOptions extends FreeColObject {
     /**
      * Creates a new <code>NationOptions</code> instance by reading a stream.
      *
-     * @param in The <code>XMLStreamReader</code> to read from.
+     * @param xr The <code>FreeColXMLReader</code> to read from.
      * @param specification The <code>Specification</code> to refer to.
      * @exception XMLStreamException if there is a problem reading the stream.
      */
-    public NationOptions(XMLStreamReader in,
+    public NationOptions(FreeColXMLReader xr,
                          Specification specification) throws XMLStreamException {
         this(specification);
         
-        readFromXML(in);
+        readFromXML(xr);
     }
 
 
@@ -200,11 +200,11 @@ public class NationOptions extends FreeColObject {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         // The nation options do not use the FreeColObject attributes, so
         // no: super.readAttributes(in);
 
-        nationalAdvantages = getAttribute(in, NATIONAL_ADVANTAGES_TAG,
+        nationalAdvantages = xr.getAttribute(NATIONAL_ADVANTAGES_TAG,
                                           Advantages.class,
                                           Advantages.SELECTABLE);
     }
@@ -213,35 +213,35 @@ public class NationOptions extends FreeColObject {
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers
         nations.clear();
 
-        super.readChildren(in);
+        super.readChildren(xr);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        String tag = in.getLocalName();
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
+        String tag = xr.getLocalName();
 
         if (NATIONS_TAG.equals(tag)) {
-            while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                tag = in.getLocalName();
+            while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                tag = xr.getLocalName();
                 if (NATION_TAG.equals(tag)) {
 
-                    Nation nation = specification.getType(in, ID_ATTRIBUTE_TAG,
+                    Nation nation = xr.getType(specification, ID_ATTRIBUTE_TAG,
                         Nation.class, (Nation)null);
 
-                    NationState state = getAttribute(in, STATE_TAG,
+                    NationState state = xr.getAttribute(STATE_TAG,
                         NationState.class, (NationState)null);
 
                     if (nation != null && state != null) {
                         nations.put(nation, state);
                     }
-                    closeTag(in, NATION_TAG);
+                    xr.closeTag(NATION_TAG);
 
                 } else {
                     logger.warning("Invalid " + NATION_TAG + " tag: " + tag);
@@ -249,7 +249,7 @@ public class NationOptions extends FreeColObject {
             }
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 

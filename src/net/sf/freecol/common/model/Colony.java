@@ -33,10 +33,10 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.util.RandomChoice;
 
@@ -166,7 +166,7 @@ public class Colony extends Settlement implements Nameable {
     /**
      * Create a new <code>Colony</code> with the given
      * identifier. The object should later be initialized by calling
-     * either {@link #readFromXML(XMLStreamReader)}.
+     * either {@link #readFromXML(FreeColXMLReader)}.
      *
      * @param game The enclosing <code>Game</code>.
      * @param id The object identifier.
@@ -2771,46 +2771,46 @@ public class Colony extends Settlement implements Nameable {
      * {@inheritDoc}
      */
     @Override
-    public void readFromXMLPartial(XMLStreamReader in) throws XMLStreamException {
-        readFromXMLPartialByClass(in, getClass());
+    public void readFromXMLPartial(FreeColXMLReader xr) throws XMLStreamException {
+        readFromXMLPartialByClass(xr, getClass());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    public void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        established = new Turn(getAttribute(in, ESTABLISHED_TAG, 0));
+        established = new Turn(xr.getAttribute(ESTABLISHED_TAG, 0));
 
-        sonsOfLiberty = getAttribute(in, SONS_OF_LIBERTY_TAG, 0);
+        sonsOfLiberty = xr.getAttribute(SONS_OF_LIBERTY_TAG, 0);
 
-        oldSonsOfLiberty = getAttribute(in, OLD_SONS_OF_LIBERTY_TAG, 0);
+        oldSonsOfLiberty = xr.getAttribute(OLD_SONS_OF_LIBERTY_TAG, 0);
 
-        tories = getAttribute(in, TORIES_TAG, 0);
+        tories = xr.getAttribute(TORIES_TAG, 0);
 
-        oldTories = getAttribute(in, OLD_TORIES_TAG, 0);
+        oldTories = xr.getAttribute(OLD_TORIES_TAG, 0);
 
-        liberty = getAttribute(in, LIBERTY_TAG, 0);
+        liberty = xr.getAttribute(LIBERTY_TAG, 0);
 
-        immigration = getAttribute(in, IMMIGRATION_TAG, 0);
+        immigration = xr.getAttribute(IMMIGRATION_TAG, 0);
 
-        productionBonus = getAttribute(in, PRODUCTION_BONUS_TAG, 0);
+        productionBonus = xr.getAttribute(PRODUCTION_BONUS_TAG, 0);
 
-        landLocked = getAttribute(in, LAND_LOCKED_TAG, true);
+        landLocked = xr.getAttribute(LAND_LOCKED_TAG, true);
         if (!landLocked) addAbility(HAS_PORT);
 
-        displayUnitCount = getAttribute(in, UNIT_COUNT_TAG, 0);
+        displayUnitCount = xr.getAttribute(UNIT_COUNT_TAG, 0);
 
-        stockadeKey = getAttribute(in, STOCKADE_KEY_TAG, (String)null);
+        stockadeKey = xr.getAttribute(STOCKADE_KEY_TAG, (String)null);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void readChildren(XMLStreamReader in) throws XMLStreamException {
+    public void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers
         colonyTiles.clear();
         buildingMap.clear();
@@ -2818,7 +2818,7 @@ public class Colony extends Settlement implements Nameable {
         buildQueue.clear();
         populationQueue.clear();
 
-        super.readChildren(in);
+        super.readChildren(xr);
 
         owner.addSettlement(this);
 
@@ -2848,49 +2848,50 @@ public class Colony extends Settlement implements Nameable {
      * {@inheritDoc}
      */
     @Override
-    public void readChild(XMLStreamReader in) throws XMLStreamException {
+    public void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
-        final String tag = in.getLocalName();
+        final Game game = getGame();
+        final String tag = xr.getLocalName();
 
         if (BUILD_QUEUE_TAG.equals(tag)) {
-            buildQueue.add(spec.getType(in, ID_ATTRIBUTE_TAG,
-                                        BuildableType.class, (BuildableType)null));
-            closeTag(in, BUILD_QUEUE_TAG);
+            buildQueue.add(xr.getType(spec, ID_ATTRIBUTE_TAG,
+                                      BuildableType.class, (BuildableType)null));
+            xr.closeTag(BUILD_QUEUE_TAG);
 
         // @compat 0.9.x
         } else if (OLD_BUILD_QUEUE_TAG.equals(tag)) {
             // TODO: remove support for old format, move serialization
             // to BuildQueue
-            int size = getAttribute(in, ARRAY_SIZE_TAG, 0);
+            int size = xr.getAttribute(ARRAY_SIZE_TAG, 0);
             if (size > 0) {
                 for (int x = 0; x < size; x++) {
-                    String typeId = in.getAttributeValue(null, "x" + Integer.toString(x));
+                    String typeId = xr.getAttributeValue(null, "x" + Integer.toString(x));
                     buildQueue.add(getSpecification().getType(typeId, BuildableType.class));
                 }
             }
-            in.nextTag();
+            xr.nextTag();
         // end @compat
 
-        } else if (POPULATION_QUEUE_TAG.equals(in.getLocalName())) {
-            populationQueue.add(spec.getType(in, ID_ATTRIBUTE_TAG,
-                                             UnitType.class, (UnitType)null));;
-            closeTag(in, POPULATION_QUEUE_TAG);
+        } else if (POPULATION_QUEUE_TAG.equals(xr.getLocalName())) {
+            populationQueue.add(xr.getType(spec, ID_ATTRIBUTE_TAG,
+                                           UnitType.class, (UnitType)null));;
+            xr.closeTag(POPULATION_QUEUE_TAG);
 
         } else if (Building.getXMLElementTagName().equals(tag)) {
-            addBuilding(readFreeColGameObject(in, Building.class));
+            addBuilding(xr.readFreeColGameObject(game, Building.class));
 
         } else if (ColonyTile.getXMLElementTagName().equals(tag)) {
-            colonyTiles.add(readFreeColGameObject(in, ColonyTile.class));
+            colonyTiles.add(xr.readFreeColGameObject(getGame(), ColonyTile.class));
 
         } else if (ExportData.getXMLElementTagName().equals(tag)) {
-            ExportData data = new ExportData(in);
+            ExportData data = new ExportData(xr);
             if (data != null) exportData.put(data.getId(), data);
         
         } else if (Modifier.getXMLElementTagName().equals(tag)) {
-            addModifier(new Modifier(in, spec));
+            addModifier(new Modifier(xr, spec));
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 

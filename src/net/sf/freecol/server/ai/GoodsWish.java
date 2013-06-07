@@ -22,9 +22,9 @@ package net.sf.freecol.server.ai;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
@@ -109,13 +109,13 @@ public class GoodsWish extends Wish {
      * XML-representation.
      *
      * @param aiMain The main AI-object.
-     * @param in The input stream containing the XML.
+     * @param xr The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    public GoodsWish(AIMain aiMain, XMLStreamReader in)
+    public GoodsWish(AIMain aiMain, FreeColXMLReader xr)
         throws XMLStreamException {
-        super(aiMain, in);
+        super(aiMain, xr);
 
         uninitialized = goodsType == null;
     }
@@ -209,15 +209,15 @@ public class GoodsWish extends Wish {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
         final Specification spec = getSpecification();
 
-        goodsType = spec.getType(in, GOODS_TYPE_TAG,
-                                 GoodsType.class, (GoodsType)null);
+        goodsType = xr.getType(spec, GOODS_TYPE_TAG,
+                               GoodsType.class, (GoodsType)null);
 
-        amountRequested = getAttribute(in, AMOUNT_REQUESTED_TAG,
+        amountRequested = xr.getAttribute(AMOUNT_REQUESTED_TAG,
                                        GoodsContainer.CARGO_SIZE);
     }
 
@@ -225,8 +225,8 @@ public class GoodsWish extends Wish {
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
-        super.readChildren(in);
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
+        super.readChildren(xr);
 
         if (goodsType != null && amountRequested > 0) uninitialized = false;
     }

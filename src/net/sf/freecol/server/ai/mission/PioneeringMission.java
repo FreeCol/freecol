@@ -22,9 +22,9 @@ package net.sf.freecol.server.ai.mission;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -101,16 +101,16 @@ public class PioneeringMission extends Mission {
      *
      * @param aiMain The main AI-object.
      * @param aiUnit The <code>AIUnit</code> this mission is created for.
-     * @param in The input stream containing the XML.
+     * @param xr The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      * @see net.sf.freecol.server.ai.AIObject#readFromXML
      */
-    public PioneeringMission(AIMain aiMain, AIUnit aiUnit, XMLStreamReader in)
+    public PioneeringMission(AIMain aiMain, AIUnit aiUnit, FreeColXMLReader xr)
         throws XMLStreamException {
         super(aiMain, aiUnit);
 
-        readFromXML(in);
+        readFromXML(xr);
         uninitialized = getAIUnit() == null;
     }
 
@@ -723,18 +723,18 @@ public class PioneeringMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
         // Do not use setTarget in serialization
-        target = findLocationAttribute(in, TARGET_TAG, getGame());
+        target = xr.findLocationAttribute(getGame(), TARGET_TAG);
 
-        if (hasAttribute(in, TILE_IMPROVEMENT_PLAN_TAG)) {
-            tileImprovementPlan = getAttribute(in, TILE_IMPROVEMENT_PLAN_TAG,
+        if (xr.hasAttribute(TILE_IMPROVEMENT_PLAN_TAG)) {
+            tileImprovementPlan = getAttribute(xr, TILE_IMPROVEMENT_PLAN_TAG,
                 TileImprovementPlan.class, (TileImprovementPlan)null);
             if (tileImprovementPlan == null) {
                 tileImprovementPlan = new TileImprovementPlan(getAIMain(),
-                    getAttribute(in, TILE_IMPROVEMENT_PLAN_TAG, (String)null));
+                    xr.getAttribute(TILE_IMPROVEMENT_PLAN_TAG, (String)null));
             }
         } else {
             tileImprovementPlan = null;

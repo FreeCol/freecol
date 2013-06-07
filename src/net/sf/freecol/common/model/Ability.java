@@ -20,8 +20,9 @@
 package net.sf.freecol.common.model;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 import org.w3c.dom.Element;
 
@@ -211,14 +212,14 @@ public final class Ability extends Feature {
     /**
      * Creates a new <code>Ability</code> instance.
      *
-     * @param in The <code>XMLStreamReader</code> to read from.
+     * @param xr The <code>FreeColXMLReader</code> to read from.
      * @param specification A <code>Specification</code> to refer to.
      * @exception XMLStreamException if an error occurs
      */
-    public Ability(XMLStreamReader in, Specification specification)
+    public Ability(FreeColXMLReader xr, Specification specification)
         throws XMLStreamException {
         setSpecification(specification);
-        readFromXML(in);
+        readFromXML(xr);
     }
 
     /**
@@ -296,10 +297,10 @@ public final class Ability extends Feature {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        value = getAttribute(in, VALUE_TAG, true);
+        value = xr.getAttribute(VALUE_TAG, true);
     }
 
     /**

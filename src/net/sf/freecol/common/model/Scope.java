@@ -22,8 +22,9 @@ package net.sf.freecol.common.model;
 import java.lang.reflect.Method;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 
 /**
@@ -68,11 +69,11 @@ public class Scope extends FreeColObject implements Cloneable {
     /**
      * Creates a new <code>Scope</code> instance from a stream.
      *
-     * @param in The <code>XMLStreamReader</code> to read from.
+     * @param xr The <code>FreeColXMLReader</code> to read from.
      * @exception XMLStreamException if there is an error reading the stream.
      */
-    public Scope(XMLStreamReader in) throws XMLStreamException {
-        readFromXML(in);
+    public Scope(FreeColXMLReader xr) throws XMLStreamException {
+        readFromXML(xr);
     }
 
 
@@ -368,20 +369,20 @@ public class Scope extends FreeColObject implements Cloneable {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        matchNegated = getAttribute(in, MATCH_NEGATED_TAG, false);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        matchNegated = xr.getAttribute(MATCH_NEGATED_TAG, false);
 
-        matchesNull = getAttribute(in, MATCHES_NULL_TAG, true);
+        matchesNull = xr.getAttribute(MATCHES_NULL_TAG, true);
 
-        type = getAttribute(in, TYPE_TAG, (String)null);
+        type = xr.getAttribute(TYPE_TAG, (String)null);
 
-        abilityId = getAttribute(in, ABILITY_ID_TAG, (String)null);
+        abilityId = xr.getAttribute(ABILITY_ID_TAG, (String)null);
 
-        abilityValue = getAttribute(in, ABILITY_VALUE_TAG, true);
+        abilityValue = xr.getAttribute(ABILITY_VALUE_TAG, true);
 
-        methodName = getAttribute(in, METHOD_NAME_TAG, (String)null);
+        methodName = xr.getAttribute(METHOD_NAME_TAG, (String)null);
 
-        methodValue = getAttribute(in, METHOD_VALUE_TAG, (String)null);
+        methodValue = xr.getAttribute(METHOD_VALUE_TAG, (String)null);
     }
 
     /**

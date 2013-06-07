@@ -20,9 +20,9 @@
 package net.sf.freecol.common.model.mission;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
@@ -78,10 +78,10 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
      * Creates a new <code>AbstractMission</code> instance.
      *
      * @param game a <code>Game</code> value
-     * @param in a <code>XMLStreamReader</code> value
+     * @param xr a <code>FreeColXMLReader</code> value
      * @exception XMLStreamException if an error occurs
      */
-    public AbstractMission(Game game, XMLStreamReader in) throws XMLStreamException {
+    public AbstractMission(Game game, FreeColXMLReader xr) throws XMLStreamException {
         super(game, null);
     }
 
@@ -197,14 +197,13 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        unit = makeFreeColGameObject(in, "unit", Unit.class, true);
+        unit = xr.makeFreeColGameObject(getGame(), "unit", Unit.class, true);
 
-        turnCount = getAttribute(in, "turnCount", 0);
+        turnCount = xr.getAttribute("turnCount", 0);
 
-        repeatCount = getAttribute(in, "repeatCount", 1);
+        repeatCount = xr.getAttribute("repeatCount", 1);
     }
 }

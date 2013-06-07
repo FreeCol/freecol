@@ -30,9 +30,9 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.IntegerOption;
@@ -1091,35 +1091,35 @@ public class Game extends FreeColGameObject {
      * {@inheritDoc}
      */
     @Override
-    public void readFromXMLPartial(XMLStreamReader in) throws XMLStreamException {
-        readFromXMLPartialByClass(in, getClass());
+    public void readFromXMLPartial(FreeColXMLReader xr) throws XMLStreamException {
+        readFromXMLPartialByClass(xr, getClass());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        nextId = getAttribute(in, NEXT_ID_TAG, -1);
+        nextId = xr.getAttribute(NEXT_ID_TAG, -1);
         // @compat 0.10.x
-        if (nextId < 0) nextId = getAttribute(in, OLD_NEXT_ID_TAG, 0);
+        if (nextId < 0) nextId = xr.getAttribute(OLD_NEXT_ID_TAG, 0);
         // end @compat
 
-        String str = getAttribute(in, UUID_TAG, (String)null);
+        String str = xr.getAttribute(UUID_TAG, (String)null);
         uuid = (str == null) ? null : UUID.fromString(str);
 
-        turn = new Turn(getAttribute(in, TURN_TAG, 1));
+        turn = new Turn(xr.getAttribute(TURN_TAG, 1));
 
-        spanishSuccession = getAttribute(in, SPANISH_SUCCESSION_TAG, false);
+        spanishSuccession = xr.getAttribute(SPANISH_SUCCESSION_TAG, false);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
         citiesOfCibola.clear();
         players.clear();
@@ -1132,9 +1132,9 @@ public class Game extends FreeColGameObject {
         // Special case for the current player.  Defer lookup of the
         // current player tag until we read the children, because that
         // is where the players are defined.
-        String current = getAttribute(in, CURRENT_PLAYER_TAG, (String)null);
+        String current = xr.getAttribute(CURRENT_PLAYER_TAG, (String)null);
 
-        super.readChildren(in);
+        super.readChildren(xr);
 
         currentPlayer = (current == null) ? null
             : getFreeColGameObject(current, Player.class);
@@ -1153,18 +1153,19 @@ public class Game extends FreeColGameObject {
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        final String tag = in.getLocalName();
-        logger.finest("Found game tag " + tag + " id=" + readId(in));
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
+        final Game game = getGame();
+        final String tag = xr.getLocalName();
+        logger.finest("Found game tag " + tag + " id=" + xr.readId());
 
         if (CIBOLA_TAG.equals(tag)) {
-            citiesOfCibola.add(readId(in));
-            closeTag(in, CIBOLA_TAG);
+            citiesOfCibola.add(xr.readId());
+            xr.closeTag(CIBOLA_TAG);
 
         // @compat 0.9.x
         } else if (CITIES_OF_CIBOLA_TAG.equals(tag)) {
-            List<String> cities = readFromListElement(in, CITIES_OF_CIBOLA_TAG, 
-                                                      String.class);
+            List<String> cities = xr.readFromListElement(CITIES_OF_CIBOLA_TAG, 
+                                                         String.class);
             citiesOfCibola.clear();
             citiesOfCibola.addAll(cities);
         // end @compat
@@ -1172,20 +1173,20 @@ public class Game extends FreeColGameObject {
         // @compat 0.9.x
         } else if (GAME_OPTIONS_1_TAG.equals(tag) 
             || GAME_OPTIONS_2_TAG.equals(tag)) {
-            gameOptions = new OptionGroup(in, specification);
+            gameOptions = new OptionGroup(xr, specification);
         // end @compat
 
         } else if (Map.getXMLElementTagName().equals(tag)) {
-            map = readFreeColGameObject(in, Map.class);
+            map = xr.readFreeColGameObject(game, Map.class);
 
         // @compat 0.9.x
         } else if (MapGeneratorOptions.getXMLElementTagName().equals(tag)) {
-            mapGeneratorOptions = new OptionGroup(in, specification);
+            mapGeneratorOptions = new OptionGroup(xr, specification);
         // end @compat
 
         // @compat 0.9.x
         } else if (ModelMessage.getXMLElementTagName().equals(tag)) {
-            ModelMessage m = new ModelMessage(in);
+            ModelMessage m = new ModelMessage(xr);
             // When this goes, remove getOwnerId().
             String owner = m.getOwnerId();
             if (owner != null) {
@@ -1195,17 +1196,17 @@ public class Game extends FreeColGameObject {
         // end @compat
 
         } else if (NationOptions.getXMLElementTagName().equals(tag)) {
-            nationOptions = new NationOptions(in, specification);
+            nationOptions = new NationOptions(xr, specification);
 
         } else if (OptionGroup.getXMLElementTagName().equals(tag)
             // @compat 0.9.x
             || DIFFICULTY_LEVEL_TAG.equals(tag)
             // end @compat
             ) {
-            specification.applyDifficultyLevel(new OptionGroup(in, specification));
+            specification.applyDifficultyLevel(new OptionGroup(xr, specification));
 
         } else if (Player.getXMLElementTagName().equals(tag)) {
-            Player player = readFreeColGameObject(in, Player.class);
+            Player player = xr.readFreeColGameObject(game, Player.class);
             if (player.isUnknownEnemy()) {
                 setUnknownEnemy(player);
             } else {
@@ -1215,10 +1216,10 @@ public class Game extends FreeColGameObject {
         } else if (Specification.getXMLElementTagName().equals(tag)) {
             logger.info(((specification == null) ? "Loading" : "Reloading")
                 + " specification.");
-            specification = new Specification(in);
+            specification = new Specification(xr);
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 

@@ -26,8 +26,9 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 import org.w3c.dom.Element;
 
@@ -319,26 +320,26 @@ public abstract class GoodsLocation extends UnitLocation {
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers
         if (goodsContainer != null) goodsContainer.removeAll();
 
-        super.readChildren(in);
+        super.readChildren(xr);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        final String tag = in.getLocalName();
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
+        final String tag = xr.getLocalName();
 
         if (GoodsContainer.getXMLElementTagName().equals(tag)) {
-            goodsContainer = readFreeColGameObject(in, GoodsContainer.class);
+            goodsContainer = xr.readFreeColGameObject(getGame(), GoodsContainer.class);
             goodsContainer.setLocation(this);
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 }

@@ -27,9 +27,9 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColGameObjectListener;
@@ -82,16 +82,16 @@ public class AIMain extends FreeColObject
      *
      * @param freeColServer The main controller object for the
      *     server.
-     * @param in The input stream containing the XML.
+     * @param xr The input stream containing the XML.
      * @exception XMLStreamException if a problem was encountered
      *     during parsing.
      * @see #readFromXML
      */
     public AIMain(FreeColServer freeColServer,
-                  XMLStreamReader in) throws XMLStreamException {
+                  FreeColXMLReader xr) throws XMLStreamException {
         this(freeColServer);
 
-        readFromXML(in);
+        readFromXML(xr);
     }
 
 
@@ -472,10 +472,10 @@ public class AIMain extends FreeColObject
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        nextId = getAttribute(in, NEXT_ID_TAG, -1);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        nextId = xr.getAttribute(NEXT_ID_TAG, -1);
         // @compat 0.10.x
-        if (nextId < 0) nextId = getAttribute(in, OLD_NEXT_ID_TAG, 0);
+        if (nextId < 0) nextId = xr.getAttribute(OLD_NEXT_ID_TAG, 0);
         // end @compat
     }
 
@@ -483,20 +483,20 @@ public class AIMain extends FreeColObject
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
         aiObjects.clear();
 
-        super.readChildren(in);
+        super.readChildren(xr);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        final String tag = in.getLocalName();
-        final String oid = readId(in);
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
+        final String tag = xr.getLocalName();
+        final String oid = xr.readId();
 
         try {
             Wish wish = null;
@@ -507,55 +507,55 @@ public class AIMain extends FreeColObject
             // ensure they complete initialization somewhere in their
             // serialization read* routines.
             if (oid != null && aiObjects.containsKey(oid)) {
-                getAIObject(oid).readFromXML(in);
+                getAIObject(oid).readFromXML(xr);
 
             // @compat 0.10.1
             } else if (COLONIAL_AI_PLAYER_TAG.equals(tag)) {
-                new EuropeanAIPlayer(this, in);
+                new EuropeanAIPlayer(this, xr);
             // end @compat
 
             } else if (AIColony.getXMLElementTagName().equals(tag)) {
-                new AIColony(this, in);
+                new AIColony(this, xr);
 
             } else if (AIGoods.getXMLElementTagName().equals(tag)) {
-                new AIGoods(this, in);
+                new AIGoods(this, xr);
 
             } else if (AIPlayer.getXMLElementTagName().equals(tag)) {
                 Player p = getGame().getFreeColGameObject(oid, Player.class);
                 if (p != null) {
                     if (p.isIndian()) {
-                        new NativeAIPlayer(this, in);
+                        new NativeAIPlayer(this, xr);
                     } else if (p.isREF()) {
-                        new REFAIPlayer(this, in);
+                        new REFAIPlayer(this, xr);
                     } else if (p.isEuropean()) {
-                        new EuropeanAIPlayer(this, in);
+                        new EuropeanAIPlayer(this, xr);
                     } else {
                         throw new RuntimeException("Bogus AIPlayer: " + p);
                     }
                 }
 
             } else if (AIUnit.getXMLElementTagName().equals(tag)) {
-                new AIUnit(this, in);
+                new AIUnit(this, xr);
 
             } else if (GoodsWish.getXMLElementTagName().equals(tag)
                 // @compat 0.10.3
                 || GOODS_WISH_TAG.equals(tag)
                 // end @compat
                        ) {
-                wish = new GoodsWish(this, in);
+                wish = new GoodsWish(this, xr);
 
             } else if (TileImprovementPlan.getXMLElementTagName().equals(tag)
                 // @compat 0.10.3
                 || TILE_IMPROVEMENT_PLAN_TAG.equals(tag)
                 // end @compat
                        ) {
-                new TileImprovementPlan(this, in);
+                new TileImprovementPlan(this, xr);
 
             } else if (WorkerWish.getXMLElementTagName().equals(tag)) {
-                wish = new WorkerWish(this, in);
+                wish = new WorkerWish(this, xr);
             
             } else {
-                super.readChild(in);
+                super.readChild(xr);
             }
             
             if (wish != null) {
@@ -568,12 +568,12 @@ public class AIMain extends FreeColObject
                 + tag + ", id=" + oid, e);
             // We are hosed.  Try to at least resynchronize at the end
             // of aiMain.
-            while (!in.getLocalName().equals(tag)
-                && !in.getLocalName().equals(getXMLElementTagName())) {
-                in.nextTag();
+            while (!xr.getLocalName().equals(tag)
+                && !xr.getLocalName().equals(getXMLElementTagName())) {
+                xr.nextTag();
             }
-            if (!in.getLocalName().equals(getXMLElementTagName())) {
-                in.nextTag();
+            if (!xr.getLocalName().equals(getXMLElementTagName())) {
+                xr.nextTag();
             }
         }
     }

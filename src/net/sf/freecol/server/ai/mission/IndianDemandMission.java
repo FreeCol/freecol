@@ -22,9 +22,9 @@ package net.sf.freecol.server.ai.mission;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
@@ -90,16 +90,16 @@ public class IndianDemandMission extends Mission {
      *
      * @param aiMain The main AI-object.
      * @param aiUnit The <code>AIUnit</code> this mission is created for.
-     * @param in The input stream containing the XML.
+     * @param xr The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
      * @see net.sf.freecol.server.ai.AIObject#readFromXML
      */
     public IndianDemandMission(AIMain aiMain, AIUnit aiUnit,
-                               XMLStreamReader in)
+                               FreeColXMLReader xr)
         throws XMLStreamException {
         super(aiMain, aiUnit);
 
-        readFromXML(in);
+        readFromXML(xr);
         uninitialized = getAIUnit() == null;
     }
 
@@ -487,15 +487,15 @@ public class IndianDemandMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        target = getAttribute(in, TARGET_TAG, getGame(),
-                              Colony.class, (Colony)null);
+        target = xr.getAttribute(getGame(), TARGET_TAG,
+                                 Colony.class, (Colony)null);
 
-        completed = getAttribute(in, COMPLETED_TAG, false);
+        completed = xr.getAttribute(COMPLETED_TAG, false);
 
-        demanded = getAttribute(in, DEMANDED_TAG, false);
+        demanded = xr.getAttribute(DEMANDED_TAG, false);
     }
 
     /**

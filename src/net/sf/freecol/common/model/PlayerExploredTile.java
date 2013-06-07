@@ -26,8 +26,9 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 
 /**
@@ -342,53 +343,53 @@ public class PlayerExploredTile extends FreeColGameObject {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
         final Game game = getGame();
 
-        super.readAttributes(in);
+        super.readAttributes(xr);
 
-        player = makeFreeColGameObject(in, PLAYER_TAG, Player.class, true);
+        player = xr.makeFreeColGameObject(game, PLAYER_TAG, Player.class, true);
 
-        tile = makeFreeColGameObject(in, TILE_TAG, Tile.class, true);
+        tile = xr.makeFreeColGameObject(game, TILE_TAG, Tile.class, true);
 
-        owner = makeFreeColGameObject(in, OWNER_TAG, Player.class, false);
+        owner = xr.makeFreeColGameObject(game, OWNER_TAG, Player.class, false);
 
         // TODO: makeFreeColGameObject is more logical, but will fail ATM
         // if the settlement has been destroyed while this pet-player can
         // not see it.  Since pets are only read in the server, there will be
         // a ServerObject for existing settlements so findFreeColGameObject
         // will do the right thing for now.
-        owningSettlement = findFreeColGameObject(in, OWNING_SETTLEMENT_TAG,
+        owningSettlement = xr.findFreeColGameObject(game, OWNING_SETTLEMENT_TAG,
             Settlement.class, (Settlement)null, false);
 
-        colonyUnitCount = getAttribute(in, COLONY_UNIT_COUNT_TAG, 0);
+        colonyUnitCount = xr.getAttribute(COLONY_UNIT_COUNT_TAG, 0);
 
-        colonyStockadeKey = getAttribute(in, COLONY_STOCKADE_KEY_TAG,
+        colonyStockadeKey = xr.getAttribute(COLONY_STOCKADE_KEY_TAG,
                                          (String)null);
 
-        skill = spec.getType(in, LEARNABLE_SKILL_TAG,
-                             UnitType.class, (UnitType)null);
+        skill = xr.getType(spec, LEARNABLE_SKILL_TAG,
+                           UnitType.class, (UnitType)null);
 
         for (int i = 0; i < WANTED_GOODS_COUNT; i++) {
-            wantedGoods[i] = spec.getType(in, WANTED_GOODS_TAG + i,
-                                          GoodsType.class, (GoodsType)null);
+            wantedGoods[i] = xr.getType(spec, WANTED_GOODS_TAG + i,
+                                        GoodsType.class, (GoodsType)null);
         }
 
-        mostHated = makeFreeColGameObject(in, MOST_HATED_TAG,
-                                          Player.class, false);
+        mostHated = xr.makeFreeColGameObject(game, MOST_HATED_TAG,
+                                             Player.class, false);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
         if (tileItems != null) tileItems.clear();
         missionary = null;
 
-        super.readChildren(in);
+        super.readChildren(xr);
 
         // Workaround for BR#2508, problem possibly dates as late as 0.10.5.
         if (tile.getIndianSettlement() == null && missionary != null) {
@@ -404,26 +405,26 @@ public class PlayerExploredTile extends FreeColGameObject {
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Game game = getGame();
-        final String tag = in.getLocalName();
+        final String tag = xr.getLocalName();
 
         if (MISSIONARY_TAG.equals(tag)) {
-            in.nextTag(); // advance to the Unit tag
-            missionary = readFreeColGameObject(in, Unit.class);
-            closeTag(in, MISSIONARY_TAG);
+            xr.nextTag(); // advance to the Unit tag
+            missionary = xr.readFreeColGameObject(game, Unit.class);
+            xr.closeTag(MISSIONARY_TAG);
 
         } else if (LostCityRumour.getXMLElementTagName().equals(tag)) {
-            addTileItem(readFreeColGameObject(in, LostCityRumour.class));
+            addTileItem(xr.readFreeColGameObject(game, LostCityRumour.class));
 
         } else if (Resource.getXMLElementTagName().equals(tag)) {
-            addTileItem(readFreeColGameObject(in, Resource.class));
+            addTileItem(xr.readFreeColGameObject(game, Resource.class));
 
         } else if (TileImprovement.getXMLElementTagName().equals(tag)) {
-            addTileItem(readFreeColGameObject(in, TileImprovement.class));
+            addTileItem(xr.readFreeColGameObject(game, TileImprovement.class));
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 

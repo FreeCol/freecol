@@ -27,8 +27,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 
 /**
@@ -274,10 +275,10 @@ public abstract class BuildableType extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        requiredPopulation = getAttribute(in, REQUIRED_POPULATION_TAG,
+        requiredPopulation = xr.getAttribute(REQUIRED_POPULATION_TAG,
                                           DEFAULT_REQUIRED_POPULATION);
     }
 
@@ -285,51 +286,51 @@ public abstract class BuildableType extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
-        if (readShouldClearContainers(in)) {
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
+        if (xr.shouldClearContainers()) {
             requiredAbilities = null;
             requiredGoods = null;
             limits = null;
         }
 
-        super.readChildren(in);
+        super.readChildren(xr);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
-        final String tag = in.getLocalName();
+        final String tag = xr.getLocalName();
 
         if (REQUIRED_ABILITY_TAG.equals(tag)) {
-            String id = readId(in);
+            String id = xr.readId();
             if (id != null) {
-                addRequiredAbility(id, getAttribute(in, VALUE_TAG, true));
+                addRequiredAbility(id, xr.getAttribute(VALUE_TAG, true));
                 spec.addAbility(id);
             }
-            closeTag(in, REQUIRED_ABILITY_TAG);
+            xr.closeTag(REQUIRED_ABILITY_TAG);
 
         } else if (REQUIRED_GOODS_TAG.equals(tag)) {
-            GoodsType type = spec.getType(in, ID_ATTRIBUTE_TAG,
-                                          GoodsType.class, (GoodsType)null);
-            int amount = getAttribute(in, VALUE_TAG, 0);
+            GoodsType type = xr.getType(spec, ID_ATTRIBUTE_TAG,
+                                        GoodsType.class, (GoodsType)null);
+            int amount = xr.getAttribute(VALUE_TAG, 0);
             if (type != null && amount > 0) {
                 type.setBuildingMaterial(true);
                 addRequiredGoods(new AbstractGoods(type, amount));
             }
-            closeTag(in, REQUIRED_GOODS_TAG);
+            xr.closeTag(REQUIRED_GOODS_TAG);
 
         } else if (Limit.getXMLElementTagName().equals(tag)) {
-            Limit limit = new Limit(in, spec);
+            Limit limit = new Limit(xr, spec);
             if (limit.getLeftHandSide().getType() == null) {
                 limit.getLeftHandSide().setType(getId());
             }
             addLimit(limit);
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 }

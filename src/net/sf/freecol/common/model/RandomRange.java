@@ -27,9 +27,9 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.util.Utils;
 
 
@@ -82,12 +82,12 @@ public class RandomRange {
     /**
      * Read a new <code>RandomRange</code> instance from a stream.
      *
-     * @param in The <code>XMLStreamReader</code> to read from.
+     * @param xr The <code>FreeColXMLReader</code> to read from.
      * @exception XMLStreamException if there is a problem reading the
      *     stream.
      */
-    public RandomRange(XMLStreamReader in) throws XMLStreamException {
-        readFromXML(in);
+    public RandomRange(FreeColXMLReader xr) throws XMLStreamException {
+        readFromXML(xr);
     }
 
 
@@ -225,27 +225,27 @@ public class RandomRange {
     /**
      * Initializes this object from an XML-representation of this object.
      *
-     * @param in The input stream with the XML.
+     * @param xr The input stream with the XML.
      * @exception XMLStreamException if there are any problems reading
      *     from the stream.
      */
-    public void readFromXML(XMLStreamReader in) throws XMLStreamException {
-        probability = FreeColObject.getAttribute(in, PROBABILITY_TAG, 0);
+    public void readFromXML(FreeColXMLReader xr) throws XMLStreamException {
+        probability = xr.getAttribute(PROBABILITY_TAG, 0);
 
-        minimum = FreeColObject.getAttribute(in, MINIMUM_TAG, 0);
+        minimum = xr.getAttribute(MINIMUM_TAG, 0);
 
-        maximum = FreeColObject.getAttribute(in, MAXIMUM_TAG, 0);
+        maximum = xr.getAttribute(MAXIMUM_TAG, 0);
 
-        factor = FreeColObject.getAttribute(in, FACTOR_TAG, 0);
+        factor = xr.getAttribute(FACTOR_TAG, 0);
 
         // Clear containers
         if (scopes != null) scopes.clear();
 
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            final String tag = in.getLocalName();
+        while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            final String tag = xr.getLocalName();
 
             if (SCOPE_TAG.equals(tag)) {
-                addScope(new Scope(in));
+                addScope(new Scope(xr));
 
             } else {
                 logger.warning("Bad RandomRange tag: " + tag);

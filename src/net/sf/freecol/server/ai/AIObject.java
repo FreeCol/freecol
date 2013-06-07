@@ -22,9 +22,9 @@ package net.sf.freecol.server.ai;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Location;
@@ -97,15 +97,15 @@ public abstract class AIObject extends FreeColObject {
      * Creates a new <code>AIObject</code>.
      *
      * @param aiMain The main AI-object.
-     * @param in The input stream containing the XML.
+     * @param xr The input stream containing the XML.
      * @exception XMLStreamException if a problem was encountered
      *     during parsing.
      * @see AIObject#readFromXML
      */
-    public AIObject(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
+    public AIObject(AIMain aiMain, FreeColXMLReader xr) throws XMLStreamException {
         this(aiMain);
 
-        readFromXML(in);
+        readFromXML(xr);
         addAIObjectWithId();
     }
 
@@ -205,19 +205,19 @@ public abstract class AIObject extends FreeColObject {
     /**
      * Gets an AIObject by reference from an attribute in a stream.
      *
-     * @param in The <code>XMLStreamReader</code> to read from.
+     * @param xr The <code>FreeColXMLReader</code> to read from.
      * @param attributeName The attribute name.
      * @param returnType The <code>AIObject</code> type to expect.
      * @param defaultValue The default value.
      * @return The <code>AIObject</code> found, or the default value if not.
      */
-    protected <T extends AIObject> T getAttribute(XMLStreamReader in,
+    protected <T extends AIObject> T getAttribute(FreeColXMLReader xr,
         String attributeName, Class<T> returnType, T defaultValue) {
         final String attrib = 
         // @compat 0.10.7
-            (ID_ATTRIBUTE_TAG.equals(attributeName)) ? readId(in) :
+            (ID_ATTRIBUTE_TAG.equals(attributeName)) ? xr.readId() :
         // end @compat
-            getAttribute(in, attributeName, (String)null);
+            xr.getAttribute(attributeName, (String)null);
 
         return (attrib == null) ? defaultValue
             : aiMain.getAIObject(attrib, returnType);

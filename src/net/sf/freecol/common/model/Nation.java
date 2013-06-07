@@ -20,8 +20,9 @@
 package net.sf.freecol.common.model;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 
 /**
@@ -154,21 +155,21 @@ public class Nation extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
 
-        super.readAttributes(in);
+        super.readAttributes(xr);
 
-        type = spec.getType(in, NATION_TYPE_TAG,
-                            NationType.class, (NationType)null);
+        type = xr.getType(spec, NATION_TYPE_TAG,
+                          NationType.class, (NationType)null);
 
-        selectable = getAttribute(in, SELECTABLE_TAG, false);
+        selectable = xr.getAttribute(SELECTABLE_TAG, false);
 
-        preferredLatitude = getAttribute(in, PREFERRED_LATITUDE_TAG, 0);
+        preferredLatitude = xr.getAttribute(PREFERRED_LATITUDE_TAG, 0);
 
-        startsOnEastCoast = getAttribute(in, STARTS_ON_EAST_COAST_TAG, true);
+        startsOnEastCoast = xr.getAttribute(STARTS_ON_EAST_COAST_TAG, true);
 
-        refNation = spec.getType(in, REF_TAG, Nation.class, (Nation)null);
+        refNation = xr.getType(spec, REF_TAG, Nation.class, (Nation)null);
     }
 
     /**

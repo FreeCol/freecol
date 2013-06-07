@@ -30,8 +30,8 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTradeItem;
 import net.sf.freecol.common.model.CombatModel;
@@ -132,12 +132,12 @@ public class NativeAIPlayer extends AIPlayer {
      * Creates a new <code>AIPlayer</code>.
      *
      * @param aiMain The main AI-object.
-     * @param in The input stream containing the XML.
+     * @param xr The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
-    public NativeAIPlayer(AIMain aiMain, XMLStreamReader in)
+    public NativeAIPlayer(AIMain aiMain, FreeColXMLReader xr)
         throws XMLStreamException {
-        super(aiMain, in);
+        super(aiMain, xr);
 
         uninitialized = getPlayer() == null;
     }

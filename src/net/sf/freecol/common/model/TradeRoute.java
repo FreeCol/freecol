@@ -25,8 +25,9 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 import org.w3c.dom.Element;
 
@@ -74,14 +75,14 @@ public class TradeRoute extends FreeColGameObject
         /**
          * Create a stop by reading a stream.
          *
-         * @param in The <code>XMLStreamReader</code> to read from.
+         * @param xr The <code>FreeColXMLReader</code> to read from.
          * @exception XMLStreamException if there is a problem reading the
          *     stream.
          */
-        public Stop(XMLStreamReader in) throws XMLStreamException {
+        public Stop(FreeColXMLReader xr) throws XMLStreamException {
             this((Location)null);
 
-            readFromXML(in);
+            readFromXML(xr);
         }
 
 
@@ -177,32 +178,32 @@ public class TradeRoute extends FreeColGameObject
         /**
          * Initializes this object from its XML-representation.
          *
-         * @param in The input stream with the XML.
+         * @param xr The input stream with the XML.
          * @exception XMLStreamException if there are any problems reading
          *     the stream.
          */
-        protected void readFromXML(XMLStreamReader in) throws XMLStreamException {
+        protected void readFromXML(FreeColXMLReader xr) throws XMLStreamException {
             final Specification spec = getSpecification();
             final Game game = getGame();
 
-            location = makeLocationAttribute(in, LOCATION_TAG, game);
+            location = xr.makeLocationAttribute(LOCATION_TAG, game);
 
             cargo.clear();
-            while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                final String tag = in.getLocalName();
+            while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                final String tag = xr.getLocalName();
 
                 if (tag.equals(CARGO_TAG)) {
-                    String id = readId(in);
+                    String id = xr.readId();
                     // @compat 0.9.x
                     if (id == null) {
                         List<GoodsType> goodsList = spec.getGoodsTypeList();
-                        for (int cargoIndex : readFromArrayElement(CARGO_TAG, in, new int[0])) {
+                        for (int cargoIndex : readFromArrayElement(CARGO_TAG, xr, new int[0])) {
                             cargo.add(goodsList.get(cargoIndex));
                         }
                     // end @compat
                     } else {
                         cargo.add(spec.getGoodsType(id));
-                        closeTag(in, CARGO_TAG);
+                        xr.closeTag(CARGO_TAG);
                     }
                 } else {
                     logger.warning("Bogus Stop tag: " + tag);
@@ -447,37 +448,38 @@ public class TradeRoute extends FreeColGameObject
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        name = getAttribute(in, NAME_TAG, (String)null);
+        name = xr.getAttribute(NAME_TAG, (String)null);
 
-        owner = makeFreeColGameObject(in, OWNER_TAG, Player.class, true);
+        owner = xr.makeFreeColGameObject(getGame(), OWNER_TAG,
+                                         Player.class, true);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
         stops.clear();
 
-        super.readChildren(in);
+        super.readChildren(xr);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        final String tag = in.getLocalName();
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
+        final String tag = xr.getLocalName();
 
         if (Stop.TRADE_ROUTE_STOP_TAG.equals(tag)) {
-            stops.add(new Stop(in));
+            stops.add(new Stop(xr));
             
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 

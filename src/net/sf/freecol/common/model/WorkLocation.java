@@ -23,8 +23,9 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 
 /**
@@ -62,7 +63,7 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
     /**
      * Creates a new <code>WorkLocation</code> with the given identifier.
      * The object should later be initialized by calling either
-     * {@link #readFromXML(XMLStreamReader)} or
+     * {@link #readFromXML(FreeColXMLReader)} or
      * {@link #readFromXMLElement(Element)}.
      *
      * @param game The enclosing <code>Game</code>.
@@ -535,26 +536,26 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        colony = findFreeColGameObject(in, COLONY_TAG,
-                                       Colony.class, (Colony)null, true);
+        colony = xr.findFreeColGameObject(getGame(), COLONY_TAG,
+                                          Colony.class, (Colony)null, true);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void readChild(XMLStreamReader in) throws XMLStreamException {
+    public void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
-        final String tag = in.getLocalName();
+        final String tag = xr.getLocalName();
 
         if (ProductionType.getXMLElementTagName().equals(tag)) {
-            productionType = new ProductionType(in, spec);
+            productionType = new ProductionType(xr, spec);
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 }

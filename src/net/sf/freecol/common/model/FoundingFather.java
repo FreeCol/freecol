@@ -28,9 +28,9 @@ import java.util.Map;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Turn;
 
 
@@ -342,14 +342,14 @@ public class FoundingFather extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        type = getAttribute(in, TYPE_TAG, FoundingFatherType.class,
+        type = xr.getAttribute(TYPE_TAG, FoundingFatherType.class,
                             (FoundingFatherType)null);
 
         for (int i = 0; i < weight.length; i++) {
-            weight[i] = getAttribute(in, WEIGHT_TAG + (i + 1), 0);
+            weight[i] = xr.getAttribute(WEIGHT_TAG + (i + 1), 0);
         }
     }
 
@@ -357,47 +357,47 @@ public class FoundingFather extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
-        if (readShouldClearContainers(in)) {
+        if (xr.shouldClearContainers()) {
             events = null;
             scopes = null;
             units = null;
             upgrades = null;
         }
         
-        super.readChildren(in);
+        super.readChildren(xr);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
-        final String tag = in.getLocalName();
+        final String tag = xr.getLocalName();
 
         if (UPGRADE_TAG.equals(tag)) {
-            UnitType fromType = spec.getType(in, FROM_ID_TAG, UnitType.class,
-                                             (UnitType)null);
-            UnitType toType = spec.getType(in, TO_ID_TAG, UnitType.class,
+            UnitType fromType = xr.getType(spec, FROM_ID_TAG, UnitType.class,
                                            (UnitType)null);
+            UnitType toType = xr.getType(spec, TO_ID_TAG, UnitType.class,
+                                         (UnitType)null);
             if (fromType != null && toType != null) {
                 addUpgrade(fromType, toType);
             }
-            closeTag(in, UPGRADE_TAG);
+            xr.closeTag(UPGRADE_TAG);
 
         } else if (UNIT_TAG.equals(tag)) {
-            addUnit(new AbstractUnit(in));
+            addUnit(new AbstractUnit(xr));
 
         } else if (Event.getXMLElementTagName().equals(tag)) {
-            addEvent(new Event(in, spec));
+            addEvent(new Event(xr, spec));
 
         } else if (Scope.getXMLElementTagName().equals(tag)) {
-            addScope(new Scope(in));
+            addScope(new Scope(xr));
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 

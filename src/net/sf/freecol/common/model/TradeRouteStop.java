@@ -25,8 +25,9 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 
 /**
@@ -162,43 +163,43 @@ public class TradeRouteStop {
     /**
      * Initialize this object from an XML-representation of this object.
      * 
-     * @param in The input stream with the XML.
+     * @param xr The input stream with the XML.
      * @throws XMLStreamException is thrown if something goes wrong.
      */
-    public void readFromXML(XMLStreamReader in)
+    public void readFromXML(FreeColXMLReader xr)
         throws XMLStreamException {
-        readFromXML(in, null);
+        readFromXML(xr, null);
     }
 
     /**
      * Initialize this object from an XML-representation of this object.
      * 
-     * @param in The input stream with the XML.
+     * @param xr The input stream with the XML.
      * @throws XMLStreamException is thrown if something goes wrong.
      */
-    public void readFromXML(XMLStreamReader in, Game game)
+    public void readFromXML(FreeColXMLReader xr, Game game)
         throws XMLStreamException {
         if (game != null) {
-            String str = in.getAttributeValue(null, "location");
+            String str = xr.getAttributeValue(null, "location");
             location = game.makeFreeColLocation(str);
         }
 
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if (in.getLocalName().equals("goodsToUnload")) {
+        while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            if (xr.getLocalName().equals("goodsToUnload")) {
                 goodsToUnload = new ArrayList<AbstractGoods>();
-                while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                    if (in.getLocalName().equals(AbstractGoods.getXMLElementTagName())) {
+                while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                    if (xr.getLocalName().equals(AbstractGoods.getXMLElementTagName())) {
                         AbstractGoods goods = new AbstractGoods();
-                        goods.readFromXML(in);
+                        goods.readFromXML(xr);
                         goodsToUnload.add(goods);
                     }
                 }
-            } else if (in.getLocalName().equals("goodsToLoad")) {
+            } else if (xr.getLocalName().equals("goodsToLoad")) {
                 goodsToLoad = new ArrayList<AbstractGoods>();
-                while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                    if (in.getLocalName().equals(AbstractGoods.getXMLElementTagName())) {
+                while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                    if (xr.getLocalName().equals(AbstractGoods.getXMLElementTagName())) {
                         AbstractGoods goods = new AbstractGoods();
-                        goods.readFromXML(in);
+                        goods.readFromXML(xr);
                         goodsToLoad.add(goods);
                     }
                 }

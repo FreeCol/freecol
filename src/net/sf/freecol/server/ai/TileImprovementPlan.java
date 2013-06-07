@@ -22,9 +22,9 @@ package net.sf.freecol.server.ai;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
@@ -115,13 +115,13 @@ public class TileImprovementPlan extends ValuedAIObject {
      * XML-representation.
      *
      * @param aiMain The main AI-object.
-     * @param in The input stream containing the XML.
+     * @param xr The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered
      *     during parsing.
      */
-    public TileImprovementPlan(AIMain aiMain, XMLStreamReader in)
+    public TileImprovementPlan(AIMain aiMain, FreeColXMLReader xr)
         throws XMLStreamException {
-        super(aiMain, in);
+        super(aiMain, xr);
 
         uninitialized = getType() == null || getTarget() == null;
     }
@@ -339,34 +339,34 @@ public class TileImprovementPlan extends ValuedAIObject {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
         final Specification spec = getSpecification();
         
-        type = spec.getType(in, TYPE_TAG, 
-                            TileImprovementType.class, (TileImprovementType)null);
+        type = xr.getType(spec, TYPE_TAG, 
+                          TileImprovementType.class, (TileImprovementType)null);
 
-        if (hasAttribute(in, PIONEER_TAG)) {
-            pioneer = getAttribute(in, PIONEER_TAG, AIUnit.class, (AIUnit)null);
+        if (xr.hasAttribute(PIONEER_TAG)) {
+            pioneer = getAttribute(xr, PIONEER_TAG, AIUnit.class, (AIUnit)null);
             if (pioneer == null) {
                 pioneer = new AIUnit(getAIMain(),
-                    getAttribute(in, PIONEER_TAG, (String)null));
+                    xr.getAttribute(PIONEER_TAG, (String)null));
             }
         } else {
             pioneer = null;
         }
 
-        target = getAttribute(in, TARGET_TAG, getGame(),
-                              Tile.class, (Tile)null);
+        target = xr.getAttribute(getGame(), TARGET_TAG,
+                                 Tile.class, (Tile)null);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
-        super.readChildren(in);
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
+        super.readChildren(xr);
 
         if (type != null && target != null) uninitialized = false;
     }

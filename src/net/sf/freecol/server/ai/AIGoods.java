@@ -22,9 +22,9 @@ package net.sf.freecol.server.ai;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -115,12 +115,12 @@ public class AIGoods extends AIObject implements Transportable {
      * XML-representation.
      *
      * @param aiMain The main AI-object.
-     * @param in The input stream containing the XML.
+     * @param xr The input stream containing the XML.
      * @exception XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    public AIGoods(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
-        super(aiMain, in);
+    public AIGoods(AIMain aiMain, FreeColXMLReader xr) throws XMLStreamException {
+        super(aiMain, xr);
 
         uninitialized = getGoods() == null;
     }
@@ -492,22 +492,21 @@ public class AIGoods extends AIObject implements Transportable {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
         final AIMain aiMain = getAIMain();
 
-        destination = findLocationAttribute(in, DESTINATION_TAG,
-                                            aiMain.getGame());
+        destination = xr.findLocationAttribute(aiMain.getGame(), DESTINATION_TAG);
 
-        transportPriority = getAttribute(in, TRANSPORT_PRIORITY_TAG, -1);
+        transportPriority = xr.getAttribute(TRANSPORT_PRIORITY_TAG, -1);
 
-        if (hasAttribute(in, TRANSPORT_TAG)) {
-            transport = getAttribute(in, TRANSPORT_TAG,
+        if (xr.hasAttribute(TRANSPORT_TAG)) {
+            transport = getAttribute(xr, TRANSPORT_TAG,
                                      AIUnit.class, (AIUnit)null);
             if (transport == null) {
                 transport = new AIUnit(aiMain,
-                    getAttribute(in, TRANSPORT_TAG, (String)null));
+                    xr.getAttribute(TRANSPORT_TAG, (String)null));
             }
         } else {
             transport = null;
@@ -518,8 +517,8 @@ public class AIGoods extends AIObject implements Transportable {
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
-        super.readChildren(in);
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
+        super.readChildren(xr);
 
         if (getGoods() != null) uninitialized = false;
     }
@@ -528,18 +527,18 @@ public class AIGoods extends AIObject implements Transportable {
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        final String tag = in.getLocalName();
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
+        final String tag = xr.getLocalName();
 
         if (Goods.getXMLElementTagName().equals(tag)) {
             if (goods != null) {
-                goods.readFromXML(in);
+                goods.readFromXML(xr);
             } else {
-                goods = new Goods(getAIMain().getGame(), in);
+                goods = new Goods(getAIMain().getGame(), xr);
             }
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 

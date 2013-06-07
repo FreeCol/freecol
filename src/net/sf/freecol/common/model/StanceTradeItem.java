@@ -20,9 +20,9 @@
 package net.sf.freecol.common.model;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Player.Stance;
 
 
@@ -54,13 +54,13 @@ public class StanceTradeItem extends TradeItem {
      * Creates a new <code>StanceTradeItem</code> instance.
      *
      * @param game The enclosing <code>Game</code>.
-     * @param in A <code>XMLStreamReader</code> to read from.
+     * @param xr A <code>FreeColXMLReader</code> to read from.
      * @exception XMLStreamException if there is an error reading the stream.
      */
-    public StanceTradeItem(Game game, XMLStreamReader in) throws XMLStreamException {
-        super(game, in);
+    public StanceTradeItem(Game game, FreeColXMLReader xr) throws XMLStreamException {
+        super(game, xr);
 
-        readFromXML(in);
+        readFromXML(xr);
     }
 
 
@@ -116,10 +116,10 @@ public class StanceTradeItem extends TradeItem {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        stance = getAttribute(in, STANCE_TAG, Stance.class, (Stance)null);
+        stance = xr.getAttribute(STANCE_TAG, Stance.class, (Stance)null);
     }
 
     /**

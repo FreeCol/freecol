@@ -24,8 +24,9 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 
 /**
@@ -222,17 +223,17 @@ public abstract class NationType extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
         final Specification spec = getSpecification();
-        NationType parent = spec.getType(in, EXTENDS_TAG,
-                                         NationType.class, this);
+        NationType parent = xr.getType(spec, EXTENDS_TAG,
+                                       NationType.class, this);
 
-        numberOfSettlements = getAttribute(in, NUMBER_OF_SETTLEMENTS_TAG,
+        numberOfSettlements = xr.getAttribute(NUMBER_OF_SETTLEMENTS_TAG,
             SettlementNumber.class, parent.numberOfSettlements);
 
-        aggression = getAttribute(in, AGGRESSION_TAG,
+        aggression = xr.getAttribute(AGGRESSION_TAG,
                                   AggressionLevel.class, parent.aggression);
     }
 
@@ -240,17 +241,17 @@ public abstract class NationType extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
-        if (readShouldClearContainers(in)) {
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
+        if (xr.shouldClearContainers()) {
             // Clear containers
             settlementTypes = null;
         }
 
         final Specification spec = getSpecification();
-        NationType parent = spec.getType(in, EXTENDS_TAG,
-                                         NationType.class, this);
+        NationType parent = xr.getType(spec, EXTENDS_TAG,
+                                       NationType.class, this);
 
-        super.readChildren(in);
+        super.readChildren(xr);
 
         if (parent != this) {
             if (parent.settlementTypes != null) {
@@ -268,15 +269,15 @@ public abstract class NationType extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
-        final String tag = in.getLocalName();
+        final String tag = xr.getLocalName();
 
         if (SETTLEMENT_TAG.equals(tag)) {
-            addSettlementType(new SettlementType(in, spec));
+            addSettlementType(new SettlementType(xr, spec));
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 }

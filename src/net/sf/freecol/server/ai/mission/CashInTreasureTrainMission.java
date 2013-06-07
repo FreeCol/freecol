@@ -22,9 +22,9 @@ package net.sf.freecol.server.ai.mission;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Location;
@@ -83,17 +83,17 @@ public class CashInTreasureTrainMission extends Mission {
      *
      * @param aiMain The main AI-object.
      * @param aiUnit The <code>AIUnit</code> this mission is created for.
-     * @param in The input stream containing the XML.
+     * @param xr The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      * @see net.sf.freecol.server.ai.AIObject#readFromXML
      */
     public CashInTreasureTrainMission(AIMain aiMain, AIUnit aiUnit,
-                                      XMLStreamReader in)
+                                      FreeColXMLReader xr)
         throws XMLStreamException {
         super(aiMain, aiUnit);
 
-        readFromXML(in);
+        readFromXML(xr);
     }
 
 
@@ -452,10 +452,10 @@ public class CashInTreasureTrainMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
         
-        target = findLocationAttribute(in, TARGET_TAG, getGame());
+        target = xr.findLocationAttribute(getGame(), TARGET_TAG);
     }
 
     /**

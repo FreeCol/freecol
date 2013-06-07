@@ -26,9 +26,9 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.util.Utils;
 
 
@@ -65,7 +65,7 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     /**
      * Create a new <code>Building</code> with the given identifier.
      * The object should later be initialized by calling
-     * {@link #readFromXML(XMLStreamReader)}.
+     * {@link #readFromXML(FreeColXMLReader)}.
      *
      * @param game The enclosing <code>Game</code>.
      * @param id The object identifier.
@@ -713,21 +713,21 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      * {@inheritDoc}
      */
     @Override
-    public void readFromXMLPartial(XMLStreamReader in) throws XMLStreamException {
-        readFromXMLPartialByClass(in, Building.class);
+    public void readFromXMLPartial(FreeColXMLReader xr) throws XMLStreamException {
+        readFromXMLPartialByClass(xr, Building.class);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
 
-        super.readAttributes(in);
+        super.readAttributes(xr);
 
-        buildingType = spec.getType(in, BUILDING_TYPE_TAG,
-                                    BuildingType.class, (BuildingType)null);
+        buildingType = xr.getType(spec, BUILDING_TYPE_TAG,
+                                  BuildingType.class, (BuildingType)null);
     }
 
     /**

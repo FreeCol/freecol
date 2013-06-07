@@ -20,9 +20,9 @@
 package net.sf.freecol.common.model.mission;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Unit;
@@ -59,11 +59,11 @@ public class GoToMission extends AbstractMission {
      * Creates a new <code>GoToMission</code> instance.
      *
      * @param game a <code>Game</code> value
-     * @param in a <code>XMLStreamReader</code> value
+     * @param xr a <code>FreeColXMLReader</code> value
      * @exception XMLStreamException if an error occurs
      */
-    public GoToMission(Game game, XMLStreamReader in) throws XMLStreamException {
-        super(game, in);
+    public GoToMission(Game game, FreeColXMLReader xr) throws XMLStreamException {
+        super(game, xr);
     }
 
     /**
@@ -170,11 +170,12 @@ public class GoToMission extends AbstractMission {
     /**
      * {@inheritDoc}
      */
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
-        super.readAttributes(in);
-        destination = findLocationAttribute(in, "destination", getGame());
-        blockedCount = getAttribute(in, "blockedCount", 0);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
+
+        destination = xr.findLocationAttribute(getGame(), "destination");
+
+        blockedCount = xr.getAttribute("blockedCount", 0);
     }
 
     /**

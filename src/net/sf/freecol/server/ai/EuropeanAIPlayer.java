@@ -30,9 +30,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.common.debug.FreeColDebugger;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTradeItem;
@@ -331,12 +331,12 @@ public class EuropeanAIPlayer extends AIPlayer {
      * Creates a new <code>AIPlayer</code>.
      *
      * @param aiMain The main AI-object.
-     * @param in The input stream containing the XML.
+     * @param xr The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
-    public EuropeanAIPlayer(AIMain aiMain, XMLStreamReader in)
+    public EuropeanAIPlayer(AIMain aiMain, FreeColXMLReader xr)
         throws XMLStreamException {
-        super(aiMain, in);
+        super(aiMain, xr);
 
         uninitialized = getPlayer() == null;
     }

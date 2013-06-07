@@ -27,8 +27,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 
 /**
@@ -95,11 +96,11 @@ public class Operand extends Scope {
     /**
      * Create a new operand by reading a stream.
      *
-     * @param in The <code>XMLStreamReader</code> to read.
+     * @param xr The <code>FreeColXMLReader</code> to read.
      * @exception XMLStreamException if there is a problem reading the stream.
      */
-    protected Operand(XMLStreamReader in) throws XMLStreamException {
-        readFromXML(in);
+    protected Operand(FreeColXMLReader xr) throws XMLStreamException {
+        readFromXML(xr);
     }
 
 
@@ -370,16 +371,16 @@ public class Operand extends Scope {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        operandType = getAttribute(in, OPERAND_TYPE_TAG,
+        operandType = xr.getAttribute(OPERAND_TYPE_TAG,
                                    OperandType.class, OperandType.NONE);
 
-        scopeLevel = getAttribute(in, SCOPE_LEVEL_TAG,
+        scopeLevel = xr.getAttribute(SCOPE_LEVEL_TAG,
                                   ScopeLevel.class, ScopeLevel.NONE);
 
-        int val = getAttribute(in, VALUE_TAG, INFINITY);
+        int val = xr.getAttribute(VALUE_TAG, INFINITY);
         if (val != INFINITY) value = new Integer(val);
     }
 

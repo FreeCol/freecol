@@ -32,9 +32,9 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
@@ -194,14 +194,14 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * XML-representation.
      *
      * @param aiMain The main AI-object.
-     * @param in The input stream containing the XML.
+     * @param xr The input stream containing the XML.
      * @exception XMLStreamException if a problem was encountered
      *     during parsing.
      */
-    public AIColony(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
+    public AIColony(AIMain aiMain, FreeColXMLReader xr) throws XMLStreamException {
         this(aiMain, (String)null);
 
-        readFromXML(in);
+        readFromXML(xr);
         addAIObjectWithId();
 
         uninitialized = getColony() == null;
@@ -1494,26 +1494,26 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
         final AIMain aiMain = getAIMain();
 
-        colony = getAttribute(in, ID_ATTRIBUTE_TAG, aiMain.getGame(),
-                              Colony.class, (Colony)null);
+        colony = xr.getAttribute(aiMain.getGame(), ID_ATTRIBUTE_TAG,
+                                 Colony.class, (Colony)null);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers
         aiGoods.clear();
         tileImprovementPlans.clear();
         wishes.clear();
 
-        super.readChildren(in);
+        super.readChildren(xr);
 
         if (getColony() != null) uninitialized = false;
     }
@@ -1522,52 +1522,52 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final AIMain aiMain = getAIMain();
-        final String tag = in.getLocalName();
+        final String tag = xr.getLocalName();
 
         if (AI_GOODS_LIST_TAG.equals(tag)) {
-            AIGoods ag = getAttribute(in, ID_ATTRIBUTE_TAG,
+            AIGoods ag = getAttribute(xr, ID_ATTRIBUTE_TAG,
                                       AIGoods.class, (AIGoods)null);
-            if (ag == null) ag = new AIGoods(aiMain, readId(in));
+            if (ag == null) ag = new AIGoods(aiMain, xr.readId());
             aiGoods.add(ag);
-            closeTag(in, AI_GOODS_LIST_TAG);
+            xr.closeTag(AI_GOODS_LIST_TAG);
 
         } else if (GOODS_WISH_LIST_TAG.equals(tag)
             // @compat 0.10.3
             || OLD_GOODS_WISH_TAG.equals(tag)
             // end @compat
                    ) {
-            GoodsWish gw = getAttribute(in, ID_ATTRIBUTE_TAG,
+            GoodsWish gw = getAttribute(xr, ID_ATTRIBUTE_TAG,
                                         GoodsWish.class, (GoodsWish)null);
-            if (gw == null) gw = new GoodsWish(aiMain, readId(in));
+            if (gw == null) gw = new GoodsWish(aiMain, xr.readId());
             wishes.add(gw);
-            closeTag(in, tag);// FIXME: tag -> GOODS_WISH_LIST_TAG
+            xr.closeTag(tag);// FIXME: tag -> GOODS_WISH_LIST_TAG
 
         } else if (TILE_IMPROVEMENT_PLAN_LIST_TAG.equals(tag)
             // @compat 0.10.3
             || OLD_TILE_IMPROVEMENT_PLAN_TAG.equals(tag)
             // end @compat
                    ) {
-            TileImprovementPlan ti = getAttribute(in, ID_ATTRIBUTE_TAG,
+            TileImprovementPlan ti = getAttribute(xr, ID_ATTRIBUTE_TAG,
                 TileImprovementPlan.class, (TileImprovementPlan)null);
-            if (ti == null) ti = new TileImprovementPlan(aiMain, readId(in));
+            if (ti == null) ti = new TileImprovementPlan(aiMain, xr.readId());
             tileImprovementPlans.add(ti);
-            closeTag(in, tag);// FIXME: tag -> TILE_IMPROVEMENT_PLAN_LIST_TAG
+            xr.closeTag(tag);// FIXME: tag -> TILE_IMPROVEMENT_PLAN_LIST_TAG
 
         } else if (WORKER_WISH_LIST_TAG.equals(tag)
             // @compat 0.10.3
             || OLD_WORKER_WISH_TAG.equals(tag)
             // end compatibility code
                    ) {
-            WorkerWish ww = getAttribute(in, ID_ATTRIBUTE_TAG,
+            WorkerWish ww = getAttribute(xr, ID_ATTRIBUTE_TAG,
                                          WorkerWish.class, (WorkerWish)null);
-            if (ww == null) ww = new WorkerWish(aiMain, readId(in));
+            if (ww == null) ww = new WorkerWish(aiMain, xr.readId());
             wishes.add(ww);
-            closeTag(in, tag);// FIXME: tag -> WORKER_WISH_LIST_TAG
+            xr.closeTag(tag);// FIXME: tag -> WORKER_WISH_LIST_TAG
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 

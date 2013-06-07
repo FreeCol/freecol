@@ -28,10 +28,9 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.client.gui.i18n.Number.Category;
-import net.sf.freecol.common.util.XMLStream;
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 
 /**
@@ -110,10 +109,10 @@ public class NumberRules {
      * @param in an <code>InputStream</code> value
      */
     public static void load(InputStream in) {
-        XMLStream xr = null;
+        FreeColXMLReader xr = null;
         try {
-            xr = new XMLStream(in);
-            readFromXML(xr.getXMLStreamReader());
+            xr = new FreeColXMLReader(in);
+            readFromXML(xr);
         } catch (Exception e) {
             logger.log(Level.WARNING, "Load parse", e);
             throw new RuntimeException("Error parsing number rules.");
@@ -125,21 +124,21 @@ public class NumberRules {
     /**
      * Describe <code>readFromXML</code> method here.
      *
-     * @param in a <code>XMLStreamReader</code> value
+     * @param in a <code>FreeColXMLReader</code> value
      * @exception XMLStreamException if an error occurs
      */
-    private static void readFromXML(XMLStreamReader in) throws XMLStreamException {
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            String tag = in.getLocalName();
+    private static void readFromXML(FreeColXMLReader xr) throws XMLStreamException {
+        while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            String tag = xr.getLocalName();
             if ("version".equals(tag)) {
-                in.nextTag();
+                xr.nextTag();
             } else if ("generation".equals(tag)) {
-                in.nextTag();
+                xr.nextTag();
             } else if ("plurals".equals(tag)) {
-                while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                    tag = in.getLocalName();
+                while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                    tag = xr.getLocalName();
                     if ("pluralRules".equals(tag)) {
-                        readChild(in);
+                        readChild(xr);
                     }
                 }
             }
@@ -149,19 +148,19 @@ public class NumberRules {
     /**
      * Describe <code>readChild</code> method here.
      *
-     * @param in a <code>XMLStreamReader</code> value
+     * @param in a <code>FreeColXMLReader</code> value
      * @exception XMLStreamException if an error occurs
      */
-    private static void readChild(XMLStreamReader in)
+    private static void readChild(FreeColXMLReader xr)
         throws XMLStreamException {
 
-        String[] locales = in.getAttributeValue(null, "locales").split(" ");
+        String[] locales = xr.getAttributeValue(null, "locales").split(" ");
         if (locales != null) {
             DefaultNumberRule numberRule = new DefaultNumberRule();
-            while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                if ("pluralRule".equals(in.getLocalName())) {
-                    Category category = Category.valueOf(in.getAttributeValue(null, "count"));
-                    Rule rule = new Rule(in.getElementText());
+            while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                if ("pluralRule".equals(xr.getLocalName())) {
+                    Category category = Category.valueOf(xr.getAttributeValue(null, "count"));
+                    Rule rule = new Rule(xr.getElementText());
                     numberRule.addRule(category, rule);
                 }
             }

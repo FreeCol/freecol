@@ -21,9 +21,9 @@ package net.sf.freecol.common.model;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.option.OptionGroup;
 
 
@@ -241,9 +241,9 @@ public abstract class FreeColGameObjectType extends FreeColObject
     // Denotes deletion of a child element.
     protected static final String DELETE_TAG = "delete";
     // Denotes that this type extends another.
-    protected static final String EXTENDS_TAG = "extends";
+    public static final String EXTENDS_TAG = "extends";
     // Denotes preservation of attributes and children.
-    protected static final String PRESERVE_TAG = "preserve";
+    public static final String PRESERVE_TAG = "preserve";
 
 
     /**
@@ -266,64 +266,53 @@ public abstract class FreeColGameObjectType extends FreeColObject
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
         if (getId() == null) throw new XMLStreamException("Null id");
 
-        abstractType = getAttribute(in, ABSTRACT_TAG, false);
-    }
-
-    /**
-     * Should this game object type clear containers on read?
-     * Usually true, but not if this type is extending another one.
-     *
-     * @return True if the containers should be cleared.
-     */
-    protected boolean readShouldClearContainers(XMLStreamReader in) {
-        return !hasAttribute(in, EXTENDS_TAG)
-            && !hasAttribute(in, PRESERVE_TAG);
+        abstractType = xr.getAttribute(ABSTRACT_TAG, false);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
-        if (featureContainer != null && readShouldClearContainers(in)) {
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
+        if (featureContainer != null && xr.shouldClearContainers()) {
             // Clear containers, but not if extending existing containers.
             featureContainer.clear();
         }
 
-        super.readChildren(in);
+        super.readChildren(xr);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
-        final String tag = in.getLocalName();
+        final String tag = xr.getLocalName();
 
         if (Ability.getXMLElementTagName().equals(tag)) {
-            if (getAttribute(in, DELETE_TAG, false)) {
-                removeAbilities(readId(in));
-                closeTag(in, DELETE_TAG);
+            if (xr.getAttribute(DELETE_TAG, false)) {
+                removeAbilities(xr.readId());
+                xr.closeTag(DELETE_TAG);
 
             } else {
-                Ability ability = new Ability(in, spec); // Closes the element
+                Ability ability = new Ability(xr, spec); // Closes the element
                 if (ability.getSource() == null) ability.setSource(this);
                 addAbility(ability);
                 spec.addAbility(ability);
             }
 
         } else if (Modifier.getXMLElementTagName().equals(tag)) {
-            if (getAttribute(in, DELETE_TAG, false)) {
-                removeModifiers(readId(in));
-                closeTag(in, Modifier.getXMLElementTagName());
+            if (xr.getAttribute(DELETE_TAG, false)) {
+                removeModifiers(xr.readId());
+                xr.closeTag(Modifier.getXMLElementTagName());
 
             } else {
-                Modifier modifier = new Modifier(in, spec);// Closes the element
+                Modifier modifier = new Modifier(xr, spec);// Closes the element
                 if (modifier.getSource() == null) modifier.setSource(this);
                 if (modifier.getIndex() < 0) {
                     modifier.setIndex(getModifierIndex(modifier));
@@ -333,7 +322,7 @@ public abstract class FreeColGameObjectType extends FreeColObject
             }
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 

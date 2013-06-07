@@ -20,8 +20,9 @@
 package net.sf.freecol.common.model;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 import org.w3c.dom.Element;
 
@@ -68,11 +69,11 @@ public final class LastSale extends FreeColObject {
     /**
      * Create a new last sale by reading a stream.
      *
-     * @param in The <code>XMLStreamReader</code> to read from.
+     * @param xr The <code>FreeColXMLReader</code> to read from.
      * @exception XMLStreamException if there is a problem reading the stream.
      */
-    public LastSale(XMLStreamReader in) throws XMLStreamException {
-        readFromXML(in);
+    public LastSale(FreeColXMLReader xr) throws XMLStreamException {
+        readFromXML(xr);
     }
 
     /**
@@ -136,12 +137,12 @@ public final class LastSale extends FreeColObject {
     /**
      * {@inheritDoc}
      */
-    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    public void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        when = new Turn(getAttribute(in, WHEN_TAG, 0));
+        when = new Turn(xr.getAttribute(WHEN_TAG, 0));
 
-        price = getAttribute(in, PRICE_TAG, 0);
+        price = xr.getAttribute(PRICE_TAG, 0);
     }
 
     /**

@@ -26,8 +26,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Game;
 
 
@@ -46,11 +46,11 @@ public class MissionManager {
     static {
         try {
             missionMap.put(CompoundMission.getXMLElementTagName(),
-                           CompoundMission.class.getConstructor(Game.class, XMLStreamReader.class));
+                           CompoundMission.class.getConstructor(Game.class, FreeColXMLReader.class));
             missionMap.put(GoToMission.getXMLElementTagName(),
-                           GoToMission.class.getConstructor(Game.class, XMLStreamReader.class));
+                           GoToMission.class.getConstructor(Game.class, FreeColXMLReader.class));
             missionMap.put(ImprovementMission.getXMLElementTagName(),
-                           ImprovementMission.class.getConstructor(Game.class, XMLStreamReader.class));
+                           ImprovementMission.class.getConstructor(Game.class, FreeColXMLReader.class));
 
         } catch (NoSuchMethodException e) {
             logger.log(Level.WARNING, "Missing constructor", e);
@@ -73,21 +73,21 @@ public class MissionManager {
      * and null if not.
      *
      * @param game a <code>Game</code> value
-     * @param in a <code>XMLStreamReader</code> value
+     * @param xr a <code>FreeColXMLReader</code> value
      * @return a <code>Mission</code> value
      * @exception XMLStreamException if an error occurs
      */
-    public static Mission getMission(Game game, XMLStreamReader in)
+    public static Mission getMission(Game game, FreeColXMLReader xr)
         throws XMLStreamException {
-        String tag = in.getLocalName();
+        String tag = xr.getLocalName();
         Constructor<? extends Mission> c = missionMap.get(tag);
         if (c == null) {
             logger.warning("Unknown type of mission: '" + tag + "'.");
-            in.nextTag();
+            xr.nextTag();
             return null;
         } else {
             try {
-                return c.newInstance(game, in);
+                return c.newInstance(game, xr);
             } catch (Exception e) {
                 logger.log(Level.WARNING, "Failed to instatiate mission with tag: "
                     + tag, e);

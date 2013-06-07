@@ -22,7 +22,9 @@ package net.sf.freecol.common.model;
 import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
+
 
 
 /**
@@ -56,18 +58,18 @@ public abstract class TileItem extends FreeColGameObject implements Locatable {
      * Creates a new <code>TileItem</code> from an XML stream.
      *
      * @param game The enclosing <code>Game</code>.
-     * @param in The input stream containing the XML.
+     * @param xr The input stream containing the XML.
      * @exception XMLStreamException if a problem was encountered
      *     during parsing.
      */
-    public TileItem(Game game, XMLStreamReader in) throws XMLStreamException {
+    public TileItem(Game game, FreeColXMLReader xr) throws XMLStreamException {
         super(game, null);
     }
 
     /**
      * Initiates a new <code>TileItem</code> with the given
      * identifier.  The object should later be initialized by calling
-     * either {@link #readFromXML(XMLStreamReader)}.
+     * either {@link #readFromXML(FreeColXMLReader)}.
      *
      * @param game The enclosing <code>Game</code>.
      * @param id The object identifier.

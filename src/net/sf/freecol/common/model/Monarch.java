@@ -27,9 +27,9 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.option.UnitListOption;
@@ -137,7 +137,7 @@ public final class Monarch extends FreeColGameObject implements Named {
     /**
      * Initiates a new <code>Monarch</code> with the given identifier.
      * The object should later be initialized by calling
-     * {@link #readFromXML(XMLStreamReader)}.
+     * {@link #readFromXML(FreeColXMLReader)}.
      *
      * @param game The enclosing <code>Game</code>.
      * @param id The object identifier.
@@ -805,22 +805,22 @@ public final class Monarch extends FreeColGameObject implements Named {
             out.writeEndElement();
         }
 
-        public void readFromXML(XMLStreamReader in) throws XMLStreamException {
+        public void readFromXML(FreeColXMLReader xr) throws XMLStreamException {
             // Clear containers.
             navalUnits.clear();
             landUnits.clear();
 
-            while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                final String tag = in.getLocalName();
+            while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                final String tag = xr.getLocalName();
 
                 if (LAND_UNITS_TAG.equals(tag)) {
-                    while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        AbstractUnit newUnit = new AbstractUnit(in);
+                    while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                        AbstractUnit newUnit = new AbstractUnit(xr);
                         if (newUnit != null) landUnits.add(newUnit);
                     }
                 } else if (NAVAL_UNITS_TAG.equals(tag)) {
-                    while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        AbstractUnit newUnit = new AbstractUnit(in);
+                    while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                        AbstractUnit newUnit = new AbstractUnit(xr);
                         if (newUnit != null) navalUnits.add(newUnit);
                     }
                 } else {
@@ -890,34 +890,33 @@ public final class Monarch extends FreeColGameObject implements Named {
      * {@inheritDoc}
      */
     @Override
-    public void readFromXMLPartial(XMLStreamReader in) throws XMLStreamException {
-        readFromXMLPartialByClass(in, getClass());
+    public void readFromXMLPartial(FreeColXMLReader xr) throws XMLStreamException {
+        readFromXMLPartialByClass(xr, getClass());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        player = findFreeColGameObject(in, PLAYER_TAG,
-                                       Player.class, (Player)null, true);
+        player = xr.findFreeColGameObject(getGame(), PLAYER_TAG,
+                                          Player.class, (Player)null, true);
 
-        name = getAttribute(in, NAME_TAG,
-                            player.getNation().getRulerNameKey());
+        name = xr.getAttribute(NAME_TAG, player.getNation().getRulerNameKey());
 
-        supportSea = getAttribute(in, SUPPORT_SEA_TAG, false);
+        supportSea = xr.getAttribute(SUPPORT_SEA_TAG, false);
 
-        displeasure = getAttribute(in, DISPLEASURE_TAG, false);
+        displeasure = xr.getAttribute(DISPLEASURE_TAG, false);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
-        super.readChildren(in);
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
+        super.readChildren(xr);
 
         // @compat 0.10.5
         // Intervention and mercenary forces introduced here.  Add
@@ -936,38 +935,38 @@ public final class Monarch extends FreeColGameObject implements Named {
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        final String tag = in.getLocalName();
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
+        final String tag = xr.getLocalName();
 
         if (EXPEDITIONARY_FORCE_TAG.equals(tag)) {
-            expeditionaryForce.readFromXML(in);
+            expeditionaryForce.readFromXML(xr);
 
         } else if (INTERVENTION_FORCE_TAG.equals(tag)) {
-            interventionForce.readFromXML(in);
+            interventionForce.readFromXML(xr);
 
         // @compat 0.10.5
         } else if (Force.LAND_UNITS_TAG.equals(tag)) {
             expeditionaryForce.getLandUnits().clear();
-            while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                AbstractUnit newUnit = new AbstractUnit(in);
+            while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                AbstractUnit newUnit = new AbstractUnit(xr);
                 expeditionaryForce.getLandUnits().add(newUnit);
             }
         // end @compat
 
         } else if (MERCENARY_FORCE_TAG.equals(tag)) {
-            interventionForce.readFromXML(in);
+            interventionForce.readFromXML(xr);
 
         // @compat 0.10.5
         } else if (Force.NAVAL_UNITS_TAG.equals(tag)) {
             expeditionaryForce.getNavalUnits().clear();
-            while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                AbstractUnit newUnit = new AbstractUnit(in);
+            while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                AbstractUnit newUnit = new AbstractUnit(xr);
                 expeditionaryForce.getNavalUnits().add(newUnit);
             }
         // end @compat
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 

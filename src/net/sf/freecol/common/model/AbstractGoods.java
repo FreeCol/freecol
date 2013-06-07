@@ -22,8 +22,9 @@ package net.sf.freecol.common.model;
 import java.util.Comparator;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 
 /**
@@ -162,15 +163,15 @@ public class AbstractGoods extends FreeColObject implements Named {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
 
-        super.readAttributes(in);
+        super.readAttributes(xr);
 
-        type = spec.getType(in, TYPE_TAG, GoodsType.class, (GoodsType)null);
+        type = xr.getType(spec, TYPE_TAG, GoodsType.class, (GoodsType)null);
         if (type == null) throw new XMLStreamException("Null goods type.");
 
-        amount = getAttribute(in, AMOUNT_TAG, 0);
+        amount = xr.getAttribute(AMOUNT_TAG, 0);
     }
 
     /**

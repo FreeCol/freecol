@@ -23,8 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 
 /**
@@ -115,15 +116,15 @@ public class ProductionType extends FreeColObject {
     /**
      * Creates a new <code>ProductionType</code> instance.
      *
-     * @param in The <code>XMLStreamReader</code> to read from.
+     * @param xr The <code>FreeColXMLReader</code> to read from.
      * @param specification The <code>Specification</code> to refer to.
      * @exception XMLStreamException if there is a problem reading the stream.
      */
-    public ProductionType(XMLStreamReader in,
+    public ProductionType(FreeColXMLReader xr,
                           Specification specification) throws XMLStreamException {
         this(specification);
 
-        readFromXML(in);
+        readFromXML(xr);
     }
 
 
@@ -290,55 +291,55 @@ public class ProductionType extends FreeColObject {
      * {@inheritDoc}
      */
     @Override
-    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    public void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         // ProductionType does not need an id.
         // No need for: super.readAttributes(in);
         // TODO: as soon as we allow the user to select a production type,
         // we will need an id
 
-        unattended = getAttribute(in, UNATTENDED_TAG, false);
+        unattended = xr.getAttribute(UNATTENDED_TAG, false);
 
-        productionLevel = getAttribute(in, PRODUCTION_LEVEL_TAG, (String)null);
+        productionLevel = xr.getAttribute(PRODUCTION_LEVEL_TAG, (String)null);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void readChildren(XMLStreamReader in) throws XMLStreamException {
+    public void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers
         if (inputs != null) inputs.clear();
         if (outputs != null) outputs.clear();
 
-        super.readChildren(in);
+        super.readChildren(xr);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void readChild(XMLStreamReader in) throws XMLStreamException {
+    public void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
-        final String tag = in.getLocalName();
+        final String tag = xr.getLocalName();
 
         if (INPUT_TAG.equals(tag)) {
-            GoodsType type = spec.getType(in, GOODS_TYPE_TAG,
-                                          GoodsType.class, (GoodsType)null);
-            int amount = getAttribute(in, VALUE_TAG, -1);
+            GoodsType type = xr.getType(spec, GOODS_TYPE_TAG,
+                                        GoodsType.class, (GoodsType)null);
+            int amount = xr.getAttribute(VALUE_TAG, -1);
 
             if (type != null && amount >= 0) addInput(type, amount);
-            closeTag(in, INPUT_TAG);
+            xr.closeTag(INPUT_TAG);
 
         } else if (OUTPUT_TAG.equals(tag)) {
-            GoodsType type = spec.getType(in, GOODS_TYPE_TAG,
-                                          GoodsType.class, (GoodsType)null);
-            int amount = getAttribute(in, VALUE_TAG, -1);
+            GoodsType type = xr.getType(spec, GOODS_TYPE_TAG,
+                                        GoodsType.class, (GoodsType)null);
+            int amount = xr.getAttribute(VALUE_TAG, -1);
 
             if (type != null && amount >= 0) addOutput(type, amount);
-            closeTag(in, OUTPUT_TAG);
+            xr.closeTag(OUTPUT_TAG);
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 

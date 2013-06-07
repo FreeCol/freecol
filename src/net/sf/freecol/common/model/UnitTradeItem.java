@@ -20,8 +20,9 @@
 package net.sf.freecol.common.model;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 
 /**
@@ -52,13 +53,13 @@ public class UnitTradeItem extends TradeItem {
      * Creates a new <code>UnitTradeItem</code> instance.
      *
      * @param game The enclosing <code>Game</code>.
-     * @param in The <code>XMLStreamReader</code> to read from.
+     * @param xr The <code>FreeColXMLReader</code> to read from.
      * @exception XMLStreamException if there is a problem reading the stream.
      */
-    public UnitTradeItem(Game game, XMLStreamReader in) throws XMLStreamException {
-        super(game, in);
+    public UnitTradeItem(Game game, FreeColXMLReader xr) throws XMLStreamException {
+        super(game, xr);
 
-        readFromXML(in);
+        readFromXML(xr);
     }
 
 
@@ -115,10 +116,10 @@ public class UnitTradeItem extends TradeItem {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        unit = getAttribute(in, UNIT_TAG, getGame(), Unit.class, (Unit)null);
+        unit = xr.getAttribute(getGame(), UNIT_TAG, Unit.class, (Unit)null);
     }
 
     /**

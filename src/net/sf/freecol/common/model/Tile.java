@@ -34,9 +34,9 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
@@ -171,7 +171,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * Create a new <code>Tile</code> with the given identifier.
      * The object should later be initialized by calling either
-     * {@link #readFromXML(XMLStreamReader)}.
+     * {@link #readFromXML(FreeColXMLReader)}.
      *
      * @param game The enclosing <code>Game</code>.
      * @param id The object identifier.
@@ -1939,27 +1939,28 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     /**
      * {@inheritDoc}
      */
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
+        final Game game = getGame();
 
-        super.readAttributes(in);
+        super.readAttributes(xr);
 
-        x = getAttribute(in, X_TAG, 0);
+        x = xr.getAttribute(X_TAG, 0);
 
-        y = getAttribute(in, Y_TAG, 0);
+        y = xr.getAttribute(Y_TAG, 0);
 
-        style = getAttribute(in, STYLE_TAG, 0);
+        style = xr.getAttribute(STYLE_TAG, 0);
 
-        type = spec.getType(in, TYPE_TAG, TileType.class, (TileType)null);
+        type = xr.getType(spec, TYPE_TAG, TileType.class, (TileType)null);
 
-        style = getAttribute(in, STYLE_TAG, 0);
+        style = xr.getAttribute(STYLE_TAG, 0);
 
-        String typeStr = getAttribute(in, TYPE_TAG, (String)null);
+        String typeStr = xr.getAttribute(TYPE_TAG, (String)null);
         type = (typeStr == null) ? null : spec.getTileType(typeStr);
         // TODO: This is better, use when dropping the @compat 0.10.5 below
         //   type = spec.getType(in, TYPE_TAG, TileType.class, (TileType)null);
 
-        String str = getAttribute(in, CONNECTED_TAG, (String)null);
+        String str = xr.getAttribute(CONNECTED_TAG, (String)null);
         if (str == null || "".equals(str)) {
             highSeasCount = -1;
             // @compat 0.10.5
@@ -1984,22 +1985,22 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             }
         }
 
-        owner = makeFreeColGameObject(in, OWNER_TAG, Player.class, false);
+        owner = xr.makeFreeColGameObject(game, OWNER_TAG, Player.class, false);
 
-        region = makeFreeColGameObject(in, REGION_TAG, Region.class, true);
+        region = xr.makeFreeColGameObject(game, REGION_TAG, Region.class, true);
 
-        moveToEurope = (hasAttribute(in, MOVE_TO_EUROPE_TAG))
-            ? new Boolean(getAttribute(in, MOVE_TO_EUROPE_TAG, false))
+        moveToEurope = (xr.hasAttribute(MOVE_TO_EUROPE_TAG))
+            ? new Boolean(xr.getAttribute(MOVE_TO_EUROPE_TAG, false))
             : null;
 
-        contiguity = getAttribute(in, CONTIGUITY_TAG, -1);
+        contiguity = xr.getAttribute(CONTIGUITY_TAG, -1);
 
-        Location loc = makeLocationAttribute(in, OWNING_SETTLEMENT_TAG,
-                                             getGame());
+        Location loc = xr.makeLocationAttribute(OWNING_SETTLEMENT_TAG,
+                                                getGame());
         if (loc == null || loc instanceof Settlement) {
             changeOwningSettlement((Settlement)loc);
         } else {
-            logger.warning("Settlement expected: " + currentTag(in));
+            logger.warning("Settlement expected: " + xr.currentTag());
         }
     }
 
@@ -2007,14 +2008,14 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
         Settlement oldSettlement = settlement;
         Player oldSettlementOwner = (settlement == null) ? null
             : settlement.getOwner();
         settlement = null;
 
-        super.readChildren(in);
+        super.readChildren(xr);
 
         // Player settlement list is not passed in player updates
         // so do it here.  TODO: something better.
@@ -2048,35 +2049,37 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        final String tag = in.getLocalName();
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
+        final Game game = getGame();
+        final String tag = xr.getLocalName();
 
         // @compat 0.10.1
         if (OLD_UNITS_TAG.equals(tag)) {
-            while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                super.readChild(in);
+            while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                super.readChild(xr);
             }
         // end @compat
 
         } else if (Colony.getXMLElementTagName().equals(tag)) {
-            settlement = readFreeColGameObject(in, Colony.class);
+            settlement = xr.readFreeColGameObject(game, Colony.class);
 
         } else if (IndianSettlement.getXMLElementTagName().equals(tag)) {
-            settlement = readFreeColGameObject(in, IndianSettlement.class);
+            settlement = xr.readFreeColGameObject(game, IndianSettlement.class);
 
         } else if (PlayerExploredTile.getXMLElementTagName().equals(tag)) {
             // Only from a saved game.
-            Player player = findFreeColGameObject(in, PLAYER_TAG, Player.class,
-                                                  (Player)null, true);
-            PlayerExploredTile pet = readFreeColGameObject(in,
+            Player player = xr.findFreeColGameObject(game, PLAYER_TAG,
+                Player.class, (Player)null, true);
+            PlayerExploredTile pet = xr.readFreeColGameObject(game,
                 PlayerExploredTile.class);
             playerExploredTiles.put(player, pet);
 
         } else if (TileItemContainer.getXMLElementTagName().equals(tag)) {
-            tileItemContainer = readFreeColGameObject(in, TileItemContainer.class);
+            tileItemContainer = xr.readFreeColGameObject(game,
+                TileItemContainer.class);
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
 
         // Fix bug where missionary locations get cleared.

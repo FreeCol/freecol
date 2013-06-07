@@ -20,8 +20,9 @@
 package net.sf.freecol.common.model;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 import org.w3c.dom.Element;
 
@@ -133,12 +134,12 @@ public class ModelMessage extends StringTemplate {
     /**
      * Creates a new model message by reading a stream.
      *
-     * @param in The <code>XMLStreamReader</code> to read from.
+     * @param xr The <code>FreeColXMLReader</code> to read from.
      * @exception XMLStreamException if there is a problem reading the stream.
      */
-    public ModelMessage(XMLStreamReader in) throws XMLStreamException {
+    public ModelMessage(FreeColXMLReader xr) throws XMLStreamException {
 
-        readFromXML(in);
+        readFromXML(xr);
     }
 
     /**
@@ -446,20 +447,20 @@ public class ModelMessage extends StringTemplate {
      * {@inheritDoc}
      */
     @Override
-    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    public void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        sourceId = getAttribute(in, SOURCE_TAG, (String)null);
+        sourceId = xr.getAttribute(SOURCE_TAG, (String)null);
 
-        displayId = getAttribute(in, DISPLAY_TAG, (String)null);
+        displayId = xr.getAttribute(DISPLAY_TAG, (String)null);
 
-        messageType = getAttribute(in, MESSAGE_TYPE_TAG, 
+        messageType = xr.getAttribute(MESSAGE_TYPE_TAG, 
                                    MessageType.class, MessageType.DEFAULT);
 
-        beenDisplayed = getAttribute(in, HAS_BEEN_DISPLAYED_TAG, false);
+        beenDisplayed = xr.getAttribute(HAS_BEEN_DISPLAYED_TAG, false);
 
         // @compat 0.9.x
-        ownerId = getAttribute(in, OWNER_TAG, (String)null);
+        ownerId = xr.getAttribute(OWNER_TAG, (String)null);
         // end @compat
     }
 

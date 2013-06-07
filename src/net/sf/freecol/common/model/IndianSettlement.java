@@ -40,9 +40,9 @@ import net.sf.freecol.common.util.Utils;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Tension.Level;
 
 
@@ -192,7 +192,7 @@ public class IndianSettlement extends Settlement {
     /**
      * Creates a new <code>IndianSettlement</code> with the given
      * identifier.  The object should later be initialized by calling either
-     * {@link #readFromXML(XMLStreamReader)}.
+     * {@link #readFromXML(FreeColXMLReader)}.
      *
      * @param game The <code>Game</code> in which this object belong.
      * @param id The object identifier.
@@ -1375,32 +1375,32 @@ public class IndianSettlement extends Settlement {
      * {@inheritDoc}
      */
     @Override
-    public void readFromXMLPartial(XMLStreamReader in) throws XMLStreamException {
-        readFromXMLPartialByClass(in, getClass());
+    public void readFromXMLPartial(FreeColXMLReader xr) throws XMLStreamException {
+        readFromXMLPartialByClass(xr, getClass());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
 
-        super.readAttributes(in);
+        super.readAttributes(xr);
 
-        lastTribute = getAttribute(in, LAST_TRIBUTE_TAG, 0);
+        lastTribute = xr.getAttribute(LAST_TRIBUTE_TAG, 0);
 
-        convertProgress = getAttribute(in, CONVERT_PROGRESS_TAG, 0);
+        convertProgress = xr.getAttribute(CONVERT_PROGRESS_TAG, 0);
 
-        learnableSkill = spec.getType(in, LEARNABLE_SKILL_TAG,
-                                      UnitType.class, (UnitType)null);
+        learnableSkill = xr.getType(spec, LEARNABLE_SKILL_TAG,
+                                    UnitType.class, (UnitType)null);
 
-        mostHated = makeFreeColGameObject(in, MOST_HATED_TAG, Player.class,
-                                          false);
+        mostHated = xr.makeFreeColGameObject(getGame(), MOST_HATED_TAG,
+                                             Player.class, false);
 
         for (int i = 0; i < wantedGoods.length; i++) {
-            wantedGoods[i] = spec.getType(in, WANTED_GOODS_TAG + i,
-                                           GoodsType.class, (GoodsType)null);
+            wantedGoods[i] = xr.getType(spec, WANTED_GOODS_TAG + i,
+                                        GoodsType.class, (GoodsType)null);
         }
     }
 
@@ -1408,14 +1408,14 @@ public class IndianSettlement extends Settlement {
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
         contactLevels.clear();
         alarm.clear();
         missionary = null;
         ownedUnits.clear();
 
-        super.readChildren(in);
+        super.readChildren(xr);
 
         owner.addSettlement(this);
 
@@ -1433,40 +1433,40 @@ public class IndianSettlement extends Settlement {
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
         final Game game = getGame();
-        final String tag = in.getLocalName();
+        final String tag = xr.getLocalName();
 
         if (ALARM_TAG.equals(tag)) {
-            Player player = makeFreeColGameObject(in, PLAYER_TAG,
-                                                  Player.class, true);
+            Player player = xr.makeFreeColGameObject(game, PLAYER_TAG,
+                                                     Player.class, true);
             // @compat 0.10.5
             setContacted(player); // Alarm used to imply contact
             // end @compat
-            alarm.put(player, new Tension(getAttribute(in, VALUE_TAG, 0)));
-            closeTag(in, ALARM_TAG);
+            alarm.put(player, new Tension(xr.getAttribute(VALUE_TAG, 0)));
+            xr.closeTag(ALARM_TAG);
 
         } else if (CONTACT_LEVEL_TAG.equals(tag)) {
-            ContactLevel cl = getAttribute(in, LEVEL_TAG,
+            ContactLevel cl = xr.getAttribute(LEVEL_TAG,
                 ContactLevel.class, ContactLevel.UNCONTACTED);
-            Player player = makeFreeColGameObject(in, PLAYER_TAG,
-                                                  Player.class, true);
+            Player player = xr.makeFreeColGameObject(game, PLAYER_TAG,
+                                                     Player.class, true);
             contactLevels.put(player, cl);
-            closeTag(in, CONTACT_LEVEL_TAG);
+            xr.closeTag(CONTACT_LEVEL_TAG);
 
         // @compat 0.10.5
         } else if (IS_VISITED_TAG.equals(tag)) {
-            Player player = makeFreeColGameObject(in, PLAYER_TAG,
-                                                  Player.class, true);
+            Player player = xr.makeFreeColGameObject(game, PLAYER_TAG,
+                                                     Player.class, true);
             setScouted(player);
-            closeTag(in, IS_VISITED_TAG);
+            xr.closeTag(IS_VISITED_TAG);
         // end @compat
 
         // @compat 0.9.x
         } else if (WANTED_GOODS_TAG.equals(tag)) {
             String[] wantedGoodsId
-                = readFromArrayElement(WANTED_GOODS_TAG, in, new String[0]);
+                = readFromArrayElement(WANTED_GOODS_TAG, xr, new String[0]);
             for (int i = 0; i < wantedGoods.length; i++) {
                 String goodsId = (i < wantedGoodsId.length) ? wantedGoodsId[i]
                     : null;
@@ -1476,14 +1476,14 @@ public class IndianSettlement extends Settlement {
         // end @compat
 
         } else if (MISSIONARY_TAG.equals(tag)) {
-            in.nextTag();
-            missionary = readFreeColGameObject(in, Unit.class);
+            xr.nextTag();
+            missionary = xr.readFreeColGameObject(game, Unit.class);
             missionary.setLocationNoUpdate(this);
-            closeTag(in, MISSIONARY_TAG);
+            xr.closeTag(MISSIONARY_TAG);
 
         } else if (OWNED_UNITS_TAG.equals(tag)) {
-            Unit unit = makeFreeColGameObject(in, ID_ATTRIBUTE_TAG,
-                                              Unit.class, true);
+            Unit unit = xr.makeFreeColGameObject(game, ID_ATTRIBUTE_TAG,
+                                                 Unit.class, true);
             if (unit.getOwner() != null && !owner.owns(unit)) {
                 logger.warning("Error in savegame: unit " + unit.getId()
                                + " does not belong to settlement " + getId());
@@ -1491,10 +1491,10 @@ public class IndianSettlement extends Settlement {
                 addOwnedUnit(unit);
                 owner.addUnit(unit);
             }
-            closeTag(in, OWNED_UNITS_TAG);
+            xr.closeTag(OWNED_UNITS_TAG);
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 

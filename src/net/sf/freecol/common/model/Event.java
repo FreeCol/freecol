@@ -25,8 +25,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 
 /**
@@ -57,14 +58,14 @@ public class Event extends FreeColGameObjectType {
     /**
      * Create a new event.
      *
-     * @param in The <code>XMLStreamReader</code> to read from.
+     * @param xr The <code>FreeColXMLReader</code> to read from.
      * @param specification The <code>Specification</code> to refer to.
      * @exception XMLStreamException if there a problem reading the stream.
      */
-    public Event(XMLStreamReader in, Specification specification) throws XMLStreamException {
+    public Event(FreeColXMLReader xr, Specification specification) throws XMLStreamException {
         super(specification);
 
-        readFromXML(in);
+        readFromXML(xr);
     }
 
 
@@ -170,36 +171,36 @@ public class Event extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        value = getAttribute(in, VALUE_TAG, (String)null);
+        value = xr.getAttribute(VALUE_TAG, (String)null);
 
-        scoreValue = getAttribute(in, SCORE_VALUE_TAG, 0);
+        scoreValue = xr.getAttribute(SCORE_VALUE_TAG, 0);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
-        if (readShouldClearContainers(in)) {
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
+        if (xr.shouldClearContainers()) {
             limits = null;
         }
         
-        super.readChildren(in);
+        super.readChildren(xr);
     }        
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
-        final String tag = in.getLocalName();
+        final String tag = xr.getLocalName();
 
         if (Limit.getXMLElementTagName().equals(tag)) {
-            Limit limit = new Limit(in, spec);
+            Limit limit = new Limit(xr, spec);
             addLimit(limit);
             // @compat 0.10.5
             if (limit.getId().equals("model.limit.independence.colonies")) {
@@ -209,7 +210,7 @@ public class Event extends FreeColGameObjectType {
             // end @compat
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 

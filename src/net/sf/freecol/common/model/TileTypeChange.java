@@ -21,8 +21,9 @@ package net.sf.freecol.common.model;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 
 /**
@@ -159,30 +160,30 @@ public class TileTypeChange implements Comparable<TileTypeChange> {
     /**
      * Reads this object from an XML stream.
      *
-     * @param in The XML input stream.
+     * @param xr The XML input stream.
      * @param spec The <code>Specification</code> to use.
      * @throws XMLStreamException if a problem was encountered
      *     during parsing.
      */
-    public void readFromXML(XMLStreamReader in,
+    public void readFromXML(FreeColXMLReader xr,
                             Specification spec) throws XMLStreamException {
 
-        from = spec.getType(in, FROM_TAG, TileType.class, (TileType)null);
+        from = xr.getType(spec, FROM_TAG, TileType.class, (TileType)null);
 
-        to = spec.getType(in, TO_TAG, TileType.class, (TileType)null);
+        to = xr.getType(spec, TO_TAG, TileType.class, (TileType)null);
 
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            final String tag = in.getLocalName();
+        while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            final String tag = xr.getLocalName();
 
             if (PRODUCTION_TAG.equals(tag)) {
-                GoodsType type = spec.getType(in, GOODS_TYPE_TAG,
-                                              GoodsType.class, (GoodsType)null);
+                GoodsType type = xr.getType(spec, GOODS_TYPE_TAG,
+                                            GoodsType.class, (GoodsType)null);
 
-                int amount = FreeColObject.getAttribute(in, VALUE_TAG, 0);
+                int amount = xr.getAttribute(VALUE_TAG, 0);
 
                 production = new AbstractGoods(type, amount);
 
-                in.nextTag(); // close tag
+                xr.nextTag(); // close tag
 
             } else {
                 throw new XMLStreamException("Unexpected TileTypeChange tag: "

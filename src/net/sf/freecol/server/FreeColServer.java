@@ -48,7 +48,6 @@ import javax.imageio.ImageIO;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
@@ -58,6 +57,7 @@ import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
@@ -87,7 +87,6 @@ import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.StringOption;
 import net.sf.freecol.common.util.Utils;
-import net.sf.freecol.common.util.XMLStream;
 import net.sf.freecol.server.ai.AIInGameInputHandler;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIPlayer;
@@ -899,11 +898,11 @@ public final class FreeColServer {
         logger.info("Found savegame version " + savegameVersion);
 
         List<String> serverStrings = null;
-        XMLStream xr = null;
+        FreeColXMLReader xr = null;
         ServerGame game = null;
         try {
             String active = null;
-            xr = fis.getXMLStream();
+            xr = fis.getFreeColXMLReader();
             xr.nextTag();
 
             if (server != null) {
@@ -923,11 +922,11 @@ public final class FreeColServer {
             }
 
             while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                final String tag = xr.getTagName();
+                final String tag = xr.getLocalName();
                 if (SERVER_OBJECTS_TAG.equals(tag)) {
                     serverStrings = new ArrayList<String>();
                     while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        serverStrings.add(xr.getTagName());
+                        serverStrings.add(xr.getLocalName());
                         serverStrings.add(xr.readId());
                         xr.nextTag();
                     }
@@ -948,8 +947,8 @@ public final class FreeColServer {
                     }
                     // @end compatibility code
                     // Read the game
-                    game = new ServerGame(null, xr.getXMLStreamReader(),
-                                          serverStrings, specification);
+                    game = new ServerGame(null, xr, serverStrings,
+                                          specification);
                     game.setCurrentPlayer(null);
                     if (server != null) server.setGame(game);
                     // @compat 0.9.x
@@ -962,8 +961,7 @@ public final class FreeColServer {
 
                 } else if (AIMain.getXMLElementTagName().equals(tag)) {
                     if (server == null) break;
-                    server.setAIMain(new AIMain(server,
-                                                xr.getXMLStreamReader()));
+                    server.setAIMain(new AIMain(server, xr));
 
                 } else {
                     throw new XMLStreamException("Unknown tag"
@@ -1109,9 +1107,9 @@ public final class FreeColServer {
      * @return The saved game version.
      */
     private static int getSavegameVersion(final FreeColSavegameFile fis) {
-        XMLStream xr = null;
+        FreeColXMLReader xr = null;
         try {
-            xr = fis.getXMLStream();
+            xr = fis.getFreeColXMLReader();
             xr.nextTag();
             return xr.getAttribute(VERSION_TAG, -1);
         } catch (Exception e) {
@@ -1267,15 +1265,15 @@ public final class FreeColServer {
      */
     private static void v11FixServerObjects(List<String> serverStrings,
                                             final FreeColSavegameFile fis) {
-        XMLStream xs = null;
+        FreeColXMLReader xs = null;
         try {
-            xs = fis.getXMLStream();
+            xs = fis.getFreeColXMLReader();
             xs.nextTag();
 
             while (xs.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                final String tag = xs.getTagName();
+                final String tag = xs.getLocalName();
                 if (Game.getXMLElementTagName().equals(tag)) {
-                    Game game = new ServerGame(null, xs.getXMLStreamReader(),
+                    Game game = new ServerGame(null, xs,
                             new ArrayList<String>(serverStrings),
                             new FreeColTcFile("freecol").getSpecification());
                     Iterator<FreeColGameObject> objs
@@ -1599,15 +1597,15 @@ public final class FreeColServer {
         highScores = new ArrayList<HighScore>();
         File hsf = FreeColDirectories.getHighScoreFile();
         if (!hsf.exists()) return;
-        XMLStream xr = null;
+        FreeColXMLReader xr = null;
         try {
-            xr = new XMLStream(new FileInputStream(hsf));
+            xr = new FreeColXMLReader(new FileInputStream(hsf));
             xr.nextTag();
 
             while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                final String tag = xr.getTagName();
+                final String tag = xr.getLocalName();
                 if (HighScore.getXMLElementTagName().equals(tag)) {
-                    highScores.add(new HighScore(xr.getXMLStreamReader()));
+                    highScores.add(new HighScore(xr));
                 }
             }
 

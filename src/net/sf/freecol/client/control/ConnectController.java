@@ -30,7 +30,6 @@ import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
@@ -43,6 +42,7 @@ import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColSavegameFile;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
@@ -55,7 +55,6 @@ import net.sf.freecol.common.networking.LoginMessage;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.ResourceManager;
-import net.sf.freecol.common.util.XMLStream;
 import net.sf.freecol.server.FreeColServer;
 
 import org.w3c.dom.Element;
@@ -278,12 +277,12 @@ public final class ConnectController {
         final boolean defaultSinglePlayer;
         final boolean defaultPublicServer;
         final FreeColSavegameFile fis;
-        XMLStream xr = null;
+        FreeColXMLReader xr = null;
         try {
             // Get suggestions for "singlePlayer" and "publicServer"
             // settings from the file
             fis = new FreeColSavegameFile(file);
-            xr = fis.getXMLStream();
+            xr = fis.getFreeColXMLReader();
             xr.nextTag();
 
             String str = xr.getAttribute(FreeColServer.OWNER_TAG,

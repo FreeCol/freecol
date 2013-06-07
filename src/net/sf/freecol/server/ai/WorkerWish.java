@@ -22,9 +22,9 @@ package net.sf.freecol.server.ai;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -110,12 +110,12 @@ public class WorkerWish extends Wish {
      * XML-representation.
      *
      * @param aiMain The main AI-object.
-     * @param in The input stream containing the XML.
+     * @param xr The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    public WorkerWish(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
-        super(aiMain, in);
+    public WorkerWish(AIMain aiMain, FreeColXMLReader xr) throws XMLStreamException {
+        super(aiMain, xr);
 
         uninitialized = unitType == null;
     }
@@ -196,23 +196,23 @@ public class WorkerWish extends Wish {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
         final Specification spec = getSpecification();
 
-        unitType = spec.getType(in, UNIT_TYPE_TAG,
-                                UnitType.class, (UnitType)null);
+        unitType = xr.getType(spec, UNIT_TYPE_TAG,
+                              UnitType.class, (UnitType)null);
         
-        expertNeeded = getAttribute(in, EXPERT_NEEDED_TAG, false);
+        expertNeeded = xr.getAttribute(EXPERT_NEEDED_TAG, false);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
-        super.readChildren(in);
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
+        super.readChildren(xr);
 
         if (unitType != null) uninitialized = false;
     }

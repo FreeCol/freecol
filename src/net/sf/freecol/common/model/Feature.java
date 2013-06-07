@@ -25,8 +25,9 @@ import java.util.List;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 
 /**
@@ -406,14 +407,14 @@ public abstract class Feature extends FreeColObject {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
         final Specification spec = getSpecification();
 
-        String str = getAttribute(in, SOURCE_TAG, (String)null);
+        String str = xr.getAttribute(SOURCE_TAG, (String)null);
         // @compat 0.9.x
-        if (!hasAttribute(in, ID_ATTRIBUTE_TAG)
+        if (!xr.hasAttribute(ID_ATTRIBUTE_TAG)
             && "model.colony.colonyGoodsParty".equals(str)) {
             setId("model.modifier.colonyGoodsParty");
             setSource(spec.findType("model.source.colonyGoodsParty"));
@@ -430,44 +431,44 @@ public abstract class Feature extends FreeColObject {
             }
         }
 
-        int firstTurn = getAttribute(in, FIRST_TURN_TAG, UNDEFINED);
+        int firstTurn = xr.getAttribute(FIRST_TURN_TAG, UNDEFINED);
         if (firstTurn != UNDEFINED) {
             setFirstTurn(new Turn(firstTurn));
         }
 
-        int lastTurn = getAttribute(in, LAST_TURN_TAG, UNDEFINED);
+        int lastTurn = xr.getAttribute(LAST_TURN_TAG, UNDEFINED);
         if (lastTurn != UNDEFINED) {
             setLastTurn(new Turn(lastTurn));
         }
 
-        duration = getAttribute(in, DURATION_TAG, 0);
+        duration = xr.getAttribute(DURATION_TAG, 0);
 
-        temporary = getAttribute(in, TEMPORARY_TAG, false);
+        temporary = xr.getAttribute(TEMPORARY_TAG, false);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear container
         scopes = null;
 
-        super.readChildren(in);
+        super.readChildren(xr);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        final String tag = in.getLocalName();
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
+        final String tag = xr.getLocalName();
 
         if (Scope.getXMLElementTagName().equals(tag)) {
-            addScope(new Scope(in));
+            addScope(new Scope(xr));
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 }

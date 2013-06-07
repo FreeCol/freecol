@@ -23,9 +23,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Specification;
 
 
@@ -191,12 +191,12 @@ public class IntegerOption extends AbstractOption<Integer> {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        maximumValue = getAttribute(in, MAXIMUM_VALUE_TAG, Integer.MAX_VALUE);
+        maximumValue = xr.getAttribute(MAXIMUM_VALUE_TAG, Integer.MAX_VALUE);
 
-        minimumValue = getAttribute(in, MINIMUM_VALUE_TAG, Integer.MIN_VALUE);
+        minimumValue = xr.getAttribute(MINIMUM_VALUE_TAG, Integer.MIN_VALUE);
     }
 
     /**

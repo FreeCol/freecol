@@ -23,8 +23,8 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Specification;
 
@@ -182,12 +182,12 @@ public abstract class AbstractOption<T> extends FreeColObject
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
         
-        String defaultValue = getAttribute(in, DEFAULT_VALUE_TAG, (String)null);
+        String defaultValue = xr.getAttribute(DEFAULT_VALUE_TAG, (String)null);
 
-        String value = getAttribute(in, VALUE_TAG, (String)null);
+        String value = xr.getAttribute(VALUE_TAG, (String)null);
 
         if (defaultValue == null && value == null) {
             if (!isNullValueOK()) {
@@ -207,18 +207,18 @@ public abstract class AbstractOption<T> extends FreeColObject
     /**
      * General option reader routine.
      *
-     * @param in The <code>XMLStreamReader</code> to read from.
+     * @param xr The <code>FreeColXMLReader</code> to read from.
      * @return An option.
      */
-    protected AbstractOption readOption(XMLStreamReader in) throws XMLStreamException {
+    protected AbstractOption readOption(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
-        final String tag = in.getLocalName();
+        final String tag = xr.getLocalName();
         AbstractOption option = null;
 
         if (ACTION_TAG.equals(tag)) {
             // TODO: load FreeColActions from client options?
-            logger.finest("Skipping action " + readId(in));
-            in.nextTag();
+            logger.finest("Skipping action " + xr.readId());
+            xr.nextTag();
 
         } else if (AbstractUnitOption.getXMLElementTagName().equals(tag)) {
             option = new AbstractUnitOption(spec);
@@ -267,10 +267,10 @@ public abstract class AbstractOption<T> extends FreeColObject
 
         } else {
             logger.warning("Not an option type: " + tag);
-            in.nextTag();
+            xr.nextTag();
         }
 
-        if (option != null) option.readFromXML(in);
+        if (option != null) option.readFromXML(xr);
         return option;
     }
 }

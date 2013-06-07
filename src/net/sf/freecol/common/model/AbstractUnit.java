@@ -23,9 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Unit.Role;
 
 
@@ -73,11 +73,11 @@ public class AbstractUnit extends FreeColObject {
     /**
      * Creates a new <code>AbstractUnit</code> instance.
      *
-     * @param in The <code>XMLStreamReader</code> to read from.
+     * @param xr The <code>FreeColXMLReader</code> to read from.
      * @exception XMLStreamException if an error occurs
      */
-    public AbstractUnit(XMLStreamReader in) throws XMLStreamException {
-        readFromXML(in);
+    public AbstractUnit(FreeColXMLReader xr) throws XMLStreamException {
+        readFromXML(xr);
     }
 
 
@@ -214,12 +214,12 @@ public class AbstractUnit extends FreeColObject {
      * {@inheritDoc}
      */
     @Override
-    protected final void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected final void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        role = getAttribute(in, ROLE_TAG, Role.class, Role.DEFAULT);
+        role = xr.getAttribute(ROLE_TAG, Role.class, Role.DEFAULT);
 
-        number = getAttribute(in, NUMBER_TAG, 1);
+        number = xr.getAttribute(NUMBER_TAG, 1);
     }
 
     /**

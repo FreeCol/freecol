@@ -20,8 +20,9 @@
 package net.sf.freecol.common.model;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 
 /**
@@ -51,13 +52,13 @@ public class GoldTradeItem extends TradeItem {
      * Creates a new <code>GoldTradeItem</code> instance.
      *
      * @param game The enclosing <code>Game</code>.
-     * @param in The <code>XMLStreamReader</code> to read from.
+     * @param xr The <code>FreeColXMLReader</code> to read from.
      * @exception XMLStreamException if there is an error reading the stream.
      */
-    public GoldTradeItem(Game game, XMLStreamReader in) throws XMLStreamException {
-        super(game, in);
+    public GoldTradeItem(Game game, FreeColXMLReader xr) throws XMLStreamException {
+        super(game, xr);
 
-        readFromXML(in);
+        readFromXML(xr);
     }
 
 
@@ -113,10 +114,10 @@ public class GoldTradeItem extends TradeItem {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        gold = getAttribute(in, GOLD_TAG, UNDEFINED);
+        gold = xr.getAttribute(GOLD_TAG, UNDEFINED);
     }
 
     /**

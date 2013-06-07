@@ -34,10 +34,10 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.GameOptions;
@@ -304,7 +304,7 @@ public class Unit extends GoodsLocation
     /**
      * Creates a new <code>Unit</code> with the given
      * identifier.  The object should later be initialized by calling
-     * {@link #readFromXML(XMLStreamReader)}.
+     * {@link #readFromXML(FreeColXMLReader)}.
      *
      * @param game The enclosing <code>Game</code>.
      * @param id The object identifier.
@@ -3888,45 +3888,45 @@ public class Unit extends GoodsLocation
      * {@inheritDoc}
      */
     @Override
-    public void readFromXMLPartial(XMLStreamReader in) throws XMLStreamException {
-        readFromXMLPartialByClass(in, getClass());
+    public void readFromXMLPartial(FreeColXMLReader xr) throws XMLStreamException {
+        readFromXMLPartialByClass(xr, getClass());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
         final Game game = getGame();
 
-        super.readAttributes(in);
+        super.readAttributes(xr);
 
-        name = getAttribute(in, NAME_TAG, (String)null);
+        name = xr.getAttribute(NAME_TAG, (String)null);
 
-        owner = makeFreeColGameObject(in, OWNER_TAG, Player.class, true);
+        owner = xr.makeFreeColGameObject(game, OWNER_TAG, Player.class, true);
 
         UnitType oldUnitType = unitType;
-        unitType = spec.getType(in, UNIT_TYPE_TAG,
-                                UnitType.class, (UnitType)null);
+        unitType = xr.getType(spec, UNIT_TYPE_TAG,
+                              UnitType.class, (UnitType)null);
 
-        state = getAttribute(in, STATE_TAG, UnitState.class, UnitState.ACTIVE);
+        state = xr.getAttribute(STATE_TAG, UnitState.class, UnitState.ACTIVE);
 
-        role = getAttribute(in, ROLE_TAG, Role.class, Role.DEFAULT);
+        role = xr.getAttribute(ROLE_TAG, Role.class, Role.DEFAULT);
 
-        location = makeLocationAttribute(in, LOCATION_TAG, game);
+        location = xr.makeLocationAttribute(LOCATION_TAG, game);
 
-        entryLocation = makeLocationAttribute(in, ENTRY_LOCATION_TAG, game);
+        entryLocation = xr.makeLocationAttribute(ENTRY_LOCATION_TAG, game);
 
-        movesLeft = getAttribute(in, MOVES_LEFT_TAG, 0);
+        movesLeft = xr.getAttribute(MOVES_LEFT_TAG, 0);
 
-        workLeft = getAttribute(in, WORK_LEFT_TAG, 0);
+        workLeft = xr.getAttribute(WORK_LEFT_TAG, 0);
 
-        attrition = getAttribute(in, ATTRITION_TAG, 0);
+        attrition = xr.getAttribute(ATTRITION_TAG, 0);
 
-        nationality = getAttribute(in, NATIONALITY_TAG, (String)null);
+        nationality = xr.getAttribute(NATIONALITY_TAG, (String)null);
 
-        ethnicity = getAttribute(in, ETHNICITY_TAG, (String)null);
+        ethnicity = xr.getAttribute(ETHNICITY_TAG, (String)null);
 
         // TODO: does this make sense?
         if (oldUnitType == null) {
@@ -3935,32 +3935,32 @@ public class Unit extends GoodsLocation
             owner.modifyScore(unitType.getScoreValue() - oldUnitType.getScoreValue());
         }
 
-        turnsOfTraining = getAttribute(in, TURNS_OF_TRAINING_TAG, 0);
+        turnsOfTraining = xr.getAttribute(TURNS_OF_TRAINING_TAG, 0);
 
-        hitPoints = getAttribute(in, HIT_POINTS_TAG, -1);
+        hitPoints = xr.getAttribute(HIT_POINTS_TAG, -1);
         // @compat 0.10.7
-        if (hitPoints < 0) hitPoints = getAttribute(in, OLD_HIT_POINTS_TAG, -1);
+        if (hitPoints < 0) hitPoints = xr.getAttribute(OLD_HIT_POINTS_TAG, -1);
         // end @compat
 
-        teacher = makeFreeColGameObject(in, TEACHER_TAG, Unit.class, false);
+        teacher = xr.makeFreeColGameObject(game, TEACHER_TAG, Unit.class, false);
 
-        student = makeFreeColGameObject(in, STUDENT_TAG, Unit.class, false);
+        student = xr.makeFreeColGameObject(game, STUDENT_TAG, Unit.class, false);
 
-        setHomeIndianSettlement(makeFreeColGameObject(in, INDIAN_SETTLEMENT_TAG,
+        setHomeIndianSettlement(xr.makeFreeColGameObject(game, INDIAN_SETTLEMENT_TAG,
                 IndianSettlement.class, false));
 
-        treasureAmount = getAttribute(in, TREASURE_AMOUNT_TAG, 0);
+        treasureAmount = xr.getAttribute(TREASURE_AMOUNT_TAG, 0);
 
-        destination = makeLocationAttribute(in, DESTINATION_TAG, game);
+        destination = xr.makeLocationAttribute(DESTINATION_TAG, game);
 
-        tradeRoute = findFreeColGameObject(in, TRADE_ROUTE_TAG,
+        tradeRoute = xr.findFreeColGameObject(game, TRADE_ROUTE_TAG,
             TradeRoute.class, (TradeRoute)null, false);
 
         currentStop = (tradeRoute == null) ? -1
-            : getAttribute(in, CURRENT_STOP_TAG, 0);
+            : xr.getAttribute(CURRENT_STOP_TAG, 0);
 
-        experienceType = spec.getType(in, EXPERIENCE_TYPE_TAG,
-                                      GoodsType.class, (GoodsType)null);
+        experienceType = xr.getType(spec, EXPERIENCE_TYPE_TAG,
+                                    GoodsType.class, (GoodsType)null);
         if (experienceType == null && workType != null) {
             experienceType = workType;
         }
@@ -3978,26 +3978,26 @@ public class Unit extends GoodsLocation
         }
         // end @compat
 
-        experience = getAttribute(in, EXPERIENCE_TAG, 0);
+        experience = xr.getAttribute(EXPERIENCE_TAG, 0);
 
-        visibleGoodsCount = getAttribute(in, VISIBLE_GOODS_COUNT_TAG, -1);
+        visibleGoodsCount = xr.getAttribute(VISIBLE_GOODS_COUNT_TAG, -1);
 
         // Make sure you do this after experience and location stuff.
-        changeWorkType(spec.getType(in, WORK_TYPE_TAG, GoodsType.class, null));
+        changeWorkType(xr.getType(spec, WORK_TYPE_TAG, GoodsType.class, null));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
         clearUnitList();
         if (getGoodsContainer() != null) getGoodsContainer().removeAll();
         clearEquipment();
         setWorkImprovement(null);
 
-        super.readChildren(in);
+        super.readChildren(xr);
 
         setRole();
         getOwner().addUnit(this);
@@ -4008,17 +4008,17 @@ public class Unit extends GoodsLocation
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
         final Game game = getGame();
-        final String tag = in.getLocalName();
+        final String tag = xr.getLocalName();
 
         if (EQUIPMENT_TAG.equals(tag)) {
             // @compat 0.9.x
-            int length = getAttribute(in, ARRAY_SIZE_TAG, 0);
+            int length = xr.getAttribute(ARRAY_SIZE_TAG, 0);
             if (length > 0) {
                 for (int index = 0; index < length; index++) {
-                    EquipmentType et = spec.getType(in, "x" + index,
+                    EquipmentType et = xr.getType(spec, "x" + index,
                         EquipmentType.class, (EquipmentType)null);
                     if (et != null) {
                         equipment.incrementCount(et, 1);
@@ -4026,23 +4026,23 @@ public class Unit extends GoodsLocation
                 }
             // end @compat
             } else {
-                equipment.incrementCount(spec.getEquipmentType(readId(in)),
-                    getAttribute(in, COUNT_TAG, 0));
+                equipment.incrementCount(spec.getEquipmentType(xr.readId()),
+                    xr.getAttribute(COUNT_TAG, 0));
             }
-            closeTag(in, EQUIPMENT_TAG);
+            xr.closeTag(EQUIPMENT_TAG);
 
         // @compat 0.10.5
         } else if (OLD_UNITS_TAG.equals(tag)) {
-            while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                super.readChild(in);
+            while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                super.readChild(xr);
             }
         // end @compat
 
         } else if (TileImprovement.getXMLElementTagName().equals(tag)) {
-            setWorkImprovement(readFreeColGameObject(in, TileImprovement.class));
+            setWorkImprovement(xr.readFreeColGameObject(game, TileImprovement.class));
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 

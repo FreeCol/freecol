@@ -25,9 +25,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 
 
@@ -743,50 +743,50 @@ public final class UnitType extends BuildableType
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
         final Specification spec = getSpecification();
 
-        UnitType parent = spec.getType(in, EXTENDS_TAG, UnitType.class, this);
+        UnitType parent = xr.getType(spec, EXTENDS_TAG, UnitType.class, this);
 
-        offence = getAttribute(in, OFFENCE_TAG, parent.offence);
+        offence = xr.getAttribute(OFFENCE_TAG, parent.offence);
 
-        defence = getAttribute(in, DEFENCE_TAG, parent.defence);
+        defence = xr.getAttribute(DEFENCE_TAG, parent.defence);
 
-        movement = getAttribute(in, MOVEMENT_TAG, parent.movement);
+        movement = xr.getAttribute(MOVEMENT_TAG, parent.movement);
 
-        lineOfSight = getAttribute(in, LINE_OF_SIGHT_TAG, parent.lineOfSight);
+        lineOfSight = xr.getAttribute(LINE_OF_SIGHT_TAG, parent.lineOfSight);
 
-        scoreValue = getAttribute(in, SCORE_VALUE_TAG, parent.scoreValue);
+        scoreValue = xr.getAttribute(SCORE_VALUE_TAG, parent.scoreValue);
 
-        space = getAttribute(in, SPACE_TAG, parent.space);
+        space = xr.getAttribute(SPACE_TAG, parent.space);
 
-        hitPoints = getAttribute(in, HIT_POINTS_TAG, parent.hitPoints);
+        hitPoints = xr.getAttribute(HIT_POINTS_TAG, parent.hitPoints);
 
-        spaceTaken = getAttribute(in, SPACE_TAKEN_TAG, parent.spaceTaken);
+        spaceTaken = xr.getAttribute(SPACE_TAKEN_TAG, parent.spaceTaken);
 
-        maximumExperience = getAttribute(in, MAXIMUM_EXPERIENCE_TAG,
+        maximumExperience = xr.getAttribute(MAXIMUM_EXPERIENCE_TAG,
                                          parent.maximumExperience);
 
-        maximumAttrition = getAttribute(in, MAXIMUM_ATTRITION_TAG,
+        maximumAttrition = xr.getAttribute(MAXIMUM_ATTRITION_TAG,
                                         parent.maximumAttrition);
 
-        skillTaught = spec.getType(in, SKILL_TAUGHT_TAG,
-                                   UnitType.class, this);
+        skillTaught = xr.getType(spec, SKILL_TAUGHT_TAG,
+                                 UnitType.class, this);
 
-        recruitProbability = getAttribute(in, RECRUIT_PROBABILITY_TAG,
+        recruitProbability = xr.getAttribute(RECRUIT_PROBABILITY_TAG,
                                           parent.recruitProbability);
 
-        skill = getAttribute(in, SKILL_TAG, parent.skill);
+        skill = xr.getAttribute(SKILL_TAG, parent.skill);
 
-        price = getAttribute(in, PRICE_TAG, parent.price);
+        price = xr.getAttribute(PRICE_TAG, parent.price);
 
-        expertProduction = spec.getType(in, EXPERT_PRODUCTION_TAG,
-                                        GoodsType.class, parent.expertProduction);
+        expertProduction = xr.getType(spec, EXPERT_PRODUCTION_TAG,
+                                      GoodsType.class, parent.expertProduction);
 
         if (parent != this) { // Handle "extends" for super-type fields
-            if (!hasAttribute(in, REQUIRED_POPULATION_TAG)) {
+            if (!xr.hasAttribute(REQUIRED_POPULATION_TAG)) {
                 setRequiredPopulation(parent.getRequiredPopulation());
             }
         }
@@ -796,15 +796,15 @@ public final class UnitType extends BuildableType
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
-        if (readShouldClearContainers(in)) {
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
+        if (xr.shouldClearContainers()) {
             consumption = null;
             defaultEquipment = null;
             typeChanges = null;
         }
 
         final Specification spec = getSpecification();
-        UnitType parent = spec.getType(in, EXTENDS_TAG, UnitType.class, this);
+        UnitType parent = xr.getType(spec, EXTENDS_TAG, UnitType.class, this);
         if (parent != this) {
             defaultEquipment = parent.defaultEquipment;
 
@@ -828,7 +828,7 @@ public final class UnitType extends BuildableType
             }
         }
 
-        super.readChildren(in);
+        super.readChildren(xr);
 
         // @compat 0.10.6
         if (hasAbility("model.ability.person")) {
@@ -852,25 +852,25 @@ public final class UnitType extends BuildableType
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
-        final String tag = in.getLocalName();
+        final String tag = xr.getLocalName();
 
         if (CONSUMES_TAG.equals(tag)) {
-            addConsumption(spec.getType(in, ID_ATTRIBUTE_TAG,
-                                        GoodsType.class, (GoodsType)null),
-                           getAttribute(in, VALUE_TAG, UNDEFINED));
-            closeTag(in, CONSUMES_TAG);
+            addConsumption(xr.getType(spec, ID_ATTRIBUTE_TAG,
+                                      GoodsType.class, (GoodsType)null),
+                           xr.getAttribute(VALUE_TAG, UNDEFINED));
+            xr.closeTag(CONSUMES_TAG);
 
         } else if (DEFAULT_EQUIPMENT_TAG.equals(tag)) {
-            defaultEquipment = spec.getType(in, ID_ATTRIBUTE_TAG,
-                                            EquipmentType.class, (EquipmentType)null);
-            closeTag(in, DEFAULT_EQUIPMENT_TAG);
+            defaultEquipment = xr.getType(spec, ID_ATTRIBUTE_TAG,
+                                          EquipmentType.class, (EquipmentType)null);
+            xr.closeTag(DEFAULT_EQUIPMENT_TAG);
 
         } else if (DOWNGRADE_TAG.equals(tag) || UPGRADE_TAG.equals(tag)) {
-            if (getAttribute(in, DELETE_TAG, false)) {
+            if (xr.getAttribute(DELETE_TAG, false)) {
                 if (typeChanges != null) {
-                    String unitId = getAttribute(in, UNIT_TAG, (String)null);
+                    String unitId = xr.getAttribute(UNIT_TAG, (String)null);
                     Iterator<UnitTypeChange> it = typeChanges.iterator();
                     while (it.hasNext()) {
                         if (unitId.equals(it.next().getNewUnitType().getId())) {
@@ -879,10 +879,10 @@ public final class UnitType extends BuildableType
                         }
                     }
                 }
-                closeTag(in, tag);
+                xr.closeTag(tag);
 
             } else {
-                UnitTypeChange change = new UnitTypeChange(in, spec);
+                UnitTypeChange change = new UnitTypeChange(xr, spec);
                 if (DOWNGRADE_TAG.equals(tag)
                     && change.getChangeTypes().isEmpty()) {
                     // add default downgrade type
@@ -892,7 +892,7 @@ public final class UnitType extends BuildableType
             }
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 

@@ -22,8 +22,8 @@ package net.sf.freecol.server.ai;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.PathNode;
@@ -69,12 +69,12 @@ public class REFAIPlayer extends EuropeanAIPlayer {
      * Creates a new <code>REFAIPlayer</code>.
      *
      * @param aiMain The main AI-object.
-     * @param in The input stream containing the XML.
+     * @param xr The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
-    public REFAIPlayer(AIMain aiMain, XMLStreamReader in)
+    public REFAIPlayer(AIMain aiMain, FreeColXMLReader xr)
         throws XMLStreamException {
-        super(aiMain, in);
+        super(aiMain, xr);
 
         uninitialized = getPlayer() == null;
     }

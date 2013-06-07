@@ -27,8 +27,9 @@ import java.util.Map;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 
 /**
@@ -90,15 +91,15 @@ public class UnitTypeChange extends FreeColObject {
     /**
      * Creates a new <code>UnitTypeChange</code> instance.
      *
-     * @param in An <code>XMLStreamReader</code> to read from.
+     * @param xr An <code>FreeColXMLReader</code> to read from.
      * @param specification The <code>Specification</code> to refer to.
      * @exception XMLStreamException if an error occurs
      */
-    public UnitTypeChange(XMLStreamReader in, Specification specification)
+    public UnitTypeChange(FreeColXMLReader xr, Specification specification)
         throws XMLStreamException {
-        setId(readId(in));
+        setId(xr.readId());
         setSpecification(specification);
-        readFromXML(in);
+        readFromXML(xr);
     }
 
 
@@ -255,21 +256,21 @@ public class UnitTypeChange extends FreeColObject {
     /**
      * {@inheritDoc}
      */
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
 
-        if (hasAttribute(in, UNIT_TAG)) {
-            newUnitType = spec.getType(in, UNIT_TAG,
-                                       UnitType.class, (UnitType)null);
+        if (xr.hasAttribute(UNIT_TAG)) {
+            newUnitType = xr.getType(spec, UNIT_TAG,
+                                     UnitType.class, (UnitType)null);
 
-            turnsToLearn = getAttribute(in, TURNS_TO_LEARN_TAG, UNDEFINED);
+            turnsToLearn = xr.getAttribute(TURNS_TO_LEARN_TAG, UNDEFINED);
             if (turnsToLearn > 0) {
                 changeTypes.put(ChangeType.EDUCATION, 100);
             }
 
             // @compat 0.9.x
             for (ChangeType type : ChangeType.values()) {
-                String value = getAttribute(in, tags.get(type), (String)null);
+                String value = xr.getAttribute(tags.get(type), (String)null);
                 if (value != null) {
                     if (value.equalsIgnoreCase("false")) {
                         changeTypes.put(type, 0);
@@ -289,24 +290,24 @@ public class UnitTypeChange extends FreeColObject {
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         scopes = null;
 
-        super.readChildren(in);
+        super.readChildren(xr);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        final String tag = in.getLocalName();
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
+        final String tag = xr.getLocalName();
 
         if (Scope.getXMLElementTagName().equals(tag)) {
-            addScope(new Scope(in));
+            addScope(new Scope(xr));
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 

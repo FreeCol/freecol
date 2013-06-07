@@ -32,8 +32,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Event;
@@ -92,7 +92,7 @@ public class ServerGame extends Game implements ServerModelObject {
      *
      * @param freeColGameObjectListener A listener that should be monitoring
      *     this <code>Game</code>.
-     * @param in The input stream containing the XML.
+     * @param xr The input stream containing the XML.
      * @param serverStrings A list of server object type,identifier
      *     pairs to create.  in this <code>Game</code>.
      * @param specification The <code>Specification</code> to use in this game.
@@ -100,7 +100,7 @@ public class ServerGame extends Game implements ServerModelObject {
      * @see net.sf.freecol.server.FreeColServer#loadGame
      */
     public ServerGame(FreeColGameObjectListener freeColGameObjectListener,
-                      XMLStreamReader in, List<String> serverStrings,
+                      FreeColXMLReader xr, List<String> serverStrings,
                       Specification specification)
         throws XMLStreamException {
         this(specification);
@@ -128,7 +128,7 @@ public class ServerGame extends Game implements ServerModelObject {
             }
         }
 
-        readFromXML(in);
+        readFromXML(xr);
     }
 
     /**

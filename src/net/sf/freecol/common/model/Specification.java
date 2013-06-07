@@ -34,11 +34,11 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColTcFile;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.option.AbstractOption;
@@ -51,7 +51,6 @@ import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.RangeOption;
 import net.sf.freecol.common.option.StringOption;
 import net.sf.freecol.common.option.UnitListOption;
-import net.sf.freecol.common.util.XMLStream;
 
 
 /**
@@ -304,26 +303,26 @@ public final class Specification {
 
     /**
      * Creates a new Specification object by loading it from the
-     * given <code>XMLStreamReader</code>.
+     * given <code>FreeColXMLReader</code>.
      *
-     * @param xsr The <code>XMLStreamReader</code> to read from.
+     * @param xr The <code>FreeColXMLReader</code> to read from.
      */
-    public Specification(XMLStreamReader xsr) {
+    public Specification(FreeColXMLReader xr) {
         this();
         initialized = false;
-        load(xsr);
-        clean("load from XMLStream");
+        load(xr);
+        clean("load from stream");
         initialized = true;
     }
 
     /**
      * Load a specification from a stream.
      *
-     * @param xsr The <code>XMLStreamReader</code> to read from.
+     * @param xr The <code>FreeColXMLReader</code> to read from.
      */
-    private void load(XMLStreamReader xsr) {
+    private void load(FreeColXMLReader xr) {
         try {
-            readFromXML(xsr);
+            readFromXML(xr);
         } catch (Exception e) {
             logger.log(Level.WARNING, "Load exception", e);
             throw new RuntimeException("Error parsing specification: "
@@ -351,11 +350,11 @@ public final class Specification {
      * @param in The <code>InputStream</code> to read from.
      */
     private void load(InputStream in) {
-        XMLStream xr = null;
+        FreeColXMLReader xr = null;
         try {
-            xr = new XMLStream(in);
+            xr = new FreeColXMLReader(in);
             xr.nextTag();
-            load(xr.getXMLStreamReader());
+            load(xr);
         } catch (Exception e) {
             logger.log(Level.WARNING, "Load stream exception", e);
             throw new RuntimeException("Error parsing specification: "
@@ -583,14 +582,14 @@ public final class Specification {
 
 
     private interface ChildReader {
-        public void readChildren(XMLStreamReader xsr) throws XMLStreamException;
+        public void readChildren(FreeColXMLReader xr) throws XMLStreamException;
     }
 
     private class ModifierReader implements ChildReader {
 
-        public void readChildren(XMLStreamReader xsr) throws XMLStreamException {
-            while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                Modifier modifier = new Modifier(xsr, Specification.this);
+        public void readChildren(FreeColXMLReader xr) throws XMLStreamException {
+            while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                Modifier modifier = new Modifier(xr, Specification.this);
                 Specification.this.addModifier(modifier);
                 Specification.this.specialModifiers.add(modifier);
             }
@@ -609,10 +608,10 @@ public final class Specification {
             this.type = type;
         }
 
-        public void readChildren(XMLStreamReader xsr) throws XMLStreamException {
-            while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                final String tag = xsr.getLocalName();
-                String id = FreeColObject.readId(xsr);
+        public void readChildren(FreeColXMLReader xr) throws XMLStreamException {
+            while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                final String tag = xr.getLocalName();
+                String id = xr.readId();
                 if (id == null) {
                     logger.warning("Null identifier, tag: " + tag);
 
@@ -632,10 +631,11 @@ public final class Specification {
                     // extensions to not have to re-specify all the
                     // attributes when just changing the children.
                     if (object.getId() != null
-                        && xsr.getAttributeValue(null, FreeColGameObjectType.PRESERVE_TAG) != null) {
-                        object.readChildren(xsr);
+                        && xr.getAttribute(FreeColGameObjectType.PRESERVE_TAG,
+                                           (String)null) != null) {
+                        object.readChildren(xr);
                     } else {
-                        object.readFromXML(xsr);
+                        object.readFromXML(xr);
                     }
                     if (!object.isAbstractType() && !result.contains(object)) {
                         result.add(object);
@@ -656,32 +656,31 @@ public final class Specification {
 
         private static final String RECURSIVE_TAG = "recursive";
 
-        public void readChildren(XMLStreamReader xsr) throws XMLStreamException {
-            while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                readChild(xsr);
+        public void readChildren(FreeColXMLReader xr) throws XMLStreamException {
+            while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                readChild(xr);
             }
         }
 
-        private void readChild(XMLStreamReader xsr) throws XMLStreamException {
-            final String tag = xsr.getLocalName();
+        private void readChild(FreeColXMLReader xr) throws XMLStreamException {
+            final String tag = xr.getLocalName();
 
-            String str = xsr.getAttributeValue(null, RECURSIVE_TAG);
-            boolean recursive = str == null || Boolean.parseBoolean(str);
+            boolean recursive = xr.getAttribute(RECURSIVE_TAG, true);
 
             if (OptionGroup.getXMLElementTagName().equals(tag)) {
-                String id = FreeColObject.readId(xsr);
+                String id = xr.readId();
                 OptionGroup group = allOptionGroups.get(id);
                 if (group == null) {
                     group = new OptionGroup(id, Specification.this);
                     allOptionGroups.put(id, group);
                 }
-                group.readFromXML(xsr);
+                group.readFromXML(xr);
                 Specification.this.addOptionGroup(group, recursive);
 
             } else {
                 logger.warning(OptionGroup.getXMLElementTagName()
                     + " expected in OptionReader, not: " + tag);
-                xsr.nextTag();
+                xr.nextTag();
             }
         }
     }
@@ -1546,29 +1545,6 @@ public final class Specification {
         return result;
     }
 
-    /**
-     * Get the FreeColGameObjectType by identifier from a stream.
-     *
-     * @param in The <code>XMLStreamReader</code> to read from.
-     * @param attributeName the name of the attribute identifying the
-     *     <code>FreeColGameObjectType</code>.
-     * @param returnClass The expected class of the return value.
-     * @param defaultValue A default value to return if the attributeName 
-     *     attribute is not present.
-     * @return The <code>FreeColGameObjectType</code> found, or the
-     *     <code>defaultValue</code>.
-     */
-    public <T extends FreeColGameObjectType> T getType(XMLStreamReader in,
-        String attributeName, Class<T> returnClass, T defaultValue) {
-        final String attrib =
-        // @compat 0.10.7
-            (FreeColObject.ID_ATTRIBUTE_TAG.equals(attributeName))
-            ? FreeColObject.readId(in) :
-        // end @compat
-            in.getAttributeValue(null, attributeName);
-        return (attrib == null) ? defaultValue : getType(attrib, returnClass);
-    }
-
 
     // Serialization
 
@@ -1653,20 +1629,21 @@ public final class Specification {
     /**
      * Initializes this object from its XML-representation.
      *
-     * @param xsr The input stream with the XML.
+     * @param xr The <code>FreeColXMLReader</code> to read from.
      * @exception XMLStreamException if there are any problems reading
      *     the stream.
      */
-    public void readFromXML(XMLStreamReader xsr) throws XMLStreamException {
-        String newId = FreeColObject.readId(xsr);
+    public void readFromXML(FreeColXMLReader xr) throws XMLStreamException {
+        String newId = xr.readId();
         if (difficultyLevel == null) {
-            difficultyLevel = xsr.getAttributeValue(null, DIFFICULTY_LEVEL_TAG);
+            difficultyLevel = xr.getAttributeValue(null, DIFFICULTY_LEVEL_TAG);
         }
         logger.fine("Difficulty level is " + difficultyLevel);
         if (id == null) id = newId; // don't overwrite id with parent id!
 
         logger.fine("Reading specification " + newId);
-        String parentId = xsr.getAttributeValue(null, FreeColGameObjectType.EXTENDS_TAG);
+        String parentId = xr.getAttribute(FreeColGameObjectType.EXTENDS_TAG,
+                                          (String)null);
         if (parentId != null) {
             try {
                 FreeColTcFile parent = new FreeColTcFile(parentId);
@@ -1676,17 +1653,17 @@ public final class Specification {
                 throw new XMLStreamException("Failed to open parent specification: " + e);
             }
         }
-        while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            String childName = xsr.getLocalName();
+        while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            String childName = xr.getLocalName();
             logger.finest("Found child named " + childName);
             ChildReader reader = readerMap.get(childName);
             if (reader == null) {
                 // @compat 0.9.x
                 if ("improvementaction-types".equals(childName)) {
-                    while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                    while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                         // skip children
-                        while ("action".equals(xsr.getLocalName())) {
-                            xsr.nextTag();
+                        while ("action".equals(xr.getLocalName())) {
+                            xr.nextTag();
                         }
                     }
                 // end @compat
@@ -1694,7 +1671,7 @@ public final class Specification {
                     throw new RuntimeException("unexpected: " + childName);
                 }
             } else {
-                reader.readChildren(xsr);
+                reader.readChildren(xr);
             }
         }
 

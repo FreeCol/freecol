@@ -24,9 +24,9 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Specification;
 
 
@@ -133,36 +133,36 @@ public class SelectOption extends IntegerOption {
     /**
      * {@inheritDoc}
      */
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        localizedLabels = getAttribute(in, LOCALIZED_LABELS_TAG, true);
+        localizedLabels = xr.getAttribute(LOCALIZED_LABELS_TAG, true);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         itemValues.clear(); // Clear containers
 
-        super.readChildren(in);
+        super.readChildren(xr);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        final String tag = in.getLocalName();
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
+        final String tag = xr.getLocalName();
 
         if (getXMLItemElementTagName().equals(tag)) {
-            itemValues.put(getAttribute(in, VALUE_TAG, INFINITY),
-                           getAttribute(in, LABEL_TAG, (String)null));
-            closeTag(in, tag);
+            itemValues.put(xr.getAttribute(VALUE_TAG, INFINITY),
+                           xr.getAttribute(LABEL_TAG, (String)null));
+            xr.closeTag(tag);
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 

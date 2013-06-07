@@ -23,8 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 
 /**
@@ -492,53 +493,53 @@ public final class GoodsType extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
 
-        super.readAttributes(in);
+        super.readAttributes(xr);
 
-        isFarmed = getAttribute(in, IS_FARMED_TAG, false);
+        isFarmed = xr.getAttribute(IS_FARMED_TAG, false);
 
-        isFood = getAttribute(in, IS_FOOD_TAG, false);
+        isFood = xr.getAttribute(IS_FOOD_TAG, false);
 
-        ignoreLimit = getAttribute(in, IGNORE_LIMIT_TAG, false);
+        ignoreLimit = xr.getAttribute(IGNORE_LIMIT_TAG, false);
 
-        newWorldGoods = getAttribute(in, NEW_WORLD_GOODS_TAG, false);
+        newWorldGoods = xr.getAttribute(NEW_WORLD_GOODS_TAG, false);
 
-        tradeGoods = getAttribute(in, TRADE_GOODS_TAG, false);
+        tradeGoods = xr.getAttribute(TRADE_GOODS_TAG, false);
 
-        breedingNumber = getAttribute(in, BREEDING_NUMBER_TAG, INFINITY);
+        breedingNumber = xr.getAttribute(BREEDING_NUMBER_TAG, INFINITY);
 
-        price = getAttribute(in, PRICE_TAG, INFINITY);
+        price = xr.getAttribute(PRICE_TAG, INFINITY);
 
-        madeFrom = spec.getType(in, MADE_FROM_TAG, GoodsType.class,
-                                (GoodsType)null);
+        madeFrom = xr.getType(spec, MADE_FROM_TAG, GoodsType.class,
+                              (GoodsType)null);
         if (madeFrom != null) madeFrom.makes = this;
 
-        storable = getAttribute(in, STORABLE_TAG, true);
+        storable = xr.getAttribute(STORABLE_TAG, true);
 
-        storedAs = spec.getType(in, STORED_AS_TAG, GoodsType.class,
-                                (GoodsType)null);
+        storedAs = xr.getType(spec, STORED_AS_TAG, GoodsType.class,
+                              (GoodsType)null);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        final String tag = in.getLocalName();
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
+        final String tag = xr.getLocalName();
 
         if (MARKET_TAG.equals(tag)) {
-            initialAmount = getAttribute(in, INITIAL_AMOUNT_TAG, 0);
+            initialAmount = xr.getAttribute(INITIAL_AMOUNT_TAG, 0);
 
-            initialPrice = getAttribute(in, INITIAL_PRICE_TAG, 1);
+            initialPrice = xr.getAttribute(INITIAL_PRICE_TAG, 1);
 
-            priceDiff = getAttribute(in, PRICE_DIFFERENCE_TAG, 1);
+            priceDiff = xr.getAttribute(PRICE_DIFFERENCE_TAG, 1);
 
-            closeTag(in, MARKET_TAG);
+            xr.closeTag(MARKET_TAG);
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 

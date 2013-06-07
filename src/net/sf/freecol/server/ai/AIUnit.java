@@ -25,9 +25,9 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.EquipmentType;
@@ -149,12 +149,12 @@ public class AIUnit extends AIObject implements Transportable {
      * XML-representation.
      *
      * @param aiMain The main AI-object.
-     * @param in The input stream containing the XML.
+     * @param xr The input stream containing the XML.
      * @exception XMLStreamException if a problem was encountered
      *     during parsing.
      */
-    public AIUnit(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
-        super(aiMain, in);
+    public AIUnit(AIMain aiMain, FreeColXMLReader xr) throws XMLStreamException {
+        super(aiMain, xr);
 
         uninitialized = getUnit() == null;
     }
@@ -699,23 +699,23 @@ public class AIUnit extends AIObject implements Transportable {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
         final AIMain aiMain = getAIMain();
 
-        unit = getAttribute(in, ID_ATTRIBUTE_TAG, aiMain.getGame(),
-                            Unit.class, (Unit)null);
+        unit = xr.getAttribute(aiMain.getGame(), ID_ATTRIBUTE_TAG,
+                               Unit.class, (Unit)null);
         if (unit == null) {
-            throw new IllegalStateException("Not a Unit: " + currentTag(in));
+            throw new IllegalStateException("Not a Unit: " + xr.currentTag());
         }
         
-        if (hasAttribute(in, TRANSPORT_TAG)) {
-            transport = getAttribute(in, TRANSPORT_TAG,
+        if (xr.hasAttribute(TRANSPORT_TAG)) {
+            transport = getAttribute(xr, TRANSPORT_TAG,
                                      AIUnit.class, (AIUnit)null);
             if (transport == null) {
                 transport = new AIUnit(aiMain,
-                    getAttribute(in, TRANSPORT_TAG, (String)null));
+                    xr.getAttribute(TRANSPORT_TAG, (String)null));
             }
         }
     }
@@ -724,8 +724,8 @@ public class AIUnit extends AIObject implements Transportable {
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
-        super.readChildren(in);
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
+        super.readChildren(xr);
 
         if (getUnit() != null) uninitialized = false;
     }
@@ -734,69 +734,69 @@ public class AIUnit extends AIObject implements Transportable {
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final AIMain aiMain = getAIMain();
-        final String tag = in.getLocalName();
+        final String tag = xr.getLocalName();
 
         mission = null;
         if (BuildColonyMission.getXMLElementTagName().equals(tag)) {
-            mission = new BuildColonyMission(aiMain, this, in);
+            mission = new BuildColonyMission(aiMain, this, xr);
 
         } else if (CashInTreasureTrainMission.getXMLElementTagName().equals(tag)) {
-            mission = new CashInTreasureTrainMission(aiMain, this, in);
+            mission = new CashInTreasureTrainMission(aiMain, this, xr);
 
         } else if (DefendSettlementMission.getXMLElementTagName().equals(tag)) {
-            mission = new DefendSettlementMission(aiMain, this, in);
+            mission = new DefendSettlementMission(aiMain, this, xr);
 
         } else if (IdleAtSettlementMission.getXMLElementTagName().equals(tag)
             // @compat 0.10.5
             || IDLE_AT_COLONY_MISSION_TAG.equals(tag)
             // end @compat
                    ) {
-            mission = new IdleAtSettlementMission(aiMain, this, in);
+            mission = new IdleAtSettlementMission(aiMain, this, xr);
 
         } else if (IndianBringGiftMission.getXMLElementTagName().equals(tag)) {
-            mission = new IndianBringGiftMission(aiMain, this, in);
+            mission = new IndianBringGiftMission(aiMain, this, xr);
 
         } else if (IndianDemandMission.getXMLElementTagName().equals(tag)) {
-            mission = new IndianDemandMission(aiMain, this, in);
+            mission = new IndianDemandMission(aiMain, this, xr);
 
         } else if (MissionaryMission.getXMLElementTagName().equals(tag)) {
-            mission = new MissionaryMission(aiMain, this, in);
+            mission = new MissionaryMission(aiMain, this, xr);
 
         } else if (PioneeringMission.getXMLElementTagName().equals(tag)
             // @compat 0.10.3
             || TILE_IMPROVEMENT_PLAN_MISSION_TAG.equals(tag)
             // end @compat
                    ) {
-            mission = new PioneeringMission(aiMain, this, in);
+            mission = new PioneeringMission(aiMain, this, xr);
 
         } else if (PrivateerMission.getXMLElementTagName().equals(tag)) {
-            mission = new PrivateerMission(aiMain, this, in);
+            mission = new PrivateerMission(aiMain, this, xr);
 
         } else if (ScoutingMission.getXMLElementTagName().equals(tag)) {
-            mission = new ScoutingMission(aiMain, this, in);
+            mission = new ScoutingMission(aiMain, this, xr);
 
         } else if (TransportMission.getXMLElementTagName().equals(tag)) {
-            mission = new TransportMission(aiMain, this, in);
+            mission = new TransportMission(aiMain, this, xr);
 
         } else if (UnitSeekAndDestroyMission.getXMLElementTagName().equals(tag)) {
-            mission = new UnitSeekAndDestroyMission(aiMain, this, in);
+            mission = new UnitSeekAndDestroyMission(aiMain, this, xr);
 
         } else if (UnitWanderHostileMission.getXMLElementTagName().equals(tag)) {
-            mission = new UnitWanderHostileMission(aiMain, this, in);
+            mission = new UnitWanderHostileMission(aiMain, this, xr);
 
         } else if (UnitWanderMission.getXMLElementTagName().equals(tag)) {
-            mission = new UnitWanderMission(aiMain, this, in);
+            mission = new UnitWanderMission(aiMain, this, xr);
 
         } else if (WishRealizationMission.getXMLElementTagName().equals(tag)) {
-            mission = new WishRealizationMission(aiMain, this, in);
+            mission = new WishRealizationMission(aiMain, this, xr);
 
         } else if (WorkInsideColonyMission.getXMLElementTagName().equals(tag)) {
-            mission = new WorkInsideColonyMission(aiMain, this, in);
+            mission = new WorkInsideColonyMission(aiMain, this, xr);
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 

@@ -25,9 +25,9 @@ import java.util.Locale;
 import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Unit.Role;
 
 
@@ -272,29 +272,29 @@ public class EquipmentType extends BuildableType {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        maximumCount = getAttribute(in, MAXIMUM_COUNT_TAG, 1);
+        maximumCount = xr.getAttribute(MAXIMUM_COUNT_TAG, 1);
 
-        combatLossPriority = getAttribute(in, COMBAT_LOSS_PRIORITY_TAG, -1);
+        combatLossPriority = xr.getAttribute(COMBAT_LOSS_PRIORITY_TAG, -1);
 
-        role = getAttribute(in, ROLE_TAG, Role.class, Role.DEFAULT);
+        role = xr.getAttribute(ROLE_TAG, Role.class, Role.DEFAULT);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
-        if (readShouldClearContainers(in)) {
+        if (xr.shouldClearContainers()) {
             captureEquipmentId = null;
             captureEquipmentByIndians = false;
             compatibleEquipment = null;
         }
 
-        super.readChildren(in);
+        super.readChildren(xr);
 
         for (Modifier modifier : getModifiers()) {
             if (modifier.getId().equals(Modifier.OFFENCE)
@@ -312,31 +312,31 @@ public class EquipmentType extends BuildableType {
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
-        final String tag = in.getLocalName();
+        final String tag = xr.getLocalName();
 
         if (CAPTURE_EQUIPMENT_TAG.equals(tag)) {
-            captureEquipmentId = readId(in);
-            captureEquipmentByIndians = getAttribute(in, BY_INDIANS_TAG, false);
-            closeTag(in, CAPTURE_EQUIPMENT_TAG);
+            captureEquipmentId = xr.readId();
+            captureEquipmentByIndians = xr.getAttribute(BY_INDIANS_TAG, false);
+            xr.closeTag(CAPTURE_EQUIPMENT_TAG);
 
         } else if (COMPATIBLE_EQUIPMENT_TAG.equals(tag)) {
-            addCompatibleEquipment(readId(in));
-            closeTag(in, COMPATIBLE_EQUIPMENT_TAG);
+            addCompatibleEquipment(xr.readId());
+            xr.closeTag(COMPATIBLE_EQUIPMENT_TAG);
 
         // @compat 0.10.0
         } else if (REQUIRED_LOCATION_ABILITY_TAG.equals(tag)) {
-            String abilityId = readId(in);
+            String abilityId = xr.readId();
             Map<String, Boolean> required = getRequiredAbilities();
-            required.put(abilityId, getAttribute(in, VALUE_TAG, true));
+            required.put(abilityId, xr.getAttribute(VALUE_TAG, true));
             setRequiredAbilities(required);
             spec.addAbility(abilityId);
-            closeTag(in, REQUIRED_LOCATION_ABILITY_TAG);
+            xr.closeTag(REQUIRED_LOCATION_ABILITY_TAG);
         // end @compat
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 

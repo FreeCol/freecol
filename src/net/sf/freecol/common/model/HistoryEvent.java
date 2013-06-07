@@ -20,8 +20,9 @@
 package net.sf.freecol.common.model;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 import org.w3c.dom.Element;
 
@@ -74,11 +75,11 @@ public class HistoryEvent extends StringTemplate {
     /**
      * Create a new history event by reading a stream.
      *
-     * @param in The <code>XMLStreamReader</code> to read from.
+     * @param xr The <code>FreeColXMLReader</code> to read from.
      * @exception XMLStreamException if there is a problem reading the stream.
      */
-    public HistoryEvent(XMLStreamReader in) throws XMLStreamException {
-        readFromXML(in);
+    public HistoryEvent(FreeColXMLReader xr) throws XMLStreamException {
+        readFromXML(xr);
     }
 
     /**
@@ -168,16 +169,16 @@ public class HistoryEvent extends StringTemplate {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        turn = new Turn(getAttribute(in, "turn", 0));
+        turn = new Turn(xr.getAttribute("turn", 0));
 
-        eventType = getAttribute(in, EVENT_TYPE_TAG,
+        eventType = xr.getAttribute(EVENT_TYPE_TAG,
                                  EventType.class, (EventType)null);
         // @compat 0.9.x
         if (eventType == null) {
-            eventType = getAttribute(in, TYPE_TAG,
+            eventType = xr.getAttribute(TYPE_TAG,
                                      EventType.class, (EventType)null);
             if ("".equals(getId())) {
                 setId("model.history." + eventType.toString());

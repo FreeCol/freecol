@@ -20,9 +20,9 @@
 package net.sf.freecol.common.model.mission;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.TileImprovement;
@@ -57,11 +57,11 @@ public class ImprovementMission extends AbstractMission {
      * Creates a new <code>ImprovementMission</code> instance.
      *
      * @param game a <code>Game</code> value
-     * @param in a <code>XMLStreamReader</code> value
+     * @param xr a <code>FreeColXMLReader</code> value
      * @exception XMLStreamException if an error occurs
      */
-    public ImprovementMission(Game game, XMLStreamReader in) throws XMLStreamException {
-        super(game, in);
+    public ImprovementMission(Game game, FreeColXMLReader xr) throws XMLStreamException {
+        super(game, xr);
     }
 
     /**
@@ -159,12 +159,11 @@ public class ImprovementMission extends AbstractMission {
     /**
      * {@inheritDoc}
      */
-    protected void readAttributes(XMLStreamReader in)
-        throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        improvement = makeFreeColGameObject(in, "improvement",
-                                            TileImprovement.class, true);
+        improvement = xr.makeFreeColGameObject(getGame(), "improvement",
+                                               TileImprovement.class, true);
     }
 
     /**

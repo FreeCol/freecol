@@ -25,8 +25,9 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 
 /**
@@ -251,17 +252,17 @@ public class Resource extends TileItem {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
 
-        super.readAttributes(in);
+        super.readAttributes(xr);
 
-        tile = makeFreeColGameObject(in, TILE_TAG, Tile.class, true);
+        tile = xr.makeFreeColGameObject(getGame(), TILE_TAG, Tile.class, true);
 
-        type = spec.getType(in, TYPE_TAG,
-                            ResourceType.class, (ResourceType)null);
+        type = xr.getType(spec, TYPE_TAG,
+                          ResourceType.class, (ResourceType)null);
 
-        quantity = getAttribute(in, QUANTITY_TAG, 0);
+        quantity = xr.getAttribute(QUANTITY_TAG, 0);
     }
 
     /**

@@ -20,9 +20,9 @@
 package net.sf.freecol.common.model;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Operand.OperandType;
 
 
@@ -63,14 +63,14 @@ public final class Limit extends FreeColGameObjectType {
     /**
      * Create a new limit.
      *
-     * @param in The <code>XMLStreamReader</code> to read from.
+     * @param xr The <code>FreeColXMLReader</code> to read from.
      * @param specification The <code>Specification</code> to refer to.
      * @exception XMLStreamException if there is a problem reading.
      */
-    public Limit(XMLStreamReader in, Specification specification) throws XMLStreamException {
+    public Limit(FreeColXMLReader xr, Specification specification) throws XMLStreamException {
         super(specification);
 
-        readFromXML(in);
+        readFromXML(xr);
     }
 
     /**
@@ -331,10 +331,10 @@ public final class Limit extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        operator = getAttribute(in, OPERATOR_TAG,
+        operator = xr.getAttribute(OPERATOR_TAG,
                                 Operator.class, (Operator)null);
     }
 
@@ -342,17 +342,17 @@ public final class Limit extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        final String tag = in.getLocalName();
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
+        final String tag = xr.getLocalName();
 
         if (LEFT_HAND_SIDE_TAG.equals(tag)) {
-            leftHandSide = new Operand(in);
+            leftHandSide = new Operand(xr);
 
         } else if (RIGHT_HAND_SIDE_TAG.equals(tag)) {
-            rightHandSide = new Operand(in);
+            rightHandSide = new Operand(xr);
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 

@@ -28,9 +28,9 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.StringOption;
 import net.sf.freecol.common.util.RandomChoice;
@@ -561,77 +561,77 @@ public final class TileType extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        basicMoveCost = getAttribute(in, BASIC_MOVE_COST_TAG, 1);
+        basicMoveCost = xr.getAttribute(BASIC_MOVE_COST_TAG, 1);
 
-        basicWorkTurns = getAttribute(in, BASIC_WORK_TURNS_TAG, 1);
+        basicWorkTurns = xr.getAttribute(BASIC_WORK_TURNS_TAG, 1);
 
-        forest = getAttribute(in, IS_FOREST_TAG, false);
+        forest = xr.getAttribute(IS_FOREST_TAG, false);
 
-        water = getAttribute(in, IS_WATER_TAG, false);
+        water = xr.getAttribute(IS_WATER_TAG, false);
 
-        elevation = getAttribute(in, IS_ELEVATION_TAG, false);
+        elevation = xr.getAttribute(IS_ELEVATION_TAG, false);
 
-        canSettle = getAttribute(in, CAN_SETTLE_TAG, !water);
+        canSettle = xr.getAttribute(CAN_SETTLE_TAG, !water);
 
-        connected = getAttribute(in, IS_CONNECTED_TAG, false);
+        connected = xr.getAttribute(IS_CONNECTED_TAG, false);
 
-        productionLevel = getAttribute(in, PRODUCTION_LEVEL_TAG, (String)null);
+        productionLevel = xr.getAttribute(PRODUCTION_LEVEL_TAG, (String)null);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
-        if (readShouldClearContainers(in)) {
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
+        if (xr.shouldClearContainers()) {
             disasters = null;
             resourceTypes = null;
             productionTypes = null;
         }
 
-        super.readChildren(in);
+        super.readChildren(xr);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
-        final String tag = in.getLocalName();
+        final String tag = xr.getLocalName();
 
         if (DISASTER_TAG.equals(tag)) {
-            addDisaster(spec.getType(in, ID_ATTRIBUTE_TAG,
-                                     Disaster.class, (Disaster)null),
-                        getAttribute(in, PROBABILITY_TAG, 100));
-            closeTag(in, DISASTER_TAG);
+            addDisaster(xr.getType(spec, ID_ATTRIBUTE_TAG,
+                                   Disaster.class, (Disaster)null),
+                        xr.getAttribute(PROBABILITY_TAG, 100));
+            xr.closeTag(DISASTER_TAG);
 
         } else if (GEN_TAG.equals(tag)) {
-            humidity[0] = getAttribute(in, HUMIDITY_MIN_TAG, 0);
-            humidity[1] = getAttribute(in, HUMIDITY_MAX_TAG, 100);
-            temperature[0] = getAttribute(in, TEMPERATURE_MIN_TAG, -20);
-            temperature[1] = getAttribute(in, TEMPERATURE_MAX_TAG, 40);
-            altitude[0] = getAttribute(in, ALTITUDE_MIN_TAG, 0);
-            altitude[1] = getAttribute(in, ALTITUDE_MAX_TAG, 0);
-            closeTag(in, GEN_TAG);
+            humidity[0] = xr.getAttribute(HUMIDITY_MIN_TAG, 0);
+            humidity[1] = xr.getAttribute(HUMIDITY_MAX_TAG, 100);
+            temperature[0] = xr.getAttribute(TEMPERATURE_MIN_TAG, -20);
+            temperature[1] = xr.getAttribute(TEMPERATURE_MAX_TAG, 40);
+            altitude[0] = xr.getAttribute(ALTITUDE_MIN_TAG, 0);
+            altitude[1] = xr.getAttribute(ALTITUDE_MAX_TAG, 0);
+            xr.closeTag(GEN_TAG);
 
         } else if (PRODUCTION_TAG.equals(tag)
-            && getAttribute(in, GOODS_TYPE_TAG, (String)null) == null) {
+            && xr.getAttribute(GOODS_TYPE_TAG, (String)null) == null) {
             // new production style
-            addProductionType(new ProductionType(in, spec));
+            addProductionType(new ProductionType(xr, spec));
 
         } else if (PRODUCTION_TAG.equals(tag)
             || PRIMARY_PRODUCTION_TAG.equals(tag)
             || SECONDARY_PRODUCTION_TAG.equals(tag)) {
             // @compat 0.10.6
-            GoodsType type = spec.getType(in, GOODS_TYPE_TAG,
-                                          GoodsType.class, (GoodsType)null);
-            int amount = getAttribute(in, VALUE_TAG, 0);
+            GoodsType type = xr.getType(spec, GOODS_TYPE_TAG,
+                                        GoodsType.class, (GoodsType)null);
+            int amount = xr.getAttribute(VALUE_TAG, 0);
             AbstractGoods goods = new AbstractGoods(type, amount);
-            String tileProduction = getAttribute(in, TILE_PRODUCTION_TAG,
+            String tileProduction = xr.getAttribute(TILE_PRODUCTION_TAG,
                                                  (String)null);
             // CAUTION: this only works if the primary production is
             // defined before the secondary production
@@ -649,17 +649,17 @@ public final class TileType extends FreeColGameObjectType {
                 addProductionType(new ProductionType(goods, false,
                                                      tileProduction));
             }
-            closeTag(in, tag);
+            xr.closeTag(tag);
             // end @compat
 
         } else if (RESOURCE_TAG.equals(tag)) {
-            addResourceType(spec.getType(in, TYPE_TAG, ResourceType.class,
-                                         (ResourceType)null),
-                            getAttribute(in, PROBABILITY_TAG, 100));
-            closeTag(in, RESOURCE_TAG);
+            addResourceType(xr.getType(spec, TYPE_TAG, ResourceType.class,
+                                       (ResourceType)null),
+                            xr.getAttribute(PROBABILITY_TAG, 100));
+            xr.closeTag(RESOURCE_TAG);
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 

@@ -20,8 +20,9 @@
 package net.sf.freecol.common.model;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 import org.w3c.dom.Element;
 
@@ -137,13 +138,13 @@ public class Modifier extends Feature implements Comparable<Modifier> {
     /**
      * Creates a new <code>Modifier</code> instance.
      *
-     * @param in The <code>XMLStreamReader</code> to read from.
+     * @param xr The <code>FreeColXMLReader</code> to read from.
      * @param specification The <code>Specification</code> to refer to.
      * @exception XMLStreamException if there is an error reading the stream.
      */
-    public Modifier(XMLStreamReader in, Specification specification) throws XMLStreamException {
+    public Modifier(FreeColXMLReader xr, Specification specification) throws XMLStreamException {
         setSpecification(specification);
-        readFromXML(in);
+        readFromXML(xr);
     }
 
     /**
@@ -481,21 +482,21 @@ public class Modifier extends Feature implements Comparable<Modifier> {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        type = getAttribute(in, TYPE_TAG, Type.class, (Type)null);
+        type = xr.getAttribute(TYPE_TAG, Type.class, (Type)null);
 
-        value = getAttribute(in, VALUE_TAG, UNKNOWN);
+        value = xr.getAttribute(VALUE_TAG, UNKNOWN);
 
-        if (hasAttribute(in, INCREMENT_TYPE_TAG)) {
-            incrementType = getAttribute(in, INCREMENT_TYPE_TAG,
+        if (xr.hasAttribute(INCREMENT_TYPE_TAG)) {
+            incrementType = xr.getAttribute(INCREMENT_TYPE_TAG,
                                          Type.class, (Type)null);
 
-            increment = getAttribute(in, INCREMENT_TAG, UNKNOWN);
+            increment = xr.getAttribute(INCREMENT_TAG, UNKNOWN);
         }
 
-        index = getAttribute(in, INDEX_TAG, -1);
+        index = xr.getAttribute(INDEX_TAG, -1);
     }
 
     /**

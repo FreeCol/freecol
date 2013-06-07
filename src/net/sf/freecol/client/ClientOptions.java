@@ -33,6 +33,7 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColModFile;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.Mods;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
@@ -48,9 +49,7 @@ import net.sf.freecol.common.option.ListOption;
 import net.sf.freecol.common.option.ModListOption;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.SelectOption;
-import net.sf.freecol.common.util.XMLStream;
 
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
 
 
@@ -573,11 +572,11 @@ public class ClientOptions extends OptionGroup {
      */
     public void loadOptions(InputStream in) {
         if (in == null) return;
-        XMLStream xr = null;
+        FreeColXMLReader xr = null;
         try {
-            xr = new XMLStream(in);
+            xr = new FreeColXMLReader(in);
             xr.nextTag();
-            readFromXML(xr.getXMLStreamReader());
+            readFromXML(xr);
         } catch (Exception e) {
             logger.log(Level.WARNING, "Exception when loading options.", e);
         } finally {
@@ -605,11 +604,11 @@ public class ClientOptions extends OptionGroup {
      * @param in The <code>InputStream</code> to read the options from.
      */
     public void updateOptions(InputStream in) {
-        XMLStream xr = null;
+        FreeColXMLReader xr = null;
         try {
-            xr = new XMLStream(in);
+            xr = new FreeColXMLReader(in);
             xr.nextTag();
-            readFromXML(xr.getXMLStreamReader());
+            readFromXML(xr);
         } catch (Exception e) {
             logger.log(Level.WARNING, "Exception when loading options.", e);
         } finally {
@@ -625,12 +624,12 @@ public class ClientOptions extends OptionGroup {
     public static String getLanguageOption() {
         File options = FreeColDirectories.getClientOptionsFile();
         if (options.canRead()) {
-            XMLStream xr = null;
+            FreeColXMLReader xr = null;
             try {
-                xr = new XMLStream(new FileInputStream(options));
+                xr = new FreeColXMLReader(new FileInputStream(options));
                 xr.nextTag();
-                for (int type = xr.getTagType();
-                     type != XMLEvent.END_DOCUMENT; type = xr.getTagType()) {
+                for (int type = xr.getEventType();
+                     type != XMLEvent.END_DOCUMENT; type = xr.getEventType()) {
                     if (type == XMLEvent.START_ELEMENT
                         && LANGUAGE.equals(xr.readId())) {
                         return xr.getAttribute("value", (String)null);

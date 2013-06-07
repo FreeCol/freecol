@@ -25,8 +25,9 @@ import java.util.List;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 
 /**
@@ -103,11 +104,11 @@ public class StringTemplate extends FreeColObject {
     /**
      * Create a new <code>StringTemplate</code> by reading a stream.
      *
-     * @param in The <code>XMLStreamReader</code> to read.
+     * @param xr The <code>FreeColXMLReader</code> to read.
      * @exception XMLStreamException if there is a problem reading the stream.
      */
-    public StringTemplate(XMLStreamReader in) throws XMLStreamException {
-        readFromXML(in);
+    public StringTemplate(FreeColXMLReader xr) throws XMLStreamException {
+        readFromXML(xr);
     }
 
 
@@ -508,54 +509,54 @@ public class StringTemplate extends FreeColObject {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        templateType = getAttribute(in, TEMPLATE_TYPE_TAG,
+        templateType = xr.getAttribute(TEMPLATE_TYPE_TAG,
                                     TemplateType.class, TemplateType.TEMPLATE);
 
-        defaultId = getAttribute(in, DEFAULT_ID_TAG, (String)null);
+        defaultId = xr.getAttribute(DEFAULT_ID_TAG, (String)null);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers
         if (keys != null) keys.clear();
         if (replacements != null) replacements.clear();
 
-        super.readChildren(in);
+        super.readChildren(xr);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        final String tag = in.getLocalName();
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
+        final String tag = xr.getLocalName();
 
         if (KEY_TAG.equals(tag)) {
-            addKey(getAttribute(in, VALUE_TAG, (String)null));
-            closeTag(in, KEY_TAG);
+            addKey(xr.getAttribute(VALUE_TAG, (String)null));
+            xr.closeTag(KEY_TAG);
 
         } else if (getXMLElementTagName().equals(tag)) {
-            addReplacement(new StringTemplate(in));
+            addReplacement(new StringTemplate(xr));
         
         // @compat 0.9.x
         } else if (DATA_TAG.equals(tag)) {
-            readOldFormat(readFromArrayElement(DATA_TAG, in, new String[0]));
+            readOldFormat(readFromArrayElement(DATA_TAG, xr, new String[0]));
         // end @compat
 
         // @compat 0.9.x
         } else if (STRINGS_TAG.equals(tag)) {
             // TODO: remove compatibility code for HistoryEvent
-            readOldFormat(readFromArrayElement(STRINGS_TAG, in, new String[0]));
+            readOldFormat(readFromArrayElement(STRINGS_TAG, xr, new String[0]));
         // end @compat
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 

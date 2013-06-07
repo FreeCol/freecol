@@ -27,9 +27,9 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Specification;
 
@@ -119,7 +119,7 @@ public class TileImprovement extends TileItem implements Named {
     /**
      * Create a new <code>TileImprovement</code> with the given
      * identifier.  The object should later be initialized by calling either
-     * {@link #readFromXML(XMLStreamReader)} or
+     * {@link #readFromXML(FreeColXMLReader)} or
      * {@link #readFromXMLElement(Element)}.
      *
      * @param game The enclosing <code>Game</code>.
@@ -578,24 +578,24 @@ public class TileImprovement extends TileItem implements Named {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
         final Game game = getGame();
 
-        super.readAttributes(in);
+        super.readAttributes(xr);
 
-        tile = makeFreeColGameObject(in, TILE_TAG, Tile.class, true);
+        tile = xr.makeFreeColGameObject(game, TILE_TAG, Tile.class, true);
 
-        type = spec.getType(in, TYPE_TAG, TileImprovementType.class,
-                            (TileImprovementType)null);
+        type = xr.getType(spec, TYPE_TAG, TileImprovementType.class,
+                          (TileImprovementType)null);
 
-        turnsToComplete = getAttribute(in, TURNS_TAG, 0);
+        turnsToComplete = xr.getAttribute(TURNS_TAG, 0);
 
-        magnitude = getAttribute(in, MAGNITUDE_TAG, 0);
+        magnitude = xr.getAttribute(MAGNITUDE_TAG, 0);
 
-        virtual = getAttribute(in, VIRTUAL_TAG, false);
+        virtual = xr.getAttribute(VIRTUAL_TAG, false);
 
-        String str = getAttribute(in, STYLE_TAG, (String)null);
+        String str = xr.getAttribute(STYLE_TAG, (String)null);
         Direction dirns[] = getConnectionDirections();
         if (dirns == null || str == null || "".equals(str)) {
             style = null;

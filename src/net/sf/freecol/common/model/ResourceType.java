@@ -22,8 +22,9 @@ package net.sf.freecol.common.model;
 import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 
 /**
@@ -109,11 +110,11 @@ public final class ResourceType extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        maxValue = getAttribute(in, MAXIMUM_VALUE_TAG, -1);
-        minValue = getAttribute(in, MINIMUM_VALUE_TAG, -1);
+        maxValue = xr.getAttribute(MAXIMUM_VALUE_TAG, -1);
+        minValue = xr.getAttribute(MINIMUM_VALUE_TAG, -1);
     }
 
     /**

@@ -20,8 +20,9 @@
 package net.sf.freecol.common.model;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 import org.w3c.dom.Element;
 
@@ -61,11 +62,11 @@ public class ExportData extends FreeColObject {
     /**
      * Create a new <code>ExportData</code> by reading a stream.
      *
-     * @param in The <code>XMLStreamReader</code> to read.
+     * @param xr The <code>FreeColXMLReader</code> to read.
      * @exception XMLStreamException if there is a problem reading the stream.
      */
-    public ExportData(XMLStreamReader in) throws XMLStreamException {
-        readFromXML(in);
+    public ExportData(FreeColXMLReader xr) throws XMLStreamException {
+        readFromXML(xr);
     }
 
     /**
@@ -178,16 +179,16 @@ public class ExportData extends FreeColObject {
      * {@inheritDoc}
      */
     @Override
-    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    public void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        exported = getAttribute(in, EXPORTED_TAG, false);
+        exported = xr.getAttribute(EXPORTED_TAG, false);
 
-        highLevel = getAttribute(in, HIGH_LEVEL_TAG, HIGH_LEVEL_DEFAULT);
+        highLevel = xr.getAttribute(HIGH_LEVEL_TAG, HIGH_LEVEL_DEFAULT);
 
-        lowLevel = getAttribute(in, LOW_LEVEL_TAG, LOW_LEVEL_DEFAULT);
+        lowLevel = xr.getAttribute(LOW_LEVEL_TAG, LOW_LEVEL_DEFAULT);
 
-        exportLevel = getAttribute(in, EXPORT_LEVEL_TAG, EXPORT_LEVEL_DEFAULT);
+        exportLevel = xr.getAttribute(EXPORT_LEVEL_TAG, EXPORT_LEVEL_DEFAULT);
     }
 
     /**

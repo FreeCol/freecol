@@ -26,8 +26,9 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 import org.w3c.dom.Element;
 
@@ -452,26 +453,26 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
         units.clear();
 
-        super.readChildren(in);
+        super.readChildren(xr);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        final String tag = in.getLocalName();
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
+        final String tag = xr.getLocalName();
 
         if (Unit.getXMLElementTagName().equals(tag)) {
-            Unit unit = readFreeColGameObject(in, Unit.class);
+            Unit unit = xr.readFreeColGameObject(getGame(), Unit.class);
             if (!units.contains(unit)) units.add(unit);
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 }

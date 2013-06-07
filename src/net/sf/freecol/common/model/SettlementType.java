@@ -23,8 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 
 /**
@@ -91,15 +92,15 @@ public class SettlementType extends FreeColGameObjectType {
     /**
      * Creates a new settlement type.
      *
-     * @param in The <code>XMLStreamReader</code> to read from.
+     * @param xr The <code>FreeColXMLReader</code> to read from.
      * @param specification The <code>Specification</code> to refer to.
      * @exception XMLStreamException if there is problem reading the stream.
      */
-    public SettlementType(XMLStreamReader in,
+    public SettlementType(FreeColXMLReader xr,
                           Specification specification) throws XMLStreamException {
         super(specification);
 
-        readFromXML(in);
+        readFromXML(xr);
     }
 
 
@@ -371,33 +372,33 @@ public class SettlementType extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        capital = getAttribute(in, CAPITAL_TAG, capital);
+        capital = xr.getAttribute(CAPITAL_TAG, capital);
 
-        minimumSize = getAttribute(in, MINIMUM_SIZE_TAG, minimumSize);
+        minimumSize = xr.getAttribute(MINIMUM_SIZE_TAG, minimumSize);
 
-        maximumSize = getAttribute(in, MAXIMUM_SIZE_TAG, maximumSize);
+        maximumSize = xr.getAttribute(MAXIMUM_SIZE_TAG, maximumSize);
 
-        visibleRadius = getAttribute(in, VISIBLE_RADIUS_TAG, visibleRadius);
+        visibleRadius = xr.getAttribute(VISIBLE_RADIUS_TAG, visibleRadius);
 
-        claimableRadius = getAttribute(in, CLAIMABLE_RADIUS_TAG,
+        claimableRadius = xr.getAttribute(CLAIMABLE_RADIUS_TAG,
                                        claimableRadius);
 
-        extraClaimableRadius = getAttribute(in, EXTRA_CLAIMABLE_RADIUS_TAG,
+        extraClaimableRadius = xr.getAttribute(EXTRA_CLAIMABLE_RADIUS_TAG,
                                             extraClaimableRadius);
 
-        wanderingRadius = getAttribute(in, WANDERING_RADIUS_TAG,
+        wanderingRadius = xr.getAttribute(WANDERING_RADIUS_TAG,
                                        wanderingRadius);
 
-        minimumGrowth = getAttribute(in, MINIMUM_GROWTH_TAG, minimumGrowth);
+        minimumGrowth = xr.getAttribute(MINIMUM_GROWTH_TAG, minimumGrowth);
 
-        maximumGrowth = getAttribute(in, MAXIMUM_GROWTH_TAG, maximumGrowth);
+        maximumGrowth = xr.getAttribute(MAXIMUM_GROWTH_TAG, maximumGrowth);
 
-        tradeBonus = getAttribute(in, TRADE_BONUS_TAG, tradeBonus);
+        tradeBonus = xr.getAttribute(TRADE_BONUS_TAG, tradeBonus);
 
-        convertThreshold = getAttribute(in, CONVERT_THRESHOLD_TAG,
+        convertThreshold = xr.getAttribute(CONVERT_THRESHOLD_TAG,
                                         convertThreshold);
     }
 
@@ -405,30 +406,30 @@ public class SettlementType extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
-        if (readShouldClearContainers(in)) {
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
+        if (xr.shouldClearContainers()) {
             plunder = null;
             gifts = null;
         }
 
-        super.readChildren(in);
+        super.readChildren(xr);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        final String tag = in.getLocalName();
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
+        final String tag = xr.getLocalName();
 
         if (GIFTS_TAG.equals(tag)) {
-            addGift(new RandomRange(in));
+            addGift(new RandomRange(xr));
 
         } else if (PLUNDER_TAG.equals(tag)) {
-            addPlunder(new RandomRange(in));
+            addPlunder(new RandomRange(xr));
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 

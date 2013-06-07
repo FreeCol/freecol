@@ -30,12 +30,13 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.PlayerExploredTile;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Layer;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 
 /**
@@ -605,21 +606,21 @@ public class TileItemContainer extends FreeColGameObject {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        tile = makeFreeColGameObject(in, TILE_TAG, Tile.class, true);
+        tile = xr.makeFreeColGameObject(getGame(), TILE_TAG, Tile.class, true);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
         tileItems.clear();
 
-        super.readChildren(in);
+        super.readChildren(xr);
 
         // @compat 0.9.x
         Collections.sort(tileItems, tileItemComparator);
@@ -630,20 +631,21 @@ public class TileItemContainer extends FreeColGameObject {
      * {@inheritDoc}
      */
     @Override
-    protected void readChild(XMLStreamReader in) throws XMLStreamException {
-        final String tag = in.getLocalName();
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
+        final Game game = getGame();
+        final String tag = xr.getLocalName();
 
         if (LostCityRumour.getXMLElementTagName().equals(tag)) {
-            tileItems.add(readFreeColGameObject(in, LostCityRumour.class));
+            tileItems.add(xr.readFreeColGameObject(game, LostCityRumour.class));
 
         } else if (Resource.getXMLElementTagName().equals(tag)) {
-            tileItems.add(readFreeColGameObject(in, Resource.class));
+            tileItems.add(xr.readFreeColGameObject(game, Resource.class));
 
         } else if (TileImprovement.getXMLElementTagName().equals(tag)) {
-            tileItems.add(readFreeColGameObject(in, TileImprovement.class));
+            tileItems.add(xr.readFreeColGameObject(game, TileImprovement.class));
 
         } else {
-            super.readChild(in);
+            super.readChild(xr);
         }
     }
 

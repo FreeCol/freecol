@@ -35,7 +35,6 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.filechooser.FileFilter;
-import javax.xml.stream.XMLStreamReader;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
@@ -43,9 +42,9 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.OptionGroupUI;
 import net.sf.freecol.common.io.FreeColDirectories;
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.option.OptionGroup;
-import net.sf.freecol.common.util.XMLStream;
 
 
 /**
@@ -250,13 +249,13 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
      * @param file a <code>File</code> value
      */
     protected void load(File file) {
-        XMLStream xr = null;
+        FreeColXMLReader xr = null;
         try {
-            xr = new XMLStream(new FileInputStream(file));
+            xr = new FreeColXMLReader(new FileInputStream(file));
             xr.nextTag();
             // TODO: read into group rather than specification
             OptionGroup group = new OptionGroup(getSpecification());
-            group.readFromXML(xr.getXMLStreamReader());
+            group.readFromXML(xr);
             getSpecification().getOptionGroup(getOptionGroupId()).setValue(group);
             logger.info("Loaded custom options from file " + file.getPath());
         } catch (Exception e) {

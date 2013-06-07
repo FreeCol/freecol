@@ -20,9 +20,9 @@
 package net.sf.freecol.common.model;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Player.Stance;
 
 import org.w3c.dom.Element;
@@ -199,26 +199,26 @@ public class NationSummary extends FreeColObject {
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        stance = getAttribute(in, STANCE_TAG, Stance.class, Stance.PEACE);
+        stance = xr.getAttribute(STANCE_TAG, Stance.class, Stance.PEACE);
 
-        numberOfSettlements = getAttribute(in, NUMBER_OF_SETTLEMENTS_TAG, -1);
+        numberOfSettlements = xr.getAttribute(NUMBER_OF_SETTLEMENTS_TAG, -1);
 
-        numberOfUnits = getAttribute(in, NUMBER_OF_UNITS_TAG, -1);
+        numberOfUnits = xr.getAttribute(NUMBER_OF_UNITS_TAG, -1);
 
-        militaryStrength = getAttribute(in, MILITARY_STRENGTH_TAG, -1);
+        militaryStrength = xr.getAttribute(MILITARY_STRENGTH_TAG, -1);
 
-        navalStrength = getAttribute(in, NAVAL_STRENGTH_TAG, -1);
+        navalStrength = xr.getAttribute(NAVAL_STRENGTH_TAG, -1);
 
-        gold = getAttribute(in, GOLD_TAG, -1);
+        gold = xr.getAttribute(GOLD_TAG, -1);
 
-        soL = getAttribute(in, SOL_TAG, -1);
+        soL = xr.getAttribute(SOL_TAG, -1);
 
-        foundingFathers = getAttribute(in, FOUNDING_FATHERS_TAG, -1);
+        foundingFathers = xr.getAttribute(FOUNDING_FATHERS_TAG, -1);
 
-        tax = getAttribute(in, TAX_TAG, -1);
+        tax = xr.getAttribute(TAX_TAG, -1);
     }
 
     /**

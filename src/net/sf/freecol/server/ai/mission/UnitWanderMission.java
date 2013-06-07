@@ -22,9 +22,9 @@ package net.sf.freecol.server.ai.mission;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIUnit;
@@ -60,16 +60,16 @@ public class UnitWanderMission extends Mission {
      *
      * @param aiMain The main AI-object.
      * @param aiUnit The <code>AIUnit</code> this mission is created for.
-     * @param in The input stream containing the XML.
+     * @param xr The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      * @see net.sf.freecol.server.ai.AIObject#readFromXML
      */
-    public UnitWanderMission(AIMain aiMain, AIUnit aiUnit, XMLStreamReader in)
+    public UnitWanderMission(AIMain aiMain, AIUnit aiUnit, FreeColXMLReader xr)
         throws XMLStreamException {
         super(aiMain, aiUnit);
 
-        readFromXML(in);
+        readFromXML(xr);
         uninitialized = getAIUnit() == null;
     }
 

@@ -20,8 +20,9 @@
 package net.sf.freecol.server.ai;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.common.io.FreeColXMLReader;
 
 import org.w3c.dom.Element;
 
@@ -77,13 +78,13 @@ public abstract class ValuedAIObject extends AIObject
      * XML-representation.
      *
      * @param aiMain The main AI-object.
-     * @param in The input stream containing the XML.
+     * @param xr The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    public ValuedAIObject(AIMain aiMain, XMLStreamReader in)
+    public ValuedAIObject(AIMain aiMain, FreeColXMLReader xr)
         throws XMLStreamException {
-        super(aiMain, in);
+        super(aiMain, xr);
     }
 
 
@@ -135,9 +136,9 @@ public abstract class ValuedAIObject extends AIObject
      * {@inheritDoc}
      */
     @Override
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
 
-        setValue(getAttribute(in, VALUE_TAG, -1));
+        setValue(xr.getAttribute(VALUE_TAG, -1));
     }
 }
