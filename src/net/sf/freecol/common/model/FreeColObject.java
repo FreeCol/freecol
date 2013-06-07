@@ -31,7 +31,6 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -66,7 +65,8 @@ import org.xml.sax.SAXException;
 
 
 /**
- * The root FreeCol object class.
+ * The FreeCol root class.  Maintains an identifier, and an optional link
+ * to the specification this object uses.
  */
 public abstract class FreeColObject {
 
@@ -105,6 +105,26 @@ public abstract class FreeColObject {
     }
 
     /**
+     * Get the specification.  It may be null.
+     *
+     * @return The <code>Specification</code> used by this object.
+     */
+    public Specification getSpecification() {
+        return specification;
+    }
+
+    /**
+     * Sets the specification for this object. 
+     *
+     * This method should only ever be used by the object's constructor.
+     *
+     * @param specification The <code>Specification</code> to use.
+     */
+    protected void setSpecification(Specification specification) {
+        this.specification = specification;
+    }
+
+    /**
      * Get the type part of the identifier.
      *
      * @return The type part of the identifier, or null on error.
@@ -116,6 +136,9 @@ public abstract class FreeColObject {
         }
         return null;
     }
+
+
+    // Identifier manipulation
 
     /**
      * Gets the numeric part of the identifier.
@@ -180,24 +203,6 @@ public abstract class FreeColObject {
         return newC;
     }
 
-    /**
-     * Describe <code>getSpecification</code> method here.
-     *
-     * @return a <code>Specification</code> value
-     */
-    public Specification getSpecification() {
-        return specification;
-    }
-
-    /**
-     * Sets the specification for this object. This method should only
-     * ever be used by the object's constructor.
-     *
-     * @param specification The <code>Specification</code> to use.
-     */
-    protected void setSpecification(Specification specification) {
-        this.specification = specification;
-    }
 
     // Property change support
 
@@ -292,6 +297,7 @@ public abstract class FreeColObject {
             pcs.removePropertyChangeListener(propertyName, listener);
         }
     }
+
 
     // Feature container handling.
 
@@ -634,7 +640,7 @@ public abstract class FreeColObject {
     /**
      * Writes the object to the given file.
      *
-     * @param file The save file to write to.
+     * @param file The <code>File</code> to write to.
      * @exception FileNotFoundException
      */
     public void save(File file) throws FileNotFoundException {
@@ -883,7 +889,7 @@ public abstract class FreeColObject {
      * @see #toXML(XMLStreamWriter, Player, boolean, boolean)
      */
     public void toXML(XMLStreamWriter out) throws XMLStreamException {
-        toXML(out, getRealXMLElementTagName());
+        toXML(out, getXMLTagName());
     }
 
     /**
@@ -1744,21 +1750,6 @@ public abstract class FreeColObject {
 
 
     /**
-     * Get the actual tag name for this object.
-     *
-     * @return The real tag name.
-     */
-    public String getRealXMLElementTagName() {
-        String tagName = "";
-        try {
-            Method m = getClass().getMethod("getXMLElementTagName",
-                                            (Class[])null);
-            tagName = (String)m.invoke((Object)null, (Object[])null);
-        } catch (Exception e) {}
-        return tagName;
-    }
-
-    /**
      * Gets the tag name used to serialize this object, generally the
      * class name starting with a lower case letter.
      *
@@ -1770,7 +1761,7 @@ public abstract class FreeColObject {
      * Gets the tag name used to serialize this object, generally the
      * class name starting with a lower case letter.  This method
      * should be overridden by all subclasses that need to be
-     * serialized.
+     * serialized if instances are expected to be read.
      *
      * @return <code>null</code>.
      */

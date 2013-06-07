@@ -50,8 +50,23 @@ public class UnitListOption extends ListOption<AbstractUnit> {
         super(specification);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public UnitListOption clone() {
+        UnitListOption ret = new UnitListOption(getId());
+        ret.setValues(this);
+        return ret;
+    }
+
 
     // Serialization
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.

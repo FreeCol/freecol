@@ -24,6 +24,7 @@ import net.sf.freecol.server.generator.MapGenerator;
 
 /**
  * Keeps track of the available map generator options.
+ * More of a handy place to organize the names than an actual option type.
  *
  * @see MapGenerator
  * @see net.sf.freecol.common.option.OptionGroup
@@ -137,5 +138,4 @@ public class MapGeneratorOptions {
     public static String getXMLElementTagName() {
         return "mapGeneratorOptions";
     }
-
 }

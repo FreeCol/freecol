@@ -104,6 +104,11 @@ public class RangeOption extends SelectOption {
     // Serialization
 
     /**
+     * {@inheritDoc}
+     */
+    public String getXMLTagName() { return getXMLElementTagName(); }
+
+    /**
      * Gets the tag name of the root element representing this object.
      *
      * @return "rangeOption".

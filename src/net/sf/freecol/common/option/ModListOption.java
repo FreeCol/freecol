@@ -55,8 +55,23 @@ public class ModListOption extends ListOption<FreeColModFile> {
         setAllowDuplicates(false);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ModListOption clone() {
+        ModListOption ret = new ModListOption(getId());
+        ret.setValues(this);
+        return ret;
+    }
+
 
     // Serialization
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**
      * Gets the tag name of the root element representing this object.

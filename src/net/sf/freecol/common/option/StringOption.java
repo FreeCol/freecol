@@ -220,7 +220,7 @@ public class StringOption extends AbstractOption<String> {
     /**
      * Gets the tag name of the root element representing this object.
      *
-     * @return "StringOption".
+     * @return "stringOption".
      */
     public static String getXMLElementTagName() {
         return "stringOption";

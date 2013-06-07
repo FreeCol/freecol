@@ -36,7 +36,7 @@ import net.sf.freecol.common.model.Specification;
 /**
  * Represents a list of Options.
  */
-public class ListOption<T> extends AbstractOption<List<AbstractOption<T>>> {
+public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T>>> {
 
     private static Logger logger = Logger.getLogger(ListOption.class.getName());
 
@@ -151,14 +151,6 @@ public class ListOption<T> extends AbstractOption<List<AbstractOption<T>>> {
 
 
     // Interface Option
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ListOption<T> clone() {
-        return new ListOption<T>(getId());
-    }
 
     /**
      * Gets the current value of this <code>ListOption</code>.
@@ -303,19 +295,5 @@ public class ListOption<T> extends AbstractOption<List<AbstractOption<T>>> {
         }
         sb.append("]");
         return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getXMLTagName() { return getXMLElementTagName(); }
-
-    /**
-     * Gets the tag name of the root element representing this object.
-     *
-     * @return "listOption".
-     */
-    public static String getXMLElementTagName() {
-        return "listOption";
     }
 }
