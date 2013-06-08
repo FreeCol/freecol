@@ -28,9 +28,9 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 
 
 /**
@@ -456,45 +456,45 @@ public class Region extends FreeColGameObject implements Nameable {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out, Player player,
+    protected void writeAttributes(FreeColXMLWriter xw, Player player,
                                    boolean showAll,
                                    boolean toSavedGame) throws XMLStreamException {
-        super.writeAttributes(out);
+        super.writeAttributes(xw);
 
         if (name != null) {
-            writeAttribute(out, NAME_TAG, name);
+            xw.writeAttribute(NAME_TAG, name);
         }
 
-        writeAttribute(out, NAME_KEY_TAG, nameKey);
+        xw.writeAttribute(NAME_KEY_TAG, nameKey);
 
-        writeAttribute(out, TYPE_TAG, type);
+        xw.writeAttribute(TYPE_TAG, type);
 
         if (prediscovered) {
-            writeAttribute(out, PREDISCOVERED_TAG, prediscovered);
+            xw.writeAttribute(PREDISCOVERED_TAG, prediscovered);
         }
 
         if (claimable) {
-            writeAttribute(out, CLAIMABLE_TAG, claimable);
+            xw.writeAttribute(CLAIMABLE_TAG, claimable);
         }
 
         if (discoverable) {
-            writeAttribute(out, DISCOVERABLE_TAG, discoverable);
+            xw.writeAttribute(DISCOVERABLE_TAG, discoverable);
         }
 
         if (parent != null) {
-            writeAttribute(out, PARENT_TAG, parent);
+            xw.writeAttribute(PARENT_TAG, parent);
         }
 
         if (discoveredIn != null) {
-            writeAttribute(out, DISCOVERED_IN_TAG, discoveredIn.getNumber());
+            xw.writeAttribute(DISCOVERED_IN_TAG, discoveredIn.getNumber());
         }
 
         if (discoveredBy != null) {
-            writeAttribute(out, DISCOVERED_BY_TAG, discoveredBy);
+            xw.writeAttribute(DISCOVERED_BY_TAG, discoveredBy);
         }
 
         if (scoreValue > 0) {
-            writeAttribute(out, SCORE_VALUE_TAG, scoreValue);
+            xw.writeAttribute(SCORE_VALUE_TAG, scoreValue);
         }
     }
 
@@ -502,15 +502,15 @@ public class Region extends FreeColGameObject implements Nameable {
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out, Player player,
+    protected void writeChildren(FreeColXMLWriter xw, Player player,
                                  boolean showAll,
                                  boolean toSavedGame) throws XMLStreamException {
         for (Region child : getChildren()) {
-            out.writeStartElement(CHILD_TAG);
+            xw.writeStartElement(CHILD_TAG);
 
-            writeAttribute(out, ID_ATTRIBUTE_TAG, child);
+            xw.writeAttribute(ID_ATTRIBUTE_TAG, child);
 
-            out.writeEndElement();
+            xw.writeEndElement();
         }
     }
 

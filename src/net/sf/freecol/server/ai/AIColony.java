@@ -32,9 +32,9 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
@@ -1453,26 +1453,26 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        super.writeChildren(out);
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeChildren(xw);
 
         for (AIGoods ag : aiGoods) {
             if (ag.checkIntegrity(false) < 0) continue;
-            out.writeStartElement(AI_GOODS_LIST_TAG);
+            xw.writeStartElement(AI_GOODS_LIST_TAG);
 
-            writeAttribute(out, ID_ATTRIBUTE_TAG, ag);
+            xw.writeAttribute(ID_ATTRIBUTE_TAG, ag);
 
-            out.writeEndElement();
+            xw.writeEndElement();
         }
 
         for (TileImprovementPlan tip : tileImprovementPlans) {
             if (tip.checkIntegrity(false) < 0) continue;
 
-            out.writeStartElement(TILE_IMPROVEMENT_PLAN_LIST_TAG);
+            xw.writeStartElement(TILE_IMPROVEMENT_PLAN_LIST_TAG);
 
-            writeAttribute(out, ID_ATTRIBUTE_TAG, tip);
+            xw.writeAttribute(ID_ATTRIBUTE_TAG, tip);
 
-            out.writeEndElement();
+            xw.writeEndElement();
         }
 
         for (Wish w : wishes) {
@@ -1482,11 +1482,11 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             if (w.checkIntegrity(false) < 0 || !w.shouldBeStored()
                 || tag == null) continue;
 
-            out.writeStartElement(tag);
+            xw.writeStartElement(tag);
 
-            writeAttribute(out, ID_ATTRIBUTE_TAG, w);
+            xw.writeAttribute(ID_ATTRIBUTE_TAG, w);
 
-            out.writeEndElement();
+            xw.writeEndElement();
         }
     }
 

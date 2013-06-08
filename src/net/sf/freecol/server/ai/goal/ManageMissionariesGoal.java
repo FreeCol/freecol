@@ -25,9 +25,9 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
@@ -180,7 +180,7 @@ public class ManageMissionariesGoal extends Goal {
     }
 
 
-    public void toXML(XMLStreamWriter out) throws XMLStreamException {
+    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
         //TODO
     }
 

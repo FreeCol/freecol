@@ -27,9 +27,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 
 
 /**
@@ -230,11 +230,11 @@ public abstract class BuildableType extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
         if (requiredPopulation > 1) {
-            writeAttribute(out, REQUIRED_POPULATION_TAG, requiredPopulation);
+            xw.writeAttribute(REQUIRED_POPULATION_TAG, requiredPopulation);
         }
     }
 
@@ -242,33 +242,33 @@ public abstract class BuildableType extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        super.writeChildren(out);
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeChildren(xw);
 
         if (requiredAbilities != null) {
             for (Map.Entry<String, Boolean> entry
                      : requiredAbilities.entrySet()) {
-                out.writeStartElement(REQUIRED_ABILITY_TAG);
+                xw.writeStartElement(REQUIRED_ABILITY_TAG);
 
-                writeAttribute(out, ID_ATTRIBUTE_TAG, entry.getKey());
+                xw.writeAttribute(ID_ATTRIBUTE_TAG, entry.getKey());
 
-                writeAttribute(out, VALUE_TAG, entry.getValue());
+                xw.writeAttribute(VALUE_TAG, entry.getValue());
 
-                out.writeEndElement();
+                xw.writeEndElement();
             }
         }
 
         for (AbstractGoods goods : getRequiredGoods()) {
-            out.writeStartElement(REQUIRED_GOODS_TAG);
+            xw.writeStartElement(REQUIRED_GOODS_TAG);
 
-            writeAttribute(out, ID_ATTRIBUTE_TAG, goods.getType());
+            xw.writeAttribute(ID_ATTRIBUTE_TAG, goods.getType());
 
-            writeAttribute(out, VALUE_TAG, goods.getAmount());
+            xw.writeAttribute(VALUE_TAG, goods.getAmount());
 
-            out.writeEndElement();
+            xw.writeEndElement();
         }
 
-        for (Limit limit : getLimits()) limit.toXML(out);
+        for (Limit limit : getLimits()) limit.toXML(xw);
     }
 
     /**
@@ -279,7 +279,7 @@ public abstract class BuildableType extends FreeColGameObjectType {
         super.readAttributes(xr);
 
         requiredPopulation = xr.getAttribute(REQUIRED_POPULATION_TAG,
-                                          DEFAULT_REQUIRED_POPULATION);
+                                             DEFAULT_REQUIRED_POPULATION);
     }
 
     /**
@@ -315,11 +315,9 @@ public abstract class BuildableType extends FreeColGameObjectType {
         } else if (REQUIRED_GOODS_TAG.equals(tag)) {
             GoodsType type = xr.getType(spec, ID_ATTRIBUTE_TAG,
                                         GoodsType.class, (GoodsType)null);
+            type.setBuildingMaterial(true);
             int amount = xr.getAttribute(VALUE_TAG, 0);
-            if (type != null && amount > 0) {
-                type.setBuildingMaterial(true);
-                addRequiredGoods(new AbstractGoods(type, amount));
-            }
+            addRequiredGoods(new AbstractGoods(type, amount));
             xr.closeTag(REQUIRED_GOODS_TAG);
 
         } else if (Limit.getXMLElementTagName().equals(tag)) {

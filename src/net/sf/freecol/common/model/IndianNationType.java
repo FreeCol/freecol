@@ -27,9 +27,9 @@ import java.util.List;
 import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.util.RandomChoice;
 
 
@@ -216,25 +216,25 @@ public class IndianNationType extends NationType {
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        super.writeChildren(out);
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeChildren(xw);
 
         for (RandomChoice<UnitType> choice : getSkills()) {
-            out.writeStartElement(SKILL_TAG);
+            xw.writeStartElement(SKILL_TAG);
 
-            writeAttribute(out, ID_ATTRIBUTE_TAG, choice.getObject());
+            xw.writeAttribute(ID_ATTRIBUTE_TAG, choice.getObject());
 
-            writeAttribute(out, PROBABILITY_TAG, choice.getProbability());
+            xw.writeAttribute(PROBABILITY_TAG, choice.getProbability());
 
-            out.writeEndElement();
+            xw.writeEndElement();
         }
 
         for (String region : getRegionNames()) {
-            out.writeStartElement(Region.getXMLElementTagName());
+            xw.writeStartElement(Region.getXMLElementTagName());
 
-            writeAttribute(out, ID_ATTRIBUTE_TAG, region);
+            xw.writeAttribute(ID_ATTRIBUTE_TAG, region);
 
-            out.writeEndElement();
+            xw.writeEndElement();
         }
     }
 

@@ -24,10 +24,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.server.model.ServerBuilding;
 import net.sf.freecol.server.model.ServerUnit;
@@ -395,12 +394,14 @@ public class BuildingTest extends FreeColTestCase {
         for (Building building : colony.getBuildings()) {
             try {
                 StringWriter sw = new StringWriter();
-                XMLOutputFactory xif = XMLOutputFactory.newInstance();
-                XMLStreamWriter xsw = xif.createXMLStreamWriter(sw);
-                building.toXML(xsw, building.getColony().getOwner(), true, true);
-                xsw.close();
-            } catch (XMLStreamException e) {
-                fail();
+                FreeColXMLWriter xw = new FreeColXMLWriter(sw);
+
+                building.toXML(xw, building.getColony().getOwner(), true, true);
+
+                xw.close();
+
+            } catch (Exception e) {
+                fail(e.toString());
             }
         }
     }

@@ -24,9 +24,9 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Specification;
 
 
@@ -106,27 +106,27 @@ public class SelectOption extends IntegerOption {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
-        writeAttribute(out, LOCALIZED_LABELS_TAG, localizedLabels);
+        xw.writeAttribute(LOCALIZED_LABELS_TAG, localizedLabels);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        super.writeChildren(out);
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeChildren(xw);
 
         for (Map.Entry<Integer, String> entry : itemValues.entrySet()) {
-            out.writeStartElement(getXMLItemElementTagName());
+            xw.writeStartElement(getXMLItemElementTagName());
 
-            writeAttribute(out, VALUE_TAG, entry.getKey());
+            xw.writeAttribute(VALUE_TAG, entry.getKey());
 
-            writeAttribute(out, LABEL_TAG, entry.getValue());
+            xw.writeAttribute(LABEL_TAG, entry.getValue());
 
-            out.writeEndElement();
+            xw.writeEndElement();
         }
     }
 

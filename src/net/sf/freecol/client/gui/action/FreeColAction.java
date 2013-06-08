@@ -30,12 +30,12 @@ import javax.swing.KeyStroke;
 import javax.swing.event.MenuKeyEvent;
 import javax.swing.event.MenuKeyListener;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -321,18 +321,18 @@ public abstract class FreeColAction extends AbstractAction implements Option<Fre
      * This method writes an XML-representation of this object to the given
      * stream.
      *
-     * @param out The target stream.
+     * @param xw The <code>FreeColXMLWriter</code> to write to.
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
      */
-    public void toXML(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
+    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
+        xw.writeStartElement(getXMLElementTagName());
 
-        out.writeAttribute(FreeColObject.ID_ATTRIBUTE_TAG, getId());
+        xw.writeAttribute(FreeColObject.ID_ATTRIBUTE_TAG, getId());
 
-        out.writeAttribute(ACCELERATOR_TAG, getKeyStrokeText(getAccelerator()));
+        xw.writeAttribute(ACCELERATOR_TAG, getKeyStrokeText(getAccelerator()));
 
-        out.writeEndElement();
+        xw.writeEndElement();
     }
 
     /**

@@ -45,10 +45,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
-import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
@@ -58,6 +56,7 @@ import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
@@ -127,6 +126,7 @@ public final class FreeColServer {
     public static final String RANDOM_STATE_TAG = "randomState";
     public static final String OWNER_TAG = "owner";
     public static final String PUBLIC_SERVER_TAG = "publicServer";
+    public static final String SAVED_GAME_TAG = "savedGame";
     public static final String SERVER_OBJECTS_TAG = "serverObjects";
     public static final String SINGLE_PLAYER_TAG = "singleplayer";
     public static final String VERSION_TAG = "version";
@@ -773,10 +773,9 @@ public final class FreeColServer {
     public void saveGame(File file, OptionGroup options, BufferedImage image)
         throws IOException {
         final ServerGame game = getGame();
-        XMLOutputFactory xof = XMLOutputFactory.newInstance();
         JarOutputStream fos = null;
+        FreeColXMLWriter xw = null;
         try {
-            XMLStreamWriter xsw;
             fos = new JarOutputStream(new FileOutputStream(file));
 
             if (image != null) {
@@ -800,59 +799,58 @@ public final class FreeColServer {
 
             // save the actual game data
             fos.putNextEntry(new JarEntry(FreeColSavegameFile.SAVEGAME_FILE));
-            xsw = xof.createXMLStreamWriter(fos, "UTF-8");
+            xw = new FreeColXMLWriter(fos);
 
-            xsw.writeStartDocument("UTF-8", "1.0");
-            xsw.writeComment("Game version: " + FreeCol.getRevision());
-            xsw.writeStartElement("savedGame");
+            xw.writeStartDocument("UTF-8", "1.0");
+
+            xw.writeComment("Game version: " + FreeCol.getRevision());
+
+            xw.writeStartElement(SAVED_GAME_TAG);
 
             // Add the attributes:
-            xsw.writeAttribute(OWNER_TAG, FreeCol.getName());
+            xw.writeAttribute(OWNER_TAG, FreeCol.getName());
 
-            xsw.writeAttribute(PUBLIC_SERVER_TAG, Boolean.toString(publicServer));
+            xw.writeAttribute(PUBLIC_SERVER_TAG, Boolean.toString(publicServer));
 
-            xsw.writeAttribute(SINGLE_PLAYER_TAG, Boolean.toString(singlePlayer));
+            xw.writeAttribute(SINGLE_PLAYER_TAG, Boolean.toString(singlePlayer));
 
-            xsw.writeAttribute(VERSION_TAG, Integer.toString(SAVEGAME_VERSION));
+            xw.writeAttribute(VERSION_TAG, Integer.toString(SAVEGAME_VERSION));
 
-            xsw.writeAttribute(RANDOM_STATE_TAG, Utils.getRandomState(random));
+            xw.writeAttribute(RANDOM_STATE_TAG, Utils.getRandomState(random));
 
-            xsw.writeAttribute(DEBUG_TAG, FreeColDebugger.getDebugModes());
+            xw.writeAttribute(DEBUG_TAG, FreeColDebugger.getDebugModes());
 
             if (getActiveUnit() != null) {
-                xsw.writeAttribute(ACTIVE_UNIT_TAG, getActiveUnit().getId());
+                xw.writeAttribute(ACTIVE_UNIT_TAG, getActiveUnit());
             }
             
             // Add server side model information:
-            xsw.writeStartElement(SERVER_OBJECTS_TAG);
+            xw.writeStartElement(SERVER_OBJECTS_TAG);
             for (ServerModelObject smo : game.getServerModelObjects()) {
-                xsw.writeStartElement(smo.getServerXMLElementTagName());
-                xsw.writeAttribute(FreeColObject.ID_ATTRIBUTE_TAG,
+                xw.writeStartElement(smo.getServerXMLElementTagName());
+                xw.writeAttribute(FreeColObject.ID_ATTRIBUTE_TAG,
                     ((FreeColGameObject)smo).getId());
-                xsw.writeEndElement();
+                xw.writeEndElement();
             }
-            xsw.writeEndElement();
-            // Add the game:
-            game.toXML(xsw, null, true, true);
-            // Add the AIObjects:
-            if (aiMain != null) {
-                aiMain.toXML(xsw);
-            }
-            xsw.writeEndElement();
-            xsw.writeEndDocument();
-            xsw.flush();
-            xsw.close();
+            xw.writeEndElement();
+            // Add the game
+            game.toXML(xw, null, true, true);
+            // Add the AIObjects
+            if (aiMain != null) aiMain.toXML(xw);
+            xw.writeEndElement();
+            xw.writeEndDocument();
+            xw.flush();
+            xw.close();
+            fos.closeEntry();
+
         } catch (XMLStreamException e) {
             throw new IOException("XMLStreamException: " + e.getMessage());
         } catch (Exception e) {
             logger.log(Level.WARNING, "Failed to save", e);
             throw new IOException(e.getCause());
         } finally {
-            try {
-                if (fos != null) fos.close();
-            } catch (IOException e) {
-                // do nothing
-            }
+            if (xw != null) xw.close();
+            if (fos != null) fos.close();
         }
     }
 
@@ -1554,39 +1552,40 @@ public final class FreeColServer {
      * @return True if the high scores were saved.
      */
     public boolean saveHighScores() {
-        boolean ret;
+        boolean ret = false;
         if (highScores == null || highScores.isEmpty()) return false;
         Collections.sort(highScores, highScoreComparator);
-        XMLOutputFactory xof = XMLOutputFactory.newInstance();
-        FileOutputStream fos = null;
+
+        FreeColXMLWriter xw = null;
         try {
-            XMLStreamWriter xsw;
-            fos = new FileOutputStream(FreeColDirectories.getHighScoreFile());
-            xsw = xof.createXMLStreamWriter(fos, "UTF-8");
-            xsw.writeStartDocument("UTF-8", "1.0");
-            xsw.writeStartElement(HIGH_SCORES_TAG);
-            int count = 0;
-            for (HighScore score : highScores) {
-                score.toXML(xsw);
-                count++;
-                if (count == NUMBER_OF_HIGH_SCORES) break;
-            }
-            xsw.writeEndElement();
-            xsw.writeEndDocument();
-            xsw.flush();
-            xsw.close();
+            xw = new FreeColXMLWriter(new FileOutputStream(FreeColDirectories.getHighScoreFile()));
             ret = true;
         } catch (FileNotFoundException fnfe) {
             logger.log(Level.WARNING, "Failed to open high scores file.", fnfe);
-            ret = false;
-        } catch (XMLStreamException xse) {
-            logger.log(Level.WARNING, "Failed to write high scores file.", xse);
-            ret = false;
-        } finally {
-            try {
-                if (fos != null) fos.close();
-            } catch (IOException e) {}
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "Error creating FreeColXMLWriter.", ioe);
         }
+
+        if (ret) {
+            try {
+                xw.writeStartDocument("UTF-8", "1.0");
+                xw.writeStartElement(HIGH_SCORES_TAG);
+                int count = 0;
+                for (HighScore score : highScores) {
+                    score.toXML(xw);
+                    count++;
+                    if (count == NUMBER_OF_HIGH_SCORES) break;
+                }
+                xw.writeEndElement();
+                xw.writeEndDocument();
+                xw.flush();
+            } catch (XMLStreamException xse) {
+                logger.log(Level.WARNING, "Failed to write high scores file.",
+                           xse);
+                ret = false;
+            }
+        }
+        if (xw != null) xw.close();
         return ret;
     }
 

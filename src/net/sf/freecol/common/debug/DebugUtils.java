@@ -39,15 +39,14 @@ import javax.swing.JMenuItem;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;

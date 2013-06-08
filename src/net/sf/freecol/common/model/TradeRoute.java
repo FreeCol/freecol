@@ -25,9 +25,9 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 
 import org.w3c.dom.Element;
 
@@ -156,23 +156,24 @@ public class TradeRoute extends FreeColGameObject
         /**
          * Write an XML-representation of this object to the given stream.
          *
-         * @param out The output stream.
+         * @param xw The <code>FreeColXMLWriter</code> to write to.
          * @exception XMLStreamException if there are any problems writing
          *      to the stream.
          */
-        protected void toXML(XMLStreamWriter out) throws XMLStreamException {
-            out.writeStartElement(TRADE_ROUTE_STOP_TAG);
+        protected void toXML(FreeColXMLWriter xw) throws XMLStreamException {
+            xw.writeStartElement(TRADE_ROUTE_STOP_TAG);
 
-            writeAttribute(out, LOCATION_TAG, (FreeColGameObject)location);
+            xw.writeAttribute(LOCATION_TAG, (FreeColGameObject)location);
 
             for (GoodsType cargoType : cargo) {
-                out.writeStartElement(CARGO_TAG);
+                xw.writeStartElement(CARGO_TAG);
 
-                writeAttribute(out, ID_ATTRIBUTE_TAG, cargoType.getId());
+                xw.writeAttribute(ID_ATTRIBUTE_TAG, cargoType.getId());
 
-                out.writeEndElement();
+                xw.writeEndElement();
             }
-            out.writeEndElement();
+
+            xw.writeEndElement();
         }
 
         /**
@@ -432,16 +433,16 @@ public class TradeRoute extends FreeColGameObject
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out, Player player,
+    protected void writeAttributes(FreeColXMLWriter xw, Player player,
                                    boolean showAll,
                                    boolean toSavedGame) throws XMLStreamException {
-        super.writeAttributes(out);
+        super.writeAttributes(xw);
 
-        writeAttribute(out, NAME_TAG, getName());
+        xw.writeAttribute(NAME_TAG, getName());
 
-        writeAttribute(out, OWNER_TAG, getOwner());
+        xw.writeAttribute(OWNER_TAG, getOwner());
 
-        for (Stop stop : stops) stop.toXML(out);
+        for (Stop stop : stops) stop.toXML(xw);
     }
 
     /**

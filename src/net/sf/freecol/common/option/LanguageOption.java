@@ -30,10 +30,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.model.Specification;
 
@@ -283,10 +283,10 @@ public class LanguageOption extends AbstractOption<LanguageOption.Language> {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
-        writeAttribute(out, VALUE_TAG, getValue().getKey());
+        xw.writeAttribute(VALUE_TAG, getValue().getKey());
     }
 
     /**

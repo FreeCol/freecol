@@ -25,9 +25,9 @@ import java.util.Locale;
 import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Unit.Role;
 
 
@@ -230,40 +230,40 @@ public class EquipmentType extends BuildableType {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
-        writeAttribute(out, MAXIMUM_COUNT_TAG, maximumCount);
+        xw.writeAttribute(MAXIMUM_COUNT_TAG, maximumCount);
 
-        writeAttribute(out, COMBAT_LOSS_PRIORITY_TAG, combatLossPriority);
+        xw.writeAttribute(COMBAT_LOSS_PRIORITY_TAG, combatLossPriority);
         
-        writeAttribute(out, ROLE_TAG, role);
+        xw.writeAttribute(ROLE_TAG, role);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        super.writeChildren(out);
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeChildren(xw);
 
         if (captureEquipmentId != null) {
-            out.writeStartElement(CAPTURE_EQUIPMENT_TAG);
+            xw.writeStartElement(CAPTURE_EQUIPMENT_TAG);
 
-            writeAttribute(out, ID_ATTRIBUTE_TAG, captureEquipmentId);
+            xw.writeAttribute(ID_ATTRIBUTE_TAG, captureEquipmentId);
 
-            writeAttribute(out, BY_INDIANS_TAG, captureEquipmentByIndians);
+            xw.writeAttribute(BY_INDIANS_TAG, captureEquipmentByIndians);
 
-            out.writeEndElement();
+            xw.writeEndElement();
         }
 
         if (compatibleEquipment != null) {
             for (String compatible : compatibleEquipment) {
-                out.writeStartElement(COMPATIBLE_EQUIPMENT_TAG);
+                xw.writeStartElement(COMPATIBLE_EQUIPMENT_TAG);
                 
-                writeAttribute(out, ID_ATTRIBUTE_TAG, compatible);
+                xw.writeAttribute(ID_ATTRIBUTE_TAG, compatible);
                 
-                out.writeEndElement();
+                xw.writeEndElement();
             }
         }
     }

@@ -25,9 +25,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 
 
@@ -667,45 +667,45 @@ public final class UnitType extends BuildableType
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
-        writeAttribute(out, OFFENCE_TAG, offence);
+        xw.writeAttribute(OFFENCE_TAG, offence);
 
-        writeAttribute(out, DEFENCE_TAG, defence);
+        xw.writeAttribute(DEFENCE_TAG, defence);
 
-        writeAttribute(out, MOVEMENT_TAG, movement);
+        xw.writeAttribute(MOVEMENT_TAG, movement);
 
-        writeAttribute(out, LINE_OF_SIGHT_TAG, lineOfSight);
+        xw.writeAttribute(LINE_OF_SIGHT_TAG, lineOfSight);
 
-        writeAttribute(out, SCORE_VALUE_TAG, scoreValue);
+        xw.writeAttribute(SCORE_VALUE_TAG, scoreValue);
 
-        writeAttribute(out, SPACE_TAG, space);
+        xw.writeAttribute(SPACE_TAG, space);
 
-        writeAttribute(out, SPACE_TAKEN_TAG, spaceTaken);
+        xw.writeAttribute(SPACE_TAKEN_TAG, spaceTaken);
 
-        writeAttribute(out, HIT_POINTS_TAG, hitPoints);
+        xw.writeAttribute(HIT_POINTS_TAG, hitPoints);
 
-        writeAttribute(out, MAXIMUM_EXPERIENCE_TAG, maximumExperience);
+        xw.writeAttribute(MAXIMUM_EXPERIENCE_TAG, maximumExperience);
 
         if (maximumAttrition < INFINITY) {
-            writeAttribute(out, MAXIMUM_ATTRITION_TAG, maximumAttrition);
+            xw.writeAttribute(MAXIMUM_ATTRITION_TAG, maximumAttrition);
         }
 
-        writeAttribute(out, RECRUIT_PROBABILITY_TAG, recruitProbability);
+        xw.writeAttribute(RECRUIT_PROBABILITY_TAG, recruitProbability);
 
         if (hasSkill()) {
-            writeAttribute(out, SKILL_TAG, skill);
+            xw.writeAttribute(SKILL_TAG, skill);
         }
 
         if (hasPrice()) {
-            writeAttribute(out, PRICE_TAG, price);
+            xw.writeAttribute(PRICE_TAG, price);
         }
 
-        writeAttribute(out, SKILL_TAUGHT_TAG, skillTaught);
+        xw.writeAttribute(SKILL_TAUGHT_TAG, skillTaught);
 
         if (expertProduction != null) {
-            writeAttribute(out, EXPERT_PRODUCTION_TAG, expertProduction);
+            xw.writeAttribute(EXPERT_PRODUCTION_TAG, expertProduction);
         }
     }
 
@@ -713,28 +713,28 @@ public final class UnitType extends BuildableType
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        super.writeChildren(out);
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeChildren(xw);
 
         if (defaultEquipment != null) {
-            out.writeStartElement(DEFAULT_EQUIPMENT_TAG);
+            xw.writeStartElement(DEFAULT_EQUIPMENT_TAG);
 
-            writeAttribute(out, ID_ATTRIBUTE_TAG, defaultEquipment);
+            xw.writeAttribute(ID_ATTRIBUTE_TAG, defaultEquipment);
 
-            out.writeEndElement();
+            xw.writeEndElement();
         }
 
-        for (UnitTypeChange change : getTypeChanges()) change.toXML(out);
+        for (UnitTypeChange change : getTypeChanges()) change.toXML(xw);
 
         if (consumption != null) {
             for (GoodsType goodsType : consumption.keySet()) {
-                out.writeStartElement(CONSUMES_TAG);
+                xw.writeStartElement(CONSUMES_TAG);
 
-                writeAttribute(out, ID_ATTRIBUTE_TAG, goodsType);
+                xw.writeAttribute(ID_ATTRIBUTE_TAG, goodsType);
 
-                writeAttribute(out, VALUE_TAG, consumption.getCount(goodsType));
+                xw.writeAttribute(VALUE_TAG, consumption.getCount(goodsType));
 
-                out.writeEndElement();
+                xw.writeEndElement();
             }
         }
     }
@@ -767,16 +767,16 @@ public final class UnitType extends BuildableType
         spaceTaken = xr.getAttribute(SPACE_TAKEN_TAG, parent.spaceTaken);
 
         maximumExperience = xr.getAttribute(MAXIMUM_EXPERIENCE_TAG,
-                                         parent.maximumExperience);
+                                            parent.maximumExperience);
 
         maximumAttrition = xr.getAttribute(MAXIMUM_ATTRITION_TAG,
-                                        parent.maximumAttrition);
+                                           parent.maximumAttrition);
 
         skillTaught = xr.getType(spec, SKILL_TAUGHT_TAG,
                                  UnitType.class, this);
 
         recruitProbability = xr.getAttribute(RECRUIT_PROBABILITY_TAG,
-                                          parent.recruitProbability);
+                                             parent.recruitProbability);
 
         skill = xr.getAttribute(SKILL_TAG, parent.skill);
 

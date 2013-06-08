@@ -20,8 +20,8 @@
 package net.sf.freecol.common.model.mission;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Unit;
 
 
@@ -86,9 +86,9 @@ public interface Mission {
      * This method writes an XML-representation of this object to
      * the given stream.
      *
-     * @param out The target stream.
+     * @param xw The <code>FreeColXMLWriter</code> to write to.
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
      */
-    public void toXML(XMLStreamWriter out) throws XMLStreamException;
+    public void toXML(FreeColXMLWriter xw) throws XMLStreamException;
 }

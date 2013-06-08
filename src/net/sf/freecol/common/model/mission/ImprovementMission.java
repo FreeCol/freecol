@@ -20,9 +20,9 @@
 package net.sf.freecol.common.model.mission;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.TileImprovement;
@@ -149,10 +149,10 @@ public class ImprovementMission extends AbstractMission {
     /**
      * {@inheritDoc}
      */
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
-        super.writeAttributes(out);
-        out.writeAttribute("improvement", improvement.getId());
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
+
+        xw.writeAttribute("improvement", improvement);
     }
 
 

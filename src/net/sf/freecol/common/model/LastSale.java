@@ -20,9 +20,9 @@
 package net.sf.freecol.common.model;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 
 import org.w3c.dom.Element;
 
@@ -118,6 +118,7 @@ public final class LastSale extends FreeColObject {
 
 
     // Serialization
+
     private static final String PRICE_TAG = "price";
     private static final String WHEN_TAG = "when";
 
@@ -126,12 +127,12 @@ public final class LastSale extends FreeColObject {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
-        writeAttribute(out, WHEN_TAG, when.getNumber());
+        xw.writeAttribute(WHEN_TAG, when.getNumber());
 
-        writeAttribute(out, PRICE_TAG, price);
+        xw.writeAttribute(PRICE_TAG, price);
     }
 
     /**

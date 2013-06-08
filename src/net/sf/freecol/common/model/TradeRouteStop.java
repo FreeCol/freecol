@@ -25,9 +25,9 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 
 
 /**
@@ -140,24 +140,24 @@ public class TradeRouteStop {
         this.location = newLocation;
     }
 
-    public void toXML(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
-        out.writeAttribute("location", this.location.getId());
+    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
+        xw.writeStartElement(getXMLElementTagName());
+        xw.writeAttribute("location", this.location.getId());
         if (goodsToUnload != null) {
-            out.writeStartElement("goodsToUnload");
+            xw.writeStartElement("goodsToUnload");
             for (AbstractGoods goods : goodsToUnload) {
-                goods.toXML(out);
+                goods.toXML(xw);
             }
-            out.writeEndElement();
+            xw.writeEndElement();
         }
         if (goodsToLoad != null) {
-            out.writeStartElement("goodsToLoad");
+            xw.writeStartElement("goodsToLoad");
             for (AbstractGoods goods : goodsToLoad) {
-                goods.toXML(out);
+                goods.toXML(xw);
             }
-            out.writeEndElement();
+            xw.writeEndElement();
         }
-        out.writeEndElement();
+        xw.writeEndElement();
     }
 
     /**

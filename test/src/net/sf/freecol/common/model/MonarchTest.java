@@ -21,33 +21,32 @@ package net.sf.freecol.common.model;
 
 import java.io.StringWriter;
 import java.util.List;
-import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.util.test.FreeColTestCase;
 
+
 public class MonarchTest extends FreeColTestCase {
 
-
     public void testSerialize() {
-
         Game game = getStandardGame();
         Player dutch = game.getPlayer("model.nation.dutch");
 
         try {
             StringWriter sw = new StringWriter();
-            XMLOutputFactory xif = XMLOutputFactory.newInstance();
-            XMLStreamWriter xsw = xif.createXMLStreamWriter(sw);
-            dutch.getMonarch().toXML(xsw);
-            xsw.close();
-        } catch (XMLStreamException e) {
+            FreeColXMLWriter xw = new FreeColXMLWriter(sw);
+
+            dutch.getMonarch().toXML(xw);
+
+            xw.close();
+
+        } catch (Exception e) {
             fail(e.toString());
         }
-
     }
 
     public void testTaxActionChoices() {

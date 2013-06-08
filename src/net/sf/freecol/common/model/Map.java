@@ -35,9 +35,9 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
@@ -2187,38 +2187,39 @@ public class Map extends FreeColGameObject implements Location {
     /**
      * {@inheritDoc}
      */
-    protected void writeAttributes(XMLStreamWriter out, Player player,
+    protected void writeAttributes(FreeColXMLWriter xw, Player player,
                                    boolean showAll,
                                    boolean toSavedGame) throws XMLStreamException {
-        super.writeAttributes(out);
+        super.writeAttributes(xw);
 
-        writeAttribute(out, WIDTH_TAG, getWidth());
+        xw.writeAttribute(WIDTH_TAG, getWidth());
 
-        writeAttribute(out, HEIGHT_TAG, getHeight());
+        xw.writeAttribute(HEIGHT_TAG, getHeight());
 
-        writeAttribute(out, LAYER_TAG, layer);
+        xw.writeAttribute(LAYER_TAG, layer);
 
-        writeAttribute(out, MINIMUM_LATITUDE_TAG, minimumLatitude);
+        xw.writeAttribute(MINIMUM_LATITUDE_TAG, minimumLatitude);
 
-        writeAttribute(out, MAXIMUM_LATITUDE_TAG, maximumLatitude);
+        xw.writeAttribute(MAXIMUM_LATITUDE_TAG, maximumLatitude);
     }
 
     /**
      * {@inheritDoc}
      */
-    protected void writeChildren(XMLStreamWriter out, Player player,
+    protected void writeChildren(FreeColXMLWriter xw, Player player,
                                  boolean showAll,
                                  boolean toSavedGame) throws XMLStreamException {
-        super.writeChildren(out);
+        super.writeChildren(xw);
 
-        for (Region region : getSortedCopy(regions.values())) region.toXML(out);
+        for (Region region : getSortedCopy(regions.values())) region.toXML(xw);
 
         for (Tile tile: getAllTiles()) {
             if (showAll || toSavedGame
                 || (player != null && player.hasExplored(tile))) {
-                tile.toXML(out, player, showAll, toSavedGame);
+                tile.toXML(xw, player, showAll, toSavedGame);
+
             } else {
-                tile.toXMLMinimal(out);
+                tile.toXMLMinimal(xw);
             }
         }
     }

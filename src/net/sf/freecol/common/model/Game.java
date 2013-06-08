@@ -30,9 +30,9 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.IntegerOption;
@@ -1029,21 +1029,21 @@ public class Game extends FreeColGameObject {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out, Player player,
+    protected void writeAttributes(FreeColXMLWriter xw, Player player,
                                    boolean showAll,
                                    boolean toSavedGame) throws XMLStreamException {
-        super.writeAttributes(out);
+        super.writeAttributes(xw);
 
-        if (toSavedGame) writeAttribute(out, NEXT_ID_TAG, nextId);
+        if (toSavedGame) xw.writeAttribute(NEXT_ID_TAG, nextId);
 
-        writeAttribute(out, UUID_TAG, getUUID());
+        xw.writeAttribute(UUID_TAG, getUUID());
 
-        writeAttribute(out, TURN_TAG, getTurn().getNumber());
+        xw.writeAttribute(TURN_TAG, getTurn().getNumber());
 
-        writeAttribute(out, SPANISH_SUCCESSION_TAG, spanishSuccession);
+        xw.writeAttribute(SPANISH_SUCCESSION_TAG, spanishSuccession);
 
         if (currentPlayer != null) {
-            writeAttribute(out, CURRENT_PLAYER_TAG, currentPlayer);
+            xw.writeAttribute(CURRENT_PLAYER_TAG, currentPlayer);
         }
     }
 
@@ -1051,40 +1051,40 @@ public class Game extends FreeColGameObject {
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out, Player player,
+    protected void writeChildren(FreeColXMLWriter xw, Player player,
                                  boolean showAll,
                                  boolean toSavedGame) throws XMLStreamException {
-        super.writeChildren(out);
+        super.writeChildren(xw);
 
-        specification.toXML(out);
+        specification.toXML(xw);
 
         for (String cityName : citiesOfCibola) { // Preserve existing order
-            out.writeStartElement(CIBOLA_TAG);
+            xw.writeStartElement(CIBOLA_TAG);
 
-            writeAttribute(out, ID_ATTRIBUTE_TAG, cityName);
+            xw.writeAttribute(ID_ATTRIBUTE_TAG, cityName);
 
-            out.writeEndElement();
+            xw.writeEndElement();
         }
 
-        nationOptions.toXML(out);
+        nationOptions.toXML(xw);
 
         for (Player p : getSortedCopy(getPlayers())) {
-            p.toXML(out, player, showAll, toSavedGame);
+            p.toXML(xw, player, showAll, toSavedGame);
         }
 
         Player enemy = getUnknownEnemy();
-        if (enemy != null) enemy.toXML(out, player, showAll, toSavedGame);
+        if (enemy != null) enemy.toXML(xw, player, showAll, toSavedGame);
 
-        if (map != null) map.toXML(out, player, showAll, toSavedGame);
+        if (map != null) map.toXML(xw, player, showAll, toSavedGame);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void toXMLPartial(XMLStreamWriter out,
+    protected void toXMLPartial(FreeColXMLWriter xw,
                                 String[] fields) throws XMLStreamException {
-        toXMLPartialByClass(out, getClass(), fields);
+        toXMLPartialByClass(xw, getClass(), fields);
     }
 
     /**

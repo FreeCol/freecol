@@ -23,9 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 
 
 /**
@@ -326,45 +326,45 @@ public class SettlementType extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
-        writeAttribute(out, CAPITAL_TAG, capital);
+        xw.writeAttribute(CAPITAL_TAG, capital);
 
-        writeAttribute(out, MINIMUM_SIZE_TAG, minimumSize);
+        xw.writeAttribute(MINIMUM_SIZE_TAG, minimumSize);
 
-        writeAttribute(out, MAXIMUM_SIZE_TAG, maximumSize);
+        xw.writeAttribute(MAXIMUM_SIZE_TAG, maximumSize);
 
-        writeAttribute(out, VISIBLE_RADIUS_TAG, visibleRadius);
+        xw.writeAttribute(VISIBLE_RADIUS_TAG, visibleRadius);
 
-        writeAttribute(out, CLAIMABLE_RADIUS_TAG, claimableRadius);
+        xw.writeAttribute(CLAIMABLE_RADIUS_TAG, claimableRadius);
 
-        writeAttribute(out, EXTRA_CLAIMABLE_RADIUS_TAG, extraClaimableRadius);
+        xw.writeAttribute(EXTRA_CLAIMABLE_RADIUS_TAG, extraClaimableRadius);
 
-        writeAttribute(out, WANDERING_RADIUS_TAG, wanderingRadius);
+        xw.writeAttribute(WANDERING_RADIUS_TAG, wanderingRadius);
 
-        writeAttribute(out, MINIMUM_GROWTH_TAG, minimumGrowth);
+        xw.writeAttribute(MINIMUM_GROWTH_TAG, minimumGrowth);
 
-        writeAttribute(out, MAXIMUM_GROWTH_TAG, maximumGrowth);
+        xw.writeAttribute(MAXIMUM_GROWTH_TAG, maximumGrowth);
 
-        writeAttribute(out, TRADE_BONUS_TAG, tradeBonus);
+        xw.writeAttribute(TRADE_BONUS_TAG, tradeBonus);
 
-        writeAttribute(out, CONVERT_THRESHOLD_TAG, convertThreshold);
+        xw.writeAttribute(CONVERT_THRESHOLD_TAG, convertThreshold);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        super.writeChildren(out);
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeChildren(xw);
 
         if (plunder != null) {
-            for (RandomRange range : plunder) range.toXML(out, PLUNDER_TAG);
+            for (RandomRange range : plunder) range.toXML(xw, PLUNDER_TAG);
         }
 
         if (gifts != null) {
-            for (RandomRange range : gifts) range.toXML(out, GIFTS_TAG);
+            for (RandomRange range : gifts) range.toXML(xw, GIFTS_TAG);
         }
     }
 
@@ -384,13 +384,13 @@ public class SettlementType extends FreeColGameObjectType {
         visibleRadius = xr.getAttribute(VISIBLE_RADIUS_TAG, visibleRadius);
 
         claimableRadius = xr.getAttribute(CLAIMABLE_RADIUS_TAG,
-                                       claimableRadius);
+                                          claimableRadius);
 
         extraClaimableRadius = xr.getAttribute(EXTRA_CLAIMABLE_RADIUS_TAG,
-                                            extraClaimableRadius);
+                                               extraClaimableRadius);
 
         wanderingRadius = xr.getAttribute(WANDERING_RADIUS_TAG,
-                                       wanderingRadius);
+                                          wanderingRadius);
 
         minimumGrowth = xr.getAttribute(MINIMUM_GROWTH_TAG, minimumGrowth);
 
@@ -399,7 +399,7 @@ public class SettlementType extends FreeColGameObjectType {
         tradeBonus = xr.getAttribute(TRADE_BONUS_TAG, tradeBonus);
 
         convertThreshold = xr.getAttribute(CONVERT_THRESHOLD_TAG,
-                                        convertThreshold);
+                                           convertThreshold);
     }
 
     /**

@@ -29,9 +29,9 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Element;
@@ -476,26 +476,26 @@ public final class Market extends FreeColGameObject implements Ownable {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out, Player player,
+    protected void writeAttributes(FreeColXMLWriter xw, Player player,
                                    boolean showAll,
                                    boolean toSavedGame) throws XMLStreamException {
-        super.writeAttributes(out);
+        super.writeAttributes(xw);
 
-        writeAttribute(out, OWNER_TAG, owner);
+        xw.writeAttribute(OWNER_TAG, owner);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out, Player player,
+    protected void writeChildren(FreeColXMLWriter xw, Player player,
                                  boolean showAll,
                                  boolean toSavedGame) throws XMLStreamException {
-        super.writeChildren(out);
+        super.writeChildren(xw);
 
         if (showAll || toSavedGame || (player != null && player == owner)) {
             for (MarketData data : getSortedCopy(marketData.values())) {
-                data.toXML(out, player, showAll, toSavedGame);
+                data.toXML(xw, player, showAll, toSavedGame);
             }
         }
     }

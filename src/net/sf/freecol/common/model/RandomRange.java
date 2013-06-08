@@ -27,9 +27,9 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.util.Utils;
 
 
@@ -188,8 +188,6 @@ public class RandomRange {
 
 
     // Serialization
-    // Note, this is not a FreeColObject, so the usual convenience functions
-    // are not available.
 
     private static final String FACTOR_TAG = "factor";
     private static final String MAXIMUM_TAG = "maximum";
@@ -202,24 +200,24 @@ public class RandomRange {
      * This method writes an XML-representation of this object to
      * the given stream.
      *
-     * @param out The target stream.
+     * @param xw The <code>FreeColXMLWriter</code> to write to.
      * @exception XMLStreamException if there are any problems writing
      *     to the stream.
      */
-    public void toXML(XMLStreamWriter out, String tag) throws XMLStreamException {
-        out.writeStartElement(tag);
+    public void toXML(FreeColXMLWriter xw, String tag) throws XMLStreamException {
+        xw.writeStartElement(tag);
 
-        out.writeAttribute(PROBABILITY_TAG, Integer.toString(probability));
+        xw.writeAttribute(PROBABILITY_TAG, probability);
 
-        out.writeAttribute(MINIMUM_TAG, Integer.toString(minimum));
+        xw.writeAttribute(MINIMUM_TAG, minimum);
 
-        out.writeAttribute(MAXIMUM_TAG, Integer.toString(maximum));
+        xw.writeAttribute(MAXIMUM_TAG, maximum);
 
-        out.writeAttribute(FACTOR_TAG, Integer.toString(factor));
+        xw.writeAttribute(FACTOR_TAG, factor);
 
-        for (Scope scope : getScopes()) scope.toXML(out);
+        for (Scope scope : getScopes()) scope.toXML(xw);
 
-        out.writeEndElement();
+        xw.writeEndElement();
     }
 
     /**

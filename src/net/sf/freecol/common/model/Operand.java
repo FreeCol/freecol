@@ -27,9 +27,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 
 
 /**
@@ -355,15 +355,15 @@ public class Operand extends Scope {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
-        writeAttribute(out, OPERAND_TYPE_TAG, operandType.toString());
+        xw.writeAttribute(OPERAND_TYPE_TAG, operandType.toString());
 
-        writeAttribute(out, SCOPE_LEVEL_TAG, scopeLevel.toString());
+        xw.writeAttribute(SCOPE_LEVEL_TAG, scopeLevel.toString());
 
         if (value != null) {
-            writeAttribute(out, VALUE_TAG, value);
+            xw.writeAttribute(VALUE_TAG, value);
         }
     }
 
@@ -378,7 +378,7 @@ public class Operand extends Scope {
                                    OperandType.class, OperandType.NONE);
 
         scopeLevel = xr.getAttribute(SCOPE_LEVEL_TAG,
-                                  ScopeLevel.class, ScopeLevel.NONE);
+                                     ScopeLevel.class, ScopeLevel.NONE);
 
         int val = xr.getAttribute(VALUE_TAG, INFINITY);
         if (val != INFINITY) value = new Integer(val);

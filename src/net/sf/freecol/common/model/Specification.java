@@ -34,11 +34,11 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.option.AbstractOption;
@@ -78,7 +78,7 @@ public final class Specification {
          * {@inheritDoc}
          */
         @Override
-        public void toXML(XMLStreamWriter out) {
+        public void toXML(FreeColXMLWriter xw) {
             throw new RuntimeException("Can not happen");
         }
 
@@ -1571,59 +1571,62 @@ public final class Specification {
     /**
      * Write an XML-representation of this object to the given stream.
      *
-     * @param out The output stream.
+     * @param xw The <code>FreeColXMLWriter</code> to write to.
      * @exception XMLStreamException if there are any problems writing
      *      to the stream.
      */
-    protected void toXML(XMLStreamWriter out) throws XMLStreamException {
-        // Start element:
-        out.writeStartElement(getXMLElementTagName());
+    protected void toXML(FreeColXMLWriter xw) throws XMLStreamException {
+        // Start element
+        xw.writeStartElement(getXMLElementTagName());
 
-        // Add attributes:
-        out.writeAttribute(FreeColObject.ID_ATTRIBUTE_TAG, getId());
+        // Add attributes
+        xw.writeAttribute(FreeColObject.ID_ATTRIBUTE_TAG, getId());
         if (difficultyLevel != null) {
-            out.writeAttribute(DIFFICULTY_LEVEL_TAG, difficultyLevel);
+            xw.writeAttribute(DIFFICULTY_LEVEL_TAG, difficultyLevel);
         }
         if (version != null) {
-            out.writeAttribute(VERSION_TAG, version);
+            xw.writeAttribute(VERSION_TAG, version);
         }
 
         // copy the order of section in specification.xml
-        writeSection(out, MODIFIERS_TAG, specialModifiers);
-        writeSection(out, EVENTS_TAG, events);
-        writeSection(out, DISASTERS_TAG, disasters);
-        writeSection(out, GOODS_TYPES_TAG, goodsTypeList);
-        writeSection(out, RESOURCE_TYPES_TAG, resourceTypeList);
-        writeSection(out, TILE_TYPES_TAG, tileTypeList);
-        writeSection(out, ROLES_TAG, roles);
-        writeSection(out, EQUIPMENT_TYPES_TAG, equipmentTypes);
-        writeSection(out, TILEIMPROVEMENT_TYPES_TAG, tileImprovementTypeList);
-        writeSection(out, UNIT_TYPES_TAG, unitTypeList);
-        writeSection(out, BUILDING_TYPES_TAG, buildingTypeList);
-        writeSection(out, FOUNDING_FATHERS_TAG, foundingFathers);
-        writeSection(out, EUROPEAN_NATION_TYPES_TAG, europeanNationTypes);
-        writeSection(out, EUROPEAN_NATION_TYPES_TAG, REFNationTypes);
-        writeSection(out, INDIAN_NATION_TYPES_TAG, indianNationTypes);
-        writeSection(out, NATIONS_TAG, nations);
+        writeSection(xw, MODIFIERS_TAG, specialModifiers);
+        writeSection(xw, EVENTS_TAG, events);
+        writeSection(xw, DISASTERS_TAG, disasters);
+        writeSection(xw, GOODS_TYPES_TAG, goodsTypeList);
+        writeSection(xw, RESOURCE_TYPES_TAG, resourceTypeList);
+        writeSection(xw, TILE_TYPES_TAG, tileTypeList);
+        writeSection(xw, ROLES_TAG, roles);
+        writeSection(xw, EQUIPMENT_TYPES_TAG, equipmentTypes);
+        writeSection(xw, TILEIMPROVEMENT_TYPES_TAG, tileImprovementTypeList);
+        writeSection(xw, UNIT_TYPES_TAG, unitTypeList);
+        writeSection(xw, BUILDING_TYPES_TAG, buildingTypeList);
+        writeSection(xw, FOUNDING_FATHERS_TAG, foundingFathers);
+        writeSection(xw, EUROPEAN_NATION_TYPES_TAG, europeanNationTypes);
+        writeSection(xw, EUROPEAN_NATION_TYPES_TAG, REFNationTypes);
+        writeSection(xw, INDIAN_NATION_TYPES_TAG, indianNationTypes);
+        writeSection(xw, NATIONS_TAG, nations);
+
         // option tree has been flattened
-        out.writeStartElement(OPTIONS_TAG);
+        xw.writeStartElement(OPTIONS_TAG);
         for (OptionGroup item : allOptionGroups.values()) {
             if ("".equals(item.getGroup())) {
-                item.toXML(out);
+                item.toXML(xw);
             }
         }
-        out.writeEndElement();
+        xw.writeEndElement();
 
-        // End element:
-        out.writeEndElement();
+        // End element
+        xw.writeEndElement();
 
     }
 
-    private <T extends FreeColObject> void writeSection(XMLStreamWriter out,
+    private <T extends FreeColObject> void writeSection(FreeColXMLWriter xw,
         String section, Collection<T> items) throws XMLStreamException {
-        out.writeStartElement(section);
-        for (T item : items) item.toXML(out);
-        out.writeEndElement();
+        xw.writeStartElement(section);
+
+        for (T item : items) item.toXML(xw);
+
+        xw.writeEndElement();
     }
 
     /**

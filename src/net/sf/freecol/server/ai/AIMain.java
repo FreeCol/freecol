@@ -27,9 +27,9 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColGameObjectListener;
@@ -424,19 +424,19 @@ public class AIMain extends FreeColObject
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         // Does not have an identifier, so no need for
         // super.writeAttributes()
 
-        writeAttribute(out, NEXT_ID_TAG, nextId);
+        xw.writeAttribute(NEXT_ID_TAG, nextId);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        super.writeChildren(out);
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeChildren(xw);
 
         for (AIObject aio : FreeColObject.getSortedCopy(aiObjects.values())) {
             if (aio.checkIntegrity(false) < 0) {
@@ -459,7 +459,7 @@ public class AIMain extends FreeColObject
                     logger.warning("Null AI identifier for: "
                         + aio.getClass().getName());
                 } else {
-                    aio.toXML(out);
+                    aio.toXML(xw);
                 }
             } catch (Exception e) {
                 logger.log(Level.WARNING, "Failed to write AI object: " + aio,
@@ -565,7 +565,7 @@ public class AIMain extends FreeColObject
 
         } catch (Exception e) {
             logger.log(Level.WARNING, "Exception reading AIObject: "
-                + tag + ", id=" + oid, e);
+                       + tag + ", id=" + oid, e);
             // We are hosed.  Try to at least resynchronize at the end
             // of aiMain.
             while (!xr.getLocalName().equals(tag)

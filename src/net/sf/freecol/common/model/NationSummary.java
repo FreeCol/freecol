@@ -20,9 +20,9 @@
 package net.sf.freecol.common.model;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Player.Stance;
 
 import org.w3c.dom.Element;
@@ -167,31 +167,31 @@ public class NationSummary extends FreeColObject {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
-        writeAttribute(out, NUMBER_OF_SETTLEMENTS_TAG, numberOfSettlements);
+        xw.writeAttribute(NUMBER_OF_SETTLEMENTS_TAG, numberOfSettlements);
 
-        writeAttribute(out, NUMBER_OF_UNITS_TAG, numberOfUnits);
+        xw.writeAttribute(NUMBER_OF_UNITS_TAG, numberOfUnits);
 
-        writeAttribute(out, MILITARY_STRENGTH_TAG, militaryStrength);
+        xw.writeAttribute(MILITARY_STRENGTH_TAG, militaryStrength);
 
-        writeAttribute(out, NAVAL_STRENGTH_TAG, navalStrength);
+        xw.writeAttribute(NAVAL_STRENGTH_TAG, navalStrength);
 
-        writeAttribute(out, STANCE_TAG, stance);
+        xw.writeAttribute(STANCE_TAG, stance);
 
-        writeAttribute(out, GOLD_TAG, gold);
+        xw.writeAttribute(GOLD_TAG, gold);
 
         if (soL >= 0) {
-            writeAttribute(out, SOL_TAG, soL);
+            xw.writeAttribute(SOL_TAG, soL);
         }
 
         if (foundingFathers >= 0) {
-            writeAttribute(out, FOUNDING_FATHERS_TAG, foundingFathers);
+            xw.writeAttribute(FOUNDING_FATHERS_TAG, foundingFathers);
         }
 
         if (tax >= 0) {
-            writeAttribute(out, TAX_TAG, tax);
+            xw.writeAttribute(TAX_TAG, tax);
         }
     }
 

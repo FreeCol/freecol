@@ -21,9 +21,9 @@ package net.sf.freecol.common.model;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.option.OptionGroup;
 
 
@@ -250,15 +250,15 @@ public abstract class FreeColGameObjectType extends FreeColObject
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        super.writeChildren(out);
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeChildren(xw);
 
         for (Ability ability : getSortedCopy(getAbilities())) {
-            ability.toXML(out);
+            ability.toXML(xw);
         }
 
         for (Modifier modifier : getSortedModifiers()) {
-            modifier.toXML(out);
+            modifier.toXML(xw);
         }
     }
 

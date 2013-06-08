@@ -24,10 +24,10 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.Mods;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Specification;
 
 
@@ -162,11 +162,11 @@ public class ModOption extends AbstractOption<FreeColModFile> {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
         if (value != null) {
-            out.writeAttribute(VALUE_TAG, value.getId());
+            xw.writeAttribute(VALUE_TAG, value.getId());
         }
     }
 

@@ -22,9 +22,9 @@ package net.sf.freecol.common.model;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 
 import org.w3c.dom.Element;
 
@@ -242,11 +242,11 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
         if (location != null) {
-            writeAttribute(out, LOCATION_TAG, (FreeColGameObject)location);
+            xw.writeAttribute(LOCATION_TAG, (FreeColGameObject)location);
         }
     }
 

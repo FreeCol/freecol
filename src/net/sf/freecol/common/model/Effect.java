@@ -24,9 +24,9 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 
 
 /**
@@ -146,20 +146,20 @@ public class Effect extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
-        writeAttribute(out, PROBABILITY_TAG, probability);
+        xw.writeAttribute(PROBABILITY_TAG, probability);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        super.writeChildren(out);
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeChildren(xw);
 
-        for (Scope scope : getScopes()) scope.toXML(out);
+        for (Scope scope : getScopes()) scope.toXML(xw);
     }
 
     /**

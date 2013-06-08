@@ -30,13 +30,12 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.PlayerExploredTile;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Layer;
-
-import net.sf.freecol.common.io.FreeColXMLReader;
 
 
 /**
@@ -571,33 +570,33 @@ public class TileItemContainer extends FreeColGameObject {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out, Player player,
+    protected void writeAttributes(FreeColXMLWriter xw, Player player,
                                    boolean showAll,
                                    boolean toSavedGame) throws XMLStreamException {
-        super.writeAttributes(out);
+        super.writeAttributes(xw);
 
-        writeAttribute(out, TILE_TAG, tile);
+        xw.writeAttribute(TILE_TAG, tile);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out, Player player,
+    protected void writeChildren(FreeColXMLWriter xw, Player player,
                                  boolean showAll,
                                  boolean toSavedGame) throws XMLStreamException {
         PlayerExploredTile pet;
 
         if (showAll || toSavedGame || player.canSee(tile)) {
             for (TileItem item : tileItems) {
-                item.toXML(out, player, showAll, toSavedGame);
+                item.toXML(xw, player, showAll, toSavedGame);
             }
 
         } else if ((pet = tile.getPlayerExploredTile(player)) != null) {
             List<TileItem> petItems = pet.getTileItems();
             Collections.sort(petItems, tileItemComparator);
             for (TileItem item : petItems) {
-                item.toXML(out, player, showAll, toSavedGame);
+                item.toXML(xw, player, showAll, toSavedGame);
             }
         }
     }

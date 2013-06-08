@@ -24,9 +24,9 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.UnitType;
@@ -232,19 +232,19 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
         if (value != null) {
-            writeAttribute(out, VALUE_TAG, value);
+            xw.writeAttribute(VALUE_TAG, value);
         }
 
         if (generateChoices != null) {
-            writeAttribute(out, GENERATE_TAG, generateChoices);
+            xw.writeAttribute(GENERATE_TAG, generateChoices);
         }
 
         if (addNone) {
-            writeAttribute(out, ADD_NONE_TAG, addNone);
+            xw.writeAttribute(ADD_NONE_TAG, addNone);
         }
     }
 
@@ -252,16 +252,16 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        super.writeChildren(out);
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeChildren(xw);
 
         if (choices != null && !choices.isEmpty()) {
             for (UnitType choice : choices) {
-                out.writeStartElement(CHOICE_TAG);
+                xw.writeStartElement(CHOICE_TAG);
 
-                writeAttribute(out, VALUE_TAG, choice);
+                xw.writeAttribute(VALUE_TAG, choice);
 
-                out.writeEndElement();
+                xw.writeEndElement();
             }
         }
     }

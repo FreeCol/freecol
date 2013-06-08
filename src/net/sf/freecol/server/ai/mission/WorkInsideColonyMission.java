@@ -22,9 +22,9 @@ package net.sf.freecol.server.ai.mission;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.server.ai.AIColony;
@@ -181,9 +181,9 @@ public class WorkInsideColonyMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    public void toXML(XMLStreamWriter out) throws XMLStreamException {
+    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
         if (isValid()) {
-            super.toXML(out, getXMLElementTagName());
+            super.toXML(xw, getXMLElementTagName());
         }
     }
 
@@ -191,10 +191,10 @@ public class WorkInsideColonyMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
-        writeAttribute(out, COLONY_TAG, aiColony);
+        xw.writeAttribute(COLONY_TAG, aiColony);
     }
 
     /**

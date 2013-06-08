@@ -25,9 +25,9 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.EquipmentType;
@@ -663,8 +663,8 @@ public class AIUnit extends AIObject implements Transportable {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
         if (transport != null) {
             Unit u = transport.getUnit();
@@ -673,7 +673,7 @@ public class AIUnit extends AIObject implements Transportable {
             } else if (transport.isDisposed()) {
                 logger.warning("broken reference to transport");
             } else {
-                writeAttribute(out, TRANSPORT_TAG, u);
+                xw.writeAttribute(TRANSPORT_TAG, u);
             }
         }
     }
@@ -682,15 +682,15 @@ public class AIUnit extends AIObject implements Transportable {
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        super.writeChildren(out);
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeChildren(xw);
 
         if (mission != null && !mission.isOneTime()) {
             String reason = mission.invalidReason();
             if (reason != null) {
                 abortMission(reason);
             } else {
-                mission.toXML(out);
+                mission.toXML(xw);
             }
         }
     }

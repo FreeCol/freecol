@@ -22,9 +22,9 @@ package net.sf.freecol.common.model;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 
 import org.w3c.dom.Element;
 
@@ -397,26 +397,26 @@ public class MarketData extends FreeColGameObject {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out, Player player,
+    protected void writeAttributes(FreeColXMLWriter xw, Player player,
                                    boolean showAll,
                                    boolean toSavedGame) throws XMLStreamException {
-        super.writeAttributes(out);
+        super.writeAttributes(xw);
 
-        writeAttribute(out, GOODS_TYPE_TAG, goodsType);
+        xw.writeAttribute(GOODS_TYPE_TAG, goodsType);
 
-        writeAttribute(out, AMOUNT_TAG, amountInMarket);
+        xw.writeAttribute(AMOUNT_TAG, amountInMarket);
 
-        writeAttribute(out, INITIAL_PRICE_TAG, initialPrice);
+        xw.writeAttribute(INITIAL_PRICE_TAG, initialPrice);
 
-        writeAttribute(out, ARREARS_TAG, arrears);
+        xw.writeAttribute(ARREARS_TAG, arrears);
 
-        writeAttribute(out, SALES_TAG, sales);
+        xw.writeAttribute(SALES_TAG, sales);
 
-        writeAttribute(out, INCOME_AFTER_TAXES_TAG, incomeAfterTaxes);
+        xw.writeAttribute(INCOME_AFTER_TAXES_TAG, incomeAfterTaxes);
 
-        writeAttribute(out, INCOME_BEFORE_TAXES_TAG, incomeBeforeTaxes);
+        xw.writeAttribute(INCOME_BEFORE_TAXES_TAG, incomeBeforeTaxes);
 
-        writeAttribute(out, TRADED_TAG, traded);
+        xw.writeAttribute(TRADED_TAG, traded);
     }
 
     /**

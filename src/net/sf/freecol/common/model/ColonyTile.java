@@ -28,9 +28,9 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Player.NoClaimReason;
 
 
@@ -518,21 +518,21 @@ public class ColonyTile extends WorkLocation implements Ownable {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out, Player player,
+    protected void writeAttributes(FreeColXMLWriter xw, Player player,
                                    boolean showAll,
                                    boolean toSavedGame) throws XMLStreamException {
-        super.writeAttributes(out, player, showAll, toSavedGame);
+        super.writeAttributes(xw, player, showAll, toSavedGame);
 
-        writeAttribute(out, WORK_TILE_TAG, workTile);
+        xw.writeAttribute(WORK_TILE_TAG, workTile);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void toXMLPartial(XMLStreamWriter out,
+    protected void toXMLPartial(FreeColXMLWriter xw,
                                 String[] fields) throws XMLStreamException {
-        toXMLPartialByClass(out, ColonyTile.class, fields);
+        toXMLPartialByClass(xw, ColonyTile.class, fields);
     }
 
     /**

@@ -20,9 +20,9 @@
 package net.sf.freecol.common.model;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Operand.OperandType;
 
 
@@ -307,24 +307,24 @@ public final class Limit extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
         // Force operator to be an upper case string (do not use the
         // writeAttribute(... Enum) routine which downcases).
-        writeAttribute(out, OPERATOR_TAG, operator.toString());
+        xw.writeAttribute(OPERATOR_TAG, operator.toString());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        super.writeChildren(out);
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeChildren(xw);
 
-        leftHandSide.toXML(out, LEFT_HAND_SIDE_TAG);
+        leftHandSide.toXML(xw, LEFT_HAND_SIDE_TAG);
 
-        rightHandSide.toXML(out, RIGHT_HAND_SIDE_TAG);
+        rightHandSide.toXML(xw, RIGHT_HAND_SIDE_TAG);
     }
 
     /**
@@ -335,7 +335,7 @@ public final class Limit extends FreeColGameObjectType {
         super.readAttributes(xr);
 
         operator = xr.getAttribute(OPERATOR_TAG,
-                                Operator.class, (Operator)null);
+                                   Operator.class, (Operator)null);
     }
 
     /**

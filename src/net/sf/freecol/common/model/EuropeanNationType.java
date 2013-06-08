@@ -27,9 +27,9 @@ import java.util.Locale;
 import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.OptionGroup;
@@ -151,52 +151,52 @@ public class EuropeanNationType extends NationType {
      * {@inheritDoc}
      */
     @Override
-    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    public void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
-        writeAttribute(out, REF_TAG, ref);
+        xw.writeAttribute(REF_TAG, ref);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        super.writeChildren(out);
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeChildren(xw);
 
         if (startingUnitMap != null && !startingUnitMap.isEmpty()) {
             Map<String, AbstractUnit> map;
             // default map
             if ((map = startingUnitMap.get(null)) != null) {
                 for (Map.Entry<String, AbstractUnit> entry : map.entrySet()) {
-                    writeUnit(out, entry.getKey(), entry.getValue(), false);
+                    writeUnit(xw, entry.getKey(), entry.getValue(), false);
                 }
             }
             // expert map
             if ((map = startingUnitMap.get(Boolean.TRUE.toString())) != null) {
                 for (Map.Entry<String, AbstractUnit> entry : map.entrySet()) {
-                    writeUnit(out, entry.getKey(), entry.getValue(), true);
+                    writeUnit(xw, entry.getKey(), entry.getValue(), true);
                 }
             }
         }
     }
 
-    private void writeUnit(XMLStreamWriter out, String id,
+    private void writeUnit(FreeColXMLWriter xw, String id,
                            AbstractUnit unit,
                            boolean expert) throws XMLStreamException {
-        out.writeStartElement(UNIT_TAG);
+        xw.writeStartElement(UNIT_TAG);
 
-        writeAttribute(out, ID_ATTRIBUTE_TAG, id);
+        xw.writeAttribute(ID_ATTRIBUTE_TAG, id);
 
-        writeAttribute(out, TYPE_TAG, unit);
+        xw.writeAttribute(TYPE_TAG, unit);
 
-        writeAttribute(out, ROLE_TAG, unit.getRole());
+        xw.writeAttribute(ROLE_TAG, unit.getRole());
 
         //writeAttribute(out, "number", unit.getNumber());
 
-        if (expert) writeAttribute(out, EXPERT_STARTING_UNITS_TAG, expert);
+        if (expert) xw.writeAttribute(EXPERT_STARTING_UNITS_TAG, expert);
 
-        out.writeEndElement();
+        xw.writeEndElement();
     }
 
     /**

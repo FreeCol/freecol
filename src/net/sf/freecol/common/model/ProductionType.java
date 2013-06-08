@@ -23,9 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 
 
 /**
@@ -242,16 +242,16 @@ public class ProductionType extends FreeColObject {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         // ProductionType does not need an id.
         // No need for: super.writeAttributes(out);
 
         if (unattended) {
-            writeAttribute(out, UNATTENDED_TAG, unattended);
+            xw.writeAttribute(UNATTENDED_TAG, unattended);
         }
 
         if (productionLevel != null) {
-            writeAttribute(out, PRODUCTION_LEVEL_TAG, productionLevel);
+            xw.writeAttribute(PRODUCTION_LEVEL_TAG, productionLevel);
         }
     }
 
@@ -259,30 +259,30 @@ public class ProductionType extends FreeColObject {
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        super.writeChildren(out);
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeChildren(xw);
 
         if (inputs != null) {
             for (AbstractGoods input : inputs) {
-                out.writeStartElement(INPUT_TAG);
+                xw.writeStartElement(INPUT_TAG);
 
-                writeAttribute(out, GOODS_TYPE_TAG, input.getType());
+                xw.writeAttribute(GOODS_TYPE_TAG, input.getType());
 
-                writeAttribute(out, VALUE_TAG, input.getAmount());
+                xw.writeAttribute(VALUE_TAG, input.getAmount());
 
-                out.writeEndElement();
+                xw.writeEndElement();
             }
         }
 
         if (outputs != null) {
             for (AbstractGoods output : outputs) {
-                out.writeStartElement(OUTPUT_TAG);
+                xw.writeStartElement(OUTPUT_TAG);
 
-                writeAttribute(out, GOODS_TYPE_TAG, output.getType());
+                xw.writeAttribute(GOODS_TYPE_TAG, output.getType());
 
-                writeAttribute(out, VALUE_TAG, output.getAmount());
+                xw.writeAttribute(VALUE_TAG, output.getAmount());
 
-                out.writeEndElement();
+                xw.writeEndElement();
             }
         }
     }
@@ -326,16 +326,14 @@ public class ProductionType extends FreeColObject {
             GoodsType type = xr.getType(spec, GOODS_TYPE_TAG,
                                         GoodsType.class, (GoodsType)null);
             int amount = xr.getAttribute(VALUE_TAG, -1);
-
-            if (type != null && amount >= 0) addInput(type, amount);
+            addInput(type, amount);
             xr.closeTag(INPUT_TAG);
 
         } else if (OUTPUT_TAG.equals(tag)) {
             GoodsType type = xr.getType(spec, GOODS_TYPE_TAG,
                                         GoodsType.class, (GoodsType)null);
             int amount = xr.getAttribute(VALUE_TAG, -1);
-
-            if (type != null && amount >= 0) addOutput(type, amount);
+            addOutput(type, amount);
             xr.closeTag(OUTPUT_TAG);
 
         } else {

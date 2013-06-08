@@ -23,9 +23,9 @@ package net.sf.freecol.server.ai;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Location;
@@ -193,15 +193,15 @@ public abstract class Wish extends ValuedAIObject {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
         // Write identifier, Location will match Object
         if (destination != null) {
-            writeAttribute(out, DESTINATION_TAG, destination.getId());
+            xw.writeAttribute(DESTINATION_TAG, destination.getId());
 
             if (transportable != null) {
-                writeAttribute(out, TRANSPORTABLE_TAG, transportable.getId());
+                xw.writeAttribute(TRANSPORTABLE_TAG, transportable.getId());
             }
         }
     }
@@ -215,7 +215,8 @@ public abstract class Wish extends ValuedAIObject {
 
         final AIMain aiMain = getAIMain();
 
-        destination = xr.findLocationAttribute(aiMain.getGame(), DESTINATION_TAG);
+        destination = xr.findLocationAttribute(aiMain.getGame(),
+                                               DESTINATION_TAG);
 
         if (xr.hasAttribute(TRANSPORTABLE_TAG)) {
             transportable = getAttribute(xr, TRANSPORTABLE_TAG,

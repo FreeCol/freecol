@@ -43,6 +43,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.OptionGroupUI;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.option.OptionGroup;
 

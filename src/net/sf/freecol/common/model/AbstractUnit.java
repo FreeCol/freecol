@@ -23,9 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Unit.Role;
 
 
@@ -202,12 +202,12 @@ public class AbstractUnit extends FreeColObject {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
-        writeAttribute(out, ROLE_TAG, role);
+        xw.writeAttribute(ROLE_TAG, role);
 
-        writeAttribute(out, NUMBER_TAG, number);
+        xw.writeAttribute(NUMBER_TAG, number);
     }
 
     /**

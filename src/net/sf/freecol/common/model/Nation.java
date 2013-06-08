@@ -20,9 +20,9 @@
 package net.sf.freecol.common.model;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 
 
 /**
@@ -137,18 +137,18 @@ public class Nation extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
-        writeAttribute(out, NATION_TYPE_TAG, type);
+        xw.writeAttribute(NATION_TYPE_TAG, type);
 
-        writeAttribute(out, SELECTABLE_TAG, selectable);
+        xw.writeAttribute(SELECTABLE_TAG, selectable);
 
-        writeAttribute(out, PREFERRED_LATITUDE_TAG, preferredLatitude);
+        xw.writeAttribute(PREFERRED_LATITUDE_TAG, preferredLatitude);
 
-        writeAttribute(out, STARTS_ON_EAST_COAST_TAG, startsOnEastCoast);
+        xw.writeAttribute(STARTS_ON_EAST_COAST_TAG, startsOnEastCoast);
 
-        if (refNation != null) writeAttribute(out, REF_TAG, refNation);
+        if (refNation != null) xw.writeAttribute(REF_TAG, refNation);
     }
 
     /**

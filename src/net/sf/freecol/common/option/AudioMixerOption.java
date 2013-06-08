@@ -30,9 +30,9 @@ import java.util.logging.Logger;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Mixer;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Specification;
 
 
@@ -218,11 +218,11 @@ public class AudioMixerOption extends AbstractOption<AudioMixerOption.MixerWrapp
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
         if (value != null) {
-            out.writeAttribute(VALUE_TAG, value.getKey());
+            xw.writeAttribute(VALUE_TAG, value.getKey());
         }
     }
 

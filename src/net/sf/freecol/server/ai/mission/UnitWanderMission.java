@@ -22,9 +22,9 @@ package net.sf.freecol.server.ai.mission;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIUnit;
@@ -135,9 +135,9 @@ public class UnitWanderMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    public void toXML(XMLStreamWriter out) throws XMLStreamException {
+    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
         if (isValid()) {
-            toXML(out, getXMLElementTagName());
+            toXML(xw, getXMLElementTagName());
         }
     }
 

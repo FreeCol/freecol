@@ -25,9 +25,9 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit.Role;
@@ -183,14 +183,14 @@ public class AbstractUnitOption extends AbstractOption<AbstractUnit> {
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        super.writeChildren(out);
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeChildren(xw);
 
-        number.toXML(out, NUMBER_TAG);
+        number.toXML(xw, NUMBER_TAG);
 
-        role.toXML(out, ROLE_TAG);
+        role.toXML(xw, ROLE_TAG);
 
-        unitType.toXML(out, UNIT_TYPE_TAG);
+        unitType.toXML(xw, UNIT_TYPE_TAG);
     }
 
     /**

@@ -25,9 +25,9 @@ import java.util.List;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Player.Stance;
 
 import org.w3c.dom.Element;
@@ -292,24 +292,24 @@ public class DiplomaticTrade extends FreeColObject {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
-        writeAttribute(out, SENDER_TAG, sender);
+        xw.writeAttribute(SENDER_TAG, sender);
 
-        writeAttribute(out, RECIPIENT_TAG, recipient);
+        xw.writeAttribute(RECIPIENT_TAG, recipient);
 
-        writeAttribute(out, STATUS_TAG, status.toString());
+        xw.writeAttribute(STATUS_TAG, status);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        super.writeChildren(out);
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeChildren(xw);
 
-        for (TradeItem item : items) item.toXML(out);
+        for (TradeItem item : items) item.toXML(xw);
     }
 
     /**

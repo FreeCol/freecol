@@ -22,9 +22,9 @@ package net.sf.freecol.server.ai;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Location;
@@ -224,6 +224,4 @@ public abstract class AIObject extends FreeColObject {
     }
 
     // Serialization is all inherited from FreeColObject.
-
-    // No getXMLElementTagName(), this is abstract.
 }

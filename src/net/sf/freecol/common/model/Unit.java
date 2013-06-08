@@ -34,10 +34,10 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.GameOptions;
@@ -3752,93 +3752,93 @@ public class Unit extends GoodsLocation
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out, Player player,
+    protected void writeAttributes(FreeColXMLWriter xw, Player player,
                                    boolean showAll,
                                    boolean toSavedGame) throws XMLStreamException {
         boolean full = showAll || toSavedGame || player == getOwner();
 
-        super.writeAttributes(out);
+        super.writeAttributes(xw);
 
         if (name != null) {
-            writeAttribute(out, NAME_TAG, name);
+            xw.writeAttribute(NAME_TAG, name);
         }
 
-        writeAttribute(out, UNIT_TYPE_TAG, unitType);
+        xw.writeAttribute(UNIT_TYPE_TAG, unitType);
 
-        writeAttribute(out, MOVES_LEFT_TAG, movesLeft);
+        xw.writeAttribute(MOVES_LEFT_TAG, movesLeft);
 
-        writeAttribute(out, STATE_TAG, state);
+        xw.writeAttribute(STATE_TAG, state);
 
-        writeAttribute(out, ROLE_TAG, role);
+        xw.writeAttribute(ROLE_TAG, role);
 
         if (location != null) {
             if (full || !(location instanceof Building
                     || location instanceof ColonyTile)) {
-                writeLocationAttribute(out, LOCATION_TAG, location);
+                xw.writeLocationAttribute(LOCATION_TAG, location);
 
             } else {
-                writeLocationAttribute(out, LOCATION_TAG, getColony());
+                xw.writeLocationAttribute(LOCATION_TAG, getColony());
             }
         }
 
         if (!full && hasAbility(Ability.PIRACY)) {
             // Pirates do not disclose national characteristics.
-            writeAttribute(out, OWNER_TAG, getGame().getUnknownEnemy());
+            xw.writeAttribute(OWNER_TAG, getGame().getUnknownEnemy());
 
         } else {
-            writeAttribute(out, OWNER_TAG, getOwner());
+            xw.writeAttribute(OWNER_TAG, getOwner());
 
             if (isPerson()) {
                 // Do not write out nationality and ethnicity for non-persons.
-                writeAttribute(out, NATIONALITY_TAG,
-                    (nationality != null) ? nationality
+                xw.writeAttribute(NATIONALITY_TAG, (nationality != null)
+                    ? nationality
                     : getOwner().getNationId());
 
-                writeAttribute(out, ETHNICITY_TAG,
-                    (ethnicity != null) ? ethnicity
+                xw.writeAttribute(ETHNICITY_TAG, (ethnicity != null)
+                    ? ethnicity
                     : getOwner().getNationId());
             }
         }
 
 
 
-        writeAttribute(out, TREASURE_AMOUNT_TAG, treasureAmount);
+        xw.writeAttribute(TREASURE_AMOUNT_TAG, treasureAmount);
 
         if (full) {
             if (entryLocation != null) {
-                writeLocationAttribute(out, ENTRY_LOCATION_TAG, entryLocation);
+                xw.writeLocationAttribute(ENTRY_LOCATION_TAG, entryLocation);
             }
 
-            writeAttribute(out, TURNS_OF_TRAINING_TAG, turnsOfTraining);
+            xw.writeAttribute(TURNS_OF_TRAINING_TAG, turnsOfTraining);
 
-            if (workType != null) writeAttribute(out, WORK_TYPE_TAG, workType);
+            if (workType != null) xw.writeAttribute(WORK_TYPE_TAG, workType);
             
             if (experienceType != null) {
-                writeAttribute(out, EXPERIENCE_TYPE_TAG, experienceType);
+                xw.writeAttribute(EXPERIENCE_TYPE_TAG, experienceType);
             }
 
-            writeAttribute(out, EXPERIENCE_TAG, experience);
+            xw.writeAttribute(EXPERIENCE_TAG, experience);
 
-            writeAttribute(out, INDIAN_SETTLEMENT_TAG, indianSettlement);
+            xw.writeAttribute(INDIAN_SETTLEMENT_TAG, indianSettlement);
 
-            writeAttribute(out, WORK_LEFT_TAG, workLeft);
+            xw.writeAttribute(WORK_LEFT_TAG, workLeft);
 
-            writeAttribute(out, HIT_POINTS_TAG, hitPoints);
+            xw.writeAttribute(HIT_POINTS_TAG, hitPoints);
             
-            writeAttribute(out, ATTRITION_TAG, attrition);
+            xw.writeAttribute(ATTRITION_TAG, attrition);
             
-            if (student != null) writeAttribute(out, STUDENT_TAG, student);
+            if (student != null) xw.writeAttribute(STUDENT_TAG, student);
             
-            if (teacher != null) writeAttribute(out, TEACHER_TAG, teacher);
+            if (teacher != null) xw.writeAttribute(TEACHER_TAG, teacher);
 
             if (destination != null) {
-                writeLocationAttribute(out, DESTINATION_TAG, destination);
+                xw.writeLocationAttribute(DESTINATION_TAG, destination);
             }
 
             if (tradeRoute != null) {
-                writeAttribute(out, TRADE_ROUTE_TAG, tradeRoute);
+                xw.writeAttribute(TRADE_ROUTE_TAG, tradeRoute);
 
-                writeAttribute(out, CURRENT_STOP_TAG, currentStop);
+                xw.writeAttribute(CURRENT_STOP_TAG, currentStop);
             }
         }
     }
@@ -3847,31 +3847,31 @@ public class Unit extends GoodsLocation
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out, Player player,
+    protected void writeChildren(FreeColXMLWriter xw, Player player,
                                  boolean showAll,
                                  boolean toSavedGame) throws XMLStreamException {
         boolean full = showAll || toSavedGame || player == getOwner();
 
         // Do not show enemy units hidden in a carrier:
         if (full) {
-            super.writeChildren(out, player, showAll, toSavedGame);
+            super.writeChildren(xw, player, showAll, toSavedGame);
 
         } else if (getType().canCarryGoods()) {
-            writeAttribute(out, VISIBLE_GOODS_COUNT_TAG, getVisibleGoodsCount());
+            xw.writeAttribute(VISIBLE_GOODS_COUNT_TAG, getVisibleGoodsCount());
         }
 
         if (workImprovement != null) {
-            workImprovement.toXML(out, player, showAll, toSavedGame);
+            workImprovement.toXML(xw, player, showAll, toSavedGame);
         }
 
         for (EquipmentType et : getSortedCopy(equipment.keySet())) {
-            out.writeStartElement(EQUIPMENT_TAG);
+            xw.writeStartElement(EQUIPMENT_TAG);
             
-            writeAttribute(out, ID_ATTRIBUTE_TAG, et);
+            xw.writeAttribute(ID_ATTRIBUTE_TAG, et);
 
-            writeAttribute(out, COUNT_TAG, equipment.getCount(et));
+            xw.writeAttribute(COUNT_TAG, equipment.getCount(et));
 
-            out.writeEndElement();
+            xw.writeEndElement();
         }
     }
 
@@ -3879,9 +3879,9 @@ public class Unit extends GoodsLocation
      * {@inheritDoc}
      */
     @Override
-    protected void toXMLPartial(XMLStreamWriter out,
+    protected void toXMLPartial(FreeColXMLWriter xw,
                                 String[] fields) throws XMLStreamException {
-        toXMLPartialByClass(out, getClass(), fields);
+        toXMLPartialByClass(xw, getClass(), fields);
     }
 
     /**
@@ -3942,12 +3942,14 @@ public class Unit extends GoodsLocation
         if (hitPoints < 0) hitPoints = xr.getAttribute(OLD_HIT_POINTS_TAG, -1);
         // end @compat
 
-        teacher = xr.makeFreeColGameObject(game, TEACHER_TAG, Unit.class, false);
+        teacher = xr.makeFreeColGameObject(game, TEACHER_TAG,
+                                           Unit.class, false);
 
-        student = xr.makeFreeColGameObject(game, STUDENT_TAG, Unit.class, false);
+        student = xr.makeFreeColGameObject(game, STUDENT_TAG,
+                                           Unit.class, false);
 
-        setHomeIndianSettlement(xr.makeFreeColGameObject(game, INDIAN_SETTLEMENT_TAG,
-                IndianSettlement.class, false));
+        setHomeIndianSettlement(xr.makeFreeColGameObject(game,
+                INDIAN_SETTLEMENT_TAG, IndianSettlement.class, false));
 
         treasureAmount = xr.getAttribute(TREASURE_AMOUNT_TAG, 0);
 
@@ -4027,7 +4029,7 @@ public class Unit extends GoodsLocation
             // end @compat
             } else {
                 equipment.incrementCount(spec.getEquipmentType(xr.readId()),
-                    xr.getAttribute(COUNT_TAG, 0));
+                                         xr.getAttribute(COUNT_TAG, 0));
             }
             xr.closeTag(EQUIPMENT_TAG);
 
@@ -4039,7 +4041,8 @@ public class Unit extends GoodsLocation
         // end @compat
 
         } else if (TileImprovement.getXMLElementTagName().equals(tag)) {
-            setWorkImprovement(xr.readFreeColGameObject(game, TileImprovement.class));
+            setWorkImprovement(xr.readFreeColGameObject(game,
+                    TileImprovement.class));
 
         } else {
             super.readChild(xr);

@@ -20,9 +20,9 @@
 package net.sf.freecol.common.model;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 
 import org.w3c.dom.Element;
 
@@ -423,22 +423,22 @@ public class ModelMessage extends StringTemplate {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
-        writeAttribute(out, SOURCE_TAG, sourceId);
+        xw.writeAttribute(SOURCE_TAG, sourceId);
 
         if (displayId != null) {
-            writeAttribute(out, DISPLAY_TAG, displayId);
+            xw.writeAttribute(DISPLAY_TAG, displayId);
         }
 
-        writeAttribute(out, MESSAGE_TYPE_TAG, messageType);
+        xw.writeAttribute(MESSAGE_TYPE_TAG, messageType);
 
-        writeAttribute(out, HAS_BEEN_DISPLAYED_TAG, beenDisplayed);
+        xw.writeAttribute(HAS_BEEN_DISPLAYED_TAG, beenDisplayed);
 
         // @compat 0.9.x
         if (ownerId != null) {
-            writeAttribute(out, OWNER_TAG, ownerId);
+            xw.writeAttribute(OWNER_TAG, ownerId);
         }
         // end @compat
     }
@@ -455,7 +455,7 @@ public class ModelMessage extends StringTemplate {
         displayId = xr.getAttribute(DISPLAY_TAG, (String)null);
 
         messageType = xr.getAttribute(MESSAGE_TYPE_TAG, 
-                                   MessageType.class, MessageType.DEFAULT);
+                                      MessageType.class, MessageType.DEFAULT);
 
         beenDisplayed = xr.getAttribute(HAS_BEEN_DISPLAYED_TAG, false);
 

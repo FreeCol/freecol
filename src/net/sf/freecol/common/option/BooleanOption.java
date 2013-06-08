@@ -22,8 +22,8 @@ package net.sf.freecol.common.option;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Specification;
 
 
@@ -111,10 +111,10 @@ public class BooleanOption extends AbstractOption<Boolean> {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
-        out.writeAttribute(VALUE_TAG, Boolean.toString(value));
+        xw.writeAttribute(VALUE_TAG, Boolean.toString(value));
     }
 
     /**

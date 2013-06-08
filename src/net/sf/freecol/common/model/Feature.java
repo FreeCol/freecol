@@ -25,9 +25,9 @@ import java.util.List;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 
 
 /**
@@ -369,27 +369,27 @@ public abstract class Feature extends FreeColObject {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
         if (getSource() != null) {
-            writeAttribute(out, SOURCE_TAG, getSource());
+            xw.writeAttribute(SOURCE_TAG, getSource());
         }
 
         if (getFirstTurn() != null) {
-            writeAttribute(out, FIRST_TURN_TAG, getFirstTurn().getNumber());
+            xw.writeAttribute(FIRST_TURN_TAG, getFirstTurn().getNumber());
         }
 
         if (getLastTurn() != null) {
-            writeAttribute(out, LAST_TURN_TAG, getLastTurn().getNumber());
+            xw.writeAttribute(LAST_TURN_TAG, getLastTurn().getNumber());
         }
 
         if (duration != 0) {
-            writeAttribute(out, DURATION_TAG, duration);
+            xw.writeAttribute(DURATION_TAG, duration);
         }
 
         if (temporary) {
-            writeAttribute(out, TEMPORARY_TAG, temporary);
+            xw.writeAttribute(TEMPORARY_TAG, temporary);
         }
     }
 
@@ -397,10 +397,10 @@ public abstract class Feature extends FreeColObject {
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        super.writeChildren(out);
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeChildren(xw);
 
-        for (Scope scope : getScopes()) scope.toXML(out);
+        for (Scope scope : getScopes()) scope.toXML(xw);
     }
 
     /**

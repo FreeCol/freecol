@@ -26,9 +26,9 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 
 
 /**
@@ -277,43 +277,43 @@ public class PlayerExploredTile extends FreeColGameObject {
      * {@inheritDoc}
      */
     @Override
-    public void writeAttributes(XMLStreamWriter out, Player player,
+    public void writeAttributes(FreeColXMLWriter xw, Player player,
                                 boolean showAll,
                                 boolean toSavedGame) throws XMLStreamException {
-        super.writeAttributes(out);
+        super.writeAttributes(xw);
 
-        writeAttribute(out, PLAYER_TAG, player);
+        xw.writeAttribute(PLAYER_TAG, player);
 
-        writeAttribute(out, TILE_TAG, tile);
+        xw.writeAttribute(TILE_TAG, tile);
 
         if (owner != null) {
-            writeAttribute(out, OWNER_TAG, owner);
+            xw.writeAttribute(OWNER_TAG, owner);
         }
 
         if (owningSettlement != null) {
-            writeAttribute(out, OWNING_SETTLEMENT_TAG, owningSettlement);
+            xw.writeAttribute(OWNING_SETTLEMENT_TAG, owningSettlement);
         }
 
         if (colonyUnitCount > 0) {
-            writeAttribute(out, COLONY_UNIT_COUNT_TAG, colonyUnitCount);
+            xw.writeAttribute(COLONY_UNIT_COUNT_TAG, colonyUnitCount);
         }
 
         if (colonyStockadeKey != null) {
-            writeAttribute(out, COLONY_STOCKADE_KEY_TAG, colonyStockadeKey);
+            xw.writeAttribute(COLONY_STOCKADE_KEY_TAG, colonyStockadeKey);
         }
 
         if (skill != null) {
-            writeAttribute(out, LEARNABLE_SKILL_TAG, skill);
+            xw.writeAttribute(LEARNABLE_SKILL_TAG, skill);
         }
 
         for (int i = 0; i < WANTED_GOODS_COUNT; i++) {
             if (wantedGoods[i] != null) {
-                writeAttribute(out, WANTED_GOODS_TAG + i, wantedGoods[i]);
+                xw.writeAttribute(WANTED_GOODS_TAG + i, wantedGoods[i]);
             }
         }
 
         if (mostHated != null) {
-            writeAttribute(out, MOST_HATED_TAG, mostHated.getId());
+            xw.writeAttribute(MOST_HATED_TAG, mostHated.getId());
         }
     }
 
@@ -321,21 +321,21 @@ public class PlayerExploredTile extends FreeColGameObject {
      * {@inheritDoc}
      */
     @Override
-    public void writeChildren(XMLStreamWriter out, Player player,
+    public void writeChildren(FreeColXMLWriter xw, Player player,
                               boolean showAll,
                               boolean toSavedGame) throws XMLStreamException {
-        super.writeChildren(out);
+        super.writeChildren(xw);
 
         if (missionary != null) {
-            out.writeStartElement(MISSIONARY_TAG);
+            xw.writeStartElement(MISSIONARY_TAG);
 
-            missionary.toXML(out, player, showAll, toSavedGame);
+            missionary.toXML(xw, player, showAll, toSavedGame);
 
-            out.writeEndElement();
+            xw.writeEndElement();
         }
 
         for (TileItem ti : getTileItems()) {
-            ti.toXML(out, player, showAll, toSavedGame);
+            ti.toXML(xw, player, showAll, toSavedGame);
         }
     }
 
@@ -366,7 +366,7 @@ public class PlayerExploredTile extends FreeColGameObject {
         colonyUnitCount = xr.getAttribute(COLONY_UNIT_COUNT_TAG, 0);
 
         colonyStockadeKey = xr.getAttribute(COLONY_STOCKADE_KEY_TAG,
-                                         (String)null);
+                                            (String)null);
 
         skill = xr.getType(spec, LEARNABLE_SKILL_TAG,
                            UnitType.class, (UnitType)null);

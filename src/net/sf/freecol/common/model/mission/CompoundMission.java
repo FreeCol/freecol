@@ -23,9 +23,9 @@ import java.util.List;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Game;
 
 import org.w3c.dom.Element;
@@ -165,20 +165,20 @@ public class CompoundMission extends AbstractMission {
     /**
      * {@inheritDoc}
      */
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
-        super.writeAttributes(out);
-        out.writeAttribute("index", Integer.toString(index));
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
+
+        xw.writeAttribute("index", index);
     }
 
     /**
      * {@inheritDoc}
      */
-    protected void writeChildren(XMLStreamWriter out)
-        throws XMLStreamException {
-        super.writeChildren(out);
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeChildren(xw);
+
         for (Mission mission : missions) {
-            mission.toXML(out);
+            mission.toXML(xw);
         }
     }
 

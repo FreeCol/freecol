@@ -22,9 +22,9 @@ package net.sf.freecol.server.ai;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Tile;
@@ -313,9 +313,9 @@ public class TileImprovementPlan extends ValuedAIObject {
      * {@inheritDoc}
      */
     @Override
-    public void toXML(XMLStreamWriter out) throws XMLStreamException {
+    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
         if (validate()) {
-            toXML(out, getXMLElementTagName());
+            toXML(xw, getXMLElementTagName());
         }
     }
 
@@ -323,15 +323,15 @@ public class TileImprovementPlan extends ValuedAIObject {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
-        writeAttribute(out, TYPE_TAG, type);
+        xw.writeAttribute(TYPE_TAG, type);
 
-        writeAttribute(out, TARGET_TAG, target);
+        xw.writeAttribute(TARGET_TAG, target);
 
         if (pioneer != null && pioneer.checkIntegrity(false) > 0) {
-            writeAttribute(out, PIONEER_TAG, pioneer);
+            xw.writeAttribute(PIONEER_TAG, pioneer);
         }
     }
 

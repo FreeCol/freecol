@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.io.FreeColDirectories;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.StringTemplate;
 
 

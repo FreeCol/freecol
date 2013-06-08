@@ -28,12 +28,11 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Element;
@@ -306,21 +305,21 @@ public abstract class FreeColGameObject extends FreeColObject {
      * {@inheritDoc}
      */
     @Override
-    public final void toXML(XMLStreamWriter out) throws XMLStreamException {
-        toXML(out, null, false, false);
+    public final void toXML(FreeColXMLWriter xw) throws XMLStreamException {
+        toXML(xw, null, false, false);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public final void toXML(XMLStreamWriter out, Player player,
+    public final void toXML(FreeColXMLWriter xw, Player player,
                             boolean showAll,
                             boolean toSavedGame) throws XMLStreamException {
         if (!showAll && toSavedGame) {
             throw new IllegalArgumentException("'showAll' should be true when saving a game.");
         }
-        toXML(out, getXMLTagName(), player, showAll, toSavedGame);
+        toXML(xw, getXMLTagName(), player, showAll, toSavedGame);
     }
 
     /**
@@ -335,7 +334,7 @@ public abstract class FreeColGameObject extends FreeColObject {
      * Attribute and child visibility are controlled by the player, showAll,
      * and toSavedGame arguments.
      *
-     * @param out The target stream.
+     * @param xw The <code>FreeColXMLWriter</code> to write to.
      * @param tag The tag to use.
      * @param player The <code>Player</code> this XML-representation
      *      should be made for, or null if <code>showAll == true</code>.
@@ -344,26 +343,26 @@ public abstract class FreeColGameObject extends FreeColObject {
      * @exception XMLStreamException if there are any problems writing
      *     to the stream.
      */
-    protected final void toXML(XMLStreamWriter out, String tag, Player player,
+    protected final void toXML(FreeColXMLWriter xw, String tag, Player player,
                                boolean showAll,
                                boolean toSavedGame) throws XMLStreamException {
-        out.writeStartElement(tag);
+        xw.writeStartElement(tag);
 
-        writeAttributes(out, player, showAll, toSavedGame);
+        writeAttributes(xw, player, showAll, toSavedGame);
 
-        writeChildren(out, player, showAll, toSavedGame);
+        writeChildren(xw, player, showAll, toSavedGame);
 
-        out.writeEndElement();
+        xw.writeEndElement();
     }
 
     /**
      * Write the attributes of this object to a stream.
      *
      * To be overridden if required by any object that has attributes
-     * and uses the toXML(XMLStreamWriter, String, Player, boolean,
+     * and uses the toXML(FreeColXMLWriter, String, Player, boolean,
      * boolean) call.
      *
-     * @param out The target stream.
+     * @param xw The <code>FreeColXMLWriter</code> to write to.
      * @param player The <code>Player</code> this XML-representation
      *      should be made for, or null if <code>showAll == true</code>.
      * @param showAll Show all attributes.
@@ -371,19 +370,19 @@ public abstract class FreeColGameObject extends FreeColObject {
      * @exception XMLStreamException if there are any problems writing
      *     to the stream.
      */
-    protected void writeAttributes(XMLStreamWriter out, Player player,
+    protected void writeAttributes(FreeColXMLWriter xw, Player player,
                                    boolean showAll,
                                    boolean toSavedGame) throws XMLStreamException {
-        super.writeAttributes(out);
+        super.writeAttributes(xw);
     }
 
     /**
      * Write the children of this object to a stream.
      *
      * To be overridden if required by any object that has children
-     * and uses the toXML(XMLStreamWriter, String) call.
+     * and uses the toXML(FreeColXMLWriter, String) call.
      *
-     * @param out The target stream.
+     * @param xw The <code>FreeColXMLWriter</code> to write to.
      * @param player The <code>Player</code> this XML-representation
      *      should be made for, or null if <code>showAll == true</code>.
      * @param showAll Show all attributes.
@@ -391,10 +390,10 @@ public abstract class FreeColGameObject extends FreeColObject {
      * @exception XMLStreamException if there are any problems writing
      *     to the stream.
      */
-    protected void writeChildren(XMLStreamWriter out, Player player,
+    protected void writeChildren(FreeColXMLWriter xw, Player player,
                                  boolean showAll,
                                  boolean toSavedGame) throws XMLStreamException {
-        super.writeChildren(out);
+        super.writeChildren(xw);
     }
 
     /**

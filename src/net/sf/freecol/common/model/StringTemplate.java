@@ -25,9 +25,9 @@ import java.util.List;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 
 
 /**
@@ -471,13 +471,13 @@ public class StringTemplate extends FreeColObject {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
-        writeAttribute(out, TEMPLATE_TYPE_TAG, templateType);
+        xw.writeAttribute(TEMPLATE_TYPE_TAG, templateType);
 
         if (defaultId != null) {
-            writeAttribute(out, DEFAULT_ID_TAG, defaultId);
+            xw.writeAttribute(DEFAULT_ID_TAG, defaultId);
         }
     }
 
@@ -485,22 +485,22 @@ public class StringTemplate extends FreeColObject {
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        super.writeChildren(out);
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeChildren(xw);
 
         if (keys != null) {
             for (String key : keys) {
-                out.writeStartElement(KEY_TAG);
+                xw.writeStartElement(KEY_TAG);
 
-                writeAttribute(out, VALUE_TAG, key);
+                xw.writeAttribute(VALUE_TAG, key);
 
-                out.writeEndElement();
+                xw.writeEndElement();
             }
         }
 
         if (replacements != null) {
             for (StringTemplate replacement : replacements) {
-                replacement.toXML(out);
+                replacement.toXML(xw);
             }
         }
     }
@@ -513,7 +513,7 @@ public class StringTemplate extends FreeColObject {
         super.readAttributes(xr);
 
         templateType = xr.getAttribute(TEMPLATE_TYPE_TAG,
-                                    TemplateType.class, TemplateType.TEMPLATE);
+            TemplateType.class, TemplateType.TEMPLATE);
 
         defaultId = xr.getAttribute(DEFAULT_ID_TAG, (String)null);
     }

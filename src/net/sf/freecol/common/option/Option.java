@@ -21,9 +21,9 @@
 package net.sf.freecol.common.option;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 
 
 /**
@@ -72,10 +72,10 @@ public interface Option<T> extends Cloneable {
     /**
      * Makes an XML-representation of this object.
      *
-     * @param out The output stream.
+     * @param xw The <code>FreeColXMLWriter</code> to write to.
      * @throws XMLStreamException if there are any problems writing the stream.
      */
-    public void toXML(XMLStreamWriter out) throws XMLStreamException;
+    public void toXML(FreeColXMLWriter xw) throws XMLStreamException;
 
     /**
      * Gets a textual representation of this object.

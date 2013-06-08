@@ -28,10 +28,10 @@ import java.util.Map;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 
 
 /**
@@ -166,34 +166,33 @@ public class NationOptions extends FreeColObject {
      * {@inheritDoc}
      */
     @Override
-    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+    public void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         // The nation options do not use the FreeColObject attributes, so
         // no: super.writeAttributes(out);
 
-        writeAttribute(out, NATIONAL_ADVANTAGES_TAG, nationalAdvantages);
+        xw.writeAttribute(NATIONAL_ADVANTAGES_TAG, nationalAdvantages);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        super.writeChildren(out);
+    public void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeChildren(xw);
 
-        out.writeStartElement(NATIONS_TAG);
+        xw.writeStartElement(NATIONS_TAG);
 
-        List<Nation> sorted = getSortedCopy(nations.keySet());
-        for (Nation nation : sorted) {
-            out.writeStartElement(NATION_TAG);
+        for (Nation nation : getSortedCopy(nations.keySet())) {
+            xw.writeStartElement(NATION_TAG);
 
-            writeAttribute(out, ID_ATTRIBUTE_TAG, nation);
+            xw.writeAttribute(ID_ATTRIBUTE_TAG, nation);
 
-            writeAttribute(out, STATE_TAG, nations.get(nation));
+            xw.writeAttribute(STATE_TAG, nations.get(nation));
             
-            out.writeEndElement();
+            xw.writeEndElement();
         }
 
-        out.writeEndElement();
+        xw.writeEndElement();
     }
 
     /**

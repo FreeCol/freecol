@@ -22,9 +22,9 @@ package net.sf.freecol.server.ai.mission;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
@@ -461,9 +461,9 @@ public class IndianDemandMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    public void toXML(XMLStreamWriter out) throws XMLStreamException {
+    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
         if (isValid()) {
-            toXML(out, getXMLElementTagName());
+            toXML(xw, getXMLElementTagName());
         }
     }
 
@@ -471,16 +471,16 @@ public class IndianDemandMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
         if (target != null) {
-            writeAttribute(out, TARGET_TAG, target.getId());
+            xw.writeAttribute(TARGET_TAG, target.getId());
         }
 
-        writeAttribute(out, COMPLETED_TAG, completed);
+        xw.writeAttribute(COMPLETED_TAG, completed);
 
-        writeAttribute(out, DEMANDED_TAG, demanded);
+        xw.writeAttribute(DEMANDED_TAG, demanded);
     }
 
     /**

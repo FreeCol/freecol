@@ -26,9 +26,9 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.util.Utils;
 
 
@@ -692,21 +692,21 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out, Player player,
+    protected void writeAttributes(FreeColXMLWriter xw, Player player,
                                    boolean showAll,
                                    boolean toSavedGame) throws XMLStreamException {
-        super.writeAttributes(out, player, showAll, toSavedGame);
+        super.writeAttributes(xw, player, showAll, toSavedGame);
 
-        writeAttribute(out, BUILDING_TYPE_TAG, buildingType);
+        xw.writeAttribute(BUILDING_TYPE_TAG, buildingType);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void toXMLPartial(XMLStreamWriter out,
+    protected void toXMLPartial(FreeColXMLWriter xw,
                                 String[] fields) throws XMLStreamException {
-        toXMLPartialByClass(out, Building.class, fields);
+        toXMLPartialByClass(xw, Building.class, fields);
     }
 
     /**

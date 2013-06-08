@@ -23,9 +23,9 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 
 
 /**
@@ -512,24 +512,24 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out, Player player,
+    protected void writeAttributes(FreeColXMLWriter xw, Player player,
                                    boolean showAll,
                                    boolean toSavedGame) throws XMLStreamException {
-        super.writeAttributes(out, player, showAll, toSavedGame);
+        super.writeAttributes(xw, player, showAll, toSavedGame);
 
-        writeAttribute(out, COLONY_TAG, colony);
+        xw.writeAttribute(COLONY_TAG, colony);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out, Player player,
+    protected void writeChildren(FreeColXMLWriter xw, Player player,
                                  boolean showAll,
                                  boolean toSavedGame) throws XMLStreamException {
-        super.writeChildren(out, player, showAll, toSavedGame);
+        super.writeChildren(xw, player, showAll, toSavedGame);
 
-        if (productionType != null) productionType.toXML(out);
+        if (productionType != null) productionType.toXML(xw);
     }
 
     /**

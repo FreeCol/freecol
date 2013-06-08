@@ -21,9 +21,9 @@ package net.sf.freecol.common.model;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 
 
 /**
@@ -121,6 +121,7 @@ public class TileTypeChange implements Comparable<TileTypeChange> {
 
 
     // Serialization
+
     private static final String FROM_TAG = "from";
     private static final String GOODS_TYPE_TAG = "goods-type";
     private static final String PRODUCTION_TAG = "production";
@@ -131,30 +132,28 @@ public class TileTypeChange implements Comparable<TileTypeChange> {
     /**
      * Makes an XML-representation of this object.
      *
-     * @param out The output stream.
+     * @param xw The <code>FreeColXMLWriter</code> to write to.
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
      */
-    public void toXML(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
+    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
+        xw.writeStartElement(getXMLElementTagName());
 
-        FreeColObject.writeAttribute(out, FROM_TAG, from);
+        xw.writeAttribute(FROM_TAG, from);
 
-        FreeColObject.writeAttribute(out, TO_TAG, to);
+        xw.writeAttribute(TO_TAG, to);
 
         if (production != null) {
-            out.writeStartElement(PRODUCTION_TAG);
+            xw.writeStartElement(PRODUCTION_TAG);
 
-            FreeColObject.writeAttribute(out, GOODS_TYPE_TAG,
-                                         production.getType());
+            xw.writeAttribute(GOODS_TYPE_TAG, production.getType());
 
-            FreeColObject.writeAttribute(out, VALUE_TAG,
-                                         production.getAmount());
+            xw.writeAttribute(VALUE_TAG, production.getAmount());
 
-            out.writeEndElement();
+            xw.writeEndElement();
         }
 
-        out.writeEndElement();
+        xw.writeEndElement();
     }
 
     /**
@@ -183,7 +182,7 @@ public class TileTypeChange implements Comparable<TileTypeChange> {
 
                 production = new AbstractGoods(type, amount);
 
-                xr.nextTag(); // close tag
+                xr.closeTag(PRODUCTION_TAG);
 
             } else {
                 throw new XMLStreamException("Unexpected TileTypeChange tag: "

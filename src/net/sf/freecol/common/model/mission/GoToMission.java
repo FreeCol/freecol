@@ -20,9 +20,9 @@
 package net.sf.freecol.common.model.mission;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Unit;
@@ -159,11 +159,12 @@ public class GoToMission extends AbstractMission {
     /**
      * {@inheritDoc}
      */
-    protected void writeAttributes(XMLStreamWriter out)
-        throws XMLStreamException {
-        super.writeAttributes(out);
-        out.writeAttribute("destination", destination.getId());
-        out.writeAttribute("blockedCount", Integer.toString(blockedCount));
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
+
+        xw.writeAttribute("destination", destination);
+
+        xw.writeAttribute("blockedCount", blockedCount);
     }
 
 

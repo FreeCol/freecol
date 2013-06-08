@@ -40,9 +40,9 @@ import net.sf.freecol.common.util.Utils;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Tension.Level;
 
 
@@ -1236,48 +1236,48 @@ public class IndianSettlement extends Settlement {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out, Player player,
+    protected void writeAttributes(FreeColXMLWriter xw, Player player,
                                    boolean showAll,
                                    boolean toSavedGame) throws XMLStreamException {
         boolean full = showAll || toSavedGame || player == getOwner();
         PlayerExploredTile pet = (player == null) ? null
             : getTile().getPlayerExploredTile(player);
 
-        super.writeAttributes(out);
+        super.writeAttributes(xw);
 
         if (full) {
-            writeAttribute(out, LAST_TRIBUTE_TAG, lastTribute);
+            xw.writeAttribute(LAST_TRIBUTE_TAG, lastTribute);
 
-            writeAttribute(out, CONVERT_PROGRESS_TAG, convertProgress);
+            xw.writeAttribute(CONVERT_PROGRESS_TAG, convertProgress);
 
-            writeAttribute(out, LEARNABLE_SKILL_TAG, learnableSkill);
+            xw.writeAttribute(LEARNABLE_SKILL_TAG, learnableSkill);
 
             for (int i = 0; i < wantedGoods.length; i++) {
                 if (wantedGoods[i] != null) {
-                    writeAttribute(out, WANTED_GOODS_TAG + i, wantedGoods[i]);
+                    xw.writeAttribute(WANTED_GOODS_TAG + i, wantedGoods[i]);
                 }
             }
 
             Player hated = getMostHated();
             if (hated != null) {
-                writeAttribute(out, MOST_HATED_TAG, hated);
+                xw.writeAttribute(MOST_HATED_TAG, hated);
             }
 
         } else if (pet != null) {
-            writeAttribute(out, LEARNABLE_SKILL_TAG, pet.getSkill());
+            xw.writeAttribute(LEARNABLE_SKILL_TAG, pet.getSkill());
 
             GoodsType[] wanted = pet.getWantedGoods();
             int i, j = 0;
             for (i = 0; i < wanted.length; i++) {
                 if (wanted[i] != null) {
-                    writeAttribute(out, WANTED_GOODS_TAG + j, wanted[i]);
+                    xw.writeAttribute(WANTED_GOODS_TAG + j, wanted[i]);
                     j++;
                 }
             }
 
             Player hated = pet.getMostHated();
             if (hated != null) {
-                writeAttribute(out, MOST_HATED_TAG, hated);
+                xw.writeAttribute(MOST_HATED_TAG, hated);
             }
         }
     }
@@ -1286,78 +1286,78 @@ public class IndianSettlement extends Settlement {
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out, Player player,
+    protected void writeChildren(FreeColXMLWriter xw, Player player,
                                  boolean showAll,
                                  boolean toSavedGame) throws XMLStreamException {
         PlayerExploredTile pet;
 
-        super.writeChildren(out, player, showAll, toSavedGame);
+        super.writeChildren(xw, player, showAll, toSavedGame);
 
         if (showAll || toSavedGame || player == getOwner()) {
             for (Player p : getSortedCopy(contactLevels.keySet())) {
-                out.writeStartElement(CONTACT_LEVEL_TAG);
+                xw.writeStartElement(CONTACT_LEVEL_TAG);
 
-                writeAttribute(out, LEVEL_TAG, contactLevels.get(p));
+                xw.writeAttribute(LEVEL_TAG, contactLevels.get(p));
 
-                writeAttribute(out, PLAYER_TAG, p);
+                xw.writeAttribute(PLAYER_TAG, p);
 
-                out.writeEndElement();
+                xw.writeEndElement();
             }
 
             for (Player p : getSortedCopy(alarm.keySet())) {
-                out.writeStartElement(ALARM_TAG);
+                xw.writeStartElement(ALARM_TAG);
 
-                writeAttribute(out, PLAYER_TAG, p);
+                xw.writeAttribute(PLAYER_TAG, p);
 
-                writeAttribute(out, VALUE_TAG, alarm.get(p).getValue());
+                xw.writeAttribute(VALUE_TAG, alarm.get(p).getValue());
 
-                out.writeEndElement();
+                xw.writeEndElement();
             }
 
             if (missionary != null) {
-                out.writeStartElement(MISSIONARY_TAG);
+                xw.writeStartElement(MISSIONARY_TAG);
 
-                missionary.toXML(out, player, showAll, toSavedGame);
+                missionary.toXML(xw, player, showAll, toSavedGame);
 
-                out.writeEndElement();
+                xw.writeEndElement();
             }
 
             for (Unit unit : getSortedCopy(ownedUnits)) {
-                out.writeStartElement(OWNED_UNITS_TAG);
+                xw.writeStartElement(OWNED_UNITS_TAG);
 
-                writeAttribute(out, ID_ATTRIBUTE_TAG, unit);
+                xw.writeAttribute(ID_ATTRIBUTE_TAG, unit);
 
-                out.writeEndElement();
+                xw.writeEndElement();
             }
 
         } else if ((pet = getTile().getPlayerExploredTile(player)) != null) {
             ContactLevel cl = contactLevels.get(player);
             if (cl != null) {
-                out.writeStartElement(CONTACT_LEVEL_TAG);
+                xw.writeStartElement(CONTACT_LEVEL_TAG);
 
-                writeAttribute(out, LEVEL_TAG, cl);
+                xw.writeAttribute(LEVEL_TAG, cl);
 
-                writeAttribute(out, PLAYER_TAG, player);
+                xw.writeAttribute(PLAYER_TAG, player);
 
-                out.writeEndElement();
+                xw.writeEndElement();
             }
 
             if (getAlarm(player) != null) {
-                out.writeStartElement(ALARM_TAG);
+                xw.writeStartElement(ALARM_TAG);
 
-                writeAttribute(out, PLAYER_TAG, player);
+                xw.writeAttribute(PLAYER_TAG, player);
 
-                writeAttribute(out, VALUE_TAG, getAlarm(player).getValue());
+                xw.writeAttribute(VALUE_TAG, getAlarm(player).getValue());
 
-                out.writeEndElement();
+                xw.writeEndElement();
             }
 
             if (pet.getMissionary() != null) {
-                out.writeStartElement(MISSIONARY_TAG);
+                xw.writeStartElement(MISSIONARY_TAG);
 
-                pet.getMissionary().toXML(out, player, showAll, toSavedGame);
+                pet.getMissionary().toXML(xw, player, showAll, toSavedGame);
 
-                out.writeEndElement();
+                xw.writeEndElement();
             }
         }
     }
@@ -1366,9 +1366,9 @@ public class IndianSettlement extends Settlement {
      * {@inheritDoc}
      */
     @Override
-    protected void toXMLPartial(XMLStreamWriter out,
+    protected void toXMLPartial(FreeColXMLWriter xw,
                                 String[] fields) throws XMLStreamException {
-        toXMLPartialByClass(out, getClass(), fields);
+        toXMLPartialByClass(xw, getClass(), fields);
     }
 
     /**

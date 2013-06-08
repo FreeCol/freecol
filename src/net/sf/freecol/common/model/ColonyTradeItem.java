@@ -20,9 +20,9 @@
 package net.sf.freecol.common.model;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 
 
 /**
@@ -123,12 +123,12 @@ public class ColonyTradeItem extends TradeItem {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
-        writeAttribute(out, COLONY_TAG, colonyId);
+        xw.writeAttribute(COLONY_TAG, colonyId);
 
-        writeAttribute(out, COLONY_NAME_TAG, colonyName);
+        xw.writeAttribute(COLONY_NAME_TAG, colonyName);
     }
 
     /**

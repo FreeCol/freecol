@@ -27,9 +27,9 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.option.UnitListOption;
@@ -787,22 +787,22 @@ public final class Monarch extends FreeColGameObject implements Named {
         // end @compat
 
 
-        public void toXML(XMLStreamWriter out, String tag) throws XMLStreamException {
-            out.writeStartElement(tag);
+        public void toXML(FreeColXMLWriter xw, String tag) throws XMLStreamException {
+            xw.writeStartElement(tag);
 
-            out.writeStartElement(NAVAL_UNITS_TAG);
+            xw.writeStartElement(NAVAL_UNITS_TAG);
 
-            for (AbstractUnit unit : navalUnits) unit.toXML(out);
+            for (AbstractUnit unit : navalUnits) unit.toXML(xw);
 
-            out.writeEndElement();
+            xw.writeEndElement();
 
-            out.writeStartElement(LAND_UNITS_TAG);
+            xw.writeStartElement(LAND_UNITS_TAG);
 
-            for (AbstractUnit unit : landUnits) unit.toXML(out);
+            for (AbstractUnit unit : landUnits) unit.toXML(xw);
 
-            out.writeEndElement();
+            xw.writeEndElement();
 
-            out.writeEndElement();
+            xw.writeEndElement();
         }
 
         public void readFromXML(FreeColXMLReader xr) throws XMLStreamException {
@@ -815,13 +815,11 @@ public final class Monarch extends FreeColGameObject implements Named {
 
                 if (LAND_UNITS_TAG.equals(tag)) {
                     while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        AbstractUnit newUnit = new AbstractUnit(xr);
-                        if (newUnit != null) landUnits.add(newUnit);
+                        landUnits.add(new AbstractUnit(xr));
                     }
                 } else if (NAVAL_UNITS_TAG.equals(tag)) {
                     while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        AbstractUnit newUnit = new AbstractUnit(xr);
-                        if (newUnit != null) navalUnits.add(newUnit);
+                        navalUnits.add(new AbstractUnit(xr));
                     }
                 } else {
                     logger.warning("Bogus Force tag: " + tag);
@@ -845,35 +843,35 @@ public final class Monarch extends FreeColGameObject implements Named {
     /**
      * {@inheritDoc}
      */
-    protected void writeAttributes(XMLStreamWriter out, Player player,
+    protected void writeAttributes(FreeColXMLWriter xw, Player player,
                                    boolean showAll,
                                    boolean toSavedGame) throws XMLStreamException {
-        super.writeAttributes(out);
+        super.writeAttributes(xw);
 
-        writeAttribute(out, PLAYER_TAG, this.player);
+        xw.writeAttribute(PLAYER_TAG, this.player);
 
-        writeAttribute(out, NAME_TAG, name);
+        xw.writeAttribute(NAME_TAG, name);
 
-        writeAttribute(out, SUPPORT_SEA_TAG, supportSea);
+        xw.writeAttribute(SUPPORT_SEA_TAG, supportSea);
 
-        writeAttribute(out, DISPLEASURE_TAG, displeasure);
+        xw.writeAttribute(DISPLEASURE_TAG, displeasure);
     }
 
     /**
      * {@inheritDoc}
      */
-    protected void writeChildren(XMLStreamWriter out, Player player,
+    protected void writeChildren(FreeColXMLWriter xw, Player player,
                                  boolean showAll,
                                  boolean toSavedGame) throws XMLStreamException {
-        super.writeChildren(out);
+        super.writeChildren(xw);
 
         if (showAll || toSavedGame
             || (player != null && player == this.player)) {
-            expeditionaryForce.toXML(out, EXPEDITIONARY_FORCE_TAG);
+            expeditionaryForce.toXML(xw, EXPEDITIONARY_FORCE_TAG);
 
-            interventionForce.toXML(out, INTERVENTION_FORCE_TAG);
+            interventionForce.toXML(xw, INTERVENTION_FORCE_TAG);
 
-            mercenaryForce.toXML(out, MERCENARY_FORCE_TAG);
+            mercenaryForce.toXML(xw, MERCENARY_FORCE_TAG);
         }
     }
 
@@ -881,9 +879,9 @@ public final class Monarch extends FreeColGameObject implements Named {
      * {@inheritDoc}
      */
     @Override
-    protected void toXMLPartial(XMLStreamWriter out,
+    protected void toXMLPartial(FreeColXMLWriter xw,
                                 String[] fields) throws XMLStreamException {
-        toXMLPartialByClass(out, getClass(), fields);
+        toXMLPartialByClass(xw, getClass(), fields);
     }
 
     /**

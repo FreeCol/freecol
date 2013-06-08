@@ -24,9 +24,9 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 
 
 /**
@@ -199,23 +199,23 @@ public abstract class NationType extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
-        writeAttribute(out, NUMBER_OF_SETTLEMENTS_TAG, numberOfSettlements);
+        xw.writeAttribute(NUMBER_OF_SETTLEMENTS_TAG, numberOfSettlements);
 
-        writeAttribute(out, AGGRESSION_TAG, aggression);
+        xw.writeAttribute(AGGRESSION_TAG, aggression);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        super.writeChildren(out);
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeChildren(xw);
 
         for (SettlementType settlementType : getSettlementTypes()) {
-            settlementType.toXML(out, SETTLEMENT_TAG);
+            settlementType.toXML(xw, SETTLEMENT_TAG);
         }
     }
 
@@ -234,7 +234,7 @@ public abstract class NationType extends FreeColGameObjectType {
             SettlementNumber.class, parent.numberOfSettlements);
 
         aggression = xr.getAttribute(AGGRESSION_TAG,
-                                  AggressionLevel.class, parent.aggression);
+                                     AggressionLevel.class, parent.aggression);
     }
 
     /**

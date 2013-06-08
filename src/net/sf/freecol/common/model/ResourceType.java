@@ -22,9 +22,9 @@ package net.sf.freecol.common.model;
 import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 
 
 /**
@@ -97,12 +97,12 @@ public final class ResourceType extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
         if (maxValue > -1) {
-            writeAttribute(out, MAXIMUM_VALUE_TAG, maxValue);
-            writeAttribute(out, MINIMUM_VALUE_TAG, minValue);
+            xw.writeAttribute(MAXIMUM_VALUE_TAG, maxValue);
+            xw.writeAttribute(MINIMUM_VALUE_TAG, minValue);
         }
     }
 

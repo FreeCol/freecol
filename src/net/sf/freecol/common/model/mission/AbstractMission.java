@@ -20,9 +20,9 @@
 package net.sf.freecol.common.model.mission;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
@@ -185,11 +185,14 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
-        out.writeAttribute("unit", unit.getId());
-        out.writeAttribute("turnCount", Integer.toString(turnCount));
-        out.writeAttribute("repeatCount", Integer.toString(repeatCount));
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
+
+        xw.writeAttribute("unit", unit.getId());
+
+        xw.writeAttribute("turnCount", Integer.toString(turnCount));
+
+        xw.writeAttribute("repeatCount", Integer.toString(repeatCount));
     }
 
 

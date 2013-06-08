@@ -28,9 +28,9 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.util.RandomChoice;
 
 
@@ -451,6 +451,7 @@ public final class TileImprovementType extends FreeColGameObjectType {
 
 
     // Serialization
+
     private static final String ADD_WORK_TURNS_TAG = "add-work-turns";
     private static final String CHANGE_TAG = "change";
     private static final String DELIVER_AMOUNT_TAG = "deliver-amount";
@@ -474,50 +475,50 @@ public final class TileImprovementType extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
-        writeAttribute(out, NATURAL_TAG, natural);
+        xw.writeAttribute(NATURAL_TAG, natural);
 
-        writeAttribute(out, MAGNITUDE_TAG, magnitude);
+        xw.writeAttribute(MAGNITUDE_TAG, magnitude);
 
-        writeAttribute(out, ADD_WORK_TURNS_TAG, addWorkTurns);
+        xw.writeAttribute(ADD_WORK_TURNS_TAG, addWorkTurns);
 
         if (requiredImprovementType != null) {
-            writeAttribute(out, REQUIRED_IMPROVEMENT_TAG,
+            xw.writeAttribute(REQUIRED_IMPROVEMENT_TAG,
                            requiredImprovementType);
         }
 
         if (expendedEquipmentType != null) {
-            writeAttribute(out, EXPENDED_EQUIPMENT_TYPE_TAG, 
+            xw.writeAttribute(EXPENDED_EQUIPMENT_TYPE_TAG, 
                            expendedEquipmentType);
 
-            writeAttribute(out, EXPENDED_AMOUNT_TAG, expendedAmount);
+            xw.writeAttribute(EXPENDED_AMOUNT_TAG, expendedAmount);
         }
 
-        writeAttribute(out, MOVEMENT_COST_TAG, movementCost);
+        xw.writeAttribute(MOVEMENT_COST_TAG, movementCost);
 
-        writeAttribute(out, ZINDEX_TAG, zIndex);
+        xw.writeAttribute(ZINDEX_TAG, zIndex);
 
-        writeAttribute(out, EXPOSE_RESOURCE_PERCENT_TAG, exposeResourcePercent);
+        xw.writeAttribute(EXPOSE_RESOURCE_PERCENT_TAG, exposeResourcePercent);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        super.writeChildren(out);
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeChildren(xw);
 
-        for (Scope scope : getScopes()) scope.toXML(out);
+        for (Scope scope : getScopes()) scope.toXML(xw);
 
         if (allowedWorkers != null) {
             for (String id : allowedWorkers) {
-                out.writeStartElement(WORKER_TAG);
+                xw.writeStartElement(WORKER_TAG);
 
-                writeAttribute(out, ID_ATTRIBUTE_TAG, id);
+                xw.writeAttribute(ID_ATTRIBUTE_TAG, id);
 
-                out.writeEndElement();
+                xw.writeEndElement();
             }
         }
 
@@ -525,17 +526,17 @@ public final class TileImprovementType extends FreeColGameObjectType {
             List<TileTypeChange> sorted
                 = new ArrayList<TileTypeChange>(tileTypeChanges.values());
             Collections.sort(sorted);
-            for (TileTypeChange change : sorted) change.toXML(out);
+            for (TileTypeChange change : sorted) change.toXML(xw);
         }
 
         for (RandomChoice<Disaster> choice : getDisasters()) {
-            out.writeStartElement(DISASTER_TAG);
+            xw.writeStartElement(DISASTER_TAG);
 
-            writeAttribute(out, ID_ATTRIBUTE_TAG, choice.getObject().getId());
+            xw.writeAttribute(ID_ATTRIBUTE_TAG, choice.getObject().getId());
 
-            writeAttribute(out, PROBABILITY_TAG, choice.getProbability());
+            xw.writeAttribute(PROBABILITY_TAG, choice.getProbability());
 
-            out.writeEndElement();
+            xw.writeEndElement();
         }
     }
 
@@ -564,7 +565,7 @@ public final class TileImprovementType extends FreeColGameObjectType {
 
         // @compat 0.10.4
         deliverGoodsType = xr.getType(spec, DELIVER_GOODS_TYPE_TAG,
-            GoodsType.class, (GoodsType)null);
+                                      GoodsType.class, (GoodsType)null);
 
         deliverAmount = xr.getAttribute(DELIVER_AMOUNT_TAG, 0);
         // end @compat
@@ -613,7 +614,7 @@ public final class TileImprovementType extends FreeColGameObjectType {
                 change.setTo(to);
                 change.setProduction(new AbstractGoods(deliverGoodsType,
                                                        deliverAmount));
-                xr.nextTag(); // close this element
+                xr.closeTag(CHANGE_TAG);
                 // end @compat
             }
             addChange(change);
@@ -622,9 +623,7 @@ public final class TileImprovementType extends FreeColGameObjectType {
             Disaster disaster = xr.getType(spec, ID_ATTRIBUTE_TAG,
                                            Disaster.class, (Disaster)null);
             int probability = xr.getAttribute(PROBABILITY_TAG, 100);
-            if (disaster != null && probability > 0) {
-                addDisaster(disaster, probability);
-            }
+            addDisaster(disaster, probability);
             xr.closeTag(DISASTER_TAG);
 
         } else if (WORKER_TAG.equals(tag)) {

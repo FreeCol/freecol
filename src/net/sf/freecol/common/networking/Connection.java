@@ -29,7 +29,6 @@ import java.net.SocketAddress;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -63,8 +62,6 @@ public class Connection {
     public static final String REPLY_TAG = "reply";
 
     private static final int TIMEOUT = 5000;
-
-    private final XMLOutputFactory xof = XMLOutputFactory.newInstance();
 
     private InputStream in;
 

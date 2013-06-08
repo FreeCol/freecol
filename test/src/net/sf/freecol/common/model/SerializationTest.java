@@ -27,8 +27,6 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.List;
 
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
@@ -37,6 +35,7 @@ import javax.xml.validation.Validator;
 
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.server.ServerTestHelper;
@@ -160,10 +159,12 @@ public class SerializationTest extends FreeColTestCase {
             String filename = "test/data/specification.xml";
             Validator validator = buildValidator("schema/specification-schema.xsd");
             FileWriter sw = new FileWriter(filename);
-            XMLOutputFactory xif = XMLOutputFactory.newInstance();
-            XMLStreamWriter out = xif.createXMLStreamWriter(sw);
-            spec().toXML(out);
-            out.close();
+            FreeColXMLWriter xw = new FreeColXMLWriter(sw);
+
+            spec().toXML(xw);
+
+            xw.close();
+
             validator.validate(new StreamSource(new FileReader(filename)));
         } catch (SAXParseException e) {
             String errMsg = e.getMessage()
@@ -181,12 +182,14 @@ public class SerializationTest extends FreeColTestCase {
             spec1 = new FreeColTcFile("classic").getSpecification();
             spec1.applyDifficultyLevel("model.difficulty.veryEasy");
             StringWriter sw = new StringWriter();
-            XMLOutputFactory xif = XMLOutputFactory.newInstance();
-            XMLStreamWriter out = xif.createXMLStreamWriter(sw);
-            spec1.toXML(out);
-            out.close();
+            FreeColXMLWriter xw = new FreeColXMLWriter(sw);
+
+            spec1.toXML(xw);
+
+            xw.close();
+
             spec2 = new Specification(new ByteArrayInputStream(sw.toString().getBytes()));
-        } catch(Exception e) {
+        } catch (Exception e) {
             fail(e.getMessage());
         }
 
@@ -215,10 +218,12 @@ public class SerializationTest extends FreeColTestCase {
             spec1 = new FreeColTcFile("classic").getSpecification();
             spec1.applyDifficultyLevel("model.difficulty.veryEasy");
             StringWriter sw = new StringWriter();
-            XMLOutputFactory xif = XMLOutputFactory.newInstance();
-            XMLStreamWriter out = xif.createXMLStreamWriter(sw);
-            spec1.toXML(out);
-            out.close();
+            FreeColXMLWriter xw = new FreeColXMLWriter(sw);
+
+            spec1.toXML(xw);
+
+            xw.close();
+
             spec2 = new Specification(new ByteArrayInputStream(sw.toString().getBytes()));
         } catch (Exception e) {
             fail(e.getMessage());

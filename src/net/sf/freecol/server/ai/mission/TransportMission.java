@@ -24,9 +24,9 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.Europe;
@@ -1766,9 +1766,9 @@ public class TransportMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    public void toXML(XMLStreamWriter out) throws XMLStreamException {
+    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
         if (isValid()) {
-            toXML(out, getXMLElementTagName());
+            toXML(xw, getXMLElementTagName());
         }
     }
 
@@ -1776,11 +1776,11 @@ public class TransportMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
         if (target != null) {
-            writeLocationAttribute(out, TARGET_TAG, target);
+            xw.writeLocationAttribute(TARGET_TAG, target);
         }
     }
 
@@ -1788,7 +1788,7 @@ public class TransportMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         final AIUnit aiCarrier = getAIUnit();
         for (Cargo cargo : tCopy()) {
             // Sanity check first.  Another nation might have captured
@@ -1801,26 +1801,26 @@ public class TransportMission extends Mission {
             // Do not bother writing cargoes that will be dumped.
             // On restore, checkCargoes will work out what to do with them.
             if (cargo.getMode() != CargoMode.DUMP) {
-                out.writeStartElement(CARGO_TAG);
+                xw.writeStartElement(CARGO_TAG);
 
                 AIObject aio = (AIObject)cargo.getTransportable();
-                writeAttribute(out, ID_ATTRIBUTE_TAG, aio);
+                xw.writeAttribute(ID_ATTRIBUTE_TAG, aio);
 
-                writeAttribute(out, CARRIER_TAG, cargo.getCarrier());
+                xw.writeAttribute(CARRIER_TAG, cargo.getCarrier());
 
-                writeAttribute(out, MODE_TAG, cargo.getMode());
+                xw.writeAttribute(MODE_TAG, cargo.getMode());
                 
                 if (cargo.getTarget() != null) {
-                    writeLocationAttribute(out, TARGET_TAG, cargo.getTarget());
+                    xw.writeLocationAttribute(TARGET_TAG, cargo.getTarget());
                 }
 
-                writeAttribute(out, TURNS_TAG, cargo.getTurns());
+                xw.writeAttribute(TURNS_TAG, cargo.getTurns());
 
-                writeAttribute(out, TRIES_TAG, cargo.getTries());
+                xw.writeAttribute(TRIES_TAG, cargo.getTries());
 
-                writeAttribute(out, SPACELEFT_TAG, cargo.getSpaceLeft());
+                xw.writeAttribute(SPACELEFT_TAG, cargo.getSpaceLeft());
 
-                out.writeEndElement();
+                xw.writeEndElement();
             }
         }
     }

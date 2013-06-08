@@ -23,9 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 
 
 /**
@@ -437,35 +437,35 @@ public final class GoodsType extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
-        writeAttribute(out, IS_FARMED_TAG, isFarmed);
+        xw.writeAttribute(IS_FARMED_TAG, isFarmed);
 
-        writeAttribute(out, IS_FOOD_TAG, isFood);
+        xw.writeAttribute(IS_FOOD_TAG, isFood);
 
-        writeAttribute(out, IGNORE_LIMIT_TAG, ignoreLimit);
+        xw.writeAttribute(IGNORE_LIMIT_TAG, ignoreLimit);
 
-        writeAttribute(out, NEW_WORLD_GOODS_TAG, newWorldGoods);
+        xw.writeAttribute(NEW_WORLD_GOODS_TAG, newWorldGoods);
 
-        writeAttribute(out, TRADE_GOODS_TAG, tradeGoods);
+        xw.writeAttribute(TRADE_GOODS_TAG, tradeGoods);
 
-        writeAttribute(out, STORABLE_TAG, storable);
+        xw.writeAttribute(STORABLE_TAG, storable);
 
         if (breedingNumber != INFINITY) {
-            writeAttribute(out, BREEDING_NUMBER_TAG, breedingNumber);
+            xw.writeAttribute(BREEDING_NUMBER_TAG, breedingNumber);
         }
 
         if (price != INFINITY) {
-            writeAttribute(out, PRICE_TAG, price);
+            xw.writeAttribute(PRICE_TAG, price);
         }
 
         if (madeFrom != null) {
-            writeAttribute(out, MADE_FROM_TAG, madeFrom);
+            xw.writeAttribute(MADE_FROM_TAG, madeFrom);
         }
 
         if (storedAs != null) {
-            writeAttribute(out, STORED_AS_TAG, storedAs);
+            xw.writeAttribute(STORED_AS_TAG, storedAs);
         }
     }
 
@@ -473,19 +473,19 @@ public final class GoodsType extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        super.writeChildren(out);
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeChildren(xw);
 
         if (initialAmount > 0) {
-            out.writeStartElement(MARKET_TAG);
+            xw.writeStartElement(MARKET_TAG);
 
-            writeAttribute(out, INITIAL_AMOUNT_TAG, initialAmount);
+            xw.writeAttribute(INITIAL_AMOUNT_TAG, initialAmount);
 
-            writeAttribute(out, INITIAL_PRICE_TAG, initialPrice);
+            xw.writeAttribute(INITIAL_PRICE_TAG, initialPrice);
 
-            writeAttribute(out, PRICE_DIFFERENCE_TAG, priceDiff);
+            xw.writeAttribute(PRICE_DIFFERENCE_TAG, priceDiff);
 
-            out.writeEndElement();
+            xw.writeEndElement();
         }
     }
 

@@ -31,9 +31,9 @@ import net.sf.freecol.common.model.Ownable;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 
 import org.w3c.dom.Element;
 
@@ -440,52 +440,53 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out, Player player,
+    protected void writeChildren(FreeColXMLWriter xw, Player player,
                                  boolean showAll,
                                  boolean toSavedGame) throws XMLStreamException {
-        super.writeChildren(out);
+        super.writeChildren(xw);
 
         if (showAll || toSavedGame || player == getOwner()) {
-            writeStorage(out, STORED_GOODS_TAG, storedGoods);
-            writeStorage(out, OLD_STORED_GOODS_TAG, oldStoredGoods);
+            writeStorage(xw, STORED_GOODS_TAG, storedGoods);
+
+            writeStorage(xw, OLD_STORED_GOODS_TAG, oldStoredGoods);
         }
     }
 
     /**
      * Write a storage container to a stream.
      *
-     * @param out The <code>XMLStreamWriter</code> to write to.
+     * @param xw The <code>FreeColXMLWriter</code> to write to.
      * @param tag The element tag.
      * @param storage The storage container.
      * @exception XMLStreamException if there is a problem writing to
      *     the stream.
      */
-    private void writeStorage(XMLStreamWriter out, String tag,
+    private void writeStorage(FreeColXMLWriter xw, String tag,
                               Map<GoodsType, Integer> storage) throws XMLStreamException {
         if (storage.isEmpty()) return;
 
-        out.writeStartElement(tag);
+        xw.writeStartElement(tag);
 
         for (Map.Entry<GoodsType, Integer> entry : storage.entrySet()) {
-            out.writeStartElement(Goods.getXMLElementTagName());
+            xw.writeStartElement(Goods.getXMLElementTagName());
 
-            writeAttribute(out, TYPE_TAG, entry.getKey().getId());
+            xw.writeAttribute(TYPE_TAG, entry.getKey().getId());
 
-            writeAttribute(out, AMOUNT_TAG, entry.getValue().toString());
+            xw.writeAttribute(AMOUNT_TAG, entry.getValue().toString());
 
-            out.writeEndElement();
+            xw.writeEndElement();
         }
 
-        out.writeEndElement();
+        xw.writeEndElement();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void toXMLPartial(XMLStreamWriter out,
+    protected void toXMLPartial(FreeColXMLWriter xw,
                                 String[] fields) throws XMLStreamException {
-        toXMLPartialByClass(out, getClass(), fields);
+        toXMLPartialByClass(xw, getClass(), fields);
     }
 
     /**
@@ -529,7 +530,7 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
     /**
      * Read a storage container from a stream.
      *
-     * @param out The <code>FreeColXMLReader</code> to read from.
+     * @param xr The <code>FreeColXMLReader</code> to read from.
      * @param storage The storage container.
      * @exception XMLStreamException if there is a problem reading from
      *     the stream.

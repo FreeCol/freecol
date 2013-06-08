@@ -22,9 +22,9 @@ package net.sf.freecol.server.ai;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
@@ -197,12 +197,12 @@ public class GoodsWish extends Wish {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
-        writeAttribute(out, GOODS_TYPE_TAG, goodsType);
+        xw.writeAttribute(GOODS_TYPE_TAG, goodsType);
 
-        writeAttribute(out, AMOUNT_REQUESTED_TAG, amountRequested);
+        xw.writeAttribute(AMOUNT_REQUESTED_TAG, amountRequested);
     }
 
     /**
@@ -218,7 +218,7 @@ public class GoodsWish extends Wish {
                                GoodsType.class, (GoodsType)null);
 
         amountRequested = xr.getAttribute(AMOUNT_REQUESTED_TAG,
-                                       GoodsContainer.CARGO_SIZE);
+                                          GoodsContainer.CARGO_SIZE);
     }
 
     /**

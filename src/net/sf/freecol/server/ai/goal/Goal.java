@@ -29,8 +29,9 @@ import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.UnitType;
 
@@ -613,11 +614,11 @@ public abstract class Goal extends AIObject implements GoalConstants {
     /**
      * Writes this object to an XML stream.
      *
-     * @param out The target stream.
+     * @param xw The <code>FreeColXMLWriter</code> to write to.
      * @throws XMLStreamException if there are any problems writing to the
      *             stream.
      */
-    //protected abstract void toXML(XMLStreamWriter out) throws XMLStreamException;
+    //protected abstract void toXML(FreeColXMLWriter xw) throws XMLStreamException;
 
     /**
      * Reads information for this object from an XML stream.

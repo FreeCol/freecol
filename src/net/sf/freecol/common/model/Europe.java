@@ -25,9 +25,9 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Unit.UnitState;
 
 
@@ -309,41 +309,41 @@ public class Europe extends UnitLocation implements Ownable, Named {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out, Player player,
+    protected void writeAttributes(FreeColXMLWriter xw, Player player,
                                    boolean showAll,
                                    boolean toSavedGame) throws XMLStreamException {
-        super.writeAttributes(out);
+        super.writeAttributes(xw);
 
         for (int index = 0; index < recruitables.length; index++) {
             if (recruitables[index] != null) {
-                writeAttribute(out, RECRUIT_TAG + index, recruitables[index]);
+                xw.writeAttribute(RECRUIT_TAG + index, recruitables[index]);
             }
         }
 
-        writeAttribute(out, RECRUIT_PRICE_TAG, recruitPrice);
+        xw.writeAttribute(RECRUIT_PRICE_TAG, recruitPrice);
 
-        writeAttribute(out, RECRUIT_LOWER_CAP_TAG, recruitLowerCap);
+        xw.writeAttribute(RECRUIT_LOWER_CAP_TAG, recruitLowerCap);
 
-        writeAttribute(out, OWNER_TAG, owner);
+        xw.writeAttribute(OWNER_TAG, owner);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out, Player player,
+    protected void writeChildren(FreeColXMLWriter xw, Player player,
                                  boolean showAll,
                                  boolean toSavedGame) throws XMLStreamException {
-        super.writeChildren(out, player, showAll, toSavedGame);
+        super.writeChildren(xw, player, showAll, toSavedGame);
 
         for (UnitType unitType : getSortedCopy(unitPrices.keySet())) {
-            out.writeStartElement(UNIT_PRICE_TAG);
+            xw.writeStartElement(UNIT_PRICE_TAG);
 
-            writeAttribute(out, UNIT_TYPE_TAG, unitType);
+            xw.writeAttribute(UNIT_TYPE_TAG, unitType);
 
-            writeAttribute(out, PRICE_TAG, unitPrices.get(unitType).intValue());
+            xw.writeAttribute(PRICE_TAG, unitPrices.get(unitType).intValue());
 
-            out.writeEndElement();
+            xw.writeEndElement();
         }
     }
 
@@ -351,9 +351,9 @@ public class Europe extends UnitLocation implements Ownable, Named {
      * {@inheritDoc}
      */
     @Override
-    protected void toXMLPartial(XMLStreamWriter out,
+    protected void toXMLPartial(FreeColXMLWriter xw,
                                 String[] fields) throws XMLStreamException {
-        toXMLPartialByClass(out, getClass(), fields);
+        toXMLPartialByClass(xw, getClass(), fields);
     }
 
     /**
@@ -388,10 +388,10 @@ public class Europe extends UnitLocation implements Ownable, Named {
         owner = xr.makeFreeColGameObject(getGame(), OWNER_TAG, Player.class, true);
 
         recruitPrice = xr.getAttribute(RECRUIT_PRICE_TAG,
-                                    RECRUIT_PRICE_INITIAL);
+                                       RECRUIT_PRICE_INITIAL);
 
         recruitLowerCap = xr.getAttribute(RECRUIT_LOWER_CAP_TAG,
-                                       LOWER_CAP_INITIAL);
+                                          LOWER_CAP_INITIAL);
     }
 
     /**

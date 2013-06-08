@@ -25,9 +25,10 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
+
 
 
 /**
@@ -236,16 +237,16 @@ public class Resource extends TileItem {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out, Player player,
+    protected void writeAttributes(FreeColXMLWriter xw, Player player,
                                    boolean showAll,
                                    boolean toSavedGame) throws XMLStreamException {
-        super.writeAttributes(out);
+        super.writeAttributes(xw);
 
-        writeAttribute(out, TILE_TAG, getTile());
+        xw.writeAttribute(TILE_TAG, getTile());
 
-        writeAttribute(out, TYPE_TAG, getType());
+        xw.writeAttribute(TYPE_TAG, getType());
 
-        writeAttribute(out, QUANTITY_TAG, quantity);
+        xw.writeAttribute(QUANTITY_TAG, quantity);
     }
 
     /**

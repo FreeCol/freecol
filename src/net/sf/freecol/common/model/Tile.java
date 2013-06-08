@@ -34,9 +34,9 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
@@ -1809,80 +1809,80 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * Write a minimal version of this tile.  This is a special case
      * used when the player has not explored the tile yet.
      *
-     * @param out The target stream.
+     * @param xw The <code>FreeColXMLWriter</code> to write to.
      * @exception XMLStreamException if there is problem writing to the stream.
      */
-    public void toXMLMinimal(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
+    public void toXMLMinimal(FreeColXMLWriter xw) throws XMLStreamException {
+        xw.writeStartElement(getXMLElementTagName());
 
-        super.writeAttributes(out);
+        super.writeAttributes(xw);
 
-        writeAttribute(out, X_TAG, this.x);
+        xw.writeAttribute(X_TAG, this.x);
 
-        writeAttribute(out, Y_TAG, this.y);
+        xw.writeAttribute(Y_TAG, this.y);
 
-        writeAttribute(out, REGION_TAG, region);
+        xw.writeAttribute(REGION_TAG, region);
 
-        writeAttribute(out, STYLE_TAG, style);
+        xw.writeAttribute(STYLE_TAG, style);
 
         if (moveToEurope != null) {
-            writeAttribute(out, MOVE_TO_EUROPE_TAG,
-                           moveToEurope.booleanValue());
+            xw.writeAttribute(MOVE_TO_EUROPE_TAG,
+                              moveToEurope.booleanValue());
         }
 
-        out.writeEndElement();
+        xw.writeEndElement();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out, Player player,
+    protected void writeAttributes(FreeColXMLWriter xw, Player player,
                                    boolean showAll,
                                    boolean toSavedGame) throws XMLStreamException {
         PlayerExploredTile pet;
 
-        super.writeAttributes(out);
+        super.writeAttributes(xw);
 
-        writeAttribute(out, X_TAG, this.x);
+        xw.writeAttribute(X_TAG, this.x);
 
-        writeAttribute(out, Y_TAG, this.y);
+        xw.writeAttribute(Y_TAG, this.y);
 
-        writeAttribute(out, STYLE_TAG, style);
+        xw.writeAttribute(STYLE_TAG, style);
 
-        writeAttribute(out, TYPE_TAG, type);
+        xw.writeAttribute(TYPE_TAG, type);
 
-        writeAttribute(out, REGION_TAG, region);
+        xw.writeAttribute(REGION_TAG, region);
 
         if (moveToEurope != null) {
-            writeAttribute(out, MOVE_TO_EUROPE_TAG,
+            xw.writeAttribute(MOVE_TO_EUROPE_TAG,
                            moveToEurope.booleanValue());
         }
 
         // Compatibility note: this used to be a boolean
         if (highSeasCount >= 0) {
-            writeAttribute(out, CONNECTED_TAG, highSeasCount);
+            xw.writeAttribute(CONNECTED_TAG, highSeasCount);
         }
 
         if (contiguity >= 0) {
-            writeAttribute(out, CONTIGUITY_TAG, contiguity);
+            xw.writeAttribute(CONTIGUITY_TAG, contiguity);
         }
 
         if (showAll || toSavedGame || player.canSee(this)) {
             if (owner != null) {
-                writeAttribute(out, OWNER_TAG, owner);
+                xw.writeAttribute(OWNER_TAG, owner);
             }
             if (owningSettlement != null) {
-                writeAttribute(out, OWNING_SETTLEMENT_TAG, owningSettlement);
+                xw.writeAttribute(OWNING_SETTLEMENT_TAG, owningSettlement);
             }
 
         } else if ((pet = getPlayerExploredTile(player)) != null) {
             if (pet.getOwner() != null) {
-                writeAttribute(out, OWNER_TAG, pet.getOwner());
+                xw.writeAttribute(OWNER_TAG, pet.getOwner());
             }
 
             if (pet.getOwningSettlement() != null) {
-                writeAttribute(out, OWNING_SETTLEMENT_TAG,
+                xw.writeAttribute(OWNING_SETTLEMENT_TAG,
                     pet.getOwningSettlement());
             }
         }
@@ -1892,20 +1892,20 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out, Player player,
+    protected void writeChildren(FreeColXMLWriter xw, Player player,
                                  boolean showAll,
                                  boolean toSavedGame) throws XMLStreamException {
         PlayerExploredTile pet;
 
         if (showAll || toSavedGame || player.canSee(this)) {
             if (settlement != null) {
-                settlement.toXML(out, player, showAll, toSavedGame);
+                settlement.toXML(xw, player, showAll, toSavedGame);
             }
             // Show enemy units if there is no enemy settlement.
             if ((showAll || toSavedGame || settlement == null
                     || settlement.getOwner() == player)
                 && !isEmpty()) {
-                super.writeChildren(out, player, showAll, toSavedGame);
+                super.writeChildren(xw, player, showAll, toSavedGame);
             }
 
         } else if ((pet = getPlayerExploredTile(player)) != null) {
@@ -1918,20 +1918,20 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                 && settlement.getOwner() == pet.getOwner()
                 && !(settlement instanceof Colony
                     && pet.getColonyUnitCount() <= 0)) {
-                settlement.toXML(out, player, showAll, toSavedGame);
+                settlement.toXML(xw, player, showAll, toSavedGame);
             }
         }
 
         if (tileItemContainer != null) {
-            tileItemContainer.toXML(out, player, showAll, toSavedGame);
+            tileItemContainer.toXML(xw, player, showAll, toSavedGame);
         }
 
         // Save the pets to saved games.
         if (toSavedGame && playerExploredTiles != null) {
             for (Entry<Player, PlayerExploredTile> entry
                      : playerExploredTiles.entrySet()) {
-                entry.getValue().toXML(out, entry.getKey(),
-                    showAll, toSavedGame);
+                entry.getValue().toXML(xw, entry.getKey(),
+                                       showAll, toSavedGame);
             }
         }
     }

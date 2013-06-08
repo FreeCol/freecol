@@ -22,9 +22,9 @@ package net.sf.freecol.common.model;
 import java.lang.reflect.Method;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 
 
 /**
@@ -342,25 +342,27 @@ public class Scope extends FreeColObject implements Cloneable {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        writeAttribute(out, MATCH_NEGATED_TAG, matchNegated);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        xw.writeAttribute(MATCH_NEGATED_TAG, matchNegated);
 
-        writeAttribute(out, MATCHES_NULL_TAG, matchesNull);
+        xw.writeAttribute(MATCHES_NULL_TAG, matchesNull);
 
         if (type != null) {
-            writeAttribute(out, TYPE_TAG, type);
+            xw.writeAttribute(TYPE_TAG, type);
         }
 
         if (abilityId != null) {
-            writeAttribute(out, ABILITY_ID_TAG, abilityId);
-            writeAttribute(out, ABILITY_VALUE_TAG, abilityValue);
+            xw.writeAttribute(ABILITY_ID_TAG, abilityId);
+
+            xw.writeAttribute(ABILITY_VALUE_TAG, abilityValue);
         }
 
         if (methodName != null) {
-            writeAttribute(out, METHOD_NAME_TAG, methodName);
+            xw.writeAttribute(METHOD_NAME_TAG, methodName);
+
             if (methodValue != null) {
                 // methodValue may be null in the Operand sub-class
-                writeAttribute(out, METHOD_VALUE_TAG, methodValue);
+                xw.writeAttribute(METHOD_VALUE_TAG, methodValue);
             }
         }
     }

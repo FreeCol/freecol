@@ -20,9 +20,9 @@
 package net.sf.freecol.common.model;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 
 import org.w3c.dom.Element;
 
@@ -460,21 +460,21 @@ public class Modifier extends Feature implements Comparable<Modifier> {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
-        writeAttribute(out, VALUE_TAG, value);
+        xw.writeAttribute(VALUE_TAG, value);
 
-        writeAttribute(out, TYPE_TAG, type);
+        xw.writeAttribute(TYPE_TAG, type);
 
         if (incrementType != null) {
-            writeAttribute(out, INCREMENT_TYPE_TAG, incrementType);
+            xw.writeAttribute(INCREMENT_TYPE_TAG, incrementType);
 
-            writeAttribute(out, INCREMENT_TAG, increment);
+            xw.writeAttribute(INCREMENT_TAG, increment);
         }
 
         if (index >= 0) {
-            writeAttribute(out, INDEX_TAG, index);
+            xw.writeAttribute(INDEX_TAG, index);
         }
     }
 
@@ -491,7 +491,7 @@ public class Modifier extends Feature implements Comparable<Modifier> {
 
         if (xr.hasAttribute(INCREMENT_TYPE_TAG)) {
             incrementType = xr.getAttribute(INCREMENT_TYPE_TAG,
-                                         Type.class, (Type)null);
+                                            Type.class, (Type)null);
 
             increment = xr.getAttribute(INCREMENT_TAG, UNKNOWN);
         }

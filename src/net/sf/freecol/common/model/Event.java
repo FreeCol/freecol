@@ -25,9 +25,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 
 
 /**
@@ -145,15 +145,15 @@ public class Event extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
         if (value != null) {
-            writeAttribute(out, VALUE_TAG, value);
+            xw.writeAttribute(VALUE_TAG, value);
         }
 
         if (scoreValue != 0) {
-            writeAttribute(out, SCORE_VALUE_TAG, scoreValue);
+            xw.writeAttribute(SCORE_VALUE_TAG, scoreValue);
         }
     }
 
@@ -161,10 +161,10 @@ public class Event extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        super.writeChildren(out);
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeChildren(xw);
 
-        for (Limit limit : getLimits()) limit.toXML(out);
+        for (Limit limit : getLimits()) limit.toXML(xw);
     }
 
     /**

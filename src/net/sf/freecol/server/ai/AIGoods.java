@@ -22,9 +22,9 @@ package net.sf.freecol.server.ai;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -460,19 +460,19 @@ public class AIGoods extends AIObject implements Transportable {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
         if (destination != null) {
-            writeAttribute(out, DESTINATION_TAG, destination.getId());
+            xw.writeAttribute(DESTINATION_TAG, destination.getId());
 
-            writeAttribute(out, TRANSPORT_PRIORITY_TAG, transportPriority);
+            xw.writeAttribute(TRANSPORT_PRIORITY_TAG, transportPriority);
 
             if (transport != null) {
                 if (transport.isDisposed()) {
                     logger.warning("broken reference to transport");
                 } else {
-                    writeAttribute(out, TRANSPORT_TAG, transport);
+                    xw.writeAttribute(TRANSPORT_TAG, transport);
                 }
             }
         }
@@ -482,10 +482,10 @@ public class AIGoods extends AIObject implements Transportable {
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        super.writeChildren(out);
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeChildren(xw);
 
-        goods.toXML(out);
+        goods.toXML(xw);
     }
 
     /**

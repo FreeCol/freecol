@@ -20,9 +20,9 @@
 package net.sf.freecol.common.model;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 
 import org.w3c.dom.Element;
 
@@ -153,6 +153,7 @@ public class ExportData extends FreeColObject {
 
 
     // Serialization
+
     private static final String EXPORTED_TAG = "exported";
     private static final String EXPORT_LEVEL_TAG = "exportLevel";
     private static final String HIGH_LEVEL_TAG = "highLevel";
@@ -163,16 +164,16 @@ public class ExportData extends FreeColObject {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
-        writeAttribute(out, EXPORTED_TAG, exported);
+        xw.writeAttribute(EXPORTED_TAG, exported);
 
-        writeAttribute(out, HIGH_LEVEL_TAG, highLevel);
+        xw.writeAttribute(HIGH_LEVEL_TAG, highLevel);
 
-        writeAttribute(out, LOW_LEVEL_TAG, lowLevel);
+        xw.writeAttribute(LOW_LEVEL_TAG, lowLevel);
 
-        writeAttribute(out, EXPORT_LEVEL_TAG, exportLevel);
+        xw.writeAttribute(EXPORT_LEVEL_TAG, exportLevel);
     }
 
     /**

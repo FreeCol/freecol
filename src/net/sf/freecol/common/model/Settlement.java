@@ -25,9 +25,9 @@ import java.util.Random;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 
 
@@ -648,17 +648,17 @@ public abstract class Settlement extends GoodsLocation
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
-        writeAttribute(out, NAME_TAG, getName());
+        xw.writeAttribute(NAME_TAG, getName());
 
         // TODO: Not owner, it is subject to PlayerExploredTile handling?
-        writeAttribute(out, OWNER_TAG, owner);
+        xw.writeAttribute(OWNER_TAG, owner);
 
-        writeAttribute(out, TILE_TAG, tile);
+        xw.writeAttribute(TILE_TAG, tile);
 
-        writeAttribute(out, SETTLEMENT_TYPE_TAG, getType());
+        xw.writeAttribute(SETTLEMENT_TYPE_TAG, getType());
     }
 
     /**

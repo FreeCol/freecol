@@ -28,9 +28,9 @@ import java.util.Map;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Turn;
 
 
@@ -296,13 +296,13 @@ public class FoundingFather extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
-        writeAttribute(out, TYPE_TAG, type);
+        xw.writeAttribute(TYPE_TAG, type);
 
         for (int i = 0; i < weight.length; i++) {
-            writeAttribute(out, WEIGHT_TAG + (i + 1), weight[i]);
+            xw.writeAttribute(WEIGHT_TAG + (i + 1), weight[i]);
         }
     }
 
@@ -310,30 +310,30 @@ public class FoundingFather extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        super.writeChildren(out);
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeChildren(xw);
 
-        for (Event event : getEvents()) event.toXML(out);
+        for (Event event : getEvents()) event.toXML(xw);
 
-        for (Scope scope : getScopes()) scope.toXML(out);
+        for (Scope scope : getScopes()) scope.toXML(xw);
 
         for (AbstractUnit unit : getUnits()) {
-            out.writeStartElement(UNIT_TAG);
+            xw.writeStartElement(UNIT_TAG);
 
-            writeAttribute(out, ID_ATTRIBUTE_TAG, unit);
+            xw.writeAttribute(ID_ATTRIBUTE_TAG, unit);
 
-            out.writeEndElement();
+            xw.writeEndElement();
         }
 
         if (upgrades != null) {
             for (Map.Entry<UnitType, UnitType> entry : upgrades.entrySet()) {
-                out.writeStartElement(UPGRADE_TAG);
+                xw.writeStartElement(UPGRADE_TAG);
 
-                writeAttribute(out, FROM_ID_TAG, entry.getKey().getId());
+                xw.writeAttribute(FROM_ID_TAG, entry.getKey().getId());
 
-                writeAttribute(out, TO_ID_TAG, entry.getValue().getId());
+                xw.writeAttribute(TO_ID_TAG, entry.getValue().getId());
 
-                out.writeEndElement();
+                xw.writeEndElement();
             }
         }
     }
@@ -346,7 +346,7 @@ public class FoundingFather extends FreeColGameObjectType {
         super.readAttributes(xr);
 
         type = xr.getAttribute(TYPE_TAG, FoundingFatherType.class,
-                            (FoundingFatherType)null);
+                               (FoundingFatherType)null);
 
         for (int i = 0; i < weight.length; i++) {
             weight[i] = xr.getAttribute(WEIGHT_TAG + (i + 1), 0);
@@ -382,9 +382,7 @@ public class FoundingFather extends FreeColGameObjectType {
                                            (UnitType)null);
             UnitType toType = xr.getType(spec, TO_ID_TAG, UnitType.class,
                                          (UnitType)null);
-            if (fromType != null && toType != null) {
-                addUpgrade(fromType, toType);
-            }
+            addUpgrade(fromType, toType);
             xr.closeTag(UPGRADE_TAG);
 
         } else if (UNIT_TAG.equals(tag)) {

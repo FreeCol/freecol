@@ -25,9 +25,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 
 import org.w3c.dom.Element;
 
@@ -302,6 +302,7 @@ public class HighScore extends FreeColObject {
 
 
     // Serialization
+
     private static final String COLONIES_TAG = "colonies";
     private static final String DATE_TAG = "date";
     private static final String DIFFICULTY_TAG = "difficulty";
@@ -325,38 +326,38 @@ public class HighScore extends FreeColObject {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
-        writeAttribute(out, DATE_TAG, dateFormat.format(date));
+        xw.writeAttribute(DATE_TAG, dateFormat.format(date));
 
-        writeAttribute(out, RETIREMENT_TURN_TAG, retirementTurn);
+        xw.writeAttribute(RETIREMENT_TURN_TAG, retirementTurn);
 
-        writeAttribute(out, INDEPENDENCE_TURN_TAG, independenceTurn);
+        xw.writeAttribute(INDEPENDENCE_TURN_TAG, independenceTurn);
 
-        writeAttribute(out, PLAYER_NAME_TAG, playerName);
+        xw.writeAttribute(PLAYER_NAME_TAG, playerName);
 
-        writeAttribute(out, NATION_ID_TAG, nationId);
+        xw.writeAttribute(NATION_ID_TAG, nationId);
 
-        writeAttribute(out, NATION_TYPE_ID_TAG, nationTypeId);
+        xw.writeAttribute(NATION_TYPE_ID_TAG, nationTypeId);
 
-        writeAttribute(out, SCORE_TAG, score);
+        xw.writeAttribute(SCORE_TAG, score);
 
-        writeAttribute(out, LEVEL_TAG, level.toString());
+        xw.writeAttribute(LEVEL_TAG, level.toString());
 
         if (nationName != null) {
-            writeAttribute(out, NATION_NAME_TAG, nationName);
+            xw.writeAttribute(NATION_NAME_TAG, nationName);
         }
 
         if (newLandName != null) {
-            writeAttribute(out, NEW_LAND_NAME_TAG, newLandName);
+            xw.writeAttribute(NEW_LAND_NAME_TAG, newLandName);
         }
 
-        writeAttribute(out, DIFFICULTY_TAG, difficulty);
+        xw.writeAttribute(DIFFICULTY_TAG, difficulty);
 
-        writeAttribute(out, UNITS_TAG, units);
+        xw.writeAttribute(UNITS_TAG, units);
 
-        writeAttribute(out, COLONIES_TAG, colonies);
+        xw.writeAttribute(COLONIES_TAG, colonies);
     }
 
     /**
@@ -393,13 +394,14 @@ public class HighScore extends FreeColObject {
         score = xr.getAttribute(SCORE_TAG, 0);
 
         level = xr.getAttribute(LEVEL_TAG, ScoreLevel.class,
-                             ScoreLevel.PARASITIC_WORM);
+                                ScoreLevel.PARASITIC_WORM);
 
         nationName = xr.getAttribute(NATION_NAME_TAG, "Freedonia");
 
         newLandName = xr.getAttribute(NEW_LAND_NAME_TAG, "New World");
         
-        difficulty = xr.getAttribute(DIFFICULTY_TAG, "model.difficulty.medium");
+        difficulty = xr.getAttribute(DIFFICULTY_TAG,
+                                     "model.difficulty.medium");
 
         units = xr.getAttribute(UNITS_TAG, 0);
 

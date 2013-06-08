@@ -27,9 +27,9 @@ import java.util.Map;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 
 
 /**
@@ -238,18 +238,18 @@ public class UnitTypeChange extends FreeColObject {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         if (newUnitType != null) {
-            writeAttribute(out, UNIT_TAG, newUnitType);
+            xw.writeAttribute(UNIT_TAG, newUnitType);
         }
 
         if (turnsToLearn != UNDEFINED) {
-            writeAttribute(out, TURNS_TO_LEARN_TAG, turnsToLearn);
+            xw.writeAttribute(TURNS_TO_LEARN_TAG, turnsToLearn);
         }
 
         for (Map.Entry<ChangeType, Integer> entry : changeTypes.entrySet()) {
-            writeAttribute(out, tags.get(entry.getKey()),
-                           entry.getValue().toString());
+            xw.writeAttribute(tags.get(entry.getKey()),
+                                       entry.getValue().toString());
         }
     }
 

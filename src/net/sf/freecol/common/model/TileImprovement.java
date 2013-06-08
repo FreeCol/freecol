@@ -27,9 +27,9 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Specification;
 
@@ -553,24 +553,24 @@ public class TileImprovement extends TileItem implements Named {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out, Player player,
+    protected void writeAttributes(FreeColXMLWriter xw, Player player,
                                    boolean showAll,
                                    boolean toSavedGame) throws XMLStreamException {
-        super.writeAttributes(out);
+        super.writeAttributes(xw);
 
-        writeAttribute(out, TILE_TAG, getTile());
+        xw.writeAttribute(TILE_TAG, getTile());
 
-        writeAttribute(out, TYPE_TAG, getType());
+        xw.writeAttribute(TYPE_TAG, getType());
 
-        writeAttribute(out, TURNS_TAG, turnsToComplete);
+        xw.writeAttribute(TURNS_TAG, turnsToComplete);
 
-        writeAttribute(out, MAGNITUDE_TAG, magnitude);
+        xw.writeAttribute(MAGNITUDE_TAG, magnitude);
 
         if (style != null) {
-            writeAttribute(out, STYLE_TAG, style);
+            xw.writeAttribute(STYLE_TAG, style);
         }
         if (virtual) {
-            writeAttribute(out, VIRTUAL_TAG, virtual);
+            xw.writeAttribute(VIRTUAL_TAG, virtual);
         }
     }
 

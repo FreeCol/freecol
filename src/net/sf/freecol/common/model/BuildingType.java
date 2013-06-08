@@ -24,9 +24,9 @@ import java.util.List;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 
 
 /**
@@ -296,29 +296,29 @@ public final class BuildingType extends BuildableType
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
         if (upgradesFrom != null) {
-            writeAttribute(out, UPGRADES_FROM_TAG, upgradesFrom);
+            xw.writeAttribute(UPGRADES_FROM_TAG, upgradesFrom);
         }
 
-        writeAttribute(out, WORKPLACES_TAG, workPlaces);
+        xw.writeAttribute(WORKPLACES_TAG, workPlaces);
 
         if (minSkill != UNDEFINED) {
-            writeAttribute(out, MIN_SKILL_TAG, minSkill);
+            xw.writeAttribute(MIN_SKILL_TAG, minSkill);
         }
 
         if (maxSkill < INFINITY) {
-            writeAttribute(out, MAX_SKILL_TAG, maxSkill);
+            xw.writeAttribute(MAX_SKILL_TAG, maxSkill);
         }
 
         if (upkeep > 0) {
-            writeAttribute(out, UPKEEP_TAG, upkeep);
+            xw.writeAttribute(UPKEEP_TAG, upkeep);
         }
 
         if (priority != Consumer.BUILDING_PRIORITY) {
-            writeAttribute(out, PRIORITY_TAG, priority);
+            xw.writeAttribute(PRIORITY_TAG, priority);
         }
 
     }
@@ -327,11 +327,11 @@ public final class BuildingType extends BuildableType
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        super.writeChildren(out);
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeChildren(xw);
 
         for (ProductionType productionType : productionTypes) {
-            productionType.toXML(out);
+            productionType.toXML(xw);
         }
     }
 

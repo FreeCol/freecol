@@ -22,9 +22,9 @@ package net.sf.freecol.server.ai;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -184,12 +184,12 @@ public class WorkerWish extends Wish {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
-        writeAttribute(out, UNIT_TYPE_TAG, unitType);
+        xw.writeAttribute(UNIT_TYPE_TAG, unitType);
 
-        writeAttribute(out, EXPERT_NEEDED_TAG, expertNeeded);
+        xw.writeAttribute(EXPERT_NEEDED_TAG, expertNeeded);
     }
 
     /**

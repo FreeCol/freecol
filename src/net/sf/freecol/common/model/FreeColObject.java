@@ -45,10 +45,8 @@ import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -56,6 +54,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.util.Introspector;
 
 import org.w3c.dom.Document;
@@ -124,6 +123,9 @@ public abstract class FreeColObject {
         this.specification = specification;
     }
 
+
+    // Identifier manipulation
+
     /**
      * Get the type part of the identifier.
      *
@@ -136,9 +138,6 @@ public abstract class FreeColObject {
         }
         return null;
     }
-
-
-    // Identifier manipulation
 
     /**
      * Gets the numeric part of the identifier.
@@ -653,22 +652,26 @@ public abstract class FreeColObject {
      * @param out The <code>OutputStream</code> to write to.
      */
     public void save(OutputStream out) {
-        XMLOutputFactory xof = XMLOutputFactory.newInstance();
-        XMLStreamWriter xsw = null;
+        FreeColXMLWriter xw = null;
         try {
-            xsw = xof.createXMLStreamWriter(out, "UTF-8");
-            xsw.writeStartDocument("UTF-8", "1.0");
-            this.toXML(xsw, null, true, true);
-            xsw.writeEndDocument();
-            xsw.flush();
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Exception writing object.", e);
+            xw = new FreeColXMLWriter(out);
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "Error creating FreeColXMLWriter.", ioe);
+            return;
+        }
+        try {
+            xw.writeStartDocument("UTF-8", "1.0");
+
+            this.toXML(xw, null, true, true);
+
+            xw.writeEndDocument();
+
+            xw.flush();
+
+        } catch (XMLStreamException xse) {
+            logger.log(Level.WARNING, "Exception writing object.", xse);
         } finally {
-            try {
-                if (xsw != null) xsw.close();
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Exception closing save stream.", e);
-            }
+            if (xw != null) xw.close();
         }
     }
 
@@ -687,23 +690,20 @@ public abstract class FreeColObject {
     public String serialize(Player player, boolean showAll,
                             boolean toSavedGame) throws XMLStreamException {
         StringWriter sw = new StringWriter();
-        XMLStreamWriter xsw = null;
+        FreeColXMLWriter xw = null;
         try {
-            XMLOutputFactory xof = XMLOutputFactory.newInstance();
-            xsw = xof.createXMLStreamWriter(sw);
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Error creating XMLStreamWriter", e);
+            xw = new FreeColXMLWriter(sw);
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "Error creating FreeColXMLWriter,", ioe);
             return null;
         }
+
         try {
-            this.toXML(xsw, player, showAll, toSavedGame);
+            this.toXML(xw, player, showAll, toSavedGame);
         } finally {
-            try {
-                if (xsw != null) xsw.close();
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Error closing XMLStreamWriter", e);
-            }
+            if (xw != null) xw.close();
         }
+
         return sw.toString();
     }
 
@@ -834,16 +834,22 @@ public abstract class FreeColObject {
     public Element toXMLElement(Player player, Document document,
                                 boolean showAll, boolean toSavedGame,
                                 String[] fields) {
+        StringWriter sw = new StringWriter();
+        FreeColXMLWriter xw = null;
         try {
-            StringWriter sw = new StringWriter();
-            XMLOutputFactory xif = XMLOutputFactory.newInstance();
-            XMLStreamWriter xsw = xif.createXMLStreamWriter(sw);
+            xw = new FreeColXMLWriter(sw);
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "Error creating FreeColXMLWriter,", ioe);
+            return null;
+        }
+
+        try {
             if (fields == null) {
-                toXML(xsw, player, showAll, toSavedGame);
+                toXML(xw, player, showAll, toSavedGame);
             } else {
-                toXMLPartial(xsw, fields);
+                toXMLPartial(xw, fields);
             }
-            xsw.close();
+            xw.close();
 
             DocumentBuilderFactory factory
                 = DocumentBuilderFactory.newInstance();
@@ -884,13 +890,13 @@ public abstract class FreeColObject {
      *
      * All attributes will be made visible.
      *
-     * @param out The target stream.
+     * @param xw The <code>FreeColXMLWriter</code> to write to.
      * @exception XMLStreamException if there are any problems writing
      *      to the stream.
-     * @see #toXML(XMLStreamWriter, Player, boolean, boolean)
+     * @see #toXML(FreeColXMLWriter, Player, boolean, boolean)
      */
-    public void toXML(XMLStreamWriter out) throws XMLStreamException {
-        toXML(out, getXMLTagName());
+    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
+        toXML(xw, getXMLTagName());
     }
 
     /**
@@ -904,36 +910,36 @@ public abstract class FreeColObject {
      *
      * All attributes will be made visible.
      *
-     * @param out The target stream.
+     * @param xw The <code>FreeColXMLWriter</code> to write to.
      * @param tag The tag to use.
      * @exception XMLStreamException if there are any problems writing
      *     to the stream.
      */
-    public void toXML(XMLStreamWriter out, String tag) throws XMLStreamException {
-        out.writeStartElement(tag);
+    public void toXML(FreeColXMLWriter xw, String tag) throws XMLStreamException {
+        xw.writeStartElement(tag);
 
-        writeAttributes(out);
+        writeAttributes(xw);
 
-        writeChildren(out);
+        writeChildren(xw);
 
-        out.writeEndElement();
+        xw.writeEndElement();
     }
 
     /**
      * Write the attributes of this object to a stream.
      *
      * To be overridden if required by any object that has attributes
-     * and uses the toXML(XMLStreamWriter, String) call.
+     * and uses the toXML(FreeColXMLWriter, String) call.
      *
-     * @param out The target stream.
+     * @param xw The <code>FreeColXMLWriter</code> to write to.
      * @exception XMLStreamException if there are any problems writing
      *     to the stream.
      */
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         if (getId() == null) {
             logger.warning("FreeColObject with null identifier: " + toString());
         } else {
-            writeAttribute(out, ID_ATTRIBUTE_TAG, getId());
+            xw.writeAttribute(ID_ATTRIBUTE_TAG, getId());
         }
     }
 
@@ -941,13 +947,13 @@ public abstract class FreeColObject {
      * Write the children of this object to a stream.
      *
      * To be overridden if required by any object that has children
-     * and uses the toXML(XMLStreamWriter, String) call.
+     * and uses the toXML(FreeColXMLWriter, String) call.
      *
-     * @param out The target stream.
+     * @param xw The <code>FreeColXMLWriter</code> to write to.
      * @exception XMLStreamException if there are any problems writing
      *     to the stream.
      */
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         // do nothing
     }
 
@@ -959,7 +965,7 @@ public abstract class FreeColObject {
      * be added to that representation if <code>showAll</code> is
      * set to <code>false</code>.
      *
-     * @param out The target stream.
+     * @param xw The <code>FreeColXMLWriter</code> to write to.
      * @param player The <code>Player</code> this XML-representation
      *      should be made for, or <code>null</code> if
      *      <code>showAll == true</code>.
@@ -971,14 +977,14 @@ public abstract class FreeColObject {
      * @exception XMLStreamException if there are any problems writing
      *      to the stream.
      */
-    public void toXML(XMLStreamWriter out, Player player, boolean showAll,
+    public void toXML(FreeColXMLWriter xw, Player player, boolean showAll,
                       boolean toSavedGame) throws XMLStreamException {
         // FreeColObjects are not to contain data that varies with
         // the observer, so the extra arguments are moot here.
         // However, this method is overridden in FreeColGameObject
         // where they are meaningful, and we need a version here for
         // toXMLElement() to call.
-        toXML(out);
+        toXML(xw);
     }
 
     /**
@@ -988,12 +994,12 @@ public abstract class FreeColObject {
      * need partial updates we provide a non-operating stub here which is
      * to be overridden where needed.
      *
-     * @param out The target stream.
+     * @param xw The <code>FreeColXMLWriter</code> to write to.
      * @param fields The fields to write.
      * @exception XMLStreamException if there are any problems writing
      *      to the stream.
      */
-    protected void toXMLPartial(XMLStreamWriter out,
+    protected void toXMLPartial(FreeColXMLWriter xw,
                                 String[] fields) throws XMLStreamException {
         throw new UnsupportedOperationException("Partial update of unsupported type.");
     }
@@ -1008,151 +1014,32 @@ public abstract class FreeColObject {
      * on the presence of a getFieldName() method that returns a type
      * compatible with String.valueOf.
      *
-     * @param out The output <code>XMLStreamWriter</code>.
+     * @param xw The <code>FreeColXMLWriter</code> to write to.
      * @param theClass The real class of this object, required by the
      *     <code>Introspector</code>.
      * @param fields The fields to write.
      * @exception XMLStreamException if there are problems writing the stream.
      */
-    protected void toXMLPartialByClass(XMLStreamWriter out, Class<?> theClass, 
+    protected void toXMLPartialByClass(FreeColXMLWriter xw, Class<?> theClass, 
                                        String[] fields) throws XMLStreamException {
         try {
-            out.writeStartElement(getXMLTagName());
+            xw.writeStartElement(getXMLTagName());
 
-            writeAttribute(out, ID_ATTRIBUTE_TAG, getId());
+            xw.writeAttribute(ID_ATTRIBUTE_TAG, getId());
 
-            writeAttribute(out, PARTIAL_ATTRIBUTE_TAG, true);
+            xw.writeAttribute(PARTIAL_ATTRIBUTE_TAG, true);
 
             for (int i = 0; i < fields.length; i++) {
                 Introspector intro = new Introspector(theClass, fields[i]);
-                writeAttribute(out, fields[i], intro.getter(this));
+                xw.writeAttribute(fields[i], intro.getter(this));
             }
 
-            out.writeEndElement();
+            xw.writeEndElement();
 
         } catch (Exception e) {
             logger.log(Level.WARNING, "Partial write failed for "
                 + theClass.getName(), e);
         }
-    }
-
-    /**
-     * Writes an XML-representation of a collection object to the given stream.
-     *
-     * @param out The stream to write to.
-     * @param tag The tag for the array <code>Element</code>.
-     * @param members The members of the array.
-     * @exception XMLStreamException if a problem was encountered
-     *      while writing.
-     */
-    protected <T extends FreeColObject> void writeToListElement(XMLStreamWriter out,
-        String tag, Collection<T> members) throws XMLStreamException {
-        out.writeStartElement(tag);
-
-        writeAttribute(out, ARRAY_SIZE_TAG, members.size());
-
-        int i = 0;
-        for (T t : members) {
-            writeAttribute(out, "x" + i, t);
-            i++;
-        }
-
-        out.writeEndElement();
-    }
-
-    /**
-     * Write a boolean attribute to a stream.
-     *
-     * @param out The <code>XMLStreamWriter</code> to write to.
-     * @param attributeName The attribute name.
-     * @param value A boolean to write.
-     * @exception XMLStreamException if a write error occurs.
-     */
-    public static void writeAttribute(XMLStreamWriter out, String attributeName,
-                                      boolean value) throws XMLStreamException {
-        out.writeAttribute(attributeName, String.valueOf(value));
-    }
-
-    /**
-     * Write a float attribute to a stream.
-     *
-     * @param out The <code>XMLStreamWriter</code> to write to.
-     * @param attributeName The attribute name.
-     * @param value A float to write.
-     * @exception XMLStreamException if a write error occurs.
-     */
-    public static void writeAttribute(XMLStreamWriter out, String attributeName,
-                                      float value) throws XMLStreamException {
-        out.writeAttribute(attributeName, String.valueOf(value));
-    }
-
-    /**
-     * Write an integer attribute to a stream.
-     *
-     * @param out The <code>XMLStreamWriter</code> to write to.
-     * @param attributeName The attribute name.
-     * @param value An integer to write.
-     * @exception XMLStreamException if a write error occurs.
-     */
-    public static void writeAttribute(XMLStreamWriter out, String attributeName,
-                                      int value) throws XMLStreamException {
-        out.writeAttribute(attributeName, String.valueOf(value));
-    }
-
-    /**
-     * Write an enum attribute to a stream.
-     *
-     * @param out The <code>XMLStreamWriter</code> to write to.
-     * @param attributeName The attribute name.
-     * @param value The <code>Enum</code> to write.
-     * @exception XMLStreamException if a write error occurs.
-     */
-    public static void writeAttribute(XMLStreamWriter out, String attributeName,
-                                      Enum<?> value) throws XMLStreamException {
-        out.writeAttribute(attributeName,
-                           value.toString().toLowerCase(Locale.US));
-    }
-
-    /**
-     * Write an Object attribute to a stream.
-     *
-     * @param out The <code>XMLStreamWriter</code> to write to.
-     * @param attributeName The attribute name.
-     * @param value The <code>Object</code> to write.
-     * @exception XMLStreamException if a write error occurs.
-     */
-    public static void writeAttribute(XMLStreamWriter out, String attributeName,
-                                      Object value) throws XMLStreamException {
-        out.writeAttribute(attributeName, String.valueOf(value));
-    }
-
-    /**
-     * Write the identifier attribute of a non-null FreeColObject to a stream.
-     *
-     * @param out The <code>XMLStreamWriter</code> to write to.
-     * @param attributeName The attribute name.
-     * @param value The <code>FreeColObject</code> to write the identifier of.
-     * @exception XMLStreamException if a write error occurs.
-     */
-    public static void writeAttribute(XMLStreamWriter out, String attributeName,
-                                      FreeColObject value) throws XMLStreamException {
-        if (value != null) {
-            out.writeAttribute(attributeName, value.getId());
-        }
-    }
-
-    /**
-     * Write the identifier attribute of a non-null Location to a stream.
-     *
-     * @param out The <code>XMLStreamWriter</code> to write to.
-     * @param attributeName The attribute name.
-     * @param value The <code>Location</code> to write the identifier of.
-     * @exception XMLStreamException if a write error occurs.
-     */
-    public static void writeLocationAttribute(XMLStreamWriter out,
-                                              String attributeName,
-                                              Location value) throws XMLStreamException {
-        writeAttribute(out, attributeName, (FreeColGameObject)value);
     }
 
 

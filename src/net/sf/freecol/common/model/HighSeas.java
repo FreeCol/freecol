@@ -24,9 +24,9 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.UnitLocation;
 
 
@@ -146,18 +146,18 @@ public class HighSeas extends UnitLocation {
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out, Player player,
+    protected void writeChildren(FreeColXMLWriter xw, Player player,
                                  boolean showAll,
                                  boolean toSavedGame) throws XMLStreamException {
-        super.writeChildren(out, player, showAll, toSavedGame);
+        super.writeChildren(xw, player, showAll, toSavedGame);
 
         for (Location destination : destinations) {
             if (destination != null) {
-                out.writeStartElement(DESTINATION_TAG);
+                xw.writeStartElement(DESTINATION_TAG);
 
-                writeLocationAttribute(out, ID_ATTRIBUTE_TAG, destination);
+                xw.writeLocationAttribute(ID_ATTRIBUTE_TAG, destination);
 
-                out.writeEndElement();
+                xw.writeEndElement();
             }
         }
     }

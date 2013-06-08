@@ -33,10 +33,10 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.util.RandomChoice;
 
@@ -2670,40 +2670,39 @@ public class Colony extends Settlement implements Nameable {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out, Player player,
+    protected void writeAttributes(FreeColXMLWriter xw, Player player,
                                    boolean showAll,
                                    boolean toSavedGame) throws XMLStreamException {
         PlayerExploredTile pet;
 
-        super.writeAttributes(out);
+        super.writeAttributes(xw);
 
-        writeAttribute(out, ESTABLISHED_TAG, established.getNumber());
+        xw.writeAttribute(ESTABLISHED_TAG, established.getNumber());
 
         if (showAll || toSavedGame || player.owns(this)) {
-            writeAttribute(out, SONS_OF_LIBERTY_TAG, sonsOfLiberty);
+            xw.writeAttribute(SONS_OF_LIBERTY_TAG, sonsOfLiberty);
             
-            writeAttribute(out, OLD_SONS_OF_LIBERTY_TAG, oldSonsOfLiberty);
+            xw.writeAttribute(OLD_SONS_OF_LIBERTY_TAG, oldSonsOfLiberty);
 
-            writeAttribute(out, TORIES_TAG, tories);
+            xw.writeAttribute(TORIES_TAG, tories);
 
-            writeAttribute(out, OLD_TORIES_TAG, oldTories);
+            xw.writeAttribute(OLD_TORIES_TAG, oldTories);
 
-            writeAttribute(out, LIBERTY_TAG, liberty);
+            xw.writeAttribute(LIBERTY_TAG, liberty);
 
-            writeAttribute(out, IMMIGRATION_TAG, immigration);
+            xw.writeAttribute(IMMIGRATION_TAG, immigration);
 
-            writeAttribute(out, PRODUCTION_BONUS_TAG, productionBonus);
+            xw.writeAttribute(PRODUCTION_BONUS_TAG, productionBonus);
 
-            writeAttribute(out, LAND_LOCKED_TAG, landLocked);
+            xw.writeAttribute(LAND_LOCKED_TAG, landLocked);
 
         } else if ((pet = getTile().getPlayerExploredTile(player)) != null) {
             if (pet.getColonyUnitCount() > 0) {
-                writeAttribute(out, UNIT_COUNT_TAG, pet.getColonyUnitCount());
+                xw.writeAttribute(UNIT_COUNT_TAG, pet.getColonyUnitCount());
             }
 
             if (pet.getColonyStockadeKey() != null) {
-                writeAttribute(out, STOCKADE_KEY_TAG,
-                    pet.getColonyStockadeKey());
+                xw.writeAttribute(STOCKADE_KEY_TAG, pet.getColonyStockadeKey());
             }
         }
     }
@@ -2712,17 +2711,17 @@ public class Colony extends Settlement implements Nameable {
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out, Player player,
+    protected void writeChildren(FreeColXMLWriter xw, Player player,
                                  boolean showAll,
                                  boolean toSavedGame) throws XMLStreamException {
-        super.writeChildren(out, player, showAll, toSavedGame);
+        super.writeChildren(xw, player, showAll, toSavedGame);
 
         if (showAll || toSavedGame || player.owns(this)) {
 
             List<String> keys = new ArrayList<String>(exportData.keySet());
             Collections.sort(keys);
             for (String key : keys) {
-                exportData.get(key).toXML(out);
+                exportData.get(key).toXML(xw);
             }
 
             // Only write the features that need specific instantiation,
@@ -2732,28 +2731,28 @@ public class Colony extends Settlement implements Nameable {
             Turn turn = getGame().getTurn();
             for (Modifier modifier : getSortedModifiers()) {
                 if (modifier.hasIncrement() && !modifier.isOutOfDate(turn)) {
-                    modifier.toXML(out);
+                    modifier.toXML(xw);
                 }
             }
 
             for (WorkLocation workLocation : getSortedCopy(getAllWorkLocations())) {
-                workLocation.toXML(out, player, showAll, toSavedGame);
+                workLocation.toXML(xw, player, showAll, toSavedGame);
             }
 
             for (BuildableType item : buildQueue.getValues()) { // In order!
-                out.writeStartElement(BUILD_QUEUE_TAG);
+                xw.writeStartElement(BUILD_QUEUE_TAG);
 
-                writeAttribute(out, ID_ATTRIBUTE_TAG, item);
+                xw.writeAttribute(ID_ATTRIBUTE_TAG, item);
 
-                out.writeEndElement();
+                xw.writeEndElement();
             }
 
             for (BuildableType item : populationQueue.getValues()) { // In order
-                out.writeStartElement(POPULATION_QUEUE_TAG);
+                xw.writeStartElement(POPULATION_QUEUE_TAG);
 
-                writeAttribute(out, ID_ATTRIBUTE_TAG, item);
+                xw.writeAttribute(ID_ATTRIBUTE_TAG, item);
 
-                out.writeEndElement();
+                xw.writeEndElement();
             }
         }
     }
@@ -2762,9 +2761,9 @@ public class Colony extends Settlement implements Nameable {
      * {@inheritDoc}
      */
     @Override
-    protected void toXMLPartial(XMLStreamWriter out,
+    protected void toXMLPartial(FreeColXMLWriter xw,
                                 String[] fields) throws XMLStreamException {
-        toXMLPartialByClass(out, getClass(), fields);
+        toXMLPartialByClass(xw, getClass(), fields);
     }
 
     /**
@@ -2881,11 +2880,11 @@ public class Colony extends Settlement implements Nameable {
             addBuilding(xr.readFreeColGameObject(game, Building.class));
 
         } else if (ColonyTile.getXMLElementTagName().equals(tag)) {
-            colonyTiles.add(xr.readFreeColGameObject(getGame(), ColonyTile.class));
+            colonyTiles.add(xr.readFreeColGameObject(game, ColonyTile.class));
 
         } else if (ExportData.getXMLElementTagName().equals(tag)) {
             ExportData data = new ExportData(xr);
-            if (data != null) exportData.put(data.getId(), data);
+            exportData.put(data.getId(), data);
         
         } else if (Modifier.getXMLElementTagName().equals(tag)) {
             addModifier(new Modifier(xr, spec));

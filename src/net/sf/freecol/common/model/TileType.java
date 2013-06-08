@@ -28,9 +28,9 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.StringOption;
 import net.sf.freecol.common.util.RandomChoice;
@@ -489,71 +489,71 @@ public final class TileType extends FreeColGameObjectType {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
-        writeAttribute(out, BASIC_MOVE_COST_TAG, basicMoveCost);
+        xw.writeAttribute(BASIC_MOVE_COST_TAG, basicMoveCost);
 
-        writeAttribute(out, BASIC_WORK_TURNS_TAG, basicWorkTurns);
+        xw.writeAttribute(BASIC_WORK_TURNS_TAG, basicWorkTurns);
 
-        writeAttribute(out, IS_FOREST_TAG, forest);
+        xw.writeAttribute(IS_FOREST_TAG, forest);
 
-        writeAttribute(out, IS_WATER_TAG, water);
+        xw.writeAttribute(IS_WATER_TAG, water);
 
-        writeAttribute(out, IS_ELEVATION_TAG, elevation);
+        xw.writeAttribute(IS_ELEVATION_TAG, elevation);
 
-        writeAttribute(out, IS_CONNECTED_TAG, connected);
+        xw.writeAttribute(IS_CONNECTED_TAG, connected);
 
-        writeAttribute(out, CAN_SETTLE_TAG, canSettle);
+        xw.writeAttribute(CAN_SETTLE_TAG, canSettle);
 
-        writeAttribute(out, PRODUCTION_LEVEL_TAG, productionLevel);
+        xw.writeAttribute(PRODUCTION_LEVEL_TAG, productionLevel);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        super.writeChildren(out);
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeChildren(xw);
 
-        out.writeStartElement(GEN_TAG);
+        xw.writeStartElement(GEN_TAG);
 
-        writeAttribute(out, HUMIDITY_MIN_TAG, humidity[0]);
+        xw.writeAttribute(HUMIDITY_MIN_TAG, humidity[0]);
 
-        writeAttribute(out, HUMIDITY_MAX_TAG, humidity[1]);
+        xw.writeAttribute(HUMIDITY_MAX_TAG, humidity[1]);
 
-        writeAttribute(out, TEMPERATURE_MIN_TAG, temperature[0]);
+        xw.writeAttribute(TEMPERATURE_MIN_TAG, temperature[0]);
 
-        writeAttribute(out, TEMPERATURE_MAX_TAG, temperature[1]);
+        xw.writeAttribute(TEMPERATURE_MAX_TAG, temperature[1]);
 
-        writeAttribute(out, ALTITUDE_MIN_TAG, altitude[0]);
+        xw.writeAttribute(ALTITUDE_MIN_TAG, altitude[0]);
 
-        writeAttribute(out, ALTITUDE_MAX_TAG, altitude[1]);
+        xw.writeAttribute(ALTITUDE_MAX_TAG, altitude[1]);
 
-        out.writeEndElement();
+        xw.writeEndElement();
 
         for (ProductionType productionType : getProductionTypes()) {
-            productionType.toXML(out);
+            productionType.toXML(xw);
         }
 
         for (RandomChoice<ResourceType> choice : getWeightedResources()) {
-            out.writeStartElement(RESOURCE_TAG);
+            xw.writeStartElement(RESOURCE_TAG);
 
-            writeAttribute(out, TYPE_TAG, choice.getObject());
+            xw.writeAttribute(TYPE_TAG, choice.getObject());
 
-            writeAttribute(out, PROBABILITY_TAG, choice.getProbability());
+            xw.writeAttribute(PROBABILITY_TAG, choice.getProbability());
 
-            out.writeEndElement();
+            xw.writeEndElement();
         }
 
         for (RandomChoice<Disaster> choice : getDisasters()) {
-            out.writeStartElement(DISASTER_TAG);
+            xw.writeStartElement(DISASTER_TAG);
 
-            writeAttribute(out, ID_ATTRIBUTE_TAG, choice.getObject());
+            xw.writeAttribute(ID_ATTRIBUTE_TAG, choice.getObject());
 
-            writeAttribute(out, PROBABILITY_TAG, choice.getProbability());
+            xw.writeAttribute(PROBABILITY_TAG, choice.getProbability());
 
-            out.writeEndElement();
+            xw.writeEndElement();
         }
     }
 
@@ -632,11 +632,12 @@ public final class TileType extends FreeColGameObjectType {
             int amount = xr.getAttribute(VALUE_TAG, 0);
             AbstractGoods goods = new AbstractGoods(type, amount);
             String tileProduction = xr.getAttribute(TILE_PRODUCTION_TAG,
-                                                 (String)null);
+                                                    (String)null);
             // CAUTION: this only works if the primary production is
             // defined before the secondary production
             if (PRIMARY_PRODUCTION_TAG.equals(tag)) {
-                addProductionType(new ProductionType(goods, true, tileProduction));
+                addProductionType(new ProductionType(goods, true,
+                                                     tileProduction));
             } else if (SECONDARY_PRODUCTION_TAG.equals(tag)) {
                 for (ProductionType productionType : getProductionTypes()) {
                     if (productionType.isColonyCenterTile()

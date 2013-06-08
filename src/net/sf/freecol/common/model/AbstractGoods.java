@@ -22,9 +22,9 @@ package net.sf.freecol.common.model;
 import java.util.Comparator;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 
 
 /**
@@ -151,12 +151,12 @@ public class AbstractGoods extends FreeColObject implements Named {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
-        writeAttribute(out, TYPE_TAG, type);
+        xw.writeAttribute(TYPE_TAG, type);
 
-        writeAttribute(out, AMOUNT_TAG, amount);
+        xw.writeAttribute(AMOUNT_TAG, amount);
     }
 
     /**

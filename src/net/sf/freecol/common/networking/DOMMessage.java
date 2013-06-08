@@ -33,13 +33,13 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.debug.FreeColDebugger;
 
 import org.w3c.dom.Document;
@@ -367,24 +367,24 @@ public class DOMMessage {
     /**
      * Creates an error message.
      *
-     * @param out The output stream for the message.
+     * @param xw The <code>FreeColXMLWriter</code> to write to.
      * @param messageID Identifies the "i18n"-keyname. Not specified in the
      *            message if <i>null</i>.
      * @param message The error in plain text. Not specified in the message if
      *            <i>null</i>.
      */
-    public static void createError(XMLStreamWriter out, String messageID, String message) {
+    public static void createError(FreeColXMLWriter xw, String messageID, String message) {
         try {
-            out.writeStartElement("error");
+            xw.writeStartElement("error");
 
             if (messageID != null && !messageID.equals("")) {
-                out.writeAttribute("messageID", messageID);
+                xw.writeAttribute("messageID", messageID);
             }
 
             if (message != null && !message.equals("")) {
-                out.writeAttribute("message", message);
+                xw.writeAttribute("message", message);
             }
-            out.writeEndElement();
+            xw.writeEndElement();
         } catch (XMLStreamException e) {
             logger.log(Level.WARNING, "Could not send error message.", e);
         }

@@ -25,9 +25,9 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Specification;
 
 
@@ -148,25 +148,25 @@ public class StringOption extends AbstractOption<String> {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
-        out.writeAttribute(VALUE_TAG, value);
+        xw.writeAttribute(VALUE_TAG, value);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
-        super.writeChildren(out);
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeChildren(xw);
 
         for (String choice : choices) {
-            out.writeStartElement(CHOICE_TAG);
+            xw.writeStartElement(CHOICE_TAG);
             
-            out.writeAttribute(VALUE_TAG, choice);
+            xw.writeAttribute(VALUE_TAG, choice);
                 
-            out.writeEndElement();
+            xw.writeEndElement();
         }
     }
 

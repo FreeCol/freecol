@@ -34,10 +34,10 @@ import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.NationOptions.NationState;
@@ -3656,83 +3656,83 @@ public class Player extends FreeColGameObject implements Nameable {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out, Player player,
+    protected void writeAttributes(FreeColXMLWriter xw, Player player,
                                    boolean showAll,
                                    boolean toSavedGame) throws XMLStreamException {
-        super.writeAttributes(out, player, showAll, toSavedGame);
+        super.writeAttributes(xw, player, showAll, toSavedGame);
 
-        writeAttribute(out, USERNAME_TAG, name);
+        xw.writeAttribute(USERNAME_TAG, name);
 
-        writeAttribute(out, NATION_ID_TAG, nationId);
+        xw.writeAttribute(NATION_ID_TAG, nationId);
 
         if (nationType != null) {
-            writeAttribute(out, NATION_TYPE_TAG, nationType);
+            xw.writeAttribute(NATION_TYPE_TAG, nationType);
         }
 
-        writeAttribute(out, ADMIN_TAG, admin);
+        xw.writeAttribute(ADMIN_TAG, admin);
 
-        writeAttribute(out, READY_TAG, ready);
+        xw.writeAttribute(READY_TAG, ready);
 
-        writeAttribute(out, DEAD_TAG, dead);
+        xw.writeAttribute(DEAD_TAG, dead);
 
-        writeAttribute(out, BANKRUPT_TAG, bankrupt);
+        xw.writeAttribute(BANKRUPT_TAG, bankrupt);
 
-        writeAttribute(out, PLAYER_TYPE_TAG, playerType);
+        xw.writeAttribute(PLAYER_TYPE_TAG, playerType);
 
-        writeAttribute(out, AI_TAG, ai);
+        xw.writeAttribute(AI_TAG, ai);
 
-        writeAttribute(out, TAX_TAG, tax);
+        xw.writeAttribute(TAX_TAG, tax);
 
         // @compat 0.9.x
-        writeAttribute(out, NUMBER_OF_SETTLEMENTS_TAG, getNumberOfSettlements());
+        xw.writeAttribute(NUMBER_OF_SETTLEMENTS_TAG, getNumberOfSettlements());
         // end compatibility code
 
         if (showAll || toSavedGame || this == player) {
-            writeAttribute(out, GOLD_TAG, gold);
+            xw.writeAttribute(GOLD_TAG, gold);
 
-            writeAttribute(out, IMMIGRATION_TAG, immigration);
+            xw.writeAttribute(IMMIGRATION_TAG, immigration);
 
-            writeAttribute(out, LIBERTY_TAG, liberty);
+            xw.writeAttribute(LIBERTY_TAG, liberty);
 
-            writeAttribute(out, INTERVENTION_BELLS_TAG, interventionBells);
+            xw.writeAttribute(INTERVENTION_BELLS_TAG, interventionBells);
 
             if (currentFather != null) {
-                writeAttribute(out, CURRENT_FATHER_TAG, currentFather);
+                xw.writeAttribute(CURRENT_FATHER_TAG, currentFather);
             }
 
-            writeAttribute(out, IMMIGRATION_REQUIRED_TAG, immigrationRequired);
+            xw.writeAttribute(IMMIGRATION_REQUIRED_TAG, immigrationRequired);
 
-            writeAttribute(out, ATTACKED_BY_PRIVATEERS_TAG, attackedByPrivateers);
-            writeAttribute(out, OLD_SOL_TAG, oldSoL);
+            xw.writeAttribute(ATTACKED_BY_PRIVATEERS_TAG, attackedByPrivateers);
+            xw.writeAttribute(OLD_SOL_TAG, oldSoL);
 
-            writeAttribute(out, SCORE_TAG, score);
+            xw.writeAttribute(SCORE_TAG, score);
 
         } else {
-            writeAttribute(out, GOLD_TAG, -1);
+            xw.writeAttribute(GOLD_TAG, -1);
 
-            writeAttribute(out, IMMIGRATION_TAG, -1);
+            xw.writeAttribute(IMMIGRATION_TAG, -1);
 
-            writeAttribute(out, LIBERTY_TAG, -1);
+            xw.writeAttribute(LIBERTY_TAG, -1);
 
-            writeAttribute(out, IMMIGRATION_REQUIRED_TAG, -1);
+            xw.writeAttribute(IMMIGRATION_REQUIRED_TAG, -1);
         }
 
         if (newLandName != null) {
-            writeAttribute(out, NEW_LAND_NAME_TAG, newLandName);
+            xw.writeAttribute(NEW_LAND_NAME_TAG, newLandName);
         }
 
         if (independentNationName != null) {
-            writeAttribute(out, INDEPENDENT_NATION_NAME_TAG, independentNationName);
+            xw.writeAttribute(INDEPENDENT_NATION_NAME_TAG, independentNationName);
         }
 
         if (entryLocation != null) {
-            writeLocationAttribute(out, ENTRY_LOCATION_TAG, entryLocation);
+            xw.writeLocationAttribute(ENTRY_LOCATION_TAG, entryLocation);
         }
 
         for (RegionType regionType : RegionType.values()) {
             String key = regionType.getNameIndexKey();
             int index = getNameIndex(key);
-            if (index > 0) writeAttribute(out, key, index);
+            if (index > 0) xw.writeAttribute(key, index);
         }
     }
 
@@ -3740,22 +3740,22 @@ public class Player extends FreeColGameObject implements Nameable {
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(XMLStreamWriter out, Player player,
+    protected void writeChildren(FreeColXMLWriter xw, Player player,
                                  boolean showAll,
                                  boolean toSavedGame) throws XMLStreamException {
         if (market != null) {
-            market.toXML(out, player, showAll, toSavedGame);
+            market.toXML(xw, player, showAll, toSavedGame);
         }
 
         if (showAll || toSavedGame || this == player) {
             for (Player p : getSortedCopy(tension.keySet())) {
-                out.writeStartElement(TENSION_TAG);
+                xw.writeStartElement(TENSION_TAG);
 
-                writeAttribute(out, PLAYER_TAG, p);
+                xw.writeAttribute(PLAYER_TAG, p);
 
-                writeAttribute(out, VALUE_TAG, tension.get(p).getValue());
+                xw.writeAttribute(VALUE_TAG, tension.get(p).getValue());
 
-                out.writeEndElement();
+                xw.writeEndElement();
             }
 
             List<String> playerIds = new ArrayList<String>(stance.keySet());
@@ -3764,77 +3764,77 @@ public class Player extends FreeColGameObject implements Nameable {
                 Stance s = stance.get(pid);
                 if (s == Stance.UNCONTACTED) continue;
 
-                out.writeStartElement(STANCE_TAG);
+                xw.writeStartElement(STANCE_TAG);
 
-                writeAttribute(out, PLAYER_TAG, pid);
+                xw.writeAttribute(PLAYER_TAG, pid);
 
-                writeAttribute(out, VALUE_TAG, stance.get(pid));
+                xw.writeAttribute(VALUE_TAG, stance.get(pid));
 
-                out.writeEndElement();
+                xw.writeEndElement();
             }
 
             for (HistoryEvent event : history) { // Already in order
-                event.toXML(out);
+                event.toXML(xw);
             }
 
             for (TradeRoute route : getSortedCopy(tradeRoutes)) {
-                route.toXML(out, this, false, false);
+                route.toXML(xw, this, false, false);
             }
 
             if (highSeas != null) {
-                highSeas.toXML(out, player, showAll, toSavedGame);
+                highSeas.toXML(xw, player, showAll, toSavedGame);
             }
             
-            writeToListElement(out, FOUNDING_FATHERS_TAG, foundingFathers);
+            xw.writeToListElement(FOUNDING_FATHERS_TAG, foundingFathers);
 
-            writeToListElement(out, OFFERED_FATHERS_TAG, offeredFathers);
+            xw.writeToListElement(OFFERED_FATHERS_TAG, offeredFathers);
 
             if (europe != null) {
-                europe.toXML(out, player, showAll, toSavedGame);
+                europe.toXML(xw, player, showAll, toSavedGame);
             }
 
             if (monarch != null) {
-                monarch.toXML(out, player, showAll, toSavedGame);
+                monarch.toXML(xw, player, showAll, toSavedGame);
             }
 
             for (ModelMessage m : getSortedCopy(modelMessages)) {
-                m.toXML(out);
+                m.toXML(xw);
             }
 
             if (lastSales != null) {
                 for (LastSale sale : getSortedCopy(lastSales.values())) {
-                    sale.toXML(out);
+                    sale.toXML(xw);
                 }
             }
 
             Turn turn = getGame().getTurn();
             for (Modifier modifier : getSortedModifiers()) {
                 if (modifier.isTemporary() && !modifier.isOutOfDate(turn)) {
-                    modifier.toXML(out);
+                    modifier.toXML(xw);
                 }
             }
 
         } else {
             Tension t = getTension(player);
             if (t != null) {
-                out.writeStartElement(TENSION_TAG);
+                xw.writeStartElement(TENSION_TAG);
 
-                writeAttribute(out, PLAYER_TAG, player);
+                xw.writeAttribute(PLAYER_TAG, player);
 
-                writeAttribute(out, VALUE_TAG, t.getValue());
+                xw.writeAttribute(VALUE_TAG, t.getValue());
 
-                out.writeEndElement();
+                xw.writeEndElement();
             }
 
             Stance s = getStance(player);
             if (s != null && s != Stance.UNCONTACTED) {
-                out.writeStartElement(STANCE_TAG);
+                xw.writeStartElement(STANCE_TAG);
                 
-                writeAttribute(out, PLAYER_TAG, player);
+                xw.writeAttribute(PLAYER_TAG, player);
 
-                writeAttribute(out, VALUE_TAG, s);
+                xw.writeAttribute(VALUE_TAG, s);
 
-                out.writeEndElement();
+                xw.writeEndElement();
             }
         }
     }
@@ -3843,9 +3843,9 @@ public class Player extends FreeColGameObject implements Nameable {
      * {@inheritDoc}
      */
     @Override
-    protected void toXMLPartial(XMLStreamWriter out,
+    protected void toXMLPartial(FreeColXMLWriter xw,
                                 String[] fields) throws XMLStreamException {
-        toXMLPartialByClass(out, getClass(), fields);
+        toXMLPartialByClass(xw, getClass(), fields);
     }
 
     /**
@@ -3906,7 +3906,7 @@ public class Player extends FreeColGameObject implements Nameable {
         tax = xr.getAttribute(TAX_TAG, 0);
 
         playerType = xr.getAttribute(PLAYER_TYPE_TAG,
-                                  PlayerType.class, (PlayerType)null);
+                                     PlayerType.class, (PlayerType)null);
 
         currentFather = xr.getType(spec, CURRENT_FATHER_TAG,
                                    FoundingFather.class, (FoundingFather)null);
@@ -3916,10 +3916,10 @@ public class Player extends FreeColGameObject implements Nameable {
         newLandName = xr.getAttribute(NEW_LAND_NAME_TAG, (String)null);
 
         independentNationName = xr.getAttribute(INDEPENDENT_NATION_NAME_TAG,
-                                             (String)null);
+                                                (String)null);
 
         attackedByPrivateers = xr.getAttribute(ATTACKED_BY_PRIVATEERS_TAG,
-                                            false);
+                                               false);
 
         entryLocation = xr.makeLocationAttribute(ENTRY_LOCATION_TAG, game);
 
@@ -3994,7 +3994,7 @@ public class Player extends FreeColGameObject implements Nameable {
             String playerId = xr.getAttribute(PLAYER_TAG, (String)null);
             if (playerId != null) {
                 stance.put(playerId, xr.getAttribute(VALUE_TAG,
-                        Stance.class, Stance.UNCONTACTED));
+                           Stance.class, Stance.UNCONTACTED));
             }
             xr.closeTag(STANCE_TAG);
 

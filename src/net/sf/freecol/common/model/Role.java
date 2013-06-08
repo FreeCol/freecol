@@ -24,9 +24,9 @@ import java.util.Comparator;
 import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
 
 
 /**
@@ -244,19 +244,19 @@ public class Role extends BuildableType {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
-        super.writeAttributes(out);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
         if (downgrade != null) {
-            writeAttribute(out, DOWNGRADE_TAG, downgrade);
+            xw.writeAttribute(DOWNGRADE_TAG, downgrade);
         }
 
         if (expertUnit != null) {
-            writeAttribute(out, EXPERT_UNIT_TAG, expertUnit);
+            xw.writeAttribute(EXPERT_UNIT_TAG, expertUnit);
         }
 
         if (maximumCount > 1) {
-            writeAttribute(out, MAXIMUM_COUNT_TAG, maximumCount);
+            xw.writeAttribute(MAXIMUM_COUNT_TAG, maximumCount);
         }
     }
 
@@ -265,9 +265,9 @@ public class Role extends BuildableType {
      */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
-        final Specification spec = getSpecification();
-
         super.readAttributes(xr);
+
+        final Specification spec = getSpecification();
 
         downgrade = xr.getType(spec, DOWNGRADE_TAG,
                                Role.class, (Role)null);
