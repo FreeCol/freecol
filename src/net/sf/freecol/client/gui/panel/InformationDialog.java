@@ -35,6 +35,9 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.resources.ResourceManager;
 
 
+/**
+ * A general dialog for information display.
+ */
 public class InformationDialog extends FreeColDialog<Boolean> {
 
     /**

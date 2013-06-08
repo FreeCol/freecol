@@ -24,6 +24,7 @@ import java.util.List;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+
 /**
  * Represents a <code>TileItem</code> item on a <code>Tile</code>.
  */

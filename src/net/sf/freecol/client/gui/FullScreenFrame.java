@@ -28,6 +28,7 @@ import javax.swing.JFrame;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 
+
 /**
  * The fullscreen frame that contains everything. If full screen mode is not
  * supported (or chosen), then the {@link WindowedFrame} will be used instead.

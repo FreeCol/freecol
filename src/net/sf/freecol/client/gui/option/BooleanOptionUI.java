@@ -27,8 +27,8 @@ import net.sf.freecol.common.option.BooleanOption;
 
 
 /**
- * This class provides visualization for an {@link
- * net.sf.freecol.common.option.BooleanOption}. In order to enable
+ * This class provides visualization for a
+ * {@link net.sf.freecol.common.option.BooleanOption} in order to enable
  * values to be both seen and changed.
  */
 public final class BooleanOptionUI extends OptionUI<BooleanOption>  {

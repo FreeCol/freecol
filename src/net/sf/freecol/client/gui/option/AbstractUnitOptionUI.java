@@ -52,8 +52,8 @@ import net.sf.freecol.common.option.UnitTypeOption;
 
 
 /**
- * This class provides visualization for an {@link
- * net.sf.freecol.common.option.AbstractUnitOption}. In order to enable
+ * This class provides visualization for an
+ * {@link net.sf.freecol.common.option.AbstractUnitOption} in order to enable
  * values to be both seen and changed.
  */
 public final class AbstractUnitOptionUI extends OptionUI<AbstractUnitOption>

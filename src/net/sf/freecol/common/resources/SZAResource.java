@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
 
+
 /**
  * A <code>Resource</code> wrapping a <code>SimpleZippedAnimation</code>.
  * 

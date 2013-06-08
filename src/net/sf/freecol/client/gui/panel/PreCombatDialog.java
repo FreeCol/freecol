@@ -41,6 +41,9 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 
 
+/**
+ * The dialog that is shown prior to a possible combat.
+ */
 public class PreCombatDialog extends FreeColDialog<Boolean> {
 
     public PreCombatDialog(FreeColClient freeColClient, GUI gui,

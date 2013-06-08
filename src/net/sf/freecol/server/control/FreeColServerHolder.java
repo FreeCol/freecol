@@ -22,6 +22,7 @@ package net.sf.freecol.server.control;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerGame;
 
+
 /**
  * This base class provides thread-safe access to a
  * {@link net.sf.freecol.server.FreeColServer} for several subclasses. 

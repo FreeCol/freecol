@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui.i18n;
 
+
 /**
  * Number optimized for languages that distinguish the categories one
  * and other.
@@ -26,11 +27,11 @@ package net.sf.freecol.client.gui.i18n;
 public class PluralNumberRule extends Number {
 
     public Category getCategory(double input) {
-	if (input == 1) {
-	    return Category.one;
-	} else {
-	    return Category.other;
-	}
+        if (input == 1) {
+            return Category.one;
+        } else {
+            return Category.other;
+        }
     }
 
 }

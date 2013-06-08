@@ -27,6 +27,9 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.common.model.Map.Direction;
 
 
+/**
+ * The outline of a canvas listener.
+ */
 public class AbstractCanvasListener {
 
     private static final int DRAG_SCROLLSPACE = 100;

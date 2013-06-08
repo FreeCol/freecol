@@ -27,6 +27,7 @@ import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Unit;
 
+
 /**
  * An action for making a unit move to a specific location. This action first
  * displays a panel from which the player can choose a location the unit should

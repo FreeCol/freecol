@@ -32,24 +32,26 @@ import javax.swing.JButton;
 import net.sf.freecol.client.gui.action.ActionManager;
 import net.sf.freecol.client.gui.action.FreeColAction;
 
+
 /**
-* A button with a set of images which is used to give commands
-* to a unit with the mouse instead of the keyboard. The UnitButton
-* has rollover highlighting, can be grayed out if it is unusable,
-* and will use a separate image for being pressed.
-* The UnitButton is useless by itself, this object needs to
-* be placed on a JComponent in order to be useable.
-*/
+ * A button with a set of images which is used to give commands
+ * to a unit with the mouse instead of the keyboard. The UnitButton
+ * has rollover highlighting, can be grayed out if it is unusable,
+ * and will use a separate image for being pressed.
+ * The UnitButton is useless by itself, this object needs to
+ * be placed on a JComponent in order to be useable.
+ */
 public final class UnitButton extends JButton {
 
-	private String actionId;
-	private ActionManager am;
+    private String actionId;
+    private ActionManager am;
 
     /**
-    * The basic constructor.
-    * @param am The action manager which holds all FreeColAction.
-    * @param actionId The key for the action to be used with this button
-    */
+     * The basic constructor.
+     *
+     * @param am The action manager which holds all FreeColAction.
+     * @param actionId The key for the action to be used with this button
+     */
     public UnitButton(ActionManager am, String actionId) {
         super(am.getFreeColAction(actionId));
         this.actionId = actionId;

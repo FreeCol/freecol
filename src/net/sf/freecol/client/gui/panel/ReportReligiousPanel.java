@@ -40,7 +40,6 @@ import net.sf.freecol.common.model.Specification;
  */
 public final class ReportReligiousPanel extends ReportPanel {
 
-
     /**
      * The constructor that will add the items to this panel.
      * @param freeColClient 

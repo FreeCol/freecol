@@ -26,8 +26,8 @@ import net.sf.freecol.common.ServerInfo;
 
 
 /**
-* This object stores information about a single running server.
-*/
+ * This object stores information about a single running server.
+ */
 public class MetaItem extends ServerInfo {
     @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(MetaItem.class.getName());

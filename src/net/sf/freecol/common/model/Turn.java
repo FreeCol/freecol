@@ -20,6 +20,7 @@
 
 package net.sf.freecol.common.model;
 
+
 /**
  * Represents a given turn in the game.
  */

@@ -26,6 +26,9 @@ import javax.swing.Timer;
 import javax.swing.event.EventListenerList;
 
 
+/**
+ * The blinking cursor on the map.
+ */
 public class TerrainCursor implements ActionListener  {
     
 

@@ -27,6 +27,9 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 
+/**
+ * A type of goods, derived from the specification.
+ */
 public final class GoodsType extends FreeColGameObjectType {
 
     /** Is this a farmed goods type. */

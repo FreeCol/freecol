@@ -41,7 +41,7 @@ import net.sf.freecol.common.util.Utils;
 
 
 /**
- * This panel displays the Colopedia.
+ * This panel displays details of resources in the Colopedia.
  */
 public class ResourcesDetailPanel extends ColopediaGameObjectTypePanel<ResourceType> {
 

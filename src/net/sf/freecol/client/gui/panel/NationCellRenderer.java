@@ -33,9 +33,11 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 
+
 /**
-* A table cell renderer that should be used to display the chosen nation in a table.
-* It is being used in the players table (StartGamePanel).
+* A table cell renderer that should be used to display the chosen
+* nation in a table.  It is being used in the players table
+* (StartGamePanel).
 */
 public final class NationCellRenderer implements TableCellRenderer {
 

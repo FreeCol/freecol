@@ -24,6 +24,9 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 
+/**
+ * A trade item consisting of a colony.
+ */
 public class ColonyTradeItem extends TradeItem {
 
     /** The identifier of the colony to change hands. */

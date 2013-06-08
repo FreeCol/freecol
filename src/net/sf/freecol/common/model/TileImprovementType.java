@@ -34,6 +34,9 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.common.util.RandomChoice;
 
 
+/**
+ * An improvement to make to a tile.
+ */
 public final class TileImprovementType extends FreeColGameObjectType {
 
     /** Is this improvement natural or man-made? */

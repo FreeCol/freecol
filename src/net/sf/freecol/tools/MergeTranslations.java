@@ -34,6 +34,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 
+/**
+ * Merge some translation updates.
+ */
 public class MergeTranslations {
     
     public static void main(String[] args) throws Exception {

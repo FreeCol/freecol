@@ -23,7 +23,6 @@ import java.net.URI;
 import java.net.URL;
 
 
-
 /**
  * A <code>Resource</code> wrapping a <code>FAFile</code>.
  *

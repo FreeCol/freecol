@@ -52,6 +52,9 @@ import net.sf.freecol.common.resources.Resource;
 import net.sf.freecol.common.resources.ResourceManager;
 
 
+/**
+ * The menu that appears in debug mode.
+ */
 public class DebugMenu extends JMenu {
 
     @SuppressWarnings("unused")

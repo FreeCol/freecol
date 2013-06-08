@@ -33,17 +33,15 @@ import net.sf.freecol.common.model.EuropeanNationType;
 
 
 /**
-* A table cell editor that can be used to select a nation.
-*/
+ * A table cell editor that can be used to select a nation.
+ */
 public final class AdvantageCellEditor extends DefaultCellEditor {
 
-
-    
     /**
-    * A standard constructor.
-    *
-    * @param nationTypes List of <code>EuropeanNationType></code>
-    */
+     * A standard constructor.
+     *
+     * @param nationTypes List of <code>EuropeanNationType></code>
+     */
     @SuppressWarnings("unchecked") // FIXME in Java7
     public AdvantageCellEditor(List<EuropeanNationType> nationTypes) {
         super(new JComboBox(new Vector<EuropeanNationType>(nationTypes)));

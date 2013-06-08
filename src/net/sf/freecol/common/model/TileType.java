@@ -36,6 +36,9 @@ import net.sf.freecol.common.option.StringOption;
 import net.sf.freecol.common.util.RandomChoice;
 
 
+/**
+ * The types of tiles.
+ */
 public final class TileType extends FreeColGameObjectType {
 
     public static enum RangeType { HUMIDITY, TEMPERATURE, ALTITUDE };

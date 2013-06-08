@@ -45,7 +45,8 @@ import org.w3c.dom.Element;
 
 
 /**
- * The main AI-class. Keeps references to all other AI-classes.
+ * The main AI-class.
+ * Keeps references to all other AI-classes.
  */
 public class AIMain extends FreeColObject
     implements FreeColGameObjectListener {

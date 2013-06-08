@@ -32,6 +32,7 @@ import net.sf.freecol.common.resources.ResourceManager;
 
 import net.miginfocom.swing.MigLayout;
 
+
 /**
  * A collection of panels and buttons that are used to provide
  * the user with a more detailed view of certain elements on the

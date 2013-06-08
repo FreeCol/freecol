@@ -22,10 +22,8 @@ package net.sf.freecol.common.util;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+
 public final class EmptyIterator<T> implements Iterator<T> {
-
-
-
 
     /**
      * Returns an instance of the EmptyIterator for the given type.

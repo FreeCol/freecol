@@ -42,7 +42,7 @@ import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
- * This panel displays the Colopedia.
+ * This panel displays details of founding fathers in the Colopedia.
  */
 public class FatherDetailPanel extends ColopediaGameObjectTypePanel<FoundingFather> {
 

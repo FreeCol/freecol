@@ -28,6 +28,9 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 
+/**
+ * The role of a unit.
+ */
 public class Role extends BuildableType {
 
     /**

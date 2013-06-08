@@ -36,6 +36,7 @@ import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Nameable;
 import net.sf.freecol.client.gui.i18n.Messages;
 
+
 /**
  * A <code>ListCellRenderer</code> to be used by <code>FreeColListUI</code>.
  */

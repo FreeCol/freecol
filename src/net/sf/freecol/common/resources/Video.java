@@ -21,6 +21,7 @@ package net.sf.freecol.common.resources;
 
 import java.net.URL;
 
+
 /**
  * Represents a video.
  */

@@ -28,6 +28,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.server.generator.TerrainGenerator;
 
+
 /**
  * An action for determining the high seas tiles.
  */

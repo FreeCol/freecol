@@ -44,10 +44,9 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.resources.ResourceManager;
 
 
-
 /**
- * This component draws a small version of the map. It allows us
- * to see a larger part of the map and to relocate the viewport by
+ * This component draws a small version of the map.  It allows us to
+ * see a larger part of the map and to relocate the viewport by
  * clicking on it.
  */
 public final class MiniMap extends JPanel implements MouseInputListener {

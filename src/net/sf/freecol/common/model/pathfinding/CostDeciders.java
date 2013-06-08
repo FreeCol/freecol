@@ -32,7 +32,6 @@ import net.sf.freecol.common.model.Unit;
  */
 public final class CostDeciders {
 
-
     /**
      * A <code>CostDecider</code> that costs unit moves normally.
      */

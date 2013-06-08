@@ -27,6 +27,7 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.server.generator.MapGenerator;
 
+
 /**
  * Creates a new empty map.
  */

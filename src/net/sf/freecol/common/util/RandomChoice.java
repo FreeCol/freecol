@@ -28,6 +28,9 @@ import java.util.logging.Logger;
 import net.sf.freecol.common.util.Utils;
 
 
+/**
+ * A class to provide flat and weighted random selection from a collection.
+ */
 public class RandomChoice<T> implements Comparable<RandomChoice<T>> {
 
     private final int probability;

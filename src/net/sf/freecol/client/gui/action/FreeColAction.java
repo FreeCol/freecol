@@ -42,8 +42,8 @@ import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
- * The super class of all actions in FreeCol. Subclasses of this object is
- * stored in an {@link ActionManager}.
+ * The super class of all actions in FreeCol.  Subclasses of this
+ * object is stored in an {@link ActionManager}.
  */
 public abstract class FreeColAction extends AbstractAction implements Option<FreeColAction> {
 

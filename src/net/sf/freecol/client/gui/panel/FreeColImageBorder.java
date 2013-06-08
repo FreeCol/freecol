@@ -32,6 +32,7 @@ import javax.swing.border.AbstractBorder;
 
 import net.sf.freecol.common.resources.ResourceManager;
 
+
 /**
  * A border created from a set of images. 
  */

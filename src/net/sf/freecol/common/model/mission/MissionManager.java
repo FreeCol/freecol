@@ -30,6 +30,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.common.model.Game;
 
+
 /**
  * The MissionManager keeps track of all missions defined.
  *

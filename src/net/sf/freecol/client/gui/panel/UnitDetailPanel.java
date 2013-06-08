@@ -51,8 +51,9 @@ import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.util.RandomChoice;
 
+
 /**
- * This panel displays the Colopedia.
+ * This panel displays details of units in the Colopedia.
  */
 public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
 

@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
 
 
 /**
- * The message sent when the client requests abandoning of a colony.
+ * The message sent to choose a founding father.
  */
 public class ChooseFoundingFatherMessage extends DOMMessage {
 

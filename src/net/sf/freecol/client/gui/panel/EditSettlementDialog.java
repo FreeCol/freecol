@@ -51,6 +51,7 @@ import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.model.ServerPlayer;
 
+
 /**
  * This dialog is used to edit an Indian settlement (map editor only).
  */

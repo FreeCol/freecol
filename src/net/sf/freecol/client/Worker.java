@@ -25,14 +25,13 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
 
+
 /**
- * The Worker Thread executes jobs one after another. The thread manages a queue
- * where new jobs can be enqueued. The jobs are processed synchronously by the
- * worker.
+ * The Worker Thread executes jobs one after another.  The thread
+ * manages a queue where new jobs can be enqueued.  The jobs are
+ * processed synchronously by the worker.
  */
 public final class Worker extends Thread {
-
-
 
     private final LinkedBlockingQueue<Runnable> jobList;
 

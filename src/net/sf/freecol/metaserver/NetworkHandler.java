@@ -32,11 +32,9 @@ import net.sf.freecol.common.networking.MessageHandler;
 import org.w3c.dom.Element;
 
 
-
-
 /**
-* Handles all network messages beeing sent to the metaserver.
-*/
+ * Handles all network messages beeing sent to the metaserver.
+ */
 public final class NetworkHandler implements MessageHandler {
     private static Logger logger = Logger.getLogger(NetworkHandler.class.getName());
 

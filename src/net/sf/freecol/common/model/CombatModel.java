@@ -24,6 +24,9 @@ import java.util.Random;
 import java.util.Set;
 
 
+/**
+ * A abstract requirements for a FreeCol combat model.
+ */
 public abstract class CombatModel {
 
     public static enum CombatResult {

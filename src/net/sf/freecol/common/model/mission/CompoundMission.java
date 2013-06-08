@@ -30,6 +30,7 @@ import net.sf.freecol.common.model.Game;
 
 import org.w3c.dom.Element;
 
+
 /**
  * The CompoundMission provides a wrapper for several more basic
  * Missions that will be carried out in order.

@@ -29,6 +29,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 
+/**
+ * Handle translations for the installer.
+ */
 public class InstallerTranslations {
 
     private static final File SOURCE_DIRECTORY =

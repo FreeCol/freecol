@@ -26,6 +26,9 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 
+/**
+ * The types of resources (e.g. fish bonus) found on a tile.
+ */
 public final class ResourceType extends FreeColGameObjectType {
 
     /** Maximum and minimum values for this resource type. */

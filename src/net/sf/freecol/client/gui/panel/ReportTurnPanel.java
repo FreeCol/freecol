@@ -63,7 +63,6 @@ import net.sf.freecol.common.option.BooleanOption;
  * This panel displays the Turn Report.
  */
 public final class ReportTurnPanel extends ReportPanel {
-	
 
     private static final Logger logger = Logger.getLogger(ReportTurnPanel.class.getName());
 

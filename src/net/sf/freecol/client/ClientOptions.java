@@ -54,13 +54,10 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
 
 
-
 /**
- * Defines how available client options are displayed on the Setting dialog from
- * File>Preferences Also contains several Comparators used for display purposes.
- *
- * <br>
- * <br>
+ * Defines how available client options are displayed on the Setting
+ * dialog from File>Preferences Also contains several Comparators used
+ * for display purposes.
  *
  * Most available client options and their default values are defined
  * in the file <code>base/client-options.xml</code> in the FreeCol

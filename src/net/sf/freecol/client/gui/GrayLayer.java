@@ -17,6 +17,7 @@ import net.sf.freecol.client.gui.panel.InfoPanel;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 
+
 /**
  * Custom component to paint turn progress.
  * <p>

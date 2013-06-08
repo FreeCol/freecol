@@ -51,6 +51,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.option.Option;
 
+
 /**
  * Represents a collection of messages in a particular locale.
  *

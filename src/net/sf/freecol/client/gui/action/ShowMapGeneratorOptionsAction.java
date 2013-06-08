@@ -25,6 +25,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.option.OptionGroup;
 
+
 /**
  * An action for displaying the Map Generator Options.
  */

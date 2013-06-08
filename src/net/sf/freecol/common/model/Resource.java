@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+
 /**
  * Represents a production resource, such as prime tobacco, or an ore
  * vein, located on a Tile. A resource may be exhausted. In the

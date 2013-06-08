@@ -41,6 +41,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.UnitType;
 
+
 /**
  * This panel displays the Labour Report.
  */

@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.client.control;
 
 import java.util.logging.Logger;
@@ -29,6 +28,7 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.MessageHandler;
 
 import org.w3c.dom.Element;
+
 
 /**
  * Provides common methods for input handlers.

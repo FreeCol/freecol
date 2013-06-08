@@ -34,7 +34,6 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.common.util.RandomChoice;
 
 
-
 /**
  * Represents a lost city rumour.
  */

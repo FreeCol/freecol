@@ -29,6 +29,9 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 
+/**
+ * A stop along a trade route.
+ */
 public class TradeRouteStop {
 
     private static final Logger logger = Logger.getLogger(TradeRouteStop.class.getName());

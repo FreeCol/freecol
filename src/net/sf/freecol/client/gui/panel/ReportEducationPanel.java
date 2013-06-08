@@ -40,7 +40,6 @@ import net.sf.freecol.common.model.Unit;
  */
 public final class ReportEducationPanel extends ReportPanel {
 
-
     /**
      * Creates the education report.
      *

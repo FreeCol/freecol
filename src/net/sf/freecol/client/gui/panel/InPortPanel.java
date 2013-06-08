@@ -23,6 +23,7 @@ import java.awt.Component;
 
 import net.sf.freecol.common.model.Unit;
 
+
 /**
  * This class displays the carriers present in a port.
  *

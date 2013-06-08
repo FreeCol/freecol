@@ -25,6 +25,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.client.gui.GUI;
 
+
 /**
  * Returns to the <code>MainPanel</code>.
  * All in-game components are removed.

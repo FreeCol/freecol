@@ -25,6 +25,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 
+
 /**
  * An action for displaying an about box with version numbers.
  */

@@ -6,6 +6,10 @@ import net.sf.freecol.common.networking.ServerAPI;
 
 import org.w3c.dom.Element;
 
+
+/**
+ * Implementation of the ServerAPI.
+ */
 public class UserServerAPI extends ServerAPI {
 
     public static final String COPYRIGHT = "Copyright (C) 2003-2012 The FreeCol Team";

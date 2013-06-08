@@ -31,6 +31,10 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.common.model.Unit.Role;
 
 
+/**
+ * A type of equipment.  Equipment differs from goods (although it is often
+ * derived from it) in that it must be attached to a unit.
+ */
 public class EquipmentType extends BuildableType {
 
     public static final EquipmentType[] NO_EQUIPMENT = new EquipmentType[0];

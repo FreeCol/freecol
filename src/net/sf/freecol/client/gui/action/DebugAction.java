@@ -30,6 +30,7 @@ import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.debug.FreeColDebugger;
 
+
 /**
  * Switch debug mode on.
  */

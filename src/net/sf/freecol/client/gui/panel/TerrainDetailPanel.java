@@ -40,7 +40,7 @@ import net.sf.freecol.common.model.TileType;
 
 
 /**
- * This panel displays the Colopedia.
+ * This panel displays details of terrain types in the Colopedia.
  */
 public class TerrainDetailPanel extends ColopediaGameObjectTypePanel<TileType> {
 

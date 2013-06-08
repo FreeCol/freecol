@@ -26,6 +26,9 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.common.model.Player.Stance;
 
 
+/**
+ * A trade item consisting of a change of stance.
+ */
 public class StanceTradeItem extends TradeItem {
     
     /** The stance between source and destination. */

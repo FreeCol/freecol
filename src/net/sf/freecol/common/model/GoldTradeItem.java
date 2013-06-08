@@ -24,6 +24,9 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 
+/**
+ * A trade item consisting of just some gold.
+ */
 public class GoldTradeItem extends TradeItem {
     
     /** The amount of gold to change hands. */

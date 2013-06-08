@@ -17,8 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
@@ -32,14 +30,14 @@ import net.sf.freecol.common.model.Unit;
 
 
 /**
-* An action for changing the view. This action will:
-*
-* <ol>
-*     <li>Open a colony panel if the active unit is located on a tile with a colony.</li>
-*     <li>If onboard a carrier then the carrier will be the active unit..</li>
-*     <li>In other cases: switch to another unit on the same tile.
-* </ol>
-*/
+ * An action for changing the view. This action will:
+ *
+ * <ol>
+ *     <li>Open a colony panel if the active unit is located on a tile with a colony.</li>
+ *     <li>If onboard a carrier then the carrier will be the active unit..</li>
+ *     <li>In other cases: switch to another unit on the same tile.
+ * </ol>
+ */
 public class ChangeAction extends UnitAction {
 
     public static final String id = "changeAction";

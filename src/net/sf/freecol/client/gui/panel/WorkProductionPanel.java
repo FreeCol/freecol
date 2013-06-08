@@ -53,6 +53,9 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.resources.ResourceManager;
 
 
+/**
+ * Display the production of a unit.
+ */
 public class WorkProductionPanel extends FreeColPanel {
 
     private final Turn turn = getGame().getTurn();

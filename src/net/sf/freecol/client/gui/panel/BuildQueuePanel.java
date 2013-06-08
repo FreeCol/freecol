@@ -82,6 +82,9 @@ import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.util.Utils;
 
 
+/**
+ * The panel used to display a colony build queue.
+ */
 public class BuildQueuePanel extends FreeColPanel implements ActionListener, ItemListener {
 
     private static Logger logger = Logger.getLogger(BuildQueuePanel.class.getName());

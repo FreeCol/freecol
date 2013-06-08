@@ -34,6 +34,9 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.FreeCol;
 
 
+/**
+ * The options specific to a nation.
+ */
 public class NationOptions extends FreeColObject {
 
     /** Type of national advantages for European players. */

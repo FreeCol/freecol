@@ -34,6 +34,7 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.FoundingFather;
 
+
 /**
  * This panel displays the different founding fathers the player can work
  * towards recruiting.

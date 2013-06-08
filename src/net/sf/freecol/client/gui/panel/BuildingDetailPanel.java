@@ -56,7 +56,7 @@ import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
- * This panel displays the Colopedia.
+ * This panel displays details of buildings in the Colopedia.
  */
 public class BuildingDetailPanel extends ColopediaGameObjectTypePanel<BuildingType> {
 

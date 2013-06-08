@@ -20,15 +20,17 @@
 
 package net.sf.freecol.common;
 
+
 /**
-* The Exception thrown by the FreeCol application.
-*/
+ * The Exception thrown by the FreeCol application.
+ */
 public final class FreeColException extends Exception {
     
     /**
-    * The constructor to use.
-    * @param message The message that this FreeColException should hold.
-    */
+     * The constructor to use.
+     *
+     * @param message The message that this FreeColException should hold.
+     */
     public FreeColException(String message) {
         super(message);
     }

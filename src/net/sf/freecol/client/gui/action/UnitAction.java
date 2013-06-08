@@ -24,8 +24,9 @@ import net.sf.freecol.client.gui.GUI;
 
 
 /**
-* Super class for all actions that should be disabled when no unit is selected.
-*/
+ * Super class for all actions that should be disabled when no unit is
+ * selected.
+ */
 public abstract class UnitAction extends MapboardAction {
 
     /**

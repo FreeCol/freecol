@@ -28,8 +28,8 @@ import net.sf.freecol.common.option.IntegerOption;
 
 
 /**
- * This class provides visualization for an {@link
- * net.sf.freecol.common.option.IntegerOption}. In order to enable
+ * This class provides visualization for an
+ * {@link net.sf.freecol.common.option.IntegerOption} in order to enable
  * values to be both seen and changed.
  */
 public final class IntegerOptionUI extends OptionUI<IntegerOption>  {

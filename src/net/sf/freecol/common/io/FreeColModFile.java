@@ -32,7 +32,7 @@ import net.sf.freecol.common.util.XMLStream;
 
 
 /**
- * A modification.
+ * A wrapped for a file containing a FreeCol modification (mod).
  */
 public class FreeColModFile extends FreeColDataFile {
 

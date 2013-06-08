@@ -24,8 +24,9 @@ import java.awt.event.ActionEvent;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 
+
 /**
- *
+ * An action to show the Foreign Affairs report.
  */
 public class ReportForeignAction extends FreeColAction {
 

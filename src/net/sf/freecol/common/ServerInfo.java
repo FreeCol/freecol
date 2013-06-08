@@ -26,6 +26,7 @@ import net.sf.freecol.FreeCol;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+
 /**
  * Contains information about a single server.
  * This information is normally retrived from

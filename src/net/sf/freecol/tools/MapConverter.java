@@ -33,6 +33,9 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.server.FreeColServer;
 
 
+/**
+ * Convert map formats.
+ */
 public class MapConverter {
 
     public static void main(String[] args) throws Exception {

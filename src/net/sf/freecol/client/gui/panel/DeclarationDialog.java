@@ -42,6 +42,7 @@ import net.sf.freecol.common.resources.FAFile;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.util.Utils;
 
+
 /**
  * This panel displays the signing of the Declaration of Independence.
  */

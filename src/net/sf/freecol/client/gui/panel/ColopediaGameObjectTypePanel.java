@@ -53,7 +53,7 @@ import net.sf.freecol.common.model.UnitType;
 
 
 /**
- * This panel displays the Colopedia.
+ * This panel displays details of game objects in the Colopedia.
  */
 public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectType>
     extends FreeColPanel implements ColopediaDetailPanel<T> {

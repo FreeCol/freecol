@@ -26,6 +26,9 @@ import javax.xml.stream.XMLStreamWriter;
 import org.w3c.dom.Element;
 
 
+/**
+ * A notable event in the history of a game.
+ */
 public class HistoryEvent extends StringTemplate {
 
     public static enum EventType {

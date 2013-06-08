@@ -28,7 +28,6 @@ import net.sf.freecol.client.gui.option.BooleanOptionUI;
 import net.sf.freecol.common.model.GameOptions;
 
 
-
 /**
  * Dialog for changing the {@link net.sf.freecol.common.model.GameOptions}.
  */

@@ -27,6 +27,7 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 
+
 /**
  * An action to toggle the display of the map grid.
  */

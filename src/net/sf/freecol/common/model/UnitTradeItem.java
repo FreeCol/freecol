@@ -24,6 +24,9 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 
+/**
+ * A trade item consisting of a unit.
+ */
 public class UnitTradeItem extends TradeItem {
     
     /** The unit to change hands. */

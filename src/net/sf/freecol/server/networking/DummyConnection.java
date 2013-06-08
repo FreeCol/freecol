@@ -27,12 +27,11 @@ import net.sf.freecol.common.networking.MessageHandler;
 
 import org.w3c.dom.Element;
 
+
 /**
  * A dummy connection, used for AI players.
  */
 public final class DummyConnection extends Connection {
-
-
 
     /** The message handler to simulate using when receiving messages. */
     private MessageHandler outgoingMessageHandler;

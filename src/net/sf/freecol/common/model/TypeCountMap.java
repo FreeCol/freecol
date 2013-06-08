@@ -25,7 +25,11 @@ import java.util.Map;
 import java.util.Set;
 
 
-// TODO: implement entire Map interface
+/**
+ * A map that incorporates a count.
+ *
+ * TODO: implement entire Map interface
+ */
 public class TypeCountMap<T extends FreeColGameObjectType> {
 
     private Map<T, Integer> values = new HashMap<T, Integer>();

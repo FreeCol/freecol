@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui.i18n;
 
+
 /**
  * Number optimized for languages that do not distinguish any number
  * categories. The category returned is always other.
@@ -26,7 +27,7 @@ package net.sf.freecol.client.gui.i18n;
 public class OtherNumberRule extends Number {
 
     public Category getCategory(double input) {
-	return Category.other;
+        return Category.other;
     }
 
 }

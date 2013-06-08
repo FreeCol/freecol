@@ -39,8 +39,9 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 
+
 /**
- * holds labour statistics for the labour report
+ * Holds labour statistics for the labour report.
  */
 public class LabourData {
     private static final LocationData.Getter UNITS_IN_EUROPE_GETTER = new LocationData.Getter() {

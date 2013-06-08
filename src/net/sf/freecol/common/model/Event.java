@@ -29,6 +29,9 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 
+/**
+ * A special game event.
+ */
 public class Event extends FreeColGameObjectType {
 
     /** A restriction on the scope of the event. */

@@ -29,7 +29,7 @@ import org.w3c.dom.Element;
 
 
 /**
- * Class to handle equipping a unit.
+ * The message sent to equip a unit.
  */
 public class EquipUnitMessage extends DOMMessage {
 

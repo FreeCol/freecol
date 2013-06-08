@@ -39,6 +39,10 @@ import net.sf.freecol.server.model.ServerIndianSettlement;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerRegion;
 
+
+/**
+ * Load a map.
+ */
 public class FreeColMapLoader implements MapLoader {
 
     private final ServerGame importGame;

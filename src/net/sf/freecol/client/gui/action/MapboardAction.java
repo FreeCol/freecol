@@ -17,8 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
 package net.sf.freecol.client.gui.action;
 
 import java.util.logging.Logger;
@@ -28,8 +26,9 @@ import net.sf.freecol.client.gui.GUI;
 
 
 /**
-* Super class for all actions that should be disabled when the mapboard is not selected.
-*/
+ * Super class for all actions that should be disabled when the
+ * mapboard is not selected.
+ */
 public abstract class MapboardAction extends FreeColAction {
 
     @SuppressWarnings("unused")

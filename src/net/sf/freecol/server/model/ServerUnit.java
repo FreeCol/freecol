@@ -76,7 +76,6 @@ import net.sf.freecol.server.control.ChangeSet.See;
 
 /**
  * Server version of a unit.
- *
  */
 public class ServerUnit extends Unit implements ServerModelObject {
 

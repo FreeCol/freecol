@@ -28,6 +28,9 @@ import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Tile;
 
 
+/**
+ * The server version of a region.
+ */
 public class ServerRegion extends Region {
 
     /**

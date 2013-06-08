@@ -65,6 +65,9 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 
+/**
+ * The root FreeCol object class.
+ */
 public abstract class FreeColObject {
 
     protected static Logger logger = Logger.getLogger(FreeColObject.class.getName());

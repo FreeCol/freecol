@@ -27,6 +27,7 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.PlayerType;
 
+
 /**
  * An action for declaring independence.
  */

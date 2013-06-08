@@ -27,6 +27,9 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 
+/**
+ * The various types of settlements in the game.
+ */
 public class SettlementType extends FreeColGameObjectType {
 
     /** Whether this SettlementType is a capital. */

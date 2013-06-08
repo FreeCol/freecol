@@ -28,6 +28,10 @@ import java.util.Enumeration;
 import java.util.Properties;
 import java.util.TreeSet;
 
+
+/**
+ * Document the state of the translations.
+ */
 public class TranslationReport {
     
     private static class LanguageStatsRecord{

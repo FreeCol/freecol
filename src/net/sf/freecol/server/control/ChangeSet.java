@@ -824,6 +824,9 @@ public class ChangeSet {
         }
     }
 
+    /**
+     * Encapsulates removing some objects.
+     */
     private static class RemoveChange extends Change {
         private Tile tile;
         private FreeColGameObject fcgo;
@@ -1037,6 +1040,9 @@ public class ChangeSet {
         }
     }
 
+    /**
+     * Encapsulates a spying action.
+     */
     private static class SpyChange extends Change {
         private Tile tile;
 

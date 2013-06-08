@@ -31,6 +31,9 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 
 
+/**
+ * The various types of units in FreeCol.
+ */
 public final class UnitType extends BuildableType
     implements Comparable<UnitType>, Consumer {
 

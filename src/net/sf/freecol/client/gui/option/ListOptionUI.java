@@ -45,10 +45,11 @@ import net.sf.freecol.common.option.AbstractOption;
 import net.sf.freecol.common.option.ListOption;
 import net.sf.freecol.common.option.Option;
 
+
 /**
- * This class provides visualization for a List of
- * {@link net.sf.freecol.common.option.AbstractOption}s in order to
- * enable values to be both seen and changed.
+ * This class provides visualization for a list of
+ * {@link net.sf.freecol.common.option.AbstractOption}s in order to enable
+ * values to be both seen and changed.
  */
 public final class ListOptionUI<T> extends OptionUI<ListOption<T>>
     implements ListSelectionListener {

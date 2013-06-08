@@ -108,6 +108,10 @@ import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.PercentageOption;
 import net.sf.freecol.common.resources.ResourceManager;
 
+
+/**
+ * A wrapper for the overall GUI.
+ */
 public class GUI {
 
 

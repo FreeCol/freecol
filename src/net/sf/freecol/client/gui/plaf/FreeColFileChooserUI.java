@@ -27,6 +27,10 @@ import javax.swing.JPanel;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.metal.MetalFileChooserUI;
 
+
+/**
+ * UI for the file chooser.
+ */
 public class FreeColFileChooserUI extends MetalFileChooserUI {
 
     public static ComponentUI createUI(JComponent c) {

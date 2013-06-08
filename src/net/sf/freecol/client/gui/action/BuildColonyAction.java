@@ -26,6 +26,7 @@ import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Unit;
 
+
 /**
  * An action for using the active unit to build a colony.
  */

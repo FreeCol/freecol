@@ -35,6 +35,9 @@ import net.sf.freecol.common.io.FreeColSavegameFile;
 import org.xml.sax.SAXParseException;
 
 
+/**
+ * Validate a saved game.
+ */
 public class SaveGameValidator {
 
     private static FileFilter fsgFilter = new FileFilter() {

@@ -21,6 +21,7 @@ package net.sf.freecol.common.option;
 
 import net.sf.freecol.server.generator.MapGenerator;
 
+
 /**
  * Keeps track of the available map generator options.
  *

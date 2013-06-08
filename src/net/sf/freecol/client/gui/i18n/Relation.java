@@ -28,12 +28,12 @@ public class Relation {
     boolean integer = true;
 
     public Relation(List<String> tokens) {
-	parse(tokens);
+        parse(tokens);
     }
 
     public Relation(int low, int high) {
-	this.low = low;
-	this.high = high;
+        this.low = low;
+        this.high = high;
     }
 
     /**
@@ -42,7 +42,7 @@ public class Relation {
      * @param mod an <code>int</code> value
      */
     public void setMod(int mod) {
-	this.mod = mod;
+        this.mod = mod;
     }
 
     /**
@@ -51,7 +51,7 @@ public class Relation {
      * @param value a <code>boolean</code> value
      */
     public void setNegated(boolean value) {
-	this.negated = value;
+        this.negated = value;
     }
 
     /**
@@ -61,7 +61,7 @@ public class Relation {
      * @param value a <code>boolean</code> value
      */
     public void setInteger(boolean value) {
-	this.integer = value;
+        this.integer = value;
     }
 
     /**
@@ -71,36 +71,36 @@ public class Relation {
      * @return a <code>boolean</code> value
      */
     public boolean matches(double number) {
-	double value = (mod == 1) ? number : number % mod;
-	if (integer && value != (int) value) {
-	    return false;
-	}
-	return (low <= value && value <= high) != negated;
+        double value = (mod == 1) ? number : number % mod;
+        if (integer && value != (int) value) {
+            return false;
+        }
+        return (low <= value && value <= high) != negated;
     }
 
     @Override
     public String toString() {
-	String result = new String("n ");
-	if (mod != 1) {
-	    result += "mod " + Integer.toString(mod) + " ";
-	}
-	if (low == high) {
-	    result += "is ";
-	    if (negated) {
-		result += "not ";
-	    }
-	    result += Integer.toString(low);
-	} else {
-	    if (negated) {
-		result += "not ";
-	    }
-	    if (!integer) {
-		result += "with";
-	    }
-	    result += "in " + Integer.toString(low)
-		+ ".." + Integer.toString(high);
-	}
-	return result;
+        String result = new String("n ");
+        if (mod != 1) {
+            result += "mod " + Integer.toString(mod) + " ";
+        }
+        if (low == high) {
+            result += "is ";
+            if (negated) {
+                result += "not ";
+            }
+            result += Integer.toString(low);
+        } else {
+            if (negated) {
+                result += "not ";
+            }
+            if (!integer) {
+                result += "with";
+            }
+            result += "in " + Integer.toString(low)
+                + ".." + Integer.toString(high);
+        }
+        return result;
     }
 
 
@@ -110,34 +110,34 @@ public class Relation {
      * @param input a list of string tokens
      */
     private void parse(List<String> input) {
-	String token = input.remove(0);
-	if ("n".equals(token)) {
-	    token = input.remove(0);
-	} else {
-	    throw new IllegalArgumentException("Relation must start with 'n'.");
-	}
-	if ("mod".equals(token)) {
-	    mod = Integer.parseInt(input.remove(0));
-	    token = input.remove(0);
-	}
-	if ("not".equals(token)) {
-	    negated = true;
-	    token = input.remove(0);
-	}
-	if ("is".equals(token)) {
-	    token = input.remove(0);
-	    if ("not".equals(token)) {
-		negated = true;
-		token = input.remove(0);
-	    }
-	    low = high = Integer.parseInt(token);
-	} else {
-	    if ("within".equals(token)) {
-		integer = false;
-	    }
-	    low = Integer.parseInt(input.remove(0));
-	    high = Integer.parseInt(input.remove(0));
-	}
+        String token = input.remove(0);
+        if ("n".equals(token)) {
+            token = input.remove(0);
+        } else {
+            throw new IllegalArgumentException("Relation must start with 'n'.");
+        }
+        if ("mod".equals(token)) {
+            mod = Integer.parseInt(input.remove(0));
+            token = input.remove(0);
+        }
+        if ("not".equals(token)) {
+            negated = true;
+            token = input.remove(0);
+        }
+        if ("is".equals(token)) {
+            token = input.remove(0);
+            if ("not".equals(token)) {
+                negated = true;
+                token = input.remove(0);
+            }
+            low = high = Integer.parseInt(token);
+        } else {
+            if ("within".equals(token)) {
+                integer = false;
+            }
+            low = Integer.parseInt(input.remove(0));
+            high = Integer.parseInt(input.remove(0));
+        }
     }
 
 }

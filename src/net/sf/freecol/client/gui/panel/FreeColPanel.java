@@ -86,6 +86,7 @@ import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.resources.ResourceManager;
 
+
 /**
  * Superclass for all panels in FreeCol.
  */

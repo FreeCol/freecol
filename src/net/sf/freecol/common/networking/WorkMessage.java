@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
 
 
 /**
- * Class to handle changes in work location.
+ * The message sent to handle changes in work location.
  */
 public class WorkMessage extends DOMMessage {
 

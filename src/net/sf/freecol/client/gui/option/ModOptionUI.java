@@ -34,8 +34,8 @@ import net.sf.freecol.common.option.ModOption;
 
 
 /**
- * This class provides visualization for an {@link
- * net.sf.freecol.common.option.ModOption}. In order to enable
+ * This class provides visualization for a
+ * {@link net.sf.freecol.common.option.ModOption} in order to enable
  * values to be both seen and changed.
  */
 public final class ModOptionUI extends OptionUI<ModOption>  {

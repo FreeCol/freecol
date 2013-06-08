@@ -22,6 +22,9 @@ package net.sf.freecol.server.ai;
 import java.util.Comparator;
 
 
+/**
+ * A special comparator to sort the production cache with.
+ */
 public class CacheEntryComparator implements Comparator<ProductionCache.Entry> {
 
     public int compareProduction(ProductionCache.Entry entry1, ProductionCache.Entry entry2) {

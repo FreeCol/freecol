@@ -31,6 +31,9 @@ import javax.xml.stream.XMLStreamWriter;
 import org.w3c.dom.Element;
 
 
+/**
+ * A FreeCol high score record.
+ */
 public class HighScore extends FreeColObject {
 
     private static final Logger logger = Logger.getLogger(HighScore.class.getName());

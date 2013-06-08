@@ -28,11 +28,11 @@ import net.sf.freecol.common.model.Operand.OperandType;
 
 /**
  * The <code>Limit</code> class encapsulates a limit on the
- * availability of FreeColObjects. It consists of a left hand side, an
- * operator and a right hand side, and can be used to limit the number
- * of units of a particular type (e.g. wagon trains) to the number of
- * a player's colonies, for example. The left hand side must apply to
- * the object on which a limit is to be placed.
+ * availability of FreeColObjects.  It consists of a left hand side,
+ * an operator and a right hand side, and can be used to limit the
+ * number of units of a particular type (e.g. wagon trains) to the
+ * number of a player's colonies, for example. The left hand side must
+ * apply to the object on which a limit is to be placed.
  */
 public final class Limit extends FreeColGameObjectType {
 

@@ -35,6 +35,7 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Layer;
 import net.sf.freecol.common.model.Specification;
 
+
 /**
  * Just pass the name of a Colonization map file (with extension ".MP").
  *

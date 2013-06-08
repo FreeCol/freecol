@@ -23,6 +23,9 @@ package net.sf.freecol.common.model;
 import java.util.Locale;
 
 
+/**
+ * A measure of the tension between nations.
+ */
 public class Tension {
 
     // Minimum possible tension value.

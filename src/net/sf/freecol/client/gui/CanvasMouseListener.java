@@ -36,6 +36,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
 
+
 /**
  * Listens to mouse buttons being pressed at the level of the Canvas.
  */

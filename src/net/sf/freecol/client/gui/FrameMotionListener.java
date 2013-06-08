@@ -9,6 +9,7 @@ import java.awt.event.MouseMotionListener;
 import javax.swing.JInternalFrame;
 import javax.swing.SwingUtilities;
 
+
 public class FrameMotionListener extends MouseAdapter implements MouseMotionListener {
 
     public static final String COPYRIGHT = "Copyright (C) 2003-2012 The FreeCol Team";

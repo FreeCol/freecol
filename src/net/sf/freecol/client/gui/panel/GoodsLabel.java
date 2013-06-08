@@ -36,6 +36,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.resources.ResourceManager;
 
+
 /**
  * This label holds Goods data in addition to the JLabel data, which makes it
  * ideal to use for drag and drop purposes.

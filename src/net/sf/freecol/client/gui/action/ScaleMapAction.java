@@ -28,6 +28,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
 
+
 /**
  * An action for scaling a map. This action is a part of the map editor.
  */

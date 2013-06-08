@@ -39,8 +39,8 @@ import net.sf.freecol.common.option.AudioMixerOption.MixerWrapper;
 
 /**
  * This class provides visualization for an
- * {@link net.sf.freecol.common.option.AudioMixerOption}.
- * In order to enable values to be both seen and changed.
+ * {@link net.sf.freecol.common.option.AudioMixerOption}
+ * in order to enable values to be both seen and changed.
  */
 public final class AudioMixerOptionUI extends OptionUI<AudioMixerOption> {
 

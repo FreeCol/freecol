@@ -32,10 +32,10 @@ import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
-* The frame that contains everything. If full screen mode is
-* supported and choosen, then the {@link FullScreenFrame} will be used
-* instead.
-*/
+ * The frame that contains everything. If full screen mode is
+ * supported and choosen, then the {@link FullScreenFrame} will be used
+ * instead.
+ */
 public final class WindowedFrame extends FreeColFrame  {
 
     private static final Logger logger = Logger.getLogger(WindowedFrame.class.getName());

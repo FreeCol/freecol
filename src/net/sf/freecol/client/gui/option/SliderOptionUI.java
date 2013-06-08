@@ -29,9 +29,10 @@ import javax.swing.JSlider;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.option.Option;
 
+
 /**
- * This class provides a JSlider as visualization for an {@link
- * net.sf.freecol.common.option.IntegerOption} or one of its
+ * This class provides a JSlider as visualization for an
+ * {@link net.sf.freecol.common.option.IntegerOption} or one of its
  * subclasses.
  */
 public class SliderOptionUI<T extends Option<Integer>> extends OptionUI<T>  {

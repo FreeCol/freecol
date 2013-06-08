@@ -39,6 +39,7 @@ import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TileImprovementType;
 
+
 /**
  * This is the menu bar used in-game.
  *

@@ -24,6 +24,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
+/**
+ * A map of goods types and their production.
+ */
 public class ProductionMap {
 
     public class ProductionTree {

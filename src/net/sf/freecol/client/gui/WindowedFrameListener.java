@@ -25,6 +25,7 @@ import java.awt.event.WindowListener;
 
 import net.sf.freecol.client.FreeColClient;
 
+
 /**
  * The WindowListener for the WindowedFrame class.
  */

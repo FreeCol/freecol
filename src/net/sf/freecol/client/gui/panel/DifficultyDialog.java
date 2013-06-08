@@ -41,7 +41,6 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.option.OptionGroup;
 
 
-
 /**
  * Dialog for displaying and modifying the difficulty level.
  *

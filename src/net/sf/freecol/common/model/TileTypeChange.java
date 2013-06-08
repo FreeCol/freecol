@@ -25,6 +25,9 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 
+/**
+ * A change in a tile type, including some bonus production when this occurs.
+ */
 public class TileTypeChange implements Comparable<TileTypeChange> {
 
     /** The original tile type. */

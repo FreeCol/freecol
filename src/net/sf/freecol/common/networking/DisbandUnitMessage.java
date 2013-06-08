@@ -29,7 +29,7 @@ import org.w3c.dom.Element;
 
 
 /**
- * The message sent when clearing a unit speciality.
+ * The message sent when disbanding a unit.
  */
 public class DisbandUnitMessage extends DOMMessage {
 

@@ -35,7 +35,7 @@ import net.sf.freecol.common.model.Player;
 
 
 /**
- * This panel displays the Colopedia.
+ * This panel displays details of nations in the Colopedia.
  */
 public class NationDetailPanel extends ColopediaGameObjectTypePanel<Nation> {
 

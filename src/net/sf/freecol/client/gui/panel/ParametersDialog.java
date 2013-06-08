@@ -16,7 +16,6 @@ import net.sf.freecol.client.gui.i18n.Messages;
 
 
 
-
 public class ParametersDialog extends FreeColDialog<Parameters> {
     
     public static final String COPYRIGHT = "Copyright (C) 2003-2012 The FreeCol Team";

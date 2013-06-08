@@ -25,6 +25,7 @@ import javax.swing.JComponent;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicMenuItemUI;
 
+
 /**
  * UI-class for menu items.
  */

@@ -45,7 +45,6 @@ import net.sf.freecol.common.model.UnitType;
 /**
  * The panel that allows a user to train people in Europe.
  */
-
 public final class TrainDialog extends FreeColDialog<Integer> implements ActionListener {
 
     @SuppressWarnings("unused")

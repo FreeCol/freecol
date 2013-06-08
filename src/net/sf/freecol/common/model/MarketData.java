@@ -30,7 +30,7 @@ import org.w3c.dom.Element;
 
 /**
  * Objects of this class hold the market data for a particular type of
- * good.
+ * goods.
  */
 public class MarketData extends FreeColGameObject {
 

@@ -22,10 +22,11 @@ package net.sf.freecol.client.gui.sound;
 import java.io.File;
 import java.util.Arrays;
 
+
 /**
-* Represent a set of sounds that will be presented to a SoundPlayer in a
-* certain order as defined by the Playlists playmodes.
-*/
+ * Represent a set of sounds that will be presented to a SoundPlayer in a
+ * certain order as defined by the Playlists playmodes.
+ */
 public final class Playlist {
     
     /**

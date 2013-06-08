@@ -23,6 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/**
+ * Container for information about production in a colony.
+ */
 public class ProductionInfo {
 
     /** The maximum production possible given unlimited input. */

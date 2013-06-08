@@ -24,6 +24,9 @@ import java.util.regex.Pattern;
 import net.sf.freecol.common.model.Turn;
 
 
+/**
+ * Support for turn selection.
+ */
 public class TurnSelector implements Selector {
 
     private static final String turn = "(SPRING|AUTUMN)?\\s*(\\d+)";

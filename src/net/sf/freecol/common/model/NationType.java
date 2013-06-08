@@ -29,7 +29,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 
 /**
- * Represents one of the nations present in the game.
+ * Represents the type of one of the nations present in the game.
  */
 public abstract class NationType extends FreeColGameObjectType {
 

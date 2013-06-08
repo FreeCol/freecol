@@ -25,9 +25,9 @@ import junit.extensions.TestSetup;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+
 /**
  * The main test class for Freecol. All tests in the subfolders will be run.
- * 
  */
 public class AllTests {
 

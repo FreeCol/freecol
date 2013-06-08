@@ -42,6 +42,7 @@ import net.sf.freecol.common.option.SelectOption;
 import net.sf.freecol.common.option.StringOption;
 import net.sf.freecol.common.option.UnitListOption;
 
+
 /**
  * This class provides common methods for various Option UIs.
  */

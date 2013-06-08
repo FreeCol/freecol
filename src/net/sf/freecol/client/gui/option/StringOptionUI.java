@@ -32,8 +32,8 @@ import net.sf.freecol.common.option.StringOption;
 
 
 /**
- * This class provides visualization for an {@link
- * net.sf.freecol.common.option.StringOption}. In order to enable
+ * This class provides visualization for a
+ * {@link net.sf.freecol.common.option.StringOption} in order to enable
  * values to be both seen and changed.
  */
 public final class StringOptionUI extends OptionUI<StringOption>  {

@@ -21,10 +21,10 @@ package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
 
-
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.client.gui.GUI;
+
 
 /**
  * An action for reconnecting to the server.

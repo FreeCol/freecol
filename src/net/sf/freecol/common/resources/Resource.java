@@ -21,11 +21,12 @@ package net.sf.freecol.common.resources;
 
 import java.net.URI;
 
+
 /**
- * Represents a resource that either has been or can be loaded using
- * a <code>URI</code>. There can only be one instance of
- * <code>Resource</code> having the same (as in URI's equals, not the identity)
- * <code>URI</code>.
+ * Represents a resource that either has been or can be loaded using a
+ * <code>URI</code>.  There can only be one instance of
+ * <code>Resource</code> having the same (as in URI's equals, not the
+ * identity) <code>URI</code>.
  *
  * Instances are created using {@link ResourceFactory#createResource(URI)}.
  */

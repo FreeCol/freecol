@@ -36,13 +36,12 @@ import net.sf.freecol.common.model.Turn;
 
 
 /**
- * This panel displays the Foreign Affairs Report.
+ * This panel displays the high scores.
  */
 public final class ReportHighScoresPanel extends ReportPanel {
 
-
     /**
-     * Creates the foreign affairs report.
+     * Creates the high scores report.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param gui The <code>GUI</code> to display on.

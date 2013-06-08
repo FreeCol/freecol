@@ -26,6 +26,9 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 
+/**
+ * A trade item consisting of some goods.
+ */
 public class GoodsTradeItem extends TradeItem {
     
     /** The goods to change hands. */

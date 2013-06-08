@@ -41,6 +41,7 @@ import net.sf.freecol.common.model.TileImprovementStyle;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.server.generator.TerrainGenerator;
 
+
 /**
  * Listens to the mouse being moved at the level of the Canvas.
  */

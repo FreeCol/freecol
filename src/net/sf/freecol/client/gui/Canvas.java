@@ -159,10 +159,13 @@ import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.resources.Video;
 
+
 /**
- * The main container for the other GUI components in FreeCol. This container is
- * where the panels, dialogs and menus are added. In addition, this is the
- * component in which the map graphics are displayed. <br>
+ * The main container for the other GUI components in FreeCol. This
+ * container is where the panels, dialogs and menus are added. In
+ * addition, this is the component in which the map graphics are
+ * displayed.
+ *
  * <b>Displaying panels and a dialogs</b> <br>
  * <br>
  * <code>Canvas</code> contains methods to display various panels and dialogs.

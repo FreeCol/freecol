@@ -33,8 +33,8 @@ import net.sf.freecol.common.option.UnitTypeOption;
 
 
 /**
- * This class provides visualization for an {@link
- * net.sf.freecol.common.option.UnitTypeOption}. In order to enable
+ * This class provides visualization for a
+ * {@link net.sf.freecol.common.option.UnitTypeOption} in order to enable
  * values to be both seen and changed.
  */
 public final class UnitTypeOptionUI extends OptionUI<UnitTypeOption>  {

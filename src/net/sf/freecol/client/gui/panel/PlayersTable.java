@@ -62,6 +62,9 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.resources.ResourceManager;
 
 
+/**
+ * The table of players.
+ */
 public final class PlayersTable extends JTable {
 
     @SuppressWarnings("unused")

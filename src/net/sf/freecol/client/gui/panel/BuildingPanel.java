@@ -47,6 +47,7 @@ import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.resources.ResourceManager;
 
+
 /**
  * This panel represents a single building in a Colony.
  */

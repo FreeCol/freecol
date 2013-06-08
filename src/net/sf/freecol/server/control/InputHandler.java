@@ -38,6 +38,7 @@ import net.sf.freecol.server.networking.Server;
 
 import org.w3c.dom.Element;
 
+
 /**
  * Handles the network messages.
  * 
@@ -171,7 +172,7 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
      * other than that of the currently active player. If no game is active or
      * if the player is unknown the same error is returned.
      */
-    abstract class CurrentPlayerNetworkRequestHandler
+    public abstract class CurrentPlayerNetworkRequestHandler
         implements NetworkRequestHandler {
         public final Element handle(Connection conn, Element element) {
             ServerPlayer player = getFreeColServer().getPlayer(conn);

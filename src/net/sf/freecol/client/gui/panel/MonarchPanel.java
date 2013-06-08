@@ -34,8 +34,9 @@ import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.StringTemplate;
 
+
 /**
- * This panel is used to show information about a tile.
+ * This panel is used to show monarch actions.
  */
 public final class MonarchPanel extends FreeColDialog<Boolean> implements ActionListener {
 

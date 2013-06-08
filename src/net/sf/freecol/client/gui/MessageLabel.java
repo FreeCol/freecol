@@ -26,9 +26,10 @@ import javax.swing.JLabel;
 import net.sf.freecol.client.gui.i18n.Messages;
 
 
+/**
+ * A label derived from a FreeCol message.
+ */
 public final class MessageLabel extends JLabel {
-
-
 
     public MessageLabel( String messageId ) {
 

@@ -8,6 +8,10 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.option.OptionUI;
 import net.sf.freecol.common.option.Option;
 
+
+/**
+ * Dialog to edit options with.
+ */
 public class EditOptionDialog extends FreeColDialog<Boolean> {
 
     public static final String COPYRIGHT = "Copyright (C) 2003-2012 The FreeCol Team";

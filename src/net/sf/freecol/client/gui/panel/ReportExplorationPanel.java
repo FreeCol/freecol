@@ -32,6 +32,7 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Region;
 
+
 /**
  * This panel displays the Foreign Affairs Report.
  */

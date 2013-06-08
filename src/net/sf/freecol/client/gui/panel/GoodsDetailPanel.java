@@ -46,8 +46,9 @@ import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.UnitType;
 
+
 /**
- * This panel displays the Colopedia.
+ * This panel displays details of goods types in the Colopedia.
  */
 public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
 

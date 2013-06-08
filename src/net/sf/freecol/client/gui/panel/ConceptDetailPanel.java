@@ -38,8 +38,9 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.client.gui.i18n.Messages;
 
+
 /**
- * This panel displays the Colopedia.
+ * This panel displays the concepts within the Colopedia.
  */
 public class ConceptDetailPanel extends FreeColPanel
     implements ColopediaDetailPanel<String> {

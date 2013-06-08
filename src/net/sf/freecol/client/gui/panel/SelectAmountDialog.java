@@ -35,7 +35,7 @@ import net.sf.freecol.common.model.GoodsType;
 
 
 /**
- * The panel that allows a user to recruit people in Europe.
+ * The panel that allows a choice of goods amount.
  */
 public final class SelectAmountDialog extends FreeColDialog<Integer> implements ActionListener {
 

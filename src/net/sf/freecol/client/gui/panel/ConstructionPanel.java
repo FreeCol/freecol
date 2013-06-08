@@ -41,6 +41,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.resources.ResourceManager;
 
+
 /**
  * This panel shows the progress of constructing a building or
  * unit in a colony.

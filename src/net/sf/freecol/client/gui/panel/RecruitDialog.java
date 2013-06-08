@@ -36,6 +36,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.UnitType;
 
+
 /**
  * The panel that allows a user to recruit people in Europe.
  */

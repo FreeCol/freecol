@@ -44,8 +44,9 @@ import net.sf.freecol.client.gui.action.FreeColAction;
 
 
 /**
-* User interface for displaying/changing a keyboard accelerator for a <code>FreeColAction</code>.
-*/
+ * User interface for displaying/changing a keyboard accelerator for a
+ * <code>FreeColAction</code>.
+ */
 public final class FreeColActionUI extends OptionUI<FreeColAction> implements ActionListener {
 
 
@@ -201,8 +202,8 @@ public final class FreeColActionUI extends OptionUI<FreeColAction> implements Ac
 
 
     /**
-    * Label for displaying a <code>KeyStroke</code>.
-    */
+     * Label for displaying a <code>KeyStroke</code>.
+     */
     class BlinkingLabel extends JLabel implements ActionListener, KeyListener, MouseListener {
 
         private Timer blinkingTimer = new Timer(500, this);

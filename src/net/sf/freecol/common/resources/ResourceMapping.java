@@ -25,8 +25,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 /**
- * Represents a mapping between IDs and resources.
+ * Represents a mapping between identifiers and resources.
  *
  * @see Resource
  */

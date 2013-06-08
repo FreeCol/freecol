@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.StringTokenizer;
 
 
-
 /**
  * Represents the data within a Font Animation File.
  * 

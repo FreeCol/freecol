@@ -33,6 +33,9 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.common.util.Utils;
 
 
+/**
+ * A range of numbers, and support routines to make a random choice therefrom.
+ */
 public class RandomRange {
 
     private static Logger logger = Logger.getLogger(RandomRange.class.getName());

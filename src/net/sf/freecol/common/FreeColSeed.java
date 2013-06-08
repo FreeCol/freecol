@@ -23,6 +23,9 @@ import java.security.SecureRandom;
 import java.util.logging.Logger;
 
 
+/**
+ * A wrapper for the pseudo-random number generator seed.
+ */
 public class FreeColSeed {
 
     private static final Logger logger = Logger.getLogger(FreeColSeed.class.getName());

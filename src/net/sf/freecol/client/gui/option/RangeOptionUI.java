@@ -30,9 +30,10 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.option.RangeOption;
 
+
 /**
- * This class provides visualization for an {@link
- * net.sf.freecol.common.option.RangeOption}. In order to enable
+ * This class provides visualization for a
+ * {@link net.sf.freecol.common.option.RangeOption} in order to enable
  * values to be both seen and changed.
  */
 public final class RangeOptionUI extends SliderOptionUI<RangeOption>  {

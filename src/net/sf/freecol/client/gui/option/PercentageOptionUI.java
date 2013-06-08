@@ -29,10 +29,11 @@ import javax.swing.JSlider;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.option.PercentageOption;
 
+
 /**
- * This class provides visualization for an {@link
- * net.sf.freecol.common.option.PercentageOption}. In order to enable
- * values to be both seen and changed.
+ * This class provides visualization for a
+ * {@link net.sf.freecol.common.option.PercentageOption}
+ * in order to enable values to be both seen and changed.
  */
 public final class PercentageOptionUI extends SliderOptionUI<PercentageOption>  {
 

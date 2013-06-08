@@ -72,6 +72,7 @@ import net.sf.freecol.common.networking.NewRegionNameMessage;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+
 /**
  * Handles the network messages that arrives while in the getGame().
  */

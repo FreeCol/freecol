@@ -28,8 +28,10 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 
 import net.sf.freecol.common.resources.ResourceManager;
 
+
 /**
- * This TreeCellRenderer is responsible for rendering tree items in the Colopedia.
+ * This TreeCellRenderer is responsible for rendering tree items in
+ * the Colopedia.
  */
 public class ColopediaTreeCellRenderer extends DefaultTreeCellRenderer {
 

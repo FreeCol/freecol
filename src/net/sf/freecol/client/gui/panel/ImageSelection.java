@@ -26,10 +26,11 @@ import java.util.logging.Logger;
 
 import javax.swing.JLabel;
 
+
 /**
-* Represents an image selection that can be selected and dragged/dropped to/from
-* Swing components.
-*/
+ * Represents an image selection that can be selected and
+ * dragged/dropped to/from Swing components.
+ */
 public final class ImageSelection implements Transferable {
     
     @SuppressWarnings("unused")

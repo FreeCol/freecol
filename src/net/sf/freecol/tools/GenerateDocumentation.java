@@ -40,6 +40,9 @@ import net.sf.freecol.common.option.LanguageOption;
 import net.sf.freecol.client.gui.i18n.Messages;
 
 
+/**
+ * Generate some documentation.
+ */
 public class GenerateDocumentation {
 
     private static final File STRING_DIRECTORY =

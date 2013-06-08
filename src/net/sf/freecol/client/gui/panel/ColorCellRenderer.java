@@ -31,6 +31,7 @@ import javax.swing.table.TableCellRenderer;
 
 import net.sf.freecol.common.resources.ResourceManager;
 
+
 /**
  * A table cell renderer that should be used to display the chosen
  * color in a table.  It is being used in the players table

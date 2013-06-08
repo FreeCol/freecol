@@ -24,6 +24,7 @@ import java.awt.Color;
 import java.util.Date;
 import java.util.logging.Logger;
 
+
 /**
  * Represents a message that can be displayed in the GUI. It has message data
  * and a Color.

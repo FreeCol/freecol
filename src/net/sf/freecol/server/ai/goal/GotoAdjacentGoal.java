@@ -34,6 +34,9 @@ import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
 
 
+/**
+ * A goal to make a move to a tile adjacent to a target tile.
+ */
 public class GotoAdjacentGoal extends Goal {
 
     private static final Logger logger = Logger.getLogger(GotoAdjacentGoal.class.getName());

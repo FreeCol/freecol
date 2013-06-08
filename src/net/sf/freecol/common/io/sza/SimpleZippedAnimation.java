@@ -21,6 +21,7 @@ import java.util.zip.ZipInputStream;
 
 import javax.imageio.ImageIO;
 
+
 /**
  * An animation made from images stored in a zip-file.
  */

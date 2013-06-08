@@ -25,6 +25,9 @@ import java.util.List;
 import java.util.Set;
 
 
+/**
+ * A queue of things for a colony to build.
+ */
 public class BuildQueue<T extends BuildableType> implements Consumer {
 
     public static enum CompletionAction {

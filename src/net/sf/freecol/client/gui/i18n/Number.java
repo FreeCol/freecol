@@ -21,6 +21,7 @@ package net.sf.freecol.client.gui.i18n;
 
 import java.util.logging.Logger;
 
+
 /**
  * Classes implementing this interface can determine the category and
  * the index of a double based on the number rules for a language.

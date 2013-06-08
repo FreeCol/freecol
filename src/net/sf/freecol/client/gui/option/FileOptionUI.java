@@ -34,9 +34,10 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.option.FileOption;
 
+
 /**
- * This class provides visualization for an {@link
- * net.sf.freecol.common.option.FileOption}. In order to enable values
+ * This class provides visualization for a
+ * {@link net.sf.freecol.common.option.FileOption} in order to enable values
  * to be both seen and changed.
  */
 public final class FileOptionUI extends OptionUI<FileOption>  {

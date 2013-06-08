@@ -21,9 +21,9 @@ package net.sf.freecol.common.networking;
 
 
 /**
- * Class for storing a network response. If the response has not
- * been set when {@link #getResponse} have been called, this method
- * will block until {@link #setResponse} has been called.
+ * Class for storing a network response.  If the response has not been
+ * set when {@link #getResponse} has been called, this method will
+ * block until {@link #setResponse} is called.
  */
 public class NetworkReplyObject {
 

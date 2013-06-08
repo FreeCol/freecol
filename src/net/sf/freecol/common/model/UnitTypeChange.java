@@ -31,6 +31,9 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 
+/**
+ * The possible changes of a unit type.
+ */
 public class UnitTypeChange extends FreeColObject {
 
     public static enum ChangeType {

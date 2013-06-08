@@ -41,9 +41,7 @@ import org.xml.sax.SAXException;
  * A class that makes it slightly tidier to create, parse and format XML
  * documents.
  */
-public final class Xml
-{
-
+public final class Xml {
 
     // ------------------------------------------------------ class API methods
 

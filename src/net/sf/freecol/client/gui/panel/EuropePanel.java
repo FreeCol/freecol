@@ -68,7 +68,7 @@ import net.sf.freecol.common.model.Unit;
 
 
 /**
- * This is a panel for the Europe display. It shows the ships in Europe and
+ * This is a panel for the Europe display.  It shows the ships in Europe and
  * allows the user to send them back.
  */
 public final class EuropePanel extends PortPanel {

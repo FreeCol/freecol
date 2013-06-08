@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.client.control;
 
 import java.awt.image.BufferedImage;
@@ -49,8 +48,8 @@ import net.sf.freecol.server.generator.MapGenerator;
 
 
 /**
-* The map editor controller.
-*/
+ * The map editor controller.
+ */
 public final class MapEditorController {
 
     @SuppressWarnings("unused")

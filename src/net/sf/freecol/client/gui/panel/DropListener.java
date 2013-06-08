@@ -30,21 +30,23 @@ import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.TransferHandler;
 
+
 /**
-* A DropListener should be attached to Swing components that have a
-* TransferHandler attached. The DropListener will make sure that the
-* Swing component to which it is attached can accept dragable data.
-*/
+ * A DropListener should be attached to Swing components that have a
+ * TransferHandler attached.  The DropListener will make sure that the
+ * Swing component to which it is attached can accept dragable data.
+ */
 public final class DropListener extends MouseAdapter {
     
     @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(DropListener.class.getName());
 
     /**
-    * Gets called when the mouse was released on a Swing component that has this
-    * object as a MouseListener.
-    * @param e The event that holds the information about the mouse click.
-    */
+     * Gets called when the mouse was released on a Swing component
+     * that has this object as a MouseListener.
+     *
+     * @param e The event that holds the information about the mouse click.
+     */
     public void mouseReleased(MouseEvent e) {
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         Transferable clipData = clipboard.getContents(clipboard);

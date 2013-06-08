@@ -36,17 +36,12 @@ import net.sf.freecol.common.networking.Connection;
 /**
  * The entry point and main controller object for the meta server.
  * 
- * <br>
- * <br>
- * 
  * When a new client connects to the meta server a new {@link Connection} is
  * made, with {@link NetworkHandler} as the control object.
  * 
  * @see net.sf.freecol.common.networking
  */
 public final class MetaServer extends Thread {
-
-
 
     private static Logger logger = Logger.getLogger(MetaServer.class.getName());
 
