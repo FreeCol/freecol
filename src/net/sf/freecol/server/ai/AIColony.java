@@ -1527,10 +1527,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         final String tag = xr.getLocalName();
 
         if (AI_GOODS_LIST_TAG.equals(tag)) {
-            AIGoods ag = getAttribute(xr, ID_ATTRIBUTE_TAG,
-                                      AIGoods.class, (AIGoods)null);
-            if (ag == null) ag = new AIGoods(aiMain, xr.readId());
-            aiGoods.add(ag);
+            aiGoods.add(xr.makeAIObject(aiMain, ID_ATTRIBUTE_TAG,
+                                        AIGoods.class, (AIGoods)null, true));
             xr.closeTag(AI_GOODS_LIST_TAG);
 
         } else if (GOODS_WISH_LIST_TAG.equals(tag)
@@ -1538,10 +1536,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             || OLD_GOODS_WISH_TAG.equals(tag)
             // end @compat
                    ) {
-            GoodsWish gw = getAttribute(xr, ID_ATTRIBUTE_TAG,
-                                        GoodsWish.class, (GoodsWish)null);
-            if (gw == null) gw = new GoodsWish(aiMain, xr.readId());
-            wishes.add(gw);
+            wishes.add(xr.makeAIObject(aiMain, ID_ATTRIBUTE_TAG,
+                                       GoodsWish.class, (GoodsWish)null, true));
             xr.closeTag(tag);// FIXME: tag -> GOODS_WISH_LIST_TAG
 
         } else if (TILE_IMPROVEMENT_PLAN_LIST_TAG.equals(tag)
@@ -1549,10 +1545,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             || OLD_TILE_IMPROVEMENT_PLAN_TAG.equals(tag)
             // end @compat
                    ) {
-            TileImprovementPlan ti = getAttribute(xr, ID_ATTRIBUTE_TAG,
-                TileImprovementPlan.class, (TileImprovementPlan)null);
-            if (ti == null) ti = new TileImprovementPlan(aiMain, xr.readId());
-            tileImprovementPlans.add(ti);
+            tileImprovementPlans.add(xr.makeAIObject(aiMain, ID_ATTRIBUTE_TAG,
+                    TileImprovementPlan.class, (TileImprovementPlan)null, true));
             xr.closeTag(tag);// FIXME: tag -> TILE_IMPROVEMENT_PLAN_LIST_TAG
 
         } else if (WORKER_WISH_LIST_TAG.equals(tag)
@@ -1560,10 +1554,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             || OLD_WORKER_WISH_TAG.equals(tag)
             // end compatibility code
                    ) {
-            WorkerWish ww = getAttribute(xr, ID_ATTRIBUTE_TAG,
-                                         WorkerWish.class, (WorkerWish)null);
-            if (ww == null) ww = new WorkerWish(aiMain, xr.readId());
-            wishes.add(ww);
+            wishes.add(xr.makeAIObject(aiMain, ID_ATTRIBUTE_TAG,
+                                       WorkerWish.class, (WorkerWish)null, true));
             xr.closeTag(tag);// FIXME: tag -> WORKER_WISH_LIST_TAG
 
         } else {

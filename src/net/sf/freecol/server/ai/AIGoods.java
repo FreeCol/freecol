@@ -501,16 +501,10 @@ public class AIGoods extends AIObject implements Transportable {
 
         transportPriority = xr.getAttribute(TRANSPORT_PRIORITY_TAG, -1);
 
-        if (xr.hasAttribute(TRANSPORT_TAG)) {
-            transport = getAttribute(xr, TRANSPORT_TAG,
-                                     AIUnit.class, (AIUnit)null);
-            if (transport == null) {
-                transport = new AIUnit(aiMain,
-                    xr.getAttribute(TRANSPORT_TAG, (String)null));
-            }
-        } else {
-            transport = null;
-        }
+        transport = (xr.hasAttribute(TRANSPORT_TAG))
+            ? xr.makeAIObject(aiMain, TRANSPORT_TAG,
+                              AIUnit.class, (AIUnit)null, true)
+            : null;
     }
 
     /**

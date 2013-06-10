@@ -704,20 +704,13 @@ public class AIUnit extends AIObject implements Transportable {
 
         final AIMain aiMain = getAIMain();
 
-        unit = xr.getAttribute(aiMain.getGame(), ID_ATTRIBUTE_TAG,
-                               Unit.class, (Unit)null);
-        if (unit == null) {
-            throw new IllegalStateException("Not a Unit: " + xr.currentTag());
-        }
+        unit = xr.findFreeColGameObject(aiMain.getGame(), ID_ATTRIBUTE_TAG,
+                                        Unit.class, (Unit)null, true);
         
-        if (xr.hasAttribute(TRANSPORT_TAG)) {
-            transport = getAttribute(xr, TRANSPORT_TAG,
-                                     AIUnit.class, (AIUnit)null);
-            if (transport == null) {
-                transport = new AIUnit(aiMain,
-                    xr.getAttribute(TRANSPORT_TAG, (String)null));
-            }
-        }
+        transport = (xr.hasAttribute(TRANSPORT_TAG))
+            ? xr.makeAIObject(aiMain, TRANSPORT_TAG,
+                              AIUnit.class, (AIUnit)null, true)
+            : null;
     }
 
     /**

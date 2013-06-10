@@ -41,7 +41,7 @@ import net.sf.freecol.common.model.Player.NoClaimReason;
  * produces two different of goods, one food type and one new world
  * raw material.
  */
-public class ColonyTile extends WorkLocation implements Ownable {
+public class ColonyTile extends WorkLocation {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ColonyTile.class.getName());

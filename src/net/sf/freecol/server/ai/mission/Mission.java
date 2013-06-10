@@ -893,6 +893,14 @@ public abstract class Mission extends AIObject {
      * {@inheritDoc}
      */
     @Override
+    public final void toXML(FreeColXMLWriter xw) throws XMLStreamException {
+        if (isValid()) toXML(xw, getXMLTagName());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         // This routine might look redundant, but if you let it
         // default out up the tree, you reach

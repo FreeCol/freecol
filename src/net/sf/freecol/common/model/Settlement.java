@@ -36,7 +36,7 @@ import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
  * indian settlements).
  */
 public abstract class Settlement extends GoodsLocation
-    implements Named, Ownable {
+    implements Nameable, Ownable {
 
     private static final Logger logger = Logger.getLogger(Settlement.class.getName());
 

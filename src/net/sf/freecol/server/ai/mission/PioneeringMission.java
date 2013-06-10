@@ -696,16 +696,6 @@ public class PioneeringMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        if (isValid()) {
-            super.toXML(xw, getXMLElementTagName());
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
@@ -726,19 +716,15 @@ public class PioneeringMission extends Mission {
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
+        final AIMain aiMain = getAIMain();
+
         // Do not use setTarget in serialization
         target = xr.findLocationAttribute(getGame(), TARGET_TAG);
 
-        if (xr.hasAttribute(TILE_IMPROVEMENT_PLAN_TAG)) {
-            tileImprovementPlan = getAttribute(xr, TILE_IMPROVEMENT_PLAN_TAG,
-                TileImprovementPlan.class, (TileImprovementPlan)null);
-            if (tileImprovementPlan == null) {
-                tileImprovementPlan = new TileImprovementPlan(getAIMain(),
-                    xr.getAttribute(TILE_IMPROVEMENT_PLAN_TAG, (String)null));
-            }
-        } else {
-            tileImprovementPlan = null;
-        }
+        tileImprovementPlan = (xr.hasAttribute(TILE_IMPROVEMENT_PLAN_TAG))
+            ? xr.makeAIObject(aiMain, TILE_IMPROVEMENT_PLAN_TAG,
+                TileImprovementPlan.class, (TileImprovementPlan)null, true)
+            : null;
     }
 
     /**

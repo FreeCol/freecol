@@ -134,16 +134,6 @@ public class UnitWanderMission extends Mission {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        if (isValid()) {
-            toXML(xw, getXMLElementTagName());
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public String getXMLTagName() { return getXMLElementTagName(); }
 
     /**

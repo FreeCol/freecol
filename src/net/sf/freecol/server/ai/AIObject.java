@@ -200,28 +200,4 @@ public abstract class AIObject extends FreeColObject {
     public int checkIntegrity(boolean fix) {
         return (isUninitialized()) ? -1 : 1;
     }
-
-
-    /**
-     * Gets an AIObject by reference from an attribute in a stream.
-     *
-     * @param xr The <code>FreeColXMLReader</code> to read from.
-     * @param attributeName The attribute name.
-     * @param returnType The <code>AIObject</code> type to expect.
-     * @param defaultValue The default value.
-     * @return The <code>AIObject</code> found, or the default value if not.
-     */
-    protected <T extends AIObject> T getAttribute(FreeColXMLReader xr,
-        String attributeName, Class<T> returnType, T defaultValue) {
-        final String attrib = 
-        // @compat 0.10.7
-            (ID_ATTRIBUTE_TAG.equals(attributeName)) ? xr.readId() :
-        // end @compat
-            xr.getAttribute(attributeName, (String)null);
-
-        return (attrib == null) ? defaultValue
-            : aiMain.getAIObject(attrib, returnType);
-    }
-
-    // Serialization is all inherited from FreeColObject.
 }

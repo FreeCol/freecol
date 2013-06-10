@@ -43,6 +43,8 @@ import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.server.ai.AIObject;
+import net.sf.freecol.server.ai.AIMain;
 
 
 /**
@@ -326,10 +328,32 @@ public class FreeColXMLReader extends StreamReaderDelegate {
     }
 
     /**
+     * Get a FreeCol AI object from an attribute in a stream.
+     *
+     * @param aiMain The <code>AIMain</code> that contains the object.
+     * @param attributeName The attribute name.
+     * @param returnType The <code>AIObject</code> type to expect.
+     * @param defaultValue The default value.
+     * @return The <code>AIObject</code> found, or the default value if not.
+     */
+    public <T extends AIObject> T getAttribute(AIMain aiMain,
+        String attributeName, Class<T> returnType, T defaultValue) {
+        final String attrib =
+        // @compat 0.10.7
+            (FreeColObject.ID_ATTRIBUTE_TAG.equals(attributeName)) ? readId() :
+        // end @compat
+            getAttribute(attributeName, (String)null);
+
+        return (attrib == null) ? defaultValue
+            : aiMain.getAIObject(attrib, returnType);
+    }
+
+    /**
      * Find a new location from a stream attribute.
      *
      * @param game The <code>Game</code> to look in.
      * @param attributeName The attribute to check.
+     * @param required 
      * @return The <code>Location</code> found.
      */
     public Location findLocationAttribute(Game game, String attributeName) {
@@ -481,14 +505,15 @@ public class FreeColXMLReader extends StreamReaderDelegate {
      * @exception XMLStreamError if there was a problem reading the stream.
      */
     public <T extends FreeColGameObject> T makeFreeColGameObject(Game game,
-        String attributeName, Class<T> returnClass, boolean required) throws XMLStreamException {
+        String attributeName, Class<T> returnClass,
+        boolean required) throws XMLStreamException {
         final String id =
             // @compat 0.10.7
             (FreeColObject.ID_ATTRIBUTE_TAG.equals(attributeName)) ? readId() :
             // end @compat
             getAttribute(attributeName, (String)null);
-        T ret = null;
 
+        T ret = null;
         if (id == null) {
             if (required) {
                 throw new XMLStreamException("Missing " + attributeName
@@ -542,8 +567,89 @@ public class FreeColXMLReader extends StreamReaderDelegate {
     }
 
     /**
-     * Should this game object type clear containers on read?
-     * Usually true, but not if this type is extending another one.
+     * Find a FreeCol AI object from an attribute in a stream.
+     *
+     * @param aiMain The <code>AIMain</code> that contains the object.
+     * @param attributeName The attribute name.
+     * @param returnClass The <code>AIObject</code> type to expect.
+     * @param defaultValue The default value.
+     * @param required If true a null result should throw an exception.
+     * @exception XMLStreamException if there is problem reading the stream.
+     * @return The <code>AIObject</code> found, or the default value if not.
+     */
+    public <T extends AIObject> T findAIObject(AIMain aiMain,
+        String attributeName, Class<T> returnClass, T defaultValue,
+        boolean required) throws XMLStreamException {
+        T ret = getAttribute(aiMain, attributeName, returnClass, (T)null);
+        if (ret == (T)null) {
+            if (required) {
+                throw new XMLStreamException("Missing " + attributeName
+                    + " for " + returnClass.getName() + ": " + currentTag());
+            } else {
+                ret = defaultValue;
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * Either get an existing <code>FreeColGameObject</code> from a stream
+     * attribute or create it if it does not exist.
+     *
+     * Use this routine when the object may not necessarily already be
+     * present in the game, but is expected to be defined eventually.
+     * @param aiMain The <code>AIMain</code> that contains the object.
+     * @param attributeName The attribute name.
+     * @param returnClass The <code>AIObject</code> type to expect.
+     * @param defaultValue The default value.
+     * @exception XMLStreamException if there is problem reading the stream.
+     * @return The <code>AIObject</code> found, or the default value if not.
+     */
+    public <T extends AIObject> T makeAIObject(AIMain aiMain,
+        String attributeName, Class<T> returnClass, T defaultValue,
+        boolean required) throws XMLStreamException {
+        final String id =
+            // @compat 0.10.7
+            (FreeColObject.ID_ATTRIBUTE_TAG.equals(attributeName)) ? readId() :
+            // end @compat
+            getAttribute(attributeName, (String)null);
+
+        T ret = null;
+        if (id == null) {
+            if (required) {
+                throw new XMLStreamException("Missing " + attributeName
+                    + " for " + returnClass.getName() + ": " + currentTag());
+            }
+        } else {
+            ret = aiMain.getAIObject(id, returnClass);
+            if (ret == null) {
+                try {
+                    Constructor<T> c = returnClass.getConstructor(AIMain.class,
+                                                                  String.class);
+                    ret = returnClass.cast(c.newInstance(aiMain, id));
+                    if (required && ret == null) {
+                        throw new XMLStreamException("Constructed null "
+                            + returnClass.getName() + " for " + id
+                            + ": " + currentTag());
+                    }
+                } catch (Exception e) {
+                    if (required) {
+                        throw new XMLStreamException(e.getCause());
+                    } else {
+                        logger.log(Level.WARNING, "Failed to create AIObject: "
+                                   + id, e);
+                    }
+                }
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * Should the game object type being read clear its containers before
+     * reading the child elements?
+     *
+     * Usually true, but not if the type is extending another one.
      *
      * @return True if the containers should be cleared.
      */
@@ -572,8 +678,8 @@ public class FreeColXMLReader extends StreamReaderDelegate {
             (FreeColObject.ID_ATTRIBUTE_TAG.equals(attributeName)) ? readId() :
         // end @compat
             getAttribute(attributeName, (String)null);
+
         return (attrib == null) ? defaultValue
             : spec.getType(attrib, returnClass);
     }
 }
-

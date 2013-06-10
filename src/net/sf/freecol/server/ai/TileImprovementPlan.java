@@ -314,9 +314,7 @@ public class TileImprovementPlan extends ValuedAIObject {
      */
     @Override
     public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        if (validate()) {
-            toXML(xw, getXMLElementTagName());
-        }
+        if (validate()) toXML(xw, getXMLTagName());
     }
 
     /**
@@ -342,20 +340,16 @@ public class TileImprovementPlan extends ValuedAIObject {
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
+        final AIMain aiMain = getAIMain();
         final Specification spec = getSpecification();
         
         type = xr.getType(spec, TYPE_TAG, 
                           TileImprovementType.class, (TileImprovementType)null);
 
-        if (xr.hasAttribute(PIONEER_TAG)) {
-            pioneer = getAttribute(xr, PIONEER_TAG, AIUnit.class, (AIUnit)null);
-            if (pioneer == null) {
-                pioneer = new AIUnit(getAIMain(),
-                    xr.getAttribute(PIONEER_TAG, (String)null));
-            }
-        } else {
-            pioneer = null;
-        }
+        pioneer = (xr.hasAttribute(PIONEER_TAG))
+            ? xr.makeAIObject(aiMain, PIONEER_TAG,
+                              AIUnit.class, (AIUnit)null, true)
+            : null;
 
         target = xr.getAttribute(getGame(), TARGET_TAG,
                                  Tile.class, (Tile)null);

@@ -41,7 +41,6 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
  */
 public abstract class WorkLocation extends UnitLocation implements Ownable {
 
-
     public static final List<AbstractGoods> EMPTY_LIST = Collections.emptyList();
 
     /** The colony that contains this work location. */

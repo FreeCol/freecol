@@ -181,16 +181,6 @@ public class WorkInsideColonyMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        if (isValid()) {
-            super.toXML(xw, getXMLElementTagName());
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
@@ -204,7 +194,8 @@ public class WorkInsideColonyMission extends Mission {
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
-        aiColony = getAttribute(xr, COLONY_TAG, AIColony.class, (AIColony)null);
+        aiColony = xr.getAttribute(getAIMain(), COLONY_TAG,
+                                   AIColony.class, (AIColony)null);
     }
 
     /**

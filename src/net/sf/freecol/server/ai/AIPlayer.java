@@ -608,13 +608,8 @@ public abstract class AIPlayer extends AIObject {
 
         final AIMain aiMain = getAIMain();
 
-        ServerPlayer p = xr.getAttribute(aiMain.getGame(), ID_ATTRIBUTE_TAG,
-                                         ServerPlayer.class, (ServerPlayer)null);
-        if (p == null) {
-            throw new IllegalStateException("Not a Player: "
-                                            + xr.currentTag());
-        }
-        player = p;
+        player = xr.findFreeColGameObject(aiMain.getGame(), ID_ATTRIBUTE_TAG,
+            ServerPlayer.class, (ServerPlayer)null, true);
 
         Random rnd = Utils.restoreRandomState(xr.getAttribute(RANDOM_STATE_TAG,
                                               (String)null));

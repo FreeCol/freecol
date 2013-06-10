@@ -472,16 +472,6 @@ public class BuildColonyMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        if (isValid()) {
-            toXML(xw, getXMLElementTagName());
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 

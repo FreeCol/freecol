@@ -220,16 +220,6 @@ public class WishRealizationMission extends Mission {
      * {@inheritDoc}
      */
     @Override
-    public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        if (isValid() && wish.shouldBeStored()) {
-            super.toXML(xw, getXMLElementTagName());
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
@@ -243,18 +233,20 @@ public class WishRealizationMission extends Mission {
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
+        final AIMain aiMain = getAIMain();
+
         final String wid = xr.getAttribute(WISH_TAG, (String)null);
-        wish = getAttribute(xr, WISH_TAG, Wish.class, (Wish)null);
+        wish = xr.getAttribute(aiMain, WISH_TAG, Wish.class, (Wish)null);
         if (wish == null) {
             if (wid.startsWith(GoodsWish.getXMLElementTagName())
                 // @compat 0.10.3
                 || wid.startsWith(OLD_GOODS_WISH_TAG)
                 // end @compat
                 ) {
-                wish = new GoodsWish(getAIMain(), wid);
+                wish = new GoodsWish(aiMain, wid);
 
             } else if (wid.startsWith(WorkerWish.getXMLElementTagName())) {
-                wish = new WorkerWish(getAIMain(), wid);
+                wish = new WorkerWish(aiMain, wid);
 
             } else {
                 logger.warning("Unknown type of Wish.");

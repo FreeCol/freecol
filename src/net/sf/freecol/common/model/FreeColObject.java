@@ -606,143 +606,7 @@ public abstract class FreeColObject {
     }
 
 
-    // Serialization
-
-    /** XML tag name for identifier attribute. */
-    public static final String ID_ATTRIBUTE_TAG = "id";
-
-    // @compat 0.10.x
-    /** Obsolete identifier attribute. */
-    public static final String ID_ATTRIBUTE = "ID";
-    // end @compat
-
-    /** XML tag name for array elements. */
-    public static final String ARRAY_SIZE_TAG = "xLength";
-
-    /** XML attribute tag to denote partial updates. */
-    protected static final String PARTIAL_ATTRIBUTE_TAG = "partial";
-    // @compat 0.10.x
-    protected static final String OLD_PARTIAL_ATTRIBUTE_TAG = "PARTIAL";
-    // end @compat
-
-    /** XML tag name for value attributes, used in many places. */
-    protected static final String VALUE_TAG = "value";
-
-
-    /**
-     * Debugging tool, dump object XML to System.err.
-     */
-    public void dumpObject() {
-        save(System.err);
-    }
-
-    /**
-     * Writes the object to the given file.
-     *
-     * @param file The <code>File</code> to write to.
-     * @exception FileNotFoundException
-     */
-    public void save(File file) throws FileNotFoundException {
-        save(new FileOutputStream(file));
-    }
-
-    /**
-     * Writes the object to the given output stream
-     *
-     * @param out The <code>OutputStream</code> to write to.
-     */
-    public void save(OutputStream out) {
-        FreeColXMLWriter xw = null;
-        try {
-            xw = new FreeColXMLWriter(out);
-        } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Error creating FreeColXMLWriter.", ioe);
-            return;
-        }
-        try {
-            xw.writeStartDocument("UTF-8", "1.0");
-
-            this.toXML(xw, null, true, true);
-
-            xw.writeEndDocument();
-
-            xw.flush();
-
-        } catch (XMLStreamException xse) {
-            logger.log(Level.WARNING, "Exception writing object.", xse);
-        } finally {
-            if (xw != null) xw.close();
-        }
-    }
-
-    /**
-     * Serialize this FreeColObject to a string.
-     *
-     * @param player The <code>Player</code> this XML-representation
-     *     should be made for, or null if <code>showAll == true</code>.
-     * @param showAll Show all attributes.
-     * @param toSavedGame Also show some extra attributes when saving the game.
-     * @return The serialized object, or null if the stream could not be
-     *     created.
-     * @exception XMLStreamException if there are any problems writing
-     *     to the stream.
-     */
-    public String serialize(Player player, boolean showAll,
-                            boolean toSavedGame) throws XMLStreamException {
-        StringWriter sw = new StringWriter();
-        FreeColXMLWriter xw = null;
-        try {
-            xw = new FreeColXMLWriter(sw);
-        } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Error creating FreeColXMLWriter,", ioe);
-            return null;
-        }
-
-        try {
-            this.toXML(xw, player, showAll, toSavedGame);
-        } finally {
-            if (xw != null) xw.close();
-        }
-
-        return sw.toString();
-    }
-
-    /**
-     * Unserialize from XML to a FreeColObject.
-     *
-     * @param xml The xml serialized version of an object.
-     * @param game The <code>Game</code> to add the object to.
-     * @param returnClass The required object class.
-     * @return The unserialized object.
-     * @exception XMLStreamException if there are any problems reading
-     *     from the stream.
-     */
-    public static <T extends FreeColObject> T unserialize(String xml,
-        Game game, Class<T> returnClass) throws XMLStreamException {
-        T ret = null;
-        try {
-            Constructor<T> c = returnClass.getConstructor(Game.class,
-                                                          String.class);
-            ret = c.newInstance(game, (String)null);
-        } catch (NoSuchMethodException nsme) { // Specific to getConstructor
-            logger.log(Level.WARNING, "No constructor for "
-                       + returnClass.getName(), nsme);
-        } catch (Exception e) { // Handles multiple fails from newInstance
-            logger.log(Level.WARNING, "Failed to instantiate "
-                       + returnClass.getName(), e);
-        }
-        if (ret != null) {
-            try {
-                FreeColXMLReader xr
-                    = new FreeColXMLReader(new StringReader(xml));
-                xr.nextTag();
-                ret.readFromXML(xr);
-            } catch (IOException ioe) {
-                logger.log(Level.WARNING, "Exception creating stream.", ioe);
-            }
-        }
-        return ret;
-    }
+    // DOM handling.  Beware, this needs to go away.
 
     /**
      * This method writes an XML-representation of this object to
@@ -884,6 +748,195 @@ public abstract class FreeColObject {
         }
     }
 
+    // @compat 0.10.x
+    /**
+     * Version of readId(FreeColXMLReader) that reads from an element.
+     *
+     * To be replaced with just:
+     *   element.getAttribute(FreeColObject.ID_ATTRIBUTE_TAG);
+     *
+     * @param element An element to read the id attribute from.
+     * @return The identifier attribute value.
+     */
+    public static String readId(Element element) {
+        String id = element.getAttribute(ID_ATTRIBUTE_TAG);
+        if (id == null) id = element.getAttribute(ID_ATTRIBUTE);
+        return id;
+    }
+    // end @compat
+
+    /**
+     * Initialize this object from an XML-representation of this object.
+     *
+     * @param element An XML-element that will be used to initialize
+     *      this object.
+     */
+    public void readFromXMLElement(Element element) {
+        FreeColXMLReader xr = null;
+        try {
+            TransformerFactory factory = TransformerFactory.newInstance();
+            Transformer xmlTransformer = factory.newTransformer();
+            StringWriter stringWriter = new StringWriter();
+            xmlTransformer.transform(new DOMSource(element), new StreamResult(stringWriter));
+            String xml = stringWriter.toString();
+            xr = new FreeColXMLReader(new StringReader(xml));
+            xr.nextTag();
+            readFromXML(xr);
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "IOException", ioe);
+            throw new IllegalStateException("IOException");
+        } catch (TransformerException te) {
+            logger.log(Level.WARNING, "TransformerException", te);
+            throw new IllegalStateException("TransformerException");
+        } catch (XMLStreamException xe) {
+            logger.log(Level.WARNING, "XMLStreamException", xe);
+            throw new IllegalStateException("XMLStreamException");
+        } finally {
+            if (xr != null) xr.close();
+        }
+    }
+
+
+    // Serialization
+
+    /** XML tag name for identifier attribute. */
+    public static final String ID_ATTRIBUTE_TAG = "id";
+
+    // @compat 0.10.x
+    /** Obsolete identifier attribute. */
+    public static final String ID_ATTRIBUTE = "ID";
+    // end @compat
+
+    /** XML tag name for array elements. */
+    public static final String ARRAY_SIZE_TAG = "xLength";
+
+    /** XML attribute tag to denote partial updates. */
+    private static final String PARTIAL_ATTRIBUTE_TAG = "partial";
+    // @compat 0.10.x
+    private static final String OLD_PARTIAL_ATTRIBUTE_TAG = "PARTIAL";
+    // end @compat
+
+    /** XML tag name for value attributes, used in many places. */
+    protected static final String VALUE_TAG = "value";
+
+
+    /**
+     * Debugging tool, dump object XML to System.err.
+     */
+    public void dumpObject() {
+        save(System.err);
+    }
+
+    /**
+     * Writes the object to the given file.
+     *
+     * @param file The <code>File</code> to write to.
+     * @exception FileNotFoundException
+     */
+    public void save(File file) throws FileNotFoundException {
+        save(new FileOutputStream(file));
+    }
+
+    /**
+     * Writes the object to the given output stream
+     *
+     * @param out The <code>OutputStream</code> to write to.
+     */
+    public void save(OutputStream out) {
+        FreeColXMLWriter xw = null;
+        try {
+            xw = new FreeColXMLWriter(out);
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "Error creating FreeColXMLWriter.", ioe);
+            return;
+        }
+
+        try {
+            xw.writeStartDocument("UTF-8", "1.0");
+
+            this.toXML(xw, null, true, true);
+
+            xw.writeEndDocument();
+
+            xw.flush();
+
+        } catch (XMLStreamException xse) {
+            logger.log(Level.WARNING, "Exception writing object.", xse);
+        } finally {
+            if (xw != null) xw.close();
+        }
+    }
+
+    /**
+     * Serialize this FreeColObject to a string.
+     *
+     * @param player The <code>Player</code> this XML-representation
+     *     should be made for, or null if <code>showAll == true</code>.
+     * @param showAll Show all attributes.
+     * @param toSavedGame Also show some extra attributes when saving the game.
+     * @return The serialized object, or null if the stream could not be
+     *     created.
+     * @exception XMLStreamException if there are any problems writing
+     *     to the stream.
+     */
+    public String serialize(Player player, boolean showAll,
+                            boolean toSavedGame) throws XMLStreamException {
+        StringWriter sw = new StringWriter();
+        FreeColXMLWriter xw = null;
+        try {
+            xw = new FreeColXMLWriter(sw);
+        } catch (IOException ioe) {
+            logger.log(Level.WARNING, "Error creating FreeColXMLWriter,", ioe);
+            return null;
+        }
+
+        try {
+            this.toXML(xw, player, showAll, toSavedGame);
+        } finally {
+            if (xw != null) xw.close();
+        }
+
+        return sw.toString();
+    }
+
+    /**
+     * Unserialize from XML to a FreeColObject.
+     *
+     * @param xml The xml serialized version of an object.
+     * @param game The <code>Game</code> to add the object to.
+     * @param returnClass The required object class.
+     * @return The unserialized object.
+     * @exception XMLStreamException if there are any problems reading
+     *     from the stream.
+     */
+    public static <T extends FreeColObject> T unserialize(String xml,
+        Game game, Class<T> returnClass) throws XMLStreamException {
+        T ret = null;
+        try {
+            Constructor<T> c = returnClass.getConstructor(Game.class,
+                                                          String.class);
+            ret = c.newInstance(game, (String)null);
+        } catch (NoSuchMethodException nsme) { // Specific to getConstructor
+            logger.log(Level.WARNING, "No constructor for "
+                       + returnClass.getName(), nsme);
+        } catch (Exception e) { // Handles multiple fails from newInstance
+            logger.log(Level.WARNING, "Failed to instantiate "
+                       + returnClass.getName(), e);
+        }
+        if (ret != null) {
+            try {
+                FreeColXMLReader xr
+                    = new FreeColXMLReader(new StringReader(xml));
+                xr.nextTag();
+                ret.readFromXML(xr);
+            } catch (IOException ioe) {
+                logger.log(Level.WARNING, "Exception creating stream.", ioe);
+            }
+        }
+        return ret;
+    }
+
+
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
@@ -961,9 +1014,11 @@ public abstract class FreeColObject {
      * This method writes an XML-representation of this object to
      * the given stream.
      *
-     * Only attributes visible to the given <code>Player</code> will
-     * be added to that representation if <code>showAll</code> is
-     * set to <code>false</code>.
+     * FreeColObjects are not to contain data that varies with
+     * the observer, so the extra arguments are moot here.
+     * However, this method is overridden in FreeColGameObject
+     * where they are meaningful, and we need a version here for
+     * toXMLElement() to call.
      *
      * @param xw The <code>FreeColXMLWriter</code> to write to.
      * @param player The <code>Player</code> this XML-representation
@@ -979,11 +1034,6 @@ public abstract class FreeColObject {
      */
     public void toXML(FreeColXMLWriter xw, Player player, boolean showAll,
                       boolean toSavedGame) throws XMLStreamException {
-        // FreeColObjects are not to contain data that varies with
-        // the observer, so the extra arguments are moot here.
-        // However, this method is overridden in FreeColGameObject
-        // where they are meaningful, and we need a version here for
-        // toXMLElement() to call.
         toXML(xw);
     }
 
@@ -1044,6 +1094,7 @@ public abstract class FreeColObject {
             readFromXMLPartial(xr);
         } else {
             readAttributes(xr);
+
             readChildren(xr);
         }
     }
@@ -1091,87 +1142,6 @@ public abstract class FreeColObject {
         throw new XMLStreamException("In " + getXMLTagName()
             + ", unexpected tag " + xr.getLocalName()
             + ", at: " + xr.currentTag());
-    }
-
-    // @compat 0.10.x
-    /**
-     * Version of readId(FreeColXMLReader) that reads from an element.
-     *
-     * To be replaced with just:
-     *   element.getAttribute(FreeColObject.ID_ATTRIBUTE_TAG);
-     *
-     * @param element An element to read the id attribute from.
-     * @return The identifier attribute value.
-     */
-    public static String readId(Element element) {
-        String id = element.getAttribute(ID_ATTRIBUTE_TAG);
-        if (id == null) id = element.getAttribute(ID_ATTRIBUTE);
-        return id;
-    }
-    // end @compat
-
-    /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param element An XML-element that will be used to initialize
-     *      this object.
-     */
-    public void readFromXMLElement(Element element) {
-        FreeColXMLReader xr = null;
-        try {
-            TransformerFactory factory = TransformerFactory.newInstance();
-            Transformer xmlTransformer = factory.newTransformer();
-            StringWriter stringWriter = new StringWriter();
-            xmlTransformer.transform(new DOMSource(element), new StreamResult(stringWriter));
-            String xml = stringWriter.toString();
-            xr = new FreeColXMLReader(new StringReader(xml));
-            xr.nextTag();
-            readFromXML(xr);
-        } catch (IOException ioe) {
-            logger.log(Level.WARNING, "IOException", ioe);
-            throw new IllegalStateException("IOException");
-        } catch (TransformerException te) {
-            logger.log(Level.WARNING, "TransformerException", te);
-            throw new IllegalStateException("TransformerException");
-        } catch (XMLStreamException xe) {
-            logger.log(Level.WARNING, "XMLStreamException", xe);
-            throw new IllegalStateException("XMLStreamException");
-        } finally {
-            if (xr != null) xr.close();
-        }
-    }
-
-    /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param element An XML-element that will be used to initialize
-     *     this object.
-     * @param specification The <code>Specification</code> to refer to.
-     * @exception XMLStreamException if there is a problem reading the stream.
-     */
-    public void readFromXMLElement(Element element,
-                                   Specification specification) throws XMLStreamException {
-        setSpecification(specification);
-        FreeColXMLReader xr = null;
-        try {
-            TransformerFactory factory = TransformerFactory.newInstance();
-            Transformer xmlTransformer = factory.newTransformer();
-            StringWriter stringWriter = new StringWriter();
-            xmlTransformer.transform(new DOMSource(element),
-                                     new StreamResult(stringWriter));
-            String xml = stringWriter.toString();
-            xr = new FreeColXMLReader(new StringReader(xml));
-            xr.nextTag();
-            readFromXML(xr);
-        } catch (IOException ioe) {
-            logger.log(Level.WARNING, "Error making stream", ioe);
-            throw new IllegalStateException("TransformerException");
-        } catch (TransformerException tfe) {
-            logger.log(Level.WARNING, "TransformerException", tfe);
-            throw new IllegalStateException("TransformerException");
-        } finally {
-            if (xr != null) xr.close();
-        }
     }
 
     // @compat 0.9.x
