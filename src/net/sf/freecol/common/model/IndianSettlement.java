@@ -1366,23 +1366,6 @@ public class IndianSettlement extends Settlement {
      * {@inheritDoc}
      */
     @Override
-    protected void toXMLPartial(FreeColXMLWriter xw,
-                                String[] fields) throws XMLStreamException {
-        toXMLPartialByClass(xw, getClass(), fields);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void readFromXMLPartial(FreeColXMLReader xr) throws XMLStreamException {
-        readFromXMLPartialByClass(xr, getClass());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
 

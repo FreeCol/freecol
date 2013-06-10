@@ -704,23 +704,6 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      * {@inheritDoc}
      */
     @Override
-    protected void toXMLPartial(FreeColXMLWriter xw,
-                                String[] fields) throws XMLStreamException {
-        toXMLPartialByClass(xw, Building.class, fields);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void readFromXMLPartial(FreeColXMLReader xr) throws XMLStreamException {
-        readFromXMLPartialByClass(xr, Building.class);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         final Specification spec = getSpecification();
 

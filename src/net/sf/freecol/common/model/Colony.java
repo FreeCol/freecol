@@ -2761,23 +2761,6 @@ public class Colony extends Settlement implements Nameable {
      * {@inheritDoc}
      */
     @Override
-    protected void toXMLPartial(FreeColXMLWriter xw,
-                                String[] fields) throws XMLStreamException {
-        toXMLPartialByClass(xw, getClass(), fields);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void readFromXMLPartial(FreeColXMLReader xr) throws XMLStreamException {
-        readFromXMLPartialByClass(xr, getClass());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 

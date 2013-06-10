@@ -484,23 +484,6 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * {@inheritDoc}
      */
     @Override
-    protected void toXMLPartial(FreeColXMLWriter xw,
-                                String[] fields) throws XMLStreamException {
-        toXMLPartialByClass(xw, getClass(), fields);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void readFromXMLPartial(FreeColXMLReader xr) throws XMLStreamException {
-        readFromXMLPartialByClass(xr, getClass());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
         storedGoods.clear();

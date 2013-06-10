@@ -990,24 +990,6 @@ public abstract class FreeColObject {
     /**
      * This method writes a partial XML-representation of this object to
      * the given stream using only the mandatory and specified fields.
-     * Ideally this would be abstract, but as not all FreeColObject-subtypes
-     * need partial updates we provide a non-operating stub here which is
-     * to be overridden where needed.
-     *
-     * @param xw The <code>FreeColXMLWriter</code> to write to.
-     * @param fields The fields to write.
-     * @exception XMLStreamException if there are any problems writing
-     *      to the stream.
-     */
-    protected void toXMLPartial(FreeColXMLWriter xw,
-                                String[] fields) throws XMLStreamException {
-        throw new UnsupportedOperationException("Partial update of unsupported type.");
-    }
-
-    /**
-     * Common routine for FreeColObject descendants to write a partial
-     * XML-representation of this object to the given stream,
-     * including only the mandatory and specified fields.
      *
      * All attributes are considered visible as this is
      * server-to-owner-client functionality, but it depends ultimately
@@ -1015,13 +997,14 @@ public abstract class FreeColObject {
      * compatible with String.valueOf.
      *
      * @param xw The <code>FreeColXMLWriter</code> to write to.
-     * @param theClass The real class of this object, required by the
-     *     <code>Introspector</code>.
      * @param fields The fields to write.
-     * @exception XMLStreamException if there are problems writing the stream.
+     * @exception XMLStreamException if there are any problems writing
+     *      to the stream.
      */
-    protected void toXMLPartialByClass(FreeColXMLWriter xw, Class<?> theClass, 
-                                       String[] fields) throws XMLStreamException {
+    public final void toXMLPartial(FreeColXMLWriter xw,
+                                   String[] fields) throws XMLStreamException {
+        final Class theClass = getClass();
+
         try {
             xw.writeStartElement(getXMLTagName());
 
@@ -1038,7 +1021,7 @@ public abstract class FreeColObject {
 
         } catch (Exception e) {
             logger.log(Level.WARNING, "Partial write failed for "
-                + theClass.getName(), e);
+                       + theClass.getName(), e);
         }
     }
 
@@ -1249,36 +1232,19 @@ public abstract class FreeColObject {
 
     /**
      * Updates this object from an XML-representation of this object.
-     * Ideally this would be abstract, but as not all FreeColObject-subtypes
-     * need partial updates we provide a non-operating stub here which is
-     * to be overridden where needed.
-     *
-     * @param xr The input stream with the XML.
-     * @exception XMLStreamException if a problem was encountered
-     *      during parsing.
-     */
-    public void readFromXMLPartial(FreeColXMLReader xr) throws XMLStreamException {
-        throw new XMLStreamException("Partial update of unsupported type: "
-            + xr.currentTag());
-    }
-
-    /**
-     * Common routine for FreeColObject descendants to update an
-     * object from a partial XML-representation which includes only
-     * mandatory and server-supplied fields.
      *
      * All attributes are considered visible as this is
      * server-to-owner-client functionality.  It depends ultimately on
      * the presence of a setFieldName() method that takes a parameter
      * type T where T.valueOf(String) exists.
      *
-     * @param xr The input <code>FreeColXMLReader</code>.
-     * @param theClass The real class of this object, required by the
-     *     <code>Introspector</code>.
-     * @exception XMLStreamException If there are problems reading the stream.
+     * @param xr The input stream with the XML.
+     * @exception XMLStreamException if a problem was encountered
+     *      during parsing.
      */
-    protected void readFromXMLPartialByClass(FreeColXMLReader xr,
-                                             Class<?> theClass) throws XMLStreamException {
+    public final void readFromXMLPartial(FreeColXMLReader xr) throws XMLStreamException {
+        final Class theClass = getClass();
+        final String tag = xr.getLocalName();
         int n = xr.getAttributeCount();
 
         setId(xr.readId());
@@ -1301,7 +1267,7 @@ public abstract class FreeColObject {
             }
         }
 
-        while (xr.nextTag() != XMLStreamConstants.END_ELEMENT);
+        xr.closeTag(tag);
     }
 
 
