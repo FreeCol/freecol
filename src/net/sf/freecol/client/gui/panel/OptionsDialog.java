@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Component;
@@ -259,6 +258,7 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
             group.readFromXML(xr);
             getSpecification().getOptionGroup(getOptionGroupId()).setValue(group);
             logger.info("Loaded custom options from file " + file.getPath());
+
         } catch (Exception e) {
             logger.log(Level.WARNING, "Failed to load OptionGroup "
                 + getOptionGroupId() + " from " + file.getName(), e);
@@ -273,7 +273,8 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
      * @return true if custom options were loaded
      */
     protected boolean loadCustomOptions() {
-        File customFile = new File(FreeColDirectories.getOptionsDirectory(), getDefaultFileName());
+        File customFile = new File(FreeColDirectories.getOptionsDirectory(),
+                                   getDefaultFileName());
         if (customFile.exists()) {
             load(customFile);
             return true;

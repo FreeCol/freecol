@@ -82,8 +82,8 @@ public abstract class ValuedAIObject extends AIObject
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    public ValuedAIObject(AIMain aiMain, FreeColXMLReader xr)
-        throws XMLStreamException {
+    public ValuedAIObject(AIMain aiMain,
+                          FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, xr);
     }
 

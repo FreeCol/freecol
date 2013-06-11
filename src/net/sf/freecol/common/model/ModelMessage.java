@@ -428,9 +428,7 @@ public class ModelMessage extends StringTemplate {
 
         xw.writeAttribute(SOURCE_TAG, sourceId);
 
-        if (displayId != null) {
-            xw.writeAttribute(DISPLAY_TAG, displayId);
-        }
+        if (displayId != null) xw.writeAttribute(DISPLAY_TAG, displayId);
 
         xw.writeAttribute(MESSAGE_TYPE_TAG, messageType);
 

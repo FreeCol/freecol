@@ -464,8 +464,8 @@ public class TransportMission extends Mission {
      * @throws XMLStreamException if a problem was encountered during parsing.
      * @see net.sf.freecol.server.ai.AIObject#readFromXML
      */
-    public TransportMission(AIMain aiMain, AIUnit aiUnit, FreeColXMLReader xr)
-        throws XMLStreamException {
+    public TransportMission(AIMain aiMain, AIUnit aiUnit,
+                            FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, aiUnit);
 
         readFromXML(xr);
@@ -1830,7 +1830,7 @@ public class TransportMission extends Mission {
      */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        // Clear containers
+        // Clear containers.
         tClear();
 
         super.readChildren(xr);

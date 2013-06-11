@@ -57,7 +57,8 @@ public class StanceTradeItem extends TradeItem {
      * @param xr A <code>FreeColXMLReader</code> to read from.
      * @exception XMLStreamException if there is an error reading the stream.
      */
-    public StanceTradeItem(Game game, FreeColXMLReader xr) throws XMLStreamException {
+    public StanceTradeItem(Game game,
+                           FreeColXMLReader xr) throws XMLStreamException {
         super(game, xr);
 
         readFromXML(xr);

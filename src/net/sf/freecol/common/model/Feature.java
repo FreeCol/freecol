@@ -451,7 +451,7 @@ public abstract class Feature extends FreeColObject {
      */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        // Clear container
+        // Clear containers.
         scopes = null;
 
         super.readChildren(xr);

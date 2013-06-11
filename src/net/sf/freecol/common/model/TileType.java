@@ -586,6 +586,7 @@ public final class TileType extends FreeColGameObjectType {
      */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
+        // Clear containers.
         if (xr.shouldClearContainers()) {
             disasters = null;
             resourceTypes = null;

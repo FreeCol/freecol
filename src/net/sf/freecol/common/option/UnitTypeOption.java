@@ -273,7 +273,7 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
         super.readAttributes(xr); // value is read here
 
         generateChoices = xr.getAttribute(GENERATE_TAG,
-                                       TypeSelector.class, (TypeSelector)null);
+            TypeSelector.class, (TypeSelector)null);
 
         addNone = xr.getAttribute(ADD_NONE_TAG, false);
     }
@@ -283,7 +283,7 @@ public class UnitTypeOption extends AbstractOption<UnitType> {
      */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        // Clear container.
+        // Clear containers.
         choices.clear();
 
         super.readChildren(xr);

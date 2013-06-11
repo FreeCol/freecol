@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.networking;
 
+
 /**
  * Thrown if there is no route to a server.
  */

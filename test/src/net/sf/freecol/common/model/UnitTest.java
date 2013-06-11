@@ -33,6 +33,7 @@ import net.sf.freecol.util.test.FreeColTestCase;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+
 public class UnitTest extends FreeColTestCase {
 
     private static final BuildingType carpenterHouseType

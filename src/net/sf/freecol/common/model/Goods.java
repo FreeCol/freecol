@@ -257,7 +257,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
-        location = xr.makeLocationAttribute(LOCATION_TAG, game);
+        location = xr.makeLocationAttribute(game, LOCATION_TAG);
     }
 
     /**

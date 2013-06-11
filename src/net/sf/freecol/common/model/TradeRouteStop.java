@@ -166,8 +166,7 @@ public class TradeRouteStop {
      * @param xr The input stream with the XML.
      * @throws XMLStreamException is thrown if something goes wrong.
      */
-    public void readFromXML(FreeColXMLReader xr)
-        throws XMLStreamException {
+    public void readFromXML(FreeColXMLReader xr) throws XMLStreamException {
         readFromXML(xr, null);
     }
 
@@ -175,10 +174,11 @@ public class TradeRouteStop {
      * Initialize this object from an XML-representation of this object.
      * 
      * @param xr The input stream with the XML.
+     * @param game The enclosing <code>Game</code>.
      * @throws XMLStreamException is thrown if something goes wrong.
      */
-    public void readFromXML(FreeColXMLReader xr, Game game)
-        throws XMLStreamException {
+    public void readFromXML(FreeColXMLReader xr,
+                            Game game) throws XMLStreamException {
         if (game != null) {
             String str = xr.getAttributeValue(null, "location");
             location = game.makeFreeColLocation(str);

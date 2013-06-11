@@ -334,8 +334,8 @@ public class EuropeanAIPlayer extends AIPlayer {
      * @param xr The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
-    public EuropeanAIPlayer(AIMain aiMain, FreeColXMLReader xr)
-        throws XMLStreamException {
+    public EuropeanAIPlayer(AIMain aiMain,
+                            FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, xr);
 
         uninitialized = getPlayer() == null;

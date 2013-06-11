@@ -187,7 +187,7 @@ public class TradeRoute extends FreeColGameObject
             final Specification spec = getSpecification();
             final Game game = getGame();
 
-            location = xr.makeLocationAttribute(LOCATION_TAG, game);
+            location = xr.makeLocationAttribute(game, LOCATION_TAG);
 
             cargo.clear();
             while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {

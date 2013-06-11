@@ -26,7 +26,6 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 
 
-
 /**
  * Represents a <code>TileItem</code> item on a <code>Tile</code>.
  */

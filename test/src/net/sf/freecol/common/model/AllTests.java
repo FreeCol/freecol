@@ -22,6 +22,7 @@ package net.sf.freecol.common.model;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+
 public class AllTests {
 
     public static Test suite() {

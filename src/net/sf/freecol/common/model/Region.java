@@ -535,8 +535,8 @@ public class Region extends FreeColGameObject implements Nameable {
 
         scoreValue = xr.getAttribute(SCORE_VALUE_TAG, 0);
 
-        int turn = xr.getAttribute(DISCOVERED_IN_TAG, -1);
-        if (turn > 0) discoveredIn = new Turn(turn);
+        int turn = xr.getAttribute(DISCOVERED_IN_TAG, UNDEFINED);
+        discoveredIn = (turn == UNDEFINED) ? null : new Turn(turn);
 
         discoveredBy = xr.makeFreeColGameObject(getGame(), DISCOVERED_BY_TAG,
                                                 Player.class, false);
@@ -563,18 +563,18 @@ public class Region extends FreeColGameObject implements Nameable {
     public void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
 
+        if (CHILD_TAG.equals(tag)) {
+            addChild(xr.makeFreeColGameObject(getGame(), ID_ATTRIBUTE_TAG,
+                                              Region.class, true));
+            xr.closeTag(CHILD_TAG);
+
         // @compat 0.9.x
-        if (CHILDREN_TAG.equals(tag)) {
+        } else if (CHILDREN_TAG.equals(tag)) {
             String[] childArray = readFromArrayElement(CHILDREN_TAG, xr, new String[0]);
             for (String child : childArray) {
                 children.add(getGame().getMap().getRegion(child));
             }
         // end @compat
-
-        } else if (CHILD_TAG.equals(tag)) {
-            addChild(xr.makeFreeColGameObject(getGame(), ID_ATTRIBUTE_TAG,
-                                              Region.class, true));
-            xr.closeTag(CHILD_TAG);
         
         } else {
             super.readChild(xr);

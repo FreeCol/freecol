@@ -22,16 +22,18 @@ package net.sf.freecol.server.model;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+
 public class AllTests {
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for net.sf.freecol.server.model");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(ServerBuildingTest.class);
-    suite.addTestSuite(ServerColonyTest.class);
-		suite.addTestSuite(ServerIndianSettlementTest.class);
-		suite.addTestSuite(ServerPlayerTest.class);
-		suite.addTestSuite(ServerUnitTest.class);
-		//$JUnit-END$
-		return suite;
-	}
+
+    public static Test suite() {
+        TestSuite suite = new TestSuite("Test for net.sf.freecol.server.model");
+        //$JUnit-BEGIN$
+        suite.addTestSuite(ServerBuildingTest.class);
+        suite.addTestSuite(ServerColonyTest.class);
+        suite.addTestSuite(ServerIndianSettlementTest.class);
+        suite.addTestSuite(ServerPlayerTest.class);
+        suite.addTestSuite(ServerUnitTest.class);
+        //$JUnit-END$
+        return suite;
+    }
 }

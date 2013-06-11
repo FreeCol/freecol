@@ -1239,11 +1239,11 @@ public class IndianSettlement extends Settlement {
     protected void writeAttributes(FreeColXMLWriter xw, Player player,
                                    boolean showAll,
                                    boolean toSavedGame) throws XMLStreamException {
+        super.writeAttributes(xw);
+
         boolean full = showAll || toSavedGame || player == getOwner();
         PlayerExploredTile pet = (player == null) ? null
             : getTile().getPlayerExploredTile(player);
-
-        super.writeAttributes(xw);
 
         if (full) {
             xw.writeAttribute(LAST_TRIBUTE_TAG, lastTribute);
@@ -1289,10 +1289,9 @@ public class IndianSettlement extends Settlement {
     protected void writeChildren(FreeColXMLWriter xw, Player player,
                                  boolean showAll,
                                  boolean toSavedGame) throws XMLStreamException {
-        PlayerExploredTile pet;
-
         super.writeChildren(xw, player, showAll, toSavedGame);
 
+        PlayerExploredTile pet;
         if (showAll || toSavedGame || player == getOwner()) {
             for (Player p : getSortedCopy(contactLevels.keySet())) {
                 xw.writeStartElement(CONTACT_LEVEL_TAG);

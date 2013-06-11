@@ -113,8 +113,8 @@ public class GoodsWish extends Wish {
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    public GoodsWish(AIMain aiMain, FreeColXMLReader xr)
-        throws XMLStreamException {
+    public GoodsWish(AIMain aiMain,
+                     FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, xr);
 
         uninitialized = goodsType == null;

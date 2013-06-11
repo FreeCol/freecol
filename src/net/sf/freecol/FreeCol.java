@@ -65,7 +65,6 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 
 
-
 /**
  * This class is responsible for handling the command-line arguments
  * and starting either the stand-alone server or the client-GUI.

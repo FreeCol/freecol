@@ -545,9 +545,9 @@ public final class TileImprovementType extends FreeColGameObjectType {
      */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
-        final Specification spec = getSpecification();
-
         super.readAttributes(xr);
+
+        final Specification spec = getSpecification();
 
         natural = xr.getAttribute(NATURAL_TAG, false);
 
@@ -582,6 +582,7 @@ public final class TileImprovementType extends FreeColGameObjectType {
      */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
+        // Clear containers.
         if (xr.shouldClearContainers()) {
             scopes = null;
             allowedWorkers = null;
@@ -623,6 +624,7 @@ public final class TileImprovementType extends FreeColGameObjectType {
             Disaster disaster = xr.getType(spec, ID_ATTRIBUTE_TAG,
                                            Disaster.class, (Disaster)null);
             int probability = xr.getAttribute(PROBABILITY_TAG, 100);
+
             addDisaster(disaster, probability);
             xr.closeTag(DISASTER_TAG);
 

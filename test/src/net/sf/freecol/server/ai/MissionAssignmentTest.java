@@ -45,6 +45,7 @@ import net.sf.freecol.server.model.ServerUnit;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.FreeColTestUtils;
 
+
 public class MissionAssignmentTest extends FreeColTestCase {
 
     private static final BuildingType stockadeType

@@ -77,8 +77,8 @@ public class MissionManager {
      * @return a <code>Mission</code> value
      * @exception XMLStreamException if an error occurs
      */
-    public static Mission getMission(Game game, FreeColXMLReader xr)
-        throws XMLStreamException {
+    public static Mission getMission(Game game,
+                                     FreeColXMLReader xr) throws XMLStreamException {
         String tag = xr.getLocalName();
         Constructor<? extends Mission> c = missionMap.get(tag);
         if (c == null) {
@@ -95,6 +95,4 @@ public class MissionManager {
             }
         }
     }
-
-
 }

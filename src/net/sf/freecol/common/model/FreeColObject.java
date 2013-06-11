@@ -936,7 +936,6 @@ public abstract class FreeColObject {
         return ret;
     }
 
-
     /**
      * This method writes an XML-representation of this object to
      * the given stream.

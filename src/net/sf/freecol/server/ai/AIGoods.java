@@ -119,7 +119,8 @@ public class AIGoods extends AIObject implements Transportable {
      * @exception XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    public AIGoods(AIMain aiMain, FreeColXMLReader xr) throws XMLStreamException {
+    public AIGoods(AIMain aiMain,
+                   FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, xr);
 
         uninitialized = getGoods() == null;

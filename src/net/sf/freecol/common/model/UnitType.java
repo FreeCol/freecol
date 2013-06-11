@@ -797,6 +797,7 @@ public final class UnitType extends BuildableType
      */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
+        // Clear containers.
         if (xr.shouldClearContainers()) {
             consumption = null;
             defaultEquipment = null;
@@ -845,7 +846,7 @@ public final class UnitType extends BuildableType
                         Modifier.Type.PERCENTAGE));
             }
         }
-        // end compatibility code
+        // end @compat
     }
 
     /**
@@ -882,7 +883,8 @@ public final class UnitType extends BuildableType
                 xr.closeTag(tag);
 
             } else {
-                UnitTypeChange change = new UnitTypeChange(xr, spec);
+                UnitTypeChange change
+                    = new UnitTypeChange(xr, spec);// Closes tag
                 if (DOWNGRADE_TAG.equals(tag)
                     && change.getChangeTypes().isEmpty()) {
                     // add default downgrade type

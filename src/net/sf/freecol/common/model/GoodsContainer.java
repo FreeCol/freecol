@@ -27,13 +27,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
-import net.sf.freecol.common.model.Ownable;
-
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.Ownable;
 
 import org.w3c.dom.Element;
 
@@ -529,12 +528,13 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
                 GoodsType goodsType = xr.getType(spec, TYPE_TAG,
                     GoodsType.class, (GoodsType)null);
 
-                Integer amount = new Integer(xr.getAttribute(AMOUNT_TAG, 0));
+                int amount = xr.getAttribute(AMOUNT_TAG, 0);
 
-                storage.put(goodsType, amount);
+                storage.put(goodsType, new Integer(amount));
 
             } else {
-                logger.warning("Ignoring bogus GoodsContainer tag: " + tag);
+                throw new XMLStreamException("Bogus GoodsContainer tag: "
+                    + tag);
             }
             xr.closeTag(tag);
         }

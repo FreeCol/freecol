@@ -30,7 +30,6 @@ import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 
 
-
 /**
  * Represents a production resource, such as prime tobacco, or an ore
  * vein, located on a Tile. A resource may be exhausted. In the

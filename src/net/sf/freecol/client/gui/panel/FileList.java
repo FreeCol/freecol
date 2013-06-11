@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.client.gui.panel;
 
 import java.io.File;
@@ -27,30 +26,29 @@ import javax.swing.JList;
 
 
 /**
-* A list for displaying files.
-*/
+ * A list for displaying files.
+ */
 public class FileList extends JList {
 
     /**
-    * Creates a <code>FileList</code> displaying the contents
-    * of the given directory.
-    *
-    * @param directory The directory to list files from.
-    */
+     * Creates a <code>FileList</code> displaying the contents
+     * of the given directory.
+     *
+     * @param directory The directory to list files from.
+     */
     @SuppressWarnings("unchecked") // FIXME in Java7
     public FileList(File directory) {        
         super();       
         setListData(getEntries(directory, getDefaultFileFilter()));        
     }
-    
-    
+
     /**
-    * Creates a <code>FileList</code> displaying the contents
-    * of the given directory.
-    *
-    * @param directory The directory to list files from.
-    * @param fileFilter The filter to apply when displaying the files.
-    */    
+     * Creates a <code>FileList</code> displaying the contents
+     * of the given directory.
+     *
+     * @param directory The directory to list files from.
+     * @param fileFilter The filter to apply when displaying the files.
+     */    
     @SuppressWarnings("unchecked") // FIXME in Java7
     public FileList(File directory, FileFilter fileFilter) {
         super();        
@@ -100,8 +98,8 @@ public class FileList extends JList {
 
         
     /**
-    * A single entry in the <code>FileList</code>.
-    */
+     * A single entry in the <code>FileList</code>.
+     */
     public class FileListEntry {
         private File file;
         
@@ -111,8 +109,8 @@ public class FileList extends JList {
         
         
         /**
-        * Gets a string representation of the file.
-        */        
+         * Gets a string representation of the file.
+         */        
         public String toString() {
             String name = file.getName();
             return name.substring(0, name.length()-4);

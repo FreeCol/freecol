@@ -278,9 +278,9 @@ public abstract class FreeColGameObjectType extends FreeColObject
      */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        if (featureContainer != null && xr.shouldClearContainers()) {
-            // Clear containers, but not if extending existing containers.
-            featureContainer.clear();
+        // Clear containers.
+        if (xr.shouldClearContainers()) {
+            if (featureContainer != null) featureContainer.clear();
         }
 
         super.readChildren(xr);

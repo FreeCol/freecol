@@ -346,8 +346,7 @@ public abstract class FreeColAction extends AbstractAction implements Option<Fre
         String acc = xr.getAttribute(ACCELERATOR_TAG, "");
         putValue(ACCELERATOR_KEY, ("".equals(acc)) ? null
             : KeyStroke.getKeyStroke(acc));
-
-        xr.nextTag();
+        xr.closeTag(getXMLElementTagName());
     }
 
     /**

@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
@@ -35,10 +34,10 @@ import net.sf.freecol.common.model.Player;
 
 
 /**
-* A table cell renderer that should be used to display the chosen
-* nation in a table.  It is being used in the players table
-* (StartGamePanel).
-*/
+ * A table cell renderer that should be used to display the chosen
+ * nation in a table.  It is being used in the players table
+ * (StartGamePanel).
+ */
 public final class NationCellRenderer implements TableCellRenderer {
 
 
@@ -47,11 +46,12 @@ public final class NationCellRenderer implements TableCellRenderer {
     private List<Player> players;
     private Player thisPlayer;
 
+
     /**
-    * The default constructor.
-    *
-    * @param nations array of <code>Nation</code>
-    */
+     * The default constructor.
+     *
+     * @param nations array of <code>Nation</code>
+     */
     @SuppressWarnings("unchecked") // FIXME in Java7
     public NationCellRenderer(Nation[] nations) {
         this.nations = nations;
@@ -60,11 +60,11 @@ public final class NationCellRenderer implements TableCellRenderer {
 
 
     /**
-    * Gives this table model the data that is being used in the table.
-    *
-    * @param players The players that should be rendered in the table.
-    * @param owningPlayer The player running the client that is displaying the table.
-    */
+     * Gives this table model the data that is being used in the table.
+     *
+     * @param players The players that should be rendered in the table.
+     * @param owningPlayer The player running the client that is displaying the table.
+     */
     public void setData(List<Player> players, Player owningPlayer) {
         this.players = players;
         thisPlayer = owningPlayer;
@@ -81,14 +81,14 @@ public final class NationCellRenderer implements TableCellRenderer {
     }
 
     /**
-    * Returns the component used to render the cell's value.
-    * @param table The table whose cell needs to be rendered.
-    * @param value The value of the cell being rendered.
-    * @param hasFocus Indicates whether or not the cell in question has focus.
-    * @param row The row index of the cell that is being rendered.
-    * @param column The column index of the cell that is being rendered.
-    * @return The component used to render the cell's value.
-    */
+     * Returns the component used to render the cell's value.
+     * @param table The table whose cell needs to be rendered.
+     * @param value The value of the cell being rendered.
+     * @param hasFocus Indicates whether or not the cell in question has focus.
+     * @param row The row index of the cell that is being rendered.
+     * @param column The column index of the cell that is being rendered.
+     * @return The component used to render the cell's value.
+     */
     public Component getTableCellRendererComponent(JTable table, Object value,
             boolean isSelected, boolean hasFocus, int row, int column) {
 

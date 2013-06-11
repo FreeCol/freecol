@@ -24,6 +24,7 @@ import java.util.Set;
 
 import net.sf.freecol.util.test.FreeColTestCase;
 
+
 public class ModTest extends FreeColTestCase {
 
     public void testGetAllMods() {

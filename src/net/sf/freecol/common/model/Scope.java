@@ -343,6 +343,9 @@ public class Scope extends FreeColObject implements Cloneable {
      */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        // Scopes do not have ids, no super.writeAttributes().
+        // However, they might in future.
+
         xw.writeAttribute(MATCH_NEGATED_TAG, matchNegated);
 
         xw.writeAttribute(MATCHES_NULL_TAG, matchesNull);
@@ -372,6 +375,9 @@ public class Scope extends FreeColObject implements Cloneable {
      */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        // Scopes do not have ids, no super.readAttributes().
+        // However, they might in future.
+
         matchNegated = xr.getAttribute(MATCH_NEGATED_TAG, false);
 
         matchesNull = xr.getAttribute(MATCHES_NULL_TAG, true);

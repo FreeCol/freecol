@@ -19,7 +19,6 @@
 
 package net.sf.freecol.client.gui.panel;
 
-
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.AbstractUnit;

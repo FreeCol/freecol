@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import net.sf.freecol.util.test.FreeColTestCase;
 
+
 public class SoLTest extends FreeColTestCase {
 
     public void testSoL() {

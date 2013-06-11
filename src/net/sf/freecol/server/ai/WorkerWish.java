@@ -114,7 +114,8 @@ public class WorkerWish extends Wish {
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    public WorkerWish(AIMain aiMain, FreeColXMLReader xr) throws XMLStreamException {
+    public WorkerWish(AIMain aiMain,
+                      FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, xr);
 
         uninitialized = unitType == null;

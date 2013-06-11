@@ -25,6 +25,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.ModelMessage.MessageType;
 import net.sf.freecol.util.test.FreeColTestCase;
 
+
 public class ModelMessageTest extends FreeColTestCase {
 
     public void testHashCode() {

@@ -344,10 +344,10 @@ public class PlayerExploredTile extends FreeColGameObject {
      */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
+
         final Specification spec = getSpecification();
         final Game game = getGame();
-
-        super.readAttributes(xr);
 
         player = xr.makeFreeColGameObject(game, PLAYER_TAG, Player.class, true);
 

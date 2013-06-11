@@ -95,8 +95,8 @@ public class UnitTypeChange extends FreeColObject {
      * @param specification The <code>Specification</code> to refer to.
      * @exception XMLStreamException if an error occurs
      */
-    public UnitTypeChange(FreeColXMLReader xr, Specification specification)
-        throws XMLStreamException {
+    public UnitTypeChange(FreeColXMLReader xr,
+                          Specification specification) throws XMLStreamException {
         setId(xr.readId());
         setSpecification(specification);
         readFromXML(xr);
@@ -239,6 +239,9 @@ public class UnitTypeChange extends FreeColObject {
      */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        // UnitTypeChange do not have ids, no super.writeAttributes().
+        // However, they might in future.
+
         if (newUnitType != null) {
             xw.writeAttribute(UNIT_TAG, newUnitType);
         }
@@ -257,6 +260,9 @@ public class UnitTypeChange extends FreeColObject {
      * {@inheritDoc}
      */
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        // UnitTypeChange do not have ids, no super.readAttributes().
+        // However, they might in future.
+
         final Specification spec = getSpecification();
 
         if (xr.hasAttribute(UNIT_TAG)) {
@@ -291,6 +297,7 @@ public class UnitTypeChange extends FreeColObject {
      */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
+        // Clear containers.
         scopes = null;
 
         super.readChildren(xr);

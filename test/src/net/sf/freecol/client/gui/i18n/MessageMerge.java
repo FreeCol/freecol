@@ -17,9 +17,7 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.client.gui.i18n;
-
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
@@ -45,8 +43,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.WindowConstants;
 
 
-public final class MessageMerge
-{
+public final class MessageMerge {
 
     public static void main( String[] args )
     {

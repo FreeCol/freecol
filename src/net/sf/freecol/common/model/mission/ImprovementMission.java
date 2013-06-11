@@ -60,7 +60,8 @@ public class ImprovementMission extends AbstractMission {
      * @param xr a <code>FreeColXMLReader</code> value
      * @exception XMLStreamException if an error occurs
      */
-    public ImprovementMission(Game game, FreeColXMLReader xr) throws XMLStreamException {
+    public ImprovementMission(Game game,
+                              FreeColXMLReader xr) throws XMLStreamException {
         super(game, xr);
     }
 
@@ -146,13 +147,19 @@ public class ImprovementMission extends AbstractMission {
         return false;
     }
 
+
+    // Serialization.
+
+    private static final String IMPROVEMENT_TAG = "improvement";
+
+
     /**
      * {@inheritDoc}
      */
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
-        xw.writeAttribute("improvement", improvement);
+        xw.writeAttribute(IMPROVEMENT_TAG, improvement);
     }
 
 
@@ -162,7 +169,7 @@ public class ImprovementMission extends AbstractMission {
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
-        improvement = xr.makeFreeColGameObject(getGame(), "improvement",
+        improvement = xr.makeFreeColGameObject(getGame(), IMPROVEMENT_TAG,
                                                TileImprovement.class, true);
     }
 

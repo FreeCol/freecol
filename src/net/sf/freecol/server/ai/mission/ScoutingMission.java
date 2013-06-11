@@ -91,8 +91,8 @@ public class ScoutingMission extends Mission {
      * @throws XMLStreamException if a problem was encountered during parsing.
      * @see net.sf.freecol.server.ai.AIObject#readFromXML
      */
-    public ScoutingMission(AIMain aiMain, AIUnit aiUnit, FreeColXMLReader xr)
-        throws XMLStreamException {
+    public ScoutingMission(AIMain aiMain, AIUnit aiUnit,
+                           FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, aiUnit);
 
         readFromXML(xr);

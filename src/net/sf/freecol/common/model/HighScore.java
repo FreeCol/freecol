@@ -301,7 +301,10 @@ public class HighScore extends FreeColObject {
     }
 
 
-    // Serialization
+    // Serialization.
+    // High scores are only FreeColObjects so that they can be c-s serialized,
+    // they do not have ids.
+
 
     private static final String COLONIES_TAG = "colonies";
     private static final String DATE_TAG = "date";
@@ -327,7 +330,7 @@ public class HighScore extends FreeColObject {
      */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
-        super.writeAttributes(xw);
+        // HighScores do not have ids, no super.writeAttributes().
 
         xw.writeAttribute(DATE_TAG, dateFormat.format(date));
 
@@ -365,6 +368,8 @@ public class HighScore extends FreeColObject {
      */
     @Override
     public void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        // HighScores do not have ids, no super.readAttributes().
+
         String str = xr.getAttribute(DATE_TAG, "2008-01-01 00:00:00+0000");
         try {
             date = dateFormat.parse(str);

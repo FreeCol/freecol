@@ -100,8 +100,8 @@ public class MissionaryMission extends Mission {
      *      during parsing.
      * @see net.sf.freecol.server.ai.AIObject#readFromXML
      */
-    public MissionaryMission(AIMain aiMain, AIUnit aiUnit, FreeColXMLReader xr)
-        throws XMLStreamException {
+    public MissionaryMission(AIMain aiMain, AIUnit aiUnit,
+                             FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, aiUnit);
 
         readFromXML(xr);

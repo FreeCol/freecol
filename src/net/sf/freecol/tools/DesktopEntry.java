@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.tools;
 
 import java.io.BufferedReader;
@@ -27,6 +26,9 @@ import java.io.FileWriter;
 import java.io.FilenameFilter;
 
 
+/**
+ * Generate a desktop entry file.
+ */
 public class DesktopEntry {
 
     private static final File SOURCE_DIRECTORY =

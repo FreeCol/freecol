@@ -668,11 +668,13 @@ public abstract class Settlement extends GoodsLocation
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
+        final Game game = getGame();
+
         name = xr.getAttribute(NAME_TAG, (String)null);
 
-        owner = xr.makeFreeColGameObject(getGame(), OWNER_TAG, Player.class, true);
+        owner = xr.makeFreeColGameObject(game, OWNER_TAG, Player.class, true);
 
-        tile = xr.makeFreeColGameObject(getGame(), TILE_TAG, Tile.class, true);
+        tile = xr.makeFreeColGameObject(game, TILE_TAG, Tile.class, true);
 
         String str = xr.getAttribute(SETTLEMENT_TYPE_TAG, (String)null);
         SettlementType settlementType;

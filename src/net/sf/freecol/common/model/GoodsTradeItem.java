@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.common.model;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -166,7 +165,7 @@ public class GoodsTradeItem extends TradeItem {
      */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        // Clear containers
+        // Clear containers.
         goods = null;
 
         super.readChildren(xr);

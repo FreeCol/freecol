@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import net.sf.freecol.util.test.FreeColTestCase;
 
+
 public class GoodsContainerTest extends FreeColTestCase {
 
     GoodsType sugar = spec().getGoodsType("model.goods.sugar");

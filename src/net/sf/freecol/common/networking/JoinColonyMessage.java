@@ -36,7 +36,7 @@ public class JoinColonyMessage extends DOMMessage {
 
     /**
      * The identifier of the colony.
-     **/
+     */
     String colonyId;
 
     /**

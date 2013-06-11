@@ -23,6 +23,9 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 
+/**
+ * An iterator that does nothing.
+ */
 public final class EmptyIterator<T> implements Iterator<T> {
 
     /**

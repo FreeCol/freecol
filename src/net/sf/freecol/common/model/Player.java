@@ -3844,10 +3844,10 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
+
         final Specification spec = getSpecification();
         final Game game = getGame();
-
-        super.readAttributes(xr);
 
         name = xr.getAttribute(USERNAME_TAG, (String)null);
 
@@ -3904,7 +3904,7 @@ public class Player extends FreeColGameObject implements Nameable {
         attackedByPrivateers = xr.getAttribute(ATTACKED_BY_PRIVATEERS_TAG,
                                                false);
 
-        entryLocation = xr.makeLocationAttribute(ENTRY_LOCATION_TAG, game);
+        entryLocation = xr.makeLocationAttribute(game, ENTRY_LOCATION_TAG);
 
         for (RegionType regionType : RegionType.values()) {
             String key = regionType.getNameIndexKey();
@@ -3942,8 +3942,7 @@ public class Player extends FreeColGameObject implements Nameable {
             break;
         }
 
-        // Bells bonuses depend on tax
-        recalculateBellsBonus();
+        recalculateBellsBonus(); // Bells bonuses depend on tax
 
         invalidateCanSeeTiles();
     }

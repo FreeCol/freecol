@@ -175,7 +175,8 @@ public class StringOption extends AbstractOption<String> {
      */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        choices.clear(); // Clear containers
+        // Clear containers.
+        choices.clear();
 
         super.readChildren(xr);
     }

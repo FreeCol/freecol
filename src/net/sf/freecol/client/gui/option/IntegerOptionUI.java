@@ -19,7 +19,6 @@
 
 package net.sf.freecol.client.gui.option;
 
-
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 

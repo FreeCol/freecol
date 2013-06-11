@@ -380,8 +380,10 @@ public class FoundingFather extends FreeColGameObjectType {
         if (UPGRADE_TAG.equals(tag)) {
             UnitType fromType = xr.getType(spec, FROM_ID_TAG, UnitType.class,
                                            (UnitType)null);
+
             UnitType toType = xr.getType(spec, TO_ID_TAG, UnitType.class,
                                          (UnitType)null);
+
             addUpgrade(fromType, toType);
             xr.closeTag(UPGRADE_TAG);
 

@@ -358,7 +358,7 @@ public final class Specification {
         } catch (Exception e) {
             logger.log(Level.WARNING, "Load stream exception", e);
             throw new RuntimeException("Error parsing specification: "
-                + e.getMessage());
+                                       + e.getMessage());
         } finally {
             if (xr != null) xr.close();
         }

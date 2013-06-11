@@ -108,7 +108,8 @@ public abstract class AIPlayer extends AIObject {
      * @exception XMLStreamException if a problem was encountered
      *     during parsing.
      */
-    public AIPlayer(AIMain aiMain, FreeColXMLReader xr) throws XMLStreamException {
+    public AIPlayer(AIMain aiMain,
+                    FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, xr);
         
         uninitialized = player == null;

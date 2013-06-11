@@ -182,7 +182,8 @@ public class HighSeas extends UnitLocation {
         final String tag = xr.getLocalName();
 
         if (DESTINATION_TAG.equals(tag)) {
-            addDestination(xr.makeLocationAttribute(ID_ATTRIBUTE_TAG, game));
+            addDestination(xr.makeLocationAttribute(game, ID_ATTRIBUTE_TAG));
+
             xr.closeTag(DESTINATION_TAG);
 
         } else {

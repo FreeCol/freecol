@@ -30,10 +30,12 @@ import java.util.logging.Logger;
  * @see Video
  */
 public class VideoResource extends Resource {
+
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(VideoResource.class.getName());
 
     private final Video video;
+
     
     /**
      * Do not use directly.

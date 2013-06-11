@@ -371,11 +371,13 @@ public class FreeColXMLReader extends StreamReaderDelegate {
     /**
      * Makes a FreeCol location from an attribute in a stream.
      *
-     * @param attributeName The attribute name.
      * @param game The <code>Game</code> to look in.
+     * @param attributeName The attribute name.
      * @return The <code>Location</code>, or null if none found.
+     * @exception XMLStreamException if a location can not be made.
      */
-    public Location makeLocationAttribute(String attributeName, Game game) {
+    public Location makeLocationAttribute(Game game, String attributeName) 
+        throws XMLStreamException {
         if (attributeName == null) return null;
 
         final String attrib =
@@ -384,7 +386,15 @@ public class FreeColXMLReader extends StreamReaderDelegate {
         // end @compat
             getAttribute(attributeName, (String)null);
 
-        return (attrib == null) ? null : game.makeFreeColLocation(attrib);
+        Location ret = null;
+        if (attrib != null) {
+            try {
+                ret = game.makeFreeColLocation(attrib);
+            } catch (IllegalArgumentException iae) {
+                throw new XMLStreamException(iae.getCause());
+            }
+        }
+        return ret;
     }
 
     /**

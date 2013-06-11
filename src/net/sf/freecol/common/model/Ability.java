@@ -216,8 +216,8 @@ public final class Ability extends Feature {
      * @param specification A <code>Specification</code> to refer to.
      * @exception XMLStreamException if an error occurs
      */
-    public Ability(FreeColXMLReader xr, Specification specification)
-        throws XMLStreamException {
+    public Ability(FreeColXMLReader xr,
+                   Specification specification) throws XMLStreamException {
         setSpecification(specification);
         readFromXML(xr);
     }

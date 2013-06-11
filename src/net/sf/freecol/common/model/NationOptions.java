@@ -204,8 +204,7 @@ public class NationOptions extends FreeColObject {
         // no: super.readAttributes(in);
 
         nationalAdvantages = xr.getAttribute(NATIONAL_ADVANTAGES_TAG,
-                                          Advantages.class,
-                                          Advantages.SELECTABLE);
+            Advantages.class, Advantages.SELECTABLE);
     }
 
     /**
@@ -213,7 +212,7 @@ public class NationOptions extends FreeColObject {
      */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        // Clear containers
+        // Clear containers.
         nations.clear();
 
         super.readChildren(xr);
@@ -230,20 +229,18 @@ public class NationOptions extends FreeColObject {
             while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 tag = xr.getLocalName();
                 if (NATION_TAG.equals(tag)) {
-
                     Nation nation = xr.getType(specification, ID_ATTRIBUTE_TAG,
                         Nation.class, (Nation)null);
 
                     NationState state = xr.getAttribute(STATE_TAG,
                         NationState.class, (NationState)null);
 
-                    if (nation != null && state != null) {
-                        nations.put(nation, state);
-                    }
+                    nations.put(nation, state);
                     xr.closeTag(NATION_TAG);
 
                 } else {
-                    logger.warning("Invalid " + NATION_TAG + " tag: " + tag);
+                    throw new XMLStreamException("Bogus " + NATION_TAG
+                        + " tag: " + tag);
                 }
             }
 

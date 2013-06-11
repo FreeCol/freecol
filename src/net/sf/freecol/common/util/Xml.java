@@ -286,13 +286,14 @@ public final class Xml {
 
 
     /**
-     * This class is defined so that exceptions thrown by methods on {@link Xml}
-     * may be filtered from other runtime exceptions such as
-     * {@link NullPointerException} if desired.  In the majority of cases, an
-     * exception will mean that the game cannot proceed, which is why this is a
-     * runtime exception so that it percolates up to the {@link Thread#run()}
-     * method of the invoking thread or other controlling loop without the need
-     * for every other method on the way to declare "throws" clauses.
+     * This class is defined so that exceptions thrown by methods on
+     * {@link Xml} may be filtered from other runtime exceptions such
+     * as {@link NullPointerException} if desired.  In the majority of
+     * cases, an exception will mean that the game cannot proceed,
+     * which is why this is a runtime exception so that it percolates
+     * up to the {@link Thread#run()} method of the invoking thread or
+     * other controlling loop without the need for every other method
+     * on the way to declare "throws" clauses.
      */
     public static final class Exception extends RuntimeException {
 

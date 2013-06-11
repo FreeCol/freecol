@@ -307,7 +307,7 @@ public class ProductionType extends FreeColObject {
      */
     @Override
     public void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        // Clear containers
+        // Clear containers.
         if (inputs != null) inputs.clear();
         if (outputs != null) outputs.clear();
 
@@ -325,15 +325,13 @@ public class ProductionType extends FreeColObject {
         if (INPUT_TAG.equals(tag)) {
             GoodsType type = xr.getType(spec, GOODS_TYPE_TAG,
                                         GoodsType.class, (GoodsType)null);
-            int amount = xr.getAttribute(VALUE_TAG, -1);
-            addInput(type, amount);
+            addInput(type, xr.getAttribute(VALUE_TAG, -1));
             xr.closeTag(INPUT_TAG);
 
         } else if (OUTPUT_TAG.equals(tag)) {
             GoodsType type = xr.getType(spec, GOODS_TYPE_TAG,
                                         GoodsType.class, (GoodsType)null);
-            int amount = xr.getAttribute(VALUE_TAG, -1);
-            addOutput(type, amount);
+            addOutput(type, xr.getAttribute(VALUE_TAG, -1));
             xr.closeTag(OUTPUT_TAG);
 
         } else {

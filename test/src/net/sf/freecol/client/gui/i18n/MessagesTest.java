@@ -33,6 +33,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.server.model.ServerUnit;
 
+
 public class MessagesTest extends FreeColTestCase {
 
     public static final String noSuchKey = "should.not.exist.and.thus.return.null";

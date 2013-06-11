@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.server.generator;
 
 import java.io.File;
@@ -66,8 +65,6 @@ import net.sf.freecol.common.model.Specification;
  * 5: mountain
  * 6: major river
  * 7: mountain + major river (never seen)
- *
- *
  */
 public class ColonizationMapLoader implements MapLoader {
 

@@ -37,7 +37,6 @@ import net.sf.freecol.common.option.PercentageOption;
  */
 public final class PercentageOptionUI extends SliderOptionUI<PercentageOption>  {
 
-
     /**
      * Creates a new <code>PercentageOptionUI</code> for the given
      * <code>PercentageOption</code>.

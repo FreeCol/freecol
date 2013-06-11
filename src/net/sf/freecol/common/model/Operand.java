@@ -375,7 +375,7 @@ public class Operand extends Scope {
         super.readAttributes(xr);
 
         operandType = xr.getAttribute(OPERAND_TYPE_TAG,
-                                   OperandType.class, OperandType.NONE);
+                                      OperandType.class, OperandType.NONE);
 
         scopeLevel = xr.getAttribute(SCOPE_LEVEL_TAG,
                                      ScopeLevel.class, ScopeLevel.NONE);

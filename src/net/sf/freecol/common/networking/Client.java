@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 import net.sf.freecol.common.FreeColException;
 
 import org.w3c.dom.Element;
@@ -34,6 +33,7 @@ import org.w3c.dom.Element;
  * The client connection to a server.
  */
 public final class Client {
+
     private static final Logger logger = Logger.getLogger(Client.class.getName());
 
     /**

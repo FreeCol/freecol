@@ -102,7 +102,8 @@ public abstract class AIObject extends FreeColObject {
      *     during parsing.
      * @see AIObject#readFromXML
      */
-    public AIObject(AIMain aiMain, FreeColXMLReader xr) throws XMLStreamException {
+    public AIObject(AIMain aiMain,
+                    FreeColXMLReader xr) throws XMLStreamException {
         this(aiMain);
 
         readFromXML(xr);

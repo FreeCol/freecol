@@ -22,6 +22,7 @@ package net.sf.freecol.common.model;
 import net.sf.freecol.common.model.LostCityRumour.RumourType;
 import net.sf.freecol.util.test.FreeColTestCase;
 
+
 public class TileItemContainerTest extends FreeColTestCase {
 
     private static final TileImprovementType riverImprov

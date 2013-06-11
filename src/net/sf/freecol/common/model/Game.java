@@ -354,7 +354,7 @@ public class Game extends FreeColGameObject {
         } else if (Unit.getXMLElementTagName().equals(tag)) {
             return new Unit(this, id);
         } else {
-            logger.warning("Not a FCGO: " + id);
+            throw new IllegalArgumentException("Not a FCGO: " + id);
         }
         return null;
     }

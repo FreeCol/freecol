@@ -424,9 +424,9 @@ public class MarketData extends FreeColGameObject {
      */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
-        final Specification spec = getSpecification();
-
         super.readAttributes(xr);
+
+        final Specification spec = getSpecification();
 
         goodsType = xr.getType(spec, GOODS_TYPE_TAG, GoodsType.class,
                                (GoodsType)null);

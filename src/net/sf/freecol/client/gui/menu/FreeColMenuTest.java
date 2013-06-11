@@ -38,6 +38,10 @@ import javax.swing.JTextArea;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.FullScreenFrame;
 
+
+/**
+ * Test the menus.
+ */
 public class FreeColMenuTest implements ActionListener, ItemListener {
     JTextArea output;
     JScrollPane scrollPane;

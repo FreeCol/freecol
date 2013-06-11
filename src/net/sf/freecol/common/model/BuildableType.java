@@ -306,10 +306,8 @@ public abstract class BuildableType extends FreeColGameObjectType {
 
         if (REQUIRED_ABILITY_TAG.equals(tag)) {
             String id = xr.readId();
-            if (id != null) {
-                addRequiredAbility(id, xr.getAttribute(VALUE_TAG, true));
-                spec.addAbility(id);
-            }
+            addRequiredAbility(id, xr.getAttribute(VALUE_TAG, true));
+            spec.addAbility(id);
             xr.closeTag(REQUIRED_ABILITY_TAG);
 
         } else if (REQUIRED_GOODS_TAG.equals(tag)) {

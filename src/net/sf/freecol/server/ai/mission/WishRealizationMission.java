@@ -82,8 +82,7 @@ public class WishRealizationMission extends Mission {
      * @see net.sf.freecol.server.ai.AIObject#readFromXML
      */
     public WishRealizationMission(AIMain aiMain, AIUnit aiUnit,
-                                  FreeColXMLReader xr)
-        throws XMLStreamException {
+                                  FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, aiUnit);
 
         readFromXML(xr);
@@ -249,7 +248,7 @@ public class WishRealizationMission extends Mission {
                 wish = new WorkerWish(aiMain, wid);
 
             } else {
-                logger.warning("Unknown type of Wish.");
+                throw new XMLStreamException("Unknown wish tag: " + wid);
             }
         }
     }

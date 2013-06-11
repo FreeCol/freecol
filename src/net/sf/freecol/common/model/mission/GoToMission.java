@@ -62,7 +62,8 @@ public class GoToMission extends AbstractMission {
      * @param xr a <code>FreeColXMLReader</code> value
      * @exception XMLStreamException if an error occurs
      */
-    public GoToMission(Game game, FreeColXMLReader xr) throws XMLStreamException {
+    public GoToMission(Game game,
+                       FreeColXMLReader xr) throws XMLStreamException {
         super(game, xr);
     }
 
@@ -156,17 +157,23 @@ public class GoToMission extends AbstractMission {
         return unit.getInitialMovesLeft() > 0;
     }
 
+
+    // Serialization
+
+    private static final String BLOCKED_COUNT_TAG = "blockedCount";
+    private static final String DESTINATION_TAG = "destination";
+
+
     /**
      * {@inheritDoc}
      */
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
-        xw.writeAttribute("destination", destination);
+        xw.writeAttribute(DESTINATION_TAG, destination);
 
-        xw.writeAttribute("blockedCount", blockedCount);
+        xw.writeAttribute(BLOCKED_COUNT_TAG, blockedCount);
     }
-
 
     /**
      * {@inheritDoc}
@@ -174,9 +181,9 @@ public class GoToMission extends AbstractMission {
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
-        destination = xr.findLocationAttribute(getGame(), "destination");
+        destination = xr.findLocationAttribute(getGame(), DESTINATION_TAG);
 
-        blockedCount = xr.getAttribute("blockedCount", 0);
+        blockedCount = xr.getAttribute(BLOCKED_COUNT_TAG, 0);
     }
 
     /**

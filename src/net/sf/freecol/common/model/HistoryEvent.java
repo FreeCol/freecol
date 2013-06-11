@@ -172,10 +172,10 @@ public class HistoryEvent extends StringTemplate {
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
-        turn = new Turn(xr.getAttribute("turn", 0));
+        turn = new Turn(xr.getAttribute(TURN_TAG, 0));
 
         eventType = xr.getAttribute(EVENT_TYPE_TAG,
-                                 EventType.class, (EventType)null);
+                                    EventType.class, (EventType)null);
         // @compat 0.9.x
         if (eventType == null) {
             eventType = xr.getAttribute(TYPE_TAG,

@@ -24,36 +24,34 @@ import java.io.FileInputStream;
 import net.sf.freecol.client.gui.i18n.Number.Category;
 import net.sf.freecol.util.test.FreeColTestCase;
 
+
 public class CLDRTest extends FreeColTestCase {
 
-
     public void testRuleParsing() {
-
-	Rule rule = new Rule("n mod 10 in 2..4 and n mod 100 not in 12..14");
-	assertTrue(rule.matches(2));
-	assertTrue(rule.matches(102));
-	assertTrue(rule.matches(103));
-	assertFalse(rule.matches(1));
-	assertFalse(rule.matches(5));
-	assertFalse(rule.matches(112));
-
-	DefaultNumberRule arabic = new DefaultNumberRule();
-	arabic.addRule(Category.zero, "n is 0");
-	arabic.addRule(Category.one, "n is 1");
-	arabic.addRule(Category.two, "n is 2");
-	arabic.addRule(Category.few, "N Mod 100 in 3.. 10");
-	arabic.addRule(Category.many, "n MOD 100 in 11   ..99");
-
-	assertEquals(Category.zero, arabic.getCategory(0));
-	assertEquals(Category.one, arabic.getCategory(1));
-	assertEquals(Category.two, arabic.getCategory(2));
-	assertEquals(Category.few, arabic.getCategory(3));
-	assertEquals(Category.few, arabic.getCategory(7));
-	assertEquals(Category.few, arabic.getCategory(10));
-	assertEquals(Category.many, arabic.getCategory(11));
-	assertEquals(Category.many, arabic.getCategory(99));
-	assertEquals(Category.many, arabic.getCategory(2345));
-
+        Rule rule = new Rule("n mod 10 in 2..4 and n mod 100 not in 12..14");
+        assertTrue(rule.matches(2));
+        assertTrue(rule.matches(102));
+        assertTrue(rule.matches(103));
+        assertFalse(rule.matches(1));
+        assertFalse(rule.matches(5));
+        assertFalse(rule.matches(112));
+        
+        DefaultNumberRule arabic = new DefaultNumberRule();
+        arabic.addRule(Category.zero, "n is 0");
+        arabic.addRule(Category.one, "n is 1");
+        arabic.addRule(Category.two, "n is 2");
+        arabic.addRule(Category.few, "N Mod 100 in 3.. 10");
+        arabic.addRule(Category.many, "n MOD 100 in 11   ..99");
+        
+        assertEquals(Category.zero, arabic.getCategory(0));
+        assertEquals(Category.one, arabic.getCategory(1));
+        assertEquals(Category.two, arabic.getCategory(2));
+        assertEquals(Category.few, arabic.getCategory(3));
+        assertEquals(Category.few, arabic.getCategory(7));
+        assertEquals(Category.few, arabic.getCategory(10));
+        assertEquals(Category.many, arabic.getCategory(11));
+        assertEquals(Category.many, arabic.getCategory(99));
+        assertEquals(Category.many, arabic.getCategory(2345));
     }
 
     public void testPlurals() {
@@ -108,7 +106,5 @@ public class CLDRTest extends FreeColTestCase {
 
         assertNotNull(NumberRules.getNumberForLanguage("sms"));
         assertTrue(NumberRules.getNumberForLanguage("sms") instanceof DualNumberRule);
-
-
     }
 }

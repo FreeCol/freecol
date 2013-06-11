@@ -153,7 +153,8 @@ public class AIUnit extends AIObject implements Transportable {
      * @exception XMLStreamException if a problem was encountered
      *     during parsing.
      */
-    public AIUnit(AIMain aiMain, FreeColXMLReader xr) throws XMLStreamException {
+    public AIUnit(AIMain aiMain,
+                  FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, xr);
 
         uninitialized = getUnit() == null;

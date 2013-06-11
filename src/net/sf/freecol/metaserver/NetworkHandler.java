@@ -17,9 +17,7 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.metaserver;
-
 
 import java.io.IOException;
 import java.util.logging.Level;

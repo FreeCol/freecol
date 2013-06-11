@@ -334,7 +334,7 @@ public class DiplomaticTrade extends FreeColObject {
      */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        // Clear containers
+        // Clear containers.
         items.clear();
 
         super.readChildren(xr);
@@ -346,28 +346,25 @@ public class DiplomaticTrade extends FreeColObject {
     @Override
     protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
         final String tag = xr.getLocalName();
-        TradeItem item = null;
 
         if (ColonyTradeItem.getXMLElementTagName().equals(tag)) {
-            item = new ColonyTradeItem(game, xr);
+            add(new ColonyTradeItem(game, xr));
 
         } else if (GoldTradeItem.getXMLElementTagName().equals(tag)) {
-            item = new GoldTradeItem(game, xr);
+            add(new GoldTradeItem(game, xr));
 
         } else if (GoodsTradeItem.getXMLElementTagName().equals(tag)) {
-            item = new GoodsTradeItem(game, xr);
+            add(new GoodsTradeItem(game, xr));
 
         } else if (StanceTradeItem.getXMLElementTagName().equals(tag)) {
-            item = new StanceTradeItem(game, xr);
+            add(new StanceTradeItem(game, xr));
 
         } else if (UnitTradeItem.getXMLElementTagName().equals(tag)) {
-            item = new UnitTradeItem(game, xr);
+            add(new UnitTradeItem(game, xr));
 
         } else {
             super.readChild(xr);
         }
-
-        if (item != null) items.add(item);
     }
 
     /**

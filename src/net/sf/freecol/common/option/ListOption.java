@@ -243,7 +243,8 @@ public abstract class ListOption<T> extends AbstractOption<List<AbstractOption<T
      */
     @Override
     public void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        value.clear(); // Clear containers.
+        // Clear containers.
+        value.clear();
 
         super.readChildren(xr);
     }

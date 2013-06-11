@@ -92,6 +92,9 @@ public class ChangeSet {
         }
     };
 
+    /**
+     * Class to control the visibility of a change.
+     */
     public static class See {
         private static final int ALL = 1;
         private static final int PERHAPS = 0;
@@ -210,7 +213,9 @@ public class ChangeSet {
         }
     }
 
-    // Abstract template for all types of Change.
+    /**
+     * Abstract template for all types of Change.
+     */
     private abstract static class Change {
 
         /**

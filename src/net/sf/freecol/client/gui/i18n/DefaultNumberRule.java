@@ -19,7 +19,6 @@
 
 package net.sf.freecol.client.gui.i18n;
 
-
 import java.util.EnumMap;
 import java.util.Map;
 

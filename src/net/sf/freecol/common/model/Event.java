@@ -184,6 +184,7 @@ public class Event extends FreeColGameObjectType {
      */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
+        // Clear containers.
         if (xr.shouldClearContainers()) {
             limits = null;
         }
@@ -201,13 +202,13 @@ public class Event extends FreeColGameObjectType {
 
         if (Limit.getXMLElementTagName().equals(tag)) {
             Limit limit = new Limit(xr, spec);
-            addLimit(limit);
             // @compat 0.10.5
             if (limit.getId().equals("model.limit.independence.colonies")) {
                 limit.setId("model.limit.independence.coastalColonies");
                 limit.getLeftHandSide().setMethodName("isConnectedPort");
             }
             // end @compat
+            addLimit(limit);
 
         } else {
             super.readChild(xr);

@@ -407,6 +407,7 @@ public class SettlementType extends FreeColGameObjectType {
      */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
+        // Clear containers.
         if (xr.shouldClearContainers()) {
             plunder = null;
             gifts = null;

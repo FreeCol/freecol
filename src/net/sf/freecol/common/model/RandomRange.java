@@ -246,7 +246,7 @@ public class RandomRange {
                 addScope(new Scope(xr));
 
             } else {
-                logger.warning("Bad RandomRange tag: " + tag);
+                throw new XMLStreamException("Bogus RandomRange tag: " + tag);
             }
         }
     }

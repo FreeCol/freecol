@@ -407,8 +407,9 @@ public class Connection {
             question = QUESTION_TAG.equals(xr.getLocalName());
             networkReplyId = xr.getAttribute(NETWORK_REPLY_ID_TAG,
                                              (String)null);
-        } catch (XMLStreamException xme) {
-            logger.log(Level.WARNING, "XML stream failure", xme);
+
+        } catch (XMLStreamException xse) {
+            logger.log(Level.WARNING, "XML stream failure", xse);
             return;
         } 
 

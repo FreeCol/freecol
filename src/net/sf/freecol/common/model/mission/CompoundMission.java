@@ -64,7 +64,8 @@ public class CompoundMission extends AbstractMission {
      * @param xr a <code>FreeColXMLReader</code> value
      * @exception XMLStreamException if an error occurs
      */
-    public CompoundMission(Game game, FreeColXMLReader xr) throws XMLStreamException {
+    public CompoundMission(Game game,
+                           FreeColXMLReader xr) throws XMLStreamException {
         super(game, xr);
     }
 
@@ -162,13 +163,18 @@ public class CompoundMission extends AbstractMission {
         return state;
     }
 
+    // Serialization.
+
+    private final static String INDEX_TAG = "index";
+
+
     /**
      * {@inheritDoc}
      */
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
-        xw.writeAttribute("index", index);
+        xw.writeAttribute(INDEX_TAG, index);
     }
 
     /**
@@ -185,10 +191,10 @@ public class CompoundMission extends AbstractMission {
     /**
      * {@inheritDoc}
      */
-    protected void readAttributes(FreeColXMLReader xr)
-        throws XMLStreamException {
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
-        index = xr.getAttribute("index", 0);
+
+        index = xr.getAttribute(INDEX_TAG, 0);
     }
 
 
@@ -196,13 +202,12 @@ public class CompoundMission extends AbstractMission {
      * {@inheritDoc}
      */
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
+        // Clear containers.
         missions.clear();
-        Mission mission;
+
         while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            mission = MissionManager.getMission(getGame(), xr);
-            if (mission != null) {
-                missions.add(mission);
-            }
+            Mission mission = MissionManager.getMission(getGame(), xr);
+            if (mission != null) missions.add(mission);
         }
     }
 

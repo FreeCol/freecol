@@ -144,9 +144,9 @@ public class Disaster extends FreeColGameObjectType {
      */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
-        final Specification spec = getSpecification();
-
         super.readAttributes(xr);
+
+        final Specification spec = getSpecification();
 
         Disaster parent = xr.getType(spec, EXTENDS_TAG, Disaster.class, this);
 
@@ -162,6 +162,7 @@ public class Disaster extends FreeColGameObjectType {
      */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
+        // Clear containers.
         if (xr.shouldClearContainers()) {
             effects = null;
         }

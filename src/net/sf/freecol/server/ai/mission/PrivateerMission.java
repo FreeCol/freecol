@@ -98,8 +98,8 @@ public class PrivateerMission extends Mission {
      *      during parsing.
      * @see net.sf.freecol.server.ai.AIObject#readFromXML
      */
-    public PrivateerMission(AIMain aiMain, AIUnit aiUnit, FreeColXMLReader xr)
-        throws XMLStreamException {
+    public PrivateerMission(AIMain aiMain, AIUnit aiUnit,
+                            FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, aiUnit);
 
         readFromXML(xr);

@@ -227,6 +227,7 @@ public abstract class NationType extends FreeColGameObjectType {
         super.readAttributes(xr);
 
         final Specification spec = getSpecification();
+
         NationType parent = xr.getType(spec, EXTENDS_TAG,
                                        NationType.class, this);
 
@@ -242,12 +243,13 @@ public abstract class NationType extends FreeColGameObjectType {
      */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
+        // Clear containers.
         if (xr.shouldClearContainers()) {
-            // Clear containers
             settlementTypes = null;
         }
 
         final Specification spec = getSpecification();
+
         NationType parent = xr.getType(spec, EXTENDS_TAG,
                                        NationType.class, this);
 

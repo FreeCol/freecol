@@ -1508,7 +1508,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
      */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        // Clear containers
+        // Clear containers.
         aiGoods.clear();
         tileImprovementPlans.clear();
         wishes.clear();

@@ -1840,8 +1840,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     protected void writeAttributes(FreeColXMLWriter xw, Player player,
                                    boolean showAll,
                                    boolean toSavedGame) throws XMLStreamException {
-        PlayerExploredTile pet;
-
         super.writeAttributes(xw);
 
         xw.writeAttribute(X_TAG, this.x);
@@ -1868,6 +1866,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             xw.writeAttribute(CONTIGUITY_TAG, contiguity);
         }
 
+        PlayerExploredTile pet;
         if (showAll || toSavedGame || player.canSee(this)) {
             if (owner != null) {
                 xw.writeAttribute(OWNER_TAG, owner);
@@ -1896,7 +1895,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                                  boolean showAll,
                                  boolean toSavedGame) throws XMLStreamException {
         PlayerExploredTile pet;
-
         if (showAll || toSavedGame || player.canSee(this)) {
             if (settlement != null) {
                 settlement.toXML(xw, player, showAll, toSavedGame);
@@ -1940,10 +1938,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * {@inheritDoc}
      */
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
+
         final Specification spec = getSpecification();
         final Game game = getGame();
-
-        super.readAttributes(xr);
 
         x = xr.getAttribute(X_TAG, 0);
 
@@ -1987,7 +1985,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
         owner = xr.makeFreeColGameObject(game, OWNER_TAG, Player.class, false);
 
-        region = xr.makeFreeColGameObject(game, REGION_TAG, Region.class, true);
+        region = xr.makeFreeColGameObject(game, REGION_TAG,
+                                          Region.class, true);
 
         moveToEurope = (xr.hasAttribute(MOVE_TO_EUROPE_TAG))
             ? new Boolean(xr.getAttribute(MOVE_TO_EUROPE_TAG, false))
@@ -1995,12 +1994,12 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
         contiguity = xr.getAttribute(CONTIGUITY_TAG, -1);
 
-        Location loc = xr.makeLocationAttribute(OWNING_SETTLEMENT_TAG,
-                                                getGame());
+        Location loc = xr.makeLocationAttribute(game, OWNING_SETTLEMENT_TAG);
         if (loc == null || loc instanceof Settlement) {
             changeOwningSettlement((Settlement)loc);
         } else {
-            logger.warning("Settlement expected: " + xr.currentTag());
+            throw new XMLStreamException("Settlement expected: "
+                + xr.currentTag());
         }
     }
 

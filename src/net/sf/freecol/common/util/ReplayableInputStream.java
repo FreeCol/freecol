@@ -20,15 +20,14 @@
 
 package net.sf.freecol.common.util;
 
-
 import java.io.IOException;
 import java.io.InputStream;
 
 
 /**
  * Wraps a {@link java.io.InputStream} and adds
- * {@link java.io.InputStream#mark(int)} and {@link java.io.InputStream#reset()}
- * support.
+ * {@link java.io.InputStream#mark(int)} and
+ * {@link java.io.InputStream#reset()} support.
  */
 public final class ReplayableInputStream extends InputStream {
 

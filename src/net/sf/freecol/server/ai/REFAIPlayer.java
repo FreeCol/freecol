@@ -72,8 +72,8 @@ public class REFAIPlayer extends EuropeanAIPlayer {
      * @param xr The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
-    public REFAIPlayer(AIMain aiMain, FreeColXMLReader xr)
-        throws XMLStreamException {
+    public REFAIPlayer(AIMain aiMain,
+                       FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, xr);
 
         uninitialized = getPlayer() == null;

@@ -2368,7 +2368,7 @@ public final class MapViewer {
                 // river style.  The map is now fixed, this is just for the
                 // the saved games.
                 if (forestImage == null) forestImage = lib.getForestImage(tile.getType(), null);
-                // @end compatibility code
+                // end @compat
                 g.drawImage(forestImage, 0, (tileHeight - forestImage.getHeight(null)), null);
             }
 

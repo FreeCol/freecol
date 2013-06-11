@@ -3755,13 +3755,11 @@ public class Unit extends GoodsLocation
     protected void writeAttributes(FreeColXMLWriter xw, Player player,
                                    boolean showAll,
                                    boolean toSavedGame) throws XMLStreamException {
-        boolean full = showAll || toSavedGame || player == getOwner();
-
         super.writeAttributes(xw);
 
-        if (name != null) {
-            xw.writeAttribute(NAME_TAG, name);
-        }
+        boolean full = showAll || toSavedGame || player == getOwner();
+
+        if (name != null) xw.writeAttribute(NAME_TAG, name);
 
         xw.writeAttribute(UNIT_TYPE_TAG, unitType);
 
@@ -3799,8 +3797,6 @@ public class Unit extends GoodsLocation
                     : getOwner().getNationId());
             }
         }
-
-
 
         xw.writeAttribute(TREASURE_AMOUNT_TAG, treasureAmount);
 
@@ -3880,10 +3876,10 @@ public class Unit extends GoodsLocation
      */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
+
         final Specification spec = getSpecification();
         final Game game = getGame();
-
-        super.readAttributes(xr);
 
         name = xr.getAttribute(NAME_TAG, (String)null);
 
@@ -3897,9 +3893,9 @@ public class Unit extends GoodsLocation
 
         role = xr.getAttribute(ROLE_TAG, Role.class, Role.DEFAULT);
 
-        location = xr.makeLocationAttribute(LOCATION_TAG, game);
+        location = xr.makeLocationAttribute(game, LOCATION_TAG);
 
-        entryLocation = xr.makeLocationAttribute(ENTRY_LOCATION_TAG, game);
+        entryLocation = xr.makeLocationAttribute(game, ENTRY_LOCATION_TAG);
 
         movesLeft = xr.getAttribute(MOVES_LEFT_TAG, 0);
 
@@ -3915,7 +3911,8 @@ public class Unit extends GoodsLocation
         if (oldUnitType == null) {
             owner.modifyScore(unitType.getScoreValue());
         } else {
-            owner.modifyScore(unitType.getScoreValue() - oldUnitType.getScoreValue());
+            owner.modifyScore(unitType.getScoreValue()
+                - oldUnitType.getScoreValue());
         }
 
         turnsOfTraining = xr.getAttribute(TURNS_OF_TRAINING_TAG, 0);
@@ -3936,7 +3933,7 @@ public class Unit extends GoodsLocation
 
         treasureAmount = xr.getAttribute(TREASURE_AMOUNT_TAG, 0);
 
-        destination = xr.makeLocationAttribute(DESTINATION_TAG, game);
+        destination = xr.makeLocationAttribute(game, DESTINATION_TAG);
 
         tradeRoute = xr.findFreeColGameObject(game, TRADE_ROUTE_TAG,
             TradeRoute.class, (TradeRoute)null, false);

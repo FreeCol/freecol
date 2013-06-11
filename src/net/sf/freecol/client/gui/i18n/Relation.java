@@ -21,6 +21,10 @@ package net.sf.freecol.client.gui.i18n;
 
 import java.util.List;
 
+
+/**
+ * A grammatical relationship.
+ */
 public class Relation {
 
     int low, high, mod = 1;

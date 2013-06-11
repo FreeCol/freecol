@@ -44,16 +44,19 @@ import net.sf.freecol.common.model.WorkLocation;
  * Holds labour statistics for the labour report.
  */
 public class LabourData {
+
     private static final LocationData.Getter UNITS_IN_EUROPE_GETTER = new LocationData.Getter() {
         public LocationData getLocationData(UnitData unitData) {
             return unitData.unitsInEurope;
         }
     };
+
     private static final LocationData.Getter UNITS_AT_SEA_GETTER = new LocationData.Getter() {
         public LocationData getLocationData(UnitData unitData) {
             return unitData.unitsAtSea;
         }
     };
+
     private static final LocationData.Getter UNITS_ON_LAND_GETTER = new LocationData.Getter() {
         public LocationData getLocationData(UnitData unitData) {
             return unitData.unitsOnLand;

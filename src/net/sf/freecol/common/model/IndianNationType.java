@@ -243,8 +243,8 @@ public class IndianNationType extends NationType {
      */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
+        // Clear containers.
         if (xr.shouldClearContainers()) {
-            // Clear containers.
             skills = null;
             regions = null;
         }

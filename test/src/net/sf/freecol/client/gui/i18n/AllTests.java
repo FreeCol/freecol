@@ -22,9 +22,8 @@ package net.sf.freecol.client.gui.i18n;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+
 public class AllTests {
-
-
 
     public static Test suite() {
         TestSuite suite = new TestSuite("Test for net.sf.freecol.client.gui.i18n");

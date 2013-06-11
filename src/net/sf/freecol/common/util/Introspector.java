@@ -32,15 +32,12 @@ import java.lang.reflect.Modifier;
  */
 public class Introspector {
 
-    /**
-     * The class whose field we are to operate on.
-     */
+    /** The class whose field we are to operate on. */
     private Class<?> theClass;
 
-    /**
-     * The field whose get/set methods we wish to invoke.
-     */
+    /** The field whose get/set methods we wish to invoke. */
     private String field;
+
 
     /**
      * Build a new Introspector for the specified class and field name.
@@ -57,6 +54,7 @@ public class Introspector {
         this.theClass = theClass;
         this.field = field;
     }
+
 
     /**
      * Get a get-method for this Introspector.

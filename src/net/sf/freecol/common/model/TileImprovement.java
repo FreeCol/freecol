@@ -579,10 +579,10 @@ public class TileImprovement extends TileItem implements Named {
      */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        super.readAttributes(xr);
+
         final Specification spec = getSpecification();
         final Game game = getGame();
-
-        super.readAttributes(xr);
 
         tile = xr.makeFreeColGameObject(game, TILE_TAG, Tile.class, true);
 

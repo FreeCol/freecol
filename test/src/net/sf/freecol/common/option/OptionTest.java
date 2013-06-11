@@ -23,6 +23,7 @@ import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.util.test.FreeColTestCase;
 
+
 public class OptionTest extends FreeColTestCase {
 
     public void testGameOptions() {

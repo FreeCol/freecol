@@ -147,7 +147,7 @@ public class FreeColDebugger {
                 return false;
             }
         } catch (NumberFormatException nfe) {}
-        // @end compatibility code
+        // end @compat
 
         for (String s : optionValue.split(",")) {
             try {

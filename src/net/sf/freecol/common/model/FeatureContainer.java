@@ -31,7 +31,8 @@ import java.util.logging.Logger;
 /**
  * A container to hold abilities and modifiers for some FreeColObject-subclass.
  *
- * - FreeColGameObjectType, Europe, Player, Settlement are current implementors.
+ * - FreeColGameObjectType, Europe, Player, Settlement are current
+ *   implementors.
  *
  * - Building delegates some functionality to its type.
  *

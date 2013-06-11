@@ -127,6 +127,23 @@ public class EuropeanNationType extends NationType {
     }
 
     /**
+     * Add a starting unit.
+     *
+     * @param id The unit identifier.
+     * @param unit The <code>AbstractUnit</code> to add.
+     * @param ex Is this an expert unit?
+     */
+    private void addStartingUnit(String id, AbstractUnit unit, boolean expert) {
+        String exTag = (expert) ? Boolean.TRUE.toString() : null;
+        Map<String, AbstractUnit> units = startingUnitMap.get(exTag);
+        if (units == null) {
+            units = new HashMap<String, AbstractUnit>();
+            startingUnitMap.put(exTag, units);
+        }
+        units.put(id, unit);
+    }
+        
+    /**
      * Applies the difficulty level to this nation type.
      *
      * @param difficulty difficulty level to apply
@@ -192,7 +209,7 @@ public class EuropeanNationType extends NationType {
 
         xw.writeAttribute(ROLE_TAG, unit.getRole());
 
-        //writeAttribute(out, "number", unit.getNumber());
+        //xw.writeAttribute("number", unit.getNumber());
 
         if (expert) xw.writeAttribute(EXPERT_STARTING_UNITS_TAG, expert);
 
@@ -207,6 +224,7 @@ public class EuropeanNationType extends NationType {
         super.readAttributes(xr);
 
         final Specification spec = getSpecification();
+
         EuropeanNationType parent = xr.getType(spec, EXTENDS_TAG,
                                                EuropeanNationType.class, this);
         
@@ -236,7 +254,7 @@ public class EuropeanNationType extends NationType {
 
         super.readChildren(xr);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -252,15 +270,8 @@ public class EuropeanNationType extends NationType {
             Role role = xr.getAttribute(ROLE_TAG, Role.class, Role.DEFAULT);
             
             boolean ex = xr.getAttribute(EXPERT_STARTING_UNITS_TAG, false);
-            String exTag = (ex) ? Boolean.TRUE.toString() : null;
 
-            AbstractUnit unit = new AbstractUnit(type, role, 1);
-            Map<String, AbstractUnit> units = startingUnitMap.get(exTag);
-            if (units == null) {
-                units = new HashMap<String, AbstractUnit>();
-                startingUnitMap.put(exTag, units);
-            }
-            units.put(id, unit);
+            addStartingUnit(id, new AbstractUnit(type, role, 1), ex);
             xr.closeTag(UNIT_TAG);
 
         } else {

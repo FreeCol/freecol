@@ -577,6 +577,7 @@ public class ClientOptions extends OptionGroup {
             xr = new FreeColXMLReader(in);
             xr.nextTag();
             readFromXML(xr);
+
         } catch (Exception e) {
             logger.log(Level.WARNING, "Exception when loading options.", e);
         } finally {
@@ -609,6 +610,7 @@ public class ClientOptions extends OptionGroup {
             xr = new FreeColXMLReader(in);
             xr.nextTag();
             readFromXML(xr);
+
         } catch (Exception e) {
             logger.log(Level.WARNING, "Exception when loading options.", e);
         } finally {
@@ -638,6 +640,7 @@ public class ClientOptions extends OptionGroup {
                 }
                 // We don't have a language option in our file, it is
                 // either not there or the file is corrupt
+
             } catch (Exception e) {
                 logger.log(Level.WARNING, "Failure getting language.", e);
             } finally {

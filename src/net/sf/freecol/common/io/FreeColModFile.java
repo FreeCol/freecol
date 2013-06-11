@@ -90,10 +90,9 @@ public class FreeColModFile extends FreeColDataFile {
             xr.nextTag();
             id = xr.readId();
             parent = xr.getAttribute("parent", (String)null);
-        } catch (XMLStreamException e) {
-            final IOException e2 = new IOException("XMLStreamException.");
-            e2.initCause(e);
-            throw e2;
+
+        } catch (XMLStreamException xse) {
+            throw new IOException(xse.getCause());
         } finally {
             if (xr != null) xr.close();
         }

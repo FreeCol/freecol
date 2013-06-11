@@ -75,8 +75,7 @@ public class WorkInsideColonyMission extends Mission {
      * @see net.sf.freecol.server.ai.AIObject#readFromXML
      */
     public WorkInsideColonyMission(AIMain aiMain, AIUnit aiUnit,
-                                   FreeColXMLReader xr)
-        throws XMLStreamException {
+                                   FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, aiUnit);
 
         readFromXML(xr);

@@ -144,7 +144,8 @@ public class SelectOption extends IntegerOption {
      */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        itemValues.clear(); // Clear containers
+        // Clear containers.
+        itemValues.clear();
 
         super.readChildren(xr);
     }

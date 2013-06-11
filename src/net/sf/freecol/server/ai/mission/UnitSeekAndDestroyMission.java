@@ -100,8 +100,7 @@ public class UnitSeekAndDestroyMission extends Mission {
      * @see net.sf.freecol.server.ai.AIObject#readFromXML
      */
     public UnitSeekAndDestroyMission(AIMain aiMain, AIUnit aiUnit,
-                                     FreeColXMLReader xr)
-        throws XMLStreamException {
+                                     FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, aiUnit);
 
         readFromXML(xr);

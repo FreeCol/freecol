@@ -166,7 +166,6 @@ public class TileTypeChange implements Comparable<TileTypeChange> {
      */
     public void readFromXML(FreeColXMLReader xr,
                             Specification spec) throws XMLStreamException {
-
         from = xr.getType(spec, FROM_TAG, TileType.class, (TileType)null);
 
         to = xr.getType(spec, TO_TAG, TileType.class, (TileType)null);
@@ -185,7 +184,7 @@ public class TileTypeChange implements Comparable<TileTypeChange> {
                 xr.closeTag(PRODUCTION_TAG);
 
             } else {
-                throw new XMLStreamException("Unexpected TileTypeChange tag: "
+                throw new XMLStreamException("Bogus TileTypeChange tag: "
                     + tag);
             }
         }

@@ -17,15 +17,12 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.client.gui.i18n;
-
 
 import javax.swing.table.AbstractTableModel;
 
 
-public final class MergeTableModel extends AbstractTableModel
-{
+public final class MergeTableModel extends AbstractTableModel {
     private static final String[]  COLUMN_NAME_ARRAY = { "file1", "file2" };
 
     Merge  merge;

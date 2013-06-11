@@ -2793,7 +2793,7 @@ public class Colony extends Settlement implements Nameable {
      */
     @Override
     public void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        // Clear containers
+        // Clear containers.
         colonyTiles.clear();
         buildingMap.clear();
         exportData.clear();
@@ -2837,7 +2837,7 @@ public class Colony extends Settlement implements Nameable {
 
         if (BUILD_QUEUE_TAG.equals(tag)) {
             buildQueue.add(xr.getType(spec, ID_ATTRIBUTE_TAG,
-                                      BuildableType.class, (BuildableType)null));
+                    BuildableType.class, (BuildableType)null));
             xr.closeTag(BUILD_QUEUE_TAG);
 
         // @compat 0.9.x

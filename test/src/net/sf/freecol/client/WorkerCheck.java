@@ -17,9 +17,7 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.client;
-
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -36,8 +34,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 
-public final class WorkerCheck
-{
+public final class WorkerCheck {
+
     private final  JTextArea  textArea;
     private final  Action     workAction;
 

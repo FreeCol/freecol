@@ -156,9 +156,9 @@ public class Nation extends FreeColGameObjectType {
      */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
-        final Specification spec = getSpecification();
-
         super.readAttributes(xr);
+
+        final Specification spec = getSpecification();
 
         type = xr.getType(spec, NATION_TYPE_TAG,
                           NationType.class, (NationType)null);

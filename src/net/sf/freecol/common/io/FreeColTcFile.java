@@ -24,8 +24,9 @@ import java.io.IOException;
 
 import net.sf.freecol.common.resources.ResourceMapping;
 
+
 /**
- * A Total Conversion (TC).
+ * A Total Conversion (TC).  Rules are TCs.
  */
 public class FreeColTcFile extends FreeColModFile {
 

@@ -119,8 +119,8 @@ public class TileImprovementPlan extends ValuedAIObject {
      * @throws XMLStreamException if a problem was encountered
      *     during parsing.
      */
-    public TileImprovementPlan(AIMain aiMain, FreeColXMLReader xr)
-        throws XMLStreamException {
+    public TileImprovementPlan(AIMain aiMain,
+                               FreeColXMLReader xr) throws XMLStreamException {
         super(aiMain, xr);
 
         uninitialized = getType() == null || getTarget() == null;

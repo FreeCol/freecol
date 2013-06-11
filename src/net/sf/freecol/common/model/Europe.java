@@ -352,9 +352,9 @@ public class Europe extends UnitLocation implements Ownable, Named {
      */
     @Override
     public void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
-        final Specification spec = getSpecification();
-
         super.readAttributes(xr);
+
+        final Specification spec = getSpecification();
 
         // @compat 0.10.0
         if (!hasAbility("model.ability.dressMissionary")) {
@@ -368,7 +368,8 @@ public class Europe extends UnitLocation implements Ownable, Named {
             if (unitType != null) recruitables[index] = unitType;
         }
 
-        owner = xr.makeFreeColGameObject(getGame(), OWNER_TAG, Player.class, true);
+        owner = xr.makeFreeColGameObject(getGame(), OWNER_TAG,
+                                         Player.class, true);
 
         recruitPrice = xr.getAttribute(RECRUIT_PRICE_TAG,
                                        RECRUIT_PRICE_INITIAL);
@@ -407,10 +408,10 @@ public class Europe extends UnitLocation implements Ownable, Named {
         if (UNIT_PRICE_TAG.equals(tag)) {
             UnitType unitType = xr.getType(spec, UNIT_TYPE_TAG,
                                            UnitType.class, (UnitType)null);
+
             int price = xr.getAttribute(PRICE_TAG, -1);
-            if (unitType != null && price > 0) {
-                unitPrices.put(unitType, new Integer(price));
-            }
+
+            unitPrices.put(unitType, new Integer(price));
             xr.closeTag(UNIT_PRICE_TAG);
 
         } else {

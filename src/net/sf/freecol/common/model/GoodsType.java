@@ -494,9 +494,9 @@ public final class GoodsType extends FreeColGameObjectType {
      */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
-        final Specification spec = getSpecification();
-
         super.readAttributes(xr);
+
+        final Specification spec = getSpecification();
 
         isFarmed = xr.getAttribute(IS_FARMED_TAG, false);
 

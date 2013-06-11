@@ -41,7 +41,4 @@ public interface Movable {
      * of each turn.
      */
     public int getInitialMovesLeft();
-
-
-
 }

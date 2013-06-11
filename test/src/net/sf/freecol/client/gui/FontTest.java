@@ -27,6 +27,7 @@ import java.util.Map;
 
 import net.sf.freecol.util.test.FreeColTestCase;
 
+
 public class FontTest extends FreeColTestCase {
 
     private static FileFilter ttfFilter = new FileFilter() {

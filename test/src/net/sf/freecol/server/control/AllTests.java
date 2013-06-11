@@ -22,14 +22,15 @@ package net.sf.freecol.server.control;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+
 public class AllTests {
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for net.sf.freecol.server.control");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(InGameControllerTest.class);
-		//$JUnit-END$
-		return suite;
-	}
+    public static Test suite() {
+        TestSuite suite = new TestSuite("Test for net.sf.freecol.server.control");
+        //$JUnit-BEGIN$
+        suite.addTestSuite(InGameControllerTest.class);
+        //$JUnit-END$
+        return suite;
+    }
 
 }

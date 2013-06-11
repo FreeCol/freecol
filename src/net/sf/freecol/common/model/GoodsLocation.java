@@ -321,7 +321,7 @@ public abstract class GoodsLocation extends UnitLocation {
      */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        // Clear containers
+        // Clear containers.
         if (goodsContainer != null) goodsContainer.removeAll();
 
         super.readChildren(xr);
@@ -336,7 +336,7 @@ public abstract class GoodsLocation extends UnitLocation {
 
         if (GoodsContainer.getXMLElementTagName().equals(tag)) {
             goodsContainer = xr.readFreeColGameObject(getGame(),
-                GoodsContainer.class);
+                                                      GoodsContainer.class);
             goodsContainer.setLocation(this);
 
         } else {

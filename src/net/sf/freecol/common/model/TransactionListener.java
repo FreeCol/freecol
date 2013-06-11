@@ -26,7 +26,6 @@ package net.sf.freecol.common.model;
 */
 public interface TransactionListener {
 
-    
     /**
      * Logs a purchase
      *
@@ -45,4 +44,5 @@ public interface TransactionListener {
      * @param tax The tax which has been applied
      */
     public void logSale(GoodsType goodsType, int amount, int price, int tax);
+
 }

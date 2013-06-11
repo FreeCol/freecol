@@ -523,7 +523,7 @@ public class StringTemplate extends FreeColObject {
      */
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        // Clear containers
+        // Clear containers.
         if (keys != null) keys.clear();
         if (replacements != null) replacements.clear();
 
@@ -541,7 +541,7 @@ public class StringTemplate extends FreeColObject {
             addKey(xr.getAttribute(VALUE_TAG, (String)null));
             xr.closeTag(KEY_TAG);
 
-        } else if (getXMLElementTagName().equals(tag)) {
+        } else if (StringTemplate.getXMLElementTagName().equals(tag)) {
             addReplacement(new StringTemplate(xr));
         
         // @compat 0.9.x

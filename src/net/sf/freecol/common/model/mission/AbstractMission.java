@@ -81,7 +81,8 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
      * @param xr a <code>FreeColXMLReader</code> value
      * @exception XMLStreamException if an error occurs
      */
-    public AbstractMission(Game game, FreeColXMLReader xr) throws XMLStreamException {
+    public AbstractMission(Game game,
+                           FreeColXMLReader xr) throws XMLStreamException {
         super(game, null);
     }
 
@@ -180,6 +181,10 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
 
     // Serialization
 
+    private static final String REPEAT_COUNT_TAG = "repeatCount";
+    private static final String TURN_COUNT_TAG = "turnCount";
+    private static final String UNIT_TAG = "unit";
+
 
     /**
      * {@inheritDoc}
@@ -188,11 +193,11 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
     protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
-        xw.writeAttribute("unit", unit.getId());
+        xw.writeAttribute(UNIT_TAG, unit);
 
-        xw.writeAttribute("turnCount", Integer.toString(turnCount));
+        xw.writeAttribute(TURN_COUNT_TAG, turnCount);
 
-        xw.writeAttribute("repeatCount", Integer.toString(repeatCount));
+        xw.writeAttribute(REPEAT_COUNT_TAG, repeatCount);
     }
 
 
@@ -203,10 +208,10 @@ public abstract class AbstractMission extends FreeColGameObject implements Missi
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
-        unit = xr.makeFreeColGameObject(getGame(), "unit", Unit.class, true);
+        unit = xr.makeFreeColGameObject(getGame(), UNIT_TAG, Unit.class, true);
 
-        turnCount = xr.getAttribute("turnCount", 0);
+        turnCount = xr.getAttribute(TURN_COUNT_TAG, 0);
 
-        repeatCount = xr.getAttribute("repeatCount", 1);
+        repeatCount = xr.getAttribute(REPEAT_COUNT_TAG, 1);
     }
 }

@@ -19,7 +19,6 @@
 
 package net.sf.freecol.client.gui.option;
 
-
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 

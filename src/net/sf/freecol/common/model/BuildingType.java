@@ -341,9 +341,9 @@ public final class BuildingType extends BuildableType
      */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
-        final Specification spec = getSpecification();
-
         super.readAttributes(xr);
+
+        final Specification spec = getSpecification();
 
         BuildingType parent = xr.getType(spec, EXTENDS_TAG,
                                          BuildingType.class, this);
@@ -374,7 +374,8 @@ public final class BuildingType extends BuildableType
                                             parent.getConsumedGoodsType());
             GoodsType produces = xr.getType(spec, PRODUCES_TAG, GoodsType.class,
                                             parent.getProducedGoodsType());
-            productionTypes.add(new ProductionType(consumes, produces, basicProduction));
+            productionTypes.add(new ProductionType(consumes, produces,
+                                                   basicProduction));
         }
         // end @compat
 

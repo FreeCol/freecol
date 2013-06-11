@@ -38,8 +38,6 @@ import net.sf.freecol.common.resources.ResourceManager;
 /**
  * A panel for adjusting the river style.
  *
- * <br><br>
- *
  * This panel is only used when running in
  * {@link net.sf.freecol.client.FreeColClient#isMapEditor() map editor mode}.
  */
