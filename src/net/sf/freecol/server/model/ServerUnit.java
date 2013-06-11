@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2012   The FreeCol Team
+ *  Copyright (C) 2002-2013   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -80,6 +80,9 @@ import net.sf.freecol.server.control.ChangeSet.See;
 public class ServerUnit extends Unit implements ServerModelObject {
 
     private static final Logger logger = Logger.getLogger(ServerUnit.class.getName());
+
+    // The bogus end of the world year.
+    private static final int MAYAN_PROPHESY_YEAR = 2012;
 
     // How many `nothing' rumours are there.
     private static int rumourNothing = -1;
@@ -650,7 +653,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         case NOTHING:
             if (game.getTurn().getYear() % 100 == 12
                 && Utils.randomInt(logger, "Mayans?", random, 4) == 0) {
-                int years = 2012 - game.getTurn().getYear();
+                int years = MAYAN_PROPHESY_YEAR - game.getTurn().getYear();
                 cs.addMessage(See.only(serverPlayer),
                     new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                         "lostCityRumour.mayans", serverPlayer, this)

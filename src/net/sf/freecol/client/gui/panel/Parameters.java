@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2012   The FreeCol Team
+ *  Copyright (C) 2002-2013   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -20,12 +20,6 @@
 package net.sf.freecol.client.gui.panel;
 
 public class Parameters {
-
-    public static final String COPYRIGHT = "Copyright (C) 2003-2012 The FreeCol Team";
-
-    public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
-
-    public static final String REVISION = "$Revision$";
 
     public int distToLandFromHighSeas;
 

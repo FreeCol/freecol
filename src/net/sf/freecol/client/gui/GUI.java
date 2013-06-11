@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2012   The FreeCol Team
+ *  Copyright (C) 2002-2013   The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -16,7 +16,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 
 package net.sf.freecol.client.gui;
 
@@ -114,15 +113,7 @@ import net.sf.freecol.common.resources.ResourceManager;
  */
 public class GUI {
 
-
     private static final Logger logger = Logger.getLogger(GUI.class.getName());
-
-    public static final String COPYRIGHT = "Copyright (C) 2002-2012   The FreeCol Team";
-
-    public static final String LICENSE = "http://www.gnu.org/licenses/gpl.html";
-
-    public static final String REVISION = "$Revision$";
-
 
     /**
      * The space not being used in windowed mode.
