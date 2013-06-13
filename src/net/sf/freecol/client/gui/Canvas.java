@@ -50,6 +50,7 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.plaf.basic.BasicInternalFrameUI;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.action.FreeColAction;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -1229,8 +1230,10 @@ public final class Canvas extends JDesktopPane {
             } catch (Exception e) { /* Ignore failure */ }
         }
 
-        // plays an alert sound on each information message if the option for it is turned on
-        if (freeColClient.getClientOptions().getBoolean("model.option.audioAlerts")) {
+        // plays an alert sound on each information message if the
+        // option for it is turned on
+        if (freeColClient.getClientOptions()
+            .getBoolean(ClientOptions.AUDIO_ALERTS)) {
             gui.playSound("sound.event.alertSound");
         }
 
