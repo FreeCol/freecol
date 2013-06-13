@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- $Revision$ -->
 <!--
     *  Copyright (C) 2002-2013  The FreeCol Team
     *
@@ -17,12 +16,11 @@
     *
     *  You should have received a copy of the GNU General Public License
     *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
-    *
-  -->
-<!-- specification version 0.64 -->
-<!-- in case of incompatible changes, please update version number and 
-     XSD schema for validation. -->
-<freecol-specification id="freecol" extends="classic">
+    
+    In case of incompatible changes, please update version number and 
+    XSD schema for validation.
+-->
+<freecol-specification id="freecol" version="0.76" extends="classic">
 
   <building-types>
     <building-type id="model.building.stockade" preserve="true">

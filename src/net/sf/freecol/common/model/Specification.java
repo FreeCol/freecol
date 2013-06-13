@@ -1638,13 +1638,19 @@ public final class Specification {
      */
     public void readFromXML(FreeColXMLReader xr) throws XMLStreamException {
         String newId = xr.readId();
-        if (difficultyLevel == null) {
-            difficultyLevel = xr.getAttributeValue(null, DIFFICULTY_LEVEL_TAG);
-        }
-        logger.fine("Difficulty level is " + difficultyLevel);
         if (id == null) id = newId; // don't overwrite id with parent id!
 
-        logger.fine("Reading specification " + newId);
+        if (difficultyLevel == null) {
+            difficultyLevel = xr.getAttribute(DIFFICULTY_LEVEL_TAG,
+                                              (String)null);
+        }
+
+        version = xr.getAttribute(VERSION_TAG, (String)null);
+
+        logger.fine("Reading specification " + newId
+            + " difficulty=" + difficultyLevel
+            + " version=" + version);
+
         String parentId = xr.getAttribute(FreeColGameObjectType.EXTENDS_TAG,
                                           (String)null);
         if (parentId != null) {
@@ -1656,6 +1662,7 @@ public final class Specification {
                 throw new XMLStreamException("Failed to open parent specification: " + e);
             }
         }
+
         while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String childName = xr.getLocalName();
             logger.finest("Found child named " + childName);

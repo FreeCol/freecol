@@ -120,6 +120,18 @@ public class NumberRules {
         }
     }
 
+
+    // Serialization
+
+    private static final String COUNT_TAG = "count";
+    private static final String GENERATION_TAG = "generation";
+    private static final String LOCALES_TAG = "locales";
+    private static final String PLURALS_TAG = "plurals";
+    private static final String PLURAL_RULE_TAG = "pluralRule";
+    private static final String PLURAL_RULES_TAG = "pluralRules";
+    private static final String VERSION_TAG = "version";
+
+
     /**
      * Describe <code>readFromXML</code> method here.
      *
@@ -129,14 +141,14 @@ public class NumberRules {
     private static void readFromXML(FreeColXMLReader xr) throws XMLStreamException {
         while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String tag = xr.getLocalName();
-            if ("version".equals(tag)) {
+            if (VERSION_TAG.equals(tag)) {
                 xr.nextTag();
-            } else if ("generation".equals(tag)) {
+            } else if (GENERATION_TAG.equals(tag)) {
                 xr.nextTag();
-            } else if ("plurals".equals(tag)) {
+            } else if (PLURALS_TAG.equals(tag)) {
                 while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                     tag = xr.getLocalName();
-                    if ("pluralRules".equals(tag)) {
+                    if (PLURAL_RULES_TAG.equals(tag)) {
                         readChild(xr);
                     }
                 }
@@ -153,12 +165,14 @@ public class NumberRules {
     private static void readChild(FreeColXMLReader xr)
         throws XMLStreamException {
 
-        String[] locales = xr.getAttributeValue(null, "locales").split(" ");
+        String loc = xr.getAttribute(LOCALES_TAG, (String)null);
+        String[] locales = (loc == null) ? null : loc.split(" ");
         if (locales != null) {
             DefaultNumberRule numberRule = new DefaultNumberRule();
             while (xr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                if ("pluralRule".equals(xr.getLocalName())) {
-                    Category category = Category.valueOf(xr.getAttributeValue(null, "count"));
+                if (PLURAL_RULE_TAG.equals(xr.getLocalName())) {
+                    String plu = xr.getAttribute(COUNT_TAG, (String)null);
+                    Category category = Category.valueOf(plu);
                     Rule rule = new Rule(xr.getElementText());
                     numberRule.addRule(category, rule);
                 }
