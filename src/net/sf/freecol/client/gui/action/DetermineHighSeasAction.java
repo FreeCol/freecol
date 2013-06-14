@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.panel.Parameters;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
@@ -40,12 +39,12 @@ public class DetermineHighSeasAction extends FreeColAction {
     /**
      * Creates a new <code>DetermineHighSeasAction</code>.
      *
-     * @param freeColClient The main controller object for the client.
-     * @param gui 
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    DetermineHighSeasAction(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui, id);
+    public DetermineHighSeasAction(FreeColClient freeColClient) {
+        super(freeColClient, id);
     }
+
 
     /**
      * Checks if this action should be enabled.
@@ -56,8 +55,8 @@ public class DetermineHighSeasAction extends FreeColAction {
     protected boolean shouldBeEnabled() {
         return super.shouldBeEnabled()
             && freeColClient.isMapEditor()
-            && freeColClient.getGame() != null
-            && freeColClient.getGame().getMap() != null;
+            && getGame() != null
+            && getGame().getMap() != null;
     }
 
     /**
@@ -66,16 +65,12 @@ public class DetermineHighSeasAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        final Game game = freeColClient.getGame();
-        final Map map = game.getMap();
+        final Map map = getGame().getMap();
         
-        Parameters p = gui.showParametersDialog();
-
+        Parameters p = getGUI().showParametersDialog();
         if (p != null) {
-            TerrainGenerator.determineHighSeas(map, p.distToLandFromHighSeas, p.maxDistanceToEdge);
+            TerrainGenerator.determineHighSeas(map, p.distToLandFromHighSeas,
+                p.maxDistanceToEdge);
         }
     }
-
- 
-
 }

@@ -32,15 +32,16 @@ public class CenterAction extends UnitAction {
 
     public static final String id = "centerAction";
 
+
     /**
      * Creates a new <code>CenterAction</code>.
      *
-     * @param freeColClient The main controller object for the client.
-     * @param gui 
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    CenterAction(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui, id);
+    public CenterAction(FreeColClient freeColClient) {
+        super(freeColClient, id);
     }
+
 
     /**
      * Applies this action.
@@ -48,6 +49,6 @@ public class CenterAction extends UnitAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        gui.centerActiveUnit();
+        getGUI().centerActiveUnit();
     }
 }

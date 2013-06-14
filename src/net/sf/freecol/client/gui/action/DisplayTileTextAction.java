@@ -49,21 +49,23 @@ public class DisplayTileTextAction extends SelectableAction {
         KeyEvent.VK_R
     };
 
-
     private DisplayText display;
+
 
     /**
      * Creates this action
      *
-     * @param freeColClient The main controller object for the client.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param type a <code>DisplayText</code> value
      */
-    DisplayTileTextAction(FreeColClient freeColClient, GUI gui, DisplayText type) {
-        super(freeColClient, gui, id + type, ClientOptions.DISPLAY_TILE_TEXT);
+    public DisplayTileTextAction(FreeColClient freeColClient,
+                                 DisplayText type) {
+        super(freeColClient, id + type, ClientOptions.DISPLAY_TILE_TEXT);
         display = type;
         setAccelerator(KeyStroke.getKeyStroke(accelerators[type.ordinal()],
-                                              KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK));
+                KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK));
     }
+
 
     /**
      * Checks if this action should be enabled.
@@ -95,7 +97,7 @@ public class DisplayTileTextAction extends SelectableAction {
     public void actionPerformed(ActionEvent e) {
         if (((JRadioButtonMenuItem) e.getSource()).isSelected()) {
             freeColClient.getClientOptions().setInteger(ClientOptions.DISPLAY_TILE_TEXT, display.ordinal());
-            gui.refresh();
+            getGUI().refresh();
         }
     }
 }

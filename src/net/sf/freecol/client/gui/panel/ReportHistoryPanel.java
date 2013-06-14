@@ -35,23 +35,20 @@ import net.sf.freecol.common.model.HistoryEvent;
  */
 public final class ReportHistoryPanel extends ReportPanel {
 
+
     /**
      * The constructor that will add the items to this panel.
-     * @param freeColClient 
      * 
-     * @param gui The parent of this panel.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    public ReportHistoryPanel(FreeColClient freeColClient, GUI gui) {
-
-        super(freeColClient, gui, Messages.message("reportHistoryAction.name"));
+    public ReportHistoryPanel(FreeColClient freeColClient) {
+        super(freeColClient, Messages.message("reportHistoryAction.name"));
 
         List<HistoryEvent> history = getMyPlayer().getHistory();
 
         // Display Panel
         reportPanel.removeAll();
-        if (history.size() == 0) {
-            return;
-        }
+        if (history.size() == 0) return;
 
         reportPanel.setLayout(new MigLayout("wrap 2", "[]20[fill]", ""));
 

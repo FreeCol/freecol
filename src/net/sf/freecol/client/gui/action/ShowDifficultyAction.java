@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
 
 
 /**
@@ -32,15 +31,16 @@ public class ShowDifficultyAction extends FreeColAction {
 
     public static final String id = "difficultyAction";
 
+
     /**
      * Creates a new <code>ShowDifficultyAction</code>.
      *
-     * @param freeColClient The main controller object for the client.
-     * @param gui 
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    ShowDifficultyAction(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui, id);
+    public ShowDifficultyAction(FreeColClient freeColClient) {
+        super(freeColClient, id);
     }
+
 
     /**
      * Applies this action.
@@ -48,6 +48,6 @@ public class ShowDifficultyAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        gui.showDifficultyDialog(false);
+        getGUI().showDifficultyDialog(false);
     }
 }

@@ -117,7 +117,7 @@ public class DebugUtils {
      *
      * Called from the debug menu.
      *
-     * @param freeColClient The <code>FreeColClient</code> in effect.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param buildingTitle A label for the choice dialog.
      */
     public static void addBuildings(final FreeColClient freeColClient,
@@ -167,7 +167,7 @@ public class DebugUtils {
      *
      * Called from the debug menu.
      *
-     * @param freeColClient The <code>FreeColClient</code> in effect.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param fatherTitle A label for the choice dialog.
      */
     public static void addFathers(final FreeColClient freeColClient,
@@ -203,7 +203,7 @@ public class DebugUtils {
      *
      * Called from the debug menu.
      *
-     * @param freeColClient The <code>FreeColClient</code> in effect.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     public static void addGold(final FreeColClient freeColClient) {
         final FreeColServer server = freeColClient.getFreeColServer();
@@ -232,7 +232,7 @@ public class DebugUtils {
      *
      * Called from the debug menu.
      *
-     * @param freeColClient The <code>FreeColClient</code> in effect.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     public static void addImmigration(final FreeColClient freeColClient) {
         final FreeColServer server = freeColClient.getFreeColServer();
@@ -261,7 +261,7 @@ public class DebugUtils {
      *
      * Called from the debug menu.
      *
-     * @param freeColClient The <code>FreeColClient</code> in effect.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     public static void addLiberty(final FreeColClient freeColClient) {
         final FreeColServer server = freeColClient.getFreeColServer();
@@ -292,7 +292,7 @@ public class DebugUtils {
      * Adds a change listener to a menu (the debug menu in fact),
      * that changes the label on a menu item when the skip status changes.
      *
-     * @param freeColClient The <code>FreeColClient</code> in effect.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param menu The menu to add the change listener to.
      * @param item The menu item whose label should change.
      */
@@ -317,7 +317,7 @@ public class DebugUtils {
      *
      * Called from tile popup menu.
      *
-     * @param freeColClient The <code>FreeColClient</code> in effect.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param tile The <code>Tile</code> to add to.
      */
     public static void addNewUnitToTile(final FreeColClient freeColClient,
@@ -372,7 +372,7 @@ public class DebugUtils {
      *
      * Called from tile popup menu.
      *
-     * @param freeColClient The <code>FreeColClient</code> in effect.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param unit The <code>Unit</code> to add to.
      */
     public static void addUnitGoods(final FreeColClient freeColClient,
@@ -417,7 +417,7 @@ public class DebugUtils {
      *
      * Called from tile popup menu.
      *
-     * @param freeColClient The <code>FreeColClient</code> in effect.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param settlement The <code>Settlement</code> to take ownership of.
      */
     public static void changeOwnership(final FreeColClient freeColClient,
@@ -453,7 +453,7 @@ public class DebugUtils {
      *
      * Called from tile popup menu.
      *
-     * @param freeColClient The <code>FreeColClient</code> in effect.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param unit The <code>Unit</code> to take ownership of.
      */
     public static void changeOwnership(final FreeColClient freeColClient,
@@ -491,7 +491,7 @@ public class DebugUtils {
      *
      * Called from tile popup menu.
      *
-     * @param freeColClient The <code>FreeColClient</code> in effect.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param unit The <code>Unit</code> to change the role of.
      */
     public static void changeRole(final FreeColClient freeColClient,
@@ -524,7 +524,7 @@ public class DebugUtils {
      *
      * Called from the debug menu.
      *
-     * @param freeColClient The <code>FreeColClient</code> in effect.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     public static void checkDesyncAction(final FreeColClient freeColClient) {
         final FreeColServer server = freeColClient.getFreeColServer();
@@ -598,7 +598,7 @@ public class DebugUtils {
      *
      * Called from tile popup menu.
      *
-     * @param freeColClient The <code>FreeColClient</code> in effect.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param colony The <code>Colony</code> to summarize.
      */
     public static void displayColonyPlan(final FreeColClient freeColClient,
@@ -616,7 +616,7 @@ public class DebugUtils {
      *
      * Called from the debug popup menu.
      *
-     * @param freeColClient The <code>FreeColClient</code> in effect.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     public static void displayEurope(final FreeColClient freeColClient) {
         final FreeColServer server = freeColClient.getFreeColServer();
@@ -684,7 +684,7 @@ public class DebugUtils {
      *
      * Called from tile popup menu.
      *
-     * @param freeColClient The <code>FreeColClient</code> in effect.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param unit The <code>Unit</code> to display.
      */
     public static void displayMission(final FreeColClient freeColClient,
@@ -704,7 +704,7 @@ public class DebugUtils {
      *
      * Called from the debug menu.
      *
-     * @param freeColClient The <code>FreeColClient</code> in effect.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     public static void displayUnits(final FreeColClient freeColClient) {
         final Player player = freeColClient.getMyPlayer();
@@ -751,7 +751,7 @@ public class DebugUtils {
      *
      * Called from tile popup menu.
      *
-     * @param freeColClient The <code>FreeColClient</code> in effect.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param tile The <code>Tile</code> to dump.
      */
     public static void dumpTile(final FreeColClient freeColClient,
@@ -771,7 +771,7 @@ public class DebugUtils {
      *
      * Called from tile popup menu.
      *
-     * @param freeColClient The <code>FreeColClient</code> in effect.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param units The <code>Unit</code>s to reactivate.
      */
     public static void resetMoves(final FreeColClient freeColClient,
@@ -798,7 +798,7 @@ public class DebugUtils {
      *
      * Called from the debug menu.
      *
-     * @param freeColClient The <code>FreeColClient</code> in effect.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param reveal If true, reveal the map, else hide the map.
      */
     public static void revealMap(final FreeColClient freeColClient,
@@ -825,7 +825,7 @@ public class DebugUtils {
      *
      * Called from the colony panel.
      *
-     * @param freeColClient The <code>FreeColClient</code> in effect.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param colony The <code>Colony</code> to set goods amounts in.
      */
     public static void setColonyGoods(final FreeColClient freeColClient,
@@ -871,7 +871,7 @@ public class DebugUtils {
      *
      * Called from the debug menu.
      *
-     * @param freeColClient The <code>FreeColClient</code> in effect.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param monarchTitle A label for the choice dialog.
      */
     public static void setMonarchAction(final FreeColClient freeColClient,
@@ -898,7 +898,7 @@ public class DebugUtils {
      *
      * Called from tile popup menu.
      *
-     * @param freeColClient The <code>FreeColClient</code> in effect.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param tile The <code>Tile</code> to operate on.
      */
     public static void setRumourType(final FreeColClient freeColClient,
@@ -927,7 +927,7 @@ public class DebugUtils {
      *
      * Called from the debug menu.
      *
-     * @param freeColClient The <code>FreeColClient</code> in effect.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     public static void skipTurns(FreeColClient freeColClient) {
         final FreeColServer server = freeColClient.getFreeColServer();
@@ -956,7 +956,7 @@ public class DebugUtils {
      *
      * Called from the debug menu.
      *
-     * @param freeColClient The <code>FreeColClient</code> in effect.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     public static void stepRNG(FreeColClient freeColClient) {
         final FreeColServer server = freeColClient.getFreeColServer();
@@ -977,7 +977,7 @@ public class DebugUtils {
      *
      * Called from tile popup menu.
      *
-     * @param freeColClient The <code>FreeColClient</code> in effect.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param is The <code>IndianSettlement</code> to summarize.
      */
     public static void summarizeSettlement(final FreeColClient freeColClient,
@@ -1069,7 +1069,7 @@ public class DebugUtils {
      *
      * Called from the debug menu.
      *
-     * @param freeColClient The <code>FreeColClient</code> in effect.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     public static void useAI(final FreeColClient freeColClient) {
         final FreeColServer server = freeColClient.getFreeColServer();

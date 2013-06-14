@@ -85,15 +85,13 @@ public final class TradeRouteDialog extends FreeColDialog<Boolean>
 
     /**
      * The constructor that will add the items to this panel.
-     * @param freeColClient The <code>FreeColClient</code> controlling the
-     *     trade routes.
-     * @param gui The <code>GUI</code> to display in.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param unit The optional <code>Unit</code> to operate on.
      */
     @SuppressWarnings("unchecked") // FIXME in Java7
-    public TradeRouteDialog(FreeColClient freeColClient, final GUI gui,
-                            Unit unit) {
-        super(freeColClient, gui);
+    public TradeRouteDialog(FreeColClient freeColClient, Unit unit) {
+        super(freeColClient);
 
         this.unit = unit;
 

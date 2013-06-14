@@ -46,17 +46,18 @@ import net.sf.freecol.common.resources.ResourceManager;
  */
 public class FatherDetailPanel extends ColopediaGameObjectTypePanel<FoundingFather> {
 
+
     /**
      * Creates a new instance of this ColopediaDetailPanel.
-     * @param freeColClient 
-     * @param gui 
      *
-     * @param colopediaPanel the ColopediaPanel
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param colopediaPanel The parent ColopediaPanel.
      */
-    public FatherDetailPanel(FreeColClient freeColClient, GUI gui, ColopediaPanel colopediaPanel) {
-        super(freeColClient, gui, colopediaPanel, PanelType.FATHERS.toString(), 0.75);
+    public FatherDetailPanel(FreeColClient freeColClient,
+                             ColopediaPanel colopediaPanel) {
+        super(freeColClient, colopediaPanel,
+              PanelType.FATHERS.toString(), 0.75);
     }
-
 
 
     /**
@@ -148,7 +149,7 @@ public class FatherDetailPanel extends ColopediaGameObjectTypePanel<FoundingFath
         text.append("] ");
         text.append(Messages.message(father.getId() + ".text"));
 
-        Turn turn = getElectionTurns().get(name);
+        Turn turn = getMyPlayer().getElectionTurns().get(name);
         if (turn != null) {
             text.append("\n\n");
             text.append(Messages.message("report.continentalCongress.elected"));

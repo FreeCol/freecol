@@ -47,13 +47,14 @@ public final class ClassicMapControls extends MapControls {
     private Font arrowFont;
     private ActionManager am;
 
+
     /**
      * The basic constructor.
-     * @param freeColClient The main controller object for the client
-     * @param gui
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    public ClassicMapControls(final FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui, false);
+    public ClassicMapControls(final FreeColClient freeColClient) {
+        super(freeColClient, false);
 
         am = freeColClient.getActionManager();
         arrowFont = ResourceManager.getFont("SimpleFont", Font.BOLD, 24f);

@@ -56,10 +56,13 @@ public class NationTypeDetailPanel extends ColopediaGameObjectTypePanel<NationTy
     /**
      * Creates a new instance of this ColopediaDetailPanel.
      *
-     * @param colopediaPanel the ColopediaPanel
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param colopediaPanel The parent ColopediaPanel.
      */
-    public NationTypeDetailPanel(FreeColClient freeColClient, GUI gui, ColopediaPanel colopediaPanel) {
-        super(freeColClient, gui, colopediaPanel, PanelType.NATION_TYPES.toString(), 0.75);
+    public NationTypeDetailPanel(FreeColClient freeColClient,
+                                 ColopediaPanel colopediaPanel) {
+        super(freeColClient, colopediaPanel,
+              PanelType.NATION_TYPES.toString(), 0.75);
     }
 
 

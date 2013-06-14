@@ -32,22 +32,23 @@ public class ChangeWindowedModeAction extends SelectableAction {
 
     public static final String id = "changeWindowedModeAction";
 
+
     /**
      * Creates a new <code>ChangeWindowedModeAction</code>.
      *
-     * @param freeColClient The main controller object for the client.
-     * @param gui 
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    ChangeWindowedModeAction(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui, id, null);
+    public ChangeWindowedModeAction(FreeColClient freeColClient) {
+        super(freeColClient, id, null);
     }
+
 
     /**
      * Updates the "enabled"-status
      */
     @Override
     public void update() {
-        selected = !gui.isWindowed();
+        selected = !getGUI().isWindowed();
     }
 
     /**
@@ -55,6 +56,7 @@ public class ChangeWindowedModeAction extends SelectableAction {
      */
     @Override
     public boolean shouldBeSelected() {
+        GUI gui = getGUI();
         return !(gui == null || gui.isWindowed());
     }
 
@@ -65,6 +67,6 @@ public class ChangeWindowedModeAction extends SelectableAction {
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-        gui.changeWindowedMode(!gui.isWindowed());
+        getGUI().changeWindowedMode(!getGUI().isWindowed());
     }
 }

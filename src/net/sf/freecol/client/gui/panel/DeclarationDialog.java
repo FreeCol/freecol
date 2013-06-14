@@ -60,10 +60,10 @@ public final class DeclarationDialog extends FreeColDialog<Boolean> {
      * Creates a DeclarationDialog.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      */
-    public DeclarationDialog(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui);
+    public DeclarationDialog(FreeColClient freeColClient) {
+        super(freeColClient);
+
         this.signaturePanel = new SignaturePanel();
 
         setLayout(null);

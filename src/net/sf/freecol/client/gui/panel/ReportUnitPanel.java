@@ -82,17 +82,17 @@ public abstract class ReportUnitPanel extends ReportPanel {
     private boolean showColonies = false;
 
 
-    protected Player player = getMyPlayer();
-
     /**
      * The constructor that will add the items to this panel.
-     * @param freeColClient the FreeColClient
-     * @param gui the GUI
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param key the report name key
      * @param showColonies whether to show colonies with no selected units
      */
-    public ReportUnitPanel(FreeColClient freeColClient, GUI gui, String key, boolean showColonies) {
-        super(freeColClient, gui, Messages.message(key));
+    public ReportUnitPanel(FreeColClient freeColClient, String key,
+                           boolean showColonies) {
+        super(freeColClient, Messages.message(key));
+
         this.showColonies = showColonies;
         reportPanel.setLayout(new MigLayout("fillx, wrap 12", "", ""));
 
@@ -108,7 +108,7 @@ public abstract class ReportUnitPanel extends ReportPanel {
         }
 
         // Europe next
-        Europe europe = player.getEurope();
+        Europe europe = getMyPlayer().getEurope();
         if (europe != null) {
             handleLocation(europe, Messages.message(europe.getNameKey()), inEurope);
         }
@@ -206,7 +206,7 @@ public abstract class ReportUnitPanel extends ReportPanel {
                         reportPanel.add(goodsLabel);
                     }
                     for (Unit unitLoaded : unit.getUnitList()) {
-                        UnitLabel unitLoadedLabel = new UnitLabel(getFreeColClient(), unitLoaded, getGUI(), true);
+                        UnitLabel unitLoadedLabel = new UnitLabel(getFreeColClient(), unitLoaded, true);
                         reportPanel.add(unitLoadedLabel);
                     }
                 } else {

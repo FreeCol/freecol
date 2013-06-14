@@ -54,10 +54,9 @@ public final class MainPanel extends FreeColPanel {
      * The constructor that will add the items to this panel.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      */
-    public MainPanel(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui, new MigLayout("wrap 1, insets n n 20 n", "[center]"));
+    public MainPanel(FreeColClient freeColClient) {
+        super(freeColClient, new MigLayout("wrap 1, insets n n 20 n", "[center]"));
         boolean canContinue = getFreeColClient().getInGameController()
             .getLastSaveGameFile() != null;
 

@@ -117,7 +117,7 @@ public class FreeColDialog<T> extends FreeColPanel {
 
         final List<JButton> choiceBtnLst = new ArrayList<JButton>();
         final FreeColDialog<ChoiceItem<T>> choiceDialog
-            = new FreeColDialog<ChoiceItem<T>>(freeColClient, gui) {
+            = new FreeColDialog<ChoiceItem<T>>(freeColClient) {
                 @Override
                 public void requestFocus() {
                     for (JButton b : choiceBtnLst) {
@@ -219,7 +219,7 @@ public class FreeColDialog<T> extends FreeColPanel {
         ImageIcon[] icons, String okText, String cancelText) {
         // create the dialog
         final FreeColDialog<Boolean> confirmDialog
-            = new FreeColDialog<Boolean>(freeColClient, gui);
+            = new FreeColDialog<Boolean>(freeColClient);
 
         confirmDialog.setLayout(new MigLayout("wrap 2", "[][fill]", ""));
 
@@ -270,7 +270,7 @@ public class FreeColDialog<T> extends FreeColPanel {
 
         final JTextField input = new JTextField(defaultValue);
         final FreeColDialog<String> inputDialog
-            = new FreeColDialog<String>(freeColClient, gui)  {
+            = new FreeColDialog<String>(freeColClient)  {
                 @Override
                 public void requestFocus() {
                     input.requestFocus();
@@ -332,7 +332,8 @@ public class FreeColDialog<T> extends FreeColPanel {
      */
     public static FreeColDialog<File> createLoadDialog(FreeColClient freeColClient, GUI gui, File directory,
                                                        FileFilter[] fileFilters) {
-        final FreeColDialog<File> loadDialog = new FreeColDialog<File>(freeColClient, gui);
+        final FreeColDialog<File> loadDialog
+            = new FreeColDialog<File>(freeColClient);
         final JFileChooser fileChooser = new JFileChooser(directory);
         if (fileFilters.length > 0) {
             for (FileFilter fileFilter : fileFilters) {
@@ -364,7 +365,8 @@ public class FreeColDialog<T> extends FreeColPanel {
         final JTextField inputWidth = new JTextField(Integer.toString(defaultWidth), COLUMNS);
         final JTextField inputHeight = new JTextField(Integer.toString(defaultHeight), COLUMNS);
 
-        final FreeColDialog<Dimension> mapSizeDialog = new FreeColDialog<Dimension>(freeColClient, gui);
+        final FreeColDialog<Dimension> mapSizeDialog
+            = new FreeColDialog<Dimension>(freeColClient);
 
         mapSizeDialog.setLayout(new MigLayout("wrap 2"));
 
@@ -424,7 +426,8 @@ public class FreeColDialog<T> extends FreeColPanel {
     public static FreeColDialog<File> createSaveDialog(FreeColClient freeColClient, GUI gui, File directory,
         final String standardName, FileFilter[] fileFilters, String defaultName) {
 
-        final FreeColDialog<File> saveDialog = new FreeColDialog<File>(freeColClient, gui);
+        final FreeColDialog<File> saveDialog
+            = new FreeColDialog<File>(freeColClient);
         final JFileChooser fileChooser = new JFileChooser(directory);
         final File defaultFile = new File(defaultName);
 
@@ -491,10 +494,9 @@ public class FreeColDialog<T> extends FreeColPanel {
      * Creates a FreeCol dialog.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      */
-    public FreeColDialog(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui);
+    public FreeColDialog(FreeColClient freeColClient) {
+        super(freeColClient);
 
         cancelButton.setActionCommand(CANCEL);
         cancelButton.addActionListener(this);

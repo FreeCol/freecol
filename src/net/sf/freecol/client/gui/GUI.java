@@ -129,9 +129,7 @@ public class GUI {
 
     public static final int VIEW_TERRAIN_MODE = 1;
 
-
     private FreeColClient freeColClient;
-
 
     private GraphicsDevice gd;
 
@@ -161,10 +159,16 @@ public class GUI {
     private JWindow splash;
 
 
+    /**
+     * Create the GUI.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     */
     public GUI(FreeColClient freeColClient) {
         this.freeColClient = freeColClient;
         this.imageLibrary = new ImageLibrary();
     }
+
 
     public void activateGotoPath() {
         Unit unit = getActiveUnit();
@@ -597,7 +601,7 @@ public class GUI {
     }
 
     public void setupInGameMenuBar() {
-        frame.setJMenuBar(new InGameMenuBar(freeColClient, this));
+        frame.setJMenuBar(new InGameMenuBar(freeColClient));
         frame.paintAll(canvas.getGraphics());
     }
 
@@ -1096,9 +1100,9 @@ public class GUI {
                 }
             });
 
-        this.mapViewer = new MapViewer(freeColClient, this, innerWindowSize, imageLibrary);
-        this.canvas = new Canvas(freeColClient, this, innerWindowSize, mapViewer);
-        this.colonyTileGUI = new MapViewer(freeColClient, this, innerWindowSize, imageLibrary);
+        this.mapViewer = new MapViewer(freeColClient, innerWindowSize, imageLibrary);
+        this.canvas = new Canvas(freeColClient, innerWindowSize, mapViewer);
+        this.colonyTileGUI = new MapViewer(freeColClient, innerWindowSize, imageLibrary);
 
         changeWindowedMode(isWindowed());
         frame.setIconImage(ResourceManager.getImage("FrameIcon.image"));
@@ -1198,7 +1202,7 @@ public class GUI {
 
 
     private void setupMapEditorMenuBar() {
-        frame.setJMenuBar(new MapEditorMenuBar(freeColClient, this));
+        frame.setJMenuBar(new MapEditorMenuBar(freeColClient));
     }
 
     private void setupMouseListenerForMapEditor() {
@@ -1228,7 +1232,7 @@ public class GUI {
                     mapControls = (MapControls) controls.getConstructor(FreeColClient.class, GUI.class)
                         .newInstance(freeColClient, this);
                 } catch(Exception e) {
-                    mapControls = new CornerMapControls(freeColClient, this);
+                    mapControls = new CornerMapControls(freeColClient);
                 }
             }
             mapControls.update();
@@ -1305,7 +1309,7 @@ public class GUI {
     }
 
     public BufferedImage createMiniMapThumbNail() {
-        MiniMap miniMap = new MiniMap(freeColClient, this);
+        MiniMap miniMap = new MiniMap(freeColClient);
         miniMap.setTileSize(MiniMap.MAX_TILE_SIZE);
         int width = freeColClient.getGame().getMap().getWidth()
             * MiniMap.MAX_TILE_SIZE + MiniMap.MAX_TILE_SIZE/2;
@@ -1325,5 +1329,4 @@ public class GUI {
         scaledImage.createGraphics().drawImage(image, 0, 0, (int) scaledWidth, 64, null);
         return scaledImage;
     }
-
 }

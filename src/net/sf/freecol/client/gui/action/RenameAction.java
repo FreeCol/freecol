@@ -22,8 +22,6 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.control.InGameController;
-import net.sf.freecol.client.gui.GUI;
 
 
 /**
@@ -32,18 +30,17 @@ import net.sf.freecol.client.gui.GUI;
 public class RenameAction extends UnitAction {
 
     public static final String id = "renameAction";
-    private final InGameController inGameController;
+
 
     /**
      * Creates this action.
      *
-     * @param freeColClient The main controller object for the client.
-     * @param gui 
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    RenameAction(FreeColClient freeColClient, InGameController inGameController, GUI gui) {
-        super(freeColClient, gui, id);
-        this.inGameController = inGameController;
+    public RenameAction(FreeColClient freeColClient) {
+        super(freeColClient, id);
     }
+
 
     /**
      * Applies this action.
@@ -51,6 +48,6 @@ public class RenameAction extends UnitAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        inGameController.rename(gui.getActiveUnit());
+        getInGameController().rename(getGUI().getActiveUnit());
     }
 }

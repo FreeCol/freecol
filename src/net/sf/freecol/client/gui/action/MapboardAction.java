@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.action;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
 
 
 /**
@@ -31,29 +30,27 @@ import net.sf.freecol.client.gui.GUI;
  */
 public abstract class MapboardAction extends FreeColAction {
 
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(MapboardAction.class.getName());
-
 
     /**
      * Creates a new <code>MapboardAction</code>.
-     * @param freeColClient The main controller object for the client
-     * @param id The object identifier for this action.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    protected MapboardAction(FreeColClient freeColClient, GUI gui, String id) {
-        super(freeColClient, gui, id);
+    protected MapboardAction(FreeColClient freeColClient, String id) {
+        super(freeColClient, id);
     }
+
 
     /**
      * Checks if this action should be enabled.
      * 
-     * @return <code>true</code> if the mapboard is selected.
+     * @return True if the mapboard is selected.
      */
     @Override
     protected boolean shouldBeEnabled() { 
         return super.shouldBeEnabled()  
-            && gui.isMapboardActionsEnabled()
-            && (getFreeColClient().getGame() == null
-                || getFreeColClient().currentPlayerIsMyPlayer());
+            && getGUI().isMapboardActionsEnabled()
+            && (getGame() == null
+                || freeColClient.currentPlayerIsMyPlayer());
     }
 }

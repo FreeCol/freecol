@@ -39,14 +39,14 @@ import net.sf.freecol.common.model.StringTemplate;
  */
 public class RebelToolTip extends JToolTip {
 
+
     /**
      * Creates a RebelToolTip.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      * @param colony The <code>Colony</code> for which to display information.
      */
-    public RebelToolTip(FreeColClient freeColClient, GUI gui, Colony colony) {
+    public RebelToolTip(FreeColClient freeColClient, Colony colony) {
         final Specification spec = colony.getSpecification();
         final int population = colony.getUnitCount();
         final int solPercent = colony.getSoL();
@@ -76,14 +76,14 @@ public class RebelToolTip extends JToolTip {
             add(new JLabel(Messages.message(goodsType.getNameKey())));
             int production = colony.getNetProductionOf(goodsType);
             libertyProduction += production;
-            add(new ProductionLabel(freeColClient, gui, goodsType, production),
+            add(new ProductionLabel(freeColClient, goodsType, production),
                 "span 2");
         }
 
         final int liberty = colony.getLiberty();
         final int modulo = liberty % Colony.LIBERTY_PER_REBEL;
         final int width = (int)getPreferredSize().getWidth() - 32;
-        FreeColProgressBar progress = new FreeColProgressBar(gui, null, 0, 
+        FreeColProgressBar progress = new FreeColProgressBar(freeColClient.getGUI(), null, 0, 
             Colony.LIBERTY_PER_REBEL, modulo, libertyProduction);
         progress.setPreferredSize(new Dimension(width, 20));
         add(progress, "span 3");

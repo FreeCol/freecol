@@ -65,8 +65,8 @@ public class WorkProductionPanel extends FreeColPanel {
                               BorderFactory.createEmptyBorder(2, 2, 2, 2));
 
 
-    public WorkProductionPanel(FreeColClient freeColClient, GUI gui, Unit unit) {
-        super(freeColClient, gui);
+    public WorkProductionPanel(FreeColClient freeColClient, Unit unit) {
+        super(freeColClient);
 
         setLayout(new MigLayout("wrap 3, insets 10 10 10 10", "[]30:push[right][]", ""));
 
@@ -110,8 +110,7 @@ public class WorkProductionPanel extends FreeColPanel {
             add(new JLabel(ResourceManager.getImageIcon(building.getType()
                         .getId() + ".image")));
         }
-        add(new UnitLabel(getFreeColClient(), unit, getGUI(), false, false),
-            "wrap");
+        add(new UnitLabel(getFreeColClient(), unit, false, false), "wrap");
 
         Collections.sort(modifiers);
         float result = 0.0f;

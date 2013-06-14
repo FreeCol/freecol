@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
 
 
 /**
@@ -32,33 +31,29 @@ public class ZoomOutAction extends FreeColAction {
 
     public static final String id = "zoomOutAction";
 
+
     /**
      * Creates a new <code>ZoomOutAction</code>.
      *
-     * @param freeColClient The main controller object for the client.
-     * @param gui 
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    ZoomOutAction(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui, id);
+    public ZoomOutAction(FreeColClient freeColClient) {
+        super(freeColClient, id);
     }
+
 
     /**
      * Checks if this action should be enabled.
      *
-     * @return <code>true</code> if the mapboard is selected
-     *      and can be zoomed onto.
+     * @return True if the mapboard is selected and can be zoomed onto.
      */
     @Override
     protected boolean shouldBeEnabled() {
-        if (!super.shouldBeEnabled()) {
-            return false;
-        }
+        if (!super.shouldBeEnabled()) return false;
 
-        if (!gui.isMapboardActionsEnabled())
-        	return false;
+        if (!getGUI().isMapboardActionsEnabled()) return false;
 
-        float oldScaling = gui.getMapScale();
-
+        float oldScaling = getGUI().getMapScale();
         return ((oldScaling - 1/8f) * 8 > 1);
     }
 
@@ -68,8 +63,8 @@ public class ZoomOutAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        gui.scaleMap(-1/4f);
+        getGUI().scaleMap(-1/4f);
         update();
-        freeColClient.getActionManager().getFreeColAction(ZoomInAction.id).update();
+        getActionManager().getFreeColAction(ZoomInAction.id).update();
     }
 }

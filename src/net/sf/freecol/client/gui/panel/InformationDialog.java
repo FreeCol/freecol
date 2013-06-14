@@ -40,19 +40,18 @@ import net.sf.freecol.common.resources.ResourceManager;
  */
 public class InformationDialog extends FreeColDialog<Boolean> {
 
+
     /**
      * Creates an information dialog that shows the given texts and
      * images, and an "OK" button.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      * @param text The text to be displayed in the dialog.
      * @param image The image to be displayed in the dialog.
      */
-    public InformationDialog(FreeColClient freeColClient, GUI gui,
+    public InformationDialog(FreeColClient freeColClient,
                              String text, ImageIcon image) {
-        this(freeColClient, gui, new String[] { text },
-             new ImageIcon[] { image });
+        this(freeColClient, new String[] { text }, new ImageIcon[] { image });
     }
 
     /**
@@ -60,13 +59,13 @@ public class InformationDialog extends FreeColDialog<Boolean> {
      * texts and images, and an "OK" button.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      * @param texts The texts to be displayed in the dialog.
      * @param images The images to be displayed in the dialog.
      */
-    public InformationDialog(FreeColClient freeColClient, GUI gui,
+    public InformationDialog(FreeColClient freeColClient,
                              String[] texts, ImageIcon[] images) {
-        super(freeColClient,  gui);
+        super(freeColClient);
+
         setLayout(new MigLayout("wrap 1, insets 200 10 10 10", "[510]", "[242]20[20]"));
 
         JPanel textPanel = new JPanel();

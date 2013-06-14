@@ -71,8 +71,10 @@ public class ConceptDetailPanel extends FreeColPanel
      *
      * @param colopediaPanel the ColopediaPanel
      */
-    public ConceptDetailPanel(FreeColClient freeColClient, GUI gui, ColopediaPanel colopediaPanel) {
-        super(freeColClient, gui);
+    public ConceptDetailPanel(FreeColClient freeColClient,
+                              ColopediaPanel colopediaPanel) {
+        super(freeColClient);
+
         this.colopediaPanel = colopediaPanel;
     }
 

@@ -69,18 +69,18 @@ public class MapEditorMenuBar extends FreeColMenuBar {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(MapEditorMenuBar.class.getName());
 
+
     /**
      * Creates a new <code>MapEditorMenuBar</code>. This menu bar will include
      * all of the submenus and items.
      *
-     * @param freeColClient The main controller.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    public MapEditorMenuBar(final FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui);
+    public MapEditorMenuBar(final FreeColClient freeColClient) {
+        super(freeColClient);
 
-        //add a mouse listener so that autoscrolling can happen in this menubar
+        // Add a mouse listener so that autoscrolling can happen in this menubar
         this.addMouseMotionListener(new MenuMouseMotionListener(freeColClient));
-      
         reset();
     }
 

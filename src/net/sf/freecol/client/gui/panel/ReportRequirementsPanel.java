@@ -80,12 +80,12 @@ public final class ReportRequirementsPanel extends ReportPanel {
 
     /**
      * The constructor that will add the items to this panel.
-     * @param freeColClient 
      *
-     * @param gui The parent of this panel.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    public ReportRequirementsPanel(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui, Messages.message("reportRequirementsAction.name"));
+    public ReportRequirementsPanel(FreeColClient freeColClient) {
+        super(freeColClient, Messages.message("reportRequirementsAction.name"));
+
         colonies = getSortedColonies();
 
         // Display Panel

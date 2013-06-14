@@ -99,51 +99,47 @@ public final class ProductionLabel extends AbstractGoodsLabel {
      * Creates a new production label.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      * @param goods The <code>AbstractGoods</code> to create a label for.
      */
-    public ProductionLabel(FreeColClient freeColClient, GUI gui,
-                           AbstractGoods goods) {
-        this(freeColClient, gui, goods, -1);
+    public ProductionLabel(FreeColClient freeColClient, AbstractGoods goods) {
+        this(freeColClient, goods, -1);
     }
 
     /**
      * Creates a new production label.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      * @param goods The <code>AbstractGoods</code> to create a label for.
      * @param maximum An <code>AbstractGoods</code> defining a maximum amount.
      */
-    public ProductionLabel(FreeColClient freeColClient, GUI gui,
+    public ProductionLabel(FreeColClient freeColClient,
                            AbstractGoods goods, AbstractGoods maximum) {
-        this(freeColClient, gui, goods, maximum.getAmount());
+        this(freeColClient, goods, maximum.getAmount());
     }
 
     /**
      * Creates a new production label.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      * @param goodsType The <code>GoodsType</code> for the label.
      * @param amount The amount of goods.
      */
-    public ProductionLabel(FreeColClient freeColClient, GUI gui,
+    public ProductionLabel(FreeColClient freeColClient,
                            GoodsType goodsType, int amount) {
-        this(freeColClient, gui, new AbstractGoods(goodsType, amount), -1);
+        this(freeColClient, new AbstractGoods(goodsType, amount), -1);
     }
 
     /**
      * Creates a new production label.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      * @param goods The <code>AbstractGoods</code> to create a label for.
      * @param maximum The maximum amount of goods.
      */
-    public ProductionLabel(FreeColClient freeColClient, GUI gui,
+    public ProductionLabel(FreeColClient freeColClient,
                            AbstractGoods goods, int maximum) {
-        super(goods, gui);
+        super(goods, freeColClient.getGUI());
+
         this.maximumProduction = maximum;
         ClientOptions options = freeColClient.getClientOptions();
         maxIcons = options.getInteger(ClientOptions.MAX_NUMBER_OF_GOODS_IMAGES);

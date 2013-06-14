@@ -64,11 +64,10 @@ public final class TilePanel extends FreeColPanel {
      * Creates a panel describing a tile.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      * @param tile The <code>Tile</code> to describe.
      */
-    public TilePanel(FreeColClient freeColClient, GUI gui, Tile tile) {
-        super(freeColClient, gui);
+    public TilePanel(FreeColClient freeColClient, Tile tile) {
+        super(freeColClient);
 
         tileType = tile.getType();
 
@@ -96,7 +95,7 @@ public final class TilePanel extends FreeColPanel {
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = (Graphics2D)image.getGraphics();
         g.translate(0, height - baseHeight);
-        gui.displayColonyTile(g, tile, null);
+        getGUI().displayColonyTile(g, tile, null);
         add(new JLabel(new ImageIcon(image)));
 
         if (tile.getRegion() != null) {

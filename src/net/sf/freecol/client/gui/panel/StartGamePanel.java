@@ -78,10 +78,9 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
      * Create the panel from which to start a game.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      */
-    public StartGamePanel(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui);
+    public StartGamePanel(FreeColClient freeColClient) {
+        super(freeColClient);
     }
 
 
@@ -98,7 +97,8 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
 
         setCancelComponent(cancel);
 
-        table = new PlayersTable(getFreeColClient(), getGUI(), nationOptions, getMyPlayer());
+        table = new PlayersTable(getFreeColClient(), nationOptions,
+                                 getMyPlayer());
 
         start = new JButton(Messages.message("startGame"));
         gameOptions = new JButton(Messages.message("gameOptions"));

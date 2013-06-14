@@ -75,17 +75,21 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
 
     private static final Logger logger = Logger.getLogger(TradeRouteInputDialog.class.getName());
 
-    public static final DataFlavor STOP_FLAVOR = new DataFlavor(Stop.class, "Stop");
+    public static final DataFlavor STOP_FLAVOR
+        = new DataFlavor(Stop.class, "Stop");
 
     private TradeRoute originalRoute;
 
-    private final JButton addStopButton = new JButton(Messages.message("traderouteDialog.addStop"));
+    private final JButton addStopButton
+        = new JButton(Messages.message("traderouteDialog.addStop"));
 
-    private final JButton removeStopButton = new JButton(Messages.message("traderouteDialog.removeStop"));
+    private final JButton removeStopButton
+        = new JButton(Messages.message("traderouteDialog.removeStop"));
 
     private final CargoHandler cargoHandler = new CargoHandler();
 
-    private final MouseListener dragListener = new DragListener(getFreeColClient(), getGUI(), this);
+    private final MouseListener dragListener
+        = new DragListener(getFreeColClient(), this);
 
     private final MouseListener dropListener = new DropListener();
 
@@ -95,7 +99,8 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
 
     private final JComboBox destinationSelector = new JComboBox();
 
-    private final JTextField tradeRouteName = new JTextField(Messages.message("traderouteDialog.newRoute"));
+    private final JTextField tradeRouteName
+        = new JTextField(Messages.message("traderouteDialog.newRoute"));
 
     private final DefaultListModel stopListModel = new DefaultListModel();
 
@@ -104,22 +109,23 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
 
     private final JScrollPane tradeRouteView = new JScrollPane(stopList);
 
-    private final JLabel nameLabel = new JLabel(Messages.message("traderouteDialog.nameLabel"));
+    private final JLabel nameLabel
+        = new JLabel(Messages.message("traderouteDialog.nameLabel"));
 
-    private final JLabel destinationLabel = new JLabel(Messages.message("traderouteDialog.destinationLabel"));
+    private final JLabel destinationLabel
+        = new JLabel(Messages.message("traderouteDialog.destinationLabel"));
 
 
     /**
      * Create a dialog to define trade route cargos.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      * @param newRoute The <code>TradeRoute</code> to operate on.
      */
     @SuppressWarnings("unchecked") // FIXME in Java7
-    public TradeRouteInputDialog(FreeColClient freeColClient, GUI gui,
+    public TradeRouteInputDialog(FreeColClient freeColClient,
                                  TradeRoute newRoute) {
-        super(freeColClient, gui);
+        super(freeColClient);
 
         this.originalRoute = newRoute;
 

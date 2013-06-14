@@ -32,6 +32,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.miginfocom.swing.MigLayout;
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -47,34 +48,34 @@ import net.sf.freecol.common.resources.ResourceManager;
  * unit in a colony.
  */
 public class ConstructionPanel extends JPanel implements PropertyChangeListener {
+    public static final String EVENT = Colony.ColonyChangeEvent.BUILD_QUEUE_CHANGE.toString();
+
+    private final FreeColClient freeColClient;
 
     private final boolean openBuildQueue;
 
     private Colony colony;
-
-    public static final String EVENT = Colony.ColonyChangeEvent.BUILD_QUEUE_CHANGE.toString();
 
     /**
      * The text to display if buildable == null.
      */
     private StringTemplate defaultLabel = StringTemplate.key("colonyPanel.clickToBuild");
 
-    private GUI gui;
-
 
     /**
      * Creates a ConstructionPanel.
      *
-     * @param gui The <code>GUI</code> to display on.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param colony The <code>Colony</code> whose construction is to be
      *     modified.
      * @param openBuildQueue True if the build queue should be immediately
      *     shown.
      */
-    public ConstructionPanel(GUI gui,
+    public ConstructionPanel(FreeColClient freeColClient,
                              Colony colony, boolean openBuildQueue) {
-        this.gui = gui;
+        this.freeColClient = freeColClient;
         this.openBuildQueue = openBuildQueue;
+
         setLayout(new MigLayout("fill, gapy 2:5, wrap 2", "push[]10[center]push"));
         setColony(colony);
     }
@@ -98,7 +99,7 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
             {
                 addMouseListener(new MouseAdapter() {
                         public void mousePressed(MouseEvent e) {
-                            gui.showBuildQueuePanel(colony);
+                            freeColClient.getGUI().showBuildQueuePanel(colony);
                         }
                     });
             }
@@ -107,6 +108,7 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
     }
 
     private void initialize(BuildableType buildable) {
+        GUI gui = freeColClient.getGUI();
 
         removeAll();
 

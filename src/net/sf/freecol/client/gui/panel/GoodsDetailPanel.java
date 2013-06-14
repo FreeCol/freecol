@@ -52,15 +52,16 @@ import net.sf.freecol.common.model.UnitType;
  */
 public class GoodsDetailPanel extends ColopediaGameObjectTypePanel<GoodsType> {
 
+
     /**
      * Creates a new instance of this ColopediaDetailPanel.
-     * @param freeColClient 
-     * @param gui 
      *
-     * @param colopediaPanel the ColopediaPanel
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param colopediaPanel The parent ColopediaPanel.
      */
-    public GoodsDetailPanel(FreeColClient freeColClient, GUI gui, ColopediaPanel colopediaPanel) {
-        super(freeColClient, gui, colopediaPanel, PanelType.GOODS.toString(), 0.75);
+    public GoodsDetailPanel(FreeColClient freeColClient,
+                            ColopediaPanel colopediaPanel) {
+        super(freeColClient, colopediaPanel, PanelType.GOODS.toString(), 0.75);
     }
 
 

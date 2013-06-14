@@ -50,8 +50,8 @@ public class ParametersDialog extends FreeColDialog<Parameters> {
     final JTextField inputM = new JTextField(Integer.toString(DEFAULT_maxDistanceToEdge), COLUMNS);
 
 
-    public ParametersDialog(FreeColClient freeColClient, final GUI gui) {
-        super(freeColClient, gui);
+    public ParametersDialog(FreeColClient freeColClient) {
+        super(freeColClient);
         /*
          * TODO: Extend this dialog. It should be possible
          *       to specify the sizes using percentages.
@@ -75,7 +75,7 @@ public class ParametersDialog extends FreeColDialog<Parameters> {
                     }
                     setResponse(new Parameters(d, m));
                 } catch (NumberFormatException nfe) {
-                    gui.errorMessage("integerAboveZero");
+                    getGUI().errorMessage("integerAboveZero");
                 }
             }
         };

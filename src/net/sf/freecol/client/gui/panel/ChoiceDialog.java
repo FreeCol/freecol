@@ -54,15 +54,14 @@ public final class ChoiceDialog<T> extends FreeColDialog<T> {
      * The constructor to use.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      * @param text <code>String</code>
      * @param cancelText <code>String</code>
      * @param choices List of <code>ChoiceItem<T></code>
      */
     @SuppressWarnings("unchecked") // FIXME in Java7
-    public ChoiceDialog(FreeColClient freeColClient, GUI gui, String text,
+    public ChoiceDialog(FreeColClient freeColClient, String text,
                         String cancelText, List<ChoiceItem<T>> choices) {
-        super(freeColClient, gui);
+        super(freeColClient);
 
         MigLayout layout = new MigLayout("wrap 1, fill", "[align center]", "[]30[]30[]");
         setLayout(layout);

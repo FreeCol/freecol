@@ -56,14 +56,14 @@ public final class ReportIndianPanel extends ReportPanel {
     };
 
 
-
     /**
      * The constructor that will add the items to this panel.
-     * @param freeColClient
-     * @param gui The parent of this panel.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    public ReportIndianPanel(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui, Messages.message("reportIndianAction.name"));
+    public ReportIndianPanel(FreeColClient freeColClient) {
+        super(freeColClient, Messages.message("reportIndianAction.name"));
+
         Player player = getMyPlayer();
         reportPanel.setLayout(new MigLayout("wrap 6, fillx, insets 0", "[]20px[center]", "[top]"));
         boolean needsSeperator = false;

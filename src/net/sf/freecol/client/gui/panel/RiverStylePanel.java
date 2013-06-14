@@ -56,10 +56,10 @@ public final class RiverStylePanel extends FreeColDialog<String> {
      * Creates a dialog to choose a river style.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      */
-    public RiverStylePanel(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui);
+    public RiverStylePanel(FreeColClient freeColClient) {
+        super(freeColClient);
+
         setLayout(new BorderLayout());
 
         JPanel stylesPanel = new JPanel(new GridLayout(9, 9));

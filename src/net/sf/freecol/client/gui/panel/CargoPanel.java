@@ -64,15 +64,14 @@ public class CargoPanel extends FreeColPanel
      * Creates this CargoPanel.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      * @param withTitle Should the panel have a title?
      */
-    public CargoPanel(FreeColClient freeColClient, GUI gui, boolean withTitle) {
-        super(freeColClient, gui);
+    public CargoPanel(FreeColClient freeColClient, boolean withTitle) {
+        super(freeColClient);
 
         carrier = null;
-        defaultTransferHandler = new DefaultTransferHandler(freeColClient, gui, this);
-        pressListener = new DragListener(getFreeColClient(), gui, this);
+        defaultTransferHandler = new DefaultTransferHandler(freeColClient, this);
+        pressListener = new DragListener(freeColClient, this);
 
         if (withTitle) {
             border = BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(),
@@ -143,7 +142,7 @@ public class CargoPanel extends FreeColPanel
             while (unitIterator.hasNext()) {
                 Unit unit = unitIterator.next();
 
-                UnitLabel label = new UnitLabel(getFreeColClient(), unit, getGUI());
+                UnitLabel label = new UnitLabel(getFreeColClient(), unit);
                 if (isEditable()) {
                     label.setTransferHandler(defaultTransferHandler);
                     label.addMouseListener(pressListener);

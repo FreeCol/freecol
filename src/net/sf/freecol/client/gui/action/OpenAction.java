@@ -22,8 +22,6 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.control.InGameController;
-import net.sf.freecol.client.gui.GUI;
 
 
 /**
@@ -32,19 +30,17 @@ import net.sf.freecol.client.gui.GUI;
 public class OpenAction extends FreeColAction {
 
     public static final String id = "openAction";
-    private final InGameController inGameController;
 
 
     /**
      * Creates a new <code>OpenAction</code>.
      *
-     * @param freeColClient The main controller object for the client.
-     * @param gui 
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    OpenAction(FreeColClient freeColClient, InGameController inGameController, GUI gui) {
-        super(freeColClient, gui, id);
-        this.inGameController = inGameController;
+    public OpenAction(FreeColClient freeColClient) {
+        super(freeColClient, id);
     }
+
 
     /**
      * Applies this action.
@@ -53,7 +49,7 @@ public class OpenAction extends FreeColAction {
      */
     public void actionPerformed(ActionEvent e) {
         if (!freeColClient.isMapEditor()) {
-            inGameController.loadGame();
+            getInGameController().loadGame();
         } else {
             freeColClient.getMapEditorController().loadGame();
         }

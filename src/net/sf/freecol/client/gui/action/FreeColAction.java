@@ -31,12 +31,16 @@ import javax.swing.event.MenuKeyEvent;
 import javax.swing.event.MenuKeyListener;
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.ConnectController;
+import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.FreeColObject;
+import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.resources.ResourceManager;
 
@@ -45,7 +49,8 @@ import net.sf.freecol.common.resources.ResourceManager;
  * The super class of all actions in FreeCol.  Subclasses of this
  * object is stored in an {@link ActionManager}.
  */
-public abstract class FreeColAction extends AbstractAction implements Option<FreeColAction> {
+public abstract class FreeColAction extends AbstractAction
+    implements Option<FreeColAction> {
 
     private static final Logger logger = Logger.getLogger(FreeColAction.class.getName());
 
@@ -60,21 +65,17 @@ public abstract class FreeColAction extends AbstractAction implements Option<Fre
 
     private int orderButtonImageCount = 0;
 
-    protected GUI gui;
-
 
     /**
      * Creates a new <code>FreeColAction</code>.
      *
-     * @param freeColClient The main controller object for the client.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param id The object identifier for this action.
      */
-    protected FreeColAction(FreeColClient freeColClient, GUI gui, String id) {
+    protected FreeColAction(FreeColClient freeColClient, String id) {
         super(Messages.message(id + ".name"));
 
         this.freeColClient = freeColClient;
-
-        this.gui = gui;
 
         putValue(ACTION_ID, id);
 
@@ -90,6 +91,71 @@ public abstract class FreeColAction extends AbstractAction implements Option<Fre
             setAccelerator(KeyStroke.getKeyStroke(accelerator));
         }
     }
+
+
+    /**
+     * Gets the main controller object for the client.
+     *
+     * @return The main controller object for the client.
+     */
+    protected FreeColClient getFreeColClient() {
+        return freeColClient;
+    }
+
+    /**
+     * Gets the game.
+     *
+     * @return The <code>Game</code>.
+     */
+    protected Game getGame() {
+        return freeColClient.getGame();
+    }
+
+    /**
+     * Get the GUI.
+     *
+     * @return The GUI.
+     */
+    protected GUI getGUI() {
+        return freeColClient.getGUI();
+    }
+
+    /**
+     * Get the controller.
+     *
+     * @return The <code>InGameController</code>.
+     */
+    protected InGameController getInGameController() {
+        return freeColClient.getInGameController();
+    }
+
+    /**
+     * Get the connect controller.
+     *
+     * @return The <code>ConnectController</code>.
+     */
+    protected ConnectController getConnectController() {
+        return freeColClient.getConnectController();
+    }
+
+    /**
+     * Get the action manager.
+     *
+     * @return The <code>ActionManager</code>.
+     */
+    protected ActionManager getActionManager() {
+        return freeColClient.getActionManager();
+    }
+
+    /**
+     * Get the client options
+     *
+     * @return The <code>ClientOptions</code>.
+     */
+    protected ClientOptions getClientOptions() {
+        return freeColClient.getClientOptions();
+    }
+
 
     /**
      * Don't use this method.
@@ -114,15 +180,6 @@ public abstract class FreeColAction extends AbstractAction implements Option<Fre
      */
     public void setMnemonic(int mnemonic) {
         putValue(MNEMONIC_KEY, mnemonic);
-    }
-
-    /**
-     * Gets the main controller object for the client.
-     *
-     * @return The main controller object for the client.
-     */
-    protected FreeColClient getFreeColClient() {
-        return freeColClient;
     }
 
     /**
@@ -180,7 +237,7 @@ public abstract class FreeColAction extends AbstractAction implements Option<Fre
      *         cases.
      */
     protected boolean shouldBeEnabled() {
-        return gui.isClientOptionsDialogShowing();
+        return getGUI().isClientOptionsDialogShowing();
     }
 
     /**

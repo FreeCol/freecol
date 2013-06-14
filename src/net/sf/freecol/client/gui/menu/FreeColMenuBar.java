@@ -65,7 +65,7 @@ public abstract class FreeColMenuBar extends JMenuBar {
      *
      * @param f The main controller.
      */
-    protected FreeColMenuBar(FreeColClient f, GUI gui) {
+    protected FreeColMenuBar(FreeColClient f) {
 
         // TODO: FreeColClient should not have to be passed in to this class.
         // This is only a menu bar, it doesn't need
@@ -90,13 +90,20 @@ public abstract class FreeColMenuBar extends JMenuBar {
 
         this.freeColClient = f;
         
-        this.gui = gui;
-
         this.am = f.getActionManager();
 
         setBorder(FreeColImageBorder.imageBorder);
     }
 
+
+    /**
+     * Get the GUI.
+     *
+     * @return The GUI.
+     */
+    public GUI getGUI() {
+        return freeColClient.getGUI();
+    }
 
     /**
      * Resets this menu bar.

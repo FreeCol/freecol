@@ -71,16 +71,18 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
     private final JSpinner units;
     private final JTextField name;
 
+
     /**
      * The constructor that will add the items to this panel.
-     * @param freeColClient the client
-     * @param gui the GUI
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param settlement the IndianSettlement to edit
      */
     @SuppressWarnings("unchecked") // FIXME in Java7
-    public EditSettlementDialog(FreeColClient freeColClient, GUI gui, final IndianSettlement settlement) {
+    public EditSettlementDialog(FreeColClient freeColClient,
+                                final IndianSettlement settlement) {
+        super(freeColClient);
 
-        super(freeColClient, gui);
         this.settlement = settlement;
 
         okButton.addActionListener(this);

@@ -22,8 +22,6 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.control.InGameController;
-import net.sf.freecol.client.gui.GUI;
 
 
 /**
@@ -32,19 +30,17 @@ import net.sf.freecol.client.gui.GUI;
 public class SaveAndQuitAction extends FreeColAction {
 
     public static final String id = "saveAndQuitAction";
-    private final InGameController inGameController;
 
 
     /**
      * Creates a new <code>SaveAndQuitAction</code>.
      *
      * @param freeColClient The main controller object for the client.
-     * @param gui 
      */
-    SaveAndQuitAction(FreeColClient freeColClient, InGameController inGameController, GUI gui) {
-        super(freeColClient, gui, id);
-        this.inGameController = inGameController;
+    public SaveAndQuitAction(FreeColClient freeColClient) {
+        super(freeColClient, id);
     }
+
 
     /**
      * Applies this action.
@@ -55,7 +51,7 @@ public class SaveAndQuitAction extends FreeColAction {
         if (freeColClient.isMapEditor()) {
             freeColClient.getMapEditorController().saveGame();
         } else {
-            if (!inGameController.saveGame()) return;
+            if (!getInGameController().saveGame()) return;
         }
         freeColClient.quit();
     }

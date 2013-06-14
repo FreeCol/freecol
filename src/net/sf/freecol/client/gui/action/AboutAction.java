@@ -23,7 +23,6 @@ import java.awt.event.ActionEvent;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
 
 
 /**
@@ -33,15 +32,18 @@ public class AboutAction extends FreeColAction {
 
     public static final String id = "aboutAction";
 
+
     /**
      * Creates a new <code>AboutAction</code>.
      *
-     * @param freeColClient The main controller object for the client.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    AboutAction(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui, id);
+    public AboutAction(FreeColClient freeColClient) {
+        super(freeColClient, id);
+
         putValue(NAME, "FreeCol " + FreeCol.getRevision());
     }
+
 
     /**
      * Applies this action.
@@ -49,6 +51,6 @@ public class AboutAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        gui.showAboutPanel();
+        getGUI().showAboutPanel();
     }
 }

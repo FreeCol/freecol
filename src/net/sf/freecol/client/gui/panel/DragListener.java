@@ -48,27 +48,29 @@ public final class DragListener extends MouseAdapter {
 
     private final FreeColPanel parentPanel;
 
-    private FreeColClient freeColClient;
+    private final FreeColClient freeColClient;
 
-    private GUI gui;
+    private final GUI gui;
 
 
     /**
      * The constructor to use.
-     * @param freeColClient
      *
-     * @param parentPanel The layered pane that contains the components to which
-     *            a DragListener might be attached.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param parentPanel The layered pane that contains the
+     *     components to which a DragListener might be attached.
      */
-    public DragListener(FreeColClient freeColClient, GUI gui, FreeColPanel parentPanel) {
+    public DragListener(FreeColClient freeColClient,
+                        FreeColPanel parentPanel) {
         this.freeColClient = freeColClient;
-        this.gui = gui;
+        this.gui = freeColClient.getGUI();
         this.parentPanel = parentPanel;
     }
 
+
     /**
-     * Gets called when the mouse was pressed on a Swing component that has this
-     * object as a MouseListener.
+     * Gets called when the mouse was pressed on a Swing component
+     * that has this object as a MouseListener.
      *
      * @param e The event that holds the information about the mouse click.
      */

@@ -69,11 +69,10 @@ public final class ColopediaPanel extends FreeColPanel
      * The constructor that will add the items to this panel.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      * @param id The object identifier of the item to select.
      */
-    public ColopediaPanel(FreeColClient freeColClient, GUI gui, String id) {
-        super(freeColClient, gui);
+    public ColopediaPanel(FreeColClient freeColClient, String id) {
+        super(freeColClient);
 
         setLayout(new MigLayout("fill", "[200:]unrelated[550:, grow, fill]", "[][grow, fill][]"));
 
@@ -123,10 +122,9 @@ public final class ColopediaPanel extends FreeColPanel
      * a more elegant solution.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      */
-    public ColopediaPanel(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui);
+    public ColopediaPanel(FreeColClient freeColClient) {
+        super(freeColClient);
     }
 
 
@@ -140,15 +138,16 @@ public final class ColopediaPanel extends FreeColPanel
         DefaultMutableTreeNode root
             = new DefaultMutableTreeNode(new ColopediaTreeItem(null, null, name, null));
 
-        new TerrainDetailPanel(getFreeColClient(), getGUI(), this).addSubTrees(root);
-        new ResourcesDetailPanel(getFreeColClient(), getGUI(), this).addSubTrees(root);
-        new GoodsDetailPanel(getFreeColClient(), getGUI(), this).addSubTrees(root);
-        new UnitDetailPanel(getFreeColClient(), getGUI(), this).addSubTrees(root);
-        new BuildingDetailPanel(getFreeColClient(),  getGUI(), this).addSubTrees(root);
-        new FatherDetailPanel(getFreeColClient(), getGUI(), this).addSubTrees(root);
-        new NationDetailPanel(getFreeColClient(), getGUI(), this).addSubTrees(root);
-        new NationTypeDetailPanel(getFreeColClient(), getGUI(), this).addSubTrees(root);
-        new ConceptDetailPanel(getFreeColClient(), getGUI(), this).addSubTrees(root);
+        FreeColClient fcc = getFreeColClient();
+        new TerrainDetailPanel(fcc, this).addSubTrees(root);
+        new ResourcesDetailPanel(fcc, this).addSubTrees(root);
+        new GoodsDetailPanel(fcc, this).addSubTrees(root);
+        new UnitDetailPanel(fcc, this).addSubTrees(root);
+        new BuildingDetailPanel(fcc, this).addSubTrees(root);
+        new FatherDetailPanel(fcc, this).addSubTrees(root);
+        new NationDetailPanel(fcc, this).addSubTrees(root);
+        new NationTypeDetailPanel(fcc, this).addSubTrees(root);
+        new ConceptDetailPanel(fcc, this).addSubTrees(root);
 
         DefaultTreeModel treeModel = new DefaultTreeModel(root);
         tree = new JTree(treeModel) {

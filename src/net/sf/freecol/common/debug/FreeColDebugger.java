@@ -236,7 +236,7 @@ public class FreeColDebugger {
     /**
      * Try to complete a debug run if one is happening.
      *
-     * @param freeColClient The <code>FreeColClient</code> of the game.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param force Force early completion of a run.
      * @return True if a debug run was completed.
      */

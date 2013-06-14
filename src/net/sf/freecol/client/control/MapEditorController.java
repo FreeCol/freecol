@@ -56,10 +56,9 @@ public final class MapEditorController {
     private static final Logger logger = Logger.getLogger(MapEditorController.class.getName());
 
 
-    /**
-     * The main controller.
-     */
     private final FreeColClient freeColClient;
+
+    private final GUI gui;
 
     /**
      * The transform that should be applied to a
@@ -68,16 +67,15 @@ public final class MapEditorController {
     private MapTransform currentMapTransform = null;
 
 
-    private GUI gui;
-
 
     /**
      * Creates a new <code>MapEditorController</code>.
-     * @param freeColClient The main controller.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    public MapEditorController(FreeColClient freeColClient, GUI gui) {
+    public MapEditorController(FreeColClient freeColClient) {
         this.freeColClient = freeColClient;
-        this.gui = gui;
+        this.gui = freeColClient.getGUI();
     }
 
 

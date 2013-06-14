@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
 
 
 /**
@@ -36,12 +35,12 @@ public class MapEditorAction extends FreeColAction {
     /**
      * Creates a new <code>MapEditorAction</code>.
      *
-     * @param freeColClient The main controller object for the client.
-     * @param gui 
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    MapEditorAction(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui, id);
+    public MapEditorAction(FreeColClient freeColClient) {
+        super(freeColClient, id);
     }
+
 
     /**
      * Applies this action.
@@ -49,6 +48,6 @@ public class MapEditorAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        getFreeColClient().getMapEditorController().startMapEditor();
+        freeColClient.getMapEditorController().startMapEditor();
     }
 }

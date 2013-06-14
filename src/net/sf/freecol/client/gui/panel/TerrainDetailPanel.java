@@ -44,16 +44,19 @@ import net.sf.freecol.common.model.TileType;
  */
 public class TerrainDetailPanel extends ColopediaGameObjectTypePanel<TileType> {
 
+
     /**
      * Creates a new instance of this ColopediaDetailPanel.
-     * @param freeColClient 
-     * @param gui 
      *
-     * @param colopediaPanel the ColopediaPanel
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param colopediaPanel The parent ColopediaPanel.
      */
-    public TerrainDetailPanel(FreeColClient freeColClient, GUI gui, ColopediaPanel colopediaPanel) {
-        super(freeColClient, gui, colopediaPanel, PanelType.TERRAIN.toString(), 0.25);
+    public TerrainDetailPanel(FreeColClient freeColClient,
+                              ColopediaPanel colopediaPanel) {
+        super(freeColClient, colopediaPanel,
+              PanelType.TERRAIN.toString(), 0.25);
     }
+
 
     /**
      * Adds one or several subtrees for all the objects for which this

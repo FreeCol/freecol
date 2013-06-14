@@ -53,11 +53,10 @@ public final class ErrorPanel extends FreeColDialog<Boolean> {
      * Creates a panel to display the given error message.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      * @param message The error message to display in this error panel.
      */
-    public ErrorPanel(FreeColClient freeColClient, GUI gui, String message) {
-        super(freeColClient, gui);
+    public ErrorPanel(FreeColClient freeColClient, String message) {
+        super(freeColClient);
 
         setLayout(new MigLayout());
 
@@ -74,10 +73,9 @@ public final class ErrorPanel extends FreeColDialog<Boolean> {
      * Creates a plain error panel.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      */
-    public ErrorPanel(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui);
+    public ErrorPanel(FreeColClient freeColClient) {
+        super(freeColClient);
 
         File logFile = new File(FreeColDirectories.getLogFilePath());
         byte[] buffer = new byte[(int) logFile.length()];

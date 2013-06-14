@@ -32,18 +32,17 @@ import net.sf.freecol.client.gui.GUI;
 public class ClearOrdersAction extends UnitAction {
 
     public static final String id = "clearOrdersAction";
-    private final InGameController inGameController;
+
 
     /**
      * Creates this action.
      *
-     * @param freeColClient The main controller object for the client.
-     * @param gui 
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    ClearOrdersAction(FreeColClient freeColClient, InGameController inGameController, GUI gui) {
-        super(freeColClient, gui, id);
-        this.inGameController = inGameController;
+    public ClearOrdersAction(FreeColClient freeColClient) {
+        super(freeColClient, id);
     }
+
 
     /**
      * Applies this action.
@@ -51,6 +50,6 @@ public class ClearOrdersAction extends UnitAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        inGameController.clearOrders(gui.getActiveUnit());
+        getInGameController().clearOrders(getGUI().getActiveUnit());
     }
 }

@@ -50,8 +50,9 @@ public class ScaleMapSizeDialog extends FreeColDialog<Dimension> {
     final JTextField inputHeight = new JTextField(Integer.toString(oldMap.getHeight()), COLUMNS);
 
 
-    public ScaleMapSizeDialog(FreeColClient freeColClient, final GUI gui) {
-        super(freeColClient, gui);
+    public ScaleMapSizeDialog(final FreeColClient freeColClient) {
+        super(freeColClient);
+
         oldMap = freeColClient.getGame().getMap();
         /*
          * TODO: Extend this dialog. It should be possible to specify the sizes
@@ -76,7 +77,7 @@ public class ScaleMapSizeDialog extends FreeColDialog<Dimension> {
                     }
                     setResponse(new Dimension(width, height));
                 } catch (NumberFormatException nfe) {
-                    gui.errorMessage("integerAboveZero");
+                    freeColClient.getGUI().errorMessage("integerAboveZero");
                 }
             }
         };

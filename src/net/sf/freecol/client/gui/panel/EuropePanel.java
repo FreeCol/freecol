@@ -106,11 +106,10 @@ public final class EuropePanel extends PortPanel {
      * The constructor for a EuropePanel.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      * @param canvas The enclosing <code>Canvas</code>.
      */
-    public EuropePanel(FreeColClient freeColClient, GUI gui, Canvas canvas) {
-        super(freeColClient, gui);
+    public EuropePanel(FreeColClient freeColClient, Canvas canvas) {
+        super(freeColClient);
 
         setFocusCycleRoot(true);
 
@@ -130,7 +129,7 @@ public final class EuropePanel extends PortPanel {
         toAmericaPanel = new DestinationPanel();
         toEuropePanel = new DestinationPanel();
         inPortPanel = new EuropeInPortPanel();
-        cargoPanel = new CargoPanel(freeColClient, getGUI(), true);
+        cargoPanel = new CargoPanel(freeColClient, true);
         docksPanel = new DocksPanel();
         marketPanel = new MarketPanel(this);
 
@@ -142,7 +141,7 @@ public final class EuropePanel extends PortPanel {
         log.setParagraphAttributes(attributes, true);
 
         defaultTransferHandler
-            = new DefaultTransferHandler(freeColClient, getGUI(), this);
+            = new DefaultTransferHandler(freeColClient, this);
         toAmericaPanel.setTransferHandler(defaultTransferHandler);
         toEuropePanel.setTransferHandler(defaultTransferHandler);
         inPortPanel.setTransferHandler(defaultTransferHandler);
@@ -150,7 +149,7 @@ public final class EuropePanel extends PortPanel {
         docksPanel.setTransferHandler(defaultTransferHandler);
         marketPanel.setTransferHandler(defaultTransferHandler);
 
-        pressListener = new DragListener(freeColClient, gui, this);
+        pressListener = new DragListener(freeColClient, this);
         MouseListener releaseListener = new DropListener();
         toAmericaPanel.addMouseListener(releaseListener);
         toEuropePanel.addMouseListener(releaseListener);
@@ -457,7 +456,8 @@ public final class EuropePanel extends PortPanel {
                         belongs = false;
                     }
                     if (belongs) {
-                        UnitLabel unitLabel = new UnitLabel(getFreeColClient(), unit, getGUI());
+                        UnitLabel unitLabel
+                            = new UnitLabel(getFreeColClient(), unit);
                         unitLabel.setTransferHandler(defaultTransferHandler);
                         unitLabel.addMouseListener(pressListener);
                         add(unitLabel);

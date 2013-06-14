@@ -34,29 +34,28 @@ import net.sf.freecol.common.model.Player.PlayerType;
 public class DeclareIndependenceAction extends MapboardAction {
 
     public static final String id = "declareIndependenceAction";
-    private final InGameController inGameController;
 
 
     /**
      * Creates a new <code>DeclareIndependenceAction</code>.
      *
-     * @param freeColClient The main controller object for the client.
-     * @param gui 
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    DeclareIndependenceAction(FreeColClient freeColClient, InGameController inGameController, GUI gui) {
-        super(freeColClient, gui, id);
-        this.inGameController = inGameController;
+    public DeclareIndependenceAction(FreeColClient freeColClient) {
+        super(freeColClient, id);
     }
+
 
     /**
      * Checks if this action should be enabled.
      *
-     * @return <code>true</code> if the player can declare independence.
+     * @return True if the player can declare independence.
      */
     @Override
     protected boolean shouldBeEnabled() {
-        Player p = getFreeColClient().getMyPlayer();
-        return super.shouldBeEnabled() && p != null && p.getPlayerType() == PlayerType.COLONIAL;
+        Player p = freeColClient.getMyPlayer();
+        return super.shouldBeEnabled() && p != null
+            && p.getPlayerType() == PlayerType.COLONIAL;
     }
 
     /**
@@ -65,7 +64,7 @@ public class DeclareIndependenceAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        inGameController.declareIndependence();
+        getInGameController().declareIndependence();
         update();
     }
 }

@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
 
 
 /**
@@ -32,35 +31,34 @@ public class GotoTileAction extends UnitAction {
 
     public static final String id = "gotoTileAction";
 
+
     /**
      * Creates this action.
      *
-     * @param freeColClient The main controller object for the client.
-     * @param gui 
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    GotoTileAction(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui, id);
+    public GotoTileAction(FreeColClient freeColClient) {
+        super(freeColClient, id);
     }
+
 
     /**
      * Checks if this action should be enabled.
      *
-     * @return <code>false</code> if there is no active unit, and
-     *      <code>true</code> otherwise.
+     * @return True if there is an active unit.
      */
     @Override
     protected boolean shouldBeEnabled() {
         return super.shouldBeEnabled()
-            && gui.getActiveUnit().getTile() != null;
+            && getGUI().getActiveUnit().getTile() != null;
     }
 
     /**
      * Applies this action.
+     *
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        gui.activateGotoPath();
-        
+        getGUI().activateGotoPath();
     }
-
 }

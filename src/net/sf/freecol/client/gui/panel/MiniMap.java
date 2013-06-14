@@ -58,7 +58,10 @@ public final class MiniMap extends JPanel implements MouseInputListener {
     public static final int MIN_TILE_SIZE = 4;
     public static final int SCALE_STEP = 4;
 
-    private FreeColClient freeColClient;
+    private final FreeColClient freeColClient;
+
+    private final GUI gui;
+
     private Color backgroundColor = ResourceManager.getColor("miniMapBackground.color");
     private Image backgroundImage = ResourceManager.getImage("MiniMap.back");
 
@@ -76,17 +79,16 @@ public final class MiniMap extends JPanel implements MouseInputListener {
      */
     private int adjustX = 0, adjustY = 0;
 
-    private GUI gui;
 
     /**
      * The constructor that will initialize this component.
      *
-     * @param freeColClient The main controller object for the client
-     * @param gui a <code>GUI</code> value
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    public MiniMap(FreeColClient freeColClient, GUI gui) {
+    public MiniMap(FreeColClient freeColClient) {
         this.freeColClient = freeColClient;
-        this.gui = gui;
+        this.gui = freeColClient.getGUI();
+
         backgroundColor = Color.BLACK;
         setLayout(null);
 

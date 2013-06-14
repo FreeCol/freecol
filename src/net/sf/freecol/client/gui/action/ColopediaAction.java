@@ -23,7 +23,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
 
 
 /**
@@ -56,20 +55,21 @@ public class ColopediaAction extends FreeColAction {
     /**
      * Creates this action.
      *
-     * @param freeColClient The main controller object for the client.
-     * @param gui The <code>GUI</code> to display on.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param panelType The <code>PanelType</code> to use.
      */
-    public ColopediaAction(FreeColClient freeColClient, GUI gui, PanelType panelType) {
-        super(freeColClient, gui, id + panelType);
+    public ColopediaAction(FreeColClient freeColClient, PanelType panelType) {
+        super(freeColClient, id + panelType);
+
         setMnemonic(mnemonics[panelType.ordinal()]);
     }
+
 
     /**
      * Applies this action.
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        gui.showColopediaPanel(getId());
+        getGUI().showColopediaPanel(getId());
     }
 }

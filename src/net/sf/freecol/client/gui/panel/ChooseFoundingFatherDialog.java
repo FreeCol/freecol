@@ -55,16 +55,16 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog<FoundingFath
      * The constructor that will add the items to this panel.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      * @param possibleFoundingFathers The founding fathers which can
      *     be selected.  The length of the array is the same as the
      *     number of <code>FoundingFather</code> categories and the
      *     values identifies a <code>FoundingFather</code> to be
      *     picked in each of those categories.
      */
-    public ChooseFoundingFatherDialog(FreeColClient freeColClient, GUI gui,
+    public ChooseFoundingFatherDialog(FreeColClient freeColClient,
         List<FoundingFather> possibleFoundingFathers) {
-        super(freeColClient, gui);
+        super(freeColClient);
+
         this.possibleFathers = possibleFoundingFathers;
         setLayout(new MigLayout("wrap 1", "align center"));
 
@@ -72,7 +72,8 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog<FoundingFath
 
         tb = new JTabbedPane(JTabbedPane.TOP);
 
-        FatherDetailPanel details = new FatherDetailPanel(getFreeColClient(), gui, new ColopediaPanel(getFreeColClient(), gui));
+        FatherDetailPanel details = new FatherDetailPanel(getFreeColClient(),
+            new ColopediaPanel(getFreeColClient()));
         for (int index = 0; index < possibleFoundingFathers.size(); index++) {
             FoundingFather father = possibleFoundingFathers.get(index);
             JPanel panel = new JPanel();

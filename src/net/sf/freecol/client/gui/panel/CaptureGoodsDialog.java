@@ -65,14 +65,13 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>>
      * Creates a new CaptureGoodsDialog.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      * @param winner The <code>Unit</code> that is looting.
      * @param loot The <code>Goods</code> to loot.
      */
     @SuppressWarnings("unchecked") // FIXME in Java7
-    public CaptureGoodsDialog(FreeColClient freeColClient, GUI gui,
-                              Unit winner, List<Goods> loot) {
-        super(freeColClient, gui);
+    public CaptureGoodsDialog(FreeColClient freeColClient, Unit winner,
+                              List<Goods> loot) {
+        super(freeColClient);
         
         maxCargo = winner.getSpaceLeft();
 

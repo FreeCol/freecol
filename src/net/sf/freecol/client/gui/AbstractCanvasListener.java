@@ -35,7 +35,7 @@ public class AbstractCanvasListener {
     protected static final int AUTO_SCROLLSPACE = 1;
 
     /** The enclosing client. */
-    protected FreeColClient freeColClient;
+    protected final FreeColClient freeColClient;
 
     /** The map viewer to scroll. */
     protected final MapViewer mapViewer;
@@ -47,7 +47,7 @@ public class AbstractCanvasListener {
     /**
      * Create a new AbstractCanvasListener.
      *
-     * @param freeColClient The <code>FreeColClient</code> to use.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     public AbstractCanvasListener(FreeColClient freeColClient) {
         this.freeColClient = freeColClient;

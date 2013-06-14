@@ -46,10 +46,10 @@ import net.sf.freecol.common.model.Unit;
  */
 public class PreCombatDialog extends FreeColDialog<Boolean> {
 
-    public PreCombatDialog(FreeColClient freeColClient, GUI gui,
+    public PreCombatDialog(FreeColClient freeColClient,
                            FreeColGameObject attacker,
                            FreeColGameObject defender) {
-        super(freeColClient, gui);
+        super(freeColClient);
 
         CombatModel combatModel = attacker.getGame().getCombatModel();
         Set<Modifier> offence = sortModifiers(combatModel
@@ -72,20 +72,23 @@ public class PreCombatDialog extends FreeColDialog<Boolean> {
             attackerName = Messages.message(StringTemplate.template("model.unit.nationUnit")
                     .addStringTemplate("%nation%", attackerUnit.getOwner().getNationName())
                     .addStringTemplate("%unit%", attackerUnit.getLabel()));
-            attackerLabel = new UnitLabel(getFreeColClient(), attackerUnit, getGUI(), false, true);
+            attackerLabel = new UnitLabel(freeColClient, attackerUnit,
+                                          false, true);
             defenderName = Messages.message(StringTemplate.template("model.unit.nationUnit")
                     .addStringTemplate("%nation%", defenderUnit.getOwner().getNationName())
                     .addStringTemplate("%unit%", defenderUnit.getLabel()));
-            defenderLabel = new UnitLabel(getFreeColClient(), defenderUnit, getGUI(), false, true);
+            defenderLabel = new UnitLabel(freeColClient, defenderUnit,
+                                          false, true);
         } else if (combatModel.combatIsSettlementAttack(attacker, defender)) {
             Unit attackerUnit = (Unit) attacker;
             Settlement settlement = (Settlement) defender;
             attackerName = Messages.message(StringTemplate.template("model.unit.nationUnit")
                     .addStringTemplate("%nation%", attackerUnit.getOwner().getNationName())
                     .addStringTemplate("%unit%", attackerUnit.getLabel()));
-            attackerLabel = new UnitLabel(getFreeColClient(), attackerUnit, getGUI(), false, true);
+            attackerLabel = new UnitLabel(freeColClient, attackerUnit,
+                                          false, true);
             defenderName = settlement.getName();
-            defenderLabel = new JLabel(gui.getImageIcon(settlement, false));
+            defenderLabel = new JLabel(getGUI().getImageIcon(settlement, false));
         } else {
             throw new IllegalStateException("Bogus attack");
         }

@@ -23,7 +23,6 @@ import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
 
 
 /**
@@ -33,25 +32,28 @@ public class ReportLabourAction extends FreeColAction {
 
     public static final String id = "reportLabourAction";
 
+
     /**
      * Creates this action.
-     * @param freeColClient The main controller object for the client.
-     * @param gui 
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    ReportLabourAction(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui, id);
+    public ReportLabourAction(FreeColClient freeColClient) {
+        super(freeColClient, id);
     }
+
 
     /**
      * Applies this action.
+     *
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        if (freeColClient.getClientOptions().getInteger(ClientOptions.LABOUR_REPORT) ==
-            ClientOptions.LABOUR_REPORT_CLASSIC) {
-            gui.showReportLabourPanel();
+        if (getClientOptions().getInteger(ClientOptions.LABOUR_REPORT)
+            == ClientOptions.LABOUR_REPORT_CLASSIC) {
+            getGUI().showReportLabourPanel();
         } else {
-            gui.showCompactLabourReport();
+            getGUI().showCompactLabourReport();
         }
     }
 }

@@ -51,11 +51,10 @@ public final class VictoryPanel extends FreeColPanel {
     /**
      * The constructor that will add the items to this panel.
      * 
-     * @param gui The parent of this panel.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    public VictoryPanel(FreeColClient freeColClient, GUI gui) {
-
-        super(freeColClient, gui);
+    public VictoryPanel(FreeColClient freeColClient) {
+        super(freeColClient);
         
         okButton.setText(Messages.message("victory.yes"));
 

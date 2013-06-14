@@ -39,16 +39,19 @@ import net.sf.freecol.common.model.Player;
  */
 public class NationDetailPanel extends ColopediaGameObjectTypePanel<Nation> {
 
+
     /**
      * Creates a new instance of this ColopediaDetailPanel.
-     * @param freeColClient 
-     * @param gui 
      *
-     * @param colopediaPanel the ColopediaPanel
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param colopediaPanel The parent ColopediaPanel.
      */
-    public NationDetailPanel(FreeColClient freeColClient, GUI gui, ColopediaPanel colopediaPanel) {
-        super(freeColClient, gui, colopediaPanel, PanelType.NATIONS.toString(), 0.5);
+    public NationDetailPanel(FreeColClient freeColClient,
+                             ColopediaPanel colopediaPanel) {
+        super(freeColClient, colopediaPanel,
+              PanelType.NATIONS.toString(), 0.5);
     }
+
 
     /**
      * Adds one or several subtrees for all the objects for which this

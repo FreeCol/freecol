@@ -22,14 +22,11 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
 
 
 /**
  * An action for changing view mode between move units mode and view terrain
- * mode
- *
- * @see net.sf.freecol.client.gui.GUI
+ * mode.
  */
 public class ToggleViewModeAction extends MapboardAction {
 
@@ -39,12 +36,12 @@ public class ToggleViewModeAction extends MapboardAction {
     /**
      * Creates this action.
      *
-     * @param freeColClient The main controller object for the client.
-     * @param gui 
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    ToggleViewModeAction(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui, id);
+    public ToggleViewModeAction(FreeColClient freeColClient) {
+        super(freeColClient, id);
     }
+
 
     /**
      * Applies this action.
@@ -52,6 +49,6 @@ public class ToggleViewModeAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        gui.toggleViewMode();
+        getGUI().toggleViewMode();
     }
 }

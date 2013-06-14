@@ -43,10 +43,9 @@ public final class StatusPanel extends FreeColPanel {
      * Creates a basic status panel.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      */
-    public StatusPanel(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui, new FlowLayout());
+    public StatusPanel(FreeColClient freeColClient) {
+        super(freeColClient, new FlowLayout());
 
         setFocusCycleRoot(false);
         setFocusable(false);

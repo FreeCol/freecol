@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
 
 
 /**
@@ -32,20 +31,22 @@ public class ReportColonyAction extends FreeColAction {
 
     public static final String id = "reportColonyAction";
 
+
     /**
      * Creates this action.
-     * @param freeColClient The main controller object for the client.
-     * @param gui 
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    ReportColonyAction(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui, id);
+    public ReportColonyAction(FreeColClient freeColClient) {
+        super(freeColClient, id);
     }
 
     /**
      * Applies this action.
+     *
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        gui.showReportColonyPanel();
+        getGUI().showReportColonyPanel();
     }
 }

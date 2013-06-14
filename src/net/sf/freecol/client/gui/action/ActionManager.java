@@ -43,20 +43,23 @@ public class ActionManager extends OptionGroup {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ActionManager.class.getName());
 
-    private FreeColClient freeColClient;
+    private final FreeColClient freeColClient;
 
-    private GUI gui;
+    private final GUI gui;
+
 
     /**
      * Creates a new <code>ActionManager</code>.
      *
-     * @param freeColClient The main client controller.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    public ActionManager(FreeColClient freeColClient, GUI gui) {
+    public ActionManager(FreeColClient freeColClient) {
         super("actionManager");
+
         this.freeColClient = freeColClient;
-        this.gui = gui;
+        this.gui = freeColClient.getGUI();
     }
+
 
     /**
      * This method adds all FreeColActions to the OptionGroup. If you
@@ -67,86 +70,86 @@ public class ActionManager extends OptionGroup {
     public void initializeActions(InGameController inGameController, ConnectController connectController) {
         // keep this list alphabetized.
 
-        add(new AboutAction(freeColClient, gui));
-        add(new AssignTradeRouteAction(freeColClient, inGameController, gui));
-        add(new BuildColonyAction(freeColClient, inGameController, gui));
-        add(new CenterAction(freeColClient, gui));
-        add(new ChangeAction(freeColClient, gui));
-        add(new ChangeWindowedModeAction(freeColClient, gui));
-        add(new ChatAction(freeColClient, gui));
-        add(new ClearOrdersAction(freeColClient, inGameController, gui));
+        add(new AboutAction(freeColClient));
+        add(new AssignTradeRouteAction(freeColClient));
+        add(new BuildColonyAction(freeColClient));
+        add(new CenterAction(freeColClient));
+        add(new ChangeAction(freeColClient));
+        add(new ChangeWindowedModeAction(freeColClient));
+        add(new ChatAction(freeColClient));
+        add(new ClearOrdersAction(freeColClient));
         for (PanelType panelType : PanelType.values()) {
-            add(new ColopediaAction(freeColClient, gui, panelType));
+            add(new ColopediaAction(freeColClient, panelType));
         }
-        add(new DebugAction(freeColClient, inGameController, connectController, gui));
-        add(new DeclareIndependenceAction(freeColClient, inGameController, gui));
-        add(new DetermineHighSeasAction(freeColClient, gui));
-        add(new DisbandUnitAction(freeColClient, inGameController, gui));
-        add(new DisplayBordersAction(freeColClient, gui));
-        add(new DisplayGridAction(freeColClient, gui));
+        add(new DebugAction(freeColClient));
+        add(new DeclareIndependenceAction(freeColClient));
+        add(new DetermineHighSeasAction(freeColClient));
+        add(new DisbandUnitAction(freeColClient));
+        add(new DisplayBordersAction(freeColClient));
+        add(new DisplayGridAction(freeColClient));
         for (DisplayText type : DisplayText.values()) {
-            add(new DisplayTileTextAction(freeColClient, gui, type));
+            add(new DisplayTileTextAction(freeColClient, type));
         }
-        add(new EndTurnAction(freeColClient, inGameController, gui));
-        add(new EuropeAction(freeColClient, gui));
-        add(new ExecuteGotoOrdersAction(freeColClient, inGameController, gui));
-        add(new FindSettlementAction(freeColClient, gui));
-        add(new FortifyAction(freeColClient, inGameController, gui));
-        add(new GotoAction(freeColClient, inGameController, gui));
-        add(new GotoTileAction(freeColClient, gui));
-        add(new LoadAction(freeColClient, inGameController, gui));
-        add(new MapControlsAction(freeColClient, gui));
-        add(new MapEditorAction(freeColClient, gui));
-        add(new MiniMapZoomInAction(freeColClient, gui));
-        add(new MiniMapZoomInAction(freeColClient, gui, true));
-        add(new MiniMapZoomOutAction(freeColClient, gui));
-        add(new MiniMapZoomOutAction(freeColClient, gui, true));
+        add(new EndTurnAction(freeColClient));
+        add(new EuropeAction(freeColClient));
+        add(new ExecuteGotoOrdersAction(freeColClient));
+        add(new FindSettlementAction(freeColClient));
+        add(new FortifyAction(freeColClient));
+        add(new GotoAction(freeColClient));
+        add(new GotoTileAction(freeColClient));
+        add(new LoadAction(freeColClient));
+        add(new MapControlsAction(freeColClient));
+        add(new MapEditorAction(freeColClient));
+        add(new MiniMapZoomInAction(freeColClient));
+        add(new MiniMapZoomInAction(freeColClient, true));
+        add(new MiniMapZoomOutAction(freeColClient));
+        add(new MiniMapZoomOutAction(freeColClient, true));
         for (Direction d : Direction.values()) {
-            add(new MoveAction(freeColClient, inGameController, gui, d));
-            add(new MoveAction(freeColClient, inGameController, gui, d, true));
+            add(new MoveAction(freeColClient, d));
+            add(new MoveAction(freeColClient, d, true));
         }
-        add(new NewAction(freeColClient, gui));
+        add(new NewAction(freeColClient));
         add(new ContinueAction(freeColClient));
-        add(new NewEmptyMapAction(freeColClient, gui));
-        add(new OpenAction(freeColClient, inGameController, gui));
-        add(new PreferencesAction(freeColClient, gui));
-        add(new SaveAndQuitAction(freeColClient, inGameController, gui));
-        add(new QuitAction(freeColClient, gui));
-        add(new ReconnectAction(freeColClient, connectController, gui));
-        add(new RenameAction(freeColClient, inGameController, gui));
-        add(new ReportCargoAction(freeColClient, gui));
-        add(new ReportContinentalCongressAction(freeColClient, gui));
-        add(new ReportColonyAction(freeColClient, gui));
-        add(new ReportEducationAction(freeColClient, gui));
-        add(new ReportExplorationAction(freeColClient, gui));
-        add(new ReportForeignAction(freeColClient, gui));
-        add(new ReportHighScoresAction(freeColClient, gui));
-        add(new ReportHistoryAction(freeColClient, gui));
-        add(new ReportIndianAction(freeColClient, gui));
-        add(new ReportLabourAction(freeColClient, gui));
-        add(new ReportMilitaryAction(freeColClient, gui));
-        add(new ReportNavalAction(freeColClient, gui));
-        add(new ReportProductionAction(freeColClient, gui));
-        add(new ReportReligionAction(freeColClient, gui));
-        add(new ReportRequirementsAction(freeColClient, gui));
-        add(new ReportTradeAction(freeColClient, gui));
-        add(new ReportTurnAction(freeColClient, inGameController, gui));
-        add(new RetireAction(freeColClient, gui));
-        add(new SaveAction(freeColClient, inGameController, gui));
-        add(new ScaleMapAction(freeColClient, gui));
-        add(new SentryAction(freeColClient, inGameController, gui));
-        add(new ShowDifficultyAction(freeColClient, gui));
-        add(new ShowGameOptionsAction(freeColClient, gui));
-        add(new ShowMainAction(freeColClient, connectController, gui));
-        add(new ShowMapGeneratorOptionsAction(freeColClient, gui));
-        add(new SkipUnitAction(freeColClient, inGameController, gui));
-        add(new TilePopupAction(freeColClient, gui));
-        add(new ToggleViewModeAction(freeColClient, gui));
-        add(new TradeRouteAction(freeColClient, gui));
-        add(new UnloadAction(freeColClient, inGameController, gui));
-        add(new WaitAction(freeColClient, inGameController, gui));
-        add(new ZoomInAction(freeColClient, gui));
-        add(new ZoomOutAction(freeColClient, gui));
+        add(new NewEmptyMapAction(freeColClient));
+        add(new OpenAction(freeColClient));
+        add(new PreferencesAction(freeColClient));
+        add(new SaveAndQuitAction(freeColClient));
+        add(new QuitAction(freeColClient));
+        add(new ReconnectAction(freeColClient));
+        add(new RenameAction(freeColClient));
+        add(new ReportCargoAction(freeColClient));
+        add(new ReportContinentalCongressAction(freeColClient));
+        add(new ReportColonyAction(freeColClient));
+        add(new ReportEducationAction(freeColClient));
+        add(new ReportExplorationAction(freeColClient));
+        add(new ReportForeignAction(freeColClient));
+        add(new ReportHighScoresAction(freeColClient));
+        add(new ReportHistoryAction(freeColClient));
+        add(new ReportIndianAction(freeColClient));
+        add(new ReportLabourAction(freeColClient));
+        add(new ReportMilitaryAction(freeColClient));
+        add(new ReportNavalAction(freeColClient));
+        add(new ReportProductionAction(freeColClient));
+        add(new ReportReligionAction(freeColClient));
+        add(new ReportRequirementsAction(freeColClient));
+        add(new ReportTradeAction(freeColClient));
+        add(new ReportTurnAction(freeColClient));
+        add(new RetireAction(freeColClient));
+        add(new SaveAction(freeColClient));
+        add(new ScaleMapAction(freeColClient));
+        add(new SentryAction(freeColClient));
+        add(new ShowDifficultyAction(freeColClient));
+        add(new ShowGameOptionsAction(freeColClient));
+        add(new ShowMainAction(freeColClient));
+        add(new ShowMapGeneratorOptionsAction(freeColClient));
+        add(new SkipUnitAction(freeColClient));
+        add(new TilePopupAction(freeColClient));
+        add(new ToggleViewModeAction(freeColClient));
+        add(new TradeRouteAction(freeColClient));
+        add(new UnloadAction(freeColClient));
+        add(new WaitAction(freeColClient));
+        add(new ZoomInAction(freeColClient));
+        add(new ZoomOutAction(freeColClient));
     }
 
     /**
@@ -160,7 +163,7 @@ public class ActionManager extends OptionGroup {
         // Initialize ImprovementActions
         for (TileImprovementType type : specification.getTileImprovementTypeList()) {
             if (!type.isNatural()) {
-                add(new ImprovementAction(freeColClient, freeColClient.getInGameController(), gui, type));
+                add(new ImprovementAction(freeColClient, type));
             }
         }
     }
@@ -173,7 +176,7 @@ public class ActionManager extends OptionGroup {
      * @return The <code>FreeColAction</code>.
      */
     public FreeColAction getFreeColAction(String id) {
-        return (FreeColAction) super.getOption(id);
+        return (FreeColAction)super.getOption(id);
     }
 
     /**

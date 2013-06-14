@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
 
 
 /**
@@ -37,12 +36,12 @@ public class EuropeAction extends MapboardAction {
     /**
      * Creates a new <code>EuropeAction</code>.
      *
-     * @param freeColClient The main controller object for the client.
-     * @param gui 
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    EuropeAction(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui, id);
+    public EuropeAction(FreeColClient freeColClient) {
+        super(freeColClient, id);
     }
+
 
     /**
      * Checks if this action should be enabled.
@@ -62,6 +61,6 @@ public class EuropeAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        gui.showEuropePanel();
+        getGUI().showEuropePanel();
     }
 }

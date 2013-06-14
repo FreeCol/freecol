@@ -36,36 +36,34 @@ public class UnloadAction extends MapboardAction {
 
     private Unit unit = null;
 
-    private final InGameController inGameController;
 
     /**
      * Creates an action for unloading the currently selected unit.
      *
-     * @param freeColClient The main controller object for the client.
-     * @param gui 
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    public UnloadAction(FreeColClient freeColClient, InGameController inGameController, GUI gui) {
-        this(freeColClient, inGameController, gui, null);
+    public UnloadAction(FreeColClient freeColClient) {
+        this(freeColClient, null);
     }
 
     /**
      * Creates an action for unloading the <code>Unit</code>
-     * provided. If the <code>Unit</code> is <code>null</code>, then
+     * provided.  If the <code>Unit</code> is <code>null</code>, then
      * the currently selected unit is used instead.
      *
-     * @param freeColClient The main controller object for the client.
-     * @param unit an <code>Unit</code> value
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param unit The <code>Unit</code> to unload.
      * @see net.sf.freecol.client.gui.MapViewer#getActiveUnit()
      */
-    public UnloadAction(FreeColClient freeColClient, InGameController inGameController, GUI gui, Unit unit) {
-        super(freeColClient, gui, id);
-        this.inGameController = inGameController;
+    public UnloadAction(FreeColClient freeColClient, Unit unit) {
+        super(freeColClient, id);
+
         this.unit = unit;
     }
 
+
     private Unit getUnit() {
-        return (unit != null) ? unit
-            : gui.getActiveUnit();
+        return (unit != null) ? unit : getGUI().getActiveUnit();
     }
 
     /**
@@ -84,13 +82,14 @@ public class UnloadAction extends MapboardAction {
 
     /**
      * Applies this action.
+     *
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
         Unit carrier = getUnit();
         if (carrier != null) {
-            inGameController.unload(carrier);
-            gui.updateMapControls();
+            getInGameController().unload(carrier);
+            getGUI().updateMapControls();
         }
     }
 }

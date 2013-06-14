@@ -82,13 +82,12 @@ public final class DefaultTransferHandler extends TransferHandler {
      * Creates the default FreeCol transfer handler.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      * @param parentPanel The layered pane that holds all kinds of information.
      */
-    public DefaultTransferHandler(FreeColClient freeColClient, GUI gui,
+    public DefaultTransferHandler(FreeColClient freeColClient,
                                   FreeColPanel parentPanel) {
         this.freeColClient = freeColClient;
-        this.gui = gui;
+        this.gui = freeColClient.getGUI();
         this.parentPanel = parentPanel;
     }
 

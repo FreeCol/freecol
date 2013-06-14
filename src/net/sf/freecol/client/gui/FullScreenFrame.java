@@ -41,10 +41,9 @@ public final class FullScreenFrame extends FreeColFrame {
 
     /**
      * The constructor to use.
-     * @param freeColClient 
-     * 
-     * @param gd
-     *            The context of this <code>FullScreenFrame</code>.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param gd The context of this <code>FullScreenFrame</code>.
      */
     public FullScreenFrame(FreeColClient freeColClient, GraphicsDevice gd) {
         super(freeColClient, "Freecol " + FreeCol.getVersion(), gd);

@@ -32,11 +32,9 @@ import net.sf.freecol.common.model.Unit;
 /**
  * An action for changing the view. This action will:
  *
- * <ol>
- *     <li>Open a colony panel if the active unit is located on a tile with a colony.</li>
- *     <li>If onboard a carrier then the carrier will be the active unit..</li>
- *     <li>In other cases: switch to another unit on the same tile.
- * </ol>
+ *  - Open a colony panel if the active unit is located on a tile with a colony.
+ *  - If onboard a carrier then the carrier will be the active unit.
+ *  - In other cases: switch to another unit on the same tile.
  */
 public class ChangeAction extends UnitAction {
 
@@ -45,25 +43,25 @@ public class ChangeAction extends UnitAction {
 
     /**
      * Creates this action.
-     * @param freeColClient The main controller object for the client.
-     * @param gui 
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    ChangeAction(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui, id);
+    public ChangeAction(FreeColClient freeColClient) {
+        super(freeColClient, id);
+
         update();
     }
 
 
     /**
-     * Updates the "enabled"-status with the value
-     * returned by {@link #shouldBeEnabled} and
-     * updates the name of the action.
+     * Updates the "enabled"-status with the value returned by
+     * {@link #shouldBeEnabled} and updates the name of the action.
      */
     @Override
     public void update() {
         super.update();
 
-        Unit unit = gui.getActiveUnit();
+        Unit unit = getGUI().getActiveUnit();
         if (unit != null && unit.getTile() != null) {
             if (unit.getColony() != null) {
                 putValue(NAME, Messages.message("changeAction.enterColony.name"));
@@ -83,7 +81,7 @@ public class ChangeAction extends UnitAction {
     @Override
     protected boolean shouldBeEnabled() {
         return super.shouldBeEnabled()
-            && gui.getActiveUnit().getTile() != null;
+            && getGUI().getActiveUnit().getTile() != null;
     }
 
     /**
@@ -91,13 +89,13 @@ public class ChangeAction extends UnitAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        Unit unit = gui.getActiveUnit();
+        Unit unit = getGUI().getActiveUnit();
         Tile tile = unit.getTile();
 
         if (tile.getColony() != null) {
-            gui.showColonyPanel(tile.getColony());
+            getGUI().showColonyPanel(tile.getColony());
         } else if (unit.isOnCarrier()) {
-            gui.setActiveUnit(unit.getCarrier());
+            getGUI().setActiveUnit(unit.getCarrier());
         } else {
             Iterator<Unit> unitIterator = tile.getUnitIterator();
             boolean activeUnitFound = false;
@@ -108,7 +106,7 @@ public class ChangeAction extends UnitAction {
                 } else if (activeUnitFound
                     && u.getState() == Unit.UnitState.ACTIVE
                     && u.getMovesLeft() > 0) {
-                    gui.setActiveUnit(u);
+                    getGUI().setActiveUnit(u);
                     return;
                 }
             }
@@ -119,7 +117,7 @@ public class ChangeAction extends UnitAction {
                     return;
                 } else if (u.getState() == Unit.UnitState.ACTIVE
                     && u.getMovesLeft() > 0) {
-                    gui.setActiveUnit(u);
+                    getGUI().setActiveUnit(u);
                     return;
                 }
             }

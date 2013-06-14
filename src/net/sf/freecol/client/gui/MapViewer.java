@@ -98,6 +98,8 @@ import net.sf.freecol.common.util.Utils;
  */
 public final class MapViewer {
 
+    private static final Logger logger = Logger.getLogger(MapViewer.class.getName());
+
     public static enum BorderType { COUNTRY, REGION }
 
  
@@ -109,11 +111,12 @@ public final class MapViewer {
             font = newFont;
         }
     }
-    private static final Logger logger = Logger.getLogger(MapViewer.class.getName());
 
     private final FreeColClient freeColClient;
-    private Dimension size;
 
+    private GUI gui;
+
+    private Dimension size;
 
     /**
      * Scaled ImageLibrary only used for map painting.
@@ -216,18 +219,21 @@ public final class MapViewer {
     private Stroke borderStroke = new BasicStroke(4);
 
     private Stroke gridStroke = new BasicStroke(1);
-    private GUI gui;
+
 
     /**
-    * The constructor to use.
-    *
-    * @param freeColClient The main control class.
-    * @param size The size of the GUI (= the entire screen if the app is displayed in full-screen).
-    * @param lib The library of images needed to display certain things visually.
-    */
-    public MapViewer(FreeColClient freeColClient, GUI gui, Dimension size, ImageLibrary lib) {
+     * The constructor to use.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param size The size of the GUI (= the entire screen if the app
+     *     is displayed in full-screen).
+     * @param lib The library of images needed to display certain
+     *     things visually.
+     */
+    public MapViewer(FreeColClient freeColClient, Dimension size,
+                     ImageLibrary lib) {
         this.freeColClient = freeColClient;
-        this.gui = gui;
+        this.gui = freeColClient.getGUI();
         this.size = size;
 
         setImageLibrary(lib);

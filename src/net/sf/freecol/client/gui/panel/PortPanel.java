@@ -42,9 +42,15 @@ public abstract class PortPanel extends FreeColPanel {
     protected InPortPanel inPortPanel;
 
 
-    public PortPanel(FreeColClient client, GUI gui) {
-        super(client, gui);
+    /**
+     * Create a new port panel.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     */
+    public PortPanel(FreeColClient freeColClient) {
+        super(freeColClient);
     }
+
 
     /**
      * Get the cargo panel.

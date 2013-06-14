@@ -31,6 +31,7 @@ import javax.swing.JToolTip;
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -52,7 +53,6 @@ import net.sf.freecol.common.resources.ResourceManager;
 public class BuildingToolTip extends JToolTip {
 
     private static final JLabel arrow = new JLabel("\u2192");
-
     static {
         arrow.setFont(ResourceManager.getFont("SimpleFont", Font.BOLD, 24f));
     }
@@ -65,13 +65,14 @@ public class BuildingToolTip extends JToolTip {
      * @param building The building to display information from.
      * @param gui The <code>GUI</code> to display on.
      */
-    public BuildingToolTip(FreeColClient freeColClient, Building building,
-                           GUI gui) {
+    public BuildingToolTip(FreeColClient freeColClient, Building building) {
+        final ImageLibrary lib = freeColClient.getGUI().getImageLibrary();
         final Game game = building.getGame();
         final int workplaces = building.getUnitCapacity();
         List<AbstractGoods> outputs = building.getOutputs();
         // TODO: consider several outputs
-        final GoodsType output = outputs.isEmpty() ? null : outputs.get(0).getType();
+        final GoodsType output = outputs.isEmpty() ? null
+            : outputs.get(0).getType();
         final Colony colony = building.getColony();
 
         String columns = "[align center]";
@@ -95,7 +96,8 @@ public class BuildingToolTip extends JToolTip {
             AbstractGoods production = info.getProduction().get(0);
             AbstractGoods maximumProduction = info.getMaximumProduction().isEmpty()
                 ? production : info.getMaximumProduction().get(0);
-            ProductionLabel productionOutput = new ProductionLabel(freeColClient, gui, production, maximumProduction);
+            ProductionLabel productionOutput
+                = new ProductionLabel(freeColClient, production, maximumProduction);
             if (info.getConsumption().isEmpty()) {
                 add(productionOutput, "span");
             } else {
@@ -103,27 +105,28 @@ public class BuildingToolTip extends JToolTip {
                 if (consumption.getAmount() > 0) {
                     AbstractGoods maximumConsumption = info.getMaximumConsumption().isEmpty()
                         ? consumption: info.getMaximumConsumption().get(0);
-                    ProductionLabel productionInput = new ProductionLabel(freeColClient, gui, consumption, maximumConsumption);
+                    ProductionLabel productionInput
+                        = new ProductionLabel(freeColClient, consumption, maximumConsumption);
                     add(productionInput, "span, split 3");
                     add(arrow);
                     add(productionOutput);
                 } else {
-                    add(new JLabel(gui.getImageLibrary().getGoodsImageIcon(consumption.getType())),
+                    add(new JLabel(lib.getGoodsImageIcon(consumption.getType())),
                         "span, split 3");
                     add(arrow);
-                    add(new JLabel(gui.getImageLibrary().getGoodsImageIcon(production.getType())));
+                    add(new JLabel(lib.getGoodsImageIcon(production.getType())));
                 }
             }
         }
 
-        add(new JLabel(new ImageIcon(gui.getImageLibrary().getBuildingImage(building))));
+        add(new JLabel(new ImageIcon(lib.getBuildingImage(building))));
 
         for (Unit unit : building.getUnitList()) {
-            UnitLabel unitLabel = new UnitLabel(freeColClient, unit, gui, false);
+            UnitLabel unitLabel = new UnitLabel(freeColClient, unit, false);
             int production = building.getUnitProduction(unit, output);
             if (production > 0) {
                 add(unitLabel);
-                JLabel pLabel = new ProductionLabel(freeColClient, gui, output,
+                JLabel pLabel = new ProductionLabel(freeColClient, output,
                                                     production);
                 add(pLabel, "split 2");
                 add(new JLabel());
@@ -131,7 +134,7 @@ public class BuildingToolTip extends JToolTip {
                 JLabel progress = new JLabel(unit.getTurnsOfTraining() + "/"
                                            + unit.getNeededTurnsOfTraining());
                 UnitLabel sLabel = new UnitLabel(freeColClient, 
-                                                 unit.getStudent(), gui, true);
+                                                 unit.getStudent(), true);
                 sLabel.setIgnoreLocation(true);
                 add(unitLabel);
                 add(progress, "split 2, flowy");

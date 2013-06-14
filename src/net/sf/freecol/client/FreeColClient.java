@@ -198,12 +198,12 @@ public final class FreeColClient {
 
         // Control.  Controllers expect GUI to be available.
         connectController = new ConnectController(this);
-        preGameController = new PreGameController(this, gui);
-        preGameInputHandler = new PreGameInputHandler(this, gui);
-        inGameController = new InGameController(this, gui);
-        inGameInputHandler = new InGameInputHandler(this, gui);
-        mapEditorController = new MapEditorController(this, gui);
-        actionManager = new ActionManager(this, gui);
+        preGameController = new PreGameController(this);
+        preGameInputHandler = new PreGameInputHandler(this);
+        inGameController = new InGameController(this);
+        inGameInputHandler = new InGameInputHandler(this);
+        mapEditorController = new MapEditorController(this);
+        actionManager = new ActionManager(this);
         worker = new Worker();
         worker.start();
 

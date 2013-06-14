@@ -56,10 +56,9 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
      * Creates the continental congress report.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      */
-    public ReportContinentalCongressPanel(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui, title);
+    public ReportContinentalCongressPanel(FreeColClient freeColClient) {
+        super(freeColClient, title);
 
         JTabbedPane tabs = new JTabbedPane(JTabbedPane.TOP);
         tabs.setOpaque(false);
@@ -102,7 +101,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
             tabs.addTab(Messages.message(FoundingFather.getTypeKey(type)), null,
                         scrollPane, null);
         }
-        Map<String, Turn> electionTurns = getElectionTurns();
+        Map<String, Turn> electionTurns = getMyPlayer().getElectionTurns();
         for (FoundingFather father : getSpecification().getFoundingFathers()) {
             String name = Messages.message(father.getNameKey());
             JPanel panel = panels.get(father.getType());

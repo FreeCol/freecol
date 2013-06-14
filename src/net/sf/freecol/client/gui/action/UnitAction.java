@@ -29,14 +29,17 @@ import net.sf.freecol.client.gui.GUI;
  */
 public abstract class UnitAction extends MapboardAction {
 
+
     /**
      * Creates a new <code>UnitAction</code>.
-     * @param freeColClient The main controller object for the client
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param id The object identifier.
      */
-    protected UnitAction(FreeColClient freeColClient, GUI gui, String id) {
-        super(freeColClient, gui, id);
+    protected UnitAction(FreeColClient freeColClient, String id) {
+        super(freeColClient, id);
     }
+
 
     /**
      * Checks if this action should be enabled.
@@ -45,7 +48,6 @@ public abstract class UnitAction extends MapboardAction {
      */
     @Override
     protected boolean shouldBeEnabled() {
-        return super.shouldBeEnabled() && gui.getActiveUnit() != null;
+        return super.shouldBeEnabled() && getGUI().getActiveUnit() != null;
     }
-
 }

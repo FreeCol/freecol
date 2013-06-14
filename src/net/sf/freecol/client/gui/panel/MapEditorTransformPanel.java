@@ -93,10 +93,9 @@ public final class MapEditorTransformPanel extends FreeColPanel {
      * Creates a panel to choose a map transform.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      */
-    public MapEditorTransformPanel(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui, new BorderLayout());
+    public MapEditorTransformPanel(FreeColClient freeColClient) {
+        super(freeColClient, new BorderLayout());
 
         // Make sure the native players are present.
         if (getGame().getPlayers().isEmpty()) {

@@ -50,10 +50,12 @@ public final class EmigrationPanel extends FreeColDialog<Integer> {
 
     /**
      * The constructor to use.
-     * @param freeColClient 
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    public EmigrationPanel(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui);
+    public EmigrationPanel(FreeColClient freeColClient) {
+        super(freeColClient);
+
         for (int index = 0; index < NUMBER_OF_PERSONS; index++) {
             person[index] = new JButton();
             person[index].setActionCommand(String.valueOf(index));

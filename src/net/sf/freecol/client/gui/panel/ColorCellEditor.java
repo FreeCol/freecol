@@ -76,7 +76,7 @@ public final class ColorCellEditor extends AbstractCellEditor
          */
         public ColorChooserPanel(FreeColClient freeColClient,
                                  ActionListener l) {
-            super(freeColClient, freeColClient.getGUI());
+            super(freeColClient);
 
             JButton okButton = new JButton(Messages.message("ok"));
             JButton cancelButton = new JButton(Messages.message("cancel"));

@@ -1692,6 +1692,22 @@ public class Player extends FreeColGameObject implements Nameable {
         return ((count + 1) * (count + 2) - 1) * base + count;
     }
 
+    /**
+     * Gets the <code>Turn</code>s during which FoundingFathers were
+     * elected to the Continental Congress
+     *
+     * @return A map of father id to <code>Turn</code>s.
+     */
+    public java.util.Map<String, Turn> getElectionTurns() {
+        java.util.Map<String, Turn> result = new HashMap<String, Turn>();
+        for (HistoryEvent e : getHistory()) {
+            if (e.getEventType() != HistoryEvent.EventType.FOUNDING_FATHER) {
+                result.put(e.getReplacement("%father%").getId(),
+                           e.getTurn());
+            }
+        }
+        return result;
+    }
 
     //
     // Taxation and trade

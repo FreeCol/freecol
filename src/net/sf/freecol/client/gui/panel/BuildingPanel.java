@@ -55,14 +55,13 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
 
     private static Logger logger = Logger.getLogger(BuildingPanel.class.getName());
 
+    private final FreeColClient freeColClient;
 
     private final Building building;
 
     private ProductionLabel productionOutput = null;
 
     private List<UnitLabel> unitLabels = new ArrayList<UnitLabel>();
-
-    private FreeColClient freeColClient;
 
 
     /**
@@ -79,6 +78,7 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
         setLayout(new MigLayout("", "[32][32][32]", "[32][44]"));
         initialize();
     }
+
 
     public void initialize() {
         cleanup();
@@ -106,7 +106,8 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
                 }
                 AbstractGoods maximum = info.getMaximumProduction().isEmpty()
                     ? output : info.getMaximumProduction().get(0);
-                productionOutput = new ProductionLabel(freeColClient, getGUI(), output, maximum);
+                productionOutput = new ProductionLabel(freeColClient,
+                                                       output, maximum);
             }
         }
         JLabel upkeep = null;
@@ -126,7 +127,7 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
         }
 
         for (Unit unit : building.getUnitList()) {
-            UnitLabel unitLabel = new UnitLabel(freeColClient, unit, getGUI(), true);
+            UnitLabel unitLabel = new UnitLabel(freeColClient, unit, true);
             unitLabels.add(unitLabel);
             add(unitLabel);
         }
@@ -186,7 +187,7 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
 
     @Override
     public JToolTip createToolTip() {
-        return new BuildingToolTip(freeColClient, building, getGUI());
+        return new BuildingToolTip(freeColClient, building);
     }
 
     public void addPropertyChangeListeners() {

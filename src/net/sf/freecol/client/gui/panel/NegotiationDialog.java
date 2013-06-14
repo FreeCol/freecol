@@ -102,29 +102,29 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade>
     /**
      * Creates a new <code>NegotiationDialog</code> instance.
      *
-     * @param freeColClient The current <code>FreeColClient</code>.
-     * @param gui The <code>GUI</code> to display on.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param unit The <code>Unit</code> that is trading.
      * @param settlement The <code>Settlement</code> that is trading.
      */
-    public NegotiationDialog(FreeColClient freeColClient, GUI gui, Unit unit,
+    public NegotiationDialog(FreeColClient freeColClient, Unit unit,
                              Settlement settlement) {
-        this(freeColClient, gui, unit, settlement, null);
+        this(freeColClient, unit, settlement, null);
     }
 
     /**
      * Creates a new <code>NegotiationDialog</code> instance.
      *
-     * @param freeColClient The current <code>FreeColClient</code>.
-     * @param gui The <code>GUI</code> to display on.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param unit The <code>Unit</code> that is trading.
      * @param settlement The <code>Settlement</code> that is trading.
      * @param agreement The <code>DiplomaticTrade</code> agreement that
      *     is being negotiated.
      */
-    public NegotiationDialog(FreeColClient freeColClient, GUI gui, Unit unit,
-                             Settlement settlement, DiplomaticTrade agreement){
-        super(freeColClient, gui);
+    public NegotiationDialog(FreeColClient freeColClient, Unit unit,
+                             Settlement settlement,
+                             DiplomaticTrade agreement) {
+        super(freeColClient);
+
         setFocusCycleRoot(true);
 
         this.unit = unit;

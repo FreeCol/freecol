@@ -40,16 +40,16 @@ import net.sf.freecol.common.model.Turn;
  */
 public final class ReportHighScoresPanel extends ReportPanel {
 
+
     /**
      * Creates the high scores report.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      * @param prefix An optional message to add at the top of the panel.
      */
-    public ReportHighScoresPanel(FreeColClient freeColClient, GUI gui,
-                                 String prefix) {
-        super(freeColClient, gui, Messages.message("reportHighScoresAction.name"));
+    public ReportHighScoresPanel(FreeColClient freeColClient, String prefix) {
+        super(freeColClient, Messages.message("reportHighScoresAction.name"));
+
         // Display Panel
         reportPanel.removeAll();
 

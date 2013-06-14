@@ -22,8 +22,6 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.control.InGameController;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.Unit;
@@ -35,20 +33,22 @@ import net.sf.freecol.common.model.Unit;
 public class ImprovementAction extends UnitAction {
 
     private TileImprovementType improvement;
-    private final InGameController inGameController;
     
+
     /**
      * Creates this action.
      * 
-     * @param freeColClient The main controller object for the client.
-     * @param improvement <code>TileImprovementType</code> ??
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param improvement The <code>TileImprovementType</code> to make.
      */
-    public ImprovementAction(FreeColClient freeColClient, InGameController inGameController, GUI gui, TileImprovementType improvement) {
-        super(freeColClient, gui, improvement.getShortId() + "Action");
-        this.inGameController = inGameController;
+    public ImprovementAction(FreeColClient freeColClient,
+                             TileImprovementType improvement) {
+        super(freeColClient, improvement.getShortId() + "Action");
+
         this.improvement = improvement;
         addImageIcons(improvement.getShortId());
     }
+
 
     /**
      * Checks if this action should be enabled.
@@ -59,7 +59,7 @@ public class ImprovementAction extends UnitAction {
     @Override
     protected boolean shouldBeEnabled() {
         if (super.shouldBeEnabled()) {
-            Unit selectedUnit = gui.getActiveUnit();
+            Unit selectedUnit = getGUI().getActiveUnit();
             Tile tile = selectedUnit.getTile();
             return selectedUnit.checkSetState(Unit.UnitState.IMPROVING)
                 && improvement.isTileAllowed(tile)
@@ -74,8 +74,9 @@ public class ImprovementAction extends UnitAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        inGameController.changeWorkImprovementType(gui.getActiveUnit(),
+        getInGameController()
+            .changeWorkImprovementType(getGUI().getActiveUnit(),
                                        improvement);
-        inGameController.nextActiveUnit();
+        getInGameController().nextActiveUnit();
     }
 }

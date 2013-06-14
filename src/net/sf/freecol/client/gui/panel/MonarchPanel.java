@@ -47,13 +47,12 @@ public final class MonarchPanel extends FreeColDialog<Boolean> implements Action
      * Creates a panel to handle monarch interactions.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      * @param action The <code>MonarchAction</code> the monarch is performing.
      * @param template The <code>StringTemplate</code> describing the action.
      */
-    public MonarchPanel(FreeColClient freeColClient, GUI gui,
+    public MonarchPanel(FreeColClient freeColClient,
                         MonarchAction action, StringTemplate template) {
-        super(freeColClient, gui);
+        super(freeColClient);
 
         String messageId = "model.monarch.action." + action.toString();
         String yesId = messageId + ".yes";

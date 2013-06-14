@@ -40,19 +40,14 @@ public abstract class InputHandler implements MessageHandler {
     /** The main FreeCol client object. */
     private final FreeColClient freeColClient;
 
-    /** The GUI to display to. */
-    protected GUI gui;
-
 
     /**
      * The constructor to use.
      *
-     * @param freeColClient The main <code>FreeColClient</code> object.
-     * @param gui The <code>GUI</code> to display to.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    public InputHandler(FreeColClient freeColClient, GUI gui) {
+    public InputHandler(FreeColClient freeColClient) {
         this.freeColClient = freeColClient;
-        this.gui = gui;
     }
 
 
@@ -63,6 +58,15 @@ public abstract class InputHandler implements MessageHandler {
      */
     protected FreeColClient getFreeColClient() {
         return freeColClient;
+    }
+
+    /**
+     * Gets the GUI.
+     *
+     * @return The GUI.
+     */
+    protected GUI getGUI() {
+        return freeColClient.getGUI();
     }
 
     /**
@@ -99,11 +103,11 @@ public abstract class InputHandler implements MessageHandler {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    if (gui.containsInGameComponents()) {
+                    if (getGUI().containsInGameComponents()) {
                         if (freeColClient.getFreeColServer() == null) {
-                            gui.returnToTitle();
+                            getGUI().returnToTitle();
                         } else {
-                            gui.removeInGameComponents();
+                            getGUI().removeInGameComponents();
                         }
                     }
                 }

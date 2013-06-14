@@ -69,14 +69,13 @@ public final class ReportTradePanel extends ReportPanel {
 
     /**
      * The constructor that will add the items to this panel.
-     * @param freeColClient 
      *
-     * @param gui The parent of this panel.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    public ReportTradePanel(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui, Messages.message("reportTradeAction.name"));
-        setSize(getMinimumSize());
+    public ReportTradePanel(FreeColClient freeColClient) {
+        super(freeColClient, Messages.message("reportTradeAction.name"));
 
+        setSize(getMinimumSize());
         Player player = getMyPlayer();
         colonies = getSortedColonies();
 

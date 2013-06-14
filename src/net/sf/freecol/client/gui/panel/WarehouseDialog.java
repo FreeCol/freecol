@@ -56,12 +56,10 @@ public final class WarehouseDialog extends FreeColDialog<Boolean> {
      * Creates a dialog to display the warehouse.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      * @param colony The <code>Colony</code> containing the warehouse.
      */
-    public WarehouseDialog(FreeColClient freeColClient, GUI gui,
-                           Colony colony) {
-        super(freeColClient, gui);
+    public WarehouseDialog(FreeColClient freeColClient, Colony colony) {
+        super(freeColClient);
 
         warehouseDialog = new JPanel(new MigLayout("wrap 4"));
         warehouseDialog.setOpaque(false);

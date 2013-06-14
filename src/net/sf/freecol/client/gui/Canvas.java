@@ -318,15 +318,14 @@ public final class Canvas extends JDesktopPane {
      * The constructor to use.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      * @param size The bounds of this <code>Canvas</code>.
      * @param mapViewer The object responsible of drawing the map onto
      *     this component.
      */
-    public Canvas(final FreeColClient freeColClient, GUI gui, Dimension size,
+    public Canvas(final FreeColClient freeColClient, Dimension size,
                   MapViewer mapViewer) {
         this.freeColClient = freeColClient;
-        this.gui = gui;
+        this.gui = freeColClient.getGUI();
         this.mapViewer = mapViewer;
 
         this.initialSize = size;
@@ -338,13 +337,13 @@ public final class Canvas extends JDesktopPane {
         setOpaque(false);
         setLayout(null);
 
-        startGamePanel = new StartGamePanel(freeColClient, gui);
-        serverListPanel = new ServerListPanel(freeColClient, gui, freeColClient.getConnectController());
-        europePanel = new EuropePanel(freeColClient, gui, this);
-        statusPanel = new StatusPanel(freeColClient, gui);
-        chatPanel = new ChatPanel(freeColClient, gui);
-        clientOptionsDialog = new ClientOptionsDialog(freeColClient, gui);
-        loadingSavegameDialog = new LoadingSavegameDialog(freeColClient, gui);
+        startGamePanel = new StartGamePanel(freeColClient);
+        serverListPanel = new ServerListPanel(freeColClient, freeColClient.getConnectController());
+        europePanel = new EuropePanel(freeColClient, this);
+        statusPanel = new StatusPanel(freeColClient);
+        chatPanel = new ChatPanel(freeColClient);
+        clientOptionsDialog = new ClientOptionsDialog(freeColClient);
+        loadingSavegameDialog = new LoadingSavegameDialog(freeColClient);
 
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
@@ -491,7 +490,7 @@ public final class Canvas extends JDesktopPane {
         }
         if (display == null || "".equals(display))
             display = message;
-        ErrorPanel errorPanel = new ErrorPanel(freeColClient, gui, display);
+        ErrorPanel errorPanel = new ErrorPanel(freeColClient, display);
         showSubPanel(errorPanel, true);
     }
 
@@ -674,7 +673,7 @@ public final class Canvas extends JDesktopPane {
     }
 
     public void showAboutPanel() {
-        showSubPanel(new AboutPanel(freeColClient, gui), false);
+        showSubPanel(new AboutPanel(freeColClient), false);
     }
 
 
@@ -735,12 +734,12 @@ public final class Canvas extends JDesktopPane {
     }
 
     public void showBuildQueuePanel(Colony colony) {
-        showSubPanel(new BuildQueuePanel(freeColClient, gui, colony), true);
+        showSubPanel(new BuildQueuePanel(freeColClient, colony), true);
 
     }
 
     public void showBuildQueuePanel(Colony colony, Runnable callBack) {
-        FreeColPanel panel = new BuildQueuePanel(freeColClient, gui, colony);
+        FreeColPanel panel = new BuildQueuePanel(freeColClient, colony);
         panel.addClosingCallback(callBack);
         showSubPanel(panel, true);
 
@@ -789,7 +788,7 @@ public final class Canvas extends JDesktopPane {
      * @return list of <code>Goods</code> to loot
      */
     public List<Goods> showCaptureGoodsDialog(Unit winner, List<Goods> loot) {
-        CaptureGoodsDialog dialog = new CaptureGoodsDialog(freeColClient, gui, winner, loot);
+        CaptureGoodsDialog dialog = new CaptureGoodsDialog(freeColClient, winner, loot);
         return showFreeColDialog(dialog, winner.getTile(), true);
     }
 
@@ -830,22 +829,22 @@ public final class Canvas extends JDesktopPane {
     }
 
     public MonarchAction showChoiceMonarchActionDialog(String monarchTitle, List<ChoiceItem<MonarchAction>> actions) {
-        ChoiceDialog<MonarchAction> choiceDialog= new ChoiceDialog<MonarchAction>(freeColClient, gui, monarchTitle,
-                                          "Cancel", actions);
+        ChoiceDialog<MonarchAction> choiceDialog
+            = new ChoiceDialog<MonarchAction>(freeColClient, monarchTitle,
+                                              "Cancel", actions);
         return showFreeColDialog(choiceDialog, null, true);
     }
 
 
     public FoundingFather showChooseFoundingFatherDialog(List<ChoiceItem<FoundingFather>> fathers, String fatherTitle) {
         ChoiceDialog<FoundingFather> choiceDialog
-        = new ChoiceDialog<FoundingFather>(freeColClient, gui, fatherTitle, "Cancel",
-            fathers);
+            = new ChoiceDialog<FoundingFather>(freeColClient, fatherTitle,
+                                               "Cancel", fathers);
         return showFreeColDialog(choiceDialog, null, true);
     }
 
     public FoundingFather showChooseFoundingFatherDialog(List<FoundingFather> ffs) {
-
-        return showFreeColDialog(new ChooseFoundingFatherDialog(freeColClient, gui, ffs), null, true);
+        return showFreeColDialog(new ChooseFoundingFatherDialog(freeColClient, ffs), null, true);
     }
 
     /**
@@ -893,7 +892,7 @@ public final class Canvas extends JDesktopPane {
     }
 
     public void showColonyPanel(Colony colony, Runnable callback) {
-        FreeColPanel panel = new ColonyPanel(freeColClient, gui, colony);
+        FreeColPanel panel = new ColonyPanel(freeColClient, colony);
         panel.addClosingCallback(callback);
         showSubPanel(panel, true);
     }
@@ -916,19 +915,19 @@ public final class Canvas extends JDesktopPane {
 
 
     public void showColopediaPanel(String nodeId) {
-        showSubPanel(new ColopediaPanel(freeColClient, gui, nodeId), false);
+        showSubPanel(new ColopediaPanel(freeColClient, nodeId), false);
     }
 
 
     public void showCompactLabourReport() {
-        CompactLabourReport details = new CompactLabourReport(freeColClient, gui);
+        CompactLabourReport details = new CompactLabourReport(freeColClient);
         details.initialize();
         showSubPanel(details, false);
 
     }
 
     public void showCompactLabourReport(UnitData unitData) {
-        CompactLabourReport details = new CompactLabourReport(freeColClient, gui, unitData);
+        CompactLabourReport details = new CompactLabourReport(freeColClient, unitData);
         details.initialize();
         showSubPanel(details, false);
     }
@@ -939,7 +938,7 @@ public final class Canvas extends JDesktopPane {
      * @return A list of names for a new nation.
      */
     public List<String> showConfirmDeclarationDialog() {
-        return showFreeColDialog(new ConfirmDeclarationDialog(freeColClient, gui), null, true);
+        return showFreeColDialog(new ConfirmDeclarationDialog(freeColClient), null, true);
     }
 
 
@@ -1011,17 +1010,19 @@ public final class Canvas extends JDesktopPane {
      * Display a dialog following declaration of independence.
      */
     public void showDeclarationDialog() {
-        showFreeColDialog(new DeclarationDialog(freeColClient, gui), null, true);
+        showFreeColDialog(new DeclarationDialog(freeColClient), null, true);
     }
 
     public void showDifficultyDialog(boolean editable) {
         Game game = freeColClient.getGame();
-        showSubPanel(new DifficultyDialog(freeColClient, gui,
+        showSubPanel(new DifficultyDialog(freeColClient,
                 game.getSpecification().getDifficultyLevel(), editable), false);
     }
 
     public OptionGroup showDifficultyDialog(Specification specification) {
-        return showFreeColDialog(new DifficultyDialog(freeColClient, gui, specification), null, false);
+        return showFreeColDialog(new DifficultyDialog(freeColClient,
+                                                      specification),
+                                 null, false);
     }
 
     /**
@@ -1031,19 +1032,22 @@ public final class Canvas extends JDesktopPane {
      * @return A list of <code>Goods</code> to dump.
      */
     public List<Goods> showDumpCargoDialog(Unit unit) {
-        DumpCargoDialog dumpDialog = new DumpCargoDialog(freeColClient, gui, unit);
+        DumpCargoDialog dumpDialog
+            = new DumpCargoDialog(freeColClient, unit);
         return showFreeColDialog(dumpDialog, unit.getTile(), true);
     }
 
     public boolean showEditOptionDialog(Option option) {
-        final EditOptionDialog editDialog = new EditOptionDialog(freeColClient, gui, option);
+        final EditOptionDialog editDialog
+            = new EditOptionDialog(freeColClient, option);
         boolean result = showFreeColDialog(editDialog, null, true);
         editDialog.requestFocus();
         return result;
     }
 
     public void showEditSettlementDialog(IndianSettlement settlement) {
-        showFreeColDialog(new EditSettlementDialog(freeColClient, gui, settlement), null, true);
+        showFreeColDialog(new EditSettlementDialog(freeColClient, settlement),
+            null, true);
     }
 
 
@@ -1056,15 +1060,16 @@ public final class Canvas extends JDesktopPane {
      * @return The emigrant that was chosen by the user.
      */
     public int showEmigrationPanel(boolean fountainOfYouth) {
-        EmigrationPanel emigrationPanel = new EmigrationPanel(freeColClient, gui);
-        emigrationPanel.initialize(freeColClient.getMyPlayer().getEurope(), fountainOfYouth);
+        EmigrationPanel emigrationPanel = new EmigrationPanel(freeColClient);
+        emigrationPanel.initialize(freeColClient.getMyPlayer().getEurope(),
+                                   fountainOfYouth);
         return showFreeColDialog(emigrationPanel, null, true);
     }
 
 
-
     public boolean showEndTurnDialog(List<Unit> units) {
-        return showFreeColDialog(new EndTurnDialog(freeColClient, gui, units), null, true);
+        return showFreeColDialog(new EndTurnDialog(freeColClient, units),
+                                 null, true);
     }
 
     /**
@@ -1094,11 +1099,11 @@ public final class Canvas extends JDesktopPane {
         case SAIL:
             return -1;
         case RECRUIT:
-            localDialog = new RecruitDialog(freeColClient, gui);
+            localDialog = new RecruitDialog(freeColClient);
             break;
         case PURCHASE:
         case TRAIN:
-            localDialog = new TrainDialog(freeColClient, gui, europeAction);
+            localDialog = new TrainDialog(freeColClient, europeAction);
             break;
         }
         localDialog.initialize();
@@ -1133,15 +1138,19 @@ public final class Canvas extends JDesktopPane {
      * @param type The <code>EventType</code>.
      */
     public void showEventPanel(EventType type) {
-        showSubPanel(new EventPanel(freeColClient, gui, type), PopupPosition.CENTERED, false);
+        showSubPanel(new EventPanel(freeColClient, type),
+                     PopupPosition.CENTERED, false);
     }
 
     public void showFindSettlementDialog() {
-        showSubPanel(new FindSettlementDialog<Canvas>(freeColClient, gui), PopupPosition.ORIGIN, true);
+        showSubPanel(new FindSettlementDialog<Canvas>(freeColClient),
+                     PopupPosition.ORIGIN, true);
     }
 
-    public void showGameOptionsDialog(boolean editable, boolean loadCustomOptions) {
-        showSubPanel(new GameOptionsDialog(freeColClient, gui, editable, loadCustomOptions), false);
+    public void showGameOptionsDialog(boolean editable,
+                                      boolean loadCustomOptions) {
+        showSubPanel(new GameOptionsDialog(freeColClient, editable,
+                                           loadCustomOptions), false);
     }
 
     /**
@@ -1150,7 +1159,8 @@ public final class Canvas extends JDesktopPane {
      * @param messageId An optional message to add to the high scores panel.
      */
     public void showHighScoresPanel(String messageId) {
-        showSubPanel(new ReportHighScoresPanel(freeColClient, gui, messageId), PopupPosition.ORIGIN, false);
+        showSubPanel(new ReportHighScoresPanel(freeColClient, messageId),
+                     PopupPosition.ORIGIN, false);
     }
 
     /**
@@ -1160,7 +1170,7 @@ public final class Canvas extends JDesktopPane {
      */
     public void showIndianSettlementPanel(IndianSettlement indianSettlement) {
         IndianSettlementPanel panel
-            = new IndianSettlementPanel(freeColClient, gui, indianSettlement);
+            = new IndianSettlementPanel(freeColClient, indianSettlement);
         showFreeColPanel(panel, indianSettlement.getTile(), true);
     }
 
@@ -1237,7 +1247,8 @@ public final class Canvas extends JDesktopPane {
             gui.playSound("sound.event.alertSound");
         }
 
-        showFreeColPanel(new InformationDialog(freeColClient, gui, text, icon), tile, true);
+        showFreeColPanel(new InformationDialog(freeColClient, text, icon),
+                         tile, true);
     }
 
     public void showInformationMessage(ModelMessage message) {
@@ -1293,7 +1304,9 @@ public final class Canvas extends JDesktopPane {
                 break;
             }
 
-            showFreeColPanel(new InformationDialog(freeColClient, gui, Messages.message("enterSomeText"), null), tile, true);
+            showFreeColPanel(new InformationDialog(freeColClient,
+                    Messages.message("enterSomeText"), null),
+                tile, true);
         }
         return response;
     }
@@ -1356,7 +1369,7 @@ public final class Canvas extends JDesktopPane {
     }
 
     public void showLogFilePanel() {
-        showSubPanel(new ErrorPanel(freeColClient, gui), true);
+        showSubPanel(new ErrorPanel(freeColClient), true);
 
     }
 
@@ -1368,21 +1381,22 @@ public final class Canvas extends JDesktopPane {
     public void showMainPanel() {
         closeMenus();
         gui.setupMenuBarToNull();
-        mainPanel = new MainPanel(freeColClient, gui);
+        mainPanel = new MainPanel(freeColClient);
         addCentered(mainPanel, MAIN_LAYER);
         mainPanel.requestFocus();
     }
 
     public void showMapEditorTransformPanel() {
 
-        JInternalFrame f = addAsFrame(new MapEditorTransformPanel(freeColClient, gui), true, PopupPosition.CENTERED, false);
+        JInternalFrame f = addAsFrame(new MapEditorTransformPanel(freeColClient), true, PopupPosition.CENTERED, false);
         f.setLocation(f.getX(), 50);
         repaint();
 
     }
 
     public OptionGroup showMapGeneratorOptionsDialog(OptionGroup mgo, boolean editable, boolean loadCustomOptions) {
-        return showFreeColDialog(new MapGeneratorOptionsDialog(freeColClient, gui, mgo, editable, loadCustomOptions), null, false);
+        return showFreeColDialog(new MapGeneratorOptionsDialog(freeColClient,
+                mgo, editable, loadCustomOptions), null, false);
     }
 
     public Dimension showMapSizeDialog() {
@@ -1428,8 +1442,8 @@ public final class Canvas extends JDesktopPane {
                 }
             }
         } else {
-            showSubPanel(new InformationDialog(freeColClient, gui,
-            messageText, messageIcon), true);
+            showSubPanel(new InformationDialog(freeColClient, messageText,
+                                               messageIcon), true);
             if (!isShowingSubPanel()) {
                 freeColClient.getInGameController().nextModelMessage();
             }
@@ -1437,7 +1451,8 @@ public final class Canvas extends JDesktopPane {
     }
 
     public boolean showMonarchPanelDialog(MonarchAction action, StringTemplate replace) {
-        return showFreeColDialog(new MonarchPanel(freeColClient, gui, action, replace), null, true);
+        return showFreeColDialog(new MonarchPanel(freeColClient, action,
+                                                  replace), null, true);
     }
 
 
@@ -1452,17 +1467,17 @@ public final class Canvas extends JDesktopPane {
      */
     public DiplomaticTrade showNegotiationDialog(Unit unit, Settlement settlement, DiplomaticTrade agreement) {
         NegotiationDialog negotiationDialog
-            = new NegotiationDialog(freeColClient, gui, unit, settlement, agreement);
+            = new NegotiationDialog(freeColClient, unit, settlement, agreement);
         negotiationDialog.initialize();
         return showFreeColDialog(negotiationDialog, unit.getTile(), true);
     }
 
     public void showNewPanel() {
-        showSubPanel(new NewPanel(freeColClient, gui), false);
+        showSubPanel(new NewPanel(freeColClient), false);
     }
 
     public void showNewPanel(Specification specification) {
-        showSubPanel(new NewPanel(freeColClient, gui, specification), false);
+        showSubPanel(new NewPanel(freeColClient, specification), false);
     }
 
     /**
@@ -1533,14 +1548,17 @@ public final class Canvas extends JDesktopPane {
     public boolean showPreCombatDialog(FreeColGameObject attacker,
                                        FreeColGameObject defender,
                                        Tile tile) {
-        return showFreeColDialog(new PreCombatDialog(freeColClient, gui, attacker, defender),
+        return showFreeColDialog(new PreCombatDialog(freeColClient,
+                                                     attacker, defender),
                                  tile, true);
     }
 
-    public void showReportLabourDetailPanel(UnitType unitType, Map<UnitType, Map<Location, Integer>> data,
-            TypeCountMap<UnitType> unitCount, List<Colony> colonies) {
-
-        ReportLabourDetailPanel details = new ReportLabourDetailPanel(freeColClient, gui, unitType, data, unitCount, colonies);
+    public void showReportLabourDetailPanel(UnitType unitType,
+        Map<UnitType, Map<Location, Integer>> data,
+        TypeCountMap<UnitType> unitCount, List<Colony> colonies) {
+        ReportLabourDetailPanel details
+            = new ReportLabourDetailPanel(freeColClient, unitType, data,
+                                          unitCount, colonies);
         details.initialize();
         showSubPanel(details, true);
     }
@@ -1550,106 +1568,91 @@ public final class Canvas extends JDesktopPane {
 
     public void showReportCargoPanel() {
         ReportCargoPanel r = getExistingFreeColPanel(ReportCargoPanel.class);
-        if (r == null) showSubPanel(new ReportCargoPanel(freeColClient,
-                                                         freeColClient.getGUI()),
+        if (r == null) showSubPanel(new ReportCargoPanel(freeColClient),
                                     true);
     }
 
     public void showReportColonyPanel() {
         ReportColonyPanel r = getExistingFreeColPanel(ReportColonyPanel.class);
-        if (r == null) showSubPanel(new ReportColonyPanel(freeColClient,
-                                                          freeColClient.getGUI()),
+        if (r == null) showSubPanel(new ReportColonyPanel(freeColClient),
                                     true);
     }
 
     public void showReportContinentalCongressPanel() {
         ReportContinentalCongressPanel r = getExistingFreeColPanel(ReportContinentalCongressPanel.class);
-        if (r == null) showSubPanel(new ReportContinentalCongressPanel(freeColClient,
-                                                                       freeColClient.getGUI()),
+        if (r == null) showSubPanel(new ReportContinentalCongressPanel(freeColClient),
                                     true);
     }
 
     public void showReportEducationPanel() {
         ReportEducationPanel r = getExistingFreeColPanel(ReportEducationPanel.class);
-        if (r == null) showSubPanel(new ReportEducationPanel(freeColClient,
-                                                             freeColClient.getGUI()),
+        if (r == null) showSubPanel(new ReportEducationPanel(freeColClient),
                                     true);
     }
 
     public void showReportExplorationPanel() {
         ReportExplorationPanel r = getExistingFreeColPanel(ReportExplorationPanel.class);
-        if (r == null) showSubPanel(new ReportExplorationPanel(freeColClient,
-                                                               freeColClient.getGUI()),
+        if (r == null) showSubPanel(new ReportExplorationPanel(freeColClient),
                                     true);
     }
 
     public void showReportForeignAffairPanel() {
         ReportForeignAffairPanel r = getExistingFreeColPanel(ReportForeignAffairPanel.class);
-        if (r == null) showSubPanel(new ReportForeignAffairPanel(freeColClient,
-                                                                 freeColClient.getGUI()),
+        if (r == null) showSubPanel(new ReportForeignAffairPanel(freeColClient),
                                     true);
     }
 
     public void showReportHistoryPanel() {
         ReportHistoryPanel r = getExistingFreeColPanel(ReportHistoryPanel.class);
-        if (r == null) showSubPanel(new ReportHistoryPanel(freeColClient,
-                                                           freeColClient.getGUI()),
+        if (r == null) showSubPanel(new ReportHistoryPanel(freeColClient),
                                     true);
     }
 
     public void showReportIndianPanel() {
         ReportIndianPanel r = getExistingFreeColPanel(ReportIndianPanel.class);
-        if (r == null) showSubPanel(new ReportIndianPanel(freeColClient,
-                                                          freeColClient.getGUI()),
+        if (r == null) showSubPanel(new ReportIndianPanel(freeColClient),
                                     true);
     }
 
     public void showReportLabourPanel() {
         ReportLabourPanel r = getExistingFreeColPanel(ReportLabourPanel.class);
-        if (r == null) showSubPanel(new ReportLabourPanel(freeColClient,
-                                                          freeColClient.getGUI()),
+        if (r == null) showSubPanel(new ReportLabourPanel(freeColClient),
                                     true);
     }
 
     public void showReportMilitaryPanel() {
         ReportMilitaryPanel r = getExistingFreeColPanel(ReportMilitaryPanel.class);
-        if (r == null) showSubPanel(new ReportMilitaryPanel(freeColClient,
-                                                            freeColClient.getGUI()),
+        if (r == null) showSubPanel(new ReportMilitaryPanel(freeColClient),
                                     true);
     }
 
     public void showReportNavalPanel() {
         ReportNavalPanel r = getExistingFreeColPanel(ReportNavalPanel.class);
-        if (r == null) showSubPanel(new ReportNavalPanel(freeColClient,
-                                                         freeColClient.getGUI()),
+        if (r == null) showSubPanel(new ReportNavalPanel(freeColClient),
                                     true);
     }
 
     public void showReportProductionPanel() {
         ReportProductionPanel r = getExistingFreeColPanel(ReportProductionPanel.class);
-        if (r == null) showSubPanel(new ReportProductionPanel(freeColClient,
-                                                              freeColClient.getGUI()),
+        if (r == null) showSubPanel(new ReportProductionPanel(freeColClient),
                                     true);
     }
 
     public void showReportReligiousPanel() {
         ReportReligiousPanel r = getExistingFreeColPanel(ReportReligiousPanel.class);
-        if (r == null) showSubPanel(new ReportReligiousPanel(freeColClient,
-                                                             freeColClient.getGUI()),
+        if (r == null) showSubPanel(new ReportReligiousPanel(freeColClient),
                                     true);
     }
 
     public void showReportRequirementsPanel() {
         ReportRequirementsPanel r = getExistingFreeColPanel(ReportRequirementsPanel.class);
-        if (r == null) showSubPanel(new ReportRequirementsPanel(freeColClient,
-                                                                freeColClient.getGUI()),
+        if (r == null) showSubPanel(new ReportRequirementsPanel(freeColClient),
                                     true);
     }
 
     public void showReportTradePanel() {
         ReportTradePanel r = getExistingFreeColPanel(ReportTradePanel.class);
-        if (r == null) showSubPanel(new ReportTradePanel(freeColClient,
-                                                         freeColClient.getGUI()),
+        if (r == null) showSubPanel(new ReportTradePanel(freeColClient),
                                     true);
     }
 
@@ -1661,8 +1664,7 @@ public final class Canvas extends JDesktopPane {
     public void showReportTurnPanel(ModelMessage... messages) {
         ReportTurnPanel r = getExistingFreeColPanel(ReportTurnPanel.class);
         if (r == null) {
-            showSubPanel(new ReportTurnPanel(freeColClient,
-                                             freeColClient.getGUI(), messages),
+            showSubPanel(new ReportTurnPanel(freeColClient, messages),
                          true);
         } else {
             r.setMessages(messages);
@@ -1672,7 +1674,7 @@ public final class Canvas extends JDesktopPane {
 
 
     public String showRiverStyleDialog() {
-        return showFreeColDialog(new RiverStylePanel(freeColClient, gui), null, true);
+        return showFreeColDialog(new RiverStylePanel(freeColClient), null, true);
     }
 
     /**
@@ -1803,8 +1805,10 @@ public final class Canvas extends JDesktopPane {
         return (result == null) ? ScoutIndianSettlementAction.CANCEL : result;
     }
 
-    public int showSelectAmountDialog(GoodsType goodsType, int available, int defaultAmount, boolean needToPay) {
-        return showFreeColDialog(new SelectAmountDialog(freeColClient, gui, goodsType, available, defaultAmount, needToPay), null, true);
+    public int showSelectAmountDialog(GoodsType goodsType, int available,
+                                      int defaultAmount, boolean needToPay) {
+        return showFreeColDialog(new SelectAmountDialog(freeColClient,
+                goodsType, available, defaultAmount, needToPay), null, true);
     }
 
     /**
@@ -1815,8 +1819,8 @@ public final class Canvas extends JDesktopPane {
      * @return A destination for the unit, or null.
      */
     public Location showSelectDestinationDialog(Unit unit) {
-        return showFreeColDialog(new SelectDestinationDialog(freeColClient, gui, unit),
-                                 unit.getTile(), true);
+        return showFreeColDialog(new SelectDestinationDialog(freeColClient,
+                unit), unit.getTile(), true);
     }
 
 
@@ -1930,7 +1934,7 @@ public final class Canvas extends JDesktopPane {
     }
 
     public void showStatisticsPanel() {
-        showSubPanel(new StatisticsPanel(freeColClient, gui), true);
+        showSubPanel(new StatisticsPanel(freeColClient), true);
     }
 
     /**
@@ -1948,7 +1952,7 @@ public final class Canvas extends JDesktopPane {
     }
 
     public void showTilePanel(Tile tile) {
-        showSubPanel(new TilePanel(freeColClient, gui, tile), false);
+        showSubPanel(new TilePanel(freeColClient, tile), false);
     }
 
     /**
@@ -1964,7 +1968,7 @@ public final class Canvas extends JDesktopPane {
     public void showTilePopup(Tile tile, int x, int y) {
         if (tile == null)
             return;
-        TilePopup tp = new TilePopup(freeColClient, gui, tile);
+        TilePopup tp = new TilePopup(freeColClient, tile);
         if (tp.hasItem()) {
             tp.show(this, x, y);
             tp.repaint();
@@ -1980,12 +1984,13 @@ public final class Canvas extends JDesktopPane {
      * @return True if the trade route changed.
      */
     public boolean showTradeRouteDialog(Unit unit) {
-        return showFreeColDialog(new TradeRouteDialog(freeColClient, gui, unit),
+        return showFreeColDialog(new TradeRouteDialog(freeColClient, unit),
                                  (unit == null) ? null : unit.getTile(), true);
     }
 
     public boolean showTradeRouteInputDialog(TradeRoute newRoute) {
-        return showFreeColDialog(new TradeRouteInputDialog(freeColClient,  gui, newRoute), null, true);
+        return showFreeColDialog(new TradeRouteInputDialog(freeColClient,
+                newRoute), null, true);
     }
 
     /**
@@ -2029,16 +2034,16 @@ public final class Canvas extends JDesktopPane {
     }
 
     public void showVictoryPanel() {
-        showSubPanel(new VictoryPanel(freeColClient, gui), true);
+        showSubPanel(new VictoryPanel(freeColClient), true);
     }
 
     public boolean showWarehouseDialog(Colony colony) {
-        return showFreeColDialog(new WarehouseDialog(freeColClient, gui,
-        colony), null, true);
+        return showFreeColDialog(new WarehouseDialog(freeColClient, colony),
+            null, true);
     }
 
     public void showWorkProductionPanel(Unit unit) {
-        showSubPanel(new WorkProductionPanel(freeColClient, gui, unit), true);
+        showSubPanel(new WorkProductionPanel(freeColClient, unit), true);
     }
 
     public void updateGameOptions() {
@@ -2110,11 +2115,10 @@ public final class Canvas extends JDesktopPane {
      * @return The colony panel being displayed.
      * @see ColonyPanel
      */
-    ColonyPanel showColonyPanel(Colony colony) {
+    public ColonyPanel showColonyPanel(Colony colony) {
         ColonyPanel panel = getColonyPanel(colony);
-        if (panel != null)
-            return panel;
-        panel = new ColonyPanel(freeColClient, gui, colony);
+        if (panel != null) return panel;
+        panel = new ColonyPanel(freeColClient, colony);
         showFreeColPanel(panel, colony.getTile(), true);
         return panel;
     }
@@ -2440,12 +2444,12 @@ public final class Canvas extends JDesktopPane {
 
 
     public Parameters showParametersDialog() {
-        return showFreeColDialog(new ParametersDialog(freeColClient, gui), null, false);
+        return showFreeColDialog(new ParametersDialog(freeColClient),
+                                 null, false);
     }
 
     public Dimension showScaleMapSizeDialog() {
-        return showFreeColDialog(new ScaleMapSizeDialog(freeColClient, gui), null, false);
+        return showFreeColDialog(new ScaleMapSizeDialog(freeColClient),
+                                 null, false);
     }
-
-
 }

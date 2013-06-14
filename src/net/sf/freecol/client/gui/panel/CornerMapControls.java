@@ -63,13 +63,15 @@ public final class CornerMapControls extends MapControls {
 
     private Image miniMapSkin;
 
+
     /**
      * The basic constructor.
-     * @param freeColClient The main controller object for the client
-     * @param gui
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    public CornerMapControls(final FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui, true);
+    public CornerMapControls(final FreeColClient freeColClient) {
+        super(freeColClient, true);
+
         compassRose = new JLabel(ResourceManager.getImageIcon("compass.image"));
         compassRose.setFocusable(false);
         compassRose.setSize(compassRose.getPreferredSize());

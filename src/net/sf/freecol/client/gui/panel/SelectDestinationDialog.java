@@ -102,11 +102,12 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
 
     /**
      * The constructor to use.
-     * @param freeColClient 
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     @SuppressWarnings("unchecked") // FIXME in Java7
-    public SelectDestinationDialog(FreeColClient freeColClient, GUI gui, Unit unit) {
-        super(freeColClient, gui);
+    public SelectDestinationDialog(FreeColClient freeColClient, Unit unit) {
+        super(freeColClient);
 
         // Collect the goods the unit is carrying.
         final List<GoodsType> goodsTypes = new ArrayList<GoodsType>();

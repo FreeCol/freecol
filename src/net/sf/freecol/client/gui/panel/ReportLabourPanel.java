@@ -51,19 +51,19 @@ public final class ReportLabourPanel extends ReportPanel {
     private TypeCountMap<UnitType> unitCount;
     private List<Colony> colonies;
 
+
     /**
      * The constructor that will add the items to this panel.
-     * @param gui The parent of this panel.
      */
-    public ReportLabourPanel(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui, Messages.message("reportLabourAction.name"));
+    public ReportLabourPanel(FreeColClient freeColClient) {
+        super(freeColClient, Messages.message("reportLabourAction.name"));
+
         colonies = getSortedColonies();
         gatherData();
         displayData();
     }
 
     public void gatherData() {
-
         data = new HashMap<UnitType, Map<Location, Integer>>();
         unitCount = new TypeCountMap<UnitType>();
 

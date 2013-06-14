@@ -23,7 +23,6 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
@@ -40,12 +39,12 @@ public class ScaleMapAction extends FreeColAction {
     /**
      * Creates a new <code>ScaleMapAction</code>.
      *
-     * @param freeColClient The main controller object for the client.
-     * @param gui 
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    ScaleMapAction(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui, id);
+    public ScaleMapAction(FreeColClient freeColClient) {
+        super(freeColClient, id);
     }
+
 
     /**
      * Checks if this action should be enabled.
@@ -56,8 +55,8 @@ public class ScaleMapAction extends FreeColAction {
     protected boolean shouldBeEnabled() {
         return super.shouldBeEnabled()
             && freeColClient.isMapEditor()
-            && freeColClient.getGame() != null
-            && freeColClient.getGame().getMap() != null;
+            && getGame() != null
+            && getGame().getMap() != null;
     }
 
     /**
@@ -66,7 +65,7 @@ public class ScaleMapAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        Dimension ms = gui.showScaleMapSizeDialog();
+        Dimension ms = getGUI().showScaleMapSizeDialog();
         if (ms != null) {
             scaleMapTo(ms.width, ms.height);
         }
@@ -91,7 +90,7 @@ public class ScaleMapAction extends FreeColAction {
          *       example: are there a majority of ocean tiles?).
          */
 
-        final Game game = freeColClient.getGame();
+        final Game game = getGame();
         final Map oldMap = game.getMap();
 
         final int oldWidth = oldMap.getWidth();
@@ -127,7 +126,7 @@ public class ScaleMapAction extends FreeColAction {
             t.getTileItemContainer().updateRiver();
         }*/
 
-        gui.setSelectedTile(map.getTile(0, 0), false);
-        gui.refresh();
+        getGUI().setSelectedTile(map.getTile(0, 0), false);
+        getGUI().refresh();
     }
 }

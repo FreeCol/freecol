@@ -124,24 +124,22 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
      * Creates a new game panel.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      */
-    public NewPanel(FreeColClient freeColClient, GUI gui) {
-        this(freeColClient, gui, null);
+    public NewPanel(FreeColClient freeColClient) {
+        this(freeColClient, null);
     }
 
     /**
      * Creates a new game panel.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      * @param specification An optional <code>Specification</code> value for
      *     the new game.
      */
     @SuppressWarnings("unchecked") // FIXME in Java7
-    public NewPanel(FreeColClient freeColClient, GUI gui,
-                    Specification specification) {
-        super(freeColClient, gui);
+    public NewPanel(FreeColClient freeColClient, Specification specification) {
+        super(freeColClient);
+
         this.specification = specification;
 
         String selectTC = (specification != null) ? specification.getId()

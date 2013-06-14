@@ -67,15 +67,14 @@ public final class MapGeneratorOptionsDialog extends OptionsDialog implements Ac
      * Creates a dialog to set the map generator options.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      * @param mgo the map generator options
      * @param editable whether the options may be edited
      * @param loadCustomOptions whether to load custom options
      */
-    public MapGeneratorOptionsDialog(FreeColClient freeColClient, GUI gui,
+    public MapGeneratorOptionsDialog(FreeColClient freeColClient,
                                      OptionGroup mgo, boolean editable,
                                      boolean loadCustomOptions) {
-        super(freeColClient, gui, editable);
+        super(freeColClient, editable);
 
         if (editable && loadCustomOptions) {
             loadCustomOptions();

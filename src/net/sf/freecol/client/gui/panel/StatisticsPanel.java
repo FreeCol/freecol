@@ -155,10 +155,9 @@ public final class StatisticsPanel extends FreeColPanel
      * Creates the statistics panel.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      */
-    public StatisticsPanel(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui, new BorderLayout());
+    public StatisticsPanel(FreeColClient freeColClient) {
+        super(freeColClient, new BorderLayout());
 
         // Retrieve the client and server data
         Map<String, String> serverStatistics

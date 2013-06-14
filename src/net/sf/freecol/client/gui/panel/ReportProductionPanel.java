@@ -51,15 +51,15 @@ public final class ReportProductionPanel extends ReportPanel {
     private final JLabel selectLabel;
     private final List<GoodsType> goodsTypes;
 
+
     /**
      * The constructor that will add the items to this panel.
-     * @param freeColClient
      *
-     * @param gui The parent of this panel.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     @SuppressWarnings("unchecked") // FIXME in Java7
-    public ReportProductionPanel(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui, Messages.message("reportProductionAction.name"));
+    public ReportProductionPanel(FreeColClient freeColClient) {
+        super(freeColClient, Messages.message("reportProductionAction.name"));
 
         // TODO: can we extend this to cover farmed goods?
         goodsTypes = new ArrayList<GoodsType>();

@@ -82,8 +82,13 @@ public final class UnitLabel extends JLabel
         UNLOAD,
     }
 
+    private final FreeColClient freeColClient;
+
+    private final GUI gui;
+
     private final Unit unit;
 
+    private final InGameController inGameController;
 
     private boolean selected;
 
@@ -91,11 +96,7 @@ public final class UnitLabel extends JLabel
 
     private boolean ignoreLocation;
 
-    private InGameController inGameController;
 
-    private FreeColClient freeColClient;
-
-    private GUI gui;
 
 
     /**
@@ -105,10 +106,10 @@ public final class UnitLabel extends JLabel
      * @param unit The <code>Unit</code> to display.
      * @param gui The <code>GUI</code> to display on.
      */
-    public UnitLabel(FreeColClient freeColClient, Unit unit, GUI gui) {
+    public UnitLabel(FreeColClient freeColClient, Unit unit) {
         this.freeColClient = freeColClient;
+        this.gui = freeColClient.getGUI();
         this.unit = unit;
-        this.gui = gui;
         this.inGameController = freeColClient.getInGameController();
 
         selected = false;
@@ -123,12 +124,11 @@ public final class UnitLabel extends JLabel
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param unit The <code>Unit</code> to display.
-     * @param gui The <code>GUI</code> to display on.
      * @param isSmall The image will be smaller if set to <code>true</code>.
      */
-    public UnitLabel(FreeColClient freeColClient, Unit unit, GUI gui,
-                     boolean isSmall) {
-        this(freeColClient, unit, gui);
+    public UnitLabel(FreeColClient freeColClient, Unit unit, boolean isSmall) {
+        this(freeColClient, unit);
+
         setSmall(isSmall);
         setIgnoreLocation(false);
     }
@@ -138,14 +138,14 @@ public final class UnitLabel extends JLabel
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param unit The <code>Unit</code> to display.
-     * @param gui The <code>GUI</code> to display on.
      * @param isSmall The image will be smaller if set to <code>true</code>.
      * @param ignoreLocation The image will not include production or state
      *            information if set to <code>true</code>.
      */
-    public UnitLabel(FreeColClient freeColClient, Unit unit, GUI gui,
+    public UnitLabel(FreeColClient freeColClient, Unit unit,
                      boolean isSmall, boolean ignoreLocation) {
-        this(freeColClient, unit, gui);
+        this(freeColClient, unit);
+
         setSmall(isSmall);
         setIgnoreLocation(ignoreLocation);
     }
@@ -273,7 +273,7 @@ public final class UnitLabel extends JLabel
             if (workType != null) {
                 int production = ((ColonyTile)unit.getLocation())
                     .getTotalProductionOf(workType);
-                ProductionLabel pl = new ProductionLabel(freeColClient, gui,
+                ProductionLabel pl = new ProductionLabel(freeColClient,
                                                          workType, production);
                 g.translate(0, 10);
                 pl.paintComponent(g);

@@ -55,10 +55,10 @@ public final class PreGameInputHandler extends InputHandler {
     /**
      * The constructor to use.
      *
-     * @param freeColClient The main controller.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    public PreGameInputHandler(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui);
+    public PreGameInputHandler(FreeColClient freeColClient) {
+        super(freeColClient);
     }
 
 
@@ -127,7 +127,7 @@ public final class PreGameInputHandler extends InputHandler {
         } else {
             fcgo.readFromXMLElement(playerElement);
         }
-        gui.refreshPlayersTable();
+        getGUI().refreshPlayersTable();
 
         return null;
     }
@@ -142,9 +142,9 @@ public final class PreGameInputHandler extends InputHandler {
     private Element chat(Element element)  {
         Game game = getGame();
         ChatMessage chatMessage = new ChatMessage(game, element);
-        gui.displayChatMessage(chatMessage.getPlayer(game),
-                               chatMessage.getMessage(),
-                               chatMessage.isPrivate());
+        getGUI().displayChatMessage(chatMessage.getPlayer(game),
+                                    chatMessage.getMessage(),
+                                    chatMessage.isPrivate());
         return null;
     }
 
@@ -157,10 +157,10 @@ public final class PreGameInputHandler extends InputHandler {
      */
     private Element error(Element element)  {
         if (element.hasAttribute("messageID")) {
-            gui.errorMessage(element.getAttribute("messageID"),
-                             element.getAttribute("message"));
+            getGUI().errorMessage(element.getAttribute("messageID"),
+                                  element.getAttribute("message"));
         } else {
-            gui.errorMessage(null, element.getAttribute("message"));
+            getGUI().errorMessage(null, element.getAttribute("message"));
         }
         return null;
     }
@@ -183,7 +183,7 @@ public final class PreGameInputHandler extends InputHandler {
 
         Player player = game.getFreeColGameObject(playerId, Player.class);
         game.removePlayer(player);
-        gui.refreshPlayersTable();
+        getGUI().refreshPlayersTable();
 
         return null;
     }
@@ -222,7 +222,7 @@ public final class PreGameInputHandler extends InputHandler {
             .booleanValue();
 
         player.setReady(ready);
-        gui.refreshPlayersTable();
+        getGUI().refreshPlayersTable();
 
         return null;
     }
@@ -242,7 +242,7 @@ public final class PreGameInputHandler extends InputHandler {
         Player player = new Player(game, playerElement);
 
         getFreeColClient().getGame().removePlayer(player);
-        gui.refreshPlayersTable();
+        getGUI().refreshPlayersTable();
 
         return null;
     }
@@ -261,7 +261,7 @@ public final class PreGameInputHandler extends InputHandler {
                                          element.getAttribute("state"));
         getFreeColClient().getGame().getNationOptions()
             .setNationState(nation, state);
-        gui.refreshPlayersTable();
+        getGUI().refreshPlayersTable();
         return null;
     }
 
@@ -362,7 +362,7 @@ public final class PreGameInputHandler extends InputHandler {
         gameOptions.readFromXMLElement(mgoElement);
         spec.clean("update game options (server initiated)");
 
-        gui.updateGameOptions();
+        getGUI().updateGameOptions();
 
         return null;
     }
@@ -381,7 +381,7 @@ public final class PreGameInputHandler extends InputHandler {
         getFreeColClient().getGame().getMapGeneratorOptions()
             .readFromXMLElement(mgoElement);
 
-        gui.updateMapGeneratorOptions();
+        getGUI().updateMapGeneratorOptions();
 
         return null;
     }
@@ -402,7 +402,7 @@ public final class PreGameInputHandler extends InputHandler {
             .getNation(element.getAttribute("value"));
 
         player.setNation(nation);
-        gui.refreshPlayersTable();
+        getGUI().refreshPlayersTable();
 
         return null;
     }
@@ -423,7 +423,7 @@ public final class PreGameInputHandler extends InputHandler {
             .getNationType(element.getAttribute("value"));
 
         player.changeNationType(nationType);
-        gui.refreshPlayersTable();
+        getGUI().refreshPlayersTable();
 
         return null;
     }

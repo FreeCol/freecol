@@ -92,25 +92,23 @@ public final class InfoPanel extends FreeColPanel {
     /**
      * The constructor that will add the items to this panel.
      *
-     * @param freeColClient The main controller object for the client.
-     * @param gui a <code>GUI</code> value
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    public InfoPanel(final FreeColClient freeColClient, final GUI gui) {
-        this(freeColClient, gui, true);
+    public InfoPanel(final FreeColClient freeColClient) {
+        this(freeColClient, true);
     }
-
 
     /**
      * The constructor that will add the items to this panel.
      *
-     * @param freeColClient The main controller object for the client.
-     * @param gui a <code>GUI</code> value
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param useSkin a <code>boolean</code> value
      */
-    public InfoPanel(final FreeColClient freeColClient, final GUI gui, boolean useSkin) {
-        super(freeColClient, gui);
+    public InfoPanel(final FreeColClient freeColClient, boolean useSkin) {
+        super(freeColClient);
+
         this.useSkin = useSkin;
-        this.endTurnPanel = new EndTurnPanel(gui);
+        this.endTurnPanel = new EndTurnPanel(getGUI());
 
         unitInfoPanel = new UnitInfoPanel();
         setLayout(null);
@@ -137,13 +135,13 @@ public final class InfoPanel extends FreeColPanel {
         add(mapEditorPanel, internalPanelTop, internalPanelHeight);
 
         addMouseListener(new MouseAdapter() {
-           @Override
-           public void mousePressed(MouseEvent e) {
-              Unit activeUnit = gui.getActiveUnit();
-              if (activeUnit != null && activeUnit.getTile() != null) {
-                  gui.setFocus(activeUnit.getTile());
-              }
-          }
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    Unit activeUnit = getGUI().getActiveUnit();
+                    if (activeUnit != null && activeUnit.getTile() != null) {
+                        getGUI().setFocus(activeUnit.getTile());
+                    }
+                }
             });
     }
 

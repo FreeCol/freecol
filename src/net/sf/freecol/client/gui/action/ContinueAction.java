@@ -23,9 +23,6 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.control.ConnectController;
-import net.sf.freecol.client.control.InGameController;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 
 
@@ -40,15 +37,16 @@ public class ContinueAction extends FreeColAction {
     /**
      * Creates a new <code>ContinueAction</code>.
      *
-     * @param freeColClient The main controller object for the client.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     public ContinueAction(FreeColClient freeColClient) {
-        super(freeColClient, freeColClient.getGUI(), id);
+        super(freeColClient, id);
         
         // interim solution to be replaced! redirect to identical NAME text
         putValue(NAME, Messages.message("victory.continue"));
         putValue(SHORT_DESCRIPTION, null);
     }
+
 
     /**
      * Applies this action.
@@ -57,12 +55,10 @@ public class ContinueAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        final FreeColClient freeColClient = getFreeColClient();
-        File lastSave = freeColClient.getInGameController()
-            .getLastSaveGameFile();
+        File lastSave = getInGameController().getLastSaveGameFile();
         if (lastSave != null) {
-            gui.removeInGameComponents();
-            freeColClient.getConnectController().startSavedGame(lastSave);
+            getGUI().removeInGameComponents();
+            getConnectController().startSavedGame(lastSave);
         }
     }
 }

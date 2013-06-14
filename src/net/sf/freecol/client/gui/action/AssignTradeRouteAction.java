@@ -33,20 +33,17 @@ import net.sf.freecol.common.model.Unit;
 public class AssignTradeRouteAction extends UnitAction {
 
     public static final String id = "assignTradeRouteAction";
-    private final InGameController inGameController;
 
 
     /**
      * Creates this action.
      *
-     * @param freeColClient The main controller object for the client.
-     * @param inGameController 
-     * @param gui 
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    AssignTradeRouteAction(FreeColClient freeColClient, InGameController inGameController, GUI gui) {
-        super(freeColClient, gui, id);
-        this.inGameController = inGameController; 
+    public AssignTradeRouteAction(FreeColClient freeColClient) {
+        super(freeColClient, id);
     }
+
 
     /**
      * Checks if this action should be enabled.
@@ -56,7 +53,7 @@ public class AssignTradeRouteAction extends UnitAction {
     @Override
     protected boolean shouldBeEnabled() {
         if (super.shouldBeEnabled()) {
-            Unit unit = gui.getActiveUnit();
+            Unit unit = getGUI().getActiveUnit();
             return (unit != null && unit.isCarrier());
         }
         return false;
@@ -68,9 +65,9 @@ public class AssignTradeRouteAction extends UnitAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        Unit unit = gui.getActiveUnit();
+        Unit unit = getGUI().getActiveUnit();
         if (unit != null) {
-            inGameController.assignTradeRoute(unit);
+            getInGameController().assignTradeRoute(unit);
         }
     }
 }

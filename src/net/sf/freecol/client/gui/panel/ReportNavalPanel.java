@@ -30,6 +30,7 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractUnit;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.Role;
@@ -41,16 +42,19 @@ import net.sf.freecol.common.model.UnitType;
  */
 public final class ReportNavalPanel extends ReportUnitPanel {
 
+
     /**
      * The constructor that will add the items to this panel.
-     * @param freeColClient
-     * @param gui The parent of this panel.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    public ReportNavalPanel(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui, "reportNavalAction.name", false);
+    public ReportNavalPanel(FreeColClient freeColClient) {
+        super(freeColClient, "reportNavalAction.name", false);
     }
 
+
     protected void addREFUnits() {
+        final Player player = getMyPlayer();
         reportPanel.add(new JLabel(Messages.message(player.getNation().getREFNation().getId() + ".name")),
                         "span, split 2");
         reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "growx");
@@ -66,6 +70,7 @@ public final class ReportNavalPanel extends ReportUnitPanel {
     }
 
     protected void addOwnUnits() {
+        final Player player = getMyPlayer();
         reportPanel.add(localizedLabel(StringTemplate.template("report.military.forces")
                                        .addStringTemplate("%nation%", player.getNationName())),
                         "newline, span, split 2");
@@ -80,7 +85,7 @@ public final class ReportNavalPanel extends ReportUnitPanel {
     }
 
     protected void gatherData() {
-        for (Unit unit : player.getUnits()) {
+        for (Unit unit : getMyPlayer().getUnits()) {
             if (unit.isNaval()) {
                 addUnit(unit, "naval");
             }

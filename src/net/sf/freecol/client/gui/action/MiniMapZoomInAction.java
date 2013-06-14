@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
 
 
 /**
@@ -32,25 +31,30 @@ public class MiniMapZoomInAction extends MapboardAction {
 
     public static final String id = "miniMapZoomInAction";
 
+
     /**
      * Creates a new <code>MiniMapZoomInAction</code>.
-     * @param freeColClient The main controller object for the client.
-     * @param gui 
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    MiniMapZoomInAction(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui,id);
+    public MiniMapZoomInAction(FreeColClient freeColClient) {
+        super(freeColClient, id);
+
         addImageIcons("zoom_in");
     }
 
     /**
      * Creates a new <code>MiniMapZoomInAction</code>.
-     * @param freeColClient The main controller object for the client.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param b a <code>boolean</code> value
      */
-    MiniMapZoomInAction(FreeColClient freeColClient, GUI gui, boolean b) {
-        super(freeColClient, gui, id + ".secondary");
+    public MiniMapZoomInAction(FreeColClient freeColClient, boolean b) {
+        super(freeColClient, id + ".secondary");
+ 
         addImageIcons("zoom_in");
     }
+
 
     /**
      * Checks if this action should be enabled.
@@ -59,18 +63,18 @@ public class MiniMapZoomInAction extends MapboardAction {
      */
     @Override
     protected boolean shouldBeEnabled() {
-        return super.shouldBeEnabled()
-            && gui.canZoomInMapControls();
+        return super.shouldBeEnabled() && getGUI().canZoomInMapControls();
     }
 
     /**
      * Applies this action.
+     *
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        gui.zoomInMapControls();
+        getGUI().zoomInMapControls();
         update();
-        getFreeColClient().getActionManager().getFreeColAction(MiniMapZoomOutAction.id).update();
-        getFreeColClient().getActionManager().getFreeColAction(MiniMapZoomOutAction.id + ".secondary").update();
+        getActionManager().getFreeColAction(MiniMapZoomOutAction.id).update();
+        getActionManager().getFreeColAction(MiniMapZoomOutAction.id + ".secondary").update();
     }
 }

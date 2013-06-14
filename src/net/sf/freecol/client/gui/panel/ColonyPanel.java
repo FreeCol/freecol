@@ -180,12 +180,11 @@ public final class ColonyPanel extends PortPanel
      * The constructor for the panel.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      * @param colony The <code>Colony</code> to display in this panel.
      */
     @SuppressWarnings("unchecked") // FIXME in Java7
-    public ColonyPanel(FreeColClient freeColClient, GUI gui, Colony colony) {
-        super(freeColClient, gui);
+    public ColonyPanel(FreeColClient freeColClient, Colony colony) {
+        super(freeColClient);
 
         setFocusCycleRoot(true);
 
@@ -222,7 +221,7 @@ public final class ColonyPanel extends PortPanel
 
         netProductionPanel.setOpaque(false);
 
-        constructionPanel = new ConstructionPanel(gui, colony, true);
+        constructionPanel = new ConstructionPanel(freeColClient, colony, true);
         constructionPanel.setOpaque(true);
 
         outsideColonyPanel = new OutsideColonyPanel();
@@ -239,8 +238,8 @@ public final class ColonyPanel extends PortPanel
 
         cargoPanel = new ColonyCargoPanel(freeColClient);
 
-        defaultTransferHandler = new DefaultTransferHandler(freeColClient, gui, this);
-        pressListener = new DragListener(freeColClient, gui, this);
+        defaultTransferHandler = new DefaultTransferHandler(freeColClient, this);
+        pressListener = new DragListener(freeColClient, this);
 
         JScrollPane outsideColonyScroll = new JScrollPane(outsideColonyPanel,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
@@ -434,7 +433,7 @@ public final class ColonyPanel extends PortPanel
             int amount = colony.getAdjustedNetProductionOf(goodsType);
             if (amount != 0) {
                 netProductionPanel.add(new ProductionLabel(getFreeColClient(),
-                                       getGUI(), goodsType, amount));
+                                                           goodsType, amount));
             }
         }
 
@@ -772,7 +771,7 @@ public final class ColonyPanel extends PortPanel
             subMenu.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         unitMenu.createUnitMenu(new UnitLabel(freeColClient,
-                                                              unit, getGUI()));
+                                                              unit));
                         unitMenu.show(getGUI().getCanvas(), 0, 0);
                     }
                 });
@@ -789,7 +788,7 @@ public final class ColonyPanel extends PortPanel
                 subMenu.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         unitMenu.createUnitMenu(new UnitLabel(freeColClient,
-                                                              unit, getGUI()));
+                                                              unit));
                         unitMenu.show(getGUI().getCanvas(), 0, 0);
                     }
                 });
@@ -802,7 +801,7 @@ public final class ColonyPanel extends PortPanel
                         subMenu = new JMenuItem(menuTitle, unitIcon);
                         subMenu.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent e) {
-                                unitMenu.createUnitMenu(new UnitLabel(freeColClient, innerUnit, getGUI()));
+                                unitMenu.createUnitMenu(new UnitLabel(freeColClient, innerUnit));
                                 unitMenu.show(getGUI().getCanvas(), 0, 0);
                             }
                         });
@@ -817,7 +816,7 @@ public final class ColonyPanel extends PortPanel
                 subMenu = new JMenuItem(menuTitle, unitIcon);
                 subMenu.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        unitMenu.createUnitMenu(new UnitLabel(freeColClient, unit, getGUI()));
+                        unitMenu.createUnitMenu(new UnitLabel(freeColClient, unit));
                         unitMenu.show(getGUI().getCanvas(), 0, 0);
                         }
                 });
@@ -935,10 +934,10 @@ public final class ColonyPanel extends PortPanel
         /**
          * Create this colony cargo panel.
          *
-         * @param freeColClient The containing <code>FreeColClient</code>.
+         * @param freeColClient The <code>FreeColClient</code> for the game.
          */
         public ColonyCargoPanel(FreeColClient freeColClient) {
-            super(freeColClient, freeColClient.getGUI(), true);
+            super(freeColClient, true);
 
             setLayout(new MigLayout("wrap 6, fill, insets 0"));
         }
@@ -1032,7 +1031,7 @@ public final class ColonyPanel extends PortPanel
         }
 
         public JToolTip createToolTip() {
-            return new RebelToolTip(getFreeColClient(), getGUI(), getColony());
+            return new RebelToolTip(getFreeColClient(), getColony());
         }
 
         @Override
@@ -1544,10 +1543,10 @@ public final class ColonyPanel extends PortPanel
         /**
          * Creates a TilesPanel.
          *
-         * @param freeColClient The container <code>FreeColClient</code>.
+         * @param freeColClient The <code>FreeColClient</code> for the game.
          */
         public TilesPanel(FreeColClient freeColClient) {
-            super(freeColClient, freeColClient.getGUI());
+            super(freeColClient);
 
             this.colonyPanel = ColonyPanel.this;
             setBackground(Color.BLACK);
@@ -1706,7 +1705,7 @@ public final class ColonyPanel extends PortPanel
 
                 UnitLabel label = null;
                 for (Unit unit : colonyTile.getUnitList()) {
-                    label = new UnitLabel(getFreeColClient(), unit, getGUI());
+                    label = new UnitLabel(getFreeColClient(), unit);
                     if (colonyPanel.isEditable()) {
                         label.setTransferHandler(defaultTransferHandler);
                         label.addMouseListener(pressListener);
@@ -1720,8 +1719,7 @@ public final class ColonyPanel extends PortPanel
                     if (info != null) {
                         for (AbstractGoods ag : info.getProduction()) {
                             ProductionLabel productionLabel
-                                = new ProductionLabel(getFreeColClient(),
-                                                      getGUI(), ag);
+                                = new ProductionLabel(getFreeColClient(), ag);
                             productionLabel.addMouseListener(pressListener);
                             add(productionLabel);
                         }

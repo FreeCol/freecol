@@ -33,20 +33,19 @@ import net.sf.freecol.common.model.Unit;
 public class BuildColonyAction extends UnitAction {
 
     public static final String id = "buildColonyAction";
-    private final InGameController inGameController;
 
 
     /**
      * Creates this action.
      *
-     * @param freeColClient The main controller object for the client.
-     * @param gui 
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    BuildColonyAction(FreeColClient freeColClient, InGameController inGameController, GUI gui) {
-        super(freeColClient, gui, id);
-        this.inGameController = inGameController;
+    public BuildColonyAction(FreeColClient freeColClient) {
+        super(freeColClient, id);
+
         addImageIcons("build");
     }
+
 
     /**
      * Checks if this action should be enabled.
@@ -56,10 +55,8 @@ public class BuildColonyAction extends UnitAction {
      */
     @Override
     protected boolean shouldBeEnabled() {
-        if (!super.shouldBeEnabled()) {
-            return false;
-        }
-        Unit selectedOne = gui.getActiveUnit();
+        if (!super.shouldBeEnabled()) return false;
+        Unit selectedOne = getGUI().getActiveUnit();
         return selectedOne != null && selectedOne.getTile() != null
             && (selectedOne.canBuildColony()
                 || (selectedOne.getTile().getColony() != null
@@ -73,6 +70,6 @@ public class BuildColonyAction extends UnitAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        inGameController.buildColony();
+        getInGameController().buildColony();
     }
 }

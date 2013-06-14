@@ -118,9 +118,9 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
     private List<UnitType> buildableUnits = new ArrayList<UnitType>();
 
     @SuppressWarnings("unchecked") // FIXME in Java7
-    public BuildQueuePanel(FreeColClient freeColClient, GUI gui, Colony colony) {
+    public BuildQueuePanel(FreeColClient freeColClient, Colony colony) {
+        super(freeColClient, new MigLayout("wrap 3", "[260:][390:, fill][260:]", "[][][300:400:][]"));
 
-        super(freeColClient, gui, new MigLayout("wrap 3", "[260:][390:, fill][260:]", "[][][300:400:][]"));
         this.colony = colony;
         this.unitCount = colony.getUnitCount();
         featureContainer = new FeatureContainer();
@@ -215,7 +215,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
         buyBuilding.setActionCommand(BUY);
         buyBuilding.addActionListener(this);
 
-        constructionPanel = new ConstructionPanel(gui, colony, false);
+        constructionPanel = new ConstructionPanel(freeColClient, colony, false);
         constructionPanel.setOpaque(false);
         StringTemplate buildingNothing = StringTemplate.template("colonyPanel.currentlyBuilding")
             .add("%buildable%", "nothing");

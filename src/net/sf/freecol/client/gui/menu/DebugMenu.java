@@ -60,20 +60,18 @@ public class DebugMenu extends JMenu {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(DebugMenu.class.getName());
 
-    private FreeColClient freeColClient;
-
-    private GUI gui;
-
     private static final String ERROR_MESSAGE =
         "This is a long error message, indicating that some error has occurred. " +
         "This is a long error message, indicating that some error has occurred. " +
         "This is a long error message, indicating that some error has occurred.";
 
+    private final FreeColClient freeColClient;
+
 
     /**
      * Create the debug menu.
      *
-     * @param freeColClient The <code>FreeColClient</code> to use.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     public DebugMenu(FreeColClient freeColClient) {
         super(Messages.message("menuBar.debug"));

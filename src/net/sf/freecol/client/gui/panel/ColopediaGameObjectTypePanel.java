@@ -62,8 +62,11 @@ public abstract class ColopediaGameObjectTypePanel<T extends FreeColGameObjectTy
     private double scale = 1;
     private ColopediaPanel colopediaPanel;
 
-    public ColopediaGameObjectTypePanel(FreeColClient freeColClient, GUI gui, ColopediaPanel colopediaPanel, String id, double scale) {
-        super(freeColClient, gui);
+
+    public ColopediaGameObjectTypePanel(FreeColClient freeColClient,
+        ColopediaPanel colopediaPanel, String id, double scale) {
+        super(freeColClient);
+
         this.colopediaPanel = colopediaPanel;
         this.id = "colopediaAction." + id;
         this.scale = scale;

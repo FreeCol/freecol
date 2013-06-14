@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Map.Direction;
 
@@ -36,35 +35,33 @@ public class MoveAction extends MapboardAction {
 
     private Direction direction;
 
-    private final InGameController inGameController;
 
     /**
      * Creates a new <code>MoveAction</code>.
      *
-     * @param freeColClient The main controller object for the client.
-     * @param direction a <code>Direction</code> value
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param direction The <code>Direction</code> to move.
      */
-    MoveAction(FreeColClient freeColClient, InGameController inGameController, GUI gui, Direction direction) {
-        super(freeColClient, gui, id + direction);
-        this.inGameController = inGameController;
+    public MoveAction(FreeColClient freeColClient, Direction direction) {
+        super(freeColClient, id + direction);
+
         this.direction = direction;
     }
 
     /**
      * Creates a new <code>MoveAction</code>.
      *
-     * @param freeColClient The main controller object for the client.
-     * @param igc The current <code>InGameController</code> to handle the move.
-     * @param gui The current <code>GUI</code>.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param direction The <code>Direction</code> to move in.
      * @param secondary a <code>boolean</code> value
      */
-    public MoveAction(FreeColClient freeColClient, InGameController igc,
-                      GUI gui, Direction direction, boolean secondary) {
-        super(freeColClient, gui, id + direction + ".secondary");
+    public MoveAction(FreeColClient freeColClient, Direction direction,
+                      boolean secondary) {
+        super(freeColClient, id + direction + ".secondary");
+
         this.direction = direction;
-        this.inGameController = igc;
     }
+
 
     /**
      * Applies this action.
@@ -72,12 +69,12 @@ public class MoveAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) { 
-        switch (gui.getCurrentViewMode()) {
+        switch (getGUI().getCurrentViewMode()) {
         case GUI.MOVE_UNITS_MODE:
-            inGameController.moveActiveUnit(direction);
+            getInGameController().moveActiveUnit(direction);
             break;
         case GUI.VIEW_TERRAIN_MODE:
-            inGameController.moveTileCursor(direction);
+            getInGameController().moveTileCursor(direction);
             break;
         }
     }

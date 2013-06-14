@@ -39,13 +39,15 @@ import net.sf.freecol.common.model.Specification;
  */
 public final class ReportReligiousPanel extends ReportPanel {
 
+
     /**
      * The constructor that will add the items to this panel.
-     * @param freeColClient 
-     * @param gui The parent of this panel.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    public ReportReligiousPanel(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui, Messages.message("reportReligionAction.name"));
+    public ReportReligiousPanel(FreeColClient freeColClient) {
+        super(freeColClient, Messages.message("reportReligionAction.name"));
+
         reportPanel.setLayout(new MigLayout("wrap 5, gap 20 20", "", ""));
         reportPanel.add(new JLabel(Messages.message("crosses")));
 

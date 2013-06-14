@@ -25,7 +25,6 @@ import javax.swing.JCheckBoxMenuItem;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
 
 
 /**
@@ -39,12 +38,12 @@ public class DisplayBordersAction extends SelectableAction {
     /**
      * Creates this action.
      *
-     * @param freeColClient The main controller object for the client.
-     * @param gui 
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    DisplayBordersAction(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui, id, ClientOptions.DISPLAY_BORDERS);
+    public DisplayBordersAction(FreeColClient freeColClient) {
+        super(freeColClient, id, ClientOptions.DISPLAY_BORDERS);
     }
+
 
     /**
      * Applies this action.
@@ -54,6 +53,6 @@ public class DisplayBordersAction extends SelectableAction {
     public void actionPerformed(ActionEvent e) {
         boolean b = ((JCheckBoxMenuItem) e.getSource()).isSelected();
         updateOption(b);
-        gui.refresh();
+        getGUI().refresh();
     }
 }

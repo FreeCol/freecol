@@ -23,7 +23,6 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.server.generator.MapGenerator;
 
@@ -39,12 +38,12 @@ public class NewEmptyMapAction extends MapboardAction {
     /**
      * Creates this action
      *
-     * @param freeColClient The main controller object for the client.
-     * @param gui 
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    NewEmptyMapAction(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui, id);
+    public NewEmptyMapAction(FreeColClient freeColClient) {
+        super(freeColClient, id);
     }
+
 
     /**
      * Checks if this action should be enabled.
@@ -64,18 +63,14 @@ public class NewEmptyMapAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        final Game game = freeColClient.getGame();
-
-        Dimension size = gui.showMapSizeDialog();
-        if (size == null) {
-            return;
-        }
-        MapGenerator mapGenerator = freeColClient.getFreeColServer().getMapGenerator();
-        mapGenerator.createEmptyMap(game, new boolean[size.width][size.height]);
-
-        gui.setFocus(game.getMap().getTile(1,1));
-        freeColClient.updateActions();
-        gui.refresh();
+        Dimension size = getGUI().showMapSizeDialog();
+        if (size == null) return;
+        MapGenerator mapGenerator = getFreeColClient().getFreeColServer()
+            .getMapGenerator();
+        mapGenerator.createEmptyMap(getGame(),
+            new boolean[size.width][size.height]);
+        getGUI().setFocus(getGame().getMap().getTile(1,1));
+        getFreeColClient().updateActions();
+        getGUI().refresh();
     }
-
 }

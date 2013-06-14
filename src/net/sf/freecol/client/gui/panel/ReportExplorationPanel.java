@@ -53,11 +53,11 @@ public final class ReportExplorationPanel extends ReportPanel {
 
     /**
      * The constructor that will add the items to this panel.
-     * @param freeColClient 
-     * @param gui The parent of this panel.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    public ReportExplorationPanel(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui, Messages.message("reportExplorationAction.name"));
+    public ReportExplorationPanel(FreeColClient freeColClient) {
+        super(freeColClient, Messages.message("reportExplorationAction.name"));
 
         // Display Panel
         reportPanel.removeAll();

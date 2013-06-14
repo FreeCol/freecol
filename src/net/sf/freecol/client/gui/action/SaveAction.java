@@ -22,8 +22,6 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.control.InGameController;
-import net.sf.freecol.client.gui.GUI;
 
 
 /**
@@ -32,19 +30,17 @@ import net.sf.freecol.client.gui.GUI;
 public class SaveAction extends FreeColAction {
 
     public static final String id = "saveAction";
-    private final InGameController inGameController;
 
 
     /**
      * Creates a new <code>SaveAction</code>.
      *
      * @param freeColClient The main controller object for the client.
-     * @param gui 
      */
-    SaveAction(FreeColClient freeColClient, InGameController inGameController, GUI gui) {
-        super(freeColClient, gui, id);
-        this.inGameController = inGameController;
+    public SaveAction(FreeColClient freeColClient) {
+        super(freeColClient, id);
     }
+
 
     /**
      * Checks if this action should be enabled.
@@ -53,15 +49,11 @@ public class SaveAction extends FreeColAction {
      */
     @Override
     protected boolean shouldBeEnabled() {
-        if (freeColClient.isMapEditor()) {
-            return true;
-        }
+        if (freeColClient.isMapEditor()) return true;
 
-        //In game
-        if (!freeColClient.canSaveCurrentGame()) {
-            return false;
-        }
-        return !gui.isShowingSubPanel();
+        // In game
+        if (!freeColClient.canSaveCurrentGame()) return false;
+        return !getGUI().isShowingSubPanel();
     }
 
     /**
@@ -71,7 +63,7 @@ public class SaveAction extends FreeColAction {
      */
     public void actionPerformed(ActionEvent e) {
         if (!freeColClient.isMapEditor()) {
-            inGameController.saveGame();
+            getInGameController().saveGame();
         } else {
             freeColClient.getMapEditorController().saveGame();
         }

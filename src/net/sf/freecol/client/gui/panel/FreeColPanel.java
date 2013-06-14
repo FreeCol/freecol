@@ -103,17 +103,22 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
     private static final int cancelKeyCode = KeyEvent.VK_ESCAPE;
 
     // The decimal format to use for Modifiers
-    protected static final DecimalFormat modifierFormat = new DecimalFormat("0.00");
+    protected static final DecimalFormat modifierFormat
+        = new DecimalFormat("0.00");
 
     // Font to use for text areas
-    protected static final Font defaultFont = ResourceManager.getFont("NormalFont", 13f);
+    protected static final Font defaultFont
+        = ResourceManager.getFont("NormalFont", 13f);
     protected static final Font boldFont = defaultFont.deriveFont(Font.BOLD);
 
     // Fonts to use for report headers, etc.
-    protected static final Font  smallHeaderFont = ResourceManager.getFont("HeaderFont", 24f);
+    protected static final Font  smallHeaderFont
+        = ResourceManager.getFont("HeaderFont", 24f);
+    protected static final Font mediumHeaderFont
+        = ResourceManager.getFont("HeaderFont", 36f);
+    protected static final Font bigHeaderFont
+        = ResourceManager.getFont("HeaderFont", 48f);
 
-    protected static final Font mediumHeaderFont = ResourceManager.getFont("HeaderFont", 36f);
-    protected static final Font    bigHeaderFont = ResourceManager.getFont("HeaderFont", 48f);
     // How many columns (em-widths) to use in the text area
     protected static final int COLUMNS = 20;
 
@@ -128,26 +133,422 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
     protected static final Color LINK_COLOR
         = ResourceManager.getColor("lookAndFeel.link.color");
 
-
     // The color to use for borders
     protected static final Color BORDER_COLOR
         = ResourceManager.getColor("lookAndFeel.border.color");
 
     // The borders to use for table cells
-    public static final Border TOPCELLBORDER =
-        BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(1, 0, 1, 1, BORDER_COLOR),
-                                           BorderFactory.createEmptyBorder(2, 2, 2, 2));
+    public static final Border TOPCELLBORDER
+        = BorderFactory.createCompoundBorder(
+            BorderFactory.createMatteBorder(1, 0, 1, 1, BORDER_COLOR),
+            BorderFactory.createEmptyBorder(2, 2, 2, 2));
 
-    public static final Border CELLBORDER =
-        BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, BORDER_COLOR),
-                                           BorderFactory.createEmptyBorder(2, 2, 2, 2));
+    public static final Border CELLBORDER
+        = BorderFactory.createCompoundBorder(
+            BorderFactory.createMatteBorder(0, 0, 1, 1, BORDER_COLOR),
+            BorderFactory.createEmptyBorder(2, 2, 2, 2));
 
-    public static final Border LEFTCELLBORDER =
-        BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(0, 1, 1, 1, BORDER_COLOR),
-                                           BorderFactory.createEmptyBorder(2, 2, 2, 2));
-    public static final Border TOPLEFTCELLBORDER =
-        BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, BORDER_COLOR),
-                                           BorderFactory.createEmptyBorder(2, 2, 2, 2));
+    public static final Border LEFTCELLBORDER
+        = BorderFactory.createCompoundBorder(
+            BorderFactory.createMatteBorder(0, 1, 1, 1, BORDER_COLOR),
+            BorderFactory.createEmptyBorder(2, 2, 2, 2));
+
+    public static final Border TOPLEFTCELLBORDER
+        = BorderFactory.createCompoundBorder(
+            BorderFactory.createMatteBorder(1, 1, 1, 1, BORDER_COLOR),
+            BorderFactory.createEmptyBorder(2, 2, 2, 2));
+
+    protected static StyleContext styleContext = new StyleContext();
+    static {
+        Style defaultStyle = StyleContext.getDefaultStyleContext()
+            .getStyle(StyleContext.DEFAULT_STYLE);
+
+        Style regular = styleContext.addStyle("regular", defaultStyle);
+        StyleConstants.setFontFamily(regular, "NormalFont");
+        StyleConstants.setFontSize(regular, 13);
+
+        Style buttonStyle = styleContext.addStyle("button", regular);
+        StyleConstants.setForeground(buttonStyle, LINK_COLOR);
+
+        Style right = styleContext.addStyle("right", regular);
+        StyleConstants.setAlignment(right, StyleConstants.ALIGN_RIGHT);
+    }
+
+
+    private FreeColClient freeColClient;
+
+    protected boolean editable = true;
+
+    protected JButton okButton = new JButton(Messages.message("ok"));
+
+
+    /**
+     * Constructor.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     */
+    public FreeColPanel(FreeColClient freeColClient) {
+        this(freeColClient, new FlowLayout());
+    }
+
+    /**
+     * Default constructor.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param layout The <code>LayoutManager</code> to be used.
+     */
+    public FreeColPanel(FreeColClient freeColClient, LayoutManager layout) {
+        super(layout);
+
+        this.freeColClient = freeColClient;
+        setFocusCycleRoot(true);
+
+        setBorder(FreeColImageBorder.imageBorder);
+
+        // See the message of Ulf Onnen for more information about the presence
+        // of this fake mouse listener.
+        addMouseListener(new MouseAdapter() {
+        });
+
+        okButton.setActionCommand(OK);
+        okButton.addActionListener(this);
+        enterPressesWhenFocused(okButton);
+        setCancelComponent(okButton);
+
+    }
+
+
+    /**
+     * Get the FreeColClient.
+     *
+     * @return The current <code>FreeColClient</code>.
+     */
+    protected FreeColClient getFreeColClient() {
+        return freeColClient;
+    }
+
+    /**
+     * Is this panel editable?
+     *
+     * @return True if the panel is editable.
+     */
+    protected boolean isEditable() {
+        return editable;
+    }
+
+    /**
+     * Get the game.
+     *
+     * @return The current <code>Game</code>.
+     */
+    protected Game getGame() {
+        return freeColClient.getGame();
+    }
+
+    /**
+     * Get the GUI.
+     *
+     * @return The current <code>GUI</code>.
+     */
+    protected GUI getGUI() {
+        return freeColClient.getGUI();
+    }
+
+    /**
+     * Get the image library.
+     *
+     * @return The <code>ImageLibrary</code>.
+     */
+    protected ImageLibrary getLibrary() {
+        return getGUI().getImageLibrary();
+    }
+
+    /**
+     * Get the game specification.
+     *
+     * @return The <code>Specification</code>.
+     */
+    protected Specification getSpecification() {
+        return freeColClient.getGame().getSpecification();
+    }
+
+    /**
+     * Get the player.
+     *
+     * @return The client <code>Player</code>.
+     */
+    protected Player getMyPlayer() {
+        return freeColClient.getMyPlayer();
+    }
+
+    /**
+     * Get the client options.
+     *
+     * @return The <code>ClientOptions</code>.
+     */
+    protected ClientOptions getClientOptions() {
+        return (freeColClient == null) ? null
+            : freeColClient.getClientOptions();
+    }
+
+    /**
+     * Get the controller.
+     *
+     * @return The <code>InGameController</code>.
+     */
+    protected InGameController getController() {
+        return freeColClient.getInGameController();
+    }
+
+    /**
+     * Get a JLabel with Messages.message(key) as text.
+     *
+     * @param key The key to use.
+     * @return The <code>JLabel</code>.
+     */
+    protected JLabel localizedLabel(String key) {
+        return new JLabel(Messages.message(key));
+    }
+
+    /**
+     * Get a JLabel with Messages.message(template) as text.
+     *
+     * @param template The <code>StringTemplate</code> to use.
+     * @return The <code>JLabel</code>.
+     */
+    protected JLabel localizedLabel(StringTemplate template) {
+        return new JLabel(Messages.message(template));
+    }
+
+    /**
+     * Create a button for a colony.
+     *
+     * @param colony The <code>Colony</code> to create a button for.
+     * @return The new button.
+     */
+    protected JButton createColonyButton(Colony colony) {
+        JButton button = getLinkButton(colony.getName(), null, colony.getId());
+        button.addActionListener(this);
+        return button;
+    }
+
+    /**
+     * The OK button requests focus.
+     */
+    @Override
+    public void requestFocus() {
+        okButton.requestFocus();
+    }
+
+    /**
+     * Make the given button the CANCEL button.
+     *
+     * @param cancelButton an <code>AbstractButton</code> value
+     */
+    public void setCancelComponent(AbstractButton cancelButton) {
+        if (cancelButton == null) throw new NullPointerException();
+
+        InputMap inputMap
+            = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        inputMap.put(KeyStroke.getKeyStroke(cancelKeyCode, 0, true),
+                     "release");
+
+        Action cancelAction = cancelButton.getAction();
+        getActionMap().put("release", cancelAction);
+    }
+
+    /**
+     * Get an <code>int</code> associated with the name of the
+     * panel's class plus the given key from the saved ClientOptions.
+     *
+     * @param key a <code>String</code> value
+     * @return an <code>int</code> value
+     */
+    private int getInteger(String key) {
+        return freeColClient.getClientOptions()
+            .getInteger(getClass().getName() + key);
+    }
+
+    /**
+     * Save an <code>int</code> value to the saved ClientOptions,
+     * using the name of the panel's class plus the given key as and
+     * identifier.
+     *
+     * @param key a <code>String</code> value
+     * @param value an <code>int</code> value
+     */
+    private void saveInteger(String key, int value) {
+        if (freeColClient != null
+            && freeColClient.getClientOptions() != null) {
+            Option o = freeColClient.getClientOptions()
+                .getOption(getClass().getName() + key);
+            if (o == null) {
+                IntegerOption io
+                    = new IntegerOption(getClass().getName() + key);
+                io.setValue(value);
+                freeColClient.getClientOptions().add(io);
+            } else if (o instanceof IntegerOption) {
+                ((IntegerOption) o).setValue(value);
+            }
+        }
+    }
+
+    /**
+     * Save the given Dimension as size of the panel.
+     *
+     * @param size a <code>Dimension</code> value
+     */
+    private void saveSize(Dimension size) {
+        saveInteger(".w", size.width);
+        saveInteger(".h", size.height);
+    }
+
+    /**
+     * Save the current size of the panel.
+     */
+    private void saveSize() {
+        saveSize(getSize());
+    }
+
+    /**
+     * Gets the saved position of this panel.
+     *
+     * @return The saved position as a <code>Point</code>, or null if no
+     *     saved position is found.
+     */
+    public Point getSavedPosition() {
+        try {
+            return new Point(getInteger(".x"), getInteger(".y"));
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * Get the saved size of this panel, null by default.
+     *
+     * @return A <code>Dimension</code> for the panel size.
+     */
+    protected final Dimension getSavedSize() {
+        try {
+            return new Dimension(getInteger(".w"), getInteger(".h"));
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * Set preferred size to saved size, or to the given
+     * <code>Dimension</code> if no saved size was found. Call this
+     * method in the constructor of a FreeColPanel in order to
+     * remember its size and position.
+     *
+     * @param d The <code>Dimension</code> to restore from.
+     */
+    protected void restoreSavedSize(Dimension d) {
+        Dimension size = getSavedSize();
+        if (size == null) {
+            size = d;
+            saveSize(size);
+        }
+        if (!getPreferredSize().equals(size)) {
+            setPreferredSize(size);
+        }
+    }
+
+    /**
+     * Set preferred size to saved size, or to [w, h] if no saved size
+     * was found.  Call this method in the constructor of a
+     * FreeColPanel in order to remember its size and position.
+     *
+     * @param w The width.
+     * @param h The height.
+     */
+    protected void restoreSavedSize(int w, int h) {
+        restoreSavedSize(new Dimension(w, h));
+    }
+
+    /**
+     * Add a routine to be called when this panel closes.
+     * Triggered by notifyClose() above.
+     *
+     * @param runnable Some code to run on close.
+     */
+    public void addClosingCallback(final Runnable runnable) {
+        final FreeColPanel fcp = this;
+        addPropertyChangeListener(new PropertyChangeListener() {
+                public void propertyChange(PropertyChangeEvent e) {
+                    if ("closing".equals(e.getPropertyName())) {
+                        runnable.run();
+                        fcp.removePropertyChangeListener(this);
+                    }
+                }
+            });
+    }
+
+    /**
+     * Notify this panel that it is being removed from the
+     * canvas.  Saves the current size and position of the panel to the
+     * ClientOptions, which are included in the savegame file.
+     *
+     * @see net.sf.freecol.client.gui.Canvas#remove(Component)
+     */
+    public void notifyClose() {
+        firePropertyChange("closing", false, true);
+        Component frame
+            = SwingUtilities.getAncestorOfClass(JInternalFrame.class, this);
+        if (frame != null
+            && getClientOptions() != null
+            && getClientOptions().getBoolean("model.option.rememberPanelPositions")) {
+            saveInteger(".x", frame.getLocation().x);
+            saveInteger(".y", frame.getLocation().y);
+        }
+        saveSize();
+    }
+
+    /**
+     * Sort the given modifiers according to type.
+     *
+     * @param result Set of <code>Modifier</code>
+     * @return a sorted Set of <code>Modifier</code>
+     */
+    protected Set<Modifier> sortModifiers(Set<Modifier> result) {
+        EnumMap<Modifier.Type, List<Modifier>> modifierMap =
+            new EnumMap<Modifier.Type, List<Modifier>>(Modifier.Type.class);
+        for (Modifier.Type type : Modifier.Type.values()) {
+            modifierMap.put(type, new ArrayList<Modifier>());
+        }
+        for (Modifier modifier : result) {
+            modifierMap.get(modifier.getType()).add(modifier);
+        }
+        Set<Modifier> sortedResult = new LinkedHashSet<Modifier>();
+        for (Modifier.Type type : Modifier.Type.values()) {
+            sortedResult.addAll(modifierMap.get(type));
+        }
+        return sortedResult;
+    }
+
+    /**
+     * Get a list of colonies.
+     *
+     * @return The players colonies sorted according to the chosen comparator.
+     */
+    public List<Colony> getSortedColonies() {
+        return getClientOptions().getSortedColonies(getMyPlayer());
+    }
+
+    /**
+     * This function analyses an event and calls the right methods to take care
+     * of the user's requests.
+     *
+     * @param event The incoming ActionEvent.
+     */
+    public void actionPerformed(ActionEvent event) {
+        String command = event.getActionCommand();
+        if (command.equals(OK)) {
+            getGUI().removeFromCanvas(this);
+        }
+    }
 
     /**
      * Registers enter key for a JButton.
@@ -155,12 +556,15 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
      * @param button
      */
     public static void enterPressesWhenFocused(JButton button) {
-        button.registerKeyboardAction(
-                button.getActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, false)), KeyStroke
-                        .getKeyStroke(KeyEvent.VK_ENTER, 0, false), JComponent.WHEN_FOCUSED);
+        button.registerKeyboardAction(button.getActionForKeyStroke(
+                KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, false)), 
+            KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false),
+            JComponent.WHEN_FOCUSED);
 
-        button.registerKeyboardAction(button.getActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true)),
-                KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, true), JComponent.WHEN_FOCUSED);
+        button.registerKeyboardAction(button.getActionForKeyStroke(
+                KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true)),
+            KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, true),
+            JComponent.WHEN_FOCUSED);
     }
 
     /**
@@ -280,7 +684,6 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
         return result;
     }
 
-
     /**
      * Returns the default header for panels.
      *
@@ -293,7 +696,6 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
         header.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         return header;
     }
-
 
     /**
      * Returns a text area with standard settings suitable for use in FreeCol
@@ -327,414 +729,5 @@ public abstract class FreeColPanel extends JPanel implements ActionListener {
         // necessary because of resizing
         textArea.setSize(textArea.getPreferredSize());
         return textArea;
-    }
-
-    protected boolean editable = true;
-
-    protected JButton okButton = new JButton(Messages.message("ok"));
-
-
-    private FreeColClient freeColClient;
-
-    private GUI gui;
-
-    protected static StyleContext styleContext = new StyleContext();
-
-    static {
-        Style defaultStyle = StyleContext.getDefaultStyleContext()
-            .getStyle(StyleContext.DEFAULT_STYLE);
-
-        Style regular = styleContext.addStyle("regular", defaultStyle);
-        StyleConstants.setFontFamily(regular, "NormalFont");
-        StyleConstants.setFontSize(regular, 13);
-
-        Style buttonStyle = styleContext.addStyle("button", regular);
-        StyleConstants.setForeground(buttonStyle, LINK_COLOR);
-
-        Style right = styleContext.addStyle("right", regular);
-        StyleConstants.setAlignment(right, StyleConstants.ALIGN_RIGHT);
-    }
-
-
-    /**
-     * Constructor.
-     *
-     * @param gui <code>GUI</code>
-     */
-    public FreeColPanel(FreeColClient freeColClient, GUI gui) {
-        this(freeColClient, gui, new FlowLayout());
-    }
-
-
-    /**
-     * Default constructor.
-     *
-     * @param gui The <code>GUI</code>.
-     * @param layout The <code>LayoutManager</code> to be used.
-     */
-    public FreeColPanel(FreeColClient freeColClient, GUI gui, LayoutManager layout) {
-        super(layout);
-
-        this.freeColClient = freeColClient;
-        this.gui = gui;
-        setFocusCycleRoot(true);
-
-        setBorder(FreeColImageBorder.imageBorder);
-
-        // See the message of Ulf Onnen for more information about the presence
-        // of this fake mouse listener.
-        addMouseListener(new MouseAdapter() {
-        });
-
-        okButton.setActionCommand(OK);
-        okButton.addActionListener(this);
-        enterPressesWhenFocused(okButton);
-        setCancelComponent(okButton);
-
-    }
-
-    /**
-     * This function analyses an event and calls the right methods to take care
-     * of the user's requests.
-     *
-     * @param event The incoming ActionEvent.
-     */
-    public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
-        if (command.equals(OK)) {
-            getGUI().removeFromCanvas(this);
-        }
-    }
-
-    /**
-     * Add a routine to be called when this panel closes.
-     * Triggered by notifyClose() above.
-     *
-     * @param runnable Some code to run on close.
-     */
-    public void addClosingCallback(final Runnable runnable) {
-        final FreeColPanel fcp = this;
-        addPropertyChangeListener(new PropertyChangeListener() {
-                public void propertyChange(PropertyChangeEvent e) {
-                    if ("closing".equals(e.getPropertyName())) {
-                        runnable.run();
-                        fcp.removePropertyChangeListener(this);
-                    }
-                }
-            });
-    }
-
-    /**
-     * Returns the saved position of this panel, null by default.
-     *
-     * @return a <code>Point</code> value
-     */
-    public Point getSavedPosition() {
-        try {
-            return new Point(getInteger(".x"), getInteger(".y"));
-        } catch(Exception e) {
-            return null;
-        }
-    }
-
-    /**
-     * Notify this panel that it is being removed from the
-     * canvas. Saves the current size and position of the panel to the
-     * ClientOptions, which are included in the savegame file.
-     *
-     * @see net.sf.freecol.client.gui.Canvas#remove(Component)
-     */
-    public void notifyClose() {
-        firePropertyChange("closing", false, true);
-        Component frame = SwingUtilities.getAncestorOfClass(JInternalFrame.class, this);
-        if (frame != null
-            && getClientOptions() != null
-            && getClientOptions().getBoolean("model.option.rememberPanelPositions")) {
-            saveInteger(".x", frame.getLocation().x);
-            saveInteger(".y", frame.getLocation().y);
-        }
-        saveSize();
-    }
-
-    /**
-     * The OK button requests focus.
-     *
-     */
-    @Override
-    public void requestFocus() {
-        okButton.requestFocus();
-    }
-
-    /**
-     * Make the given button the CANCEL button.
-     *
-     * @param cancelButton an <code>AbstractButton</code> value
-     */
-    public void setCancelComponent(AbstractButton cancelButton) {
-        if (cancelButton == null) {
-            throw new NullPointerException();
-        }
-
-        InputMap inputMap = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-        inputMap.put(KeyStroke.getKeyStroke(cancelKeyCode, 0, true), "release");
-
-        Action cancelAction = cancelButton.getAction();
-        getActionMap().put("release", cancelAction);
-    }
-
-    protected JButton createColonyButton(Colony colony) {
-        JButton button = getLinkButton(colony.getName(), null, colony.getId());
-        button.addActionListener(this);
-        return button;
-    }
-
-    /**
-     * Return the client's <code>ClientOptions</code>.
-     *
-     * @return a <code>ClientOptions</code> value
-     */
-    protected ClientOptions getClientOptions() {
-        return freeColClient == null ? null : freeColClient.getClientOptions();
-    }
-
-    /**
-     * Describe <code>getController</code> method here.
-     *
-     * @return an <code>InGameController</code> value
-     */
-    protected InGameController getController() {
-        return freeColClient.getInGameController();
-    }
-
-    /**
-     * Returns the <code>Turn</code>s during which a Player's
-     * FoundingFathers were elected to the Continental Congress
-     *
-     * @return a <code>Turn</code> value
-     */
-    protected Map<String, Turn> getElectionTurns() {
-        Map<String, Turn> result = new HashMap<String, Turn>();
-        if (!getMyPlayer().getFathers().isEmpty()) {
-            for (HistoryEvent event : getMyPlayer().getHistory()) {
-                if (event.getEventType() == HistoryEvent.EventType.FOUNDING_FATHER) {
-                    result.put(event.getReplacement("%father%").getId(), event.getTurn());
-                }
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Gets the FreeColClient from the canvas.
-     *
-     * @return A current <code>FreeColClient</code>.
-     */
-    protected FreeColClient getFreeColClient() {
-        return freeColClient;
-    }
-
-
-
-    /**
-     * Describe <code>getGame</code> method here.
-     *
-     * @return a <code>Game</code> value
-     */
-    protected Game getGame() {
-        return freeColClient.getGame();
-    }
-
-    protected GUI getGUI() {
-        return gui;
-    }
-
-    /**
-     * Returns the ImageLibrary.
-     *
-     * @return the ImageLibrary.
-     */
-    protected ImageLibrary getLibrary() {
-        return gui.getImageLibrary();
-    }
-
-    /**
-     * Describe <code>getMyPlayer</code> method here.
-     *
-     * @return a <code>Player</code> value
-     */
-    protected Player getMyPlayer() {
-        return freeColClient.getMyPlayer();
-    }
-
-
-    /**
-     * Returns the saved size of this panel, null by default.
-     *
-     * @return a <code>Dimension</code> value
-     */
-    protected final Dimension getSavedSize() {
-        try {
-            return new Dimension(getInteger(".w"), getInteger(".h"));
-        } catch(Exception e) {
-            return null;
-        }
-    }
-
-    /**
-     * Return the player's Colonies, sorted according to player's
-     * <code>ClientOptions</code>.
-     *
-     * @return a sorted List of Colonies
-     */
-    protected List<Colony> getSortedColonies() {
-        return freeColClient.getClientOptions()
-            .getSortedColonies(getMyPlayer());
-    }
-
-    /**
-     * Describe <code>getSpecification</code> method here.
-     *
-     * @return a <code>Specification</code> value
-     */
-    protected Specification getSpecification() {
-        return freeColClient.getGame().getSpecification();
-    }
-
-
-    /**
-     * Checks if this panel is editable
-     * @return boolean
-     */
-    protected boolean isEditable() {
-        return editable;
-    }
-
-    /**
-     * Return a JLabel with Messages.message(key) as text.
-     *
-     * @param key a <code>String</code> value
-     * @return a <code>JLabel</code> value
-     */
-    protected JLabel localizedLabel(String key) {
-        return new JLabel(Messages.message(key));
-    }
-
-    /**
-     * Return a JLabel with Messages.localize(template) as text.
-     *
-     * @param template a <code>StringTemplate</code> value
-     * @return a <code>JLabel</code> value
-     */
-    protected JLabel localizedLabel(StringTemplate template) {
-        return new JLabel(Messages.message(template));
-    }
-
-    /**
-     * Set preferred size to saved size, or to the given
-     * <code>Dimension</code> if no saved size was found. Call this
-     * method in the constructor of a FreeColPanel in order to
-     * remember its size and position.
-     *
-     * @param d a <code>Dimension</code> value
-     */
-    protected void restoreSavedSize(Dimension d) {
-        Dimension size = getSavedSize();
-        if (size == null) {
-            size = d;
-            saveSize(size);
-        }
-        if (!getPreferredSize().equals(size)) {
-            setPreferredSize(size);
-        }
-    }
-
-    /**
-     * Set preferred size to saved size, or to [w, h] if no saved size
-     * was found. Call this method in the constructor of a
-     * FreeColPanel in order to remember its size and position.
-     *
-     * @param w an <code>int</code> value
-     * @param h an <code>int</code> value
-     */
-    protected void restoreSavedSize(int w, int h) {
-        restoreSavedSize(new Dimension(w, h));
-    }
-
-    /**
-     * Sort the given modifiers according to type.
-     *
-     * @param result Set of <code>Modifier</code>
-     * @return a sorted Set of <code>Modifier</code>
-     */
-    protected Set<Modifier> sortModifiers(Set<Modifier> result) {
-        EnumMap<Modifier.Type, List<Modifier>> modifierMap =
-            new EnumMap<Modifier.Type, List<Modifier>>(Modifier.Type.class);
-        for (Modifier.Type type : Modifier.Type.values()) {
-            modifierMap.put(type, new ArrayList<Modifier>());
-        }
-        for (Modifier modifier : result) {
-            modifierMap.get(modifier.getType()).add(modifier);
-        }
-        Set<Modifier> sortedResult = new LinkedHashSet<Modifier>();
-        for (Modifier.Type type : Modifier.Type.values()) {
-            sortedResult.addAll(modifierMap.get(type));
-        }
-        return sortedResult;
-    }
-
-    /**
-     * Return an <code>int</code> associated with the name of the
-     * panel's class plus the given key from the saved ClientOptions.
-     *
-     * @param key a <code>String</code> value
-     * @return an <code>int</code> value
-     */
-    private int getInteger(String key) {
-        return freeColClient.getClientOptions()
-            .getInteger(getClass().getName() + key);
-    }
-
-
-
-
-    /**
-     * Save an <code>int</code> value to the saved ClientOptions,
-     * using the name of the panel's class plus the given key as and
-     * identifier.
-     *
-     * @param key a <code>String</code> value
-     * @param value an <code>int</code> value
-     */
-    private void saveInteger(String key, int value) {
-        if (freeColClient != null
-            && freeColClient.getClientOptions() != null) {
-            Option o = freeColClient.getClientOptions()
-                .getOption(getClass().getName() + key);
-            if (o == null) {
-                IntegerOption io = new IntegerOption(getClass().getName() + key);
-                io.setValue(value);
-                freeColClient.getClientOptions().add(io);
-            } else if (o instanceof IntegerOption) {
-                ((IntegerOption) o).setValue(value);
-            }
-        }
-    }
-
-    /**
-     * Save the current size of the panel.
-     *
-     */
-    private void saveSize() {
-        saveSize(getSize());
-    }
-
-    /**
-     * Save the given Dimension as size of the panel.
-     *
-     * @param size a <code>Dimension</code> value
-     */
-    private void saveSize(Dimension size) {
-        saveInteger(".w", size.width);
-        saveInteger(".h", size.height);
     }
 }

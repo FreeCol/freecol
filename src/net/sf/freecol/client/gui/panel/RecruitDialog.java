@@ -52,12 +52,14 @@ public final class RecruitDialog extends FreeColDialog<Integer> implements Actio
 
     private final JTextArea question;
 
+
     /**
      * The constructor to use.
-     * @param freeColClient 
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    public RecruitDialog(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui);
+    public RecruitDialog(FreeColClient freeColClient) {
+        super(freeColClient);
 
         setFocusCycleRoot(true);
 

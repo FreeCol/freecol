@@ -25,9 +25,6 @@ import java.awt.event.KeyEvent;
 import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.control.ConnectController;
-import net.sf.freecol.client.control.InGameController;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.debug.FreeColDebugger;
 
 
@@ -37,21 +34,20 @@ import net.sf.freecol.common.debug.FreeColDebugger;
 public class DebugAction extends FreeColAction {
 
     public static final String id = "debugAction";
-    private final InGameController inGameController;
-    private final ConnectController connectController;
+
 
     /**
      * Creates a new <code>DebugAction</code>.
      *
-     * @param freeColClient The main controller object for the client.
-     * @param gui 
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    DebugAction(FreeColClient freeColClient, InGameController inGameController, ConnectController connectController, GUI gui) {
-        super(freeColClient, gui, id);
-        this.inGameController = inGameController;
-        this.connectController = connectController;
-        setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, KeyEvent.SHIFT_MASK | KeyEvent.CTRL_MASK));
+    public DebugAction(FreeColClient freeColClient) {
+        super(freeColClient, id);
+
+        setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D,
+                KeyEvent.SHIFT_MASK | KeyEvent.CTRL_MASK));
     }
+
 
     /**
      * Checks if this action should be enabled.
@@ -70,8 +66,8 @@ public class DebugAction extends FreeColAction {
      */
     public void actionPerformed(ActionEvent e) {
         if (shouldBeEnabled()) {
-            inGameController.setInDebugMode();
-            connectController.reconnect();
+            getInGameController().setInDebugMode();
+            getConnectController().reconnect();
         }
     }
 }

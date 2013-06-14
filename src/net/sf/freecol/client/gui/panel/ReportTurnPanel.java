@@ -79,12 +79,11 @@ public final class ReportTurnPanel extends ReportPanel {
      * Creates the turn report.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      * @param messages The <code>ModelMessages</code> to display in the report.
      */
-    public ReportTurnPanel(FreeColClient freeColClient, GUI gui,
+    public ReportTurnPanel(FreeColClient freeColClient,
                            ModelMessage... messages) {
-        super(freeColClient, gui, Messages.message("reportTurnAction.name"));
+        super(freeColClient, Messages.message("reportTurnAction.name"));
 
         // Display Panel
         reportPanel.removeAll();

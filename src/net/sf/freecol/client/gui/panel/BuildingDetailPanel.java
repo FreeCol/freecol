@@ -60,17 +60,20 @@ import net.sf.freecol.common.resources.ResourceManager;
  */
 public class BuildingDetailPanel extends ColopediaGameObjectTypePanel<BuildingType> {
 
-    private static final Font arrowFont = ResourceManager.getFont("SimpleFont", Font.BOLD, 24f);
+    private static final Font arrowFont
+        = ResourceManager.getFont("SimpleFont", Font.BOLD, 24f);
 
 
     /**
      * Creates a new instance of this ColopediaDetailPanel.
-     * @param freeColClient
      *
-     * @param colopediaPanel the ColopediaPanel
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param colopediaPanel The parent ColopediaPanel.
      */
-    public BuildingDetailPanel(FreeColClient freeColClient, GUI gui, ColopediaPanel colopediaPanel) {
-        super(freeColClient, gui, colopediaPanel, PanelType.BUILDINGS.toString(), 0.75);
+    public BuildingDetailPanel(FreeColClient freeColClient,
+                               ColopediaPanel colopediaPanel) {
+        super(freeColClient, colopediaPanel,
+              PanelType.BUILDINGS.toString(), 0.75);
     }
 
 

@@ -25,6 +25,7 @@ import javax.swing.JSeparator;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.AbstractUnit;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.Role;
@@ -36,20 +37,21 @@ import net.sf.freecol.common.model.UnitType;
  */
 public final class ReportCargoPanel extends ReportUnitPanel {
 
+
     /**
      * Creates a cargo report.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      */
-    public ReportCargoPanel(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui, "reportCargoAction.name", false);
+    public ReportCargoPanel(FreeColClient freeColClient) {
+        super(freeColClient, "reportCargoAction.name", false);
     }
 
 
     protected void addREFUnits() {}
 
     protected void addOwnUnits() {
+        Player player = getMyPlayer();
         reportPanel.add(localizedLabel(StringTemplate.template("report.military.forces")
                                        .addStringTemplate("%nation%", player.getNationName())),
                         "newline, span, split 2");
@@ -65,7 +67,7 @@ public final class ReportCargoPanel extends ReportUnitPanel {
     }
 
     protected void gatherData() {
-        for (Unit unit : player.getUnits()) {
+        for (Unit unit : getMyPlayer().getUnits()) {
             if (unit.isCarrier()) {
                 addUnit(unit, "carriers");
             }

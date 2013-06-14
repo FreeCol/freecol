@@ -23,30 +23,26 @@ import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Unit;
 
 
 /**
- * An action for making a unit move to a specific location. This action first
- * displays a panel from which the player can choose a location the unit should
- * move towards.
+ * An action for making a unit move to a specific location.  This
+ * action first displays a panel from which the player can choose a
+ * location the unit should move towards.
  */
 public class GotoAction extends UnitAction {
 
     public static final String id = "gotoAction";
-    private final InGameController inGameController;
 
 
     /**
      * Creates this action.
      *
-     * @param freeColClient The main controller object for the client.
-     * @param gui 
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    GotoAction(FreeColClient freeColClient, InGameController inGameController, GUI gui) {
-        super(freeColClient, gui, id);
-        this.inGameController = inGameController;
+    public GotoAction(FreeColClient freeColClient) {
+        super(freeColClient, id);
     }
 
     /**
@@ -56,8 +52,7 @@ public class GotoAction extends UnitAction {
      */
     @Override
     protected boolean shouldBeEnabled() {
-        return super.shouldBeEnabled()
-            && !gui.isShowingSubPanel();
+        return super.shouldBeEnabled() && !getGUI().isShowingSubPanel();
     }
 
     /**
@@ -66,9 +61,9 @@ public class GotoAction extends UnitAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        Unit unit = gui.getActiveUnit();
+        Unit unit = getGUI().getActiveUnit();
         if (unit != null) {
-            inGameController.selectDestination(unit);
+            getInGameController().selectDestination(unit);
         }
     }
 }

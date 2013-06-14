@@ -48,16 +48,15 @@ public final class IndianSettlementPanel extends FreeColPanel {
      * Creates a panel to show information about a native settlement.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      * @param settlement The <code>IndianSettlement</code> to display.
      */
-    public IndianSettlementPanel(FreeColClient freeColClient, GUI gui,
+    public IndianSettlementPanel(FreeColClient freeColClient,
                                  IndianSettlement settlement) {
-        super(freeColClient, gui);
+        super(freeColClient);
 
         setLayout(new MigLayout("wrap 2, gapx 20", "", ""));
         
-        JLabel settlementLabel = new JLabel(gui.getImageIcon(settlement, false));
+        JLabel settlementLabel = new JLabel(getGUI().getImageIcon(settlement, false));
         Player indian = settlement.getOwner();
         Player player = getMyPlayer();
         boolean contacted = settlement.hasContacted(player);
@@ -78,7 +77,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
             String missionaryName = Messages.message(StringTemplate.template("model.unit.nationUnit")
                 .addStringTemplate("%nation%", missionary.getOwner().getNationName())
                 .addStringTemplate("%unit%", missionary.getLabel()));
-            add(new JLabel(missionaryName, gui.getImageIcon(missionary, true), JLabel.CENTER));
+            add(new JLabel(missionaryName, getGUI().getImageIcon(missionary, true), JLabel.CENTER));
         }
 
         add(localizedLabel("indianSettlement.learnableSkill"), "newline");
@@ -88,7 +87,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
                 add(localizedLabel("indianSettlement.skillNone"));
             } else {
                 add(new JLabel(Messages.message(skillType.getNameKey()),
-                        gui.getImageIcon(skillType, true), JLabel.CENTER));
+                        getGUI().getImageIcon(skillType, true), JLabel.CENTER));
             }
         } else {
             add(localizedLabel("indianSettlement.skillUnknown"));
@@ -101,7 +100,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
                 add(localizedLabel("indianSettlement.mostHatedNone"));
             } else {
                 add(new JLabel(Messages.message(mostHated.getNationName()),
-                        gui.getImageIcon(mostHated, true), JLabel.CENTER));
+                        getGUI().getImageIcon(mostHated, true), JLabel.CENTER));
             }
         } else {
             add(localizedLabel("indianSettlement.mostHatedUnknown"));
@@ -121,7 +120,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
                 sale = player.getLastSaleString(settlement, wantedGoods[0]);
                 add(new JLabel(Messages.message(wantedGoods[0].getNameKey())
                         + ((sale == null) ? "" : " " + sale),
-                        gui.getImageIcon(wantedGoods[0], false),
+                        getGUI().getImageIcon(wantedGoods[0], false),
                         JLabel.CENTER));
                 n--;
             }
@@ -137,7 +136,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
                 sale = player.getLastSaleString(settlement, wantedGoods[1]);
                 add(new JLabel(Messages.message(wantedGoods[1].getNameKey())
                         + ((sale == null) ? "" : " " + sale),
-                        gui.getImageIcon(wantedGoods[1], false),
+                        getGUI().getImageIcon(wantedGoods[1], false),
                         JLabel.CENTER),
                     "split " + Integer.toString(n));
                 for (int i = 2; i < wantedGoods.length; i++) {
@@ -145,7 +144,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
                         sale = player.getLastSaleString(settlement,wantedGoods[i]);
                         add(new JLabel(Messages.message(wantedGoods[i].getNameKey())
                                 + ((sale == null) ? "" : " " + sale),
-                                gui.getImageIcon(wantedGoods[i], false),
+                                getGUI().getImageIcon(wantedGoods[i], false),
                                 JLabel.CENTER));
                     }
                 }

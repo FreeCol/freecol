@@ -69,10 +69,10 @@ public final class LoadingSavegameDialog extends FreeColDialog<Boolean> implemen
      * Creates a dialog to set the options for loading a saved game.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      */
-    public LoadingSavegameDialog(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui);
+    public LoadingSavegameDialog(FreeColClient freeColClient) {
+        super(freeColClient);
+
         setLayout(new BorderLayout());
 
         buttons.add(okButton);

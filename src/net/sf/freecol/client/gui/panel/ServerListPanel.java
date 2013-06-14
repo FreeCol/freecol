@@ -65,13 +65,13 @@ public final class ServerListPanel extends FreeColPanel implements ActionListene
      * Creates a panel to display the meta-server.
      * 
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      * @param connectController The controller responsible for creating new
      *     connections.
      */
-    public ServerListPanel(FreeColClient freeColClient, GUI gui,
+    public ServerListPanel(FreeColClient freeColClient,
                            ConnectController connectController) {
-        super(freeColClient, gui);
+        super(freeColClient);
+
         this.connectController = connectController;
 
         JButton cancel = new JButton("Cancel");

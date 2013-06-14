@@ -66,7 +66,8 @@ public abstract class UnitPanel extends JPanel implements PropertyChangeListener
         for (Unit unit : portPanel.getUnitList()) {
             if (accepts(unit)) {
 
-                UnitLabel unitLabel = new UnitLabel(portPanel.getFreeColClient(), unit, portPanel.getGUI());
+                UnitLabel unitLabel
+                    = new UnitLabel(portPanel.getFreeColClient(), unit);
                 TradeRoute tradeRoute = unit.getTradeRoute();
                 if (tradeRoute != null) {
                     unitLabel.setDescriptionLabel(Messages.message(Messages.getLabel(unit))

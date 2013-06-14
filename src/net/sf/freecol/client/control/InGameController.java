@@ -140,11 +140,11 @@ public final class InGameController implements NetworkConstants {
     /**
      * The constructor to use.
      *
-     * @param freeColClient The main controller.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    public InGameController(FreeColClient freeColClient, GUI gui) {
+    public InGameController(FreeColClient freeColClient) {
         this.freeColClient = freeColClient;
-        this.gui = gui;
+        this.gui = freeColClient.getGUI();
         // TODO: fetch value of lastSaveGameFile from a persistent client value
         // lastSaveGameFile = new File(freeColClient.getClientOptions().getString(null));
     }

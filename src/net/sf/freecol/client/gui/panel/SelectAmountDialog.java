@@ -54,9 +54,9 @@ public final class SelectAmountDialog extends FreeColDialog<Integer> implements 
      * The constructor to use.
      */
     @SuppressWarnings("unchecked") // FIXME in Java7
-    public SelectAmountDialog(FreeColClient freeColClient, GUI gui, GoodsType goodsType,
+    public SelectAmountDialog(FreeColClient freeColClient, GoodsType goodsType,
         int available, int defaultAmount, boolean needToPay) {
-        super(freeColClient, gui);
+        super(freeColClient);
 
         setFocusCycleRoot(true);
 

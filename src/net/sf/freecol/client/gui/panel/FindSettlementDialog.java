@@ -78,8 +78,8 @@ public final class FindSettlementDialog<T> extends FreeColDialog<T> implements L
      * The constructor to use.
      */
     @SuppressWarnings("unchecked") // FIXME in Java7
-    public FindSettlementDialog(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui);
+    public FindSettlementDialog(FreeColClient freeColClient) {
+        super(freeColClient);
 
         for (Player player : getGame().getPlayers()) {
             knownSettlements.addAll(player.getSettlements());

@@ -56,13 +56,16 @@ public final class TrainDialog extends FreeColDialog<Integer> implements ActionL
 
     private final Comparator<UnitType> unitPriceComparator;
 
+
     /**
      * The constructor to use.
-     * @param freeColClient 
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param europeAction The <code>EuropeAction</code> to perform.
      */
-    public TrainDialog(FreeColClient freeColClient, GUI gui, EuropePanel.EuropeAction europeAction) {
-
-        super(freeColClient, gui);
+    public TrainDialog(FreeColClient freeColClient,
+                       EuropePanel.EuropeAction europeAction) {
+        super(freeColClient);
 
         okButton.setText(Messages.message("trainDialog.done"));
 

@@ -56,9 +56,9 @@ public abstract class MapControls {
     public static final int MAP_WIDTH = 220;
     public static final int MAP_HEIGHT = 128;
     public static final int GAP = 4;
+    public static final int CONTROLS_LAYER = JLayeredPane.MODAL_LAYER;
 
     protected final FreeColClient freeColClient;
-
     protected final InfoPanel infoPanel;
     protected MiniMap miniMap;
     protected final UnitButton miniMapZoomOutButton;
@@ -66,21 +66,16 @@ public abstract class MapControls {
     protected final List<UnitButton> unitButtons;
 
 
-    private GUI gui;
-
-    public static final int CONTROLS_LAYER = JLayeredPane.MODAL_LAYER;
-
     /**
      * The basic constructor.
-     * @param freeColClient The main controller object for the client
-     * @param gui
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    public MapControls(final FreeColClient freeColClient, GUI gui, boolean useSkin) {
+    public MapControls(final FreeColClient freeColClient, boolean useSkin) {
         this.freeColClient = freeColClient;
-        this.gui = gui;
 
-        infoPanel = new InfoPanel(freeColClient, gui, useSkin);
-        miniMap = new MiniMap(freeColClient, gui);
+        infoPanel = new InfoPanel(freeColClient, useSkin);
+        miniMap = new MiniMap(freeColClient);
         final ActionManager am = freeColClient.getActionManager();
 
         unitButtons = new ArrayList<UnitButton>();
@@ -114,8 +109,8 @@ public abstract class MapControls {
         for (UnitButton button : unitButtons) {
             button.setFocusable(false);
         }
-
     }
+
 
     /**
      * Adds the map controls to the given component.
@@ -146,6 +141,7 @@ public abstract class MapControls {
      * Updates this <code>MapControls</code>.
      */
     public void update() {
+        GUI gui = freeColClient.getGUI();
         int viewMode = gui.getCurrentViewMode();
         switch (viewMode) {
         case GUI.MOVE_UNITS_MODE:

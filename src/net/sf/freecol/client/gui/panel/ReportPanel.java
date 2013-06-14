@@ -88,11 +88,10 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
      * Creates the basic FreeCol report panel.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      * @param title The title to display on the panel.
      */
-    public ReportPanel(FreeColClient freeColClient, GUI gui, String title) {
-        super(freeColClient, gui);
+    public ReportPanel(FreeColClient freeColClient, String title) {
+        super(freeColClient);
 
         setLayout(new MigLayout("wrap 1", "[fill]", "[]30[fill]30[]"));
 

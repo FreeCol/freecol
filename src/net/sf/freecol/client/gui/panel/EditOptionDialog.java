@@ -35,10 +35,12 @@ public class EditOptionDialog extends FreeColDialog<Boolean> {
 
     private OptionUI ui;
 
-    public EditOptionDialog(FreeColClient freeColClient, GUI gui, Option option) {
-        super(freeColClient, gui);
+
+    public EditOptionDialog(FreeColClient freeColClient, Option option) {
+        super(freeColClient);
+
         setLayout(new MigLayout()); 
-        ui = OptionUI.getOptionUI(gui, option, editable);
+        ui = OptionUI.getOptionUI(getGUI(), option, editable);
         if (ui.getLabel() == null) {
             add(ui.getLabel(), "split 2");
         }

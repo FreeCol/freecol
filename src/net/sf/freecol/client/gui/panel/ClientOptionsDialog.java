@@ -46,10 +46,10 @@ public final class ClientOptionsDialog extends OptionsDialog  {
      * The constructor that will add the items to this panel.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      */
-    public ClientOptionsDialog(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui, true);
+    public ClientOptionsDialog(FreeColClient freeColClient) {
+        super(freeColClient, true);
+
         getButtons().clear();
         initialize(getClientOptions(), getClientOptions().getName(), null);
     }

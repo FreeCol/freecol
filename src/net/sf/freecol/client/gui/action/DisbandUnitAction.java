@@ -32,20 +32,19 @@ import net.sf.freecol.client.gui.GUI;
 public class DisbandUnitAction extends UnitAction {
 
     public static final String id = "disbandUnitAction";
-    private final InGameController inGameController;
 
 
     /**
      * Creates a new <code>DisbandUnitAction</code>.
      *
-     * @param freeColClient The main controller object for the client.
-     * @param gui 
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    DisbandUnitAction(FreeColClient freeColClient, InGameController inGameController, GUI gui) {
-        super(freeColClient, gui, id);
-        this.inGameController = inGameController;
+    public DisbandUnitAction(FreeColClient freeColClient) {
+        super(freeColClient, id);
+
         addImageIcons("disband");
     }
+
 
     /**
      * Applies this action.
@@ -53,6 +52,6 @@ public class DisbandUnitAction extends UnitAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        inGameController.disbandActiveUnit();
+        getInGameController().disbandActiveUnit();
     }
 }

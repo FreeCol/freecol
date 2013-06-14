@@ -78,12 +78,13 @@ public final class ConnectController {
     /**
      * Creates a new <code>ConnectController</code>.
      *
-     * @param freeColClient The main client controller.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
     public ConnectController(FreeColClient freeColClient) {
         this.freeColClient = freeColClient;
         this.gui = freeColClient.getGUI();
     }
+
 
     /**
      * Shut down an existing server on a given port.

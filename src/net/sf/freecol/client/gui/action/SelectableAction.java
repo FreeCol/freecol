@@ -36,17 +36,22 @@ public abstract class SelectableAction extends MapboardAction {
 
     protected boolean selected = false;
 
+
     /**
      * Creates this action.
-     * @param freeColClient The main controller object for the client
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param id The object identifier.
      * @param optionId the id of a boolean client option
      */
-    protected SelectableAction(FreeColClient freeColClient, GUI gui, String id, String optionId) {
-        super(freeColClient, gui, id);
+    protected SelectableAction(FreeColClient freeColClient,
+                               String id, String optionId) {
+        super(freeColClient, id);
+
         this.optionId = optionId;
         setSelected(shouldBeSelected());
     }
+
 
     /**
      * Updates the "enabled" status with the value returned by {@link
@@ -99,5 +104,4 @@ public abstract class SelectableAction extends MapboardAction {
     protected void updateOption(boolean value) {
         freeColClient.getClientOptions().setBoolean(optionId, value);
     }
-
 }

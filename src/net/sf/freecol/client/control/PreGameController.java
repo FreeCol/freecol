@@ -47,21 +47,20 @@ public final class PreGameController {
     private static final Logger logger = Logger.getLogger(PreGameController.class.getName());
 
     /** The main client. */
-    private FreeColClient freeColClient;
+    private final FreeColClient freeColClient;
 
     /** The GUI to display on. */
-    private GUI gui;
+    private final GUI gui;
 
 
     /**
      * The constructor to use.
      *
-     * @param freeColClient The main client.
-     * @param gui The <code>GUI</code> to display on.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    public PreGameController(FreeColClient freeColClient, GUI gui) {
+    public PreGameController(FreeColClient freeColClient) {
         this.freeColClient = freeColClient;
-        this.gui = gui;
+        this.gui = freeColClient.getGUI();
     }
 
 

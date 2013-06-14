@@ -84,12 +84,11 @@ public abstract class OptionsDialog extends FreeColDialog<OptionGroup>  {
      * The constructor that will add the items to this panel.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      * @param editable Whether the dialog is editable.
      */
-    public OptionsDialog(FreeColClient freeColClient, GUI gui,
-                         boolean editable) {
-        super(freeColClient, gui);
+    public OptionsDialog(FreeColClient freeColClient, boolean editable) {
+        super(freeColClient);
+
         this.editable = editable;
         setLayout(new MigLayout("wrap 1, fill"));
 

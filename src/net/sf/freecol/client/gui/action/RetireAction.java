@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Player;
 
 
@@ -33,15 +32,16 @@ public class RetireAction extends FreeColAction {
 
     public static final String id = "retireAction";
 
+
     /**
      * Creates a new <code>RetireAction</code>.
      *
-     * @param freeColClient The main controller object for the client.
-     * @param gui
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    public RetireAction(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui, id);
+    public RetireAction(FreeColClient freeColClient) {
+        super(freeColClient, id);
     }
+
 
     /**
      * Checks if this action should be enabled.

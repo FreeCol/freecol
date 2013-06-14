@@ -39,12 +39,12 @@ public class MapControlsAction extends SelectableAction {
     /**
      * Creates this action.
      *
-     * @param freeColClient The main controller object for the client.
-     * @param gui The <code>GUI</code> to display on.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    MapControlsAction(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui, id, ClientOptions.DISPLAY_MAP_CONTROLS);
+    public MapControlsAction(FreeColClient freeColClient) {
+        super(freeColClient, id, ClientOptions.DISPLAY_MAP_CONTROLS);
     }
+
 
     /**
      * Updates the "enabled"-status and calls
@@ -54,7 +54,7 @@ public class MapControlsAction extends SelectableAction {
     public void update() {
         super.update();
 
-        gui.showMapControls(enabled && isSelected());
+        getGUI().showMapControls(enabled && isSelected());
     }
 
     /**
@@ -65,6 +65,6 @@ public class MapControlsAction extends SelectableAction {
     public void actionPerformed(ActionEvent e) {
         selected = ((AbstractButton) e.getSource()).isSelected();
         updateOption(selected);
-        gui.showMapControls((enabled && selected));
+        getGUI().showMapControls(enabled && selected);
     }
 }

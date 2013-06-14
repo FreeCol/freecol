@@ -87,10 +87,10 @@ public final class CompactLabourReport extends ReportPanel {
      * The constructor that will add the items to this panel.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      */
-    public CompactLabourReport(FreeColClient freeColClient, GUI gui) {
-        this(freeColClient, gui, null);
+    public CompactLabourReport(FreeColClient freeColClient) {
+        this(freeColClient, null);
+
         labourData = new LabourData(getFreeColClient());
     }
 
@@ -98,14 +98,15 @@ public final class CompactLabourReport extends ReportPanel {
      * The constructor that will add the items to this panel.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      * @param data The <code>UnitData</code> to display in this report.
      */
-    public CompactLabourReport(FreeColClient freeColClient, GUI gui,
+    public CompactLabourReport(FreeColClient freeColClient,
                                LabourData.UnitData data) {
-        super(freeColClient, gui, ((data == null)
+        super(freeColClient,
+            ((data == null)
                 ? Messages.message("reportLabourAction.name")
                 : Messages.message("report.labour.details")));
+
         this.unitData = data;
 
         headerRow.setBorder(new EmptyBorder(20, 20, 0, 20));

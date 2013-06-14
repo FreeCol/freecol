@@ -40,14 +40,14 @@ import net.sf.freecol.common.model.Unit;
  */
 public final class ReportEducationPanel extends ReportPanel {
 
+
     /**
      * Creates the education report.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      */
-    public ReportEducationPanel(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui, Messages.message("reportEducationAction.name"));
+    public ReportEducationPanel(FreeColClient freeColClient) {
+        super(freeColClient, Messages.message("reportEducationAction.name"));
 
         reportPanel.setLayout(new MigLayout("wrap 2, fill", "[]20[fill, growprio 200]"));
         List<Colony> colonies = getSortedColonies();
@@ -60,7 +60,7 @@ public final class ReportEducationPanel extends ReportPanel {
                     JPanel teacherPanel = getPanel("report.education.teachers");
                     for (Unit unit : colony.getUnitList()) {
                         if (building.canAdd(unit)) {
-                            teacherPanel.add(new UnitLabel(getFreeColClient(), unit, getGUI(), true, true));
+                            teacherPanel.add(new UnitLabel(getFreeColClient(), unit, true, true));
                             maxSkill = Math.max(maxSkill, unit.getType().getSkill());
                         }
                     }
@@ -68,7 +68,7 @@ public final class ReportEducationPanel extends ReportPanel {
                     JPanel studentPanel = getPanel("report.education.students");
                     for (Unit unit : colony.getUnitList()) {
                         if (unit.getType().getEducationUnit(maxSkill) != null) {
-                            studentPanel.add(new UnitLabel(getFreeColClient(), unit, getGUI(), true, true));
+                            studentPanel.add(new UnitLabel(getFreeColClient(), unit, true, true));
                         }
                     }
                     reportPanel.add(studentPanel, "grow");

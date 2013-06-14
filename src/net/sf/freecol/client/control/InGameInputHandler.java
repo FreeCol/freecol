@@ -86,10 +86,10 @@ public final class InGameInputHandler extends InputHandler {
     /**
      * The constructor to use.
      *
-     * @param freeColClient The main controller.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    public InGameInputHandler(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui);
+    public InGameInputHandler(FreeColClient freeColClient) {
+        super(freeColClient);
     }
 
 
@@ -270,8 +270,9 @@ public final class InGameInputHandler extends InputHandler {
                 if (fcgo instanceof Unit) {
                     Unit u = (Unit) fcgo;
                     player.invalidateCanSeeTiles();
-                    if (u == gui.getActiveUnit())
-                        gui.setActiveUnit(null);
+                    if (u == getGUI().getActiveUnit()) {
+                        getGUI().setActiveUnit(null);
+                    }
                     // Temporary hack until we have real containers.
                     player.removeUnit(u);
                 }
@@ -372,7 +373,7 @@ public final class InGameInputHandler extends InputHandler {
                 + " missing newTile: " + newTileId);
         }
 
-        if (gui.getAnimationSpeed(unit) > 0) {
+        if (getGUI().getAnimationSpeed(unit) > 0) {
             // All is well, queue the animation.
             // Use lastAnimatedUnit as a filter to avoid excessive refocussing.
             try {
@@ -384,9 +385,9 @@ public final class InGameInputHandler extends InputHandler {
         } else {
             // Not animating, but if the centering option is enabled at least
             // refocus so we can see the move happen.
-            if (!gui.onScreen(oldTile) && client.getClientOptions()
+            if (!getGUI().onScreen(oldTile) && client.getClientOptions()
                 .getBoolean(ClientOptions.ALWAYS_CENTER)) {
-                gui.setFocus(oldTile);
+                getGUI().setFocus(oldTile);
             }
         }
         lastAnimatedUnit = unit;
@@ -540,7 +541,7 @@ public final class InGameInputHandler extends InputHandler {
         // is turned on
         if (getFreeColClient().getClientOptions()
             .getBoolean(ClientOptions.AUDIO_ALERTS)) {
-            gui.playSound("sound.event.alertSound");
+            getGUI().playSound("sound.event.alertSound");
         }
 
 
@@ -622,9 +623,9 @@ public final class InGameInputHandler extends InputHandler {
 
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                gui.displayChatMessage(chatMessage.getPlayer(game),
-                                       chatMessage.getMessage(),
-                                       chatMessage.isPrivate());
+                getGUI().displayChatMessage(chatMessage.getPlayer(game),
+                                            chatMessage.getMessage(),
+                                            chatMessage.isPrivate());
             }
         });
         return null;
@@ -672,7 +673,7 @@ public final class InGameInputHandler extends InputHandler {
         ChooseFoundingFatherMessage message
             = new ChooseFoundingFatherMessage(getGame(), element);
         List<FoundingFather> ffs = message.getFathers();
-        FoundingFather ff = gui.showChooseFoundingFatherDialog(ffs);
+        FoundingFather ff = getGUI().showChooseFoundingFatherDialog(ffs);
         if (ff != null) {
             message.setResult(ff);
             getFreeColClient().getMyPlayer().setCurrentFather(ff);
@@ -723,7 +724,7 @@ public final class InGameInputHandler extends InputHandler {
             break;
         case PROPOSE_TRADE:
             DiplomaticTrade ourAgreement
-                = gui.showNegotiationDialog(unit, settlement, agreement);
+                = getGUI().showNegotiationDialog(unit, settlement, agreement);
             if (ourAgreement == null) {
                 agreement.setStatus(TradeStatus.REJECT_TRADE);
             } else {
@@ -960,8 +961,7 @@ public final class InGameInputHandler extends InputHandler {
         logger.info("Stance transition: " + old.toString()
             + " -> " + stance.toString());
         if (player == first && old == Stance.UNCONTACTED) {
-            gui.playSound("sound.event.meet."
-                + second.getNationId());
+            getGUI().playSound("sound.event.meet." + second.getNationId());
         }
         return null;
     }
@@ -1162,7 +1162,7 @@ public final class InGameInputHandler extends InputHandler {
             SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         for (int i = 0; i < m; i++) {
-                            int index = gui.showEmigrationPanel(true);
+                            int index = getGUI().showEmigrationPanel(true);
                             getFreeColClient().askServer().emigrate(index + 1);
                         }
                     }
@@ -1199,7 +1199,7 @@ public final class InGameInputHandler extends InputHandler {
      * @return Null.
      */
     public Element closeMenus() {
-        gui.closeMenus();
+        getGUI().closeMenus();
         return null;
     }
 
@@ -1416,10 +1416,10 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected void doNoResultWork() {
-            gui.refresh();
+            getGUI().refresh();
 
-            if (requestFocus && !gui.isShowingSubPanel()) {
-                gui.requestFocusInWindow();
+            if (requestFocus && !getGUI().isShowingSubPanel()) {
+                getGUI().requestFocusInWindow();
             }
         }
     }
@@ -1447,7 +1447,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected void doNoResultWork() {
-            goods = gui.showCaptureGoodsDialog(unit, goods);
+            goods = getGUI().showCaptureGoodsDialog(unit, goods);
             if (!goods.isEmpty()) {
                 getFreeColClient().askServer().loot(unit, defenderId, goods);
             }
@@ -1482,7 +1482,7 @@ public final class InGameInputHandler extends InputHandler {
         protected void doNoResultWork() {
             // Player names the land.
             Tile tile = unit.getTile();
-            String name = gui.showInputDialog(tile,
+            String name = getGUI().showInputDialog(tile,
                 StringTemplate.template("newLand.text"), defaultName,
                 "newLand.yes", null, true);
 
@@ -1493,7 +1493,7 @@ public final class InGameInputHandler extends InputHandler {
                     ? "welcomeOffer.text" : "welcomeSimple.text";
                 String type = ((IndianNationType) welcomer
                     .getNationType()).getSettlementTypeKey(true);
-                accept = gui.showConfirmDialog(tile,
+                accept = getGUI().showConfirmDialog(tile,
                     StringTemplate.template(messageId)
                         .addStringTemplate("%nation%", welcomer.getNationName())
                         .addName("%camps%", camps)
@@ -1541,7 +1541,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected void doNoResultWork() {
-            String name = gui.showInputDialog(tile,
+            String name = getGUI().showInputDialog(tile,
                 StringTemplate.template("nameRegion.text")
                     .addName("%type%", Messages.message(region.getLabel())),
                 defaultName, "ok", null, false);
@@ -1559,8 +1559,8 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected void doNoResultWork() {
-            gui.refreshTile(_oldTile);
-            gui.refreshTile(_newTile);
+            getGUI().refreshTile(_oldTile);
+            getGUI().refreshTile(_newTile);
         }
 
 
@@ -1601,12 +1601,12 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected void doNoResultWork() {
-            if (focus || !gui.onScreen(sourceTile)) {
-                gui.setFocusImmediately(sourceTile);
+            if (focus || !getGUI().onScreen(sourceTile)) {
+                getGUI().setFocusImmediately(sourceTile);
             }
 
-            gui.animateUnitMove(unit, sourceTile, destinationTile);
-            gui.refresh();
+            getGUI().animateUnitMove(unit, sourceTile, destinationTile);
+            getGUI().refresh();
         }
     }
 
@@ -1647,14 +1647,14 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected void doNoResultWork() {
-            if (focus || !gui.onScreen(attackerTile)
-                || !gui.onScreen(defenderTile)) {
-                gui.setFocusImmediately(attackerTile);
+            if (focus || !getGUI().onScreen(attackerTile)
+                || !getGUI().onScreen(defenderTile)) {
+                getGUI().setFocusImmediately(attackerTile);
             }
 
-            gui.animateUnitAttack(attacker, defender,
-                                  attackerTile, defenderTile, success);
-            gui.refresh();
+            getGUI().animateUnitAttack(attacker, defender,
+                                       attackerTile, defenderTile, success);
+            getGUI().refresh();
         }
     }
 
@@ -1673,7 +1673,7 @@ public final class InGameInputHandler extends InputHandler {
 
         protected void doNoResultWork() {
             final Tile tile = colony.getTile();
-            gui.showColonyPanel(colony)
+            getGUI().showColonyPanel(colony)
                 .addClosingCallback(new Runnable() {
                         public void run() {
                             tile.readFromXMLElement(normalTile);
@@ -1697,7 +1697,7 @@ public final class InGameInputHandler extends InputHandler {
      */
     class UpdateMenuBarSwingTask extends NoResultCanvasSwingTask {
         protected void doNoResultWork() {
-            gui.updateMenuBar();
+            getGUI().updateMenuBar();
         }
     }
 
@@ -1706,7 +1706,7 @@ public final class InGameInputHandler extends InputHandler {
      */
     class ShowVictoryPanelSwingTask extends NoResultCanvasSwingTask {
         protected void doNoResultWork() {
-            gui.showVictoryPanel();
+            getGUI().showVictoryPanel();
         }
     }
 
@@ -1759,8 +1759,8 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected Object doWork() {
-            boolean choice = gui.showConfirmDialog(tile, text, okText,
-                cancelText);
+            boolean choice = getGUI().showConfirmDialog(tile, text,
+                                                        okText, cancelText);
             return Boolean.valueOf(choice);
         }
     }
@@ -1824,7 +1824,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected Object doWork() {
-            String choice = gui.showInputDialog(tile, text, defaultValue,
+            String choice = getGUI().showInputDialog(tile, text, defaultValue,
                 okText, cancelText, rejectEmpty);
             return choice;
         }
@@ -1865,7 +1865,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected Object doWork() {
-            gui.showModelMessages(_modelMessage);
+            getGUI().showModelMessages(_modelMessage);
             return null;
         }
 
@@ -1891,7 +1891,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected Object doWork() {
-            gui.showInformationMessage(null, message);
+            getGUI().showInformationMessage(null, message);
             return null;
         }
     }
@@ -1914,7 +1914,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected Object doWork() {
-            gui.errorMessage(_messageId, _message);
+            getGUI().errorMessage(_messageId, _message);
             return null;
         }
 
@@ -1987,7 +1987,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected Object doWork() {
-            boolean choice = gui.showMonarchPanelDialog(action, replace);
+            boolean choice = getGUI().showMonarchPanelDialog(action, replace);
             return Boolean.valueOf(choice);
         }
     }

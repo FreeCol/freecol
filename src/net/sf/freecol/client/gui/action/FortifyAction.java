@@ -22,8 +22,6 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.control.InGameController;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Unit;
 
 
@@ -33,30 +31,28 @@ import net.sf.freecol.common.model.Unit;
 public class FortifyAction extends UnitAction {
 
     public static final String id = "fortifyAction";
-    private final InGameController inGameController;
 
 
     /**
      * Creates this action.
      *
-     * @param freeColClient The main controller object for the client.
-     * @param gui 
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    FortifyAction(FreeColClient freeColClient, InGameController inGameController, GUI gui) {
-        super(freeColClient, gui, id);
-        this.inGameController = inGameController;
+    public FortifyAction(FreeColClient freeColClient) {
+        super(freeColClient, id);
+
         addImageIcons("fortify");
     }
+
 
     /**
      * Checks if this action should be enabled.
      *
-     * @return <code>true</code> if there is an active unit.
+     * @return True if there is an active unit.
      */
     @Override
     protected boolean shouldBeEnabled() {
-        return super.shouldBeEnabled()
-            && gui.getActiveUnit()
+        return super.shouldBeEnabled() && getGUI().getActiveUnit()
             .checkSetState(Unit.UnitState.FORTIFYING);
     }
 
@@ -66,7 +62,7 @@ public class FortifyAction extends UnitAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        inGameController.changeState(gui.getActiveUnit(),
-                Unit.UnitState.FORTIFYING);
+        getInGameController().changeState(getGUI().getActiveUnit(),
+            Unit.UnitState.FORTIFYING);
     }
 }

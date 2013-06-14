@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.action;
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.GUI;
 
 
 /**
@@ -38,23 +37,24 @@ public class ChatAction extends FreeColAction {
     /**
      * Creates a new <code>ChatAction</code>.
      *
-     * @param freeColClient The main controller object for the client.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    ChatAction(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui, id);
+    public ChatAction(FreeColClient freeColClient) {
+        super(freeColClient, id);
     }
+
 
     /**
      * Checks if this action should be enabled.
      *
-     * @return <code>true</code> if the mapboard is selected.
+     * @return True if the mapboard is selected.
      */
     @Override
     protected boolean shouldBeEnabled() {
         return super.shouldBeEnabled()
-            && !getFreeColClient().isSinglePlayer()
-            && (!gui.isShowingSubPanel() || getFreeColClient().getGame() != null
-                && !getFreeColClient().currentPlayerIsMyPlayer());
+            && !freeColClient.isSinglePlayer()
+            && (!getGUI().isShowingSubPanel() || getGame() != null
+                && !freeColClient.currentPlayerIsMyPlayer());
     }
 
     /**
@@ -63,6 +63,6 @@ public class ChatAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        gui.showChatPanel();
+        getGUI().showChatPanel();
     }
 }

@@ -73,19 +73,18 @@ public final class TilePopup extends JPopupMenu {
 
     /**
      * The constructor that will insert the MenuItems.
-     * @param freeColClient The main controller object for the client.
-     * @param gui The GUI frontend.
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param tile The <code>Tile</code> to create a popup for.
      *       The popup menu also appears near this <code>Tile</code>.
      */
-    public TilePopup(final FreeColClient freeColClient, final GUI gui,
-                     final Tile tile) {
+    public TilePopup(final FreeColClient freeColClient, final Tile tile) {
         super(Messages.message(StringTemplate.template("tile")
                                .addAmount("%x%", tile.getX())
                                .addAmount("%y%", tile.getY())));
 
         this.freeColClient = freeColClient;
-        this.gui = gui;
+        this.gui = freeColClient.getGUI();
 
         final Player player = freeColClient.getMyPlayer();
         final Unit activeUnit = gui.getActiveUnit();
@@ -221,8 +220,7 @@ public final class TilePopup extends JPopupMenu {
     /**
      * Build the debug entries for the TilePopup.
      *
-     * @param freeColClient The <code>FreeColClient</code> where the menu
-     *     is being created.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param tile The <code>Tile</code> to build menu items for.
      */
     public void addDebugItems(final FreeColClient freeColClient, 
@@ -437,8 +435,7 @@ public final class TilePopup extends JPopupMenu {
 
         if (hasGoods) {
             JMenuItem dumpItem = new JMenuItem(Messages.message("dumpCargo"));
-            dumpItem.setAction(new UnloadAction(freeColClient,
-                    freeColClient.getInGameController(), gui, unit));
+            dumpItem.setAction(new UnloadAction(freeColClient, unit));
             menu.add(dumpItem);
             lineCount++;
         }

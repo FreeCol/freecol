@@ -48,13 +48,14 @@ public class ResourcesDetailPanel extends ColopediaGameObjectTypePanel<ResourceT
 
     /**
      * Creates a new instance of this ColopediaDetailPanel.
-     * @param freeColClient 
-     * @param gui 
      *
-     * @param colopediaPanel the ColopediaPanel
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param colopediaPanel The parent ColopediaPanel.
      */
-    public ResourcesDetailPanel(FreeColClient freeColClient, GUI gui, ColopediaPanel colopediaPanel) {
-        super(freeColClient, gui, colopediaPanel, PanelType.RESOURCES.toString(), 0.75);
+    public ResourcesDetailPanel(FreeColClient freeColClient,
+                                ColopediaPanel colopediaPanel) {
+        super(freeColClient, colopediaPanel,
+              PanelType.RESOURCES.toString(), 0.75);
     }
 
 

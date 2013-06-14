@@ -104,14 +104,14 @@ public final class PlayersTable extends JTable {
      * Creates a players table.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      * @param nationOptions The <code>NationOptions</code> for this game.
      * @param myPlayer The client <code>Player</code>.
      */
-    public PlayersTable(final FreeColClient freeColClient, final GUI gui,
+    public PlayersTable(final FreeColClient freeColClient,
                         NationOptions nationOptions, Player myPlayer) {
         super();
 
+        final GUI gui = freeColClient.getGUI();
         final Specification spec = freeColClient.getGame().getSpecification();
         library = gui.getImageLibrary();
 

@@ -60,14 +60,16 @@ public class UnitDetailPanel extends ColopediaGameObjectTypePanel<UnitType> {
     // layout of production modifier panel
     private static final int MODIFIERS_PER_ROW = 5;
 
+
     /**
      * Creates a new instance of this ColopediaDetailPanel.
-     * @param freeColClient 
      *
-     * @param colopediaPanel the ColopediaPanel
+     * @param freeColClient The <code>FreeColClient</code> for the game.
+     * @param colopediaPanel The parent ColopediaPanel.
      */
-    public UnitDetailPanel(FreeColClient freeColClient, GUI gui, ColopediaPanel colopediaPanel) {
-        super(freeColClient, gui, colopediaPanel, PanelType.UNITS.toString(), 0.5);
+    public UnitDetailPanel(FreeColClient freeColClient,
+                           ColopediaPanel colopediaPanel) {
+        super(freeColClient, colopediaPanel, PanelType.UNITS.toString(), 0.5);
     }
 
 

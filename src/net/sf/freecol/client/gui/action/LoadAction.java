@@ -23,8 +23,6 @@ import java.awt.event.ActionEvent;
 import java.util.Iterator;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.control.InGameController;
-import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
@@ -37,17 +35,17 @@ import net.sf.freecol.common.model.Unit;
 public class LoadAction extends MapboardAction {
 
     public static final String id = "loadAction";
-    private final InGameController inGameController;
+
 
     /**
      * Creates this action.
-     * @param freeColClient The main controller object for the client.
-     * @param gui 
+     *
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    public LoadAction(FreeColClient freeColClient, InGameController inGameController, GUI gui) {
-        super(freeColClient, gui, id);
-        this.inGameController = inGameController;
+    public LoadAction(FreeColClient freeColClient) {
+        super(freeColClient, id);
     }
+
 
     /**
      * Checks if this action should be enabled.
@@ -56,19 +54,21 @@ public class LoadAction extends MapboardAction {
      */
     @Override
     protected boolean shouldBeEnabled() {
-        final Unit carrier = gui.getActiveUnit();
+        final Unit carrier = getGUI().getActiveUnit();
         return super.shouldBeEnabled()
             && carrier != null
             && carrier.isCarrier()
             && carrier.hasSpaceLeft();
     }    
-    
+
+
     /**
      * Applies this action.
+     *
      * @param e The <code>ActionEvent</code>.
      */    
     public void actionPerformed(ActionEvent e) {
-        Unit unit = gui.getActiveUnit();
+        Unit unit = getGUI().getActiveUnit();
         if (unit != null) {
             Colony colony = unit.getColony();
             if (colony != null) {
@@ -80,7 +80,7 @@ public class LoadAction extends MapboardAction {
                         int amount = Math.min(GoodsContainer.CARGO_SIZE - goods.getAmount(),
                             colony.getGoodsCount(goods.getType()));
                         Goods newGoods = new Goods(goods.getGame(), colony, goods.getType(), amount);
-                        inGameController.loadCargo(newGoods, unit);
+                        getInGameController().loadCargo(newGoods, unit);
                     }
                 }
             }

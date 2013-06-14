@@ -36,15 +36,14 @@ import net.sf.freecol.common.model.Player;
  */
 public final class ReportForeignAffairPanel extends ReportPanel {
 
+
     /**
      * The constructor that will add the items to this panel.
-     * @param freeColClient 
      *
-     * @param gui The parent of this panel.
+     * @param freeColClient The <code>FreeColClient</code> for the game.
      */
-    public ReportForeignAffairPanel(FreeColClient freeColClient, GUI gui) {
-
-        super(freeColClient, gui, Messages.message("reportForeignAction.name"));
+    public ReportForeignAffairPanel(FreeColClient freeColClient) {
+        super(freeColClient, Messages.message("reportForeignAction.name"));
 
         // Display Panel
         reportPanel.removeAll();

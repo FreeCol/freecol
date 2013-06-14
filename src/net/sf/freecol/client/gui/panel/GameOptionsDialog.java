@@ -40,13 +40,12 @@ public final class GameOptionsDialog extends OptionsDialog {
      * Creates a game options dialog.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      * @param editable Whether the game options can be modified.
      * @param loadCustomOptions Whether to load custom options.
      */
-    public GameOptionsDialog(FreeColClient freeColClient, GUI gui,
+    public GameOptionsDialog(FreeColClient freeColClient,
                              boolean editable, boolean loadCustomOptions) {
-        super(freeColClient, gui, editable);
+        super(freeColClient, editable);
 
         if (editable && loadCustomOptions) {
             loadCustomOptions();

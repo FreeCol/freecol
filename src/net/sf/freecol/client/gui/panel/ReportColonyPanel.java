@@ -129,12 +129,11 @@ public final class ReportColonyPanel extends ReportPanel
      * Creates a colony report.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param gui The <code>GUI</code> to display on.
      */
-    public ReportColonyPanel(FreeColClient freeColClient, GUI gui) {
-        super(freeColClient, gui, Messages.message("reportColonyAction.name"));
-        colonies = getSortedColonies();
+    public ReportColonyPanel(FreeColClient freeColClient) {
+        super(freeColClient, Messages.message("reportColonyAction.name"));
 
+        colonies = getSortedColonies();
         try {
             useCompact = getClientOptions().getInteger(ClientOptions.COLONY_REPORT)
                 == ClientOptions.COLONY_REPORT_COMPACT;
@@ -186,7 +185,8 @@ public final class ReportColonyPanel extends ReportPanel
             List<Unit> unitList = colony.getUnitList();
             Collections.sort(unitList, getUnitTypeComparator());
             for (Unit unit : unitList) {
-                UnitLabel unitLabel = new UnitLabel(getFreeColClient(), unit, getGUI(), true, true);
+                UnitLabel unitLabel = new UnitLabel(getFreeColClient(), unit,
+                                                    true, true);
                 colonistsPanel.add(unitLabel);
             }
             JPanel unitsPanel = new JPanel(new GridLayout(0, UNITS_PER_ROW));
@@ -194,7 +194,8 @@ public final class ReportColonyPanel extends ReportPanel
             unitList = colony.getTile().getUnitList();
             Collections.sort(unitList, getUnitTypeComparator());
             for (Unit unit : unitList) {
-                UnitLabel unitLabel = new UnitLabel(getFreeColClient(), unit, getGUI(), true, true);
+                UnitLabel unitLabel = new UnitLabel(getFreeColClient(), unit,
+                                                    true, true);
                 unitsPanel.add(unitLabel);
             }
             if(buildableLabel != null && currentType.getSpecification().getUnitTypeList().contains(currentType)) {
@@ -214,7 +215,7 @@ public final class ReportColonyPanel extends ReportPanel
                     for (Building building : colony.getBuildingsForProducing(goodsType)) {
                         maxProduction += building.getMaximumProductionOf(goodsType);
                     }
-                    ProductionLabel productionLabel = new ProductionLabel(getFreeColClient(), getGUI(), goodsType, newValue);
+                    ProductionLabel productionLabel = new ProductionLabel(getFreeColClient(), goodsType, newValue);
                     if (maxProduction > 0) {
                         productionLabel.setMaximumProduction(maxProduction);
                     }
