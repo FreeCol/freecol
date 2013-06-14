@@ -144,6 +144,14 @@
 
   <xs:simpleType name="RegionType">
     <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="ocean" />
+      <xs:enumeration value="coast" />
+      <xs:enumeration value="lake" />
+      <xs:enumeration value="river" />
+      <xs:enumeration value="land" />
+      <xs:enumeration value="mountain" />
+      <xs:enumeration value="desert" />
+      <!-- @compat 0.10.7 -->
       <xs:enumeration value="OCEAN" />
       <xs:enumeration value="COAST" />
       <xs:enumeration value="LAKE" />
@@ -151,6 +159,7 @@
       <xs:enumeration value="LAND" />
       <xs:enumeration value="MOUNTAIN" />
       <xs:enumeration value="DESERT" />
+      <!-- end @compat 0.10.7 -->
     </xs:restriction>
   </xs:simpleType>
 

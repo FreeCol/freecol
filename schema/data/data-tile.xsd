@@ -65,7 +65,7 @@
                     use="optional" />
       <xs:attribute name="lostCityRumour" type="xs:boolean"
                     default="false" use="optional" />
-      <xs:attribute name="connected" type="xs:boolean" use="optional" />
+      <xs:attribute name="connected" type="xs:int" use="optional" />
       <xs:attribute name="moveToEurope" type="xs:boolean" use="optional" />
       <xs:attribute name="owner" type="xs:string" use="optional" />
       <xs:attribute name="owningSettlement" type="xs:string"
