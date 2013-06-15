@@ -27,7 +27,7 @@ import net.sf.freecol.common.model.Player;
 
 /**
  * Can be used as a single choice for the
- * {@link net.sf.freecol.client.gui.panel.FreeColDialog#createChoiceDialog(FreeColClient, GUI, String, String, List) choice dialog}.
+ * {@link net.sf.freecol.client.gui.panel.FreeColDialog#createChoiceDialog(FreeColClient, String, String, List) choice dialog}.
  */
 public class ChoiceItem<T> {
 

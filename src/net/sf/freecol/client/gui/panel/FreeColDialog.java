@@ -108,8 +108,9 @@ public class FreeColDialog<T> extends FreeColPanel {
      * @return <code>FreeColDialog</code>
      * @see ChoiceItem
      */
-    public static <T> FreeColDialog<ChoiceItem<T>> createChoiceDialog(FreeColClient freeColClient, GUI gui, String text,
-        String cancelText, List<ChoiceItem<T>> choices) {
+    public static <T> FreeColDialog<ChoiceItem<T>>
+        createChoiceDialog(FreeColClient freeColClient, String text,
+            String cancelText, List<ChoiceItem<T>> choices) {
 
         if (choices.isEmpty()) {
             throw new IllegalArgumentException("Can not create choice dialog with 0 choices!");
@@ -210,13 +211,18 @@ public class FreeColDialog<T> extends FreeColPanel {
      * @param cancelText The text displayed on the "cancel"-button.
      * @return The <code>FreeColDialog</code>.
      */
-    public static FreeColDialog<Boolean> createConfirmDialog(final FreeColClient freeColClient, GUI gui, String text, String okText, String cancelText) {
-        return createConfirmDialog(freeColClient, gui, new String[] {text}, null, okText, cancelText);
+    public static FreeColDialog<Boolean>
+        createConfirmDialog(final FreeColClient freeColClient, String text,
+                            String okText, String cancelText) {
+        return createConfirmDialog(freeColClient, new String[] {text}, null,
+                                   okText, cancelText);
     }
 
 
-    public static FreeColDialog<Boolean> createConfirmDialog(FreeColClient freeColClient, GUI gui, String[] texts,
-        ImageIcon[] icons, String okText, String cancelText) {
+    public static FreeColDialog<Boolean>
+        createConfirmDialog(FreeColClient freeColClient, String[] texts,
+                            ImageIcon[] icons,
+                            String okText, String cancelText) {
         // create the dialog
         final FreeColDialog<Boolean> confirmDialog
             = new FreeColDialog<Boolean>(freeColClient);
@@ -265,8 +271,10 @@ public class FreeColDialog<T> extends FreeColPanel {
      * @param cancelText The text displayed on the "cancel"-button.
      * @return The <code>FreeColDialog</code>.
      */
-    public static FreeColDialog<String> createInputDialog(FreeColClient freeColClient, GUI gui, String text,
-        String defaultValue, String okText, String cancelText) {
+    public static FreeColDialog<String>
+        createInputDialog(FreeColClient freeColClient, String text,
+                          String defaultValue,
+                          String okText, String cancelText) {
 
         final JTextField input = new JTextField(defaultValue);
         final FreeColDialog<String> inputDialog
@@ -330,8 +338,9 @@ public class FreeColDialog<T> extends FreeColPanel {
      *       dialog.
      * @return The <code>FreeColDialog</code>.
      */
-    public static FreeColDialog<File> createLoadDialog(FreeColClient freeColClient, GUI gui, File directory,
-                                                       FileFilter[] fileFilters) {
+    public static FreeColDialog<File>
+        createLoadDialog(FreeColClient freeColClient, File directory,
+                         FileFilter[] fileFilters) {
         final FreeColDialog<File> loadDialog
             = new FreeColDialog<File>(freeColClient);
         final JFileChooser fileChooser = new JFileChooser(directory);
@@ -353,7 +362,8 @@ public class FreeColDialog<T> extends FreeColPanel {
         return loadDialog;
     }
 
-    public static FreeColDialog<Dimension> createMapSizeDialog(FreeColClient freeColClient, final GUI gui) {
+    public static FreeColDialog<Dimension>
+        createMapSizeDialog(final FreeColClient freeColClient) {
 
         final int defaultHeight = 100;
         final int defaultWidth = 40;
@@ -381,7 +391,7 @@ public class FreeColDialog<T> extends FreeColPanel {
                         }
                         mapSizeDialog.setResponse(new Dimension(width, height));
                     } catch (NumberFormatException nfe) {
-                        gui.errorMessage("integerAboveZero");
+                        freeColClient.getGUI().errorMessage("integerAboveZero");
                     }
                 }
             });
@@ -423,8 +433,10 @@ public class FreeColDialog<T> extends FreeColPanel {
      * @param defaultName Default filename for the savegame.
      * @return The <code>FreeColDialog</code>.
      */
-    public static FreeColDialog<File> createSaveDialog(FreeColClient freeColClient, GUI gui, File directory,
-        final String standardName, FileFilter[] fileFilters, String defaultName) {
+    public static FreeColDialog<File>
+        createSaveDialog(FreeColClient freeColClient, File directory,
+                         final String standardName, FileFilter[] fileFilters,
+                         String defaultName) {
 
         final FreeColDialog<File> saveDialog
             = new FreeColDialog<File>(freeColClient);

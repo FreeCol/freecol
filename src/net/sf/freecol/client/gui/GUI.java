@@ -1206,7 +1206,8 @@ public class GUI {
     }
 
     private void setupMouseListenerForMapEditor() {
-        CanvasMapEditorMouseListener listener = new CanvasMapEditorMouseListener(freeColClient, this, canvas);
+        CanvasMapEditorMouseListener listener
+            = new CanvasMapEditorMouseListener(freeColClient, canvas);
         canvas.addMouseListener(listener);
         canvas.addMouseMotionListener(listener);
     }
@@ -1218,8 +1219,6 @@ public class GUI {
     public Dimension showScaleMapSizeDialog() {
         return canvas.showScaleMapSizeDialog();
     }
-
-
 
 
     public void showMapControls(boolean value) {

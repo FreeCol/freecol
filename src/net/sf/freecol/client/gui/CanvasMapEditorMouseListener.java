@@ -32,6 +32,7 @@ import javax.swing.JComponent;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.MapEditorController;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.panel.RiverStylePanel;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.TileTypeTransform;
 import net.sf.freecol.common.model.Map;
@@ -55,7 +56,6 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
     private Point oldPoint;
     private Point startPoint;
 
-    private GUI gui;
 
     /**
      * The constructor to use.
@@ -63,22 +63,28 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
      * @param canvas The component this object gets created for.
      * @param gui The GUI that holds information such as screen resolution.
      */
-    public CanvasMapEditorMouseListener(FreeColClient freeColClient, GUI gui, Canvas canvas) {
+    public CanvasMapEditorMouseListener(FreeColClient freeColClient, Canvas canvas) {
         super(freeColClient);
-        this.gui = gui;
         this.canvas = canvas;
     }
 
+
+    /**
+     * Get the GUI.
+     *
+     * @return The GUI.
+     */
+    private GUI getGUI() {
+        return freeColClient.getGUI();
+    }
 
     /**
      * This method can be called to make sure the map is loaded
      * There is no point executing mouse events if the map is not loaded
      */
     private Map getMap() {
-        Map map = null;
-        if (freeColClient.getGame() != null)
-            map = freeColClient.getGame().getMap();
-        return map;
+        return (freeColClient.getGame() == null) ? null
+            : freeColClient.getGame().getMap();
     }
 
     /**
@@ -152,7 +158,7 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
                         canvas.showEditSettlementDialog(tile.getIndianSettlement());
                     }
                 } else {
-                    gui.setSelectedTile(null,
+                    getGUI().setSelectedTile(null,
                         tile.getX() >= 0 && tile.getY() >= 0);
                 }
             } else if (e.getButton() == MouseEvent.BUTTON1) {
@@ -181,7 +187,7 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
         if (startPoint == null) startPoint = e.getPoint();
         if (oldPoint == null)	oldPoint = e.getPoint();
         drawBox(component, startPoint, oldPoint);
-        if (gui.getFocus() != null) {
+        if (getGUI().getFocus() != null) {
             Tile start = mapViewer.convertToMapTile(startPoint.x, startPoint.y);
             Tile end = start;
             // Optimization, only check if the points are different
@@ -194,7 +200,7 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
             // map then dont focus to that else setfocus to that
             // position no option selected, just center map
             if (!isTransformActive && end.getX() >= 0 && end.getY() >= 0) {
-                gui.setFocus(end);
+                getGUI().setFocus(end);
                 return;
             }
 
@@ -235,7 +241,7 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
                     }
                 }
             }
-            gui.refresh();
+            getGUI().refresh();
             canvas.requestFocus();
         }
     }
@@ -246,15 +252,11 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
      * @param e The MouseEvent that holds all the information.
      */
     public void mouseMoved(MouseEvent e) {
-        if (getMap() == null) {
-            return;
-        }
-        if (e.getY() < AUTO_SCROLLSPACE){
-        	return; // handle this in the menu bar
-        }
+        if (getMap() == null) return;
+        if (e.getY() < AUTO_SCROLLSPACE) return; // handle this in the menu bar
+
         performAutoScrollIfActive(e);
     }
-
 
     /**
      * Invoked when the mouse has been dragged.
@@ -273,24 +275,18 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
 
         performDragScrollIfActive(e);
 
-        gui.refresh();
+        getGUI().refresh();
     }
 
     private void drawBox(JComponent component, Point startPoint, Point endPoint) {
-        if(startPoint == null || endPoint == null){
-        	return;
-        }
-        if(startPoint.distance(endPoint) == 0){
-        	return;
-        }
+        if (startPoint == null || endPoint == null
+            || startPoint.distance(endPoint) == 0) return;
 
         // only bother to draw if a transformation is active
         MapEditorController controller = freeColClient.getMapEditorController();
-        if(controller.getMapTransform() == null){
-        	return;
-        }
+        if (controller.getMapTransform() == null) return;
 
-    	Graphics2D graphics = (Graphics2D) component.getGraphics ();
+        Graphics2D graphics = (Graphics2D) component.getGraphics ();
         graphics.setColor(Color.WHITE);
         int x = Math.min(startPoint.x, endPoint.x);
         int y = Math.min(startPoint.y, endPoint.y);
@@ -298,6 +294,5 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
         int height = Math.abs(startPoint.y - endPoint.y);
         graphics.drawRect(x, y, width, height);
     }
-
 
 }

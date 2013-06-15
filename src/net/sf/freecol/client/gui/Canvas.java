@@ -820,7 +820,7 @@ public final class Canvas extends JDesktopPane {
     public <T> T showChoiceDialog(Tile tile, String text, String cancelText,
                                   List<ChoiceItem<T>> choices) {
         FreeColDialog<ChoiceItem<T>> choiceDialog
-            = FreeColDialog.createChoiceDialog(freeColClient, gui, text, cancelText, choices);
+            = FreeColDialog.createChoiceDialog(freeColClient, text, cancelText, choices);
         if (choiceDialog.getHeight() > getHeight() / 3) {
             choiceDialog.setSize(choiceDialog.getWidth(), (getHeight() * 2) / 3);
         }
@@ -953,9 +953,10 @@ public final class Canvas extends JDesktopPane {
      * @see FreeColDialog
      */
     public boolean showConfirmDialog(String text, String okText, String cancelText) {
-        return showFreeColDialog(FreeColDialog.createConfirmDialog(freeColClient, gui, Messages.message(text),
-                                                                   Messages.message(okText),
-                                                                   Messages.message(cancelText)),
+        return showFreeColDialog(FreeColDialog
+            .createConfirmDialog(freeColClient, Messages.message(text),
+                                 Messages.message(okText),
+                                 Messages.message(cancelText)),
                                  null, true);
     }
 
@@ -981,7 +982,7 @@ public final class Canvas extends JDesktopPane {
         }
 
         FreeColDialog<Boolean> confirmDialog
-            = FreeColDialog.createConfirmDialog(freeColClient, gui, texts, images,
+            = FreeColDialog.createConfirmDialog(freeColClient, texts, images,
                     Messages.message(okText), Messages.message(cancelText));
         return showFreeColDialog(confirmDialog, tile, true);
     }
@@ -1000,9 +1001,10 @@ public final class Canvas extends JDesktopPane {
      */
     public boolean showConfirmDialog(Tile tile, StringTemplate text,
                                      String okText, String cancelText) {
-        return showFreeColDialog(FreeColDialog.createConfirmDialog(freeColClient, gui, Messages.message(text),
-                                                                   Messages.message(okText),
-                                                                   Messages.message(cancelText)),
+        return showFreeColDialog(FreeColDialog
+            .createConfirmDialog(freeColClient, Messages.message(text),
+                                 Messages.message(okText),
+                                 Messages.message(cancelText)),
                                  tile, true);
     }
 
@@ -1293,8 +1295,8 @@ public final class Canvas extends JDesktopPane {
                                   String okText, String cancelText,
                                   boolean rejectEmptyString) {
         FreeColDialog<String> inputDialog
-            = FreeColDialog.createInputDialog(freeColClient, gui, Messages.message(text),
-                defaultValue,
+            = FreeColDialog.createInputDialog(freeColClient,
+                Messages.message(text), defaultValue,
                 Messages.message(okText),
                 (cancelText == null) ? null : Messages.message(cancelText));
         String response = null;
@@ -1339,7 +1341,8 @@ public final class Canvas extends JDesktopPane {
      * @see FreeColDialog
      */
     public File showLoadDialog(File directory, FileFilter[] fileFilters) {
-        FreeColDialog<File> loadDialog = FreeColDialog.createLoadDialog(freeColClient, gui, directory, fileFilters);
+        FreeColDialog<File> loadDialog = FreeColDialog
+            .createLoadDialog(freeColClient, directory, fileFilters);
 
         File response = null;
         showSubPanel(loadDialog, true);
@@ -1400,7 +1403,8 @@ public final class Canvas extends JDesktopPane {
     }
 
     public Dimension showMapSizeDialog() {
-        return showFreeColDialog(FreeColDialog.createMapSizeDialog(freeColClient, gui), null, true);
+        return showFreeColDialog(FreeColDialog
+            .createMapSizeDialog(freeColClient), null, true);
 
     }
 
@@ -1426,7 +1430,8 @@ public final class Canvas extends JDesktopPane {
         if ((source instanceof Europe && !europePanel.isShowing())
             || (source instanceof Colony || source instanceof WorkLocation)) {
             FreeColDialog<Boolean> confirmDialog
-                = FreeColDialog.createConfirmDialog(freeColClient, gui, messageText, messageIcon,
+                = FreeColDialog.createConfirmDialog(freeColClient,
+                    messageText, messageIcon,
                     Messages.message("ok"), Messages.message("display"));
             if (showFreeColDialog(confirmDialog, null, true)) {
                 if (!isShowingSubPanel()) {
@@ -1709,8 +1714,11 @@ public final class Canvas extends JDesktopPane {
      * @return The <code>File</code>.
      * @see FreeColDialog
      */
-    public File showSaveDialog(File directory, String standardName, FileFilter[] fileFilters, String defaultName) {
-        FreeColDialog<File> saveDialog = FreeColDialog.createSaveDialog(freeColClient, gui, directory, standardName, fileFilters, defaultName);
+    public File showSaveDialog(File directory, String standardName,
+                               FileFilter[] fileFilters, String defaultName) {
+        FreeColDialog<File> saveDialog = FreeColDialog
+            .createSaveDialog(freeColClient, directory, standardName,
+                              fileFilters, defaultName);
         return showFreeColDialog(saveDialog, null, true);
     }
 
