@@ -2824,6 +2824,8 @@ public class Colony extends Settlement implements Nameable {
             }
         }
         // end compatibility code
+
+        invalidateCache();
     }
 
     /**

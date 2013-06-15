@@ -89,12 +89,10 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
     public void update() {
         removeAll();
         unitLabels.clear();
+        productionOutput = null;
 
         ProductionInfo info = building.getProductionInfo();
-
-        if (info == null || info.getProduction().isEmpty()) {
-            productionOutput = null;
-        } else {
+        if (info != null && !info.getProduction().isEmpty()) {
             AbstractGoods output = info.getProduction().get(0);
             if (output.getAmount() > 0) {
                 if (building.hasAbility(Ability.AVOID_EXCESS_PRODUCTION)) {
