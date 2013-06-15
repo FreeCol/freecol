@@ -20,8 +20,10 @@
 package net.sf.freecol.common.io;
 
 import java.io.File;
+import java.io.InputStream;
 import java.io.IOException;
 
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.resources.ResourceMapping;
 
 
@@ -48,6 +50,22 @@ public class FreeColTcFile extends FreeColModFile {
      */
     public FreeColTcFile(final String id) throws IOException {
         super(new File(FreeColDirectories.getRulesDirectory(), id));
+    }
+
+
+    /**
+     * Gets the Specification of this TC.
+     *
+     * @return The <code>Specification</code> in this TC, or null if
+     *     none present.
+     * @exception IOException if an error occurs reading the specification.
+     */
+    public Specification getSpecification() throws IOException {
+        InputStream si = getSpecificationInputStream();
+        if (si == null) return null;
+        Specification specification = new Specification(si);
+        si.close();
+        return specification;
     }
 
     /**
@@ -81,5 +99,4 @@ public class FreeColTcFile extends FreeColModFile {
     protected String[] getFileEndings() {
         return new String[] {".ftc", ".zip"};
     }
-
 }

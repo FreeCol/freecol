@@ -20,6 +20,7 @@
 package net.sf.freecol.common.io;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -27,7 +28,6 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.FreeColObject;
-import net.sf.freecol.common.model.Specification;
 
 
 /**
@@ -58,24 +58,16 @@ public class FreeColModFile extends FreeColDataFile {
      * Gets the input stream to the specification.
      *
      * @return An <code>InputStream</code> to the file
-     *      "specification.xml" within this data file.
+     *     "specification.xml" within this data file, or null if none present.
      * @exception IOException if thrown while opening the input stream.
      */
     public InputStream getSpecificationInputStream() throws IOException {
-        return getInputStream(SPECIFICATION_FILE);
-    }
-
-    /**
-     * Gets the Specification of this Mod.
-     *
-     * @return The <code>Specification</code> in this mod.
-     * @exception IOException if an error occurs
-     */
-    public Specification getSpecification() throws IOException {
-        InputStream si = getSpecificationInputStream();
-        Specification specification = new Specification(si);
-        si.close();
-        return specification;
+        try {
+            return getInputStream(SPECIFICATION_FILE);
+        } catch (FileNotFoundException fnfe) {
+            ; // Normal for graphic-only mods.
+        }
+        return null;
     }
 
     /**
