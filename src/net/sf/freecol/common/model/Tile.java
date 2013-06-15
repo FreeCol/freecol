@@ -1821,15 +1821,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
         xw.writeAttribute(Y_TAG, this.y);
 
-        xw.writeAttribute(REGION_TAG, region);
-
-        xw.writeAttribute(STYLE_TAG, style);
-
-        if (moveToEurope != null) {
-            xw.writeAttribute(MOVE_TO_EUROPE_TAG,
-                              moveToEurope.booleanValue());
-        }
-
         xw.writeEndElement();
     }
 
@@ -1846,9 +1837,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
         xw.writeAttribute(Y_TAG, this.y);
 
-        xw.writeAttribute(STYLE_TAG, style);
-
         xw.writeAttribute(TYPE_TAG, type);
+
+        xw.writeAttribute(STYLE_TAG, style);
 
         xw.writeAttribute(REGION_TAG, region);
 
@@ -1947,16 +1938,18 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
         y = xr.getAttribute(Y_TAG, 0);
 
-        style = xr.getAttribute(STYLE_TAG, 0);
-
         type = xr.getType(spec, TYPE_TAG, TileType.class, (TileType)null);
+        if (type == null) { // Unexplored tile.
+            style = 0;
+            highSeasCount = -1;
+            owner = null;
+            region = null;
+            moveToEurope = null;
+            contiguity = -1;
+            return;
+        }
 
         style = xr.getAttribute(STYLE_TAG, 0);
-
-        String typeStr = xr.getAttribute(TYPE_TAG, (String)null);
-        type = (typeStr == null) ? null : spec.getTileType(typeStr);
-        // TODO: This is better, use when dropping the @compat 0.10.5 below
-        //   type = spec.getType(in, TYPE_TAG, TileType.class, (TileType)null);
 
         String str = xr.getAttribute(CONNECTED_TAG, (String)null);
         if (str == null || "".equals(str)) {
@@ -1964,6 +1957,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             // @compat 0.10.5
             // High seas should have connected==0.  If it does not, this
             // is probably an old save file, so flag a recalculation.
+            String typeStr = xr.getAttribute(TYPE_TAG, (String)null);
             if ("model.tile.highSeas".equals(typeStr)) {
                 highSeasCount = Tile.FLAG_RECALCULATE;
             }
