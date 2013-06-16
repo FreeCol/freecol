@@ -73,6 +73,7 @@ import net.sf.freecol.common.networking.PayArrearsMessage;
 import net.sf.freecol.common.networking.PayForBuildingMessage;
 import net.sf.freecol.common.networking.PutOutsideColonyMessage;
 import net.sf.freecol.common.networking.RenameMessage;
+import net.sf.freecol.common.networking.ScoutSpeakToChiefMessage;
 import net.sf.freecol.common.networking.ScoutIndianSettlementMessage;
 import net.sf.freecol.common.networking.SellGoodsMessage;
 import net.sf.freecol.common.networking.SellMessage;
@@ -465,6 +466,14 @@ public final class InGameInputHandler extends InputHandler
             public Element handle(Player player, Connection connection,
                                   Element element) {
                 return new ScoutIndianSettlementMessage(getGame(), element)
+                    .handle(freeColServer, player, connection);
+            }});
+        register(ScoutSpeakToChiefMessage.getXMLElementTagName(),
+                 new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection,
+                                  Element element) {
+                return new ScoutSpeakToChiefMessage(getGame(), element)
                     .handle(freeColServer, player, connection);
             }});
         register(SellMessage.getXMLElementTagName(),

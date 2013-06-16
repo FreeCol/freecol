@@ -33,11 +33,11 @@ import org.w3c.dom.Element;
 
 
 /**
- * The message sent when scouting a native settlement.
+ * The message sent when speaking to a chief.
  */
-public class ScoutIndianSettlementMessage extends DOMMessage {
+public class ScoutSpeakToChiefMessage extends DOMMessage {
 
-    /** The identifier of the unit that is scouting. */
+    /** The identifier of the unit that is speaking. */
     private String unitId;
 
     /** The direction of the settlement from the unit. */
@@ -45,31 +45,31 @@ public class ScoutIndianSettlementMessage extends DOMMessage {
 
 
     /**
-     * Create a new <code>ScoutIndianSettlementMessage</code> with the
+     * Create a new <code>ScoutSpeakToChiefMessage</code> with the
      * supplied unit and direction.
      *
      * @param unit The <code>Unit</code> that is learning.
      * @param direction The <code>Direction</code> the unit is looking.
      */
-    public ScoutIndianSettlementMessage(Unit unit, Direction direction) {
+    public ScoutSpeakToChiefMessage(Unit unit, Direction direction) {
         this.unitId = unit.getId();
         this.directionString = String.valueOf(direction);
     }
 
     /**
-     * Create a new <code>ScoutIndianSettlementMessage</code> from a
+     * Create a new <code>ScoutSpeakToChiefMessage</code> from a
      * supplied element.
      *
      * @param game The <code>Game</code> this message belongs to.
      * @param element The <code>Element</code> to use to create the message.
      */
-    public ScoutIndianSettlementMessage(Game game, Element element) {
+    public ScoutSpeakToChiefMessage(Game game, Element element) {
         this.unitId = element.getAttribute("unitId");
         this.directionString = element.getAttribute("direction");
     }
 
     /**
-     * Handle a "scoutIndianSettlement"-message.
+     * Handle a "scoutSpeakToChief"-message.
      *
      * @param server The <code>FreeColServer</code> handling the message.
      * @param player The <code>Player</code> the message applies to.
@@ -109,11 +109,11 @@ public class ScoutIndianSettlementMessage extends DOMMessage {
 
         // Valid request, do the scouting.
         return server.getInGameController()
-            .scoutIndianSettlement(serverPlayer, unit, is);
+            .scoutSpeakToChief(serverPlayer, unit, is);
     }
 
     /**
-     * Convert this ScoutIndianSettlementMessage to XML.
+     * Convert this ScoutSpeakToChiefMessage to XML.
      *
      * @return The XML representation of this message.
      */
@@ -126,9 +126,9 @@ public class ScoutIndianSettlementMessage extends DOMMessage {
     /**
      * The tag name of the root element representing this object.
      *
-     * @return "scoutIndianSettlement".
+     * @return "scoutSpeakToChief".
      */
     public static String getXMLElementTagName() {
-        return "scoutIndianSettlement";
+        return "scoutSpeakToChief";
     }
 }

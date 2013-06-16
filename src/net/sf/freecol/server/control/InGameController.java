@@ -623,16 +623,17 @@ public final class InGameController extends Controller {
      * @param serverPlayer The <code>ServerPlayer</code> that is contacting
      *     the settlement.
      * @param is The <code>IndianSettlement</code> to contact.
-     * @param scout True if this contact is due to a scout asking to
-     *     speak to the chief.
+     * @param scout Positive if this contact is due to a scout asking to
+     *     speak to the chief, zero if it is another unit, negative if
+     *     this is from the greeting dialog generation.
      * @param cs A <code>ChangeSet</code> to update.
      */
     private void csVisit(ServerPlayer serverPlayer, IndianSettlement is,
-                         boolean scout, ChangeSet cs) {
+                         int scout, ChangeSet cs) {
         serverPlayer.csContact((ServerPlayer) is.getOwner(), null, cs);
         is.setVisited(serverPlayer);
-        if (scout || getGame().getSpecification()
-            .getBoolean("model.option.settlementActionsContactChief")) {
+        if (scout > 0 || (scout == 0 && getGame().getSpecification()
+                .getBoolean("model.option.settlementActionsContactChief"))) {
             is.setScouted(serverPlayer);
         }
     }
@@ -1526,7 +1527,7 @@ public final class InGameController extends Controller {
         }
         ChangeSet cs = new ChangeSet();
         if (settlement instanceof IndianSettlement) {
-            csVisit(serverPlayer, (IndianSettlement)settlement, false, cs);
+            csVisit(serverPlayer, (IndianSettlement)settlement, 0, cs);
         }
 
         // AI considers the proposition, return with a gold value
@@ -1562,7 +1563,7 @@ public final class InGameController extends Controller {
         }
         ChangeSet cs = new ChangeSet();
         if (settlement instanceof IndianSettlement) {
-            csVisit(serverPlayer, (IndianSettlement)settlement, false, cs);
+            csVisit(serverPlayer, (IndianSettlement)settlement, 0, cs);
         }
 
         // AI considers the proposition, return with a gold value
@@ -1959,7 +1960,7 @@ public final class InGameController extends Controller {
                                  IndianSettlement settlement) {
         ChangeSet cs = new ChangeSet();
 
-        csVisit(serverPlayer, settlement, false, cs);
+        csVisit(serverPlayer, settlement, 0, cs);
         Tile tile = settlement.getTile();
         tile.updatePlayerExploredTile(serverPlayer, true);
         cs.add(See.only(serverPlayer), tile);
@@ -1997,7 +1998,7 @@ public final class InGameController extends Controller {
         final Specification spec = getGame().getSpecification();
         ChangeSet cs = new ChangeSet();
         unit.setMovesLeft(0);
-        csVisit(serverPlayer, settlement, false, cs);
+        csVisit(serverPlayer, settlement, 0, cs);
         switch (settlement.getAlarm(serverPlayer).getLevel()) {
         case HATEFUL: // Killed, might be visible to other players.
             cs.add(See.perhaps().always(serverPlayer),
@@ -2043,7 +2044,7 @@ public final class InGameController extends Controller {
         ChangeSet cs = new ChangeSet();
         final int TURNS_PER_TRIBUTE = 5;
 
-        csVisit(serverPlayer, settlement, false, cs);
+        csVisit(serverPlayer, settlement, 0, cs);
 
         Player indianPlayer = settlement.getOwner();
         int gold = 0;
@@ -2098,9 +2099,9 @@ public final class InGameController extends Controller {
         return cs.build(serverPlayer);
     }
 
-
     /**
-     * Scout a native settlement.
+     * Scout a native settlement, that is, the contacting action
+     * that generates the greeting dialog.
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is scouting.
      * @param unit The scout <code>Unit</code>.
@@ -2110,6 +2111,29 @@ public final class InGameController extends Controller {
     public Element scoutIndianSettlement(ServerPlayer serverPlayer,
                                          Unit unit,
                                          IndianSettlement settlement) {
+        ChangeSet cs = new ChangeSet();
+        Tile tile = settlement.getTile();
+
+        csVisit(serverPlayer, settlement, -1, cs);
+        tile.updatePlayerExploredTile(serverPlayer, true);
+        cs.add(See.only(serverPlayer), tile);
+        cs.addAttribute(See.only(serverPlayer), "settlements",
+            Integer.toString(settlement.getOwner().getSettlements().size()));
+
+        // This is private.
+        return cs.build(serverPlayer);
+    }
+
+    /**
+     * Speak to the chief at a native settlement.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that is scouting.
+     * @param unit The scout <code>Unit</code>.
+     * @param settlement The <code>IndianSettlement</code> to scout.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element scoutSpeakToChief(ServerPlayer serverPlayer,
+                                     Unit unit, IndianSettlement settlement) {
         ChangeSet cs = new ChangeSet();
         Tile tile = settlement.getTile();
         boolean tileDirty = settlement.setVisited(serverPlayer);
@@ -2163,7 +2187,7 @@ public final class InGameController extends Controller {
             }
 
             // Have now spoken to the chief.
-            csVisit(serverPlayer, settlement, true, cs);
+            csVisit(serverPlayer, settlement, 1, cs);
             tileDirty = true;
 
             // Update settlement tile with new information, and any
@@ -2215,7 +2239,7 @@ public final class InGameController extends Controller {
     public Element denounceMission(ServerPlayer serverPlayer, Unit unit,
                                    IndianSettlement settlement) {
         ChangeSet cs = new ChangeSet();
-        csVisit(serverPlayer, settlement, false, cs);
+        csVisit(serverPlayer, settlement, 0, cs);
 
         // Determine result
         Unit missionary = settlement.getMissionary();
@@ -2272,7 +2296,7 @@ public final class InGameController extends Controller {
     public Element establishMission(ServerPlayer serverPlayer, Unit unit,
                                     IndianSettlement settlement) {
         ChangeSet cs = new ChangeSet();
-        csVisit(serverPlayer, settlement, false, cs);
+        csVisit(serverPlayer, settlement, 0, cs);
 
         if (settlement.hasMissionary()) {
             ((ServerIndianSettlement)settlement)
@@ -2347,7 +2371,7 @@ public final class InGameController extends Controller {
         ChangeSet cs = new ChangeSet();
 
         Tile tile = settlement.getTile();
-        csVisit(serverPlayer, settlement, false, cs);
+        csVisit(serverPlayer, settlement, 0, cs);
         tile.updatePlayerExploredTile(serverPlayer, true);
         cs.add(See.only(serverPlayer), tile);
 
@@ -2473,7 +2497,7 @@ public final class InGameController extends Controller {
                                      IndianSettlement settlement,
                                      Goods goods, int amount) {
         ChangeSet cs = new ChangeSet();
-        csVisit(serverPlayer, settlement, false, cs);
+        csVisit(serverPlayer, settlement, 0, cs);
 
         TradeSession session
             = TradeSession.lookup(TradeSession.class, unit, settlement);
@@ -2535,7 +2559,7 @@ public final class InGameController extends Controller {
                                     IndianSettlement settlement,
                                     Goods goods, int amount) {
         ChangeSet cs = new ChangeSet();
-        csVisit(serverPlayer, settlement, false, cs);
+        csVisit(serverPlayer, settlement, 0, cs);
 
         TradeSession session
             = TransactionSession.lookup(TradeSession.class, unit, settlement);
@@ -2606,7 +2630,7 @@ public final class InGameController extends Controller {
         cs.add(See.perhaps(), unit);
         if (settlement instanceof IndianSettlement) {
             IndianSettlement is = (IndianSettlement) settlement;
-            csVisit(serverPlayer, is, false, cs);
+            csVisit(serverPlayer, is, 0, cs);
             cs.add(See.only(serverPlayer),
                 ((ServerIndianSettlement)is).modifyAlarm(serverPlayer,
                     -is.getPriceToBuy(goods) / 50));

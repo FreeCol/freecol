@@ -2932,10 +2932,8 @@ public final class InGameController implements NetworkConstants {
         clearGotoOrders(unit);
 
         // Offer the choices.
-        NationSummary ns = getNationSummary(settlement.getOwner());
-        String number = (ns == null || ns.getNumberOfSettlements() < 0)
-            ? Messages.message("many")
-            : Integer.toString(ns.getNumberOfSettlements());
+        String number = askServer().scoutSettlement(unit, direction);
+        if (number == null) number = Messages.message("many");
         switch (gui.showScoutIndianSettlementDialog(settlement, number)) {
         case CANCEL:
             return true;
@@ -2945,7 +2943,7 @@ public final class InGameController implements NetworkConstants {
             return false;
         case INDIAN_SETTLEMENT_SPEAK:
             final int oldGold = player.getGold();
-            String result = askServer().scoutSpeak(unit, direction);
+            String result = askServer().scoutSpeakToChief(unit, direction);
             if (result == null) {
                 return false; // Fail
             } else if ("die".equals(result)) {

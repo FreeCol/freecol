@@ -1129,6 +1129,23 @@ public abstract class ServerAPI {
     }
 
     /**
+     * Server query-response for the dialog on scouting a native
+     * settlement, *before* choosing to speak to the chief, attack, et
+     * al.
+     *
+     * @param unit The <code>Unit</code> that is speaking.
+     * @param direction The direction to a settlement to ask.
+     * @return The number of settlements of this tribe (which is
+     *     needed in the dialog following), or negative on error.
+     */
+    public String scoutSettlement(Unit unit, Direction direction) {
+        HashMap<String, String> results = loadMap("settlements");
+        return (askHandling(new ScoutIndianSettlementMessage(unit, direction),
+                            null, results)) ? results.get("settlements")
+            : null;
+    }
+   
+    /**
      * Server query-response for speaking with a native chief.
      *
      * @param unit The <code>Unit</code> that is speaking.
@@ -1136,9 +1153,9 @@ public abstract class ServerAPI {
      * @return A string describing the result,
      *     or null if the server interaction failed.
      */
-    public String scoutSpeak(Unit unit, Direction direction) {
+    public String scoutSpeakToChief(Unit unit, Direction direction) {
         HashMap<String, String> results = loadMap("result");
-        return (askHandling(new ScoutIndianSettlementMessage(unit, direction),
+        return (askHandling(new ScoutSpeakToChiefMessage(unit, direction),
                 null, results)) ? results.get("result")
             : null;
     }
