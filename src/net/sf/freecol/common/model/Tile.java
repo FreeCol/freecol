@@ -1039,8 +1039,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return A vacant <code>Tile</code> near this one.
      */
     public Tile getSafeTile(Player player, Random random) {
-        if ((getFirstUnit() == null || player.owns(getFirstUnit()))
-            && (!hasSettlement() || player.owns(getSettlement()))) {
+        if ((getFirstUnit() == null || getFirstUnit().getOwner() == player)
+            && (!hasSettlement() || getSettlement().getOwner() == player)) {
             return this;
         }
 
