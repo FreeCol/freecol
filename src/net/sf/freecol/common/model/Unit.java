@@ -1776,7 +1776,7 @@ public class Unit extends GoodsLocation
      */
     public boolean isBeached(Tile tile) {
         return isNaval() && tile != null && tile.isLand()
-            && tile.getSettlement() == null;
+            && !tile.hasSettlement();
     }
 
     /**
@@ -1995,7 +1995,7 @@ public class Unit extends GoodsLocation
             // Using +2 in order to make 1/3 and 2/3 move count as
             // 3/3, only when getMovesLeft > 0
             if ((ml + 2 >= getInitialMovesLeft() || cost <= ml + 2
-                 || target.getSettlement()!=null) && ml != 0) {
+                 || target.hasSettlement()) && ml != 0) {
                 cost = ml;
             }
         }
@@ -2339,8 +2339,10 @@ public class Unit extends GoodsLocation
      *     actually move, such as trade.
      */
     public boolean isTileAccessible(Tile tile) {
-        return (isNaval()) ? !tile.isLand() || (tile.getSettlement() != null
-            && getOwner() == tile.getSettlement().getOwner())
+        return (isNaval())
+            ? (!tile.isLand()
+                || (tile.hasSettlement()
+                    && getOwner().owns(tile.getSettlement())))
             : tile.isLand();
     }
 
@@ -2671,7 +2673,7 @@ public class Unit extends GoodsLocation
                     Settlement settlement = t.getSettlement();
                     int value;
                     if (settlement != null
-                        && settlement.getOwner() == player
+                        && player.owns(settlement)
                         && (!coastal || settlement.isConnectedPort())
                         && (value = path.getTotalTurns()) < bestValue) {
                         bestValue = value;
@@ -2795,8 +2797,8 @@ public class Unit extends GoodsLocation
         Tile tile = defender.getTile();
 
         return (isNaval())
-            ? (tile.getSettlement() == null && defender.isNaval())
-            : (!defender.isNaval() || defender.isBeached());
+            ? !tile.hasSettlement() && defender.isNaval()
+            : !defender.isNaval() || defender.isBeached();
     }
 
     /**

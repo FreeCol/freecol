@@ -262,7 +262,7 @@ public class SimpleCombatModel extends CombatModel {
             Unit defenderUnit = (Unit) defender;
             Tile tile = defenderUnit.getTile();
             if (tile != null) {
-                if (tile.getSettlement() != null) {
+                if (tile.hasSettlement()) {
                     result.addAll(attackerUnit
                                   .getModifierSet(BOMBARD_BONUS));
                 } else {

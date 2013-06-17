@@ -250,7 +250,7 @@ public class MapTest extends FreeColTestCase {
         FreeColTestUtils.getColonyBuilder().player(frenchPlayer)
             .colonyTile(settlementTile).build();
         assertTrue("French colony was not set properly on the map",
-            settlementTile.getSettlement() != null);
+            settlementTile.hasSettlement());
         // set unit
         Player dutchPlayer = game.getPlayer("model.nation.dutch");
         Tile unitTile = map.getTile(1, 11);
@@ -355,8 +355,7 @@ public class MapTest extends FreeColTestCase {
         Unit artillery = new ServerUnit(game, galleon, dutchPlayer, artilleryType);
         FreeColTestUtils.getColonyBuilder().player(frenchPlayer)
             .colonyTile(colonyTile).build();
-        assertTrue("French colony not on the map",
-                   colonyTile.getSettlement() != null);
+        assertTrue("French colony not on the map", colonyTile.hasSettlement());
         dutchPlayer.setStance(frenchPlayer, Stance.WAR);
         frenchPlayer.setStance(dutchPlayer, Stance.WAR);
 
@@ -404,7 +403,7 @@ public class MapTest extends FreeColTestCase {
         FreeColTestUtils.getColonyBuilder().player(frenchPlayer)
             .colonyTile(colonyTile2).build();
         assertTrue("French colony not on the map",
-                   colonyTile2.getSettlement() != null);
+                   colonyTile2.hasSettlement());
         path = map.search(artillery, unitTile, gd,
                           CostDeciders.avoidIllegal(),
                           FreeColObject.INFINITY, galleon);
@@ -476,7 +475,7 @@ public class MapTest extends FreeColTestCase {
         FreeColTestUtils.getColonyBuilder().player(dutch)
             .colonyTile(settlementTile).build();
         assertTrue("Dutch colony should be on the map.",
-            settlementTile.getSettlement() != null);
+            settlementTile.hasSettlement());
         assertTrue("Dutch colony should be on the shore.",
             settlementTile.isShore());
 

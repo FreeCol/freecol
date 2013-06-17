@@ -224,7 +224,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         Player enemy;
-        if (target.getSettlement() != null) {
+        if (target.hasSettlement()) {
             enemy = target.getSettlement().getOwner();
         } else if (target == attacker.getTile()) {
             // Fortify on tile owned by another nation
@@ -312,7 +312,7 @@ public final class InGameController implements NetworkConstants {
     private StringTemplate getNationAt(Tile tile, Direction direction) {
         Tile newTile = tile.getNeighbourOrNull(direction);
         Player player = null;
-        if (newTile.getSettlement() != null) {
+        if (newTile.hasSettlement()) {
             player = newTile.getSettlement().getOwner();
         } else if (newTile.getFirstUnit() != null) {
             player = newTile.getFirstUnit().getOwner();
@@ -1379,8 +1379,7 @@ public final class InGameController implements NetworkConstants {
 
         // Proceed to abandon
         Tile tile = colony.getTile();
-        if (askServer().abandonColony(colony)
-            && tile.getSettlement() == null) {
+        if (askServer().abandonColony(colony) && !tile.hasSettlement()) {
             player.invalidateCanSeeTiles();
             gui.setActiveUnit(null);
             gui.setSelectedTile(tile, false);
@@ -1545,8 +1544,7 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        if (askServer().buildColony(name, unit)
-            && tile.getSettlement() != null) {
+        if (askServer().buildColony(name, unit) && tile.hasSettlement()) {
             player.invalidateCanSeeTiles();
             gui.playSound("sound.event.buildingComplete");
             gui.setActiveUnit(null);

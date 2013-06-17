@@ -305,6 +305,15 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
+     * Does this tile have a settlement.
+     *
+     * @return True if there is a settlement present.
+     */
+    public boolean hasSettlement() {
+        return settlement != null;
+    }
+
+    /**
      * Gets the owning settlement for this tile.
      *
      * @return The <code>Settlement</code> that owns this <code>Tile</code>.
@@ -1014,7 +1023,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             if (t == this) continue;
             Settlement settlement = t.getSettlement();
             if (settlement != null
-                && (owner == null || settlement.getOwner() == owner)) {
+                && (owner == null || owner.owns(settlement))) {
                 return settlement;
             }
         }
@@ -1030,10 +1039,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return A vacant <code>Tile</code> near this one.
      */
     public Tile getSafeTile(Player player, Random random) {
-        if ((getFirstUnit() == null
-                || getFirstUnit().getOwner() == player)
-            && (getSettlement() == null
-                || getSettlement().getOwner() == player)) {
+        if ((getFirstUnit() == null || player.owns(getFirstUnit()))
+            && (!hasSettlement() || player.owns(getSettlement()))) {
             return this;
         }
 
@@ -1043,10 +1050,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                 Utils.randomShuffle(logger, "Safe tile", tiles, random);
             }
             for (Tile t : tiles) {
-                if ((t.getFirstUnit() == null
-                        || t.getFirstUnit().getOwner() == player)
+                if ((t.getFirstUnit() == null || player.owns(t.getFirstUnit()))
                     && (t.getSettlement() == null
-                        || t.getSettlement().getOwner() == player)) {
+                        || player.owns(t.getSettlement()))) {
                     return t;
                 }
             }
@@ -1476,7 +1482,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
         // ...then a settlement defender if any...
         if ((defender == null || !defender.isDefensiveUnit())
-            && getSettlement() != null) {
+            && hasSettlement()) {
             Unit u = null;
             try {
                 // HACK: The AI is prone to removing all units in a
@@ -2138,8 +2144,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             .append(" ").append((type == null) ? "unknown"
                 : Utils.lastPart(type.getId(), "."))
             .append(" ").append(x).append(",").append(y)
-            .append((getSettlement() == null) ? ""
-                : " " + getSettlement().getName())
+            .append((!hasSettlement()) ? "" : " " + getSettlement().getName())
             .append("]");
         return sb.toString();
     }

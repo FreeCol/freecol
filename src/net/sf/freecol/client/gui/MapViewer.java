@@ -850,7 +850,7 @@ public final class MapViewer {
                         0, 0, null);
         }
 
-        if (price > 0 && tile.getSettlement() == null) {
+        if (price > 0 && !tile.hasSettlement()) {
             Image image = lib.getMiscImage(ImageLibrary.TILE_OWNED_BY_INDIANS);
             centerImage(g, image);
         }
@@ -1303,7 +1303,7 @@ public final class MapViewer {
 
         if (getView() == GUI.MOVE_UNITS_MODE) {
             if (noActiveUnitIsAt(newTile)) {
-                if (newTile != null && newTile.getSettlement() != null) {
+                if (newTile != null && newTile.hasSettlement()) {
                     gui.getCanvas().showSettlement(newTile.getSettlement());
                     return false;
                 }
@@ -2753,7 +2753,7 @@ public final class MapViewer {
         if (activeUnit != null && activeUnit.getTile() == unitTile) {
             return activeUnit;
         } else {
-            if (unitTile.getSettlement() == null) {
+            if (!unitTile.hasSettlement()) {
                 Unit bestDefendingUnit = null;
                 if (activeUnit != null) {
                     bestDefendingUnit = unitTile.getDefendingUnit(activeUnit);

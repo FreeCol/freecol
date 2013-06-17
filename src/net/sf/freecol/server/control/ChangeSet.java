@@ -564,13 +564,12 @@ public class ChangeSet {
             return unit.getOwner() == serverPlayer
                 || (oldTile != null
                     && serverPlayer.canSee(oldTile)
-                    && oldTile.getSettlement() == null
+                    && !oldTile.hasSettlement()
                     && !(oldLocation instanceof Unit));
         }
 
         private boolean seeNew(ServerPlayer serverPlayer) {
-            return unit.getOwner() == serverPlayer
-                || unit.isVisibleTo(serverPlayer);
+            return serverPlayer.owns(unit) || unit.isVisibleTo(serverPlayer);
         }
 
 
@@ -876,7 +875,7 @@ public class ChangeSet {
                 && serverPlayer.canSee(tile)
                 && ((settlement = tile.getSettlement()) == null
                     || settlement.isDisposed()
-                    || (ServerPlayer)settlement.getOwner() == serverPlayer);
+                    || serverPlayer.owns(settlement));
         }
 
         /**

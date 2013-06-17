@@ -399,7 +399,7 @@ public class UnitSeekAndDestroyMission extends Mission {
             ? "target-not-on-map"
             : (aiUnit.getUnit().getOwner() == unit.getOwner())
             ? Mission.TARGETOWNERSHIP
-            : (tile.getSettlement() != null)
+            : (tile.hasSettlement())
             ? "target-in-settlement"
             : (!aiUnit.getUnit().isTileAccessible(tile))
             ? "target-incompatible"

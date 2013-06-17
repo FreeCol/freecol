@@ -342,7 +342,7 @@ public class ColonyTile extends WorkLocation {
                 || claim == NoClaimReason.WATER)
             ? NoAddReason.MISSING_ABILITY
             : (claim == NoClaimReason.SETTLEMENT)
-            ? ((tile.getSettlement().getOwner() == getOwner())
+            ? ((getOwner().owns(tile.getSettlement()))
                 ? NoAddReason.ANOTHER_COLONY
                 : NoAddReason.OWNED_BY_ENEMY)
             : (claim == NoClaimReason.OCCUPIED)

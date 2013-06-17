@@ -2966,7 +2966,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
         if (nationOwner == null || nationOwner == this) {
             return 0; // Freely available
-        } else if (tile.getSettlement() != null) {
+        } else if (tile.hasSettlement()) {
             return -1; // Not for sale
         } else if (nationOwner.isEuropean()) {
             if (tile.getOwningSettlement() != null
@@ -3072,7 +3072,7 @@ public class Player extends FreeColGameObject implements Nameable {
         int price;
         NoClaimReason reason = canOwnTileReason(tile);
         return (reason != NoClaimReason.NONE) ? reason
-            : (tile.getSettlement() != null) ? NoClaimReason.SETTLEMENT
+            : (tile.hasSettlement()) ? NoClaimReason.SETTLEMENT
             : (tile.getOwner() == null) ? NoClaimReason.NONE
             : (tile.getOwner() == this) ? ((tile.isInUse())
                                            ? NoClaimReason.WORKED
@@ -3239,7 +3239,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 if (tile.getColony() != null) {
                     // can't build next to colony
                     return 0;
-                } else if (tile.getSettlement() != null) {
+                } else if (tile.hasSettlement()) {
                     // can build next to an indian settlement, but shouldn't
                     SettlementType type = tile.getSettlement().getType();
                     if (type.getClaimableRadius() > 1) {
@@ -3347,7 +3347,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
         // Return -INFINITY if there is a settlement here or neighbouring.
         for (Tile t : tile.getSurroundingTiles(0, 1)) {
-            if (t.getSettlement() != null) return -INFINITY;
+            if (t.hasSettlement()) return -INFINITY;
         }
 
         //initialize tile value
@@ -3406,7 +3406,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 Settlement set = t.getSettlement(); //may be null!
                 Colony col = t.getColony(); //may be null!
 
-                if (radius==1) {
+                if (radius == 1) {
                     //already checked: no colony here - if set!=null, it's indian
                     if (set != null) {
                         //penalize building next to native settlement

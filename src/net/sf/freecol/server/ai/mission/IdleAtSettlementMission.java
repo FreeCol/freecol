@@ -85,7 +85,7 @@ public class IdleAtSettlementMission extends Mission {
     public Location getTransportDestination() {
         final Unit unit = getUnit();
         if (unit.getTile() == null
-            || unit.getTile().getSettlement() != null) return null;
+            || unit.getTile().hasSettlement()) return null;
         PathNode path = unit.findOurNearestOtherSettlement();
         Tile target = (path == null) ? null : path.getLastNode().getTile();
         return (unit.shouldTakeTransportTo(target)) ? target : null;
@@ -148,7 +148,7 @@ public class IdleAtSettlementMission extends Mission {
         if (unit.getTile() == null) return;
 
         // If our tile contains a settlement, idle.  No log, this is normal.
-        if (unit.getTile().getSettlement() != null) return;
+        if (unit.getTile().hasSettlement()) return;
 
         Location target = findTarget();
         if (target != null) {

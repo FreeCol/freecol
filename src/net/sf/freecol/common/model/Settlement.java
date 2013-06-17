@@ -437,7 +437,7 @@ public abstract class Settlement extends GoodsLocation
         List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
         if (owner != null
             && getTile() != null
-            && getTile().getSettlement() != null) {
+            && getTile().hasSettlement()) {
             // Defensive tests to handle transition from calling dispose()
             // on both sides to when it is only called on server-side.
 

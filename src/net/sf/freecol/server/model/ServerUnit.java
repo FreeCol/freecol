@@ -204,7 +204,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
         boolean unitDirty = false;
 
         // Attrition.  Do it first as the unit might die.
-        if (loc instanceof Tile && ((Tile) loc).getSettlement() == null) {
+        if (loc instanceof Tile && !((Tile)loc).hasSettlement()) {
             int attrition = getAttrition() + 1;
             setAttrition(attrition);
             if (attrition > getType().getMaximumAttrition()) {
@@ -386,8 +386,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 amount *= 2;
             }
             Settlement settlement = tile.getSettlement();
-            if (settlement != null
-                && (ServerPlayer) settlement.getOwner() == owner) {
+            if (settlement != null && owner.owns(settlement)) {
                 amount = (int)settlement.applyModifier(amount,
                     Modifier.TILE_TYPE_CHANGE_PRODUCTION, deliver.getType());
                 settlement.addGoods(deliver.getType(), amount);
@@ -396,7 +395,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 int newAmount = amount;
                 for (Tile t : tile.getSurroundingTiles(2)) {
                     Settlement ts = t.getSettlement();
-                    if (ts != null && (ServerPlayer)ts.getOwner() == owner) {
+                    if (ts != null && owner.owns(ts)) {
                         adjacent.add(ts);
                         int modAmount = (int)ts.applyModifier((float)amount,
                             Modifier.TILE_TYPE_CHANGE_PRODUCTION,

@@ -420,8 +420,10 @@ public class LabourData {
                 incrementColonyCount(location.getColony(), unit, data);
             } else if (location instanceof Europe) {
                 incrementOutsideWorker(data, unit, UNITS_IN_EUROPE_GETTER);
-            } else if (location instanceof Tile && ((Tile) location).getSettlement() != null) {
-                incrementColonyCount((Colony) ((Tile) location).getSettlement(), unit, data);
+            } else if (location instanceof Tile
+                && ((Tile)location).hasSettlement()) {
+                incrementColonyCount((Colony)((Tile)location).getSettlement(),
+                                     unit, data);
             } else if (location instanceof Unit) {
                 incrementOutsideWorker(data, unit, UNITS_AT_SEA_GETTER);
             } else {

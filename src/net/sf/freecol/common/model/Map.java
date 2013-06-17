@@ -1344,7 +1344,7 @@ public class Map extends FreeColGameObject implements Location {
             : null;
         Unit offMapUnit = (carrier != null) ? carrier : unit;
         Unit currentUnit = (start.isLand())
-            ? ((start.getSettlement() != null
+            ? ((start.hasSettlement()
                     && start.getSettlement().isConnectedPort()
                     && unit != null
                     && unit.getLocation() == carrier) ? carrier : unit)

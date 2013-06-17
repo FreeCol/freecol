@@ -100,7 +100,7 @@ public final class TilePopup extends JPopupMenu {
                 String victoryPercent;
                 // If attacking a settlement, the true odds are never
                 // known because units may be hidden within
-                if (tile.getSettlement() != null
+                if (tile.hasSettlement() 
                     || combatOdds.win == CombatOdds.UNKNOWN_ODDS) {
                     victoryPercent = "??";
                 } else {

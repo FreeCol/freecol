@@ -293,7 +293,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
                 if (tile.isExplored()) {
                     g.setColor(getMinimapColor(tile.getType()));
                     g.fill(tilePath);
-                    if (tile.getSettlement() == null) {
+                    if (!tile.hasSettlement()) {
                         Unit unit = tile.getFirstUnit();
                         if (unit != null) {
                             g.setColor(Color.BLACK);

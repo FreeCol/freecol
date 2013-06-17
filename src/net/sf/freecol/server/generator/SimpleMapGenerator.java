@@ -244,7 +244,7 @@ public class SimpleMapGenerator implements MapGenerator {
                     Tile t = terrainGenerator.getRandomLandTile(map, random);
                     if (t.isPolar()) continue; // No polar lost cities
                     if (t.isLand() && !t.hasLostCityRumour()
-                        && t.getSettlement() == null && t.getUnitCount() == 0) {
+                        && !t.hasSettlement() && t.getUnitCount() == 0) {
                         LostCityRumour r = new LostCityRumour(t.getGame(), t);
                         if (r.chooseType(null, difficulty, random)
                             == LostCityRumour.RumourType.MOUNDS
@@ -992,7 +992,7 @@ public class SimpleMapGenerator implements MapGenerator {
         player.addSettlement(colony);
         colony.placeSettlement(true);
         for (Tile tile : colonyTile.getSurroundingTiles(1)) {
-            if (tile.getSettlement() == null
+            if (!tile.hasSettlement()
                 && (tile.getOwner() == null
                     || !tile.getOwner().isEuropean())) {
                 tile.changeOwnership(player, colony);
