@@ -19,6 +19,8 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Image;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +32,7 @@ import javax.swing.JSeparator;
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.GoodsType;
@@ -94,8 +97,9 @@ public final class ReportIndianPanel extends ReportPanel {
         String numSettlements = "" + nativeSettlements.size() + " / "
             + ns.getNumberOfSettlements();
 
+        ImageLibrary lib = getLibrary();
         JLabel villageLabel = new JLabel();
-        villageLabel.setIcon(new ImageIcon(getLibrary().getSettlementImage(opponent.getNationType().getCapitalType(), 0.66)));
+        villageLabel.setIcon(new ImageIcon(lib.getSettlementImage(opponent.getNationType().getCapitalType(), 0.66)));
         reportPanel.add(villageLabel, "span, split 2");
         JLabel headline = localizedLabel(opponent.getNationName());
         headline.setFont(smallHeaderFont);
@@ -142,7 +146,8 @@ public final class ReportIndianPanel extends ReportPanel {
                 if (known && settlement.isCapital()) {
                     locationName += "*";
                 }
-                JButton settlementButton = getLinkButton(locationName, null, settlement.getTile().getId());
+                JButton settlementButton = getLinkButton(locationName, null,
+                    settlement.getTile().getId());
                 settlementButton.addActionListener(this);
                 reportPanel.add(settlementButton, "newline 15");
 
@@ -151,10 +156,17 @@ public final class ReportIndianPanel extends ReportPanel {
                 if (missionary == null) {
                     missionLabel.setText("");
                 } else {
-                    missionLabel.setIcon(new ImageIcon(getLibrary().getMissionChip(settlement)));
-                    String text = Messages.message(StringTemplate.template("model.unit.nationUnit")
-                        .addStringTemplate("%nation%", missionary.getOwner().getNationName())
-                        .addStringTemplate("%unit%", Messages.getLabel(missionary)));
+                    boolean expert
+                        = missionary.hasAbility(Ability.EXPERT_MISSIONARY);
+                    Image chip = lib.getMissionChip(missionary.getOwner(),
+                                                    expert);
+                    missionLabel.setIcon(new ImageIcon(chip));
+                    String text = Messages.message(StringTemplate
+                        .template("model.unit.nationUnit")
+                            .addStringTemplate("%nation%",
+                                missionary.getOwner().getNationName())
+                            .addStringTemplate("%unit%",
+                                Messages.getLabel(missionary)));
                     missionLabel.setToolTipText(text);
                 }
                 reportPanel.add(missionLabel);

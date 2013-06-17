@@ -2300,8 +2300,13 @@ public final class MapViewer {
                     xOffset += chip.getWidth(null) + 2;
 
                     // Draw the mission chip if needed.
-                    if ((chip = lib.getMissionChip(is)) != null) {
-                        g.drawImage(chip, (int)xOffset, (int)yOffset, null);
+                    Unit missionary = is.getMissionary();
+                    if (missionary != null) {
+                        boolean expert
+                            = missionary.hasAbility(Ability.EXPERT_MISSIONARY);
+                        g.drawImage(lib.getMissionChip(missionary.getOwner(),
+                                                       expert),
+                                    (int)xOffset, (int)yOffset, null);
                         xOffset += chip.getWidth(null) + 2;
                     }
                 }

@@ -669,15 +669,12 @@ public final class ImageLibrary {
     /**
      * Gets the mission chip for a native settlement.
      *
-     * @param is The <code>IndianSettlement</code> to produce a chip for.
+     * @param owner The player that owns the mission.
+     * @param expert True if the unit is an expert.
      * @return A suitable chip, or null if no mission is present.
      */
-    public Image getMissionChip(IndianSettlement is) {
-        Unit missionary = is.getMissionary();
-        if (missionary == null) return null;
-
-        boolean expert = missionary.hasAbility(Ability.EXPERT_MISSIONARY);
-        Color background = missionary.getOwner().getNationColor();
+    public Image getMissionChip(Player owner, boolean expert) {
+        Color background = owner.getNationColor();
         String key = "dynamic.mission." + ((expert) ? "expert" : "normal")
             + "." + Integer.toHexString(background.getRGB());
         Image img = ResourceManager.getImage(key, 1.0);
