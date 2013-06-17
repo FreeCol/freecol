@@ -71,6 +71,7 @@ public class PlayerExploredTile extends FreeColGameObject {
     private UnitType skill = null;
     private GoodsType[] wantedGoods = { null, null, null };
     private Unit missionary = null;
+    private Tension alarm = null;
     private Player mostHated = null;
 
 
@@ -132,9 +133,11 @@ public class PlayerExploredTile extends FreeColGameObject {
             missionary = null;
             skill = null;
             wantedGoods = new GoodsType[] { null, null, null };
+            alarm = null;
             mostHated = null;
         } else {
             missionary = is.getMissionary();
+            alarm = is.getAlarm(player);
             if (full) {
                 skill = is.getLearnableSkill();
                 wantedGoods = is.getWantedGoods();
@@ -192,6 +195,10 @@ public class PlayerExploredTile extends FreeColGameObject {
 
     public GoodsType[] getWantedGoods() {
         return wantedGoods;
+    }
+
+    public Tension getAlarm() {
+        return alarm;
     }
 
     public Player getMostHated() {
@@ -259,8 +266,9 @@ public class PlayerExploredTile extends FreeColGameObject {
 
     // Serialization
     
-    private static final String COLONY_UNIT_COUNT_TAG = "colonyUnitCount";
+    private static final String ALARM_TAG = "alarm";
     private static final String COLONY_STOCKADE_KEY_TAG = "colonyStockadeKey";
+    private static final String COLONY_UNIT_COUNT_TAG = "colonyUnitCount";
     private static final String LEARNABLE_SKILL_TAG = "learnableSkill";
     private static final String MISSIONARY_TAG = "missionary";
     private static final String MOST_HATED_TAG = "mostHated";
@@ -310,6 +318,10 @@ public class PlayerExploredTile extends FreeColGameObject {
             }
         }
 
+        if (alarm != null) {
+            xw.writeAttribute(ALARM_TAG, alarm.getValue());
+        }
+
         if (mostHated != null) {
             xw.writeAttribute(MOST_HATED_TAG, mostHated.getId());
         }
@@ -347,7 +359,8 @@ public class PlayerExploredTile extends FreeColGameObject {
         final Specification spec = getSpecification();
         final Game game = getGame();
 
-        player = xr.makeFreeColGameObject(game, PLAYER_TAG, Player.class, true);
+        player = xr.makeFreeColGameObject(game, PLAYER_TAG,
+                                          Player.class, true);
 
         tile = xr.makeFreeColGameObject(game, TILE_TAG, Tile.class, true);
 
@@ -358,8 +371,9 @@ public class PlayerExploredTile extends FreeColGameObject {
         // not see it.  Since pets are only read in the server, there will be
         // a ServerObject for existing settlements so findFreeColGameObject
         // will do the right thing for now.
-        owningSettlement = xr.findFreeColGameObject(game, OWNING_SETTLEMENT_TAG,
-            Settlement.class, (Settlement)null, false);
+        owningSettlement
+            = xr.findFreeColGameObject(game, OWNING_SETTLEMENT_TAG,
+                Settlement.class, (Settlement)null, false);
 
         colonyUnitCount = xr.getAttribute(COLONY_UNIT_COUNT_TAG, 0);
 
@@ -373,6 +387,8 @@ public class PlayerExploredTile extends FreeColGameObject {
             wantedGoods[i] = xr.getType(spec, WANTED_GOODS_TAG + i,
                                         GoodsType.class, (GoodsType)null);
         }
+
+        alarm = new Tension(xr.getAttribute(ALARM_TAG, 0));
 
         mostHated = xr.makeFreeColGameObject(game, MOST_HATED_TAG,
                                              Player.class, false);

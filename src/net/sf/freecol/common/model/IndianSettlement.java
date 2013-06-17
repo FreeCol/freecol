@@ -1341,12 +1341,12 @@ public class IndianSettlement extends Settlement {
                 xw.writeEndElement();
             }
 
-            if (getAlarm(player) != null) {
+            if (pet.getAlarm() != null) {
                 xw.writeStartElement(ALARM_TAG);
 
                 xw.writeAttribute(PLAYER_TAG, player);
 
-                xw.writeAttribute(VALUE_TAG, getAlarm(player).getValue());
+                xw.writeAttribute(VALUE_TAG, pet.getAlarm().getValue());
 
                 xw.writeEndElement();
             }
@@ -1366,9 +1366,9 @@ public class IndianSettlement extends Settlement {
      */
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
-        final Specification spec = getSpecification();
-
         super.readAttributes(xr);
+
+        final Specification spec = getSpecification();
 
         lastTribute = xr.getAttribute(LAST_TRIBUTE_TAG, 0);
 
