@@ -148,12 +148,14 @@ public class ScoutingMission extends Mission {
      * @return A score for the proposed mission.
      */
     public static int scorePath(AIUnit aiUnit, PathNode path) {
-        Location loc;
-        if (path == null
-            || (loc = extractTarget(aiUnit, path)) == null
-            || !(loc instanceof IndianSettlement || loc instanceof Tile))
-            return Integer.MIN_VALUE;
-        return 1000 / (path.getTotalTurns() + 1);
+        Location loc = (path == null) ? null : extractTarget(aiUnit, path);
+        return (loc instanceof Colony)
+            ? 12 / (path.getTotalTurns() + 1)
+            : (loc instanceof IndianSettlement)
+            ? 2000 / (path.getTotalTurns() + 1)
+            : (loc instanceof Tile)
+            ? 1000 / (path.getTotalTurns() + 1)
+            : Integer.MIN_VALUE;
     }
 
     /**
@@ -439,7 +441,7 @@ public class ScoutingMission extends Mission {
                 throw new IllegalStateException("Unit not next to target "
                     + getTarget() + ": " + unit + "/" + unit.getLocation());
             }
-            if (!AIMessage.askScoutIndianSettlement(aiUnit, d)) {
+            if (!AIMessage.askScoutSpeakToChief(aiUnit, d)) {
                 logger.warning(tag + " unexpected failure at " + getTarget()
                     + ": " + this);
             }
@@ -470,11 +472,12 @@ public class ScoutingMission extends Mission {
         Location completed = getTarget();
         setTarget(findTarget(aiUnit, 20, false));
         if (completed instanceof Colony) {
-            if (getTarget() == null) {
+            if (getTarget() == null || getTarget() == completed) {
                 for (EquipmentType e : new ArrayList<EquipmentType>(unit
                         .getEquipment().keySet())) {
                     AIMessage.askEquipUnit(aiUnit, e, -unit.getEquipmentCount(e));
                 }
+                setTarget(null);
             }
             logger.finest(tag + " arrived at " + ((Colony)completed).getName()
                 + ", retargeting " + getTarget() + ": " + this);

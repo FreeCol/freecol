@@ -68,7 +68,7 @@ import net.sf.freecol.common.networking.MissionaryMessage;
 import net.sf.freecol.common.networking.MoveMessage;
 import net.sf.freecol.common.networking.MoveToMessage;
 import net.sf.freecol.common.networking.PutOutsideColonyMessage;
-import net.sf.freecol.common.networking.ScoutIndianSettlementMessage;
+import net.sf.freecol.common.networking.ScoutSpeakToChiefMessage;
 import net.sf.freecol.common.networking.SellGoodsMessage;
 import net.sf.freecol.common.networking.SetBuildQueueMessage;
 import net.sf.freecol.common.networking.TrainUnitInEuropeMessage;
@@ -564,11 +564,11 @@ public class AIMessage {
      * @param direction The <code>Direction</code> to move.
      * @return True if the message was sent, and a non-error reply returned.
      */
-    public static boolean askScoutIndianSettlement(AIUnit aiUnit,
-                                                   Direction direction) {
+    public static boolean askScoutSpeakToChief(AIUnit aiUnit,
+                                               Direction direction) {
         return sendMessage(aiUnit.getAIOwner().getConnection(),
-                           new ScoutIndianSettlementMessage(aiUnit.getUnit(),
-                                                            direction));
+                           new ScoutSpeakToChiefMessage(aiUnit.getUnit(), 
+                                                        direction));
     }
 
 
