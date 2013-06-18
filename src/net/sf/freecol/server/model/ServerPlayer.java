@@ -3725,6 +3725,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
         csChangeStance(Stance.PEACE, other, true, cs);
         setTension(other, new Tension(Tension.TENSION_MIN));
         other.setTension(this, new Tension(Tension.TENSION_MIN));
+        logger.finest("First contact between " + this + " and " + other
+            + " at " + tile);
 
         return welcomer;
     }
