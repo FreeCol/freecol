@@ -1050,9 +1050,10 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                 Utils.randomShuffle(logger, "Safe tile", tiles, random);
             }
             for (Tile t : tiles) {
-                if ((t.getFirstUnit() == null || player.owns(t.getFirstUnit()))
+                if ((t.getFirstUnit() == null
+                        || t.getFirstUnit().getOwner() == player)
                     && (t.getSettlement() == null
-                        || player.owns(t.getSettlement()))) {
+                        || t.getSettlement().getOwner() == player)) {
                     return t;
                 }
             }
