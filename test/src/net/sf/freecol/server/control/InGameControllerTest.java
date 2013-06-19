@@ -36,6 +36,7 @@ import net.sf.freecol.common.model.Event;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -414,12 +415,13 @@ public class InGameControllerTest extends FreeColTestCase {
         InGameController igc = ServerTestHelper.getInGameController();
 
         Player dutch = game.getPlayer("model.nation.dutch");
-        Unit unit = new ServerUnit(game, map.getTile(5, 8), dutch, hardyPioneerType);
+        Unit unit = new ServerUnit(game, map.getTile(5, 8), dutch,
+                                   hardyPioneerType);
         assertTrue("Unit should be a hardy pioneer",
                    unit.getType() == hardyPioneerType);
 
         // Basic function
-        igc.clearSpeciality((ServerPlayer) dutch, unit);
+        igc.clearSpeciality((ServerPlayer)dutch, unit);
         assertTrue("Unit should be cleared of its specialty",
                     unit.getType() != hardyPioneerType);
 
@@ -427,13 +429,24 @@ public class InGameControllerTest extends FreeColTestCase {
         Colony colony = getStandardColony();
         Building school = new ServerBuilding(game, colony, schoolHouseType);
         colony.addBuilding(school);
-        Unit teacher = new ServerUnit(game, school, colony.getOwner(),
+
+        Unit teacher = new ServerUnit(game, map.getTile(5, 8), dutch,
                                       hardyPioneerType);
         assertEquals("Unit should be a hardy pioneer",
                      hardyPioneerType, teacher.getType());
-        igc.clearSpeciality((ServerPlayer) dutch, teacher);
+
+        boolean sel = spec().getBoolean(GameOptions.ALLOW_STUDENT_SELECTION);
+        spec().getBooleanOption(GameOptions.ALLOW_STUDENT_SELECTION)
+            .setValue(false);
+        teacher.setLocation(school);
+        assertNotNull("Teacher should have student", teacher.getStudent());
+
+        igc.clearSpeciality((ServerPlayer)dutch, teacher);
         assertEquals("Teacher specialty cannot be cleared",
                      hardyPioneerType, teacher.getType());
+
+        spec().getBooleanOption(GameOptions.ALLOW_STUDENT_SELECTION)
+            .setValue(sel);
     }
 
     public void testAtackedNavalUnitIsDamaged() {
