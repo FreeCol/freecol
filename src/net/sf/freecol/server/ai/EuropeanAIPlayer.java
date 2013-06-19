@@ -38,6 +38,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTradeItem;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.GameOptions;
@@ -2105,22 +2106,21 @@ public class EuropeanAIPlayer extends AIPlayer {
      */
     public int buyProposition(Unit unit, Settlement settlement, Goods goods, int gold) {
         logger.finest("Entering method buyProposition");
+        final Specification spec = getSpecification(); 
         Player buyer = unit.getOwner();
+        IndianSettlement is = (IndianSettlement)settlement;
         String goldKey = "tradeGold#" + goods.getType().getId()
             + "#" + goods.getAmount() + "#" + settlement.getId();
         String hagglingKey = "tradeHaggling#" + unit.getId();
         Integer registered = sessionRegister.get(goldKey);
         if (registered == null) {
-            int price = ((IndianSettlement) settlement).getPriceToSell(goods)
+            int price = is.getPriceToSell(goods)
                 + getPlayer().getTension(buyer).getValue();
-            Unit missionary = ((IndianSettlement) settlement).getMissionary(buyer);
-            final Specification spec = getSpecification(); 
-            if (missionary != null
+            if (is.hasMissionary(buyer)
                 && spec.getBoolean(GameOptions.ENHANCED_MISSIONARIES)) {
-                // 10% bonus for missionary, 20% if expert
-                int bonus = (missionary.hasAbility(Ability.EXPERT_MISSIONARY)) ? 8
-                    : 9;
-                price = (price * bonus) / 10;
+                Unit u = is.getMissionary();
+                price = (int)FeatureContainer.applyModifierSet(price,
+                    getGame().getTurn(), u.getMissionaryTradeModifiers(false));
             }
             sessionRegister.put(goldKey, new Integer(price));
             return price;

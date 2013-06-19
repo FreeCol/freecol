@@ -305,8 +305,8 @@ public class ServerGame extends Game implements ServerModelObject {
                 + ":";
             for (Player player : getPlayers()) {
                 if (!player.isIndian()) continue;
-                for (IndianSettlement settlement
-                         : player.getIndianSettlementsWithMission(weakestAIPlayer)) {
+                for (IndianSettlement settlement : player.getIndianSettlements()) {
+                    if (!settlement.hasMissionary(weakestAIPlayer)) continue;
                     logMe += " " + settlement.getName() + "(mission)";
                     settlement.setContacted(strongestAIPlayer);
                     Unit missionary = settlement.getMissionary();
@@ -315,7 +315,7 @@ public class ServerGame extends Game implements ServerModelObject {
                     t.updatePlayerExploredTile(strongestAIPlayer, true);
                     t.updatePlayerExploredTiles();
                     cs.add(See.perhaps().always((ServerPlayer)strongestAIPlayer),
-                           settlement);
+                        settlement);
                 }
             }
             for (Colony colony : weakestAIPlayer.getColonies()) {

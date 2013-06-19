@@ -3342,6 +3342,22 @@ public class Unit extends GoodsLocation
     }
 
     /**
+     * Gets the appropriate trade bonuses due to a missionary unit.
+     *
+     * @param sense The sense to apply the modifiers.
+     * @return The missionary trade bonuses.
+     */
+    public Set<Modifier> getMissionaryTradeModifiers(boolean sense) {
+        HashSet<Modifier> result = new HashSet<Modifier>();
+        for (Modifier m : getModifierSet("model.modifier.missionaryTradeBonus")) {
+            result.add(new Modifier(m.getId(), m.getSource(),
+                                    (sense) ? m.getValue() : -m.getValue(),
+                                    m.getType()));
+        }
+        return result;
+    }
+
+    /**
      * Adds a feature to the Unit.  This method always throws an
      * <code>UnsupportedOperationException</code>, since features can
      * not be added to Units directly.

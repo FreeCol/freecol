@@ -503,7 +503,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             if (other == this) continue;
             if (isEuropean() && other.isIndian()) {
                 for (IndianSettlement s : other.getIndianSettlements()) {
-                    if (s.getMissionary(this) != null) {
+                    if (s.hasMissionary(this)) {
                         ((ServerIndianSettlement)s).csKillMissionary(null, cs);
                     }
                     s.removeAlarm(this);
@@ -1423,12 +1423,12 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 }
                 // Missionary helps reducing alarm a bit
                 if (settlement.hasMissionary()) {
-                    Unit mission = settlement.getMissionary();
+                    Unit missionary = settlement.getMissionary();
                     int missionAlarm = ALARM_MISSIONARY_PRESENT;
-                    if (mission.hasAbility(Ability.EXPERT_MISSIONARY)) {
+                    if (missionary.hasAbility(Ability.EXPERT_MISSIONARY)) {
                         missionAlarm *= 2;
                     }
-                    Player enemy = mission.getOwner();
+                    Player enemy = missionary.getOwner();
                     extra.put(enemy,
                               extra.get(enemy).intValue() + missionAlarm);
                 }
@@ -2022,7 +2022,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     && natives != null
                     && isEuropean() && defenderPlayer.isIndian();
                 if (ok) {
-                    defenderTileDirty |= natives.getMissionary(this) != null;
+                    defenderTileDirty |= natives.hasMissionary(this);
                     csBurnMissions(attackerUnit, natives, cs);
                 }
                 break;
@@ -2433,7 +2433,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         // Burn down the missions
         for (IndianSettlement s : nativePlayer.getIndianSettlements()) {
-            if (s.getMissionary(attackerPlayer) != null) {
+            if (s.hasMissionary(attackerPlayer)) {
                 ((ServerIndianSettlement)s).csKillMissionary(null, cs);
             }
         }

@@ -611,7 +611,7 @@ public class SimpleCombatModel extends CombatModel {
                 if (attackerWon) {
                     if (r < winner.getConvertProbability()) {
                         if (is.getUnitCount() + tile.getUnitCount() > 1
-                            && is.getMissionary(winnerPlayer) != null
+                            && is.hasMissionary(winnerPlayer)
                             && winner.getTile() != null
                             && winner.getTile().isLand()) {
                             crs.add(CombatResult.CAPTURE_CONVERT);
@@ -620,7 +620,7 @@ public class SimpleCombatModel extends CombatModel {
                     } else if (r >= 1.0f - winner.getBurnProbability()) {
                         for (IndianSettlement s
                                  : loserPlayer.getIndianSettlements()) {
-                            if (s.getMissionary(winnerPlayer) != null) {
+                            if (s.hasMissionary(winnerPlayer)) {
                                 crs.add(CombatResult.BURN_MISSIONS);
                                 break;
                             }

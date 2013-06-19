@@ -291,15 +291,6 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
-     * Does this settlement have a missionary?
-     *
-     * @return True if there is a missionary at this settlement.
-     */
-    public boolean hasMissionary() {
-        return missionary != null;
-    }
-
-    /**
      * Gets the missionary from this settlement.
      *
      * @return The missionary at this settlement, or null if there is none.
@@ -309,16 +300,22 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
-     * Gets the missionary from this settlement if there is one and
-     * it is owned by a specified player.
+     * Does this settlement have a missionary?
      *
-     * @param player The player purported to own the missionary
-     * @return The missionary from this settlement if there is one and
-     *     it is owned by the specified player, otherwise null.
+     * @return True if there is a missionary at this settlement.
      */
-    public Unit getMissionary(Player player) {
-        return (missionary == null || missionary.getOwner() != player) ? null
-            : missionary;
+    public boolean hasMissionary() {
+        return missionary != null;
+    }
+
+    /**
+     * Does this settlement have a missionary from the given player?
+     *
+     * @param player The <code>Player</code> to test.
+     * @return True if there is a suitable missionary present.
+     */
+    public boolean hasMissionary(Player player) {
+        return missionary != null && player != null && player.owns(missionary);
     }
 
     /**
@@ -328,25 +325,6 @@ public class IndianSettlement extends Settlement {
      */
     public void setMissionary(Unit missionary) {
         this.missionary = missionary;
-    }
-
-    /**
-     * Changes the missionary for this settlement and updates other players.
-     *
-     * @param missionary The new missionary for this settlement.
-     */
-    public void changeMissionary(Unit missionary) {
-        Unit old = getMissionary();
-        setMissionary(missionary);
-        getTile().updatePlayerExploredTiles();
-        // Full updates for the old and new missionary owners.
-        if (missionary != null) {
-            getTile().updatePlayerExploredTile(missionary.getOwner(), true);
-        }
-        if (old != null) {
-            getTile().updatePlayerExploredTile(old.getOwner(), true);
-        }
-        if (old != null && old != missionary) getTile().fixMissionary(old);
     }
 
     /**

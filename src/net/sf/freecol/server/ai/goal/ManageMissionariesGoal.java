@@ -167,9 +167,7 @@ public class ManageMissionariesGoal extends Goal {
 
             for (Tile t : tile.getSurroundingTiles(MAX_SEARCH_RADIUS)) {
                 IndianSettlement is = t.getIndianSettlement();
-                if (is != null
-                    && (is.getMissionary() == null
-                        || is.getMissionary().getOwner() != player.getPlayer())) {
+                if (is != null && !is.hasMissionary(player.getPlayer())) {
                     //TODO: Check if this settlement is reachable
                     return is;
                 }

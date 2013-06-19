@@ -140,14 +140,13 @@ public class CreateMissionAtSettlementGoal extends Goal {
                         hasFoundMissionary = true;
                         if (u.getUnit().getTile().isAdjacent(target.getTile())) {
                             //Missionary is adjacent, use it to finish the goal.
-                            if (((IndianSettlement)target).getMissionary()==null ||
-                                ((IndianSettlement)target).getMissionary().getOwner()!=player.getPlayer()) {
+                            if (((IndianSettlement)target).hasMissionary(player.getPlayer())) {
                                 PathNode pathNode = u.getUnit().findPath(target.getTile());
                                 u.getUnit().setMovesLeft(0);
                                                         
                                 AIMessage.askEstablishMission(u,
                                     pathNode.getDirection(),
-                                    ((IndianSettlement)target).getMissionary() != null);
+                                    ((IndianSettlement)target).hasMissionary());
                             } else {
                                 //we can't establish a mission here
                                 addUnitToParent(u);

@@ -292,16 +292,6 @@ public class SimpleMapGenerator implements MapGenerator {
                             settlement.add(newUnit);
                             settlement.addOwnedUnit(newUnit);
                         }
-                        /* what about European influences?
-                        Unit missionary = template.getMissionary();
-                        if (missionary != null) {
-                            UnitType type = game.getSpecification().getUnitType(missionary.getType().getId());
-                            Player owner = game.getPlayer(missionary.getOwner().getNationID());
-                            settlement.setMissionary(new ServerUnit(game, settlement, owner, type));
-                        }
-                        settlement.setConvertProgress(template.getConvertProgress());
-                        settlement.setLastTribute(template.getLastTribute());
-                        */
                         for (Goods goods : template.getCompactGoods()) {
                             GoodsType type = game.getSpecification().getGoodsType(goods.getType().getId());
                             settlement.addGoods(type, goods.getAmount());

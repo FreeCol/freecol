@@ -3330,10 +3330,10 @@ public final class InGameController implements NetworkConstants {
     private boolean moveUseMissionary(Unit unit, Direction direction) {
         IndianSettlement settlement
             = (IndianSettlement)getSettlementAt(unit.getTile(), direction);
-        Unit missionary = settlement.getMissionary();
-        boolean canEstablish = missionary == null;
-        boolean canDenounce = missionary != null
-            && missionary.getOwner() != unit.getOwner();
+        Player player = unit.getOwner();
+        boolean canEstablish = !settlement.hasMissionary();
+        boolean canDenounce = !canEstablish
+            && !settlement.hasMissionary(player);
         clearGotoOrders(unit);
 
         // Offer the choices.
@@ -3343,7 +3343,7 @@ public final class InGameController implements NetworkConstants {
             return true;
         case ESTABLISH_MISSION:
             if (askServer().missionary(unit, direction, false)) {
-                if (settlement.getMissionary() == unit) {
+                if (settlement.hasMissionary(player)) {
                     gui.playSound("sound.event.missionEstablished");
                 }
                 nextActiveUnit();
@@ -3351,7 +3351,7 @@ public final class InGameController implements NetworkConstants {
             break;
         case DENOUNCE_HERESY:
             if (askServer().missionary(unit, direction, true)) {
-                if (settlement.getMissionary() == unit) {
+                if (settlement.hasMissionary(player)) {
                     gui.playSound("sound.event.missionEstablished");
                 }
                 nextModelMessage();
@@ -3361,7 +3361,6 @@ public final class InGameController implements NetworkConstants {
         case INCITE_INDIANS:
             List<Player> enemies = new ArrayList<Player>(freeColClient
                 .getGame().getLiveEuropeanPlayers());
-            Player player = freeColClient.getMyPlayer();
             enemies.remove(player);
             Player enemy = gui.showSimpleChoiceDialog(unit.getTile(),
                 "missionarySettlement.inciteQuestion",

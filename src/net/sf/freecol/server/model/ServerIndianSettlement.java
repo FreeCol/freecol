@@ -70,7 +70,6 @@ public class ServerIndianSettlement extends IndianSettlement
      * @param learnableSkill The skill that can be learned by
      *     Europeans at this settlement.
      * @param missionary The missionary in this settlement (or null).
-     * @exception IllegalArgumentException if an invalid tribe or kind is given
      */
     public ServerIndianSettlement(Game game, Player owner, String name,
                                   Tile tile, boolean isCapital,
@@ -87,7 +86,16 @@ public class ServerIndianSettlement extends IndianSettlement
         updateWantedGoods();
     }
 
-    public ServerIndianSettlement(Game game, Player owner, Tile tile, IndianSettlement template) {
+    /**
+     * Creates a new ServerIndianSettlement from a template.
+     *
+     * @param game The <code>Game</code> in which this object belong.
+     * @param owner The <code>Player</code> owning this settlement.
+     * @param tile The location of the <code>IndianSettlement</code>.
+     * @param template The template <code>IndianSettlement</code> to copy.
+     */
+    public ServerIndianSettlement(Game game, Player owner, Tile tile,
+                                  IndianSettlement template) {
         super(game, owner, template.getName(), tile);
 
         setLearnableSkill(template.getLearnableSkill());
@@ -101,13 +109,14 @@ public class ServerIndianSettlement extends IndianSettlement
         }
         Unit missionary = template.getMissionary();
         if (missionary != null) {
-            setMissionary(new ServerUnit(game, this, missionary));
+            this.missionary = new ServerUnit(game, this, missionary);
         }
         setConvertProgress(template.getConvertProgress());
         setLastTribute(template.getLastTribute());
         setGoodsContainer(new GoodsContainer(game, this));
+        final Specification spec = getSpecification();
         for (Goods goods : template.getCompactGoods()) {
-            GoodsType type = getSpecification().getGoodsType(goods.getType().getId());
+            GoodsType type = spec.getGoodsType(goods.getType().getId());
             addGoods(type, goods.getAmount());
         }
         wantedGoods = template.getWantedGoods();
@@ -232,6 +241,24 @@ public class ServerIndianSettlement extends IndianSettlement
             + " modified by " + Integer.toString(addToAlarm)
             + " now = " + Integer.toString(getAlarm(player).getValue()));
         return modified;
+    }
+
+    /**
+     * Changes the missionary for this settlement and updates other players.
+     *
+     * @param missionary The new missionary for this settlement.
+     */
+    public void changeMissionary(Unit missionary) {
+        Unit old = getMissionary();
+        setMissionary(missionary);
+        getTile().updatePlayerExploredTiles();
+        // Full updates for the old and new missionary owners.
+        if (missionary != null) {
+            getTile().updatePlayerExploredTile(missionary.getOwner(), true);
+        }
+        if (old != null) {
+            getTile().updatePlayerExploredTile(old.getOwner(), true);
+        }
     }
 
     /**

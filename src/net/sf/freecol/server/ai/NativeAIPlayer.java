@@ -92,13 +92,6 @@ public class NativeAIPlayer extends AIPlayer {
     private static final String SHIP_TRADE_PENALTY
         = "model.modifier.shipTradePenalty";
 
-    /**
-     * The modifier to apply when to trade with a settlement with a
-     * missionary if the enhancedMissionaries option is enabled.
-     */
-    private static final String MISSIONARY_TRADE_BONUS
-        = "model.modifier.missionaryTradeBonus";
-
     public static final int MAX_DISTANCE_TO_BRING_GIFTS = 5;
 
     public static final int MAX_NUMBER_OF_GIFTS_BEING_DELIVERED = 1;
@@ -809,30 +802,6 @@ public class NativeAIPlayer extends AIPlayer {
     }
 
     /**
-     * Gets the appropriate missionary trade bonuses.
-     *
-     * @param missionary The missionary <code>Unit</code>.
-     * @param sense The sense to apply the modifiers.
-     * @return The missionary trade bonuses.
-     */
-    private Set<Modifier> getMissionaryTradeBonuses(Unit missionary,
-                                                    boolean sense) {
-        Set<Modifier> missionaryBonuses = missionary
-            .getModifierSet(MISSIONARY_TRADE_BONUS);
-        Set<Modifier> result;
-        if (sense) {
-            result = missionaryBonuses;
-        } else {
-            result = new HashSet<Modifier>();
-            for (Modifier m : missionaryBonuses) {
-                result.add(new Modifier(m.getId(), m.getSource(),
-                        -m.getValue(), m.getType()));
-            }
-        }
-        return result;
-    }
-
-    /**
      * Gets the appropriate ship trade penalties.
      *
      * @param sense The sense to apply the modifiers.
@@ -852,7 +821,6 @@ public class NativeAIPlayer extends AIPlayer {
 
     /**
      * Called when another <code>Player</code> proposes to buy.
-     *
      *
      * @param unit The foreign <code>Unit</code> trying to trade.
      * @param settlement The <code>Settlement</code> this player owns and
@@ -885,10 +853,10 @@ public class NativeAIPlayer extends AIPlayer {
                 return NetworkConstants.NO_TRADE_HOSTILE;
             }
             Set<Modifier> modifiers = new HashSet<Modifier>();
-            Unit missionary = is.getMissionary(buyer);
-            if (missionary != null
+            if (is.hasMissionary(buyer)
                 && spec.getBoolean(GameOptions.ENHANCED_MISSIONARIES)) {
-                modifiers.addAll(getMissionaryTradeBonuses(missionary, false));
+                Unit u = is.getMissionary();
+                modifiers.addAll(u.getMissionaryTradeModifiers(false));
             }
             if (unit.isNaval()) {
                 modifiers.addAll(getShipTradePenalties(false));
@@ -960,10 +928,10 @@ public class NativeAIPlayer extends AIPlayer {
                 return NetworkConstants.NO_TRADE_HOSTILE;
             }
             Set<Modifier> modifiers = new HashSet<Modifier>();
-            Unit missionary = is.getMissionary(seller);
-            if (missionary != null
+            if (is.hasMissionary(seller)
                 && spec.getBoolean(GameOptions.ENHANCED_MISSIONARIES)) {
-                modifiers.addAll(getMissionaryTradeBonuses(missionary, true));
+                Unit u = is.getMissionary();
+                modifiers.addAll(u.getMissionaryTradeModifiers(true));
             }
             if (unit.isNaval()) {
                 modifiers.addAll(getShipTradePenalties(true));

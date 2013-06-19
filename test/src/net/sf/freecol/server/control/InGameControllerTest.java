@@ -269,14 +269,14 @@ public class InGameControllerTest extends FreeColTestCase {
         assertTrue("Dutch Jesuit should be dead",
                    dutchJesuit.isDisposed());
         assertTrue("Indian settlement should not have a mission",
-                   camp.getMissionary() == null);
+                   !camp.hasMissionary());
 
         // But succeed for the French
         igc.establishMission((ServerPlayer) french, frenchJesuit, camp);
         assertTrue("French Jesuit should not be dead",
                    !frenchJesuit.isDisposed());
         assertTrue("Indian settlement should have a mission",
-                   camp.getMissionary() != null);
+                   camp.hasMissionary());
     }
 
     public void testDumpGoods() {

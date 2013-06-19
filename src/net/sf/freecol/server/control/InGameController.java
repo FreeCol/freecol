@@ -2014,7 +2014,7 @@ public final class InGameController extends Controller {
             // Do a full information update as the unit is in the settlement.
             unit.setType(skill);
             if (!settlement.isCapital()
-                && !(settlement.getMissionary(serverPlayer) != null
+                && !(settlement.hasMissionary(serverPlayer)
                     && spec.getBoolean(GameOptions.ENHANCED_MISSIONARIES))) {
                 settlement.setLearnableSkill(null);
             }
@@ -2232,8 +2232,8 @@ public final class InGameController extends Controller {
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is denouncing.
      * @param unit The <code>Unit</code> denouncing.
-     * @param settlement The <code>IndianSettlement</code> containing the
-     *                   mission to denounce.
+     * @param settlement The <code>IndianSettlement</code>
+     *     containing the mission to denounce.
      * @return An <code>Element</code> encapsulating this action.
      */
     public Element denounceMission(ServerPlayer serverPlayer, Unit unit,
@@ -2317,7 +2317,7 @@ public final class InGameController extends Controller {
             unit.setLocation(settlement);
             unit.setMovesLeft(0);
             cs.add(See.only(serverPlayer), unit);
-            settlement.changeMissionary(unit);
+            ((ServerIndianSettlement)settlement).changeMissionary(unit);
             settlement.setConvertProgress(0);
             List<FreeColGameObject> modifiedSettlements
                 = ((ServerIndianSettlement)settlement).modifyAlarm(serverPlayer,

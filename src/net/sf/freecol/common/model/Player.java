@@ -2362,29 +2362,6 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Gets a list of all IndianSettlements this player owns that have
-     * missions, optionally owned by a specific player.
-     *
-     * @param other If non-null, collect only missions established by
-     *     the given <code>Player</code>.
-     * @return A list of suitable <code>IndianSettlement</code>s with
-     *     missions.
-     */
-    public List<IndianSettlement> getIndianSettlementsWithMission(Player other) {
-        List<IndianSettlement> indianSettlements
-            = new ArrayList<IndianSettlement>();
-        for (Settlement s : getSettlements()) {
-            Unit missionary;
-            if (s instanceof IndianSettlement
-                && (missionary = ((IndianSettlement)s).getMissionary()) != null
-                && (other == null || missionary.getOwner() == other)) {
-                indianSettlements.add((IndianSettlement) s);
-            }
-        }
-        return indianSettlements;
-    }
-
-    /**
      * Find a <code>Settlement</code> by name.
      *
      * @param name The name of the <code>Settlement</code>.
@@ -2721,7 +2698,7 @@ public class Player extends FreeColGameObject implements Nameable {
                     if (this.equals(other) || !other.isIndian()) continue;
                     for (Settlement settlement : other.getSettlements()) {
                         IndianSettlement is = (IndianSettlement) settlement;
-                        if (is.getMissionary(this) == null) continue;
+                        if (!is.hasMissionary(this)) continue;
                         for (Tile t : is.getTile().getSurroundingTiles(is.getLineOfSight())) {
                             if (t != null) {
                                 cST[t.getX()][t.getY()] = hasExplored(t);

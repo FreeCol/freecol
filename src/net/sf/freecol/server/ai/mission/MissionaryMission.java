@@ -332,8 +332,7 @@ public class MissionaryMission extends Mission {
             ? "target-is-uncontacted"
             : (is.getOwner().atWarWith(owner))
             ? "target-at-war"
-            : (is.getMissionary() != null
-                && is.getMissionary().getOwner() == owner)
+            : (is.hasMissionary(owner))
             ? "target-has-our-mission"
             : null;
     }
@@ -410,12 +409,12 @@ public class MissionaryMission extends Mission {
                     + getTarget() + ": " + unit + "/" + unit.getLocation());
             }
             IndianSettlement is = (IndianSettlement)getTarget();
-            AIMessage.askEstablishMission(aiUnit, d,
-                                          is.getMissionary() != null);
+            AIMessage.askEstablishMission(aiUnit, d, is.hasMissionary());
             if (unit.isDisposed()) {
                 logger.finest(tag + " died at target " + getTarget() 
                     + ": " + this);
-            } else if (is.getMissionary() == unit && unit.isInMission()) {
+            } else if (is.hasMissionary(unit.getOwner())
+                && unit.isInMission()) {
                 logger.finest(tag + " completed at " + getTarget()
                     + ": " + this);
                 setTarget(null);

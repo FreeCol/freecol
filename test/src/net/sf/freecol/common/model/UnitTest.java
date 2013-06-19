@@ -233,10 +233,10 @@ public class UnitTest extends FreeColTestCase {
 
         // add the missionary
         s.setMissionary(jesuit);
-        assertNotNull("No missionary set", s.getMissionary());
+        assertTrue("No missionary set", s.hasMissionary());
         assertEquals("Wrong missionary set", s.getMissionary(), jesuit);
         s.setMissionary(null);
-        assertNull("Missionary not removed", s.getMissionary());
+        assertFalse("Missionary not removed", s.hasMissionary());
     }
 
     public void testLineOfSight() {
