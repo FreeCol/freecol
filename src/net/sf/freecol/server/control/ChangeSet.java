@@ -29,6 +29,7 @@ import net.sf.freecol.common.model.Feature;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
+import net.sf.freecol.common.model.FreeColObject.WriteScope;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HistoryEvent;
@@ -383,17 +384,14 @@ public class ChangeSet {
             element.setAttribute("defenderTile", defenderTile.getId());
             element.setAttribute("success", Boolean.toString(success));
             if (!attacker.isVisibleTo(serverPlayer)) {
-                element.appendChild(attacker.toXMLElement(serverPlayer, doc,
-                                                          false, false));
+                element.appendChild(attacker.toXMLElement(doc, serverPlayer));
                 if (attacker.getLocation() instanceof Unit) {
                     Unit loc = (Unit)attacker.getLocation();
-                    element.appendChild(loc.toXMLElement(serverPlayer, doc,
-                                                         false, false));
+                    element.appendChild(loc.toXMLElement(doc, serverPlayer));
                 }
             }
             if (!defender.isVisibleTo(serverPlayer)) {
-                element.appendChild(defender.toXMLElement(serverPlayer, doc,
-                                                          false, false));
+                element.appendChild(defender.toXMLElement(doc, serverPlayer));
             }
             return element;
         }
@@ -647,8 +645,7 @@ public class ChangeSet {
                 // being present on the client side, and it is needed
                 // before we can run the animation, so it is attached
                 // to animateMove.
-                element.appendChild(unit.toXMLElement(serverPlayer, doc,
-                                                      false, false));
+                element.appendChild(unit.toXMLElement(doc, serverPlayer));
             }
             return element;
         }
@@ -738,8 +735,7 @@ public class ChangeSet {
          */
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
             Element element = doc.createElement("update");
-            element.appendChild(fcgo.toXMLElement(serverPlayer, doc,
-                                                  false, false));
+            element.appendChild(fcgo.toXMLElement(doc, serverPlayer));
             return element;
         }
 
@@ -807,8 +803,7 @@ public class ChangeSet {
         @Override
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
             Element element = doc.createElement("update");
-            element.appendChild(fcgo.toXMLElement(serverPlayer, doc,
-                                                  false, false, fields));
+            element.appendChild(fcgo.toXMLElementPartial(doc, fields));
             return element;
         }
 
@@ -955,7 +950,7 @@ public class ChangeSet {
          */
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
             Element element = doc.createElement("addObject");
-            Element child = fco.toXMLElement(serverPlayer, doc, false, false);
+            Element child = fco.toXMLElement(doc, serverPlayer);
             child.setAttribute("owner", serverPlayer.getId());
             element.appendChild(child);
             return element;
@@ -1082,10 +1077,8 @@ public class ChangeSet {
             element.setAttribute("tile", tile.getId());
             // Have to tack on two copies of the settlement tile.
             // One full version, one ordinary version to restore.
-            element.appendChild(tile.toXMLElement(serverPlayer, doc,
-                                                  true, false));
-            element.appendChild(tile.toXMLElement(serverPlayer, doc,
-                                                  false, false));
+            element.appendChild(tile.toXMLElement(doc, serverPlayer));
+            element.appendChild(tile.toXMLElement(doc, serverPlayer));
             return element;
         }
 

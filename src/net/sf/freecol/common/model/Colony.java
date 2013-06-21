@@ -2668,15 +2668,15 @@ public class Colony extends Settlement implements Nameable {
      */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw, Player player,
-                                   boolean showAll,
-                                   boolean toSavedGame) throws XMLStreamException {
-        PlayerExploredTile pet;
+                                   WriteScope writeScope) throws XMLStreamException {
 
-        super.writeAttributes(xw);
+        super.writeAttributes(xw, player, writeScope);
 
         xw.writeAttribute(ESTABLISHED_TAG, established.getNumber());
 
-        if (showAll || toSavedGame || player.owns(this)) {
+        PlayerExploredTile pet;
+        if (writeScope != WriteScope.CLIENT || player == getOwner()) {
+
             xw.writeAttribute(SONS_OF_LIBERTY_TAG, sonsOfLiberty);
             
             xw.writeAttribute(OLD_SONS_OF_LIBERTY_TAG, oldSonsOfLiberty);
@@ -2709,11 +2709,10 @@ public class Colony extends Settlement implements Nameable {
      */
     @Override
     protected void writeChildren(FreeColXMLWriter xw, Player player,
-                                 boolean showAll,
-                                 boolean toSavedGame) throws XMLStreamException {
-        super.writeChildren(xw, player, showAll, toSavedGame);
+                                 WriteScope writeScope) throws XMLStreamException {
+        super.writeChildren(xw, player, writeScope);
 
-        if (showAll || toSavedGame || player.owns(this)) {
+        if (writeScope != WriteScope.CLIENT || player == getOwner()) {
 
             List<String> keys = new ArrayList<String>(exportData.keySet());
             Collections.sort(keys);
@@ -2733,7 +2732,7 @@ public class Colony extends Settlement implements Nameable {
             }
 
             for (WorkLocation workLocation : getSortedCopy(getAllWorkLocations())) {
-                workLocation.toXML(xw, player, showAll, toSavedGame);
+                workLocation.toXML(xw, player, writeScope);
             }
 
             for (BuildableType item : buildQueue.getValues()) { // In order!

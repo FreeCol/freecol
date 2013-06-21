@@ -37,6 +37,7 @@ import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.FreeColObject.WriteScope;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -54,10 +55,8 @@ public class SerializationTest extends FreeColTestCase {
         return schema.newValidator();
     }
 
-    private Source buildSource(FreeColObject object, Player player,
-                               boolean showAll, boolean toSavedGame)
-        throws Exception {
-        return new StreamSource(new StringReader(object.serialize(player, showAll, toSavedGame)));
+    private Source buildSource(FreeColObject object) throws Exception {
+        return new StreamSource(new StringReader(object.serialize(null, WriteScope.SAVE)));
     }
 
 
@@ -98,7 +97,7 @@ public class SerializationTest extends FreeColTestCase {
         String serialized = null;
         try {
             Validator validator = buildValidator("schema/data/data-game.xsd");
-            serialized = game.serialize(player, true, true);
+            serialized = game.serialize(player, WriteScope.SAVE);
             validator.validate(new StreamSource(new StringReader(serialized)));
         } catch (SAXParseException e) {
             int col = e.getColumnNumber();
@@ -145,7 +144,7 @@ public class SerializationTest extends FreeColTestCase {
 
         try {
             Validator validator = buildValidator("schema/data/data-stringTemplate.xsd");
-            validator.validate(buildSource(t2, player, true, true));
+            validator.validate(buildSource(t2));
         } catch (SAXParseException e){
             String errMsg = e.getMessage()
                 + " at line=" + e.getLineNumber()

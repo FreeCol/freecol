@@ -218,8 +218,7 @@ public class IndianDemandMessage extends DOMMessage {
         if (goldString != null) result.setAttribute("gold", goldString);
         if (resultString != null) result.setAttribute("result", resultString);
         if (goods != null) {
-            result.appendChild(goods.toXMLElement(null, 
-                                                  result.getOwnerDocument()));
+            result.appendChild(goods.toXMLElement(result.getOwnerDocument()));
         }
         return result;
     }

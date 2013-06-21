@@ -97,8 +97,7 @@ public class UpdateTradeRouteMessage extends DOMMessage {
      */
     public Element toXMLElement() {
         Element result = createMessage(getXMLElementTagName());
-        result.appendChild(tradeRoute.toXMLElement(null, 
-                                                   result.getOwnerDocument()));
+        result.appendChild(tradeRoute.toXMLElement(result.getOwnerDocument()));
         return result;
     }
 

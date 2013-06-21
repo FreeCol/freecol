@@ -113,8 +113,7 @@ public class GetNationSummaryMessage extends DOMMessage {
         Element result = createMessage(getXMLElementTagName(),
             "player", playerId);
         if (summary != null) {
-            result.appendChild(summary.toXMLElement(null,
-                    result.getOwnerDocument()));
+            result.appendChild(summary.toXMLElement(result.getOwnerDocument()));
         }
         return result;
     }

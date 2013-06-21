@@ -28,6 +28,8 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.FreeColObject.WriteScope;
+import net.sf.freecol.common.model.GoodsLocation;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 
 
@@ -645,8 +647,9 @@ public abstract class Settlement extends GoodsLocation
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
-        super.writeAttributes(xw);
+    protected void writeAttributes(FreeColXMLWriter xw, Player player,
+                                   WriteScope writeScope) throws XMLStreamException {
+        super.writeAttributes(xw, player, writeScope);
 
         xw.writeAttribute(NAME_TAG, getName());
 

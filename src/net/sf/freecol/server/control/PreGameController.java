@@ -29,6 +29,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.model.FreeColObject.WriteScope;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Nation;
@@ -95,8 +96,8 @@ public final class PreGameController extends Controller {
             if (!player.isAI()) {
                 Connection conn = ((ServerPlayer)player).getConnection();
                 Element update = DOMMessage.createMessage("updateGame");
-                update.appendChild(game.toXMLElement(player,
-                                   update.getOwnerDocument(), false, false));
+                update.appendChild(game.toXMLElement(update.getOwnerDocument(),
+                        player));
                 try {
                     conn.askDumping(update);
                 } catch (IOException e) {

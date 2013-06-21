@@ -379,8 +379,7 @@ public abstract class FreeColAction extends AbstractAction
      * stream.
      *
      * @param xw The <code>FreeColXMLWriter</code> to write to.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
+     * @throws XMLStreamException if there is a problem writing to the stream.
      */
     public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
         xw.writeStartElement(getXMLElementTagName());

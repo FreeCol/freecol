@@ -843,9 +843,8 @@ public final class Monarch extends FreeColGameObject implements Named {
      * {@inheritDoc}
      */
     protected void writeAttributes(FreeColXMLWriter xw, Player player,
-                                   boolean showAll,
-                                   boolean toSavedGame) throws XMLStreamException {
-        super.writeAttributes(xw);
+                                   WriteScope writeScope) throws XMLStreamException {
+        super.writeAttributes(xw, player, writeScope);
 
         xw.writeAttribute(PLAYER_TAG, this.player);
 
@@ -860,12 +859,11 @@ public final class Monarch extends FreeColGameObject implements Named {
      * {@inheritDoc}
      */
     protected void writeChildren(FreeColXMLWriter xw, Player player,
-                                 boolean showAll,
-                                 boolean toSavedGame) throws XMLStreamException {
-        super.writeChildren(xw);
+                                 WriteScope writeScope) throws XMLStreamException {
+        super.writeChildren(xw, player, writeScope);
 
-        if (showAll || toSavedGame
-            || (player != null && player == this.player)) {
+        if (writeScope != WriteScope.CLIENT || player == this.player) {
+
             expeditionaryForce.toXML(xw, EXPEDITIONARY_FORCE_TAG);
 
             interventionForce.toXML(xw, INTERVENTION_FORCE_TAG);

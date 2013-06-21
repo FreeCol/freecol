@@ -132,9 +132,8 @@ public class GoodsForSaleMessage extends DOMMessage {
             "unit", unitId,
             "settlement", settlementId);
         if (sellGoods != null) {
-            Document doc = result.getOwnerDocument();
             for (Goods goods : sellGoods) {
-                result.appendChild(goods.toXMLElement(null, doc));
+                result.appendChild(goods.toXMLElement(result.getOwnerDocument()));
             }
         }
         return result;

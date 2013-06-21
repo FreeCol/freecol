@@ -152,9 +152,8 @@ public class LootCargoMessage extends DOMMessage {
             "winner", winnerId,
             "loser", loserId);
         if (goods != null) {
-            Document doc = result.getOwnerDocument();
             for (Goods g : goods) {
-                result.appendChild(g.toXMLElement(null, doc, true, true));
+                result.appendChild(g.toXMLElement(result.getOwnerDocument()));
             }
         }
         return result;

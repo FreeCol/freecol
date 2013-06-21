@@ -54,6 +54,7 @@ public class FreeColXMLWriter implements XMLStreamWriter {
 
     private static final Logger logger = Logger.getLogger(FreeColXMLWriter.class.getName());
 
+    /** The stream to write to. */
     private XMLStreamWriter xmlStreamWriter;
 
 

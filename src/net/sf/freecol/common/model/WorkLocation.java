@@ -512,9 +512,8 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
      */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw, Player player,
-                                   boolean showAll,
-                                   boolean toSavedGame) throws XMLStreamException {
-        super.writeAttributes(xw, player, showAll, toSavedGame);
+                                   WriteScope writeScope) throws XMLStreamException {
+        super.writeAttributes(xw, player, writeScope);
 
         xw.writeAttribute(COLONY_TAG, colony);
     }
@@ -524,9 +523,8 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
      */
     @Override
     protected void writeChildren(FreeColXMLWriter xw, Player player,
-                                 boolean showAll,
-                                 boolean toSavedGame) throws XMLStreamException {
-        super.writeChildren(xw, player, showAll, toSavedGame);
+                                 WriteScope writeScope) throws XMLStreamException {
+        super.writeChildren(xw, player, writeScope);
 
         if (productionType != null) productionType.toXML(xw);
     }

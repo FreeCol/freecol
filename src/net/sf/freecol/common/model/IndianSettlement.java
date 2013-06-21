@@ -1215,15 +1215,14 @@ public class IndianSettlement extends Settlement {
      */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw, Player player,
-                                   boolean showAll,
-                                   boolean toSavedGame) throws XMLStreamException {
-        super.writeAttributes(xw);
+                                   WriteScope writeScope) throws XMLStreamException {
+        super.writeAttributes(xw, player, writeScope);
 
-        boolean full = showAll || toSavedGame || player == getOwner();
-        PlayerExploredTile pet = (player == null) ? null
-            : getTile().getPlayerExploredTile(player);
+        boolean full = writeScope != WriteScope.CLIENT || player == getOwner();
 
+        PlayerExploredTile pet;
         if (full) {
+
             xw.writeAttribute(LAST_TRIBUTE_TAG, lastTribute);
 
             xw.writeAttribute(CONVERT_PROGRESS_TAG, convertProgress);
@@ -1241,7 +1240,8 @@ public class IndianSettlement extends Settlement {
                 xw.writeAttribute(MOST_HATED_TAG, hated);
             }
 
-        } else if (pet != null) {
+        } else if ((pet = getTile().getPlayerExploredTile(player)) != null) {
+
             xw.writeAttribute(LEARNABLE_SKILL_TAG, pet.getSkill());
 
             GoodsType[] wanted = pet.getWantedGoods();
@@ -1265,12 +1265,12 @@ public class IndianSettlement extends Settlement {
      */
     @Override
     protected void writeChildren(FreeColXMLWriter xw, Player player,
-                                 boolean showAll,
-                                 boolean toSavedGame) throws XMLStreamException {
-        super.writeChildren(xw, player, showAll, toSavedGame);
+                                 WriteScope writeScope) throws XMLStreamException {
+        super.writeChildren(xw, player, writeScope);
 
         PlayerExploredTile pet;
-        if (showAll || toSavedGame || player == getOwner()) {
+        if (writeScope != WriteScope.CLIENT || player == getOwner()) {
+
             for (Player p : getSortedCopy(contactLevels.keySet())) {
                 xw.writeStartElement(CONTACT_LEVEL_TAG);
 
@@ -1294,7 +1294,7 @@ public class IndianSettlement extends Settlement {
             if (missionary != null) {
                 xw.writeStartElement(MISSIONARY_TAG);
 
-                missionary.toXML(xw, player, showAll, toSavedGame);
+                missionary.toXML(xw, player, writeScope);
 
                 xw.writeEndElement();
             }
@@ -1332,7 +1332,7 @@ public class IndianSettlement extends Settlement {
             if (pet.getMissionary() != null) {
                 xw.writeStartElement(MISSIONARY_TAG);
 
-                pet.getMissionary().toXML(xw, player, showAll, toSavedGame);
+                pet.getMissionary().toXML(xw, player, writeScope);
 
                 xw.writeEndElement();
             }

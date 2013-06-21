@@ -1018,11 +1018,13 @@ public class Game extends FreeColGameObject {
      */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw, Player player,
-                                   boolean showAll,
-                                   boolean toSavedGame) throws XMLStreamException {
-        super.writeAttributes(xw);
+                                   WriteScope writeScope) throws XMLStreamException {
+        super.writeAttributes(xw, player, writeScope);
 
-        if (toSavedGame) xw.writeAttribute(NEXT_ID_TAG, nextId);
+        if (writeScope == WriteScope.SAVE) {
+
+            xw.writeAttribute(NEXT_ID_TAG, nextId);
+        }
 
         xw.writeAttribute(UUID_TAG, getUUID());
 
@@ -1040,9 +1042,8 @@ public class Game extends FreeColGameObject {
      */
     @Override
     protected void writeChildren(FreeColXMLWriter xw, Player player,
-                                 boolean showAll,
-                                 boolean toSavedGame) throws XMLStreamException {
-        super.writeChildren(xw);
+                                 WriteScope writeScope) throws XMLStreamException {
+        super.writeChildren(xw, player, writeScope);
 
         specification.toXML(xw);
 
@@ -1057,13 +1058,13 @@ public class Game extends FreeColGameObject {
         nationOptions.toXML(xw);
 
         for (Player p : getSortedCopy(getPlayers())) {
-            p.toXML(xw, player, showAll, toSavedGame);
+            p.toXML(xw, player, writeScope);
         }
 
         Player enemy = getUnknownEnemy();
-        if (enemy != null) enemy.toXML(xw, player, showAll, toSavedGame);
+        if (enemy != null) enemy.toXML(xw, player, writeScope);
 
-        if (map != null) map.toXML(xw, player, showAll, toSavedGame);
+        if (map != null) map.toXML(xw, player, writeScope);
     }
 
     /**

@@ -27,6 +27,7 @@ import java.util.Set;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLWriter;
+import net.sf.freecol.common.model.FreeColObject.WriteScope;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.server.model.ServerBuilding;
 import net.sf.freecol.server.model.ServerUnit;
@@ -396,7 +397,8 @@ public class BuildingTest extends FreeColTestCase {
                 StringWriter sw = new StringWriter();
                 FreeColXMLWriter xw = new FreeColXMLWriter(sw);
 
-                building.toXML(xw, building.getColony().getOwner(), true, true);
+                building.toXML(xw, building.getColony().getOwner(),
+                               WriteScope.SAVE);
 
                 xw.close();
 

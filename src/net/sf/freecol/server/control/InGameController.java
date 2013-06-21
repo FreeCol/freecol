@@ -3846,8 +3846,7 @@ public final class InGameController extends Controller {
         Element reply = cs.build(serverPlayer);
         // TODO: eliminate explicit Element hackery
         for (AbstractUnit unit : units) {
-            reply.appendChild(unit.toXMLElement(serverPlayer,
-                                                reply.getOwnerDocument()));
+            reply.appendChild(unit.toXMLElement(reply.getOwnerDocument()));
         }
         return reply;
     }
@@ -3865,8 +3864,7 @@ public final class InGameController extends Controller {
                       ChangePriority.CHANGE_NORMAL);
         Element reply = cs.build(serverPlayer);
         for (HighScore score : getFreeColServer().getHighScores()) {
-            reply.appendChild(score.toXMLElement(serverPlayer,
-                                                 reply.getOwnerDocument()));
+            reply.appendChild(score.toXMLElement(reply.getOwnerDocument()));
         }
         return reply;
     }

@@ -440,11 +440,11 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      */
     @Override
     protected void writeChildren(FreeColXMLWriter xw, Player player,
-                                 boolean showAll,
-                                 boolean toSavedGame) throws XMLStreamException {
+                                 WriteScope writeScope) throws XMLStreamException {
         super.writeChildren(xw);
 
-        if (showAll || toSavedGame || player == getOwner()) {
+        if (writeScope != WriteScope.CLIENT || player == getOwner()) {
+
             writeStorage(xw, STORED_GOODS_TAG, storedGoods);
 
             writeStorage(xw, OLD_STORED_GOODS_TAG, oldStoredGoods);

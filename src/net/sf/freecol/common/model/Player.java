@@ -3660,9 +3660,8 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw, Player player,
-                                   boolean showAll,
-                                   boolean toSavedGame) throws XMLStreamException {
-        super.writeAttributes(xw, player, showAll, toSavedGame);
+                                   WriteScope writeScope) throws XMLStreamException {
+        super.writeAttributes(xw, player, writeScope);
 
         xw.writeAttribute(USERNAME_TAG, name);
 
@@ -3686,7 +3685,8 @@ public class Player extends FreeColGameObject implements Nameable {
 
         xw.writeAttribute(TAX_TAG, tax);
 
-        if (showAll || toSavedGame || this == player) {
+        if (writeScope != WriteScope.CLIENT || this == player) {
+
             xw.writeAttribute(GOLD_TAG, gold);
 
             xw.writeAttribute(IMMIGRATION_TAG, immigration);
@@ -3740,13 +3740,15 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     @Override
     protected void writeChildren(FreeColXMLWriter xw, Player player,
-                                 boolean showAll,
-                                 boolean toSavedGame) throws XMLStreamException {
+                                 WriteScope writeScope) throws XMLStreamException {
+        super.writeChildren(xw, player, writeScope);
+
         if (market != null) {
-            market.toXML(xw, player, showAll, toSavedGame);
+            market.toXML(xw, player, writeScope);
         }
 
-        if (showAll || toSavedGame || this == player) {
+        if (writeScope != WriteScope.CLIENT || this == player) {
+
             for (Player p : getSortedCopy(tension.keySet())) {
                 xw.writeStartElement(TENSION_TAG);
 
@@ -3777,11 +3779,11 @@ public class Player extends FreeColGameObject implements Nameable {
             }
 
             for (TradeRoute route : getSortedCopy(tradeRoutes)) {
-                route.toXML(xw, this, false, false);
+                route.toXML(xw, player, writeScope);
             }
 
             if (highSeas != null) {
-                highSeas.toXML(xw, player, showAll, toSavedGame);
+                highSeas.toXML(xw, player, writeScope);
             }
             
             xw.writeToListElement(FOUNDING_FATHERS_TAG, foundingFathers);
@@ -3789,11 +3791,11 @@ public class Player extends FreeColGameObject implements Nameable {
             xw.writeToListElement(OFFERED_FATHERS_TAG, offeredFathers);
 
             if (europe != null) {
-                europe.toXML(xw, player, showAll, toSavedGame);
+                europe.toXML(xw, player, writeScope);
             }
 
             if (monarch != null) {
-                monarch.toXML(xw, player, showAll, toSavedGame);
+                monarch.toXML(xw, player, writeScope);
             }
 
             for (ModelMessage m : getSortedCopy(modelMessages)) {

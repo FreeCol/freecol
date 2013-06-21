@@ -454,9 +454,8 @@ public class Region extends FreeColGameObject implements Nameable {
      */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw, Player player,
-                                   boolean showAll,
-                                   boolean toSavedGame) throws XMLStreamException {
-        super.writeAttributes(xw);
+                                   WriteScope writeScope) throws XMLStreamException {
+        super.writeAttributes(xw, player, writeScope);
 
         if (name != null) {
             xw.writeAttribute(NAME_TAG, name);
@@ -500,8 +499,9 @@ public class Region extends FreeColGameObject implements Nameable {
      */
     @Override
     protected void writeChildren(FreeColXMLWriter xw, Player player,
-                                 boolean showAll,
-                                 boolean toSavedGame) throws XMLStreamException {
+                                 WriteScope writeScope) throws XMLStreamException {
+        super.writeChildren(xw, player, writeScope);
+
         for (Region child : getChildren()) {
             xw.writeStartElement(CHILD_TAG);
 

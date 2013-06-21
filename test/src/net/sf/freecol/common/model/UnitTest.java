@@ -25,6 +25,7 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 
+import net.sf.freecol.common.model.FreeColObject.WriteScope;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.server.model.ServerColony;
 import net.sf.freecol.server.model.ServerUnit;
@@ -692,7 +693,7 @@ public class UnitTest extends FreeColTestCase {
         merchantman.add(goods);
 
         try {
-            String xml = merchantman.serialize(dutch, true, true);
+            String xml = merchantman.serialize(dutch, WriteScope.SAVE);
             Field nextId = Game.class.getDeclaredField("nextId");
             nextId.setAccessible(true);
             int id = nextId.getInt(game);

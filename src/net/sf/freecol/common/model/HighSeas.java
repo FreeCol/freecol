@@ -147,9 +147,8 @@ public class HighSeas extends UnitLocation {
      */
     @Override
     protected void writeChildren(FreeColXMLWriter xw, Player player,
-                                 boolean showAll,
-                                 boolean toSavedGame) throws XMLStreamException {
-        super.writeChildren(xw, player, showAll, toSavedGame);
+                                 WriteScope writeScope) throws XMLStreamException {
+        super.writeChildren(xw, player, writeScope);
 
         for (Location destination : destinations) {
             if (destination != null) {

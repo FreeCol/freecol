@@ -571,9 +571,8 @@ public class TileItemContainer extends FreeColGameObject {
      */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw, Player player,
-                                   boolean showAll,
-                                   boolean toSavedGame) throws XMLStreamException {
-        super.writeAttributes(xw);
+                                   WriteScope writeScope) throws XMLStreamException {
+        super.writeAttributes(xw, player, writeScope);
 
         xw.writeAttribute(TILE_TAG, tile);
     }
@@ -583,20 +582,22 @@ public class TileItemContainer extends FreeColGameObject {
      */
     @Override
     protected void writeChildren(FreeColXMLWriter xw, Player player,
-                                 boolean showAll,
-                                 boolean toSavedGame) throws XMLStreamException {
-        PlayerExploredTile pet;
+                                 WriteScope writeScope) throws XMLStreamException {
+        super.writeChildren(xw, player, writeScope);
 
-        if (showAll || toSavedGame || player.canSee(tile)) {
+        PlayerExploredTile pet;
+        if (writeScope != WriteScope.CLIENT || player.canSee(tile)) {
+
             for (TileItem item : tileItems) {
-                item.toXML(xw, player, showAll, toSavedGame);
+                item.toXML(xw, player, writeScope);
             }
 
         } else if ((pet = tile.getPlayerExploredTile(player)) != null) {
+
             List<TileItem> petItems = pet.getTileItems();
             Collections.sort(petItems, tileItemComparator);
             for (TileItem item : petItems) {
-                item.toXML(xw, player, showAll, toSavedGame);
+                item.toXML(xw, player, writeScope);
             }
         }
     }

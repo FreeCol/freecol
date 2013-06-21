@@ -157,8 +157,7 @@ public class DeliverGiftMessage extends DOMMessage {
         Element result = createMessage(getXMLElementTagName(),
             "unit", unitId,
             "settlement", settlementId);
-        result.appendChild(goods.toXMLElement(null,
-                                              result.getOwnerDocument()));
+        result.appendChild(goods.toXMLElement(result.getOwnerDocument()));
         return result;
     }
 

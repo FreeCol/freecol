@@ -517,9 +517,8 @@ public class ColonyTile extends WorkLocation {
      */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw, Player player,
-                                   boolean showAll,
-                                   boolean toSavedGame) throws XMLStreamException {
-        super.writeAttributes(xw, player, showAll, toSavedGame);
+                                   WriteScope writeScope) throws XMLStreamException {
+        super.writeAttributes(xw, player, writeScope);
 
         xw.writeAttribute(WORK_TILE_TAG, workTile);
     }

@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.common.model.FreeColObject.WriteScope;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
@@ -178,8 +179,7 @@ public class LoginMessage extends DOMMessage {
             "singlePlayer", Boolean.toString(singlePlayer),
             "currentPlayer", Boolean.toString(currentPlayer),
             "activeUnit", activeUnitId);
-        result.appendChild(game.toXMLElement(player, result.getOwnerDocument(),
-                                             false, false));
+        result.appendChild(game.toXMLElement(result.getOwnerDocument(), player));
         return result;
     }
 

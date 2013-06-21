@@ -166,9 +166,10 @@ public final class UserConnectionHandler implements MessageHandler {
                                       connection.getSocket(), connection);
             game.addPlayer(player);
 
-            // Send message to all players except to the new player:
+            // Send message to all players except to the new player.
+            // TODO: check visibility.
             Element add = DOMMessage.createMessage("addPlayer");
-            add.appendChild(player.toXMLElement(null, add.getOwnerDocument()));
+            add.appendChild(player.toXMLElement(add.getOwnerDocument()));
             server.sendToAll(add, connection);
 
             // Ready now to handle pre-game messages.

@@ -154,8 +154,7 @@ public class SellPropositionMessage extends DOMMessage {
             "unit", unitId,
             "settlement", settlementId,
             "gold", goldString);
-        result.appendChild(goods.toXMLElement(null,
-                                              result.getOwnerDocument()));
+        result.appendChild(goods.toXMLElement(result.getOwnerDocument()));
         return result;
     }
 

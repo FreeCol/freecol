@@ -101,7 +101,7 @@ public class SetGoodsLevelsMessage extends DOMMessage {
     public Element toXMLElement() {
         Element result = createMessage(getXMLElementTagName(),
             "colony", colonyId);
-        result.appendChild(data.toXMLElement(null, result.getOwnerDocument()));
+        result.appendChild(data.toXMLElement(result.getOwnerDocument()));
         return result;
     }
 

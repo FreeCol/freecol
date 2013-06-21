@@ -3771,11 +3771,10 @@ public class Unit extends GoodsLocation
      */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw, Player player,
-                                   boolean showAll,
-                                   boolean toSavedGame) throws XMLStreamException {
-        super.writeAttributes(xw);
+                                   WriteScope writeScope) throws XMLStreamException {
+        super.writeAttributes(xw, player, writeScope);
 
-        boolean full = showAll || toSavedGame || player == getOwner();
+        boolean full = writeScope != WriteScope.CLIENT || player == getOwner();
 
         if (name != null) xw.writeAttribute(NAME_TAG, name);
 
@@ -3862,20 +3861,19 @@ public class Unit extends GoodsLocation
      */
     @Override
     protected void writeChildren(FreeColXMLWriter xw, Player player,
-                                 boolean showAll,
-                                 boolean toSavedGame) throws XMLStreamException {
-        boolean full = showAll || toSavedGame || player == getOwner();
+                                 WriteScope writeScope) throws XMLStreamException {
+        boolean full = writeScope != WriteScope.CLIENT || player == getOwner();
 
         // Do not show enemy units hidden in a carrier:
         if (full) {
-            super.writeChildren(xw, player, showAll, toSavedGame);
+            super.writeChildren(xw, player, writeScope);
 
         } else if (getType().canCarryGoods()) {
             xw.writeAttribute(VISIBLE_GOODS_COUNT_TAG, getVisibleGoodsCount());
         }
 
         if (workImprovement != null) {
-            workImprovement.toXML(xw, player, showAll, toSavedGame);
+            workImprovement.toXML(xw, player, writeScope);
         }
 
         for (EquipmentType et : getSortedCopy(equipment.keySet())) {

@@ -63,6 +63,7 @@ import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
+import net.sf.freecol.common.model.FreeColObject.WriteScope;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.HighScore;
@@ -839,7 +840,7 @@ public final class FreeColServer {
 
             xw.writeEndElement();
 
-            game.toXML(xw, null, true, true); // Add the game
+            game.toXML(xw, null, WriteScope.SAVE); // Add the game
 
             if (aiMain != null) aiMain.toXML(xw); // Add the AIObjects
 
@@ -850,6 +851,7 @@ public final class FreeColServer {
             fos.closeEntry();
 
         } catch (XMLStreamException e) {
+            logger.log(Level.WARNING, "Failed to save", e);
             throw new IOException("XMLStreamException: " + e.getMessage());
         } catch (Exception e) {
             logger.log(Level.WARNING, "Failed to save", e);
@@ -1332,8 +1334,7 @@ public final class FreeColServer {
         // Send message to all players except to the new player:
         // TODO: null-destination-player is unnecessarily generous visibility
         Element player = DOMMessage.createMessage("addPlayer");
-        player.appendChild(aiPlayer.toXMLElement(null,
-                player.getOwnerDocument()));
+        player.appendChild(aiPlayer.toXMLElement(player.getOwnerDocument()));
         getServer().sendToAll(player, theConnection);
         return aiPlayer;
     }

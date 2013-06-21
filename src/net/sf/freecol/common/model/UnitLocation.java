@@ -441,12 +441,11 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      */
     @Override
     protected void writeChildren(FreeColXMLWriter xw, Player player,
-                                 boolean showAll,
-                                 boolean toSavedGame) throws XMLStreamException {
+                                 WriteScope writeScope) throws XMLStreamException {
         super.writeChildren(xw);
 
         for (Unit unit : units) {
-            unit.toXML(xw, player, showAll, toSavedGame);
+            unit.toXML(xw, player, writeScope);
         }
     }
 

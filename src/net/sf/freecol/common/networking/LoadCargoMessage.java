@@ -105,7 +105,7 @@ public class LoadCargoMessage extends DOMMessage {
     public Element toXMLElement() {
         Element result = createMessage(getXMLElementTagName(),
             "carrier", carrierId);
-        result.appendChild(goods.toXMLElement(null, result.getOwnerDocument()));
+        result.appendChild(goods.toXMLElement(result.getOwnerDocument()));
         return result;
     }
 

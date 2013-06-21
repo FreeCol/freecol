@@ -268,9 +268,8 @@ public class PlayerExploredTile extends FreeColGameObject {
      */
     @Override
     public void writeAttributes(FreeColXMLWriter xw, Player player,
-                                boolean showAll,
-                                boolean toSavedGame) throws XMLStreamException {
-        super.writeAttributes(xw);
+                                WriteScope writeScope) throws XMLStreamException {
+        super.writeAttributes(xw, player, writeScope);
 
         xw.writeAttribute(PLAYER_TAG, player);
 
@@ -316,20 +315,19 @@ public class PlayerExploredTile extends FreeColGameObject {
      */
     @Override
     public void writeChildren(FreeColXMLWriter xw, Player player,
-                              boolean showAll,
-                              boolean toSavedGame) throws XMLStreamException {
-        super.writeChildren(xw);
+                              WriteScope writeScope) throws XMLStreamException {
+        super.writeChildren(xw, player, writeScope);
 
         if (missionary != null) {
             xw.writeStartElement(MISSIONARY_TAG);
 
-            missionary.toXML(xw, player, showAll, toSavedGame);
+            missionary.toXML(xw, player, writeScope);
 
             xw.writeEndElement();
         }
 
         for (TileItem ti : getTileItems()) {
-            ti.toXML(xw, player, showAll, toSavedGame);
+            ti.toXML(xw, player, writeScope);
         }
     }
 

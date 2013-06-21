@@ -162,8 +162,7 @@ public class MonarchActionMessage extends DOMMessage {
             "action", action.toString());
         if (tax != null) result.setAttribute("tax", tax);
         if (resultString != null) result.setAttribute("result", resultString);
-        result.appendChild(template.toXMLElement(null,
-                                                 result.getOwnerDocument()));
+        result.appendChild(template.toXMLElement(result.getOwnerDocument()));
         return result;
     }
 

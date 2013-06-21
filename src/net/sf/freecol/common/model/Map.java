@@ -2188,9 +2188,8 @@ public class Map extends FreeColGameObject implements Location {
      * {@inheritDoc}
      */
     protected void writeAttributes(FreeColXMLWriter xw, Player player,
-                                   boolean showAll,
-                                   boolean toSavedGame) throws XMLStreamException {
-        super.writeAttributes(xw);
+                                   WriteScope writeScope) throws XMLStreamException {
+        super.writeAttributes(xw, player, writeScope);
 
         xw.writeAttribute(WIDTH_TAG, getWidth());
 
@@ -2207,14 +2206,15 @@ public class Map extends FreeColGameObject implements Location {
      * {@inheritDoc}
      */
     protected void writeChildren(FreeColXMLWriter xw, Player player,
-                                 boolean showAll,
-                                 boolean toSavedGame) throws XMLStreamException {
-        super.writeChildren(xw);
+                                 WriteScope writeScope) throws XMLStreamException {
+        super.writeChildren(xw, player, writeScope);
 
-        for (Region region : getSortedCopy(regions.values())) region.toXML(xw);
+        for (Region region : getSortedCopy(regions.values())) {
+            region.toXML(xw, player, writeScope);
+        }
 
         for (Tile tile: getAllTiles()) {
-            tile.toXML(xw, player, showAll, toSavedGame);
+            tile.toXML(xw, player, writeScope);
         }
     }
 

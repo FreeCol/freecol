@@ -98,8 +98,7 @@ public class UnloadCargoMessage extends DOMMessage {
      */
     public Element toXMLElement() {
         Element result = createMessage(getXMLElementTagName());
-        result.appendChild(goods.toXMLElement(null,
-                                              result.getOwnerDocument()));
+        result.appendChild(goods.toXMLElement(result.getOwnerDocument()));
         return result;
     }
 

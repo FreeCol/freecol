@@ -160,9 +160,8 @@ public class SetTradeRoutesMessage extends DOMMessage {
      */
     public Element toXMLElement() {
         Element result = createMessage(getXMLElementTagName());
-        Document doc = result.getOwnerDocument();
         for (TradeRoute tradeRoute : tradeRoutes) {
-            result.appendChild(tradeRoute.toXMLElement(null, doc));
+            result.appendChild(tradeRoute.toXMLElement(result.getOwnerDocument()));
         }
         return result;
     }

@@ -307,12 +307,11 @@ public abstract class GoodsLocation extends UnitLocation {
      */
     @Override
     protected void writeChildren(FreeColXMLWriter xw, Player player,
-                                 boolean showAll,
-                                 boolean toSavedGame) throws XMLStreamException {
-        super.writeChildren(xw, player, showAll, toSavedGame);
+                                 WriteScope writeScope) throws XMLStreamException {
+        super.writeChildren(xw, player, writeScope);
 
         if (goodsContainer != null) {
-            goodsContainer.toXML(xw, player, showAll, toSavedGame);
+            goodsContainer.toXML(xw, player, writeScope);
         }
     }
 

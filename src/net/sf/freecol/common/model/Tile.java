@@ -1817,16 +1817,15 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     @Override
     protected void writeAttributes(FreeColXMLWriter xw, Player player,
-                                   boolean showAll,
-                                   boolean toSavedGame) throws XMLStreamException {
-        super.writeAttributes(xw);
+                                   WriteScope writeScope) throws XMLStreamException {
+        super.writeAttributes(xw, player, writeScope);
 
         xw.writeAttribute(X_TAG, this.x);
 
         xw.writeAttribute(Y_TAG, this.y);
 
         PlayerExploredTile pet;
-        if (showAll || toSavedGame || (player != null && player.canSee(this))) {
+        if (writeScope != WriteScope.CLIENT || player.canSee(this)) {
 
             xw.writeAttribute(TYPE_TAG, type);
 
@@ -1890,18 +1889,27 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     @Override
     protected void writeChildren(FreeColXMLWriter xw, Player player,
-                                 boolean showAll,
-                                 boolean toSavedGame) throws XMLStreamException {
+                                 WriteScope writeScope) throws XMLStreamException {
         PlayerExploredTile pet;
-        if (showAll || toSavedGame || player.canSee(this)) {
-            if (settlement != null) {
-                settlement.toXML(xw, player, showAll, toSavedGame);
-            }
+        if (writeScope != WriteScope.CLIENT || player.canSee(this)) {
+
             // Show enemy units if there is no enemy settlement.
-            if ((showAll || toSavedGame || settlement == null
-                    || settlement.getOwner() == player)
-                && !isEmpty()) {
-                super.writeChildren(xw, player, showAll, toSavedGame);
+            if (writeScope != WriteScope.CLIENT || settlement == null
+                || settlement.getOwner() == player) {
+
+                super.writeChildren(xw, player, writeScope);
+            }
+
+            if (settlement != null) {
+                settlement.toXML(xw, player, writeScope);
+            }
+
+            // Save the pets to saved games.
+            if (writeScope == WriteScope.SAVE && playerExploredTiles != null) {
+                for (Entry<Player, PlayerExploredTile> entry
+                         : playerExploredTiles.entrySet()) {
+                    entry.getValue().toXML(xw, entry.getKey(), writeScope);
+                }
             }
 
         } else if ((pet = getPlayerExploredTile(player)) != null) {
@@ -1914,21 +1922,12 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                 && settlement.getOwner() == pet.getOwner()
                 && !(settlement instanceof Colony
                     && pet.getColonyUnitCount() <= 0)) {
-                settlement.toXML(xw, player, showAll, toSavedGame);
+                settlement.toXML(xw, player, writeScope);
             }
         }
 
         if (tileItemContainer != null) {
-            tileItemContainer.toXML(xw, player, showAll, toSavedGame);
-        }
-
-        // Save the pets to saved games.
-        if (toSavedGame && playerExploredTiles != null) {
-            for (Entry<Player, PlayerExploredTile> entry
-                     : playerExploredTiles.entrySet()) {
-                entry.getValue().toXML(xw, entry.getKey(),
-                                       showAll, toSavedGame);
-            }
+            tileItemContainer.toXML(xw, player, writeScope);
         }
     }
 

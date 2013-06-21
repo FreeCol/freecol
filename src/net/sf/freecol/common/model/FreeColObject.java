@@ -74,6 +74,12 @@ public abstract class FreeColObject {
     public static final int INFINITY = Integer.MAX_VALUE;
     public static final int UNDEFINED = Integer.MIN_VALUE;
 
+    /** The scope of a FreeCol object write. */
+    public static enum WriteScope {
+        CLIENT,  // Only the client-visible information
+        SERVER,  // Full server-visible information
+        SAVE     // Absolutely everything needed to save the game state
+    }
 
     /** The unique identifier of an object. */
     private String id;
@@ -616,8 +622,7 @@ public abstract class FreeColObject {
      * @return An XML-representation of this object.
      */
     public Element toXMLElement(Document document) {
-        // since the player is null, showAll must be true
-        return toXMLElement(null, document, true, false);
+        return toXMLElement(document, null, WriteScope.SERVER);
     }
 
     /**
@@ -628,14 +633,15 @@ public abstract class FreeColObject {
      * be added to that representation if <code>showAll</code> is
      * set to <code>false</code>.
      *
-     * @param player The <code>Player</code> this XML-representation
-     *      should be made for, or <code>null</code> if
-     *      <code>showAll == true</code>.
      * @param document The <code>Document</code>.
+     * @param player The <code>Player</code> to write to.
      * @return An XML-representation of this object.
      */
-    public Element toXMLElement(Player player, Document document) {
-        return toXMLElement(player, document, true, false);
+    public Element toXMLElement(Document document, Player player) {
+        if (player == null) {
+            throw new IllegalArgumentException("Null player for toXMLElement(doc, player)");
+        }
+        return toXMLElement(document, player, WriteScope.CLIENT);
     }
 
     /**
@@ -646,20 +652,17 @@ public abstract class FreeColObject {
      * be added to that representation if <code>showAll</code> is
      * set to <code>false</code>.
      *
-     * @param player The <code>Player</code> this XML-representation
-     *      should be made for, or <code>null</code> if
-     *      <code>showAll == true</code>.
      * @param document The <code>Document</code>.
-     * @param showAll Only attributes visible to <code>player</code>
-     *      will be added to the representation if <code>showAll</code>
-     *      is set to <i>false</i>.
-     * @param toSavedGame If <code>true</code> then information that
-     *      is only needed when saving a game is added.
+     * @param player The an optional <code>Player</code> to write to.
+     * @param writeScope The <code>WriteScope</code> to apply.
      * @return An XML-representation of this object.
      */
-    public Element toXMLElement(Player player, Document document,
-                                boolean showAll, boolean toSavedGame) {
-        return toXMLElement(player, document, showAll, toSavedGame, null);
+    public Element toXMLElement(Document document, Player player,
+                                WriteScope writeScope) {
+        if ((writeScope == WriteScope.CLIENT) != (player != null)) {
+            throw new IllegalArgumentException("Bad scope/player for toXMLElement(doc, " + player + ", " + writeScope + ")");
+        }            
+        return toXMLElement(document, player, writeScope, null);
     }
 
     /**
@@ -671,7 +674,7 @@ public abstract class FreeColObject {
      * @return An XML-representation of this object.
      */
     public Element toXMLElementPartial(Document document, String... fields) {
-        return toXMLElement(null, document, true, false, fields);
+        return toXMLElement(document, null, WriteScope.SERVER, fields);
     }
 
     /**
@@ -682,22 +685,15 @@ public abstract class FreeColObject {
      * be added to that representation if <code>showAll</code> is
      * set to <code>false</code>.
      *
-     * @param player The <code>Player</code> this XML-representation
-     *      should be made for, or <code>null</code> if
-     *      <code>showAll == true</code>.
      * @param document The <code>Document</code>.
-     * @param showAll Only attributes visible to <code>player</code>
-     *      will be added to the representation if <code>showAll</code>
-     *      is set to <i>false</i>.
-     * @param toSavedGame If <code>true</code> then information that
-     *      is only needed when saving a game is added.
+     * @param player An optional <code>Player</code> to write to.
+     * @param writeScope The <code>WriteScope</code> to apply.
      * @param fields An array of field names, which if non-null
      *               indicates this should be a partial write.
      * @return An XML-representation of this object.
      */
-    public Element toXMLElement(Player player, Document document,
-                                boolean showAll, boolean toSavedGame,
-                                String[] fields) {
+    private Element toXMLElement(Document document, Player player,
+                                 WriteScope writeScope, String[] fields) {
         StringWriter sw = new StringWriter();
         FreeColXMLWriter xw = null;
         try {
@@ -709,7 +705,7 @@ public abstract class FreeColObject {
 
         try {
             if (fields == null) {
-                toXML(xw, player, showAll, toSavedGame);
+                toXML(xw, player, writeScope);
             } else {
                 toXMLPartial(xw, fields);
             }
@@ -738,7 +734,7 @@ public abstract class FreeColObject {
             }
         } catch (XMLStreamException e) {
             try {
-                String x = serialize(player, showAll, toSavedGame);
+                String x = serialize(player, writeScope);
                 logger.log(Level.WARNING, "Error writing stream: " + x, e);
             } catch (XMLStreamException xse) {
                 logger.log(Level.WARNING, "Serialize died", xse);
@@ -854,7 +850,7 @@ public abstract class FreeColObject {
         try {
             xw.writeStartDocument("UTF-8", "1.0");
 
-            this.toXML(xw, null, true, true);
+            this.toXML(xw, null, WriteScope.SAVE);
 
             xw.writeEndDocument();
 
@@ -870,17 +866,14 @@ public abstract class FreeColObject {
     /**
      * Serialize this FreeColObject to a string.
      *
-     * @param player The <code>Player</code> this XML-representation
-     *     should be made for, or null if <code>showAll == true</code>.
-     * @param showAll Show all attributes.
-     * @param toSavedGame Also show some extra attributes when saving the game.
+     * @param player An optional <code>Player</code> to write to.
+     * @param writeScope The <code>WriteScope</code> to apply.
      * @return The serialized object, or null if the stream could not be
      *     created.
      * @exception XMLStreamException if there are any problems writing
      *     to the stream.
      */
-    public String serialize(Player player, boolean showAll,
-                            boolean toSavedGame) throws XMLStreamException {
+    public String serialize(Player player, WriteScope writeScope) throws XMLStreamException {
         StringWriter sw = new StringWriter();
         FreeColXMLWriter xw = null;
         try {
@@ -891,7 +884,7 @@ public abstract class FreeColObject {
         }
 
         try {
-            this.toXML(xw, player, showAll, toSavedGame);
+            this.toXML(xw, player, writeScope);
         } finally {
             if (xw != null) xw.close();
         }
@@ -1013,26 +1006,19 @@ public abstract class FreeColObject {
      * This method writes an XML-representation of this object to
      * the given stream.
      *
-     * FreeColObjects are not to contain data that varies with
-     * the observer, so the extra arguments are moot here.
-     * However, this method is overridden in FreeColGameObject
-     * where they are meaningful, and we need a version here for
-     * toXMLElement() to call.
+     * FreeColObjects are not to contain data that varies with the
+     * observer, so write scope is moot here.  However, this method is
+     * overridden in FreeColGameObject where it is meaningful, and we
+     * need a version here for toXMLElement() to call.
      *
      * @param xw The <code>FreeColXMLWriter</code> to write to.
-     * @param player The <code>Player</code> this XML-representation
-     *      should be made for, or <code>null</code> if
-     *      <code>showAll == true</code>.
-     * @param showAll Only attributes visible to <code>player</code>
-     *      will be added to the representation if <code>showAll</code>
-     *      is set to <i>false</i>.
-     * @param toSavedGame If <code>true</code> then information that
-     *      is only needed when saving a game is added.
+     * @param player An optional <code>Player</code> to write to.
+     * @param writeScope The <code>WriteScope</code> to apply.
      * @exception XMLStreamException if there are any problems writing
      *      to the stream.
      */
-    public void toXML(FreeColXMLWriter xw, Player player, boolean showAll,
-                      boolean toSavedGame) throws XMLStreamException {
+    public void toXML(FreeColXMLWriter xw, Player player,
+                      WriteScope writeScope) throws XMLStreamException {
         toXML(xw);
     }
 
