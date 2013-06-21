@@ -1813,25 +1813,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
 
     /**
-     * Write a minimal version of this tile.  This is a special case
-     * used when the player has not explored the tile yet.
-     *
-     * @param xw The <code>FreeColXMLWriter</code> to write to.
-     * @exception XMLStreamException if there is problem writing to the stream.
-     */
-    public void toXMLMinimal(FreeColXMLWriter xw) throws XMLStreamException {
-        xw.writeStartElement(getXMLElementTagName());
-
-        super.writeAttributes(xw);
-
-        xw.writeAttribute(X_TAG, this.x);
-
-        xw.writeAttribute(Y_TAG, this.y);
-
-        xw.writeEndElement();
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -1844,36 +1825,29 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
         xw.writeAttribute(Y_TAG, this.y);
 
-        xw.writeAttribute(TYPE_TAG, type);
-
-        xw.writeAttribute(STYLE_TAG, style);
-
-        xw.writeAttribute(REGION_TAG, region);
-
-        if (moveToEurope != null) {
-            xw.writeAttribute(MOVE_TO_EUROPE_TAG,
-                           moveToEurope.booleanValue());
-        }
-
-        // Compatibility note: this used to be a boolean
-        if (highSeasCount >= 0) {
-            xw.writeAttribute(CONNECTED_TAG, highSeasCount);
-        }
-
-        if (contiguity >= 0) {
-            xw.writeAttribute(CONTIGUITY_TAG, contiguity);
-        }
-
         PlayerExploredTile pet;
-        if (showAll || toSavedGame || player.canSee(this)) {
+        if (showAll || toSavedGame || (player != null && player.canSee(this))) {
+
+            xw.writeAttribute(TYPE_TAG, type);
+
             if (owner != null) {
                 xw.writeAttribute(OWNER_TAG, owner);
             }
+
             if (owningSettlement != null) {
                 xw.writeAttribute(OWNING_SETTLEMENT_TAG, owningSettlement);
             }
+            
+            xw.writeAttribute(STYLE_TAG, style);
+
+            writeCommonAttributes(xw);
 
         } else if ((pet = getPlayerExploredTile(player)) != null) {
+
+            // These need to move into the pet.
+            xw.writeAttribute(TYPE_TAG, type);
+            xw.writeAttribute(STYLE_TAG, style);
+
             if (pet.getOwner() != null) {
                 xw.writeAttribute(OWNER_TAG, pet.getOwner());
             }
@@ -1882,6 +1856,32 @@ public final class Tile extends UnitLocation implements Named, Ownable {
                 xw.writeAttribute(OWNING_SETTLEMENT_TAG,
                     pet.getOwningSettlement());
             }
+
+            writeCommonAttributes(xw);
+        }
+    }
+
+    /**
+     * Write the attributes that do not change once discovered and thus
+     * do not need to be cached in the pet.
+     *
+     * @param xw The <code>FreeColXMLWriter</code> to write to.
+     * @exception XMLStreamException if there is problem writing to the stream.
+     */
+    private void writeCommonAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        xw.writeAttribute(REGION_TAG, region);
+        
+        if (moveToEurope != null) {
+            xw.writeAttribute(MOVE_TO_EUROPE_TAG,
+                              moveToEurope.booleanValue());
+        }
+
+        if (highSeasCount >= 0) {
+            xw.writeAttribute(CONNECTED_TAG, highSeasCount);
+        }
+       
+        if (contiguity >= 0) {
+            xw.writeAttribute(CONTIGUITY_TAG, contiguity);
         }
     }
 

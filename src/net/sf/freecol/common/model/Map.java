@@ -2214,13 +2214,7 @@ public class Map extends FreeColGameObject implements Location {
         for (Region region : getSortedCopy(regions.values())) region.toXML(xw);
 
         for (Tile tile: getAllTiles()) {
-            if (showAll || toSavedGame
-                || (player != null && player.hasExplored(tile))) {
-                tile.toXML(xw, player, showAll, toSavedGame);
-
-            } else {
-                tile.toXMLMinimal(xw);
-            }
+            tile.toXML(xw, player, showAll, toSavedGame);
         }
     }
 
