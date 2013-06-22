@@ -251,13 +251,16 @@ public class ServerIndianSettlement extends IndianSettlement
     public void changeMissionary(Unit missionary) {
         Unit old = getMissionary();
         setMissionary(missionary);
-        getTile().updatePlayerExploredTiles();
+        Tile tile = getTile();
+        tile.updatePlayerExploredTiles();
         // Full updates for the old and new missionary owners.
         if (missionary != null) {
-            getTile().updatePlayerExploredTile(missionary.getOwner(), true);
+            tile.updatePlayerExploredTile(missionary.getOwner(), true);
         }
         if (old != null) {
-            getTile().updatePlayerExploredTile(old.getOwner(), true);
+            tile.updatePlayerExploredTile(old.getOwner(), true);
+            // TODO: remove this when settlements are fully virtualized
+            tile.fixMissionary(old);
         }
     }
 
