@@ -553,9 +553,8 @@ public class TileImprovement extends TileItem implements Named {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(FreeColXMLWriter xw, Player player,
-                                   WriteScope writeScope) throws XMLStreamException {
-        super.writeAttributes(xw, player, writeScope);
+    protected void writeAttributes(FreeColXMLWriter xw, WriteScope writeScope) throws XMLStreamException {
+        super.writeAttributes(xw, writeScope);
 
         xw.writeAttribute(TILE_TAG, getTile());
 
@@ -565,12 +564,9 @@ public class TileImprovement extends TileItem implements Named {
 
         xw.writeAttribute(MAGNITUDE_TAG, magnitude);
 
-        if (style != null) {
-            xw.writeAttribute(STYLE_TAG, style);
-        }
-        if (virtual) {
-            xw.writeAttribute(VIRTUAL_TAG, virtual);
-        }
+        if (style != null) xw.writeAttribute(STYLE_TAG, style);
+
+        if (virtual) xw.writeAttribute(VIRTUAL_TAG, virtual);
     }
 
     /**

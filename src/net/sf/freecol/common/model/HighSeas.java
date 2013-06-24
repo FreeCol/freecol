@@ -146,18 +146,17 @@ public class HighSeas extends UnitLocation {
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(FreeColXMLWriter xw, Player player,
-                                 WriteScope writeScope) throws XMLStreamException {
-        super.writeChildren(xw, player, writeScope);
+    protected void writeChildren(FreeColXMLWriter xw, WriteScope writeScope) throws XMLStreamException {
+        super.writeChildren(xw, writeScope);
 
         for (Location destination : destinations) {
-            if (destination != null) {
-                xw.writeStartElement(DESTINATION_TAG);
+            if (destination == null) continue;
+            
+            xw.writeStartElement(DESTINATION_TAG);
 
-                xw.writeLocationAttribute(ID_ATTRIBUTE_TAG, destination);
-
-                xw.writeEndElement();
-            }
+            xw.writeLocationAttribute(ID_ATTRIBUTE_TAG, destination);
+            
+            xw.writeEndElement();
         }
     }
 

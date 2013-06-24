@@ -56,7 +56,7 @@ public class SerializationTest extends FreeColTestCase {
     }
 
     private Source buildSource(FreeColObject object) throws Exception {
-        return new StreamSource(new StringReader(object.serialize(null, WriteScope.SAVE)));
+        return new StreamSource(new StringReader(object.serialize(WriteScope.toSave())));
     }
 
 
@@ -97,7 +97,7 @@ public class SerializationTest extends FreeColTestCase {
         String serialized = null;
         try {
             Validator validator = buildValidator("schema/data/data-game.xsd");
-            serialized = game.serialize(player, WriteScope.SAVE);
+            serialized = game.serialize(WriteScope.toSave());
             validator.validate(new StreamSource(new StringReader(serialized)));
         } catch (SAXParseException e) {
             int col = e.getColumnNumber();

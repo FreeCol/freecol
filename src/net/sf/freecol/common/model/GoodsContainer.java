@@ -439,11 +439,10 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(FreeColXMLWriter xw, Player player,
-                                 WriteScope writeScope) throws XMLStreamException {
-        super.writeChildren(xw);
+    protected void writeChildren(FreeColXMLWriter xw, WriteScope writeScope) throws XMLStreamException {
+        super.writeChildren(xw, writeScope);
 
-        if (writeScope != WriteScope.CLIENT || player == getOwner()) {
+        if (writeScope.validFor(getOwner())) {
 
             writeStorage(xw, STORED_GOODS_TAG, storedGoods);
 

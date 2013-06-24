@@ -424,9 +424,8 @@ public class TradeRoute extends FreeColGameObject
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(FreeColXMLWriter xw, Player player,
-                                   WriteScope writeScope) throws XMLStreamException {
-        super.writeAttributes(xw, player, writeScope);
+    protected void writeAttributes(FreeColXMLWriter xw, WriteScope writeScope) throws XMLStreamException {
+        super.writeAttributes(xw, writeScope);
 
         xw.writeAttribute(NAME_TAG, getName());
 
@@ -437,9 +436,8 @@ public class TradeRoute extends FreeColGameObject
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(FreeColXMLWriter xw, Player player,
-                                 WriteScope writeScope) throws XMLStreamException {
-        super.writeChildren(xw, player, writeScope);
+    protected void writeChildren(FreeColXMLWriter xw, WriteScope writeScope) throws XMLStreamException {
+        super.writeChildren(xw, writeScope);
 
         for (Stop stop : stops) stop.toXML(xw);
     }

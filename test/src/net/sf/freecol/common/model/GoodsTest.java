@@ -258,7 +258,7 @@ public class GoodsTest extends FreeColTestCase {
         Colony colony = getStandardColony();
         Goods goods1 = new Goods(game, colony, cottonType, 75);
         Document document = DOMMessage.createNewDocument();
-        Element element = goods1.toXMLElement(document, null, WriteScope.SAVE);
+        Element element = goods1.toXMLElement(document, WriteScope.toSave());
 
         element.setAttribute(FreeColObject.ID_ATTRIBUTE_TAG, "newID");
         Goods goods2 = new Goods(colony.getGame(), element);

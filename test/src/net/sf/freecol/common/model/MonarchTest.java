@@ -41,7 +41,7 @@ public class MonarchTest extends FreeColTestCase {
             StringWriter sw = new StringWriter();
             FreeColXMLWriter xw = new FreeColXMLWriter(sw);
 
-            dutch.getMonarch().toXML(xw, null, WriteScope.SAVE);
+            dutch.getMonarch().toXML(xw, WriteScope.toSave());
 
             xw.close();
 

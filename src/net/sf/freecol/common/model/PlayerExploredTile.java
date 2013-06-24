@@ -267,17 +267,14 @@ public class PlayerExploredTile extends FreeColGameObject {
      * {@inheritDoc}
      */
     @Override
-    public void writeAttributes(FreeColXMLWriter xw, Player player,
-                                WriteScope writeScope) throws XMLStreamException {
-        super.writeAttributes(xw, player, writeScope);
+    public void writeAttributes(FreeColXMLWriter xw, WriteScope writeScope) throws XMLStreamException {
+        super.writeAttributes(xw, writeScope);
 
         xw.writeAttribute(PLAYER_TAG, player);
 
         xw.writeAttribute(TILE_TAG, tile);
 
-        if (owner != null) {
-            xw.writeAttribute(OWNER_TAG, owner);
-        }
+        if (owner != null) xw.writeAttribute(OWNER_TAG, owner);
 
         if (owningSettlement != null) {
             xw.writeAttribute(OWNING_SETTLEMENT_TAG, owningSettlement);
@@ -291,9 +288,7 @@ public class PlayerExploredTile extends FreeColGameObject {
             xw.writeAttribute(COLONY_STOCKADE_KEY_TAG, colonyStockadeKey);
         }
 
-        if (skill != null) {
-            xw.writeAttribute(LEARNABLE_SKILL_TAG, skill);
-        }
+        if (skill != null) xw.writeAttribute(LEARNABLE_SKILL_TAG, skill);
 
         for (int i = 0; i < WANTED_GOODS_COUNT; i++) {
             if (wantedGoods[i] != null) {
@@ -301,9 +296,7 @@ public class PlayerExploredTile extends FreeColGameObject {
             }
         }
 
-        if (alarm != null) {
-            xw.writeAttribute(ALARM_TAG, alarm.getValue());
-        }
+        if (alarm != null) xw.writeAttribute(ALARM_TAG, alarm.getValue());
 
         if (mostHated != null) {
             xw.writeAttribute(MOST_HATED_TAG, mostHated.getId());
@@ -314,20 +307,19 @@ public class PlayerExploredTile extends FreeColGameObject {
      * {@inheritDoc}
      */
     @Override
-    public void writeChildren(FreeColXMLWriter xw, Player player,
-                              WriteScope writeScope) throws XMLStreamException {
-        super.writeChildren(xw, player, writeScope);
+    public void writeChildren(FreeColXMLWriter xw, WriteScope writeScope) throws XMLStreamException {
+        super.writeChildren(xw, writeScope);
 
         if (missionary != null) {
             xw.writeStartElement(MISSIONARY_TAG);
 
-            missionary.toXML(xw, player, writeScope);
+            missionary.toXML(xw, writeScope);
 
             xw.writeEndElement();
         }
 
         for (TileItem ti : getTileItems()) {
-            ti.toXML(xw, player, writeScope);
+            ti.toXML(xw, writeScope);
         }
     }
 

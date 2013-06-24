@@ -693,7 +693,7 @@ public class UnitTest extends FreeColTestCase {
         merchantman.add(goods);
 
         try {
-            String xml = merchantman.serialize(dutch, WriteScope.SAVE);
+            String xml = merchantman.serialize(WriteScope.toSave());
             Field nextId = Game.class.getDeclaredField("nextId");
             nextId.setAccessible(true);
             int id = nextId.getInt(game);

@@ -840,7 +840,7 @@ public final class FreeColServer {
 
             xw.writeEndElement();
 
-            game.toXML(xw, null, WriteScope.SAVE); // Add the game
+            game.toXML(xw, WriteScope.toSave()); // Add the game
 
             if (aiMain != null) aiMain.toXML(xw); // Add the AIObjects
 

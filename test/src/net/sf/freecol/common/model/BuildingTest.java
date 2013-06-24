@@ -397,8 +397,7 @@ public class BuildingTest extends FreeColTestCase {
                 StringWriter sw = new StringWriter();
                 FreeColXMLWriter xw = new FreeColXMLWriter(sw);
 
-                building.toXML(xw, building.getColony().getOwner(),
-                               WriteScope.SAVE);
+                building.toXML(xw, WriteScope.toSave());
 
                 xw.close();
 

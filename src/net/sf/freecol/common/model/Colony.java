@@ -2667,15 +2667,14 @@ public class Colony extends Settlement implements Nameable {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(FreeColXMLWriter xw, Player player,
-                                   WriteScope writeScope) throws XMLStreamException {
+    protected void writeAttributes(FreeColXMLWriter xw, WriteScope writeScope) throws XMLStreamException {
 
-        super.writeAttributes(xw, player, writeScope);
+        super.writeAttributes(xw, writeScope);
 
         xw.writeAttribute(ESTABLISHED_TAG, established.getNumber());
 
         PlayerExploredTile pet;
-        if (writeScope != WriteScope.CLIENT || player == getOwner()) {
+        if (writeScope.validFor(getOwner())) {
 
             xw.writeAttribute(SONS_OF_LIBERTY_TAG, sonsOfLiberty);
             
@@ -2693,7 +2692,7 @@ public class Colony extends Settlement implements Nameable {
 
             xw.writeAttribute(LAND_LOCKED_TAG, landLocked);
 
-        } else if ((pet = getTile().getPlayerExploredTile(player)) != null) {
+        } else if ((pet = getTile().getPlayerExploredTile(writeScope.getPlayer())) != null) {
             if (pet.getColonyUnitCount() > 0) {
                 xw.writeAttribute(UNIT_COUNT_TAG, pet.getColonyUnitCount());
             }
@@ -2708,11 +2707,10 @@ public class Colony extends Settlement implements Nameable {
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(FreeColXMLWriter xw, Player player,
-                                 WriteScope writeScope) throws XMLStreamException {
-        super.writeChildren(xw, player, writeScope);
+    protected void writeChildren(FreeColXMLWriter xw, WriteScope writeScope) throws XMLStreamException {
+        super.writeChildren(xw, writeScope);
 
-        if (writeScope != WriteScope.CLIENT || player == getOwner()) {
+        if (writeScope.validFor(getOwner())) {
 
             List<String> keys = new ArrayList<String>(exportData.keySet());
             Collections.sort(keys);
@@ -2732,7 +2730,7 @@ public class Colony extends Settlement implements Nameable {
             }
 
             for (WorkLocation workLocation : getSortedCopy(getAllWorkLocations())) {
-                workLocation.toXML(xw, player, writeScope);
+                workLocation.toXML(xw, writeScope);
             }
 
             for (BuildableType item : buildQueue.getValues()) { // In order!

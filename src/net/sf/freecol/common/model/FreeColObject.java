@@ -75,10 +75,50 @@ public abstract class FreeColObject {
     public static final int UNDEFINED = Integer.MIN_VALUE;
 
     /** The scope of a FreeCol object write. */
-    public static enum WriteScope {
+    public enum WriteScope {
         CLIENT,  // Only the client-visible information
         SERVER,  // Full server-visible information
-        SAVE     // Absolutely everything needed to save the game state
+        SAVE;    // Absolutely everything needed to save the game state
+
+        private Player player = null; // The player to write to.
+
+
+        public static WriteScope toClient(Player player) {
+            if (player == null) {
+                throw new IllegalArgumentException("Null player.");
+            }
+            WriteScope ret = WriteScope.CLIENT;
+            ret.player = player;
+            return ret;
+        }            
+
+        public static WriteScope toServer() {
+            return WriteScope.SERVER;
+        }
+
+        public static WriteScope toSave() {
+            return WriteScope.SAVE;
+        }
+
+        public Player getPlayer() {
+            return player;
+        }
+
+        public boolean isValid() {
+            return (this == WriteScope.CLIENT) == (player != null);
+        }
+
+        public boolean validForSave() {
+            return this == WriteScope.SAVE;
+        }
+
+        public boolean validFor(Player player) {
+            return this != WriteScope.CLIENT || this.player == player;
+        }
+
+        public boolean canSee(Tile tile) {
+            return this != WriteScope.CLIENT || this.player.canSee(tile);
+        }
     }
 
     /** The unique identifier of an object. */
@@ -622,7 +662,7 @@ public abstract class FreeColObject {
      * @return An XML-representation of this object.
      */
     public Element toXMLElement(Document document) {
-        return toXMLElement(document, null, WriteScope.SERVER);
+        return toXMLElement(document, WriteScope.toServer());
     }
 
     /**
@@ -641,7 +681,7 @@ public abstract class FreeColObject {
         if (player == null) {
             throw new IllegalArgumentException("Null player for toXMLElement(doc, player)");
         }
-        return toXMLElement(document, player, WriteScope.CLIENT);
+        return toXMLElement(document, WriteScope.toClient(player));
     }
 
     /**
@@ -653,16 +693,15 @@ public abstract class FreeColObject {
      * set to <code>false</code>.
      *
      * @param document The <code>Document</code>.
-     * @param player The an optional <code>Player</code> to write to.
      * @param writeScope The <code>WriteScope</code> to apply.
      * @return An XML-representation of this object.
      */
-    public Element toXMLElement(Document document, Player player,
-                                WriteScope writeScope) {
-        if ((writeScope == WriteScope.CLIENT) != (player != null)) {
-            throw new IllegalArgumentException("Bad scope/player for toXMLElement(doc, " + player + ", " + writeScope + ")");
-        }            
-        return toXMLElement(document, player, writeScope, null);
+    public Element toXMLElement(Document document, WriteScope writeScope) {
+        if (!writeScope.isValid()) {
+            throw new IllegalStateException("Invalid write scope: "
+                + writeScope);
+        }
+        return toXMLElement(document, writeScope, null);
     }
 
     /**
@@ -674,7 +713,7 @@ public abstract class FreeColObject {
      * @return An XML-representation of this object.
      */
     public Element toXMLElementPartial(Document document, String... fields) {
-        return toXMLElement(document, null, WriteScope.SERVER, fields);
+        return toXMLElement(document, WriteScope.toServer(), fields);
     }
 
     /**
@@ -686,14 +725,13 @@ public abstract class FreeColObject {
      * set to <code>false</code>.
      *
      * @param document The <code>Document</code>.
-     * @param player An optional <code>Player</code> to write to.
      * @param writeScope The <code>WriteScope</code> to apply.
      * @param fields An array of field names, which if non-null
      *               indicates this should be a partial write.
      * @return An XML-representation of this object.
      */
-    private Element toXMLElement(Document document, Player player,
-                                 WriteScope writeScope, String[] fields) {
+    private Element toXMLElement(Document document, WriteScope writeScope,
+                                 String[] fields) {
         StringWriter sw = new StringWriter();
         FreeColXMLWriter xw = null;
         try {
@@ -705,7 +743,7 @@ public abstract class FreeColObject {
 
         try {
             if (fields == null) {
-                toXML(xw, player, writeScope);
+                toXML(xw, writeScope);
             } else {
                 toXMLPartial(xw, fields);
             }
@@ -734,7 +772,7 @@ public abstract class FreeColObject {
             }
         } catch (XMLStreamException e) {
             try {
-                String x = serialize(player, writeScope);
+                String x = serialize(writeScope);
                 logger.log(Level.WARNING, "Error writing stream: " + x, e);
             } catch (XMLStreamException xse) {
                 logger.log(Level.WARNING, "Serialize died", xse);
@@ -850,7 +888,7 @@ public abstract class FreeColObject {
         try {
             xw.writeStartDocument("UTF-8", "1.0");
 
-            this.toXML(xw, null, WriteScope.SAVE);
+            this.toXML(xw, WriteScope.toSave());
 
             xw.writeEndDocument();
 
@@ -866,14 +904,13 @@ public abstract class FreeColObject {
     /**
      * Serialize this FreeColObject to a string.
      *
-     * @param player An optional <code>Player</code> to write to.
      * @param writeScope The <code>WriteScope</code> to apply.
      * @return The serialized object, or null if the stream could not be
      *     created.
      * @exception XMLStreamException if there are any problems writing
      *     to the stream.
      */
-    public String serialize(Player player, WriteScope writeScope) throws XMLStreamException {
+    public String serialize(WriteScope writeScope) throws XMLStreamException {
         StringWriter sw = new StringWriter();
         FreeColXMLWriter xw = null;
         try {
@@ -884,7 +921,7 @@ public abstract class FreeColObject {
         }
 
         try {
-            this.toXML(xw, player, writeScope);
+            this.toXML(xw, writeScope);
         } finally {
             if (xw != null) xw.close();
         }
@@ -938,7 +975,7 @@ public abstract class FreeColObject {
      * @param xw The <code>FreeColXMLWriter</code> to write to.
      * @exception XMLStreamException if there are any problems writing
      *      to the stream.
-     * @see #toXML(FreeColXMLWriter, Player, boolean, boolean)
+     * @see #toXML(FreeColXMLWriter, WriteScope)
      */
     public void toXML(FreeColXMLWriter xw) throws XMLStreamException {
         toXML(xw, getXMLTagName());
@@ -1012,13 +1049,11 @@ public abstract class FreeColObject {
      * need a version here for toXMLElement() to call.
      *
      * @param xw The <code>FreeColXMLWriter</code> to write to.
-     * @param player An optional <code>Player</code> to write to.
      * @param writeScope The <code>WriteScope</code> to apply.
      * @exception XMLStreamException if there are any problems writing
      *      to the stream.
      */
-    public void toXML(FreeColXMLWriter xw, Player player,
-                      WriteScope writeScope) throws XMLStreamException {
+    public void toXML(FreeColXMLWriter xw, WriteScope writeScope) throws XMLStreamException {
         toXML(xw);
     }
 
