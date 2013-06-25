@@ -306,10 +306,10 @@ public abstract class GoodsLocation extends UnitLocation {
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(FreeColXMLWriter xw, WriteScope writeScope) throws XMLStreamException {
-        super.writeChildren(xw, writeScope);
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeChildren(xw);
 
-        if (goodsContainer != null) goodsContainer.toXML(xw, writeScope);
+        if (goodsContainer != null) goodsContainer.toXML(xw);
     }
 
     /**

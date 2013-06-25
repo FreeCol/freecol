@@ -553,8 +553,8 @@ public class TileImprovement extends TileItem implements Named {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(FreeColXMLWriter xw, WriteScope writeScope) throws XMLStreamException {
-        super.writeAttributes(xw, writeScope);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
         xw.writeAttribute(TILE_TAG, getTile());
 

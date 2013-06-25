@@ -476,8 +476,8 @@ public final class Market extends FreeColGameObject implements Ownable {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(FreeColXMLWriter xw, WriteScope writeScope) throws XMLStreamException {
-        super.writeAttributes(xw, writeScope);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
         xw.writeAttribute(OWNER_TAG, owner);
     }
@@ -486,13 +486,13 @@ public final class Market extends FreeColGameObject implements Ownable {
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(FreeColXMLWriter xw, WriteScope writeScope) throws XMLStreamException {
-        super.writeChildren(xw, writeScope);
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeChildren(xw);
 
-        if (writeScope.validFor(owner)) {
+        if (xw.validFor(owner)) {
 
             for (MarketData data : getSortedCopy(marketData.values())) {
-                data.toXML(xw, writeScope);
+                data.toXML(xw);
             }
         }
     }

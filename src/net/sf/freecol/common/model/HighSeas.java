@@ -146,8 +146,8 @@ public class HighSeas extends UnitLocation {
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(FreeColXMLWriter xw, WriteScope writeScope) throws XMLStreamException {
-        super.writeChildren(xw, writeScope);
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeChildren(xw);
 
         for (Location destination : destinations) {
             if (destination == null) continue;

@@ -36,6 +36,8 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Tile;
 
 
 /**
@@ -54,8 +56,59 @@ public class FreeColXMLWriter implements XMLStreamWriter {
 
     private static final Logger logger = Logger.getLogger(FreeColXMLWriter.class.getName());
 
+    /** The scope of a FreeCol object write. */
+    public enum WriteScope {
+        CLIENT,  // Only the client-visible information
+        SERVER,  // Full server-visible information
+        SAVE;    // Absolutely everything needed to save the game state
+
+        private Player player = null; // The player to write to.
+
+
+        public static WriteScope toClient(Player player) {
+            if (player == null) {
+                throw new IllegalArgumentException("Null player.");
+            }
+            WriteScope ret = WriteScope.CLIENT;
+            ret.player = player;
+            return ret;
+        }            
+
+        public static WriteScope toServer() {
+            return WriteScope.SERVER;
+        }
+
+        public static WriteScope toSave() {
+            return WriteScope.SAVE;
+        }
+
+        public Player getPlayer() {
+            return player;
+        }
+
+        public boolean isValid() {
+            return (this == WriteScope.CLIENT) == (player != null);
+        }
+
+        public boolean validForSave() {
+            return this == WriteScope.SAVE;
+        }
+
+        public boolean validFor(Player player) {
+            return this != WriteScope.CLIENT || this.player == player;
+        }
+
+        public boolean canSee(Tile tile) {
+            return this != WriteScope.CLIENT || this.player.canSee(tile);
+        }
+    }
+
+
     /** The stream to write to. */
     private XMLStreamWriter xmlStreamWriter;
+
+    /** A write scope to use for FreeCol object writes. */
+    private WriteScope writeScope;
 
 
     /**
@@ -63,10 +116,13 @@ public class FreeColXMLWriter implements XMLStreamWriter {
      *
      * @param outputStream The <code>OutputStream</code> to create
      *     an <code>FreeColXMLWriter</code> for.
+     * @param writeScope The <code>WriteScope</code> to use for
+     *     FreeCol object writes.
      * @exception IOException if thrown while creating the
      *     <code>XMLStreamWriter</code>.
      */
-    public FreeColXMLWriter(OutputStream outputStream) throws IOException {
+    public FreeColXMLWriter(OutputStream outputStream,
+                            WriteScope writeScope) throws IOException {
         try {
             XMLOutputFactory xof = XMLOutputFactory.newInstance();
             this.xmlStreamWriter = xof.createXMLStreamWriter(outputStream,
@@ -74,6 +130,7 @@ public class FreeColXMLWriter implements XMLStreamWriter {
         } catch (XMLStreamException e) {
             throw new IOException(e.getCause());
         }
+        this.writeScope = writeScope;
     }
 
     /**
@@ -81,16 +138,20 @@ public class FreeColXMLWriter implements XMLStreamWriter {
      *
      * @param writer A <code>Writer</code> to create
      *     an <code>FreeColXMLWriter</code> for.
+     * @param writeScope The <code>WriteScope</code> to use for
+     *     FreeCol object writes.
      * @exception IOException if thrown while creating the
      *     <code>FreeColXMLWriter</code>.
      */
-    public FreeColXMLWriter(Writer writer) throws IOException {
+    public FreeColXMLWriter(Writer writer,
+                            WriteScope writeScope) throws IOException {
         try {
             XMLOutputFactory xof = XMLOutputFactory.newInstance();
             this.xmlStreamWriter = xof.createXMLStreamWriter(writer);
         } catch (XMLStreamException e) {
             throw new IOException(e.getCause());
         }
+        this.writeScope = writeScope;
     }
 
     /**
@@ -211,8 +272,30 @@ public class FreeColXMLWriter implements XMLStreamWriter {
         writeEndElement();
     }
 
+    // Delegations to the WriteScope.
 
-    // Simple delegations.  All except close (supplied above).
+    public Player getClientPlayer() {
+        return writeScope.getPlayer();
+    }
+
+    //public boolean isValid() {
+    //    return (this == WriteScope.CLIENT) == (player != null);
+    //}
+
+    public boolean validForSave() {
+        return writeScope.validForSave();
+    }
+
+    public boolean validFor(Player player) {
+        return writeScope.validFor(player);
+    }
+
+    public boolean canSee(Tile tile) {
+        return writeScope.canSee(tile);
+    }
+
+    // Simple delegations to the XMLStreamWriter.  All should be
+    // present here except close which is supplied above.
 
     public void flush() throws XMLStreamException {
         xmlStreamWriter.flush();

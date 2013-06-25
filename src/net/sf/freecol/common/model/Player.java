@@ -3659,8 +3659,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(FreeColXMLWriter xw, WriteScope writeScope) throws XMLStreamException {
-        super.writeAttributes(xw, writeScope);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
         xw.writeAttribute(USERNAME_TAG, name);
 
@@ -3684,7 +3684,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
         xw.writeAttribute(TAX_TAG, tax);
 
-        if (writeScope.validFor(this)) {
+        if (xw.validFor(this)) {
 
             xw.writeAttribute(GOLD_TAG, gold);
 
@@ -3738,14 +3738,12 @@ public class Player extends FreeColGameObject implements Nameable {
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(FreeColXMLWriter xw, WriteScope writeScope) throws XMLStreamException {
-        super.writeChildren(xw, writeScope);
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeChildren(xw);
 
-        if (market != null) {
-            market.toXML(xw, writeScope);
-        }
+        if (market != null) market.toXML(xw);
 
-        if (writeScope.validFor(this)) {
+        if (xw.validFor(this)) {
 
             for (Player p : getSortedCopy(tension.keySet())) {
                 xw.writeStartElement(TENSION_TAG);
@@ -3777,20 +3775,18 @@ public class Player extends FreeColGameObject implements Nameable {
             }
 
             for (TradeRoute route : getSortedCopy(tradeRoutes)) {
-                route.toXML(xw, writeScope);
+                route.toXML(xw);
             }
 
-            if (highSeas != null) {
-                highSeas.toXML(xw, writeScope);
-            }
+            if (highSeas != null) highSeas.toXML(xw);
             
             xw.writeToListElement(FOUNDING_FATHERS_TAG, foundingFathers);
 
             xw.writeToListElement(OFFERED_FATHERS_TAG, offeredFathers);
 
-            if (europe != null) europe.toXML(xw, writeScope);
+            if (europe != null) europe.toXML(xw);
 
-            if (monarch != null) monarch.toXML(xw, writeScope);
+            if (monarch != null) monarch.toXML(xw);
 
             for (ModelMessage m : getSortedCopy(modelMessages)) m.toXML(xw);
 
@@ -3808,8 +3804,7 @@ public class Player extends FreeColGameObject implements Nameable {
             }
 
         } else {
-            Player player = writeScope.getPlayer();
-
+            Player player = xw.getClientPlayer();
             Tension t = getTension(player);
             if (t != null) {
                 xw.writeStartElement(TENSION_TAG);

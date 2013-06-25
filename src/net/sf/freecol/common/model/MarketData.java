@@ -397,8 +397,8 @@ public class MarketData extends FreeColGameObject {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(FreeColXMLWriter xw, WriteScope writeScope) throws XMLStreamException {
-        super.writeAttributes(xw, writeScope);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
         xw.writeAttribute(GOODS_TYPE_TAG, goodsType);
 

@@ -1214,10 +1214,10 @@ public class IndianSettlement extends Settlement {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(FreeColXMLWriter xw, WriteScope writeScope) throws XMLStreamException {
-        super.writeAttributes(xw, writeScope);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
-        boolean full = writeScope.validFor(getOwner());
+        boolean full = xw.validFor(getOwner());
 
         PlayerExploredTile pet;
         if (full) {
@@ -1237,7 +1237,7 @@ public class IndianSettlement extends Settlement {
             Player hated = getMostHated();
             if (hated != null) xw.writeAttribute(MOST_HATED_TAG, hated);
 
-        } else if ((pet = getTile().getPlayerExploredTile(writeScope.getPlayer())) != null) {
+        } else if ((pet = getTile().getPlayerExploredTile(xw.getClientPlayer())) != null) {
 
             xw.writeAttribute(LEARNABLE_SKILL_TAG, pet.getSkill());
 
@@ -1259,11 +1259,11 @@ public class IndianSettlement extends Settlement {
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(FreeColXMLWriter xw, WriteScope writeScope) throws XMLStreamException {
-        super.writeChildren(xw, writeScope);
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeChildren(xw);
 
         PlayerExploredTile pet;
-        if (writeScope.validFor(getOwner())) {
+        if (xw.validFor(getOwner())) {
 
             for (Player p : getSortedCopy(contactLevels.keySet())) {
                 xw.writeStartElement(CONTACT_LEVEL_TAG);
@@ -1288,7 +1288,7 @@ public class IndianSettlement extends Settlement {
             if (missionary != null) {
                 xw.writeStartElement(MISSIONARY_TAG);
 
-                missionary.toXML(xw, writeScope);
+                missionary.toXML(xw);
 
                 xw.writeEndElement();
             }
@@ -1301,8 +1301,8 @@ public class IndianSettlement extends Settlement {
                 xw.writeEndElement();
             }
 
-        } else if ((pet = getTile().getPlayerExploredTile(writeScope.getPlayer())) != null) {
-            Player player = writeScope.getPlayer();
+        } else if ((pet = getTile().getPlayerExploredTile(xw.getClientPlayer())) != null) {
+            Player player = xw.getClientPlayer();
 
             ContactLevel cl = contactLevels.get(player);
             if (cl != null) {
@@ -1328,7 +1328,7 @@ public class IndianSettlement extends Settlement {
             if (pet.getMissionary() != null) {
                 xw.writeStartElement(MISSIONARY_TAG);
 
-                pet.getMissionary().toXML(xw, writeScope);
+                pet.getMissionary().toXML(xw);
 
                 xw.writeEndElement();
             }

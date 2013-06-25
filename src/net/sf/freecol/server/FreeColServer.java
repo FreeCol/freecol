@@ -63,7 +63,6 @@ import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
-import net.sf.freecol.common.model.FreeColObject.WriteScope;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.HighScore;
@@ -801,7 +800,7 @@ public final class FreeColServer {
 
             // save the actual game data
             fos.putNextEntry(new JarEntry(FreeColSavegameFile.SAVEGAME_FILE));
-            xw = new FreeColXMLWriter(fos);
+            xw = new FreeColXMLWriter(fos, FreeColXMLWriter.WriteScope.toSave());
 
             xw.writeStartDocument("UTF-8", "1.0");
 
@@ -840,7 +839,7 @@ public final class FreeColServer {
 
             xw.writeEndElement();
 
-            game.toXML(xw, WriteScope.toSave()); // Add the game
+            game.toXML(xw); // Add the game
 
             if (aiMain != null) aiMain.toXML(xw); // Add the AIObjects
 
@@ -1459,7 +1458,8 @@ public final class FreeColServer {
 
         FreeColXMLWriter xw = null;
         try {
-            xw = new FreeColXMLWriter(new FileOutputStream(FreeColDirectories.getHighScoreFile()));
+            xw = new FreeColXMLWriter(new FileOutputStream(FreeColDirectories.getHighScoreFile()),
+                                      FreeColXMLWriter.WriteScope.toSave());
             ret = true;
         } catch (FileNotFoundException fnfe) {
             logger.log(Level.WARNING, "Failed to open high scores file.", fnfe);

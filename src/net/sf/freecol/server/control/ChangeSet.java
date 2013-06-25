@@ -29,7 +29,6 @@ import net.sf.freecol.common.model.Feature;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
-import net.sf.freecol.common.model.FreeColObject.WriteScope;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HistoryEvent;

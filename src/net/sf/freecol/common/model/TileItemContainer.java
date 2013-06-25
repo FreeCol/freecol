@@ -570,8 +570,8 @@ public class TileItemContainer extends FreeColGameObject {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(FreeColXMLWriter xw, WriteScope writeScope) throws XMLStreamException {
-        super.writeAttributes(xw, writeScope);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
         xw.writeAttribute(TILE_TAG, tile);
     }
@@ -580,21 +580,21 @@ public class TileItemContainer extends FreeColGameObject {
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(FreeColXMLWriter xw, WriteScope writeScope) throws XMLStreamException {
-        super.writeChildren(xw, writeScope);
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeChildren(xw);
 
         PlayerExploredTile pet;
-        if (writeScope.canSee(tile)) {
+        if (xw.canSee(tile)) {
 
             for (TileItem item : tileItems) {
-                item.toXML(xw, writeScope);
+                item.toXML(xw);
             }
 
-        } else if ((pet = tile.getPlayerExploredTile(writeScope.getPlayer())) != null) {
+        } else if ((pet = tile.getPlayerExploredTile(xw.getClientPlayer())) != null) {
 
             List<TileItem> petItems = pet.getTileItems();
             Collections.sort(petItems, tileItemComparator);
-            for (TileItem item : petItems) item.toXML(xw, writeScope);
+            for (TileItem item : petItems) item.toXML(xw);
         }
     }
 

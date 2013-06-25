@@ -310,12 +310,12 @@ public class LostCityRumour extends TileItem {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(FreeColXMLWriter xw, WriteScope writeScope) throws XMLStreamException {
-        super.writeAttributes(xw, writeScope);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
         xw.writeAttribute(TILE_TAG, getTile());
 
-        if (writeScope.canSee(getTile())) {
+        if (xw.canSee(getTile())) {
 
             if (type != null) {
                 xw.writeAttribute(TYPE_TAG, getType());

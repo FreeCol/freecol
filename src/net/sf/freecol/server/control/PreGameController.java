@@ -29,7 +29,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.model.FreeColObject.WriteScope;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Nation;

@@ -3770,10 +3770,10 @@ public class Unit extends GoodsLocation
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(FreeColXMLWriter xw, WriteScope writeScope) throws XMLStreamException {
-        super.writeAttributes(xw, writeScope);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
-        boolean full = writeScope.validFor(getOwner());
+        boolean full = xw.validFor(getOwner());
 
         if (name != null) xw.writeAttribute(NAME_TAG, name);
 
@@ -3859,18 +3859,18 @@ public class Unit extends GoodsLocation
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(FreeColXMLWriter xw, WriteScope writeScope) throws XMLStreamException {
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
         // Do not show enemy units hidden in a carrier:
-        if (writeScope.validFor(getOwner())) {
+        if (xw.validFor(getOwner())) {
 
-            super.writeChildren(xw, writeScope);
+            super.writeChildren(xw);
 
         } else if (getType().canCarryGoods()) {
             xw.writeAttribute(VISIBLE_GOODS_COUNT_TAG, getVisibleGoodsCount());
         }
 
         if (workImprovement != null) {
-            workImprovement.toXML(xw, writeScope);
+            workImprovement.toXML(xw);
         }
 
         for (EquipmentType et : getSortedCopy(equipment.keySet())) {

@@ -309,8 +309,8 @@ public class Europe extends UnitLocation implements Ownable, Named {
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(FreeColXMLWriter xw, WriteScope writeScope) throws XMLStreamException {
-        super.writeAttributes(xw, writeScope);
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
 
         for (int index = 0; index < recruitables.length; index++) {
             if (recruitables[index] != null) {
@@ -329,8 +329,8 @@ public class Europe extends UnitLocation implements Ownable, Named {
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(FreeColXMLWriter xw, WriteScope writeScope) throws XMLStreamException {
-        super.writeChildren(xw, writeScope);
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeChildren(xw);
 
         for (UnitType unitType : getSortedCopy(unitPrices.keySet())) {
             xw.writeStartElement(UNIT_PRICE_TAG);

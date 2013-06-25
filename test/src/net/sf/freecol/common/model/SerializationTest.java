@@ -37,7 +37,6 @@ import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.FreeColGameObject;
-import net.sf.freecol.common.model.FreeColObject.WriteScope;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -56,7 +55,7 @@ public class SerializationTest extends FreeColTestCase {
     }
 
     private Source buildSource(FreeColObject object) throws Exception {
-        return new StreamSource(new StringReader(object.serialize(WriteScope.toSave())));
+        return new StreamSource(new StringReader(object.serialize()));
     }
 
 
@@ -97,7 +96,7 @@ public class SerializationTest extends FreeColTestCase {
         String serialized = null;
         try {
             Validator validator = buildValidator("schema/data/data-game.xsd");
-            serialized = game.serialize(WriteScope.toSave());
+            serialized = game.serialize();
             validator.validate(new StreamSource(new StringReader(serialized)));
         } catch (SAXParseException e) {
             int col = e.getColumnNumber();
@@ -158,7 +157,8 @@ public class SerializationTest extends FreeColTestCase {
             String filename = "test/data/specification.xml";
             Validator validator = buildValidator("schema/specification-schema.xsd");
             FileWriter sw = new FileWriter(filename);
-            FreeColXMLWriter xw = new FreeColXMLWriter(sw);
+            FreeColXMLWriter xw = new FreeColXMLWriter(sw,
+                FreeColXMLWriter.WriteScope.toSave());
 
             spec().toXML(xw);
 
@@ -181,7 +181,8 @@ public class SerializationTest extends FreeColTestCase {
             spec1 = new FreeColTcFile("classic").getSpecification();
             spec1.applyDifficultyLevel("model.difficulty.veryEasy");
             StringWriter sw = new StringWriter();
-            FreeColXMLWriter xw = new FreeColXMLWriter(sw);
+            FreeColXMLWriter xw = new FreeColXMLWriter(sw,
+                FreeColXMLWriter.WriteScope.toSave());
 
             spec1.toXML(xw);
 
@@ -217,7 +218,8 @@ public class SerializationTest extends FreeColTestCase {
             spec1 = new FreeColTcFile("classic").getSpecification();
             spec1.applyDifficultyLevel("model.difficulty.veryEasy");
             StringWriter sw = new StringWriter();
-            FreeColXMLWriter xw = new FreeColXMLWriter(sw);
+            FreeColXMLWriter xw = new FreeColXMLWriter(sw,
+                FreeColXMLWriter.WriteScope.toSave());
 
             spec1.toXML(xw);
 

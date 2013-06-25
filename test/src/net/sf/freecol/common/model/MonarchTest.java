@@ -25,7 +25,6 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.FreeColObject.WriteScope;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -39,9 +38,10 @@ public class MonarchTest extends FreeColTestCase {
 
         try {
             StringWriter sw = new StringWriter();
-            FreeColXMLWriter xw = new FreeColXMLWriter(sw);
+            FreeColXMLWriter xw = new FreeColXMLWriter(sw,
+                FreeColXMLWriter.WriteScope.toSave());
 
-            dutch.getMonarch().toXML(xw, WriteScope.toSave());
+            dutch.getMonarch().toXML(xw);
 
             xw.close();
 

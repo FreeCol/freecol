@@ -196,7 +196,7 @@ public abstract class FreeColGameObject extends FreeColObject {
             ? ((Ownable)this).getOwner()
             : null;
         try {
-            String xml = this.serialize(WriteScope.toSave());
+            String xml = this.serialize();
 
             Field nextId = Game.class.getDeclaredField("nextId");
             nextId.setAccessible(true);
@@ -284,83 +284,7 @@ public abstract class FreeColGameObject extends FreeColObject {
 
 
     // Serialization
-    // FreeColGameObjects use the 4-arg toXML
 
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public final void toXML(FreeColXMLWriter xw) throws XMLStreamException {
-        throw new XMLStreamException("Do not call FreeColGameObject.toXML(xw)");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public final void toXML(FreeColXMLWriter xw, WriteScope writeScope) throws XMLStreamException {
-        toXML(xw, getXMLTagName(), writeScope);
-    }
-
-    /**
-     * This method writes an XML-representation of this object with
-     * a specified tag to the given stream.
-     *
-     * Almost all FreeColGameObjects end up calling this, and implementing
-     * their own write{Attributes,Children} methods which begin by
-     * calling their superclass.  This allows a clean nesting of the
-     * serialization routines throughout the class hierarchy.
-     *
-     * Attribute and child visibility are controlled by the player and
-     * writeScope arguments.
-     *
-     * @param xw The <code>FreeColXMLWriter</code> to write to.
-     * @param tag The tag to use.
-     * @param writeScope The <code>WriteScope</code> to apply.
-     * @exception XMLStreamException if there are any problems writing
-     *     to the stream.
-     */
-    protected final void toXML(FreeColXMLWriter xw, String tag, WriteScope writeScope) throws XMLStreamException {
-        xw.writeStartElement(tag);
-
-        writeAttributes(xw, writeScope);
-
-        writeChildren(xw, writeScope);
-
-        xw.writeEndElement();
-    }
-
-    /**
-     * Write the attributes of this object to a stream.
-     *
-     * To be overridden if required by any object that has attributes
-     * and uses the toXML(FreeColXMLWriter, String, Player, boolean,
-     * boolean) call.
-     *
-     * @param xw The <code>FreeColXMLWriter</code> to write to.
-     * @param writeScope The <code>WriteScope</code> to apply.
-     * @exception XMLStreamException if there are any problems writing
-     *     to the stream.
-     */
-    protected void writeAttributes(FreeColXMLWriter xw, WriteScope writeScope) throws XMLStreamException {
-        super.writeAttributes(xw);
-    }
-
-    /**
-     * Write the children of this object to a stream.
-     *
-     * To be overridden if required by any object that has children
-     * and uses the toXML(FreeColXMLWriter, String) call.
-     *
-     * @param xw The <code>FreeColXMLWriter</code> to write to.
-     * @param writeScope The <code>WriteScope</code> to apply.
-     * @exception XMLStreamException if there are any problems writing
-     *     to the stream.
-     */
-    protected void writeChildren(FreeColXMLWriter xw, WriteScope writeScope) throws XMLStreamException {
-        super.writeChildren(xw);
-    }
 
     /**
      * Initialize this object from an XML-representation of this object.
