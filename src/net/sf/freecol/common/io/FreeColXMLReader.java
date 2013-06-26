@@ -56,7 +56,16 @@ public class FreeColXMLReader extends StreamReaderDelegate {
 
     private static final Logger logger = Logger.getLogger(FreeColXMLReader.class.getName());
 
+    public static enum ReadScope {
+        NORMAL,     // Normal interning read
+        NOINTERN,   // Do not intern any object that are read
+    }
+
+    /** The stream to read from. */
     private InputStream inputStream = null;
+
+    /** The read scope to apply. */
+    private ReadScope readScope;
 
 
     /**
@@ -74,9 +83,10 @@ public class FreeColXMLReader extends StreamReaderDelegate {
             XMLInputFactory xif = XMLInputFactory.newInstance();
             setParent(xif.createXMLStreamReader(inputStream, "UTF-8"));
         } catch (XMLStreamException e) {
-            throw new IOException(e.getCause());
+            throw new IOException(e);
         }
         this.inputStream = inputStream;
+        this.readScope = ReadScope.NORMAL;
     }
 
     /**
@@ -84,6 +94,7 @@ public class FreeColXMLReader extends StreamReaderDelegate {
      *
      * @param reader A <code>Reader</code> to create
      *     an <code>FreeColXMLReader</code> for.
+     * @param readScope The <code>ReadScope</code> to apply.
      * @exception IOException if thrown while creating the
      *     <code>FreeColXMLReader</code>.
      */
@@ -94,9 +105,39 @@ public class FreeColXMLReader extends StreamReaderDelegate {
             XMLInputFactory xif = XMLInputFactory.newInstance();
             setParent(xif.createXMLStreamReader(reader));
         } catch (XMLStreamException e) {
-            throw new IOException(e.getCause());
+            throw new IOException(e);
         }
         this.inputStream = null;
+        this.readScope = ReadScope.NORMAL;
+    }
+
+
+    /**
+     * Should reads from this stream intern their objects into the
+     * enclosing game?
+     *
+     * @return True if this is an interning stream.
+     */
+    public boolean shouldIntern() {
+        return this.readScope != ReadScope.NOINTERN;
+    }
+
+    /**
+     * Get the read scope.
+     *
+     * @return The <code>ReadScope</code>.
+     */
+    public ReadScope getReadScope() {
+        return this.readScope;
+    }
+
+    /**
+     * Set the read scope.
+     *
+     * @param readScope The new <code>ReadScope</code>.
+     */
+    public void setReadScope(ReadScope readScope) {
+        this.readScope = readScope;
     }
 
     /**
@@ -314,17 +355,23 @@ public class FreeColXMLReader extends StreamReaderDelegate {
      * @param defaultValue The default value.
      * @return The <code>FreeColObject</code> found, or the default
      *     value if not.
+     * @exception XMLStreamException if the wrong class was passed.
      */
     public <T extends FreeColGameObject> T getAttribute(Game game,
-        String attributeName, Class<T> returnType, T defaultValue) {
+        String attributeName, Class<T> returnType, T defaultValue) throws XMLStreamException {
         final String attrib =
         // @compat 0.10.7
             (FreeColObject.ID_ATTRIBUTE_TAG.equals(attributeName)) ? readId() :
         // end @compat
             getAttribute(attributeName, (String)null);
 
-        return (attrib == null) ? defaultValue
-            : game.getFreeColGameObject(attrib, returnType);
+        if (attrib == null) return defaultValue;
+        FreeColGameObject fcgo = game.getFreeColGameObject(attrib);
+        try {
+            return returnType.cast(fcgo);
+        } catch (ClassCastException cce) {
+            throw new XMLStreamException(cce);
+        }
     }
 
     /**
@@ -390,7 +437,7 @@ public class FreeColXMLReader extends StreamReaderDelegate {
             try {
                 ret = game.makeFreeColLocation(attrib);
             } catch (IllegalArgumentException iae) {
-                throw new XMLStreamException(iae.getCause());
+                throw new XMLStreamException(iae);
             }
         }
         return ret;
@@ -532,20 +579,14 @@ public class FreeColXMLReader extends StreamReaderDelegate {
             ret = game.getFreeColGameObject(id, returnClass);
             if (ret == null) {
                 try {
-                    Constructor<T> c = returnClass.getConstructor(Game.class,
-                                                                  String.class);
-                    ret = returnClass.cast(c.newInstance(game, id));
-                    if (required && ret == null) {
-                        throw new XMLStreamException("Constructed null "
-                            + returnClass.getName() + " for " + id
-                            + ": " + currentTag());
-                    }
-                } catch (Exception e) {
+                    ret = game.newInstance(returnClass);
+                    if (shouldIntern()) ret.internId(id);
+                } catch (IOException e) {
                     if (required) {
-                        throw new XMLStreamException(e.getCause());
+                        throw new XMLStreamException(e);
                     } else {
                         logger.log(Level.WARNING, "Failed to create FCGO: "
-                                   + id, e);
+                            + id, e);
                     }
                 }
             }
@@ -569,8 +610,17 @@ public class FreeColXMLReader extends StreamReaderDelegate {
      */
     public <T extends FreeColGameObject> T readFreeColGameObject(Game game,
         Class<T> returnClass) throws XMLStreamException {
-        T ret = makeFreeColGameObject(game, FreeColObject.ID_ATTRIBUTE_TAG, 
-                                      returnClass, false);
+        T ret = null;
+        if (shouldIntern()) {
+            ret = makeFreeColGameObject(game, FreeColObject.ID_ATTRIBUTE_TAG, 
+                                        returnClass, false);
+        } else {
+            try {
+                ret = game.newInstance(returnClass);
+            } catch (IOException ioe) {
+                throw new XMLStreamException(ioe);
+            }
+        }
         if (ret != null) ret.readFromXML(this);
         return ret;
     }
@@ -643,7 +693,7 @@ public class FreeColXMLReader extends StreamReaderDelegate {
                     }
                 } catch (Exception e) {
                     if (required) {
-                        throw new XMLStreamException(e.getCause());
+                        throw new XMLStreamException(e);
                     } else {
                         logger.log(Level.WARNING, "Failed to create AIObject: "
                                    + id, e);

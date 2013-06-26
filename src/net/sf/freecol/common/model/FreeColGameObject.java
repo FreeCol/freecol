@@ -70,7 +70,7 @@ public abstract class FreeColGameObject extends FreeColObject {
     public FreeColGameObject(Game game) {
         if (game != null) {
             this.game = game;
-            setId(getXMLTagName() + ":" + game.getNextId());
+            internId(getXMLTagName() + ":" + game.getNextId());
 
         } else if (this instanceof Game) {
             this.game = (Game)this;
@@ -100,7 +100,7 @@ public abstract class FreeColGameObject extends FreeColObject {
         }
 
         this.game = game;
-        if (id != null) setId(id);
+        if (id != null) internId(id);
         this.uninitialized = true;
     }
 
@@ -183,9 +183,6 @@ public abstract class FreeColGameObject extends FreeColObject {
      */
     public <T extends FreeColGameObject> T cloneFreeColGameObject(Class<T> returnClass) {
         final Game game = getGame();
-        final Player owner = (this instanceof Ownable)
-            ? ((Ownable)this).getOwner()
-            : null;
         try {
             String xml = this.serialize();
 
@@ -195,7 +192,7 @@ public abstract class FreeColGameObject extends FreeColObject {
             nextId.setInt(game, id + 1);
             xml = xml.replace(getId(), T.getXMLElementTagName() + ":" + id);
 
-            return unserialize(xml, game, returnClass);
+            return game.unserialize(xml, returnClass);
 
         } catch (Exception e) {
             logger.log(Level.WARNING, "Failed to clone " + getId(), e);
@@ -221,25 +218,25 @@ public abstract class FreeColGameObject extends FreeColObject {
     // Override FreeColObject
 
     /**
-     * Sets the unique identifier of this object.  When setting a new
-     * identifier, the object is automatically registered at the
-     * corresponding <code>Game</code> with that identifier.
+     * Sets the unique identifier of this object and registers it in its
+     * <code>Game</code> with that identifier, i.e. "intern" this object.
      *
      * @param newId The unique identifier of this object.
      */
     @Override
-    public final void setId(String newId) {
+    public final void internId(final String newId) {
         if (game != null && !(this instanceof Game)) {
             if (!newId.equals(getId())) {
+                FreeColObject ret = null;
                 if (getId() != null) {
                     game.removeFreeColGameObject(getId());
                 }
 
-                super.setId(newId);
+                setId(newId);
                 game.setFreeColGameObject(newId, this);
             }
         } else {
-            super.setId(newId);
+            setId(newId);
         }
     }
 

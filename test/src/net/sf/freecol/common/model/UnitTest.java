@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -650,7 +651,7 @@ public class UnitTest extends FreeColTestCase {
     }
 
 
-    public void testSerialization() {
+    public void testCopy() {
         Game game = getStandardGame();
         Player dutch = game.getPlayer("model.nation.dutch");
         Map map = getTestMap(plains, true);
@@ -663,18 +664,26 @@ public class UnitTest extends FreeColTestCase {
         Unit soldier = new ServerUnit(game, merchantman, dutch, veteranSoldierType);
         Goods goods = new Goods(game, merchantman, cottonType, 44);
         merchantman.add(goods);
+        
+        try {
+            Unit other = merchantman.copy(game, merchantman.getClass());
 
-        Unit clone = merchantman.cloneFreeColGameObject(Unit.class);
-
-        assertFalse(merchantman == clone);
-        assertFalse(merchantman.getId().equals(clone.getId()));
-        assertEquals(merchantman.getType(), clone.getType());
-        assertEquals(1, merchantman.getUnitCount());
-        assertEquals(1, clone.getUnitCount());
-        assertEquals(44, merchantman.getGoodsCount(cottonType));
-        assertEquals(44, clone.getGoodsCount(cottonType));
-        assertEquals(merchantman.getUnitList().get(0), clone.getUnitList().get(0));
-
+            assertFalse(merchantman == other);
+            assertEquals(merchantman.getId(), other.getId());
+            assertEquals(merchantman.getType(), other.getType());
+            assertEquals(1, merchantman.getUnitCount());
+            assertEquals(1, other.getUnitCount());
+            assertEquals(44, merchantman.getGoodsCount(cottonType));
+            assertEquals(44, other.getGoodsCount(cottonType));
+            assertEquals(1, merchantman.getUnitCount());
+            assertEquals(1, other.getUnitCount());
+            assertFalse(merchantman.getUnitList().get(0)
+                        == other.getUnitList().get(0));
+            assertEquals(merchantman.getUnitList().get(0).getId(),
+                         other.getUnitList().get(0).getId());
+        } catch (IOException ioe) {
+            fail(ioe.getMessage());
+        }
     }
 
     public void testElement() {

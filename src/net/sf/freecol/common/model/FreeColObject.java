@@ -29,9 +29,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -100,8 +97,19 @@ public abstract class FreeColObject {
      *
      * @param newId The new object identifier.
      */
-    protected void setId(final String newId) {
+    public void setId(final String newId) {
         this.id = newId;
+    }
+
+    /**
+     * Version of setId() for FreeColGameObject to override and intern the
+     * id into the enclosing game.  Just equivalent to setId() at the
+     * FreeColObject level.
+     *
+     * @param newId The new object identifier.
+     */
+    public void internId(final String newId) {
+        setId(newId);
     }
 
     /**
@@ -761,11 +769,13 @@ public abstract class FreeColObject {
             TransformerFactory factory = TransformerFactory.newInstance();
             Transformer xmlTransformer = factory.newTransformer();
             StringWriter stringWriter = new StringWriter();
-            xmlTransformer.transform(new DOMSource(element), new StreamResult(stringWriter));
+            xmlTransformer.transform(new DOMSource(element),
+                                     new StreamResult(stringWriter));
             String xml = stringWriter.toString();
             xr = new FreeColXMLReader(new StringReader(xml));
             xr.nextTag();
             readFromXML(xr);
+
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "IOException", ioe);
             throw new IllegalStateException("IOException");
@@ -879,40 +889,32 @@ public abstract class FreeColObject {
     }
 
     /**
-     * Unserialize from XML to a FreeColObject.
+     * Copy a FreeColObject by serializing it and reading back the result
+     * with a non-interning stream.
      *
-     * @param xml The xml serialized version of an object.
+     * The copied object and its descendents will be identical, but
+     * not present in the game.
+     *
      * @param game The <code>Game</code> to add the object to.
      * @param returnClass The required object class.
-     * @return The unserialized object.
-     * @exception XMLStreamException if there are any problems reading
-     *     from the stream.
+     * @return The copied object.
+     * @exception IOException if there is a problem in the underlying
+     *     stream processing or object creation.
      */
-    public static <T extends FreeColObject> T unserialize(String xml,
-        Game game, Class<T> returnClass) throws XMLStreamException {
-        T ret = null;
+    public <T extends FreeColObject> T copy(Game game, Class<T> returnClass)
+        throws IOException {
         try {
-            Constructor<T> c = returnClass.getConstructor(Game.class,
-                                                          String.class);
-            ret = c.newInstance(game, (String)null);
-        } catch (NoSuchMethodException nsme) { // Specific to getConstructor
-            logger.log(Level.WARNING, "No constructor for "
-                       + returnClass.getName(), nsme);
-        } catch (Exception e) { // Handles multiple fails from newInstance
-            logger.log(Level.WARNING, "Failed to instantiate "
-                       + returnClass.getName(), e);
+            String xml = this.serialize();
+            FreeColXMLReader xr = new FreeColXMLReader(new StringReader(xml));
+            xr.setReadScope(FreeColXMLReader.ReadScope.NOINTERN);
+            xr.nextTag();
+            T ret = game.newInstance(returnClass);
+            ret.readFromXML(xr);
+            return ret;
+
+        } catch (XMLStreamException xse) {
+            throw new IOException(xse);
         }
-        if (ret != null) {
-            try {
-                FreeColXMLReader xr
-                    = new FreeColXMLReader(new StringReader(xml));
-                xr.nextTag();
-                ret.readFromXML(xr);
-            } catch (IOException ioe) {
-                logger.log(Level.WARNING, "Exception creating stream.", ioe);
-            }
-        }
-        return ret;
     }
 
     /**
@@ -1058,7 +1060,13 @@ public abstract class FreeColObject {
      */
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         String newId = xr.readId();
-        if (newId != null) setId(newId);
+        if (newId != null) {
+            if (xr.shouldIntern()) {
+                internId(newId);
+            } else {
+                setId(newId);
+            }
+        }
     }
 
     /**
@@ -1112,7 +1120,7 @@ public abstract class FreeColObject {
         final String tag = xr.getLocalName();
         int n = xr.getAttributeCount();
 
-        setId(xr.readId());
+        internId(xr.readId());
 
         for (int i = 0; i < n; i++) {
             String name = xr.getAttributeLocalName(i);

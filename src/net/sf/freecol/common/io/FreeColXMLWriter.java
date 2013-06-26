@@ -57,7 +57,7 @@ public class FreeColXMLWriter implements XMLStreamWriter {
     private static final Logger logger = Logger.getLogger(FreeColXMLWriter.class.getName());
 
     /** The scope of a FreeCol object write. */
-    public enum WriteScope {
+    public static enum WriteScope {
         CLIENT,  // Only the client-visible information
         SERVER,  // Full server-visible information
         SAVE;    // Absolutely everything needed to save the game state
@@ -128,7 +128,7 @@ public class FreeColXMLWriter implements XMLStreamWriter {
             this.xmlStreamWriter = xof.createXMLStreamWriter(outputStream,
                                                              "UTF-8");
         } catch (XMLStreamException e) {
-            throw new IOException(e.getCause());
+            throw new IOException(e);
         }
         this.writeScope = writeScope;
     }
@@ -149,7 +149,7 @@ public class FreeColXMLWriter implements XMLStreamWriter {
             XMLOutputFactory xof = XMLOutputFactory.newInstance();
             this.xmlStreamWriter = xof.createXMLStreamWriter(writer);
         } catch (XMLStreamException e) {
-            throw new IOException(e.getCause());
+            throw new IOException(e);
         }
         this.writeScope = writeScope;
     }

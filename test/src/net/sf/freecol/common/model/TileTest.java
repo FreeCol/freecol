@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.model;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
@@ -615,12 +616,22 @@ public class TileTest extends FreeColTestCase {
         assertTrue(road.getZIndex() < TileItem.RESOURCE_ZINDEX);
     }
 
-    public void testSerialization() {
+    public void testCopy() {
         Game game = getStandardGame();
         game.setMap(getTestMap(plains));
         Colony colony = getStandardColony();
-        ColonyTile tile = colony.getColonyTile(colony.getTile());
+        Tile tile = colony.getTile();
 
-        assertNotNull(tile.cloneFreeColGameObject(ColonyTile.class));
+        try {
+            Tile otherTile = tile.copy(game, tile.getClass());
+            assertNotNull(otherTile);
+            assertFalse(otherTile == tile);
+            assertEquals(tile.getId(), otherTile.getId());
+            assertFalse(colony == otherTile.getColony());
+            assertEquals(colony.getId(), otherTile.getColony().getId());
+
+        } catch (IOException ioe) {
+            fail(ioe.getMessage());
+        }
     }
 }

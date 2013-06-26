@@ -854,7 +854,7 @@ public final class FreeColServer {
             throw new IOException("XMLStreamException: " + e.getMessage());
         } catch (Exception e) {
             logger.log(Level.WARNING, "Failed to save", e);
-            throw new IOException(e.getCause());
+            throw new IOException(e);
         } finally {
             if (xw != null) xw.close();
             if (fos != null) fos.close();

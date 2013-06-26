@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.model;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -98,5 +99,4 @@ public class GameTest extends FreeColTestCase {
         assertEquals(Turn.Season.AUTUMN, Turn.getSeason(310));
         assertEquals(3, Turn.getAge(1700));
     }
-
 }

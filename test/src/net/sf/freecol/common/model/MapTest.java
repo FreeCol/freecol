@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.model;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -60,7 +61,7 @@ public class MapTest extends FreeColTestCase {
         = spec().getUnitType("model.unit.hardyPioneer");
 
 
-    private Map getSingleLandPathMap(Game game){
+    private Map getSingleLandPathMap(Game game) {
         MapBuilder builder = new MapBuilder(game);
         builder.setBaseTileType(oceanType);
         // Land Stripe
@@ -83,7 +84,7 @@ public class MapTest extends FreeColTestCase {
     //
     //      *S(1,11)
     //
-    private Map getShortLongPathMap(Game game){
+    private Map getShortLongPathMap(Game game) {
         MapBuilder builder = new MapBuilder(game);
         builder.setBaseTileType(oceanType);
         //Start
@@ -587,5 +588,31 @@ public class MapTest extends FreeColTestCase {
             path.isOnCarrier());
         assertNotNull("From-galleon path should have a drop node.",
             path.getTransportDropNode());
+    }
+
+    public void testCopy() {
+        Game game = getStandardGame();
+        game.setMap(getTestMap());
+        Map map = game.getMap();
+        Colony colony = getStandardColony();
+        Tile tile = colony.getTile();
+
+        try {
+            Map otherMap = map.copy(game, map.getClass());
+            assertNotNull(otherMap);
+            assertFalse(otherMap == map);
+            assertEquals(otherMap.getId(), map.getId());
+            Tile otherTile = otherMap.getTile(tile.getX(), tile.getY());
+            assertNotNull(otherTile);
+            assertFalse(otherTile == tile);
+            assertEquals(otherTile.getId(), tile.getId());
+            Colony otherColony = otherTile.getColony();
+            assertNotNull(otherColony);
+            assertFalse(otherColony == colony);
+            assertEquals(otherColony.getId(), colony.getId());
+
+        } catch (IOException ioe) {
+            fail(ioe.getMessage());
+        }
     }
 }

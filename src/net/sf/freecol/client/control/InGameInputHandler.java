@@ -1757,7 +1757,7 @@ public final class InGameInputHandler extends InputHandler {
                 if (e.getCause() instanceof RuntimeException) {
                     throw (RuntimeException) e.getCause();
                 } else {
-                    throw new RuntimeException(e.getCause());
+                    throw new RuntimeException(e);
                 }
             }
         }
@@ -1822,7 +1822,7 @@ public final class InGameInputHandler extends InputHandler {
                 if (e.getCause() instanceof RuntimeException) {
                     throw (RuntimeException) e.getCause();
                 } else {
-                    throw new RuntimeException(e.getCause());
+                    throw new RuntimeException(e);
                 }
             }
         }
@@ -1848,7 +1848,7 @@ public final class InGameInputHandler extends InputHandler {
                 if (e.getCause() instanceof RuntimeException) {
                     throw (RuntimeException) e.getCause();
                 } else {
-                    throw new RuntimeException(e.getCause());
+                    throw new RuntimeException(e);
                 }
             }
         }
@@ -1944,7 +1944,7 @@ public final class InGameInputHandler extends InputHandler {
                 if (e.getCause() instanceof RuntimeException) {
                     throw (RuntimeException) e.getCause();
                 } else {
-                    throw new RuntimeException(e.getCause());
+                    throw new RuntimeException(e);
                 }
             }
         }
@@ -1985,7 +1985,7 @@ public final class InGameInputHandler extends InputHandler {
                 if (e.getCause() instanceof RuntimeException) {
                     throw (RuntimeException) e.getCause();
                 } else {
-                    throw new RuntimeException(e.getCause());
+                    throw new RuntimeException(e);
                 }
             }
         }

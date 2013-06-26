@@ -20,6 +20,11 @@
 package net.sf.freecol.common.model;
 
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -232,7 +237,7 @@ public class Game extends FreeColGameObject {
      * @return The game object, or null if not found.
      */
     public <T extends FreeColGameObject> T getFreeColGameObject(String id,
-        Class<T> returnClass) {
+        Class<T> returnClass) throws ClassCastException {
         FreeColGameObject fcgo = getFreeColGameObject(id);
         try {
             return returnClass.cast(fcgo);
@@ -956,6 +961,50 @@ public class Game extends FreeColGameObject {
         }
 
         return stats;
+    }
+
+
+    /**
+     * Instantiate an uninitialized FreeColObject class within this game.
+     *
+     * @param returnClass The required FreeColObject class.
+     * @return The new uninitialized object, or null on error.
+     * @exception IOException on error.
+     */
+    public <T extends FreeColObject> T newInstance(Class<T> returnClass) throws IOException {
+        try {
+            Constructor<T> c = returnClass.getConstructor(Game.class,
+                                                          String.class);
+            return c.newInstance(this, (String)null);
+
+        } catch (NoSuchMethodException nsme) { // Specific to getConstructor
+            throw new IOException(nsme);
+        } catch (Exception e) { // Handles multiple fails from newInstance
+            throw new IOException(e);
+        }
+    }
+
+    /**
+     * Unserialize from XML to a FreeColObject in this game.
+     *
+     * @param xml The xml serialized version of an object.
+     * @param returnClass The required object class.
+     * @return The unserialized object.
+     * @exception XMLStreamException if there are any problems reading from
+     *     the stream.
+     */
+    public <T extends FreeColObject> T unserialize(String xml,
+                                                   Class<T> returnClass) throws XMLStreamException {
+        try {
+            FreeColXMLReader xr = new FreeColXMLReader(new StringReader(xml));
+            xr.nextTag();
+            T ret = newInstance(returnClass);
+            ret.readFromXML(xr);
+            return ret;
+
+        } catch (IOException ioe) {
+            throw new XMLStreamException(ioe);
+        }
     }
 
 
