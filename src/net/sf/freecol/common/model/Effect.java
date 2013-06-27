@@ -85,8 +85,8 @@ public class Effect extends FreeColGameObjectType {
      * @param template The <code>Effect</code> to copy from.
      */
     public Effect(Effect template) {
-        setSpecification(template.getSpecification());
         setId(template.getId());
+        setSpecification(template.getSpecification());
         this.probability = template.probability;
         this.scopes = template.scopes;
         addFeatures(template);

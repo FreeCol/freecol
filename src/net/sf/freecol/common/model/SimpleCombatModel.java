@@ -269,12 +269,11 @@ public class SimpleCombatModel extends CombatModel {
                     // Ambush bonus in the open = defender's defence
                     // bonus, if defender is REF, or attacker is indian.
                     if (isAmbush(attacker, defender)) {
-                        for (Modifier mod : tile.getType()
+                        for (Modifier m : tile.getType()
                                  .getModifierSet(Modifier.DEFENCE)) {
-                            Modifier modifier = new Modifier(mod);
-                            modifier.setId(Modifier.OFFENCE);
-                            modifier.setSource(Specification.AMBUSH_BONUS_SOURCE);
-                            result.add(modifier);
+                            Modifier mod = new Modifier(Modifier.OFFENCE, m);
+                            mod.setSource(Specification.AMBUSH_BONUS_SOURCE);
+                            result.add(mod);
                         }
                     }
                     // Artillery in the open penalty, must be on a

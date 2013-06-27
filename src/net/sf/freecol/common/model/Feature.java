@@ -63,7 +63,12 @@ public abstract class Feature extends FreeColObject {
     private List<Scope> scopes = null;
 
 
-    protected void copy(Feature other) {
+    /**
+     * Copy another Feature.
+     *
+     * @param other The other <code>Feature</code> to copy.
+     */
+    protected void copyFrom(Feature other) {
         setId(other.getId());
         this.source = other.source;
         this.firstTurn = other.firstTurn;

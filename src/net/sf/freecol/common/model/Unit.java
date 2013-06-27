@@ -3350,9 +3350,9 @@ public class Unit extends GoodsLocation
     public Set<Modifier> getMissionaryTradeModifiers(boolean sense) {
         HashSet<Modifier> result = new HashSet<Modifier>();
         for (Modifier m : getModifierSet("model.modifier.missionaryTradeBonus")) {
-            result.add(new Modifier(m.getId(), m.getSource(),
-                                    (sense) ? m.getValue() : -m.getValue(),
-                                    m.getType()));
+            Modifier modifier = new Modifier(m);
+            if (!sense) modifier.setValue(-m.getValue());
+            result.add(modifier);
         }
         return result;
     }

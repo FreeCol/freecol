@@ -50,8 +50,8 @@ public abstract class TradeItem extends FreeColObject {
      * @param destination The destination <code>Player</code>.
      */
     public TradeItem(Game game, String id, Player source, Player destination) {
-        this.game = game;
         setId(id);
+        this.game = game;
         this.source = source;
         this.destination = destination;
     }

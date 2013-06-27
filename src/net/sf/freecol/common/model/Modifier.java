@@ -126,13 +126,23 @@ public class Modifier extends Feature implements Comparable<Modifier> {
      * @param template A <code>Modifier</code> to copy.
      */
     public Modifier(Modifier template) {
-        super.copy(template);
+        copyFrom(template);
         setType(template.getType());
         setValue(template.getValue());
-        if (template.hasIncrement()) {
-            setIncrement(template.getIncrement(), template.getIncrementType(),
-                         template.getFirstTurn(), template.getLastTurn());
-        }
+        setIncrementValue(template.getIncrementValue());
+        setIncrementType(template.getIncrementType());
+    }
+
+    /**
+     * Creates a new <code>Modifier</code> instance from another with
+     * an identifier override.
+     *
+     * @param id The object identifier.
+     * @param template A <code>Modifier</code> to copy.
+     */
+    public Modifier(String id, Modifier template) {
+        this(template);
+        setId(id);
     }
 
     /**
@@ -173,9 +183,7 @@ public class Modifier extends Feature implements Comparable<Modifier> {
      */
     public static Modifier makeTimedModifier(String id, Modifier template,
                                              Turn start) {
-        Modifier modifier = new Modifier(id, template.getSource(),
-                                         template.getValue(),
-                                         template.getType());
+        Modifier modifier = new Modifier(id, template);
         float inc = template.getIncrement();
         int duration = template.getDuration();
         modifier.setTemporary(template.isTemporary());
@@ -222,6 +230,24 @@ public class Modifier extends Feature implements Comparable<Modifier> {
      */
     public void setIncrementType(final Type newIncrementType) {
         this.incrementType = newIncrementType;
+    }
+
+    /**
+     * Get the increment value.
+     *
+     * @return The increment value.
+     */
+    public float getIncrementValue() {
+        return increment;
+    }
+
+    /**
+     * Set the increment value.
+     *
+     * @param newValue The new value.
+     */
+    public void setIncrementValue(final float newValue) {
+        this.increment = newValue;
     }
 
     /**

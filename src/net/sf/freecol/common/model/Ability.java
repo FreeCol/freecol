@@ -205,7 +205,7 @@ public final class Ability extends Feature {
      * @param template An <code>Ability</code> to copy from.
      */
     public Ability(Ability template) {
-        super.copy(template);
+        copyFrom(template);
         this.value = template.value;
     }
 

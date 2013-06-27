@@ -70,10 +70,12 @@ public abstract class FreeColGameObject extends FreeColObject {
     public FreeColGameObject(Game game) {
         if (game != null) {
             this.game = game;
-            setDefaultId(game);
+            setId(getXMLTagName() + ":" + game.getNextId());
+
         } else if (this instanceof Game) {
             this.game = (Game)this;
             setId("0");
+
         } else {
             throw new IllegalArgumentException("FCGO with null game.");
         }
@@ -138,17 +140,6 @@ public abstract class FreeColGameObject extends FreeColObject {
      */
     public boolean isUninitialized() {
         return uninitialized;
-    }
-
-    /**
-     * Sets the identifier from the real type and the next identifier
-     * in the server.  Split out only to help out a backward
-     * compatibility reader.
-     *
-     * @param game The <code>Game</code> this object is in.
-     */
-    protected void setDefaultId(Game game) {
-        setId(getXMLTagName() + ":" + game.getNextId());
     }
 
     /**

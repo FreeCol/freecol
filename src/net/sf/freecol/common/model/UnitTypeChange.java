@@ -84,7 +84,7 @@ public class UnitTypeChange extends FreeColObject {
 
 
     /**
-     * Delibaretely empty constructor.
+     * Deliberately empty constructor.
      */
     public UnitTypeChange() {}
 
@@ -97,7 +97,6 @@ public class UnitTypeChange extends FreeColObject {
      */
     public UnitTypeChange(FreeColXMLReader xr,
                           Specification specification) throws XMLStreamException {
-        setId(xr.readId());
         setSpecification(specification);
         readFromXML(xr);
     }
