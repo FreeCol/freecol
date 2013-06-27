@@ -135,7 +135,7 @@ public class NumberRules {
     /**
      * Describe <code>readFromXML</code> method here.
      *
-     * @param in a <code>FreeColXMLReader</code> value
+     * @param xr The <code>FreeColXMLReader</code> to read from.
      * @exception XMLStreamException if an error occurs
      */
     private static void readFromXML(FreeColXMLReader xr) throws XMLStreamException {
@@ -159,12 +159,10 @@ public class NumberRules {
     /**
      * Describe <code>readChild</code> method here.
      *
-     * @param in a <code>FreeColXMLReader</code> value
+     * @param xr The <code>FreeColXMLReader</code> to read from.
      * @exception XMLStreamException if an error occurs
      */
-    private static void readChild(FreeColXMLReader xr)
-        throws XMLStreamException {
-
+    private static void readChild(FreeColXMLReader xr) throws XMLStreamException {
         String loc = xr.getAttribute(LOCALES_TAG, (String)null);
         String[] locales = (loc == null) ? null : loc.split(" ");
         if (locales != null) {

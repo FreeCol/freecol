@@ -611,21 +611,6 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     // Interface Consumer
 
     /**
-     * Can this Consumer consume the given GoodsType?
-     *
-     * @param goodsType a <code>GoodsType</code> value
-     * @return a <code>boolean</code> value
-     */
-    public boolean consumes(GoodsType goodsType) {
-        for (AbstractGoods input : getInputs()) {
-            if (input.getType() == goodsType) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * {@inheritDoc}
      */
     public List<AbstractGoods> getConsumedGoods() {

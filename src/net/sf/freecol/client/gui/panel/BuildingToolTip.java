@@ -63,7 +63,6 @@ public class BuildingToolTip extends JToolTip {
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param building The building to display information from.
-     * @param gui The <code>GUI</code> to display on.
      */
     public BuildingToolTip(FreeColClient freeColClient, Building building) {
         final ImageLibrary lib = freeColClient.getGUI().getImageLibrary();

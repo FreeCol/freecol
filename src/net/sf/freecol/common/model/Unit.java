@@ -3368,6 +3368,20 @@ public class Unit extends GoodsLocation
         throw new UnsupportedOperationException("Can not add Feature to Unit directly!");
     }
 
+    /**
+     * Gets the <code>ProductionInfo</code> for this unit.
+     * TODO: the input parameter is ignored! Fix?
+     *
+     * @param input A list of input <code>AbstractGoods</code>.
+     * @return The <code>ProductionInfo</code> for this unit.
+     */
+    public ProductionInfo getProductionInfo(List<AbstractGoods> input) {
+        ProductionInfo result = new ProductionInfo();
+        result.setConsumption(getType().getConsumedGoods());
+        result.setMaximumConsumption(getType().getConsumedGoods());
+        return result;
+    }
+
 
     // Message unpacking support.
 
@@ -3466,16 +3480,6 @@ public class Unit extends GoodsLocation
      */
     public List<AbstractGoods> getConsumedGoods() {
         return unitType.getConsumedGoods();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public ProductionInfo getProductionInfo(List<AbstractGoods> input) {
-        ProductionInfo result = new ProductionInfo();
-        result.setConsumption(getType().getConsumedGoods());
-        result.setMaximumConsumption(getType().getConsumedGoods());
-        return result;
     }
 
     /**

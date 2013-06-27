@@ -394,7 +394,7 @@ public abstract class FreeColAction extends AbstractAction
     /**
      * Initialize this object from an XML-representation of this object.
      *
-     * @param in The input stream with the XML.
+     * @param xr The <code>FreeColXMLReader</code> to read from.
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
     public void readFromXML(FreeColXMLReader xr) throws XMLStreamException {

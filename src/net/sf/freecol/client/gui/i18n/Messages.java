@@ -124,7 +124,7 @@ public class Messages {
     /**
      * Gets the Selector with the given tag.
      *
-     * @param The tag to check.
+     * @param tag The tag to check.
      * @return A suitable <code>Selector</code>.
      */
     private static Selector getSelector(String tag) {

@@ -74,7 +74,7 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
      * Create a new build queue.
      *
      * @param colony The <code>Colony</code> to build for.
-     * @param completionAction The action on build completion.
+     * @param action The action on build completion.
      * @param priority The build priority.
      */
     public BuildQueue(Colony colony, CompletionAction action, int priority) {
@@ -158,14 +158,6 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
     /**
      * {@inheritDoc}
      */
-    public boolean consumes(GoodsType goodsType) {
-        return getCurrentlyBuilding() != null
-            && getCurrentlyBuilding().getRequiredAmountOf(goodsType) > 0;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public List<AbstractGoods> getConsumedGoods() {
         T current = getCurrentlyBuilding();
         return (current == null) ? new ArrayList<AbstractGoods>()
@@ -175,8 +167,8 @@ public class BuildQueue<T extends BuildableType> implements Consumer {
     /**
      * Return the <code>ProductionInfo</code> for this BuildQueue.
      *
-     * @param input the goods available
-     * @return the <code>ProductionInfo</code> for this BuildQueue
+     * @param input A list of input <code>AbstractGoods</code>.
+     * @return The <code>ProductionInfo</code> for this BuildQueue
      */
     public ProductionInfo getProductionInfo(List<AbstractGoods> input) {
         ProductionInfo result = new ProductionInfo();

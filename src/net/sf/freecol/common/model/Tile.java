@@ -300,8 +300,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      *     <code>Tile</code>.
      * @see #getSettlement
      */
-    public void setSettlement(Settlement s) {
-        settlement = s;
+    public void setSettlement(Settlement settlement) {
+        this.settlement = settlement;
     }
 
     /**
@@ -542,7 +542,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * Does this tile contain a completed improvement of the given type?
      *
      * @param type The <code>TileImprovementType</code> to look for.
-     * @param True if there is a completed improvement present.
+     * @return True if there is a completed improvement present.
      */
     public boolean hasTileImprovement(TileImprovementType type) {
         return (tileItemContainer == null) ? false
@@ -553,7 +553,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * Gets the TileImprovement of a given type, or null if there is no match.
      *
      * @param type The <code>TileImprovementType</code> to look for.
-     * @param The <code>TileImprovement</code> of the requested type found,
+     * @return The <code>TileImprovement</code> of the requested type found,
      *     or null if none.
      */
     public TileImprovement getTileImprovement(TileImprovementType type) {

@@ -353,7 +353,6 @@ public class FreeColXMLReader extends StreamReaderDelegate {
      *
      * @param game The <code>Game</code> to look in.
      * @param attributeName The attribute to check.
-     * @param required 
      * @return The <code>Location</code> found.
      */
     public Location findLocationAttribute(Game game, String attributeName) {

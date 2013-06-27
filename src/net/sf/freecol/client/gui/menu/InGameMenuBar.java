@@ -61,10 +61,8 @@ public class InGameMenuBar extends FreeColMenuBar {
      * all of the submenus and items.
      *
      * @param f The main controller.
-     * @param gui 
      */
     public InGameMenuBar(FreeColClient f) {
-
         // TODO: FreeColClient should not have to be passed in to this class.
         // This is only a menu bar, it doesn't need
         // a reference to the main controller. The only reason it has one now is

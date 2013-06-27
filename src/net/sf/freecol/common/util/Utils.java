@@ -292,7 +292,6 @@ public class Utils {
      * @param logMe A string to log with the result.
      * @param list The list.
      * @param random A random number source.
-     * @return A random member from the list.
      */
     public static void randomShuffle(Logger logger, String logMe,
                                      List<?> list, Random random) {

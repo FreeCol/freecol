@@ -61,10 +61,11 @@ public final class CanvasMapEditorMouseListener extends AbstractCanvasListener
      * The constructor to use.
      *
      * @param canvas The component this object gets created for.
-     * @param gui The GUI that holds information such as screen resolution.
      */
-    public CanvasMapEditorMouseListener(FreeColClient freeColClient, Canvas canvas) {
+    public CanvasMapEditorMouseListener(FreeColClient freeColClient,
+                                        Canvas canvas) {
         super(freeColClient);
+
         this.canvas = canvas;
     }
 

@@ -1387,8 +1387,6 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Sets the number of immigration this player possess.
-     *
-     * @see #incrementImmigration(int)
      */
     public void reduceImmigration() {
         if (!isColonial()) return;
@@ -1541,7 +1539,6 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * @return The total amount of liberty this <code>Player</code>'s
      *     <code>Colony</code>s will make next turn.
-     * @see #incrementLiberty
      */
     public int getLibertyProductionNextTurn() {
         int libertyNextTurn = 0;
@@ -1669,7 +1666,6 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * @return How many more liberty points the <code>Player</code>
      *     needs in order to recruit the next <code>FoundingFather</code>.
-     * @see #incrementLiberty
      */
     public int getRemainingFoundingFatherCost() {
         return getTotalFoundingFatherCost() - getLiberty();
@@ -1683,7 +1679,6 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * @return Total number of liberty points the <code>Player</code>
      *     needs to recruit the next <code>FoundingFather</code>.
-     * @see #incrementLiberty
      */
     public int getTotalFoundingFatherCost() {
         final Specification spec = getSpecification();

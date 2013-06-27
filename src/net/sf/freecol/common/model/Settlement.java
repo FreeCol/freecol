@@ -123,24 +123,6 @@ public abstract class Settlement extends GoodsLocation
     }
 
     /**
-     * Get the name of this <code>Settlement</code>.
-     *
-     * @return The settlement name.
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Sets the name of this <code>Settlement</code>.
-     *
-     * @param newName The new name.
-     */
-    public void setName(String newName) {
-        this.name = newName;
-    }
-
-    /**
      * Is this a national capital?
      *
      * @return True if this is a national capital.
@@ -465,13 +447,24 @@ public abstract class Settlement extends GoodsLocation
     }
 
 
-    // Interface Named
+    // Interface Nameable
 
     /**
-     * {@inheritDoc}
+     * Get the name of this <code>Settlement</code>.
+     *
+     * @return The settlement name.
      */
-    public String getNameKey() {
-        return getName();
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Sets the name of this <code>Settlement</code>.
+     *
+     * @param newName The new name.
+     */
+    public void setName(String newName) {
+        this.name = newName;
     }
 
 

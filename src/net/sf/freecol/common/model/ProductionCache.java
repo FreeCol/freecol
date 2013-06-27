@@ -205,8 +205,8 @@ public class ProductionCache {
     }
 
     /**
-     * Returns the <code>ProductionInfo</code> for the given {@link
-     * WorkLocation} or {@link Consumer}.
+     * Gets the <code>ProductionInfo</code> for the given
+     * {@link WorkLocation} or {@link Consumer}.
      *
      * @param object an <code>Object</code> value
      * @return a <code>ProductionInfo</code> value

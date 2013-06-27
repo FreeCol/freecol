@@ -217,7 +217,9 @@ public class TradeRouteStop {
     }
 
     /**
-     * {@inheritDoc}
+     * Delegate to getXMLElementTagName.
+     *
+     * @return What getXMLElementTagName does.
      */
     public String getXMLTagName() { return getXMLElementTagName(); }
 

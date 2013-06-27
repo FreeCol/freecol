@@ -131,7 +131,7 @@ public class EuropeanNationType extends NationType {
      *
      * @param id The unit identifier.
      * @param unit The <code>AbstractUnit</code> to add.
-     * @param ex Is this an expert unit?
+     * @param expert Is this an expert unit?
      */
     private void addStartingUnit(String id, AbstractUnit unit, boolean expert) {
         String exTag = (expert) ? Boolean.TRUE.toString() : null;

@@ -97,14 +97,11 @@ public final class UnitLabel extends JLabel
     private boolean ignoreLocation;
 
 
-
-
     /**
      * Creates a JLabel to display a unit.
      *
      * @param freeColClient The <code>FreeColClient</code> for the game.
      * @param unit The <code>Unit</code> to display.
-     * @param gui The <code>GUI</code> to display on.
      */
     public UnitLabel(FreeColClient freeColClient, Unit unit) {
         this.freeColClient = freeColClient;
