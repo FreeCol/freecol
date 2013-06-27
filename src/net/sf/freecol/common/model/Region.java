@@ -534,8 +534,8 @@ public class Region extends FreeColGameObject implements Nameable {
         int turn = xr.getAttribute(DISCOVERED_IN_TAG, UNDEFINED);
         discoveredIn = (turn == UNDEFINED) ? null : new Turn(turn);
 
-        discoveredBy = xr.makeFreeColGameObject(getGame(), DISCOVERED_BY_TAG,
-                                                Player.class, false);
+        discoveredBy = xr.findFreeColGameObject(getGame(), DISCOVERED_BY_TAG,
+            Player.class, (Player)null, false);
 
         parent = xr.makeFreeColGameObject(getGame(), PARENT_TAG,
                                           Region.class, false);

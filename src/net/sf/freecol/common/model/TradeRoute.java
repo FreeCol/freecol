@@ -451,8 +451,8 @@ public class TradeRoute extends FreeColGameObject
 
         name = xr.getAttribute(NAME_TAG, (String)null);
 
-        owner = xr.makeFreeColGameObject(getGame(), OWNER_TAG,
-                                         Player.class, true);
+        owner = xr.findFreeColGameObject(getGame(), OWNER_TAG,
+                                         Player.class, (Player)null, true);
     }
 
     /**

@@ -334,7 +334,8 @@ public class LostCityRumour extends TileItem {
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
-        tile = xr.makeFreeColGameObject(getGame(), TILE_TAG, Tile.class, true);
+        tile = xr.findFreeColGameObject(getGame(), TILE_TAG,
+                                        Tile.class, (Tile)null, true);
 
         type = xr.getAttribute(TYPE_TAG, RumourType.class, (RumourType)null);
 

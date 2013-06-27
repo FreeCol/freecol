@@ -663,9 +663,11 @@ public abstract class Settlement extends GoodsLocation
 
         name = xr.getAttribute(NAME_TAG, (String)null);
 
-        owner = xr.makeFreeColGameObject(game, OWNER_TAG, Player.class, true);
+        owner = xr.findFreeColGameObject(game, OWNER_TAG,
+                                         Player.class, (Player)null, true);
 
-        tile = xr.makeFreeColGameObject(game, TILE_TAG, Tile.class, true);
+        tile = xr.findFreeColGameObject(game, TILE_TAG,
+                                        Tile.class, (Tile)null, true);
 
         String type = xr.getAttribute(SETTLEMENT_TYPE_TAG, (String)null);
         changeType(owner.getNationType().getSettlementType(type));

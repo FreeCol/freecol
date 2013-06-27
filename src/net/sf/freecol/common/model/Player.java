@@ -3966,9 +3966,9 @@ public class Player extends FreeColGameObject implements Nameable {
             xr.closeTag(STANCE_TAG);
 
         } else if (TENSION_TAG.equals(tag)) {
-            tension.put(xr.makeFreeColGameObject(game, PLAYER_TAG,
-                                                 Player.class, true),
-                        new Tension(xr.getAttribute(VALUE_TAG, 0)));
+            tension.put(xr.findFreeColGameObject(game, PLAYER_TAG,
+                    Player.class, (Player)null, true),
+                new Tension(xr.getAttribute(VALUE_TAG, 0)));
             xr.closeTag(TENSION_TAG);
         
         } else if (Europe.getXMLElementTagName().equals(tag)) {

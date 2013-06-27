@@ -1351,8 +1351,8 @@ public class IndianSettlement extends Settlement {
         learnableSkill = xr.getType(spec, LEARNABLE_SKILL_TAG,
                                     UnitType.class, (UnitType)null);
 
-        mostHated = xr.makeFreeColGameObject(getGame(), MOST_HATED_TAG,
-                                             Player.class, false);
+        mostHated = xr.findFreeColGameObject(getGame(), MOST_HATED_TAG,
+                                             Player.class, (Player)null, false);
 
         for (int i = 0; i < wantedGoods.length; i++) {
             wantedGoods[i] = xr.getType(spec, WANTED_GOODS_TAG + i,
@@ -1395,8 +1395,8 @@ public class IndianSettlement extends Settlement {
         final String tag = xr.getLocalName();
 
         if (ALARM_TAG.equals(tag)) {
-            Player player = xr.makeFreeColGameObject(game, PLAYER_TAG,
-                                                     Player.class, true);
+            Player player = xr.findFreeColGameObject(game, PLAYER_TAG,
+                Player.class, (Player)null, true);
             // @compat 0.10.5
             setContacted(player); // Alarm used to imply contact
             // end @compat
@@ -1406,15 +1406,15 @@ public class IndianSettlement extends Settlement {
         } else if (CONTACT_LEVEL_TAG.equals(tag)) {
             ContactLevel cl = xr.getAttribute(LEVEL_TAG,
                 ContactLevel.class, ContactLevel.UNCONTACTED);
-            Player player = xr.makeFreeColGameObject(game, PLAYER_TAG,
-                                                     Player.class, true);
+            Player player = xr.findFreeColGameObject(game, PLAYER_TAG,
+                Player.class, (Player)null, true);
             contactLevels.put(player, cl);
             xr.closeTag(CONTACT_LEVEL_TAG);
 
         // @compat 0.10.5
         } else if (IS_VISITED_TAG.equals(tag)) {
-            Player player = xr.makeFreeColGameObject(game, PLAYER_TAG,
-                                                     Player.class, true);
+            Player player = xr.findFreeColGameObject(game, PLAYER_TAG,
+                Player.class, (Player)null, true);
             setScouted(player);
             xr.closeTag(IS_VISITED_TAG);
         // end @compat

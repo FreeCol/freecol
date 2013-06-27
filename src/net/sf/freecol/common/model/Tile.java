@@ -1976,10 +1976,11 @@ public final class Tile extends UnitLocation implements Named, Ownable {
             }
         }
 
-        owner = xr.makeFreeColGameObject(game, OWNER_TAG, Player.class, false);
+        owner = xr.findFreeColGameObject(game, OWNER_TAG,
+                                         Player.class, (Player)null, false);
 
-        region = xr.makeFreeColGameObject(game, REGION_TAG,
-                                          Region.class, true);
+        region = xr.findFreeColGameObject(game, REGION_TAG,
+                                          Region.class, (Region)null, true);
 
         moveToEurope = (xr.hasAttribute(MOVE_TO_EUROPE_TAG))
             ? new Boolean(xr.getAttribute(MOVE_TO_EUROPE_TAG, false))

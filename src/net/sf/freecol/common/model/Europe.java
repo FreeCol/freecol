@@ -364,8 +364,8 @@ public class Europe extends UnitLocation implements Ownable, Named {
             if (unitType != null) recruitables[index] = unitType;
         }
 
-        owner = xr.makeFreeColGameObject(getGame(), OWNER_TAG,
-                                         Player.class, true);
+        owner = xr.findFreeColGameObject(getGame(), OWNER_TAG,
+                                         Player.class, (Player)null, true);
 
         recruitPrice = xr.getAttribute(RECRUIT_PRICE_TAG,
                                        RECRUIT_PRICE_INITIAL);

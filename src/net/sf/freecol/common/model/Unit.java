@@ -3900,7 +3900,8 @@ public class Unit extends GoodsLocation
 
         name = xr.getAttribute(NAME_TAG, (String)null);
 
-        owner = xr.makeFreeColGameObject(game, OWNER_TAG, Player.class, true);
+        owner = xr.findFreeColGameObject(game, OWNER_TAG,
+                                         Player.class, (Player)null, true);
 
         UnitType oldUnitType = unitType;
         unitType = xr.getType(spec, UNIT_TYPE_TAG,
