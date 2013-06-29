@@ -3864,17 +3864,15 @@ public class Unit extends GoodsLocation
      */
     @Override
     protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
-        // Do not show enemy units hidden in a carrier:
         if (xw.validFor(getOwner())) {
 
+            // Do not show goods or units carried by this unit.
             super.writeChildren(xw);
+
+            if (workImprovement != null) workImprovement.toXML(xw);
 
         } else if (getType().canCarryGoods()) {
             xw.writeAttribute(VISIBLE_GOODS_COUNT_TAG, getVisibleGoodsCount());
-        }
-
-        if (workImprovement != null) {
-            workImprovement.toXML(xw);
         }
 
         for (EquipmentType et : getSortedCopy(equipment.keySet())) {
