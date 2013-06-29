@@ -361,6 +361,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 break;
             case IMPROVING:
                 csImproveTile(random, cs);
+                setWorkImprovement(null);
                 return true;
             default:
                 logger.warning("Unknown work completed, state=" + getState());
