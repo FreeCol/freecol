@@ -2674,7 +2674,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 cST[tile.getX()][tile.getY()] = true;
                 for (Tile t : tile.getSurroundingTiles(unit.getLineOfSight())) {
                     if (t != null) {
-                        cST[t.getX()][t.getY()] = hasExplored(t);
+                        cST[t.getX()][t.getY()] = true;
                     }
                 }
             }
@@ -2683,7 +2683,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 cST[tile.getX()][tile.getY()] = true;
                 for (Tile t : tile.getSurroundingTiles(settlement.getLineOfSight())) {
                     if (t != null) {
-                        cST[t.getX()][t.getY()] = hasExplored(t);
+                        cST[t.getX()][t.getY()] = true;
                     }
                 }
             }
@@ -2696,7 +2696,7 @@ public class Player extends FreeColGameObject implements Nameable {
                         if (!is.hasMissionary(this)) continue;
                         for (Tile t : is.getTile().getSurroundingTiles(is.getLineOfSight())) {
                             if (t != null) {
-                                cST[t.getX()][t.getY()] = hasExplored(t);
+                                cST[t.getX()][t.getY()] = true;
                             }
                         }
                     }
