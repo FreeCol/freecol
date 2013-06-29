@@ -280,6 +280,21 @@ public class DiplomaticTrade extends FreeColObject {
         return colonyList;
     }
 
+    /**
+     * Get a list of units offered in this trade.
+     *
+     * @return A list of <code>Unit</code>s offered in this trade.
+     */
+    public List<Unit> getUnitsGivenBy(Player player) {
+        List<Unit> unitList = new ArrayList<Unit>();
+        for (TradeItem ti : items) {
+            if (ti instanceof UnitTradeItem && player == ti.getSource()) {
+                unitList.add(((UnitTradeItem)ti).getUnit());
+            }
+        }
+        return unitList;
+    }
+
 
     // Serialization
 

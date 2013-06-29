@@ -3513,26 +3513,22 @@ public class Unit extends GoodsLocation
         }
 
         // Clear trade route and goto orders if changing owner.
-        if (getTradeRoute() != null) {
-            setTradeRoute(null);
-        }
-        if (getDestination() != null) {
-            setDestination(null);
-        }
+        if (getTradeRoute() != null) setTradeRoute(null);
+        if (getDestination() != null) setDestination(null);
 
         // This need to be set right away
         this.owner = owner;
         // If its a carrier, we need to update the units it has loaded
-        //before finishing with it
+        // before finishing with it
         for (Unit unit : getUnitList()) {
             unit.setOwner(owner);
         }
 
-        if(oldOwner != null) {
+        if (oldOwner != null) {
             oldOwner.removeUnit(this);
             oldOwner.modifyScore(-getType().getScoreValue());
             // for speed optimizations
-            if(!isOnCarrier()){
+            if (!isOnCarrier()) {
                 oldOwner.invalidateCanSeeTiles();
             }
         }
@@ -3898,8 +3894,10 @@ public class Unit extends GoodsLocation
 
         name = xr.getAttribute(NAME_TAG, (String)null);
 
+        Player oldOwner = owner;
         owner = xr.findFreeColGameObject(game, OWNER_TAG,
                                          Player.class, (Player)null, true);
+        game.checkOwners(this, oldOwner);
 
         UnitType oldUnitType = unitType;
         unitType = xr.getType(spec, UNIT_TYPE_TAG,
@@ -3977,16 +3975,13 @@ public class Unit extends GoodsLocation
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
-        clearUnitList();
         if (getGoodsContainer() != null) getGoodsContainer().removeAll();
-        clearEquipment();
-        setWorkImprovement(null);
+        equipment.clear();
+        workImprovement = null;
 
         super.readChildren(xr);
 
         setRole();
-        getOwner().addUnit(this);
-        getOwner().invalidateCanSeeTiles();
     }
 
     /**
@@ -4011,7 +4006,8 @@ public class Unit extends GoodsLocation
         // end @compat
 
         } else if (TileImprovement.getXMLElementTagName().equals(tag)) {
-            setWorkImprovement(xr.readFreeColGameObject(game, TileImprovement.class));
+            workImprovement = xr.readFreeColGameObject(game,
+                                                       TileImprovement.class);
 
         } else {
             super.readChild(xr);

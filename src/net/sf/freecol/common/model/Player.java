@@ -544,14 +544,6 @@ public class Player extends FreeColGameObject implements Nameable {
     protected java.util.Map<String, Stance> stance
         = new HashMap<String, Stance>();
 
-    /** A map of the units this player owns indexed by object identifier. */
-    protected final java.util.Map<String, Unit> units
-        = new HashMap<String, Unit>();
-
-    /** The settlements this player owns. */
-    protected final List<Settlement> settlements
-        = new ArrayList<Settlement>();
-
     /** The trade routes defined by this player. */
     protected final List<TradeRoute> tradeRoutes = new ArrayList<TradeRoute>();
 
@@ -570,6 +562,14 @@ public class Player extends FreeColGameObject implements Nameable {
         = new HashMap<String, Integer>();
 
     // Temporary/transient variables, do not serialize.
+
+    /** A map of the units this player owns indexed by object identifier. */
+    protected final java.util.Map<String, Unit> units
+        = new HashMap<String, Unit>();
+
+    /** The settlements this player owns. */
+    protected final List<Settlement> settlements
+        = new ArrayList<Settlement>();
 
     /** The tiles the player can see. */
     private boolean[][] canSeeTiles = null;
@@ -2052,30 +2052,31 @@ public class Player extends FreeColGameObject implements Nameable {
      * Add a unit to this player.
      *
      * @param newUnit The new <code>Unit</code> value.
+     * @return True if the units container changed.
      */
-    public final void addUnit(final Unit newUnit) {
-        if (newUnit == null) throw new IllegalStateException("Null new unit.");
+    public final boolean addUnit(final Unit newUnit) {
+        if (newUnit == null) return false;
 
         // Make sure the owner of the unit is set first, before adding
         // it to the list
-        if (newUnit.getOwner() != null && !this.owns(newUnit)) {
+        if (!this.owns(newUnit)) {
             throw new IllegalStateException(this + " adding another players unit=" + newUnit);
         }
 
+        if (units.get(newUnit.getId()) == newUnit) return false;
         units.put(newUnit.getId(), newUnit);
+        return true;
     }
 
     /**
      * Remove a unit from this player.
      *
      * @param oldUnit The <code>Unit</code> to remove.
+     * @return True if the units container changed.
      */
-    public void removeUnit(final Unit oldUnit) {
-        if (oldUnit != null) {
-            units.remove(oldUnit.getId());
-            nextActiveUnitIterator.remove(oldUnit);
-            nextGoingToUnitIterator.remove(oldUnit);
-        }
+    public boolean removeUnit(final Unit oldUnit) {
+        return (oldUnit == null) ? false
+            : units.remove(oldUnit.getId()) != null;
     }
 
     /**
@@ -2206,6 +2207,32 @@ public class Player extends FreeColGameObject implements Nameable {
         tradeRoutes.addAll(newTradeRoutes);
     }
 
+    /**
+     * Add an ownable to a caching container.  Not all ownables are
+     * cached.
+     *
+     * @param o The <code>Ownable</code> to add.
+     * @return True if the container changed.
+     */
+    public boolean addOwnable(Ownable o) {
+        return (o instanceof Settlement) ? addSettlement((Settlement)o)
+            : (o instanceof Unit) ? addUnit((Unit)o)
+            : false;
+    }
+
+    /**
+     * Remove an ownable from a caching container.  Not all ownables
+     * are cached.
+     *
+     * @param o The <code>Ownable</code> to remove.
+     * @return True if the container changed.
+     */
+    public boolean removeOwnable(Ownable o) {
+        return (o instanceof Settlement) ? removeSettlement((Settlement)o)
+            : (o instanceof Unit) ? removeUnit((Unit)o)
+            : false;
+    }
+
 
     //
     // Settlements
@@ -2244,24 +2271,23 @@ public class Player extends FreeColGameObject implements Nameable {
      * Adds a given settlement to this player's list of settlements.
      *
      * @param settlement The <code>Settlement</code> to add.
+     * @return True if the settlements container changed.
      */
-    public void addSettlement(Settlement settlement) {
-        if (settlement == null) {
-            throw new IllegalArgumentException("Null settlement.");
+    public boolean addSettlement(Settlement settlement) {
+        if (settlement == null) return false;
+        if (!owns(settlement)) {
+            throw new IllegalStateException("Does not own: " + settlement);
         }
-        if (!hasSettlement(settlement)) {
-            if (!owns(settlement)) {
-                throw new IllegalStateException("Does not own: " + settlement);
-            }
-            settlements.add(settlement);
-        }
+        if (hasSettlement(settlement)) return false;
+        settlements.add(settlement);
+        return true;
     }
 
     /**
      * Removes the given settlement from this player's list of settlements.
      *
      * @param settlement The <code>Settlement</code> to remove.
-     * @return True if the settlement was removed.
+     * @return True if the settlements container changed.
      */
     public boolean removeSettlement(Settlement settlement) {
         return settlements.remove(settlement);

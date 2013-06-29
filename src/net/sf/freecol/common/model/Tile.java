@@ -2003,39 +2003,9 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     @Override
     protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
         // Clear containers.
-        Settlement oldSettlement = settlement;
-        Player oldSettlementOwner = (settlement == null) ? null
-            : settlement.getOwner();
         settlement = null;
 
         super.readChildren(xr);
-
-        // Player settlement list is not passed in player updates
-        // so do it here.  TODO: something better.
-        Player settlementOwner = (settlement == null) ? null
-            : settlement.getOwner();
-        if (settlement == null && oldSettlement != null) {
-            // Settlement disappeared
-            logger.info("Settlement " + oldSettlement.getName() + " removed.");
-            oldSettlementOwner.removeSettlement(oldSettlement);
-        } else if (settlement != null && oldSettlement == null) {
-            // Settlement appeared
-            settlementOwner.addSettlement(settlement);
-            owner = settlementOwner;
-        } else if (settlementOwner != oldSettlementOwner) {
-            // Settlement changed owner
-            logger.info("Settlement " + oldSettlement.getName() + " captured"
-                + " from " + oldSettlement.getOwner()
-                + " to " + settlementOwner);
-            settlement.setOwner(settlementOwner);
-            oldSettlementOwner.removeSettlement(oldSettlement);
-            settlementOwner.addSettlement(settlement);
-            owner = settlementOwner;
-        }
-
-        if (getColony() != null && getColony().isTileInUse(this)) {
-            getColony().invalidateCache();
-        }
     }
 
     /**

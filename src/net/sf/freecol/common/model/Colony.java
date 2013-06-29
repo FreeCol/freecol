@@ -2796,8 +2796,6 @@ public class Colony extends Settlement implements Nameable {
 
         super.readChildren(xr);
 
-        owner.addSettlement(this);
-
         invalidateCache();
     }
 

@@ -834,6 +834,25 @@ public class Game extends FreeColGameObject {
         }
     }
 
+    /**
+     * Maintain the player containers for certain ownables.
+     *
+     * @param o The <code>Ownable</code> that may have changed.
+     * @param oldOwner The previous (possible unchanged) owning
+     *     <code>Player</code>.
+     */
+    public void checkOwners(Ownable o, Player oldOwner) {
+        Player newOwner = o.getOwner();
+        if (oldOwner == newOwner) return;
+
+        if (oldOwner != null && oldOwner.removeOwnable(o)) {
+            oldOwner.invalidateCanSeeTiles();
+        }
+        if (newOwner != null && newOwner.addOwnable(o)) {
+            newOwner.invalidateCanSeeTiles();
+        }
+    }
+
 
     // Miscellaneous utilities.
 

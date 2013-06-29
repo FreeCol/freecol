@@ -239,12 +239,7 @@ public abstract class Settlement extends GoodsLocation
         Player oldOwner = this.owner;
         setOwner(newOwner);
 
-        if (oldOwner.hasSettlement(this)) {
-            oldOwner.removeSettlement(this);
-        }
-        if (!newOwner.hasSettlement(this)) {
-            newOwner.addSettlement(this);
-        }
+        getGame().checkOwners(this, oldOwner);
 
         List<Unit> units = getUnitList();
         units.addAll(getTile().getUnitList());
@@ -663,8 +658,10 @@ public abstract class Settlement extends GoodsLocation
 
         name = xr.getAttribute(NAME_TAG, (String)null);
 
+        Player oldOwner = owner;
         owner = xr.findFreeColGameObject(game, OWNER_TAG,
                                          Player.class, (Player)null, true);
+        game.checkOwners(this, oldOwner);
 
         tile = xr.findFreeColGameObject(game, TILE_TAG,
                                         Tile.class, (Tile)null, true);

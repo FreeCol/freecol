@@ -1373,8 +1373,6 @@ public class IndianSettlement extends Settlement {
 
         super.readChildren(xr);
 
-        owner.addSettlement(this);
-
         // @compat 0.10.1
         for (Unit u : getUnitList()) {
             if (u.getLocation() != this) {
@@ -1433,7 +1431,6 @@ public class IndianSettlement extends Settlement {
                                + " does not belong to settlement " + getId());
             } else {
                 addOwnedUnit(unit);
-                owner.addUnit(unit);
             }
             xr.closeTag(OWNED_UNITS_TAG);
 

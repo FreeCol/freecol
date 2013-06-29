@@ -3761,6 +3761,22 @@ public final class InGameController implements NetworkConstants {
                gui.playSound("sound.anthem." + player.getNationId());
            }
            displayModelMessages(true, true);
+
+           // TEMPORARY PARANOIA
+           boolean bad = false;
+           for (Settlement s : player.getSettlements()) {
+               if (!player.owns(s)) {
+                   logger.log(Level.SEVERE, "Not " + player + "'s settlement: " + s);
+                   bad = true;
+               }
+           }
+           for (Unit u : player.getUnits()) {
+               if (!player.owns(u)) {
+                   logger.log(Level.SEVERE, "Not " + player + "'s unit: " + u);
+                   bad = true;
+               }
+           }
+           if (bad) System.exit(1);
         }
         logger.finest("Exiting client setCurrentPlayer: " + player.getName());
     }

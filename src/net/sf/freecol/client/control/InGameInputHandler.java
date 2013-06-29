@@ -218,19 +218,7 @@ public final class InGameInputHandler extends InputHandler {
      * @return The reply.
      */
     public Element update(Element updateElement) {
-
-        updateGameObjects(updateElement.getChildNodes());
-
-        new RefreshCanvasSwingTask().invokeLater();
-        return null;
-    }
-
-    /**
-     * Updates all FreeColGameObjects from the childNodes of the message
-     *
-     * @param nodeList The list of nodes from the message
-     */
-    private void updateGameObjects(NodeList nodeList) {
+        NodeList nodeList = updateElement.getChildNodes();
         for (int i = 0; i < nodeList.getLength(); i++) {
             Element element = (Element) nodeList.item(i);
             String id = FreeColObject.readId(element);
@@ -241,6 +229,9 @@ public final class InGameInputHandler extends InputHandler {
                 fcgo.readFromXMLElement(element);
             }
         }
+
+        new RefreshCanvasSwingTask().invokeLater();
+        return null;
     }
 
     /**
@@ -266,8 +257,11 @@ public final class InGameInputHandler extends InputHandler {
                 if (divert != null) {
                     player.divertModelMessages(fcgo, divert);
                 }
-                // Deselect the object if it is the current active unit.
-                if (fcgo instanceof Unit) {
+                if (fcgo instanceof Settlement) {
+                    player.removeSettlement((Settlement)fcgo);
+
+                } else if (fcgo instanceof Unit) {
+                    // Deselect the object if it is the current active unit.
                     Unit u = (Unit) fcgo;
                     player.invalidateCanSeeTiles();
                     if (u == getGUI().getActiveUnit()) {
@@ -711,6 +705,16 @@ public final class InGameInputHandler extends InputHandler {
 
         switch (agreement.getStatus()) {
         case ACCEPT_TRADE:
+            boolean visibilityChange = false;
+            for (Colony c : agreement.getColoniesGivenBy(player)) {
+                player.removeSettlement(c);
+                visibilityChange = true;
+            }
+            for (Unit u : agreement.getUnitsGivenBy(player)) {
+                player.removeUnit(u);
+                visibilityChange = true;
+            }
+            if (visibilityChange) player.invalidateCanSeeTiles();
             new ShowInformationMessageSwingTask(StringTemplate
                 .template("negotiationDialog.offerAccepted")
                     .addName("%nation%", nation)).show();
