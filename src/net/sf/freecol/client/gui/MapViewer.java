@@ -1993,6 +1993,7 @@ public final class MapViewer {
                 String name = Messages.message(settlement.getLocationNameFor(player));
                 if (name == null) continue;
                 Color backgroundColor = settlement.getOwner().getNationColor();
+                if (backgroundColor == null) backgroundColor = Color.WHITE;
                 Font font = ResourceManager.getFont("NormalFont", 18f);
                 Font italicFont = ResourceManager.getFont("NormalFont", Font.ITALIC, 18f);
                 Font productionFont = ResourceManager.getFont("NormalFont", 12f);
@@ -2285,6 +2286,7 @@ public final class MapViewer {
                 String text = null;
                 Image chip = null;
                 Color background = is.getOwner().getNationColor();
+                if (background == null) background = Color.WHITE;
                 Color foreground = lib.getForegroundColor(background);
                 float xOffset = STATE_OFFSET_X * lib.getScalingFactor();
                 float yOffset = STATE_OFFSET_Y * lib.getScalingFactor();
