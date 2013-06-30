@@ -193,6 +193,10 @@ public final class MapEditorController {
      * @param file The <code>File</code>.
      */
     public void saveGame(final File file) {
+        final Game game = freeColClient.getGame();
+        game.getMap().resetContiguity();
+        game.getMap().resetHighSeasCount();
+
         gui.showStatusPanel(Messages.message("status.savingGame"));
         Thread t = new Thread(FreeCol.CLIENT_THREAD+"Saving Map") {
             @Override

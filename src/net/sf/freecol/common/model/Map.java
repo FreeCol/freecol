@@ -1927,6 +1927,7 @@ public class Map extends FreeColGameObject implements Location {
      * Sets the contiguity identifier for all tiles.
      */
     public void resetContiguity() {
+        
         // Create the water map.  It is an error for any tile not to
         // have a region at this point.
         boolean[][] waterMap = new boolean[getWidth()][getHeight()];
@@ -1934,6 +1935,8 @@ public class Map extends FreeColGameObject implements Location {
             for (int x = 0; x < getWidth(); x++) {
                 if (isValid(x, y)) {
                     waterMap[x][y] = !getTile(x,y).isLand();
+                    Tile tile = getTile(x, y);
+                    tile.setContiguity(-1);
                 }
             }
         }
@@ -1943,8 +1946,8 @@ public class Map extends FreeColGameObject implements Location {
         int contig = 0;
         for (int y = 0; y < getHeight(); y++) {
             for (int x = 0; x < getWidth(); x++) {
-                Tile tile = getTile(x, y);
                 if (waterMap[x][y]) {
+                    Tile tile = getTile(x, y);
                     if (tile.getContiguity() >= 0) continue;
                     
                     boolean[][] found = floodFill(waterMap,
