@@ -624,7 +624,6 @@ public final class TileImprovementType extends FreeColGameObjectType {
             Disaster disaster = xr.getType(spec, ID_ATTRIBUTE_TAG,
                                            Disaster.class, (Disaster)null);
             int probability = xr.getAttribute(PROBABILITY_TAG, 100);
-
             addDisaster(disaster, probability);
             xr.closeTag(DISASTER_TAG);
 

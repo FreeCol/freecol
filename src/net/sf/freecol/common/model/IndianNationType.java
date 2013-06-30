@@ -252,9 +252,6 @@ public class IndianNationType extends NationType {
         final Specification spec = getSpecification();
         IndianNationType parent = xr.getType(spec, EXTENDS_TAG,
                                              IndianNationType.class, this);
-
-        super.readChildren(xr);
-
         if (parent != this) {
             if (parent.skills != null && !parent.skills.isEmpty()) {
                 if (skills == null) {
@@ -270,6 +267,8 @@ public class IndianNationType extends NationType {
                 regions.addAll(parent.regions);
             }
         }
+
+        super.readChildren(xr);
 
         if (skills != null) Collections.sort(skills);
     }

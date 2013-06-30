@@ -231,10 +231,8 @@ public class NationOptions extends FreeColObject {
                 if (NATION_TAG.equals(tag)) {
                     Nation nation = xr.getType(specification, ID_ATTRIBUTE_TAG,
                         Nation.class, (Nation)null);
-
                     NationState state = xr.getAttribute(STATE_TAG,
                         NationState.class, (NationState)null);
-
                     nations.put(nation, state);
                     xr.closeTag(NATION_TAG);
 

@@ -2281,15 +2281,13 @@ public class Map extends FreeColGameObject implements Location {
 
         } else if (Tile.getXMLElementTagName().equals(tag)) {
             Tile t = xr.readFreeColGameObject(game, Tile.class);
-            if (t != null) {
-                setTile(t, t.getX(), t.getY());
+            setTile(t, t.getX(), t.getY());
 
-                // @compat 0.10.5
-                if (t.getHighSeasCount() == Tile.FLAG_RECALCULATE) {
-                    fixupHighSeas = true;
-                }
-                // end @compat
+            // @compat 0.10.5
+            if (t.getHighSeasCount() == Tile.FLAG_RECALCULATE) {
+                fixupHighSeas = true;
             }
+            // end @compat
 
         } else {
             super.readChild(xr);

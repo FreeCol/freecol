@@ -234,12 +234,8 @@ public abstract class NationType extends FreeColGameObjectType {
         }
 
         final Specification spec = getSpecification();
-
         NationType parent = xr.getType(spec, EXTENDS_TAG,
                                        NationType.class, this);
-
-        super.readChildren(xr);
-
         if (parent != this) {
             if (parent.settlementTypes != null) {
                 addSettlementTypes(parent.settlementTypes);
@@ -250,6 +246,8 @@ public abstract class NationType extends FreeColGameObjectType {
                 getFeatureContainer().replaceSource(parent, this);
             }
         }
+
+        super.readChildren(xr);
     }
 
     /**

@@ -1654,10 +1654,10 @@ public final class Specification {
             logger.finest("Found child named " + childName);
             ChildReader reader = readerMap.get(childName);
             if (reader == null) {
-				logger.warning("No reader found for: " + childName);
+                logger.warning("No reader found for: " + childName);
             } else {  
-				reader.readChildren(xr);
-			}
+                reader.readChildren(xr);
+            }
         }
 
         // @compat 0.10.1

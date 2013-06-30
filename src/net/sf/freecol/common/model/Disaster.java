@@ -168,7 +168,6 @@ public class Disaster extends FreeColGameObjectType {
         }
 
         final Specification spec = getSpecification();
-
         Disaster parent = xr.getType(spec, EXTENDS_TAG, Disaster.class, this);
 
         if (parent != this && !parent.getEffects().isEmpty()) {
