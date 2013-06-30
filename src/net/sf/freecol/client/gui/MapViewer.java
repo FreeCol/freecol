@@ -2905,8 +2905,10 @@ public final class MapViewer {
             Color newColor = Color.WHITE;
             if (type == BorderType.COUNTRY) {
                 Color c = owner.getNationColor();
-                newColor = new Color(c.getRed(), c.getGreen(), c.getBlue(),
-                                     (opaque) ? 255 : 100);
+                if (c != null) {
+                    newColor = new Color(c.getRed(), c.getGreen(), c.getBlue(),
+                                         (opaque) ? 255 : 100);
+                }
             }
             g.setColor(newColor);
             GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
