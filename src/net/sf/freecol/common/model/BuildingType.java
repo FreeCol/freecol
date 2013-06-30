@@ -208,12 +208,12 @@ public final class BuildingType extends BuildableType
         return result;
     }
 
+    // @compat 0.10.6
     /**
      * Get the type of goods consumed by this BuildingType.
      *
      * @return The consumed <code>GoodsType</code>.
      */
-    // @compat 0.10.6
     private GoodsType getConsumedGoodsType() {
         if (productionTypes == null || productionTypes.isEmpty()) {
             return null;
@@ -296,7 +296,7 @@ public final class BuildingType extends BuildableType
      * {@inheritDoc}
      */
     @Override
-    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
         super.writeAttributes(xw);
 
         if (upgradesFrom != null) {
@@ -346,10 +346,10 @@ public final class BuildingType extends BuildableType
         final Specification spec = getSpecification();
 
         BuildingType parent = xr.getType(spec, EXTENDS_TAG,
-                                         BuildingType.class, this);
+            BuildingType.class, this);
 
         upgradesFrom = xr.getType(spec, UPGRADES_FROM_TAG,
-                                  BuildingType.class, (BuildingType)null);
+            BuildingType.class, (BuildingType)null);
         if (upgradesFrom == null) {
             level = 1;
         } else {
@@ -371,11 +371,11 @@ public final class BuildingType extends BuildableType
         int basicProduction = xr.getAttribute(BASIC_PRODUCTION_TAG, -1);
         if (basicProduction > 0) {
             GoodsType consumes = xr.getType(spec, CONSUMES_TAG, GoodsType.class,
-                                            parent.getConsumedGoodsType());
+                parent.getConsumedGoodsType());
             GoodsType produces = xr.getType(spec, PRODUCES_TAG, GoodsType.class,
-                                            parent.getProducedGoodsType());
+                parent.getProducedGoodsType());
             productionTypes.add(new ProductionType(consumes, produces,
-                                                   basicProduction));
+                    basicProduction));
         }
         // end @compat
 
@@ -391,6 +391,33 @@ public final class BuildingType extends BuildableType
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
+
+        super.readChildren(xr);
+
+        // @compat 0.10.x
+        // Town Hall and Chapel* unattended production modifiers
+        // require a scope.
+        if (getId().equals("model.building.townHall")
+            || getId().equals("model.building.chapel")
+            || getId().equals("model.building.church")
+            || getId().equals("model.building.cathedral")) {
+            for (Modifier m : getModifiers()) {
+                if (m.getType() == Modifier.Type.ADDITIVE && !m.hasScope()) {
+                    Scope scope = new Scope();
+                    scope.setMatchNegated(true);
+                    scope.setAbilityId("model.ability.person");
+                    m.addScope(scope);
+                    break;
+                }
+            }
+        }
+        // end @compat
+    }
 
     /**
      * {@inheritDoc}

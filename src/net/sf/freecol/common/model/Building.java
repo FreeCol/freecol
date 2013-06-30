@@ -193,21 +193,6 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     }
 
     /**
-     * Gets the unit type that is the expert for this <code>Building</code>.
-     *
-     * @return The expert <code>UnitType</code>.
-     */
-    public UnitType getExpertUnitType() {
-        for (AbstractGoods goods : getOutputs()) {
-            UnitType expert = getSpecification().getExpertForProducing(goods.getType());
-            if (expert != null) {
-                return expert;
-            }
-        }
-        return null;
-    }
-
-    /**
      * Can a particular type of unit be added to this building?
      *
      * @param unitType The <code>UnitType</code> to check.
@@ -276,7 +261,6 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      */
     public ProductionInfo getAdjustedProductionInfo(List<AbstractGoods> inputs,
                                                     List<AbstractGoods> outputs) {
-
         ProductionInfo result = new ProductionInfo();
         if (!hasOutputs()) return result;
 
@@ -558,33 +542,33 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      */
     public List<Modifier> getProductionModifiers(GoodsType goodsType,
                                                  UnitType unitType) {
+        final BuildingType type = getType();
+        final String id = (goodsType == null) ? null : goodsType.getId();
+        final Turn turn = getGame().getTurn();
+        final Player owner = getOwner();
         List<Modifier> mods = new ArrayList<Modifier>();
         for (AbstractGoods output : getOutputs()) {
-            if (output.getType() == goodsType) {
-                final BuildingType type = getType();
-                final String id = goodsType.getId();
-                final Turn turn = getGame().getTurn();
-                final Player owner = getOwner();
-                if (unitType == null) {
-                    // If a unit is not present add only the bonuses
-                    // specific to the building (such as the Paine bells bonus).
-                    mods.addAll(getColony().getModifierSet(id, type, turn));
-                    if (owner != null) {
-                        mods.addAll(owner.getModifierSet(id, type, turn));
-                    }
-                } else {
-                    // If a unit is present add unit specific bonuses and
-                    // unspecific owner bonuses (which includes things
-                    // like the Building national advantage).
-                    mods.addAll(getModifierSet(id, unitType, turn));
-                    mods.add(getColony().getProductionModifier(goodsType));
-                    mods.addAll(unitType.getModifierSet(id, goodsType, turn));
-                    if (owner != null) {
-                        mods.addAll(owner.getModifierSet(id, unitType, turn));
-                    }
+            if (output.getType() != goodsType) continue;
+
+            if (unitType == null) {
+                // If a unit is not present add only the bonuses
+                // specific to the building (such as the Paine bells bonus).
+                mods.addAll(getColony().getModifierSet(id, type, turn));
+                if (owner != null) {
+                    mods.addAll(owner.getModifierSet(id, type, turn));
                 }
-                break;
+            } else {
+                // If a unit is present add unit specific bonuses and
+                // unspecific owner bonuses (which includes things
+                // like the Building national advantage).
+                mods.addAll(getModifierSet(id, unitType, turn));
+                mods.add(getColony().getProductionModifier(goodsType));
+                mods.addAll(unitType.getModifierSet(id, goodsType, turn));
+                if (owner != null) {
+                    mods.addAll(owner.getModifierSet(id, unitType, turn));
+                }
             }
+            break;
         }
         return mods;
     }

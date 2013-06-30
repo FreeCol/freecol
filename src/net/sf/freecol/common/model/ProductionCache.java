@@ -97,8 +97,9 @@ public class ProductionCache {
             }
         }
 
-        GoodsType bells = colony.getSpecification().getGoodsType("model.goods.bells");
-        int unitsThatUseNoBells = colony.getSpecification().getInteger("model.option.unitsThatUseNoBells");
+        final Specification spec = colony.getSpecification();
+        GoodsType bells = spec.getGoodsType("model.goods.bells");
+        int unitsThatUseNoBells = spec.getInteger("model.option.unitsThatUseNoBells");
         int amount = Math.min(unitsThatUseNoBells, colony.getUnitCount());
         ProductionInfo bellsInfo = new ProductionInfo();
         bellsInfo.addProduction(new AbstractGoods(bells, amount));

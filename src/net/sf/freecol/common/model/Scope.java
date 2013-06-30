@@ -37,22 +37,22 @@ public class Scope extends FreeColObject implements Cloneable {
      * The identifier of a <code>FreeColGameObjectType</code>, or
      * <code>Option</code>.
      */
-    private String type;
+    private String type = null;
 
     /** The object identifier of an <code>Ability</code>. */
-    private String abilityId;
+    private String abilityId = null;
 
     /** The value of an <code>Ability</code>. */
     private boolean abilityValue = true;
 
     /** The name of an <code>Method</code>. */
-    private String methodName;
+    private String methodName = null;
 
     /**
      * The <code>String</code> representation of the value of an
      * <code>Method</code>.
      */
-    private String methodValue;
+    private String methodValue = null;
 
     /** True if the scope applies to a null object. */
     private boolean matchesNull = true;

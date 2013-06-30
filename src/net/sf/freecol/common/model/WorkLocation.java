@@ -270,6 +270,21 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
         }
     }
 
+    /**
+     * Gets the unit type that is the expert for this <code>WorkLocation</code>
+     * using its first output for which an expert type can be found.
+     *
+     * @return The expert <code>UnitType</code>.
+     */
+    public UnitType getExpertUnitType() {
+        final Specification spec = getSpecification();
+        for (AbstractGoods goods : getOutputs()) {
+            UnitType expert = spec.getExpertForProducing(goods.getType());
+            if (expert != null) return expert;
+        }
+        return null;
+    }
+
 
     // Interface Location
     // Inherits:
@@ -536,6 +551,17 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
 
         colony = xr.findFreeColGameObject(getGame(), COLONY_TAG,
                                           Colony.class, (Colony)null, true);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void readChildren(FreeColXMLReader xr) throws XMLStreamException {
+
+        super.readChildren(xr);
+
+        updateProductionType();
     }
 
     /**

@@ -165,7 +165,7 @@ public abstract class Feature extends FreeColObject {
      *
      * @param scope The <code>Scope</code> to add.
      */
-    private void addScope(Scope scope) {
+    public void addScope(Scope scope) {
         if (scopes == null) scopes = new ArrayList<Scope>();
         scopes.add(scope);
     }
