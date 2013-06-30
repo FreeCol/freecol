@@ -87,6 +87,12 @@ public class ClientOptions extends OptionGroup {
     // clientOptions.gui
 
     /**
+     * Option for the player's preferred name
+     */
+    public static final String NAME
+        = "model.option.playerName";
+
+    /**
      * Option for setting the language.
      */
     public static final String LANGUAGE

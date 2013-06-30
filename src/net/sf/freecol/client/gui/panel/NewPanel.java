@@ -38,6 +38,7 @@ import javax.swing.JTextField;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.client.gui.GUI;
@@ -78,7 +79,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
     private final JLabel rulesLabel = localizedLabel("rules");
 
     private final JCheckBox publicServer = new JCheckBox(Messages.message("publicServer"));
-    private final JTextField name = new JTextField(FreeCol.getName(), 20);
+    private final JTextField name = new JTextField(getPlayerName(), 20);
     private final JTextField server = new JTextField("127.0.0.1");
     private final JTextField port1 = new JTextField(Integer.toString(FreeCol.getServerPort()));
     private final JTextField port2 = new JTextField(Integer.toString(FreeCol.getServerPort()));
@@ -215,7 +216,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         enableComponents();
 
         setSize(getPreferredSize());
-        
+
     }
 
 
@@ -227,7 +228,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
     private FreeColTcFile getTC() {
         Object o = specificationBox.getSelectedItem();
         return (o == null) ? null : (FreeColTcFile)o;
-    }     
+    }
 
     /**
      * Gets the currently selected Advantages type from the nationalAdvantages
@@ -237,6 +238,22 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
      */
     private Advantages getAdvantages() {
         return (Advantages)nationalAdvantages.getSelectedItem();
+    }
+
+    /**
+     * Return the preferred player name. This is either the value of
+     * the client option "model.option.playerName", or the value of
+     * the system property "user.name", or the localized value of
+     * "defaultPlayerName".
+     *
+     * @return a <code>String</code> value
+     */
+    private String getPlayerName() {
+        String name = getClientOptions().getText(ClientOptions.NAME);
+        if (name == null || name.isEmpty()) {
+            name = FreeCol.getName();
+        }
+        return name;
     }
 
     /**

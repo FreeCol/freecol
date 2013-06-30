@@ -72,8 +72,8 @@ public final class OptionGroupUI extends JPanel
      * The constructor that will add the items to this panel.
      *
      * @param gui
-     * @param group 
-     * @param editable 
+     * @param group
+     * @param editable
      */
     public OptionGroupUI(GUI gui, OptionGroup group, boolean editable) {
         this.gui = gui;

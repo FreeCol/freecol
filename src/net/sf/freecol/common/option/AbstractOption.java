@@ -185,7 +185,7 @@ public abstract class AbstractOption<T> extends FreeColObject
     @Override
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
-        
+
         String defaultValue = xr.getAttribute(DEFAULT_VALUE_TAG, (String)null);
 
         String value = xr.getAttribute(VALUE_TAG, (String)null);
@@ -265,6 +265,9 @@ public abstract class AbstractOption<T> extends FreeColObject
 
         } else if (UnitTypeOption.getXMLElementTagName().equals(tag)) {
             option = new UnitTypeOption(spec);
+
+        } else if (TextOption.getXMLElementTagName().equals(tag)) {
+            option = new TextOption(spec);
 
         } else {
             logger.warning("Not an option type: " + tag);

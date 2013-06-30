@@ -32,67 +32,42 @@ import net.sf.freecol.common.model.Specification;
 
 
 /**
- * Represents an option that can be a string selected from a list of
- * possible values (choices).
+ * Represents an option that can be an arbitrary string.
  */
-public class StringOption extends AbstractOption<String> {
+public class TextOption extends AbstractOption<String> {
 
     @SuppressWarnings("unused")
-    private static Logger logger = Logger.getLogger(StringOption.class.getName());
+    private static Logger logger = Logger.getLogger(TextOption.class.getName());
 
     /** The value of this option. */
     private String value;
 
-    /** A list of choices to provide to the UI. */
-    private final List<String> choices = new ArrayList<String>();
-
-
     /**
-     * Creates a new <code>StringOption</code>.
+     * Creates a new <code>TextOption</code>.
      *
      * @param id The object identifier.
      */
-    public StringOption(String id) {
+    public TextOption(String id) {
         super(id);
     }
 
     /**
-     * Creates a new <code>StringOption</code>.
+     * Creates a new <code>TextOption</code>.
      *
      * @param specification The <code>Specification</code> to refer to.
      */
-    public StringOption(Specification specification) {
+    public TextOption(Specification specification) {
         super(specification);
     }
 
     /**
-     * Creates a new <code>StringOption</code>.
+     * Creates a new <code>TextOption</code>.
      *
      * @param id The object identifier.
      * @param specification The <code>Specification</code> to refer to.
      */
-    public StringOption(String id, Specification specification) {
+    public TextOption(String id, Specification specification) {
         super(id, specification);
-    }
-
-
-    /**
-     * Get the list of string choices.
-     *
-     * @return The list of choices.
-     */
-    public final List<String> getChoices() {
-        return choices;
-    }
-
-    /**
-     * Set the choices.
-     *
-     * @param newChoices The new list of choices.
-     */
-    public final void setChoices(final List<String> newChoices) {
-        this.choices.clear();
-        this.choices.addAll(newChoices);
     }
 
 
@@ -101,10 +76,9 @@ public class StringOption extends AbstractOption<String> {
     /**
      * {@inheritDoc}
      */
-    public StringOption clone() {
-        StringOption result = new StringOption(getId());
+    public TextOption clone() {
+        TextOption result = new TextOption(getId());
         result.setValues(this);
-        result.setChoices(this.choices);
         return result;
     }
 
@@ -159,58 +133,11 @@ public class StringOption extends AbstractOption<String> {
      * {@inheritDoc}
      */
     @Override
-    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
-        super.writeChildren(xw);
-
-        for (String choice : choices) {
-            xw.writeStartElement(CHOICE_TAG);
-
-            xw.writeAttribute(VALUE_TAG, choice);
-
-            xw.writeEndElement();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
-        // Clear containers.
-        choices.clear();
-
-        super.readChildren(xr);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
-        final String tag = xr.getLocalName();
-
-        if (CHOICE_TAG.equals(tag)) {
-            choices.add(xr.getAttribute(VALUE_TAG, (String)null));
-            xr.closeTag(CHOICE_TAG);
-
-        } else {
-            super.readChild(xr);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(32);
         sb.append("[").append(getId())
-            .append(" value=").append(value)
-            .append(" choices=[");
-        if (choices != null) {
-            for (String choice : choices) sb.append(" ").append(choice);
-        }
-        sb.append("]]");
+            .append(" value=").append(value);
+        sb.append("]");
         return sb.toString();
     }
 
@@ -225,6 +152,6 @@ public class StringOption extends AbstractOption<String> {
      * @return "stringOption".
      */
     public static String getXMLElementTagName() {
-        return "stringOption";
+        return "textOption";
     }
 }

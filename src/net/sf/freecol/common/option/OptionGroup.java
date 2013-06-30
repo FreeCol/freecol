@@ -356,6 +356,43 @@ public class OptionGroup extends AbstractOption<OptionGroup> {
     }
 
 
+    /**
+     * Gets the string value of an option.
+     *
+     * @param id The object identifier.
+     * @return The string value.
+     * @exception IllegalArgumentException If there is no string value
+     *     associated with the specified option.
+     * @exception NullPointerException if the given
+     *     <code>Option</code> does not exist.
+     */
+    public String getText(String id) {
+        try {
+            return ((TextOption) getOption(id)).getValue();
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException("No String value associated with the specified option.");
+        }
+    }
+
+    /**
+     * Sets the string value of an option.
+     *
+     * @param id The object identifier.
+     * @param value The new string value.
+     * @exception IllegalArgumentException If there is no string value
+     *     associated with the specified option.
+     * @exception NullPointerException if the given
+     *     <code>Option</code> does not exist.
+     */
+    public void setText(String id, String value) {
+        try {
+            ((TextOption) getOption(id)).setValue(value);
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException("No String value associated with the specified option.");
+        }
+    }
+
+
     // Interface Option
 
     /**

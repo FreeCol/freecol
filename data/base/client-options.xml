@@ -20,6 +20,9 @@
     *
   -->
 <clientOptions>
+    <optionGroup id="clientOptions.personal">
+      <textOption id="model.option.playerName" defaultValue="" />
+    </optionGroup>
     <optionGroup id="clientOptions.gui" >
       <!-- Option for setting the language -->
       <languageOption id="model.option.languageOption" defaultValue="automatic" />
