@@ -757,6 +757,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
         case FOUNTAIN_OF_YOUTH:
             Europe europe = serverPlayer.getEurope();
             if (europe == null) {
+                // FoY should now be disabled for non-colonial
+                // players, but leave this in for now as it is harmless.
                 cs.addMessage(See.only(serverPlayer),
                      new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                          "lostCityRumour.fountainOfYouthWithoutEurope",

@@ -234,7 +234,10 @@ public class LostCityRumour extends TileItem {
         events.put(RumourType.MOUNDS, 8 * percentGood);
         events.put(RumourType.RUINS, 6 * percentGood);
         events.put(RumourType.CIBOLA, 4 * percentGood);
-        events.put(RumourType.FOUNTAIN_OF_YOUTH, 3 * percentGood);
+        if (unit == null
+            || unit.getOwner().getPlayerType() == Player.PlayerType.COLONIAL) {
+            events.put(RumourType.FOUNTAIN_OF_YOUTH, 3 * percentGood);
+        }
 
         // Add all possible events to a RandomChoice List
         List<RandomChoice<RumourType>> choices
