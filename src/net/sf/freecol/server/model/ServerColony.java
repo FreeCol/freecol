@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.logging.Logger;
 
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildQueue;
@@ -43,6 +44,7 @@ import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.ProductionInfo;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TypeCountMap;
@@ -343,26 +345,31 @@ public class ServerColony extends Colony implements ServerModelObject {
         // Do not flush price changes yet, as any price change may change
         // yet again in csYearlyGoodsAdjust.
         if (hasAbility(Ability.EXPORT)) {
-            boolean gold = false;
+            StringBuilder sb = new StringBuilder(64);
+            sb.append(" ");
             for (Goods goods : getCompactGoods()) {
                 GoodsType type = goods.getType();
                 ExportData data = getExportData(type);
                 if (data.isExported()
-                    && (owner.canTrade(goods.getType(), Market.Access.CUSTOM_HOUSE))) {
+                    && owner.canTrade(goods.getType(), Market.Access.CUSTOM_HOUSE)) {
                     int amount = goods.getAmount() - data.getExportLevel();
                     if (amount > 0) {
-                        owner.sell(container, type, amount, random);
-                        gold = true;
-                        cs.addMessage(See.only(owner),
-                            new ModelMessage(ModelMessage.MessageType.GOODS_MOVEMENT,
-                                             "customs.sale", this)
-                                      .addName("%colony%", getName())
-                                      .addAmount("%amount%", amount)
-                                      .add("%goods%", type.getNameKey()));
+                        int gold = owner.sell(container, type, amount, random);
+                        StringTemplate st = StringTemplate.template("customs.saleData")
+                            .addAmount("%amount%", amount)
+                            .add("%goods%", type.getNameKey())
+                            .addAmount("%gold%", gold);
+                        sb.append(Messages.message(st) + ", ");
                     }
                 }
             }
-            if (gold) {
+            if (sb.length() > 1) {
+                sb.setLength(sb.length() - 2);
+                cs.addMessage(See.only(owner),
+                    new ModelMessage(ModelMessage.MessageType.GOODS_MOVEMENT,
+                                     "customs.sale", this)
+                        .addName("%colony%", getName())
+                        .addName("%data%", sb.toString()));
                 cs.addPartial(See.only(owner), owner, "gold");
             }
         }

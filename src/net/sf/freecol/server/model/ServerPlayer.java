@@ -933,9 +933,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param type The <code>GoodsType</code> to sell.
      * @param amount The amount of goods to sell.
      * @param random A <code>Random</code> number source.
+     * @return The post-tax income from the sale.
      */
-    public void sell(GoodsContainer container, GoodsType type, int amount,
-                     Random random) {
+    public int sell(GoodsContainer container, GoodsType type, int amount,
+                    Random random) {
         logger.finest(getName() + " sells " + amount + " " + type);
         Market market = getMarket();
         int tax = getTax();
@@ -952,6 +953,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         propagateToEuropeanMarkets(type, marketAmount, random);
 
         if (container != null) container.addGoods(type, -amount);
+        return incomeAfterTaxes;
     }
 
     /**
