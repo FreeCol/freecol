@@ -1492,6 +1492,18 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Gets the effective amount of liberty points this player has.
+     * That is, the normal liberty amount post application of
+     * modifiers.
+     *
+     * @return The effective amount of liberty points.
+     */
+    public int getEffectiveLiberty() {
+        return (int)applyModifier((float)getLiberty(), "model.modifier.liberty",
+                                  null, getGame().getTurn());
+    }
+
+    /**
      * Sets the current amount of liberty this player has.
      *
      * @param liberty The new amount of liberty.
@@ -1507,7 +1519,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param amount The amount of liberty to add.
      */
     public void modifyLiberty(int amount) {
-        setLiberty(Math.max(0, getLiberty() + amount));
+        setLiberty(Math.max(0, liberty + amount));
         if (playerType == PlayerType.REBEL) interventionBells += amount;
     }
 
@@ -1541,14 +1553,15 @@ public class Player extends FreeColGameObject implements Nameable {
      *     <code>Colony</code>s will make next turn.
      */
     public int getLibertyProductionNextTurn() {
-        int libertyNextTurn = 0;
+        int nextTurn = 0;
         for (Colony colony : getColonies()) {
             for (GoodsType libertyGoods : getSpecification()
                      .getLibertyGoodsTypeList()) {
-                libertyNextTurn += colony.getTotalProductionOf(libertyGoods);
+                nextTurn += colony.getTotalProductionOf(libertyGoods);
             }
         }
-        return libertyNextTurn;
+        return (int)applyModifier((float)nextTurn, "model.modifier.liberty",
+                                  null, getGame().getTurn());
     }
 
     /**
@@ -1563,11 +1576,7 @@ public class Player extends FreeColGameObject implements Nameable {
             sum += c.getSoL();
             number++;
         }
-        if (number > 0) {
-            return sum / number;
-        } else {
-            return 0;
-        }
+        return (number > 0) ? sum / number : 0;
     }
 
     /**
@@ -1668,7 +1677,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *     needs in order to recruit the next <code>FoundingFather</code>.
      */
     public int getRemainingFoundingFatherCost() {
-        return getTotalFoundingFatherCost() - getLiberty();
+        return getTotalFoundingFatherCost() - getEffectiveLiberty();
     }
 
     /**

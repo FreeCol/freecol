@@ -1825,7 +1825,7 @@ resources of 400, lost city rumours of 500
     </founding-father>
     <founding-father id="model.foundingFather.simonBolivar" type="political"
                      weight1="0" weight2="4" weight3="6">
-      <event id="model.event.increaseSonsOfLiberty" value="20"/>
+      <modifier id="model.modifier.liberty" type="percentage" value="20"/>
     </founding-father>
     <founding-father id="model.foundingFather.benjaminFranklin" type="political"
                      weight1="5" weight2="5" weight3="5">

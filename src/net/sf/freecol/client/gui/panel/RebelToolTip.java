@@ -80,7 +80,7 @@ public class RebelToolTip extends JToolTip {
                 "span 2");
         }
 
-        final int liberty = colony.getLiberty();
+        final int liberty = colony.getEffectiveLiberty();
         final int modulo = liberty % Colony.LIBERTY_PER_REBEL;
         final int width = (int)getPreferredSize().getWidth() - 32;
         FreeColProgressBar progress = new FreeColProgressBar(freeColClient.getGUI(), null, 0, 

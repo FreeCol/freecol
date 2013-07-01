@@ -1658,7 +1658,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             }
         }
 
-        if (recalculateBellsBonus()) {
+        if (!father.getModifiers().isEmpty()) {
             cs.add(See.only(this), this);
         }
 
@@ -1720,28 +1720,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
                         }
                     }
                 }
-
-            } else if (eventId.equals("model.event.increaseSonsOfLiberty")) {
-                int value = Integer.parseInt(event.getValue());
-                GoodsType bells = spec.getLibertyGoodsTypeList().get(0);
-                int totalBells = 0;
-                for (Colony colony : getColonies()) {
-                    float oldRatio = (float) colony.getLiberty()
-                        / (colony.getUnitCount() * Colony.LIBERTY_PER_REBEL);
-                    float reqRatio = Math.min(1.0f, oldRatio + 0.01f * value);
-                    int reqBells = (int) Math.round(Colony.LIBERTY_PER_REBEL
-                                                    * colony.getUnitCount()
-                                                    * (reqRatio - oldRatio));
-                    if (reqBells > 0) { // Can go negative if already over 100%
-                        colony.addGoods(bells, reqBells);
-                        colony.updateSoL();
-                        cs.add(See.only(this), colony);
-                        totalBells += reqBells;
-                    }
-                }
-                // Bonus bells from the FF do not count towards recruiting
-                // the next one!
-                modifyLiberty(-totalBells);
 
             } else if (eventId.equals("model.event.newRecruits")
                        && europe != null) {
