@@ -2704,7 +2704,7 @@ public class Player extends FreeColGameObject implements Nameable {
                     }
                 }
             }
-            for (Settlement settlement : new ArrayList<Settlement>(getSettlements())) {
+            for (Settlement settlement : getSettlements()) {
                 Tile tile = settlement.getTile();
                 cST[tile.getX()][tile.getY()] = true;
                 for (Tile t : tile.getSurroundingTiles(settlement.getLineOfSight())) {
@@ -2717,14 +2717,22 @@ public class Player extends FreeColGameObject implements Nameable {
                 && spec.getBoolean(GameOptions.ENHANCED_MISSIONARIES)) {
                 for (Player other : getGame().getPlayers()) {
                     if (this.equals(other) || !other.isIndian()) continue;
-                    for (Settlement settlement : other.getSettlements()) {
-                        IndianSettlement is = (IndianSettlement) settlement;
+                    for (IndianSettlement is : other.getIndianSettlements()) {
                         if (!is.hasMissionary(this)) continue;
                         for (Tile t : is.getTile().getSurroundingTiles(is.getLineOfSight())) {
                             if (t != null) {
                                 cST[t.getX()][t.getY()] = true;
                             }
                         }
+                    }
+                }
+            }
+            if (isEuropean() && hasAbility(Ability.SEE_ALL_COLONIES)) {
+                for (Player other : getGame().getPlayers()) {
+                    if (this.equals(other) || !other.isEuropean()) continue;
+                    for (Colony colony : other.getColonies()) {
+                        Tile t = colony.getTile();
+                        cST[t.getX()][t.getY()] = true;
                     }
                 }
             }

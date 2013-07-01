@@ -1752,6 +1752,7 @@ resources of 400, lost city rumours of 500
     </founding-father>
     <founding-father id="model.foundingFather.franciscoDeCoronado" type="exploration"
                      weight1="3" weight2="5" weight3="7">
+      <ability id="model.ability.seeAllColonies" value="true"/>
       <event id="model.event.seeAllColonies"/>
     </founding-father>
     <founding-father id="model.foundingFather.hernandoDeSoto" type="exploration"

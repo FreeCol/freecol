@@ -349,6 +349,10 @@ public final class Ability extends Feature {
     public static final String SCOUT_INDIAN_SETTLEMENT
         = "model.ability.scoutIndianSettlement";
 
+    /** The ability to see all colonies (Coronado). */
+    public static final String SEE_ALL_COLONIES
+        = "model.ability.seeAllColonies";
+
     /** The ability to select recruits (Brewster). */
     public static final String SELECT_RECRUIT
         = "model.ability.selectRecruit";

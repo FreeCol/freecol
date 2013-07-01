@@ -2841,6 +2841,12 @@ public final class InGameController extends Controller {
             settlement = new ServerColony(game, serverPlayer, name, tile);
             serverPlayer.addSettlement(settlement);
             settlement.placeSettlement(false);
+            for (ServerPlayer sp : getOtherPlayers(serverPlayer)) {
+                if (sp.hasAbility(Ability.SEE_ALL_COLONIES)) {
+                    tile.setExploredBy(sp, true);
+                    sp.invalidateCanSeeTiles();
+                }
+            }
         } else {
             IndianNationType nationType
                 = (IndianNationType) serverPlayer.getNationType();
