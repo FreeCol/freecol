@@ -230,12 +230,12 @@ public class MissionaryMission extends Mission {
         String reason = invalidReason(aiUnit);
         if (reason == null) {
             final Unit unit = aiUnit.getUnit();
-            if (!unit.hasAbility("model.ability.establishMission")
+            if (!unit.hasAbility(Ability.ESTABLISH_MISSION)
                 && (((FreeColGameObject)unit.getLocation())
-                    .hasAbility("model.ability.dressMissionary"))) {
+                    .hasAbility(Ability.DRESS_MISSIONARY))) {
                 aiUnit.equipForRole(Unit.Role.MISSIONARY, false);
             }
-            reason = (unit.hasAbility("model.ability.establishMission"))
+            reason = (unit.hasAbility(Ability.ESTABLISH_MISSION))
                 ? null
                 : "unit-can-not-establish-mission";
         }

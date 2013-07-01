@@ -53,6 +53,7 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColObject;
@@ -214,7 +215,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
     private void collectDestinations(Unit unit, List<GoodsType> goodsTypes) {
         final Player player = unit.getOwner();
         final Settlement inSettlement = unit.getSettlement();
-        final boolean canTrade = player.hasAbility("model.ability.tradeWithForeignColonies");
+        final boolean canTrade = player.hasAbility(Ability.TRADE_WITH_FOREIGN_COLONIES);
         final Europe europe = player.getEurope();
         final Game game = getGame();
         final Map map = game.getMap();

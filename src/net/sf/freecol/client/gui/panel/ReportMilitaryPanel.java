@@ -109,7 +109,7 @@ public final class ReportMilitaryPanel extends ReportUnitPanel {
                 !unitType.hasAbility(Ability.NAVAL_UNIT) &&
                 (unitType.hasAbility(Ability.EXPERT_SOLDIER) ||
                  unitType.getOffence() > 0)) {
-                if (unitType.hasAbility("model.ability.canBeEquipped")) {
+                if (unitType.hasAbility(Ability.CAN_BE_EQUIPPED)) {
                     scoutUnits.add(new AbstractUnit(unitType, Role.SCOUT, getCount("scouts", unitType)));
                     dragoonUnits.add(new AbstractUnit(unitType, Role.DRAGOON, getCount("dragoons", unitType)));
                     soldierUnits.add(new AbstractUnit(unitType, Role.SOLDIER, getCount("soldiers", unitType)));

@@ -210,21 +210,21 @@ public class BuildingTest extends FreeColTestCase {
         Unit unit = colony.getUnitList().get(0);
         EquipmentType missionary = spec().getEquipmentType("model.equipment.missionary");
 
-        assertFalse(chapelType.hasAbility("model.ability.dressMissionary"));
-        assertFalse(unit.hasAbility("model.ability.dressMissionary"));
+        assertFalse(chapelType.hasAbility(Ability.DRESS_MISSIONARY));
+        assertFalse(unit.hasAbility(Ability.DRESS_MISSIONARY));
         assertFalse(unit.canBeEquippedWith(missionary));
 
         Building church = colony.getBuilding(chapelType);
         assertTrue(church != null);
-        assertFalse(colony.hasAbility("model.ability.dressMissionary"));
-        assertFalse(unit.hasAbility("model.ability.dressMissionary"));
+        assertFalse(colony.hasAbility(Ability.DRESS_MISSIONARY));
+        assertFalse(unit.hasAbility(Ability.DRESS_MISSIONARY));
         assertFalse(unit.canBeEquippedWith(missionary));
         assertEquals(1, church.getPotentialProduction(crossesType, null));
 
         church.upgrade();
-        assertTrue(church.getType().hasAbility("model.ability.dressMissionary"));
-        assertTrue(colony.hasAbility("model.ability.dressMissionary"));
-        assertTrue(unit.hasAbility("model.ability.dressMissionary"));
+        assertTrue(church.getType().hasAbility(Ability.DRESS_MISSIONARY));
+        assertTrue(colony.hasAbility(Ability.DRESS_MISSIONARY));
+        assertTrue(unit.hasAbility(Ability.DRESS_MISSIONARY));
         assertTrue(unit.canBeEquippedWith(missionary));
         assertEquals(2, church.getPotentialProduction(crossesType, null));
     }

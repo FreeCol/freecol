@@ -22,6 +22,7 @@ package net.sf.freecol.server.model;
 import java.util.Random;
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
@@ -75,7 +76,7 @@ public class ServerBuilding extends Building implements ServerModelObject {
             teach(cs, owner);
         }
 
-        if (type.hasAbility("model.ability.repairUnits")) {
+        if (type.hasAbility(Ability.REPAIR_UNITS)) {
             repairUnits(cs);
         }
 
@@ -186,7 +187,7 @@ public class ServerBuilding extends Building implements ServerModelObject {
     private void repairUnits(ChangeSet cs) {
         for (Unit unit : getTile().getUnitList()) {
             if (unit.isDamaged()
-                && getType().hasAbility("model.ability.repairUnits",
+                && getType().hasAbility(Ability.REPAIR_UNITS,
                                         unit.getType())) {
                 ((ServerUnit) unit).csRepairUnit(cs);
             }

@@ -166,9 +166,9 @@ public class EuropeanAIPlayer extends AIPlayer {
                     || unit.getLocation() == null
                     || !unit.isColonist()) {
                     return -1000;
-                } else if (unit.hasAbility("model.ability.scoutIndianSettlement")) {
+                } else if (unit.hasAbility(Ability.SCOUT_INDIAN_SETTLEMENT)) {
                     return 900 + ((unit.getTile() != null) ? 100 : 0);
-                } else if (unit.hasAbility("model.ability.expertScout")) {
+                } else if (unit.hasAbility(Ability.EXPERT_SCOUT)) {
                     return 600;
                 }
                 int base = (unit.isInEurope()) ? 500
@@ -207,9 +207,9 @@ public class EuropeanAIPlayer extends AIPlayer {
                     || unit.getLocation() == null
                     || !unit.isColonist()) {
                     return -1000;
-                } else if (unit.hasAbility("model.ability.improveTerrain")) {
+                } else if (unit.hasAbility(Ability.IMPROVE_TERRAIN)) {
                     return 900 + ((unit.getTile() != null) ? 100 : 0);
-                } else if (unit.hasAbility("model.ability.expertPioneer")) {
+                } else if (unit.hasAbility(Ability.EXPERT_PIONEER)) {
                     return 600;
                 }
                 int base = (unit.isInEurope()) ? 500
@@ -970,7 +970,7 @@ public class EuropeanAIPlayer extends AIPlayer {
         AIUnit aiUnit = null;
         Europe europe = getPlayer().getEurope();
         int n = europe.getUnitCount();
-        final String selectAbility = "model.ability.selectRecruit";
+        final String selectAbility = Ability.SELECT_RECRUIT;
         int slot = (index >= 0 && index < Europe.RECRUIT_COUNT
             && getPlayer().hasAbility(selectAbility)) ? (index + 1) : 0;
         if (AIMessage.askEmigrate(this, slot)
@@ -2033,9 +2033,10 @@ public class EuropeanAIPlayer extends AIPlayer {
                         value -= 500;
                         break;
                     case PEACE:
-                        if (!agreement.getSender().hasAbility("model.ability.alwaysOfferedPeace")) {
-                            // TODO: introduce some kind of counter in order to avoid
-                            // Benjamin Franklin exploit
+                        if (!agreement.getSender()
+                            .hasAbility(Ability.ALWAYS_OFFERED_PEACE)) {
+                            // TODO: introduce some kind of counter in
+                            // order to avoid Benjamin Franklin exploit
                             value -= 1000;
                         }
                         break;
@@ -2258,7 +2259,7 @@ public class EuropeanAIPlayer extends AIPlayer {
             // offering custom houses.  Allowing the AI to build CH
             // early alleviates the complexity problem of handling all
             // TransportMissions correctly somewhat.
-            if (father.hasAbility("model.ability.buildCustomHouse")) {
+            if (father.hasAbility(Ability.BUILD_CUSTOM_HOUSE)) {
                 bestFather = father;
                 break;
             }

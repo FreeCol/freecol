@@ -128,7 +128,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         final Specification spec = getSpecification();
         UnitListOption op;
         op = (UnitListOption)spec.getOption("model.option.refSize");
-        expeditionaryForce = new Force(op, "model.ability.refUnit");
+        expeditionaryForce = new Force(op, Ability.REF_UNIT);
         op = (UnitListOption)spec.getOption("model.option.interventionForce");
         interventionForce = new Force(op, null);
     }
@@ -257,7 +257,7 @@ public final class Monarch extends FreeColGameObject implements Named {
     public List<Player> collectPotentialEnemies() {
         List<Player> enemies = new ArrayList<Player>();
         // Benjamin Franklin puts an end to the monarch's interference
-        if (!player.hasAbility("model.ability.ignoreEuropeanWars")) {
+        if (!player.hasAbility(Ability.IGNORE_EUROPEAN_WARS)) {
             for (Player enemy : getGame().getLiveEuropeanPlayers()) {
                 if (enemy.isREF()) continue;
                 switch (player.getStance(enemy)) {
@@ -278,7 +278,7 @@ public final class Monarch extends FreeColGameObject implements Named {
     public List<Player> collectPotentialFriends() {
         List<Player> friends = new ArrayList<Player>();
         // Benjamin Franklin puts an end to the monarch's interference
-        if (!player.hasAbility("model.ability.ignoreEuropeanWars")) {
+        if (!player.hasAbility(Ability.IGNORE_EUROPEAN_WARS)) {
             for (Player enemy : getGame().getLiveEuropeanPlayers()) {
                 if (enemy.isREF()) continue;
                 switch (player.getStance(enemy)) {
@@ -435,7 +435,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         UnitType unitType = Utils.getRandomMember(logger, "Choose REF unit",
                                                   types, random);
         Role role = (needNaval
-            || !unitType.hasAbility("model.ability.canBeEquipped"))
+            || !unitType.hasAbility(Ability.CAN_BE_EQUIPPED))
             ? Role.DEFAULT
             : (Utils.randomInt(logger, "Choose land role", random, 2) == 0)
             ? Role.SOLDIER
@@ -497,7 +497,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         List<UnitType> bombardTypes = new ArrayList<UnitType>();
         List<UnitType> mountedTypes = new ArrayList<UnitType>();
         for (UnitType unitType : spec.getUnitTypeList()) {
-            if (unitType.hasAbility("model.ability.supportUnit")) {
+            if (unitType.hasAbility(Ability.SUPPORT_UNIT)) {
                 if (unitType.hasAbility(Ability.NAVAL_UNIT)) {
                     navalTypes.add(unitType);
                 } else if (unitType.hasAbility(Ability.BOMBARD)) {
@@ -574,7 +574,7 @@ public final class Monarch extends FreeColGameObject implements Named {
         Specification spec = getSpecification();
         List<UnitType> unitTypes = new ArrayList<UnitType>();
         for (UnitType unitType : spec.getUnitTypeList()) {
-            if (unitType.hasAbility("model.ability.mercenaryUnit")) {
+            if (unitType.hasAbility(Ability.MERCENARY_UNIT)) {
                 unitTypes.add(unitType);
             }
         }

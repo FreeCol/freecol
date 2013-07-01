@@ -466,7 +466,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         int power = 0;
         for (Unit u : getUnits()) {
             if (u.isNaval()) naval = true; else {
-                if (u.hasAbility("model.ability.refUnit")) {
+                if (u.hasAbility(Ability.REF_UNIT)) {
                     land++;
                     power += cm.getOffencePower(u, null);
                 }
@@ -667,7 +667,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             = new ArrayList<RandomChoice<UnitType>>();
         for (UnitType unitType : getSpecification().getUnitTypeList()) {
             if (unitType.isRecruitable()
-                && hasAbility("model.ability.canRecruitUnit", unitType)) {
+                && hasAbility(Ability.CAN_RECRUIT_UNIT, unitType)) {
                 recruitables.add(new RandomChoice<UnitType>(unitType,
                         unitType.getRecruitProbability()));
             }
@@ -1069,7 +1069,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         if (isEuropean()) { // Update liberty and immigration
             if (checkEmigrate()
-                && !hasAbility("model.ability.selectRecruit")) {
+                && !hasAbility(Ability.SELECT_RECRUIT)) {
                 // Auto-emigrate if selection not allowed.
                 csEmigrate(0, MigrationType.NORMAL, random, cs);
             } else {
@@ -1123,7 +1123,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 ServerPlayer sp = (ServerPlayer) p;
                 if (sp == this || p == s
                     || !p.hasContacted(this) || !p.hasContacted(p)) continue;
-                if (p.hasAbility("model.ability.betterForeignAffairsReport")
+                if (p.hasAbility(Ability.BETTER_FOREIGN_AFFAIRS_REPORT)
                     || war) {
                     cs.addStance(See.only(sp), this, sta, s);
                     cs.addMessage(See.only(sp),
@@ -1493,7 +1493,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
             // Check for braves converted by missionaries
             List<UnitType> converts = game.getSpecification()
-                .getUnitTypesWithAbility("model.ability.convert");
+                .getUnitTypesWithAbility(Ability.CONVERT);
             StringTemplate nation = getNationName();
             for (IndianSettlement settlement : allSettlements) {
                 Unit missionary = settlement.getMissionary();
@@ -1748,7 +1748,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 List<RandomChoice<UnitType>> recruits
                     = generateRecruitablesList();
                 for (int i = 0; i < Europe.RECRUIT_COUNT; i++) {
-                    if (!hasAbility("model.ability.canRecruitUnit",
+                    if (!hasAbility(Ability.CAN_RECRUIT_UNIT,
                                     europe.getRecruitable(i))) {
                         UnitType newType = RandomChoice
                             .getWeightedRandom(logger,
@@ -2353,7 +2353,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             // The Revenger unit can attack multiple times, so spend
             // at least the eventual cost of moving to the tile.
             // Other units consume the entire move.
-            if (attacker.hasAbility("model.ability.multipleAttacks")) {
+            if (attacker.hasAbility(Ability.MULTIPLE_ATTACKS)) {
                 int movecost = attackerUnit.getMoveCost(defenderTile);
                 attackerUnit.setMovesLeft(attackerUnit.getMovesLeft()
                                           - movecost);
@@ -2554,7 +2554,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
         StringTemplate convertNation = natives.getOwner().getNationName();
         List<UnitType> converts = getGame().getSpecification()
-            .getUnitTypesWithAbility("model.ability.convert");
+            .getUnitTypesWithAbility(Ability.CONVERT);
         UnitType type = Utils.getRandomMember(logger, "Choose convert",
                                               converts, random);
         Unit convert = natives.getUnitList().get(0);

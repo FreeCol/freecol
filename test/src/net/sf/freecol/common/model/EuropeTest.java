@@ -34,8 +34,8 @@ public class EuropeTest extends FreeColTestCase {
         UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
         Unit colonist = new ServerUnit(game, amsterdam, dutch, colonistType);
 
-        assertTrue(amsterdam.hasAbility("model.ability.dressMissionary"));
-        assertTrue(colonist.hasAbility("model.ability.dressMissionary"));
+        assertTrue(amsterdam.hasAbility(Ability.DRESS_MISSIONARY));
+        assertTrue(colonist.hasAbility(Ability.DRESS_MISSIONARY));
 
     }
 

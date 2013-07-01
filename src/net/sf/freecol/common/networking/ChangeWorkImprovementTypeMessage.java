@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
@@ -94,7 +95,7 @@ public class ChangeWorkImprovementTypeMessage extends DOMMessage {
         Tile tile = unit.getTile();
         if (tile == null) {
             return DOMMessage.clientError("Unit is not on the map: " + unitId);
-        } else if (!unit.hasAbility("model.ability.improveTerrain")) {
+        } else if (!unit.hasAbility(Ability.IMPROVE_TERRAIN)) {
             return DOMMessage.clientError("Unit can not improve tiles: "
                 + unitId);
         }

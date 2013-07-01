@@ -165,7 +165,7 @@ public final class TileType extends FreeColGameObjectType {
      * @return True if the tile type is directly connected.
      */
     public boolean isDirectlyHighSeasConnected() {
-        return hasAbility("model.ability.moveToEurope");
+        return hasAbility(Ability.MOVE_TO_EUROPE);
     }
 
     /**

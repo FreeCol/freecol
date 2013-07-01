@@ -1269,7 +1269,7 @@ public final class InGameController extends Controller {
         serverPlayer.setIndependentNationName(nationName);
         serverPlayer.setNewLandName(countryName);
         serverPlayer.setPlayerType(PlayerType.REBEL);
-        serverPlayer.addAbility(new Ability("model.ability.independenceDeclared"));
+        serverPlayer.addAbility(new Ability(Ability.INDEPENDENCE_DECLARED));
         serverPlayer.modifyScore(SCORE_INDEPENDENCE_DECLARED);
 
         // Do not add history event to cs as we are going to update the
@@ -2249,10 +2249,10 @@ public final class InGameController extends Controller {
         ServerPlayer enemy = (ServerPlayer) missionary.getOwner();
         double denounce = Utils.randomDouble(logger, "Denounce base", random)
             * enemy.getImmigration() / (serverPlayer.getImmigration() + 1);
-        if (missionary.hasAbility("model.ability.expertMissionary")) {
+        if (missionary.hasAbility(Ability.EXPERT_MISSIONARY)) {
             denounce += 0.2;
         }
-        if (unit.hasAbility("model.ability.expertMissionary")) {
+        if (unit.hasAbility(Ability.EXPERT_MISSIONARY)) {
             denounce -= 0.2;
         }
 
@@ -3929,13 +3929,13 @@ public final class InGameController extends Controller {
         }
         Game game = getGame();
         List<UnitType> undeads = game.getSpecification()
-            .getUnitTypesWithAbility("model.ability.undead");
+            .getUnitTypesWithAbility(Ability.UNDEAD);
         List<UnitType> navalUnits = new ArrayList<UnitType>();
         List<UnitType> landUnits = new ArrayList<UnitType>();
         for (UnitType undead : undeads) {
             if (undead.hasAbility(Ability.NAVAL_UNIT)) {
                 navalUnits.add(undead);
-            } else if (undead.hasAbility("model.ability.multipleAttacks")) {
+            } else if (undead.hasAbility(Ability.MULTIPLE_ATTACKS)) {
                 landUnits.add(undead);
             }
         }

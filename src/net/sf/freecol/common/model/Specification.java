@@ -1190,7 +1190,7 @@ public final class Specification {
      */
     public List<UnitType> getREFUnitTypes(boolean naval) {
         List<UnitType> types = new ArrayList<UnitType>();
-        for (UnitType ut : getUnitTypesWithAbility("model.ability.refUnit")) {
+        for (UnitType ut : getUnitTypesWithAbility(Ability.REF_UNIT)) {
             if (naval == ut.isNaval()) types.add(ut);
         }
         return types;
@@ -1754,9 +1754,9 @@ public final class Specification {
         EquipmentType missionaryEquipment
             = getEquipmentType("model.equipment.missionary");
         if (missionaryEquipment != null) {
-            for (String as : new String[] { "model.ability.establishMission",
-                                            "model.ability.denounceHeresy",
-                                            "model.ability.inciteNatives" }) {
+            for (String as : new String[] { Ability.ESTABLISH_MISSION,
+                                            Ability.DENOUNCE_HERESY,
+                                            Ability.INCITE_NATIVES }) {
                 List<Ability> al = allAbilities.get(as);
                 if (al != null) {
                     for (Ability a : al) missionaryEquipment.addAbility(a);

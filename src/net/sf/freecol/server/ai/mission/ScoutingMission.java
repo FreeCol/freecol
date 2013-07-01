@@ -108,7 +108,7 @@ public class ScoutingMission extends Mission {
      */
     private static boolean hasHorses(AIUnit aiUnit) {
         return aiUnit.getUnit()
-            .hasAbility("model.ability.scoutIndianSettlement");
+            .hasAbility(Ability.SCOUT_INDIAN_SETTLEMENT);
     }
 
     /**

@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Europe.MigrationType;
 import net.sf.freecol.common.model.Game;
@@ -92,7 +93,7 @@ public class EmigrateUnitMessage extends DOMMessage {
             type = MigrationType.FOUNTAIN;
         } else if (player.checkEmigrate()) {
             if (selected) {
-                if (!player.hasAbility("model.ability.selectRecruit")) {
+                if (!player.hasAbility(Ability.SELECT_RECRUIT)) {
                     return DOMMessage.clientError("selectRecruit ability absent.");
                 }
             } else if (slot != 0) {

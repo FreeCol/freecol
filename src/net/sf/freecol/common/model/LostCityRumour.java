@@ -151,9 +151,9 @@ public class LostCityRumour extends TileItem {
             && !unit.getType().getUnitTypesLearntInLostCity().isEmpty();
         boolean isExpertScout = unit != null
             && unit.hasAbility(Ability.EXPERT_SCOUT)
-            && unit.hasAbility("model.ability.scoutIndianSettlement");
+            && unit.hasAbility(Ability.SCOUT_INDIAN_SETTLEMENT);
         boolean hasDeSoto = unit != null
-            && unit.getOwner().hasAbility("model.ability.rumoursAlwaysPositive");
+            && unit.getOwner().hasAbility(Ability.RUMOURS_ALWAYS_POSITIVE);
         // The following arrays contain percentage values for
         // "good" and "bad" events when scouting with a non-expert
         // at the various difficulty levels [0..4] exact values

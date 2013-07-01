@@ -38,98 +38,209 @@ public final class Ability extends Feature {
      * The ability to add the current tax as a bonus to the production
      * of bells.  Provided by the {@link FoundingFather} Thomas Paine.
      */
-    public static final String ADD_TAX_TO_BELLS = "model.ability.addTaxToBells";
+    public static final String ADD_TAX_TO_BELLS
+        = "model.ability.addTaxToBells";
+
+    /** The ability to always receive a peace offer (Franklin). */
+    public static final String ALWAYS_OFFERED_PEACE
+        = "model.ability.alwaysOfferedPeace";
+
+    /** The ability to ambush other units. */
+    public static final String AMBUSH_BONUS
+        = "model.ability.ambushBonus";
+
+    /** The susceptibility to ambush from other units. */
+    public static final String AMBUSH_PENALTY
+        = "model.ability.ambushPenalty";
 
     /**
      * The ability of certain buildings (e.g. the stables) to produce
      * goods even if no units are present.
      */
-    public static final String AUTO_PRODUCTION = "model.ability.autoProduction";
+    public static final String AUTO_PRODUCTION
+        = "model.ability.autoProduction";
+
+    /**
+     * The ability of a colony to automatocally arm defenders (Revere).
+     */
+    public static final String AUTOMATIC_EQUIPMENT
+        = "model.ability.automaticEquipment";
+
+    /** The ability to automatically promote combat winners (Washington). */
+    public static final String AUTOMATIC_PROMOTION
+        = "model.ability.automaticPromotion";
 
     /**
      * The ability of certain buildings (e.g. the stables) to avoid
      * producing more goods than the colony can store, which would
      * normally go to waste.
      */
-    public static final String AVOID_EXCESS_PRODUCTION = "model.ability.avoidExcessProduction";
+    public static final String AVOID_EXCESS_PRODUCTION
+        = "model.ability.avoidExcessProduction";
 
-    /**
-     * The ability to bombard other units, i.e. attack them from a
-     * distance without risking damage.
-     */
-    public static final String BOMBARD = "model.ability.bombard";
+    /** The ability for better foreign affairs reporting (deWitt). */
+    public static final String BETTER_FOREIGN_AFFAIRS_REPORT
+        = "model.ability.betterForeignAffairsReport";
+
+    /** The ability of a unit to bombard other units. */
+    public static final String BOMBARD
+        = "model.ability.bombard";
+
+    /** The ability of a colony to bombard ships. */
+    public static final String BOMBARD_SHIPS
+        = "model.ability.bombardShips";
 
     /**
      * The ability to be born in a Colony.  Only Units with this
      * ability can be produced by a Colony.
      */
-    public static final String BORN_IN_COLONY = "model.ability.bornInColony";
+    public static final String BORN_IN_COLONY
+        = "model.ability.bornInColony";
 
     /**
      * The ability to be born in an IndianSettlement.  Only Units with
      * this ability can be produced by an IndianSettlement.
      */
-    public static final String BORN_IN_INDIAN_SETTLEMENT = "model.ability.bornInIndianSettlement";
+    public static final String BORN_IN_INDIAN_SETTLEMENT
+        = "model.ability.bornInIndianSettlement";
 
     /**
      * The ability to build {@link BuildableType}s, such as units.  The
      * shipyard provides the ability to build ships, for example.
      */
-    public static final String BUILD = "model.ability.build";
+    public static final String BUILD
+        = "model.ability.build";
+
+    /**
+     * The ability to build a customs house.  Yes this is misspelled.
+     */
+    public static final String BUILD_CUSTOM_HOUSE
+        = "model.ability.buildCustomHouse";
+
+    /** The ability to build a factories. */
+    public static final String BUILD_FACTORY
+        = "model.ability.buildFactory";
 
     /**
      * The ability of certain unarmed units to be captured by another
      * player's units. Units lacking this ability (e.g. braves) will
      * be destroyed instead.
      */
-    public static final String CAN_BE_CAPTURED = "model.ability.canBeCaptured";
+    public static final String CAN_BE_CAPTURED
+        = "model.ability.canBeCaptured";
 
     /**
      * The ability of certain units to be equipped with tools, muskets, etc.
      */
-    public static final String CAN_BE_EQUIPPED = "model.ability.canBeEquipped";
+    public static final String CAN_BE_EQUIPPED
+        = "model.ability.canBeEquipped";
 
-    /** The ability of some buildings (e.g. the schoolhouse) to teach skills. */
-    public static final String CAN_TEACH = "model.ability.teach";
+    /** 
+     * The ability of some buildings (e.g. the schoolhouse) to teach
+     * skills.
+     */
+    public static final String CAN_TEACH
+        = "model.ability.teach";
+
+    /** The ability of a player to recruit units. */
+    public static final String CAN_RECRUIT_UNIT
+        = "model.ability.canRecruitUnit";
+
+    /** The ability of certain armed units to capture equipment.*/
+    public static final String CAPTURE_EQUIPMENT
+        = "model.ability.captureEquipment";
 
     /**
      * The ability of certain units (e.g. privateers) to capture goods
      * carried by another player's units.
      */
-    public static final String CAPTURE_GOODS = "model.ability.captureGoods";
+    public static final String CAPTURE_GOODS
+        = "model.ability.captureGoods";
 
     /** The ability of certain armed units to capture another player's units.*/
-    public static final String CAPTURE_UNITS = "model.ability.captureUnits";
+    public static final String CAPTURE_UNITS
+        = "model.ability.captureUnits";
 
     /** The ability of certain units (e.g. wagon trains) to carry goods. */
-    public static final String CARRY_GOODS = "model.ability.carryGoods";
-
-    /** The ability of certain units (e.g. ships) to carry other units. */
-    public static final String CARRY_UNITS = "model.ability.carryUnits";
+    public static final String CARRY_GOODS
+        = "model.ability.carryGoods";
 
     /**
      * The ability of certain units (e.g. treasure trains) to carry
      * treasure.
      */
-    public static final String CARRY_TREASURE = "model.ability.carryTreasure";
+    public static final String CARRY_TREASURE
+        = "model.ability.carryTreasure";
+
+    /** The ability of certain units (e.g. ships) to carry other units. */
+    public static final String CARRY_UNITS
+        = "model.ability.carryUnits";
 
     /**
      * The ability of certain consumers (e.g. BuildQueues) to consume
      * a large amount of goods at once instead of turn by turn.
      */
-    public static final String CONSUME_ALL_OR_NOTHING = "model.ability.consumeAllOrNothing";
+    public static final String CONSUME_ALL_OR_NOTHING
+        = "model.ability.consumeAllOrNothing";
 
-    /** The ability of certain units to work as missionaries more effectively. */
-    public static final String EXPERT_MISSIONARY = "model.ability.expertMissionary";
+    /** Units with this ability are converts. */
+    public static final String CONVERT
+        = "model.ability.convert";
+
+    /** The ability of customs houses to trade with other players. */
+    public static final String CUSTOM_HOUSE_TRADES_WITH_FOREIGN_COUNTRIES
+        = "model.ability.customHouseTradesWithForeignCountries";
+
+    /** Units with this ability are demoted on losing all equipment. */
+    public static final String DEMOTE_ON_ALL_EQUIPMENT_LOST
+        = "model.ability.demoteOnAllEquipLost";
+
+    /** The ability to denounce heresy. */
+    public static final String DENOUNCE_HERESY
+        = "model.ability.denounceHeresy";
+
+    /** Units with this ability die on losing all equipment. */
+    public static final String DISPOSE_ON_ALL_EQUIPMENT_LOST
+        = "model.ability.disposeOnAllEquipLost";
+
+    /** Units with this ability die on losing a combat. */
+    public static final String DISPOSE_ON_COMBAT_LOSS
+        = "model.ability.disposeOnCombatLoss";
+
+    /** The ability to bless a missionary. */
+    public static final String DRESS_MISSIONARY
+        = "model.ability.dressMissionary";
+
+    /** The ability to elect founding fathers. */
+    public static final String ELECT_FOUNDING_FATHER
+        = "model.ability.electFoundingFather";
+
+    /** The ability to establish a mission. */
+    public static final String ESTABLISH_MISSION
+        = "model.ability.establishMission";
+
+    /** The ability to evade naval attack. */
+    public static final String EVADE_ATTACK
+        = "model.ability.evadeAttack";
+
+    /**
+     * The ability of certain units to work as missionaries more
+     * effectively.
+     */
+    public static final String EXPERT_MISSIONARY
+        = "model.ability.expertMissionary";
 
     /** The ability of certain units to build TileImprovements faster. */
-    public static final String EXPERT_PIONEER = "model.ability.expertPioneer";
+    public static final String EXPERT_PIONEER
+        = "model.ability.expertPioneer";
 
     /** The ability of certain units to work as scouts more effectively. */
-    public static final String EXPERT_SCOUT = "model.ability.expertScout";
+    public static final String EXPERT_SCOUT
+        = "model.ability.expertScout";
 
     /** The ability of certain units to work as soldiers more effectively. */
-    public static final String EXPERT_SOLDIER = "model.ability.expertSoldier";
+    public static final String EXPERT_SOLDIER
+        = "model.ability.expertSoldier";
 
     /**
      * The somewhat controversial ability of expert units in factory
@@ -137,31 +248,126 @@ public final class Ability extends Feature {
      * no raw materials are available.  Allegedly, this is a feature of
      * the original game.
      */
-    public static final String EXPERTS_USE_CONNECTIONS = "model.ability.expertsUseConnections";
+    public static final String EXPERTS_USE_CONNECTIONS
+        = "model.ability.expertsUseConnections";
 
     /** The ability to export goods to Europe directly. */
-    public static final String EXPORT = "model.ability.export";
+    public static final String EXPORT
+        = "model.ability.export";
 
     /** The ability of a unit to found a colony. */
-    public static final String FOUND_COLONY = "model.ability.foundColony";
+    public static final String FOUND_COLONY
+        = "model.ability.foundColony";
 
     /** The ability of a player to found colonies. */
-    public static final String FOUNDS_COLONIES = "model.ability.foundsColonies";
+    public static final String FOUNDS_COLONIES
+        = "model.ability.foundsColonies";
+
+    /** The ability of a unit to be found in a lost city. */
+    public static final String FOUND_IN_LOST_CITY
+        = "model.ability.foundInLostCity";
+
+    /** The ability of a colony which is a port. */
+    public static final String HAS_PORT
+        = "model.ability.hasPort";
+
+    /** The ability to ignore the monarchs wars. */
+    public static final String IGNORE_EUROPEAN_WARS
+        = "model.ability.ignoreEuropeanWars";
+
+    /** The ability of a unit to make terrain improvements. */
+    public static final String IMPROVE_TERRAIN
+        = "model.ability.improveTerrain";
+
+    /**
+     * The ability denoting that a declaration of independence has
+     * been made.
+     */
+    public static final String INDEPENDENCE_DECLARED
+        = "model.ability.independenceDeclared";
+
+    /** The ability to incite the natives. */
+    public static final String INCITE_NATIVES
+        = "model.ability.inciteNatives";
+
+    /** Units with this ability can be chosen as mercenaries support units. */
+    public static final String MERCENARY_UNIT
+        = "model.ability.mercenaryUnit";
+
+    /** The ability to operate a mission. */
+    public static final String MISSIONARY
+        = "model.ability.missionary";
+
+    /** The ability to move to Europe from a tile. */
+    public static final String MOVE_TO_EUROPE
+        = "model.ability.moveToEurope";
+
+    /** The ability to attack multiple times. */
+    public static final String MULTIPLE_ATTACKS
+        = "model.ability.multipleAttacks";
+
+    /** The ability of being a native unit. */
+    public static final String NATIVE
+        = "model.ability.native";
 
     /** The ability of ships to move across water tiles. */
-    public static final String NAVAL_UNIT = "model.ability.navalUnit";
+    public static final String NAVAL_UNIT
+        = "model.ability.navalUnit";
+
+    /** Units with this property are persons, not a ship or wagon etc. */
+    public static final String PERSON
+        = "model.ability.person";
+
+    /** The ability to pillage unprotected colonies. */
+    public static final String PILLAGE_UNPROTECTED_COLONY
+        = "model.ability.pillageUnprotectedColony";
 
     /**
      * The ability of certain units (e.g. privateers) to attack and
      * plunder another player's units without causing war.
      */
-    public static final String PIRACY = "model.ability.piracy";
+    public static final String PIRACY
+        = "model.ability.piracy";
 
     /** The ability to produce goods (e.g. fish) on water tiles. */
-    public static final String PRODUCE_IN_WATER = "model.ability.produceInWater";
+    public static final String PRODUCE_IN_WATER
+        = "model.ability.produceInWater";
+
+    /** Units with this ability can be added to the REF. */
+    public static final String REF_UNIT
+        = "model.ability.refUnit";
 
     /** The ability to repair certain units. */
-    public static final String REPAIR_UNITS = "model.ability.repairUnits";
+    public static final String REPAIR_UNITS
+        = "model.ability.repairUnits";
+
+    /** LCRs always yield positive results (deSoto). */
+    public static final String RUMOURS_ALWAYS_POSITIVE
+        = "model.ability.repairUnits";
+
+    /** The ability to scout native settlements. */
+    public static final String SCOUT_INDIAN_SETTLEMENT
+        = "model.ability.scoutIndianSettlement";
+
+    /** The ability to select recruits (Brewster). */
+    public static final String SELECT_RECRUIT
+        = "model.ability.selectRecruit";
+
+    /**
+     * Units with this ability can be chosen as support units from
+     * the crown.
+     */
+    public static final String SUPPORT_UNIT
+        = "model.ability.supportUnit";
+
+    /** The ability to trade with foreign colonies (deWitt). */
+    public static final String TRADE_WITH_FOREIGN_COLONIES
+        = "model.ability.tradeWithForeignColonies";
+
+    /** Undead units have this ability. */
+    public static final String UNDEAD
+        = "model.ability.undead";
+
 
     /** The ability value. */
     private boolean value = true;

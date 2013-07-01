@@ -1079,7 +1079,7 @@ public final class ImageLibrary {
         }
         else for (Entry<String, Boolean> entry
                       : unitType.getRequiredAbilities().entrySet()) {
-            if (entry.getKey().equals("model.ability.native")
+            if (entry.getKey().equals(Ability.NATIVE)
                 && entry.getValue() == true) {
                 nativeEthnicity = false;
             }

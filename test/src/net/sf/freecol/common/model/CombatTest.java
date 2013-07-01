@@ -137,8 +137,8 @@ public class CombatTest extends FreeColTestCase {
         assertEquals(Specification.BASE_OFFENCE_SOURCE, offenceModifiers.iterator().next().getSource());
 
         Set<Modifier> hillsModifierSet = hills.getDefenceBonus();
-        assertFalse(soldier.hasAbility("model.ability.ambushBonus"));
-        assertFalse(colonist.hasAbility("model.ability.ambushPenalty"));
+        assertFalse(soldier.hasAbility(Ability.AMBUSH_BONUS));
+        assertFalse(colonist.hasAbility(Ability.AMBUSH_PENALTY));
         assertEquals(1, hillsModifierSet.size());
         Modifier hillsModifier = hillsModifierSet.iterator().next();
 
@@ -486,7 +486,7 @@ public class CombatTest extends FreeColTestCase {
         InGameController igc = ServerTestHelper.getInGameController();
 
         ServerPlayer french = (ServerPlayer) game.getPlayer("model.nation.french");
-        french.addAbility(new Ability("model.ability.independenceDeclared"));
+        french.addAbility(new Ability(Ability.INDEPENDENCE_DECLARED));
         ServerPlayer refPlayer = igc.createREFPlayer(french);
 
         SimpleCombatModel combatModel = new SimpleCombatModel();

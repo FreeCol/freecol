@@ -89,7 +89,7 @@ public class NationSummary extends FreeColObject {
 
             gold = player.getGold();
             if (player == requester || requester
-                .hasAbility("model.ability.betterForeignAffairsReport")) {
+                .hasAbility(Ability.BETTER_FOREIGN_AFFAIRS_REPORT)) {
                 soL = player.getSoL();
                 foundingFathers = player.getFatherCount();
                 tax = player.getTax();

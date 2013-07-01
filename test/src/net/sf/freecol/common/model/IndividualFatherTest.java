@@ -171,7 +171,7 @@ public class IndividualFatherTest extends FreeColTestCase {
         player.addFather(paine);
         player.recalculateBellsBonus();
 
-        assertTrue(player.hasAbility("model.ability.addTaxToBells"));
+        assertTrue(player.hasAbility(Ability.ADD_TAX_TO_BELLS));
         Set<Modifier> modifierSet
             = player.getModifierSet("model.goods.bells");
         assertEquals(1, modifierSet.size());
@@ -247,7 +247,7 @@ public class IndividualFatherTest extends FreeColTestCase {
         Player dutch = game.getPlayer("model.nation.dutch");
         FoundingFather brebeuf
             = spec().getFoundingFather("model.foundingFather.fatherJeanDeBrebeuf");
-        String ability = "model.ability.expertMissionary";
+        String ability = Ability.EXPERT_MISSIONARY;
 
         assertTrue(brebeuf.hasAbility(ability));
         assertFalse(dutch.hasAbility(ability));
@@ -261,8 +261,8 @@ public class IndividualFatherTest extends FreeColTestCase {
                                          bibleType);
         camp.setMissionary(missionary);
 
-        assertTrue(bibleType.hasAbility("model.ability.missionary"));
-        assertTrue(missionary.hasAbility("model.ability.missionary"));
+        assertTrue(bibleType.hasAbility(Ability.MISSIONARY));
+        assertTrue(missionary.hasAbility(Ability.MISSIONARY));
 
         dutch.addFather(brebeuf);
         assertTrue(dutch.hasAbility(ability));
@@ -274,7 +274,7 @@ public class IndividualFatherTest extends FreeColTestCase {
         Game game = getGame();
         Player dutch = game.getPlayer("model.nation.dutch");
 
-        String ability = "model.ability.canRecruitUnit";
+        String ability = Ability.CAN_RECRUIT_UNIT;
         assertTrue(dutch.hasAbility(ability));
 
         for (UnitType unitType : spec().getUnitTypeList()) {

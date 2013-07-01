@@ -111,7 +111,7 @@ public class ServerColony extends Colony implements ServerModelObject {
             buildQueue.add(spec.getBuildingType("model.building.docks"));
             addAbility(HAS_PORT);
         }
-        for (UnitType unitType : spec.getUnitTypesWithAbility("model.ability.bornInColony")) {
+        for (UnitType unitType : spec.getUnitTypesWithAbility(Ability.BORN_IN_COLONY)) {
             if (unitType.needsGoodsToBuild()) {
                 populationQueue.add(unitType);
             }
@@ -140,7 +140,7 @@ public class ServerColony extends Colony implements ServerModelObject {
         final Specification spec = getSpecification();
         List<BuildableType> buildables = new ArrayList<BuildableType>();
         buildables.addAll(spec.getBuildingTypeList());
-        buildables.addAll(spec.getUnitTypesWithoutAbility("model.ability.person"));
+        buildables.addAll(spec.getUnitTypesWithoutAbility(Ability.PERSON));
         for (BuildableType bt : buildables) {
             if (canBuild(bt)) {
                 for (AbstractGoods ag : bt.getRequiredGoods()) {

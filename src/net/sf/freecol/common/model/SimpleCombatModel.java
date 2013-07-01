@@ -112,7 +112,7 @@ public class SimpleCombatModel extends CombatModel {
 
         } else if (combatIsBombard(attacker, defender)) {
             Settlement attackerSettlement = (Settlement) attacker;
-            if (attackerSettlement.hasAbility("model.ability.bombardShips")) {
+            if (attackerSettlement.hasAbility(Ability.BOMBARD_SHIPS)) {
                 for (Unit unit : attackerSettlement.getTile().getUnitList()) {
                     if (unit.hasAbility(Ability.BOMBARD)) {
                         result += unit.getType().getOffence();
@@ -454,7 +454,7 @@ public class SimpleCombatModel extends CombatModel {
                     // Rescale to 0 <= r < 1
                     r / (0.1f * odds.win), crs);
             } else if (r < 0.8f * odds.win + 0.2f
-                    && defenderUnit.hasAbility("model.ability.evadeAttack")) {
+                    && defenderUnit.hasAbility(Ability.EVADE_ATTACK)) {
                 crs.add(CombatResult.NO_RESULT);
                 crs.add(CombatResult.EVADE_ATTACK);
             } else {
@@ -632,7 +632,7 @@ public class SimpleCombatModel extends CombatModel {
                 }
 
             // Immediately slaughter units with this property.
-            } else if (loser.hasAbility("model.ability.disposeOnCombatLoss")) {
+            } else if (loser.hasAbility(Ability.DISPOSE_ON_COMBAT_LOSS)) {
                 crs.add(CombatResult.SLAUGHTER_UNIT);
 
             // Disarm losing defensive units.
@@ -676,7 +676,7 @@ public class SimpleCombatModel extends CombatModel {
         UnitTypeChange promotion = winner.getType()
             .getUnitTypeChange(ChangeType.PROMOTION, winnerPlayer);
         if (promotion != null
-            && (winner.hasAbility("model.ability.automaticPromotion")
+            && (winner.hasAbility(Ability.AUTOMATIC_PROMOTION)
                 || (great && (100 * (r - Math.floor(r)) <= promotion.getProbability(ChangeType.PROMOTION))))) {
             crs.add(CombatResult.PROMOTE_UNIT);
         }
@@ -692,8 +692,8 @@ public class SimpleCombatModel extends CombatModel {
     private boolean isAmbush(FreeColGameObject attacker,
                              FreeColGameObject defender) {
         return (attacker != null
-            && attacker.hasAbility("model.ability.ambushBonus"))
+            && attacker.hasAbility(Ability.AMBUSH_BONUS))
             || (defender != null
-                && defender.hasAbility("model.ability.ambushPenalty"));
+                && defender.hasAbility(Ability.AMBUSH_PENALTY));
     }
 }

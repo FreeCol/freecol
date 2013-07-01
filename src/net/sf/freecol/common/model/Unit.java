@@ -433,7 +433,7 @@ public class Unit extends GoodsLocation
      * @return True if the unit is undead.
      */
     public boolean isUndead() {
-        return hasAbility("model.ability.undead");
+        return hasAbility(Ability.UNDEAD);
     }
 
     /**
@@ -492,7 +492,7 @@ public class Unit extends GoodsLocation
      * @return True if this unit is a person.
      */
     public boolean isPerson() {
-        return hasAbility("model.ability.person")
+        return hasAbility(Ability.PERSON)
             // @compat 0.10.0
             || unitType.hasAbility(Ability.BORN_IN_COLONY)
             || unitType.hasAbility(Ability.BORN_IN_INDIAN_SETTLEMENT)
@@ -669,7 +669,7 @@ public class Unit extends GoodsLocation
             role = role.newRole(type.getRole());
         }
         if (getState() == UnitState.IMPROVING
-            && !hasAbility("model.ability.improveTerrain")) {
+            && !hasAbility(Ability.IMPROVE_TERRAIN)) {
             setStateUnchecked(UnitState.ACTIVE);
             setMovesLeft(0);
         }
@@ -791,7 +791,7 @@ public class Unit extends GoodsLocation
      * @return True if this unit is running a mission.
      */
     public boolean isInMission() {
-        return hasAbility("model.ability.missionary")
+        return hasAbility(Ability.MISSIONARY)
             && (getLocation() instanceof IndianSettlement
                 // TODO: remove this when PET missionary serialization is fixed
                 || getLocation() == null);
@@ -1590,7 +1590,7 @@ public class Unit extends GoodsLocation
      *     Or return null if capture is not possible.
      */
     public EquipmentType canCaptureEquipment(EquipmentType equip, Unit loser) {
-        if (hasAbility("model.ability.captureEquipment")) {
+        if (hasAbility(Ability.CAPTURE_EQUIPMENT)) {
             if (getOwner().isIndian() != loser.getOwner().isIndian()) {
                 equip = equip.getCaptureEquipment(getOwner().isIndian());
             }
@@ -1613,7 +1613,7 @@ public class Unit extends GoodsLocation
         // available. Indians can also pick up equipment.
         if (isArmed()) return null;
 
-        if (!getOwner().hasAbility("model.ability.automaticEquipment")) {
+        if (!getOwner().hasAbility(Ability.AUTOMATIC_EQUIPMENT)) {
             return null;
         }
 
@@ -1630,7 +1630,7 @@ public class Unit extends GoodsLocation
         // Check for necessary equipment in the settlement
         Set<Ability> autoDefence = new HashSet<Ability>();
         autoDefence.addAll(getOwner()
-            .getAbilitySet("model.ability.automaticEquipment"));
+            .getAbilitySet(Ability.AUTOMATIC_EQUIPMENT));
 
         for (EquipmentType equipment : getSpecification().getEquipmentTypeList()) {
             for (Ability ability : autoDefence) {
@@ -1664,7 +1664,7 @@ public class Unit extends GoodsLocation
      * @return True if the unit is doomed.
      */
     public boolean losingEquipmentKillsUnit(EquipmentType lose) {
-        if (hasAbility("model.ability.disposeOnAllEquipLost")) {
+        if (hasAbility(Ability.DISPOSE_ON_ALL_EQUIPMENT_LOST)) {
             for (EquipmentType equip : getEquipment().keySet()) {
                 if (equip != lose) return false;
             }
@@ -1680,7 +1680,7 @@ public class Unit extends GoodsLocation
      * @return True if the unit is to be demoted.
      */
     public boolean losingEquipmentDemotesUnit(EquipmentType lose) {
-        if (hasAbility("model.ability.demoteOnAllEquipLost")) {
+        if (hasAbility(Ability.DEMOTE_ON_ALL_EQUIPMENT_LOST)) {
             for (EquipmentType equip : getEquipment().keySet()) {
                 if (equip != lose) return false;
             }
@@ -1855,7 +1855,7 @@ public class Unit extends GoodsLocation
         for (Colony colony : player.getColonies()) {
             int turns;
             if (colony != null && colony != tile.getColony()
-                && colony.hasAbility("model.ability.repairUnits")
+                && colony.hasAbility(Ability.REPAIR_UNITS)
                 && (turns = getTurnsToReach(colony)) >= 0
                 && turns < bestTurns) {
                 // Tile.getDistanceTo(Tile) doesn't care about
@@ -2225,7 +2225,7 @@ public class Unit extends GoodsLocation
         if (settlement instanceof Colony) {
             return (getOwner().atWarWith(settlement.getOwner()))
                 ? MoveType.MOVE_NO_ACCESS_WAR
-                : (!hasAbility("model.ability.tradeWithForeignColonies"))
+                : (!hasAbility(Ability.TRADE_WITH_FOREIGN_COLONIES))
                 ? MoveType.MOVE_NO_ACCESS_TRADE
                 : MoveType.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS;
         } else if (settlement instanceof IndianSettlement) {

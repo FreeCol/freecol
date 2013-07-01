@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.networking;
 
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map.Direction;
@@ -91,7 +92,7 @@ public class DemandTributeMessage extends DOMMessage {
             return DOMMessage.clientError(e.getMessage());
         }
         if (unit.isArmed()
-            || unit.hasAbility("model.ability.scoutIndianSettlement")) {
+            || unit.hasAbility(Ability.SCOUT_INDIAN_SETTLEMENT)) {
             ; // ok
         } else {
             return DOMMessage.clientError("Unit is neither armed nor a scout: "

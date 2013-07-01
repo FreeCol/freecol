@@ -832,11 +832,11 @@ public final class UnitType extends BuildableType
         super.readChildren(xr);
 
         // @compat 0.10.6
-        if (hasAbility("model.ability.person")) {
+        if (hasAbility(Ability.PERSON)) {
             if (!containsModifierKey("model.modifier.conversionSkill")) {
                 addModifier(new Modifier("model.modifier.conversionSkill", 8.0f,
                         Modifier.Type.ADDITIVE));
-                if (hasAbility("model.ability.expertMissionary")) {
+                if (hasAbility(Ability.EXPERT_MISSIONARY)) {
                     addModifier(new Modifier("model.modifier.conversionSkill", 5.0f,
                             Modifier.Type.ADDITIVE));
                 }

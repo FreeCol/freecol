@@ -53,7 +53,7 @@ public class Colony extends Settlement implements Nameable {
     public static final String REARRANGE_WORKERS = "rearrangeWorkers";
     public static final int LIBERTY_PER_REBEL = 200;
 
-    public static final Ability HAS_PORT = new Ability("model.ability.hasPort");
+    public static final Ability HAS_PORT = new Ability(Ability.HAS_PORT);
 
     public static enum ColonyChangeEvent {
         POPULATION_CHANGE,
@@ -1033,7 +1033,7 @@ public class Colony extends Settlement implements Nameable {
      */
     public boolean canBePillaged(Unit attacker) {
         return !hasStockade()
-            && attacker.hasAbility("model.ability.pillageUnprotectedColony")
+            && attacker.hasAbility(Ability.PILLAGE_UNPROTECTED_COLONY)
             && !(getBurnableBuildingList().isEmpty()
                  && getShipList().isEmpty()
                  && (getLootableGoodsList().isEmpty()
@@ -1639,7 +1639,7 @@ public class Colony extends Settlement implements Nameable {
                 }
             }
         } else if (buildableType instanceof UnitType) {
-            if (!buildableType.hasAbility("model.ability.person")
+            if (!buildableType.hasAbility(Ability.PERSON)
                 && !hasAbility(Ability.BUILD, buildableType)) {
                 return NoBuildReason.MISSING_BUILD_ABILITY;
             }
@@ -2098,7 +2098,7 @@ public class Colony extends Settlement implements Nameable {
             return false;
         } else {
             // does it have the buildings that give such abilities?
-            return hasAbility("model.ability.bombardShips");
+            return hasAbility(Ability.BOMBARD_SHIPS);
         }
     }
 

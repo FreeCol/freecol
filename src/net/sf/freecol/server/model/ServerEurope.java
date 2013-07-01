@@ -61,7 +61,7 @@ public class ServerEurope extends Europe implements ServerModelObject {
     public ServerEurope(Game game, Player owner) {
         super(game, owner);
         // TODO: put this in the specification
-        addAbility(new Ability("model.ability.dressMissionary"));
+        addAbility(new Ability(Ability.DRESS_MISSIONARY));
     }
 
 

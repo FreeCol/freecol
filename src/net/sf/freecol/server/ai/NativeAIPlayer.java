@@ -32,6 +32,7 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTradeItem;
 import net.sf.freecol.common.model.CombatModel;
@@ -743,7 +744,7 @@ public class NativeAIPlayer extends AIPlayer {
                         break;
                     case PEACE:
                         if (!agreement.getSender()
-                            .hasAbility("model.ability.alwaysOfferedPeace")) {
+                            .hasAbility(Ability.ALWAYS_OFFERED_PEACE)) {
                             // TODO: introduce some kind of counter in
                             // order to avoid Benjamin Franklin exploit.
                             value -= 1000;

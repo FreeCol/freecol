@@ -1061,7 +1061,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return True if this player can recruit founding fathers.
      */
     public boolean canHaveFoundingFathers() {
-        return nationType.hasAbility("model.ability.electFoundingFather");
+        return nationType.hasAbility(Ability.ELECT_FOUNDING_FATHER);
     }
 
     /**
@@ -1519,7 +1519,7 @@ public class Player extends FreeColGameObject implements Nameable {
     protected boolean recalculateBellsBonus() {
         Set<Modifier> libertyBonus = getModifierSet("model.goods.bells");
         boolean ret = false;
-        for (Ability ability : getAbilitySet("model.ability.addTaxToBells")) {
+        for (Ability ability : getAbilitySet(Ability.ADD_TAX_TO_BELLS)) {
             FreeColObject source = ability.getSource();
             if (source != null) {
                 for (Modifier modifier : libertyBonus) {
@@ -1815,7 +1815,7 @@ public class Player extends FreeColGameObject implements Nameable {
             if (getSpecification().getBoolean(GameOptions.CUSTOM_IGNORE_BOYCOTT)) {
                 return true;
             }
-            if (hasAbility("model.ability.customHouseTradesWithForeignCountries")) {
+            if (hasAbility(Ability.CUSTOM_HOUSE_TRADES_WITH_FOREIGN_COUNTRIES)) {
                 for (Player otherPlayer : getGame().getLiveEuropeanPlayers()) {
                     if (otherPlayer != this
                         && (getStance(otherPlayer) == Stance.PEACE
@@ -2101,7 +2101,7 @@ public class Player extends FreeColGameObject implements Nameable {
     public int getNumberOfKingLandUnits() {
         int n = 0;
         for (Unit unit : getUnits()) {
-            if (unit.hasAbility("model.ability.refUnit") && !unit.isNaval()) {
+            if (unit.hasAbility(Ability.REF_UNIT) && !unit.isNaval()) {
                 n++;
             }
         }
@@ -3947,7 +3947,7 @@ public class Player extends FreeColGameObject implements Nameable {
         // Dynamic abilities are not currently saved.  TODO: better?
         switch (playerType) {
         case REBEL: case INDEPENDENT:
-            addAbility(new Ability("model.ability.independenceDeclared"));
+            addAbility(new Ability(Ability.INDEPENDENCE_DECLARED));
             break;
         default: // No other special abilities, just silence the warning.
             break;

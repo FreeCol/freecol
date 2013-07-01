@@ -133,8 +133,8 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 boolean a1 = u1.hasAbility(Ability.EXPERT_SCOUT);
                 boolean a2 = u2.hasAbility(Ability.EXPERT_SCOUT);
                 if (a1 != a2) return (a1) ? -1 : 1;
-                a1 = u1.hasAbility("model.ability.scoutIndianSettlement");
-                a2 = u2.hasAbility("model.ability.scoutIndianSettlement");
+                a1 = u1.hasAbility(Ability.SCOUT_INDIAN_SETTLEMENT);
+                a2 = u2.hasAbility(Ability.SCOUT_INDIAN_SETTLEMENT);
                 if (a1 != a2) return (a1) ? -1 : 1;
                 return u1.getType().getSkill() - u2.getType().getSkill();
             }
@@ -553,7 +553,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         for (Unit u : tile.getUnitList()) {
             if (u.isPerson()
                 && (u.getType().getSkill() <= 0
-                    || u.hasAbility("model.ability.expertScout"))) {
+                    || u.hasAbility(Ability.EXPERT_SCOUT))) {
                 explorers.add(u);
             }
         }

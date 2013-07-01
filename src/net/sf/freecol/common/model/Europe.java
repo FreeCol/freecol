@@ -353,8 +353,8 @@ public class Europe extends UnitLocation implements Ownable, Named {
         final Specification spec = getSpecification();
 
         // @compat 0.10.0
-        if (!hasAbility("model.ability.dressMissionary")) {
-            addAbility(new Ability("model.ability.dressMissionary"));
+        if (!hasAbility(Ability.DRESS_MISSIONARY)) {
+            addAbility(new Ability(Ability.DRESS_MISSIONARY));
         }
         // end @compat
 

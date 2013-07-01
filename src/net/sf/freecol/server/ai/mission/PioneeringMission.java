@@ -187,7 +187,7 @@ public class PioneeringMission extends Mission {
      * @return True if the pioneer has tools.
      */
     private static boolean hasTools(AIUnit aiUnit) {
-        return aiUnit.getUnit().hasAbility("model.ability.improveTerrain");
+        return aiUnit.getUnit().hasAbility(Ability.IMPROVE_TERRAIN);
     }
 
     /**

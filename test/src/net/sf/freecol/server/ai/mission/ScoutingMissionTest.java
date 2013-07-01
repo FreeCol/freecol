@@ -19,6 +19,7 @@
 
 package net.sf.freecol.server.ai.mission;
 
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -76,7 +77,7 @@ public class ScoutingMissionTest extends FreeColTestCase {
         aiUnit.abortMission("test");
         assertNotNull("The scout should be an AI unit", aiUnit);
         assertTrue("Scout should have the scout role",
-            scout.hasAbility("model.ability.scoutIndianSettlement"));
+            scout.hasAbility(Ability.SCOUT_INDIAN_SETTLEMENT));
         assertEquals("The Inca settlement should be a scouting target", null,
             ScoutingMission.invalidReason(aiUnit, is));
         assertEquals("The Inca settlement should be found as scouting target",
@@ -96,7 +97,7 @@ public class ScoutingMissionTest extends FreeColTestCase {
         // Invalidate the mission by losing the horses.
         scout.changeEquipment(horsesEqType, -1);
         assertFalse("Scout should not have the scout role",
-            scout.hasAbility("model.ability.scoutIndianSettlement"));
+            scout.hasAbility(Ability.SCOUT_INDIAN_SETTLEMENT));
         assertNotNull("Scouting mission should be invalid",
             aiUnit.getMission().invalidReason());
         assertNotNull("Scouting mission should be impossible for this unit",

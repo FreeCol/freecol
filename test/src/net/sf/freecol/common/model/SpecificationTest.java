@@ -116,7 +116,7 @@ public final class SpecificationTest extends FreeColTestCase {
         assertTrue(smith.getWeight(0) == 0);
         assertTrue(smith.getWeight(34) == 0);
         // check for ability
-        assertTrue(smith.hasAbility("model.ability.buildFactory"));
+        assertTrue(smith.hasAbility(Ability.BUILD_FACTORY));
     }
 
     public void testModifiers() {
@@ -177,25 +177,25 @@ public final class SpecificationTest extends FreeColTestCase {
         // Abilities
         equipmentTypeStr = "model.equipment.horses";
         expectAbilities = new Hashtable<String,Boolean>();
-        expectAbilities.put("model.ability.canBeEquipped", true);
+        expectAbilities.put(Ability.CAN_BE_EQUIPPED, true);
         expectAbilities.put(Ability.BORN_IN_INDIAN_SETTLEMENT, false);
         eqTypesAbilities.put(equipmentTypeStr, expectAbilities);
 
         equipmentTypeStr = "model.equipment.muskets";
         expectAbilities = new Hashtable<String,Boolean>();
-        expectAbilities.put("model.ability.canBeEquipped", true);
+        expectAbilities.put(Ability.CAN_BE_EQUIPPED, true);
         expectAbilities.put(Ability.BORN_IN_INDIAN_SETTLEMENT, false);
         eqTypesAbilities.put(equipmentTypeStr, expectAbilities);
 
         equipmentTypeStr = "model.equipment.indian.horses";
         expectAbilities = new Hashtable<String,Boolean>();
-        expectAbilities.put("model.ability.canBeEquipped", true);
+        expectAbilities.put(Ability.CAN_BE_EQUIPPED, true);
         expectAbilities.put(Ability.BORN_IN_INDIAN_SETTLEMENT, true);
         eqTypesAbilities.put(equipmentTypeStr, expectAbilities);
 
         equipmentTypeStr = "model.equipment.indian.muskets";
         expectAbilities = new Hashtable<String,Boolean>();
-        expectAbilities.put("model.ability.canBeEquipped", true);
+        expectAbilities.put(Ability.CAN_BE_EQUIPPED, true);
         expectAbilities.put(Ability.BORN_IN_INDIAN_SETTLEMENT, true);
         eqTypesAbilities.put(equipmentTypeStr, expectAbilities);
 

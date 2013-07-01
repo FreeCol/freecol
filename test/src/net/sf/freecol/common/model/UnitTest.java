@@ -217,12 +217,12 @@ public class UnitTest extends FreeColTestCase {
         Unit colonist = new ServerUnit(game, colony, dutch, colonistType);
 
         // check abilities
-        assertFalse(colonist.hasAbility("model.ability.missionary"));
+        assertFalse(colonist.hasAbility(Ability.MISSIONARY));
         colonist.changeEquipment(missionaryEquipmentType, 1);
-        assertTrue(colonist.hasAbility("model.ability.missionary"));
-        assertFalse(colonist.hasAbility("model.ability.expertMissionary"));
-        assertTrue(jesuit.hasAbility("model.ability.missionary"));
-        assertTrue(jesuit.hasAbility("model.ability.expertMissionary"));
+        assertTrue(colonist.hasAbility(Ability.MISSIONARY));
+        assertFalse(colonist.hasAbility(Ability.EXPERT_MISSIONARY));
+        assertTrue(jesuit.hasAbility(Ability.MISSIONARY));
+        assertTrue(jesuit.hasAbility(Ability.EXPERT_MISSIONARY));
 
         // check mission creation
         FreeColTestCase.IndianSettlementBuilder builder
@@ -255,7 +255,7 @@ public class UnitTest extends FreeColTestCase {
 
         Unit colonist = new ServerUnit(game, tile, player, colonistType);
         assertEquals(1, colonist.getLineOfSight());
-        assertTrue(colonist.hasAbility("model.ability.canBeEquipped"));
+        assertTrue(colonist.hasAbility(Ability.CAN_BE_EQUIPPED));
 
         assertTrue(colonist.canBeEquippedWith(horsesEquipmentType));
         colonist.changeEquipment(horsesEquipmentType, 1);
@@ -357,7 +357,7 @@ public class UnitTest extends FreeColTestCase {
         assertFalse(undeadType.isAvailableTo(indian));
         assertFalse(undeadType.isAvailableTo(european));
 
-        european.addAbility(new Ability("model.ability.independenceDeclared"));
+        european.addAbility(new Ability(Ability.INDEPENDENCE_DECLARED));
         assertTrue(colonialRegularType.isAvailableTo(european));
     }
 
@@ -396,10 +396,10 @@ public class UnitTest extends FreeColTestCase {
         game.setMap(getTestMap(true));
 
         Colony colony = getStandardColony(6);
-        assertFalse(churchType.hasAbility("model.ability.dressMissionary"));
+        assertFalse(churchType.hasAbility(Ability.DRESS_MISSIONARY));
         Building church = colony.getBuilding(churchType);
         church.upgrade();
-        assertTrue(colony.hasAbility("model.ability.dressMissionary"));
+        assertTrue(colony.hasAbility(Ability.DRESS_MISSIONARY));
 
         Unit colonist = colony.getUnitList().get(0);
         assertEquals("Colonist is not a missionary", 0,

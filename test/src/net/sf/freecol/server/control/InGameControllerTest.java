@@ -516,7 +516,7 @@ public class InGameControllerTest extends FreeColTestCase {
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
 
-        dutch.addAbility(new Ability("model.ability.independenceDeclared"));
+        dutch.addAbility(new Ability(Ability.INDEPENDENCE_DECLARED));
         Tile tile1 = map.getTile(5, 8);
         tile1.setExploredBy(dutch, true);
         tile1.setExploredBy(french, true);
@@ -593,7 +593,7 @@ public class InGameControllerTest extends FreeColTestCase {
         Tile tile2 = map.getTile(4, 8);
         tile2.setExploredBy(dutch, true);
         tile2.setExploredBy(french, true);
-        dutch.addAbility(new Ability("model.ability.independenceDeclared"));
+        dutch.addAbility(new Ability(Ability.INDEPENDENCE_DECLARED));
         Unit colonist = colony.getUnitIterator().next();
         colonist.setType(colonialType);
         assertEquals("Colonist should be Colonial Regular",
@@ -1079,7 +1079,7 @@ public class InGameControllerTest extends FreeColTestCase {
         Unit unit = new ServerUnit(game, tile1, dutch, pettyCriminalType, muskets);
         Unit soldier = new ServerUnit(game, tile2, french, colonistType, muskets);
         // Enable automatic promotion
-        dutch.addAbility(new Ability("model.ability.automaticPromotion"));
+        dutch.addAbility(new Ability(Ability.AUTOMATIC_PROMOTION));
 
         // Criminal -> Servant
         crs = fakeAttackResult(CombatResult.WIN, unit, soldier);
@@ -1122,7 +1122,7 @@ public class InGameControllerTest extends FreeColTestCase {
         assertFalse("Colonial Regulars should not yet be available",
                     colonialType.isAvailableTo(dutch));
         dutch.setPlayerType(PlayerType.REBEL);
-        dutch.addAbility(new Ability("model.ability.independenceDeclared"));
+        dutch.addAbility(new Ability(Ability.INDEPENDENCE_DECLARED));
         dutch.setIndependentNationName("Vrije Nederlands");
         assertTrue("Colonial Regulars should be available",
                    colonialType.isAvailableTo(dutch));
@@ -2092,7 +2092,7 @@ public class InGameControllerTest extends FreeColTestCase {
 
         UnitType gardenerType = new UnitType("gardener", spec());
         gardenerType.setSkill(0);
-        gardenerType.addAbility(new Ability("model.ability.person"));
+        gardenerType.addAbility(new Ability(Ability.PERSON));
 
         ChangeType enterColony = ChangeType.ENTER_COLONY;
         UnitTypeChange change = new UnitTypeChange();

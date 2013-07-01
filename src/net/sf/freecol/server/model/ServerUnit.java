@@ -702,7 +702,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
                 .addAmount("%money%", chiefAmount));
             break;
         case COLONIST:
-            List<UnitType> foundTypes = spec.getUnitTypesWithAbility("model.ability.foundInLostCity");
+            List<UnitType> foundTypes = spec.getUnitTypesWithAbility(Ability.FOUND_IN_LOST_CITY);
             unitType = Utils.getRandomMember(logger, "Choose found",
                                              foundTypes, random);
             newUnit = new ServerUnit(game, tile, serverPlayer, unitType);
