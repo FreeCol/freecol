@@ -580,7 +580,18 @@ public class TileImprovement extends TileItem implements Named {
         final Game game = getGame();
 
         tile = xr.findFreeColGameObject(game, TILE_TAG,
-                                        Tile.class, (Tile)null, true);
+                                        Tile.class, (Tile)null,
+            // @compat 0.10.x
+            // There was a bug in 0.10.x that did not clear tile
+            // improvements after they were complete, leading to units
+            // that still had a tile improvement after they had moved
+            // away.  Consequently when reading such bogus
+            // improvements, there is no guarantee that the tile is
+            // defined.  So we need to accept null tiles for now.
+            // When 0.10.x compatibility goes away, replace with "true".
+                                        false
+            // end @compat 0.10.x
+                                        );
 
         type = xr.getType(spec, TYPE_TAG, TileImprovementType.class,
                           (TileImprovementType)null);

@@ -3982,6 +3982,20 @@ public class Unit extends GoodsLocation
         super.readChildren(xr);
 
         setRole();
+
+        // @compat 0.10.x
+        // There was a bug in 0.10.x that did not clear tile
+        // improvements after they were complete, leading to units
+        // that still had a tile improvement after they had moved
+        // away.  Consequently when reading such bogus improvements,
+        // there is no guarantee that the tile is defined so
+        // compatibility code in TileImprovement.readAttributes
+        // tolerates null tile references.  These are obviously bogus,
+        // so drop them.
+        if (workImprovement != null && workImprovement.getTile() == null) {
+            workImprovement = null;
+        }
+        // end @compat 0.10.x
     }
 
     /**
