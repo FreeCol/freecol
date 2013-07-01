@@ -3984,17 +3984,16 @@ public class Player extends FreeColGameObject implements Nameable {
             offeredFathers.addAll(ofs);
 
         } else if (STANCE_TAG.equals(tag)) {
-            String playerId = xr.getAttribute(PLAYER_TAG, (String)null);
-            if (playerId != null) {
-                stance.put(playerId, xr.getAttribute(VALUE_TAG,
-                           Stance.class, Stance.UNCONTACTED));
-            }
+            Player player = xr.makeFreeColGameObject(game, PLAYER_TAG,
+                                                     Player.class, true);
+            stance.put(player.getId(),
+                xr.getAttribute(VALUE_TAG, Stance.class, Stance.UNCONTACTED));
             xr.closeTag(STANCE_TAG);
 
         } else if (TENSION_TAG.equals(tag)) {
-            tension.put(xr.findFreeColGameObject(game, PLAYER_TAG,
-                    Player.class, (Player)null, true),
-                new Tension(xr.getAttribute(VALUE_TAG, 0)));
+            tension.put(xr.makeFreeColGameObject(game, PLAYER_TAG,
+                                                 Player.class, true),
+                        new Tension(xr.getAttribute(VALUE_TAG, 0)));
             xr.closeTag(TENSION_TAG);
         
         } else if (Europe.getXMLElementTagName().equals(tag)) {
