@@ -2845,6 +2845,12 @@ public final class InGameController extends Controller {
                 if (sp.hasAbility(Ability.SEE_ALL_COLONIES)) {
                     tile.setExploredBy(sp, true);
                     sp.invalidateCanSeeTiles();
+                    cs.addMessage(See.only(sp),
+                        new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                         "buildColony.others", settlement)
+                            .addStringTemplate("%nation%", serverPlayer.getNationName())
+                            .addName("%colony%", settlement.getLocationNameFor(sp))
+                            .addName("%region%", tile.getRegion().getName()));
                 }
             }
         } else {
@@ -2989,6 +2995,17 @@ public final class InGameController extends Controller {
                              Settlement settlement, int price) {
         ChangeSet cs = new ChangeSet();
         serverPlayer.csClaimLand(tile, settlement, price, cs);
+
+        if (settlement != null) {
+            // Define Coronado to make all colony-owned tiles visible
+            for (ServerPlayer sp : getOtherPlayers(serverPlayer)) {
+                if (sp.isEuropean()
+                    && sp.hasAbility(Ability.SEE_ALL_COLONIES)) {
+                    tile.setExploredBy(sp, true);
+                    sp.invalidateCanSeeTiles();
+                }
+            }
+        }
 
         // Others can see the tile.
         sendToOthers(serverPlayer, cs);
