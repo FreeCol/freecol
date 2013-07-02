@@ -71,7 +71,7 @@ public class PlayerTest extends FreeColTestCase {
         unit1.dispose();
         assertTrue(dutch.getUnitById(id) == null);
 
-        unit2.setOwner(french);
+        unit2.changeOwner(french);
         assertTrue(dutch.getUnitById(unit2.getId()) == null);
         assertTrue(french.getUnitById(unit2.getId()) == unit2);
 

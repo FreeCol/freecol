@@ -112,7 +112,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
         super(game);
         setLocation(location);
         setType(getSpecification().getUnitType(template.getType().getId()));
-        setOwner(((ServerGame) game).getPlayer(template.getOwner().getNationId()));
+        Player newOwner = game.getPlayer(template.getOwner().getNationId());
+        changeOwner(newOwner);
         setNationality(template.getNationality());
         setEthnicity(template.getEthnicity());
         visibleGoodsCount = -1;

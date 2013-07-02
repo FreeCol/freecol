@@ -906,7 +906,7 @@ public final class InGameController extends Controller {
                 UnitType downgrade = u.getTypeChange(ChangeType.CAPTURE,
                                                      independent);
                 if (downgrade != null) u.setType(downgrade);
-                u.setOwner(independent);
+                u.changeOwner(independent);
                 // Make sure the former owner is notified!
                 cs.add(See.perhaps().always(serverPlayer), u);
             }
@@ -3080,7 +3080,7 @@ public final class InGameController extends Controller {
             Unit newUnit = tradeItem.getUnit();
             if (newUnit != null) {
                 ServerPlayer former = (ServerPlayer) newUnit.getOwner();
-                unit.setOwner(dest);
+                unit.changeOwner(dest);
                 cs.add(See.perhaps().always(former), newUnit);
             }
         }

@@ -478,9 +478,9 @@ public class DebugUtils {
                                                   Player.class);
         if (player == unit.getOwner()) return;
 
-        sUnit.setOwner(playerChoice);
+        sUnit.changeOwner(playerChoice);
         for (Unit u : sUnit.getUnitList()) {
-            u.setOwner(playerChoice);
+            u.changeOwner(playerChoice);
         }
         playerChoice.invalidateCanSeeTiles();
         freeColClient.getConnectController().reconnect();

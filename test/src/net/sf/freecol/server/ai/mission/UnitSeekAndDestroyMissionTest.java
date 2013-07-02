@@ -80,7 +80,7 @@ public class UnitSeekAndDestroyMissionTest extends FreeColTestCase {
                    aiUnit.getMission() instanceof UnitSeekAndDestroyMission);
                 
         // simulate capture
-        attacker.setOwner(player2);
+        attacker.changeOwner(player2);
         assertEquals("Attacking unit should have been captured",
                      attacker.getOwner(), player2);
         

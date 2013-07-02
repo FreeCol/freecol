@@ -310,7 +310,7 @@ public class ServerGame extends Game implements ServerModelObject {
                     logMe += " " + settlement.getName() + "(mission)";
                     settlement.setContacted(strongestAIPlayer);
                     Unit missionary = settlement.getMissionary();
-                    missionary.setOwner(strongestAIPlayer);
+                    missionary.changeOwner(strongestAIPlayer);
                     Tile t = settlement.getTile();
                     t.updatePlayerExploredTile(strongestAIPlayer, true);
                     t.updatePlayerExploredTiles();
@@ -326,7 +326,7 @@ public class ServerGame extends Game implements ServerModelObject {
                 }
             }
             for (Unit unit : weakestAIPlayer.getUnits()) {
-                unit.setOwner(strongestAIPlayer);
+                unit.changeOwner(strongestAIPlayer);
                 logMe += " " + unit.getId();
                 if (unit.getLocation() instanceof Europe) {
                     unit.setLocation(strongestAIPlayer.getEurope());

@@ -642,6 +642,54 @@ public class Unit extends GoodsLocation
     }
 
     /**
+     * Change the owner of this unit.
+     *
+     * @param owner The new owner <code>Player</code>.
+     */
+    public void changeOwner(Player owner) {
+        Player oldOwner = this.owner;
+
+        // safeguard
+        if (oldOwner == owner) {
+            return;
+        } else if (oldOwner == null) {
+            logger.warning("Unit " + getId() + " had no previous owner, when changing owner to " + owner.getId());
+        }
+
+        // Clear trade route and goto orders if changing owner.
+        if (getTradeRoute() != null) setTradeRoute(null);
+        if (getDestination() != null) setDestination(null);
+
+        // This need to be set right away
+        this.owner = owner;
+        // If its a carrier, we need to update the units it has loaded
+        // before finishing with it
+        for (Unit unit : getUnitList()) {
+            unit.changeOwner(owner);
+        }
+
+        if (oldOwner != null) {
+            oldOwner.removeUnit(this);
+            oldOwner.modifyScore(-getType().getScoreValue());
+            // for speed optimizations
+            if (!isOnCarrier()) {
+                oldOwner.invalidateCanSeeTiles();
+            }
+        }
+        owner.addUnit(this);
+        if (getType() != null) { // can be null when fixing integrity
+            owner.modifyScore(getType().getScoreValue());
+        }
+
+        // for speed optimizations
+        if(!isOnCarrier()) {
+            getOwner().setExplored(this);
+        }
+
+        getGame().notifyOwnerChanged(this, oldOwner, owner);
+    }
+
+    /**
      * Gets the unit role.
      *
      * @return The <code>Role</code> of this <code>Unit</code>.
@@ -3502,48 +3550,10 @@ public class Unit extends GoodsLocation
     /**
      * {@inheritDoc}
      */
-    public void setOwner(Player owner) {
-        Player oldOwner = this.owner;
-
-        // safeguard
-        if (oldOwner == owner) {
-            return;
-        } else if (oldOwner == null) {
-            logger.warning("Unit " + getId() + " had no previous owner, when changing owner to " + owner.getId());
-        }
-
-        // Clear trade route and goto orders if changing owner.
-        if (getTradeRoute() != null) setTradeRoute(null);
-        if (getDestination() != null) setDestination(null);
-
-        // This need to be set right away
-        this.owner = owner;
-        // If its a carrier, we need to update the units it has loaded
-        // before finishing with it
-        for (Unit unit : getUnitList()) {
-            unit.setOwner(owner);
-        }
-
-        if (oldOwner != null) {
-            oldOwner.removeUnit(this);
-            oldOwner.modifyScore(-getType().getScoreValue());
-            // for speed optimizations
-            if (!isOnCarrier()) {
-                oldOwner.invalidateCanSeeTiles();
-            }
-        }
-        owner.addUnit(this);
-        if (getType() != null) { // can be null when fixing integrity
-            owner.modifyScore(getType().getScoreValue());
-        }
-
-        // for speed optimizations
-        if(!isOnCarrier()) {
-            getOwner().setExplored(this);
-        }
-
-        getGame().notifyOwnerChanged(this, oldOwner, owner);
+    public void setOwner(Player player) {
+        this.owner = player;
     }
+
 
     // Interface Location (from GoodsLocation via UnitLocation)
     // Inherits

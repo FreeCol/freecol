@@ -540,7 +540,7 @@ public class UnitTest extends FreeColTestCase {
                      french.getUnits().size());
 
         // change owner
-        colonist.setOwner(french);
+        colonist.changeOwner(french);
         assertEquals("Colonist should be french", french,
                      colonist.getOwner());
         assertEquals("Dutch player should have no units", 0,
@@ -580,7 +580,7 @@ public class UnitTest extends FreeColTestCase {
                      french.getUnits().size());
 
         // change carrier owner
-        galleon.setOwner(french);
+        galleon.changeOwner(french);
         assertEquals("Galleon should be french", french,
                      galleon.getOwner());
         assertEquals("Colonist should be french", french,

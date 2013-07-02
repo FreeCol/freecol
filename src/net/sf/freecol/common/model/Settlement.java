@@ -251,7 +251,7 @@ public abstract class Settlement extends GoodsLocation
                                             ? ChangeType.UNDEAD
                                             : ChangeType.CAPTURE, newOwner);
             if (type != null) u.setType(type);
-            u.setOwner(newOwner);
+            u.changeOwner(newOwner);
         }
 
         for (Tile t : getOwnedTiles()) {
