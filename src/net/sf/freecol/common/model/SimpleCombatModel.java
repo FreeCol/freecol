@@ -691,9 +691,20 @@ public class SimpleCombatModel extends CombatModel {
      */
     private boolean isAmbush(FreeColGameObject attacker,
                              FreeColGameObject defender) {
-        return (attacker != null
-            && attacker.hasAbility(Ability.AMBUSH_BONUS))
-            || (defender != null
-                && defender.hasAbility(Ability.AMBUSH_PENALTY));
+        Unit attackerUnit, defenderUnit;
+        if (attacker instanceof Unit && defender instanceof Unit) {
+            // Should be true
+            attackerUnit = (Unit)attacker;
+            defenderUnit = (Unit)defender;
+            return attackerUnit.getSettlement() == null
+                && attackerUnit.getTile() != null
+                && defenderUnit.getSettlement() == null
+                && defenderUnit.getTile() != null
+                && (attackerUnit.hasAbility(Ability.AMBUSH_BONUS)
+                    || defenderUnit.hasAbility(Ability.AMBUSH_PENALTY))
+                && (attackerUnit.getTile().hasAbility(Ability.AMBUSH_TERRAIN)
+                    || defenderUnit.getTile().hasAbility(Ability.AMBUSH_TERRAIN));
+        }
+        return false;
     }
 }

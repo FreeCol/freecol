@@ -53,6 +53,10 @@ public final class Ability extends Feature {
     public static final String AMBUSH_PENALTY
         = "model.ability.ambushPenalty";
 
+    /** Terrain in which an ambush may occur. */
+    public static final String AMBUSH_TERRAIN
+        = "model.ability.ambushTerrain";
+
     /**
      * The ability of certain buildings (e.g. the stables) to produce
      * goods even if no units are present.
