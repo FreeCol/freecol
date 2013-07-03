@@ -1076,10 +1076,11 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Gets this Player's nation.
      *
-     * @return The player <code>Nation</code>.
+     * @return The player <code>Nation</code>, or null if the unknown enemy.
      */
     public Nation getNation() {
-        return getSpecification().getNation(nationId);
+        return (isUnknownEnemy()) ? null
+            : getSpecification().getNation(nationId);
     }
 
     /**
@@ -1226,7 +1227,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *         royal expeditionary force.
      */
     public Player getREFPlayer() {
-        Nation ref = getNation().getREFNation();
+        Nation ref = (isUnknownEnemy()) ? null : getNation().getREFNation();
         return (ref == null) ? null : getGame().getPlayer(ref.getId());
     }
 
@@ -1236,7 +1237,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The <code>Color</code>.
      */
     public Color getNationColor() {
-        return getNation().getColor();
+        return (isUnknownEnemy()) ? Color.BLACK : getNation().getColor();
     }
 
 
@@ -1705,7 +1706,7 @@ public class Player extends FreeColGameObject implements Nameable {
     public java.util.Map<String, Turn> getElectionTurns() {
         java.util.Map<String, Turn> result = new HashMap<String, Turn>();
         for (HistoryEvent e : getHistory()) {
-            if (e.getEventType() != HistoryEvent.EventType.FOUNDING_FATHER) {
+            if (e.getEventType() == HistoryEvent.EventType.FOUNDING_FATHER) {
                 result.put(e.getReplacement("%father%").getId(),
                            e.getTurn());
             }

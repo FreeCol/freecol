@@ -148,7 +148,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         this.name = name;
         this.admin = admin;
-        europe = null;
         if (nation != null && nation.getType() != null) {
             this.nationType = nation.getType();
             this.nationId = nation.getId();
@@ -167,27 +166,30 @@ public class ServerPlayer extends Player implements ServerModelObject {
                  */
                 this.playerType = (nationType.isREF()) ? PlayerType.ROYAL
                     : PlayerType.COLONIAL;
-                europe = new ServerEurope(game, this);
+                this.europe = new ServerEurope(game, this);
                 initializeHighSeas();
                 if (this.playerType == PlayerType.COLONIAL) {
-                    monarch = new Monarch(game, this, nation.getRulerNameKey());
+                    this.monarch = new Monarch(game, this, nation.getRulerNameKey());
                 }
-                gold = 0;
+                this.gold = 0;
             } else { // indians
                 this.playerType = PlayerType.NATIVE;
-                gold = Player.GOLD_NOT_ACCOUNTED;
+                this.gold = Player.GOLD_NOT_ACCOUNTED;
             }
         } else {
             // virtual "enemy privateer" player
             // or undead ?
+            this.nationType = null;
             this.nationId = Nation.UNKNOWN_NATION_ID;
             this.playerType = PlayerType.COLONIAL;
-            gold = 0;
+            this.europe = null;
+            this.monarch = null;
+            this.gold = 0;
         }
-        market = new Market(getGame(), this);
-        immigration = 0;
-        liberty = 0;
-        currentFather = null;
+        this.market = new Market(getGame(), this);
+        this.immigration = 0;
+        this.liberty = 0;
+        this.currentFather = null;
 
         //call of super() will lead to this object being registered with AIMain
         //before playerType has been set. AIMain will fall back to use of
