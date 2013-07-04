@@ -523,12 +523,27 @@ public final class Specification {
         }
 
         logger.info("Specification clean following " + why + " complete"
-                    + ", starting year=" + Turn.getStartingYear()
-                    + ", season year=" + Turn.getSeasonYear()
-                    + ", " + allTypes.size() + " FreeColGameObjectTypes"
-                    + ", " + allOptions.size() + " Options"
-                    + ", " + allAbilities.size() + " Abilities"
-                    + ", " + allModifiers.size() + " Modifiers read.");
+            + ", starting year=" + Turn.getStartingYear()
+            + ", season year=" + Turn.getSeasonYear()
+            + ", " + allTypes.size() + " FreeColGameObjectTypes"
+            + ", " + allAbilities.size() + " Abilities"
+            + ", " + buildingTypeList.size() + " BuildingTypes"
+            + ", " + disasters.size() + " Disasters"
+            + ", " + equipmentTypes.size() + " EquipmentTypes"
+            + ", " + europeanNationTypes.size() + " EuropeanNationTypes"
+            + ", " + events.size() + " Events"
+            + ", " + foundingFathers.size() + " FoundingFathers"
+            + ", " + goodsTypeList.size() + " GoodsTypes"
+            + ", " + indianNationTypes.size() + " IndianNationTypes"
+            + ", " + allModifiers.size() + " Modifiers"
+            + ", " + nations.size() + " Nations"
+            + ", " + allOptions.size() + " Options"
+            + ", " + resourceTypeList.size() + " ResourceTypes"
+            + ", " + roles.size() + " Roles"
+            + ", " + tileTypeList.size() + " TileTypes"
+            + ", " + tileImprovementTypeList.size() + " TileImprovementTypes"
+            + ", " + unitTypeList.size() + " UnitTypes"
+            + " read.");
     }
 
     /**
