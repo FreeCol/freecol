@@ -52,6 +52,7 @@
      0.74: add convertThreshold to settlement
      0.75: add generalized production element
      0.76: change attribute name from "colonyCenterTile" to "unattended"
+     0.77: nation has a color attribute again
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 
@@ -693,6 +694,8 @@
         <xs:element maxOccurs="unbounded" name="nation">
           <xs:complexType>
             <xs:attribute name="id" use="required" type="xs:ID"/>
+            <!-- color is not really a string, but XML lacks hex constants -->
+            <xs:attribute name="color" use="optional" type="xs:string"/>
             <xs:attribute name="preserve" use="optional" type="xs:boolean"/>
             <xs:attribute name="nation-type" use="required" type="NationTypeId"/>
             <xs:attribute name="selectable" type="xs:boolean"/>

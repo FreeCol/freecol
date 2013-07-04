@@ -20,7 +20,7 @@
     In case of incompatible changes, please update version number and
     XSD schema for validation.
 -->
-<freecol-specification id="classic" version="0.76">
+<freecol-specification id="classic" version="0.77">
 
   <!-- Modifiers that are not attached to other game object
        types. They may be modified, but MUST NOT be removed. -->
@@ -2124,41 +2124,41 @@ resources of 400, lost city rumours of 500
   </indian-nation-types>
 
   <nations>
-    <nation id="model.nation.dutch"
+    <nation id="model.nation.dutch" color="0xff9d3c"
             nation-type="model.nationType.trade" selectable="true"
             preferredLatitude="-40" ref="model.nation.dutchREF"/>
-    <nation id="model.nation.french"
+    <nation id="model.nation.french" color="0x0000ff"
             nation-type="model.nationType.cooperation" selectable="true"
             preferredLatitude="-53" ref="model.nation.frenchREF"/>
-    <nation id="model.nation.english"
+    <nation id="model.nation.english" color="0xff0000"
             nation-type="model.nationType.immigration" selectable="true"
             preferredLatitude="-37" ref="model.nation.englishREF"/>
-    <nation id="model.nation.spanish"
+    <nation id="model.nation.spanish" color="0xffff00"
             nation-type="model.nationType.conquest" selectable="true"
             preferredLatitude="-19" ref="model.nation.spanishREF"/>
-    <nation id="model.nation.inca"
+    <nation id="model.nation.inca" color="0xf4f0c4"
             nation-type="model.nationType.inca"/>
-    <nation id="model.nation.aztec"
+    <nation id="model.nation.aztec" color="0xc4a020"
             nation-type="model.nationType.aztec"/>
-    <nation id="model.nation.arawak"
+    <nation id="model.nation.arawak" color="0x6888c0"
             nation-type="model.nationType.arawak"/>
-    <nation id="model.nation.cherokee"
+    <nation id="model.nation.cherokee" color="0x6c3c18"
             nation-type="model.nationType.cherokee"/>
-    <nation id="model.nation.iroquois"
+    <nation id="model.nation.iroquois" color="0x74a44c"
             nation-type="model.nationType.iroquois"/>
-    <nation id="model.nation.sioux"
+    <nation id="model.nation.sioux" color="0xc0ac84"
             nation-type="model.nationType.sioux"/>
-    <nation id="model.nation.apache"
+    <nation id="model.nation.apache" color="0x900000"
             nation-type="model.nationType.apache"/>
-    <nation id="model.nation.tupi"
+    <nation id="model.nation.tupi" color="0x045c04"
             nation-type="model.nationType.tupi"/>
-    <nation id="model.nation.dutchREF"
+    <nation id="model.nation.dutchREF" color="0xcc5500"
             nation-type="model.nationType.ref"/>
-    <nation id="model.nation.frenchREF"
+    <nation id="model.nation.frenchREF" color="0x6050dc"
             nation-type="model.nationType.ref"/>
-    <nation id="model.nation.englishREF"
+    <nation id="model.nation.englishREF" color="0xde3163"
             nation-type="model.nationType.ref"/>
-    <nation id="model.nation.spanishREF"
+    <nation id="model.nation.spanishREF" color="0xffdf00"
             nation-type="model.nationType.ref"/>
   </nations>
 

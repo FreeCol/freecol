@@ -241,11 +241,11 @@ public final class PreGameInputHandler extends InputHandler {
             String str = element.getAttribute("color");
             Color color;
             try {
-                int rgb = Integer.parseInt(str);
+                int rgb = Integer.decode(str);
                 color = new Color(rgb);
             } catch (NumberFormatException nfe) {
-                logger.warning("Invalid color: " + str);
-                return null;
+                return DOMMessage.createError("server.badColor",
+                                              "Invalid color: " + str);
             }
             nation.setColor(color);
             getFreeColServer().getServer()
@@ -280,7 +280,8 @@ public final class PreGameInputHandler extends InputHandler {
                             "value", nation.getId()),
                         player.getConnection());
             } else {
-                logger.warning("Selected non-selectable nation.");
+                return DOMMessage.createError("server.badNation",
+                    "Selected non-selectable nation: " + nation);
             }
         } else {
             logger.warning("setNation from unknown connection.");
@@ -314,7 +315,8 @@ public final class PreGameInputHandler extends InputHandler {
                             "value", nationType.getId()),
                         player.getConnection());
             } else {
-                logger.warning("NationType is not selectable");
+                return DOMMessage.createError("server.badNationType",
+                    "Selected non-selectable nation type: " + nationType);
             }
         } else {
             logger.warning("setNationType from unknown connection.");

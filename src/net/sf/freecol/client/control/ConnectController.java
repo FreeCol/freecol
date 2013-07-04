@@ -446,7 +446,6 @@ public final class ConnectController {
             return false;
         }
         freeColClient.setMyPlayer(player);
-        freeColClient.loadDefaultColors(game.getSpecification());
         freeColClient.addSpecificationActions(game.getSpecification());
         freeColClient.updateActions();
         logger.info("FreeColClient logged in as " + userName

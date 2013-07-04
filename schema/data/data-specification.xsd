@@ -638,6 +638,7 @@
         <xs:element maxOccurs="unbounded" name="nation">
           <xs:complexType>
             <xs:attribute name="id" use="required" type="xs:ID"/>
+            <xs:attribute name="color" use="optional" type="xs:string"/>
             <xs:attribute name="nation-type" use="required" type="NationTypeId"/>
             <xs:attribute name="selectable" type="xs:boolean"/>
             <xs:attribute name="preferredLatitude" type="xs:int"/>

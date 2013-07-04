@@ -298,7 +298,7 @@ public class FreeColXMLReader extends StreamReaderDelegate {
         int result = defaultValue;
         if (attrib != null) {
             try {
-                result = Integer.parseInt(attrib);
+                result = Integer.decode(attrib);
             } catch (NumberFormatException e) {
                 logger.warning(attributeName + " is not an integer: " + attrib);
             }

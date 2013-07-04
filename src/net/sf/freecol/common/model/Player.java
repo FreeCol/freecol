@@ -1237,7 +1237,10 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The <code>Color</code>.
      */
     public Color getNationColor() {
-        return (isUnknownEnemy()) ? Color.BLACK : getNation().getColor();
+        Color color;
+        return (isUnknownEnemy()) ? Nation.UNKNOWN_NATION_COLOR
+            : ((color = getNation().getColor()) != null) ? color
+            : getNation().forceDefaultColor();
     }
 
 

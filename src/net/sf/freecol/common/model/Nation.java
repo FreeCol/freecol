@@ -21,6 +21,9 @@ package net.sf.freecol.common.model;
 
 import java.awt.Color;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
@@ -34,6 +37,42 @@ import net.sf.freecol.common.resources.ResourceManager;
 public class Nation extends FreeColGameObjectType {
 
     public static String UNKNOWN_NATION_ID = "model.nation.unknownEnemy";
+
+    public static Color UNKNOWN_NATION_COLOR = Color.BLACK;
+
+    // @compat 0.10.x
+    // Colours moved back into the spec at 0.11.  We have to tolerate
+    // old specs that lack them while 0.10.x is supported.
+    /** A map of default nation colours. */
+    private final static Map<String, Color> defaultColors
+        = new HashMap<String, Color>();
+    static {
+        defaultColors.put("model.nation.dutch",         new Color(0xff9d3c));
+        defaultColors.put("model.nation.french",        new Color(0x0000ff));
+        defaultColors.put("model.nation.english",       new Color(0xff0000));
+        defaultColors.put("model.nation.spanish",       new Color(0xffff00));
+        defaultColors.put("model.nation.inca",          new Color(0xf4f0c4));
+        defaultColors.put("model.nation.aztec",         new Color(0xc4a020));
+        defaultColors.put("model.nation.arawak",        new Color(0x6888c0));
+        defaultColors.put("model.nation.cherokee",      new Color(0x6c3c18));
+        defaultColors.put("model.nation.iroquois",      new Color(0x74a44c));
+        defaultColors.put("model.nation.sioux",         new Color(0xc0ac84));
+        defaultColors.put("model.nation.apache",        new Color(0x900000));
+        defaultColors.put("model.nation.tupi",          new Color(0x045c04));
+        defaultColors.put("model.nation.dutchREF",      new Color(0xcc5500));
+        defaultColors.put("model.nation.frenchREF",     new Color(0x6050dc));
+        defaultColors.put("model.nation.englishREF",    new Color(0xde3163));
+        defaultColors.put("model.nation.spanishREF",    new Color(0xffdf00));
+        defaultColors.put("model.nation.portuguese",    new Color(0x00ff00));
+        defaultColors.put("model.nation.swedish",       new Color(0x00bfff));
+        defaultColors.put("model.nation.danish",        new Color(0xff00bf));
+        defaultColors.put("model.nation.russian",       new Color(0xffffff));
+        defaultColors.put("model.nation.portugueseREF", new Color(0xbfff00));
+        defaultColors.put("model.nation.swedishREF",    new Color(0x367588));
+        defaultColors.put("model.nation.danishREF",     new Color(0x91006d));
+        defaultColors.put("model.nation.russianREF",    new Color(0xbebebe));
+    }
+    // end @compat 0.10.x
 
     public static final String[] EUROPEAN_NATIONS = new String[] {
         // the original game's nations
@@ -145,6 +184,19 @@ public class Nation extends FreeColGameObjectType {
      */
     public void setColor(Color color) {
         this.color = color;
+    }
+
+    /**
+     * Enforce the default color for this nation.
+     * Call this if getColor() is returning null, which should only happen
+     * if a colorless old specification is in force.
+     *
+     * @return The default color for this nation.
+     */
+    public Color forceDefaultColor() {
+        Color ret = defaultColors.get(getId());
+        setColor(ret);
+        return ret;
     }
 
 

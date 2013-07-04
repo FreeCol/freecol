@@ -110,7 +110,6 @@ public final class PreGameController {
             .getNations().put(nation, state);
 
         freeColClient.askServer().setAvailable(nation, state);
-
     }
 
     /**
@@ -120,7 +119,8 @@ public final class PreGameController {
      * @param color The <code>Color</code> to set.
      */
     public void setColor(Nation nation, Color color) {
-        freeColClient.getMyPlayer().getNation().setColor(color);
+        nation.setColor(color);
+
         freeColClient.askServer().setColor(nation, color);
     }
 
@@ -133,7 +133,6 @@ public final class PreGameController {
         freeColClient.getMyPlayer().setNation(nation);
         
         freeColClient.askServer().setNation(nation);
-
     }
 
     /**
@@ -145,7 +144,6 @@ public final class PreGameController {
         freeColClient.getMyPlayer().changeNationType(nationType);
 
         freeColClient.askServer().setNationType(nationType);
-
     }
 
     /**
@@ -158,7 +156,6 @@ public final class PreGameController {
         spec.clean("update game options (client initiated)");
 
         freeColClient.askServer().updateGameOptions(gameOptions);
-
     }
 
     /**

@@ -20,7 +20,7 @@
     In case of incompatible changes, please update version number and 
     XSD schema for validation.
 -->
-<freecol-specification id="freecol" version="0.76" extends="classic">
+<freecol-specification id="freecol" version="0.77" extends="classic">
 
   <building-types>
     <building-type id="model.building.stockade" preserve="true">
@@ -63,26 +63,26 @@
   </european-nation-types>
 
   <nations>
-    <nation id="model.nation.portuguese"
+    <nation id="model.nation.portuguese" color="0x00ff00"
             nation-type="model.nationType.naval" selectable="true"
             preferredLatitude="-16" ref="model.nation.portugueseREF"/>
-    <nation id="model.nation.swedish"
+    <nation id="model.nation.swedish" color="0x00bfff"
             nation-type="model.nationType.building" selectable="true"
             preferredLatitude="-39" ref="model.nation.swedishREF"/>
-    <nation id="model.nation.danish"
+    <nation id="model.nation.danish" color="0xff00bf"
             nation-type="model.nationType.agriculture" selectable="true"
             preferredLatitude="-64" ref="model.nation.danishREF"/>
-    <nation id="model.nation.russian"
+    <nation id="model.nation.russian" color="0xffffff"
             nation-type="model.nationType.furTrapping" selectable="true"
             preferredLatitude="-55" startsOnEastCoast="false"
             ref="model.nation.russianREF"/>
-    <nation id="model.nation.portugueseREF"
+    <nation id="model.nation.portugueseREF" color="0xbfff00"
             nation-type="model.nationType.ref"/>
-    <nation id="model.nation.swedishREF"
+    <nation id="model.nation.swedishREF" color="0x367588"
             nation-type="model.nationType.ref"/>
-    <nation id="model.nation.danishREF"
+    <nation id="model.nation.danishREF" color="0x91006d"
             nation-type="model.nationType.ref"/>
-    <nation id="model.nation.russianREF"
+    <nation id="model.nation.russianREF" color="0xbebebe"
             nation-type="model.nationType.ref"/>
   </nations>
 
