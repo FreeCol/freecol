@@ -204,17 +204,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @param t The new <code>TileType</code> for this <code>Tile</code>.
      */
     public void setType(TileType t) {
-        if (t == null) {
-            throw new IllegalArgumentException("Tile type must not be null");
-        }
         type = t;
-        if (tileItemContainer != null) {
-            tileItemContainer.removeIncompatibleImprovements();
-        }
-        if (!isLand()) settlement = null;
-
-        updateColonyTiles();
-        updatePlayerExploredTiles();
     }
 
     /**
@@ -1062,8 +1052,28 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
 
     //
-    // Ownership
+    // Type and Ownership
     //
+
+    /**
+     * Changes the type of this tile.
+     * The map generator et al should just use setType(), whereas this
+     * routine should be called for the special case of a change of an
+     * existing tile type (e.g. pioneer clearing forest).     *
+     *
+     * @param tileType The new <code>TileType</code>.
+     */
+    public void changeType(TileType type) {
+        setType(type);
+
+        if (tileItemContainer != null) {
+            tileItemContainer.removeIncompatibleImprovements();
+        }
+        if (!isLand()) settlement = null;
+
+        updatePlayerExploredTiles();
+        updateColonyTiles();
+    }
 
     /**
      * Is this tile under active use?

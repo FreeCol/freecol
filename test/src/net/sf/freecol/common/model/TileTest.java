@@ -259,7 +259,7 @@ public class TileTest extends FreeColTestCase {
         assertEquals(cotton, secondaryProduction.getType());
         assertEquals(2, secondaryProduction.getAmount());
 
-        tile.setType(plainsForest);
+        tile.changeType(plainsForest);
         colony.invalidateCache();
 
         production = center.getProduction();
@@ -389,11 +389,11 @@ public class TileTest extends FreeColTestCase {
         assertTrue(tile2.hasRoad());
         assertTrue(tile2.hasRiver());
 
-        tile1.setType(savannah);
+        tile1.changeType(savannah);
         assertTrue(tile1.hasRoad());
         assertTrue(tile1.hasRiver());
 
-        tile2.setType(hills);
+        tile2.changeType(hills);
         assertTrue(tile2.hasRoad());
         assertFalse(tile2.hasRiver());
     }
@@ -438,11 +438,11 @@ public class TileTest extends FreeColTestCase {
         assertTrue(tile2.hasRoad());
         assertTrue(tile2.hasRiver());
 
-        tile1.setType(savannah);
+        tile1.changeType(savannah);
         assertTrue(tile1.hasRoad());
         assertTrue(tile1.hasRiver());
 
-        tile2.setType(hills);
+        tile2.changeType(hills);
         assertTrue(tile2.hasRoad());
         assertFalse(tile2.hasRiver());
 

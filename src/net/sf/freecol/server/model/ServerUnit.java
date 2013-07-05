@@ -426,7 +426,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
             // Changes like clearing a forest need to be completed,
             // whereas for changes like road building the improvement
             // is already added and now complete.
-            tile.setType(changeType);
+            tile.changeType(changeType);
         }
 
         // Does a resource get exposed?
