@@ -80,8 +80,7 @@ public class PrivateerMissionTest extends FreeColTestCase {
     }
 
     private Game setupPrivateerTestGame() {
-        Map map = getCoastTestMap(plains);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getCoastTestMap(plains));
         setupPrivateerTestMap(game);
         return game;
     }

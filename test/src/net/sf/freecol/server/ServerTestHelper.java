@@ -63,12 +63,12 @@ public final class ServerTestHelper {
         return server.getInGameController();
     }
 
-    public static void stopServer(FreeColServer serv) {
-        if (serv != null) {
-            Controller c = serv.getController();
+    public static void stopServer() {
+        if (server != null) {
+            Controller c = server.getController();
             assertNotNull(c);
             c.shutdown();
-            serv = null;
+            server = null;
         }
     }
 
@@ -77,7 +77,7 @@ public final class ServerTestHelper {
     }
 
     public static FreeColServer startServer(boolean publicServer, boolean singlePlayer, int port, String name) {
-        stopServer(server);
+        stopServer();
         try {
             // TODO: fixme! Pass tc
             server = new FreeColServer(publicServer, singlePlayer,
@@ -97,7 +97,7 @@ public final class ServerTestHelper {
     }
 
     public static FreeColServer startServer(File file, boolean publicServer, boolean singlePlayer, int port, String name) {
-        stopServer(server);
+        stopServer();
         try {
             server = new FreeColServer(new FreeColSavegameFile(file), 
                                        null, port, name);
@@ -136,7 +136,7 @@ public final class ServerTestHelper {
             fail(e.toString());
         }
         assertTrue(file.exists());
-        stopServer(serv);
+        stopServer();
 
         return file;
     }
@@ -147,6 +147,12 @@ public final class ServerTestHelper {
         game.csNewTurn(random, new ChangeSet());
     }
 
+    /**
+     * Start a new server game, using a *copy* of a supplied map.
+     *
+     * @param map The <code>Map</code> to copy.
+     * @return The new running server game.
+     */
     public static Game startServerGame(Map map) {
         stopServerGame();
         FreeColServer serv = startServer(false, true);
@@ -168,7 +174,7 @@ public final class ServerTestHelper {
     }
 
     public static void stopServerGame() {
-        stopServer(server);
+        stopServer();
         FreeColTestCase.setGame(null);
     }
 

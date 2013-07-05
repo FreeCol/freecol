@@ -73,8 +73,8 @@ public class TransportMissionTest extends FreeColTestCase {
 
 
     public void testTransportMissionInvalidAfterCombatLost() {
-        Map map = getCoastTestMap(plainsType);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getCoastTestMap(plainsType));
+        Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
         assertNotNull(aiMain);
@@ -119,8 +119,8 @@ public class TransportMissionTest extends FreeColTestCase {
     }
 
     public void testGetNextStopAlreadyAtDestination(){
-        Map map = getCoastTestMap(plainsType);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getCoastTestMap(plainsType));
+        Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
         assertNotNull(aiMain);
@@ -151,8 +151,8 @@ public class TransportMissionTest extends FreeColTestCase {
     }
 
     public void testGetNextStopIsEurope() {
-        Map map = getCoastTestMap(plainsType);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getCoastTestMap(plainsType));
+        Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
         assertNotNull(aiMain);
@@ -188,8 +188,8 @@ public class TransportMissionTest extends FreeColTestCase {
     }
 
     public void testGetNextStopIsColony() {
-        Map map = getCoastTestMap(plainsType);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getCoastTestMap(plainsType));
+        Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
         assertNotNull(aiMain);
@@ -225,8 +225,8 @@ public class TransportMissionTest extends FreeColTestCase {
     }
 
     public void testGetDefaultDestination() {
-        Map map = getCoastTestMap(plainsType);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getCoastTestMap(plainsType));
+        Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
         assertNotNull(aiMain);
@@ -273,8 +273,7 @@ public class TransportMissionTest extends FreeColTestCase {
     }
 
     public void testWagonTrain() {
-        Map map = getTestMap();
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap());
         Colony one = getStandardColony(3, 3, 3);
         Colony two = getStandardColony(3, 8, 8);
         assertEquals(one.getOwner(), two.getOwner());

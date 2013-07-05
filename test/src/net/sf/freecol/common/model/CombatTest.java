@@ -481,8 +481,7 @@ public class CombatTest extends FreeColTestCase {
             0.7107396f
         };
 
-        Map map = getTestMap(plains, true);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap(plains, true));
         InGameController igc = ServerTestHelper.getInGameController();
 
         ServerPlayer french = (ServerPlayer) game.getPlayer("model.nation.french");
@@ -491,6 +490,7 @@ public class CombatTest extends FreeColTestCase {
 
         SimpleCombatModel combatModel = new SimpleCombatModel();
 
+        Map map = game.getMap();
         Tile tile1 = map.getTile(5, 8);
         Tile tile2 = map.getTile(4, 8);
 

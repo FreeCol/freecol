@@ -245,8 +245,7 @@ public class InGameControllerTest extends FreeColTestCase {
     }
 
     public void testCreateMission() {
-        Map map = getTestMap();
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap());
         InGameController igc = ServerTestHelper.getInGameController();
 
         Player dutch = game.getPlayer("model.nation.dutch");
@@ -281,8 +280,8 @@ public class InGameControllerTest extends FreeColTestCase {
     }
 
     public void testDumpGoods() {
-        Map map = getTestMap(ocean);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap(ocean));
+        Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
 
         Player dutch = game.getPlayer("model.nation.dutch");
@@ -307,8 +306,8 @@ public class InGameControllerTest extends FreeColTestCase {
     }
 
     public void testCashInTreasure() {
-        Map map = getCoastTestMap(plains, true);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getCoastTestMap(plains, true));
+        Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
 
         Player dutch = game.getPlayer("model.nation.dutch");
@@ -369,8 +368,8 @@ public class InGameControllerTest extends FreeColTestCase {
     }
 
     public void testEmbark() {
-        Map map = getCoastTestMap(plains);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getCoastTestMap(plains));
+        Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
 
         Player dutch = game.getPlayer("model.nation.dutch");
@@ -410,8 +409,8 @@ public class InGameControllerTest extends FreeColTestCase {
     }
 
     public void testClearSpecialty() {
-        Map map = getTestMap();
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+        Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
 
         Player dutch = game.getPlayer("model.nation.dutch");
@@ -450,8 +449,8 @@ public class InGameControllerTest extends FreeColTestCase {
     }
 
     public void testAtackedNavalUnitIsDamaged() {
-        Map map = getTestMap(ocean);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap(ocean));
+        Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
 
         List<CombatResult> crs;
@@ -508,8 +507,8 @@ public class InGameControllerTest extends FreeColTestCase {
     }
 
     public void testUnarmedAttack() {
-        Map map = getTestMap(plains);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap(plains));
+        Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
 
         List<CombatResult> crs;
@@ -581,8 +580,8 @@ public class InGameControllerTest extends FreeColTestCase {
     }
 
     public void testAttackColonyWithVeteran() {
-        Map map = getTestMap(true);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap(true));
+        Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
 
         List<CombatResult> crs;
@@ -701,8 +700,8 @@ public class InGameControllerTest extends FreeColTestCase {
     }
 
     public void testAttackColonyWithBrave() {
-        Map map = getTestMap(true);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap(true));
+        Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
 
         List<CombatResult> crs;
@@ -926,8 +925,8 @@ public class InGameControllerTest extends FreeColTestCase {
     }
 
     public void testLoseColonyDefenceWithRevere() {
-        Map map = getTestMap(true);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap(true));
+        Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
 
         List<CombatResult> crs;
@@ -975,8 +974,8 @@ public class InGameControllerTest extends FreeColTestCase {
     }
 
     public void testPioneerDiesNotLosesEquipment() {
-        Map map = getTestMap();
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+        Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
 
         List<CombatResult> crs;
@@ -1006,8 +1005,8 @@ public class InGameControllerTest extends FreeColTestCase {
     }
 
     public void testScoutDiesNotLosesEquipment() {
-        Map map = getTestMap();
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+        Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
 
         List<CombatResult> crs;
@@ -1036,8 +1035,8 @@ public class InGameControllerTest extends FreeColTestCase {
     }
 
     public void testPromotion() {
-        Map map = getTestMap(plains);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap(plains));
+        Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
 
         List<CombatResult> crs;
@@ -1156,8 +1155,8 @@ public class InGameControllerTest extends FreeColTestCase {
     }
 
     public void testColonistDemotedBySoldier() {
-        Map map = getTestMap(plains);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap(plains));
+        Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
 
         List<CombatResult> crs;
@@ -1196,8 +1195,8 @@ public class InGameControllerTest extends FreeColTestCase {
     }
 
     public void testSoldierDemotedBySoldier() {
-        Map map = getTestMap(plains);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap(plains));
+        Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
 
         List<CombatResult> crs;
@@ -1245,8 +1244,8 @@ public class InGameControllerTest extends FreeColTestCase {
     }
 
     public void testDragoonDemotedBySoldier() {
-        Map map = getTestMap(plains);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap(plains));
+        Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
 
         List<CombatResult> crs;
@@ -1320,8 +1319,8 @@ public class InGameControllerTest extends FreeColTestCase {
     }
 
     public void testDragoonDemotedByBrave() {
-        Map map = getTestMap(plains);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap(plains));
+        Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
 
         List<CombatResult> crs;
@@ -1411,8 +1410,8 @@ public class InGameControllerTest extends FreeColTestCase {
     }
 
     public void testScoutDemotedBySoldier() {
-        Map map = getTestMap(plains);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap(plains));
+        Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
 
         List<CombatResult> crs;
@@ -1439,8 +1438,8 @@ public class InGameControllerTest extends FreeColTestCase {
     }
 
     public void testVeteranSoldierDemotedBySoldier() {
-        Map map = getTestMap(plains);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap(plains));
+        Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
 
         List<CombatResult> crs;
@@ -1490,8 +1489,8 @@ public class InGameControllerTest extends FreeColTestCase {
     }
 
     public void testArtilleryDemotedBySoldier() {
-        Map map = getTestMap(plains);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap(plains));
+        Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
 
         List<CombatResult> crs;
@@ -1871,8 +1870,8 @@ public class InGameControllerTest extends FreeColTestCase {
     }
 
     public void testPocahontas() {
-        Map map = getTestMap();
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+        Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
 
         Colony colony = getStandardColony(4);
@@ -1956,8 +1955,8 @@ public class InGameControllerTest extends FreeColTestCase {
     }
 
     public void testUnitLosesExperienceWithWorkChange() {
-        Map map = getTestMap();
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+        Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
 
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
@@ -1977,14 +1976,16 @@ public class InGameControllerTest extends FreeColTestCase {
                    colonist.getExperience() == 0);
     }
 
-    public static int getWorkLeftForPioneerWork(UnitType unitType,
-                                                TileType tileType,
-                                                TileImprovementType whichWork) {
-        Game game = ServerTestHelper.startServerGame(getTestMap());
+    private static int workLeftFor(UnitType unitType, TileType tileType,
+                                   TileImprovementType whichWork) {
+        Game game = getStandardGame();
+        game = ServerTestHelper.startServerGame(getTestMap(tileType));
         InGameController igc = ServerTestHelper.getInGameController();
 
-        ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
-        Tile tile = new Tile(game, tileType, 0, 0);
+        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        Tile tile = game.getMap().getTile(3, 3);
+        assertEquals(tile.getType(), tileType);
+
         Unit unit = new ServerUnit(game, tile, dutch, unitType,
                                    tools, tools, tools, tools, tools);
         tile.setOwner(dutch);
@@ -1998,85 +1999,85 @@ public class InGameControllerTest extends FreeColTestCase {
      */
     public void testDoAssignedWorkAmateurAndHardyPioneer() {
         { // Savanna
-            assertEquals(8, getWorkLeftForPioneerWork(colonistType, savannahForest, clear));
-            assertEquals(6, getWorkLeftForPioneerWork(colonistType, savannahForest, road));
-            assertEquals(5, getWorkLeftForPioneerWork(colonistType, savannah, plow));
-            assertEquals(3, getWorkLeftForPioneerWork(colonistType, savannah, road));
+            assertEquals(8, workLeftFor(colonistType, savannahForest, clear));
+            assertEquals(6, workLeftFor(colonistType, savannahForest, road));
+            assertEquals(5, workLeftFor(colonistType, savannah, plow));
+            assertEquals(3, workLeftFor(colonistType, savannah, road));
 
-            assertEquals(4, getWorkLeftForPioneerWork(hardyPioneerType, savannahForest, clear));
-            assertEquals(3, getWorkLeftForPioneerWork(hardyPioneerType, savannahForest, road));
-            assertEquals(3, getWorkLeftForPioneerWork(hardyPioneerType, savannah, plow));
-            assertEquals(2, getWorkLeftForPioneerWork(hardyPioneerType, savannah, road));
+            assertEquals(4, workLeftFor(hardyPioneerType, savannahForest, clear));
+            assertEquals(3, workLeftFor(hardyPioneerType, savannahForest, road));
+            assertEquals(3, workLeftFor(hardyPioneerType, savannah, plow));
+            assertEquals(2, workLeftFor(hardyPioneerType, savannah, road));
         }
 
         { // Tundra
-            assertEquals(6, getWorkLeftForPioneerWork(colonistType, tundraForest, clear));
-            assertEquals(4, getWorkLeftForPioneerWork(colonistType, tundraForest, road));
-            assertEquals(6, getWorkLeftForPioneerWork(colonistType, tundra, plow));
-            assertEquals(4, getWorkLeftForPioneerWork(colonistType, tundra, road));
+            assertEquals(6, workLeftFor(colonistType, tundraForest, clear));
+            assertEquals(4, workLeftFor(colonistType, tundraForest, road));
+            assertEquals(6, workLeftFor(colonistType, tundra, plow));
+            assertEquals(4, workLeftFor(colonistType, tundra, road));
 
-            assertEquals(3, getWorkLeftForPioneerWork(hardyPioneerType, tundraForest, clear));
-            assertEquals(2, getWorkLeftForPioneerWork(hardyPioneerType, tundraForest, road));
-            assertEquals(3, getWorkLeftForPioneerWork(hardyPioneerType, tundra, plow));
-            assertEquals(2, getWorkLeftForPioneerWork(hardyPioneerType, tundra, road));
+            assertEquals(3, workLeftFor(hardyPioneerType, tundraForest, clear));
+            assertEquals(2, workLeftFor(hardyPioneerType, tundraForest, road));
+            assertEquals(3, workLeftFor(hardyPioneerType, tundra, plow));
+            assertEquals(2, workLeftFor(hardyPioneerType, tundra, road));
         }
 
         { // Plains
-            assertEquals(6, getWorkLeftForPioneerWork(colonistType, plainsForest, clear));
-            assertEquals(4, getWorkLeftForPioneerWork(colonistType, plainsForest, road));
-            assertEquals(5, getWorkLeftForPioneerWork(colonistType, plains, plow));
-            assertEquals(3, getWorkLeftForPioneerWork(colonistType, plains, road));
+            assertEquals(6, workLeftFor(colonistType, plainsForest, clear));
+            assertEquals(4, workLeftFor(colonistType, plainsForest, road));
+            assertEquals(5, workLeftFor(colonistType, plains, plow));
+            assertEquals(3, workLeftFor(colonistType, plains, road));
 
-            assertEquals(3, getWorkLeftForPioneerWork(hardyPioneerType, plainsForest, clear));
-            assertEquals(2, getWorkLeftForPioneerWork(hardyPioneerType, plainsForest, road));
-            assertEquals(3, getWorkLeftForPioneerWork(hardyPioneerType, plains, plow));
-            assertEquals(2, getWorkLeftForPioneerWork(hardyPioneerType, plains, road));
+            assertEquals(3, workLeftFor(hardyPioneerType, plainsForest, clear));
+            assertEquals(2, workLeftFor(hardyPioneerType, plainsForest, road));
+            assertEquals(3, workLeftFor(hardyPioneerType, plains, plow));
+            assertEquals(2, workLeftFor(hardyPioneerType, plains, road));
         }
 
         { // Hill
-            assertEquals(4, getWorkLeftForPioneerWork(colonistType, hills, road));
-            assertEquals(2, getWorkLeftForPioneerWork(hardyPioneerType, hills, road));
+            assertEquals(4, workLeftFor(colonistType, hills, road));
+            assertEquals(2, workLeftFor(hardyPioneerType, hills, road));
         }
 
         { // Mountain
-            assertEquals(7, getWorkLeftForPioneerWork(colonistType, mountains, road));
-            assertEquals(4, getWorkLeftForPioneerWork(hardyPioneerType, mountains, road));
+            assertEquals(7, workLeftFor(colonistType, mountains, road));
+            assertEquals(4, workLeftFor(hardyPioneerType, mountains, road));
         }
 
         { // Marsh
-            assertEquals(8, getWorkLeftForPioneerWork(colonistType, marshForest, clear));
-            assertEquals(6, getWorkLeftForPioneerWork(colonistType, marshForest, road));
-            assertEquals(7, getWorkLeftForPioneerWork(colonistType, marsh, plow));
-            assertEquals(5, getWorkLeftForPioneerWork(colonistType, marsh, road));
+            assertEquals(8, workLeftFor(colonistType, marshForest, clear));
+            assertEquals(6, workLeftFor(colonistType, marshForest, road));
+            assertEquals(7, workLeftFor(colonistType, marsh, plow));
+            assertEquals(5, workLeftFor(colonistType, marsh, road));
 
-            assertEquals(4, getWorkLeftForPioneerWork(hardyPioneerType, marshForest, clear));
-            assertEquals(3, getWorkLeftForPioneerWork(hardyPioneerType, marshForest, road));
-            assertEquals(4, getWorkLeftForPioneerWork(hardyPioneerType, marsh, plow));
-            assertEquals(3, getWorkLeftForPioneerWork(hardyPioneerType, marsh, road));
+            assertEquals(4, workLeftFor(hardyPioneerType, marshForest, clear));
+            assertEquals(3, workLeftFor(hardyPioneerType, marshForest, road));
+            assertEquals(4, workLeftFor(hardyPioneerType, marsh, plow));
+            assertEquals(3, workLeftFor(hardyPioneerType, marsh, road));
         }
 
         { // Desert
-            assertEquals(6, getWorkLeftForPioneerWork(colonistType, desertForest, clear));
-            assertEquals(4, getWorkLeftForPioneerWork(colonistType, desertForest, road));
-            assertEquals(5, getWorkLeftForPioneerWork(colonistType, desert, plow));
-            assertEquals(3, getWorkLeftForPioneerWork(colonistType, desert, road));
+            assertEquals(6, workLeftFor(colonistType, desertForest, clear));
+            assertEquals(4, workLeftFor(colonistType, desertForest, road));
+            assertEquals(5, workLeftFor(colonistType, desert, plow));
+            assertEquals(3, workLeftFor(colonistType, desert, road));
 
-            assertEquals(3, getWorkLeftForPioneerWork(hardyPioneerType, desertForest, clear));
-            assertEquals(2, getWorkLeftForPioneerWork(hardyPioneerType, desertForest, road));
-            assertEquals(3, getWorkLeftForPioneerWork(hardyPioneerType, desert, plow));
-            assertEquals(2, getWorkLeftForPioneerWork(hardyPioneerType, desert, road));
+            assertEquals(3, workLeftFor(hardyPioneerType, desertForest, clear));
+            assertEquals(2, workLeftFor(hardyPioneerType, desertForest, road));
+            assertEquals(3, workLeftFor(hardyPioneerType, desert, plow));
+            assertEquals(2, workLeftFor(hardyPioneerType, desert, road));
         }
 
         { // Swamp
-            assertEquals(9, getWorkLeftForPioneerWork(colonistType, swampForest, clear));
-            assertEquals(7, getWorkLeftForPioneerWork(colonistType, swampForest, road));
-            assertEquals(9, getWorkLeftForPioneerWork(colonistType, swamp, plow));
-            assertEquals(7, getWorkLeftForPioneerWork(colonistType, swamp, road));
+            assertEquals(9, workLeftFor(colonistType, swampForest, clear));
+            assertEquals(7, workLeftFor(colonistType, swampForest, road));
+            assertEquals(9, workLeftFor(colonistType, swamp, plow));
+            assertEquals(7, workLeftFor(colonistType, swamp, road));
 
-            assertEquals(5, getWorkLeftForPioneerWork(hardyPioneerType, swampForest, clear));
-            assertEquals(4, getWorkLeftForPioneerWork(hardyPioneerType, swampForest, road));
-            assertEquals(5, getWorkLeftForPioneerWork(hardyPioneerType, swamp, plow));
-            assertEquals(4, getWorkLeftForPioneerWork(hardyPioneerType, swamp, road));
+            assertEquals(5, workLeftFor(hardyPioneerType, swampForest, clear));
+            assertEquals(4, workLeftFor(hardyPioneerType, swampForest, road));
+            assertEquals(5, workLeftFor(hardyPioneerType, swamp, plow));
+            assertEquals(4, workLeftFor(hardyPioneerType, swamp, road));
         }
     }
 

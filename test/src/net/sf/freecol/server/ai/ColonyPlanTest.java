@@ -196,8 +196,7 @@ public class ColonyPlanTest extends FreeColTestCase {
     }
 
     public void testReqLumberAndHammersForBuild() {
-        Map map = buildMap(true);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(buildMap(true));
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
         Colony colony = getStandardColony(4);
 
@@ -213,8 +212,7 @@ public class ColonyPlanTest extends FreeColTestCase {
     }
 
     public void testReqOreAndToolsWithEnoughHammersForBuild() {
-        Map map = buildMap(true);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(buildMap(true));
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
         Colony colony = getStandardColony(4);
 
@@ -239,8 +237,7 @@ public class ColonyPlanTest extends FreeColTestCase {
      * provide the raw materials for the build, but has them in stock
      */
     public void testNoBuildRawMatTiles() {
-        Map map = buildMap(false);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(buildMap(false));
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
         Colony colony = getStandardColony(4);
 

@@ -140,9 +140,9 @@ public class ServerPlayerTest extends FreeColTestCase {
     }
 
     public void testHasExploredTile() {
-        Map map = getTestMap();
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap());
         
+        Map map = game.getMap();
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
         ServerPlayer french = (ServerPlayer) game.getPlayer("model.nation.french");
         Tile tile1 = map.getTile(6, 8);
@@ -161,8 +161,8 @@ public class ServerPlayerTest extends FreeColTestCase {
     }
 
     public void testLoadInColony() {
-        Map map = getTestMap();
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+        Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
         
         Colony colony = getStandardColony();
@@ -339,8 +339,8 @@ public class ServerPlayerTest extends FreeColTestCase {
     }
 
     public void testCheckNoGameOverHasColonistInNewWorld() {
-        Map map = getTestMap();
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+        Map map = game.getMap();
         ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
         dutch.setGold(0);
 
@@ -350,8 +350,7 @@ public class ServerPlayerTest extends FreeColTestCase {
     }
 
     public void testCheckGameOver1600Threshold() {
-        Map map = getTestMap();
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap());
         ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
         dutch.setGold(0);
 
@@ -371,8 +370,8 @@ public class ServerPlayerTest extends FreeColTestCase {
     }
 
     public void testCheckGameOverUnitsGoingToEurope() {
-        Map map = getTestMap(spec().getTileType("model.tile.highSeas"));
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap(spec().getTileType("model.tile.highSeas")));
+        Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
         ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
         dutch.setGold(0);
@@ -395,8 +394,8 @@ public class ServerPlayerTest extends FreeColTestCase {
     }
 
     public void testCheckGameOverUnitsGoingToNewWorld() {
-        Map map = getTestMap();
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+        Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
         ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
         dutch.setGold(0);

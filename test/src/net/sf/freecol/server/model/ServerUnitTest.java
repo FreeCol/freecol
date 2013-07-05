@@ -102,11 +102,10 @@ public class ServerUnitTest extends FreeColTestCase {
     }
 
     public void testToggleHorses() {
-        Map map = getTestMap(plains);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap(plains));
 
         Player dutch = game.getPlayer("model.nation.dutch");
-        Tile tile1 = map.getTile(5, 8);
+        Tile tile1 = game.getMap().getTile(5, 8);
         tile1.setExploredBy(dutch, true);
         ServerUnit scout = new ServerUnit(game, tile1, dutch, colonistType);
 
@@ -132,12 +131,11 @@ public class ServerUnitTest extends FreeColTestCase {
      * Test Plowing with a hardy pioneer
      */
     public void testDoAssignedWorkHardyPioneerPlowPlain() {
-        Map map = getTestMap(plains);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap(plains));
         InGameController igc = ServerTestHelper.getInGameController();
 
         ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
-        Tile plain = map.getTile(5, 8);
+        Tile plain = game.getMap().getTile(5, 8);
         plain.setExploredBy(dutch, true);
         plain.setOwner(dutch);
 
@@ -176,11 +174,11 @@ public class ServerUnitTest extends FreeColTestCase {
     }
 
     public void testColonyProfitFromEnhancement() {
-        Map map = getTestMap(plains);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap(plains));
         InGameController igc = ServerTestHelper.getInGameController();
 
         ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        Map map = game.getMap();
         map.getTile(5, 8).setExploredBy(dutch, true);
         map.getTile(6, 8).setExploredBy(dutch, true);
         Tile plain58 = map.getTile(5, 8);
@@ -260,11 +258,11 @@ public class ServerUnitTest extends FreeColTestCase {
      *
      */
     public void testDoAssignedWorkHardyPioneerBuildRoad() {
-        Map map = getTestMap(savannahForest);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap(savannahForest));
         InGameController igc = ServerTestHelper.getInGameController();
 
         ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        Map map = game.getMap();
         Tile tile = map.getTile(5, 8);
         map.getTile(5, 8).setExploredBy(dutch, true);
 
@@ -335,8 +333,7 @@ public class ServerUnitTest extends FreeColTestCase {
     }
 
     public void testUnitGetsExperienceThroughWork() {
-        Map map = getTestMap();
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap());
 
         Colony colony = getStandardColony();
         Unit colonist = colony.getUnitList().get(0);
@@ -356,8 +353,7 @@ public class ServerUnitTest extends FreeColTestCase {
     }
 
     public void testUnitPromotionWorkingInWorkTile() {
-        Map map = getTestMap(plains);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap(plains));
 
         Colony colony = getStandardColony();
         assertTrue("Colony should only have 1 colonist for test setup",
@@ -415,11 +411,11 @@ public class ServerUnitTest extends FreeColTestCase {
     }
 
     public void testExposeResource() {
-        Map map = getTestMap(savannahForest);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap(savannahForest));
         InGameController igc = ServerTestHelper.getInGameController();
 
         ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
+        Map map = game.getMap();
         Tile tile = map.getTile(5, 8);
         tile.setOwner(dutch);
         tile.setExploredBy(dutch, true);

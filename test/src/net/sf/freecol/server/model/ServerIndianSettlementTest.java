@@ -58,8 +58,7 @@ public class ServerIndianSettlementTest extends FreeColTestCase {
 
 
     public void testFoodConsumption() {
-        Map map = getTestMap();
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap());
 
         FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
         IndianSettlement camp = builder.build();
@@ -112,8 +111,7 @@ public class ServerIndianSettlementTest extends FreeColTestCase {
     }
 
     public void testHorseBreedingNoFoodAvail() {
-        Map map = getTestMap(desertType);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap(desertType));
 
         int initialBravesInCamp = 3;
         FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);

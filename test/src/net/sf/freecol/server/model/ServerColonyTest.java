@@ -65,9 +65,13 @@ public class ServerColonyTest extends FreeColTestCase {
     private static final GoodsType foodGoodsType
         = spec().getPrimaryFoodType();
 
+    private static final TileType desert
+        = spec().getTileType("model.tile.desert");
+    private static final TileType marsh
+        = spec().getTileType("model.tile.marsh");
     private static final TileType plains
         = spec().getTileType("model.tile.plains");
-
+    
     private static final UnitType colonistType
         = spec().getUnitType("model.unit.freeColonist");
     private static final UnitType pioneerType
@@ -75,12 +79,11 @@ public class ServerColonyTest extends FreeColTestCase {
 
 
     public void testFoodConsumption() {
-        Map map = getTestMap(plains);
-        Game game = ServerTestHelper.startServerGame(map);
-        ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
+        Game game = ServerTestHelper.startServerGame(getTestMap(plains));
+        ServerPlayer dutch = (ServerPlayer)game.getPlayer("model.nation.dutch");
         // Setting test colony and colonist
         Colony colony = FreeColTestUtils.getColonyBuilder()
-            .colonyTile(map.getTile(5, 8)).build();
+            .colonyTile(game.getMap().getTile(5, 8)).build();
         new ServerUnit(game, colony.getBuildingForProducing(bellsType), dutch,
                        colonistType);
         assertEquals(0, colony.getGoodsCount(foodType));
@@ -98,16 +101,14 @@ public class ServerColonyTest extends FreeColTestCase {
     }
 
     public void testEqualFoodProductionConsumptionCase() {
-        Game game = ServerTestHelper.startServerGame(getTestMap());
+        Game game = ServerTestHelper.startServerGame(getTestMap(desert));
 
         Player dutch = game.getPlayer("model.nation.dutch");
-        Map map = getTestMap(spec().getTileType("model.tile.desert"));
-        game.setMap(map);
 
         //////////////////////
         // Setting test colony
 
-        Tile colonyTile = map.getTile(5, 8);
+        Tile colonyTile = game.getMap().getTile(5, 8);
 
         Colony colony = FreeColTestUtils.getColonyBuilder().colonyTile(colonyTile).build();
 
@@ -141,9 +142,7 @@ public class ServerColonyTest extends FreeColTestCase {
     }
 
     public void testDeathByStarvation() {
-        Game game = ServerTestHelper.startServerGame(getTestMap());
-        Map map = getTestMap(spec().getTileType("model.tile.marsh"));
-        game.setMap(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap(marsh));
 
         int consumption, production, unitsBeforeNewTurn = 3;
         Colony colony = getStandardColony(unitsBeforeNewTurn);
@@ -180,9 +179,7 @@ public class ServerColonyTest extends FreeColTestCase {
     }
 
     public void testAvoidStarvation() {
-        Game game = ServerTestHelper.startServerGame(getTestMap());
-        Map map = getTestMap(spec().getTileType("model.tile.marsh"));
-        game.setMap(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap(marsh));
 
         int unitsBeforeNewTurn = 3;
         Colony colony = getStandardColony(unitsBeforeNewTurn);

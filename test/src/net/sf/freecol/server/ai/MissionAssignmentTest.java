@@ -76,8 +76,8 @@ public class MissionAssignmentTest extends FreeColTestCase {
 
 
     public void testImpossibleConditionsForTargetSelection() {
-        Map map = getCoastTestMap(plainsType);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getCoastTestMap(plainsType));
+        Map map = game.getMap();
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
 
         // Create attacking player and units
@@ -120,8 +120,8 @@ public class MissionAssignmentTest extends FreeColTestCase {
     }
 
     public void testIsTargetValidForSeekAndDestroy() {
-        Map map = getTestMap();
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+        Map map = game.getMap();
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
 
         // Create player and unit
@@ -148,8 +148,8 @@ public class MissionAssignmentTest extends FreeColTestCase {
     }
 
     public void testAssignDefendSettlementMission() {
-        Map map = getTestMap();
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+        Map map = game.getMap();
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
 
         // Create player and unit
@@ -179,8 +179,8 @@ public class MissionAssignmentTest extends FreeColTestCase {
     }
 
     public void testSecureIndianSettlementMission() {
-        Map map = getTestMap();
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+        Map map = game.getMap();
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
 
         // Create player and unit
@@ -256,8 +256,8 @@ public class MissionAssignmentTest extends FreeColTestCase {
      * should ignore naval threats, as he does not have naval power
      */
     public void testSecureIndianSettlementMissionIgnoreNavalThreat() {
-        Map map = getCoastTestMap(plainsType);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getCoastTestMap(plainsType));
+        Map map = game.getMap();
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
         InGameController igc = ServerTestHelper.getInGameController();
 

@@ -51,8 +51,8 @@ public class TensionTest extends FreeColTestCase {
 
 
     public void testTension()  {
-        Map map = getTestMap(plainsType);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap(plainsType));
+        Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
 

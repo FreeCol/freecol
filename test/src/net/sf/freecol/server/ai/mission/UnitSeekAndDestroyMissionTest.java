@@ -51,8 +51,8 @@ public class UnitSeekAndDestroyMissionTest extends FreeColTestCase {
 	
 	
     public void testCapturedUnitsLoseMission() {
-        Map map = getTestMap();
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+        Map map = game.getMap();
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
         
         // Create attacking player and unit
@@ -91,8 +91,8 @@ public class UnitSeekAndDestroyMissionTest extends FreeColTestCase {
     }
 	
     public void testDoNotPursueUnitsInColonies(){
-        Map map = getTestMap();
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap());
+        Map map = game.getMap();
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
 
         // Create attacking player and unit

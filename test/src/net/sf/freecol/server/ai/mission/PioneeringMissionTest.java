@@ -67,8 +67,7 @@ public class PioneeringMissionTest extends FreeColTestCase {
         final List<EquipmentType> pioneerEquipment
             = Unit.Role.PIONEER.getRoleEquipment(spec());
 
-        Map map = getTestMap();
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap());
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
         
         // Get player, colony and unit

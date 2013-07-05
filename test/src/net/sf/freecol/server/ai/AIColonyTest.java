@@ -91,14 +91,17 @@ public class AIColonyTest extends FreeColTestCase {
     //    - a colony in (5,8) (built after)
     //    - a forest in (4,8) for lumber
     //    - a mountain in (6,8) for ore
-    private Map buildMap(boolean withBuildRawMat) {
-        MapBuilder builder = new MapBuilder(getGame());
-        builder.setBaseTileType(savannahType);
-        if (withBuildRawMat) {
-            builder.setTile(4, 8, forestType);
-            builder.setTile(6, 8, mountainType);
+    private Colony decorateMap(Game game, boolean full) {
+        Map map = game.getMap();
+        if (full) {
+            map.getTile(4, 8).setType(forestType);
+            map.getTile(6, 8).setType(mountainType);
         }
-        return builder.build();
+
+        // Needs a decent sized colony.
+        Colony colony = getStandardColony(6);
+        game.setCurrentPlayer(colony.getOwner());
+        return colony;
     }
 
     // Add buildings until the next buildable requires tools
@@ -122,12 +125,9 @@ public class AIColonyTest extends FreeColTestCase {
      * Tests worker allocation regarding building tasks
      */
     public void testBuildersAllocation() {
-        Game game = ServerTestHelper.startServerGame(buildMap(true));
+        Game game = ServerTestHelper.startServerGame(getTestMap(savannahType));
+        Colony colony = decorateMap(game, true);
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
-
-        // Needs a decent sized colony.
-        Colony colony = getStandardColony(6);
-        game.setCurrentPlayer(colony.getOwner());
 
         final Building carpenterHouse
             = colony.getBuildingForProducing(hammersType);
@@ -203,12 +203,11 @@ public class AIColonyTest extends FreeColTestCase {
      * the build.
      */
     public void testBuildersAllocNoRawMatTiles() {
-        Game game = ServerTestHelper.startServerGame(buildMap(false));
+        Game game = ServerTestHelper.startServerGame(getTestMap(savannahType));
         AIMain aiMain = ServerTestHelper.getServer().getAIMain();
+        Colony colony = decorateMap(game, false);
 
         // The number needs to be high to ensure allocation
-        Colony colony = getStandardColony(6);
-        game.setCurrentPlayer(colony.getOwner());
         final Building carpenterHouse
             = colony.getBuildingForProducing(hammersType);
         final Building blacksmithHouse

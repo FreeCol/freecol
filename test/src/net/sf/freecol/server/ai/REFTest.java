@@ -49,8 +49,7 @@ public class REFTest extends FreeColTestCase {
 
 
     public void testCreateREFPlayer() {
-        Map map = getTestMap();
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap());
         InGameController igc = ServerTestHelper.getInGameController();
 
         // Create player

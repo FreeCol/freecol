@@ -58,8 +58,8 @@ public class ContactTest extends FreeColTestCase {
 
 
     public void testEuropeanMeetsEuropean() throws Exception {
-        Map map = getTestMap(plains);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap(plains));
+        Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
 
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
@@ -90,8 +90,8 @@ public class ContactTest extends FreeColTestCase {
     }
 
     public void testEuropeanMeetsNative() throws Exception {
-        Map map = getTestMap(plains);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap(plains));
+        Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
 
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
@@ -126,8 +126,8 @@ public class ContactTest extends FreeColTestCase {
     }
 
     public void testEuropeanMeetsColony() throws Exception {
-        Map map = getTestMap(plains);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap(plains));
+        Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
 
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
@@ -157,8 +157,8 @@ public class ContactTest extends FreeColTestCase {
     }
 
     public void testEuropeanMeetsIndianSettlement() throws Exception {
-        Map map = getTestMap(plains);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap(plains));
+        Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
 
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
@@ -193,8 +193,8 @@ public class ContactTest extends FreeColTestCase {
     }
 
     public void testNativeMeetsEuropean() throws Exception {
-        Map map = getTestMap(plains);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap(plains));
+        Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
 
         ServerPlayer apache = (ServerPlayer) game.getPlayer("model.nation.apache");
@@ -226,8 +226,8 @@ public class ContactTest extends FreeColTestCase {
     }
 
     public void testNativeMeetsNative() throws Exception {
-        Map map = getTestMap(plains);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap(plains));
+        Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
 
         ServerPlayer apache = (ServerPlayer) game.getPlayer("model.nation.apache");
@@ -259,8 +259,8 @@ public class ContactTest extends FreeColTestCase {
     }
 
     public void testNativeMeetsColony() throws Exception {
-        Map map = getTestMap(plains);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap(plains));
+        Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
 
         ServerPlayer apache = (ServerPlayer) game.getPlayer("model.nation.apache");
@@ -290,8 +290,8 @@ public class ContactTest extends FreeColTestCase {
     }
 
     public void testNativeMeetsIndianSettlement() throws Exception {
-        Map map = getTestMap(plains);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap(plains));
+        Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
 
         ServerPlayer apache = (ServerPlayer) game.getPlayer("model.nation.apache");
@@ -324,8 +324,8 @@ public class ContactTest extends FreeColTestCase {
     }
 
     public void testShipMeetsShip() throws Exception {
-        Map map = getTestMap(ocean);
-        Game game = ServerTestHelper.startServerGame(map);
+        Game game = ServerTestHelper.startServerGame(getTestMap(ocean));
+        Map map = game.getMap();
         InGameController igc = ServerTestHelper.getInGameController();
 
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
