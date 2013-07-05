@@ -765,12 +765,12 @@ public class ServerPlayer extends Player implements ServerModelObject {
             return;
         }
 
+        invalidateCanSeeTiles();
         Tile tile = unit.getTile();
         setExplored(tile);
         for (Tile t : tile.getSurroundingTiles(unit.getLineOfSight())) {
             setExplored(t);
         }
-        invalidateCanSeeTiles();
     }
 
     /**

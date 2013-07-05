@@ -772,9 +772,6 @@ public class Unit extends GoodsLocation
         /*if (!result) return false;*/
 
         location = newLocation;
-        // Explore the new location now to prevent dealing with tiles
-        // with null (unexplored) type.
-        getOwner().setExplored(this);
 
         // It is possible to add a unit to a non-specific location
         // within a colony by specifying the colony as the new
@@ -789,6 +786,11 @@ public class Unit extends GoodsLocation
                 ? newColony.addUnit(this, (WorkLocation) newLocation)
                 : newLocation.add(this);
         }
+
+        // Explore the new location now to prevent dealing with tiles
+        // with null (unexplored) type.  This will update the PETs so
+        // it needs to be done after the unit is added back to its tile.
+        getOwner().setExplored(this);
 
         return /*result*/;
     }
