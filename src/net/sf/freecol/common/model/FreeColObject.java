@@ -873,7 +873,7 @@ public abstract class FreeColObject {
         StringWriter sw = new StringWriter();
         FreeColXMLWriter xw = null;
         try {
-            xw = new FreeColXMLWriter(sw, FreeColXMLWriter.WriteScope.toSave());
+            xw = new FreeColXMLWriter(sw, FreeColXMLWriter.WriteScope.toServer());
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "Error creating FreeColXMLWriter,", ioe);
             return null;
