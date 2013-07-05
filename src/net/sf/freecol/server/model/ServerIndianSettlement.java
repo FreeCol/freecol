@@ -233,7 +233,7 @@ public class ServerIndianSettlement extends IndianSettlement
         // Propagate alarm upwards.  Capital has a greater impact.
         List<FreeColGameObject> modified = owner.modifyTension(player,
                 ((isCapital()) ? addToAlarm : addToAlarm/2), this);
-        if (change && getTile().isExploredBy(player)) {
+        if (change && player.hasExplored(getTile())) {
             modified.add(this);
         }
         logger.finest("Alarm at " + getName()

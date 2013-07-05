@@ -741,7 +741,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     public List<Tile> exploreMap(boolean reveal) {
         List<Tile> result = new ArrayList<Tile>();
         for (Tile tile : getGame().getMap().getAllTiles()) {
-            if (tile.isExploredBy(this) != reveal) {
+            if (hasExplored(tile) != reveal) {
                 tile.setExploredBy(this, reveal);
                 result.add(tile);
             }
@@ -1708,13 +1708,13 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     Colony colony = t.getColony();
                     if (colony != null
                         && (ServerPlayer) colony.getOwner() != this) {
-                        if (!t.isExploredBy(this)) {
+                        if (!hasExplored(t)) {
                             t.setExploredBy(this, true);
                         }
                         t.updatePlayerExploredTile(this, false);
                         cs.add(See.only(this), t);
                         for (Tile x : colony.getOwnedTiles()) {
-                            if (!x.isExploredBy(this)) {
+                            if (!hasExplored(x)) {
                                 x.setExploredBy(this, true);
                             }
                             x.updatePlayerExploredTile(this, false);
@@ -2278,7 +2278,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     is.getAlarm(this).setValue(Tension.SURRENDERED);
                     // Only update attacker with settlements that have
                     // been seen, as contact can occur with its members.
-                    if (is.getTile().isExploredBy(this)) {
+                    if (hasExplored(is.getTile())) {
                         cs.add(See.perhaps().always(this), is);
                     } else {
                         cs.add(See.only(defenderPlayer), is);

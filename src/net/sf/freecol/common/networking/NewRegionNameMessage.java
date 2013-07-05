@@ -121,7 +121,7 @@ public class NewRegionNameMessage extends DOMMessage {
         ServerPlayer serverPlayer = server.getPlayer(connection);
 
         Tile tile = getTile(game);
-        if (!tile.isExploredBy(player)) {
+        if (!serverPlayer.hasExplored(tile)) {
             return DOMMessage.clientError("Can not claim discovery in unexplored tile: " + tileId);
         }
 

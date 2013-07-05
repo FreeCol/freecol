@@ -2332,7 +2332,7 @@ public final class InGameController extends Controller {
                 : 1;
             for (Tile x : settlement.getTile().getSurroundingTiles(radius)) {
                 if (x == null) continue;
-                if (!x.isExploredBy(serverPlayer)) {
+                if (!serverPlayer.hasExplored(x)) {
                     x.setExploredBy(serverPlayer, true);
                 }
                 cs.add(See.only(serverPlayer), x);
