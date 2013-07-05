@@ -1017,40 +1017,14 @@ public class ColonyPlan {
     }
 
     /**
-     * Equips a unit for a role.
-     *
-     * @param unit The <code>Unit</code> to equip if possible.
-     * @param role The <code>Role</code> for the unit to take.
-     * @param colony The <code>Colony</code> that provides the equipment.
-     * @return True if the unit was equipped.
-     */
-    private boolean equipUnit(Unit unit, Role role, Colony colony) {
-        if (role == Unit.Role.SOLDIER) role = Unit.Role.DRAGOON; // Special case
-
-        List<EquipmentType> equipment = role.getRoleEquipment(spec());
-        if (equipment.isEmpty() || !unit.isPerson()) return false;
-
-        boolean result = false;
-        for (EquipmentType et : equipment) {
-            if (colony.canProvideEquipment(et)
-                && unit.canBeEquippedWith(et)) {
-                unit.setLocation(colony.getTile());
-                unit.changeEquipment(et, 1);
-                colony.addEquipmentGoods(et, -1);
-                result = true;
-            }
-        }
-        return result;
-    }
-
-    /**
      * Tries to swap an expert unit for another doing its job.
      *
      * @param expert The expert <code>Unit</code>.
      * @param others A list of other <code>Unit</code>s to test against.
+     * @param colony The <code>Colony</code> the units are working in.
      * @return The unit that was replaced by the expert, or null if none.
      */
-    private Unit trySwapExpert(Unit expert, List<Unit> others) {
+    private Unit trySwapExpert(Unit expert, List<Unit> others, Colony colony) {
         GoodsType work = expert.getType().getExpertProduction();
         GoodsType oldWork = expert.getWorkType();
         for (int i = 0; i < others.size(); i++) {
@@ -1222,6 +1196,87 @@ public class ColonyPlan {
     }
 
     /**
+     * Remove equipment from a unit.
+     *
+     * @param unit The <code>Unit</code> to unequip.
+     * @param colony The <code>Colony</code> to store the equipment.
+     */
+    public static void unequipUnit(Unit unit, Colony colony) {
+        TypeCountMap<EquipmentType> equipment = unit.getEquipment();
+        for (EquipmentType et
+                 : new ArrayList<EquipmentType>(equipment.keySet())) {
+            int count = unit.getEquipmentCount(et);
+            unit.changeEquipment(et, -count);
+            colony.addEquipmentGoods(et, count); 
+        }
+        unit.setRole(Role.DEFAULT);
+    }
+
+    /**
+     * Equips a unit for a role.
+     *
+     * @param unit The <code>Unit</code> to equip if possible.
+     * @param role The <code>Role</code> for the unit to take.
+     * @param colony The <code>Colony</code> storing the equipment.
+     * @return True if the unit was equipped.
+     */
+    public static boolean equipUnit(Unit unit, Unit.Role role, Colony colony) {
+        if (!unit.isPerson()) return false;
+        final Specification spec = colony.getSpecification();
+
+        List<EquipmentType> roleEq = role.getRoleEquipment(spec);
+        TypeCountMap<EquipmentType> change = new TypeCountMap<EquipmentType>();
+
+        for (EquipmentType et : spec.getEquipmentTypeList()) {
+            if (!unit.canBeEquippedWith(et)) continue; // Drop native equipment
+            int oldCount = unit.getEquipmentCount(et);
+            int newCount = (roleEq.contains(et)) ? 1 : 0;
+            if (newCount > oldCount && !colony.canBuildEquipment(et)) {
+logger.warning("equipUnit fail " + unit + "/" + unit.getRole() + "/" + unit.isMounted() + " " + et + " oldCOunt=" + oldCount + " newCount=" + newCount + " contianer=" + colony.getGoodsContainer().toString());
+                return false;
+            }
+            if (newCount != oldCount) {
+                change.incrementCount(et, newCount - oldCount);
+            }
+        }
+        for (Entry<EquipmentType, Integer> entry
+                 : change.getValues().entrySet()) {
+            EquipmentType et = entry.getKey();
+            int count = entry.getValue().intValue();
+            if (count < 0) {
+                unit.changeEquipment(et, count);
+                colony.addEquipmentGoods(et, -count);
+            }
+        }
+        for (Entry<EquipmentType, Integer> entry
+                 : change.getValues().entrySet()) {
+            EquipmentType et = entry.getKey();
+            int count = entry.getValue().intValue();
+            if (count > 0) {
+                unit.changeEquipment(et, count);
+                colony.addEquipmentGoods(et, -count);
+            }
+        }
+        unit.setRole(role);
+        return true;
+    }
+
+    /**
+     * Equips a unit for a role, trying extra possibilities.
+     *
+     * @param unit The <code>Unit</code> to equip if possible.
+     * @param role The <code>Role</code> for the unit to take.
+     * @param colony The <code>Colony</code> storing the equipment.
+     * @return True if the unit was equipped.
+     */
+    private static boolean fullEquipUnit(Unit unit, Unit.Role role, Colony colony) {
+        return (role == Role.SOLDIER)
+            ? equipUnit(unit, Role.DRAGOON, colony)
+                || equipUnit(unit, Role.SOLDIER, colony)
+            : equipUnit(unit, role, colony);
+    }
+
+    /**
      * Tries to apply a colony plan given a list of workers.
      *
      * @param workers A list of <code>Unit</code>s to assign.
@@ -1231,6 +1286,7 @@ public class ColonyPlan {
     public Colony assignWorkers(List<Unit> workers, boolean preferScout) {
         final GoodsType foodType = spec().getPrimaryFoodType();
         final int maxUnitFood = colony.getOwner().getMaximumFoodConsumption();
+        final String name = colony.getName();
         final Turn turn = aiMain.getGame().getTurn();
 
         // Collect the work location plans.  Note that the plans are
@@ -1240,45 +1296,44 @@ public class ColonyPlan {
         List<WorkLocationPlan> workPlans = getWorkPlans();
 
         // Make a scratch colony to work on.
-        Colony scratch = colony.getScratchColony();
-        Tile tile = scratch.getTile();
-        String report = "Worker assignment at " + colony.getName()
-            + " of " + workers.size() + " workers "
-            + " in " + turn + "/" + turn.getNumber() + "\n";
+        Colony col = colony.copyColony();
+        Tile tile = col.getTile();
+        StringBuilder report = new StringBuilder(256);
+        report.append("Worker assignment at ").append(name)
+            .append(" of ").append(workers.size()).append(" workers")
+            .append(" in ").append(turn).append("/").append(turn.getNumber())
+            .append("\n");
 
-        // Move all workers to the tile, removing storable equipment.
+        // Replace the given workers with those in the scratch colony.
+        List<Unit> otherWorkers = new ArrayList<Unit>(workers);
+        workers.clear();
+        for (Unit u : otherWorkers) workers.add(col.getCorresponding(u));
+
+        // Move all workers to the tile.
+        // Also remove equipment, which is safe because no missionaries
+        // or active pioneers should be on the worker list.
         for (Unit u : workers) {
-            TypeCountMap<EquipmentType> equipment = u.getEquipment();
             u.setLocation(tile);
-            for (EquipmentType e
-                     : new ArrayList<EquipmentType>(equipment.keySet())) {
-                int n = equipment.getCount(e);
-                u.changeEquipment(e, -n);
-                scratch.addEquipmentGoods(e, n);
-            }
+            unequipUnit(u, col);
         }
 
         // Move outdoor experts outside if possible.
         // Prefer scouts in early game if there are very few.
-        final Role outdoorRoles[] = new Role[] { Role.PIONEER,
-                                                 Role.SOLDIER,
-                                                 Role.SCOUT };
+        Role[] outdoorRoles = new Role[] { Role.PIONEER,
+                                           Role.SOLDIER, Role.SCOUT };
         if (preferScout) {
             outdoorRoles[1] = Role.SCOUT;
             outdoorRoles[2] = Role.SOLDIER;
         }
         for (int j = 0; j < outdoorRoles.length; j++) {
-            String ability = "model.ability.expert"
-                + outdoorRoles[j].toString().substring(0, 1)
-                + outdoorRoles[j].toString().substring(1).toLowerCase();
             for (Unit u : new ArrayList<Unit>(workers)) {
                 if (workers.size() <= 1) break;
-                if (u.hasAbility(ability)
-                    && equipUnit(u, outdoorRoles[j], scratch)) {
+                if (u.hasAbility(outdoorRoles[j].getExpertAbility())
+                    && fullEquipUnit(u, outdoorRoles[j], col)) {
                     workers.remove(u);
-                    report += u.getId() + "("
-                        + u.getType().toString().substring(11)
-                        + ") -> " + outdoorRoles[j] + "\n";
+                    report.append(u.getId()).append("(")
+                        .append(Utils.lastPart(u.getType().toString(), "."))
+                        .append(") -> ").append(outdoorRoles[j]).append("\n");
                 }
             }
         }
@@ -1302,17 +1357,18 @@ public class ColonyPlan {
         Collections.sort(workers, soldierComparator);
         for (Unit u : new ArrayList<Unit>(workers)) {
             if (workers.size() <= 1) break;
-            if (!AIColony.isBadlyDefended(scratch)) break;
-            if (equipUnit(u, Role.SOLDIER, scratch)) {
+            if (!AIColony.isBadlyDefended(col)) break;
+            if (fullEquipUnit(u, Role.SOLDIER, col)) {
                 workers.remove(u);
-                report += u.getId() + "("
-                    + u.getType().toString().substring(11) + ") -> SOLDIER\n";
+                report.append(u.getId()).append("(")
+                    .append(Utils.lastPart(u.getType().toString(), "."))
+                    .append(") -> ").append(u.getRole()).append("\n");
             }
         }
 
         // Greedy assignment of other workers to plans.
         List<AbstractGoods> buildGoods = new ArrayList<AbstractGoods>();
-        BuildableType build = colony.getCurrentlyBuilding();
+        BuildableType build = col.getCurrentlyBuilding();
         if (build != null) buildGoods.addAll(build.getRequiredGoods());
         List<WorkLocationPlan> wlps;
         WorkLocationPlan wlp;
@@ -1323,7 +1379,7 @@ public class ColonyPlan {
             // be recycled if successful (wlps).
             wlps = null;
             wlp = null;
-            if (scratch.getAdjustedNetProductionOf(foodType) > 0) {
+            if (col.getAdjustedNetProductionOf(foodType) > 0) {
                 // Try to produce something.
                 wlps = workPlans;
                 while (!produce.isEmpty()) {
@@ -1341,7 +1397,7 @@ public class ColonyPlan {
             for (;;) {
                 if (wlp == null) { // Time to use a food plan.
                     if (foodPlans.isEmpty()) {
-                        report += "Food plans exhausted\n";
+                        report.append("Food plans exhausted\n");
                         done = true;
                         break;
                     }
@@ -1351,18 +1407,17 @@ public class ColonyPlan {
 
                 String err = null;
                 goodsType = wlp.getGoodsType();
-                wl = wlp.getWorkLocation();
-                wl = scratch.getCorrespondingWorkLocation(wl);
+                wl = col.getCorresponding(wlp.getWorkLocation());
                 best = null;
-                report += String.format("%-2d: %15s@%-25s => ",
-                    scratch.getUnitCount(),
+                report.append(String.format("%-2d: %15s@%-25s => ",
+                    col.getUnitCount(),
                     goodsType.toString().substring(12),
                     ((wl instanceof Building)
-                        ? ((Building)wl).getType().toString().substring(15)
+                        ? Utils.lastPart(((Building)wl).getType().toString(), ".")
                         : (wl instanceof ColonyTile)
                         ? (((ColonyTile)wl).getWorkTile().getPosition().toString()
-                            + ((ColonyTile)wl).getWorkTile().getType().toString().substring(11))
-                        : wl.toString()));
+                            + Utils.lastPart(((ColonyTile)wl).getWorkTile().getType().toString(), "."))
+                        : wl.toString())));
 
                 if (!wl.canBeWorked()) {
                     err = "can not be worked";
@@ -1374,7 +1429,7 @@ public class ColonyPlan {
                 }
                 if (err != null) {
                     wlps.remove(wlp); // The plan can not be worked, dump it.
-                    report += err + "\n";
+                    report.append(err).append("\n");
                     break;
                 }
 
@@ -1382,17 +1437,17 @@ public class ColonyPlan {
                 best.setLocation(wl);
 
                 // Did the placement break the production bonus?
-                if (scratch.getProductionBonus() < 0) {
+                if (col.getProductionBonus() < 0) {
                     best.setLocation(tile);
                     done = true;
-                    report += "broke production bonus\n";
+                    report.append("broke production bonus\n");
                     break;
                 }
 
                 // Is the colony going to starve because of this placement?
-                if (scratch.getAdjustedNetProductionOf(foodType) < 0) {
-                    int net = scratch.getAdjustedNetProductionOf(foodType);
-                    int count = scratch.getGoodsCount(foodType);
+                if (col.getAdjustedNetProductionOf(foodType) < 0) {
+                    int net = col.getAdjustedNetProductionOf(foodType);
+                    int count = col.getGoodsCount(foodType);
                     if (count / -net < PRODUCTION_TURNOVER_TURNS) {
                         // Too close for comfort.  Back out the
                         // placement and try a food plan, unless this
@@ -1400,12 +1455,13 @@ public class ColonyPlan {
                         best.setLocation(tile);
                         wlp = null;
                         if (goodsType.isFoodType()) {
-                            report += "starvation (" + count
-                                + "/" + net + ")\n";
+                            report.append("starvation (").append(count)
+                                .append("/").append(net).append(")\n");
                             done = true;
                             break;
                         }
-                        report += "would starve (" + count + "/" + net + ")\n";
+                        report.append("would starve (").append(count)
+                            .append("/").append(net).append(")\n");
                         continue;
                     }
                     // Otherwise tolerate the food stock running down.
@@ -1423,9 +1479,9 @@ public class ColonyPlan {
                     if (raw == ag.getType()) rawNeeded += ag.getAmount();
                 }
                 if (raw == null
-                    || scratch.getAdjustedNetProductionOf(raw) >= 0
-                    || (((scratch.getGoodsCount(raw) - rawNeeded)
-                            / -scratch.getAdjustedNetProductionOf(raw))
+                    || col.getAdjustedNetProductionOf(raw) >= 0
+                    || (((col.getGoodsCount(raw) - rawNeeded)
+                            / -col.getAdjustedNetProductionOf(raw))
                         >= PRODUCTION_TURNOVER_TURNS)) {
                     // No raw material problems, the placement
                     // succeeded.  Set the work type, move the
@@ -1435,8 +1491,9 @@ public class ColonyPlan {
                     // on its list.
                     best.changeWorkType(goodsType);
                     workers.remove(best);
-                    report += best.getId() + "("
-                        + best.getType().toString().substring(11) + ")\n";
+                    report.append(best.getId()).append("(")
+                        .append(Utils.lastPart(best.getType().toString(), "."))
+                        .append(")\n");
                     if (!goodsType.isFoodType() && produce.remove(goodsType)) {
                         produce.add(goodsType);
                     }
@@ -1454,8 +1511,9 @@ public class ColonyPlan {
                     // loop trying to satisfy the alternate plan.
                     if (produce.remove(raw)) produce.add(0, raw);
                     wlp = rawWlp;
-                    report += "retry with " + raw.toString().substring(12)
-                        + "\n";
+                    report.append("retry with ")
+                        .append(Utils.lastPart(raw.toString(), "."))
+                        .append("\n");
                     continue;
                 }
 
@@ -1465,7 +1523,8 @@ public class ColonyPlan {
                 // we will succeed next time.
                 wlps.remove(wlp);
                 produce.remove(goodsType);
-                report += "needs more " + raw.toString().substring(12) + "\n";
+                report.append("needs more ")
+                    .append(Utils.lastPart(raw.toString(), ".")).append("\n");
                 break;
             }
         }
@@ -1482,9 +1541,9 @@ public class ColonyPlan {
         //   unit can *improve* production by being added.
         //   - find a place to produce food that at least avoids
         //     starvation and add one worker.
-        if (scratch.getWorkLocationUnitCount() == 0) {
+        if (col.getWorkLocationUnitCount() == 0) {
             if (getFoodPlans().isEmpty()) {
-locations:      for (WorkLocation wl : scratch.getAvailableWorkLocations()) {
+locations:      for (WorkLocation wl : col.getAvailableWorkLocations()) {
                     for (Unit u : new ArrayList<Unit>(workers)) {
                         for (GoodsType type : libertyGoodsTypes) {
                             if (wl.canAdd(u)
@@ -1492,6 +1551,7 @@ locations:      for (WorkLocation wl : scratch.getAvailableWorkLocations()) {
                                     u.getType()) > 0) {
                                 u.setLocation(wl);
                                 u.changeWorkType(type);
+                                workers.remove(u);
                                 break locations;
                             }
                         }
@@ -1500,13 +1560,14 @@ locations:      for (WorkLocation wl : scratch.getAvailableWorkLocations()) {
             } else {
 plans:          for (WorkLocationPlan w : getFoodPlans()) {
                     GoodsType goodsType = w.getGoodsType();
-                    WorkLocation wl = w.getWorkLocation();
+                    WorkLocation wl = col.getCorresponding(w.getWorkLocation());
                     for (Unit u : new ArrayList<Unit>(workers)) {
                         GoodsType oldWork = u.getWorkType();
                         u.setLocation(wl);
                         u.changeWorkType(goodsType);
-                        if (scratch.getAdjustedNetProductionOf(foodType) >= 0) {
-                            report += "Subsist with " + u + "\n";
+                        if (col.getAdjustedNetProductionOf(foodType) >= 0) {
+                            report.append("Subsist with ").append(u)
+                                .append("\n");
                             workers.remove(u);
                             break plans;
                         }
@@ -1524,7 +1585,7 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
         // follow.  Do a cleanup pass to sort these out.
         List<Unit> experts = new ArrayList<Unit>();
         List<Unit> nonExperts = new ArrayList<Unit>();
-        for (Unit u : scratch.getUnitList()) {
+        for (Unit u : col.getUnitList()) {
             if (u.getType().getExpertProduction() != null) {
                 if (u.getType().getExpertProduction() != u.getWorkType()) {
                     experts.add(u);
@@ -1537,58 +1598,63 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
         while (expert < experts.size()) {
             Unit u1 = experts.get(expert);
             Unit other;
-            if ((other = trySwapExpert(u1, experts)) != null) {
-                report += "Swapped " + u1.getId() + "("
-                    + u1.getType().toString().substring(11)
-                    + ") for " + other + "\n";
+            if ((other = trySwapExpert(u1, experts, col)) != null) {
+                report.append("Swapped ").append(u1.getId()).append("(")
+                    .append(Utils.lastPart(u1.getType().toString(), "."))
+                    .append(") for ").append(other).append("\n");
                 experts.remove(u1);
-            } else if ((other = trySwapExpert(u1, nonExperts)) != null) {
-                report += "Swapped " + u1.getId() + "("
-                    + u1.getType().toString().substring(11)
-                    + ") for " + other + "\n";
+            } else if ((other = trySwapExpert(u1, nonExperts, col)) != null) {
+                report.append("Swapped ").append(u1.getId()).append("(")
+                    .append(Utils.lastPart(u1.getType().toString(), "."))
+                    .append(") for ").append(other).append("\n");
                 experts.remove(u1);
             } else {
                 expert++;
             }
         }
-        for (Unit u : tile.getUnitList()) {
+        for (Unit u : new ArrayList<Unit>(workers)) {
             GoodsType work = u.getType().getExpertProduction();
             if (work != null) {
-                Unit other = trySwapExpert(u, scratch.getUnitList());
+                Unit other = trySwapExpert(u, col.getUnitList(), col);
                 if (other != null) {
-                    report += "Swapped " + u.getId() + "("
-                        + u.getType().toString().substring(11)
-                        + ") for " + other + "\n";
+                    report.append("Swapped ").append(u.getId()).append("(")
+                        .append(Utils.lastPart(u.getType().toString(), "."))
+                        .append(") for ").append(other).append("\n");
+                    workers.remove(u);
+                    workers.add(other);
                 }
             }
         }
 
         // Rearm what remains as far as possible.
-        workers.clear();
-        for (Unit u : tile.getUnitList()) {
-            if (u.getEquipment().isEmpty()) workers.add(u);
-        }
         Collections.sort(workers, soldierComparator);
-        for (Unit u : workers) {
-            if (equipUnit(u, Role.SOLDIER, scratch)) {
-                report += u.getId() + "("
-                    + u.getType().toString().substring(11) + ") -> SOLDIER\n";
-            }
+        for (Unit u : new ArrayList<Unit>(workers)) {
+            if (fullEquipUnit(u, Role.SOLDIER, col)) {
+                report.append(u.getId()).append("(")
+                    .append(Utils.lastPart(u.getType().toString(), "."))
+                    .append(") -> ").append(u.getRole()).append("\n");
+                workers.remove(u);
+            } else break;
         }
 
         // Log and return the scratch colony on success.
         // Otherwise abandon this rearrangement, disposing of the
         // scratch colony and returning null.
-        report += "Final population = " + scratch.getWorkLocationUnitCount();
-        if (scratch.getWorkLocationUnitCount() <= 0) {
-            // Move units out of scope for dispose.
-            for (Unit u : tile.getUnitList()) u.setLocation(null);
-            scratch.disposeScratchColony();
-            report += "\nassignWorkers at " + colony.getName() + " failed.";
-            scratch = null;
+        for (Unit u : workers) {
+            report.append(u.getId()).append("(")
+                .append(Utils.lastPart(u.getType().toString(), "."))
+                .append(") -> UNUSED\n");
+        }                
+        report.append("Final population = ")
+            .append(col.getWorkLocationUnitCount());
+        if (col.getWorkLocationUnitCount() <= 0) {
+            report.append("\nassignWorkers at ").append(name)
+                .append(" failed.");
+            col = null;
         }
-        logger.finest(report);
-        return scratch;
+
+        logger.finest(report.toString());
+        return col;
     }
 
     /**

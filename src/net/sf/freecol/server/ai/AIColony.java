@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,6 +44,8 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.FreeColObject;
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
@@ -318,7 +321,10 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         // Remember where the units came from.
         List<Unit> workers = colony.getUnitList();
         List<UnitWas> was = new ArrayList<UnitWas>();
-        for (Unit u : workers) was.add(new UnitWas(u));
+        for (Unit u : workers) {
+            Location loc = u.getLocation();
+            was.add(new UnitWas(u));
+        }
         for (Unit u : tile.getUnitList()) {
             if (!u.isPerson() || getAIUnit(u) == null) continue;
             Mission mission = getAIUnit(u).getMission();
@@ -333,49 +339,87 @@ public class AIColony extends AIObject implements PropertyChangeListener {
                 was.add(new UnitWas(u));
             }
         }
-
         // Assign the workers according to the colony plan.
         // ATM we just accept this assignment unless it failed, in
         // which case restore original state.
         AIPlayer aiPlayer = getAIOwner();
         boolean preferScouts = ((EuropeanAIPlayer)aiPlayer).scoutsNeeded() > 0;
-        Colony scratch = colonyPlan.assignWorkers(workers, preferScouts);
+        Colony scratch = colonyPlan.assignWorkers(new ArrayList<Unit>(workers),
+                                                  preferScouts);
         if (scratch == null) {
-            if (!UnitWas.revertAll(was)) {
-                StringBuilder sb = new StringBuilder();
-                for (UnitWas w : was) {
-                    sb.append(", ").append(w.getUnit().toString());
-                }
-                logger.warning("Failed to revert: "
-                    + sb.toString().substring(2));
-            }
             rearrangeTurn = new Turn(turn + 1);
             return false;
         }
-            
+
         // Apply the arrangement, and give suitable missions to all units.
         // For now, do a soft rearrange (that is, no c-s messaging).
-        // Also change the goods counts as we may have changed equipment.
-        // TODO: Better would be to restore the initial state and use
-        // a special c-s message to execute the rearrangement--- code to
-        // untangle the movement dependencies is non-trivial.
-        for (Unit u : scratch.getUnitList()) {
-            WorkLocation wl = (WorkLocation)u.getLocation();
-            wl = colony.getCorrespondingWorkLocation(wl);
-            u.setLocation(wl);
+        // TODO: Better would be to use a special c-s message to
+        // execute the rearrangement.
+        // Also, remove equipment when moving.
+        List<Unit> tileUnits = new ArrayList<Unit>();
+        for (Unit u : workers) {
+            Unit su = scratch.getCorresponding(u);
+            if (su.getLocation() instanceof Tile) {
+                ColonyPlan.unequipUnit(u, colony);
+                if (u.getLocation() != tile) u.setLocation(tile);
+                tileUnits.add(u);
+            }
         }
-        for (Unit u : scratch.getTile().getUnitList()) {
-            u.setLocation(tile);
-        }            
+        workers.removeAll(tileUnits);
+        while (!workers.isEmpty()) {
+            Unit u = workers.remove(0);
+            Unit su = scratch.getCorresponding(u);
+            Location sl = su.getLocation();
+            WorkLocation wl = colony.getCorresponding((WorkLocation)sl);
+            // Adding to wl can fail, and in the worse case there
+            // might be a circular dependency.  If the move can
+            // succeed, do it, but if not move the unit to the tile
+            // and retry.
+            switch (wl.getNoAddReason(u)) {
+            case NONE:
+                ColonyPlan.unequipUnit(u, colony);
+                u.setLocation(wl);
+                // Fall through
+            case ALREADY_PRESENT:
+                if (u.getWorkType() != su.getWorkType()) {
+                    u.changeWorkType(su.getWorkType());
+                }
+                break;
+            case CAPACITY_EXCEEDED:
+                u.setLocation(tile);
+                workers.add(workers.size(), u);
+                break;
+            default:
+                logger.warning("Bad move for " + u + " to " + wl);
+                break;
+            }
+        }
+        // Re-equip units for their roles.
+        for (Unit u : tileUnits) {
+            Unit su = scratch.getCorresponding(u);
+            if (u.getRole() != su.getRole()) {
+                if (!ColonyPlan.equipUnit(u, su.getRole(), colony)) {
+                    logger.warning("At " + colony.getName()
+                        + " failed to equip unit " + u
+                        + " for role " + su.getRole());
+                }
+            }
+        }
+        // This should not be necessary, as the equipment changes above
+        // should have set this correctly.  However an older version did
+        // require it, so leave this in place for now to check we are doing
+        // it right.
         for (GoodsType g : spec.getGoodsTypeList()) {
             if (!g.isStorable()) continue;
             int oldCount = colony.getGoodsCount(g);
             int newCount = scratch.getGoodsCount(g);
             if (newCount != oldCount) {
-                colony.getGoodsContainer().addGoods(g, newCount - oldCount);
+                throw new IllegalStateException("rearrangeWorkers fail "
+                    + colony.getName() + " " + g + " old=" + oldCount
+                    + " new=" + newCount);
+                //colony.getGoodsContainer().addGoods(g, newCount - oldCount);
             }
         }
-        scratch.disposeScratchColony();
 
         // Emergency recovery if something broke and the colony is empty.
         if (colony.getWorkLocationUnitCount() <= 0) {

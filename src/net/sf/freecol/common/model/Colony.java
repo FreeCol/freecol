@@ -359,8 +359,8 @@ public class Colony extends Settlement implements Nameable {
         Player owner = getOwner();
         Tile tile = getTile();
         Tile tileCopy = tile.copy(game, tile.getClass());
-        Colony scratch = tileCopy.getColony();
-        for (ColonyTile ct : scratch.getColonyTiles()) {
+        Colony colony = tileCopy.getColony();
+        for (ColonyTile ct : colony.getColonyTiles()) {
             Tile wt;
             if (ct.isColonyCenterTile()) {
                 wt = tileCopy;
@@ -368,12 +368,12 @@ public class Colony extends Settlement implements Nameable {
                 wt = ct.getWorkTile();
                 wt = wt.copy(game, wt.getClass());
                 if (wt.getOwningSettlement() == this) {
-                    wt.setOwningSettlement(scratch);
+                    wt.setOwningSettlement(colony);
                 }
             }
             ct.setWorkTile(wt);
         }
-        return scratch;
+        return colony;
     }
 
     /**
@@ -396,117 +396,6 @@ public class Colony extends Settlement implements Nameable {
             }
             for (Unit t : getTile().getUnitList()) {
                 if (t.getId().equals(id)) return (T)t;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Creates a temporary copy of this colony for planning purposes.
-     * The copy is identical except:
-     *   - it is obviously not actually present on the map
-     *   - it does not appear in the list of player colonies
-     *   - it contains no units in its work locations
-     *   - its export data is clear
-     *   - its build queue is empty
-     *   - its production cache is empty
-     *   - its name is prefixed with "scratch"
-     * Note that these fields are shared--- do not mutate!
-     *   + the population queue
-     *
-     * @return A scratch version of this colony.
-     */
-    public Colony getScratchColony() {
-        Game game = getGame();
-        Player owner = getOwner();
-        Colony scratch = new Colony(game, owner, "scratch" + getName(),
-            getTile().getScratchTile());
-        GoodsContainer container = new GoodsContainer(game, scratch);
-        for (Goods g : getCompactGoods()) {
-            container.addGoods(g.getType(), g.getAmount());
-        }
-        scratch.setGoodsContainer(container);
-        FeatureContainer fc = scratch.getFeatureContainer();
-        FeatureContainer.addFeatures(fc, this);
-        scratch.colonyTiles.clear();
-        for (ColonyTile ct : colonyTiles) {
-            Tile wt = ct.getWorkTile();
-            Tile t;
-            if (ct.isColonyCenterTile()) {
-                t = scratch.getTile();
-                t.setSettlement(scratch);
-                t.changeOwningSettlement(scratch);
-            } else {
-                t = wt.getScratchTile();
-            }
-            if (owner.owns(wt)) {
-                t.setOwner(owner);
-                t.setOwningSettlement(scratch);
-            }
-            scratch.colonyTiles.add(new ColonyTile(game, scratch, t));
-        }
-        scratch.buildingMap.clear();
-        for (Entry<String, Building> e : buildingMap.entrySet()) {
-            scratch.buildingMap.put(e.getKey(),
-                new Building(game, scratch, e.getValue().getType()));
-        }
-        scratch.exportData.clear();
-        scratch.established = established;
-        scratch.sonsOfLiberty = sonsOfLiberty;
-        scratch.oldSonsOfLiberty = oldSonsOfLiberty;
-        scratch.tories = tories;
-        scratch.oldTories = oldTories;
-        scratch.productionBonus = productionBonus;
-        scratch.immigration = immigration;
-        scratch.liberty = liberty;
-        scratch.landLocked = landLocked;
-        scratch.buildQueue.clear();
-        scratch.populationQueue = populationQueue;
-        // ignore displayUnitCount and stockadeKey
-        // leave productionCache as is
-        return scratch;
-    }
-
-    /**
-     * Dispose of this scratch colony.  Special handling to avoid mutating
-     * the shared fields on dispose.
-     */
-    public void disposeScratchColony() {
-        populationQueue = null;
-        for (ColonyTile ct : colonyTiles) {
-            ct.getWorkTile().disposeScratchTile();
-        }
-        colonyTiles.clear();
-        dispose();
-    }
-
-    /**
-     * Finds the corresponding work location in a scratch colony.
-     *
-     * @param wl The <code>WorkLocation</code> in the original colony.
-     * @return The corresponding <code>WorkLocation</code> or null if not found.
-     */
-    public WorkLocation getCorrespondingWorkLocation(WorkLocation wl) {
-        Colony original = wl.getColony();
-        // Insist that this is a scratch colony, and the work location
-        // is in the original or vice versa.
-        if (getName().equals("scratch" + original.getName())
-            || original.getName().equals("scratch" + getName())) {
-            if (wl instanceof Building) {
-                // Types are unique for buildings, so use that as a key
-                BuildingType type = ((Building)wl).getType();
-                for (Building b : getBuildings()) {
-                    if (b.getType() == type) return b;
-                }
-            } else if (wl instanceof ColonyTile) {
-                // ColonyTiles are harder because the underlying tile is
-                // also a scratch-version, but the scratch and original
-                // tile share item containers.
-                Tile workTile = ((ColonyTile)wl).getWorkTile();
-                for (ColonyTile c : getColonyTiles()) {
-                    if (c.getWorkTile().getTileItemContainer()
-                        == workTile.getTileItemContainer()) return c;
-                }
             }
         }
         return null;

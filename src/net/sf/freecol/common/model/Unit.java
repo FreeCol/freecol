@@ -177,6 +177,22 @@ public class Unit extends GoodsLocation
             }
         }
 
+        public String getExpertAbility() {
+            switch (this) {
+            case DEFAULT:
+                break;
+            case MISSIONARY:
+                return "model.ability.jesuitMissionary";
+            case PIONEER:
+                return "model.ability.hardyPioneer";
+            case SCOUT:
+                return "model.ability.seasonedScout";
+            case SOLDIER: case DRAGOON:
+                return "model.ability.veteranSoldier";
+            }
+            return null;
+        }
+
         public String getId() {
             return toString().toLowerCase(Locale.US);
         }
