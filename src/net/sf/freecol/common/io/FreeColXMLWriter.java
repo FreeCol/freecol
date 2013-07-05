@@ -154,6 +154,25 @@ public class FreeColXMLWriter implements XMLStreamWriter {
         this.writeScope = writeScope;
     }
 
+
+    /**
+     * Get the write scope prevailing on this stream.
+     *
+     * @return The write scope.
+     */     
+    public WriteScope getWriteScope() {
+        return this.writeScope;
+    }
+
+    /**
+     * Set the write scope prevailing on this stream.
+     *
+     * @param The new <code>WriteScope</code>.
+     */     
+    public void setWriteScope(WriteScope writeScope) {
+        this.writeScope = writeScope;
+    }
+
     /**
      * Closes both the <code>XMLStreamWriter</code> and
      * the underlying stream if any.
