@@ -67,7 +67,7 @@
         </xs:annotation>
       </xs:attribute>
 
-      <xs:attribute name="nextId" type="xs:int" use="required"/>
+      <xs:attribute name="nextId" type="xs:int" use="optional"/>
       <!-- @compat 0.10.x -->
       <xs:attribute name="nextID" type="xs:int" use="optional"/>
       <!-- end @compat -->
