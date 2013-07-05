@@ -597,22 +597,17 @@ public class MapTest extends FreeColTestCase {
         Colony colony = getStandardColony();
         Tile tile = colony.getTile();
 
-        try {
-            Map otherMap = map.copy(game, map.getClass());
-            assertNotNull(otherMap);
-            assertFalse(otherMap == map);
-            assertEquals(otherMap.getId(), map.getId());
-            Tile otherTile = otherMap.getTile(tile.getX(), tile.getY());
-            assertNotNull(otherTile);
-            assertFalse(otherTile == tile);
-            assertEquals(otherTile.getId(), tile.getId());
-            Colony otherColony = otherTile.getColony();
-            assertNotNull(otherColony);
-            assertFalse(otherColony == colony);
-            assertEquals(otherColony.getId(), colony.getId());
-
-        } catch (IOException ioe) {
-            fail(ioe.getMessage());
-        }
+        Map otherMap = map.copy(game, map.getClass());
+        assertNotNull(otherMap);
+        assertFalse(otherMap == map);
+        assertEquals(otherMap.getId(), map.getId());
+        Tile otherTile = otherMap.getTile(tile.getX(), tile.getY());
+        assertNotNull(otherTile);
+        assertFalse(otherTile == tile);
+        assertEquals(otherTile.getId(), tile.getId());
+        Colony otherColony = otherTile.getColony();
+        assertNotNull(otherColony);
+        assertFalse(otherColony == colony);
+        assertEquals(otherColony.getId(), colony.getId());
     }
 }

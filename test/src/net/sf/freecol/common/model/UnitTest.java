@@ -665,25 +665,21 @@ public class UnitTest extends FreeColTestCase {
         Goods goods = new Goods(game, merchantman, cottonType, 44);
         merchantman.add(goods);
         
-        try {
-            Unit other = merchantman.copy(game, merchantman.getClass());
+        Unit other = merchantman.copy(game, merchantman.getClass());
 
-            assertFalse(merchantman == other);
-            assertEquals(merchantman.getId(), other.getId());
-            assertEquals(merchantman.getType(), other.getType());
-            assertEquals(1, merchantman.getUnitCount());
-            assertEquals(1, other.getUnitCount());
-            assertEquals(44, merchantman.getGoodsCount(cottonType));
-            assertEquals(44, other.getGoodsCount(cottonType));
-            assertEquals(1, merchantman.getUnitCount());
-            assertEquals(1, other.getUnitCount());
-            assertFalse(merchantman.getUnitList().get(0)
-                        == other.getUnitList().get(0));
-            assertEquals(merchantman.getUnitList().get(0).getId(),
-                         other.getUnitList().get(0).getId());
-        } catch (IOException ioe) {
-            fail(ioe.getMessage());
-        }
+        assertFalse(merchantman == other);
+        assertEquals(merchantman.getId(), other.getId());
+        assertEquals(merchantman.getType(), other.getType());
+        assertEquals(1, merchantman.getUnitCount());
+        assertEquals(1, other.getUnitCount());
+        assertEquals(44, merchantman.getGoodsCount(cottonType));
+        assertEquals(44, other.getGoodsCount(cottonType));
+        assertEquals(1, merchantman.getUnitCount());
+        assertEquals(1, other.getUnitCount());
+        assertFalse(merchantman.getUnitList().get(0)
+                    == other.getUnitList().get(0));
+        assertEquals(merchantman.getUnitList().get(0).getId(),
+            other.getUnitList().get(0).getId());
     }
 
     public void testElement() {

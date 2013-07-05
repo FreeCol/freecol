@@ -897,12 +897,9 @@ public abstract class FreeColObject {
      *
      * @param game The <code>Game</code> to add the object to.
      * @param returnClass The required object class.
-     * @return The copied object.
-     * @exception IOException if there is a problem in the underlying
-     *     stream processing or object creation.
+     * @return The copied object, or null on error.
      */
-    public <T extends FreeColObject> T copy(Game game, Class<T> returnClass)
-        throws IOException {
+    public <T extends FreeColObject> T copy(Game game, Class<T> returnClass) {
         try {
             String xml = this.serialize();
             FreeColXMLReader xr = new FreeColXMLReader(new StringReader(xml));
@@ -912,9 +909,10 @@ public abstract class FreeColObject {
             ret.readFromXML(xr);
             return ret;
 
-        } catch (XMLStreamException xse) {
-            throw new IOException(xse);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Failed to copy object: " + getId(), e);
         }
+        return null;
     }
 
     /**

@@ -622,16 +622,15 @@ public class TileTest extends FreeColTestCase {
         Colony colony = getStandardColony();
         Tile tile = colony.getTile();
 
-        try {
-            Tile otherTile = tile.copy(game, tile.getClass());
-            assertNotNull(otherTile);
-            assertFalse(otherTile == tile);
-            assertEquals(tile.getId(), otherTile.getId());
-            assertFalse(colony == otherTile.getColony());
-            assertEquals(colony.getId(), otherTile.getColony().getId());
-
-        } catch (IOException ioe) {
-            fail(ioe.getMessage());
-        }
+        Tile otherTile = tile.copy(game, tile.getClass());
+        assertNotNull(otherTile);
+        assertFalse(otherTile == tile);
+        assertEquals(tile.getId(), otherTile.getId());
+        Colony otherColony = otherTile.getColony();
+        assertFalse(colony == otherColony);
+        assertEquals(colony.getId(), otherColony.getId());
+        // Do not test units, colony owned tiles are not correctly
+        // recognized as belonging to the colony which stops those
+        // work locations from contributing their units.
     }
 }
