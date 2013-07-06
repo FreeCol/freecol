@@ -3919,9 +3919,10 @@ public class Unit extends GoodsLocation
 
         role = xr.getAttribute(ROLE_TAG, Role.class, Role.DEFAULT);
 
-        location = xr.makeLocationAttribute(game, LOCATION_TAG);
+        location = xr.getLocationAttribute(game, LOCATION_TAG, true);
 
-        entryLocation = xr.makeLocationAttribute(game, ENTRY_LOCATION_TAG);
+        entryLocation = xr.getLocationAttribute(game, ENTRY_LOCATION_TAG,
+                                                true);
 
         movesLeft = xr.getAttribute(MOVES_LEFT_TAG, 0);
 
@@ -3959,7 +3960,7 @@ public class Unit extends GoodsLocation
 
         treasureAmount = xr.getAttribute(TREASURE_AMOUNT_TAG, 0);
 
-        destination = xr.makeLocationAttribute(game, DESTINATION_TAG);
+        destination = xr.getLocationAttribute(game, DESTINATION_TAG, true);
 
         tradeRoute = xr.findFreeColGameObject(game, TRADE_ROUTE_TAG,
             TradeRoute.class, (TradeRoute)null, false);

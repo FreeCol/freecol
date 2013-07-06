@@ -498,7 +498,8 @@ public class AIGoods extends AIObject implements Transportable {
 
         final AIMain aiMain = getAIMain();
 
-        destination = xr.findLocationAttribute(aiMain.getGame(), DESTINATION_TAG);
+        destination = xr.getLocationAttribute(aiMain.getGame(),
+                                              DESTINATION_TAG, false);
 
         transportPriority = xr.getAttribute(TRANSPORT_PRIORITY_TAG, -1);
 

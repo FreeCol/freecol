@@ -719,7 +719,7 @@ public class PioneeringMission extends Mission {
         final AIMain aiMain = getAIMain();
 
         // Do not use setTarget in serialization
-        target = xr.findLocationAttribute(getGame(), TARGET_TAG);
+        target = xr.getLocationAttribute(getGame(), TARGET_TAG, false);
 
         tileImprovementPlan = (xr.hasAttribute(TILE_IMPROVEMENT_PLAN_TAG))
             ? xr.makeAIObject(aiMain, TILE_IMPROVEMENT_PLAN_TAG,

@@ -26,8 +26,10 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -66,6 +68,9 @@ public class FreeColXMLReader extends StreamReaderDelegate {
 
     /** The read scope to apply. */
     private ReadScope readScope;
+
+    /** A cache of uninterned objects. */
+    private Map<String, FreeColGameObject> uninterned = null;
 
 
     /**
@@ -138,6 +143,22 @@ public class FreeColXMLReader extends StreamReaderDelegate {
      */
     public void setReadScope(ReadScope readScope) {
         this.readScope = readScope;
+        this.uninterned = (shouldIntern()) ? null
+            : new HashMap<String, FreeColGameObject>();
+    }
+
+    /**
+     * Look up an identifier in an enclosing game, but if not interning
+     * prefer an uninterned result.
+     *
+     * @param game The <code>Game</code> to consult.
+     * @param id The object identifier.
+     * @return The <code>FreeColGameObject</code> found, or null if none.
+     */
+    private FreeColGameObject lookup(Game game, String id) {
+        FreeColGameObject fcgo = (shouldIntern()) ? null
+            : uninterned.get(id);
+        return (fcgo != null) ? fcgo : game.getFreeColGameObject(id);
     }
 
     /**
@@ -324,19 +345,19 @@ public class FreeColXMLReader extends StreamReaderDelegate {
      * Gets an enum from an attribute in a stream.
      *
      * @param attributeName The attribute name.
-     * @param returnType The type of the return value.
+     * @param returnClass The class of the return value.
      * @param defaultValue The default value.
      * @return The enum attribute value, or the default value if none found.
      */
     public <T extends Enum<T>> T getAttribute(String attributeName,
-                                              Class<T> returnType,
+                                              Class<T> returnClass,
                                               T defaultValue) {
         final String attrib = getParent().getAttributeValue(null,
                                                             attributeName);
         T result = defaultValue;
         if (attrib != null) {
             try {
-                result = Enum.valueOf(returnType,
+                result = Enum.valueOf(returnClass,
                                       attrib.toUpperCase(Locale.US));
             } catch (Exception e) {
                 logger.warning(attributeName + " is not a "
@@ -351,14 +372,16 @@ public class FreeColXMLReader extends StreamReaderDelegate {
      *
      * @param game The <code>Game</code> to look in.
      * @param attributeName The attribute name.
-     * @param returnType The <code>FreeColObject</code> type to expect.
+     * @param returnClass The <code>FreeColObject</code> type to expect.
      * @param defaultValue The default value.
      * @return The <code>FreeColObject</code> found, or the default
      *     value if not.
      * @exception XMLStreamException if the wrong class was passed.
      */
     public <T extends FreeColGameObject> T getAttribute(Game game,
-        String attributeName, Class<T> returnType, T defaultValue) throws XMLStreamException {
+        String attributeName, Class<T> returnClass,
+        T defaultValue) throws XMLStreamException {
+
         final String attrib =
         // @compat 0.10.7
             (FreeColObject.ID_ATTRIBUTE_TAG.equals(attributeName)) ? readId() :
@@ -366,9 +389,9 @@ public class FreeColXMLReader extends StreamReaderDelegate {
             getAttribute(attributeName, (String)null);
 
         if (attrib == null) return defaultValue;
-        FreeColGameObject fcgo = game.getFreeColGameObject(attrib);
+        FreeColGameObject fcgo = lookup(game, attrib);
         try {
-            return returnType.cast(fcgo);
+            return returnClass.cast(fcgo);
         } catch (ClassCastException cce) {
             throw new XMLStreamException(cce);
         }
@@ -379,12 +402,12 @@ public class FreeColXMLReader extends StreamReaderDelegate {
      *
      * @param aiMain The <code>AIMain</code> that contains the object.
      * @param attributeName The attribute name.
-     * @param returnType The <code>AIObject</code> type to expect.
+     * @param returnClass The <code>AIObject</code> type to expect.
      * @param defaultValue The default value.
      * @return The <code>AIObject</code> found, or the default value if not.
      */
     public <T extends AIObject> T getAttribute(AIMain aiMain,
-        String attributeName, Class<T> returnType, T defaultValue) {
+        String attributeName, Class<T> returnClass, T defaultValue) {
         final String attrib =
         // @compat 0.10.7
             (FreeColObject.ID_ATTRIBUTE_TAG.equals(attributeName)) ? readId() :
@@ -392,7 +415,7 @@ public class FreeColXMLReader extends StreamReaderDelegate {
             getAttribute(attributeName, (String)null);
 
         return (attrib == null) ? defaultValue
-            : aiMain.getAIObject(attrib, returnType);
+            : aiMain.getAIObject(attrib, returnClass);
     }
 
     /**
@@ -400,9 +423,12 @@ public class FreeColXMLReader extends StreamReaderDelegate {
      *
      * @param game The <code>Game</code> to look in.
      * @param attributeName The attribute to check.
+     * @param make If true, try to make the location if it is not found.
      * @return The <code>Location</code> found.
      */
-    public Location findLocationAttribute(Game game, String attributeName) {
+    public Location getLocationAttribute(Game game, String attributeName,
+        boolean make) throws XMLStreamException {
+
         if (attributeName == null) return null;
 
         final String attrib =
@@ -411,36 +437,23 @@ public class FreeColXMLReader extends StreamReaderDelegate {
         // end @compat
             getAttribute(attributeName, (String)null);
 
-        return (attrib == null) ? null : game.findFreeColLocation(attrib);
-    }
-
-    /**
-     * Makes a FreeCol location from an attribute in a stream.
-     *
-     * @param game The <code>Game</code> to look in.
-     * @param attributeName The attribute name.
-     * @return The <code>Location</code>, or null if none found.
-     * @exception XMLStreamException if a location can not be made.
-     */
-    public Location makeLocationAttribute(Game game, String attributeName) 
-        throws XMLStreamException {
-        if (attributeName == null) return null;
-
-        final String attrib =
-        // @compat 0.10.7
-            (FreeColObject.ID_ATTRIBUTE_TAG.equals(attributeName)) ? readId() :
-        // end @compat
-            getAttribute(attributeName, (String)null);
-
-        Location ret = null;
         if (attrib != null) {
-            try {
-                ret = game.makeFreeColLocation(attrib);
-            } catch (IllegalArgumentException iae) {
-                throw new XMLStreamException(iae);
+            FreeColGameObject fcgo = lookup(game, attrib);
+            if (fcgo instanceof Location) {
+                return (Location)fcgo;
+            } else if (fcgo != null) {
+                logger.warning("Not a location: " + attrib);
+                return null;
+            }
+            if (make) {
+                try {
+                    return game.makeFreeColLocation(attrib);
+                } catch (IllegalArgumentException iae) {
+                    throw new XMLStreamException(iae);
+                }
             }
         }
-        return ret;
+        return null;
     }
 
     /**
@@ -563,24 +576,29 @@ public class FreeColXMLReader extends StreamReaderDelegate {
     public <T extends FreeColGameObject> T makeFreeColGameObject(Game game,
         String attributeName, Class<T> returnClass,
         boolean required) throws XMLStreamException {
+
         final String id =
             // @compat 0.10.7
             (FreeColObject.ID_ATTRIBUTE_TAG.equals(attributeName)) ? readId() :
             // end @compat
             getAttribute(attributeName, (String)null);
 
-        T ret = null;
         if (id == null) {
             if (required) {
                 throw new XMLStreamException("Missing " + attributeName
                     + " for " + returnClass.getName() + ": " + currentTag());
             }
         } else {
-            ret = game.getFreeColGameObject(id, returnClass);
-            if (ret == null) {
+            FreeColGameObject fcgo = lookup(game, id);
+            if (fcgo == null) {
                 try {
-                    ret = game.newInstance(returnClass);
-                    if (shouldIntern()) ret.internId(id);
+                    T ret = game.newInstance(returnClass);
+                    if (shouldIntern()) {
+                        ret.internId(id);
+                    } else {
+                        uninterned.put(id, ret);
+                    }
+                    return ret;
                 } catch (IOException e) {
                     if (required) {
                         throw new XMLStreamException(e);
@@ -589,9 +607,15 @@ public class FreeColXMLReader extends StreamReaderDelegate {
                             + id, e);
                     }
                 }
+            } else {
+                try {
+                    return returnClass.cast(fcgo);
+                } catch (ClassCastException cce) {
+                    throw new XMLStreamException(cce);
+                }
             }
         }
-        return ret;
+        return null;
     }
 
     /**
@@ -617,11 +641,14 @@ public class FreeColXMLReader extends StreamReaderDelegate {
         } else {
             try {
                 ret = game.newInstance(returnClass);
-            } catch (IOException ioe) {
-                throw new XMLStreamException(ioe);
+            } catch (IOException e) {
+                throw new XMLStreamException(e);
             }
         }
-        if (ret != null) ret.readFromXML(this);
+        if (ret != null) {
+            ret.readFromXML(this);
+            if (!shouldIntern()) uninterned.put(ret.getId(), ret);
+        }
         return ret;
     }
 

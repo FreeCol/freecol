@@ -3936,7 +3936,8 @@ public class Player extends FreeColGameObject implements Nameable {
         attackedByPrivateers = xr.getAttribute(ATTACKED_BY_PRIVATEERS_TAG,
                                                false);
 
-        entryLocation = xr.makeLocationAttribute(game, ENTRY_LOCATION_TAG);
+        entryLocation = xr.getLocationAttribute(game, ENTRY_LOCATION_TAG,
+                                                true);
 
         for (RegionType regionType : RegionType.values()) {
             String key = regionType.getNameIndexKey();

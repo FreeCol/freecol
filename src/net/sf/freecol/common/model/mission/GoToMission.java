@@ -181,7 +181,8 @@ public class GoToMission extends AbstractMission {
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
-        destination = xr.findLocationAttribute(getGame(), DESTINATION_TAG);
+        destination = xr.getLocationAttribute(getGame(), DESTINATION_TAG,
+                                              false);
 
         blockedCount = xr.getAttribute(BLOCKED_COUNT_TAG, 0);
     }

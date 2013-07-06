@@ -491,7 +491,7 @@ public class BuildColonyMission extends Mission {
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
-        target = xr.findLocationAttribute(getGame(), TARGET_TAG);
+        target = xr.getLocationAttribute(getGame(), TARGET_TAG, false);
 
         colonyValue = xr.getAttribute(VALUE_TAG, -1);
     }

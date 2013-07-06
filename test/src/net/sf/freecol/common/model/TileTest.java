@@ -626,9 +626,14 @@ public class TileTest extends FreeColTestCase {
         assertNotNull(otherTile);
         assertFalse(otherTile == tile);
         assertEquals(tile.getId(), otherTile.getId());
+        assertEquals(tile.getType(), otherTile.getType());
+
         Colony otherColony = otherTile.getColony();
+        assertEquals(otherTile, otherColony.getTile());
+        assertEquals(otherTile.getOwningSettlement(), otherColony);
         assertFalse(colony == otherColony);
         assertEquals(colony.getId(), otherColony.getId());
+
         // Do not test units, colony owned tiles are not correctly
         // recognized as belonging to the colony which stops those
         // work locations from contributing their units.

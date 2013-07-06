@@ -473,7 +473,7 @@ public class PrivateerMission extends Mission {
     protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
         super.readAttributes(xr);
 
-        target = xr.findLocationAttribute(getGame(), TARGET_TAG);
+        target = xr.getLocationAttribute(getGame(), TARGET_TAG, false);
     }
 
     /**

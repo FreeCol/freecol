@@ -214,8 +214,8 @@ public abstract class Wish extends ValuedAIObject {
 
         final AIMain aiMain = getAIMain();
 
-        destination = xr.findLocationAttribute(aiMain.getGame(),
-                                               DESTINATION_TAG);
+        destination = xr.getLocationAttribute(aiMain.getGame(),
+                                              DESTINATION_TAG, false);
 
         transportable = (xr.hasAttribute(TRANSPORTABLE_TAG))
             ? xr.makeAIObject(aiMain, TRANSPORTABLE_TAG,
