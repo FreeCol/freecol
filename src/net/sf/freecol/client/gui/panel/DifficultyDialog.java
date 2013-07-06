@@ -84,42 +84,6 @@ public final class DifficultyDialog extends OptionsDialog implements TreeSelecti
         getOptionUI().getTree().addTreeSelectionListener(this);
     }
 
-    /**
-     * Use this constructor to allow the selection of a difficulty
-     * level when starting a new game.
-     *
-     * @param freeColClient The <code>FreeColClient</code> for the game.
-     * @param specification The <code>Specification</code> containing the
-     *     difficulty levels in this game.
-     */
-    public DifficultyDialog(FreeColClient freeColClient,
-                            Specification specification) {
-        super(freeColClient, true);
-
-        this.specification = specification;
-
-        boolean customized = loadCustomOptions();
-
-        OptionGroup group = specification.getOptionGroup("difficultyLevels");
-        selected = specification.getDifficultyLevel((customized) ? CUSTOM_LEVEL
-            : FreeCol.getDifficulty());
-        if (selected == null) {
-            // this really should not happen
-            selected = specification.getDifficultyLevels().get(0);
-        }
-
-        edit.setActionCommand(EDIT);
-        edit.addActionListener(this);
-        edit.setEnabled(!isGroupEditable());
-        getButtons().add(edit);
-
-        save.setEnabled(isGroupEditable());
-
-        initialize(group, Messages.message("difficulty"), null);
-        getOptionUI().getTree().addTreeSelectionListener(this);
-        selectLevel(getOptionUI().getTree(), selected.getId());
-    }
-
     private boolean isGroupEditable() {
         return selected != null && selected.isEditable();
     }

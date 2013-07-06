@@ -23,6 +23,8 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -51,6 +53,7 @@ import net.sf.freecol.common.io.FreeColTcFile;
 import net.sf.freecol.common.io.Mods;
 import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 
 
@@ -59,7 +62,7 @@ import net.sf.freecol.common.option.OptionGroup;
  * game, to join a running game, and to fetch a list of games from the
  * meta-server.
  */
-public final class NewPanel extends FreeColPanel implements ActionListener {
+public final class NewPanel extends FreeColPanel implements ActionListener, ItemListener {
 
     private static final Logger logger = Logger.getLogger(NewPanel.class.getName());
 
@@ -69,7 +72,8 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         SINGLE,
         JOIN,
         START,
-        META_SERVER
+        META_SERVER,
+        SHOW_DIFFICULTY
     };
 
     private final JLabel ipLabel = localizedLabel("host");
@@ -77,6 +81,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
     private final JLabel port2Label = localizedLabel("startServerOnPort");
     private final JLabel advantageLabel = localizedLabel("playerOptions.nationalAdvantages");
     private final JLabel rulesLabel = localizedLabel("rules");
+    private final JLabel difficultyLabel = localizedLabel("difficulty");
 
     private final JCheckBox publicServer = new JCheckBox(Messages.message("publicServer"));
     private final JTextField name = new JTextField(getPlayerName(), 20);
@@ -88,6 +93,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
     private final JRadioButton start = new JRadioButton(Messages.message("startMultiplayerGame"), false);
     private final JRadioButton meta = new JRadioButton( Messages.message("getServerList")
                                                         + " (" + FreeCol.META_SERVER_ADDRESS + ")", false);
+    private final JButton showDifficulty = new JButton(Messages.message("showDifficulty"));
     private final Advantages[] advChoices = new Advantages[] {
         Advantages.SELECTABLE,
         Advantages.FIXED,
@@ -100,6 +106,9 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
     @SuppressWarnings("unchecked") // FIXME in Java7
     private final JComboBox specificationBox = new JComboBox();
 
+    @SuppressWarnings("unchecked") // FIXME in Java7
+    private final JComboBox difficultyBox = new JComboBox();
+
     private final Component[] joinComponents = new Component[] {
         ipLabel, server, port1Label, port1
     };
@@ -110,7 +119,8 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
 
     private final Component[] gameComponents = new Component[] {
         advantageLabel, nationalAdvantages,
-        rulesLabel, specificationBox
+        rulesLabel, specificationBox,
+        difficultyLabel, difficultyBox, showDifficulty
     };
 
     private final ButtonGroup group = new ButtonGroup();
@@ -119,6 +129,12 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
      * The specification to use for the new game.
      */
     private Specification specification;
+
+    /**
+     * The difficulty level to use for the new game.
+     *
+     */
+    private OptionGroup difficulty;
 
 
     /**
@@ -184,10 +200,16 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         add(port2, "width 60:");
         add(rulesLabel);
         add(specificationBox, "growx");
+        specificationBox.addItemListener(this);
 
         add(publicServer, "newline, skip, span 2");
+        add(difficultyLabel);
+        add(difficultyBox, "growx");
+        difficultyBox.addItemListener(this);
+        updateDifficulty();
 
         add(meta, "newline, span 3");
+        add(showDifficulty, "skip 2, growx");
 
         add(join, "newline, span 3");
 
@@ -205,18 +227,64 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         join.setActionCommand(String.valueOf(NewPanelAction.JOIN));
         start.setActionCommand(String.valueOf(NewPanelAction.START));
         meta.setActionCommand(String.valueOf(NewPanelAction.META_SERVER));
+        showDifficulty.setActionCommand(String.valueOf(NewPanelAction.SHOW_DIFFICULTY));
 
         cancel.addActionListener(this);
         single.addActionListener(this);
         join.addActionListener(this);
         start.addActionListener(this);
         meta.addActionListener(this);
+        showDifficulty.addActionListener(this);
 
         single.setSelected(true);
         enableComponents();
 
         setSize(getPreferredSize());
 
+    }
+
+    /**
+     * Update the contents of the difficulty level box depending on
+     * the specification currently selected.
+     *
+     */
+    private void updateDifficulty() {
+        difficultyBox.removeAllItems();
+        Specification spec = getSpecification();
+        OptionGroup selected = null;
+        for (OptionGroup group : spec.getDifficultyLevels()) {
+            difficultyBox.addItem(group);
+            // check the equality of the group ids rather than the
+            // option groups themselves
+            if (difficulty != null && group.getId().equals(difficulty.getId())) {
+                selected = group;
+            }
+        }
+        if (selected == null) {
+            selected = spec.getDifficultyLevel("model.difficulty.medium");
+        }
+        if (selected == null) {
+            int index = difficultyBox.getItemCount() / 2;
+            selected = (OptionGroup)difficultyBox.getItemAt(index);
+        }
+        difficulty = selected;
+        difficultyBox.setSelectedItem(selected);
+        updateShowButton();
+    }
+
+
+    private void updateShowButton() {
+        OptionGroup selected = (OptionGroup)difficultyBox.getSelectedItem();
+        if (selected == null) {
+            showDifficulty.setEnabled(false);
+        } else {
+            showDifficulty.setEnabled(true);
+            if (selected.isEditable()) {
+                showDifficulty.setText(Messages.message("editDifficulty"));
+            } else {
+                showDifficulty.setText(Messages.message("showDifficulty"));
+            }
+        }
     }
 
 
@@ -300,7 +368,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
             enableComponents(joinComponents, false);
             enableComponents(serverComponents, false);
             enableComponents(gameComponents, true);
-            specificationBox.setEnabled(specification == null);
+            specificationBox.setEnabled(true);
             break;
         case JOIN:
             enableComponents(joinComponents, true);
@@ -311,7 +379,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
             enableComponents(joinComponents, false);
             enableComponents(serverComponents, true);
             enableComponents(gameComponents, true);
-            specificationBox.setEnabled(specification == null);
+            specificationBox.setEnabled(true);
             break;
         case META_SERVER:
             enableComponents(joinComponents, false);
@@ -330,6 +398,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
     private void setRenderers() {
         specificationBox.setRenderer(new FreeColModFileRenderer());
         nationalAdvantages.setRenderer(new AdvantageRenderer());
+        difficultyBox.setRenderer(new DifficultyRenderer());
     }
 
     private class AdvantageRenderer extends FreeColComboBoxRenderer {
@@ -347,6 +416,23 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         }
     }
 
+    private class DifficultyRenderer extends FreeColComboBoxRenderer {
+        @Override
+        public void setLabelValues(JLabel label, Object value) {
+            label.setText(Messages.getName((Option)value));
+        }
+    }
+
+
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+        if (e.getSource() == specificationBox) {
+            difficulty = (OptionGroup)difficultyBox.getSelectedItem();
+            updateDifficulty();
+        } else if (e.getSource() == difficultyBox) {
+            updateShowButton();
+        }
+    }
 
     /**
      * This function analyses an event and calls the right methods to take
@@ -360,7 +446,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         final ConnectController connectController
             = getFreeColClient().getConnectController();
         String command = event.getActionCommand();
-        OptionGroup level;
+        OptionGroup level = (OptionGroup)difficultyBox.getSelectedItem();
         int port;
         switch (Enum.valueOf(NewPanelAction.class, command)) {
         case OK:
@@ -371,8 +457,6 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                 group.getSelection().getActionCommand());
             switch (action) {
             case SINGLE:
-                level = getGUI().showDifficultyDialog(spec);
-                if (level == null) break;
                 spec.applyDifficultyLevel(level);
                 // Launch!
                 if (connectController.startSinglePlayerGame(spec,
@@ -396,8 +480,6 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                     port2Label.setForeground(Color.red);
                     break;
                 }
-                level = getGUI().showDifficultyDialog(spec);
-                if (level == null) break;
                 spec.applyDifficultyLevel(level);
                 // Launch!
                 if (connectController.startMultiplayerGame(spec,
@@ -414,6 +496,9 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         case CANCEL:
             getGUI().removeFromCanvas(this);
             getGUI().showMainPanel();
+            break;
+        case SHOW_DIFFICULTY:
+            getGUI().showDifficultyDialog(level);
             break;
         case SINGLE:
         case JOIN:

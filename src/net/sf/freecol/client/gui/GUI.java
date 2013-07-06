@@ -724,8 +724,8 @@ public class GUI {
         canvas.showDifficultyDialog(editable);
     }
 
-    public OptionGroup showDifficultyDialog(Specification specification) {
-        return canvas.showDifficultyDialog(specification);
+    public void showDifficultyDialog(OptionGroup group) {
+        canvas.showDifficultyDialog(group);
     }
 
     public List<Goods> showDumpCargoDialog(Unit unit) {
