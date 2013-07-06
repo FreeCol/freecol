@@ -70,7 +70,7 @@ public class FreeColXMLReader extends StreamReaderDelegate {
     private ReadScope readScope;
 
     /** A cache of uninterned objects. */
-    private Map<String, FreeColGameObject> uninterned = null;
+    private Map<String, FreeColObject> uninterned = null;
 
 
     /**
@@ -144,21 +144,21 @@ public class FreeColXMLReader extends StreamReaderDelegate {
     public void setReadScope(ReadScope readScope) {
         this.readScope = readScope;
         this.uninterned = (shouldIntern()) ? null
-            : new HashMap<String, FreeColGameObject>();
+            : new HashMap<String, FreeColObject>();
     }
 
     /**
-     * Look up an identifier in an enclosing game, but if not interning
-     * prefer an uninterned result.
+     * Look up an identifier in an enclosing game.  If not interning
+     * prefer an non-interned result.
      *
      * @param game The <code>Game</code> to consult.
      * @param id The object identifier.
-     * @return The <code>FreeColGameObject</code> found, or null if none.
+     * @return The <code>FreeColObject</code> found, or null if none.
      */
-    private FreeColGameObject lookup(Game game, String id) {
-        FreeColGameObject fcgo = (shouldIntern()) ? null
-            : uninterned.get(id);
-        return (fcgo != null) ? fcgo : game.getFreeColGameObject(id);
+    private FreeColObject lookup(Game game, String id) {
+        FreeColObject fco = (shouldIntern()) ? null : uninterned.get(id);
+        return (fco != null) ? fco
+            : (FreeColObject)game.getFreeColGameObject(id);
     }
 
     /**
@@ -378,7 +378,7 @@ public class FreeColXMLReader extends StreamReaderDelegate {
      *     value if not.
      * @exception XMLStreamException if the wrong class was passed.
      */
-    public <T extends FreeColGameObject> T getAttribute(Game game,
+    public <T extends FreeColObject> T getAttribute(Game game,
         String attributeName, Class<T> returnClass,
         T defaultValue) throws XMLStreamException {
 
@@ -389,9 +389,9 @@ public class FreeColXMLReader extends StreamReaderDelegate {
             getAttribute(attributeName, (String)null);
 
         if (attrib == null) return defaultValue;
-        FreeColGameObject fcgo = lookup(game, attrib);
+        FreeColObject fco = lookup(game, attrib);
         try {
-            return returnClass.cast(fcgo);
+            return returnClass.cast(fco);
         } catch (ClassCastException cce) {
             throw new XMLStreamException(cce);
         }
@@ -419,7 +419,8 @@ public class FreeColXMLReader extends StreamReaderDelegate {
     }
 
     /**
-     * Find a new location from a stream attribute.
+     * Find a new location from a stream attribute.  This is necessary
+     * because <code>Location</code> is an interface.
      *
      * @param game The <code>Game</code> to look in.
      * @param attributeName The attribute to check.
@@ -438,10 +439,10 @@ public class FreeColXMLReader extends StreamReaderDelegate {
             getAttribute(attributeName, (String)null);
 
         if (attrib != null) {
-            FreeColGameObject fcgo = lookup(game, attrib);
-            if (fcgo instanceof Location) {
-                return (Location)fcgo;
-            } else if (fcgo != null) {
+            FreeColObject fco = lookup(game, attrib);
+            if (fco instanceof Location) {
+                return (Location)fco;
+            } else if (fco != null) {
                 logger.warning("Not a location: " + attrib);
                 return null;
             }
@@ -457,7 +458,7 @@ public class FreeColXMLReader extends StreamReaderDelegate {
     }
 
     /**
-     * Reads an XML-representation of a list.
+     * Reads an XML-representation of a list of some general type.
      *
      * @param tag The tag for the list <code>Element</code>.
      * @param type The type of the items to be added.  This type
@@ -509,8 +510,10 @@ public class FreeColXMLReader extends StreamReaderDelegate {
      * @exception XMLStreamException if a problem was encountered
      *     during parsing.
      */
-    public <T extends FreeColGameObjectType> List<T>
-        readFromListElement(Specification spec, String tag, Class<T> type) throws XMLStreamException {
+    public <T extends FreeColGameObjectType> List<T> 
+        readFromListElement(Specification spec, String tag,
+                            Class<T> type) throws XMLStreamException {
+
         expectTag(tag);
 
         final int length = getAttribute(FreeColObject.ARRAY_SIZE_TAG, -1);
@@ -546,6 +549,7 @@ public class FreeColXMLReader extends StreamReaderDelegate {
     public <T extends FreeColGameObject> T findFreeColGameObject(Game game,
         String attributeName, Class<T> returnClass, T defaultValue,
         boolean required) throws XMLStreamException {
+
         T ret = getAttribute(game, attributeName, returnClass, (T)null);
         if (ret == (T)null) {
             if (required) {
@@ -589,8 +593,8 @@ public class FreeColXMLReader extends StreamReaderDelegate {
                     + " for " + returnClass.getName() + ": " + currentTag());
             }
         } else {
-            FreeColGameObject fcgo = lookup(game, id);
-            if (fcgo == null) {
+            FreeColObject fco = lookup(game, id);
+            if (fco == null) {
                 try {
                     T ret = game.newInstance(returnClass);
                     if (shouldIntern()) {
@@ -609,13 +613,58 @@ public class FreeColXMLReader extends StreamReaderDelegate {
                 }
             } else {
                 try {
-                    return returnClass.cast(fcgo);
+                    return returnClass.cast(fco);
                 } catch (ClassCastException cce) {
                     throw new XMLStreamException(cce);
                 }
             }
         }
         return null;
+    }
+
+    /**
+     * Do a normal interning read of a <code>FreeColGameObject</code>.
+     *
+     * @param game The <code>Game</code> to look in.
+     * @param returnClass The class to expect.
+     * @return The <code>FreeColGameObject</code> found, or null there
+     *     was no ID_ATTRIBUTE_TAG present.
+     * @exception XMLStreamException if there is problem reading the stream.
+     */
+    private <T extends FreeColGameObject> T internedRead(Game game,
+        Class<T> returnClass) throws XMLStreamException {
+
+        T ret = makeFreeColGameObject(game, FreeColObject.ID_ATTRIBUTE_TAG, 
+                                      returnClass, false);
+        if (ret != null) ret.readFromXML(this);
+        return ret;
+    }
+
+    /**
+     * Do a special non-interning read of a <code>FreeColObject</code>.
+     *
+     * @param game The <code>Game</code> to look in.
+     * @param returnClass The class to expect.
+     * @return The <code>FreeColObject</code> found, or null there
+     *     was no ID_ATTRIBUTE_TAG present.
+     * @exception XMLStreamException if there is problem reading the stream.
+     */
+    private <T extends FreeColObject> T uninternedRead(Game game,
+        Class<T> returnClass) throws XMLStreamException {
+
+        T ret;
+        try {
+            ret = game.newInstance(returnClass);
+        } catch (IOException e) {
+            throw new XMLStreamException(e);
+        }
+        String id = readId();
+        if (id == null) {
+            throw new XMLStreamException("Object identifier not found.");
+        }
+        uninterned.put(id, ret);
+        ret.readFromXML(this);
+        return ret;
     }
 
     /**
@@ -634,22 +683,9 @@ public class FreeColXMLReader extends StreamReaderDelegate {
      */
     public <T extends FreeColGameObject> T readFreeColGameObject(Game game,
         Class<T> returnClass) throws XMLStreamException {
-        T ret = null;
-        if (shouldIntern()) {
-            ret = makeFreeColGameObject(game, FreeColObject.ID_ATTRIBUTE_TAG, 
-                                        returnClass, false);
-        } else {
-            try {
-                ret = game.newInstance(returnClass);
-            } catch (IOException e) {
-                throw new XMLStreamException(e);
-            }
-        }
-        if (ret != null) {
-            ret.readFromXML(this);
-            if (!shouldIntern()) uninterned.put(ret.getId(), ret);
-        }
-        return ret;
+        return (shouldIntern())
+            ? internedRead(game, returnClass)
+            : uninternedRead(game, returnClass);
     }
 
     /**
@@ -666,6 +702,7 @@ public class FreeColXMLReader extends StreamReaderDelegate {
     public <T extends AIObject> T findAIObject(AIMain aiMain,
         String attributeName, Class<T> returnClass, T defaultValue,
         boolean required) throws XMLStreamException {
+
         T ret = getAttribute(aiMain, attributeName, returnClass, (T)null);
         if (ret == (T)null) {
             if (required) {
@@ -694,6 +731,7 @@ public class FreeColXMLReader extends StreamReaderDelegate {
     public <T extends AIObject> T makeAIObject(AIMain aiMain,
         String attributeName, Class<T> returnClass, T defaultValue,
         boolean required) throws XMLStreamException {
+
         final String id =
             // @compat 0.10.7
             (FreeColObject.ID_ATTRIBUTE_TAG.equals(attributeName)) ? readId() :
@@ -759,6 +797,7 @@ public class FreeColXMLReader extends StreamReaderDelegate {
      */
     public <T extends FreeColGameObjectType> T getType(Specification spec,
         String attributeName, Class<T> returnClass, T defaultValue) {
+
         final String attrib =
         // @compat 0.10.7
             (FreeColObject.ID_ATTRIBUTE_TAG.equals(attributeName)) ? readId() :
@@ -767,5 +806,23 @@ public class FreeColXMLReader extends StreamReaderDelegate {
 
         return (attrib == null) ? defaultValue
             : spec.getType(attrib, returnClass);
+    }
+
+    /**
+     * Copy a FreeColObject by serializing it and reading back the result
+     * with a non-interning stream.
+     *
+     * @param game The <code>Game</code> to look in.
+     * @param returnClass The class to expect.
+     * @return The copied <code>FreeColObject</code> found, or null there
+     *     was no ID_ATTRIBUTE_TAG present.
+     * @exception XMLStreamException if there is problem reading the stream.
+     */
+    public <T extends FreeColObject> T copy(Game game, Class<T> returnClass)
+        throws XMLStreamException {
+
+        setReadScope(ReadScope.NOINTERN);
+        nextTag();
+        return uninternedRead(game, returnClass);
     }
 }

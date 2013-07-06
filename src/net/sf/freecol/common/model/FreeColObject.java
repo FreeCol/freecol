@@ -889,30 +889,30 @@ public abstract class FreeColObject {
     }
 
     /**
-     * Copy a FreeColObject by serializing it and reading back the result
-     * with a non-interning stream.
+     * Copy a FreeColObject.
      *
-     * The copied object and its descendents will be identical, but
-     * not present in the game.
+     * The copied object and its internal descendents will be
+     * identical to the original objects, but not present in the game.
+     * Newly created objects will prefer to refer to other newly
+     * created objects.  Thus if you copy a tile, an internal colony
+     * on the tile will also be copied, and the copied tile will refer
+     * to the copied colony and the copied colony refer to the copied
+     * tile, but both will refer to the original uncopied owning player. 
      *
      * @param game The <code>Game</code> to add the object to.
      * @param returnClass The required object class.
      * @return The copied object, or null on error.
      */
     public <T extends FreeColObject> T copy(Game game, Class<T> returnClass) {
+        T ret = null;
         try {
             String xml = this.serialize();
             FreeColXMLReader xr = new FreeColXMLReader(new StringReader(xml));
-            xr.setReadScope(FreeColXMLReader.ReadScope.NOINTERN);
-            xr.nextTag();
-            T ret = game.newInstance(returnClass);
-            ret.readFromXML(xr);
-            return ret;
-
+            ret = xr.copy(game, returnClass);
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Failed to copy object: " + getId(), e);
+            logger.log(Level.WARNING, "Failed to copy: " + getId(), e);
         }
-        return null;
+        return ret;
     }
 
     /**

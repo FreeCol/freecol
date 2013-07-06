@@ -344,6 +344,65 @@ public class Colony extends Settlement implements Nameable {
 
     /**
      * Creates a temporary copy of this colony for planning purposes.
+     *
+     * A simple colony.copy() can not work because all the colony tiles
+     * will be left referring to uncopied work tiles which the colony-copy
+     * does not own, which prevents them being used as valid work locations.
+     * We have to copy the colony tile (which includes the colony), and
+     * fix up all the colony tile work tiles to point to copies of the
+     * original tile, and fix the ownership of those tiles.
+     *
+     * @return A scratch version of this colony.
+     */
+    public Colony copyColony() {
+        Game game = getGame();
+        Player owner = getOwner();
+        Tile tile = getTile();
+        Tile tileCopy = tile.copy(game, tile.getClass());
+        Colony scratch = tileCopy.getColony();
+        for (ColonyTile ct : scratch.getColonyTiles()) {
+            Tile wt;
+            if (ct.isColonyCenterTile()) {
+                wt = tileCopy;
+            } else {
+                wt = ct.getWorkTile();
+                wt = wt.copy(game, wt.getClass());
+                if (wt.getOwningSettlement() == this) {
+                    wt.setOwningSettlement(scratch);
+                }
+            }
+            ct.setWorkTile(wt);
+        }
+        return scratch;
+    }
+
+    /**
+     * Finds the corresponding FreeColObject from another copy of this colony.
+     *
+     * @param fco The <code>FreeColObject</code> in the other colony.
+     * @return The corresponding <code>FreeColObject</code> in this
+     *     colony, or null if not found.
+     */
+    @SuppressWarnings("unchecked")
+    public <T extends FreeColObject> T getCorresponding(T fco) {
+        final String id = fco.getId();
+        if (fco instanceof WorkLocation) {
+            for (WorkLocation t : getAllWorkLocations()) {
+                if (t.getId().equals(id)) return (T)t;
+            }
+        } else if (fco instanceof Unit) {
+            for (Unit t : getUnitList()) {
+                if (t.getId().equals(id)) return (T)t;
+            }
+            for (Unit t : getTile().getUnitList()) {
+                if (t.getId().equals(id)) return (T)t;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Creates a temporary copy of this colony for planning purposes.
      * The copy is identical except:
      *   - it is obviously not actually present on the map
      *   - it does not appear in the list of player colonies

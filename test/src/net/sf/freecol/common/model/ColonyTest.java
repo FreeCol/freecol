@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.List;
+
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.NoClaimReason;
@@ -445,4 +447,49 @@ public class ColonyTest extends FreeColTestCase {
         assertEquals(churchUpkeep + lumberMillUpkeep, colony.getUpkeep());
     }
 
+    public void testCopyColony() {
+        Game game = getGame();
+        game.setMap(getTestMap(true));
+        Colony colony = getStandardColony(2);
+        Colony copied = colony.copyColony();
+        
+        assertNotNull(copied);
+        assertFalse(colony == copied);
+        assertEquals(colony.getId(), copied.getId());
+        assertEquals(colony.getName(), copied.getName());
+
+        Tile ct = colony.getTile();
+        Tile oct = copied.getTile();
+        assertFalse(ct == oct);
+        assertEquals(ct.getId(), oct.getId());
+        assertEquals(ct.getUnitCount(), oct.getUnitCount());
+        assertEquals(ct.getType(), oct.getType());
+        
+        assertEquals(oct.getColony(), copied);
+        assertEquals(oct.getOwningSettlement(), copied);
+
+        for (WorkLocation wl : colony.getAllWorkLocations()) {
+            WorkLocation owl = copied.getCorresponding(wl);
+            assertNotNull(owl);
+            assertFalse(wl == owl);
+            assertEquals(wl.getId(), owl.getId());
+            if (wl instanceof ColonyTile) {
+                Tile wt = ((ColonyTile)wl).getWorkTile();
+                Tile owt = ((ColonyTile)owl).getWorkTile();
+                assertFalse(wt == owt);
+                assertEquals(wt.getId(), owt.getId());
+                assertEquals(wt.getType(), owt.getType());
+                assertEquals(owt.getOwningSettlement(), copied);
+            }
+            assertEquals(wl.getUnitCount(), owl.getUnitCount());
+            for (Unit u : wl.getUnitList()) {
+                Unit ou = copied.getCorresponding(u);
+                assertNotNull(ou);
+                assertFalse(u == ou);
+                assertEquals(u.getId(), ou.getId());
+                assertEquals(u.getType(), ou.getType());
+                assertEquals(u.getRole(), ou.getRole());
+            }
+        }
+    }
 }
