@@ -38,7 +38,9 @@ import net.sf.freecol.client.gui.i18n.Messages;
 
 
 /**
- * A <code>ListCellRenderer</code> to be used by <code>FreeColListUI</code>.
+ * A <code>ListCellRenderer</code> to be used by
+ * <code>FreeColListUI</code> and <code>JComboBox</code>es that
+ * display <code>ObjectWithId</code> values.
  */
 public class FreeColComboBoxRenderer implements ListCellRenderer, UIResource {
 
@@ -48,10 +50,21 @@ public class FreeColComboBoxRenderer implements ListCellRenderer, UIResource {
     private final String prefix;
 
 
+    /**
+     * Creates a new <code>FreeColComboBoxRenderer</code> instance
+     * with an empty prefix.
+     *
+     */
     public FreeColComboBoxRenderer() {
         this("");
     }
 
+    /**
+     * Creates a new <code>FreeColComboBoxRenderer</code> instance
+     * with a given prefix.
+     *
+     * @param prefix a <code>String</code> value
+     */
     public FreeColComboBoxRenderer(String prefix) {
         this.prefix = prefix;
     }
@@ -77,6 +90,14 @@ public class FreeColComboBoxRenderer implements ListCellRenderer, UIResource {
         return c;
     }
 
+    /**
+     * Returns the concatenation of the renderer's prefix and the id
+     * of the given Object, or null if the latter can not be
+     * determined.
+     *
+     * @param value an <code>Object</code> value
+     * @return a <code>String</code> value
+     */
     public String getId(Object value) {
         return (value instanceof ObjectWithId)
             ? prefix + ((ObjectWithId) value).getId()

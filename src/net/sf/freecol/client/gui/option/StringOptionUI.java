@@ -54,7 +54,7 @@ public final class StringOptionUI extends OptionUI<StringOption>  {
 
         box.setModel(new DefaultComboBoxModel(choices.toArray(new String[choices.size()])));
         box.setSelectedItem(option.getValue());
-        box.setRenderer(new ChoiceRenderer());
+        box.setRenderer(new FreeColComboBoxRenderer());
 
         initialize();
     }
@@ -80,15 +80,4 @@ public final class StringOptionUI extends OptionUI<StringOption>  {
         box.setSelectedItem(getOption().getValue());
     }
 
-    private class ChoiceRenderer extends FreeColComboBoxRenderer {
-
-        @Override
-        public void setLabelValues(JLabel label, Object value) {
-            String key = (String) value;
-            label.setText(Messages.message(key + ".name"));
-            if (Messages.containsKey(key + ".shortDescription")) {
-                label.setToolTipText(Messages.message(key + ".shortDescription"));
-            }
-        }
-    }
 }

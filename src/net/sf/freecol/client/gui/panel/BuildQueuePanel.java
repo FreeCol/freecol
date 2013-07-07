@@ -626,9 +626,9 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
     private ListCellRenderer getCellRenderer() {
         if (compact.isSelected()) {
             if (cellRenderer == null || cellRenderer instanceof DefaultBuildQueueCellRenderer) {
-                return new SimpleBuildQueueCellRenderer();
+                return new FreeColComboBoxRenderer();
             }
-        } else if (cellRenderer == null || cellRenderer instanceof SimpleBuildQueueCellRenderer) {
+        } else if (cellRenderer == null || cellRenderer instanceof FreeColComboBoxRenderer) {
             return new DefaultBuildQueueCellRenderer();
         }
 
@@ -935,15 +935,6 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
                 return false;
             }
         }
-    }
-
-    class SimpleBuildQueueCellRenderer extends FreeColComboBoxRenderer {
-
-        @Override
-        public void setLabelValues(JLabel c, Object value) {
-            c.setText(Messages.message(((BuildableType) value).getNameKey()));
-        }
-
     }
 
     class DefaultBuildQueueCellRenderer implements ListCellRenderer {

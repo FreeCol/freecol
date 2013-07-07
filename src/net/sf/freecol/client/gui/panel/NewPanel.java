@@ -402,13 +402,6 @@ public final class NewPanel extends FreeColPanel implements ActionListener, Item
         difficultyBox.setRenderer(new FreeColComboBoxRenderer());
     }
 
-    private class FreeColModFileRenderer extends FreeColComboBoxRenderer {
-        @Override
-        public String getId(Object value) {
-            return "mod." + ((FreeColModFile) value).getId();
-        }
-    }
-
     @Override
     public void itemStateChanged(ItemEvent e) {
         if (e.getSource() == specificationBox) {

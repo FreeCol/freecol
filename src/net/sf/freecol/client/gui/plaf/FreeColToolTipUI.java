@@ -51,6 +51,7 @@ public class FreeColToolTipUI extends BasicToolTipUI {
 
     private static int margin = 5;
     private static int maximumWidth = 300;
+    private static int LEADING = 5;
 
     private static final Pattern lineBreak = Pattern.compile("\n");
 
@@ -84,6 +85,10 @@ public class FreeColToolTipUI extends BasicToolTipUI {
         float x = margin;
         float y = margin;
         for (String line : lineBreak.split(((JToolTip) c).getTipText())) {
+            if (line.isEmpty()) {
+                y += LEADING;
+                continue;
+            }
             AttributedCharacterIterator styledText =
                 new AttributedString(line).getIterator();
 
@@ -105,13 +110,17 @@ public class FreeColToolTipUI extends BasicToolTipUI {
 
     public Dimension getPreferredSize(JComponent c) {
         String tipText = ((JToolTip)c).getTipText();
-        if (tipText == null) {
+        if (tipText == null || tipText.isEmpty()) {
             return new Dimension(0, 0);
         }
 
         float x = 0f;
         float y = 0f;
-        for (String line : lineBreak.split(((JToolTip) c).getTipText())) {
+        for (String line : lineBreak.split(tipText)) {
+            if (line.isEmpty()) {
+                y += LEADING;
+                continue;
+            }
             AttributedCharacterIterator styledText
                 = new AttributedString(line).getIterator();
             LineBreakMeasurer measurer = new LineBreakMeasurer(styledText, frc);

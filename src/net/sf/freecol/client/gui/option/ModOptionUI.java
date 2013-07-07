@@ -96,10 +96,10 @@ public final class ModOptionUI extends OptionUI<ModOption>  {
             if (modFile == null) {
                 label.setText(value.toString());
             } else {
-                String key = "mod." + modFile.getId() + ".name";
-                label.setText(Messages.message(key));
-                if (Messages.containsKey(key + ".shortDescription")) {
-                    label.setToolTipText(Messages.message(key + ".shortDescription"));
+                String key = "mod." + modFile.getId();
+                label.setText(Messages.getName(key));
+                if (Messages.containsKey(key + Messages.SHORT_DESCRIPTION_SUFFIX)) {
+                    label.setToolTipText(Messages.getShortDescription(key));
                 }
             }
         }

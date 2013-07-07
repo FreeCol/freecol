@@ -44,19 +44,12 @@ public final class AdvantageCellEditor extends DefaultCellEditor {
     @SuppressWarnings("unchecked") // FIXME in Java7
     public AdvantageCellEditor(List<EuropeanNationType> nationTypes) {
         super(new JComboBox(new Vector<EuropeanNationType>(nationTypes)));
-        ((JComboBox) getComponent()).setRenderer(new AdvantageRenderer());
+        ((JComboBox) getComponent()).setRenderer(new FreeColComboBoxRenderer());
     }
-    
+
     @Override
     public Object getCellEditorValue() {
         return ((JComboBox) getComponent()).getSelectedItem();
-    }
-
-    private class AdvantageRenderer extends FreeColComboBoxRenderer {
-        @Override
-        public void setLabelValues(JLabel label, Object value) {
-            label.setText((value == null) ? "" : Messages.message(value.toString() + ".name"));
-        }
     }
 
 
