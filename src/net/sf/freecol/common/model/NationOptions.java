@@ -30,6 +30,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.ObjectWithId;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 
@@ -40,12 +41,12 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
 public class NationOptions extends FreeColObject {
 
     /** Type of national advantages for European players. */
-    public static enum Advantages {
+    public static enum Advantages implements ObjectWithId {
         NONE,
         FIXED,
         SELECTABLE;
 
-        public String getKey() {
+        public String getId() {
             return "playerOptions." + this.toString();
         }
     };

@@ -77,7 +77,7 @@ public abstract class OptionUI<T extends Option<?>> implements OptionUpdater {
         this.editable = editable;
 
         String name = Messages.getName(option);
-        String text = Messages.getDescription(option);
+        String text = Messages.getBestDescription(option);
         label.setText(name);
         label.setToolTipText(text);
     }

@@ -686,7 +686,7 @@ public final class FreeCol {
      */
     private static Advantages selectAdvantages(String advantages) {
         for (Advantages a : Advantages.values()) {
-            String msg = Messages.message(a.getKey());
+            String msg = Messages.message(a.getId());
             if (msg.equals(advantages)) {
                 setAdvantages(a);
                 return a;
@@ -705,14 +705,14 @@ public final class FreeCol {
     }
 
     /**
-     * Gets a comma separated list of i18n advantage type names.
+     * Gets a comma separated list of localized advantage type names.
      *
      * @return A list of advantage types.
      */
     private static String getValidAdvantages() {
         String ret = "";
         for (Advantages a : Advantages.values()) {
-            ret += "," + Messages.message(a.getKey());
+            ret += "," + Messages.getName(a);
         }
         return ret.substring(1);
     }

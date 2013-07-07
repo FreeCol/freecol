@@ -22,6 +22,7 @@ package net.sf.freecol.common.option;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.common.ObjectWithId;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 
@@ -31,7 +32,7 @@ import net.sf.freecol.common.io.FreeColXMLWriter;
  *
  * @see net.sf.freecol.common.model.GameOptions
  */
-public interface Option<T> extends Cloneable {
+public interface Option<T> extends Cloneable, ObjectWithId {
 
     /**
      * Clone this option.
@@ -39,13 +40,6 @@ public interface Option<T> extends Cloneable {
      * @return A clone of this option.
      */
     public Option<T> clone() throws CloneNotSupportedException;
-
-    /**
-     * Gets the identifier of this option.
-     *
-     * @return The unique identifier as provided in the constructor.
-     */
-    public String getId();
 
     /**
      * Gets the value of this option.

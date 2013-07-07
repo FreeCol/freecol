@@ -26,6 +26,7 @@ import java.io.InputStream;
 
 import javax.xml.stream.XMLStreamException;
 
+import net.sf.freecol.common.ObjectWithId;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.model.FreeColObject;
 
@@ -33,7 +34,7 @@ import net.sf.freecol.common.model.FreeColObject;
 /**
  * A wrapped for a file containing a FreeCol modification (mod).
  */
-public class FreeColModFile extends FreeColDataFile {
+public class FreeColModFile extends FreeColDataFile implements ObjectWithId {
 
     public static final String SPECIFICATION_FILE = "specification.xml";
     public static final String MOD_DESCRIPTOR_FILE = "mod.xml";

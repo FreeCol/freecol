@@ -32,7 +32,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
-import net.sf.freecol.common.model.FreeColObject;
+import net.sf.freecol.common.ObjectWithId;
 import net.sf.freecol.common.model.Nameable;
 import net.sf.freecol.client.gui.i18n.Messages;
 
@@ -44,6 +44,17 @@ public class FreeColComboBoxRenderer implements ListCellRenderer, UIResource {
 
     private final SelectedComponent SELECTED_COMPONENT = new SelectedComponent();
     private final NormalComponent NORMAL_COMPONENT = new NormalComponent();
+
+    private final String prefix;
+
+
+    public FreeColComboBoxRenderer() {
+        this("");
+    }
+
+    public FreeColComboBoxRenderer(String prefix) {
+        this.prefix = prefix;
+    }
 
 
     /**
@@ -63,26 +74,30 @@ public class FreeColComboBoxRenderer implements ListCellRenderer, UIResource {
         c.setForeground(list.getForeground());
         c.setFont(list.getFont());
         setLabelValues(c, value);
-
         return c;
     }
 
+    public String getId(Object value) {
+        return (value instanceof ObjectWithId)
+            ? prefix + ((ObjectWithId) value).getId()
+            : null;
+    }
 
     public void setLabelValues(JLabel c, Object value) {
-        if (value instanceof Icon) {
-            // TODO: does this even make sense? Value should never be an icon!
-            c.setIcon((Icon) value);
-        } else if (value instanceof FreeColObject) {
+        String id = getId(value);
+        if (id == null) {
+            c.setText((value == null) ? null : value.toString());
+        } else {
+            String name = Messages.getName(id);
+            String description = Messages.getBestDescription(id);
             if (value instanceof Nameable) {
-                String name = ((Nameable) value).getName();
-                if (name != null) {
-                    c.setText(name);
-                    return;
+                String realname = ((Nameable) value).getName();
+                if (realname != null) {
+                    name = realname;
                 }
             }
-            c.setText(Messages.getName((FreeColObject) value));
-        } else {
-            c.setText((value == null) ? null : value.toString());
+            c.setText(name);
+            c.setToolTipText(description);
         }
     }
 

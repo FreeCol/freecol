@@ -397,33 +397,17 @@ public final class NewPanel extends FreeColPanel implements ActionListener, Item
      */
     @SuppressWarnings("unchecked") // FIXME in Java7
     private void setRenderers() {
-        specificationBox.setRenderer(new FreeColModFileRenderer());
-        nationalAdvantages.setRenderer(new AdvantageRenderer());
-        difficultyBox.setRenderer(new DifficultyRenderer());
-    }
-
-    private class AdvantageRenderer extends FreeColComboBoxRenderer {
-        @Override
-        public void setLabelValues(JLabel label, Object value) {
-            label.setText(Messages.message(((Advantages)value).getKey()));
-        }
+        specificationBox.setRenderer(new FreeColComboBoxRenderer("mod."));
+        nationalAdvantages.setRenderer(new FreeColComboBoxRenderer());
+        difficultyBox.setRenderer(new FreeColComboBoxRenderer());
     }
 
     private class FreeColModFileRenderer extends FreeColComboBoxRenderer {
         @Override
-        public void setLabelValues(JLabel label, Object value) {
-            FreeColModFile mod = (FreeColModFile) value;
-            label.setText(Messages.message("mod." + mod.getId() + ".name"));
+        public String getId(Object value) {
+            return "mod." + ((FreeColModFile) value).getId();
         }
     }
-
-    private class DifficultyRenderer extends FreeColComboBoxRenderer {
-        @Override
-        public void setLabelValues(JLabel label, Object value) {
-            label.setText(Messages.getName((Option)value));
-        }
-    }
-
 
     @Override
     public void itemStateChanged(ItemEvent e) {

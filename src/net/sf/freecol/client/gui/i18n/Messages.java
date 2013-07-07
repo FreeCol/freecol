@@ -37,6 +37,7 @@ import java.util.logging.Logger;
 
 import javax.swing.UIManager;
 
+import net.sf.freecol.common.ObjectWithId;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.io.FreeColDataFile;
 import net.sf.freecol.common.io.FreeColModFile;
@@ -97,8 +98,12 @@ public class Messages {
 
     public static final String MESSAGE_FILE_SUFFIX = ".properties";
 
+    public static final String DESCRIPTION_SUFFIX = ".description";
+    public static final String SHORT_DESCRIPTION_SUFFIX = ".shortDescription";
+    public static final String NAME_SUFFIX = ".name";
+
     private static final String[] DESCRIPTION_KEYS = new String[] {
-        ".description", ".shortDescription", ".name"
+        DESCRIPTION_SUFFIX, SHORT_DESCRIPTION_SUFFIX, NAME_SUFFIX
     };
 
     /**
@@ -216,7 +221,7 @@ public class Messages {
             return; // We have big problems if UTF-8 is not supported.
         }
         BufferedReader in = new BufferedReader(inputReader);
-        
+
         String line = null;
         while((line = in.readLine()) != null) {
             line = line.trim();
@@ -575,35 +580,42 @@ public class Messages {
     }
 
 
-    public static String getName(FreeColObject object) {
-        return message(object.getId() + ".name");
+    public static String getName(ObjectWithId object) {
+        return getName(object.getId());
     }
 
-    public static String getDescription(FreeColObject object) {
-        return message(object.getId() + ".description");
+    public static String getDescription(ObjectWithId object) {
+        return getDescription(object.getId());
     }
 
-    public static String getShortDescription(FreeColObject object) {
-        return message(object.getId() + ".shortDescription");
+    public static String getShortDescription(ObjectWithId object) {
+        return getShortDescription(object.getId());
     }
 
-
-    public static String getName(Option<?> object) {
-        return message(object.getId() + ".name");
+    public static String getBestDescription(ObjectWithId object) {
+        return getBestDescription(object.getId());
     }
 
-    public static String getDescription(Option<?> object) {
+    public static String getName(String id) {
+        return message(id + NAME_SUFFIX);
+    }
+
+    public static String getDescription(String id) {
+        return message(id + DESCRIPTION_SUFFIX);
+    }
+
+    public static String getShortDescription(String id) {
+        return message(id + SHORT_DESCRIPTION_SUFFIX);
+    }
+
+    public static String getBestDescription(String id) {
         for (String suffix : DESCRIPTION_KEYS) {
-            String key = object.getId() + suffix;
+            String key = id + suffix;
             if (containsKey(key)) {
                 return message(key);
             }
         }
-        return object.getId();
-    }
-
-    public static String getShortDescription(Option<?> object) {
-        return message(object.getId() + ".shortDescription");
+        return id;
     }
 
 

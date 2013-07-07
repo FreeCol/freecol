@@ -50,6 +50,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import net.sf.freecol.common.ObjectWithId;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.io.FreeColXMLWriter.WriteScope;
@@ -65,7 +66,7 @@ import org.xml.sax.SAXException;
  * The FreeCol root class.  Maintains an identifier, and an optional link
  * to the specification this object uses.
  */
-public abstract class FreeColObject {
+public abstract class FreeColObject implements ObjectWithId {
 
     protected static Logger logger = Logger.getLogger(FreeColObject.class.getName());
 
