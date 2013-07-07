@@ -179,9 +179,10 @@ public final class NewPanel extends FreeColPanel implements ActionListener, Item
         group.add(start);
         group.add(meta);
 
-        setLayout(new MigLayout("", "[15]", ""));
+        setLayout(new MigLayout("wrap 6", "[15]", ""));
+        add(getDefaultHeader(Messages.message("newGamePanel")), "span 6, center");
 
-        add(single, "span 3");
+        add(single, "newline, span 3");
         add(new JSeparator(JSeparator.VERTICAL), "spany 7, grow");
         add(nameLabel, "span, split 2");
         add(name, "growx");
