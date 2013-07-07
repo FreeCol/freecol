@@ -3990,9 +3990,8 @@ public class Player extends FreeColGameObject implements Nameable {
         final String tag = xr.getLocalName();
 
         if (FOUNDING_FATHERS_TAG.equals(tag)) {
-            List<FoundingFather> ffs
-                = xr.readFromListElement(spec, FOUNDING_FATHERS_TAG,
-                                         FoundingFather.class);
+            List<FoundingFather> ffs = xr.readList(spec, FOUNDING_FATHERS_TAG,
+                                                   FoundingFather.class);
             if (ffs != null) {
                 for (FoundingFather ff : ffs) {
                     addFather(ff); // addFather adds the features
@@ -4000,9 +3999,8 @@ public class Player extends FreeColGameObject implements Nameable {
             }
         
         } else if (OFFERED_FATHERS_TAG.equals(tag)) {
-            List<FoundingFather> ofs = 
-                xr.readFromListElement(spec, OFFERED_FATHERS_TAG,
-                                       FoundingFather.class);
+            List<FoundingFather> ofs = xr.readList(spec, OFFERED_FATHERS_TAG,
+                                                   FoundingFather.class);
             offeredFathers.addAll(ofs);
 
         } else if (STANCE_TAG.equals(tag)) {

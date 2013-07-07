@@ -467,7 +467,9 @@ public class FreeColXMLReader extends StreamReaderDelegate {
      * @exception XMLStreamException if a problem was encountered
      *     during parsing.
      */
-    public <T> List<T> readFromListElement(String tag, Class<T> type) throws XMLStreamException {
+    public <T> List<T> readList(String tag, Class<T> type)
+        throws XMLStreamException {
+
         expectTag(tag);
 
         final int length = getAttribute(FreeColObject.ARRAY_SIZE_TAG, -1);
@@ -510,9 +512,8 @@ public class FreeColXMLReader extends StreamReaderDelegate {
      * @exception XMLStreamException if a problem was encountered
      *     during parsing.
      */
-    public <T extends FreeColGameObjectType> List<T> 
-        readFromListElement(Specification spec, String tag,
-                            Class<T> type) throws XMLStreamException {
+    public <T extends FreeColGameObjectType> List<T> readList(Specification spec,
+        String tag, Class<T> type) throws XMLStreamException {
 
         expectTag(tag);
 
