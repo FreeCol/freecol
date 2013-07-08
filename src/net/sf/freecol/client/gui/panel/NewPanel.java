@@ -249,6 +249,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener, Item
      * the specification currently selected.
      *
      */
+    @SuppressWarnings("unchecked") // FIXME in Java7
     private void updateDifficulty() {
         difficultyBox.removeAllItems();
         Specification spec = getSpecification();
