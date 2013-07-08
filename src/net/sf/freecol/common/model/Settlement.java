@@ -661,7 +661,7 @@ public abstract class Settlement extends GoodsLocation
         Player oldOwner = owner;
         owner = xr.findFreeColGameObject(game, OWNER_TAG,
                                          Player.class, (Player)null, true);
-        game.checkOwners(this, oldOwner);
+        if (xr.shouldIntern()) game.checkOwners(this, oldOwner);
 
         tile = xr.findFreeColGameObject(game, TILE_TAG,
                                         Tile.class, (Tile)null, true);

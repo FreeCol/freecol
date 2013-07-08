@@ -3909,7 +3909,7 @@ public class Unit extends GoodsLocation
         Player oldOwner = owner;
         owner = xr.findFreeColGameObject(game, OWNER_TAG,
                                          Player.class, (Player)null, true);
-        game.checkOwners(this, oldOwner);
+        if (xr.shouldIntern()) game.checkOwners(this, oldOwner);
 
         UnitType oldUnitType = unitType;
         unitType = xr.getType(spec, UNIT_TYPE_TAG,

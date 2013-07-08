@@ -1141,7 +1141,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     public void csPayUpkeep(Random random, ChangeSet cs) {
         Disaster bankruptcy = getSpecification().getDisaster(Disaster.BANKRUPTCY);
         int upkeep = 0;
-        for (Settlement settlement : settlements) {
+        for (Settlement settlement : getSettlements()) {
             upkeep += settlement.getUpkeep();
         }
         if (getGold() >= upkeep) {

@@ -451,12 +451,20 @@ public class ColonyTest extends FreeColTestCase {
         Game game = getGame();
         game.setMap(getTestMap(true));
         Colony colony = getStandardColony(2);
+        Player player = colony.getOwner();
+
         Colony copied = colony.copyColony();
-        
         assertNotNull(copied);
         assertFalse(colony == copied);
+        // Note: The following is true because it uses FCGO.equals().
+        assertTrue(colony.equals(copied));
         assertEquals(colony.getId(), copied.getId());
         assertEquals(colony.getName(), copied.getName());
+        // Note: we can not check that player.hasSettlement(copied) is false
+        // because it too will use FCGO.equals().
+        for (Settlement s : player.getSettlements()) {
+            assertFalse(s == copied);
+        }
 
         Tile ct = colony.getTile();
         Tile oct = copied.getTile();
@@ -489,6 +497,9 @@ public class ColonyTest extends FreeColTestCase {
                 assertEquals(u.getId(), ou.getId());
                 assertEquals(u.getType(), ou.getType());
                 assertEquals(u.getRole(), ou.getRole());
+                assertEquals(game.getFreeColGameObject(u.getId()), u);
+                assertEquals(u.getOwner(), ou.getOwner());
+                assertEquals(u.getOwner().getUnitById(u.getId()), u);
             }
         }
     }
