@@ -465,12 +465,13 @@ public class GoodsContainer extends FreeColGameObject implements Ownable {
 
         xw.writeStartElement(tag);
 
-        for (Map.Entry<GoodsType, Integer> entry : storage.entrySet()) {
+        for (GoodsType goodsType : getSortedCopy(storage.keySet())) {
+
             xw.writeStartElement(Goods.getXMLElementTagName());
 
-            xw.writeAttribute(TYPE_TAG, entry.getKey().getId());
+            xw.writeAttribute(TYPE_TAG, goodsType);
 
-            xw.writeAttribute(AMOUNT_TAG, entry.getValue().toString());
+            xw.writeAttribute(AMOUNT_TAG, storage.get(goodsType).intValue());
 
             xw.writeEndElement();
         }
