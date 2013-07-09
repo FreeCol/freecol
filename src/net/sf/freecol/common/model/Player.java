@@ -2073,12 +2073,23 @@ public class Player extends FreeColGameObject implements Nameable {
         // Make sure the owner of the unit is set first, before adding
         // it to the list
         if (!this.owns(newUnit)) {
-            throw new IllegalStateException(this + " adding another players unit=" + newUnit);
+            throw new IllegalStateException(this + " adding another players unit=" + newUnit.getId());
         }
 
-        if (units.get(newUnit.getId()) == newUnit) return false;
-        units.put(newUnit.getId(), newUnit);
-        return true;
+        Unit old = units.get(newUnit.getId());
+        if (old == null
+            || old.isDisposed() // Normal, clients see units come and go
+            ) {
+            units.put(newUnit.getId(), newUnit);
+            return true;
+        } else if (old == newUnit) {
+            return false;
+        } else {
+            throw new IllegalStateException(this + " duplicate add for "
+                + newUnit.getId() + "/" + newUnit.hashCode()
+                + " existing " + old.getId() + "/" + old.hashCode()
+                + ": " + old);
+        }
     }
 
     /**
