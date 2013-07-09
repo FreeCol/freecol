@@ -4072,7 +4072,7 @@ public class Unit extends GoodsLocation
             sb.append(" disposed");
         } else {
             sb.append(" ").append(Utils.lastPart(owner.getNationId(), "."))
-                .append(" ").append(Utils.lastPart(getType().getId(), "."));
+                .append(" ").append(getType().getSuffix());
             if (getRole() != Role.DEFAULT) {
                 sb.append("-").append(getRole());
             }

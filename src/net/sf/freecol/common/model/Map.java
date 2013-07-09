@@ -364,6 +364,20 @@ public class Map extends FreeColGameObject implements Location {
         }
 
         /**
+         * Get the direction from this position to an adjacent position.
+         *
+         * @param other The adjacent <code>Position</code>.
+         * @return The <code>Direction</code>, or null if not adjacent.
+         */
+        public Direction getDirection(Position other) {
+            for (Direction d : Direction.values()) {
+                Position step = getAdjacent(d);
+                if (step.equals(other)) return d;
+            }
+            return null;
+        }
+
+        /**
          * {@inheritDoc}
          */
         @Override

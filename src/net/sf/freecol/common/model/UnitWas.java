@@ -281,7 +281,7 @@ public class UnitWas implements Comparable<UnitWas> {
         }
         String locStr = (loc == null) ? ""
             : (loc instanceof Building)
-            ? Utils.lastPart(((Building)loc).getType().toString(), ".")
+            ? ((Building)loc).getType().getSuffix()
             : (loc instanceof ColonyTile)
             ? tile.getDirection(((ColonyTile)loc).getWorkTile()).toString()
             : (loc instanceof Tile)
@@ -294,7 +294,7 @@ public class UnitWas implements Comparable<UnitWas> {
         }
         String newLocStr = (newLoc == null) ? ""
             : (newLoc instanceof Building)
-            ? Utils.lastPart(((Building)newLoc).getType().toString(), ".")
+            ? ((Building)newLoc).getType().getSuffix()
             : (newLoc instanceof ColonyTile)
             ? tile.getDirection(((ColonyTile)newLoc).getWorkTile()).toString()
             : (newLoc instanceof Tile)
@@ -303,12 +303,11 @@ public class UnitWas implements Comparable<UnitWas> {
         GoodsType newWork = unit.getWorkType();
         int newWorkAmount = (newWork == null) ? 0 : getAmount(newLoc, newWork);
         return String.format("%-30s %-25s -> %-25s",
-            unit.getId() + ":" + Utils.lastPart(unit.getType().toString(),"."),
+            unit.getId() + ":" + unit.getType().getSuffix(),
             locStr + ((work == null || workAmount <= 0) ? "" : "("
-                + Integer.toString(workAmount) + " "
-                + Utils.lastPart(work.toString(), ".") + ")"),
+                + Integer.toString(workAmount) + " " + work.getSuffix() + ")"),
             newLocStr + ((newWork == null || newWorkAmount <= 0) ? "" : "("
                 + Integer.toString(newWorkAmount) + " "
-                + Utils.lastPart(newWork.toString(), ".") + ")")).trim();
+                + newWork.getSuffix() + ")")).trim();
     }
 }

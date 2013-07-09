@@ -2026,8 +2026,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public String toString() {
         StringBuilder sb = new StringBuilder(64);
         sb.append("[").append(getId())
-            .append(" ").append((type == null) ? "unknown"
-                : Utils.lastPart(type.getId(), "."))
+            .append(" ").append((type == null) ? "unknown" : type.getSuffix())
             .append(" ").append(x).append(",").append(y)
             .append((!hasSettlement()) ? "" : " " + getSettlement().getName())
             .append("]");

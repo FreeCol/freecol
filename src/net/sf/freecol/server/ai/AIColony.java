@@ -438,8 +438,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         // rearrange next turn until we get out of this state.
         if (build != null && !colony.canBuild(build)) {
             logger.warning(colony.getName() + " reneged building "
-                + Utils.lastPart(build.toString(), ".")
-                + ": " + colony.getNoBuildReason(build));
+                + build.getSuffix() + ": " + colony.getNoBuildReason(build));
             List<BuildableType> queue = new ArrayList<BuildableType>();
             build = colonyPlan.getBestBuildableType();
             if (build != null) queue.add(build);
@@ -780,7 +779,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             Goods goods = (ag == null) ? null : ag.getGoods();
             int amount = (goods == null) ? -1 : goods.getAmount();
             String type = (goods == null) ? "(null)"
-                : Utils.lastPart(ag.getGoods().getType().getId(), ".");
+                : ag.getGoods().getType().getSuffix();
             logger.finest(String.format("%-20s %-10s %s %s %s",
                     colony.getName(), action,
                     ((ag == null) ? "(null)" : ag.getId()),

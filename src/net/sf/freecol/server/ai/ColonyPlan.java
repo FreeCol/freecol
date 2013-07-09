@@ -40,6 +40,7 @@ import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.NationType;
@@ -143,9 +144,8 @@ public class ColonyPlan {
          */
         @Override
         public String toString() {
-            String t = type.toString();
             return String.format("%s (%1.3f * %1.3f / %1.3f = %1.3f)",
-                                 Utils.lastPart(t, "."), weight, support,
+                                 type.getSuffix(), weight, support,
                                  difficulty, getValue());
         }
     };
@@ -1332,7 +1332,7 @@ logger.warning("equipUnit fail " + unit + "/" + unit.getRole() + "/" + unit.isMo
                     && fullEquipUnit(u, outdoorRoles[j], col)) {
                     workers.remove(u);
                     report.append(u.getId()).append("(")
-                        .append(Utils.lastPart(u.getType().toString(), "."))
+                        .append(u.getType().getSuffix())
                         .append(") -> ").append(outdoorRoles[j]).append("\n");
                 }
             }
@@ -1361,7 +1361,7 @@ logger.warning("equipUnit fail " + unit + "/" + unit.getRole() + "/" + unit.isMo
             if (fullEquipUnit(u, Role.SOLDIER, col)) {
                 workers.remove(u);
                 report.append(u.getId()).append("(")
-                    .append(Utils.lastPart(u.getType().toString(), "."))
+                    .append(u.getType().getSuffix())
                     .append(") -> ").append(u.getRole()).append("\n");
             }
         }
@@ -1410,14 +1410,8 @@ logger.warning("equipUnit fail " + unit + "/" + unit.getRole() + "/" + unit.isMo
                 wl = col.getCorresponding(wlp.getWorkLocation());
                 best = null;
                 report.append(String.format("%-2d: %15s@%-25s => ",
-                    col.getUnitCount(),
-                    goodsType.toString().substring(12),
-                    ((wl instanceof Building)
-                        ? Utils.lastPart(((Building)wl).getType().toString(), ".")
-                        : (wl instanceof ColonyTile)
-                        ? (((ColonyTile)wl).getWorkTile().getPosition().toString()
-                            + Utils.lastPart(((ColonyTile)wl).getWorkTile().getType().toString(), "."))
-                        : wl.toString())));
+                        col.getUnitCount(), goodsType.getSuffix(),
+                        locationDescription(wl)));
 
                 if (!wl.canBeWorked()) {
                     err = "can not be worked";
@@ -1492,8 +1486,7 @@ logger.warning("equipUnit fail " + unit + "/" + unit.getRole() + "/" + unit.isMo
                     best.changeWorkType(goodsType);
                     workers.remove(best);
                     report.append(best.getId()).append("(")
-                        .append(Utils.lastPart(best.getType().toString(), "."))
-                        .append(")\n");
+                        .append(best.getType().getSuffix()).append(")\n");
                     if (!goodsType.isFoodType() && produce.remove(goodsType)) {
                         produce.add(goodsType);
                     }
@@ -1512,8 +1505,7 @@ logger.warning("equipUnit fail " + unit + "/" + unit.getRole() + "/" + unit.isMo
                     if (produce.remove(raw)) produce.add(0, raw);
                     wlp = rawWlp;
                     report.append("retry with ")
-                        .append(Utils.lastPart(raw.toString(), "."))
-                        .append("\n");
+                        .append(raw.getSuffix()).append("\n");
                     continue;
                 }
 
@@ -1524,7 +1516,7 @@ logger.warning("equipUnit fail " + unit + "/" + unit.getRole() + "/" + unit.isMo
                 wlps.remove(wlp);
                 produce.remove(goodsType);
                 report.append("needs more ")
-                    .append(Utils.lastPart(raw.toString(), ".")).append("\n");
+                    .append(raw.getSuffix()).append("\n");
                 break;
             }
         }
@@ -1600,12 +1592,12 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
             Unit other;
             if ((other = trySwapExpert(u1, experts, col)) != null) {
                 report.append("Swapped ").append(u1.getId()).append("(")
-                    .append(Utils.lastPart(u1.getType().toString(), "."))
+                    .append(u1.getType().getSuffix())
                     .append(") for ").append(other).append("\n");
                 experts.remove(u1);
             } else if ((other = trySwapExpert(u1, nonExperts, col)) != null) {
                 report.append("Swapped ").append(u1.getId()).append("(")
-                    .append(Utils.lastPart(u1.getType().toString(), "."))
+                    .append(u1.getType().getSuffix())
                     .append(") for ").append(other).append("\n");
                 experts.remove(u1);
             } else {
@@ -1618,7 +1610,7 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
                 Unit other = trySwapExpert(u, col.getUnitList(), col);
                 if (other != null) {
                     report.append("Swapped ").append(u.getId()).append("(")
-                        .append(Utils.lastPart(u.getType().toString(), "."))
+                        .append(u.getType().getSuffix())
                         .append(") for ").append(other).append("\n");
                     workers.remove(u);
                     workers.add(other);
@@ -1631,7 +1623,7 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
         for (Unit u : new ArrayList<Unit>(workers)) {
             if (fullEquipUnit(u, Role.SOLDIER, col)) {
                 report.append(u.getId()).append("(")
-                    .append(Utils.lastPart(u.getType().toString(), "."))
+                    .append(u.getType().getSuffix())
                     .append(") -> ").append(u.getRole()).append("\n");
                 workers.remove(u);
             } else break;
@@ -1642,8 +1634,7 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
         // scratch colony and returning null.
         for (Unit u : workers) {
             report.append(u.getId()).append("(")
-                .append(Utils.lastPart(u.getType().toString(), "."))
-                .append(") -> UNUSED\n");
+                .append(u.getType().getSuffix()).append(") -> UNUSED\n");
         }                
         report.append("Final population = ")
             .append(col.getWorkLocationUnitCount());
@@ -1667,15 +1658,17 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
     private String locationDescription(Location loc) {
         if (loc instanceof Building) {
             Building building = (Building)loc;
-            return Utils.lastPart(building.getType().toString(), ".");
+            return building.getType().getSuffix();
         } else if (loc instanceof ColonyTile) {
             ColonyTile colonyTile = (ColonyTile)loc;
-            Tile workTile = colonyTile.getWorkTile();
-            return Utils.lastPart(workTile.getType().toString(), ".")
-                + "/"
-                + colony.getTile().getDirection(workTile).toString();
+            // Have to use positions to get the direction as
+            // Map.getDirection() will not see copied tiles.
+            Position cPos = colonyTile.getColony().getTile().getPosition();
+            Position wPos = colonyTile.getWorkTile().getPosition();
+            return colonyTile.getWorkTile().getType().getSuffix() + "/"
+                + cPos.getDirection(wPos).toString();
         } else {
-            return ((FreeColObject)loc).getId();
+            return loc.getId();
         }
     }
 
@@ -1691,7 +1684,7 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
             .append("\nProfile: ").append(profileType.toString())
             .append("\nPreferred production:\n");
         for (GoodsType goodsType : getPreferredProduction()) {
-            sb.append(Utils.lastPart(goodsType.toString(), ".")).append("\n");
+            sb.append(goodsType.getSuffix()).append("\n");
         }
         sb.append(getBuildableReport());
         sb.append("Food Plans:\n");
@@ -1701,7 +1694,7 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
                 .append(": ")
                 .append(wl.getGenericPotential(wlp.getGoodsType()))
                 .append(" ")
-                .append(Utils.lastPart(wlp.getGoodsType().toString(), "."))
+                .append(wlp.getGoodsType().getSuffix())
                 .append("\n");
         }
         sb.append("Work Plans:\n");
@@ -1711,7 +1704,7 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
                 .append(": ")
                 .append(wl.getGenericPotential(wlp.getGoodsType()))
                 .append(" ")
-                .append(Utils.lastPart(wlp.getGoodsType().toString(), "."))
+                .append(wlp.getGoodsType().getSuffix())
                 .append("\n");
         }
         return sb.toString();

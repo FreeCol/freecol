@@ -134,7 +134,7 @@ public class WorkLocationPlan extends AIObject {
     public String toString() {
         StringBuilder sb = new StringBuilder(32);
         sb.append("[").append(getId())
-            .append(" ").append(Utils.lastPart(goodsType.getId(), "."))
+            .append(" ").append(goodsType.getSuffix())
             .append(" at ").append(workLocation.getId())
             .append("]");
         return sb.toString();
