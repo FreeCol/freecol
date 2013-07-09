@@ -3458,8 +3458,7 @@ public final class InGameController extends Controller {
             return DOMMessage.clientError("Colony " + colony.getId()
                 + " is not building anything!");
         }
-        HashMap<GoodsType, Integer> required
-            = colony.getGoodsForBuilding(build);
+        List<AbstractGoods> required = colony.getRequiredGoods(build);
         int price = colony.priceGoodsForBuilding(required);
         if (!serverPlayer.checkGold(price)) {
             return DOMMessage.clientError("Insufficient funds to pay for build.");
@@ -3474,8 +3473,9 @@ public final class InGameController extends Controller {
         ChangeSet cs = new ChangeSet();
         GoodsContainer container = colony.getGoodsContainer();
         container.saveState();
-        for (GoodsType type : required.keySet()) {
-            int amount = required.get(type);
+        for (AbstractGoods ag : required) {
+            GoodsType type = ag.getType();
+            int amount = ag.getAmount();
             if (type.isStorable()) {
                 // TODO: should also check canTrade(type, Access.?)
                 serverPlayer.buy(container, type, amount, random);

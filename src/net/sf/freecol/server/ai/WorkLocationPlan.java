@@ -113,6 +113,15 @@ public class WorkLocationPlan extends AIObject {
         this.goodsType = goodsType;
     }
 
+    /**
+     * Is this a food producing plan?
+     *
+     * @return True if this plan produces food.
+     */
+    public boolean isFoodPlan() {
+        return goodsType.isFoodType();
+    }
+
 
     // Serialization
     // WorkLocationPlans are not currently saved so this is a no-op.

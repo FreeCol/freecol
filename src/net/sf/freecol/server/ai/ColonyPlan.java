@@ -54,10 +54,8 @@ import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
+import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.ai.EuropeanAIPlayer;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 
 /**
@@ -147,8 +145,8 @@ public class ColonyPlan {
         public String toString() {
             String t = type.toString();
             return String.format("%s (%1.3f * %1.3f / %1.3f = %1.3f)",
-                t.substring(t.lastIndexOf(".")+1),
-                weight, support, difficulty, getValue());
+                                 Utils.lastPart(t, "."), weight, support,
+                                 difficulty, getValue());
         }
     };
     private final List<BuildPlan> buildPlans = new ArrayList<BuildPlan>();
@@ -212,17 +210,6 @@ public class ColonyPlan {
             .getProfileTypeFromSize(colony.getUnitCount());
     }
 
-    /**
-     * Creates a new <code>ColonyPlan</code>.
-     *
-     * @param aiMain The main AI-object.
-     * @param element An <code>Element</code> containing an XML-representation
-     *            of this object.
-     */
-    public ColonyPlan(AIMain aiMain, Element element) {
-        this.aiMain = aiMain;
-        readFromXMLElement(element);
-    }
 
     /**
      * Gets the main AI-object.
@@ -233,7 +220,6 @@ public class ColonyPlan {
         return aiMain;
     }
 
-
     /**
      * Gets the specification.
      *
@@ -243,22 +229,6 @@ public class ColonyPlan {
         return aiMain.getGame().getSpecification();
     }
 
-    /**
-     * Gets the production for a work location of a specified goods type,
-     * using the default unit type to avoid considering which unit is
-     * to be allocated.  This is thus an approximation to what will
-     * finally occur when units are assigned, but it serves for planning
-     * purposes.
-     *
-     * @param wl The <code>WorkLocation</code> where production is to occur.
-     * @param goodsType The <code>GoodsType</code> to produce.
-     * @return The work location production.
-     */
-    private int getWorkLocationProduction(WorkLocation wl,
-                                          GoodsType goodsType) {
-        return wl.getPotentialProduction(goodsType,
-                                         spec().getDefaultUnitType());
-    }
 
     // Public functionality.
 
@@ -297,6 +267,18 @@ public class ColonyPlan {
     }
 
     /**
+     * Get a report on the build plans.
+     *
+     * @return A build plan report.
+     */
+    public String getBuildableReport() {
+        StringBuilder sb = new StringBuilder(64);
+        sb.append("Buildables:\n");
+        for (BuildPlan b : buildPlans) sb.append(b.toString()).append("\n");
+        return sb.toString();
+    }
+
+    /**
      * Gets the food-producing and non-autoproducing work location
      * plans associated with this <code>ColonyPlan</code>.
      *
@@ -305,7 +287,7 @@ public class ColonyPlan {
     public List<WorkLocationPlan> getFoodPlans() {
         List<WorkLocationPlan> plans = new ArrayList<WorkLocationPlan>();
         for (WorkLocationPlan wlp : workPlans) {
-            if (wlp.getGoodsType().isFoodType()
+            if (wlp.isFoodPlan()
                 && !wlp.getWorkLocation().canAutoProduce()) plans.add(wlp);
         }
         return plans;
@@ -315,77 +297,15 @@ public class ColonyPlan {
      * Gets the non-food-producing/non-autoproducing work location
      * plans associated with this <code>ColonyPlan</code>.
      *
-     * @return A list of nonfood producing plans.
+     * @return A list of non-food producing plans.
      */
     public List<WorkLocationPlan> getWorkPlans() {
         List<WorkLocationPlan> plans = new ArrayList<WorkLocationPlan>();
         for (WorkLocationPlan wlp : workPlans) {
-            if (!wlp.getGoodsType().isFoodType()
+            if (!wlp.isFoodPlan()
                 && !wlp.getWorkLocation().canAutoProduce()) plans.add(wlp);
         }
         return plans;
-    }
-
-    /**
-     * Recreates the buildables and work location plans for this
-     * colony.
-     */
-    public void update() {
-        UnitType defaultUnitType = spec().getDefaultUnitType();
-
-        // Update the profile type.
-        profileType = ProfileType
-            .getProfileTypeFromSize(colony.getWorkLocationUnitCount());
-
-        // Build the total map of all possible production with standard units.
-        Map<GoodsType, Map<WorkLocation, Integer>> production
-            = createProductionMap();
-
-        // Set the goods type lists, and prune production of manufactured
-        // goods that are missing raw materials and other non-interesting.
-        updateGoodsTypeLists(production);
-
-        // Set the preferred raw materials.  Prune production and
-        // goods lists further removing the non-preferred new world
-        // raw and refined materials.
-        updateRawMaterials(production);
-
-        // The buildables depend on the profile type, the goods type lists
-        // and/or goods-to-produce list.
-        updateBuildableTypes();
-
-        // Make plans for each valid <goods, location> production and
-        // complete the list of goods to produce.
-        updatePlans(production);
-    }
-
-    /**
-     * Gets the goods required to complete a build.  The list includes
-     * the prerequisite raw materials as well as the direct
-     * requirements (i.e. hammers, tools).  If enough of a required
-     * goods is present in the colony, then that type is not returned.
-     * Take care to order types with raw materials first so that we
-     * can prioritize gathering what is required before manufacturing.
-     *
-     * Public for the benefit of the test suite.
-     *
-     * @param buildable The <code>BuildableType</code> to consider.
-     * @return A list of required abstract goods.
-     */
-    public List<AbstractGoods> getRequiredGoods(BuildableType buildable) {
-        List<AbstractGoods> required = new ArrayList<AbstractGoods>();
-        if (buildable == null) return required;
-        for (AbstractGoods ag : buildable.getRequiredGoods()) {
-            int amount = ag.getAmount();
-            GoodsType type = ag.getType();
-            while (type != null) {
-                if (amount <= colony.getGoodsCount(type)) break; // Shortcut
-                required.add(0, new AbstractGoods(type,
-                        amount - colony.getGoodsCount(type)));
-                type = type.getInputType();
-            }
-        }
-        return required;
     }
 
     /**
@@ -395,7 +315,7 @@ public class ColonyPlan {
      */
     public void refine(BuildableType build) {
         List<GoodsType> required = new ArrayList<GoodsType>();
-        for (AbstractGoods ag : getRequiredGoods(build)) {
+        for (AbstractGoods ag : colony.getFullRequiredGoods(build)) {
             required.add(ag.getType());
         }
         Map<GoodsType, List<WorkLocationPlan>> suppressed
@@ -465,6 +385,42 @@ public class ColonyPlan {
     }
 
     /**
+     * Recreates the buildables and work location plans for this
+     * colony.
+     */
+    public void update() {
+        UnitType defaultUnitType = spec().getDefaultUnitType();
+
+        // Update the profile type.
+        profileType = ProfileType
+            .getProfileTypeFromSize(colony.getWorkLocationUnitCount());
+
+        // Build the total map of all possible production with standard units.
+        Map<GoodsType, Map<WorkLocation, Integer>> production
+            = createProductionMap();
+
+        // Set the goods type lists, and prune production of manufactured
+        // goods that are missing raw materials and other non-interesting.
+        updateGoodsTypeLists(production);
+
+        // Set the preferred raw materials.  Prune production and
+        // goods lists further removing the non-preferred new world
+        // raw and refined materials.
+        updateRawMaterials(production);
+
+        // The buildables depend on the profile type, the goods type lists
+        // and/or goods-to-produce list.
+        updateBuildableTypes();
+
+        // Make plans for each valid <goods, location> production and
+        // complete the list of goods to produce.
+        updatePlans(production);
+    }
+
+
+    // Internals
+
+    /**
      * Creates a map of potential production of all goods types
      * from all available work locations using the default unit type.
      * Includes non-workable locations (e.g. chapel, colony-center-tile)
@@ -477,7 +433,7 @@ public class ColonyPlan {
             = new HashMap<GoodsType, Map<WorkLocation, Integer>>();
         for (WorkLocation wl : colony.getAvailableWorkLocations()) {
             for (GoodsType g : spec().getGoodsTypeList()) {
-                int p = getWorkLocationProduction(wl, g);
+                int p = wl.getGenericPotential(g);
                 if (p > 0) {
                     Map<WorkLocation, Integer> m = production.get(g);
                     if (m == null) {
@@ -541,7 +497,7 @@ public class ColonyPlan {
                 luxuryGoodsTypes.add(g);
             } else if (g.isFarmed()) {
                 otherRawGoodsTypes.add(g);
-            } else { // Not interested in this goods type.
+            } else { // Not interested in this goods type.  Should not happen.
                 logger.warning("Ignoring goods type " + g
                     + " at " + colony.getName());
                 production.remove(g);
@@ -551,7 +507,7 @@ public class ColonyPlan {
 
     /**
      * Chooses the two best raw materials, updating the production
-     * map and lists.
+     * map and lists.  TODO: scale with colony size.
      *
      * @param production The production map.
      */
@@ -626,6 +582,7 @@ public class ColonyPlan {
             }
         }
     }
+
 
     // Relative weights of the various building categories.
     // TODO: split out/parameterize into a `building strategy'
@@ -965,8 +922,8 @@ public class ColonyPlan {
                     if (i2 < 0 && !g2.isFoodType()) i2 = 99999;
                     int cmp = i1 - i2;
                     if (cmp == 0) {
-                        cmp = getWorkLocationProduction(w2.getWorkLocation(), g2)
-                            - getWorkLocationProduction(w1.getWorkLocation(), g1);
+                        cmp = w2.getWorkLocation().getGenericPotential(g2)
+                            - w1.getWorkLocation().getGenericPotential(g1);
                     }
                     return cmp;
                 }
@@ -1634,11 +1591,26 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
         return scratch;
     }
 
-
-    public String getBuildableReport() {
-        String ret = "Buildables:\n";
-        for (BuildPlan b : buildPlans) ret += b.toString() + "\n";
-        return ret;
+    /**
+     * Gets a concise textual description of a location associated with
+     * the colony.  No i18n here, this is for debugging purposes.
+     *
+     * @param loc The <code>Location</code> to describe.
+     * @return The text description.
+     */
+    private String locationDescription(Location loc) {
+        if (loc instanceof Building) {
+            Building building = (Building)loc;
+            return Utils.lastPart(building.getType().toString(), ".");
+        } else if (loc instanceof ColonyTile) {
+            ColonyTile colonyTile = (ColonyTile)loc;
+            Tile workTile = colonyTile.getWorkTile();
+            return Utils.lastPart(workTile.getType().toString(), ".")
+                + "/"
+                + colony.getTile().getDirection(workTile).toString();
+        } else {
+            return ((FreeColObject)loc).getId();
+        }
     }
 
     /**
@@ -1648,81 +1620,34 @@ plans:          for (WorkLocationPlan w : getFoodPlans()) {
     public String toString() {
         final Tile tile = colony.getTile();
         final StringBuilder sb = new StringBuilder(256);
-        sb.append("ColonyPlan: " + colony.getName()
-            + " " + colony.getTile().getPosition()
-            + "\nProfile: " + profileType.toString()
-            + "\nPreferred production:\n");
+        sb.append("ColonyPlan: ").append(colony.getName())
+            .append(" ").append(colony.getTile().getPosition())
+            .append("\nProfile: ").append(profileType.toString())
+            .append("\nPreferred production:\n");
         for (GoodsType goodsType : getPreferredProduction()) {
-            sb.append(goodsType.toString().substring(12) + "\n");
+            sb.append(Utils.lastPart(goodsType.toString(), ".")).append("\n");
         }
         sb.append(getBuildableReport());
         sb.append("Food Plans:\n");
         for (WorkLocationPlan wlp : getFoodPlans()) {
             WorkLocation wl = wlp.getWorkLocation();
-            String wlStr = (wl instanceof Building)
-                ? ((Building)wl).getType().toString().substring(15)
-                : (wl instanceof ColonyTile)
-                ? tile.getDirection(((ColonyTile)wl).getWorkTile()).toString()
-                : wl.getId();
-            sb.append(wlStr
-                + ": " + getWorkLocationProduction(wl, wlp.getGoodsType())
-                + " " + wlp.getGoodsType().toString().substring(12)
-                + "\n");
+            sb.append(locationDescription(wl))
+                .append(": ")
+                .append(wl.getGenericPotential(wlp.getGoodsType()))
+                .append(" ")
+                .append(Utils.lastPart(wlp.getGoodsType().toString(), "."))
+                .append("\n");
         }
         sb.append("Work Plans:\n");
         for (WorkLocationPlan wlp : getWorkPlans()) {
             WorkLocation wl = wlp.getWorkLocation();
-            String wlStr = (wl instanceof Building)
-                ? ((Building)wl).getType().toString().substring(15)
-                : (wl instanceof ColonyTile)
-                ? tile.getDirection(((ColonyTile)wl).getWorkTile()).toString()
-                : wl.getId();
-            sb.append(wlStr
-                + ": " + getWorkLocationProduction(wl, wlp.getGoodsType())
-                + " " + wlp.getGoodsType().toString().substring(12)
-                + "\n");
+            sb.append(locationDescription(wl))
+                .append(": ")
+                .append(wl.getGenericPotential(wlp.getGoodsType()))
+                .append(" ")
+                .append(Utils.lastPart(wlp.getGoodsType().toString(), "."))
+                .append("\n");
         }
         return sb.toString();
-    }
-
-
-    // Serialization
-
-    /**
-     * Creates an XML-representation of this object.
-     *
-     * @param document The <code>Document</code> in which the
-     *            XML-representation should be created.
-     * @return The XML-representation.
-     */
-    public Element toXMLElement(Document document) {
-        Element element = document.createElement(getXMLElementTagName());
-        element.setAttribute(FreeColObject.ID_ATTRIBUTE_TAG, colony.getId());
-        return element;
-    }
-
-    /**
-     * Updates this object from an XML-representation of a
-     * <code>ColonyPlan</code>.
-     *
-     * @param element The XML-representation.
-     */
-    public void readFromXMLElement(Element element) {
-        String colonyId = FreeColObject.readId(element);
-        colony = getAIMain().getGame()
-            .getFreeColGameObject(colonyId, Colony.class);
-
-        // TODO: serialize profile?
-        profileType = ProfileType
-            .getProfileTypeFromSize(colony.getUnitCount());
-    }
-
-    /**
-     * Gets the tag name of the root element representing this object.
-     *
-     * @return "colonyPlan"
-     */
-    public static String getXMLElementTagName() {
-        return "colonyPlan";
     }
 }

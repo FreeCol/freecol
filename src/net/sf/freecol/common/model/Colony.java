@@ -1735,21 +1735,22 @@ public class Colony extends Settlement implements Nameable {
      * @see net.sf.freecol.client.control.InGameController#payForBuilding
      */
     public int getPriceForBuilding(BuildableType type) {
-        return priceGoodsForBuilding(getGoodsForBuilding(type));
+        return priceGoodsForBuilding(getRequiredGoods(type));
     }
 
     /**
      * Gets a price for a map of resources to build a given buildable.
      *
-     * @param required The map of resources required.
+     * @param required A list of required <code>AbstractGoods</code>.
      * @return The price.
      * @see net.sf.freecol.client.control.InGameController#payForBuilding
      */
-    public int priceGoodsForBuilding(HashMap<GoodsType, Integer> required) {
+    public int priceGoodsForBuilding(List<AbstractGoods> required) {
         int price = 0;
         Market market = getOwner().getMarket();
-        for (GoodsType goodsType : required.keySet()) {
-            int amount = required.get(goodsType);
+        for (AbstractGoods ag : required) {
+            GoodsType goodsType = ag.getType();
+            int amount = ag.getAmount();
             if (goodsType.isStorable()) {
                 // TODO: magic number!
                 price += (market.getBidPrice(goodsType, amount) * 110) / 100;
@@ -1767,16 +1768,45 @@ public class Colony extends Settlement implements Nameable {
      * @param type The <code>BuildableType</code> to build.
      * @return The map to completion.
      */
-    public HashMap<GoodsType, Integer> getGoodsForBuilding(BuildableType type) {
-        HashMap<GoodsType, Integer> result = new HashMap<GoodsType, Integer>();
+    public List<AbstractGoods> getRequiredGoods(BuildableType type) {
+        List<AbstractGoods> result = new ArrayList<AbstractGoods>();
         for (AbstractGoods goods : type.getRequiredGoods()) {
             GoodsType goodsType = goods.getType();
             int remaining = goods.getAmount() - getGoodsCount(goodsType);
             if (remaining > 0) {
-                result.put(goodsType, new Integer(remaining));
+                result.add(new AbstractGoods(goodsType, remaining));
             }
         }
         return result;
+    }
+
+    /**
+     * Gets all the goods required to complete a build.  The list
+     * includes the prerequisite raw materials as well as the direct
+     * requirements (i.e. hammers, tools).  If enough of a required
+     * goods is present in the colony, then that type is not returned.
+     * Take care to order types with raw materials first so that we
+     * can prioritize gathering what is required before manufacturing.
+     *
+     * Public for the benefit of AI planning and the test suite.
+     *
+     * @param buildable The <code>BuildableType</code> to consider.
+     * @return A list of required abstract goods.
+     */
+    public List<AbstractGoods> getFullRequiredGoods(BuildableType buildable) {
+        List<AbstractGoods> required = new ArrayList<AbstractGoods>();
+        if (buildable == null) return required;
+        for (AbstractGoods ag : buildable.getRequiredGoods()) {
+            int amount = ag.getAmount();
+            GoodsType type = ag.getType();
+            while (type != null) {
+                if (amount <= this.getGoodsCount(type)) break; // Shortcut
+                required.add(0, new AbstractGoods(type,
+                        amount - this.getGoodsCount(type)));
+                type = type.getInputType();
+            }
+        }
+        return required;
     }
 
     /**

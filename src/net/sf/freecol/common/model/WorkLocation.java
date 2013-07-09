@@ -285,6 +285,18 @@ public abstract class WorkLocation extends UnitLocation implements Ownable {
         return null;
     }
 
+    /**
+     * Get the potential production of a given goods type using the
+     * default unit.  This is useful for planning.
+     *
+     * @param goodsType The <code>GoodsType</code> to check.
+     * @return The potential production.
+     */
+    public int getGenericPotential(GoodsType goodsType) {
+        return getPotentialProduction(goodsType,
+            getSpecification().getDefaultUnitType());
+    }
+
 
     // Interface Location
     // Inherits:
