@@ -52,7 +52,8 @@ import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.resources.ResourceManager;
+import net.sf.freecol.common.model.WorkLocation;
+//import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -67,6 +68,7 @@ public class WorkProductionPanel extends FreeColPanel {
                               BorderFactory.createEmptyBorder(2, 2, 2, 2));
 
 
+    // TODO: expand display to handle several outputs
     public WorkProductionPanel(FreeColClient freeColClient, Unit unit) {
         super(freeColClient);
 
@@ -74,59 +76,56 @@ public class WorkProductionPanel extends FreeColPanel {
 
         final Colony colony = unit.getColony();
         final UnitType unitType = unit.getType();
+        final WorkLocation location = (WorkLocation) unit.getLocation();
+        final List<AbstractGoods> outputs = location.getOutputs();
 
         List<Modifier> modifiers = new ArrayList<Modifier>();
         List<Modifier> moreModifiers = new ArrayList<Modifier>();
         float result = 0.0f;
-        String workLocationName = "";
-        if (unit.getLocation() instanceof ColonyTile) {
-            ColonyTile colonyTile = (ColonyTile) unit.getLocation();
-            ProductionType productionType = colonyTile.getProductionType();
-            AbstractGoods output = productionType.getOutputs().get(0);
-            GoodsType goodsType = output.getType();
-            result = output.getAmount();
-            List<Modifier> tileModifiers
-                = colonyTile.getProductionModifiers(goodsType, unitType);
-            if (FeatureContainer.applyModifiers(0f, turn, tileModifiers) > 0) {
-                modifiers.addAll(tileModifiers);
-            }
+        String shortName = "";
+        String longName = "";
+        Image image = null;
 
-            add(localizedLabel(colonyTile.getLabel()),
-                               "span, align center, wrap 30");
-            final Tile tile = colonyTile.getWorkTile();
-            final TileType tileType = tile.getType();
-            workLocationName = Messages.getName(tileType);
+        if (!outputs.isEmpty()) {
             final ImageLibrary lib = getGUI().getImageLibrary();
-            final Image terrain = lib.getTerrainImage(tileType,
-                tile.getX(), tile.getY());
-            BufferedImage image = new BufferedImage(terrain.getWidth(null),
-                terrain.getHeight(null), BufferedImage.TYPE_INT_ARGB);
-            getGUI().displayColonyTile((Graphics2D)image.getGraphics(),
-                                       colonyTile.getWorkTile(), colony);
-            add(new JLabel(new ImageIcon(image)));
+            final GoodsType goodsType = outputs.get(0).getType();
+            result = outputs.get(0).getAmount();
 
-        } else if (unit.getLocation() instanceof Building) {
-            Building building = (Building) unit.getLocation();
-            workLocationName = Messages.getName(building.getType());
-            ProductionType productionType = building.getProductionType();
-            // TODO: expand display to handle several outputs
-            AbstractGoods output = productionType.getOutputs().get(0);
-            GoodsType goodsType = output.getType();
-            result = output.getAmount();
-            modifiers.addAll(building.getProductionModifiers(goodsType,
-                                                             unitType));
-            moreModifiers.addAll(building.getProductionModifiers(goodsType,
-                                                                 null));
-            add(localizedLabel(building.getNameKey()),
-                               "span, align center, wrap 30");
-            add(new JLabel(ResourceManager.getImageIcon(building.getType()
-                        .getId() + ".image")));
+            if (location instanceof ColonyTile) {
+                final ColonyTile colonyTile = (ColonyTile) location;
+                List<Modifier> tileModifiers
+                    = colonyTile.getProductionModifiers(goodsType, unitType);
+                if (FeatureContainer.applyModifiers(0f, turn, tileModifiers) > 0) {
+                    modifiers.addAll(tileModifiers);
+                }
+                longName = Messages.message(colonyTile.getLabel());
+                final Tile tile = colonyTile.getWorkTile();
+                final TileType tileType = tile.getType();
+                shortName = Messages.getName(tileType);
+                final Image terrain =
+                    lib.getTerrainImage(tileType, tile.getX(), tile.getY());
+                image = new BufferedImage(terrain.getWidth(null), terrain.getHeight(null),
+                                          BufferedImage.TYPE_INT_ARGB);
+                getGUI().displayColonyTile((Graphics2D)image.getGraphics(), tile, colony);
+
+            } else if (location instanceof Building) {
+                final Building building = (Building) location;
+                shortName = Messages.getName(building.getType());
+                modifiers.addAll(building.getProductionModifiers(goodsType,
+                                                                 unitType));
+                moreModifiers.addAll(building.getProductionModifiers(goodsType,
+                                                                     null));
+                longName = shortName;
+                image = lib.getBuildingImage(building);
+            }
         }
+
+        add(new JLabel(longName), "span, align center, wrap 30");
+        add(new JLabel(new ImageIcon(image)));
         add(new UnitLabel(getFreeColClient(), unit, false, false), "wrap");
 
-        add(new JLabel(workLocationName));
-        // TODO: make this work for floats?
-        add(new JLabel(Integer.toString((int)result)));
+        add(new JLabel(shortName));
+        add(new JLabel(getModifierFormat().format(result)));
 
         Collections.sort(modifiers);
         for (Modifier modifier : modifiers) {
@@ -168,8 +167,8 @@ public class WorkProductionPanel extends FreeColPanel {
                 }
             }
         }
-        
-        add(okButton, "span, tag ok");
+
+        add(okButton, "newline, span, tag ok");
 
         setSize(getPreferredSize());
     }
