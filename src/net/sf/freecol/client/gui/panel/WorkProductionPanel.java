@@ -38,6 +38,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
@@ -45,6 +46,7 @@ import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Modifier;
+import net.sf.freecol.common.model.ProductionType;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Turn;
@@ -75,9 +77,14 @@ public class WorkProductionPanel extends FreeColPanel {
 
         List<Modifier> modifiers = new ArrayList<Modifier>();
         List<Modifier> moreModifiers = new ArrayList<Modifier>();
+        float result = 0.0f;
+        String workLocationName = "";
         if (unit.getLocation() instanceof ColonyTile) {
             ColonyTile colonyTile = (ColonyTile) unit.getLocation();
-            GoodsType goodsType = unit.getWorkType();
+            ProductionType productionType = colonyTile.getProductionType();
+            AbstractGoods output = productionType.getOutputs().get(0);
+            GoodsType goodsType = output.getType();
+            result = output.getAmount();
             List<Modifier> tileModifiers
                 = colonyTile.getProductionModifiers(goodsType, unitType);
             if (FeatureContainer.applyModifiers(0f, turn, tileModifiers) > 0) {
@@ -88,6 +95,7 @@ public class WorkProductionPanel extends FreeColPanel {
                                "span, align center, wrap 30");
             final Tile tile = colonyTile.getWorkTile();
             final TileType tileType = tile.getType();
+            workLocationName = Messages.getName(tileType);
             final ImageLibrary lib = getGUI().getImageLibrary();
             final Image terrain = lib.getTerrainImage(tileType,
                 tile.getX(), tile.getY());
@@ -99,8 +107,12 @@ public class WorkProductionPanel extends FreeColPanel {
 
         } else if (unit.getLocation() instanceof Building) {
             Building building = (Building) unit.getLocation();
+            workLocationName = Messages.getName(building.getType());
+            ProductionType productionType = building.getProductionType();
             // TODO: expand display to handle several outputs
-            GoodsType goodsType = unit.getWorkType();
+            AbstractGoods output = productionType.getOutputs().get(0);
+            GoodsType goodsType = output.getType();
+            result = output.getAmount();
             modifiers.addAll(building.getProductionModifiers(goodsType,
                                                              unitType));
             moreModifiers.addAll(building.getProductionModifiers(goodsType,
@@ -112,8 +124,11 @@ public class WorkProductionPanel extends FreeColPanel {
         }
         add(new UnitLabel(getFreeColClient(), unit, false, false), "wrap");
 
+        add(new JLabel(workLocationName));
+        // TODO: make this work for floats?
+        add(new JLabel(Integer.toString((int)result)));
+
         Collections.sort(modifiers);
-        float result = 0.0f;
         for (Modifier modifier : modifiers) {
             JLabel[] mLabels = getModifierLabels(modifier, unitType, turn);
             for (int i = 0; i < mLabels.length; i++) {

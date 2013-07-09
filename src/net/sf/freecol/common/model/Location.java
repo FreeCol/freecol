@@ -22,13 +22,15 @@ package net.sf.freecol.common.model;
 import java.util.Iterator;
 import java.util.List;
 
+import net.sf.freecol.common.ObjectWithId;
+
 
 /**
  * A place where a <code>Locatable</code> can be put.
  *
  * @see Locatable
  */
-public interface Location {
+public interface Location extends ObjectWithId {
 
     /**
      * Gets the identifier of this <code>Location</code>.
