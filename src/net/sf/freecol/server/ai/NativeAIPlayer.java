@@ -654,8 +654,9 @@ public class NativeAIPlayer extends AIPlayer {
                 int alarm = is.getAlarm(c.getOwner()).getValue();
                 int defence = c.getUnitCount() + ((c.getStockade() == null) ? 1
                     : (c.getStockade().getLevel() * 10));
-                nearbyColonies.add(new RandomChoice<Colony>(c,
-                        alarm * (1000000 / defence / path.getTotalTurns())));
+                int weight = 1 + alarm * (1000000 / defence
+                                                  / path.getTotalTurns());
+                nearbyColonies.add(new RandomChoice<Colony>(c, weight));
             }
             // If there are any suitable colonies, pick one to demand from.
             // Sometimes a random one, sometimes the weakest, sometimes the
