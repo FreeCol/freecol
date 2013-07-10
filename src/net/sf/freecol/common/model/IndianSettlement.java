@@ -1427,7 +1427,7 @@ public class IndianSettlement extends Settlement {
             Unit unit = xr.makeFreeColGameObject(game, ID_ATTRIBUTE_TAG,
                                                  Unit.class, true);
             if (unit.getOwner() != null && !owner.owns(unit)) {
-                logger.warning("Error in savegame: unit " + unit.getId()
+                logger.warning("Unit " + unit.getId()
                                + " does not belong to settlement " + getId());
             } else {
                 addOwnedUnit(unit);

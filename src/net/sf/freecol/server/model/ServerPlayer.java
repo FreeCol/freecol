@@ -1532,13 +1532,16 @@ public class ServerPlayer extends Player implements ServerModelObject {
                             : settlement.getUnitList()),
                         random);
                     brave.clearEquipment();
+                    brave.setRole(Unit.Role.DEFAULT);
                     brave.changeOwner(other);
                     brave.setHomeIndianSettlement(null);
                     brave.setNationality(other.getNationId());
                     brave.setType(Utils.getRandomMember(logger,
                                   "Choose convert type", converts, random));
                     brave.setLocation(colony.getTile());
-                    cs.add(See.perhaps(), colony.getTile(), settlement);
+                    cs.add(See.only(this), settlement);
+                    cs.addDispose(See.only(this), settlement.getTile(), brave);
+                    cs.add(See.only(other), colony.getTile());
                     cs.addMessage(See.only(other),
                         new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
                                          "model.colony.newConvert", brave)
@@ -2531,13 +2534,15 @@ public class ServerPlayer extends Player implements ServerModelObject {
      */
     private void csCaptureConvert(Unit attacker, IndianSettlement natives,
                                   Random random, ChangeSet cs) {
-        ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
-        StringTemplate convertNation = natives.getOwner().getNationName();
+        ServerPlayer attackerPlayer = (ServerPlayer)attacker.getOwner();
+        ServerPlayer nativePlayer = (ServerPlayer)natives.getOwner();
+        StringTemplate convertNation = nativePlayer.getNationName();
         List<UnitType> converts = getGame().getSpecification()
             .getUnitTypesWithAbility(Ability.CONVERT);
         UnitType type = Utils.getRandomMember(logger, "Choose convert",
                                               converts, random);
         Unit convert = natives.getUnitList().get(0);
+        convert.setRole(Unit.Role.DEFAULT);
         convert.clearEquipment();
 
         cs.addMessage(See.only(attackerPlayer),
@@ -2547,10 +2552,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
                       .addStringTemplate("%nation%", convertNation)
                       .addStringTemplate("%unit%", convert.getLabel()));
 
-        convert.changeOwner(attacker.getOwner());
-        // do not change nationality: convert was forcibly captured and wants to run away
+        convert.changeOwner(attackerPlayer);
         convert.setType(type);
         convert.setLocation(attacker.getTile());
+        cs.add(See.only(nativePlayer), natives);
+        cs.addDispose(See.only(nativePlayer), natives.getTile(), convert);
     }
 
     /**
