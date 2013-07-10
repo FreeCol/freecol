@@ -669,7 +669,8 @@ public class Unit extends GoodsLocation
         if (oldOwner == owner) {
             return;
         } else if (oldOwner == null) {
-            logger.warning("Unit " + getId() + " had no previous owner, when changing owner to " + owner.getId());
+            logger.warning("Unit " + getId()
+                + " had no owner, when changing owner to " + owner.getId());
         }
 
         // Clear trade route and goto orders if changing owner.
@@ -3635,7 +3636,7 @@ public class Unit extends GoodsLocation
             }
         } else {
             throw new IllegalStateException("Can not be added to unit: "
-                + ((FreeColGameObject)locatable).toString());
+                + ((FreeColGameObject)locatable));
         }
         return false;
     }

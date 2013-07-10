@@ -53,7 +53,8 @@ public class SetDestinationMessage extends DOMMessage {
      */
     public SetDestinationMessage(Unit unit, Location destination) {
         this.unitId = unit.getId();
-        this.destinationId = (destination == null) ? null : destination.getId();
+        this.destinationId = (destination == null) ? null
+            : destination.getId();
     }
 
     /**

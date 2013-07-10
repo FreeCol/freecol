@@ -200,7 +200,7 @@ public class AbstractGoods extends FreeColObject implements Named {
      * @return A string version of the goods.
      */     
     public static String toString(GoodsType goodsType, int amount) {
-        return Integer.toString(amount) + " " + goodsType.getId();
+        return amount + " " + goodsType.getId();
     }
 
     /**

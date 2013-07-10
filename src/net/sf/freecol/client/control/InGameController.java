@@ -474,7 +474,7 @@ public final class InGameController implements NetworkConstants {
                 atStop = unit.getTile() == stop.getLocation().getTile();
             } else {
                 throw new IllegalStateException("Bogus stop location: "
-                    + (FreeColGameObject) stop.getLocation());
+                    + (FreeColGameObject)stop.getLocation());
             }
             if (atStop) {
                 int len = sb.length();
@@ -3616,7 +3616,7 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        askServer().rename((FreeColGameObject) object, name);
+        askServer().rename((FreeColGameObject)object, name);
     }
 
     /**

@@ -659,7 +659,7 @@ public class ChangeSet {
                 .append(" ").append(see.toString())
                 .append(" #").append(getPriority())
                 .append(" ").append(unit.getId())
-                .append(" ").append(((FreeColGameObject)oldLocation).getId())
+                .append(" ").append(oldLocation.getId())
                 .append(" ").append(newTile.getId())
                 .append("]");
             return sb.toString();

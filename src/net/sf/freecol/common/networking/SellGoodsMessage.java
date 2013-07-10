@@ -120,9 +120,8 @@ public class SellGoodsMessage extends DOMMessage {
         }
         int present = carrier.getGoodsCount(type);
         if (present < amount) {
-            return DOMMessage.clientError("Attempt to sell "
-                + Integer.toString(amount) + " " + type.getId()
-                + " but only " + Integer.toString(present) + " present.");
+            return DOMMessage.clientError("Attempt to sell " + amount
+                + " " + type.getId() + " but only " + present + " present.");
         }
 
         // Try to sell.

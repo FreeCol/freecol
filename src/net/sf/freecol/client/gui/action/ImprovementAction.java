@@ -43,10 +43,10 @@ public class ImprovementAction extends UnitAction {
      */
     public ImprovementAction(FreeColClient freeColClient,
                              TileImprovementType improvement) {
-        super(freeColClient, improvement.getShortId() + "Action");
+        super(freeColClient, improvement.getSuffix() + "Action");
 
         this.improvement = improvement;
-        addImageIcons(improvement.getShortId());
+        addImageIcons(improvement.getSuffix());
     }
 
 

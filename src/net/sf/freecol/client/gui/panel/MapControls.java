@@ -85,11 +85,11 @@ public abstract class MapControls {
         unitButtons.add(new UnitButton(am, FortifyAction.id));
         for (TileImprovementType type : freeColClient.getGame().getSpecification()
                  .getTileImprovementTypeList()) {
-            FreeColAction action = am.getFreeColAction(type.getShortId()
+            FreeColAction action = am.getFreeColAction(type.getSuffix()
                                                        + "Action");
             if (!type.isNatural() && action != null
                 && action.hasOrderButtons()) {
-                unitButtons.add(new UnitButton(am, type.getShortId() + "Action"));
+                unitButtons.add(new UnitButton(am, type.getSuffix() + "Action"));
             }
         }
         unitButtons.add(new UnitButton(am, BuildColonyAction.id));

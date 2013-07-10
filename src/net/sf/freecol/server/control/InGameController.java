@@ -1243,7 +1243,7 @@ public final class InGameController extends Controller {
                 .addStringTemplate("%nation%", serverPlayer.getNationName()));
 
         // Dispose of the unit, only visible to the owner.
-        cs.add(See.only(serverPlayer), (FreeColGameObject) unit.getLocation());
+        cs.add(See.only(serverPlayer), (FreeColGameObject)unit.getLocation());
         cs.addDispose(See.only(serverPlayer), null, unit);
 
         // Others can see the cash in message.
@@ -1398,7 +1398,7 @@ public final class InGameController extends Controller {
         ChangeSet cs = new ChangeSet();
 
         object.setName(newName);
-        FreeColGameObject fcgo = (FreeColGameObject) object;
+        FreeColGameObject fcgo = (FreeColGameObject)object;
         cs.addPartial(See.all(), fcgo, "name");
 
         // Others may be able to see the name change.
@@ -1763,7 +1763,7 @@ public final class InGameController extends Controller {
         } else if (destination instanceof Europe) {
             if (!highSeas.getDestinations().contains(destination)) {
                 return DOMMessage.clientError("HighSeas does not connect to: "
-                    + ((FreeColGameObject) destination).getId());
+                    + destination.getId());
             } else if (unit.getLocation() == highSeas) {
                 if (!(current instanceof Europe)) {
                     // Changed direction
@@ -1788,7 +1788,7 @@ public final class InGameController extends Controller {
         } else if (destination instanceof Map) {
             if (!highSeas.getDestinations().contains(destination)) {
                 return DOMMessage.clientError("HighSeas does not connect to: "
-                    + ((FreeColGameObject) destination).getId());
+                    + destination.getId());
             } else if (unit.getLocation() == highSeas) {
                 if (current != destination && (current == null
                         || current.getTile() == null
@@ -1813,7 +1813,7 @@ public final class InGameController extends Controller {
             Tile tile = destination.getTile();
             if (!highSeas.getDestinations().contains(tile.getMap())) {
                 return DOMMessage.clientError("HighSeas does not connect to: "
-                    + ((FreeColGameObject) destination).getId());
+                    + destination.getId());
             } else if (unit.getLocation() == highSeas) {
                 // Direction is somewhat moot, so just reset.
                 unit.setWorkLeft(unit.getSailTurns());
@@ -1831,12 +1831,12 @@ public final class InGameController extends Controller {
             }
         } else {
             return DOMMessage.clientError("Bogus moveTo destination: "
-                + ((FreeColGameObject) destination).getId());
+                + destination.getId());
         }
         if (invalid) {
             return DOMMessage.clientError("Invalid moveTo: unit=" + unit.getId()
-                + " from=" + ((FreeColGameObject) unit.getLocation()).getId()
-                + " to=" + ((FreeColGameObject) destination).getId());
+                + " from=" + unit.getLocation().getId()
+                + " to=" + destination.getId());
         }
 
         if (others) sendToOthers(serverPlayer, cs);
@@ -2002,7 +2002,7 @@ public final class InGameController extends Controller {
         switch (settlement.getAlarm(serverPlayer).getLevel()) {
         case HATEFUL: // Killed, might be visible to other players.
             cs.add(See.perhaps().always(serverPlayer),
-                   (FreeColGameObject) unit.getLocation());
+                   (FreeColGameObject)unit.getLocation());
             cs.addDispose(See.perhaps().always(serverPlayer),
                 unit.getLocation(), unit);
             break;
@@ -2143,7 +2143,7 @@ public final class InGameController extends Controller {
         Tension tension = settlement.getAlarm(serverPlayer);
         if (tension.getLevel() == Tension.Level.HATEFUL) {
             cs.add(See.perhaps().always(serverPlayer),
-                   (FreeColGameObject) unit.getLocation());
+                   (FreeColGameObject)unit.getLocation());
             cs.addDispose(See.perhaps().always(serverPlayer),
                 unit.getLocation(), unit);
             result = "die";
@@ -2276,7 +2276,7 @@ public final class InGameController extends Controller {
                 .addStringTemplate("%settlement%", settlement.getLocationNameFor(enemy))
                 .addStringTemplate("%nation%", owner.getNationName()));
         cs.add(See.perhaps().always(serverPlayer),
-               (FreeColGameObject) unit.getLocation());
+               (FreeColGameObject)unit.getLocation());
         cs.addDispose(See.perhaps().always(serverPlayer),
             unit.getLocation(), unit);
 
@@ -2308,7 +2308,7 @@ public final class InGameController extends Controller {
         switch (settlement.getAlarm(serverPlayer).getLevel()) {
         case HATEFUL: case ANGRY:
             cs.add(See.perhaps().always(serverPlayer),
-                (FreeColGameObject) unit.getLocation());
+                   (FreeColGameObject)unit.getLocation());
             cs.addDispose(See.perhaps().always(serverPlayer),
                 unit.getLocation(), unit);
             break;
@@ -2707,7 +2707,7 @@ public final class InGameController extends Controller {
                 cs.addPartial(See.only(serverPlayer), oldUnit, "movesLeft");
             }
         } else {
-            cs.add(See.perhaps(), (FreeColGameObject) unit.getLocation());
+            cs.add(See.perhaps(), (FreeColGameObject)unit.getLocation());
         }
 
         // Others might see capacity change.
@@ -2752,7 +2752,7 @@ public final class InGameController extends Controller {
             cs.add(See.only(serverPlayer), unit.getGoodsContainer());
             if (moved) cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
         } else {
-            cs.add(See.perhaps(), (FreeColGameObject) unit.getLocation());
+            cs.add(See.perhaps(), (FreeColGameObject)unit.getLocation());
         }
 
         // Others might see a capacity change.
@@ -2808,7 +2808,7 @@ public final class InGameController extends Controller {
 
         // Dispose of the unit.
         cs.add(See.perhaps().always(serverPlayer),
-               (FreeColGameObject) unit.getLocation());
+               (FreeColGameObject)unit.getLocation());
         cs.addDispose(See.perhaps().always(serverPlayer),
             unit.getLocation(), unit);
 

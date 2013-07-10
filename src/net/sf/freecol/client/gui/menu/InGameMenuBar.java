@@ -197,7 +197,7 @@ public class InGameMenuBar extends FreeColMenuBar {
         for (TileImprovementType type : freeColClient.getGame().getSpecification()
                  .getTileImprovementTypeList()) {
             if (!type.isNatural()) {
-                menu.add(getMenuItem(type.getShortId() + "Action"));
+                menu.add(getMenuItem(type.getSuffix() + "Action"));
             }
         }
         menu.addSeparator();

@@ -240,17 +240,6 @@ public final class TileImprovementType extends FreeColGameObjectType {
         this.zIndex = newZIndex;
     }
 
-
-    /**
-     * Gets an identifier for the action of building this improvement.
-     *
-     * @return a <code>String</code> value
-     */
-    public String getShortId() {
-        int index = getId().lastIndexOf('.') + 1;
-        return getId().substring(index);
-    }
-
     /**
      * Add an allowed worker identifier.
      *

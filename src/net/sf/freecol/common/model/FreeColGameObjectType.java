@@ -25,7 +25,6 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.option.OptionGroup;
-import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -174,7 +173,8 @@ public abstract class FreeColGameObjectType extends FreeColObject
      * @return The usual identifier suffix.
      */
     public final String getSuffix() {
-        return Utils.lastPart(getId(), ".");
+        String id = getId();
+        return (id == null) ? null : id.substring(id.lastIndexOf('.') + 1);
     }
 
     /**

@@ -116,9 +116,9 @@ public class EmbarkMessage extends DOMMessage {
             // must be on the same tile.
             if (!carrier.isAtLocation(sourceLocation)) {
                 return DOMMessage.clientError("Unit " + unitId
-                    + " at " + ((FreeColGameObject) sourceLocation)
+                    + " at " + sourceLocation.getId()
                     + " and carrier " + carrierId
-                    + " at " + ((FreeColGameObject) carrier.getLocation())
+                    + " at " + carrier.getLocation().getId()
                     + " are not co-located.");
             }
         } else {

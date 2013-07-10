@@ -888,7 +888,7 @@ public final class ColonyPanel extends PortPanel
             }
             updatePopulationPanel();
         } else if (ColonyChangeEvent.UNIT_TYPE_CHANGE.toString().equals(property)) {
-            FreeColGameObject object = (FreeColGameObject) event.getSource();
+            FreeColGameObject object = (FreeColGameObject)event.getSource();
             UnitType oldType = (UnitType) event.getOldValue();
             UnitType newType = (UnitType) event.getNewValue();
             getGUI().showInformationMessage(object,

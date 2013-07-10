@@ -2099,7 +2099,7 @@ public class Colony extends Settlement implements Nameable {
     public List<FreeColGameObject> disposeList() {
         List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
         for (WorkLocation workLocation : getAllWorkLocations()) {
-            objects.addAll(((FreeColGameObject) workLocation).disposeList());
+            objects.addAll(workLocation.disposeList());
         }
         TileImprovement road = getTile().getRoad();
         if (road != null && road.isVirtual()) {

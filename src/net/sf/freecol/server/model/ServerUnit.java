@@ -492,7 +492,7 @@ public class ServerUnit extends Unit implements ServerModelObject {
             Location loc = getLocation();
             cs.addMessage(See.only(owner),
                 new ModelMessage("model.unit.unitRepaired",
-                    this, (FreeColGameObject) loc)
+                    this, (FreeColGameObject)loc)
                 .addStringTemplate("%unit%", getLabel())
                 .addStringTemplate("%repairLocation%",
                     loc.getLocationNameFor(owner)));
@@ -876,9 +876,9 @@ public class ServerUnit extends Unit implements ServerModelObject {
             cs.addMove(See.perhaps().always(serverPlayer), this,
                 oldLocation, newTile);
             cs.add(See.perhaps().always(serverPlayer),
-                (FreeColGameObject) oldLocation);
+                (FreeColGameObject)oldLocation);
         } else {
-            cs.add(See.only(serverPlayer), (FreeColGameObject) oldLocation);
+            cs.add(See.only(serverPlayer), (FreeColGameObject)oldLocation);
         }
         cs.add(See.perhaps().always(serverPlayer), newTile);
         if (isDisposed()) return;
