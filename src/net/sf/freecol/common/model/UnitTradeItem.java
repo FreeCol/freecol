@@ -58,8 +58,6 @@ public class UnitTradeItem extends TradeItem {
      */
     public UnitTradeItem(Game game, FreeColXMLReader xr) throws XMLStreamException {
         super(game, xr);
-
-        readFromXML(xr);
     }
 
 

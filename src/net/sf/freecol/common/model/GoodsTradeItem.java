@@ -63,8 +63,6 @@ public class GoodsTradeItem extends TradeItem {
      */
     public GoodsTradeItem(Game game, FreeColXMLReader xr) throws XMLStreamException {
         super(game, xr);
-
-        readFromXML(xr);
     }
 
 

@@ -64,8 +64,6 @@ public class ColonyTradeItem extends TradeItem {
      */
     public ColonyTradeItem(Game game, FreeColXMLReader xr) throws XMLStreamException {
         super(game, xr);
-
-        readFromXML(xr);
     }
 
 

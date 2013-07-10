@@ -55,11 +55,8 @@ public class GoldTradeItem extends TradeItem {
      * @param xr The <code>FreeColXMLReader</code> to read from.
      * @exception XMLStreamException if there is an error reading the stream.
      */
-    public GoldTradeItem(Game game,
-                         FreeColXMLReader xr) throws XMLStreamException {
+    public GoldTradeItem(Game game, FreeColXMLReader xr) throws XMLStreamException {
         super(game, xr);
-
-        readFromXML(xr);
     }
 
 

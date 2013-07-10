@@ -65,6 +65,8 @@ public abstract class TradeItem extends FreeColObject {
      */
     public TradeItem(Game game, FreeColXMLReader xr) throws XMLStreamException {
         this.game = game;
+
+        readFromXML(xr);
     }
 
 
