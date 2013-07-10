@@ -535,7 +535,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * @return True if there is a completed improvement present.
      */
     public boolean hasTileImprovement(TileImprovementType type) {
-        return (tileItemContainer == null) ? false
+        return (type.isChangeType()) ? type.changeContainsTarget(getType())
+            : (tileItemContainer == null) ? false
             : tileItemContainer.hasImprovement(type);
     }
 
