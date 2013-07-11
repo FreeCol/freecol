@@ -1772,7 +1772,7 @@ public final class InGameController extends Controller {
                 }
                 unit.setDestination(destination);
                 cs.add(See.only(serverPlayer), unit, highSeas);
-            } else if (unit.getTile() != null) {
+            } else if (unit.hasTile()) {
                 Tile tile = unit.getTile();
                 unit.setEntryLocation(tile);
                 unit.setWorkLeft(unit.getSailTurns());
@@ -2731,7 +2731,7 @@ public final class InGameController extends Controller {
         Settlement settlement = null;
         if (unit.isInEurope()) { // Must be a dump of boycotted goods
             loc = null;
-        } else if (unit.getTile() == null) {
+        } else if (!unit.hasTile()) {
             return DOMMessage.clientError("Unit not on the map.");
         } else if (unit.getSettlement() != null) {
             settlement = unit.getTile().getSettlement();
@@ -3350,7 +3350,7 @@ public final class InGameController extends Controller {
      */
     public Element equipUnit(ServerPlayer serverPlayer, Unit unit,
                              EquipmentType type, int amount) {
-        Settlement settlement = (unit.getTile() == null) ? null
+        Settlement settlement = (!unit.hasTile()) ? null
             : unit.getSettlement();
         GoodsContainer container = null;
         boolean tileDirty = false;

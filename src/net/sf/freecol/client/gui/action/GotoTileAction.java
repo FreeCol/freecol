@@ -50,7 +50,7 @@ public class GotoTileAction extends UnitAction {
     @Override
     protected boolean shouldBeEnabled() {
         return super.shouldBeEnabled()
-            && getGUI().getActiveUnit().getTile() != null;
+            && getGUI().getActiveUnit().hasTile();
     }
 
     /**

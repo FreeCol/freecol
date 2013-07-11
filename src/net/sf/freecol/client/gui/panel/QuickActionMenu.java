@@ -113,7 +113,7 @@ public final class QuickActionMenu extends JPopupMenu {
             }
         }
 
-        if (tempUnit.getLocation().getTile() != null) {
+        if (tempUnit.hasTile()) {
             Colony colony = tempUnit.getLocation().getTile().getColony();
             if (colony != null) {
             	if (addTileItem(unitLabel)) {

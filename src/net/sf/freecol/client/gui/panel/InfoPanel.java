@@ -138,7 +138,7 @@ public final class InfoPanel extends FreeColPanel {
                 @Override
                 public void mousePressed(MouseEvent e) {
                     Unit activeUnit = getGUI().getActiveUnit();
-                    if (activeUnit != null && activeUnit.getTile() != null) {
+                    if (activeUnit != null && activeUnit.hasTile()) {
                         getGUI().setFocus(activeUnit.getTile());
                     }
                 }

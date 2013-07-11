@@ -140,7 +140,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                 int base = (!unit.getEquipment().isEmpty()) ? 0
                     : (unit.getSkillLevel() > 0) ? 100
                     : 500 + 100 * unit.getSkillLevel();
-                if (unit.getTile() != null) base += 50;
+                if (unit.hasTile()) base += 50;
                 return base;
             }
 
@@ -167,7 +167,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                     || !unit.isColonist()) {
                     return -1000;
                 } else if (unit.hasAbility(Ability.SCOUT_INDIAN_SETTLEMENT)) {
-                    return 900 + ((unit.getTile() != null) ? 100 : 0);
+                    return 900 + ((unit.hasTile()) ? 100 : 0);
                 } else if (unit.hasAbility(Ability.EXPERT_SCOUT)) {
                     return 600;
                 }
@@ -208,7 +208,7 @@ public class EuropeanAIPlayer extends AIPlayer {
                     || !unit.isColonist()) {
                     return -1000;
                 } else if (unit.hasAbility(Ability.IMPROVE_TERRAIN)) {
-                    return 900 + ((unit.getTile() != null) ? 100 : 0);
+                    return 900 + ((unit.hasTile()) ? 100 : 0);
                 } else if (unit.hasAbility(Ability.EXPERT_PIONEER)) {
                     return 600;
                 }

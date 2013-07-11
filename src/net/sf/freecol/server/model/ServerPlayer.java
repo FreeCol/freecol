@@ -365,13 +365,13 @@ public class ServerPlayer extends Player implements ServerModelObject {
             // Verify if unit is in new world, or on a carrier in new world
             Unit carrier;
             if ((carrier = unit.getCarrier()) != null) {
-                if (carrier.getTile() != null) {
+                if (carrier.hasTile()) {
                     logger.info(getName() + " alive, unit (embarked) on map.");
                     return IS_ALIVE;
                 }
                 hasEmbarked = true;
             }
-            if (unit.getTile() != null) {
+            if (unit.hasTile()) {
                 logger.info(getName() + " alive, unit on map.");
                 return IS_ALIVE;
             }
@@ -734,9 +734,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      */
     public void setExplored(Unit unit) {
         if (getGame() == null || getGame().getMap() == null || unit == null
-            || unit.getLocation() == null || unit.getTile() == null) {
-            return;
-        }
+            || !unit.hasTile()) return;
 
         invalidateCanSeeTiles();
         Tile tile = unit.getTile();

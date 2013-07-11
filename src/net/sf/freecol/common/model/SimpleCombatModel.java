@@ -611,7 +611,7 @@ public class SimpleCombatModel extends CombatModel {
                     if (r < winner.getConvertProbability()) {
                         if (is.getUnitCount() + tile.getUnitCount() > 1
                             && is.hasMissionary(winnerPlayer)
-                            && winner.getTile() != null
+                            && winner.hasTile()
                             && winner.getTile().isLand()) {
                             crs.add(CombatResult.CAPTURE_CONVERT);
                             lose++;
@@ -697,9 +697,9 @@ public class SimpleCombatModel extends CombatModel {
             attackerUnit = (Unit)attacker;
             defenderUnit = (Unit)defender;
             return attackerUnit.getSettlement() == null
-                && attackerUnit.getTile() != null
+                && attackerUnit.hasTile()
                 && defenderUnit.getSettlement() == null
-                && defenderUnit.getTile() != null
+                && defenderUnit.hasTile()
                 && (attackerUnit.hasAbility(Ability.AMBUSH_BONUS)
                     || defenderUnit.hasAbility(Ability.AMBUSH_PENALTY))
                 && (attackerUnit.getTile().hasAbility(Ability.AMBUSH_TERRAIN)

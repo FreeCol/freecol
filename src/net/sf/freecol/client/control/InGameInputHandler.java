@@ -1117,7 +1117,7 @@ public final class InGameInputHandler extends InputHandler {
         Unit unit = message.getUnit(game);
         String defaultName = message.getNewLandName();
         if (unit == null || defaultName == null
-            || unit.getTile() == null) return null;
+            || !unit.hasTile()) return null;
 
         // Offer to name the land.
         new NewLandNameSwingTask(unit, defaultName, message.getWelcomer(game),

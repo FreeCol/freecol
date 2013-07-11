@@ -558,7 +558,7 @@ public class DebugUtils {
                     } else {
                         Unit cUnit = game.getFreeColGameObject(u.getId(),
                                                                Unit.class);
-                        if (cUnit.getTile() != null
+                        if (cUnit.hasTile()
                             && !cUnit.getTile().getId().equals(u.getTile().getId())) {
                             sb.append("Unit located on different tiles.\n");
                             sb.append("  Server: " + Messages.message(Messages.getLabel(u))

@@ -57,7 +57,7 @@ public class BuildColonyAction extends UnitAction {
     protected boolean shouldBeEnabled() {
         if (!super.shouldBeEnabled()) return false;
         Unit selectedOne = getGUI().getActiveUnit();
-        return selectedOne != null && selectedOne.getTile() != null
+        return selectedOne != null && selectedOne.hasTile()
             && (selectedOne.canBuildColony()
                 || (selectedOne.getTile().getColony() != null
                     // exclude artillery, ships, etc.

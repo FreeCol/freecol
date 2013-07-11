@@ -894,7 +894,7 @@ public final class InGameController implements NetworkConstants {
             if (unit.isAtLocation(path.getLocation())) continue;
 
             if (path.getLocation() instanceof Europe) {
-                if (unit.getTile() != null
+                if (unit.hasTile()
                     && unit.getTile().isDirectlyHighSeasConnected()) {
                     moveTo(unit, path.getLocation());
                 } else {
@@ -2255,13 +2255,12 @@ public final class InGameController implements NetworkConstants {
                 return false;
             }
         } else if (destination instanceof Map) {
-            if (unit.getTile() != null
-                && unit.getTile().getMap() == destination) {
+            if (unit.hasTile() && unit.getTile().getMap() == destination) {
                 gui.playSound("sound.event.illegalMove");
                 return false;
             }
         } else if (destination instanceof Settlement) {
-            if (unit.getTile() != null) {
+            if (unit.hasTile()) {
                 gui.playSound("sound.event.illegalMove");
                 return false;
             }
@@ -2385,7 +2384,7 @@ public final class InGameController implements NetworkConstants {
         Unit.MoveType mt = unit.getMoveType(direction);
         Location destination = unit.getDestination();
         boolean clearDestination = destination != null
-            && unit.getTile() != null
+            && unit.hasTile()
             && Map.isSameLocation(unit.getTile().getNeighbourOrNull(direction),
                                   destination);
 
@@ -3633,7 +3632,7 @@ public final class InGameController implements NetworkConstants {
         if (setDestination(unit, destination)
             && freeColClient.currentPlayerIsMyPlayer()) {
             if (destination instanceof Europe) {
-                if (unit.getTile() != null
+                if (unit.hasTile()
                     && unit.getTile().isDirectlyHighSeasConnected()) {
                     moveTo(unit, destination);
                 } else {
@@ -3929,7 +3928,7 @@ public final class InGameController implements NetworkConstants {
         carrier = (Unit) goods.getLocation();
         Colony colony = null;
         if (!carrier.isInEurope()) {
-            if (carrier.getTile() == null) {
+            if (!carrier.hasTile()) {
                 throw new IllegalArgumentException("Carrier with null location.");
             }
             colony = carrier.getColony();

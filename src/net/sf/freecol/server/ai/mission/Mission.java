@@ -490,8 +490,8 @@ public abstract class Mission extends AIObject {
                     return MoveType.MOVE_ILLEGAL;
                 }
             }
-        } else if (unit.getTile() == null) {
-            throw new IllegalStateException("Null unit tile: " + unit);
+        } else if (!unit.hasTile()) {
+            throw new IllegalStateException("Unit not on the map: " + unit);
         } else if (target instanceof Europe) {
             if (!unit.getOwner().canMoveToEurope()) {
                 logger.fine(logMe + " impossible move to Europe"
@@ -576,8 +576,8 @@ public abstract class Mission extends AIObject {
                 return MoveType.MOVE_NO_MOVES;
             } else if (unit.isInEurope()) {
                 useEurope++;
-            } else if (unit.getTile() == null) {
-                logger.fine(logMe + " null location tile: " + this);
+            } else if (!unit.hasTile()) {
+                logger.fine(logMe + " unit not on the map: " + this);
                 return MoveType.MOVE_ILLEGAL;
             }
 
@@ -600,7 +600,7 @@ public abstract class Mission extends AIObject {
                 Direction d;
                 if (unit.isAtLocation(path.getLocation())) {
                     d = null;
-                } else if (unit.getTile() != null
+                } else if (unit.hasTile()
                     && unit.getTile().isAdjacent(path.getTile())) {
                     if (unit.getMovesLeft() <= 0) {
                         logger.finest(logMe + " at " + unit.getLocation()
@@ -651,7 +651,7 @@ public abstract class Mission extends AIObject {
                 Direction d;
                 if (unit.isAtLocation(path.getLocation())) {
                     d = null;
-                } else if (unit.getTile() != null
+                } else if (unit.hasTile()
                     && unit.getTile().isAdjacent(newCarrier.getTile())) {
                     if (unit.getMovesLeft() <= 0) {
                         logger.finest(logMe + " at " + unit.getLocation()
@@ -769,7 +769,7 @@ public abstract class Mission extends AIObject {
         final Unit carrier = unit.getCarrier();
         PathNode path;
 
-        return (unit.getTile() == null)
+        return (!unit.hasTile())
             ? ((unit.isOnCarrier()) ? carrier : unit).getFullEntryLocation()
             : (!unit.isOnCarrier()) ? null
             : (carrier.getSettlement() != null) ? carrier.getTile()

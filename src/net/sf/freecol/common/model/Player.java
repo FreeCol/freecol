@@ -1199,7 +1199,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public boolean isWorkForREF() {
         for (Unit u : getUnits()) { // Work to do if unit in the new world
-            if (u.getTile() != null) return true;
+            if (u.hasTile()) return true;
         }
         return !getRebels().isEmpty();
     }
@@ -2684,8 +2684,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public void setExplored(Unit unit) {
         if (getGame() == null || getGame().getMap() == null || unit == null
-            || unit.getLocation() == null || unit.getTile() == null
-            || isIndian()) {
+            || !unit.hasTile() || isIndian()) {
             return;
         }
         invalidateCanSeeTiles();

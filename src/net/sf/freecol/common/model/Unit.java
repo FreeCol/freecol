@@ -864,6 +864,16 @@ public class Unit extends GoodsLocation
     }
 
     /**
+     * Is this unit on a tile?
+     *
+     * @return True if this unit is on a tile.
+     */
+    public boolean hasTile() {
+        return getTile() != null;
+    }
+
+
+    /**
      * Gets the work location this unit is working in.
      *
      * @return The current <code>WorkLocation</code>, or null if none.
@@ -2075,11 +2085,12 @@ public class Unit extends GoodsLocation
      * @return The move type.
      */
     public MoveType getMoveType(Direction direction) {
-        Tile tile = getTile();
-        if (tile == null) return MoveType.MOVE_NO_TILE;
-        Tile target = tile.getNeighbourOrNull(direction);
-        if (target == null) return MoveType.MOVE_ILLEGAL;
-        return getMoveType(target);
+        Tile target;
+        return (!hasTile())
+            ? MoveType.MOVE_NO_TILE
+            : ((target = getTile().getNeighbourOrNull(direction)) == null)
+            ? MoveType.MOVE_ILLEGAL
+            : getMoveType(target);
     }
 
     /**
@@ -2090,9 +2101,9 @@ public class Unit extends GoodsLocation
      * @return The move type.
      */
     public MoveType getMoveType(Tile target) {
-        Tile tile = getTile();
-        if (tile == null) return MoveType.MOVE_NO_TILE;
-        return getMoveType(tile, target, getMovesLeft());
+        return (!hasTile()) 
+            ? MoveType.MOVE_NO_TILE
+            : getMoveType(getTile(), target, getMovesLeft());
     }
 
     /**
@@ -2150,9 +2161,8 @@ public class Unit extends GoodsLocation
      *         types on failure.
      */
     public MoveType getSimpleMoveType(Tile target) {
-        Tile tile = getTile();
-        if (tile == null) return MoveType.MOVE_NO_TILE;
-        return getSimpleMoveType(tile, target);
+        return (!hasTile()) ? MoveType.MOVE_NO_TILE
+            : getSimpleMoveType(getTile(), target);
     }
 
     /**
@@ -2163,10 +2173,12 @@ public class Unit extends GoodsLocation
      * @return The move type.
      */
     public MoveType getSimpleMoveType(Direction direction) {
-        Tile tile = getTile();
-        if (tile == null) return MoveType.MOVE_NO_TILE;
-        Tile target = tile.getNeighbourOrNull(direction);
-        return getSimpleMoveType(tile, target);
+        Tile target;
+        return (!hasTile())
+            ? MoveType.MOVE_NO_TILE
+            : ((target = getTile().getNeighbourOrNull(direction)) == null)
+            ? MoveType.MOVE_ILLEGAL
+            : getSimpleMoveType(getTile(), target);
     }
 
     /**
@@ -2478,9 +2490,8 @@ public class Unit extends GoodsLocation
      */
     public boolean hasHighSeasMove() {
         if (canMoveToHighSeas()) return true;
-        Tile tile = getTile();
-        if (tile != null && getMovesLeft() > 0) {
-            for (Tile t : tile.getSurroundingTiles(1)) {
+        if (hasTile() && getMovesLeft() > 0) {
+            for (Tile t : getTile().getSurroundingTiles(1)) {
                 if (t.isDirectlyHighSeasConnected()
                     && getMoveType(t).isLegal()) return true;
             }
@@ -2496,8 +2507,7 @@ public class Unit extends GoodsLocation
      * @return <code>true</code> if this unit can build a colony.
      */
     public boolean canBuildColony() {
-        return unitType.canBuildColony() && getMovesLeft() > 0
-            && getTile() != null;
+        return hasTile() && unitType.canBuildColony() && getMovesLeft() > 0;
     }
 
     /**
@@ -2595,7 +2605,7 @@ public class Unit extends GoodsLocation
     public Tile getPathStartTile() {
         if (isOnCarrier()) {
             final Unit carrier = getCarrier();
-            return (carrier.getTile() != null)
+            return (carrier.hasTile())
                 ? carrier.getTile()
                 : (carrier.getDestination() instanceof Map)
                 ? carrier.getFullEntryLocation()
@@ -2722,8 +2732,7 @@ public class Unit extends GoodsLocation
     public PathNode findOurNearestSettlement(final boolean excludeStart,
                                              int range, final boolean coastal) {
         final Player player = getOwner();
-        if (player.getNumberOfSettlements() <= 0
-            || getTile() == null) return null;
+        if (player.getNumberOfSettlements() <= 0 || !hasTile()) return null;
 
         final Tile startTile = getTile();
         final GoalDecider gd = new GoalDecider() {
@@ -2857,11 +2866,10 @@ public class Unit extends GoodsLocation
      * @return True if this unit can attack.
      */
     public boolean canAttack(Unit defender) {
-        if (!isOffensiveUnit()
-            || defender == null
-            || defender.getTile() == null) return false;
-        Tile tile = defender.getTile();
+        if (!isOffensiveUnit() || defender == null
+            || !defender.hasTile()) return false;
 
+        Tile tile = defender.getTile();
         return (isNaval())
             ? !tile.hasSettlement() && defender.isNaval()
             : !defender.isNaval() || defender.isBeached();
@@ -2946,7 +2954,7 @@ public class Unit extends GoodsLocation
         Turn turn = getGame().getTurn();
         Set<Modifier> modifierSet = new HashSet<Modifier>();
         modifierSet.addAll(getModifierSet("model.modifier.lineOfSightBonus"));
-        if (getTile() != null && getTile().getType() != null) {
+        if (hasTile() && getTile().isExplored()) {
             modifierSet.addAll(getTile().getType()
                 .getModifierSet("model.modifier.lineOfSightBonus",
                                 unitType, turn));
@@ -3459,7 +3467,7 @@ public class Unit extends GoodsLocation
      * @throws IllegalStateException if there is trouble.
      */
     public Tile getNeighbourTile(String directionString) {
-        if (getTile() == null) {
+        if (!hasTile()) {
             throw new IllegalStateException("Unit is not on the map: "
                 + getId());
         }
@@ -3498,7 +3506,7 @@ public class Unit extends GoodsLocation
                 + settlementId);
         }
 
-        if (getTile() == null) {
+        if (!hasTile()) {
             throw new IllegalStateException("Unit is not on the map: "
                 + getId());
         } else if (getTile().getDistanceTo(settlement.getTile()) > 1) {

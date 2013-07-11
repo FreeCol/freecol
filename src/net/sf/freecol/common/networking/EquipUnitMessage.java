@@ -97,7 +97,7 @@ public class EquipUnitMessage extends DOMMessage {
         }
         if (unit.isInEurope()) {
             ; // Always OK
-        } else if (unit.getTile() == null) {
+        } else if (!unit.hasTile()) {
             return DOMMessage.clientError("Unit is not on the map: "
                 + unitId);
         } else if (unit.getSettlement() == null) {

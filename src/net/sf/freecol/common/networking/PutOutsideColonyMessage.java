@@ -78,7 +78,7 @@ public class PutOutsideColonyMessage extends DOMMessage {
         } catch (Exception e) {
             return DOMMessage.clientError(e.getMessage());
         }
-        if (unit.getTile() == null) {
+        if (!unit.hasTile()) {
             return DOMMessage.clientError("Unit is not on the map: " + unitId);
         } else if (unit.getColony() == null) {
             return DOMMessage.clientError("Unit is not in a colony: "

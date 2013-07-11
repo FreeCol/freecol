@@ -705,7 +705,7 @@ public final class ColonyPanel extends PortPanel
             if (getFreeColClient().currentPlayerIsMyPlayer()) {
                 getController().nextModelMessage();
                 Unit activeUnit = getGUI().getActiveUnit();
-                if (activeUnit == null || activeUnit.getTile() == null
+                if (activeUnit == null || !activeUnit.hasTile()
                     || (!(activeUnit.getLocation() instanceof Tile)
                         && !activeUnit.isOnCarrier())) {
                     getController().nextActiveUnit();

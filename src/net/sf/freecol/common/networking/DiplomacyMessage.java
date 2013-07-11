@@ -149,7 +149,7 @@ public class DiplomacyMessage extends DOMMessage {
         Unit unit = getUnit();
         if (unit == null) {
             return DOMMessage.clientError("Missing unit in diplomacy.");
-        } else if (unit.getTile() == null) {
+        } else if (!unit.hasTile()) {
             return DOMMessage.clientError("Unit is not on the map: "
                 + unit.getId());
         } else if (unit.getOwner() != serverPlayer) {

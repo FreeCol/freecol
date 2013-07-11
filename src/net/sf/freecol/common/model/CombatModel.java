@@ -155,11 +155,11 @@ public abstract class CombatModel {
     public boolean combatIsAmphibious(FreeColGameObject attacker,
                                       FreeColGameObject defender) {
         return attacker instanceof Unit
-            && ((Unit) attacker).getTile() != null
-            && !((Unit) attacker).getTile().isLand()
+            && ((Unit)attacker).hasTile()
+            && !((Unit)attacker).getTile().isLand()
             && defender instanceof Locatable
-            && ((Locatable) defender).getTile() != null
-            && ((Locatable) defender).getTile().isLand();
+            && ((Locatable)defender).getTile() != null
+            && ((Locatable)defender).getTile().isLand();
     }
 
 

@@ -293,7 +293,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                                              this)
                                 .addName("%colony%", getName()));
                         cs.addDispose(See.perhaps().always(owner),
-                            getTile(), this);
+                                      getTile(), this);
                         return;
                     }
                 } else if (net < 0) {

@@ -1369,7 +1369,7 @@ public final class MapViewer {
             public void actionPerformed(ActionEvent event) {
                 if (!blinkingMarqueeEnabled)
                     return;
-                if (getActiveUnit() != null && getActiveUnit().getTile() != null) {
+                if (getActiveUnit() != null && getActiveUnit().hasTile()) {
                     Tile tile = getActiveUnit().getTile();
                     if (isTileVisible(tile)) {
                         gui.refreshTile(tile);
@@ -2444,7 +2444,7 @@ public final class MapViewer {
             // Draw the unit.
             // If unit is sentry, draw in grayscale
             boolean fade = (unit.getState() == Unit.UnitState.SENTRY)
-                || (unit.getTile() != null
+                || (unit.hasTile()
                     && player != null
                     && !player.canSee(unit.getTile()));
             Image image = lib.getUnitImageIcon(unit, fade).getImage();
@@ -2460,7 +2460,7 @@ public final class MapViewer {
 
             // Draw one small line for each additional unit (like in civ3).
             int unitsOnTile = 0;
-            if (unit.getTile() != null) {
+            if (unit.hasTile()) {
                 // When a unit is moving from tile to tile, it is
                 // removed from the source tile.  So the unit stack
                 // indicator cannot be drawn during the movement see

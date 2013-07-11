@@ -102,7 +102,7 @@ public class ColonyProductionTest extends FreeColTestCase {
 
         assertEquals(foodType, soldier.getWorkType());
 
-        assertEquals(colony.getColonyTile(tile).getTile(), soldier.getLocation().getTile());
+        assertEquals(colony.getColonyTile(tile).getTile(), soldier.getTile());
 
         assertEquals(0, soldier.getMovesLeft());
 
@@ -155,7 +155,7 @@ public class ColonyProductionTest extends FreeColTestCase {
         // Pioneer should be working on the field with the bonus
         assertEquals(foodType, pioneer.getWorkType());
 
-        assertEquals(colony.getColonyTile(tile).getTile(), pioneer.getLocation().getTile());
+        assertEquals(colony.getColonyTile(tile).getTile(), pioneer.getTile());
 
         assertEquals(0, pioneer.getMovesLeft());
 

@@ -1023,7 +1023,7 @@ public class TransportMission extends Mission {
             // updating in response to changes in moves left or the
             // map situation.
             Transportable t = cargo.getTransportable();
-            if (carrier.getTile() != null) {
+            if (carrier.hasTile()) {
                 if ((reason = cargo.setTarget()) != null && !cargo.retry()) {
                     removeCargo(cargo, "can not progress (" + reason
                         + ") to " + t.getTransportDestination());

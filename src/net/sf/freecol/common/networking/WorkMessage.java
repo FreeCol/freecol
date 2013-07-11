@@ -90,13 +90,12 @@ public class WorkMessage extends DOMMessage {
             return DOMMessage.clientError(e.getMessage());
         }
 
-        Tile tile = unit.getTile();
-        if (tile == null) {
+        if (!unit.hasTile()) {
             return DOMMessage.clientError("Unit is not on the map: "
                 + unitId);
         }
 
-        Colony colony = tile.getColony();
+        Colony colony = unit.getTile().getColony();
         if (colony == null) {
             return DOMMessage.clientError("Unit is not at a colony: "
                 + unitId);

@@ -62,7 +62,7 @@ public class ChangeAction extends UnitAction {
         super.update();
 
         Unit unit = getGUI().getActiveUnit();
-        if (unit != null && unit.getTile() != null) {
+        if (unit != null && unit.hasTile()) {
             if (unit.getColony() != null) {
                 putValue(NAME, Messages.message("changeAction.enterColony.name"));
             } else if (unit.isOnCarrier()) {
@@ -81,7 +81,7 @@ public class ChangeAction extends UnitAction {
     @Override
     protected boolean shouldBeEnabled() {
         return super.shouldBeEnabled()
-            && getGUI().getActiveUnit().getTile() != null;
+            && getGUI().getActiveUnit().hasTile();
     }
 
     /**
