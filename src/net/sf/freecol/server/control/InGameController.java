@@ -3058,7 +3058,7 @@ public final class InGameController extends Controller {
             Colony colony = tradeItem.getColony();
             if (colony != null) {
                 ServerPlayer former = (ServerPlayer) colony.getOwner();
-                colony.changeOwner(dest);
+                ((ServerColony)colony).changeOwner(dest);
                 List<FreeColGameObject> tiles
                     = new ArrayList<FreeColGameObject>();
                 tiles.addAll(colony.getOwnedTiles());

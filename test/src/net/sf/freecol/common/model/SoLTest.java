@@ -35,7 +35,6 @@ public class SoLTest extends FreeColTestCase {
                 * (colony.getSoL() + 1) * colony.getUnitCount()) / 100;
             colony.addGoods(bellsType,
                             requiredBells - colony.getGoodsCount(bellsType));
-            colony.updatePopulation(0);
             assertEquals(colony.getSoL(), i);
             assertEquals(colony.getTory(), 100 - i);
             int rebels = Colony.calculateRebels(colony.getUnitCount(), 

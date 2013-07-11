@@ -2465,7 +2465,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
 
         // Hand over the colony.
-        colony.changeOwner(attackerPlayer);
+        ((ServerColony)colony).changeOwner(attackerPlayer);
         // Remove goods party modifiers as they apply to a different monarch.
         for (Modifier m : colony.getModifiers()) {
             if ("model.modifier.colonyGoodsParty".equals(m.getSource())) {

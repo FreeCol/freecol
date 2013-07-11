@@ -276,6 +276,7 @@ public class Colony extends Settlement implements Nameable {
             addGoods(libertyTypeList.get(0), amount);
         }
         updateSoL();
+        updateProductionBonus();
     }
 
     /**
@@ -286,6 +287,8 @@ public class Colony extends Settlement implements Nameable {
     public void modifyLiberty(int amount) {
         liberty += amount;
         getOwner().modifyLiberty(amount);
+        updateSoL();
+        updateProductionBonus();
     }
 
     /**
@@ -1955,8 +1958,10 @@ public class Colony extends Settlement implements Nameable {
             : (tories > veryBadGovernment) ? -2
             : (tories > badGovernment) ? -1
             : 0;
-        if (productionBonus != newBonus) invalidateCache();
-        productionBonus = newBonus;
+        if (productionBonus != newBonus) {
+            invalidateCache();
+            productionBonus = newBonus;
+        }
     }
 
     /**
@@ -2476,24 +2481,6 @@ public class Colony extends Settlement implements Nameable {
 
 
     // Interface Settlement
-
-    /**
-     * Sets the owner of this <code>Colony</code>, including all units
-     * within, and change main tile nation ownership.
-     *
-     * @param owner The new owner <code>Player</code>.
-     * @see Settlement#changeOwner
-     */
-    @Override
-    public void changeOwner(Player owner) {
-        super.changeOwner(owner);
-        // Disable all exports
-        for (ExportData exportDatum : exportData.values()) {
-            exportDatum.setExported(false);
-        }
-        // Changing the owner might alter bonuses applied by founding fathers:
-        updatePopulation(0);
-    }
 
     /**
      * {@inheritDoc}

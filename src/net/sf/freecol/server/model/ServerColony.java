@@ -130,25 +130,22 @@ public class ServerColony extends Colony implements ServerModelObject {
 
 
     /**
-     * Is a goods type needed for a buildable that this colony could
-     * be building.
+     * Sets the owner of this <code>Colony</code>, including all units
+     * within, and change main tile nation ownership.
      *
-     * @param goodsType The <code>GoodsType</code> to check.
-     * @return True if the goods could be used to build something.
+     * @param owner The new owner <code>Player</code>.
+     * @see Settlement#changeOwner
      */
-    private boolean neededForBuildableType(GoodsType goodsType) {
-        final Specification spec = getSpecification();
-        List<BuildableType> buildables = new ArrayList<BuildableType>();
-        buildables.addAll(spec.getBuildingTypeList());
-        buildables.addAll(spec.getUnitTypesWithoutAbility(Ability.PERSON));
-        for (BuildableType bt : buildables) {
-            if (canBuild(bt)) {
-                for (AbstractGoods ag : bt.getRequiredGoods()) {
-                    if (ag.getType() == goodsType) return true;
-                }
-            }
+    @Override
+    public void changeOwner(Player owner) {
+        super.changeOwner(owner);
+        // Disable all exports
+        for (ExportData exportDatum : exportData.values()) {
+            exportDatum.setExported(false);
         }
-        return false;
+        // Changing the owner might alter bonuses applied by founding fathers:
+        updateSoL();
+        updateProductionBonus();
     }
 
     /**
@@ -501,6 +498,28 @@ public class ServerColony extends Colony implements ServerModelObject {
         } else {
             cs.add(See.only(owner), this);
         }
+    }
+
+    /**
+     * Is a goods type needed for a buildable that this colony could
+     * be building.
+     *
+     * @param goodsType The <code>GoodsType</code> to check.
+     * @return True if the goods could be used to build something.
+     */
+    private boolean neededForBuildableType(GoodsType goodsType) {
+        final Specification spec = getSpecification();
+        List<BuildableType> buildables = new ArrayList<BuildableType>();
+        buildables.addAll(spec.getBuildingTypeList());
+        buildables.addAll(spec.getUnitTypesWithoutAbility(Ability.PERSON));
+        for (BuildableType bt : buildables) {
+            if (canBuild(bt)) {
+                for (AbstractGoods ag : bt.getRequiredGoods()) {
+                    if (ag.getType() == goodsType) return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**

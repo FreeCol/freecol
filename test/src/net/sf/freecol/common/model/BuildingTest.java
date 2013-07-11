@@ -768,7 +768,6 @@ public class BuildingTest extends FreeColTestCase {
         // make sure no penalties apply
         colony.addGoods(spec().getGoodsType("model.goods.bells"),
                         Colony.LIBERTY_PER_REBEL * 3);
-        colony.updatePopulation(0);
 
         Building smithy = colony.getBuilding(blacksmithType);
         smithy.add(units.get(0));

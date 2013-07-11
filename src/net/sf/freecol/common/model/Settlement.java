@@ -241,15 +241,15 @@ public abstract class Settlement extends GoodsLocation
 
         getGame().checkOwners(this, oldOwner);
 
+        ChangeType change = (newOwner.isUndead()) ? ChangeType.UNDEAD
+            : ChangeType.CAPTURE;
         List<Unit> units = getUnitList();
         units.addAll(getTile().getUnitList());
         while (!units.isEmpty()) {
             Unit u = units.remove(0);
             units.addAll(u.getUnitList());
             u.setState(Unit.UnitState.ACTIVE);
-            UnitType type = u.getTypeChange((newOwner.isUndead())
-                                            ? ChangeType.UNDEAD
-                                            : ChangeType.CAPTURE, newOwner);
+            UnitType type = u.getTypeChange(change, newOwner);
             if (type != null) u.setType(type);
             u.changeOwner(newOwner);
         }
