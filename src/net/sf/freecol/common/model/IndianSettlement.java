@@ -1376,7 +1376,9 @@ public class IndianSettlement extends Settlement {
         // @compat 0.10.1
         for (Unit u : getUnitList()) {
             if (u.getLocation() != this) {
-                logger.warning("Fixing unit location");
+                logger.warning("Fixing unit location"
+                    + " from " + u.getLocation().getId()
+                    + " to " + this.getId());
                 u.setLocation(this);
             }
         }
