@@ -203,7 +203,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
         this.connection = connection;
         connected = connection != null;
 
-        resetExploredTiles(getGame().getMap());
         invalidateCanSeeTiles();
     }
 
@@ -687,31 +686,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     /**
-     * Resets this player's explored tiles. This is done by setting
-     * all the tiles within a {@link Unit}s line of sight visible.
-     * The other tiles are made unvisible.
-     *
-     * @param map The <code>Map</code> to reset the explored tiles on.
-     * @see #hasExplored
-     */
-    public void resetExploredTiles(Map map) {
-        if (map != null) {
-            for (Unit unit : getUnits()) {
-                Tile tile = unit.getTile();
-                if (tile == null) continue;
-                setExplored(tile);
-
-                int radius = (unit.getColony() != null)
-                    ? unit.getColony().getLineOfSight()
-                    : unit.getLineOfSight();
-                for (Tile t : tile.getSurroundingTiles(radius)) {
-                    setExplored(t);
-                }
-            }
-        }
-    }
-
-    /**
      * Checks if this <code>Player</code> has explored the given
      * <code>Tile</code>.
      *
@@ -746,7 +720,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 result.add(tile);
             }
         }
-        resetExploredTiles(getGame().getMap());
         invalidateCanSeeTiles();
         return result;
     }
