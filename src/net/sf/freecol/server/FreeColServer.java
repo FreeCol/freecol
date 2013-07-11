@@ -831,8 +831,7 @@ public final class FreeColServer {
             for (ServerModelObject smo : game.getServerModelObjects()) {
                 xw.writeStartElement(smo.getServerXMLElementTagName());
 
-                xw.writeAttribute(FreeColObject.ID_ATTRIBUTE_TAG,
-                    ((FreeColGameObject)smo).getId());
+                xw.writeAttribute(FreeColObject.ID_ATTRIBUTE_TAG, smo.getId());
 
                 xw.writeEndElement();
             }

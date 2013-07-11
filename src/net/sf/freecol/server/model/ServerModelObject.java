@@ -28,7 +28,7 @@ import net.sf.freecol.server.control.ChangeSet;
  * Interface for server-side objects which needs to store
  * extra information to a save game.
  */
-public interface ServerModelObject  {
+public interface ServerModelObject {
 
     /*
       All ServerModelObjects must also implement a trivial constructor
@@ -39,6 +39,13 @@ public interface ServerModelObject  {
           super(game, id);
       }
     */
+
+    /**
+     * Get the object identifier.
+     *
+     * @return The object identifier.
+     */
+    public String getId();
 
     /**
      * Gets the tag to use when saving this server object.
