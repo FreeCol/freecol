@@ -883,7 +883,7 @@ public class SimpleMapGenerator implements MapGenerator {
                 throw new RuntimeException(err);
             }
 
-            startTile.setExploredBy(player, true);
+            startTile.updatePlayerExploredTile(player, false);
             player.setEntryLocation(startTile);
 
             if (startAtSea) {

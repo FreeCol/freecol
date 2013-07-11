@@ -2332,9 +2332,7 @@ public final class InGameController extends Controller {
                 : 1;
             for (Tile x : settlement.getTile().getSurroundingTiles(radius)) {
                 if (x == null) continue;
-                if (!serverPlayer.hasExplored(x)) {
-                    x.setExploredBy(serverPlayer, true);
-                }
+                x.updatePlayerExploredTile(serverPlayer, true);
                 cs.add(See.only(serverPlayer), x);
             }
             break;
@@ -2838,20 +2836,20 @@ public final class InGameController extends Controller {
             name = serverPlayer.getSettlementName(random);
         }
         if (serverPlayer.isEuropean()) {
+            StringTemplate nation = serverPlayer.getNationName();
             settlement = new ServerColony(game, serverPlayer, name, tile);
             serverPlayer.addSettlement(settlement);
             settlement.placeSettlement(false);
             for (ServerPlayer sp : getOtherPlayers(serverPlayer)) {
-                if (sp.hasAbility(Ability.SEE_ALL_COLONIES)) {
-                    tile.setExploredBy(sp, true);
-                    sp.invalidateCanSeeTiles();
-                    cs.addMessage(See.only(sp),
-                        new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                         "buildColony.others", settlement)
-                            .addStringTemplate("%nation%", serverPlayer.getNationName())
-                            .addName("%colony%", settlement.getLocationNameFor(sp))
-                            .addName("%region%", tile.getRegion().getName()));
-                }
+                if (!sp.hasAbility(Ability.SEE_ALL_COLONIES)) continue;
+                tile.updatePlayerExploredTile(sp, true);
+                sp.invalidateCanSeeTiles();
+                cs.addMessage(See.only(sp),
+                    new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                     "buildColony.others", settlement)
+                        .addStringTemplate("%nation%", nation)
+                        .addName("%colony%", settlement.getLocationNameFor(sp))
+                        .addName("%region%", tile.getRegion().getName()));
             }
         } else {
             IndianNationType nationType
@@ -3001,7 +2999,7 @@ public final class InGameController extends Controller {
             for (ServerPlayer sp : getOtherPlayers(serverPlayer)) {
                 if (sp.isEuropean()
                     && sp.hasAbility(Ability.SEE_ALL_COLONIES)) {
-                    tile.setExploredBy(sp, true);
+                    tile.updatePlayerExploredTile(sp, false);
                     sp.invalidateCanSeeTiles();
                 }
             }

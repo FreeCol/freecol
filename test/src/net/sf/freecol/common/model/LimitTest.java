@@ -125,7 +125,7 @@ public class LimitTest extends FreeColTestCase {
         Tile tile = colony.getTile().getNeighbourOrNull(Map.Direction.N);
         tile.setType(spec().getTileType("model.tile.ocean"));
         tile.setHighSeasCount(5);
-        tile.setExploredBy(dutch, true);
+        tile.updatePlayerExploredTile(dutch, false);
         assertTrue(tile.isExploredBy(dutch));
         assertTrue(tile.isHighSeasConnected());
         assertTrue(!tile.isLand());

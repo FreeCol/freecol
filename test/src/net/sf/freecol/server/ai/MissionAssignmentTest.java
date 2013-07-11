@@ -165,7 +165,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
         // Add nearby colony in need of defense
         Tile colonyTile = map.getTile(2, 3);
         assertTrue(colonyTile != null);
-        colonyTile.setExploredBy(dutch, true);
+        colonyTile.updatePlayerExploredTile(dutch, false);
         Colony colony = FreeColTestUtils.getColonyBuilder().player(dutch).colonyTile(colonyTile).build();
 
         assertTrue(colonyTile.getSettlement() == colony);

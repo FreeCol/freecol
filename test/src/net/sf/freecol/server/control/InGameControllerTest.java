@@ -465,14 +465,14 @@ public class InGameControllerTest extends FreeColTestCase {
                      french.getStance(dutch), Stance.WAR);
 
         Tile tile1 = map.getTile(5, 8);
-        tile1.setExploredBy(dutch, true);
-        tile1.setExploredBy(french, true);
+        tile1.updatePlayerExploredTile(dutch, false);
+        tile1.updatePlayerExploredTile(french, false);
         Tile tile2 = map.getTile(4, 8);
-        tile2.setExploredBy(dutch, true);
-        tile2.setExploredBy(french, true);
+        tile2.updatePlayerExploredTile(dutch, false);
+        tile2.updatePlayerExploredTile(french, false);
         Tile tile3 = map.getTile(6, 8);
-        tile3.setExploredBy(dutch, true);
-        tile3.setExploredBy(french, true);
+        tile3.updatePlayerExploredTile(dutch, false);
+        tile3.updatePlayerExploredTile(french, false);
         Unit galleon = new ServerUnit(game, tile1, dutch, galleonType);
         Unit privateer = new ServerUnit(game, tile2, french, privateerType);
         assertEquals("Galleon should be empty", 0,
@@ -517,11 +517,11 @@ public class InGameControllerTest extends FreeColTestCase {
 
         dutch.addAbility(new Ability(Ability.INDEPENDENCE_DECLARED));
         Tile tile1 = map.getTile(5, 8);
-        tile1.setExploredBy(dutch, true);
-        tile1.setExploredBy(french, true);
+        tile1.updatePlayerExploredTile(dutch, false);
+        tile1.updatePlayerExploredTile(french, false);
         Tile tile2 = map.getTile(4, 8);
-        tile2.setExploredBy(dutch, true);
-        tile2.setExploredBy(french, true);
+        tile2.updatePlayerExploredTile(dutch, false);
+        tile2.updatePlayerExploredTile(french, false);
         // Create Colonial Regular with default equipment
         Unit colonial = new ServerUnit(game, tile1, dutch, colonialType,
                                        EquipmentType.NO_EQUIPMENT);
@@ -590,8 +590,8 @@ public class InGameControllerTest extends FreeColTestCase {
         Colony colony = getStandardColony();
 
         Tile tile2 = map.getTile(4, 8);
-        tile2.setExploredBy(dutch, true);
-        tile2.setExploredBy(french, true);
+        tile2.updatePlayerExploredTile(dutch, false);
+        tile2.updatePlayerExploredTile(french, false);
         dutch.addAbility(new Ability(Ability.INDEPENDENCE_DECLARED));
         Unit colonist = colony.getUnitIterator().next();
         colonist.setType(colonialType);
@@ -710,8 +710,7 @@ public class InGameControllerTest extends FreeColTestCase {
         Colony colony = getStandardColony(1, 5, 8);
 
         Tile tile2 = map.getTile(4, 8);
-        tile2.setExploredBy(dutch, true);
-        tile2.setExploredBy(inca, true);
+        tile2.updatePlayerExploredTile(dutch, false);
         Unit colonist = colony.getUnitIterator().next();
         Unit defender = new ServerUnit(getGame(), colony.getTile(), dutch,
                                        veteranType, horses, muskets);
@@ -937,8 +936,7 @@ public class InGameControllerTest extends FreeColTestCase {
         dutch.setStance(inca, Stance.WAR);
         inca.setStance(dutch, Stance.WAR);
         Tile tile2 = map.getTile(4, 8);
-        tile2.setExploredBy(dutch, true);
-        tile2.setExploredBy(inca, true);
+        tile2.updatePlayerExploredTile(dutch, false);
         Unit colonist = colony.getUnitIterator().next();
         Unit attacker = new ServerUnit(getGame(), tile2, inca, braveType,
                                        indianHorses, indianMuskets);
@@ -983,11 +981,11 @@ public class InGameControllerTest extends FreeColTestCase {
         Player french = game.getPlayer("model.nation.french");
 
         Tile tile1 = map.getTile(5, 8);
-        tile1.setExploredBy(dutch, true);
-        tile1.setExploredBy(french, true);
+        tile1.updatePlayerExploredTile(dutch, false);
+        tile1.updatePlayerExploredTile(french, false);
         Tile tile2 = map.getTile(4, 8);
-        tile2.setExploredBy(dutch, true);
-        tile2.setExploredBy(french, true);
+        tile2.updatePlayerExploredTile(dutch, false);
+        tile2.updatePlayerExploredTile(french, false);
         Unit pioneer = new ServerUnit(game, tile1, dutch, colonistType, tools);
         Unit soldier = new ServerUnit(game, tile2, french, veteranType,
                                       muskets, horses);
@@ -1014,11 +1012,11 @@ public class InGameControllerTest extends FreeColTestCase {
         Player french = game.getPlayer("model.nation.french");
 
         Tile tile1 = map.getTile(5, 8);
-        tile1.setExploredBy(dutch, true);
-        tile1.setExploredBy(french, true);
+        tile1.updatePlayerExploredTile(dutch, false);
+        tile1.updatePlayerExploredTile(french, false);
         Tile tile2 = map.getTile(4, 8);
-        tile2.setExploredBy(dutch, true);
-        tile2.setExploredBy(french, true);
+        tile2.updatePlayerExploredTile(dutch, false);
+        tile2.updatePlayerExploredTile(french, false);
         Unit scout = new ServerUnit(game, tile1, dutch, colonistType, horses);
         Unit soldier = new ServerUnit(game, tile2, french, veteranType, horses, muskets);
         scout.setMovesLeft(1);
@@ -1070,11 +1068,11 @@ public class InGameControllerTest extends FreeColTestCase {
                      null, indianConvertType
                      .getTargetType(ChangeType.PROMOTION, dutch));
         Tile tile1 = map.getTile(5, 8);
-        tile1.setExploredBy(dutch, true);
-        tile1.setExploredBy(french, true);
+        tile1.updatePlayerExploredTile(dutch, false);
+        tile1.updatePlayerExploredTile(french, false);
         Tile tile2 = map.getTile(4, 8);
-        tile2.setExploredBy(dutch, true);
-        tile2.setExploredBy(french, true);
+        tile2.updatePlayerExploredTile(dutch, false);
+        tile2.updatePlayerExploredTile(french, false);
         Unit unit = new ServerUnit(game, tile1, dutch, pettyCriminalType, muskets);
         Unit soldier = new ServerUnit(game, tile2, french, colonistType, muskets);
         // Enable automatic promotion
@@ -1164,11 +1162,11 @@ public class InGameControllerTest extends FreeColTestCase {
         Player french = game.getPlayer("model.nation.french");
 
         Tile tile1 = map.getTile(5, 8);
-        tile1.setExploredBy(dutch, true);
-        tile1.setExploredBy(french, true);
+        tile1.updatePlayerExploredTile(dutch, false);
+        tile1.updatePlayerExploredTile(french, false);
         Tile tile2 = map.getTile(4, 8);
-        tile2.setExploredBy(dutch, true);
-        tile2.setExploredBy(french, true);
+        tile2.updatePlayerExploredTile(dutch, false);
+        tile2.updatePlayerExploredTile(french, false);
         Unit colonist = new ServerUnit(game, tile1, dutch, colonistType);
         assertTrue("Colonists should be capturable",
                    colonist.hasAbility(Ability.CAN_BE_CAPTURED));
@@ -1204,11 +1202,11 @@ public class InGameControllerTest extends FreeColTestCase {
         Player french = game.getPlayer("model.nation.french");
 
         Tile tile1 = map.getTile(5, 8);
-        tile1.setExploredBy(dutch, true);
-        tile1.setExploredBy(french, true);
+        tile1.updatePlayerExploredTile(dutch, false);
+        tile1.updatePlayerExploredTile(french, false);
         Tile tile2 = map.getTile(4, 8);
-        tile2.setExploredBy(dutch, true);
-        tile2.setExploredBy(french, true);
+        tile2.updatePlayerExploredTile(dutch, false);
+        tile2.updatePlayerExploredTile(french, false);
         Unit soldier1 = new ServerUnit(game, tile1, dutch, colonistType, muskets);
         Unit soldier2 = new ServerUnit(game, tile2, french, colonistType, muskets);
 
@@ -1253,11 +1251,11 @@ public class InGameControllerTest extends FreeColTestCase {
         Player french = game.getPlayer("model.nation.french");
 
         Tile tile1 = map.getTile(5, 8);
-        tile1.setExploredBy(dutch, true);
-        tile1.setExploredBy(french, true);
+        tile1.updatePlayerExploredTile(dutch, false);
+        tile1.updatePlayerExploredTile(french, false);
         Tile tile2 = map.getTile(4, 8);
-        tile2.setExploredBy(dutch, true);
-        tile2.setExploredBy(french, true);
+        tile2.updatePlayerExploredTile(dutch, false);
+        tile2.updatePlayerExploredTile(french, false);
         Unit dragoon = new ServerUnit(game, tile1, dutch, colonistType, horses, muskets);
         ServerTestHelper.newTurn();
 
@@ -1328,11 +1326,9 @@ public class InGameControllerTest extends FreeColTestCase {
         Player inca = game.getPlayer("model.nation.inca");
 
         Tile tile1 = map.getTile(5, 8);
-        tile1.setExploredBy(dutch, true);
-        tile1.setExploredBy(inca, true);
+        tile1.updatePlayerExploredTile(dutch, false);
         Tile tile2 = map.getTile(4, 8);
-        tile2.setExploredBy(dutch, true);
-        tile2.setExploredBy(inca, true);
+        tile2.updatePlayerExploredTile(dutch, false);
         // Build indian settlements
         FreeColTestCase.IndianSettlementBuilder builder
             = new FreeColTestCase.IndianSettlementBuilder(game);
@@ -1418,11 +1414,11 @@ public class InGameControllerTest extends FreeColTestCase {
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
         Tile tile1 = map.getTile(5, 8);
-        tile1.setExploredBy(dutch, true);
-        tile1.setExploredBy(french, true);
+        tile1.updatePlayerExploredTile(dutch, false);
+        tile1.updatePlayerExploredTile(french, false);
         Tile tile2 = map.getTile(4, 8);
-        tile2.setExploredBy(dutch, true);
-        tile2.setExploredBy(french, true);
+        tile2.updatePlayerExploredTile(dutch, false);
+        tile2.updatePlayerExploredTile(french, false);
         Unit scout = new ServerUnit(game, tile1, dutch, colonistType, horses);
         Unit soldier = new ServerUnit(game, tile2, french, colonistType, muskets);
 
@@ -1446,11 +1442,11 @@ public class InGameControllerTest extends FreeColTestCase {
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
         Tile tile1 = map.getTile(5, 8);
-        tile1.setExploredBy(dutch, true);
-        tile1.setExploredBy(french, true);
+        tile1.updatePlayerExploredTile(dutch, false);
+        tile1.updatePlayerExploredTile(french, false);
         Tile tile2 = map.getTile(4, 8);
-        tile2.setExploredBy(dutch, true);
-        tile2.setExploredBy(french, true);
+        tile2.updatePlayerExploredTile(dutch, false);
+        tile2.updatePlayerExploredTile(french, false);
         Unit soldier1 = new ServerUnit(game, tile1, dutch, veteranType, muskets);
         Unit soldier2 = new ServerUnit(game, tile2, french, colonistType, muskets);
         assertEquals("Veterans should become colonists on capture",
@@ -1497,11 +1493,11 @@ public class InGameControllerTest extends FreeColTestCase {
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
         Tile tile1 = map.getTile(5, 8);
-        tile1.setExploredBy(dutch, true);
-        tile1.setExploredBy(french, true);
+        tile1.updatePlayerExploredTile(dutch, false);
+        tile1.updatePlayerExploredTile(french, false);
         Tile tile2 = map.getTile(4, 8);
-        tile2.setExploredBy(dutch, true);
-        tile2.setExploredBy(french, true);
+        tile2.updatePlayerExploredTile(dutch, false);
+        tile2.updatePlayerExploredTile(french, false);
         Unit artillery = new ServerUnit(game, tile1, dutch, artilleryType);
         Unit soldier = new ServerUnit(game, tile2, french, colonistType, muskets);
         assertEquals("Artillery should demote to damaged artillery",
@@ -1989,7 +1985,7 @@ public class InGameControllerTest extends FreeColTestCase {
         Unit unit = new ServerUnit(game, tile, dutch, unitType,
                                    tools, tools, tools, tools, tools);
         tile.setOwner(dutch);
-        tile.setExploredBy(dutch, true);
+        tile.updatePlayerExploredTile(dutch, false);
         igc.changeWorkImprovementType(dutch, unit, whichWork);
         return unit.getWorkTurnsLeft();
     }

@@ -65,14 +65,14 @@ public class ContactTest extends FreeColTestCase {
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
         ServerPlayer french = (ServerPlayer) game.getPlayer("model.nation.french");
         Tile tile1 = map.getTile(6, 8);
-        tile1.setExploredBy(dutch, true);
-        tile1.setExploredBy(french, false);
+        tile1.updatePlayerExploredTile(dutch, false);
+        tile1.updatePlayerExploredTile(french, false);
         Tile tile2 = map.getTile(5, 8);
-        tile2.setExploredBy(dutch, true);
-        tile2.setExploredBy(french, true);
+        tile2.updatePlayerExploredTile(dutch, false);
+        tile2.updatePlayerExploredTile(french, false);
         Tile tile3 = map.getTile(4, 8);
-        tile3.setExploredBy(dutch, false);
-        tile3.setExploredBy(french, true);
+        tile3.updatePlayerExploredTile(dutch, false);
+        tile3.updatePlayerExploredTile(french, false);
 
         assertFalse(french.hasContacted(dutch));
         assertFalse(dutch.hasContacted(french));
@@ -97,14 +97,11 @@ public class ContactTest extends FreeColTestCase {
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
         ServerPlayer iroquois = (ServerPlayer) game.getPlayer("model.nation.iroquois");
         Tile tile1 = map.getTile(6, 8);
-        tile1.setExploredBy(dutch, true);
-        tile1.setExploredBy(iroquois, false);
+        tile1.updatePlayerExploredTile(dutch, false);
         Tile tile2 = map.getTile(5, 8);
-        tile2.setExploredBy(dutch, true);
-        tile2.setExploredBy(iroquois, true);
+        tile2.updatePlayerExploredTile(dutch, false);
         Tile tile3 = map.getTile(4, 8);
-        tile3.setExploredBy(dutch, false);
-        tile3.setExploredBy(iroquois, true);
+        tile3.updatePlayerExploredTile(dutch, false);
 
         assertFalse(iroquois.hasContacted(dutch));
         assertFalse(dutch.hasContacted(iroquois));
@@ -133,14 +130,14 @@ public class ContactTest extends FreeColTestCase {
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
         ServerPlayer french = (ServerPlayer) game.getPlayer("model.nation.french");
         Tile tile1 = map.getTile(5, 8);
-        tile1.setExploredBy(dutch, true);
-        tile1.setExploredBy(french, false);
+        tile1.updatePlayerExploredTile(dutch, false);
+        tile1.updatePlayerExploredTile(french, false);
         Tile tile2 = map.getTile(4, 8);
-        tile2.setExploredBy(dutch, true);
-        tile2.setExploredBy(french, true);
+        tile2.updatePlayerExploredTile(dutch, false);
+        tile2.updatePlayerExploredTile(french, false);
         Tile tile3 = map.getTile(3, 8);
-        tile3.setExploredBy(dutch, false);
-        tile3.setExploredBy(french, true);
+        tile3.updatePlayerExploredTile(dutch, false);
+        tile3.updatePlayerExploredTile(french, false);
 
         assertFalse(french.hasContacted(dutch));
         assertFalse(dutch.hasContacted(french));
@@ -164,14 +161,11 @@ public class ContactTest extends FreeColTestCase {
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
         ServerPlayer iroquois = (ServerPlayer) game.getPlayer("model.nation.iroquois");
         Tile tile1 = map.getTile(5, 8);
-        tile1.setExploredBy(dutch, true);
-        tile1.setExploredBy(iroquois, false);
+        tile1.updatePlayerExploredTile(dutch, false);
         Tile tile2 = map.getTile(4, 8);
-        tile2.setExploredBy(dutch, true);
-        tile2.setExploredBy(iroquois, true);
+        tile2.updatePlayerExploredTile(dutch, false);
         Tile tile3 = map.getTile(3, 8);
-        tile3.setExploredBy(dutch, false);
-        tile3.setExploredBy(iroquois, true);
+        tile3.updatePlayerExploredTile(dutch, false);
 
         assertFalse(iroquois.hasContacted(dutch));
         assertFalse(dutch.hasContacted(iroquois));
@@ -200,14 +194,11 @@ public class ContactTest extends FreeColTestCase {
         ServerPlayer apache = (ServerPlayer) game.getPlayer("model.nation.apache");
         ServerPlayer french = (ServerPlayer) game.getPlayer("model.nation.french");
         Tile tile1 = map.getTile(5, 8);
-        tile1.setExploredBy(apache, true);
-        tile1.setExploredBy(french, false);
+        tile1.updatePlayerExploredTile(french, false);
         Tile tile2 = map.getTile(4, 8);
-        tile2.setExploredBy(apache, true);
-        tile2.setExploredBy(french, true);
+        tile2.updatePlayerExploredTile(french, false);
         Tile tile3 = map.getTile(3, 8);
-        tile3.setExploredBy(apache, false);
-        tile3.setExploredBy(french, true);
+        tile3.updatePlayerExploredTile(french, false);
 
         assertFalse(french.hasContacted(apache));
         assertFalse(apache.hasContacted(french));
@@ -233,14 +224,8 @@ public class ContactTest extends FreeColTestCase {
         ServerPlayer apache = (ServerPlayer) game.getPlayer("model.nation.apache");
         ServerPlayer iroquois = (ServerPlayer) game.getPlayer("model.nation.iroquois");
         Tile tile1 = map.getTile(5, 8);
-        tile1.setExploredBy(apache, true);
-        tile1.setExploredBy(iroquois, false);
         Tile tile2 = map.getTile(4, 8);
-        tile2.setExploredBy(apache, true);
-        tile2.setExploredBy(iroquois, true);
         Tile tile3 = map.getTile(3, 8);
-        tile3.setExploredBy(apache, false);
-        tile3.setExploredBy(iroquois, true);
 
         assertTrue(iroquois.hasContacted(apache));
         assertTrue(apache.hasContacted(iroquois));
@@ -266,14 +251,11 @@ public class ContactTest extends FreeColTestCase {
         ServerPlayer apache = (ServerPlayer) game.getPlayer("model.nation.apache");
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
         Tile tile1 = map.getTile(5, 8);
-        tile1.setExploredBy(apache, false);
-        tile1.setExploredBy(dutch, true);
+        tile1.updatePlayerExploredTile(dutch, false);
         Tile tile2 = map.getTile(4, 8);
-        tile2.setExploredBy(apache, true);
-        tile2.setExploredBy(dutch, true);
+        tile2.updatePlayerExploredTile(dutch, false);
         Tile tile3 = map.getTile(3, 8);
-        tile3.setExploredBy(apache, true);
-        tile3.setExploredBy(dutch, false);
+        tile3.updatePlayerExploredTile(dutch, false);
 
         assertFalse(dutch.hasContacted(apache));
         assertFalse(apache.hasContacted(dutch));
@@ -297,14 +279,8 @@ public class ContactTest extends FreeColTestCase {
         ServerPlayer apache = (ServerPlayer) game.getPlayer("model.nation.apache");
         ServerPlayer iroquois = (ServerPlayer) game.getPlayer("model.nation.iroquois");
         Tile tile1 = map.getTile(5, 8);
-        tile1.setExploredBy(apache, true);
-        tile1.setExploredBy(iroquois, false);
         Tile tile2 = map.getTile(4, 8);
-        tile2.setExploredBy(apache, true);
-        tile2.setExploredBy(iroquois, true);
         Tile tile3 = map.getTile(3, 8);
-        tile3.setExploredBy(apache, false);
-        tile3.setExploredBy(iroquois, true);
 
         assertTrue(iroquois.hasContacted(apache));
         assertTrue(apache.hasContacted(iroquois));
@@ -331,14 +307,14 @@ public class ContactTest extends FreeColTestCase {
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
         ServerPlayer french = (ServerPlayer) game.getPlayer("model.nation.french");
         Tile tile1 = map.getTile(5, 8);
-        tile1.setExploredBy(dutch, true);
-        tile1.setExploredBy(french, false);
+        tile1.updatePlayerExploredTile(dutch, false);
+        tile1.updatePlayerExploredTile(french, false);
         Tile tile2 = map.getTile(4, 8);
-        tile2.setExploredBy(dutch, true);
-        tile2.setExploredBy(french, true);
+        tile2.updatePlayerExploredTile(dutch, false);
+        tile2.updatePlayerExploredTile(french, false);
         Tile tile3 = map.getTile(3, 8);
-        tile3.setExploredBy(dutch, false);
-        tile3.setExploredBy(french, true);
+        tile3.updatePlayerExploredTile(dutch, false);
+        tile3.updatePlayerExploredTile(french, false);
 
         assertFalse(french.hasContacted(dutch));
         assertFalse(dutch.hasContacted(french));

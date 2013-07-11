@@ -719,7 +719,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * the player's information about the tile.
      */
     public void setExplored(Tile tile) {
-        tile.setExploredBy(this, true);
+        tile.updatePlayerExploredTile(this, false);
     }
 
     /**
@@ -733,7 +733,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
         List<Tile> result = new ArrayList<Tile>();
         for (Tile tile : getGame().getMap().getAllTiles()) {
             if (hasExplored(tile) != reveal) {
-                tile.setExploredBy(this, reveal);
+                if (reveal) {
+                    tile.updatePlayerExploredTile(this, false);
+                } else {
+                    tile.unexplore(this);
+                }
                 result.add(tile);
             }
         }
@@ -1698,16 +1702,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 for (Tile t : game.getMap().getAllTiles()) {
                     Colony colony = t.getColony();
                     if (colony != null
-                        && (ServerPlayer) colony.getOwner() != this) {
-                        if (!hasExplored(t)) {
-                            t.setExploredBy(this, true);
-                        }
+                        && (ServerPlayer)colony.getOwner() != this) {
                         t.updatePlayerExploredTile(this, false);
                         cs.add(See.only(this), t);
                         for (Tile x : colony.getOwnedTiles()) {
-                            if (!hasExplored(x)) {
-                                x.setExploredBy(this, true);
-                            }
                             x.updatePlayerExploredTile(this, false);
                             cs.add(See.only(this), x);
                         }

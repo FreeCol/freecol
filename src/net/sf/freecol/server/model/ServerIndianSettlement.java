@@ -238,8 +238,8 @@ public class ServerIndianSettlement extends IndianSettlement
         }
         logger.finest("Alarm at " + getName()
             + " toward " + player.getName()
-            + " modified by " + Integer.toString(addToAlarm)
-            + " now = " + Integer.toString(getAlarm(player).getValue()));
+            + " modified by " + addToAlarm
+            + " now = " + getAlarm(player).getValue());
         return modified;
     }
 
@@ -251,17 +251,13 @@ public class ServerIndianSettlement extends IndianSettlement
     public void changeMissionary(Unit missionary) {
         Unit old = getMissionary();
         setMissionary(missionary);
+        if (missionary != null) missionary.getOwner().invalidateCanSeeTiles();
+        if (old != null) old.getOwner().invalidateCanSeeTiles();
+
+        // Should see full updates for the old and new missionary owners.
         Tile tile = getTile();
         tile.updatePlayerExploredTiles();
-        // Full updates for the old and new missionary owners.
-        if (missionary != null) {
-            tile.updatePlayerExploredTile(missionary.getOwner(), true);
-        }
-        if (old != null) {
-            tile.updatePlayerExploredTile(old.getOwner(), true);
-            // TODO: remove this when settlements are fully virtualized
-            tile.fixMissionary(old);
-        }
+        if (old != null) tile.updatePlayerExploredTile(old.getOwner(), false);
     }
 
     /**

@@ -1367,23 +1367,16 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
-     * Sets this <code>Tile</code> to be explored by the given
-     * <code>Player</code>.
+     * Unexplore this tile for a player.
      *
-     * @param player The <code>Player</code>.
-     * @param explored True if this <code>Tile</code> should be
-     *     explored by the given <code>Player</code>.
+     * @param player The <code>Player</code> that forgets the tile.
      */
-    public void setExploredBy(Player player, boolean explored) {
-        if (!player.isEuropean()) return;
-        if (explored) {
-            updatePlayerExploredTile(player, false);
-        } else {
-            if (playerExploredTiles != null) {
-                playerExploredTiles.remove(player);
-            }
+    public void unexplore(Player player) {
+        if (playerExploredTiles != null && player.isEuropean()) {
+            playerExploredTiles.remove(player);
         }
     }
+
 
     /**
      * This is a hack.  When a missionary is removed, its player
