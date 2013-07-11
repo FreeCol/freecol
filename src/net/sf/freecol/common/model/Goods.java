@@ -246,7 +246,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable {
         super.writeAttributes(xw);
 
         if (location != null) {
-            xw.writeAttribute(LOCATION_TAG, (FreeColGameObject)location);
+            xw.writeLocationAttribute(LOCATION_TAG, location);
         }
     }
 
