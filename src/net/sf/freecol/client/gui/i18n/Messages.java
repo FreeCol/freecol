@@ -27,6 +27,7 @@ import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.List;
@@ -117,13 +118,14 @@ public class Messages {
      * A map with Selector values and the tag keys used in choice
      * formats.
      */
-    private static Map<String, Selector> tagMap =
-        new HashMap<String, Selector>();
-
-
+    private static Map<String, Selector> tagMap
+        = new HashMap<String, Selector>();
     static {
         tagMap.put("turn", new TurnSelector());
     }
+
+    /** Extra river names. */
+    private static List<String> otherRivers = null;
 
 
     /**
@@ -746,6 +748,7 @@ public class Messages {
      * @return a <code>String</code> value
      */
     public static String getDefaultRegionName(Player player, RegionType regionType) {
+        // Try national names first.
         net.sf.freecol.common.model.Map map = player.getGame().getMap();
         int index = player.getNameIndex(regionType.getNameIndexKey());
         if (index < 1) index = 1;
@@ -760,12 +763,32 @@ public class Messages {
             }
         } while (name != null && map.getRegionByName(name) != null);
         player.setNameIndex(regionType.getNameIndexKey(), index);
+
+        // There are a bunch of extra rivers not attached to a specific
+        // nation at model.other.region.river.*.
+        if (name == null && regionType == RegionType.RIVER) {
+            if (otherRivers == null) {
+                otherRivers = new ArrayList<String>();
+                collectNames("model.other.region.river.", otherRivers);
+                // Does not need to use player or system PRNG
+                Collections.shuffle(otherRivers);
+            }
+            while (!otherRivers.isEmpty()) {
+                name = otherRivers.remove(0);
+                if (map.getRegionByName(name) == null) return name;
+            }
+            name = null;
+        }
+
+        // Fall back to generic names.
         if (name == null) {
+            String rtype = "model.region."
+                + regionType.toString().toLowerCase(Locale.US) + ".name";
             do {
                 name = message(StringTemplate.template("model.region.default")
-                               .addStringTemplate("%nation%", player.getNationName())
-                               .add("%type%", "model.region." + regionType.toString().toLowerCase() + ".name")
-                               .addAmount("%index%", index));
+                    .addStringTemplate("%nation%", player.getNationName())
+                    .add("%type%", rtype)
+                    .addAmount("%index%", index));
                 index++;
             } while (map.getRegionByName(name) != null);
         }
