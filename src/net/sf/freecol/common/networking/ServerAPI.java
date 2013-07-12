@@ -1034,11 +1034,13 @@ public abstract class ServerAPI {
      *
      * @param region The <code>Region</code> that is being discovered.
      * @param tile The <code>Tile</code> where the region is discovered.
+     * @param unit The <code>Unit</code> discovering the region.
      * @param name The new region name.
      * @return True if the server interaction succeeded.
      */
-    public boolean newRegionName(Region region, Tile tile, String name) {
-        return askHandling(new NewRegionNameMessage(region, tile, name),
+    public boolean newRegionName(Region region, Tile tile, Unit unit, 
+                                 String name) {
+        return askHandling(new NewRegionNameMessage(region, tile, unit, name),
             null, null);
     }
 

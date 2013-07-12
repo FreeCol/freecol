@@ -23,6 +23,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
@@ -34,20 +35,18 @@ import org.w3c.dom.Element;
  */
 public class NewRegionNameMessage extends DOMMessage {
 
-    /**
-     * The object identifier of the region being discovered.
-     */
+    /** The object identifier of the region being discovered. */
     private String regionId;
 
-    /**
-     * The tile where the region is discovered.
-     */
+    /** The tile where the region is discovered. */
     private String tileId;
 
-    /**
-     * The new name.
-     */
+    /** The unit making the discovery. */
+    private String unitId;
+
+    /** The new name. */
     private String newRegionName;
+
 
     /**
      * Create a new <code>NewRegionNameMessage</code> with the
@@ -55,12 +54,14 @@ public class NewRegionNameMessage extends DOMMessage {
      *
      * @param region The <code>Region</code> being discovered.
      * @param tile The <code>Tile</code> where the region is discovered.
+     * @param unit The <code>Unit</code> that discovers the region.
      * @param newRegionName The default new region name.
      */
-    public NewRegionNameMessage(Region region, Tile tile,
+    public NewRegionNameMessage(Region region, Tile tile, Unit unit,
                                 String newRegionName) {
         this.regionId = region.getId();
         this.tileId = tile.getId();
+        this.unitId = unit.getId();
         this.newRegionName = newRegionName;
     }
 
@@ -74,6 +75,7 @@ public class NewRegionNameMessage extends DOMMessage {
     public NewRegionNameMessage(Game game, Element element) {
         this.regionId = element.getAttribute("region");
         this.tileId = element.getAttribute("tile");
+        this.unitId = element.getAttribute("unit");
         this.newRegionName = element.getAttribute("newRegionName");
     }
 
@@ -95,6 +97,16 @@ public class NewRegionNameMessage extends DOMMessage {
      */
     public Tile getTile(Game game) {
         return game.getFreeColGameObject(tileId, Tile.class);
+    }
+
+    /**
+     * Public accessor for the unit.
+     *
+     * @param game The <code>Game</code> to look for a tile in.
+     * @return The unit of this message.
+     */
+    public Unit getUnit(Game game) {
+        return game.getFreeColGameObject(unitId, Unit.class);
     }
 
     /**
@@ -125,6 +137,17 @@ public class NewRegionNameMessage extends DOMMessage {
             return DOMMessage.clientError("Can not claim discovery in unexplored tile: " + tileId);
         }
 
+        Unit unit = getUnit(game);
+        if (unit == null) {
+            return DOMMessage.clientError("Null discovering unit: " + unitId);
+        } else if (!player.owns(unit)) {
+            return DOMMessage.clientError("Player " + player.getId()
+                + " does not own discovering unit: " + unitId);
+        } else if (unit.getTile() != tile) {
+            return DOMMessage.clientError("Discovering unit " + unitId
+                + " is not at tile: " + tileId);
+        }
+
         Region region = tile.getDiscoverableRegion();
         if (region == null) {
             return DOMMessage.clientError("No discoverable region in: "
@@ -152,6 +175,7 @@ public class NewRegionNameMessage extends DOMMessage {
         return createMessage(getXMLElementTagName(),
             "region", regionId,
             "tile", tileId,
+            "unit", unitId,
             "newRegionName", newRegionName);
     }
 
