@@ -25,10 +25,13 @@ import java.util.logging.Logger;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Resource;
+import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.control.ChangeSet;
 import net.sf.freecol.server.control.ChangeSet.See;
 
@@ -74,9 +77,8 @@ public class ServerColonyTile extends ColonyTile implements ServerModelObject {
         Tile workTile = getWorkTile();
         if (!isColonyCenterTile() && !isEmpty() && canBeWorked()) {
             for (Unit unit : getUnitList()) {
-                Resource resource
-                    = workTile.expendResource(unit.getWorkType(),
-                        unit.getType(), colony);
+                Resource resource = expendResource(workTile, unit.getWorkType(),
+                                                   unit.getType(), colony);
                 if (resource != null) {
                     cs.addMessage(See.only(owner),
                         new ModelMessage(ModelMessage.MessageType.WARNING,
@@ -90,7 +92,34 @@ public class ServerColonyTile extends ColonyTile implements ServerModelObject {
         }
     }
 
+    /**
+     * This method is called only when a new turn is beginning.  It
+     * will reduce the quantity of the bonus <code>Resource</code>
+     * that is on the given tile, if any and if applicable.
+     *
+     * @param tile The <code>Tile</code> to check for a resource.
+     * @param goodsType The <code>GoodsType</code> the goods type to expend.
+     * @param unitType The <code>UnitType</code> doing the production.
+     * @return The <code>Resource</code> if it is exhausted by this
+     *     call (so it can be used in a message), otherwise null.
+     * @see ResourceType
+     */
+    private Resource expendResource(Tile tile, GoodsType goodsType,
+                                    UnitType unitType, Settlement settlement) {
+        if (!tile.hasResource()) return null;
 
+        Resource resource = tile.getResource();
+        if (resource.isUnlimited()) return null;
+
+        if (resource.useQuantity(goodsType, unitType,
+                                 tile.potential(goodsType, unitType)) == 0) {
+            tile.removeResource();
+            tile.updatePlayerExploredTiles();
+            return resource;
+        }
+        return null;
+    }
+    
     /**
      * Returns the tag name of the root element representing this object.
      *

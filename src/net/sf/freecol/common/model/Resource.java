@@ -39,6 +39,7 @@ public class Resource extends TileItem {
 
     private static Logger logger = Logger.getLogger(Resource.class.getName());
 
+    /** Some resources are unlimited. */
     private static final int UNLIMITED = -1;
 
     /** The type of resource. */
@@ -111,6 +112,15 @@ public class Resource extends TileItem {
     }
 
     /**
+     * Is this an unlimited resource?
+     *
+     * @return True if this is an unlimited resource.
+     */
+    public boolean isUnlimited() {
+        return quantity == UNLIMITED;
+    }
+
+    /**
      * Get the resource quantity.
      *
      * @return The resource quantity.
@@ -160,10 +170,10 @@ public class Resource extends TileItem {
      * @return The final value of quantity.
      */
     public int useQuantity(int usedQuantity) {
-        if (quantity >= usedQuantity) {
+        if (quantity == UNLIMITED) {
+            ; // No change
+        } else if (quantity >= usedQuantity) {
             quantity -= usedQuantity;
-        } else if (quantity == UNLIMITED) {
-            logger.warning("useQuantity called for unlimited resource");
         } else {
             // Shouldn't generally happen.  Do something more drastic here?
             logger.severe("Insufficient quantity in " + this);

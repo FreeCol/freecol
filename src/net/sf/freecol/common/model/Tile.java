@@ -742,6 +742,16 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
+     * Gets the resource on this tile.
+     *
+     * @return A <code>Resource</code>, or null if none present.
+     */
+    public Resource getResource() {
+        return (tileItemContainer == null) ? null
+            : tileItemContainer.getResource();
+    }
+
+    /**
      * Adds a resource to this tile.
      *
      * @param resource The <code>Resource</code> to add.
@@ -751,38 +761,14 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     }
 
     /**
-     * This method is called only when a new turn is beginning.  It
-     * will reduce the quantity of the bonus <code>Resource</code>
-     * that is on the tile, if any and if applicable.
+     * Removes a resource from this tile.
      *
-     * @param goodsType The <code>GoodsType</code> the goods type to expend.
-     * @param unitType The <code>UnitType</code> doing the production.
-     * @return The <code>Resource</code> if it is exhausted by this
-     *     call (so it can be used in a message), otherwise null.
-     * @see ResourceType
+     * @return The removed <code>Resource</code>.
      */
-    public Resource expendResource(GoodsType goodsType, UnitType unitType,
-                                   Settlement settlement) {
-        if (hasResource()
-            && tileItemContainer.getResource().getQuantity() != -1) {
-            Resource resource = tileItemContainer.getResource();
-            // Potential of this Tile and Improvements
-            // TODO: review
-            int potential = getTileTypePotential(getType(), goodsType, unitType,
-                                                 tileItemContainer);
-            for (TileItem item : tileItemContainer.getTileItems()) {
-                if (item instanceof TileImprovement) {
-                    potential = item.applyBonus(goodsType, unitType, potential);
-                }
-            }
-
-            if (resource.useQuantity(goodsType, unitType, potential) == 0) {
-                tileItemContainer.removeTileItem(resource);
-                updatePlayerExploredTiles();
-                return resource;
-            }
-        }
-        return null;
+    public Resource removeResource() {
+        Resource resource = getResource();
+        if (resource == null) return null;
+        return removeTileItem(resource);
     }
 
     /**
