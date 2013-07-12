@@ -395,7 +395,7 @@ public class BuildingTest extends FreeColTestCase {
             try {
                 StringWriter sw = new StringWriter();
                 FreeColXMLWriter xw = new FreeColXMLWriter(sw,
-                    FreeColXMLWriter.WriteScope.toSave());
+                    FreeColXMLWriter.WriteScope.toSave(), false);
 
                 building.toXML(xw);
 

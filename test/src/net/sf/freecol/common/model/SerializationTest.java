@@ -158,7 +158,7 @@ public class SerializationTest extends FreeColTestCase {
             Validator validator = buildValidator("schema/specification-schema.xsd");
             FileWriter sw = new FileWriter(filename);
             FreeColXMLWriter xw = new FreeColXMLWriter(sw,
-                FreeColXMLWriter.WriteScope.toSave());
+                FreeColXMLWriter.WriteScope.toSave(), false);
 
             spec().toXML(xw);
 
@@ -182,7 +182,7 @@ public class SerializationTest extends FreeColTestCase {
             spec1.applyDifficultyLevel("model.difficulty.veryEasy");
             StringWriter sw = new StringWriter();
             FreeColXMLWriter xw = new FreeColXMLWriter(sw,
-                FreeColXMLWriter.WriteScope.toSave());
+                FreeColXMLWriter.WriteScope.toSave(), false);
 
             spec1.toXML(xw);
 
@@ -219,7 +219,7 @@ public class SerializationTest extends FreeColTestCase {
             spec1.applyDifficultyLevel("model.difficulty.veryEasy");
             StringWriter sw = new StringWriter();
             FreeColXMLWriter xw = new FreeColXMLWriter(sw,
-                FreeColXMLWriter.WriteScope.toSave());
+                FreeColXMLWriter.WriteScope.toSave(), false);
 
             spec1.toXML(xw);
 

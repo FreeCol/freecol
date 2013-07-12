@@ -800,7 +800,8 @@ public final class FreeColServer {
 
             // save the actual game data
             fos.putNextEntry(new JarEntry(FreeColSavegameFile.SAVEGAME_FILE));
-            xw = new FreeColXMLWriter(fos, FreeColXMLWriter.WriteScope.toSave());
+            xw = new FreeColXMLWriter(fos, FreeColXMLWriter.WriteScope.toSave(),
+                                      false);
 
             xw.writeStartDocument("UTF-8", "1.0");
 
@@ -1458,7 +1459,7 @@ public final class FreeColServer {
         FreeColXMLWriter xw = null;
         try {
             xw = new FreeColXMLWriter(new FileOutputStream(FreeColDirectories.getHighScoreFile()),
-                                      FreeColXMLWriter.WriteScope.toSave());
+                FreeColXMLWriter.WriteScope.toSave(), true);
             ret = true;
         } catch (FileNotFoundException fnfe) {
             logger.log(Level.WARNING, "Failed to open high scores file.", fnfe);

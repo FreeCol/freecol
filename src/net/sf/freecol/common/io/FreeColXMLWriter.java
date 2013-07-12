@@ -32,6 +32,7 @@ import javax.xml.namespace.NamespaceContext;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.OutputKeys;
 
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -118,15 +119,16 @@ public class FreeColXMLWriter implements XMLStreamWriter {
      *     an <code>FreeColXMLWriter</code> for.
      * @param writeScope The <code>WriteScope</code> to use for
      *     FreeCol object writes.
+     * @param indent If true, produce indented output if supported.
      * @exception IOException if thrown while creating the
      *     <code>XMLStreamWriter</code>.
      */
     public FreeColXMLWriter(OutputStream outputStream,
-                            WriteScope writeScope) throws IOException {
+                            WriteScope writeScope,
+                            boolean indent) throws IOException {
         try {
-            XMLOutputFactory xof = XMLOutputFactory.newInstance();
-            this.xmlStreamWriter = xof.createXMLStreamWriter(outputStream,
-                                                             "UTF-8");
+            this.xmlStreamWriter = getFactory(indent)
+                .createXMLStreamWriter(outputStream, "UTF-8");
         } catch (XMLStreamException e) {
             throw new IOException(e);
         }
@@ -140,20 +142,35 @@ public class FreeColXMLWriter implements XMLStreamWriter {
      *     an <code>FreeColXMLWriter</code> for.
      * @param writeScope The <code>WriteScope</code> to use for
      *     FreeCol object writes.
+     * @param indent If true, produce indented output if supported.
      * @exception IOException if thrown while creating the
      *     <code>FreeColXMLWriter</code>.
      */
-    public FreeColXMLWriter(Writer writer,
-                            WriteScope writeScope) throws IOException {
+    public FreeColXMLWriter(Writer writer, WriteScope writeScope,
+                            boolean indent) throws IOException {
         try {
-            XMLOutputFactory xof = XMLOutputFactory.newInstance();
-            this.xmlStreamWriter = xof.createXMLStreamWriter(writer);
+            this.xmlStreamWriter = getFactory(indent)
+                .createXMLStreamWriter(writer);
         } catch (XMLStreamException e) {
             throw new IOException(e);
         }
         this.writeScope = writeScope;
     }
 
+
+    /**
+     * Get the <code>XMLOutputFactory</code> to create the output stream with.
+     *
+     * @param indent If true, produce indented output if supported.
+     * @return An <code>XMLOutputFactory</code>.
+     */
+    private XMLOutputFactory getFactory(boolean indent) {
+        XMLOutputFactory xof = XMLOutputFactory.newInstance();
+        if (indent && xof.isPropertySupported(OutputKeys.INDENT)) {
+            xof.setProperty(OutputKeys.INDENT, "yes");
+        }
+        return xof;
+    }
 
     /**
      * Get the write scope prevailing on this stream.

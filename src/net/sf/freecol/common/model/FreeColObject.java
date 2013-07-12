@@ -699,7 +699,7 @@ public abstract class FreeColObject implements ObjectWithId {
         StringWriter sw = new StringWriter();
         FreeColXMLWriter xw = null;
         try {
-            xw = new FreeColXMLWriter(sw, writeScope);
+            xw = new FreeColXMLWriter(sw, writeScope, false);
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "Error creating FreeColXMLWriter,", ioe);
             return null;
@@ -840,7 +840,7 @@ public abstract class FreeColObject implements ObjectWithId {
     public void save(OutputStream out) {
         FreeColXMLWriter xw = null;
         try {
-            xw = new FreeColXMLWriter(out, WriteScope.toSave());
+            xw = new FreeColXMLWriter(out, WriteScope.toSave(), true);
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "Error creating FreeColXMLWriter.", ioe);
             return;
@@ -874,7 +874,8 @@ public abstract class FreeColObject implements ObjectWithId {
         StringWriter sw = new StringWriter();
         FreeColXMLWriter xw = null;
         try {
-            xw = new FreeColXMLWriter(sw, FreeColXMLWriter.WriteScope.toServer());
+            xw = new FreeColXMLWriter(sw, 
+                FreeColXMLWriter.WriteScope.toServer(), false);
         } catch (IOException ioe) {
             logger.log(Level.WARNING, "Error creating FreeColXMLWriter,", ioe);
             return null;
