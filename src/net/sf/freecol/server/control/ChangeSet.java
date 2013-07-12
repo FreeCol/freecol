@@ -353,7 +353,7 @@ public class ChangeSet {
 
         /**
          * Should a player perhaps be notified of this attack?
-         * Do not use Unit.isVisibleTo because that gives a false
+         * Do not use ServerPlayer.canSeeUnit because that gives a false
          * negative for units in settlements, which should be animated.
          *
          * @param serverPlayer The <code>ServerPlayer</code> to notify.
@@ -382,14 +382,14 @@ public class ChangeSet {
             element.setAttribute("attackerTile", attackerTile.getId());
             element.setAttribute("defenderTile", defenderTile.getId());
             element.setAttribute("success", Boolean.toString(success));
-            if (!attacker.isVisibleTo(serverPlayer)) {
+            if (!serverPlayer.canSeeUnit(attacker)) {
                 element.appendChild(attacker.toXMLElement(doc, serverPlayer));
                 if (attacker.getLocation() instanceof Unit) {
                     Unit loc = (Unit)attacker.getLocation();
                     element.appendChild(loc.toXMLElement(doc, serverPlayer));
                 }
             }
-            if (!defender.isVisibleTo(serverPlayer)) {
+            if (!serverPlayer.canSeeUnit(defender)) {
                 element.appendChild(defender.toXMLElement(doc, serverPlayer));
             }
             return element;
@@ -558,7 +558,7 @@ public class ChangeSet {
 
         private boolean seeOld(ServerPlayer serverPlayer) {
             Tile oldTile = oldLocation.getTile();
-            return unit.getOwner() == serverPlayer
+            return serverPlayer.owns(unit)
                 || (oldTile != null
                     && serverPlayer.canSee(oldTile)
                     && !oldTile.hasSettlement()
@@ -566,7 +566,7 @@ public class ChangeSet {
         }
 
         private boolean seeNew(ServerPlayer serverPlayer) {
-            return serverPlayer.owns(unit) || unit.isVisibleTo(serverPlayer);
+            return serverPlayer.canSeeUnit(unit);
         }
 
 
@@ -703,7 +703,7 @@ public class ChangeSet {
             if (fcgo instanceof Unit) {
                 // Units have a precise test, use that rather than
                 // the more general interface-based tests.
-                return ((Unit) fcgo).isVisibleTo(serverPlayer);
+                return serverPlayer.canSeeUnit((Unit)fcgo);
             }
             // If we own it, we can see it.
             if (fcgo instanceof Ownable

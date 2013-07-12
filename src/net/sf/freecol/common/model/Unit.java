@@ -3131,26 +3131,6 @@ public class Unit extends GoodsLocation
     // Miscellaneous more complex functionality
 
     /**
-     * Checks if this unit is visible to the given player.
-     *
-     * @param player The <code>Player</code>.
-     * @return <code>true</code> if this <code>Unit</code> is visible to the
-     *         given <code>Player</code>.
-     */
-    public boolean isVisibleTo(Player player) {
-        Tile unitTile;
-        Settlement settlement;
-
-        return (player == getOwner()) ? true
-            : ((unitTile = getTile()) == null) ? false
-            : (!player.canSee(unitTile)) ? false
-            : ((settlement = getSettlement()) != null
-                && !player.owns(settlement)) ? false
-            : (isOnCarrier() && !player.owns(getCarrier())) ? false
-            : true;
-    }
-
-    /**
      * Gets a key for the unit occupation.
      *
      * @param owner True if the key should be for the owner of the unit.

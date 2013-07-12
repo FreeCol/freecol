@@ -533,8 +533,8 @@ public class DebugUtils {
         final Player player = freeColClient.getMyPlayer();
         final Game sGame = server.getGame();
         final Map sMap = sGame.getMap();
-        final Player sPlayer = sGame.getFreeColGameObject(player.getId(),
-                                                          Player.class);
+        final ServerPlayer sPlayer = sGame.getFreeColGameObject(player.getId(),
+                                                                ServerPlayer.class);
         final GUI gui = freeColClient.getGUI();
 
         boolean problemDetected = false;
@@ -542,7 +542,7 @@ public class DebugUtils {
         for (Tile t : sMap.getAllTiles()) {
             if (sPlayer.canSee(t)) {
                 for (Unit u : t.getUnitList()) {
-                    if (!u.isVisibleTo(sPlayer)) continue;
+                    if (!sPlayer.canSeeUnit(u)) continue;
                     if (game.getFreeColGameObject(u.getId(), Unit.class) == null) {
                         sb.append("Unit missing on client-side.\n");
                         sb.append("  Server: ");
