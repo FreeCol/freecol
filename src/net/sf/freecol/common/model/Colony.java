@@ -2104,10 +2104,6 @@ public class Colony extends Settlement implements Nameable {
         for (WorkLocation workLocation : getAllWorkLocations()) {
             objects.addAll(workLocation.disposeList());
         }
-        TileImprovement road = getTile().getRoad();
-        if (road != null && road.isVirtual()) {
-            getTile().removeRoad();
-        }
         objects.addAll(super.disposeList());
         return objects;
     }

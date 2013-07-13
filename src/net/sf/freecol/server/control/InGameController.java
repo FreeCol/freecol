@@ -709,9 +709,7 @@ public final class InGameController extends Controller {
             // the following explicit action.
             ChangeSet cs = new ChangeSet();
             if (player.isAI() && player.isEuropean()) {
-                for (Colony c : player.getColonies()) {
-                    cs.add(See.perhaps().except(player), c);
-                }
+                cs.add(See.perhaps().except(player), player.getColonies());
             }
 
             // Clean up futures from the current player.
@@ -2887,9 +2885,7 @@ public final class InGameController extends Controller {
         unit.setMovesLeft(0);
 
         // Update with settlement tile, and newly owned tiles.
-        List<FreeColGameObject> tiles = new ArrayList<FreeColGameObject>();
-        tiles.addAll(settlement.getOwnedTiles());
-        cs.add(See.perhaps(), tiles);
+        cs.add(See.perhaps(), settlement.getOwnedTiles());
 
         cs.addHistory(serverPlayer, new HistoryEvent(game.getTurn(),
                 HistoryEvent.EventType.FOUND_COLONY)
@@ -2898,12 +2894,10 @@ public final class InGameController extends Controller {
         // Also send any tiles that can now be seen because the colony
         // can perhaps see further than the founding unit.
         if (settlement.getLineOfSight() > unit.getLineOfSight()) {
-            tiles.clear();
             for (Tile t : tile.getSurroundingTiles(unit.getLineOfSight()+1,
-                                                  settlement.getLineOfSight())) {
-                if (!tiles.contains(t)) tiles.add(t);
+                    settlement.getLineOfSight())) {
+                cs.add(See.only(serverPlayer), t);
             }
-            cs.add(See.only(serverPlayer), tiles);
         }
 
         // Others can see tile changes.
@@ -2957,12 +2951,6 @@ public final class InGameController extends Controller {
                                      Settlement settlement) {
         ChangeSet cs = new ChangeSet();
 
-        // Collect the tiles the settlement owns before disposing,
-        // except the center tile as that is in the dispose below.
-        for (Tile t : settlement.getOwnedTiles()) {
-            if (t != settlement.getTile()) cs.add(See.perhaps(), t);
-        }
-
         // Create history event before disposing.
         if (settlement instanceof Colony) {
             cs.addHistory(serverPlayer,
@@ -2971,10 +2959,8 @@ public final class InGameController extends Controller {
                     .addName("%colony%", settlement.getName()));
         }
 
-        // Now do the dispose.
-        cs.add(See.perhaps().always(serverPlayer), settlement.getTile());
-        cs.addDispose(See.perhaps().always(serverPlayer),
-            settlement.getTile(), settlement);
+        // Comprehensive dispose.
+        serverPlayer.csDisposeSettlement(settlement, cs);
 
         // TODO: Player.settlements is still being fixed on the client side.
         sendToOthers(serverPlayer, cs);

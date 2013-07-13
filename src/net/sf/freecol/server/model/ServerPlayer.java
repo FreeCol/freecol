@@ -552,9 +552,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
         List<Unit> units = getUnits();
         while (!units.isEmpty()) {
             Unit unit = units.remove(0);
-            if (unit.getLocation() instanceof Tile) {
-                cs.add(See.perhaps().always(this), unit.getTile());
-            }
             cs.addDispose(See.perhaps().always(this),
                 unit.getLocation(), unit);
         }
@@ -1733,16 +1730,14 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 }
 
             } else if (eventId.equals("model.event.seeAllColonies")) {
+                invalidateCanSeeTiles(); // seeAllColonies ability added
                 for (Tile t : game.getMap().getAllTiles()) {
                     Colony colony = t.getColony();
-                    if (colony != null
-                        && (ServerPlayer)colony.getOwner() != this) {
-                        t.updatePlayerExploredTile(this, false);
-                        cs.add(See.only(this), t);
+                    if (colony != null && !this.owns(colony)) {
                         for (Tile x : colony.getOwnedTiles()) {
                             x.updatePlayerExploredTile(this, false);
-                            cs.add(See.only(this), x);
                         }
+                        cs.add(See.only(this), colony.getOwnedTiles());
                     }
                 }
 
@@ -2983,7 +2978,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
      */
     public void csDisposeSettlement(Settlement settlement, ChangeSet cs) {
         logger.finest("Disposing of " + settlement.getName());
-        ServerPlayer owner = (ServerPlayer) settlement.getOwner();
+        ServerPlayer owner = (ServerPlayer)settlement.getOwner();
+        List<Tile> owned = settlement.getOwnedTiles();
+        Tile centerTile = settlement.getTile();
 
         // Get rid of the any missionary first.
         if (settlement instanceof IndianSettlement) {
@@ -2993,20 +2990,28 @@ public class ServerPlayer extends Player implements ServerModelObject {
             }
         }
             
-        // Try to reassign the tiles
-        List<Tile> owned = settlement.getOwnedTiles();
-        Tile centerTile = settlement.getTile();
+        // Get it off the map and off the owners list.
+        settlement.exciseSettlement();
+        if (!owner.removeSettlement(settlement)) {
+            throw new IllegalStateException("Failed to remove settlement: "
+                + settlement);
+        }
+        if (owner.hasSettlement(settlement)) {
+            throw new IllegalStateException("Still has settlement: "
+                + settlement);
+        }
+
+        // Try to reassign the tiles.  Do it in two passes so the first
+        // successful claim does not give a large advantage.
         Settlement centerClaimant = null;
         HashMap<Settlement, Integer> votes = new HashMap<Settlement,Integer>();
         HashMap<Tile, Settlement> claims = new HashMap<Tile, Settlement>();
         Settlement claimant;
-
-        while (!owned.isEmpty()) {
-            Tile tile = owned.remove(0);
+        for (Tile tile : owned) {
             votes.clear();
             for (Tile t : tile.getSurroundingTiles(1)) {
                 claimant = t.getOwningSettlement();
-                if (claimant != null && claimant != settlement
+                if (claimant != null
                     // BR#3375773 found a case where tiles were
                     // still owned by a settlement that had been
                     // previously destroyed.  These should be gone, but...
@@ -3045,35 +3050,15 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
         for (Tile t : claims.keySet()) {
             claimant = claims.get(t);
-            if (t == centerTile) {
-                centerClaimant = claimant; // Defer until settlement gone
+            if (claimant == null) {
+                t.changeOwnership(null, null);
             } else {
-                if (claimant == null) {
-                    t.changeOwnership(null, null);
-                } else {
-                    t.changeOwnership(claimant.getOwner(), claimant);
-                }
-                cs.add(See.perhaps().always(owner), t);
+                t.changeOwnership(claimant.getOwner(), claimant);
             }
         }
 
-        // Settlement goes away
-        if (!owner.removeSettlement(settlement)) {
-            throw new IllegalStateException("Failed to remove settlement: "
-                + settlement);
-        }
-        if (owner.hasSettlement(settlement)) {
-            throw new IllegalStateException("Still has settlement: "
-                + settlement);
-        }
         cs.addDispose(See.perhaps().always(owner), centerTile, settlement);
-        // Now the settlement is gone, the center tile can be claimed.
-        if (centerClaimant == null) {
-            centerTile.changeOwnership(null, null);
-        } else {
-            centerTile.changeOwnership(centerClaimant.getOwner(),
-                                       centerClaimant);
-        }
+        cs.add(See.perhaps().always(owner), owned);
     }
 
     /**

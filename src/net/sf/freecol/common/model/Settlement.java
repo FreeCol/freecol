@@ -225,7 +225,30 @@ public abstract class Settlement extends GoodsLocation
         for (Tile t : tile.getSurroundingTiles(getLineOfSight())) {
             owner.setExplored(t);
         }
+        if (this instanceof Colony && !tile.hasRoad()) {
+            TileImprovement road = tile.addRoad();
+            road.setTurnsToComplete(0);
+            road.setVirtual(true);
+            road.updateRoadConnections(true);
+        }
         owner.invalidateCanSeeTiles();
+    }
+
+    /**
+     * Remove a settlement from the map.
+     */
+    public void exciseSettlement() {
+        Tile settlementTile = getTile();
+        List<Tile> lostTiles = getOwnedTiles();
+        for (Tile tile : lostTiles) {
+            tile.changeOwnership(null, null);
+        }
+        settlementTile.setSettlement(null);
+        settlementTile.setOwningSettlement(null);
+        TileImprovement road = settlementTile.getRoad();
+        if (road != null && road.isVirtual()) {
+            settlementTile.removeRoad();
+        }
     }
 
     /**
@@ -420,13 +443,7 @@ public abstract class Settlement extends GoodsLocation
             // on both sides to when it is only called on server-side.
 
             // Get off the map
-            Tile settlementTile = getTile();
-            List<Tile> lostTiles = getOwnedTiles();
-            for (Tile tile : lostTiles) {
-                tile.changeOwnership(null, null);
-            }
-            settlementTile.setSettlement(null);
-            settlementTile.setOwningSettlement(null);
+            exciseSettlement();
 
             // The owner forgets about the settlement.
             owner.removeSettlement(this);

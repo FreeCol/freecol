@@ -321,9 +321,7 @@ public class ServerGame extends Game implements ServerModelObject {
             for (Colony colony : weakestAIPlayer.getColonies()) {
                 ((ServerColony)colony).changeOwner(strongestAIPlayer);
                 logMe += " " + colony.getName();
-                for (Tile tile : colony.getOwnedTiles()) {
-                    cs.add(See.perhaps(), tile);
-                }
+                cs.add(See.perhaps(), colony.getOwnedTiles());
             }
             for (Unit unit : weakestAIPlayer.getUnits()) {
                 unit.changeOwner(strongestAIPlayer);
