@@ -106,7 +106,7 @@ public class ServerGame extends Game implements ServerModelObject {
         this(specification);
 
         this.freeColGameObjectListener = freeColGameObjectListener;
-        this.viewOwner = null;
+        this.clientPlayer = null;
         this.setGame(this);
 
         // Need a container to hold a reference to all the server

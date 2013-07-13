@@ -114,7 +114,7 @@ public class Game extends FreeColGameObject {
      * The owner of this view of the game, or <code>null</code> if this game
      * has all the information.
      */
-    protected Player viewOwner = null;
+    protected Player clientPlayer = null;
 
     /**
      * The combat model this game uses. At the moment, the only combat
@@ -156,15 +156,15 @@ public class Game extends FreeColGameObject {
      * in a DOM-parsed XML-tree.
      *
      * @param element The <code>Element</code> containing the game.
-     * @param viewOwnerUsername The username of the owner of this view of the
+     * @param clientUsername The username of the owner of this view of the
      *     game.
      */
-    public Game(Element element, String viewOwnerUsername) {
+    public Game(Element element, String clientUsername) {
         super(null);
      
         this.combatModel = new SimpleCombatModel();
         readFromXMLElement(element);
-        this.viewOwner = getPlayerByName(viewOwnerUsername);
+        this.clientPlayer = getPlayerByName(clientUsername);
         // setId() does not add Games to the freeColGameObjects
         this.setFreeColGameObject(getId(), this);
     }
@@ -592,29 +592,31 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Get the owner of this view of the game, or null if this game
-     * has all the information.
+     * Get the client player this thread is operating for.  If in the server
+     * there will be none.
      *
-     * If this value is null, then it means that this game object has
-     * access to all information (i.e. is the server model).
-     *
-     * TODO: This is not used much except in Tile, and perhaps could
-     * go away if we had ServerTiles?
-     *
-     * @return The <code>Player</code> using this <code>Game</code>-object
-     *     as a view.
+     * @return The client <code>Player</code>.
      */
-    public Player getViewOwner() {
-        return viewOwner;
+    public Player getClientPlayer() {
+        return clientPlayer;
     }
 
     /**
-     * Is this view visible to a player?
+     * Are we executing in a client?
      *
-     * @return True if there is a player attached to this game/view.
+     * @return True in a client.
      */
-    public boolean isViewShared() {
-        return getViewOwner() != null;
+    public boolean isInClient() {
+        return getClientPlayer() != null;
+    }
+
+    /**
+     * Are we executing in the server?
+     *
+     * @return True in the server.
+     */
+    public boolean isInServer() {
+        return getClientPlayer() == null;
     }
 
     /**

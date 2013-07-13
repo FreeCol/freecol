@@ -156,15 +156,13 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         super(game);
 
         this.type = type;
+        this.x = locX;
+        this.y = locY;
+        this.owningSettlement = null;
+        this.settlement = null;
 
-        x = locX;
-        y = locY;
-
-        owningSettlement = null;
-        settlement = null;
-
-        if (!game.isViewShared()) {
-            playerExploredTiles = new HashMap<Player, PlayerExploredTile>();
+        if (game.isInServer()) {
+            this.playerExploredTiles = new HashMap<Player, PlayerExploredTile>();
         }
     }
 
@@ -179,8 +177,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public Tile(Game game, String id) {
         super(game, id);
 
-        if (!game.isViewShared()) {
-            playerExploredTiles = new HashMap<Player, PlayerExploredTile>();
+        if (game.isInServer()) {
+            this.playerExploredTiles = new HashMap<Player, PlayerExploredTile>();
         }
     }
 
@@ -1659,12 +1657,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      * {@inheritDoc}
      */
     public String getNameKey() {
-        if (getGame().isViewShared()) {
-            if (isExplored()) {
-                return getType().getNameKey();
-            } else {
-                return "unexplored";
-            }
+        if (getGame().isInClient()) {
+            return (isExplored()) ? getType().getNameKey() : "unexplored";
         } else {
             Player player = getGame().getCurrentPlayer();
             if (player != null) {
