@@ -232,7 +232,7 @@ public final class TileType extends FreeColGameObjectType {
      */
     public List<ResourceType> getResourceTypes() {
         List<ResourceType> result = new ArrayList<ResourceType>();
-        if (resourceTypes != null) { 
+        if (resourceTypes != null) {
             for (RandomChoice<ResourceType> resource : resourceTypes) {
                 result.add(resource.getObject());
             }
@@ -318,7 +318,7 @@ public final class TileType extends FreeColGameObjectType {
      *
      * @return The TILE_PRODUCTION option value.
      */
-    public String getTileProduction() {
+    private String getTileProduction() {
         return getSpecification().getString(TILE_PRODUCTION);
     }
 
@@ -638,6 +638,11 @@ public final class TileType extends FreeColGameObjectType {
                             xr.getAttribute(PROBABILITY_TAG, 100));
             xr.closeTag(RESOURCE_TAG);
 
+        } else if (Modifier.getXMLElementTagName().equals(tag)) {
+            // @compat 0.10.7
+            // the tile type no longer contains the base production modifier
+            xr.closeTag(Modifier.getXMLElementTagName());
+            // end @compat
         } else {
             super.readChild(xr);
         }
