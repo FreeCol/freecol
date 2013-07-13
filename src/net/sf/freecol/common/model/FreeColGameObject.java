@@ -202,16 +202,17 @@ public abstract class FreeColGameObject extends FreeColObject {
 
     /**
      * FreeColGameObjects are equal if the two fcgos are in the same
-     * game and have the same identifier.
+     * game and have the same identifier.  Take care to use Utils.equals
+     * which guards against nulls.
      *
      * @param o The <code>FreeColGameObject</code> to compare against
      *     this object.
      * @return True if the <code>FreeColGameObject</code> is equal to this one.
      */
     public boolean equals(FreeColGameObject o) {
-        if (o == null) return false;
-        return Utils.equals(this.getGame(), o.getGame())
-            && getId().equals(o.getId());
+        return (o == null) ? false
+            : (Utils.equals(this.getGame(), o.getGame())
+                && Utils.equals(this.getId(), o.getId()));
     }
 
 
