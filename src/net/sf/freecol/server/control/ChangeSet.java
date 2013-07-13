@@ -227,7 +227,7 @@ public class ChangeSet {
         /**
          * Make a new Change.
          */
-        Change(See see) {
+        public Change(See see) {
             this.see = see;
         }
 
@@ -450,7 +450,7 @@ public class ChangeSet {
          * @return false.
          */
         @Override
-            public boolean convertsToElement() {
+        public boolean convertsToElement() {
             return false;
         }
 
@@ -706,8 +706,7 @@ public class ChangeSet {
                 return serverPlayer.canSeeUnit((Unit)fcgo);
             }
             // If we own it, we can see it.
-            if (fcgo instanceof Ownable
-                && ((Ownable) fcgo).getOwner() == (Player) serverPlayer) {
+            if (fcgo instanceof Ownable && serverPlayer.owns((Ownable)fcgo)) {
                 return true;
             }
             // We do not own it, so the only way we could see it is if
@@ -720,8 +719,8 @@ public class ChangeSet {
                 return false;
             }
             return fcgo instanceof Location
-                && ((Location) fcgo).getTile() != null
-                && serverPlayer.canSee(((Location) fcgo).getTile());
+                && ((Location)fcgo).getTile() != null
+                && serverPlayer.canSee(((Location)fcgo).getTile());
         }
 
         /**
@@ -840,7 +839,7 @@ public class ChangeSet {
         public RemoveChange(See see, Location loc,
                             List<? extends FreeColGameObject> objects) {
             super(see);
-            this.tile = (loc instanceof Tile) ? (Tile) loc : null;
+            this.tile = (loc instanceof Tile) ? (Tile)loc : null;
             this.fcgo = objects.remove(objects.size() - 1);
             this.contents = objects;
         }
@@ -881,10 +880,9 @@ public class ChangeSet {
          */
         public Element toElement(ServerPlayer serverPlayer, Document doc) {
             Element element = doc.createElement("remove");
-            // The main object may be visible, but the contents are by
+            // The main object may be visible, but the contents are
             // only visible if the deeper ownership test succeeds.
-            if (fcgo instanceof Ownable
-                && ((Ownable)fcgo).getOwner() == serverPlayer) {
+            if (fcgo instanceof Ownable && serverPlayer.owns((Ownable)fcgo)) {
                 for (FreeColGameObject o : contents) {
                     element.appendChild(o.toXMLElementPartial(doc));
                 }
@@ -979,7 +977,7 @@ public class ChangeSet {
         private boolean add;
 
         /**
-         * Build a new OwnedChange.
+         * Build a new FeatureChange.
          *
          * @param see The visibility of this change.
          * @param object The <code>FreeColGameObject</code> to update.
@@ -1076,7 +1074,7 @@ public class ChangeSet {
             element.setAttribute("tile", tile.getId());
             // Have to tack on two copies of the settlement tile.
             // One full version, one ordinary version to restore.
-            element.appendChild(tile.toXMLElement(doc, serverPlayer));
+            element.appendChild(tile.toXMLElement(doc));
             element.appendChild(tile.toXMLElement(doc, serverPlayer));
             return element;
         }
