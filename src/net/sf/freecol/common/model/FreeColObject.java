@@ -907,12 +907,14 @@ public abstract class FreeColObject implements ObjectWithId {
      */
     public <T extends FreeColObject> T copy(Game game, Class<T> returnClass) {
         T ret = null;
+        FreeColXMLReader xr = null;
         try {
-            String xml = this.serialize();
-            FreeColXMLReader xr = new FreeColXMLReader(new StringReader(xml));
+            xr = new FreeColXMLReader(new StringReader(this.serialize()));
             ret = xr.copy(game, returnClass);
         } catch (Exception e) {
             logger.log(Level.WARNING, "Failed to copy: " + getId(), e);
+        } finally {
+            if (xr != null) xr.close();
         }
         return ret;
     }
