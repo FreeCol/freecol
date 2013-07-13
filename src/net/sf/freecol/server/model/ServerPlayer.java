@@ -979,7 +979,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             setStance(otherPlayer, stance);
             if (modifier != 0) {
                 cs.add(See.only(null).perhaps(other),
-                    modifyTension(otherPlayer, modifier));
+                       modifyTension(otherPlayer, modifier));
             }
             logger.info("Stance modification " + getName()
                 + " " + old.toString() + " -> " + stance.toString()
@@ -1467,7 +1467,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                         || !enemy.hasExplored(settlement.getTile()))
                         continue;
                     cs.add(See.only(null).perhaps((ServerPlayer)enemy),
-                        settlement);
+                           settlement);
                     // No messages about improving tension
                     if (newLevel == null
                         || (entry.getValue() != null 

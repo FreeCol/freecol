@@ -119,6 +119,7 @@ public class ChangeSet {
         public boolean check(ServerPlayer player, boolean perhapsResult) {
             return (seeNever == player) ? false
                 : (seeAlways == player) ? true
+                : (seePerhaps == player) ? perhapsResult
                 : (type == ONLY) ? false
                 : (type == ALL) ? true
                 : perhapsResult;
@@ -1263,7 +1264,7 @@ public class ChangeSet {
      * @param objects The <code>FreeColGameObject</code>s that changed.
      * @return The updated <code>ChangeSet</code>.
      */
-    public ChangeSet add(See see, List<FreeColGameObject> objects) {
+    public ChangeSet add(See see, List<? extends FreeColGameObject> objects) {
         for (FreeColGameObject o : objects) {
             changes.add(new ObjectChange(see, o));
         }
