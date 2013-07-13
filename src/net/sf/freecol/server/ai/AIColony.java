@@ -1500,7 +1500,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         super.writeChildren(xw);
 
         for (AIGoods ag : aiGoods) {
-            if (ag.checkIntegrity(false) < 0) continue;
+            if (ag.checkIntegrity(true) < 0) continue;
             xw.writeStartElement(AI_GOODS_LIST_TAG);
 
             xw.writeAttribute(ID_ATTRIBUTE_TAG, ag);
@@ -1509,7 +1509,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         }
 
         for (TileImprovementPlan tip : tileImprovementPlans) {
-            if (tip.checkIntegrity(false) < 0) continue;
+            if (tip.checkIntegrity(true) < 0) continue;
 
             xw.writeStartElement(TILE_IMPROVEMENT_PLAN_LIST_TAG);
 
@@ -1522,7 +1522,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
             String tag = (w instanceof GoodsWish) ? GOODS_WISH_LIST_TAG
                 : (w instanceof WorkerWish) ? WORKER_WISH_LIST_TAG
                 : null;
-            if (w.checkIntegrity(false) < 0 || !w.shouldBeStored()
+            if (w.checkIntegrity(true) < 0 || !w.shouldBeStored()
                 || tag == null) continue;
 
             xw.writeStartElement(tag);

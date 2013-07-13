@@ -439,12 +439,20 @@ public class AIGoods extends AIObject implements Transportable {
             : (goods.getAmount() <= 0) ? "non-positive-goods-amount"
             : (goods.getLocation() == null) ? "null-location"
             : (((FreeColGameObject)goods.getLocation()).isDisposed()) ? "disposed-location"
-            //: (destination == null) ? "null-destination"
-            : (destination != null
-                && ((FreeColGameObject)destination).isDisposed()) ? "disposed-destination"
             : null;
+        if (destination != null
+            && ((FreeColGameObject)destination).isDisposed()) {
+            if (fix) {
+                logger.warning("Fixing disposed destination for " + this);
+                destination = null;
+                if (result > 0) result = 0;
+            } else {
+                why = "disposed-destination";
+            }
+        }
         if (why != null) {
             logger.finest("checkIntegrity(" + this.toString() + ") = " + why);
+            result = -1;
         }
         return result;
     }
