@@ -1179,7 +1179,6 @@ public final class Tile extends UnitLocation implements Named, Ownable {
     public List<Modifier> getProductionModifiers(GoodsType goodsType,
                                                  UnitType unitType) {
         List<Modifier> result = new ArrayList<Modifier>();
-        result.addAll(type.getProductionBonus(goodsType));
         if (tileItemContainer != null) {
             result.addAll(tileItemContainer.getProductionModifiers(goodsType,
                                                                    unitType));

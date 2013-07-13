@@ -175,6 +175,13 @@ public class ProductionType extends FreeColObject {
         this.outputs = newOutputs;
     }
 
+    /**
+     * Returns the goods of the given goods type produced by this
+     * production type, or null.
+     *
+     * @param goodsType a <code>GoodsType</code> value
+     * @return an <code>AbstractGoods</code> value
+     */
     public AbstractGoods getOutput(GoodsType goodsType) {
         if (inputs == null && outputs != null) {
             for (AbstractGoods output : outputs) {

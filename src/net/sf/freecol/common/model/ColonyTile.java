@@ -397,9 +397,10 @@ public class ColonyTile extends WorkLocation {
             }
         } else if (workTile.isLand()
             || getColony().hasAbility(Ability.PRODUCE_IN_WATER)) {
+            production = tileType.getProductionOf(goodsType, unitType);
             List<Modifier> mods = getProductionModifiers(goodsType, unitType);
             if (!mods.isEmpty()) {
-                production = (int)FeatureContainer.applyModifiers(0f,
+                production = (int)FeatureContainer.applyModifiers(production,
                     getGame().getTurn(), mods);
             }
         }

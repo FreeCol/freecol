@@ -458,8 +458,6 @@ public class TileTest extends FreeColTestCase {
         tile1.addResource(new Resource(game, tile1, sugarResource));
 
         assertTrue(hasBonusFrom(tile1.getProductionModifiers(sugar, null),
-                                savannah));
-        assertTrue(hasBonusFrom(tile1.getProductionModifiers(sugar, null),
                                 river1.getType()));
         assertTrue(hasBonusFrom(tile1.getProductionModifiers(sugar, null),
                                 sugarResource));

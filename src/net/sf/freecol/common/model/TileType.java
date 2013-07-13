@@ -93,9 +93,6 @@ public final class TileType extends FreeColGameObjectType {
 
     private static final String TILE_PRODUCTION = "model.option.tileProduction";
 
-    // TODO: make this hack go away!
-    private String productionLevel = null;
-
 
     /**
      * Create a new tile type.
@@ -268,12 +265,8 @@ public final class TileType extends FreeColGameObjectType {
     }
 
     /**
-     * Gets the amount of goods of given goods type this tile type can
-     * produce.
-     *
-     * This method applies the production bonus to
-     * <code>0f</code>.  Thus, it will always return <code>0</code>
-     * unless an additive modifier is present.  This is intentional.
+     * Returns the amount of goods of given goods type the given unit
+     * type could produce on a tile of this tile type.
      *
      * @param goodsType The <code>GoodsType</code> to produce.
      * @param unitType A <code>UnitType</code> that is to do the work.
@@ -281,17 +274,33 @@ public final class TileType extends FreeColGameObjectType {
      * @see #getProductionBonus(GoodsType)
      */
     public int getProductionOf(GoodsType goodsType, UnitType unitType) {
-        return (int)applyModifier(0f, goodsType.getId(), unitType);
+        int production = getProductionOf(goodsType);
+        return (int)applyModifier(production, goodsType.getId(), unitType);
     }
 
     /**
-     * Gets the production bonuses for the given goods type.
+     * Returns the amount of goods of given goods type this tile type can
+     * produce.
      *
-     * @param goodsType The <code>GoodsType</code> to check.
-     * @return A set of applicable production modifiers.
+     * @param goodsType The <code>GoodsType</code> to produce.
+     * @return The amount of goods production.
+     * @see #getProductionBonus(GoodsType)
      */
-    public Set<Modifier> getProductionBonus(GoodsType goodsType) {
-        return getModifierSet(goodsType.getId());
+    public int getProductionOf(GoodsType goodsType) {
+        int amount = 0;
+        for (ProductionType productionType : getProductionTypes(false)) {
+            if (productionType.getOutputs() != null) {
+                for (AbstractGoods output : productionType.getOutputs()) {
+                    if (output.getType() == goodsType) {
+                        int newAmount = output.getAmount();
+                        if (newAmount > amount) {
+                            amount = newAmount;
+                        }
+                    }
+                }
+            }
+        }
+        return amount;
     }
 
     /**
@@ -356,7 +365,7 @@ public final class TileType extends FreeColGameObjectType {
     public List<AbstractGoods> getProduction() {
         List<AbstractGoods> production = new ArrayList<AbstractGoods>();
         for (ProductionType productionType
-                 : getProductionTypes(false, productionLevel)) {
+                 : getProductionTypes(false, getTileProduction())) {
             List<AbstractGoods> outputs = productionType.getOutputs();
             if (outputs != null && !outputs.isEmpty()) {
                 production.addAll(outputs);
@@ -417,34 +426,6 @@ public final class TileType extends FreeColGameObjectType {
         return false;
     }
 
-    /**
-     * Apply a difficulty level to this tile type.
-     *
-     * @param difficultyLevel difficulty level to apply
-     */
-    @Override
-    public void applyDifficultyLevel(OptionGroup difficultyLevel) {
-        final Specification spec = getSpecification();
-
-        productionLevel = ((StringOption) difficultyLevel.getOption("model.option.tileProduction"))
-            .getValue();
-        // remove old modifiers
-        for (GoodsType goodsType : spec.getGoodsTypeList()) {
-            removeModifiers(goodsType.getId());
-        }
-        // add new modifiers
-        for (ProductionType productionType : getProductionTypes()) {
-            if (productionType.appliesTo(productionLevel)) {
-                List<AbstractGoods> outputs = productionType.getOutputs();
-                if (outputs == null) continue;
-                for (AbstractGoods goods : outputs) {
-                    addModifier(new Modifier(goods.getType().getId(), this,
-                                             goods.getAmount(),
-                                             Modifier.Type.ADDITIVE));
-                }
-            }
-        }
-    }
 
     /**
      * {@inheritDoc}
@@ -476,7 +457,6 @@ public final class TileType extends FreeColGameObjectType {
     private static final String PRIMARY_PRODUCTION_TAG = "primary-production";
     private static final String PROBABILITY_TAG = "probability";
     private static final String PRODUCTION_TAG = "production";
-    private static final String PRODUCTION_LEVEL_TAG = "productionLevel";
     private static final String RESOURCE_TAG = "resource";
     private static final String SECONDARY_PRODUCTION_TAG = "secondary-production";
     private static final String TEMPERATURE_MIN_TAG = "temperatureMin";
@@ -506,7 +486,6 @@ public final class TileType extends FreeColGameObjectType {
 
         xw.writeAttribute(CAN_SETTLE_TAG, canSettle);
 
-        xw.writeAttribute(PRODUCTION_LEVEL_TAG, productionLevel);
     }
 
     /**
@@ -578,7 +557,6 @@ public final class TileType extends FreeColGameObjectType {
 
         connected = xr.getAttribute(IS_CONNECTED_TAG, false);
 
-        productionLevel = xr.getAttribute(PRODUCTION_LEVEL_TAG, (String)null);
     }
 
     /**
