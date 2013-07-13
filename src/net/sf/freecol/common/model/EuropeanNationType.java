@@ -41,11 +41,11 @@ import net.sf.freecol.common.option.OptionGroup;
  */
 public class EuropeanNationType extends NationType {
 
+    public static final String EXPERT_STARTING_UNITS
+        = "model.option.expertStartingUnits";
+
     /** Whether this is an REF Nation. */
     private boolean ref = false;
-
-    /** Stores the starting units of this Nation. */
-    private List<AbstractUnit> startingUnits = null;
 
     /**
      * Stores the starting units of this Nation at various
@@ -102,8 +102,8 @@ public class EuropeanNationType extends NationType {
      * @return A list of <code>AbstractUnit</code>s to start with.
      */
     public List<AbstractUnit> getStartingUnits() {
-        if (startingUnits == null) return Collections.emptyList();
-        return startingUnits;
+        boolean ex = getSpecification().getBoolean(EXPERT_STARTING_UNITS);
+        return getStartingUnits(String.valueOf(ex));
     }
 
     /**
@@ -141,17 +141,6 @@ public class EuropeanNationType extends NationType {
             startingUnitMap.put(exTag, units);
         }
         units.put(id, unit);
-    }
-        
-    /**
-     * Applies the difficulty level to this nation type.
-     *
-     * @param difficulty difficulty level to apply
-     */
-    @Override
-    public void applyDifficultyLevel(OptionGroup difficulty) {
-        boolean ex = difficulty.getBoolean("model.option.expertStartingUnits");
-        startingUnits = getStartingUnits(String.valueOf(ex));
     }
 
 
@@ -227,7 +216,7 @@ public class EuropeanNationType extends NationType {
 
         EuropeanNationType parent = xr.getType(spec, EXTENDS_TAG,
                                                EuropeanNationType.class, this);
-        
+
         ref = xr.getAttribute(REF_TAG, parent.ref);
     }
 
@@ -268,7 +257,7 @@ public class EuropeanNationType extends NationType {
             String type = xr.getAttribute(TYPE_TAG, (String)null);
 
             Role role = xr.getAttribute(ROLE_TAG, Role.class, Role.DEFAULT);
-            
+
             boolean ex = xr.getAttribute(EXPERT_STARTING_UNITS_TAG, false);
 
             addStartingUnit(id, new AbstractUnit(type, role, 1), ex);

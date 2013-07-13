@@ -178,18 +178,6 @@ public abstract class FreeColGameObjectType extends FreeColObject
     }
 
     /**
-     * Applies the given difficulty level to this
-     * FreeColGameObjectType.  If the behaviour of a
-     * FreeColGameObjectType depends on difficulty, it must override
-     * this method.  This base form does nothing.
-     *
-     * @param difficulty The difficulty level to apply.
-     */
-    public void applyDifficultyLevel(OptionGroup difficulty) {
-        // do nothing
-    }
-
-    /**
      * Get the modifier index value.  This is the priority with which
      * Modifiers provided by this type will be applied.
      *

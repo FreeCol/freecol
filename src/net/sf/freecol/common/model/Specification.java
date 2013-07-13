@@ -1381,11 +1381,6 @@ public final class Specification {
         if (level == null) return;
         logger.fine("Applying difficulty level " + level.getId());
         addOptionGroup(level, true);
-
-        for (FreeColGameObjectType type : allTypes.values()) {
-            type.applyDifficultyLevel(level);
-        }
-
         this.difficultyLevel = level.getId();
     }
 
