@@ -886,11 +886,12 @@ public final class InGameController extends Controller {
         independent.setPlayerType(PlayerType.INDEPENDENT);
         Game game = getGame();
         Turn turn = game.getTurn();
-        independent.modifyScore(SCORE_INDEPENDENCE_GRANTED - turn.getNumber());
         independent.setTax(0);
         independent.reinitialiseMarket();
-        cs.addGlobalHistory(game,
-            new HistoryEvent(turn, HistoryEvent.EventType.INDEPENDENCE));
+        HistoryEvent h = new HistoryEvent(turn, HistoryEvent.EventType.INDEPENDENCE);
+        h.setPlayerId(independent.getId());
+        h.setScore(SCORE_INDEPENDENCE_GRANTED - turn.getNumber());
+        cs.addGlobalHistory(game, h);
         cs.addMessage(See.only(independent),
             new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                 "model.player.independence", independent)
@@ -1147,6 +1148,7 @@ public final class InGameController extends Controller {
      * @return An element indicating the players high score state.
      */
     public Element checkHighScore(ServerPlayer serverPlayer) {
+        serverPlayer.updateScore();
         boolean highScore = getFreeColServer().newHighScore(serverPlayer);
         ChangeSet cs = new ChangeSet();
         cs.addAttribute(See.only(serverPlayer),
@@ -1270,13 +1272,14 @@ public final class InGameController extends Controller {
         serverPlayer.setNewLandName(countryName);
         serverPlayer.setPlayerType(PlayerType.REBEL);
         serverPlayer.addAbility(new Ability(Ability.INDEPENDENCE_DECLARED));
-        serverPlayer.modifyScore(SCORE_INDEPENDENCE_DECLARED);
 
         // Do not add history event to cs as we are going to update the
         // entire player.  Likewise clear model messages.
         Turn turn = getGame().getTurn();
-        cs.addGlobalHistory(getGame(), new HistoryEvent(turn,
-                HistoryEvent.EventType.DECLARE_INDEPENDENCE));
+        HistoryEvent h = new HistoryEvent(turn, HistoryEvent.EventType.DECLARE_INDEPENDENCE);
+        h.setPlayerId(serverPlayer.getId());
+        h.setScore(SCORE_INDEPENDENCE_DECLARED);
+        cs.addGlobalHistory(getGame(), h);
         serverPlayer.clearModelMessages();
         cs.addMessage(See.only(serverPlayer),
             new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,

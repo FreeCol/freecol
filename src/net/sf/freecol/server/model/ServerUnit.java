@@ -137,7 +137,6 @@ public class ServerUnit extends Unit implements ServerModelObject {
 
         owner.addUnit(this);
         owner.invalidateCanSeeTiles();
-        owner.modifyScore(unitType.getScoreValue());
     }
 
     /**
@@ -186,7 +185,6 @@ public class ServerUnit extends Unit implements ServerModelObject {
 
         owner.addUnit(this);
         owner.invalidateCanSeeTiles();
-        owner.modifyScore(unitType.getScoreValue());
     }
 
 

@@ -109,6 +109,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     public static final int MAX_CONVERT_DISTANCE = 10;
 
     public static final int SCORE_SETTLEMENT_DESTROYED = -40;
+    public static final int SCORE_NATION_DESTROYED = -400;
 
     /** The network socket to the player's client. */
     private Socket socket;
@@ -700,6 +701,35 @@ public class ServerPlayer extends Player implements ServerModelObject {
      */
     public void addHistory(HistoryEvent event) {
         history.add(event);
+    }
+
+    /**
+     * Update the current score for this player.
+     *
+     * @return True if the player score changed.
+     */
+    public boolean updateScore() {
+        int oldScore = score;
+        score = 0;
+
+        for (Unit u : getUnits()) {
+            score += u.getType().getScoreValue();
+        }
+        
+        for (Colony c : getColonies()) {
+            for (Building b : c.getBuildings()) {
+                score += b.getLevel() - 1;
+            }
+        }
+
+        int gold = getGold();
+        if (gold != GOLD_NOT_ACCOUNTED) score += gold;
+        
+        for (HistoryEvent h : getHistory()) {
+            if (getId().equals(h.getPlayerId())) score += h.getScore();
+        }
+
+        return score != oldScore;
     }
 
     /**
@@ -1353,6 +1383,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 clearOfferedFathers();
             }
 
+            if (updateScore()) {
+                cs.addPartial(See.only(this), this, "score");
+            }
+            
         } else if (isIndian()) {
             // We do not have to worry about Player level stance
             // changes driving Stance, as that is delegated to the AI.
@@ -2904,11 +2938,16 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
 
         // This is an atrocity.
-        int atrocities = SCORE_SETTLEMENT_DESTROYED;
-        if (settlement.getType().getClaimableRadius() > 1) atrocities *= 2;
-        if (capital) atrocities = (atrocities * 3) / 2;
-        attackerPlayer.modifyScore(atrocities);
-        cs.addPartial(See.only(attackerPlayer), attackerPlayer, "score");
+        int score = SCORE_SETTLEMENT_DESTROYED;
+        if (settlement.getType().getClaimableRadius() > 1) score *= 2;
+        if (capital) score = (score * 3) / 2;
+        HistoryEvent h = new HistoryEvent(game.getTurn(),
+            HistoryEvent.EventType.DESTROY_SETTLEMENT)
+            .addStringTemplate("%nation%", nativeNation)
+            .addName("%settlement%", settlementName);
+        h.setPlayerId(getId());
+        h.setScore(score);
+        cs.addHistory(attackerPlayer, h);
 
         // Finish with messages and history.
         cs.addMessage(See.only(attackerPlayer),
@@ -2916,11 +2955,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
                              "model.unit.indianTreasure", attacker)
                 .addName("%settlement%", settlementName)
                 .addAmount("%amount%", plunder));
-        cs.addHistory(attackerPlayer,
-            new HistoryEvent(game.getTurn(),
-                             HistoryEvent.EventType.DESTROY_SETTLEMENT)
-                .addStringTemplate("%nation%", nativeNation)
-                .addName("%settlement%", settlementName));
         if (capital) {
             cs.addMessage(See.only(attackerPlayer),
                 new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
@@ -2929,11 +2963,13 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     .addStringTemplate("%nation%", nativeNation));
         }
         if (nativePlayer.checkForDeath() == IS_DEAD) {
-            cs.addGlobalHistory(game,
-                new HistoryEvent(game.getTurn(),
+            h = new HistoryEvent(game.getTurn(),
                                  HistoryEvent.EventType.DESTROY_NATION)
-                    .addStringTemplate("%nation%", attackerNation)
-                    .addStringTemplate("%nativeNation%", nativeNation));
+                .addStringTemplate("%nation%", attackerNation)
+                .addStringTemplate("%nativeNation%", nativeNation);
+            h.setPlayerId(getId());
+            h.setScore(SCORE_NATION_DESTROYED);
+            cs.addGlobalHistory(game, h);
         }
         cs.addAttribute(See.only(attackerPlayer), "sound",
             "sound.event.destroySettlement");

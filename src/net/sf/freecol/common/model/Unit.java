@@ -410,12 +410,6 @@ public class Unit extends GoodsLocation
      */
     public void setType(UnitType newUnitType) {
         if (newUnitType.isAvailableTo(owner)) {
-            if (unitType == null) {
-                owner.modifyScore(newUnitType.getScoreValue());
-            } else {
-                owner.modifyScore(newUnitType.getScoreValue()
-                    - unitType.getScoreValue());
-            }
             this.unitType = newUnitType;
             if (getMovesLeft() > getInitialMovesLeft()) {
                 setMovesLeft(getInitialMovesLeft());
@@ -687,16 +681,12 @@ public class Unit extends GoodsLocation
 
         if (oldOwner != null) {
             oldOwner.removeUnit(this);
-            oldOwner.modifyScore(-getType().getScoreValue());
             // for speed optimizations
             if (!isOnCarrier()) {
                 oldOwner.invalidateCanSeeTiles();
             }
         }
         owner.addUnit(this);
-        if (getType() != null) { // can be null when fixing integrity
-            owner.modifyScore(getType().getScoreValue());
-        }
 
         // for speed optimizations
         if(!isOnCarrier()) {
@@ -3938,14 +3928,6 @@ public class Unit extends GoodsLocation
         nationality = xr.getAttribute(NATIONALITY_TAG, (String)null);
 
         ethnicity = xr.getAttribute(ETHNICITY_TAG, (String)null);
-
-        // TODO: does this make sense?
-        if (oldUnitType == null) {
-            owner.modifyScore(unitType.getScoreValue());
-        } else {
-            owner.modifyScore(unitType.getScoreValue()
-                - oldUnitType.getScoreValue());
-        }
 
         turnsOfTraining = xr.getAttribute(TURNS_OF_TRAINING_TAG, 0);
 

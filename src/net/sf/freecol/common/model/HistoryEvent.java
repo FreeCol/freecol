@@ -59,6 +59,12 @@ public class HistoryEvent extends StringTemplate {
     /** The type of event. */
     private EventType eventType;
 
+    /** Which player gets credit for the event, if any. */
+    private String playerId;
+
+    /** Points for this event, if any. */
+    private int score;
+
 
     /**
      * Create a new history event of given turn and type.
@@ -70,6 +76,8 @@ public class HistoryEvent extends StringTemplate {
         super("model.history." + eventType.toString(), TemplateType.TEMPLATE);
         this.turn = turn;
         this.eventType = eventType;
+        this.playerId = null;
+        this.score = 0;
     }
 
     /**
@@ -110,6 +118,41 @@ public class HistoryEvent extends StringTemplate {
         return eventType;
     }
 
+    /**
+     * Get the id for the player that is credited with this event, if any.
+     *
+     * @return The credited <code>Player</code> id.
+     */
+    public final String getPlayerId() {
+        return playerId;
+    }
+
+    /**
+     * Set the id for the player to credit for this event.
+     *
+     * @param playerId The new credited <code>Player</code> id.
+     */
+    public void setPlayerId(String playerId) {
+        this.playerId = playerId;
+    }
+
+    /**
+     * Get the score for this event.
+     *
+     * @return The score.
+     */
+    public final int getScore() {
+        return score;
+    }
+
+    /**
+     * Set the score for this event.
+     *
+     * @param score The new score for this event.
+     */
+    public void setScore(int score) {
+        this.score = score;
+    }
 
     /**
      * {@inheritDoc}
@@ -147,6 +190,8 @@ public class HistoryEvent extends StringTemplate {
     // Serialization
 
     private static final String EVENT_TYPE_TAG = "eventType";
+    private static final String PLAYER_ID_TAG = "playerId";
+    private static final String SCORE_TAG = "score";
     private static final String TURN_TAG = "turn";
 
 
@@ -160,6 +205,10 @@ public class HistoryEvent extends StringTemplate {
         xw.writeAttribute(TURN_TAG, turn.getNumber());
 
         xw.writeAttribute(EVENT_TYPE_TAG, eventType);
+
+        if (playerId != null) xw.writeAttribute(PLAYER_ID_TAG, playerId);
+
+        xw.writeAttribute(SCORE_TAG, score);
     }
 
     /**
@@ -173,6 +222,10 @@ public class HistoryEvent extends StringTemplate {
 
         eventType = xr.getAttribute(EVENT_TYPE_TAG,
                                     EventType.class, (EventType)null);
+
+        playerId = xr.getAttribute(PLAYER_ID_TAG, (String)null);
+
+        score = xr.getAttribute(SCORE_TAG, 0);
     }
 
     /**
@@ -183,8 +236,12 @@ public class HistoryEvent extends StringTemplate {
         StringBuilder sb = new StringBuilder(32);
         sb.append("[").append(getId())
             .append(" ").append(eventType.toString())
-            .append(" (").append(turn.getYear()).append(")")
-            .append(super.toString()).append("]");
+            .append(" (").append(turn.getYear()).append(")");
+        if (playerId != null) {
+            sb.append(" playerId=").append(playerId)
+                .append(" score=").append(score);
+        }
+        sb.append(" ").append(super.toString()).append("]");
         return sb.toString();
     }
 

@@ -1260,19 +1260,10 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Set the current score of the player.
      *
-     * @param newScore The new score.
+     * @param score The new score.
      */
-    public void setScore(int newScore) {
-        score = newScore;
-    }
-
-    /**
-     * Modifies the score of the player by the given value.
-     *
-     * @param value The amount to change the score by.
-     */
-    public void modifyScore(int value) {
-        score += value;
+    public void setScore(int score) {
+        this.score = score;
     }
 
     /**
@@ -1329,7 +1320,6 @@ public class Player extends FreeColGameObject implements Nameable {
     public int modifyGold(int amount) {
         if (this.gold != Player.GOLD_NOT_ACCOUNTED) {
             if ((gold + amount) >= 0) {
-                modifyScore((gold + amount) / 1000 - gold / 1000);
                 gold += amount;
             } else {
                 // This can happen if the server and the client get
