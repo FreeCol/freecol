@@ -762,7 +762,6 @@ public class Colony extends Settlement implements Nameable {
         }
         if (!loc.add(unit)) return false;
         Player owner = unit.getOwner();
-        owner.modifyScore(unit.getType().getScoreValue());
         updatePopulation(1);
         unit.setState(Unit.UnitState.IN_COLONY);
         if (owner.isAI()) {
@@ -786,7 +785,6 @@ public class Colony extends Settlement implements Nameable {
                     teacher.setStudent(null);
                     unit.setTeacher(null);
                 }
-                owner.modifyScore(-unit.getType().getScoreValue());
                 updatePopulation(-1);
                 unit.setState(Unit.UnitState.ACTIVE);
                 if (owner.isAI()) {
