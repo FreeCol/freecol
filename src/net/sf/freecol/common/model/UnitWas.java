@@ -100,7 +100,7 @@ public class UnitWas implements Comparable<UnitWas> {
             || unit.getType() != type) return false;
 
         if (unit.getLocation() != loc) {
-            unit.setLocation(loc);
+            unit.setLocationNoUpdate(loc);
         }
         if (unit.getWorkType() != work) {
             unit.changeWorkType(work);
@@ -128,6 +128,7 @@ public class UnitWas implements Comparable<UnitWas> {
                     colony.addEquipmentGoods(et, -count);
                 }
             }
+            unit.setRole();
         }
         return unit.getRole() == role;
     }
