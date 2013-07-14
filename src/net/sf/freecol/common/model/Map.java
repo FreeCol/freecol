@@ -2103,11 +2103,9 @@ public class Map extends FreeColGameObject implements Location {
      * {@inheritDoc}
      */
     public boolean add(Locatable locatable) {
-        if (locatable instanceof Unit) {
-            Unit unit = (Unit)locatable;
-            unit.setLocation(unit.getEntryLocation());
-            return true;
-        }
+        // Used to add units to their entry location.  Dropped as this
+        // is handled explicitly in the server.
+        if (locatable instanceof Unit) throw new RuntimeException("DISABLED MAP.ADD");
         return false;
     }
 
