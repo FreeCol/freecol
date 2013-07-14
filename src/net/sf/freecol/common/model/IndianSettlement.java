@@ -1379,7 +1379,7 @@ public class IndianSettlement extends Settlement {
                 logger.warning("Fixing unit location"
                     + " from " + u.getLocation().getId()
                     + " to " + this.getId());
-                u.setLocation(this);
+                u.setLocationNoUpdate(this);
             }
         }
         // end @compat
