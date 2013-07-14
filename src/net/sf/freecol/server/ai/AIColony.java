@@ -729,6 +729,21 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         }
     }
 
+    /**
+     * Stop using a work location.
+     *
+     * Called from BuildColonyMission to clear a colony tile that is about
+     * to have a colony built on it.
+     *
+     * @param wl The <code>WorkLocation</code> to stop using.
+     */
+    public void stopUsing(WorkLocation wl) {
+        for (Unit u : wl.getUnitList()) {
+            AIMessage.askPutOutsideColony(getAIUnit(u));
+        }
+        if (colony.getUnitCount() <= 0) avertAutoDestruction();
+        rearrangeTurn = new Turn(getGame().getTurn().getNumber());
+    }
     
     /**
      * Gets the goods to be exported from this AI colony.

@@ -127,22 +127,6 @@ public class ColonyTile extends WorkLocation {
     }
 
     /**
-     * Relocates any worker on this <code>ColonyTile</code>.
-     * The workers are added to another {@link WorkLocation}
-     * within the {@link Colony}.
-     */
-    public void relocateWorkers() {
-        for (Unit unit : getUnitList()) {
-            for (WorkLocation wl : getColony().getCurrentWorkLocations()) {
-                if (wl != this && wl.canAdd(unit)) {
-                    unit.setLocation(wl);
-                    break;
-                }
-            }
-        }
-    }
-
-    /**
      * Gets a unit who is occupying the tile.
      *
      * @return A <code>Unit</code> who is occupying the work tile, if any.
