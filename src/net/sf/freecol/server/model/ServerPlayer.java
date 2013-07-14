@@ -979,7 +979,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             setStance(otherPlayer, stance);
             if (modifier != 0) {
                 cs.add(See.only(null).perhaps(other),
-                    modifyTension(otherPlayer, modifier));
+                       modifyTension(otherPlayer, modifier));
             }
             logger.info("Stance modification " + getName()
                 + " " + old.toString() + " -> " + stance.toString()
@@ -1467,7 +1467,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                         || !enemy.hasExplored(settlement.getTile()))
                         continue;
                     cs.add(See.only(null).perhaps((ServerPlayer)enemy),
-                        settlement);
+                           settlement);
                     // No messages about improving tension
                     if (newLevel == null
                         || (entry.getValue() != null 
@@ -3297,28 +3297,27 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
     /**
      * Damage a building in a colony by downgrading it if possible and
-     * destroying it otherwise. Workers in a destroyed building are
-     * automatically assigned to other work locations.
+     * destroying it otherwise.
      *
-     * @param building a <code>Building</code> value
+     * This is called as a result of pillaging, which always updates
+     * the colony tile.
+     *
+     * @param building The <code>Building</code> to damage.
      * @param cs a <code>ChangeSet</code> value
      */
     private void csDamageBuilding(Building building, ChangeSet cs) {
-        Colony colony = building.getColony();
+        ServerColony colony = (ServerColony)building.getColony();
+        boolean def = building.getType().isDefenceType();
+        int unitCount = colony.getUnitCount();
         if (building.getType().getUpgradesFrom() == null) {
-            // Eject units to any available work location.
-            unit: for (Unit u : building.getUnitList()) {
-                for (WorkLocation wl : colony.getAvailableWorkLocations()) {
-                    if (wl == building || !wl.canAdd(u)) continue;
-                    u.setLocation(wl);
-                    continue unit;
-                }
-                u.setLocation(colony.getTile());
-            }
+            colony.ejectUnits(building, building.getUnitList());
             colony.removeBuilding(building);
-            cs.addDispose(See.only((ServerPlayer) colony.getOwner()), colony, building);
+            cs.addDispose(See.only((ServerPlayer)colony.getOwner()), colony, 
+                          building);
         } else if (building.canBeDamaged()) {
-            building.downgrade();
+            colony.ejectUnits(building, building.downgrade());
+        } else {
+            return;
         }
         if (isAI()) {
             colony.firePropertyChange(Colony.REARRANGE_WORKERS, true, false);

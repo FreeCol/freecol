@@ -241,10 +241,13 @@ public class ServerColony extends Colony implements ServerModelObject {
                     }
                     built.add(queue);
                 } else if (buildable instanceof BuildingType) {
+                    int unitCount = getUnitCount();
                     if (csBuildBuilding(queue, cs)) {
                         built.add(queue);
-                        // Building *might* have ejected units.
-                        tileDirty = true;
+                        // Visible change if building changed the
+                        // stockade level or ejected units.
+                        tileDirty = ((BuildingType)buildable).isDefenceType()
+                            || unitCount != getUnitCount();
                     }
                 } else {
                     throw new IllegalStateException("Bogus buildable: "
@@ -585,11 +588,31 @@ public class ServerColony extends Colony implements ServerModelObject {
     }
 
     /**
+     * Eject units to any available work location.
+     *
+     * Called on building type changes, see below and
+     * @see ServerPlayer#csDamageBuilding
+     *
+     * @param building The <code>Building</code> to eject from.
+     * @param units A list of <code>Unit</code>s to eject.
+     */
+    public void ejectUnits(Building building, List<Unit> units) {
+        unit: for (Unit u : units) {
+            for (WorkLocation wl : getAvailableWorkLocations()) {
+                if (wl == building || !wl.canAdd(u)) continue;
+                u.setLocation(wl);
+                continue unit;
+            }
+            u.setLocation(getTile());
+        }
+    }
+
+    /**
      * Builds a building from a build queue.
      *
      * @param buildQueue The <code>BuildQueue</code> to build from.
      * @param cs A <code>ChangeSet</code> to update.
-     * @return True if the build was successful.
+     * @return True if the build succeeded.
      */
     private boolean csBuildBuilding(BuildQueue<? extends BuildableType> buildQueue,
                                     ChangeSet cs) {
@@ -601,8 +624,11 @@ public class ServerColony extends Colony implements ServerModelObject {
             success = true;
         } else {
             Building building = getBuilding(from);
-            success = building.upgrade();
-            if (!success) {
+            List<Unit> eject = building.upgrade();
+            success = eject != null;
+            if (success) {
+                ejectUnits(building, eject);
+            } else {
                 cs.addMessage(See.only((ServerPlayer) owner),
                     new ModelMessage(ModelMessage.MessageType.BUILDING_COMPLETED,
                                      "colonyPanel.unbuildable",
@@ -612,7 +638,6 @@ public class ServerColony extends Colony implements ServerModelObject {
             }
         }
         if (success) {
-            tile.updatePlayerExploredTiles(); // See stockade changes
             cs.addMessage(See.only((ServerPlayer) owner),
                 new ModelMessage(ModelMessage.MessageType.BUILDING_COMPLETED,
                                  "model.colony.buildingReady",
@@ -622,6 +647,7 @@ public class ServerColony extends Colony implements ServerModelObject {
             if (owner.isAI()) {
                 firePropertyChange(REARRANGE_WORKERS, true, false);
             }
+            
         }
         return success;
     }

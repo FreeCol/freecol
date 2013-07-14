@@ -2319,7 +2319,7 @@ public final class InGameController extends Controller {
             cs.add(See.only(serverPlayer), unit);
             ((ServerIndianSettlement)settlement).changeMissionary(unit);
             settlement.setConvertProgress(0);
-            List<FreeColGameObject> modifiedSettlements
+            List<? extends FreeColGameObject> modifiedSettlements
                 = ((ServerIndianSettlement)settlement).modifyAlarm(serverPlayer,
                     ALARM_NEW_MISSIONARY);
             modifiedSettlements.remove(settlement);

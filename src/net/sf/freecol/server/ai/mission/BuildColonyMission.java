@@ -26,6 +26,7 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.PathNode;
@@ -403,9 +404,12 @@ public class BuildColonyMission extends Mission {
                 ; // All is well
             } else if (player.owns(tile)) { // Already ours, clear users
                 Colony colony = (Colony)tile.getOwningSettlement();
+                ColonyTile ct;
                 if (colony != null
-                    && colony.getColonyTile(tile) != null) {
-                    colony.getColonyTile(tile).relocateWorkers();
+                    && (ct = colony.getColonyTile(tile)) != null) {
+                    // Weird, building next to one of own colonies.
+                    // This should not happen, but handle it.
+                    aiMain.getAIColony(colony).stopUsing(ct);
                 }
             } else {
                 // Not our tile, so claim it first.  Fail if someone

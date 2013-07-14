@@ -309,10 +309,10 @@ public class CombatTest extends FreeColTestCase {
         }
 
         Set<Modifier> defenceModifiers = combatModel.getDefensiveModifiers(attacker, colonist);
-        for (Modifier defenceModifier : muskets.getModifierSet("model.modifier.defence")) {
+        for (Modifier defenceModifier : muskets.getModifierSet(Modifier.DEFENCE)) {
             assertTrue(defenceModifiers.contains(defenceModifier));
         }
-        for (Modifier defenceModifier : horses.getModifierSet("model.modifier.defence")) {
+        for (Modifier defenceModifier : horses.getModifierSet(Modifier.DEFENCE)) {
             assertFalse(defenceModifiers.contains(defenceModifier));
         }
     }
@@ -347,10 +347,10 @@ public class CombatTest extends FreeColTestCase {
         }
 
         Set<Modifier> defenceModifiers = combatModel.getDefensiveModifiers(attacker, defender);
-        for (Modifier defenceModifier : indianMuskets.getModifierSet("model.modifier.defence")) {
+        for (Modifier defenceModifier : indianMuskets.getModifierSet(Modifier.DEFENCE)) {
             assertTrue(defenceModifiers.contains(defenceModifier));
         }
-        for (Modifier defenceModifier : indianHorses.getModifierSet("model.modifier.defence")) {
+        for (Modifier defenceModifier : indianHorses.getModifierSet(Modifier.DEFENCE)) {
             assertTrue(defenceModifiers.contains(defenceModifier));
         }
     }

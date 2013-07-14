@@ -176,7 +176,7 @@ public class Role extends BuildableType {
      */
     private float getDefence() {
         return getFeatureContainer()
-            .applyModifier(1, "model.modifier.defence", null, null);
+            .applyModifier(1, Modifier.DEFENCE, null, null);
     }
 
     /**
