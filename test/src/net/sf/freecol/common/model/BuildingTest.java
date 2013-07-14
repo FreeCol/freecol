@@ -123,12 +123,12 @@ public class BuildingTest extends FreeColTestCase {
         Building warehouse = new ServerBuilding(getGame(), colony, depotType);
         colony.addBuilding(warehouse);
         assertTrue(warehouse.canBuildNext());
-        warehouse.upgrade();
+        assertNotNull(warehouse.upgrade());
         assertTrue(warehouse.canBuildNext());
-        warehouse.upgrade();
+        assertNotNull(warehouse.upgrade());
         assertFalse(warehouse.canBuildNext());
 
-        assertFalse(warehouse.upgrade());
+        assertNull(warehouse.upgrade());
         assertFalse(warehouse.canBuildNext());
 
         // Check whether population restrictions work
@@ -413,13 +413,13 @@ public class BuildingTest extends FreeColTestCase {
         Set<Modifier> modifierSet;
 
         Colony colony = getStandardColony(2);
-        modifierSet = colony.getModifierSet("model.modifier.defence");
+        modifierSet = colony.getModifierSet(Modifier.DEFENCE);
         assertEquals(1, modifierSet.size());
         Modifier modifier = modifierSet.iterator().next();
         assertEquals(50f, modifier.getValue());
         assertEquals(Modifier.Type.PERCENTAGE, modifier.getType());
 
-        modifierSet = stockadeType.getModifierSet("model.modifier.defence");
+        modifierSet = stockadeType.getModifierSet(Modifier.DEFENCE);
         assertEquals(1, modifierSet.size());
         modifier = modifierSet.iterator().next();
         assertEquals(100f, modifier.getValue());
@@ -427,7 +427,7 @@ public class BuildingTest extends FreeColTestCase {
         assertEquals(0f, stockadeType.applyModifier(0,
                 "model.modifier.minimumColonySize"));
 
-        modifierSet = fortType.getModifierSet("model.modifier.defence");
+        modifierSet = fortType.getModifierSet(Modifier.DEFENCE);
         assertEquals(1, modifierSet.size());
         modifier = modifierSet.iterator().next();
         assertEquals(150f, modifier.getValue());
@@ -435,7 +435,7 @@ public class BuildingTest extends FreeColTestCase {
         assertEquals(0f, stockadeType.applyModifier(0,
                 "model.modifier.minimumColonySize"));
 
-        modifierSet = fortressType.getModifierSet("model.modifier.defence");
+        modifierSet = fortressType.getModifierSet(Modifier.DEFENCE);
         assertEquals(1, modifierSet.size());
         modifier = modifierSet.iterator().next();
         assertEquals(200f, modifier.getValue());

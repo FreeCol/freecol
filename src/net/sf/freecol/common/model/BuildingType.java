@@ -262,6 +262,16 @@ public final class BuildingType extends BuildableType
         }
     }
 
+    /**
+     * Is this a defence-related building type?  Such buildings
+     * (stockade et al) are visible to other players.
+     *
+     * @return True if this is a defence related building.
+     */
+    public boolean isDefenceType() {
+        return containsModifierKey(Modifier.DEFENCE);
+    }
+
 
     // Interface Comparable
 

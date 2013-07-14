@@ -88,14 +88,16 @@ public class Building extends WorkLocation implements Named, Comparable<Building
      * Changes the type of the Building.  The type of a building may
      * change when it is upgraded or damaged.
      *
-     * @param newBuildingType The new <code>BuildingType</code>.
      * @see #upgrade
      * @see #downgrade
+     * @param newBuildingType The new <code>BuildingType</code>.
+     * @return A list of units present that need to be removed.
      */
-    private void setType(final BuildingType newBuildingType) {
+    private List<Unit> setType(final BuildingType newBuildingType) {
         // remove features from current type
         Colony colony = getColony();
         colony.removeFeatures(buildingType);
+        List<Unit> eject = new ArrayList<Unit>();
 
         if (newBuildingType != null) {
             buildingType = newBuildingType;
@@ -108,19 +110,21 @@ public class Building extends WorkLocation implements Named, Comparable<Building
 
             // Colonists which can't work here must be put outside
             for (Unit unit : getUnitList()) {
-                if (!canAddType(unit.getType())) {
-                    unit.setLocation(colony.getTile());
-                }
+                if (!canAddType(unit.getType())) eject.add(unit);
             }
         }
 
         // Colonists exceding units limit must be put outside
-        if (getUnitCount() > getUnitCapacity()) {
-            for (Unit unit : getUnitList().subList(getUnitCapacity(),
-                                                   getUnitCount())) {
-                unit.setLocation(colony.getTile());
+        int extra = getUnitCount() - getUnitCapacity() - eject.size();
+        for (Unit unit : getUnitList()) {
+            if (extra <= 0) break;
+            if (!eject.contains(unit)) {
+                eject.add(unit);
+                extra -= 1;
             }
         }
+
+        return eject;
     }
 
     /**
@@ -167,29 +171,27 @@ public class Building extends WorkLocation implements Named, Comparable<Building
     /**
      * Downgrade this building.
      *
-     * @return True if the building was downgraded.
+     * @return A list of units to eject (usually empty) if the
+     *     building was downgraded, or null on failure.
      */
-    public boolean downgrade() {
-        if (canBeDamaged()) {
-            setType(getType().getUpgradesFrom());
-            getColony().invalidateCache();
-            return true;
-        }
-        return false;
+    public List<Unit> downgrade() {
+        if (!canBeDamaged()) return null;
+        List<Unit> ret = setType(getType().getUpgradesFrom());
+        getColony().invalidateCache();
+        return ret;
     }
 
     /**
      * Upgrade this building to next level.
      *
-     * @return True if the upgrade succeeds.
+     * @return A list of units to eject (usually empty) if the
+     *     building was upgraded, or null on failure.
      */
-    public boolean upgrade() {
-        if (canBuildNext()) {
-            setType(getType().getUpgradesTo());
-            getColony().invalidateCache();
-            return true;
-        }
-        return false;
+    public List<Unit> upgrade() {
+        if (!canBuildNext()) return null;
+        List<Unit> ret = setType(getType().getUpgradesTo());
+        getColony().invalidateCache();
+        return ret;
     }
 
     /**
