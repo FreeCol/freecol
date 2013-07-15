@@ -259,26 +259,28 @@ public final class ImageLibrary {
      * most hated nation if any.
      *
      * @param is The <code>IndianSettlement</code> to check.
-     * @param player The <code>Player</code> viewing the settlement.
      * @param text The text for the chip.
      * @return An alarm chip, or null if none suitable.
      */
-    public Image getAlarmChip(IndianSettlement is, Player player, String text) {
+    public Image getAlarmChip(IndianSettlement is, String text) {
         Color ownerColor = is.getOwner().getNationColor();
-        Color foreground = getForegroundColor(ownerColor);
-        Color enemyColor = null;
-        int amount = 0;
+        Color enemyColor;
+        int amount;
         Player enemy = is.getMostHated();
         Tension alarm;
-        if (player != null && (alarm = is.getAlarm(player)) != null) {
-            enemyColor = player.getNationColor();
+        if (enemy != null && (alarm = is.getAlarm(enemy)) != null) {
+            enemyColor = enemy.getNationColor();
             // Set amount to [0-4] corresponding to HAPPY, CONTENT,
             // DISPLEASED, ANGRY, HATEFUL.
             amount = alarm.getLevel().ordinal() - Tension.Level.HAPPY.ordinal();
-            if (amount >= 2) foreground = getForegroundColor(enemyColor);
+        } else {
+            enemyColor = Color.WHITE;
+            amount = 0;
         }
+        Color foreground = getForegroundColor((amount > 2) ? enemyColor
+                                              : ownerColor);
         String key = "dynamic.alarm." + text + "." + ownerColor.getRGB();
-        key += "." + Integer.toString(amount) + "." + enemyColor.getRGB();
+        key += "." + amount + "." + enemyColor.getRGB();
         Image img = (Image)ResourceManager.getImage(key);
         if (img == null) {
             img = createFilledChip(text, Color.BLACK, ownerColor,
