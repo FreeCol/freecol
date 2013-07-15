@@ -2696,6 +2696,7 @@ public final class InGameController implements NetworkConstants {
         clearGotoOrders(unit);
         if (askServer().embark(unit, carrier, direction)
             && unit.getLocation() == carrier) {
+            unit.getOwner().invalidateCanSeeTiles();
             if (carrier.getMovesLeft() > 0) {
                 gui.setActiveUnit(carrier);
             } else {
@@ -2851,8 +2852,10 @@ public final class InGameController implements NetworkConstants {
         // Ask the server
         UnitWas unitWas = new UnitWas(unit);
         if (!askServer().move(unit, direction)) return false;
-        unitWas.fireChanges();
 
+        unit.getOwner().invalidateCanSeeTiles();
+        unitWas.fireChanges();
+        
         final Tile tile = unit.getTile();
 
         // Perform a short pause on an active unit's last move if
