@@ -654,15 +654,16 @@ public class Unit extends GoodsLocation
     /**
      * Change the owner of this unit.
      *
+     * This routine calls setOwner() and thus has visibility implications.
+     * It should be in the server.
+     *
      * @param owner The new owner <code>Player</code>.
      */
     public void changeOwner(Player owner) {
         Player oldOwner = this.owner;
+        if (oldOwner == owner) return;
 
-        // safeguard
-        if (oldOwner == owner) {
-            return;
-        } else if (oldOwner == null) {
+        if (oldOwner == null) {
             logger.warning("Unit " + getId()
                 + " had no owner, when changing owner to " + owner.getId());
         }
@@ -671,26 +672,18 @@ public class Unit extends GoodsLocation
         if (getTradeRoute() != null) setTradeRoute(null);
         if (getDestination() != null) setDestination(null);
 
-        // This need to be set right away
+        // This need to be set right away.
         this.owner = owner;
+
         // If its a carrier, we need to update the units it has loaded
         // before finishing with it
-        for (Unit unit : getUnitList()) {
-            unit.changeOwner(owner);
-        }
+        for (Unit u : getUnitList()) u.changeOwner(owner);
 
-        if (oldOwner != null) {
-            oldOwner.removeUnit(this);
-            // for speed optimizations
-            if (!isOnCarrier()) {
-                oldOwner.invalidateCanSeeTiles();
-            }
-        }
-        owner.addUnit(this);
+        if (oldOwner != null) oldOwner.removeUnit(this);
+        if (owner != null) {
+            owner.addUnit(this);
 
-        // for speed optimizations
-        if(!isOnCarrier()) {
-            getOwner().setExplored(this);
+            if (!isOnCarrier()) owner.setExplored(this);
         }
 
         getGame().notifyOwnerChanged(this, oldOwner, owner);
@@ -3546,6 +3539,8 @@ public class Unit extends GoodsLocation
 
     /**
      * {@inheritDoc}
+     *
+     * This routine has visibility implications.
      */
     public void setOwner(Player player) {
         this.owner = player;

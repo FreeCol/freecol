@@ -905,8 +905,7 @@ public final class InGameController extends Controller {
                 UnitType downgrade = u.getTypeChange(ChangeType.CAPTURE,
                                                      independent);
                 if (downgrade != null) u.setType(downgrade);
-                u.changeOwner(independent);
-                // Make sure the former owner is notified!
+                u.changeOwner(independent); // Visibility handled below.
                 cs.add(See.perhaps().always(serverPlayer), u);
             }
             cs.addMessage(See.only(independent),
@@ -914,6 +913,9 @@ public final class InGameController extends Controller {
                     "model.player.independence.unitsAcquired", independent)
                 .addStringTemplate("%units%",
                     unitTemplate(", ", surrenderUnits)));
+            // Handle visiblity.
+            independent.invalidateCanSeeTiles();
+            serverPlayer.invalidateCanSeeTiles();
         }
 
         // Update player type.  Again, a pity to have to do a whole
@@ -926,10 +928,8 @@ public final class InGameController extends Controller {
                 .addStringTemplate("%ref%", serverPlayer.getNationName()));
         cs.add(See.only(independent), independent);
 
-        // Col1 reveals the map on independence
-        List<FreeColGameObject> objs = new ArrayList<FreeColGameObject>();
-        objs.addAll(independent.exploreMap(true));
-        cs.add(See.only(independent), objs);
+        // Reveal the map on independence.
+        cs.add(See.only(independent), independent.exploreMap(true));
     }
 
     private StringTemplate unitTemplate(String base, List<Unit> units) {
@@ -3010,8 +3010,9 @@ public final class InGameController extends Controller {
      */
     private void csAcceptTrade(Unit unit, Settlement settlement,
                                DiplomaticTrade agreement, ChangeSet cs) {
-        ServerPlayer srcPlayer = (ServerPlayer) agreement.getSender();
-        ServerPlayer dstPlayer = (ServerPlayer) agreement.getRecipient();
+        ServerPlayer srcPlayer = (ServerPlayer)agreement.getSender();
+        ServerPlayer dstPlayer = (ServerPlayer)agreement.getRecipient();
+        boolean visibilityChange = false;
 
         for (TradeItem tradeItem : agreement.getTradeItems()) {
             // Check trade carefully before committing.
@@ -3045,7 +3046,8 @@ public final class InGameController extends Controller {
             Colony colony = tradeItem.getColony();
             if (colony != null) {
                 ServerPlayer former = (ServerPlayer) colony.getOwner();
-                ((ServerColony)colony).changeOwner(dest);
+                ((ServerColony)colony)
+                    .changeOwner(dest); visibilityChange = true;
                 List<FreeColGameObject> tiles
                     = new ArrayList<FreeColGameObject>();
                 tiles.addAll(colony.getOwnedTiles());
@@ -3067,9 +3069,13 @@ public final class InGameController extends Controller {
             Unit newUnit = tradeItem.getUnit();
             if (newUnit != null) {
                 ServerPlayer former = (ServerPlayer) newUnit.getOwner();
-                unit.changeOwner(dest);
+                unit.changeOwner(dest); visibilityChange = true;
                 cs.add(See.perhaps().always(former), newUnit);
             }
+        }
+        if (visibilityChange) { // Handle visibility.
+            srcPlayer.invalidateCanSeeTiles();
+            dstPlayer.invalidateCanSeeTiles();
         }
     }
 

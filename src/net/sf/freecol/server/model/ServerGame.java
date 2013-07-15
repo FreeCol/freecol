@@ -257,6 +257,8 @@ public class ServerGame extends Game implements ServerModelObject {
      * Checks for and if necessary performs the War of Spanish
      * Succession changes.
      *
+     * Visibility changes for the winner, loser is killed/irrelevant.
+     *
      * @param cs A <code>ChangeSet</code> to update.
      * @param spanishSuccession A Spanish Succession <code>Event</code>.
      */
@@ -309,8 +311,8 @@ public class ServerGame extends Game implements ServerModelObject {
                     if (!settlement.hasMissionary(weakestAIPlayer)) continue;
                     logMe += " " + settlement.getName() + "(mission)";
                     settlement.setContacted(strongestAIPlayer);
-                    Unit missionary = settlement.getMissionary();
-                    missionary.changeOwner(strongestAIPlayer);
+                    settlement.getMissionary()
+                        .changeOwner(strongestAIPlayer); // Visibility handled below
                     Tile t = settlement.getTile();
                     t.updatePlayerExploredTile(strongestAIPlayer, true);
                     t.updatePlayerExploredTiles();
@@ -319,12 +321,13 @@ public class ServerGame extends Game implements ServerModelObject {
                 }
             }
             for (Colony colony : weakestAIPlayer.getColonies()) {
-                ((ServerColony)colony).changeOwner(strongestAIPlayer);
+                ((ServerColony)colony)
+                    .changeOwner(strongestAIPlayer);// Visibility handled below
                 logMe += " " + colony.getName();
                 cs.add(See.perhaps(), colony.getOwnedTiles());
             }
             for (Unit unit : weakestAIPlayer.getUnits()) {
-                unit.changeOwner(strongestAIPlayer);
+                unit.changeOwner(strongestAIPlayer); // Visibility handled below
                 logMe += " " + unit.getId();
                 if (unit.getLocation() instanceof Europe) {
                     unit.setLocation(strongestAIPlayer.getEurope());
@@ -351,6 +354,7 @@ public class ServerGame extends Game implements ServerModelObject {
             cs.addPartial(See.all(), this, "spanishSuccession");
 
             ((ServerPlayer) weakestAIPlayer).csKill(cs);
+            strongestAIPlayer.invalidateCanSeeTiles();
             logger.info(logMe);
         }
     }

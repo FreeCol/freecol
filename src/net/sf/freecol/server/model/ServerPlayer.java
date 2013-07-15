@@ -1556,7 +1556,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                         random);
                     brave.clearEquipment();
                     brave.setRole(Unit.Role.DEFAULT);
-                    brave.changeOwner(other);
+                    brave.changeOwner(other); // ->colony, no visibility change
                     brave.setHomeIndianSettlement(null);
                     brave.setNationality(other.getNationId());
                     brave.setType(Utils.getRandomMember(logger,
@@ -1888,6 +1888,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
     /**
      * Combat.
      *
+     * Visibility changes handled here, rather than the lower level routines.
+     *
      * @param attacker The <code>FreeColGameObject</code> that is attacking.
      * @param defender The <code>FreeColGameObject</code> that is defending.
      * @param crs A list of <code>CombatResult</code>s defining the result.
@@ -1906,13 +1908,15 @@ public class ServerPlayer extends Player implements ServerModelObject {
         Settlement attackerSettlement = null;
         Tile attackerTile = null;
         Unit defenderUnit = null;
+        ServerPlayer attackerPlayer = null;
         ServerPlayer defenderPlayer = null;
         Tile defenderTile = null;
         if (isAttack) {
-            attackerUnit = (Unit) attacker;
+            attackerUnit = (Unit)attacker;
+            attackerPlayer = (ServerPlayer)attackerUnit.getOwner();
             attackerTile = attackerUnit.getTile();
-            defenderUnit = (Unit) defender;
-            defenderPlayer = (ServerPlayer) defenderUnit.getOwner();
+            defenderUnit = (Unit)defender;
+            defenderPlayer = (ServerPlayer)defenderUnit.getOwner();
             defenderTile = defenderUnit.getTile();
             boolean bombard = attackerUnit.hasAbility(Ability.BOMBARD);
             cs.addAttribute(See.only(this), "sound",
@@ -1934,10 +1938,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     .addName("%colony%", colony.getName()));
             }
         } else if (isBombard) {
-            attackerSettlement = (Settlement) attacker;
+            attackerSettlement = (Settlement)attacker;
+            attackerPlayer = (ServerPlayer)attackerSettlement.getOwner();
             attackerTile = attackerSettlement.getTile();
-            defenderUnit = (Unit) defender;
-            defenderPlayer = (ServerPlayer) defenderUnit.getOwner();
+            defenderUnit = (Unit)defender;
+            defenderPlayer = (ServerPlayer)defenderUnit.getOwner();
             defenderTile = defenderUnit.getTile();
             cs.addAttribute(See.only(this), "sound", "sound.attack.bombard");
         } else {
@@ -2044,6 +2049,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     attackerTileDirty = defenderTileDirty = false;
                     moveAttacker = true;
                     defenderTension += Tension.TENSION_ADD_MAJOR;
+                    attackerPlayer.invalidateCanSeeTiles();
+                    defenderPlayer.invalidateCanSeeTiles();
                 }
                 break;
             case CAPTURE_CONVERT:
@@ -2075,6 +2082,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                         csCaptureUnit(defenderUnit, attackerUnit, cs);
                     }
                     attackerTileDirty = defenderTileDirty = true;
+                    defenderPlayer.invalidateCanSeeTiles();
                 }
                 break;
             case DAMAGE_COLONY_SHIPS:
@@ -2093,9 +2101,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     if (result == CombatResult.WIN) {
                         csDamageShipAttack(attackerUnit, defenderUnit, cs);
                         defenderTileDirty = true;
+                        defenderPlayer.invalidateCanSeeTiles();
                     } else {
                         csDamageShipAttack(defenderUnit, attackerUnit, cs);
                         attackerTileDirty = true;
+                        attackerPlayer.invalidateCanSeeTiles();
                     }
                 }
                 break;
@@ -2105,6 +2115,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 if (ok) {
                     csDamageShipBombard(attackerSettlement, defenderUnit, cs);
                     defenderTileDirty = true;
+                    defenderPlayer.invalidateCanSeeTiles();
                 }
                 break;
             case DEMOTE_UNIT:
@@ -2129,6 +2140,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     moveAttacker = true;
                     attackerTension -= Tension.TENSION_ADD_NORMAL;
                     defenderTension += Tension.TENSION_ADD_MAJOR;
+                    defenderPlayer.invalidateCanSeeTiles();
                 }
                 break;
             case DESTROY_SETTLEMENT:
@@ -2230,9 +2242,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     if (result == CombatResult.WIN) {
                         csSinkShipAttack(attackerUnit, defenderUnit, cs);
                         defenderTileDirty = true;
+                        defenderPlayer.invalidateCanSeeTiles();
                     } else {
                         csSinkShipAttack(defenderUnit, attackerUnit, cs);
                         attackerTileDirty = true;
+                        attackerPlayer.invalidateCanSeeTiles();
                     }
                 }
                 break;
@@ -2242,6 +2256,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 if (ok) {
                     csSinkShipBombard(attackerSettlement, defenderUnit, cs);
                     defenderTileDirty = true;
+                    defenderPlayer.invalidateCanSeeTiles();
                 }
                 break;
             case SLAUGHTER_UNIT:
@@ -2252,11 +2267,13 @@ public class ServerPlayer extends Player implements ServerModelObject {
                         defenderTileDirty = true;
                         attackerTension -= Tension.TENSION_ADD_NORMAL;
                         defenderTension += getSlaughterTension(defenderUnit);
+                        defenderPlayer.invalidateCanSeeTiles();
                     } else {
                         csSlaughterUnit(defenderUnit, attackerUnit, cs);
                         attackerTileDirty = true;
                         attackerTension += getSlaughterTension(attackerUnit);
                         defenderTension -= Tension.TENSION_ADD_NORMAL;
+                        attackerPlayer.invalidateCanSeeTiles();
                     }
                 }
                 break;
@@ -2289,7 +2306,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
             ; // do nothing
         } else if (burnedNativeCapital) {
             defenderPlayer.getTension(this).setValue(Tension.SURRENDERED);
-            cs.add(See.perhaps().always(this), defenderPlayer); // TODO: just the tension
+            // TODO: just the tension
+            cs.add(See.perhaps().always(this), defenderPlayer);
             csChangeStance(Stance.PEACE, defenderPlayer, true, cs);
             for (IndianSettlement is : defenderPlayer.getIndianSettlements()) {
                 if (is.hasContacted(this)) {
@@ -2380,7 +2398,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         Settlement settlement = loser.getSettlement();
         if (settlement != null) {
             if (settlement instanceof IndianSettlement) {
-                return (((IndianSettlement) settlement).isCapital())
+                return (((IndianSettlement)settlement).isCapital())
                     ? Tension.TENSION_ADD_CAPITAL_ATTACKED
                     : Tension.TENSION_ADD_SETTLEMENT_ATTACKED;
             } else {
@@ -2509,7 +2527,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
 
         // Hand over the colony.
-        ((ServerColony)colony).changeOwner(attackerPlayer);
+        ((ServerColony)colony)
+            .changeOwner(attackerPlayer); // Visibility handled in csCombat
         // Remove goods party modifiers as they apply to a different monarch.
         for (Modifier m : colony.getModifiers()) {
             if ("model.modifier.colonyGoodsParty".equals(m.getSource())) {
@@ -2567,7 +2586,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                       .addStringTemplate("%nation%", convertNation)
                       .addStringTemplate("%unit%", convert.getLabel()));
 
-        convert.changeOwner(attackerPlayer);
+        convert.changeOwner(attackerPlayer); // Visibility handled in csCombat
         convert.setType(type);
         convert.setLocation(attacker.getTile());
         cs.add(See.only(nativePlayer), natives);
@@ -2659,7 +2678,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         UnitType type = loser.getTypeChange((winnerPlayer.isUndead())
                                             ? ChangeType.UNDEAD
                                             : ChangeType.CAPTURE, winnerPlayer);
-        loser.changeOwner(winnerPlayer);
+        loser.changeOwner(winnerPlayer); // Visibility handled in csCombat
         if (type != null) loser.setType(type);
         loser.setLocation(winner.getTile());
         loser.setState(Unit.UnitState.ACTIVE);

@@ -108,35 +108,37 @@ public class ServerUnit extends Unit implements ServerModelObject {
         this(game, location, owner, type, type.getDefaultEquipment());
     }
 
+    /**
+     * Create a new ServerUnit from a template.
+     *
+     * @param game The <code>Game</code> in which this unit belongs.
+     * @param location The <code>Location</code> to place this at.
+     * @param template A <code>Unit</code> to copy from.
+     */
     public ServerUnit(Game game, Location location, Unit template) {
-        super(game);
-        setLocation(location);
-        setType(getSpecification().getUnitType(template.getType().getId()));
-        Player newOwner = game.getPlayer(template.getOwner().getNationId());
-        changeOwner(newOwner);
+        this(game, location, game.getPlayer(template.getOwner().getNationId()),
+            game.getSpecification().getUnitType(template.getType().getId()));
+
+        final Specification spec = getSpecification();
         setNationality(template.getNationality());
         setEthnicity(template.getEthnicity());
         visibleGoodsCount = -1;
-
         if (getType().canCarryGoods()) {
             setGoodsContainer(new GoodsContainer(game, this));
         }
-
         workLeft = template.getWorkLeft();
-        workType = getSpecification().getGoodsType(template.getWorkType().getId());
-
-        this.movesLeft = template.getMovesLeft();
+        workType = spec.getGoodsType(template.getWorkType().getId());
+        movesLeft = template.getMovesLeft();
         hitPoints = template.getType().getHitPoints();
-
         for (EquipmentType equipmentType : template.getEquipment().keySet()) {
-            EquipmentType myType = getSpecification().getEquipmentType(equipmentType.getId());
-            equipment.incrementCount(myType, template.getEquipment().getCount(equipmentType));
+            EquipmentType et = spec.getEquipmentType(equipmentType.getId());
+            int amount = template.getEquipment().getCount(equipmentType);
+            equipment.incrementCount(et, amount);
         }
         setRole();
         setStateUnchecked(template.getState());
 
-        owner.addUnit(this);
-        owner.invalidateCanSeeTiles();
+        getOwner().addUnit(this);
     }
 
     /**

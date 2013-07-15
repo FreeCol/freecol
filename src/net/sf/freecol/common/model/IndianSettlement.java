@@ -321,6 +321,9 @@ public class IndianSettlement extends Settlement {
     /**
      * Sets the missionary for this settlement.
      *
+     * This routine has visibility implications when enhanced missionaries
+     * are enabled.
+     *
      * @param missionary The missionary for this settlement.
      */
     public void setMissionary(Unit missionary) {
