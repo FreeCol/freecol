@@ -2316,7 +2316,7 @@ public final class MapViewer {
                 // Draw the alarm chip if needed.
                 Player player = freeColClient.getMyPlayer();
                 if (player != null && is.hasContacted(player)) {
-                    chip = lib.getAlarmChip(is, player,
+                    chip = lib.getAlarmChip(is,
                         Messages.message((is.hasScouted(player))
                             ? "indianSettlement.scouted"
                             : "indianSettlement.contacted"));

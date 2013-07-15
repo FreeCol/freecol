@@ -277,8 +277,8 @@ public final class ImageLibrary {
             amount = alarm.getLevel().ordinal() - Tension.Level.HAPPY.ordinal();
             if (amount >= 2) foreground = getForegroundColor(enemyColor);
         }
-        String key = "dynamic.alarm." + text + "." + ownerColor.getRGB()
-            + "." + Integer.toString(amount) + "." + enemyColor.getRGB();
+        String key = "dynamic.alarm." + text + "." + ownerColor.getRGB();
+        key += "." + Integer.toString(amount) + "." + enemyColor.getRGB();
         Image img = (Image)ResourceManager.getImage(key);
         if (img == null) {
             img = createFilledChip(text, Color.BLACK, ownerColor,
