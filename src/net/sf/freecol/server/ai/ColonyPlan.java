@@ -1196,70 +1196,6 @@ public class ColonyPlan {
     }
 
     /**
-     * Remove equipment from a unit.
-     *
-     * @param unit The <code>Unit</code> to unequip.
-     * @param colony The <code>Colony</code> to store the equipment.
-     */
-    public static void unequipUnit(Unit unit, Colony colony) {
-        TypeCountMap<EquipmentType> equipment = unit.getEquipment();
-        for (EquipmentType et
-                 : new ArrayList<EquipmentType>(equipment.keySet())) {
-            int count = unit.getEquipmentCount(et);
-            unit.changeEquipment(et, -count);
-            colony.addEquipmentGoods(et, count); 
-        }
-        unit.setRole(Role.DEFAULT);
-    }
-
-    /**
-     * Equips a unit for a role.
-     *
-     * @param unit The <code>Unit</code> to equip if possible.
-     * @param role The <code>Role</code> for the unit to take.
-     * @param colony The <code>Colony</code> storing the equipment.
-     * @return True if the unit was equipped.
-     */
-    public static boolean equipUnit(Unit unit, Unit.Role role, Colony colony) {
-        if (!unit.isPerson()) return false;
-        final Specification spec = colony.getSpecification();
-
-        List<EquipmentType> roleEq = unit.getRoleEquipment(role);
-        TypeCountMap<EquipmentType> change = new TypeCountMap<EquipmentType>();
-
-        for (EquipmentType et : spec.getEquipmentTypeList()) {
-            int oldCount = unit.getEquipmentCount(et);
-            int newCount = (roleEq.contains(et)) ? 1 : 0;
-            if (newCount > oldCount && !colony.canBuildEquipment(et)) {
-                return false;
-            }
-            if (newCount != oldCount) {
-                change.incrementCount(et, newCount - oldCount);
-            }
-        }
-        for (Entry<EquipmentType, Integer> entry
-                 : change.getValues().entrySet()) {
-            EquipmentType et = entry.getKey();
-            int count = entry.getValue().intValue();
-            if (count < 0) {
-                unit.changeEquipment(et, count);
-                colony.addEquipmentGoods(et, -count);
-            }
-        }
-        for (Entry<EquipmentType, Integer> entry
-                 : change.getValues().entrySet()) {
-            EquipmentType et = entry.getKey();
-            int count = entry.getValue().intValue();
-            if (count > 0) {
-                unit.changeEquipment(et, count);
-                colony.addEquipmentGoods(et, -count);
-            }
-        }
-        unit.setRole(role);
-        return true;
-    }
-
-    /**
      * Equips a unit for a role, trying extra possibilities.
      *
      * @param unit The <code>Unit</code> to equip if possible.
@@ -1269,9 +1205,9 @@ public class ColonyPlan {
      */
     private static boolean fullEquipUnit(Unit unit, Unit.Role role, Colony colony) {
         return (role == Role.SOLDIER)
-            ? equipUnit(unit, Role.DRAGOON, colony)
-                || equipUnit(unit, Role.SOLDIER, colony)
-            : equipUnit(unit, role, colony);
+            ? unit.equipForRole(Role.DRAGOON, colony)
+                || unit.equipForRole(Role.SOLDIER, colony)
+            : unit.equipForRole(role, colony);
     }
 
     /**
@@ -1312,7 +1248,7 @@ public class ColonyPlan {
         // or active pioneers should be on the worker list.
         for (Unit u : workers) {
             u.setLocation(tile);
-            unequipUnit(u, col);
+            u.clearEquipment(col);
         }
 
         // Move outdoor experts outside if possible.
@@ -1343,13 +1279,21 @@ public class ColonyPlan {
         Comparator<Unit> soldierComparator = new Comparator<Unit>() {
             public int compare(Unit u1, Unit u2) {
                 int cmp = u1.getSkillLevel() - u2.getSkillLevel();
-                if (cmp != 0) return cmp;
-                GoodsType g1 = u1.getType().getExpertProduction();
-                GoodsType g2 = u2.getType().getExpertProduction();
-                if (g1 != null && g2 != null) {
-                    return produce.indexOf(g2) - produce.indexOf(g1);
+                if (cmp == 0) {
+                    GoodsType g1 = u1.getType().getExpertProduction();
+                    GoodsType g2 = u2.getType().getExpertProduction();
+                    cmp = ((g2 == null) ? 1 : 0) - ((g1 == null) ? 1 : 0);
+                    if (cmp == 0 && g1 != null) {
+                        int i = produce.indexOf(g2);
+                        cmp = (i < 0) ? produce.size() : i;
+                        i = produce.indexOf(g1);
+                        cmp -= (i < 0) ? produce.size() : i;
+                    }
                 }
-                return u1.getExperience() - u2.getExperience();
+                if (cmp == 0) {
+                    cmp = u1.getExperience() - u2.getExperience();
+                }
+                return cmp;
             }
         };
         Collections.sort(workers, soldierComparator);

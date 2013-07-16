@@ -134,7 +134,7 @@ public class EquipUnitMessage extends DOMMessage {
 
         // Proceed to equip.
         return server.getInGameController()
-            .equipUnit(serverPlayer, unit, type, amount);
+            .equipUnit(serverPlayer, unit, type, amount); 
     }
 
     /**

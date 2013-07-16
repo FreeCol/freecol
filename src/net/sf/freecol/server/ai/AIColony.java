@@ -352,74 +352,7 @@ public class AIColony extends AIObject implements PropertyChangeListener {
         }
 
         // Apply the arrangement, and give suitable missions to all units.
-        // For now, do a soft rearrange (that is, no c-s messaging).
-        // TODO: Better would be to use a special c-s message to
-        // execute the rearrangement.
-        // Also, remove equipment when moving.
-        List<Unit> tileUnits = new ArrayList<Unit>();
-        for (Unit u : workers) {
-            Unit su = scratch.getCorresponding(u);
-            if (su.getLocation() instanceof Tile) {
-                ColonyPlan.unequipUnit(u, colony);
-                if (u.getLocation() != tile) u.setLocation(tile);
-                tileUnits.add(u);
-            }
-        }
-        workers.removeAll(tileUnits);
-        while (!workers.isEmpty()) {
-            Unit u = workers.remove(0);
-            Unit su = scratch.getCorresponding(u);
-            Location sl = su.getLocation();
-            WorkLocation wl = colony.getCorresponding((WorkLocation)sl);
-            // Adding to wl can fail, and in the worse case there
-            // might be a circular dependency.  If the move can
-            // succeed, do it, but if not move the unit to the tile
-            // and retry.
-            switch (wl.getNoAddReason(u)) {
-            case NONE:
-                ColonyPlan.unequipUnit(u, colony);
-                u.setLocation(wl);
-                // Fall through
-            case ALREADY_PRESENT:
-                if (u.getWorkType() != su.getWorkType()) {
-                    u.changeWorkType(su.getWorkType());
-                }
-                break;
-            case CAPACITY_EXCEEDED:
-                u.setLocation(tile);
-                workers.add(workers.size(), u);
-                break;
-            default:
-                logger.warning("Bad move for " + u + " to " + wl);
-                break;
-            }
-        }
-        // Re-equip units for their roles.
-        for (Unit u : tileUnits) {
-            Unit su = scratch.getCorresponding(u);
-            if (u.getRole() != su.getRole()) {
-                if (!ColonyPlan.equipUnit(u, su.getRole(), colony)) {
-                    logger.warning("At " + colony.getName()
-                        + " failed to equip unit " + u
-                        + " for role " + su.getRole());
-                }
-            }
-        }
-        // This should not be necessary, as the equipment changes above
-        // should have set this correctly.  However an older version did
-        // require it, so leave this in place for now to check we are doing
-        // it right.
-        for (GoodsType g : spec.getGoodsTypeList()) {
-            if (!g.isStorable()) continue;
-            int oldCount = colony.getGoodsCount(g);
-            int newCount = scratch.getGoodsCount(g);
-            if (newCount != oldCount) {
-                throw new IllegalStateException("rearrangeWorkers fail "
-                    + colony.getName() + " " + g + " old=" + oldCount
-                    + " new=" + newCount);
-                //colony.getGoodsContainer().addGoods(g, newCount - oldCount);
-            }
-        }
+        AIMessage.askRearrangeColony(this, workers, scratch);
 
         // Emergency recovery if something broke and the colony is empty.
         if (colony.getWorkLocationUnitCount() <= 0) {

@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
@@ -107,6 +108,8 @@ import net.sf.freecol.common.networking.GoodsForSaleMessage;
 import net.sf.freecol.common.networking.IndianDemandMessage;
 import net.sf.freecol.common.networking.LootCargoMessage;
 import net.sf.freecol.common.networking.MonarchActionMessage;
+import net.sf.freecol.common.networking.RearrangeColonyMessage;
+import net.sf.freecol.common.networking.RearrangeColonyMessage.UnitChange;
 import net.sf.freecol.common.util.Introspector;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.common.util.Utils;
@@ -3358,7 +3361,6 @@ public final class InGameController extends Controller {
         return cs.build(serverPlayer);
     }
 
-
     /**
      * Equip a unit.
      * Currently the unit is either in Europe or in a settlement.
@@ -4054,5 +4056,73 @@ public final class InGameController extends Controller {
         cs.add(See.perhaps(), start);
         sendToOthers(serverPlayer, cs);
         return cs.build(serverPlayer);
+    }
+
+
+    /**
+     * Rearrange a colony.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that is querying.
+     * @param colony The <code>Colony</code> to rearrange.
+     * @param unitChanges A list of <code>UnitChange</code>s to apply.
+     * @return An <code>Element</code> encapsulating this action.
+     */
+    public Element rearrangeColony(ServerPlayer serverPlayer, Colony colony,
+                                   List<UnitChange> unitChanges) {
+        ChangeSet cs = new ChangeSet();
+        Tile tile = colony.getTile();
+
+        // Move everyone out of the way.
+        for (UnitChange uc : unitChanges) {
+            uc.unit.setLocation(tile);
+        }
+
+        List<UnitChange> todo = new ArrayList<UnitChange>(unitChanges);
+        while (!todo.isEmpty()) {
+            UnitChange uc = todo.remove(0);
+            if (uc.loc == tile) continue;
+            WorkLocation wl = (WorkLocation)uc.loc;
+            // Adding to wl can fail, and in the worse case there
+            // might be a circular dependency.  If the move can
+            // succeed, do it, but if not move the unit to the tile
+            // and retry.
+            switch (wl.getNoAddReason(uc.unit)) {
+            case NONE:
+                uc.unit.setLocation(wl);
+                // Fall through
+            case ALREADY_PRESENT:
+                if (uc.unit.getWorkType() != uc.work) {
+                    uc.unit.changeWorkType(uc.work);
+                }
+                break;
+            case CAPACITY_EXCEEDED:
+                todo.add(todo.size(), uc);
+                break;
+            default:
+                logger.warning("Bad move for " + uc.unit + " to " + wl);
+                break;
+            }
+        }
+
+        Iterator<UnitChange> uci = unitChanges.iterator();
+        while (uci.hasNext()) {
+            UnitChange uc = uci.next();
+            if (uc.unit.getRole() == uc.role) uci.remove();
+        }
+        if (!unitChanges.isEmpty()) {
+            Collections.sort(unitChanges,
+                             RearrangeColonyMessage.roleComparator);
+            for (UnitChange uc : unitChanges) {
+                if (!uc.unit.equipForRole(uc.role, colony)) {
+                    // Should not happen if we equip simplest first
+                    return DOMMessage.clientError("Failed to equip "
+                        + uc.unit.getId() + " for role " + uc.role);
+                }
+            }
+        }
+
+        // Just update the whole tile, including for other players
+        // which might see colony population change.
+        return new ChangeSet().add(See.perhaps(), tile).build(serverPlayer);
     }
 }
