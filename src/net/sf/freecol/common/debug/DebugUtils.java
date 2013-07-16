@@ -427,24 +427,26 @@ public class DebugUtils {
         final Settlement sSettlement
             = sGame.getFreeColGameObject(settlement.getId(), Settlement.class);
         final GUI gui = freeColClient.getGUI();
+        final Game game = freeColClient.getGame();
             
         List<ChoiceItem<Player>> pcs = new ArrayList<ChoiceItem<Player>>();
-        for (Player sp : sGame.getPlayers()) {
-            if ((settlement instanceof Colony) == sp.isEuropean()) {
-                String msg = Messages.message(sp.getNationName());
-                pcs.add(new ChoiceItem<Player>(msg, sp));
+        for (Player p : game.getPlayers()) {
+            if ((settlement instanceof Colony) == p.isEuropean()) {
+                String msg = Messages.message(p.getNationName());
+                pcs.add(new ChoiceItem<Player>(msg, p));
             }
         }
-        Player playerChoice = gui.showChoiceDialog(null, "Select owner",
-                                                   "Cancel", pcs);
-        if (playerChoice == null) return;
-        final Game game = freeColClient.getGame();
-        Player player = game.getFreeColGameObject(playerChoice.getId(),
-                                                  Player.class);
-        if (player == settlement.getOwner()) return;
+        Player player = gui.showChoiceDialog(null, "Select owner", "Cancel",
+                                             pcs);
+        if (player == null || player == settlement.getOwner()) return;
 
-        sSettlement.changeOwner(playerChoice);
-        playerChoice.invalidateCanSeeTiles();
+        ServerPlayer sPlayer = sGame.getFreeColGameObject(player.getId(),
+                                                          ServerPlayer.class);
+        ServerPlayer sOldPlayer = (ServerPlayer)sSettlement.getOwner();
+        sSettlement.changeOwner(sPlayer); // Visibility handled immediately
+        sPlayer.invalidateCanSeeTiles();
+        sOldPlayer.invalidateCanSeeTiles();
+
         freeColClient.getConnectController().reconnect();
     }
 
@@ -459,30 +461,29 @@ public class DebugUtils {
     public static void changeOwnership(final FreeColClient freeColClient,
                                        final Unit unit) {
         final FreeColServer server = freeColClient.getFreeColServer();
-        final Game sGame = server.getGame();
-        final Unit sUnit = sGame.getFreeColGameObject(unit.getId(), Unit.class);
         final GUI gui = freeColClient.getGUI();
+        final Game game = unit.getGame();
 
         List<ChoiceItem<Player>> pcs = new ArrayList<ChoiceItem<Player>>();
-        for (Player sp : sGame.getPlayers()) {
-            if (unit.getType().isAvailableTo(sp)) {
-                String msg = Messages.message(sp.getNationName());
-                pcs.add(new ChoiceItem<Player>(msg, sp));
+        for (Player p : game.getPlayers()) {
+            if (unit.getType().isAvailableTo(p)) {
+                String msg = Messages.message(p.getNationName());
+                pcs.add(new ChoiceItem<Player>(msg, p));
             }
         }
-        Player playerChoice = gui.showChoiceDialog(null, "Select owner",
-                                                   "Cancel", pcs);
-        if (playerChoice == null) return;
-        final Game game = freeColClient.getGame();
-        Player player = game.getFreeColGameObject(playerChoice.getId(),
-                                                  Player.class);
-        if (player == unit.getOwner()) return;
+        Player player = gui.showChoiceDialog(null, "Select owner", "Cancel",
+                                             pcs);
+        if (player == null || unit.getOwner() == player) return;
 
-        sUnit.changeOwner(playerChoice);
-        for (Unit u : sUnit.getUnitList()) {
-            u.changeOwner(playerChoice);
-        }
-        playerChoice.invalidateCanSeeTiles();
+        final Game sGame = server.getGame();
+        final Unit sUnit = sGame.getFreeColGameObject(unit.getId(), Unit.class);
+        ServerPlayer sPlayer = sGame.getFreeColGameObject(player.getId(),
+                                                          ServerPlayer.class);
+        ServerPlayer sOldPlayer = (ServerPlayer)sUnit.getOwner();
+        sUnit.changeOwner(sPlayer); // Visibility handled immediately
+        sPlayer.invalidateCanSeeTiles();
+        sOldPlayer.invalidateCanSeeTiles();
+
         freeColClient.getConnectController().reconnect();
     }
 
