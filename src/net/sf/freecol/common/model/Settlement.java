@@ -206,6 +206,8 @@ public abstract class Settlement extends GoodsLocation
     /**
      * Put a prepared settlement onto the map.
      *
+     * Several visibility issues accumulated here.
+     *
      * @param maximal If true, also claim all the tiles possible.
      */
     public void placeSettlement(boolean maximal) {
@@ -236,6 +238,8 @@ public abstract class Settlement extends GoodsLocation
 
     /**
      * Remove a settlement from the map.
+     *
+     * Several visibility issues accumulated here.
      */
     public void exciseSettlement() {
         Tile settlementTile = getTile();
@@ -274,14 +278,14 @@ public abstract class Settlement extends GoodsLocation
             u.setState(Unit.UnitState.ACTIVE);
             UnitType type = u.getTypeChange(change, newOwner);
             if (type != null) u.setType(type);
-            u.changeOwner(newOwner); // No additional visibility implications
+            u.changeOwner(newOwner);//-vis(oldOwner,newOwner)
         }
 
         for (Tile t : getOwnedTiles()) {
             t.changeOwnership(newOwner, this);
         }
-        oldOwner.invalidateCanSeeTiles();
-        newOwner.invalidateCanSeeTiles();
+        oldOwner.invalidateCanSeeTiles();//+vis(oldOwner)
+        newOwner.invalidateCanSeeTiles();//+vis(newOwner)
 
         getGame().notifyOwnerChanged(this, oldOwner, newOwner);
     }

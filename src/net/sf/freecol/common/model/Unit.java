@@ -654,8 +654,8 @@ public class Unit extends GoodsLocation
     /**
      * Change the owner of this unit.
      *
-     * This routine calls setOwner() and thus has visibility implications.
-     * It should be in the server.
+     * -vis: This routine calls setOwner() and thus has visibility
+     * implications.  It should be in the server.
      *
      * @param owner The new owner <code>Player</code>.
      */
@@ -3540,7 +3540,7 @@ public class Unit extends GoodsLocation
     /**
      * {@inheritDoc}
      *
-     * This routine has visibility implications.
+     * -vis: This routine has visibility implications.
      */
     public void setOwner(Player player) {
         this.owner = player;
@@ -3702,6 +3702,8 @@ public class Unit extends GoodsLocation
 
     /**
      * {@inheritDoc}
+     *
+     * -vis: This routine can change player visibility.
      */
     @Override
     public List<FreeColGameObject> disposeList() {
@@ -3709,6 +3711,7 @@ public class Unit extends GoodsLocation
 
         if (location != null) {
             location.remove(this);
+            location = null;
         }
 
         if (teacher != null) {
@@ -3723,7 +3726,6 @@ public class Unit extends GoodsLocation
 
         setHomeIndianSettlement(null);
 
-        getOwner().invalidateCanSeeTiles();
         getOwner().removeUnit(this);
 
         objects.addAll(super.disposeList());

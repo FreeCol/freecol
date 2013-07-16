@@ -824,6 +824,8 @@ public class ChangeSet {
 
     /**
      * Encapsulates removing some objects.
+     *
+     * -vis: If removing settlements or units, visibility changes.
      */
     private static class RemoveChange extends Change {
         private Tile tile;
@@ -1332,13 +1334,16 @@ public class ChangeSet {
     /**
      * Helper function to add a removal for a disposal list to a ChangeSet.
      *
+     * -vis: If disposing of units or colonies, this routine changes
+     * player visibility.
+     *
      * @param see The visibility of this change.
      * @param loc The <code>Location</code> where the object was.
      * @param obj The <code>FreeColGameObject</code> to remove.
      * @return The updated <code>ChangeSet</code>.
      */
     public ChangeSet addDispose(See see, Location loc, FreeColGameObject obj) {
-        changes.add(new RemoveChange(see, loc, obj.disposeList()));
+        changes.add(new RemoveChange(see, loc, obj.disposeList()));//-vis
         return this;
     }
 

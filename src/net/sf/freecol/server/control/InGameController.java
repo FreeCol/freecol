@@ -904,8 +904,8 @@ public final class InGameController extends Controller {
             for (Unit u : surrenderUnits) {
                 UnitType downgrade = u.getTypeChange(ChangeType.CAPTURE,
                                                      independent);
-                if (downgrade != null) u.setType(downgrade);
-                u.changeOwner(independent); // Visibility handled below.
+                if (downgrade != null) u.setType(downgrade);//-vis(owner)
+                u.changeOwner(independent);//-vis(both)
                 cs.add(See.perhaps().always(serverPlayer), u);
             }
             cs.addMessage(See.only(independent),
@@ -913,9 +913,8 @@ public final class InGameController extends Controller {
                     "model.player.independence.unitsAcquired", independent)
                 .addStringTemplate("%units%",
                     unitTemplate(", ", surrenderUnits)));
-            // Handle visiblity.
-            independent.invalidateCanSeeTiles();
-            serverPlayer.invalidateCanSeeTiles();
+            independent.invalidateCanSeeTiles();//+vis(independent)
+            serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
         }
 
         // Update player type.  Again, a pity to have to do a whole
@@ -1244,7 +1243,7 @@ public final class InGameController extends Controller {
 
         // Dispose of the unit, only visible to the owner.
         cs.add(See.only(serverPlayer), (FreeColGameObject)unit.getLocation());
-        cs.addDispose(See.only(serverPlayer), null, unit);
+        cs.addDispose(See.only(serverPlayer), null, unit);//-vis: safe in colony
 
         // Others can see the cash in message.
         sendToOthers(serverPlayer, cs);
@@ -1359,7 +1358,7 @@ public final class InGameController extends Controller {
 
         // Now the REF is ready, we can dispose of the European connection.
         serverPlayer.getHighSeas().removeDestination(europe);
-        cs.addDispose(See.only(serverPlayer), null, europe);
+        cs.addDispose(See.only(serverPlayer), null, europe);//-vis: not on map
         serverPlayer.setEurope(null);
         //serverPlayer.setMonarch(null);
 
@@ -2005,7 +2004,8 @@ public final class InGameController extends Controller {
             cs.add(See.perhaps().always(serverPlayer),
                    (FreeColGameObject)unit.getLocation());
             cs.addDispose(See.perhaps().always(serverPlayer),
-                unit.getLocation(), unit);
+                          unit.getLocation(), unit);//-vis(serverPlayer)
+            serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
             break;
         case ANGRY: // Learn nothing, not even a pet update
             cs.addPartial(See.only(serverPlayer), unit, "movesLeft");
@@ -2013,7 +2013,9 @@ public final class InGameController extends Controller {
         default:
             // Teach the unit, and expend the skill if necessary.
             // Do a full information update as the unit is in the settlement.
-            unit.setType(skill);
+            unit.setType(skill);//-vis(serverPlayer)
+            serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
+            cs.add(See.perhaps(), unit);
             if (!settlement.isCapital()
                 && !(settlement.hasMissionary(serverPlayer)
                     && spec.getBoolean(GameOptions.ENHANCED_MISSIONARIES))) {
@@ -2022,8 +2024,8 @@ public final class InGameController extends Controller {
             break;
         }
         Tile tile = settlement.getTile();
+        cs.add(See.only(serverPlayer), tile);
         tile.updatePlayerExploredTile(serverPlayer, true);
-        cs.add(See.only(serverPlayer), unit, tile);
 
         // Others always see the unit, it may have died or been taught.
         sendToOthers(serverPlayer, cs);
@@ -2146,7 +2148,8 @@ public final class InGameController extends Controller {
             cs.add(See.perhaps().always(serverPlayer),
                    (FreeColGameObject)unit.getLocation());
             cs.addDispose(See.perhaps().always(serverPlayer),
-                unit.getLocation(), unit);
+                          unit.getLocation(), unit);//-vis(serverPlayer)
+            serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
             result = "die";
         } else {
             // Otherwise player gets to visit, and learn about the settlement.
@@ -2167,7 +2170,8 @@ public final class InGameController extends Controller {
                 // If the scout can be taught to be an expert it will be.
                 // TODO: in the old code the settlement retains the
                 // teaching ability.  WWC1D?
-                unit.setType(scoutSkill);
+                unit.setType(scoutSkill);//-vis(serverPlayer)
+                serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
                 result = "expert";
             } else {
                 // Choose tales 1/3 of the time, or if there are no beads.
@@ -2279,7 +2283,8 @@ public final class InGameController extends Controller {
         cs.add(See.perhaps().always(serverPlayer),
                (FreeColGameObject)unit.getLocation());
         cs.addDispose(See.perhaps().always(serverPlayer),
-            unit.getLocation(), unit);
+                      unit.getLocation(), unit);//-vis(serverPlayer)
+        serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
 
         // Others can see missionary disappear
         sendToOthers(serverPlayer, cs);
@@ -2311,14 +2316,16 @@ public final class InGameController extends Controller {
             cs.add(See.perhaps().always(serverPlayer),
                    (FreeColGameObject)unit.getLocation());
             cs.addDispose(See.perhaps().always(serverPlayer),
-                unit.getLocation(), unit);
+                          unit.getLocation(), unit);//-vis(serverPlayer)
+            serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
             break;
         case HAPPY: case CONTENT: case DISPLEASED:
             cs.add(See.perhaps().always(serverPlayer), unit.getTile());
-            unit.setLocation(settlement);
+            unit.setLocation(settlement);//-vis(serverPlayer)
             unit.setMovesLeft(0);
             cs.add(See.only(serverPlayer), unit);
-            ((ServerIndianSettlement)settlement).changeMissionary(unit);
+            ((ServerIndianSettlement)settlement)
+                .csChangeMissionary(unit, cs);//+vis(serverPlayer)
             settlement.setConvertProgress(0);
             List<? extends FreeColGameObject> modifiedSettlements
                 = ((ServerIndianSettlement)settlement).modifyAlarm(serverPlayer,
@@ -2809,7 +2816,8 @@ public final class InGameController extends Controller {
         cs.add(See.perhaps().always(serverPlayer),
                (FreeColGameObject)unit.getLocation());
         cs.addDispose(See.perhaps().always(serverPlayer),
-            unit.getLocation(), unit);
+                      unit.getLocation(), unit);//-vis(serverPlayer)
+        serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
 
         // Others can see the unit removal and the space it leaves.
         sendToOthers(serverPlayer, cs);
@@ -2960,7 +2968,7 @@ public final class InGameController extends Controller {
         }
 
         // Comprehensive dispose.
-        serverPlayer.csDisposeSettlement(settlement, cs);
+        serverPlayer.csDisposeSettlement(settlement, cs);//+vis
 
         // TODO: Player.settlements is still being fixed on the client side.
         sendToOthers(serverPlayer, cs);
@@ -3046,8 +3054,8 @@ public final class InGameController extends Controller {
             Colony colony = tradeItem.getColony();
             if (colony != null) {
                 ServerPlayer former = (ServerPlayer) colony.getOwner();
-                ((ServerColony)colony)
-                    .changeOwner(dest); visibilityChange = true;
+                ((ServerColony)colony).changeOwner(dest);//-vis(both)
+                visibilityChange = true;
                 List<FreeColGameObject> tiles
                     = new ArrayList<FreeColGameObject>();
                 tiles.addAll(colony.getOwnedTiles());
@@ -3069,13 +3077,14 @@ public final class InGameController extends Controller {
             Unit newUnit = tradeItem.getUnit();
             if (newUnit != null) {
                 ServerPlayer former = (ServerPlayer) newUnit.getOwner();
-                unit.changeOwner(dest); visibilityChange = true;
+                unit.changeOwner(dest);//-vis(both)
+                visibilityChange = true;
                 cs.add(See.perhaps().always(former), newUnit);
             }
         }
-        if (visibilityChange) { // Handle visibility.
-            srcPlayer.invalidateCanSeeTiles();
-            dstPlayer.invalidateCanSeeTiles();
+        if (visibilityChange) {
+            srcPlayer.invalidateCanSeeTiles();//+vis(srcPlayer)
+            dstPlayer.invalidateCanSeeTiles();//+vis(dstPlayer)
         }
     }
 

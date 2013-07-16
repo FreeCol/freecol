@@ -152,17 +152,21 @@ public class ServerColony extends Colony implements ServerModelObject {
      */
     public void csNewTurn(Random random, ChangeSet cs) {
         logger.finest("ServerColony.csNewTurn, for " + toString());
-        ServerPlayer owner = (ServerPlayer) getOwner();
-        Specification spec = getSpecification();
+        final Specification spec = getSpecification();
+        final ServerPlayer owner = (ServerPlayer) getOwner();
         BuildQueue<?>[] queues = new BuildQueue<?>[] { buildQueue,
                  populationQueue };
+        final Tile tile = getTile();
 
         // The AI is prone to removing all units from a colony.
         // Clean up such cases, to avoid other players seeing the
         // nonsensical 0-unit colony.
         if (getUnitCount() <= 0) {
             logger.warning("Cleaning up 0-unit colony: " + getName());
-            cs.addDispose(See.perhaps().always(owner), getTile(), this);
+            exciseSettlement();
+            cs.add(See.perhaps().always(owner), tile);
+            cs.addDispose(See.perhaps().always(owner), tile, this);//-vis(owner)
+            owner.invalidateCanSeeTiles();//+vis(owner)
             return;
         }
 
@@ -273,7 +277,8 @@ public class ServerColony extends Colony implements ServerModelObject {
                     if (getUnitCount() > 1) {
                         Unit victim = Utils.getRandomMember(logger,
                             "Choose starver", getUnitList(), random);
-                        cs.addDispose(See.only(owner), null, victim);
+                        cs.addDispose(See.only(owner), null,
+                                      victim);//-vis: safe, all within colony
                         cs.addMessage(See.only(owner),
                             new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
                                              "model.colony.colonistStarved",
@@ -285,8 +290,7 @@ public class ServerColony extends Colony implements ServerModelObject {
                                              "model.colony.colonyStarved",
                                              this)
                                 .addName("%colony%", getName()));
-                        cs.addDispose(See.perhaps().always(owner),
-                                      getTile(), this);
+                        owner.csDisposeSettlement(this, cs);
                         return;
                     }
                 } else if (net < 0) {
@@ -425,12 +429,12 @@ public class ServerColony extends Colony implements ServerModelObject {
                 int loss = amount + getNetProductionOf(type) - limit;
                 if (loss > 0) {
                     cs.addMessage(See.only(owner),
-                                  new ModelMessage(ModelMessage.MessageType.WAREHOUSE_CAPACITY,
-                                                   "model.building.warehouseSoonFull",
-                                                   this, type)
-                                  .add("%goods%", goods.getNameKey())
-                                  .addName("%colony%", getName())
-                                  .addAmount("%amount%", loss));
+                        new ModelMessage(ModelMessage.MessageType.WAREHOUSE_CAPACITY,
+                                         "model.building.warehouseSoonFull",
+                                         this, type)
+                            .add("%goods%", goods.getNameKey())
+                            .addName("%colony%", getName())
+                            .addAmount("%amount%", loss));
                 }
             }
         }
@@ -477,9 +481,9 @@ public class ServerColony extends Colony implements ServerModelObject {
                                  ? "model.colony.SoLIncrease"
                                  : "model.colony.SoLDecrease",
                                  this, spec.getGoodsType("model.goods.bells"))
-                          .addAmount("%oldSoL%", oldSonsOfLiberty)
-                          .addAmount("%newSoL%", sonsOfLiberty)
-                          .addName("%colony%", getName()));
+                    .addAmount("%oldSoL%", oldSonsOfLiberty)
+                    .addAmount("%newSoL%", sonsOfLiberty)
+                    .addName("%colony%", getName()));
 
             ModelMessage govMgtMessage = checkForGovMgtChangeMessage();
             if (govMgtMessage != null) {
@@ -490,7 +494,7 @@ public class ServerColony extends Colony implements ServerModelObject {
 
         // Try to update minimally.
         if (tileDirty) {
-            cs.add(See.perhaps(), getTile());
+            cs.add(See.perhaps(), tile);
         } else {
             cs.add(See.only(owner), this);
         }

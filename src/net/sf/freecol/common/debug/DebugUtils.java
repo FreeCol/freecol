@@ -443,9 +443,9 @@ public class DebugUtils {
         ServerPlayer sPlayer = sGame.getFreeColGameObject(player.getId(),
                                                           ServerPlayer.class);
         ServerPlayer sOldPlayer = (ServerPlayer)sSettlement.getOwner();
-        sSettlement.changeOwner(sPlayer); // Visibility handled immediately
-        sPlayer.invalidateCanSeeTiles();
-        sOldPlayer.invalidateCanSeeTiles();
+        sSettlement.changeOwner(sPlayer);//-vis(sPlayer,sOldPlayer)
+        sPlayer.invalidateCanSeeTiles();//+vis(sPlayer)
+        sOldPlayer.invalidateCanSeeTiles();//+vis(sOldPlayer)
 
         freeColClient.getConnectController().reconnect();
     }
@@ -480,9 +480,9 @@ public class DebugUtils {
         ServerPlayer sPlayer = sGame.getFreeColGameObject(player.getId(),
                                                           ServerPlayer.class);
         ServerPlayer sOldPlayer = (ServerPlayer)sUnit.getOwner();
-        sUnit.changeOwner(sPlayer); // Visibility handled immediately
-        sPlayer.invalidateCanSeeTiles();
-        sOldPlayer.invalidateCanSeeTiles();
+        sUnit.changeOwner(sPlayer);//-vis(sPlayer,sOldPlayer)
+        sPlayer.invalidateCanSeeTiles();//+vis(sPlayer)
+        sOldPlayer.invalidateCanSeeTiles();//+vis(sOldPlayer)
 
         freeColClient.getConnectController().reconnect();
     }

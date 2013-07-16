@@ -199,7 +199,8 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
             /*
              * TODO: improve recalculation of tile ownership
              */
-            ((ServerPlayer) settlement.getOwner()).csDisposeSettlement(settlement, new ChangeSet());
+            ((ServerPlayer)settlement.getOwner())
+                .csDisposeSettlement(settlement, new ChangeSet());
         }
         getGUI().removeFromCanvas(this);
     }

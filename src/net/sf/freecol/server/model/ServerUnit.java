@@ -215,8 +215,10 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     .addStringTemplate("%unit%", getLabel())
                     .addStringTemplate("%location%",
                                        loc.getLocationNameFor(owner)));
-                cs.addDispose(See.perhaps().always(owner), loc, this);
                 cs.add(See.perhaps(), (Tile)loc);
+                cs.addDispose(See.perhaps().always(owner), loc,
+                              this);//-vis(owner)
+                owner.invalidateCanSeeTiles();//+vis(owner)
                 return;
             }
         } else {
@@ -646,7 +648,9 @@ public class ServerUnit extends Unit implements ServerModelObject {
             csNativeBurialGround(cs);
             break;
         case EXPEDITION_VANISHES:
-            cs.addDispose(See.perhaps().always(serverPlayer), tile, this);
+            cs.addDispose(See.perhaps().always(serverPlayer), tile,
+                          this);//-vis(serverPlayer)
+            serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                     "lostCityRumour.expeditionVanishes", serverPlayer));

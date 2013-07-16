@@ -510,6 +510,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
     /**
      * Kill off a player and clear out its remains.
      *
+     * +vis: Albeit killing the player makes visibility changes moot.
+     *
      * @param cs A <code>ChangeSet</code> to update.
      */
     public void csKill(ChangeSet cs) {
@@ -535,9 +537,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // Remove settlements.  Update formerly owned tiles.
         List<Settlement> settlements = getSettlements();
         while (!settlements.isEmpty()) {
-            Settlement settlement = settlements.remove(0);
-            cs.addDispose(See.perhaps().always(this),
-                settlement.getTile(), settlement);
+            csDisposeSettlement(settlements.remove(0), cs);
         }
 
         // Clean up remaining tile ownerships
@@ -551,10 +551,13 @@ public class ServerPlayer extends Player implements ServerModelObject {
         // Remove units
         List<Unit> units = getUnits();
         while (!units.isEmpty()) {
-            Unit unit = units.remove(0);
+            Unit u = units.remove(0);
+            if (u.hasTile()) cs.add(See.perhaps(), u.getTile());
             cs.addDispose(See.perhaps().always(this),
-                unit.getLocation(), unit);
+                          u.getLocation(), u);//-vis(this)
         }
+       
+        invalidateCanSeeTiles();//+vis(this)
     }
 
     /**
@@ -1293,6 +1296,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                                                       effect.getId(), this)
                                      .addAmount("%amount%", goods.getAmount())
                                      .add("%goods%", goods.getType().getNameKey()));
+                        
                     }
                 } else if (Effect.LOSS_OF_UNIT.equals(effect.getId())) {
                     Unit unit = getUnitForEffect(colony, effect, random);
@@ -1306,8 +1310,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
                             messages.add(new ModelMessage(ModelMessage.MessageType.DEFAULT,
                                                           effect.getId(), this)
                                          .add("%unit%", unit.getType().getNameKey()));
-                            cs.addDispose(See.perhaps().always(this),
-                                          unit.getLocation(), unit);
+                            cs.addDispose(See.only(this), null,
+                                unit);//-vis: Safe, entirely within colony
                         }
                     }
                 } else if (Effect.DAMAGED_UNIT.equals(effect.getId())) {
@@ -1556,14 +1560,15 @@ public class ServerPlayer extends Player implements ServerModelObject {
                         random);
                     brave.clearEquipment();
                     brave.setRole(Unit.Role.DEFAULT);
-                    brave.changeOwner(other); // ->colony, no visibility change
+                    brave.changeOwner(other);//-vis: but within colony so safe
                     brave.setHomeIndianSettlement(null);
                     brave.setNationality(other.getNationId());
                     brave.setType(Utils.getRandomMember(logger,
                                   "Choose convert type", converts, random));
                     brave.setLocation(colony.getTile());
                     cs.add(See.only(this), settlement);
-                    cs.addDispose(See.only(this), settlement.getTile(), brave);
+                    cs.addDispose(See.only(this), settlement.getTile(),
+                                  brave);//-vis: again safe
                     cs.add(See.only(other), colony.getTile());
                     cs.addMessage(See.only(other),
                         new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
@@ -1888,8 +1893,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
     /**
      * Combat.
      *
-     * Visibility changes handled here, rather than the lower level routines.
-     *
      * @param attacker The <code>FreeColGameObject</code> that is attacking.
      * @param defender The <code>FreeColGameObject</code> that is defending.
      * @param crs A list of <code>CombatResult</code>s defining the result.
@@ -2049,8 +2052,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     attackerTileDirty = defenderTileDirty = false;
                     moveAttacker = true;
                     defenderTension += Tension.TENSION_ADD_MAJOR;
-                    attackerPlayer.invalidateCanSeeTiles();
-                    defenderPlayer.invalidateCanSeeTiles();
                 }
                 break;
             case CAPTURE_CONVERT:
@@ -2082,7 +2083,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
                         csCaptureUnit(defenderUnit, attackerUnit, cs);
                     }
                     attackerTileDirty = defenderTileDirty = true;
-                    defenderPlayer.invalidateCanSeeTiles();
                 }
                 break;
             case DAMAGE_COLONY_SHIPS:
@@ -2101,11 +2101,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     if (result == CombatResult.WIN) {
                         csDamageShipAttack(attackerUnit, defenderUnit, cs);
                         defenderTileDirty = true;
-                        defenderPlayer.invalidateCanSeeTiles();
                     } else {
                         csDamageShipAttack(defenderUnit, attackerUnit, cs);
                         attackerTileDirty = true;
-                        attackerPlayer.invalidateCanSeeTiles();
                     }
                 }
                 break;
@@ -2115,7 +2113,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 if (ok) {
                     csDamageShipBombard(attackerSettlement, defenderUnit, cs);
                     defenderTileDirty = true;
-                    defenderPlayer.invalidateCanSeeTiles();
                 }
                 break;
             case DEMOTE_UNIT:
@@ -2140,7 +2137,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     moveAttacker = true;
                     attackerTension -= Tension.TENSION_ADD_NORMAL;
                     defenderTension += Tension.TENSION_ADD_MAJOR;
-                    defenderPlayer.invalidateCanSeeTiles();
                 }
                 break;
             case DESTROY_SETTLEMENT:
@@ -2242,11 +2238,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     if (result == CombatResult.WIN) {
                         csSinkShipAttack(attackerUnit, defenderUnit, cs);
                         defenderTileDirty = true;
-                        defenderPlayer.invalidateCanSeeTiles();
                     } else {
                         csSinkShipAttack(defenderUnit, attackerUnit, cs);
                         attackerTileDirty = true;
-                        attackerPlayer.invalidateCanSeeTiles();
                     }
                 }
                 break;
@@ -2256,7 +2250,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 if (ok) {
                     csSinkShipBombard(attackerSettlement, defenderUnit, cs);
                     defenderTileDirty = true;
-                    defenderPlayer.invalidateCanSeeTiles();
                 }
                 break;
             case SLAUGHTER_UNIT:
@@ -2267,13 +2260,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
                         defenderTileDirty = true;
                         attackerTension -= Tension.TENSION_ADD_NORMAL;
                         defenderTension += getSlaughterTension(defenderUnit);
-                        defenderPlayer.invalidateCanSeeTiles();
                     } else {
                         csSlaughterUnit(defenderUnit, attackerUnit, cs);
                         attackerTileDirty = true;
                         attackerTension += getSlaughterTension(attackerUnit);
                         defenderTension -= Tension.TENSION_ADD_NORMAL;
-                        attackerPlayer.invalidateCanSeeTiles();
                     }
                 }
                 break;
@@ -2528,7 +2519,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         // Hand over the colony.
         ((ServerColony)colony)
-            .changeOwner(attackerPlayer); // Visibility handled in csCombat
+            .changeOwner(attackerPlayer);//-vis(attackerPlayer,colonyPlayer)
+
         // Remove goods party modifiers as they apply to a different monarch.
         for (Modifier m : colony.getModifiers()) {
             if ("model.modifier.colonyGoodsParty".equals(m.getSource())) {
@@ -2551,11 +2543,14 @@ public class ServerPlayer extends Player implements ServerModelObject {
             }
         }
 
-        // Inform the former owner of loss of units.
+        // Inform the former owner of loss of units, and add sound.
         cs.addRemoves(See.only(colonyPlayer), null, units);
-
         cs.addAttribute(See.only(attackerPlayer), "sound",
                         "sound.event.captureColony");
+
+        // Handle visibility
+        attackerPlayer.invalidateCanSeeTiles();//+vis(attackerPlayer)
+        colonyPlayer.invalidateCanSeeTiles();//+vis(colonyPlayer)
     }
 
     /**
@@ -2586,11 +2581,16 @@ public class ServerPlayer extends Player implements ServerModelObject {
                       .addStringTemplate("%nation%", convertNation)
                       .addStringTemplate("%unit%", convert.getLabel()));
 
-        convert.changeOwner(attackerPlayer); // Visibility handled in csCombat
-        convert.setType(type);
-        convert.setLocation(attacker.getTile());
+        // No visibility issue for the loser as the unit moves/changes
+        // from within a non-collapsing settlement.  The attacker however
+        // might have captured a unit with greater line of sight.
+        convert.changeOwner(attackerPlayer);//-vis(attackerPlayer)
+        convert.setType(type);//-vis(attackerPlayer)
+        convert.setLocation(attacker.getTile());//-vis(attackerPlayer)
         cs.add(See.only(nativePlayer), natives);
-        cs.addDispose(See.only(nativePlayer), natives.getTile(), convert);
+        cs.addDispose(See.only(nativePlayer), null,
+                      convert);//-vis: safe, within settlement
+        attackerPlayer.invalidateCanSeeTiles();//+vis(attackerPlayer)
     }
 
     /**
@@ -2674,14 +2674,19 @@ public class ServerPlayer extends Player implements ServerModelObject {
         StringTemplate winnerLocation = winner.getLocation()
             .getLocationNameFor(winnerPlayer);
 
-        // Capture the unit
+        // Capture the unit.  There are visibility implications for
+        // both players because the captured unitloser might be the
+        // only one on its tile, and the winner might have captured a
+        // unit with greater line of sight.
         UnitType type = loser.getTypeChange((winnerPlayer.isUndead())
                                             ? ChangeType.UNDEAD
                                             : ChangeType.CAPTURE, winnerPlayer);
-        loser.changeOwner(winnerPlayer); // Visibility handled in csCombat
-        if (type != null) loser.setType(type);
-        loser.setLocation(winner.getTile());
+        loser.changeOwner(winnerPlayer);//-vis(loserPlayer)
+        if (type != null) loser.setType(type);//-vis(winnerPlayer)
+        loser.setLocation(winner.getTile());//-vis(winnerPlayer)
         loser.setState(Unit.UnitState.ACTIVE);
+        winnerPlayer.invalidateCanSeeTiles();//+vis(winnerPlayer)
+        loserPlayer.invalidateCanSeeTiles();//+vis(loserPlayer)
 
         // Winner message post-capture when it owns the loser
         cs.addMessage(See.only(winnerPlayer),
@@ -2799,7 +2804,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
         for (Unit u : ship.getUnitList()) {
             ship.remove(u);
-            cs.addDispose(See.only(player), null, u); // Only owner-visible
+            cs.addDispose(See.only(player), null, u);//-vis: safe, within unit
         }
 
         // Damage the ship and send it off for repair
@@ -2807,10 +2812,11 @@ public class ServerPlayer extends Player implements ServerModelObject {
             : repair;
         ship.setHitPoints(1);
         ship.setDestination(null);
-        ship.setLocation(shipLoc);
+        ship.setLocation(shipLoc);//-vis(player)
         ship.setState(Unit.UnitState.ACTIVE);
         ship.setMovesLeft(0);
         cs.add(See.only(player), (FreeColGameObject)shipLoc);
+        player.invalidateCanSeeTiles();//+vis(player)
     }
 
     /**
@@ -2838,7 +2844,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 + ((type == null) ? "null" : "same type: " + type));
             return;
         }
-        loser.setType(type);
+        loser.setType(type);//-vis(loserPlayer)
+        loserPlayer.invalidateCanSeeTiles();//+vis(loserPlayer)
 
         cs.addMessage(See.only(winnerPlayer),
             new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
@@ -3010,7 +3017,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
             
         // Get it off the map and off the owners list.
-        settlement.exciseSettlement();
+        settlement.exciseSettlement();//-vis(owner)
         if (!owner.removeSettlement(settlement)) {
             throw new IllegalStateException("Failed to remove settlement: "
                 + settlement);
@@ -3072,12 +3079,15 @@ public class ServerPlayer extends Player implements ServerModelObject {
             if (claimant == null) {
                 t.changeOwnership(null, null);
             } else {
-                t.changeOwnership(claimant.getOwner(), claimant);
+                ServerPlayer newOwner = (ServerPlayer)claimant.getOwner();
+                t.changeOwnership(newOwner, claimant);
             }
         }
 
-        cs.addDispose(See.perhaps().always(owner), centerTile, settlement);
         cs.add(See.perhaps().always(owner), owned);
+        cs.addDispose(See.perhaps().always(owner), centerTile, 
+                      settlement);//-vis(owner)
+        owner.invalidateCanSeeTiles();//+vis(owner)
     }
 
     /**
@@ -3353,7 +3363,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             colony.ejectUnits(building, building.getUnitList());
             colony.removeBuilding(building);
             cs.addDispose(See.only((ServerPlayer)colony.getOwner()), colony, 
-                          building);
+                          building);//-vis: safe, buildings are ok
         } else if (building.canBeDamaged()) {
             colony.ejectUnits(building, building.downgrade());
         } else {
@@ -3384,7 +3394,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 + ((type == null) ? "null" : "same type: " + type));
             return;
         }
-        winner.setType(type);
+        winner.setType(type);//-vis(winnerPlayer)
+        winnerPlayer.invalidateCanSeeTiles();//+vis(winnerPlayer)
+
         cs.addMessage(See.only(winnerPlayer),
                       new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                           "model.unit.unitPromoted", winner)
@@ -3480,7 +3492,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
                             ChangeSet cs) {
         ServerPlayer shipPlayer = (ServerPlayer) ship.getOwner();
         cs.addDispose(See.perhaps().always(shipPlayer),
-            ship.getLocation(), ship);
+                      ship.getLocation(), ship);//-vis(shipPlayer)
+        shipPlayer.invalidateCanSeeTiles();//+vis(shipPlayer)
         if (attackerPlayer != null) {
             cs.addAttribute(See.only(attackerPlayer), "sound",
                             "sound.event.shipSunk");
@@ -3542,7 +3555,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         // Destroy unit.
         cs.addDispose(See.perhaps().always(loserPlayer),
-            loser.getLocation(), loser);
+                      loser.getLocation(), loser);//-vis(loserPlayer)
+        loserPlayer.invalidateCanSeeTiles();//+vis(loserPlayer)
     }
 
     /**

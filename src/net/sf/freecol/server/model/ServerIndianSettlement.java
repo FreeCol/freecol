@@ -150,13 +150,13 @@ public class ServerIndianSettlement extends IndianSettlement
         if (storedFood <= 0 && getUnitCount() > 0) {
             Unit victim = Utils.getRandomMember(logger, "Choose starver",
                                                 getUnitList(), random);
-            cs.addDispose(See.only(owner), this, victim);
+            cs.addDispose(See.only(owner), this, victim);//-vis(owner)
             logger.finest("Famine in " + getName());
         }
         if (getUnitCount() <= 0) {
             if (tile.isEmpty()) {
                 logger.info(getName() + " collapsed.");
-                owner.csDisposeSettlement(this, cs);
+                owner.csDisposeSettlement(this, cs);//+vis(owner)
                 return;
             }
             tile.getFirstUnit().setLocation(this);
@@ -246,18 +246,36 @@ public class ServerIndianSettlement extends IndianSettlement
     /**
      * Changes the missionary for this settlement and updates other players.
      *
+     * +vis: Handles the visibility implications.
+     *
      * @param missionary The new missionary for this settlement.
+     * @param cs A <code>ChangeSet</code> to update.
      */
-    public void changeMissionary(Unit missionary) {
-        Unit old = getMissionary();
-        setMissionary(missionary);
-        if (missionary != null) missionary.getOwner().invalidateCanSeeTiles();
-        if (old != null) old.getOwner().invalidateCanSeeTiles();
-
-        // Should see full updates for the old and new missionary owners.
+    public void csChangeMissionary(Unit missionary, ChangeSet cs) {
         Tile tile = getTile();
+        Unit old = getMissionary();
+        ServerPlayer oldOwner = null, newOwner = null;
+
+        if (old != null) {
+            oldOwner = (ServerPlayer)old.getOwner(); 
+            setMissionary(null);//-vis(oldOwner)
+            tile.updatePlayerExploredTile(oldOwner, true);
+            cs.addDispose(See.perhaps(), tile, old);//-vis(oldOwner)
+        }
+
+        if (missionary != null) {
+            newOwner = (ServerPlayer)missionary.getOwner();
+            setMissionary(missionary);//-vis(newOwner)
+            tile.updatePlayerExploredTile(newOwner, true);
+        }
+
+        cs.add(See.perhaps().always(oldOwner), tile);
+
+        if (oldOwner != null) oldOwner.invalidateCanSeeTiles();//+vis(oldOwner)
+        if (newOwner != null) newOwner.invalidateCanSeeTiles();//+vis(newOwner)
+
+        // TODO: do not update oldOwner,newOwner again.
         tile.updatePlayerExploredTiles();
-        if (old != null) tile.updatePlayerExploredTile(old.getOwner(), false);
     }
 
     /**
@@ -269,12 +287,10 @@ public class ServerIndianSettlement extends IndianSettlement
     public void csKillMissionary(String messageId, ChangeSet cs) {
         Unit missionary = getMissionary();
         if (missionary == null) return;
-        ServerPlayer missionaryOwner = (ServerPlayer)missionary.getOwner();
-        changeMissionary(null);
-
+        csChangeMissionary(null, cs);
+        
         // Inform the enemy of loss of mission
-        cs.add(See.perhaps().always(missionaryOwner), getTile());
-        cs.addDispose(See.only(missionaryOwner), null, missionary);
+        ServerPlayer missionaryOwner = (ServerPlayer)missionary.getOwner();
         if ("indianSettlement.mission.denounced".equals(messageId)) {
             cs.addMessage(See.only(missionaryOwner),
                 new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
@@ -291,7 +307,7 @@ public class ServerIndianSettlement extends IndianSettlement
     }
 
     /**
-     * Returns the tag name of the root element representing this object.
+     * Gets the tag name of the root element representing this object.
      *
      * @return "serverIndianSettlement"
      */

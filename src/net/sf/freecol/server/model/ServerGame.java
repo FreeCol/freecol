@@ -312,7 +312,7 @@ public class ServerGame extends Game implements ServerModelObject {
                     logMe += " " + settlement.getName() + "(mission)";
                     settlement.setContacted(strongestAIPlayer);
                     settlement.getMissionary()
-                        .changeOwner(strongestAIPlayer); // Visibility handled below
+                        .changeOwner(strongestAIPlayer);//-vis(both)
                     Tile t = settlement.getTile();
                     t.updatePlayerExploredTile(strongestAIPlayer, true);
                     t.updatePlayerExploredTiles();
@@ -322,12 +322,12 @@ public class ServerGame extends Game implements ServerModelObject {
             }
             for (Colony colony : weakestAIPlayer.getColonies()) {
                 ((ServerColony)colony)
-                    .changeOwner(strongestAIPlayer);// Visibility handled below
+                    .changeOwner(strongestAIPlayer);//-vis(both)
                 logMe += " " + colony.getName();
                 cs.add(See.perhaps(), colony.getOwnedTiles());
             }
             for (Unit unit : weakestAIPlayer.getUnits()) {
-                unit.changeOwner(strongestAIPlayer); // Visibility handled below
+                unit.changeOwner(strongestAIPlayer); //-vis(both)
                 logMe += " " + unit.getId();
                 if (unit.getLocation() instanceof Europe) {
                     unit.setLocation(strongestAIPlayer.getEurope());
@@ -353,8 +353,8 @@ public class ServerGame extends Game implements ServerModelObject {
             setSpanishSuccession(true);
             cs.addPartial(See.all(), this, "spanishSuccession");
 
-            ((ServerPlayer) weakestAIPlayer).csKill(cs);
-            strongestAIPlayer.invalidateCanSeeTiles();
+            ((ServerPlayer)weakestAIPlayer).csKill(cs);//+vis(weakest)
+            strongestAIPlayer.invalidateCanSeeTiles();//+vis(strongest)
             logger.info(logMe);
         }
     }
