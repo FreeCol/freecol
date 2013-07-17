@@ -98,6 +98,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
     /**
      * Creates a new ServerUnit.
      *
+     * -vis: Visibility issues depending on location.
+     *
      * @param game The <code>Game</code> in which this unit belongs.
      * @param location The <code>Location</code> to place this at.
      * @param owner The <code>Player</code> owning this unit.
@@ -110,6 +112,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
 
     /**
      * Create a new ServerUnit from a template.
+     *
+     * -vis: Visibility issues depending on location.
      *
      * @param game The <code>Game</code> in which this unit belongs.
      * @param location The <code>Location</code> to place this at.
@@ -143,6 +147,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
 
     /**
      * Creates a new ServerUnit.
+     *
+     * -vis: Visibility issues depending on location.
      *
      * @param game The <code>Game</code> in which this unit belongs.
      * @param location The <code>Location</code> to place this at.
@@ -710,7 +716,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
             List<UnitType> foundTypes = spec.getUnitTypesWithAbility(Ability.FOUND_IN_LOST_CITY);
             unitType = Utils.getRandomMember(logger, "Choose found",
                                              foundTypes, random);
-            newUnit = new ServerUnit(game, tile, serverPlayer, unitType);
+            newUnit = new ServerUnit(game, tile, serverPlayer,
+                                     unitType);//-vis: safe, scout on tile
             cs.addMessage(See.only(serverPlayer),
                 new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                     "lostCityRumour.colonist", serverPlayer, newUnit));
@@ -722,7 +729,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     "Base treasure amount", random, dx * 600) + dx * 300;
                 unitType = Utils.getRandomMember(logger, "Choose train",
                                                  treasureUnitTypes, random);
-                newUnit = new ServerUnit(game, tile, serverPlayer, unitType);
+                newUnit = new ServerUnit(game, tile, serverPlayer,
+                                         unitType);//-vis: safe, scout on tile
                 newUnit.setTreasureAmount(treasureAmount);
                 cs.addMessage(See.only(serverPlayer),
                     new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
@@ -748,7 +756,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
             } else {
                 unitType = Utils.getRandomMember(logger, "Choose train",
                                                  treasureUnitTypes, random);
-                newUnit = new ServerUnit(game, tile, serverPlayer, unitType);
+                newUnit = new ServerUnit(game, tile, serverPlayer,
+                                         unitType);//-vis: safe, scout on tile
                 newUnit.setTreasureAmount(ruinsAmount);
             }
             cs.addMessage(See.only(serverPlayer),
@@ -781,7 +790,8 @@ public class ServerUnit extends Unit implements ServerModelObject {
                     for (int k = 0; k < dx; k++) {
                         UnitType type = RandomChoice.getWeightedRandom(logger,
                             "Choose FoY", recruitables, random);
-                        new ServerUnit(game, europe, serverPlayer, type);
+                        new ServerUnit(game, europe, serverPlayer,
+                                       type);//-vis: safe, Europe
                     }
                     cs.add(See.only(serverPlayer), europe);
                 }

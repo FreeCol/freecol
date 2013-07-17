@@ -337,18 +337,17 @@ public final class InGameController extends Controller {
     public ServerPlayer createREFPlayer(ServerPlayer serverPlayer) {
         Nation refNation = serverPlayer.getNation().getREFNation();
         Monarch monarch = serverPlayer.getMonarch();
+        Europe europe = serverPlayer.getEurope();
         ServerPlayer refPlayer = getFreeColServer().addAIPlayer(refNation);
         refPlayer.setEntryLocation(null); // Trigger initial placement routine
         Player.makeContact(serverPlayer, refPlayer); // Will change, setup only
 
         // Instantiate the REF in Europe
-        List<Unit> landUnits
-            = refPlayer.createUnits(monarch.getExpeditionaryForce().getLandUnits(),
-                                    serverPlayer.getEurope());
-        List<Unit> navalUnits
-            = refPlayer.createUnits(monarch.getExpeditionaryForce().getNavalUnits(),
-                                    serverPlayer.getEurope());
-
+        Monarch.Force exf = monarch.getExpeditionaryForce();
+        List<Unit> landUnits = refPlayer.createUnits(exf.getLandUnits(),
+                                                     europe);//-vis: safe/Europe
+        List<Unit> navalUnits = refPlayer.createUnits(exf.getNavalUnits(),
+                                                     europe);//-vis: safe/Europe
         refPlayer.loadShips(landUnits, navalUnits, random);
         // Send the navy on its way
         for (Unit u : navalUnits) {
@@ -1116,7 +1115,8 @@ public final class InGameController extends Controller {
             boolean sea = action == MonarchAction.SUPPORT_SEA;
             List<AbstractUnit> support = monarch.getSupport(random, sea);
             if (support.isEmpty()) break;
-            serverPlayer.createUnits(support, serverPlayer.getEurope());
+            serverPlayer.createUnits(support,
+                serverPlayer.getEurope());//-vis: safe, Europe
             cs.add(See.only(serverPlayer), serverPlayer.getEurope());
             cs.add(See.only(serverPlayer), ChangePriority.CHANGE_LATE,
                 new MonarchActionMessage(action,
@@ -3591,10 +3591,11 @@ public final class InGameController extends Controller {
             return DOMMessage.clientError("Not enough gold to train " + type);
         }
 
-        Unit unit = new ServerUnit(getGame(), europe, serverPlayer, type);
+        Unit unit = new ServerUnit(getGame(), europe, serverPlayer,
+                                   type);//-vis: safe, Europe
         unit.setName(serverPlayer.getNameForUnit(type, random));
         serverPlayer.modifyGold(-price);
-        ((ServerEurope) europe).increasePrice(type, price);
+        ((ServerEurope)europe).increasePrice(type, price);
 
         // Only visible in Europe
         ChangeSet cs = new ChangeSet();
@@ -3993,15 +3994,17 @@ public final class InGameController extends Controller {
         ChangeSet cs = new ChangeSet();
         UnitType navalType = navalUnits.get(Utils.randomInt(logger,
                 "Choose undead navy", random, navalUnits.size()));
-        Tile start = ((Tile) serverPlayer.getEntryLocation())
+        Tile start = ((Tile)serverPlayer.getEntryLocation())
             .getSafeTile(serverPlayer, random);
         Unit theFlyingDutchman
-            = new ServerUnit(game, start, serverPlayer, navalType);
+            = new ServerUnit(game, start, serverPlayer,
+                             navalType);//-vis(serverPlayer)
         UnitType landType = landUnits.get(Utils.randomInt(logger,
                 "Choose undead army", random, landUnits.size()));
-        new ServerUnit(game, theFlyingDutchman, serverPlayer, landType);
+        new ServerUnit(game, theFlyingDutchman, serverPlayer, landType);//-vis
         serverPlayer.setDead(false);
         serverPlayer.setPlayerType(PlayerType.UNDEAD);
+        serverPlayer.invalidateCanSeeTiles();//+vis(serverPlayer)
 
         // No one likes the undead.
         for (Player p : game.getPlayers()) {

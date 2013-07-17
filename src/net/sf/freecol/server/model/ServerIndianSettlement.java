@@ -103,13 +103,15 @@ public class ServerIndianSettlement extends IndianSettlement
         // TODO: the template settlement might have additional owned
         // units
         for (Unit unit: template.getUnitList()) {
-            Unit newUnit = new ServerUnit(game, this, unit);
+            Unit newUnit = new ServerUnit(game, this,
+                                          unit);//-vis: safe, not on map yet
             add(newUnit);
             addOwnedUnit(newUnit);
         }
         Unit missionary = template.getMissionary();
         if (missionary != null) {
-            this.missionary = new ServerUnit(game, this, missionary);
+            this.missionary = new ServerUnit(game, this,
+                                             missionary);//-vis: safe not on map
         }
         setConvertProgress(template.getConvertProgress());
         setLastTribute(template.getLastTribute());
@@ -177,7 +179,8 @@ public class ServerIndianSettlement extends IndianSettlement
             // without discussing it on the developer's mailing list first.
             UnitType type = Utils.getRandomMember(logger, "Choose birth",
                                                   unitTypes, random);
-            Unit unit = new ServerUnit(getGame(), getTile(), owner, type);
+            Unit unit = new ServerUnit(getGame(), getTile(), owner,
+                                       type);//-vis: safe within settlement
             consumeGoods(foodType, FOOD_PER_COLONIST);
             consumeGoods(rumType, FOOD_PER_COLONIST/4);
             // New units quickly go out of their city and start annoying.

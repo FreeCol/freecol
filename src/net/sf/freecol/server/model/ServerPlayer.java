@@ -845,11 +845,15 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * Create units from a list of abstract units.  Only used by
      * Europeans at present.
      *
+     * -vis: Visibility issues depending on location.
+     *
      * @param abstractUnits The list of <code>AbstractUnit</code>s to create.
-     * @param location The location where the units will be created.
+     * @param location The <code>Location</code> where the units will
+     *     be created.
      * @return A list of units created.
      */
-    public List<Unit> createUnits(List<AbstractUnit> abstractUnits, Location location) {
+    public List<Unit> createUnits(List<AbstractUnit> abstractUnits,
+                                  Location location) {
         Game game = getGame();
         List<Unit> units = new ArrayList<Unit>();
         if (location == null) return units;
@@ -858,7 +862,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
         for (AbstractUnit au : abstractUnits) {
             for (int i = 0; i < au.getNumber(); i++) {
                 units.add(new ServerUnit(game, location, this,
-                        au.getUnitType(spec), au.getEquipment(spec)));
+                                         au.getUnitType(spec),
+                                         au.getEquipment(spec)));//-vis(this)
             }
         }
         return units;
@@ -1160,26 +1165,28 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 && interventionBells >= getSpecification().getInteger("model.option.interventionBells")) {
                 interventionBells = Integer.MIN_VALUE;
                 // TODO: this assumes that the entry location will
-                // always be a tile. This seems safe enough at the moment.
-                Tile entryLocation = ((Tile) getEntryLocation()).getSafeTile(this, random);
-                List<Unit> landUnits =
-                    createUnits(getMonarch().getInterventionForce().getLandUnits(),
-                                entryLocation);
-                List<Unit> navalUnits =
-                    createUnits(getMonarch().getInterventionForce().getNavalUnits(),
-                                entryLocation);
+                // always be a tile.  This seems safe enough at the moment.
+                Tile entryLocation = ((Tile)getEntryLocation())
+                    .getSafeTile(this, random);
+                Monarch.Force ivf = getMonarch().getInterventionForce();
+
+                List<Unit> landUnits = createUnits(ivf.getLandUnits(),
+                                                   entryLocation);//-vis(this)
+                List<Unit> navalUnits = createUnits(ivf.getNavalUnits(),
+                                                    entryLocation);//-vis(this)
                 List<Unit> leftOver = loadShips(landUnits, navalUnits, random);
                 for (Unit unit : leftOver) {
                     // no use for left over units
                     logger.warning("Disposing of left over unit " + unit);
-                    unit.setLocation(null);
-                    unit.dispose();
+                    unit.setLocationNoUpdate(null);
+                    unit.disposeList();//-vis: safe, never sighted
                 }
+                invalidateCanSeeTiles();//+vis(this)
                 cs.add(See.perhaps(), entryLocation);
                 cs.addMessage(See.only(this),
-                              new ModelMessage(ModelMessage.MessageType.DEFAULT,
-                                               "declareIndependence.interventionForceArrives",
-                                               this));
+                    new ModelMessage(ModelMessage.MessageType.DEFAULT,
+                        "declareIndependence.interventionForceArrives",
+                        this));
             }
         }
 
@@ -1722,7 +1729,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         List<AbstractUnit> units = father.getUnits();
         if (units != null && !units.isEmpty() && europe != null) {
-            createUnits(father.getUnits(), europe);
+            createUnits(father.getUnits(), europe);//-vis: safe, Europe
             europeDirty = true;
         }
 
@@ -1879,7 +1886,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
         ServerEurope europe = (ServerEurope)getEurope();
         UnitType recruitType = europe.getRecruitable(index);
         Game game = getGame();
-        Unit unit = new ServerUnit(game, europe, this, recruitType);
+        Unit unit = new ServerUnit(game, europe, this,
+                                   recruitType);//-vis: Europe
         unit.setLocation(europe);
 
         // Handle migration type specific changes.
@@ -3001,7 +3009,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 = spec.getUnitTypesWithAbility(Ability.CARRY_TREASURE);
             UnitType type = Utils.getRandomMember(logger, "Choose train",
                                                   unitTypes, random);
-            Unit train = new ServerUnit(game, tile, attackerPlayer, type);
+            Unit train = new ServerUnit(game, tile, attackerPlayer,
+                                        type);//-vis: safe, attacker on tile
             train.setTreasureAmount(plunder);
         }
 
@@ -3711,7 +3720,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
     public void csAddMercenaries(List<AbstractUnit> mercs, int price,
                                  ChangeSet cs) {
         if (checkGold(price)) {
-            createUnits(mercs, getEurope());
+            createUnits(mercs, getEurope());//-vis: safe, Europe
             cs.add(See.only(this), getEurope());
             modifyGold(-price);
             cs.addPartial(See.only(this), this, "gold");

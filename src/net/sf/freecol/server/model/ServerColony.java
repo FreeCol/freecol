@@ -563,7 +563,8 @@ public class ServerColony extends Colony implements ServerModelObject {
     private Unit csBuildUnit(BuildQueue<? extends BuildableType> buildQueue,
                              Random random, ChangeSet cs) {
         UnitType type = (UnitType)buildQueue.getCurrentlyBuilding();
-        Unit unit = new ServerUnit(getGame(), getTile(), owner, type);
+        Unit unit = new ServerUnit(getGame(), getTile(), owner,
+                                   type);//-vis: safe, within colony
         if (unit.hasAbility(Ability.BORN_IN_COLONY)) {
             cs.addMessage(See.only((ServerPlayer) owner),
                           new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,

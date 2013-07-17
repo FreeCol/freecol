@@ -2616,6 +2616,38 @@ public class Player extends FreeColGameObject implements Nameable {
      * <code>canSeeTiles</code> when something significant changes.
      * The method {@link #resetCanSeeTiles} will be called whenever it
      * is needed.
+     *
+     * So what is "significant"?  Looking at the makeCanSeeTiles routine
+     * suggests the following:
+     *
+     * - Unit added to map
+     * - Unit removed from map
+     * - Unit moved on map
+     * - Unit type changes (which may change its line-of-sight)
+     * - Unit ownership changes
+     * - Settlement added to map
+     * - Settlement removed from map
+     * - Settlement ownership changes
+     * - Coronado added (can now see other colonies)
+     * - Coronado removed (only in debug mode)
+     * - Mission established (if enhanced missionaries enabled)
+     * - Mission removed (if enhanced missionaries enabled)
+     * - Mission ownership changes (Spanish succession with enhanced
+     *                              missionaries enabled)
+     *
+     * Ideally then when any of these events occurs we should call
+     * invalidateCanSeeTiles().  However while iCST is quick and
+     * cheap, as soon as we then call canSee() the big expensive
+     * makeCanSeeTiles will be run.  Often the situation in the server
+     * is that several routines with visibility implications will be
+     * called in succession.  Usually there, the best solution is to
+     * make all the changes and issue the iCST at the end.  So, to
+     * make this a bit more visible, routines that change visibility
+     * are annotated with a "-vis" comment at both definition and call
+     * sites.  Similarly routines that fix up the mess have a "+vis"
+     * comment.  Thus it is an error for a -vis to appear without a
+     * following +vis (unless the enclosing routine is marked -vis).
+     * By convention, we try to avoid cs* routines being -vis.
      */
     public void invalidateCanSeeTiles() {
         synchronized (canSeeLock) {

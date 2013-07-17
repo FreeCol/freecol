@@ -354,9 +354,10 @@ public class DebugUtils {
             }
         }
         Location loc = (sCarrier != null) ? sCarrier : sTile;
-        ServerUnit sUnit = new ServerUnit(sGame, loc, sPlayer, unitChoice);
+        ServerUnit sUnit = new ServerUnit(sGame, loc, sPlayer,
+                                          unitChoice);//-vis(sPlayer)
         sUnit.setMovesLeft(sUnit.getInitialMovesLeft());
-        sPlayer.invalidateCanSeeTiles();
+        sPlayer.invalidateCanSeeTiles();//+vis(sPlayer)
         int los = sUnit.getLineOfSight();
         for (Tile t : loc.getTile().getSurroundingTiles(los)) {
             t.updatePlayerExploredTile(sPlayer, true);
