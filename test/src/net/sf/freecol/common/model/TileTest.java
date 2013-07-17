@@ -604,6 +604,16 @@ public class TileTest extends FreeColTestCase {
         assertEquals(colonyTile, colony.getVacantColonyTileFor(unit, false, silver));
     }
 
+    public void testDefence() {
+        for (TileType tileType : spec().getTileTypeList()) {
+            if (tileType.isForested()
+                || "model.tile.hills".equals(tileType.getId())
+                || "model.tile.mountains".equals(tileType.getId())) {
+                assertFalse(tileType.getModifierSet("model.modifier.defence").isEmpty());
+            }
+        }
+    }
+
     public void testZIndex() {
         assertTrue(MapViewer.OVERLAY_INDEX < MapViewer.FOREST_INDEX);
         assertTrue(MapViewer.FOREST_INDEX < TileItem.RESOURCE_ZINDEX);

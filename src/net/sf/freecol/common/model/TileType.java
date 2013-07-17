@@ -641,7 +641,12 @@ public final class TileType extends FreeColGameObjectType {
         } else if (Modifier.getXMLElementTagName().equals(tag)) {
             // @compat 0.10.7
             // the tile type no longer contains the base production modifier
-            xr.closeTag(Modifier.getXMLElementTagName());
+            String id = xr.getAttribute(ID_ATTRIBUTE_TAG, null);
+            if (id.startsWith("model.goods.")) {
+                xr.closeTag(Modifier.getXMLElementTagName());
+            } else {
+                super.readChild(xr);
+            }
             // end @compat
         } else {
             super.readChild(xr);
