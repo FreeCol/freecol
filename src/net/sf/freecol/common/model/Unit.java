@@ -3789,16 +3789,6 @@ public class Unit extends GoodsLocation
 
         xw.writeAttribute(ROLE_TAG, role);
 
-        if (location != null) {
-            if (full || !(location instanceof Building
-                    || location instanceof ColonyTile)) {
-                xw.writeLocationAttribute(LOCATION_TAG, location);
-
-            } else {
-                xw.writeLocationAttribute(LOCATION_TAG, getColony());
-            }
-        }
-
         if (!full && hasAbility(Ability.PIRACY)) {
             // Pirates do not disclose national characteristics.
             xw.writeAttribute(OWNER_TAG, getGame().getUnknownEnemy());
@@ -3815,6 +3805,19 @@ public class Unit extends GoodsLocation
                 xw.writeAttribute(ETHNICITY_TAG, (ethnicity != null)
                     ? ethnicity
                     : getOwner().getNationId());
+            }
+        }
+
+        if (location != null) {
+            if (!full && location instanceof WorkLocation) {
+                // Really special case.  This happens in attack
+                // animations when a defender unit is invisible
+                // working inside a colony and has to be specially
+                // serialized to the client.
+                xw.writeLocationAttribute(LOCATION_TAG, getColony());
+
+            } else {
+                xw.writeLocationAttribute(LOCATION_TAG, location);
             }
         }
 
