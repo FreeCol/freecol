@@ -68,6 +68,19 @@ public class UnitWas implements Comparable<UnitWas> {
         }
     }
 
+
+    public Unit getUnit() {
+        return unit;
+    }
+
+    public Location getLocation() {
+        return loc;
+    }
+
+    public GoodsType getWorkType() {
+        return work;
+    }
+
     /**
      * Compares this UnitWas with another.
      *
@@ -88,72 +101,6 @@ public class UnitWas implements Comparable<UnitWas> {
             - ((UnitLocation)this.loc).getUnitCapacity();
         if (cmp != 0) return cmp;
         return this.equipment.keySet().size() - uw.equipment.keySet().size();
-    }
-
-    /**
-     * Reverts the unit to the previous state, if possible.
-     *
-     * @return True if the reversion succeeds.
-     */
-    public boolean revert() {
-        if (unit.isDisposed()
-            || unit.getType() != type) return false;
-
-        if (unit.getLocation() != loc) {
-            unit.setLocationNoUpdate(loc);
-        }
-        if (unit.getWorkType() != work) {
-            unit.changeWorkType(work);
-        }
-
-        if (unit.getRole() != role) { // Try to restore role equipment.
-            if (colony == null || unit.getColony() != colony) return false;
-            Set<EquipmentType> eq = new HashSet<EquipmentType>();
-            TypeCountMap<EquipmentType> unitEquipment = unit.getEquipment();
-            eq.addAll(equipment.keySet());
-            eq.addAll(unitEquipment.keySet());
-            // Give back first, avoiding incompatible equipment problems.
-            for (EquipmentType et : eq) {
-                int count = equipment.getCount(et) - unitEquipment.getCount(et);
-                if (count < 0) {
-                    unit.changeEquipment(et, count);
-                    colony.addEquipmentGoods(et, -count);
-                }
-            }
-            for (EquipmentType et : eq) {
-                int count = equipment.getCount(et) - unitEquipment.getCount(et);
-                if (count > 0 && colony.canProvideEquipment(et)
-                    && unit.canBeEquippedWith(et)) {
-                    unit.changeEquipment(et, count);
-                    colony.addEquipmentGoods(et, -count);
-                }
-            }
-            unit.setRole();
-        }
-        return unit.getRole() == role;
-    }
-
-    /**
-     * Tries hard to revert all of a list of UnitWas.
-     *
-     * @param was The list of <code>UnitWas</code> to revert (the reverted
-     *     members will be removed from this list).
-     * @return True if the reversion was complete.
-     */
-    public static boolean revertAll(List<UnitWas> was) {
-        for (UnitWas uw : was) uw.getUnit().setLocation(null);
-        Collections.sort(was);
-        List<UnitWas> retry = new ArrayList<UnitWas>();
-        while (!was.isEmpty()) {
-            UnitWas w = was.remove(0);
-            if (!w.revert()) retry.add(w);
-        }
-        Collections.sort(retry);
-        while (!retry.isEmpty()) {
-            UnitWas w = retry.remove(0);
-            if (!w.revert()) was.add(w);
-        }
-        return was.isEmpty();
     }
 
     /**
@@ -255,19 +202,6 @@ public class UnitWas implements Comparable<UnitWas> {
             */
         }
         return 0;
-    }
-
-
-    public Unit getUnit() {
-        return unit;
-    }
-
-    public Location getLocation() {
-        return loc;
-    }
-
-    public GoodsType getWorkType() {
-        return work;
     }
 
     /**
