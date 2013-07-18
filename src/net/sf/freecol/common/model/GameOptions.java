@@ -35,6 +35,8 @@ public class GameOptions {
     public static final String SHIP_TRADE_PENALTY
         = "model.option.shipTradePenalty";
 
+    public static final String DESTROY_SETTLEMENT_SCORE
+        = "model.option.destroySettlementScore";
 
     /** Enables/disables fog of war. */
     public static final String FOG_OF_WAR = "model.option.fogOfWar";

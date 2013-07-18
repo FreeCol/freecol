@@ -1156,6 +1156,10 @@ public final class FreeColServer {
         addBooleanOption(GameOptions.EMPTY_TRADERS,
             "gameOptions.map", false, false);
         // end @compat
+
+        // Introduced: SAVEGAME_VERSION == 13
+        addIntegerOption(GameOptions.DESTROY_SETTLEMENT_SCORE,
+            "gameOptions.natives", -5, true);
     }
 
     private void addOptionGroup(String id, boolean difficulty) {

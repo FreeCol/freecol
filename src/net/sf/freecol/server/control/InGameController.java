@@ -140,12 +140,18 @@ public final class InGameController extends Controller {
     // Alarm adjustments.
     public static final int ALARM_NEW_MISSIONARY = -100;
 
-    // Score bonus on declaration of independence.
-    public static final int SCORE_INDEPENDENCE_DECLARED = 100;
-
-    // Score bonus on achieving independence.
-    public static final int SCORE_INDEPENDENCE_GRANTED = 1000;
-
+    /**
+     * Score bonus on declaring independence = (1780, Spring) - turn
+     * 1780 is documented in the Col1 manual:
+     *   ``if you've declared your independence before 1780, your score
+     *     is increased; the sooner you declare; the better your Bonus.''
+     * which suggests this needs to be turn based and cut off at the earliest
+     * turn in 1780.
+     */
+    public static final int SCORE_INDEPENDENCE_YEAR = 1780;
+    public static final Turn.Season SCORE_INDEPENDENCE_SEASON
+        = Turn.Season.SPRING;
+    
     // The server random number source.
     private final Random random;
 
@@ -888,7 +894,20 @@ public final class InGameController extends Controller {
         independent.reinitialiseMarket();
         HistoryEvent h = new HistoryEvent(turn, HistoryEvent.EventType.INDEPENDENCE);
         h.setPlayerId(independent.getId());
-        h.setScore(SCORE_INDEPENDENCE_GRANTED - turn.getNumber());
+        // The score for actual independence is actually a percentage
+        // bonus depending on how many other nations are independent.
+        // If we ever go for a more complex scoring algorithm it might
+        // be better to replace the score int with a Modifier, but for
+        // now we just set the score value to the number of
+        // independent players other than the one we are granting
+        // here, and generate the bonus with a special case in
+        // ServerPlayer.updateScore().
+        int n = 0;
+        for (Player p : game.getLiveEuropeanPlayers()) {
+            if ((ServerPlayer)p == independent) continue;
+            if (p.getPlayerType() == PlayerType.INDEPENDENT) n++;
+        }
+        h.setScore(n);
         cs.addGlobalHistory(game, h);
         cs.addMessage(See.only(independent),
             new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
@@ -1275,7 +1294,9 @@ public final class InGameController extends Controller {
         Turn turn = getGame().getTurn();
         HistoryEvent h = new HistoryEvent(turn, HistoryEvent.EventType.DECLARE_INDEPENDENCE);
         h.setPlayerId(serverPlayer.getId());
-        h.setScore(SCORE_INDEPENDENCE_DECLARED);
+        h.setScore(Math.max(0, Turn.yearToTurn(SCORE_INDEPENDENCE_YEAR,
+                                               SCORE_INDEPENDENCE_SEASON)
+                - turn.getNumber()));
         cs.addGlobalHistory(getGame(), h);
         serverPlayer.clearModelMessages();
         cs.addMessage(See.only(serverPlayer),

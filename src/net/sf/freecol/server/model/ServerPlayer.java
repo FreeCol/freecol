@@ -56,6 +56,7 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HistoryEvent;
+import net.sf.freecol.common.model.HistoryEvent.EventType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
@@ -108,8 +109,23 @@ public class ServerPlayer extends Player implements ServerModelObject {
     // How far to search for a colony to add an Indian convert to.
     public static final int MAX_CONVERT_DISTANCE = 10;
 
-    public static final int SCORE_SETTLEMENT_DESTROYED = -40;
-    public static final int SCORE_NATION_DESTROYED = -400;
+    // Penalty for destroying a settlement (Col1)
+    public static final int SCORE_SETTLEMENT_DESTROYED = -5;
+
+    // Penalty for destroying a nation (FreeCol extension)
+    public static final int SCORE_NATION_DESTROYED = -50;
+
+    // Gold converts to score at 1 pt per 1000 gp (Col1)
+    public static final double SCORE_GOLD = 0.001;
+
+    // Score bonus for each founding father (Col1)
+    public static final int SCORE_FOUNDING_FATHER = 5;
+
+    // Percentage bonuses for being the 1st,2nd and 3rd player to
+    // achieve independence. (Col1)
+    public static final int SCORE_INDEPENDENCE_BONUS_FIRST = 100;
+    public static final int SCORE_INDEPENDENCE_BONUS_SECOND = 50;
+    public static final int SCORE_INDEPENDENCE_BONUS_THIRD = 25;
 
     /** The network socket to the player's client. */
     private Socket socket;
@@ -706,6 +722,18 @@ public class ServerPlayer extends Player implements ServerModelObject {
     /**
      * Update the current score for this player.
      *
+     * Known incompatiblity with the Col1 manual:
+     * ``In addition, you get one point per liberty bell produced
+     *   after foreign intervention''
+     * However you are already getting a point per liberty bell
+     * produced, so this implies you get no further liberty after
+     * declaring independence!?, but it can then start again if the
+     * foreign intervention happens (penalizing players who quickly
+     * thrash the REF:-S).  Whatever this really means, it is
+     * incompatible with our extensions to allow playing on (and
+     * defeating other Europeans), so for now at least just leave the
+     * simple liberty==score rule in place.
+     *
      * @return True if the player score changed.
      */
     public boolean updateScore() {
@@ -717,17 +745,35 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
         
         for (Colony c : getColonies()) {
-            for (Building b : c.getBuildings()) {
-                score += b.getLevel() - 1;
-            }
+            score += c.getLiberty();
         }
 
+        score += SCORE_FOUNDING_FATHER * getFathers().size();
+
         int gold = getGold();
-        if (gold != GOLD_NOT_ACCOUNTED) score += gold;
-        
-        for (HistoryEvent h : getHistory()) {
-            if (getId().equals(h.getPlayerId())) score += h.getScore();
+        if (gold != GOLD_NOT_ACCOUNTED) {
+            score += (int)Math.floor(SCORE_GOLD * gold);
         }
+        
+        int bonus = 0;
+        for (HistoryEvent h : getHistory()) {
+            if (getId().equals(h.getPlayerId())) {
+                switch (h.getEventType()) {
+                case INDEPENDENCE:
+                    switch (h.getScore()) {
+                    case 0: bonus = SCORE_INDEPENDENCE_BONUS_FIRST; break;
+                    case 1: bonus = SCORE_INDEPENDENCE_BONUS_SECOND; break;
+                    case 2: bonus = SCORE_INDEPENDENCE_BONUS_THIRD; break;
+                    default: bonus = 0; break;
+                    }
+                    break;
+                default:
+                    score += h.getScore();
+                    break;
+                }
+            }
+        }
+        score += (score * bonus) / 100;
 
         return score != oldScore;
     }
@@ -2929,7 +2975,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
     private void csDestroySettlement(Unit attacker,
                                      IndianSettlement settlement,
                                      Random random, ChangeSet cs) {
-        Game game = getGame();
+        final Game game = getGame();
+        final Specification spec = game.getSpecification();
         Tile tile = settlement.getTile();
         ServerPlayer attackerPlayer = (ServerPlayer) attacker.getOwner();
         ServerPlayer nativePlayer = (ServerPlayer) settlement.getOwner();
@@ -2950,8 +2997,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
         // Make the treasure train if there is treasure.
         if (plunder > 0) {
-            List<UnitType> unitTypes = game.getSpecification()
-                .getUnitTypesWithAbility(Ability.CARRY_TREASURE);
+            List<UnitType> unitTypes
+                = spec.getUnitTypesWithAbility(Ability.CARRY_TREASURE);
             UnitType type = Utils.getRandomMember(logger, "Choose train",
                                                   unitTypes, random);
             Unit train = new ServerUnit(game, tile, attackerPlayer, type);
@@ -2959,9 +3006,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
 
         // This is an atrocity.
-        int score = SCORE_SETTLEMENT_DESTROYED;
-        if (settlement.getType().getClaimableRadius() > 1) score *= 2;
-        if (capital) score = (score * 3) / 2;
+        int score = spec.getInteger(GameOptions.DESTROY_SETTLEMENT_SCORE);
         HistoryEvent h = new HistoryEvent(game.getTurn(),
             HistoryEvent.EventType.DESTROY_SETTLEMENT)
             .addStringTemplate("%nation%", nativeNation)

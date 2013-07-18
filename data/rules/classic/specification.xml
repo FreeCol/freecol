@@ -2206,6 +2206,7 @@ resources of 400, lost city rumours of 500
           <integerOption id="model.option.nativeDemands" value="0"/>
           <integerOption id="model.option.rumourDifficulty" value="0"/>
           <integerOption id="model.option.shipTradePenalty" value="-20"/>
+          <integerOption id="model.option.destroySettlementScore" value="-2"/>
           <stringOption  id="model.option.buildOnNativeLand" value="model.option.buildOnNativeLand.always" />
           <rangeOption id="model.option.settlementNumber" defaultValue="10" localizedLabels="true">
             <rangeValue label="verySmall" value="10"/>
@@ -2340,6 +2341,7 @@ resources of 400, lost city rumours of 500
           <integerOption id="model.option.nativeDemands" value="1"/>
           <integerOption id="model.option.rumourDifficulty" value="1"/>
           <integerOption id="model.option.shipTradePenalty" value="-25"/>
+          <integerOption id="model.option.destroySettlementScore" value="-3"/>
           <stringOption  id="model.option.buildOnNativeLand" value="model.option.buildOnNativeLand.first" />
           <rangeOption id="model.option.settlementNumber" defaultValue="8" localizedLabels="true">
             <rangeValue label="verySmall" value="10"/>
@@ -2469,6 +2471,7 @@ resources of 400, lost city rumours of 500
           <integerOption id="model.option.nativeDemands" value="2"/>
           <integerOption id="model.option.rumourDifficulty" value="2"/>
           <integerOption id="model.option.shipTradePenalty" value="-30"/>
+          <integerOption id="model.option.destroySettlementScore" value="-4"/>
           <stringOption  id="model.option.buildOnNativeLand" value="model.option.buildOnNativeLand.firstAndUncontacted" />
           <rangeOption id="model.option.settlementNumber" defaultValue="7" localizedLabels="true">
             <rangeValue label="verySmall" value="10"/>
@@ -2591,6 +2594,7 @@ resources of 400, lost city rumours of 500
           <integerOption id="model.option.nativeDemands" value="3"/>
           <integerOption id="model.option.rumourDifficulty" value="3"/>
           <integerOption id="model.option.shipTradePenalty" value="-35"/>
+          <integerOption id="model.option.destroySettlementScore" value="-5"/>
           <stringOption  id="model.option.buildOnNativeLand" value="model.option.buildOnNativeLand.never" />
           <rangeOption id="model.option.settlementNumber" defaultValue="6" localizedLabels="true">
             <rangeValue label="verySmall" value="10"/>
@@ -2713,6 +2717,7 @@ resources of 400, lost city rumours of 500
           <integerOption id="model.option.nativeDemands" value="4"/>
           <integerOption id="model.option.rumourDifficulty" value="4"/>
           <integerOption id="model.option.shipTradePenalty" value="-40"/>
+          <integerOption id="model.option.destroySettlementScore" value="-6"/>
           <stringOption  id="model.option.buildOnNativeLand" value="model.option.buildOnNativeLand.never" />
           <rangeOption id="model.option.settlementNumber" defaultValue="5" localizedLabels="true">
             <rangeValue label="verySmall" value="10"/>
@@ -2846,6 +2851,7 @@ resources of 400, lost city rumours of 500
           <integerOption id="model.option.nativeDemands" value="4" minimumValue="0" maximumValue="5"/>
           <integerOption id="model.option.rumourDifficulty" value="4" minimumValue="0" maximumValue="4"/>
           <integerOption id="model.option.shipTradePenalty" value="-40" minimumValue="-100" maximumValue="0"/>
+          <integerOption id="model.option.destroySettlementScore" value="-6" minimumValue="-10" maximumValue="0"/>
           <!-- Whether a player can build a colony on native land without
                having to buy/steal the land first. -->
           <stringOption  id="model.option.buildOnNativeLand"
