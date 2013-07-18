@@ -824,7 +824,7 @@ public class InGameControllerTest extends FreeColTestCase {
         assertTrue("Colony should not be disposed",
                    !colony.isDisposed());
         assertTrue("Colony should not have a school",
-                   colony.getBurnableBuildingList().isEmpty());
+                   colony.getBurnableBuildings().isEmpty());
 
         // Attacker pillages, damaging ship
         assertFalse("Colony should not be pillageable",

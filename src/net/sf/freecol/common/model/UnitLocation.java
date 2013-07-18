@@ -211,6 +211,19 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
         return false;
     }
 
+    /**
+     * Gets a list of all naval units here.
+     *
+     * @return A list of naval <code>Unit</code>s present.
+     */
+    public List<Unit> getNavalUnits() {
+        List<Unit> shipList = new ArrayList<Unit>();
+        for (Unit u : getUnitList()) {
+            if (u.isNaval()) shipList.add(u);
+        }
+        return shipList;
+    }
+
 
     // Override FreeColGameObject
 

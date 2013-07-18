@@ -3340,8 +3340,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
         StringTemplate colonyNation = colonyPlayer.getNationName();
 
         // Collect the damagable buildings, ships, movable goods.
-        List<Building> buildingList = colony.getBurnableBuildingList();
-        List<Unit> shipList = colony.getShipList();
+        List<Building> buildingList = colony.getBurnableBuildings();
+        List<Unit> shipList = colony.getTile().getNavalUnits();
         List<Goods> goodsList = colony.getLootableGoodsList();
 
         // Pick one, with one extra choice for stealing gold.

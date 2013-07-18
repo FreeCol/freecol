@@ -167,6 +167,20 @@ public abstract class GoodsLocation extends UnitLocation {
         return goodsContainer.getCompactGoods();
     }
 
+    /**
+     * Adds the goods for n of a piece of equipment to this goods location.
+     *
+     * @param type The <code>EquipmentType</code> to add.
+     * @param n The number of pieces of equipment (may be negative).
+     */
+    public void addEquipmentGoods(EquipmentType type, int n) {
+        for (AbstractGoods ag : type.getRequiredGoods()) {
+            if (ag.getType().isStorable()) {
+                addGoods(ag.getType(), n * ag.getAmount());
+            }
+        }
+    }
+
 
     // Interface Location (from UnitLocation)
     // Inheriting

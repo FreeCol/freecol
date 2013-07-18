@@ -589,8 +589,9 @@ public class SimpleCombatModel extends CombatModel {
                 if (colonyResult == CombatResult.CAPTURE_COLONY
                     || colonyResult == CombatResult.DESTROY_COLONY) {
                     CombatResult shipResult = null;
-                    shipResult = (colony.getShipList().isEmpty()) ? null
-                        : (colony.getShipList().get(0).getRepairLocation() == null)
+                    List<Unit> ships = colony.getTile().getNavalUnits();
+                    shipResult = (ships.isEmpty()) ? null
+                        : (ships.get(0).getRepairLocation() == null)
                         ? CombatResult.SINK_COLONY_SHIPS
                         : CombatResult.DAMAGE_COLONY_SHIPS;
                     if (shipResult != null) crs.add(shipResult);
